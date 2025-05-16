@@ -4,8 +4,8 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { UserPreferences } from '@/types/preferences';
-import { ThemeName, FontSize, FontFamily } from '@/types/theme';
+import { UserPreferences } from '@/types/types';
+import { Theme, FontSize, FontFamily } from '@/types/theme';
 
 interface DisplayPreferencesProps {
   preferences: UserPreferences;
@@ -19,7 +19,7 @@ const DisplayPreferences: React.FC<DisplayPreferencesProps> = ({ preferences, on
         <Label className="text-base">Thème</Label>
         <RadioGroup
           value={preferences.theme}
-          onValueChange={(value: ThemeName) => 
+          onValueChange={(value: Theme) => 
             onChange({ theme: value })
           }
           className="flex flex-col space-y-2"

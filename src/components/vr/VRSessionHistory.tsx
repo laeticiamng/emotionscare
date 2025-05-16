@@ -38,17 +38,26 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="font-medium">
-                      {session.template?.title || 'Session'}
+                      {session.templateId || 'Session'}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {formatDate(session.start_time || session.startTime || session.date)}
+                      {formatDate(
+                        session.startedAt || 
+                        (session.start_time ?? session.startTime) || 
+                        session.date || 
+                        new Date()
+                      )}
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className={`px-2 py-1 rounded text-xs ${session.completed || session.isCompleted ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100'}`}>
-                      {session.completed || session.isCompleted ? 'Completed' : 'In progress'}
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      session.completed ? 
+                        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : 
+                        'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100'
+                    }`}>
+                      {session.completed ? 'Completed' : 'In progress'}
                     </span>
-                    {session.rating && (
+                    {session.rating !== undefined && (
                       <p className="text-xs text-muted-foreground mt-1">
                         Rating: {session.rating}/5
                       </p>

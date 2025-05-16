@@ -21,6 +21,21 @@ export interface VRSessionTemplate {
   audio_url?: string;
   preview_url?: string;
   lastUsed?: Date;
+  
+  // Properties used in VRTemplateDetail and other components
+  thumbnailUrl?: string;
+  imageUrl?: string;
+  coverUrl?: string;
+  cover_url?: string;
+  emotion?: string;
+  theme?: string;
+  emotionTarget?: string;
+  emotion_target?: string;
+  completionRate?: number;
+  completion_rate?: number;
+  recommendedMood?: string;
+  recommended_mood?: string;
+  environment?: string;
 }
 
 export interface VRSession {
@@ -42,6 +57,20 @@ export interface VRSession {
   };
   notes?: string;
   completed?: boolean;
+  
+  // Additional properties needed by VRSessionHistory and VRSessionStats
+  template?: VRSessionTemplate;
+  start_time?: Date;
+  startTime?: Date;
+  date?: string;
+  isCompleted?: boolean;
+  rating?: number;
+  emotionBefore?: string;
+  emotionAfter?: string;
+  heart_rate_before?: number;
+  heartRateBefore?: number;
+  heart_rate_after?: number;
+  heartRateAfter?: number;
 }
 
 export interface VRHistoryListProps {
@@ -60,10 +89,18 @@ export interface VRSessionHistoryProps {
 export interface VRSessionWithMusicProps {
   session: VRSessionTemplate;
   onComplete?: (feedback: { rating: number; comment: string }) => void;
+  // Additional properties
+  sessionId?: string;
+  title?: string;
+  description?: string;
+  duration?: number;
+  environment?: string;
+  musicTrackId?: string;
 }
 
 export interface VRTemplateGridProps {
   templates: VRSessionTemplate[];
   onSelect: (template: VRSessionTemplate) => void;
   filter?: string;
+  emotion?: string;
 }

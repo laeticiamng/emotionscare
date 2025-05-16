@@ -4,6 +4,8 @@ import { Card } from '@/components/ui/card';
 import { VRSessionWithMusicProps } from '@/types';
 
 const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
+  session,
+  onComplete,
   sessionId,
   title = "Session VR immersive",
   description = "Une expérience VR avec accompagnement musical",

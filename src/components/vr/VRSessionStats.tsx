@@ -45,10 +45,12 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
       ? new Date(session.startedAt) 
       : session.startedAt;
       
-    if (session.completed && (session.endedAt || session.end_time)) {
-      const endDate = session.endedAt 
-        ? (typeof session.endedAt === 'string' ? new Date(session.endedAt) : session.endedAt)
-        : (typeof session.end_time === 'string' ? new Date(session.end_time) : session.end_time);
+    if (session.completed && (session.completedAt || session.endedAt || session.end_time)) {
+      const endDate = session.completedAt 
+        ? (typeof session.completedAt === 'string' ? new Date(session.completedAt) : session.completedAt)
+        : session.endedAt 
+          ? (typeof session.endedAt === 'string' ? new Date(session.endedAt) : session.endedAt)
+          : (typeof session.end_time === 'string' ? new Date(session.end_time) : session.end_time);
       
       if (endDate) {
         const durationMs = endDate.getTime() - startDate.getTime();
@@ -69,6 +71,9 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
       </Card>
     );
   }
+
+  const heartRateBefore = session.heartRateBefore || session.heart_rate_before;
+  const heartRateAfter = session.heartRateAfter || session.heart_rate_after;
 
   return (
     <Card className={className}>
@@ -93,75 +98,71 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
                 <p className="text-sm text-muted-foreground">{formatDate(session.startedAt)}</p>
               </div>
             </div>
-
-            {(session.heart_rate_before || session.heartRateBefore) && (
-              <div className="flex items-center space-x-2">
-                <Heart className="h-5 w-5 text-rose-500" />
-                <div>
-                  <p className="text-sm font-medium">Fréquence cardiaque initiale</p>
-                  <p className="text-sm text-muted-foreground">
-                    {session.heart_rate_before || session.heartRateBefore} bpm
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {(session.heart_rate_after || session.heartRateAfter) && (
-              <div className="flex items-center space-x-2">
-                <Heart className="h-5 w-5 text-emerald-500" />
-                <div>
-                  <p className="text-sm font-medium">Fréquence cardiaque finale</p>
-                  <p className="text-sm text-muted-foreground">
-                    {session.heart_rate_after || session.heartRateAfter} bpm
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {session.rating !== undefined && (
-              <div className="flex items-center space-x-2">
-                <Star className="h-5 w-5 text-amber-500" />
-                <div>
-                  <p className="text-sm font-medium">Notation</p>
-                  <p className="text-sm text-muted-foreground">{session.rating} / 5</p>
-                </div>
-              </div>
-            )}
           </div>
-
-          {session.notes && (
-            <div className="pt-2">
-              <div className="flex items-center space-x-2 mb-1">
-                <FileText className="h-5 w-5 text-blue-500" />
-                <p className="text-sm font-medium">Notes</p>
-              </div>
-              <div className="bg-muted p-3 rounded-md">
-                <p className="text-sm whitespace-pre-wrap">{session.notes}</p>
+          
+          {(heartRateBefore !== undefined) && (
+            <div className="flex items-center space-x-2">
+              <Heart className="h-5 w-5 text-red-500" />
+              <div>
+                <p className="text-sm font-medium">Rythme cardiaque avant</p>
+                <p className="text-sm text-muted-foreground">{heartRateBefore} BPM</p>
               </div>
             </div>
           )}
-
+          
+          {(heartRateAfter !== undefined) && (
+            <div className="flex items-center space-x-2">
+              <Heart className="h-5 w-5 text-green-500" />
+              <div>
+                <p className="text-sm font-medium">Rythme cardiaque après</p>
+                <p className="text-sm text-muted-foreground">{heartRateAfter} BPM</p>
+              </div>
+            </div>
+          )}
+          
+          {(session.rating !== undefined) && (
+            <div className="flex items-center space-x-2">
+              <Star className="h-5 w-5 text-yellow-500" />
+              <div>
+                <p className="text-sm font-medium">Évaluation</p>
+                <div className="flex">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star 
+                      key={i} 
+                      className={`h-4 w-4 ${i < (session.rating || 0) ? 'fill-yellow-500 text-yellow-500' : 'text-muted'}`} 
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+          
           {session.feedback && (
-            <div className="pt-2">
-              <div className="flex items-center space-x-2 mb-1">
-                <FileText className="h-5 w-5 text-purple-500" />
+            <div className="flex items-start space-x-2">
+              <FileText className="h-5 w-5 text-muted-foreground mt-1" />
+              <div>
                 <p className="text-sm font-medium">Feedback</p>
-              </div>
-              <div className="bg-muted p-3 rounded-md">
-                <p className="text-sm whitespace-pre-wrap">{session.feedback}</p>
+                <p className="text-sm text-muted-foreground">
+                  {typeof session.feedback === 'string' ? session.feedback : JSON.stringify(session.feedback)}
+                </p>
               </div>
             </div>
           )}
-
-          {session.emotionBefore && session.emotionAfter && (
-            <div className="grid grid-cols-2 gap-4 pt-2">
-              <div>
-                <p className="text-sm font-medium">Émotion initiale</p>
-                <p className="text-sm text-muted-foreground capitalize">{session.emotionBefore}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium">Émotion finale</p>
-                <p className="text-sm text-muted-foreground capitalize">{session.emotionAfter}</p>
+          
+          {(session.emotionBefore || session.emotionAfter) && (
+            <div className="border-t pt-4 mt-4">
+              <p className="text-sm font-medium mb-3">Évolution émotionnelle</p>
+              
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div className="p-2 rounded-md bg-muted/50">
+                  <p className="text-xs text-muted-foreground">Avant</p>
+                  <p className="font-medium capitalize">{session.emotionBefore || "N/A"}</p>
+                </div>
+                
+                <div className="p-2 rounded-md bg-muted/50">
+                  <p className="text-xs text-muted-foreground">Après</p>
+                  <p className="font-medium capitalize">{session.emotionAfter || "N/A"}</p>
+                </div>
               </div>
             </div>
           )}

@@ -2,7 +2,7 @@
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large';
 export type FontFamily = 'inter' | 'system' | 'serif' | 'mono' | 'rounded' | 'sans' | 'sans-serif' | 'monospace';
-export type PrivacyLevel = 'strict' | 'balanced' | 'relaxed';
+export type PrivacyLevel = 'strict' | 'balanced' | 'relaxed' | string;
 export type Theme = ThemeName;
 
 export interface NotificationPreference {

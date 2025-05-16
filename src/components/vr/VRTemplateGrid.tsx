@@ -9,17 +9,30 @@ interface VRTemplateGridProps {
   templates: VRSessionTemplate[];
   onSelect: (template: VRSessionTemplate) => void;
   emotion?: string;
+  filter?: string;
 }
 
 const VRTemplateGrid: React.FC<VRTemplateGridProps> = ({
   templates,
   onSelect,
-  emotion
+  emotion,
+  filter
 }) => {
-  const filteredTemplates = emotion 
+  // Filter templates by emotion if provided
+  let filteredTemplates = emotion 
     ? templates.filter(t => t.emotionTarget === emotion || !t.emotionTarget)
     : templates;
     
+  // Further filter by search term if provided
+  if (filter && filter.trim() !== '') {
+    const searchTerm = filter.toLowerCase();
+    filteredTemplates = filteredTemplates.filter(t => 
+      t.title?.toLowerCase().includes(searchTerm) || 
+      t.description?.toLowerCase().includes(searchTerm) ||
+      t.tags?.some(tag => tag.toLowerCase().includes(searchTerm))
+    );
+  }
+  
   if (filteredTemplates.length === 0) {
     return (
       <div className="text-center p-8">

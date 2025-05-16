@@ -2,6 +2,7 @@
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large';
 export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'inter' | 'sans-serif' | 'monospace';
+export type ThemeName = Theme;
 
 export interface ThemeContextType {
   theme: Theme;
@@ -18,4 +19,9 @@ export interface ThemeOption {
   name: string;
   value: Theme;
   preview: string;
+}
+
+export interface ThemeSettingsTabProps {
+  currentTheme: Theme;
+  onThemeChange: (theme: Theme) => void;
 }
