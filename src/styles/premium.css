@@ -1,22 +1,60 @@
 
-/* Premium styles */
+/* Import glass styles */
+@import './glass.css';
+
+/* Premium UI elements */
 @layer components {
-  /* Premium card styles */
   .premium-card {
-    @apply rounded-xl transition-all duration-300;
+    @apply rounded-xl shadow-lg overflow-hidden transition-all;
   }
   
-  /* Glassmorphism effects */
-  .glass {
-    @apply backdrop-blur-lg border;
+  .premium-button {
+    @apply rounded-full px-6 py-2 font-medium transition-all;
   }
   
-  /* Interactive elements */
-  .interactive-element {
-    @apply transition-all duration-300;
+  .premium-input {
+    @apply rounded-lg border-2 focus:ring-2 focus:ring-offset-2 transition-all;
   }
   
-  .interactive-element:hover {
-    @apply transform -translate-y-1;
+  .premium-dashboard-section {
+    @apply p-6 rounded-2xl;
   }
+  
+  .premium-gradient-bg {
+    @apply bg-gradient-to-br;
+  }
+}
+
+/* Premium animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.float-animation {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes pulse-premium {
+  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+
+.pulse-premium {
+  animation: pulse-premium 2s infinite;
+}
+
+/* Premium gradients */
+.premium-gradient-blue {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+}
+
+.premium-gradient-purple {
+  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+}
+
+.premium-gradient-green {
+  background: linear-gradient(135deg, #34d399, #10b981);
 }

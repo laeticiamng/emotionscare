@@ -1,12 +1,17 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { GamificationStats } from '@/types/gamification';
 
 interface GamificationSummaryCardProps {
   stats: Partial<GamificationStats>;
+  gamificationData?: GamificationStats;
 }
 
-export const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({ stats }) => {
+export const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({ stats, gamificationData }) => {
+  // Use gamificationData if provided, otherwise use stats
+  const data = gamificationData || stats;
+  
   return (
     <Card>
       <CardHeader>
@@ -16,20 +21,22 @@ export const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = (
       <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <div className="text-2xl font-medium">Badges</div>
-          <div className="text-3xl font-bold">{stats.badges?.length || 0}</div>
+          <div className="text-3xl font-bold">{data.badges?.length || data.totalBadges || 0}</div>
           <div className="text-muted-foreground text-sm">Total de badges débloqués</div>
         </div>
         <div>
           <div className="text-2xl font-medium">Engagement</div>
-          <div className="text-3xl font-bold">{stats.activeUsersPercent || 85}%</div>
+          <div className="text-3xl font-bold">{data.activeUsersPercent || 85}%</div>
           <div className="text-muted-foreground text-sm">Utilisateurs actifs</div>
         </div>
         <div>
           <div className="text-2xl font-medium">Complétion</div>
-          <div className="text-3xl font-bold">{stats.completionRate || 72}%</div>
+          <div className="text-3xl font-bold">{data.completionRate || 72}%</div>
           <div className="text-muted-foreground text-sm">Taux de complétion des défis</div>
         </div>
       </CardContent>
     </Card>
   );
 };
+
+export default GamificationSummaryCard;

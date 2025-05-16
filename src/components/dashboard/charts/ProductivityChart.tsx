@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -7,9 +8,10 @@ import { ChartInteractiveLegend } from '@/components/ui/chart/ChartInteractiveLe
 
 interface ProductivityChartProps {
   className?: string;
+  data?: Array<{ date: string; value: number }>;
 }
 
-const data = [
+const defaultData = [
   { date: '01/01', series1: 400, series2: 240 },
   { date: '01/08', series1: 300, series2: 139 },
   { date: '01/15', series1: 200, series2: 980 },
@@ -25,7 +27,7 @@ const CustomTooltip: React.FC = () => {
   );
 };
 
-export const ProductivityChart: React.FC<ProductivityChartProps> = ({ className }) => {
+export const ProductivityChart: React.FC<ProductivityChartProps> = ({ className, data }) => {
   const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
 
   const handleToggleSeries = (dataKey: string, isHidden: boolean) => {
@@ -40,7 +42,7 @@ export const ProductivityChart: React.FC<ProductivityChartProps> = ({ className 
       </CardHeader>
       <CardContent className="pl-2">
         <ResponsiveContainer width="100%" height={300}>
-          <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <AreaChart data={data || defaultData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" />
             <YAxis />
@@ -53,7 +55,7 @@ export const ProductivityChart: React.FC<ProductivityChartProps> = ({ className 
               stroke="#8884d8"
               fill="#8884d8"
               name="Série 1"
-              hidden={hiddenSeries.includes('series1')}
+              hide={hiddenSeries.includes('series1')}
             />
             <Area
               type="monotone"
@@ -61,7 +63,7 @@ export const ProductivityChart: React.FC<ProductivityChartProps> = ({ className 
               stroke="#82ca9d"
               fill="#82ca9d"
               name="Série 2"
-              hidden={hiddenSeries.includes('series2')}
+              hide={hiddenSeries.includes('series2')}
             />
           </AreaChart>
         </ResponsiveContainer>
@@ -77,3 +79,5 @@ export const ProductivityChart: React.FC<ProductivityChartProps> = ({ className 
     </Card>
   );
 };
+
+export default ProductivityChart;

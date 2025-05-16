@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ChartLine, BarChart2, BarChartHorizontal } from 'lucide-react';
-import AbsenteeismChart from './AbsenteeismChart';
-import ProductivityChart from './ProductivityChart';
+import { AbsenteeismChart } from './AbsenteeismChart';
+import { ProductivityChart } from './ProductivityChart';
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { ZoomableChart } from '@/components/ui/chart/ZoomableChart';

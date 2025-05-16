@@ -1,87 +1,90 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { LeaderboardEntry } from '@/types/gamification';
-import { TrendingUp, TrendingDown, Minus, Crown } from 'lucide-react';
+import { ChevronRight, TrendingDown, TrendingUp, Minus } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface LeaderboardWidgetProps {
   entries: LeaderboardEntry[];
-  className?: string;
   title?: string;
-  showAvatar?: boolean;
+  showSeeAll?: boolean;
+  onSeeAll?: () => void;
 }
 
-export const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = ({
-  entries,
-  className = '',
-  title = 'Classement',
-  showAvatar = true
+const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = ({ 
+  entries, 
+  title = 'Classement', 
+  showSeeAll = false, 
+  onSeeAll 
 }) => {
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase();
-  };
-
-  const getTrendIcon = (entry: LeaderboardEntry) => {
-    if (!entry.trend) return <Minus className="h-4 w-4 text-muted-foreground" />;
-    
-    if (entry.trend === 'up') {
-      return <TrendingUp className="h-4 w-4 text-green-500" />;
-    } else if (entry.trend === 'down') {
-      return <TrendingDown className="h-4 w-4 text-red-500" />;
-    } else {
-      return <Minus className="h-4 w-4 text-muted-foreground" />;
-    }
-  };
-
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle className="text-lg">{title}</CardTitle>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-lg font-medium">{title}</CardTitle>
+        {showSeeAll && onSeeAll && (
+          <Button variant="ghost" size="sm" onClick={onSeeAll} className="h-8 px-2">
+            Tout voir <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        )}
       </CardHeader>
-      <CardContent className="px-2">
-        <div className="space-y-1">
-          {entries.map((entry, index) => (
-            <div
-              key={entry.id}
-              className={`flex items-center p-2 rounded-md ${
-                entry.isCurrentUser ? 'bg-primary/10' : index % 2 === 0 ? 'bg-muted/50' : ''
-              }`}
-            >
-              <div className="w-6 font-medium text-center">
-                {index === 0 ? (
-                  <Crown className="h-5 w-5 text-amber-500 mx-auto" />
-                ) : (
-                  <span>{index + 1}</span>
-                )}
-              </div>
-              
-              {showAvatar && (
-                <Avatar className="h-8 w-8 ml-2">
+      <CardContent>
+        {entries.length === 0 ? (
+          <div className="text-center py-6 text-muted-foreground">
+            Aucun classement disponible
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {entries.map((entry) => (
+              <div 
+                key={entry.id} 
+                className={`flex items-center p-2 rounded-lg ${
+                  entry.isCurrentUser ? 'bg-muted/40' : ''
+                }`}
+              >
+                <div className="w-8 text-center font-bold">
+                  {entry.rank}.
+                </div>
+                
+                <Avatar className="h-8 w-8 mr-3">
                   {entry.avatar ? (
                     <AvatarImage src={entry.avatar} alt={entry.name} />
-                  ) : (
-                    <AvatarFallback>{getInitials(entry.name)}</AvatarFallback>
-                  )}
+                  ) : null}
+                  <AvatarFallback>{entry.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                 </Avatar>
-              )}
-              
-              <div className="ml-3 flex-1">
-                <p className={`text-sm font-medium ${entry.isCurrentUser ? 'text-primary' : ''}`}>
-                  {entry.name}
-                </p>
+                
+                <div className="flex-1 min-w-0">
+                  <p className={`font-medium truncate ${entry.isCurrentUser ? 'text-primary' : ''}`}>
+                    {entry.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Niveau {entry.level}
+                  </p>
+                </div>
+                
+                <div className="text-right">
+                  <p className="font-medium">{entry.points} pts</p>
+                  <div className="flex items-center justify-end text-xs">
+                    {entry.trend === 'up' ? (
+                      <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
+                    ) : entry.trend === 'down' ? (
+                      <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
+                    ) : (
+                      <Minus className="h-3 w-3 mr-1" />
+                    )}
+                    <span className={
+                      entry.trend === 'up' ? 'text-green-500' : 
+                      entry.trend === 'down' ? 'text-red-500' : ''
+                    }>
+                      {entry.trend === 'up' ? '+' : entry.trend === 'down' ? '-' : ''}
+                    </span>
+                  </div>
+                </div>
               </div>
-              
-              <div className="text-sm font-medium">{entry.points} pts</div>
-              
-              <div className="ml-2">{getTrendIcon(entry)}</div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

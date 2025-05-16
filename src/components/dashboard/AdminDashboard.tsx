@@ -1,209 +1,116 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Tabs, TabsContent } from "@/components/ui";
-import { fetchReports } from '@/lib/dashboardService';
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import PeriodSelector from '@/components/dashboard/admin/PeriodSelector';
-import AdminChartSection from '@/components/dashboard/admin/AdminChartSection';
-import EmotionalClimateCard from '@/components/dashboard/admin/EmotionalClimateCard';
-import SocialCocoonCard from '@/components/dashboard/admin/SocialCocoonCard';
-import GamificationSummaryCard from '@/components/dashboard/admin/GamificationSummaryCard';
-import { GamificationStats } from '@/types/gamification';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  BarChart3, 
+  Users, 
+  Clock, 
+  Calendar, 
+  TrendingUp, 
+  Heart, 
+  Activity 
+} from 'lucide-react';
+import DraggableKpiCardsGrid from './admin/draggable/DraggableKpiCardsGrid';
+import AdminTabContents from './admin/AdminTabContents';
+import { Button } from '@/components/ui/button';
+import { DraggableCardProps } from '@/types/widgets';
 
 const AdminDashboard: React.FC = () => {
-  const { user } = useAuth();
-  const [absenteeismData, setAbsenteeismData] = useState<Array<{ date: string; value: number }>>([]);
-  const [productivityData, setProductivityData] = useState<Array<{ date: string; value: number }>>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [timePeriod, setTimePeriod] = useState<string>('7');
-
-  // Mock data for Social Cocoon section
-  const socialCocoonData = {
-    totalPosts: 248,
-    moderationRate: 3.2, // Changed from blockedPercentage to moderationRate
-    topHashtags: [
-      { tag: '#bienetre', count: 42 },
-      { tag: '#entraide', count: 36 },
-      { tag: '#motivation', count: 31 },
-      { tag: '#teamspirit', count: 28 },
-      { tag: '#pausecafe', count: 22 }
-    ]
-  };
-
-  // Mock data for gamification section
-  const stats: GamificationStats = {
-    points: 0,
-    level: 1,
-    badges: [],
-    streak: 0,
-    completedChallenges: 0,
-    totalChallenges: 0,
-    challenges: [],
-    progress: 45,
-    leaderboard: [],
-    
-    // Additional properties required by components
-    totalBadges: 24,
-    activeUsersPercent: 68,
-    completionRate: 65,
-    topChallenges: [
-      { 
-        id: "challenge-1", 
-        title: "Méditation quotidienne", 
-        name: "Méditation quotidienne", 
-        completions: 89,
-        description: "Méditez tous les jours pendant une semaine",
-        points: 100,
-        progress: 0,
-        completed: false,
-        category: "daily",
-        goal: 7,
-        total: 7
+  // KPI Card data
+  const kpiCards: DraggableCardProps[] = [
+    {
+      id: 'activeUsers',
+      title: 'Utilisateurs actifs',
+      value: '1,234',
+      icon: <Users className="h-4 w-4" />,
+      delta: {
+        value: 12,
+        trend: 'up',
+        label: 'vs last week'
       },
-      { 
-        id: "challenge-2", 
-        title: "Journal émotionnel", 
-        name: "Journal émotionnel", 
-        completions: 76,
-        description: "Complétez votre journal pendant 5 jours consécutifs",
-        points: 150,
-        progress: 0,
-        completed: false,
-        category: "weekly",
-        goal: 5,
-        total: 5
-      },
-      { 
-        id: "challenge-3", 
-        title: "Scan émotionnel", 
-        name: "Scan émotionnel", 
-        completions: 45,
-        description: "Effectuez 3 scans émotionnels en une semaine",
-        points: 120,
-        progress: 0,
-        completed: false,
-        category: "special",
-        goal: 3,
-        total: 3
+      subtitle: 'Utilisateurs uniques',
+      status: 'success'
+    },
+    {
+      id: 'totalSessions',
+      title: 'Sessions totales',
+      value: '5,678',
+      icon: <Calendar className="h-4 w-4" />,
+      delta: {
+        value: 8,
+        trend: 'up'
       }
-    ],
-    badgeLevels: [
-      { level: "Bronze", count: 120 },
-      { level: "Silver", count: 68 },
-      { level: "Gold", count: 23 }
-    ]
-  };
-
-  // Update challenge definitions to include status
-  const challenges = [
-    {
-      id: "1",
-      title: "Méditation quotidienne",
-      name: "Méditation quotidienne",
-      description: "Faites 10 minutes de méditation chaque jour cette semaine",
-      points: 50,
-      progress: 65,
-      completed: false,
-      completions: 45,
-      category: "daily",
-      goal: 100,
-      total: 150,
-      status: "active" as const
     },
     {
-      id: "2",
-      title: "Journal émotionnel",
-      name: "Journal émotionnel",
-      description: "Complétez votre journal émotionnel 5 jours de suite",
-      points: 100,
-      progress: 40,
-      completed: false,
-      completions: 32,
-      category: "weekly",
-      goal: 50,
-      total: 125,
-      status: "active" as const
+      id: 'avgDuration',
+      title: 'Durée moyenne',
+      value: '12:34',
+      icon: <Clock className="h-4 w-4" />,
+      delta: {
+        value: 3,
+        trend: 'down'
+      },
+      status: 'warning'
     },
     {
-      id: "3",
-      title: "Scan bien-être",
-      name: "Scan bien-être",
-      description: "Réalisez 3 scans bien-être cette semaine",
-      points: 75,
-      progress: 90,
-      completed: false,
-      completions: 67,
-      category: "special",
-      goal: 75,
-      total: 80,
-      status: "active" as const
+      id: 'completionRate',
+      title: 'Taux de complétion',
+      value: '87%',
+      icon: <BarChart3 className="h-4 w-4" />,
+      delta: {
+        value: 5,
+        trend: 'up'
+      }
+    },
+    {
+      id: 'weeklyTrend',
+      title: 'Tendance hebdo',
+      value: '+23%',
+      icon: <TrendingUp className="h-4 w-4" />,
+      delta: {
+        value: 15,
+        trend: 'up'
+      },
+      status: 'success'
+    },
+    {
+      id: 'emotionalBalance',
+      title: 'Score émotionnel',
+      value: '72/100',
+      icon: <Heart className="h-4 w-4" />,
+      delta: {
+        value: 4,
+        trend: 'up'
+      }
     }
   ];
 
-  // Update badgeLevels to use the correct type
-  const badgeLevels = [
-    { level: "bronze", count: 245 },
-    { level: "silver", count: 120 },
-    { level: "gold", count: 45 }
-  ];
-
-  useEffect(() => {
-    async function loadDashboardData() {
-      try {
-        setIsLoading(true);
-        
-        // Load reports data
-        const reportsData = await fetchReports(['absenteeism', 'productivity'], parseInt(timePeriod));
-        
-        setAbsenteeismData(reportsData.absenteeism || []);
-        setProductivityData(reportsData.productivity || []);
-      } catch (error) {
-        console.error("Erreur lors du chargement des données:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    
-    loadDashboardData();
-  }, [timePeriod]);
-  
   return (
-    <div className="max-w-7xl mx-auto">
-      {/* Hero Section with Period Selector */}
-      <div className="mb-10 animate-fade-in">
-        <div className="flex flex-col md:flex-row items-start justify-between">
-          <div>
-            <h1 className="text-4xl font-light">Tableau de bord <span className="font-semibold">Direction</span></h1>
-            <h2 className="text-xl text-muted-foreground mt-2">
-              Métriques globales et anonymisées
-            </h2>
-          </div>
-          <PeriodSelector timePeriod={timePeriod} setTimePeriod={setTimePeriod} />
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Dashboard Admin</h1>
+        <div className="flex gap-2">
+          <Button variant="outline">Télécharger rapport</Button>
+          <Button>Nouvelle notification</Button>
         </div>
       </div>
-      
-      {/* Main Content */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Charts Section */}
-        <AdminChartSection 
-          absenteeismData={absenteeismData} 
-          productivityData={productivityData}
-        />
+
+      {/* KPI Cards Section */}
+      <section className="mb-8">
+        <DraggableKpiCardsGrid cards={kpiCards} />
+      </section>
+
+      {/* Tabs Section */}
+      <Tabs defaultValue="global" className="space-y-4">
+        <TabsList className="grid grid-cols-4 mb-4">
+          <TabsTrigger value="global">Vue globale</TabsTrigger>
+          <TabsTrigger value="emotions">Émotions</TabsTrigger>
+          <TabsTrigger value="activity">Activité</TabsTrigger>
+          <TabsTrigger value="teams">Équipes</TabsTrigger>
+        </TabsList>
         
-        {/* Emotional Climate Overview */}
-        <EmotionalClimateCard emotionalScoreTrend={[
-          { date: '1/5', value: 72 },
-          { date: '2/5', value: 75 },
-          { date: '3/5', value: 78 },
-          { date: '4/5', value: 80 }
-        ]} />
-        
-        {/* Social Cocoon Analytics */}
-        <SocialCocoonCard socialStats={socialCocoonData} />
-        
-        {/* Gamification Summary */}
-        <GamificationSummaryCard gamificationData={stats} />
-      </div>
+        <AdminTabContents />
+      </Tabs>
     </div>
   );
 };

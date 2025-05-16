@@ -13,7 +13,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
+import { ChallengeStatus } from "@/types/gamification";
 
 const AdminTabContents: React.FC = () => {
   const totalUsers = 1250;
@@ -34,7 +35,7 @@ const AdminTabContents: React.FC = () => {
       category: "daily",
       goal: 100,
       total: 150,
-      status: "upcoming" as const
+      status: "upcoming" as ChallengeStatus
     },
     {
       id: "2",
@@ -48,7 +49,7 @@ const AdminTabContents: React.FC = () => {
       category: "weekly",
       goal: 75,
       total: 100,
-      status: "upcoming" as const
+      status: "upcoming" as ChallengeStatus
     },
     {
       id: "3",
@@ -62,7 +63,7 @@ const AdminTabContents: React.FC = () => {
       category: "monthly",
       goal: 50,
       total: 75,
-      status: "upcoming" as const
+      status: "upcoming" as ChallengeStatus
     }
   ];
 

@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Trophy } from 'lucide-react';
-import GamificationSummaryCard from '../GamificationSummaryCard';
+import { GamificationSummaryCard } from '../GamificationSummaryCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GamificationStats, Challenge } from '@/types/gamification';
 

@@ -1,26 +1,16 @@
 
-export type UserRole = 'user' | 'b2c' | 'b2b_user' | 'b2b_admin';
+export type UserRole = 'user' | 'admin' | 'b2b_user' | 'b2b_admin' | 'b2b-user' | 'b2b-admin' | 'collaborator' | 'b2c';
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
-  role?: UserRole;
+  role: UserRole;
   created_at: string;
-  preferences?: {
-    theme: string;
-    fontSize: string;
-    fontFamily: string;
-    reduceMotion: boolean;
-    colorBlindMode: boolean;
-    autoplayMedia: boolean;
-    soundEnabled: boolean;
-    notifications: {
-      email: boolean;
-      push: boolean;
-      sms: boolean;
-      frequency: string;
-    }
-  };
+  updated_at?: string;
+  avatar?: string;
+  company_id?: string;
+  department?: string;
+  position?: string;
+  settings?: Record<string, any>;
 }

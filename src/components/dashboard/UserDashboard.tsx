@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Challenge, GamificationStats } from '@/types/gamification';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,6 +12,7 @@ import LeaderboardWidget from '@/components/dashboard/widgets/LeaderboardWidget'
 import BadgesWidget from '@/components/dashboard/widgets/BadgesWidget';
 import DailyInsightCard from '@/components/dashboard/widgets/DailyInsightCard';
 import QuickActionLinks from '@/components/dashboard/widgets/QuickActionLinks';
+import { normalizeBadges, visibleBadges } from '@/utils/badgeUtils';
 
 const { 
   PopularSessionsSection, 
@@ -19,6 +21,8 @@ const {
 } = UserDashboardSections;
 
 const UserDashboard: React.FC = () => {
+  const navigate = useNavigate();
+  
   // Mock data for dashboard
   const userChallenges = [
     {
@@ -238,7 +242,7 @@ const UserDashboard: React.FC = () => {
             </Card>
             <BadgesWidget 
               badges={normalizeBadges(visibleBadges)}
-              showSeeAll={userBadges.length > 3}
+              showSeeAll={true}
               onSeeAll={() => navigate('/gamification')}
             />
           </div>
@@ -255,7 +259,7 @@ const UserDashboard: React.FC = () => {
               </CardContent>
             </Card>
             <LeaderboardWidget 
-              leaderboard={leaderboard}
+              entries={leaderboard}
               title="Classement"
               showSeeAll={true}
               onSeeAll={() => console.log('View all leaderboard')} 
