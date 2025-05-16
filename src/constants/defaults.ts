@@ -9,6 +9,14 @@ export enum TimeOfDay {
 // Add DEFAULT_THEME constant
 export const DEFAULT_THEME = 'light';
 
+// Add the missing DEFAULT_WELCOME_MESSAGES export
+export const DEFAULT_WELCOME_MESSAGES = {
+  morning: "Bonjour ! Comment vous sentez-vous ce matin ?",
+  afternoon: "Bon après-midi ! Comment se passe votre journée ?",
+  evening: "Bonsoir ! Comment s'est passée votre journée ?",
+  night: "Bonne soirée ! Comment vous sentez-vous avant de vous reposer ?"
+};
+
 export const DEFAULT_PREFERENCES = {
   theme: 'system',
   fontSize: 'medium',
