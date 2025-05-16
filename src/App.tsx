@@ -1,33 +1,21 @@
 
-import React, { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
-import { Toaster } from '@/components/ui/toaster';
-import { Toaster as SonnerToaster } from 'sonner';
-import { MusicProvider } from '@/contexts/music/MusicContext';
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import LandingPage from './pages/LandingPage';
 import { DEFAULT_THEME } from './constants/defaults';
+import NotFoundPage from './pages/NotFoundPage';
+import { useAuth } from './contexts/AuthContext';
 
-const App = () => {
-  // Apply default theme and load preferences from localStorage
-  useEffect(() => {
-    const theme = localStorage.getItem('theme') || DEFAULT_THEME;
-    const root = window.document.documentElement;
-
-    // Remove all theme classes
-    root.classList.remove('light', 'dark', 'system', 'pastel');
-    // Add current theme class
-    root.classList.add(theme);
-  }, []);
-
+const App: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+  
   return (
-    <>
-      <MusicProvider>
-        <Outlet />
-      </MusicProvider>
-
-      {/* UI Notifications */}
-      <Toaster />
-      <SonnerToaster position="bottom-right" expand={true} richColors />
-    </>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   );
 };
 

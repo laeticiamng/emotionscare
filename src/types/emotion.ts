@@ -15,6 +15,9 @@ export interface EmotionResult {
   text?: string;
   feedback?: string; // Use feedback instead of ai_feedback
   timestamp?: string;
+  emojis?: string[];
+  recommendations?: string[];
+  triggers?: string[];
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -25,6 +28,9 @@ export interface EnhancedEmotionResult extends EmotionResult {
 export interface EmotionalTeamViewProps {
   teamId?: string;
   period?: string;
+  userId?: string;
+  anonymized?: boolean;
+  className?: string;
 }
 
 export interface LiveVoiceScannerProps {

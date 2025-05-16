@@ -27,7 +27,8 @@ export const DEFAULT_PREFERENCES = {
     // Add missing properties for UserDetailView
     showProfile: true,
     shareActivity: true,
-    allowMessages: true
+    allowMessages: true,
+    allowNotifications: true
   },
   notifications: {
     email: true,

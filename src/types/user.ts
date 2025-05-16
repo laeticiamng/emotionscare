@@ -1,6 +1,6 @@
 
 // User related types
-export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | string;
+export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin' | string;
 
 export interface User {
   id: string;
@@ -36,6 +36,7 @@ export interface UserPreferences {
     showProfile?: boolean; // Add showProfile property
     shareActivity?: boolean; // Add shareActivity property
     allowMessages?: boolean; // Add allowMessages property
+    allowNotifications?: boolean; // Add allowNotifications property
   };
   notifications?: {
     email?: boolean;
@@ -82,5 +83,5 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<User | null>;
   logout: () => Promise<void>;
   clearError: () => void;
-  updateUser?: (userData: Partial<User>) => Promise<void>; // Make sure updateUser is defined
+  updateUser: (userData: Partial<User>) => Promise<void>; // Make sure updateUser is defined
 }

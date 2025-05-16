@@ -41,7 +41,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         email: email,
         role: 'b2c',
         avatar_url: '/avatars/default.png',
-        created_at: new Date().toISOString()
+        avatar: '/avatars/default.png', // Add avatar property
+        created_at: new Date().toISOString(),
+        joined_at: new Date().toISOString(), // Add joined_at
+        department: 'Marketing', // Add department
+        position: 'Manager', // Add position
+        onboarded: true // Add onboarded
       };
       
       setUser(userData);
