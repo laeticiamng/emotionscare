@@ -1,4 +1,5 @@
 
+
 // Types for music functionality
 export interface MusicTrack {
   id: string;
@@ -132,3 +133,4 @@ export interface TrackInfoProps {
   className?: string;
   showCover?: boolean;
 }
+

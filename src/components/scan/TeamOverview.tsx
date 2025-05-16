@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TeamOverviewProps } from '@/types/emotions';
+import { TeamOverviewProps } from '@/types/scan';
 
 const TeamOverview: React.FC<TeamOverviewProps> = ({
   userId,
@@ -16,18 +16,21 @@ const TeamOverview: React.FC<TeamOverviewProps> = ({
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle>Vue d'équipe</CardTitle>
+        <CardTitle>Aperçu de l'équipe</CardTitle>
       </CardHeader>
       <CardContent>
-        <p>Cette fonctionnalité montre l'état émotionnel global de l'équipe.</p>
+        {/* Implement the team overview visualization based on props */}
+        <p>Période: {period || 'Semaine'}</p>
         {users && users.length > 0 ? (
-          <div className="mt-4">
-            <p>{users.length} membres dans l'équipe</p>
-            <p>Période: {period || 'Cette semaine'}</p>
-            <p>Mode anonymisé: {anonymized ? 'Oui' : 'Non'}</p>
+          <div>
+            {users.map((user, index) => (
+              <div key={user.id || index} className="mb-2">
+                {showNames ? user.name : `Membre ${index + 1}`}: {user.emotionalScore || 'N/A'}
+              </div>
+            ))}
           </div>
         ) : (
-          <p className="mt-4">Aucune donnée disponible pour l'équipe.</p>
+          <p>Aucune donnée d'équipe disponible</p>
         )}
       </CardContent>
     </Card>

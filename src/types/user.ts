@@ -1,6 +1,7 @@
 
+
 import { UserPreferences } from './preferences';
-import { NotificationPreference } from './notification';
+import { NotificationPreferences } from './preferences';
 
 export type UserRole = 'user' | 'admin' | 'b2b_user' | 'b2b_admin' | 'b2b-user' | 'b2b-admin' | 'collaborator' | 'b2c';
 
@@ -28,3 +29,4 @@ export interface UserPreferencesContextType {
   preferences: UserPreferences;
   updatePreferences: (newPreferences: Partial<UserPreferences>) => void;
 }
+

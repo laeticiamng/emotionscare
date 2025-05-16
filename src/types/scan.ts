@@ -1,4 +1,5 @@
 
+
 // Mise à jour de TeamOverviewProps pour inclure toutes les propriétés requises
 
 export interface TeamOverviewProps {
@@ -31,3 +32,4 @@ export interface EmotionResult {
   confidence?: number;
   recommendations?: string[];
 }
+

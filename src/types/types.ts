@@ -1,6 +1,7 @@
 
+
 import { UserRole } from "./user";
-import { ThemeName, FontSize, FontFamily } from "./preferences";
+import { ThemeName, FontSize, FontFamily, NotificationPreferences as NotificationPrefs } from "./preferences";
 
 export interface User {
   id: string;
@@ -27,7 +28,7 @@ export interface UserPreferences {
   colorBlindMode?: boolean;
   autoplayMedia?: boolean;
   language?: string;
-  notifications?: boolean;
+  notifications?: NotificationPrefs;
   emailEnabled?: boolean;
   pushEnabled?: boolean;
   soundEnabled?: boolean;
@@ -35,7 +36,15 @@ export interface UserPreferences {
   dashboardLayout?: string;
   privacyLevel?: string;
   notifications_enabled?: boolean;
-  notificationPreferences?: NotificationPreferences;
+  notificationPreferences?: NotificationPrefs;
+  ambientSound?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  displayName?: string;
+  pronouns?: string;
+  biography?: string;
+  avatarUrl?: string;
+  fullAnonymity?: boolean;
   privacy?: {
     shareData: boolean;
     anonymizeReports?: boolean;
@@ -44,24 +53,11 @@ export interface UserPreferences {
     shareActivity?: boolean;
     allowMessages?: boolean;
     allowNotifications?: boolean;
+    anonymousMode?: boolean;
   };
 }
 
-export type NotificationPreferences = {
-  enabled: boolean;
-  emailEnabled?: boolean;
-  pushEnabled?: boolean;
-  inAppEnabled?: boolean;
-  types?: {
-    system?: boolean;
-    emotion?: boolean;
-    coach?: boolean;
-    journal?: boolean;
-    community?: boolean;
-    achievement?: boolean;
-  },
-  frequency?: string;
-};
+export type NotificationPreferences = NotificationPrefs;
 
 export interface Story {
   id: string;
@@ -87,3 +83,4 @@ export interface InvitationVerificationResult {
   email?: string;
   role?: UserRole;
 }
+

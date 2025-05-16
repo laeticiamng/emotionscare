@@ -50,7 +50,7 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({ history }) => {
                       <div className="text-sm text-gray-900">{item.score}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{formatDate(item.timestamp)}</div>
+                      <div className="text-sm text-gray-900">{formatDate(item.timestamp || new Date())}</div>
                     </td>
                   </tr>
                 ))}

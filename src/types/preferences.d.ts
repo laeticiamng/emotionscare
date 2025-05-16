@@ -1,4 +1,5 @@
 
+
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large';
 export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'inter' | 'sans-serif' | 'monospace';
@@ -38,7 +39,7 @@ export interface UserPreferences {
   fontSize?: FontSize;
   fontFamily?: FontFamily;
   language?: string;
-  notifications?: NotificationPreferences | boolean;
+  notifications?: NotificationPreferences;
   haptics?: boolean;
   dataCollection?: boolean;
   privacyLevel?: PrivacyLevel;
@@ -72,3 +73,4 @@ export interface UserPreferences {
     anonymousMode?: boolean;
   };
 }
+
