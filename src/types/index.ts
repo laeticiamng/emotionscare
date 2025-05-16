@@ -72,3 +72,12 @@ export interface Theme {
   value: string;
   preview?: string;
 }
+
+export interface VRSessionWithMusicProps {
+  sessionId?: string;
+  title?: string;
+  description?: string;
+  duration?: number;
+  environment?: string;
+  musicTrackId?: string;
+}

@@ -6,7 +6,7 @@ export interface DraggableCardProps {
   id: string;
   title: string;
   value: string | number;
-  icon?: ReactNode | LucideIcon;
+  icon?: ReactNode;
   delta?: number | {
     value: number;
     label?: string;
@@ -37,9 +37,10 @@ export type KpiCardProps = DraggableCardProps;
 export interface DailyInsightCardProps {
   title: string;
   insight: string;
+  message?: string;
   date?: Date | string;
   category?: string;
-  icon?: ReactNode | LucideIcon;
+  icon?: ReactNode;
   className?: string;
 }
 
@@ -48,7 +49,14 @@ export interface QuickActionLinksProps {
     id: string;
     name: string;
     href: string;
-    icon?: ReactNode | LucideIcon;
+    icon?: ReactNode;
+    description?: string;
+  }[];
+  links?: {
+    id: string;
+    name: string;
+    href: string;
+    icon?: ReactNode;
     description?: string;
   }[];
   className?: string;

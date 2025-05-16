@@ -1,18 +1,42 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 const B2CLogin = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add authentication logic here
-    navigate('/'); 
+    setIsLoading(true);
+    
+    try {
+      await login(email, password);
+      toast({
+        title: "Connexion réussie",
+        description: "Vous êtes maintenant connecté à votre espace personnel.",
+        variant: "success",
+      });
+      navigate('/b2c/dashboard');
+    } catch (error) {
+      console.error('Erreur de connexion:', error);
+      toast({
+        title: "Échec de la connexion",
+        description: "Veuillez vérifier vos identifiants et réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -29,7 +53,14 @@ const B2CLogin = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium">Email</label>
-              <Input id="email" placeholder="votre@email.fr" type="email" required />
+              <Input 
+                id="email" 
+                placeholder="votre@email.fr" 
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required 
+              />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -38,9 +69,17 @@ const B2CLogin = () => {
                   Mot de passe oublié?
                 </Button>
               </div>
-              <Input id="password" type="password" required />
+              <Input 
+                id="password" 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required 
+              />
             </div>
-            <Button type="submit" className="w-full">Se connecter</Button>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Connexion en cours..." : "Se connecter"}
+            </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">

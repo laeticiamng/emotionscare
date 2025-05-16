@@ -16,6 +16,7 @@ export interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<void>;
   updatePreferences?: (preferences: UserPreferences) => Promise<void>;
   updateUser?: (user: any) => Promise<void>;
+  clearError?: () => void;
 }
 
 export interface UserPreferences {
@@ -26,6 +27,8 @@ export interface UserPreferences {
   colorBlindMode: boolean;
   autoplayMedia: boolean;
   soundEnabled: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
   notifications: {
     enabled?: boolean;
     emailEnabled?: boolean;

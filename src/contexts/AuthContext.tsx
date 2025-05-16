@@ -12,7 +12,8 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   register: async () => {},
   updatePreferences: async () => {},
-  updateUser: async () => {}
+  updateUser: async () => {},
+  clearError: () => {}
 });
 
 // Mock user data for development
@@ -30,11 +31,21 @@ const mockUserData = {
     colorBlindMode: false,
     autoplayMedia: true,
     soundEnabled: true,
+    emotionalCamouflage: false,
+    aiSuggestions: true,
     notifications: {
       email: true,
       push: true,
       sms: false,
-      frequency: 'daily'
+      frequency: 'daily',
+      types: {
+        system: true,
+        emotion: true,
+        coach: true,
+        journal: true,
+        community: true,
+        achievement: true
+      }
     }
   }
 };
@@ -73,6 +84,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Validation de l'email/mot de passe pour la démo
+      if (password.length < 3) {
+        throw new Error("Le mot de passe doit avoir au moins 3 caractères");
+      }
+      
+      // Set mock data and session
       setUser(mockUserData);
       localStorage.setItem('auth_session', 'mock_token');
     } catch (err) {
@@ -117,10 +135,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
     
     try {
-      // Simuler une requête API
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Mettre à jour l'utilisateur avec les nouvelles préférences
       setUser({
         ...user,
         preferences: {
@@ -140,10 +156,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
     
     try {
-      // Simuler une requête API
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Mettre à jour l'utilisateur
       setUser({
         ...user,
         ...updatedUser
@@ -154,6 +168,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(err instanceof Error ? err : new Error('Failed to update user'));
       throw err;
     }
+  };
+
+  const clearError = () => {
+    setError(null);
   };
   
   return (
@@ -166,7 +184,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       logout,
       register,
       updatePreferences,
-      updateUser
+      updateUser,
+      clearError
     }}>
       {children}
     </AuthContext.Provider>
