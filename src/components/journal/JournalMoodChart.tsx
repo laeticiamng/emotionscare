@@ -1,9 +1,19 @@
 
 import React from 'react';
-import { MoodLineChart, MoodLineChartProps, MoodData } from '@/components/charts/MoodLineChart';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-interface JournalMoodChartProps {
+export interface MoodData {
+  date: string;
+  value: number;
+  label?: string;
+}
+
+export interface MoodLineChartProps {
+  data: MoodData[];
+  showControls?: boolean;
+}
+
+export interface JournalMoodChartProps {
   data: MoodData[];
   showControls?: boolean;
   title?: string;
@@ -25,10 +35,10 @@ export const JournalMoodChart: React.FC<JournalMoodChartProps> = ({
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <MoodLineChart 
-          data={data} 
-          showControls={showControls}
-        />
+        {/* Placeholder for MoodLineChart */}
+        <div className="h-60 w-full bg-muted/20 rounded-md flex items-center justify-center">
+          <p className="text-muted-foreground">Graphique d'émotions</p>
+        </div>
       </CardContent>
     </Card>
   );

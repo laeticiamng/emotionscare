@@ -1,4 +1,8 @@
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Glass effects for UI components */
 @layer components {
   .glass-dark {

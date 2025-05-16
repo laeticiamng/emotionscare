@@ -1,60 +1,159 @@
 
-/* Import glass styles */
-@import './glass.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Premium UI elements */
-@layer components {
-  .premium-card {
-    @apply rounded-xl shadow-lg overflow-hidden transition-all;
+/* Premium styling for music components */
+
+/* Gradient backgrounds */
+.bg-gradient-calm {
+  background: linear-gradient(135deg, #a5b4fc, #818cf8);
+}
+
+.bg-gradient-focus {
+  background: linear-gradient(135deg, #67e8f9, #22d3ee);
+}
+
+.bg-gradient-energy {
+  background: linear-gradient(135deg, #fde68a, #f59e0b);
+}
+
+.bg-gradient-relax {
+  background: linear-gradient(135deg, #6ee7b7, #10b981);
+}
+
+/* Glassmorphism */
+.glass-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-card {
+  background: rgba(17, 24, 39, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Animations */
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
   }
-  
-  .premium-button {
-    @apply rounded-full px-6 py-2 font-medium transition-all;
-  }
-  
-  .premium-input {
-    @apply rounded-lg border-2 focus:ring-2 focus:ring-offset-2 transition-all;
-  }
-  
-  .premium-dashboard-section {
-    @apply p-6 rounded-2xl;
-  }
-  
-  .premium-gradient-bg {
-    @apply bg-gradient-to-br;
+  50% {
+    opacity: 0.8;
   }
 }
 
-/* Premium animations */
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
-.float-animation {
-  animation: float 4s ease-in-out infinite;
+.animate-float {
+  animation: float 5s ease-in-out infinite;
 }
 
-@keyframes pulse-premium {
-  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+/* Music player specific styles */
+.music-player-progress {
+  height: 5px;
+  border-radius: 9999px;
+  transition: height 0.2s;
 }
 
-.pulse-premium {
-  animation: pulse-premium 2s infinite;
+.music-player-progress:hover {
+  height: 8px;
 }
 
-/* Premium gradients */
-.premium-gradient-blue {
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+.music-control-button {
+  transition: transform 0.2s;
 }
 
-.premium-gradient-purple {
-  background: linear-gradient(135deg, #8b5cf6, #6366f1);
+.music-control-button:hover {
+  transform: scale(1.1);
 }
 
-.premium-gradient-green {
-  background: linear-gradient(135deg, #34d399, #10b981);
+.music-control-button:active {
+  transform: scale(0.95);
+}
+
+/* Album art hover effects */
+.album-art-container {
+  overflow: hidden;
+  border-radius: 8px;
+  position: relative;
+}
+
+.album-art-container img {
+  transition: transform 0.5s;
+}
+
+.album-art-container:hover img {
+  transform: scale(1.08);
+}
+
+.album-art-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.5));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.album-art-container:hover .album-art-overlay {
+  opacity: 1;
+}
+
+/* Audio visualizer styles */
+.visualizer-bar {
+  width: 4px;
+  margin: 0 1px;
+  border-radius: 2px;
+  transition: height 0.2s ease;
+}
+
+/* Playlist hover styles */
+.playlist-item {
+  transition: all 0.2s ease;
+}
+
+.playlist-item:hover {
+  background-color: rgba(var(--primary-rgb), 0.1);
+  transform: translateX(5px);
+}
+
+/* Card transitions */
+.music-card {
+  transition: all 0.3s ease;
+}
+
+.music-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Volume slider fade in/out */
+.volume-slider-container {
+  transition: width 0.3s, opacity 0.3s;
+}
+
+.volume-slider-hidden {
+  width: 0;
+  opacity: 0;
+}
+
+.volume-slider-visible {
+  width: 100px;
+  opacity: 1;
 }

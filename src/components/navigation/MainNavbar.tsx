@@ -32,7 +32,7 @@ import {
   User,
   BarChart3
 } from "lucide-react";
-import { useTheme } from "@/components/theme-provider";
+import { useTheme } from '@/hooks/use-theme';
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {

@@ -1,112 +1,121 @@
 
-import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import React from 'react';
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  ReferenceLine
+} from 'recharts';
 
 export interface MoodData {
   date: string;
   value: number;
   label?: string;
-  category?: string;
 }
 
 export interface MoodLineChartProps {
   data: MoodData[];
   showControls?: boolean;
-  height?: number;
-  colors?: {
-    line: string;
-    grid: string;
-    tooltip: string;
-  };
 }
 
-export const MoodLineChart: React.FC<MoodLineChartProps> = ({
+export const MoodLineChart: React.FC<MoodLineChartProps> = ({ 
   data,
-  showControls = true,
-  height = 300,
-  colors = {
-    line: '#3b82f6',
-    grid: '#e5e7eb',
-    tooltip: '#f3f4f6',
-  },
+  showControls = true
 }) => {
-  const [period, setPeriod] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
+  // Function to get color based on mood value
+  const getMoodColor = (value: number) => {
+    if (value >= 8) return '#10b981'; // Very positive - green
+    if (value >= 6) return '#60a5fa'; // Positive - blue
+    if (value >= 4) return '#a78bfa'; // Neutral - purple
+    if (value >= 2) return '#f59e0b'; // Negative - orange
+    return '#ef4444'; // Very negative - red
+  };
 
-  const filteredData = React.useMemo(() => {
-    if (period === 'all') return data;
-    
-    const now = new Date();
-    let daysAgo: number;
-    
-    switch (period) {
-      case '7d':
-        daysAgo = 7;
-        break;
-      case '30d':
-        daysAgo = 30;
-        break;
-      case '90d':
-        daysAgo = 90;
-        break;
-      default:
-        daysAgo = 30;
+  // Get domain for YAxis
+  const yDomain = [0, 10];
+
+  // Format date for XAxis
+  const formatDate = (dateStr: string) => {
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+    } catch (e) {
+      return dateStr;
     }
-    
-    const cutoffDate = new Date();
-    cutoffDate.setDate(now.getDate() - daysAgo);
-    
-    return data.filter(item => {
-      const itemDate = new Date(item.date);
-      return itemDate >= cutoffDate;
-    });
-  }, [data, period]);
-  
-  return (
-    <div className="space-y-4">
-      {showControls && (
-        <div className="flex justify-end">
-          <ToggleGroup type="single" value={period} onValueChange={(value) => value && setPeriod(value as any)}>
-            <ToggleGroupItem value="7d" aria-label="7 jours">7j</ToggleGroupItem>
-            <ToggleGroupItem value="30d" aria-label="30 jours">30j</ToggleGroupItem>
-            <ToggleGroupItem value="90d" aria-label="90 jours">90j</ToggleGroupItem>
-            <ToggleGroupItem value="all" aria-label="Tout">Tout</ToggleGroupItem>
-          </ToggleGroup>
-        </div>
-      )}
+  };
+
+  // Custom tooltip
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const date = new Date(label).toLocaleDateString('fr-FR', { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'long' 
+      });
       
-      <div style={{ width: '100%', height }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart
-            data={filteredData}
-            margin={{
-              top: 5,
-              right: 20,
-              left: 0,
-              bottom: 5,
+      const moodValue = payload[0].value;
+      let moodLabel = 'Neutre';
+      
+      if (moodValue >= 8) moodLabel = 'Très positif';
+      else if (moodValue >= 6) moodLabel = 'Positif';
+      else if (moodValue >= 4) moodLabel = 'Neutre';
+      else if (moodValue >= 2) moodLabel = 'Négatif';
+      else moodLabel = 'Très négatif';
+      
+      return (
+        <div className="bg-background p-3 rounded-md border shadow-sm">
+          <p className="font-medium">{date}</p>
+          <p className="text-sm">
+            Émotion: <span style={{ color: getMoodColor(moodValue) }}>{moodLabel}</span>
+          </p>
+          <p className="text-xs text-muted-foreground">Valeur: {moodValue}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="w-full">
+      <ResponsiveContainer width="100%" height={250}>
+        <LineChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--muted)" opacity={0.4} />
+          <XAxis 
+            dataKey="date" 
+            tickFormatter={formatDate} 
+            stroke="var(--muted-foreground)" 
+          />
+          <YAxis 
+            domain={yDomain} 
+            ticks={[0, 2, 4, 6, 8, 10]}
+            stroke="var(--muted-foreground)"
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <ReferenceLine y={5} stroke="var(--muted)" strokeDasharray="3 3" />
+          <Line 
+            type="monotone" 
+            dataKey="value" 
+            stroke="var(--primary)" 
+            strokeWidth={2}
+            dot={{ 
+              stroke: 'var(--primary)', 
+              strokeWidth: 2, 
+              r: 4, 
+              fill: 'var(--background)' 
             }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
-            <XAxis 
-              dataKey="date"
-              tickFormatter={(date) => new Date(date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
-            />
-            <YAxis domain={[0, 100]} />
-            <Tooltip 
-              contentStyle={{ backgroundColor: colors.tooltip }}
-              formatter={(value: number) => [`${value}%`, 'Humeur']}
-            />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="value"
-              stroke={colors.line}
-              activeDot={{ r: 8 }}
-              name="Niveau d'humeur"
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+            activeDot={{ 
+              stroke: 'var(--primary)', 
+              strokeWidth: 2, 
+              r: 6, 
+              fill: 'var(--background)' 
+            }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 };
