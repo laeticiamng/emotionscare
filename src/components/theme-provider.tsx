@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Theme, ThemeContextType } from '@/types/theme';
+import { Theme, ThemeContextType, FontSize, FontFamily } from '@/types/theme';
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: 'system',
@@ -24,10 +24,10 @@ export function ThemeProvider({
     () => (localStorage.getItem('theme') as Theme) || defaultTheme
   );
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
-  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large' | 'x-large'>(
+  const [fontSize, setFontSize] = useState<FontSize>(
     () => (localStorage.getItem('fontSize') as any) || 'medium'
   );
-  const [fontFamily, setFontFamily] = useState<'system' | 'serif' | 'sans-serif' | 'monospace'>(
+  const [fontFamily, setFontFamily] = useState<FontFamily>(
     () => (localStorage.getItem('fontFamily') as any) || 'system'
   );
 

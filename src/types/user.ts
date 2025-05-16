@@ -1,17 +1,23 @@
 
+export type UserRole = 'user' | 'admin' | 'b2c' | 'b2b_user' | 'b2b_admin';
+
 export interface User {
   id: string;
   name?: string;
   email: string;
-  role: 'user' | 'admin' | 'b2c' | 'b2b_user' | 'b2b_admin';
+  role: UserRole;
   avatarUrl?: string;
+  avatar_url?: string; // Alias pour compatibilité
+  avatar?: string; // Alias pour compatibilité
   preferences?: UserPreferences;
   created_at?: string;
-  position?: string; // Added
-  department?: string; // Added
-  joined_at?: string | Date; // Added
+  position?: string;
+  department?: string;
+  joined_at?: string | Date;
   lastActive?: string | Date;
   isOnline?: boolean;
+  onboarded?: boolean;
+  emotional_score?: number;
 }
 
 export interface UserPreferences {
@@ -28,7 +34,15 @@ export interface UserPreferences {
   shareActivity?: boolean;
   allowMessages?: boolean;
   allowNotifications?: boolean;
-  anonymizeReports?: boolean; // Added
+  anonymizeReports?: boolean;
+  language?: string;
+  notifications_enabled?: boolean;
+  privacy?: {
+    showProfile?: boolean;
+    shareActivity?: boolean;
+    allowMessages?: boolean;
+    allowNotifications?: boolean;
+  };
   sound?: {
     volume?: number;
     effects?: boolean;

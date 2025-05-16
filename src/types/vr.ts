@@ -2,6 +2,7 @@
 export interface VRSessionTemplate {
   id: string;
   title: string;
+  name?: string;
   description: string;
   duration: number;
   thumbnailUrl?: string;
@@ -18,7 +19,6 @@ export interface VRSessionTemplate {
   level?: string;
   rating?: number;
   featured?: boolean;
-  name?: string; // Added for VRHistoryList, VRPromptWidget, VRRecommendations
   lastUsed?: string | Date; // Added for VRHistoryList
   is_audio_only?: boolean;
   emotion_target?: string; // Added for dashboard components

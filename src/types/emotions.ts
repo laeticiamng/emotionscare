@@ -6,8 +6,8 @@ export interface EmotionResult {
   confidence: number;
   text?: string;
   feedback?: string;
-  audioUrl?: string; // Added to fix error
-  ai_feedback?: string; // Added to fix error
+  audioUrl?: string;
+  ai_feedback?: string;
 }
 
 export interface EmotionMusicParams {
@@ -15,3 +15,4 @@ export interface EmotionMusicParams {
   intensity: number;
   duration?: number;
 }
+

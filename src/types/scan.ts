@@ -6,3 +6,4 @@ export interface VoiceEmotionScannerProps {
   showVisualizer?: boolean;
   className?: string;
 }
+

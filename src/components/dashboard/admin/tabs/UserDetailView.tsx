@@ -38,6 +38,7 @@ const mockUser: UserType = {
   name: "Sophie Martin",
   email: "sophie.martin@example.com",
   role: "b2b_user",
+  avatarUrl: "/images/avatars/sophie.jpg",
   avatar_url: "/images/avatars/sophie.jpg",
   joined_at: "2023-03-15T09:30:00Z",
   created_at: "2023-03-15T09:30:00Z",
@@ -48,7 +49,7 @@ const mockUser: UserType = {
   preferences: {
     theme: "light",
     fontSize: "medium",
-    fontFamily: "sans",
+    fontFamily: "system",
     reduceMotion: false,
     colorBlindMode: false,
     autoplayMedia: true,
@@ -60,12 +61,6 @@ const mockUser: UserType = {
       shareActivity: true,
       allowMessages: true,
       allowNotifications: true
-    },
-    notifications: {
-      email: true,
-      push: true,
-      sms: false,
-      frequency: "daily"
     }
   }
 };
@@ -74,9 +69,10 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user = mockUser, onClos
   const [activeTab, setActiveTab] = useState('profile');
 
   // Format date to readable string
-  const formatDate = (dateString?: string) => {
+  const formatDate = (dateString?: string | Date) => {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('fr-FR', { 
+    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+    return date.toLocaleDateString('fr-FR', { 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric' 
@@ -84,10 +80,10 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user = mockUser, onClos
   };
 
   // Calculate user account age
-  const calculateAccountAge = (dateString?: string) => {
+  const calculateAccountAge = (dateString?: string | Date) => {
     if (!dateString) return 'N/A';
     
-    const joinedDate = new Date(dateString);
+    const joinedDate = typeof dateString === 'string' ? new Date(dateString) : dateString;
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - joinedDate.getTime());
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
@@ -124,7 +120,7 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user = mockUser, onClos
       <div className="px-6 pb-2">
         <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
           <Avatar className="w-24 h-24 border-2 border-primary/10">
-            <AvatarImage src={user?.avatar_url || user?.avatar} />
+            <AvatarImage src={user?.avatarUrl || user?.avatar_url || user?.avatar} />
             <AvatarFallback>
               {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
             </AvatarFallback>
