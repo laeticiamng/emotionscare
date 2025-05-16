@@ -1,54 +1,59 @@
 
-import { ReactNode } from 'react';
-import { MusicTrack } from './music';
-
 export interface VRSessionTemplate {
   id: string;
   title: string;
   description: string;
   duration: number;
-  tags: string[];
-  emotionTarget?: string;
-  emotion_target?: string;
-  difficulty?: string;
-  benefits?: string[];
   thumbnailUrl?: string;
+  categoryId?: string;
+  videoUrl?: string;
+  audioUrl?: string;
+  tags?: string[];
+  type?: string;
   category?: string;
-  theme?: string;
-  completionRate?: number;
-  recommendedMood?: string;
-  is_audio_only?: boolean;
-  preview_url?: string;
-  audio_url?: string;
-  emotion?: string;
+  level?: string;
+  rating?: number;
+  featured?: boolean;
+  name?: string; // Added for VRHistoryList, VRPromptWidget, VRRecommendations
+  lastUsed?: string | Date; // Added for VRHistoryList
 }
 
 export interface VRSession {
   id: string;
-  template_id: string;
-  user_id: string;
-  start_time: string;
-  end_time?: string;
-  rating?: number;
-  feedback?: string;
-  mood_before?: number;
-  mood_after?: number;
+  templateId: string;
+  userId: string;
+  startedAt: Date;
+  endedAt?: Date;
   completed: boolean;
+  duration: number;
+  feedback?: string;
+  rating?: number;
+  emotionBefore?: string;
+  emotionAfter?: string;
+  template?: VRSessionTemplate;
 }
 
 export interface VRHistoryListProps {
-  sessions: VRSession[];
-  onSessionClick?: (session: VRSession) => void;
+  limit?: number;
+  userId?: string;
+  onSessionSelect?: (session: VRSession) => void;
+  className?: string;
+  templates?: VRSessionTemplate[]; // Added for HistoryList component
+  sessions?: VRSession[]; // Added for VRSessionHistory component
 }
 
 export interface VRSessionHistoryProps {
   userId?: string;
   limit?: number;
-  showViewAll?: boolean;
+  onSessionSelect?: (session: VRSession) => void;
+  className?: string;
+  sessions?: VRSession[]; // Added for compatibility
 }
 
 export interface VRSessionWithMusicProps {
-  session: VRSessionTemplate;
-  music?: MusicTrack[];
-  onComplete?: (rating: number, feedback?: string) => void;
+  sessionId: string;
+  templateId?: string;
+  onComplete?: (sessionData: VRSession) => void;
+  autoPlay?: boolean;
+  className?: string;
 }

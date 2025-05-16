@@ -32,7 +32,8 @@ export type {
   ProgressBarProps,
   TrackInfoProps,
   VolumeControlProps,
-  MusicLibraryProps
+  MusicLibraryProps,
+  EmotionMusicParams
 } from './types/music';
 
 // Export types from audio-player
@@ -200,4 +201,35 @@ export interface InvitationFormData {
   role: string;
   message?: string;
   expires_in_days: number;
+}
+
+// Define UserPreferences interface if not defined in types/types.ts
+export interface UserPreference {
+  theme: "system" | "light" | "dark" | "pastel";
+  fontSize: string;
+  fontFamily: string;
+  reduceMotion: boolean;
+  colorBlindMode: boolean;
+  autoplayMedia: boolean;
+  notifications: {
+    enabled: boolean;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+    inAppEnabled: boolean;
+    types: {
+      system: boolean;
+      emotion: boolean;
+      coach: boolean;
+      journal: boolean;
+      community: boolean;
+      achievement: boolean;
+    };
+    frequency: string;
+  };
+  privacy: {
+    shareData: boolean;
+    anonymizeReports?: boolean;
+    profileVisibility: string;
+  };
+  soundEnabled: boolean;
 }

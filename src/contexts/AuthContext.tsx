@@ -1,7 +1,7 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
-interface User {
+export interface User {
   id: string;
   name: string;
   email: string;
@@ -14,7 +14,7 @@ interface User {
   joined_at?: string;
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -79,6 +79,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         role: 'user',
         avatar: '/path/to/avatar.jpg',
         avatar_url: '/path/to/avatar.jpg',
+        position: 'User',
+        department: 'General',
+        joined_at: new Date().toISOString(),
       });
     } catch (error) {
       console.error('Register error:', error);
@@ -118,3 +121,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export default useAuth;

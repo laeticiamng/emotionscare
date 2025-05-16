@@ -10,7 +10,7 @@ export interface MusicTrack {
   coverImage?: string;
   track_url?: string;
   emotionalTone?: string;
-  // Add missing properties that are used in components
+  cover?: string; // Added for VRMusicTrackInfo component
   category?: string;
   mood?: string;
   cover_url?: string;
@@ -35,7 +35,7 @@ export interface MusicContextType {
   isPlaying: boolean;
   volume: number;
   isMuted: boolean;
-  muted: boolean; // Added to fix MusicPlayer.tsx errors
+  muted: boolean; 
   progress: number;
   duration: number;
   currentPlaylist: MusicPlaylist | null;
@@ -71,7 +71,39 @@ export interface MusicContextType {
   initializeMusicSystem?: () => void; // Added to fix MusicLayout.tsx error
 }
 
-// Add missing interfaces used by music components
+export interface MusicControlsProps {
+  isPlaying: boolean;
+  onPlay: () => void;
+  onPause: () => void;
+  onTogglePlay: () => void;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  currentTime: number;
+  duration: number;
+  onSeek: (position: number) => void;
+  volume: number;
+  isMuted: boolean;
+  onToggleMute: () => void;
+  onVolumeChange: (volume: number) => void;
+  track?: MusicTrack;
+  showVolume?: boolean; // Added for MusicControls.tsx
+  size?: 'sm' | 'md' | 'lg'; // Added for MusicControls.tsx
+  vertical?: boolean; // Added for MusicControls.tsx
+  className?: string; // Added for MusicControls.tsx
+}
+
+export interface MusicLibraryProps {
+  onTrackSelect?: (track: MusicTrack) => void;
+  onSelectTrack?: (track: MusicTrack) => void; // Added for LibraryTab.tsx
+  currentTrack?: MusicTrack;
+  isPlaying?: boolean;
+  searchTerm?: string;
+  onSearchChange?: (term: string) => void;
+  tracks?: MusicTrack[];
+  playlists?: MusicPlaylist[];
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+}
+
 export interface ProgressBarProps {
   currentTime: number;
   duration: number;
@@ -91,32 +123,4 @@ export interface VolumeControlProps {
   onMuteToggle?: () => void;
   className?: string;
   showLabel?: boolean;
-}
-
-export interface MusicControlsProps {
-  isPlaying: boolean;
-  onPlay: () => void;
-  onPause: () => void;
-  onTogglePlay: () => void;
-  onPrevious?: () => void;
-  onNext?: () => void;
-  currentTime: number;
-  duration: number;
-  onSeek: (position: number) => void;
-  volume: number;
-  isMuted: boolean;
-  onToggleMute: () => void;
-  onVolumeChange: (volume: number) => void;
-  track?: MusicTrack;
-}
-
-export interface MusicLibraryProps {
-  onTrackSelect?: (track: MusicTrack) => void;
-  currentTrack?: MusicTrack;
-  isPlaying?: boolean;
-  searchTerm?: string;
-  onSearchChange?: (term: string) => void;
-  tracks?: MusicTrack[];
-  playlists?: MusicPlaylist[];
-  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
 }
