@@ -5,6 +5,9 @@ export interface Emotion {
   score: number;
   color: string;
   icon?: string;
+  emotion?: string; // Added to fix EnhancedEmotionAnalysis errors
+  confidence?: number; // Added to fix EnhancedEmotionAnalysis errors
+  intensity?: number; // Added to fix missing properties in components
 }
 
 export interface EmotionResult {
@@ -15,9 +18,14 @@ export interface EmotionResult {
   text?: string;
   feedback?: string; // Use feedback instead of ai_feedback
   timestamp?: string;
-  emojis?: string[];
+  emojis?: string | string[];
   recommendations?: string[];
   triggers?: string[];
+  // Add missing properties that are used in components
+  user_id?: string;
+  date?: string | Date;
+  intensity?: number;
+  transcript?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -34,8 +42,13 @@ export interface EmotionalTeamViewProps {
 }
 
 export interface LiveVoiceScannerProps {
+  onScanComplete?: (result: EmotionResult) => void;
   onResult?: (result: EmotionResult) => void;
   autoStart?: boolean;
+  scanDuration?: number;
+  stopAfterSeconds?: number;
+  duration?: number;
+  className?: string;
 }
 
 export interface VoiceEmotionScannerProps {
@@ -46,4 +59,11 @@ export interface VoiceEmotionScannerProps {
 export interface TeamOverviewProps {
   teamId?: string;
   period?: 'day' | 'week' | 'month';
+  userId?: string;
+  anonymized?: boolean;
+  className?: string;
+  dateRange?: any;
+  users?: any[];
+  showNames?: boolean;
+  compact?: boolean;
 }

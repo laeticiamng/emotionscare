@@ -6,9 +6,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { isAdminRole } from '@/utils/roleUtils';
 
 interface NavItemProps {
-  href: string;
+  href?: string;
+  to?: string; // Add 'to' property to support newer components
   label: string;
   isActive?: boolean;
+  active?: boolean; // Alternative name for isActive
   icon?: React.ReactNode;
   onClick?: () => void;
   requiresAuth?: boolean;
@@ -17,14 +19,18 @@ interface NavItemProps {
 
 const NavItem: React.FC<NavItemProps> = ({
   href,
+  to,
   label,
   isActive = false,
+  active = false,
   icon,
   onClick,
   requiresAuth = false,
   adminOnly = false,
 }) => {
   const { user, isAuthenticated } = useAuth();
+  const finalHref = to || href || '#';
+  const finalIsActive = isActive || active;
   
   // Don't render if item requires authentication but user is not authenticated
   if (requiresAuth && !isAuthenticated) return null;
@@ -34,11 +40,11 @@ const NavItem: React.FC<NavItemProps> = ({
   
   return (
     <Link
-      to={href}
+      to={finalHref}
       onClick={onClick}
       className={cn(
         "flex items-center px-4 py-2 text-sm font-medium transition-colors",
-        isActive 
+        finalIsActive 
           ? "bg-primary text-primary-foreground" 
           : "hover:bg-accent hover:text-accent-foreground",
         "rounded-md"

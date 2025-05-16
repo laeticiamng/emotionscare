@@ -99,3 +99,9 @@ export const useToast = () => {
     // Expose other Sonner methods as needed
   };
 };
+
+// Export a direct toast function for use without the hook
+export const toast = (messageOrProps: string | ToastProps, type?: ToastType, options?: ToastOptions) => {
+  const { toast: showToast } = useToast();
+  showToast(messageOrProps, type, options);
+};
