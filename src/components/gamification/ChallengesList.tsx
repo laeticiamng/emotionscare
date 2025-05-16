@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,14 +5,25 @@ import { BadgeCheck, Clock, TrendingUp, Award } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Challenge } from '@/types';
 
-const ChallengesList = ({ challenges = [] }: { challenges: Challenge[] }) => {
+interface ChallengesListProps {
+  challenges: Challenge[];
+  onComplete?: (challengeId: string) => Promise<boolean>;
+}
+
+const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, onComplete }) => {
   // Filter challenges by status
   const activeChallenges = challenges.filter(c => !c.completed && !c.failed);
   const completedChallenges = challenges.filter(c => c.completed);
   const failedChallenges = challenges.filter(c => c.failed);
   
+  const handleComplete = async (id: string) => {
+    if (onComplete) {
+      await onComplete(id);
+    }
+  };
+  
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <h2 className="text-2xl font-bold">Défis</h2>
       
       {activeChallenges.length > 0 && (

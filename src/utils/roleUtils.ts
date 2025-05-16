@@ -112,3 +112,23 @@ export const normalizeUserMode = (mode?: string | UserModeType): string => {
   
   return 'b2c';
 };
+
+/**
+ * Compare roles to determine hierarchy level
+ */
+export const compareRoles = (roleA?: string, roleB?: string): number => {
+  const roles = {
+    'b2b_admin': 3,
+    'admin': 3,
+    'administrator': 3,
+    'b2b_user': 2,
+    'user': 2,
+    'employee': 2,
+    'b2c': 1
+  };
+  
+  const valueA = roles[normalizeUserRole(roleA)] || 0;
+  const valueB = roles[normalizeUserRole(roleB)] || 0;
+  
+  return valueA - valueB;
+};

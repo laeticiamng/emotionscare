@@ -1,72 +1,65 @@
 
-import React, { useState, useEffect } from 'react';
-import { DraggableCardProps } from './types';
+import React, { useState } from 'react';
 import DraggableCard from './DraggableCard';
-import { KpiCardProps } from '@/types';
+import { DraggableCardProps, DraggableKpiCardsGridProps } from './types';
 
-interface DraggableKpiCardsGridProps {
-  cards?: KpiCardProps[];
-  onReorder?: (cards: KpiCardProps[]) => void;
-  editable?: boolean;
-  className?: string;
-}
-
-const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
-  cards = [],
-  onReorder,
-  editable = false,
-  className
+const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ 
+  cards,
+  kpiCards,
+  onOrderChange 
 }) => {
-  const [draggableCards, setDraggableCards] = useState<DraggableCardProps[]>([]);
+  // Use either cards or kpiCards prop
+  const cardsList = cards || kpiCards || [];
+  const [draggableCards, setDraggableCards] = useState<DraggableCardProps[]>(cardsList);
 
-  useEffect(() => {
-    // Convert KpiCardProps to DraggableCardProps
-    const convertedCards: DraggableCardProps[] = cards.map((card, index) => ({
-      id: `card-${index}`,
-      title: card.title,
-      value: card.value,
-      icon: card.icon,
-      delta: card.delta,
-      subtitle: card.subtitle,
-      ariaLabel: card.ariaLabel,
-      onClick: card.onClick
-    }));
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    e.dataTransfer.setData('text/plain', index.toString());
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, dropIndex: number) => {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
+    if (dragIndex === dropIndex) return;
+
+    const newCards = [...draggableCards];
+    const draggedCard = newCards[dragIndex];
     
-    setDraggableCards(convertedCards);
-  }, [cards]);
+    // Remove the dragged card
+    newCards.splice(dragIndex, 1);
+    // Insert it at the drop position
+    newCards.splice(dropIndex, 0, draggedCard);
 
-  const handleReorder = (reorderedCards: DraggableCardProps[]) => {
-    setDraggableCards(reorderedCards);
-    if (onReorder) {
-      // Convert DraggableCardProps back to KpiCardProps
-      const convertedCards = reorderedCards.map((card) => ({
-        title: card.title,
-        value: card.value,
-        icon: card.icon,
-        delta: card.delta,
-        subtitle: card.subtitle,
-        ariaLabel: card.ariaLabel,
-        onClick: card.onClick
-      }));
-      
-      onReorder(convertedCards as KpiCardProps[]);
+    setDraggableCards(newCards);
+    if (onOrderChange) {
+      onOrderChange(newCards);
     }
   };
 
   return (
-    <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ${className || ''}`}>
-      {draggableCards.map((card) => (
-        <DraggableCard
-          key={card.id}
-          id={card.id}
-          title={card.title}
-          value={card.value}
-          icon={card.icon}
-          delta={card.delta}
-          subtitle={card.subtitle}
-          ariaLabel={card.ariaLabel}
-          onClick={card.onClick}
-        />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {draggableCards.map((card, index) => (
+        <div
+          key={card.id || `card-${index}`}
+          draggable
+          onDragStart={(e) => handleDragStart(e, index)}
+          onDragOver={handleDragOver}
+          onDrop={(e) => handleDrop(e, index)}
+          className="transition-all"
+        >
+          <DraggableCard
+            id={card.id || `card-${index}`}
+            title={card.title}
+            value={card.value}
+            icon={card.icon}
+            delta={card.delta}
+            subtitle={card.subtitle}
+            status={card.status}
+          />
+        </div>
       ))}
     </div>
   );

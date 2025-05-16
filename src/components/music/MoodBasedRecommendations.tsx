@@ -1,99 +1,95 @@
 
 import React from 'react';
-import { useMusic } from '@/contexts/MusicContext';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Music } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Play, Heart, HeartOff } from 'lucide-react';
+import { MusicPlaylist } from '@/types';
+import { motion } from 'framer-motion';
 
 interface MoodBasedRecommendationsProps {
-  mood: string;
-  intensity?: number;
-  standalone?: boolean;
+  mood?: string;
+  playlists: MusicPlaylist[];
+  onPlayPlaylist: (playlist: MusicPlaylist) => void;
+  onToggleFavorite?: (id: string, isFavorite: boolean) => void;
+  favorites?: string[];
 }
 
-const MOOD_LABELS: Record<string, string> = {
-  calm: "Calme et relaxation",
-  happy: "Énergie et joie",
-  focus: "Concentration",
-  sad: "Réconfort",
-  anxious: "Apaisement",
-  neutral: "Équilibre"
-};
-
 const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ 
-  mood, 
-  intensity = 50, 
-  standalone = false 
+  mood = "relaxed",
+  playlists = [],
+  onPlayPlaylist,
+  onToggleFavorite,
+  favorites = []
 }) => {
-  const { loadPlaylistForEmotion, playTrack, currentTrack } = useMusic();
-  const { toast } = useToast();
+  // Filter playlists based on the mood
+  const filteredPlaylists = playlists.slice(0, 4);
   
-  const handlePlayRecommended = async () => {
-    try {
-      const playlist = await loadPlaylistForEmotion(mood);
-      
-      if (playlist && playlist.tracks.length > 0) {
-        playTrack(playlist.tracks[0]);
-        toast({
-          title: "Musique lancée",
-          description: `Lecture de la playlist "${playlist.title}"`
-        });
-      } else {
-        toast({
-          title: "Aucune musique disponible",
-          description: "Pas de recommandation disponible pour cette émotion.",
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement des recommandations musicales:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les recommandations musicales.",
-        variant: "destructive"
-      });
-    }
-  };
-  
+  const isFavorite = (playlistId: string) => favorites.includes(playlistId);
+
   return (
-    <Card className={standalone ? 'w-full' : 'max-w-md mx-auto'}>
-      <CardContent className="p-6 space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-            <Music className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h3 className="text-lg font-medium">Recommandation musicale</h3>
-            <p className="text-sm text-muted-foreground">
-              Basée sur votre humeur: <span className="font-medium">{MOOD_LABELS[mood] || mood}</span>
-            </p>
-          </div>
-        </div>
-        
-        <div className="bg-muted/30 p-4 rounded-lg">
-          <p className="text-sm">
-            {intensity > 70 ? (
-              "Notre algorithme a détecté une forte intensité émotionnelle. Voici une sélection musicale pour vous accompagner."
-            ) : intensity > 40 ? (
-              "Voici une sélection musicale adaptée à votre état émotionnel actuel."
-            ) : (
-              "Voici une douce sélection musicale pour maintenir votre équilibre émotionnel."
-            )}
-          </p>
-        </div>
-      </CardContent>
-      <CardFooter className="pt-0 px-6 pb-6">
-        <Button 
-          className="w-full"
-          onClick={handlePlayRecommended}
-          disabled={currentTrack?.id === `track-${mood}`}
-        >
-          <Play className="h-4 w-4 mr-2" /> 
-          Écouter la recommandation
-        </Button>
-      </CardFooter>
-    </Card>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Recommandations pour vous</h3>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        {filteredPlaylists.map((playlist, index) => (
+          <motion.div 
+            key={playlist.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <Card className="h-full overflow-hidden">
+              <div 
+                className="h-32 bg-gradient-to-br from-indigo-500 to-purple-700 relative overflow-hidden"
+                style={{
+                  backgroundImage: playlist.coverUrl ? `url(${playlist.coverUrl})` : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Button 
+                    size="icon" 
+                    className="h-10 w-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm"
+                    onClick={() => onPlayPlaylist(playlist)}
+                  >
+                    <Play className="h-5 w-5 text-white" fill="white" />
+                  </Button>
+                </div>
+              </div>
+              
+              <CardContent className="p-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-medium line-clamp-1">
+                      {playlist.name || playlist.title || "Playlist sans titre"}
+                    </h4>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {playlist.tracks.length} morceaux
+                    </p>
+                  </div>
+                  
+                  {onToggleFavorite && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => onToggleFavorite(playlist.id, !isFavorite(playlist.id))}
+                    >
+                      {isFavorite(playlist.id) ? (
+                        <Heart className="h-4 w-4 text-red-500" fill="#ef4444" />
+                      ) : (
+                        <Heart className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+    </div>
   );
 };
 

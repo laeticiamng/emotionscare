@@ -1,87 +1,106 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GridPosition, KpiCardProps } from '@/types/dashboard';
-import GlobalOverviewTab from './tabs/GlobalOverviewTab';
-import EmotionalAnalysisTab from './tabs/EmotionalAnalysisTab';
-import UsageStatisticsTab from './tabs/UsageStatisticsTab';
-import TeamManagementTab from './tabs/TeamManagementTab';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Users, Layers, Settings } from 'lucide-react';
+import { TeamOverviewTab, TeamDetailTab, SettingsTab } from './AdminTabContents';
+import { DraggableCardProps } from './draggable/types';
 
-const AdminDashboard = () => {
-  const [selectedTab, setSelectedTab] = useState('overview');
-
-  // Example KPI data
-  const kpiCards: KpiCardProps[] = [
+const AdminDashboard: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  
+  // Sample KPI cards data
+  const kpiCards: DraggableCardProps[] = [
     {
-      title: "Utilisateurs Actifs",
-      value: "324",
+      id: 'users',
+      title: 'Utilisateurs actifs',
+      value: '1,204',
+      icon: Users,
       delta: {
-        value: 22.4,
+        value: 12,
         trend: 'up',
-        label: 'depuis le dernier mois'
+        label: 'vs mois dernier'
       },
-      status: 'positive'
+      subtitle: '85% taux d\'engagement',
+      status: 'success'
     },
     {
-      title: "Score émotionnel moyen",
-      value: "76/100",
+      id: 'sessions',
+      title: 'Sessions journalières',
+      value: '348',
+      icon: Layers,
       delta: {
-        value: 3.2,
-        trend: 'down',
-        label: 'depuis le dernier mois'
-      },
-      status: 'negative'
-    },
-    {
-      title: "Sessions VR",
-      value: "156",
-      delta: {
-        value: 18.9,
+        value: 8,
         trend: 'up',
-        label: 'depuis le dernier mois'
+        label: 'vs semaine dernière'
       },
-      status: 'positive'
+      subtitle: '24 min temps moyen',
+      status: 'info'
     },
     {
-      title: "Alertes",
-      value: "3",
+      id: 'emotions',
+      title: 'Bien-être collectif',
+      value: '76%',
+      icon: Settings,
       delta: {
-        value: 0,
-        trend: 'neutral',
-        label: 'stable'
+        value: 5,
+        trend: 'up',
+        label: 'vs semaine dernière'
       },
-      status: 'neutral'
+      subtitle: 'Basé sur 950 analyses',
+      status: 'success'
+    },
+    {
+      id: 'retention',
+      title: 'Rétention mensuelle',
+      value: '92%',
+      icon: Users,
+      delta: {
+        value: 2,
+        trend: 'up',
+        label: 'vs mois dernier'
+      },
+      subtitle: 'Objectif: 95%',
+      status: 'warning'
     }
   ];
-
+  
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-4">Tableau de bord administrateur</h1>
+      <h1 className="text-3xl font-bold mb-6">Tableau de bord administrateur</h1>
       
-      <Tabs defaultValue="overview" value={selectedTab} onValueChange={setSelectedTab}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="emotional">Analyse émotionnelle</TabsTrigger>
-          <TabsTrigger value="usage">Statistiques d'utilisation</TabsTrigger>
-          <TabsTrigger value="teams">Gestion des équipes</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview">
-          <GlobalOverviewTab kpiCards={kpiCards} />
-        </TabsContent>
-        
-        <TabsContent value="emotional">
-          <EmotionalAnalysisTab />
-        </TabsContent>
-        
-        <TabsContent value="usage">
-          <UsageStatisticsTab />
-        </TabsContent>
-        
-        <TabsContent value="teams">
-          <TeamManagementTab />
-        </TabsContent>
-      </Tabs>
+      <Card className="mb-6">
+        <CardContent className="p-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="overview" className="flex items-center gap-2">
+                <Layers className="h-4 w-4" />
+                <span>Vue d'ensemble</span>
+              </TabsTrigger>
+              <TabsTrigger value="teams" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                <span>Équipes</span>
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                <span>Paramètres</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview">
+              <TeamOverviewTab kpiCards={kpiCards} />
+            </TabsContent>
+            
+            <TabsContent value="teams">
+              <TeamDetailTab />
+            </TabsContent>
+            
+            <TabsContent value="settings">
+              <SettingsTab />
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };

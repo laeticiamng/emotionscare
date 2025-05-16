@@ -1,181 +1,180 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Music, Sparkles, Wand, Clock } from 'lucide-react';
 import { MusicTrack } from '@/types';
 
 interface MusicCreatorProps {
-  onCreateTrack: (track: MusicTrack) => void;
-  loading?: boolean;
+  onGenerate: (params: any) => void;
+  isGenerating?: boolean;
 }
 
-const MusicCreator: React.FC<MusicCreatorProps> = ({ onCreateTrack, loading = false }) => {
-  const [title, setTitle] = useState('');
-  const [artist, setArtist] = useState('');
-  const [duration, setDuration] = useState(180);
-  const [emotion, setEmotion] = useState('calm');
-  const [generating, setGenerating] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-
-  useEffect(() => {
-    // Reset upload progress when not generating
-    if (!generating) {
-      setUploadProgress(0);
-    }
-  }, [generating]);
-
-  useEffect(() => {
-    // Simulate progress when generating
-    let interval: number | undefined;
+const MusicCreator: React.FC<MusicCreatorProps> = ({ 
+  onGenerate,
+  isGenerating = false
+}) => {
+  const [activeTab, setActiveTab] = useState('prompt');
+  const [prompt, setPrompt] = useState('');
+  const [duration, setDuration] = useState(60);
+  const [genre, setGenre] = useState<string>('ambient');
+  const [emotion, setEmotion] = useState<string>('calm');
+  
+  const handleGenerate = () => {
+    if (activeTab === 'prompt' && !prompt) return;
     
-    if (generating) {
-      interval = window.setInterval(() => {
-        setUploadProgress(prev => {
-          const newProgress = prev + Math.random() * 5;
-          if (newProgress >= 100) {
-            clearInterval(interval);
-            setTimeout(() => {
-              handleMusicCreation();
-              setGenerating(false);
-            }, 500);
-            return 100;
-          }
-          return newProgress;
-        });
-      }, 300);
+    let params = {};
+    
+    if (activeTab === 'prompt') {
+      params = { prompt, duration };
+    } else if (activeTab === 'emotion') {
+      params = { emotion, duration };
+    } else {
+      params = { genre, duration };
     }
     
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [generating]);
-
-  const handleMusicCreation = () => {
-    // Create a unique ID for the track
-    const id = `track-${Date.now()}`;
-    
-    // Default cover images based on emotion
-    const coverMap: Record<string, string> = {
-      calm: '/images/music/calm.jpg',
-      happy: '/images/music/happy.jpg',
-      focus: '/images/music/focus.jpg',
-      energy: '/images/music/energy.jpg',
-      melancholy: '/images/music/melancholy.jpg'
-    };
-    
-    // Create the new track
-    const newTrack: MusicTrack = {
-      id,
-      title,
-      artist,
+    const mockTrack: MusicTrack = {
+      id: Math.random().toString(),
+      title: activeTab === 'prompt' ? prompt : activeTab === 'emotion' ? `${emotion} melody` : `${genre} track`,
+      artist: 'AI Composer',
       duration,
-      url: `/audio/${emotion}-${id}.mp3`,
-      coverUrl: coverMap[emotion] || '/images/music/default.jpg',
-      emotion
+      track_url: '/sample-audio.mp3'
     };
     
-    // Call the callback function with the new track
-    onCreateTrack(newTrack);
-    
-    // Reset form
-    setTitle('');
-    setArtist('');
-    setDuration(180);
+    onGenerate(mockTrack);
   };
-
-  const startGeneration = () => {
-    if (!title || !artist) return;
-    setGenerating(true);
-  };
+  
+  const emotions = [
+    { value: 'calm', label: 'Calme', color: 'bg-blue-500' },
+    { value: 'happy', label: 'Joyeux', color: 'bg-yellow-500' },
+    { value: 'sad', label: 'Mélancolique', color: 'bg-indigo-500' },
+    { value: 'energetic', label: 'Énergique', color: 'bg-red-500' },
+    { value: 'focused', label: 'Concentré', color: 'bg-green-500' },
+    { value: 'dreamy', label: 'Rêveur', color: 'bg-purple-500' },
+  ];
+  
+  const genres = [
+    { value: 'ambient', label: 'Ambiant' },
+    { value: 'classical', label: 'Classique' },
+    { value: 'electronic', label: 'Électronique' },
+    { value: 'jazz', label: 'Jazz' },
+    { value: 'lofi', label: 'Lo-Fi' },
+    { value: 'nature', label: 'Sons naturels' },
+  ];
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Create Custom Music</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="title">Track Title</Label>
-            <Input
-              id="title"
-              placeholder="Enter track title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              disabled={generating || loading}
-            />
-          </div>
+      <CardContent className="pt-6">
+        <Tabs defaultValue="prompt" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid grid-cols-3 mb-6">
+            <TabsTrigger value="prompt" className="flex items-center gap-2">
+              <Wand className="h-4 w-4" />
+              <span>Prompt</span>
+            </TabsTrigger>
+            <TabsTrigger value="emotion" className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              <span>Émotion</span>
+            </TabsTrigger>
+            <TabsTrigger value="genre" className="flex items-center gap-2">
+              <Music className="h-4 w-4" />
+              <span>Genre</span>
+            </TabsTrigger>
+          </TabsList>
           
-          <div className="grid gap-2">
-            <Label htmlFor="artist">Artist Name</Label>
-            <Input
-              id="artist"
-              placeholder="Enter artist name"
-              value={artist}
-              onChange={(e) => setArtist(e.target.value)}
-              disabled={generating || loading}
-            />
-          </div>
-          
-          <div className="grid gap-2">
-            <Label htmlFor="duration">Duration (seconds)</Label>
-            <Input
-              id="duration"
-              type="number"
-              min={30}
-              max={600}
-              value={duration}
-              onChange={(e) => setDuration(parseInt(e.target.value))}
-              disabled={generating || loading}
-            />
-          </div>
-          
-          <div className="grid gap-2">
-            <Label htmlFor="emotion">Emotion</Label>
-            <Select
-              value={emotion}
-              onValueChange={setEmotion}
-              disabled={generating || loading}
-            >
-              <SelectTrigger id="emotion">
-                <SelectValue placeholder="Select an emotion" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="calm">Calm</SelectItem>
-                <SelectItem value="happy">Happy</SelectItem>
-                <SelectItem value="focus">Focus</SelectItem>
-                <SelectItem value="energy">Energy</SelectItem>
-                <SelectItem value="melancholy">Melancholy</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {generating && (
-            <div className="space-y-2">
-              <div className="h-2 w-full bg-muted overflow-hidden rounded-full">
-                <div 
-                  className="h-full bg-primary transition-all" 
-                  style={{ width: `${uploadProgress}%` }}
+          <TabsContent value="prompt">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="prompt">Description de la musique souhaitée</Label>
+                <Input
+                  id="prompt"
+                  placeholder="Ex: Une ambiance relaxante avec des sons de pluie et un piano doux"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
                 />
               </div>
-              <p className="text-sm text-muted-foreground text-center">
-                {uploadProgress < 100 
-                  ? `Generating music: ${Math.round(uploadProgress)}%`
-                  : 'Processing complete!'}
-              </p>
             </div>
-          )}
+          </TabsContent>
           
-          <Button 
-            className="w-full" 
-            onClick={startGeneration}
-            disabled={!title || !artist || generating || loading}
-          >
-            {generating ? 'Generating...' : 'Generate Music Track'}
-          </Button>
-        </div>
+          <TabsContent value="emotion">
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {emotions.map(emotionOption => (
+                  <Button
+                    key={emotionOption.value}
+                    variant={emotion === emotionOption.value ? "default" : "outline"}
+                    className="flex flex-col h-auto py-3 px-4 gap-1"
+                    onClick={() => setEmotion(emotionOption.value)}
+                  >
+                    <div className={`w-4 h-4 rounded-full ${emotionOption.color}`}></div>
+                    <span>{emotionOption.label}</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="genre">
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {genres.map(genreOption => (
+                  <Button
+                    key={genreOption.value}
+                    variant={genre === genreOption.value ? "default" : "outline"}
+                    className="h-auto py-3"
+                    onClick={() => setGenre(genreOption.value)}
+                  >
+                    {genreOption.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+          
+          <div className="mt-6 space-y-6">
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <Label>Durée: {Math.floor(duration / 60)}:{(duration % 60).toString().padStart(2, '0')}</Label>
+                <Clock className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <Slider
+                value={[duration]}
+                min={30}
+                max={300}
+                step={30}
+                onValueChange={(value) => setDuration(value[0])}
+              />
+              <div className="flex justify-between mt-1">
+                <span className="text-xs text-muted-foreground">30s</span>
+                <span className="text-xs text-muted-foreground">5m</span>
+              </div>
+            </div>
+            
+            <Button 
+              className="w-full"
+              onClick={handleGenerate}
+              disabled={isGenerating || (activeTab === 'prompt' && !prompt)}
+            >
+              {isGenerating ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Génération en cours...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Générer la musique
+                </>
+              )}
+            </Button>
+          </div>
+        </Tabs>
       </CardContent>
     </Card>
   );

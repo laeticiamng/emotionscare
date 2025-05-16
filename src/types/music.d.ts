@@ -16,8 +16,8 @@ export interface MusicTrack {
   cover_url?: string;
   url?: string;
   audioUrl?: string;
-  category?: string;
   track_url?: string;
+  category?: string;
 }
 
 export interface MusicPlaylist {

@@ -2,74 +2,49 @@
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-
-interface VolumeControlProps {
-  volume?: number;
-  onChange?: (value: number) => void;
-  onVolumeChange?: (value: number) => void;
-  className?: string;
-  showLabel?: boolean;
-  isMuted?: boolean;
-  onMuteToggle?: () => void;
-}
+import { VolumeControlProps } from '@/types';
 
 const VolumeControl: React.FC<VolumeControlProps> = ({
-  volume = 50,
+  volume = 0.5,
   onChange,
   onVolumeChange,
   className = '',
   showLabel = false,
   isMuted = false,
-  onMuteToggle,
+  onMuteToggle
 }) => {
-  const handleValueChange = (values: number[]) => {
-    const newVolume = values[0];
-    if (onChange) {
-      onChange(newVolume);
-    }
-    if (onVolumeChange) {
-      onVolumeChange(newVolume);
-    }
+  const handleVolumeChange = (value: number[]) => {
+    const vol = value[0];
+    if (onChange) onChange(vol);
+    if (onVolumeChange) onVolumeChange(vol);
   };
 
   const VolumeIcon = () => {
-    if (isMuted || volume === 0) {
-      return <VolumeX size={16} />;
-    }
-    if (volume < 33) {
-      return <Volume size={16} />;
-    }
-    if (volume < 66) {
-      return <Volume1 size={16} />;
-    }
+    if (isMuted || volume === 0) return <VolumeX size={16} />;
+    if (volume < 0.3) return <Volume size={16} />;
+    if (volume < 0.7) return <Volume1 size={16} />;
     return <Volume2 size={16} />;
   };
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <Button 
-        variant="ghost" 
-        size="sm"
-        className="p-1 rounded-full h-7 w-7"
-        onClick={onMuteToggle}
-      >
-        <VolumeIcon />
-      </Button>
+      {showLabel && (
+        <button 
+          className="text-muted-foreground hover:text-foreground cursor-pointer"
+          onClick={onMuteToggle}
+        >
+          <VolumeIcon />
+        </button>
+      )}
       
       <Slider
         value={[isMuted ? 0 : volume]}
-        max={100}
-        step={1}
-        onValueChange={handleValueChange}
-        className="w-24"
+        min={0}
+        max={1}
+        step={0.01}
+        onValueChange={handleVolumeChange}
+        className="cursor-pointer"
       />
-      
-      {showLabel && (
-        <span className="text-xs text-muted-foreground w-8">
-          {isMuted ? '0%' : `${Math.round(volume)}%`}
-        </span>
-      )}
     </div>
   );
 };

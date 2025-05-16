@@ -1,95 +1,170 @@
 
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { useMusic } from '@/contexts/MusicContext';
-import AudioVisualizer from './AudioVisualizer';
-import { useTheme } from '@/contexts/ThemeContext';
+import React, { useRef, useEffect, useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { MusicTrack } from '@/types';
 
 interface EmotionMusicVisualizerProps {
-  emotion?: string;
-  intensity?: number;
-  className?: string;
+  track: MusicTrack | null;
+  isPlaying: boolean;
+  color?: string;
+  height?: number;
+  barWidth?: number;
+  barGap?: number;
+  barCount?: number;
 }
 
-const EmotionMusicVisualizer: React.FC<EmotionMusicVisualizerProps> = ({ 
-  emotion = 'neutral',
-  intensity = 50,
-  className
+const EmotionMusicVisualizer: React.FC<EmotionMusicVisualizerProps> = ({
+  track,
+  isPlaying,
+  color = '#3B82F6',
+  height = 100,
+  barWidth = 3,
+  barGap = 1,
+  barCount = 80
 }) => {
-  const { currentTrack, isPlaying } = useMusic();
-  const { theme } = useTheme();
-  const [visualizerType, setVisualizerType] = useState<'bars' | 'circle' | 'wave'>('bars');
-  const [primaryColor, setPrimaryColor] = useState<string>('#6366F1');
-  const [secondaryColor, setSecondaryColor] = useState<string>('#818CF8');
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [audioSource, setAudioSource] = useState<MediaElementAudioSourceNode | null>(null);
+  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   
-  // Map emotions to visualizer types and colors
+  // Create audio context and set up analyzer
   useEffect(() => {
-    // Determine visualization based on emotion
-    switch(emotion.toLowerCase()) {
-      case 'happy':
-      case 'energetic':
-        setVisualizerType('bars');
-        setPrimaryColor(theme === 'dark' ? '#FBBF24' : '#F59E0B');
-        setSecondaryColor(theme === 'dark' ? '#FCD34D' : '#FBBF24');
-        break;
-      case 'calm':
-      case 'relaxed':
-        setVisualizerType('wave');
-        setPrimaryColor(theme === 'dark' ? '#3B82F6' : '#2563EB');
-        setSecondaryColor(theme === 'dark' ? '#60A5FA' : '#3B82F6');
-        break;
-      case 'focused':
-      case 'concentrated':
-        setVisualizerType('circle');
-        setPrimaryColor(theme === 'dark' ? '#8B5CF6' : '#7C3AED');
-        setSecondaryColor(theme === 'dark' ? '#A78BFA' : '#8B5CF6');
-        break;
-      case 'melancholic':
-      case 'sad':
-        setVisualizerType('wave');
-        setPrimaryColor(theme === 'dark' ? '#6B7280' : '#4B5563');
-        setSecondaryColor(theme === 'dark' ? '#9CA3AF' : '#6B7280');
-        break;
-      default:
-        setVisualizerType('bars');
-        setPrimaryColor(theme === 'dark' ? '#6366F1' : '#4F46E5');
-        setSecondaryColor(theme === 'dark' ? '#A5B4FC' : '#818CF8');
+    if (!track) return;
+    
+    const audio = new Audio();
+    audio.crossOrigin = 'anonymous';
+    
+    // Use the appropriate track URL property
+    const trackUrl = track.track_url || track.audioUrl || track.url;
+    
+    if (!trackUrl) {
+      console.error('No URL available for track:', track);
+      return;
     }
-  }, [emotion, theme]);
-
-  // Adjust intensity
-  const visualizerHeight = Math.max(80, Math.min(140, 80 + intensity / 2));
-
+    
+    audio.src = trackUrl;
+    setAudioElement(audio);
+    
+    const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const source = context.createMediaElementSource(audio);
+    const analyzerNode = context.createAnalyser();
+    
+    analyzerNode.fftSize = 256;
+    analyzerNode.smoothingTimeConstant = 0.8;
+    
+    source.connect(analyzerNode);
+    analyzerNode.connect(context.destination);
+    
+    setAudioContext(context);
+    setAudioSource(source);
+    setAnalyser(analyzerNode);
+    
+    return () => {
+      audio.pause();
+      if (context.state !== 'closed') {
+        context.close();
+      }
+    };
+  }, [track]);
+  
+  // Handle play/pause
+  useEffect(() => {
+    if (!audioElement) return;
+    
+    if (isPlaying) {
+      audioElement.play().catch(err => console.error('Failed to play:', err));
+    } else {
+      audioElement.pause();
+    }
+    
+    return () => {
+      audioElement.pause();
+    };
+  }, [isPlaying, audioElement]);
+  
+  // Animation frame for visualization
+  useEffect(() => {
+    if (!canvasRef.current || !analyser || !isPlaying) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    
+    const draw = () => {
+      if (!isPlaying) return;
+      
+      const width = canvas.width;
+      const height = canvas.height;
+      
+      analyser.getByteFrequencyData(dataArray);
+      
+      ctx.clearRect(0, 0, width, height);
+      
+      // Calculate total width of all bars and gaps
+      const totalBarWidth = barCount * barWidth;
+      const totalGapWidth = (barCount - 1) * barGap;
+      const totalWidth = totalBarWidth + totalGapWidth;
+      
+      // Calculate starting position to center the bars
+      const startX = (width - totalWidth) / 2;
+      
+      // Draw bars
+      for (let i = 0; i < barCount; i++) {
+        // Map dataArray index to available data points
+        const dataIndex = Math.floor((i / barCount) * bufferLength);
+        const value = dataArray[dataIndex] || 0;
+        
+        // Calculate bar height based on audio data
+        const barHeight = (value / 255) * height;
+        
+        // Calculate x position
+        const x = startX + i * (barWidth + barGap);
+        
+        ctx.fillStyle = color;
+        ctx.fillRect(
+          x,
+          height - barHeight,
+          barWidth,
+          barHeight
+        );
+      }
+      
+      requestAnimationFrame(draw);
+    };
+    
+    draw();
+  }, [analyser, isPlaying, barCount, barGap, barWidth, color]);
+  
+  // Resize canvas on window resize
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    
+    const resizeCanvas = () => {
+      if (!canvasRef.current) return;
+      const canvas = canvasRef.current;
+      canvas.width = canvas.offsetWidth;
+      canvas.height = height;
+    };
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, [height]);
+  
   return (
-    <Card className={className}>
-      <CardContent className="p-4">
-        {currentTrack ? (
-          <div className="space-y-3">
-            <div className="text-center text-sm text-muted-foreground">
-              {emotion === 'neutral' 
-                ? "Visualisation musicale" 
-                : `Visualisation adaptée à votre humeur: ${emotion}`}
-            </div>
-            
-            <AudioVisualizer 
-              audioUrl={currentTrack.url}
-              isPlaying={isPlaying}
-              variant={visualizerType}
-              height={visualizerHeight}
-              primaryColor={primaryColor}
-              secondaryColor={secondaryColor}
-            />
-            
-            <div className="text-xs text-center text-muted-foreground">
-              {currentTrack.title} • {currentTrack.artist}
-            </div>
-          </div>
-        ) : (
-          <div className="h-24 flex items-center justify-center text-sm text-muted-foreground">
-            Lancez une piste audio pour voir la visualisation
-          </div>
-        )}
-      </CardContent>
+    <Card className="overflow-hidden p-0">
+      <canvas 
+        ref={canvasRef} 
+        className="w-full block"
+        style={{ height: `${height}px`, background: 'transparent' }}
+      />
     </Card>
   );
 };

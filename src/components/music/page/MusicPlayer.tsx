@@ -1,181 +1,165 @@
 
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Play, Pause, SkipForward, SkipBack, Volume2, Music, VolumeX } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
-import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
-import { useActivityLogging } from '@/hooks/useActivityLogging';
+import React, { useState, useRef, useEffect } from 'react';
+import { MusicTrack, MusicPlaylist } from '@/types';
+import MusicControls from './MusicControls';
 
-const MusicPlayer: React.FC = () => {
-  const { 
-    currentTrack, 
-    isPlaying, 
-    playTrack, 
-    pauseTrack, 
-    nextTrack, 
-    previousTrack,
-    volume,
-    setVolume,
-    isMuted,
-    toggleMute
-  } = useMusic();
+interface MusicPlayerProps {
+  tracks: MusicTrack[];
+  autoPlay?: boolean;
+  initialTrack?: MusicTrack;
+  onTrackChange?: (track: MusicTrack) => void;
+  onPlay?: () => void;
+  onPause?: () => void;
+}
+
+const MusicPlayer: React.FC<MusicPlayerProps> = ({
+  tracks = [],
+  autoPlay = false,
+  initialTrack,
+  onTrackChange,
+  onPlay,
+  onPause
+}) => {
+  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(initialTrack || (tracks.length > 0 ? tracks[0] : null));
+  const [isPlaying, setIsPlaying] = useState(autoPlay);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(0.8);
+  const [isMuted, setIsMuted] = useState(false);
   
-  const { logUserAction } = useActivityLogging('music');
-  const [progress, setProgress] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  // Simulate track playback for demo purposes
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    
-    if (isPlaying && currentTrack) {
-      interval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(interval!);
-            return 0;
-          }
-          return prev + 0.5;
-        });
-      }, 500);
+    if (initialTrack) {
+      setCurrentTrack(initialTrack);
     }
+  }, [initialTrack]);
+  
+  useEffect(() => {
+    if (!audioRef.current) return;
+    
+    const audio = audioRef.current;
+    
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+    
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration);
+    };
+    
+    const handleEnded = () => {
+      handleNext();
+    };
+    
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('ended', handleEnded);
     
     return () => {
-      if (interval) clearInterval(interval);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('ended', handleEnded);
     };
-  }, [isPlaying, currentTrack]);
+  }, [currentTrack]);
   
-  const handleVolumeChange = (value: number[]) => {
-    const newVolume = value[0] / 100;
-    setVolume(newVolume);
+  useEffect(() => {
+    if (!audioRef.current || !currentTrack) return;
     
-    // If user increases volume while muted, unmute
-    if (isMuted && newVolume > 0) {
-      toggleMute();
+    const audio = audioRef.current;
+    
+    if (isPlaying) {
+      audio.play().catch(err => console.error('Error playing audio:', err));
+      onPlay && onPlay();
+    } else {
+      audio.pause();
+      onPause && onPause();
     }
+  }, [isPlaying, currentTrack, onPlay, onPause]);
+  
+  useEffect(() => {
+    if (!audioRef.current) return;
+    
+    const audio = audioRef.current;
+    audio.volume = isMuted ? 0 : volume;
+  }, [volume, isMuted]);
+  
+  const getCurrentTrackUrl = () => {
+    if (!currentTrack) return '';
+    return currentTrack.track_url || currentTrack.audioUrl || currentTrack.url || '';
   };
   
-  const togglePlayPause = () => {
-    if (isPlaying) {
-      pauseTrack();
-      logUserAction('pause_music');
-    } else if (currentTrack) {
-      playTrack(currentTrack);
-      logUserAction('play_music');
-    }
+  const getCurrentTrackCover = () => {
+    if (!currentTrack) return '';
+    return currentTrack.cover_url || '';
+  };
+  
+  const handleTogglePlay = () => {
+    setIsPlaying(prev => !prev);
+  };
+  
+  const handlePrevious = () => {
+    if (!currentTrack || tracks.length <= 1) return;
+    
+    const currentIndex = tracks.findIndex(track => track.id === currentTrack.id);
+    const prevIndex = currentIndex <= 0 ? tracks.length - 1 : currentIndex - 1;
+    const prevTrack = tracks[prevIndex];
+    
+    setCurrentTrack(prevTrack);
+    onTrackChange && onTrackChange(prevTrack);
+  };
+  
+  const handleNext = () => {
+    if (!currentTrack || tracks.length <= 1) return;
+    
+    const currentIndex = tracks.findIndex(track => track.id === currentTrack.id);
+    const nextIndex = currentIndex >= tracks.length - 1 ? 0 : currentIndex + 1;
+    const nextTrack = tracks[nextIndex];
+    
+    setCurrentTrack(nextTrack);
+    onTrackChange && onTrackChange(nextTrack);
+  };
+  
+  const handleSeek = (value: number) => {
+    if (!audioRef.current) return;
+    
+    audioRef.current.currentTime = value;
+    setCurrentTime(value);
+  };
+  
+  const handleVolumeChange = (value: number) => {
+    setVolume(value);
+    setIsMuted(value === 0);
+  };
+  
+  const handleToggleMute = () => {
+    setIsMuted(prev => !prev);
   };
   
   return (
-    <div className="flex flex-col md:flex-row">
-      <div className="w-full md:w-1/3 bg-muted/20 p-6 flex flex-col justify-center items-center">
-        <div className="rounded-full h-32 w-32 bg-primary/10 flex items-center justify-center mb-4">
-          {currentTrack?.coverUrl ? (
-            <img 
-              src={currentTrack.coverUrl} 
-              alt={currentTrack.title} 
-              className="h-full w-full object-cover rounded-full"
-            />
-          ) : (
-            <Music className="h-12 w-12 text-primary/80" />
-          )}
-        </div>
-        <h2 className="text-xl font-medium text-center">
-          {currentTrack?.title || "Aucune piste sélectionnée"}
-        </h2>
-        <p className="text-muted-foreground text-center">
-          {currentTrack?.artist || "Sélectionnez une piste pour commencer"}
-        </p>
-      </div>
+    <>
+      <audio
+        ref={audioRef}
+        src={getCurrentTrackUrl()}
+        preload="metadata"
+        style={{ display: 'none' }}
+      />
       
-      <div className="flex-1 p-6">
-        <div className="h-[180px] mb-6">
-          <EnhancedMusicVisualizer 
-            showControls={false}
-            height={180}
-          />
-        </div>
-        
-        {/* Progress bar */}
-        {currentTrack && (
-          <div className="mb-4">
-            <Slider
-              value={[progress]}
-              max={100}
-              step={0.1}
-              className="mb-1"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>
-                {Math.floor((progress / 100) * (currentTrack?.duration || 0) / 60)}:
-                {String(Math.floor((progress / 100) * (currentTrack?.duration || 0) % 60)).padStart(2, '0')}
-              </span>
-              <span>
-                {Math.floor((currentTrack?.duration || 0) / 60)}:
-                {String(Math.floor((currentTrack?.duration || 0) % 60)).padStart(2, '0')}
-              </span>
-            </div>
-          </div>
-        )}
-        
-        <div className="flex justify-center space-x-2 mb-4">
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="h-10 w-10"
-            onClick={() => previousTrack()}
-            disabled={!currentTrack}
-          >
-            <SkipBack className="h-5 w-5" />
-          </Button>
-          
-          <Button 
-            variant="default" 
-            size="icon"
-            className="h-12 w-12" 
-            onClick={togglePlayPause}
-            disabled={!currentTrack}
-          >
-            {isPlaying ? (
-              <Pause className="h-6 w-6" />
-            ) : (
-              <Play className="h-6 w-6" />
-            )}
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="h-10 w-10"
-            onClick={() => nextTrack()}
-            disabled={!currentTrack}
-          >
-            <SkipForward className="h-5 w-5" />
-          </Button>
-        </div>
-        
-        <div className="flex items-center space-x-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8"
-            onClick={toggleMute}
-          >
-            {isMuted || volume === 0 ? (
-              <VolumeX className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <Volume2 className="h-4 w-4 text-muted-foreground" />
-            )}
-          </Button>
-          <Slider
-            value={[isMuted ? 0 : volume * 100]}
-            max={100}
-            step={1}
-            onValueChange={handleVolumeChange}
-            className="flex-1"
-          />
-        </div>
-      </div>
-    </div>
+      <MusicControls
+        isPlaying={isPlaying}
+        currentTrack={currentTrack}
+        onTogglePlay={handleTogglePlay}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+        currentTime={currentTime}
+        duration={duration || (currentTrack?.duration || 0)}
+        onSeek={handleSeek}
+        volume={volume}
+        isMuted={isMuted}
+        onToggleMute={handleToggleMute}
+        onVolumeChange={handleVolumeChange}
+      />
+    </>
   );
 };
 

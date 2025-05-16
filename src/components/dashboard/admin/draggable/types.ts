@@ -15,6 +15,7 @@ export interface DraggableCardProps {
   subtitle?: string | ReactNode;
   ariaLabel?: string;
   onClick?: () => void;
+  status?: 'success' | 'warning' | 'danger' | 'info';
 }
 
 export interface DraggableKpiCardsGridProps {
@@ -22,3 +23,5 @@ export interface DraggableKpiCardsGridProps {
   kpiCards?: DraggableCardProps[];
   onOrderChange?: (cards: DraggableCardProps[]) => void;
 }
+
+export type KpiCardProps = DraggableCardProps;

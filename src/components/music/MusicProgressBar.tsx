@@ -1,56 +1,55 @@
 
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
+import { ProgressBarProps } from '@/types';
 
-interface MusicProgressBarProps {
-  value?: number;
-  max?: number;
-  currentTime?: number;
-  duration?: number;
-  onSeek?: (value: number) => void;
-  className?: string;
-  formatTime?: (seconds: number) => string;
-  showTimestamps?: boolean;
-}
-
-const MusicProgressBar: React.FC<MusicProgressBarProps> = ({
-  value = 0,
-  max = 100,
-  currentTime = 0,
-  duration = 0,
-  onSeek,
+const MusicProgressBar: React.FC<ProgressBarProps> = ({
+  progress,
+  max,
+  onChange,
   className = '',
-  formatTime = (seconds) => {
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-  },
-  showTimestamps = true
+  formatTime,
+  currentTime,
+  duration,
+  onSeek,
+  value,
+  showTimestamps = false
 }) => {
-  const handleValueChange = (values: number[]) => {
-    if (onSeek) {
-      onSeek(values[0]);
-    }
+  // Use provided props or fallbacks
+  const actualProgress = value !== undefined ? value : progress;
+  const actualMax = max || 100;
+  const handleChange = onChange || onSeek || (() => {});
+  
+  const defaultFormatTime = (seconds: number) => {
+    if (isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  const sliderValue = value || currentTime;
-  const sliderMax = max || duration || 100;
-
+  
+  const timeFormatter = formatTime || defaultFormatTime;
+  
   return (
-    <div className={`flex flex-col gap-1 w-full ${className}`}>
+    <div className={`flex items-center ${className}`}>
+      {showTimestamps && currentTime !== undefined && (
+        <span className="text-xs text-muted-foreground mr-2">
+          {timeFormatter(currentTime)}
+        </span>
+      )}
+      
       <Slider
-        value={[sliderValue]}
-        max={sliderMax}
+        value={[actualProgress || 0]}
+        min={0}
+        max={actualMax}
         step={1}
-        onValueChange={handleValueChange}
+        onValueChange={(value) => handleChange(value[0])}
         className="cursor-pointer"
       />
       
-      {showTimestamps && (
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
-        </div>
+      {showTimestamps && duration !== undefined && (
+        <span className="text-xs text-muted-foreground ml-2">
+          {timeFormatter(duration)}
+        </span>
       )}
     </div>
   );

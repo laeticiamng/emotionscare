@@ -1,228 +1,168 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MusicTrack, MusicPlaylist, MusicLibraryProps } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Play, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import LibraryTab from './LibraryTab';
-import { MusicLibraryProps, MusicPlaylist, MusicTrack } from '@/types';
+import { Play } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-// Default playlists for demo
-const defaultPlaylists: MusicPlaylist[] = [
-  {
-    id: 'calm',
-    name: 'Calme et relaxation',
-    title: 'Calme et relaxation',
-    description: 'Musiques apaisantes pour la relaxation et la méditation',
-    tracks: [],
-    category: 'relaxation',
-  },
-  {
-    id: 'energy',
-    name: 'Énergie et motivation',
-    title: 'Énergie et motivation',
-    description: 'Boost d\'énergie pour commencer la journée',
-    tracks: [],
-    category: 'energie',
-  },
-  {
-    id: 'focus',
-    name: 'Concentration',
-    title: 'Concentration',
-    description: 'Améliorer votre focus et productivité',
-    tracks: [],
-    category: 'travail',
-  },
-  {
-    id: 'sleep',
-    name: 'Sommeil',
-    title: 'Sommeil',
-    description: 'Sons relaxants pour un meilleur sommeil',
-    tracks: [],
-    category: 'relaxation',
-  }
-];
-
-// Default track placeholders
-const placeholderTracks: MusicTrack[] = [
-  {
-    id: 'track1',
-    title: 'Méditation matinale',
-    artist: 'Nature Sounds',
-    duration: 180,
-    url: '/audio/track1.mp3',
-    cover_url: 'https://via.placeholder.com/300?text=Morning+Meditation',
-    genre: 'meditation',
-    emotion: 'calm',
-  },
-  {
-    id: 'track2',
-    title: 'Focus intense',
-    artist: 'Mind Collection',
-    duration: 240,
-    url: '/audio/track2.mp3',
-    cover_url: 'https://via.placeholder.com/300?text=Deep+Focus',
-    genre: 'focus',
-    emotion: 'neutral',
-  },
-];
-
-const MusicLibrary: React.FC<MusicLibraryProps> = ({
-  playlists = defaultPlaylists,
-  onSelectTrack,
+const MusicLibrary: React.FC<MusicLibraryProps> = ({ 
+  playlists = [], 
+  onSelectTrack, 
   onSelectPlaylist
 }) => {
-  // Get categories from playlists
-  const categories = [...new Set(playlists.map(p => p.category || 'Autres'))];
+  const [activeTab, setActiveTab] = React.useState('playlists');
   
+  // Sample data for demonstration
+  const samplePlaylists = [
+    {
+      id: '1',
+      name: 'Calme et concentration',
+      description: 'Mélodies douces pour se concentrer',
+      coverUrl: '',
+      tracks: [
+        { id: '1-1', title: 'Méditation matinale', artist: 'IA Composer', duration: 180, cover_url: '' },
+        { id: '1-2', title: 'Focus profond', artist: 'IA Composer', duration: 240, cover_url: '' }
+      ]
+    },
+    {
+      id: '2',
+      name: 'Énergie et motivation',
+      description: 'Rythmes dynamiques pour booster l\'énergie',
+      coverUrl: '',
+      tracks: [
+        { id: '2-1', title: 'Éveil créatif', artist: 'IA Composer', duration: 190, cover_url: '' },
+        { id: '2-2', title: 'Inspiration', artist: 'IA Composer', duration: 210, cover_url: '' }
+      ]
+    },
+    {
+      id: '3',
+      name: 'Détente et relaxation',
+      description: 'Sons apaisants pour se relaxer',
+      coverUrl: '',
+      tracks: [
+        { id: '3-1', title: 'Vagues océaniques', artist: 'IA Composer', duration: 300, cover_url: '' },
+        { id: '3-2', title: 'Forêt brumeuse', artist: 'IA Composer', duration: 280, cover_url: '' }
+      ]
+    },
+    {
+      id: '4',
+      name: 'Sommeil profond',
+      description: 'Berceuses et ambiances nocturnes',
+      coverUrl: '',
+      tracks: [
+        { id: '4-1', title: 'Nuit étoilée', artist: 'IA Composer', duration: 450, cover_url: '' },
+        { id: '4-2', title: 'Rêverie', artist: 'IA Composer', duration: 420, cover_url: '' }
+      ]
+    }
+  ];
+
+  const recentTracks = [
+    {
+      id: '5-1',
+      title: 'Méditation matinale',
+      artist: 'IA Composer',
+      duration: 180,
+      cover_url: '',
+      track_url: ''
+    },
+    {
+      id: '5-2',
+      title: 'Focus profond',
+      artist: 'IA Composer',
+      duration: 240,
+      cover_url: '',
+      track_url: ''
+    }
+  ];
+
+  // Use provided playlists or fallback to sample data
+  const displayPlaylists = playlists.length > 0 ? playlists : samplePlaylists;
+
+  const handlePlaylistSelect = (playlist: MusicPlaylist) => {
+    if (onSelectPlaylist) {
+      onSelectPlaylist(playlist);
+    }
+  };
+
+  const handleTrackSelect = (track: MusicTrack) => {
+    if (onSelectTrack) {
+      onSelectTrack(track);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="discover" className="w-full">
+      <Tabs defaultValue="playlists" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-4">
-          <TabsTrigger value="discover">Découvrir</TabsTrigger>
-          <TabsTrigger value="library">Bibliothèque</TabsTrigger>
-          <TabsTrigger value="mood">Par humeur</TabsTrigger>
-          <TabsTrigger value="recent">Récents</TabsTrigger>
+          <TabsTrigger value="playlists">Playlists</TabsTrigger>
+          <TabsTrigger value="tracks">Morceaux récents</TabsTrigger>
+          <TabsTrigger value="favorites">Favoris</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="discover" className="space-y-6">
-          <div>
-            <h2 className="text-lg font-medium mb-3">Recommandé pour vous</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {placeholderTracks.map(track => (
-                <Card key={track.id} className="overflow-hidden">
-                  <div className="relative group">
-                    <img 
-                      src={track.cover_url} 
-                      alt={track.title}
-                      className="w-full aspect-square object-cover" 
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button 
-                        size="icon" 
-                        className="rounded-full" 
-                        onClick={() => onSelectTrack?.(track)}
-                      >
-                        <Play className="h-5 w-5" />
-                      </Button>
-                    </div>
+        <TabsContent value="playlists" className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {displayPlaylists.map((playlist) => (
+              <Card 
+                key={playlist.id} 
+                className="overflow-hidden cursor-pointer hover:ring-1 hover:ring-primary transition-all"
+                onClick={() => handlePlaylistSelect(playlist)}
+              >
+                <div className="h-32 bg-gradient-to-r from-indigo-500 to-purple-600">
+                  {/* Placeholder for playlist cover */}
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="font-medium truncate">{playlist.name}</h3>
+                  <p className="text-sm text-muted-foreground truncate">{playlist.description}</p>
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-xs text-muted-foreground">
+                      {playlist.tracks.length} morceaux
+                    </span>
+                    <Button size="icon" variant="ghost" className="h-8 w-8">
+                      <Play className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <CardContent className="p-3">
-                    <h3 className="font-medium truncate">{track.title}</h3>
-                    <p className="text-sm text-muted-foreground">{track.artist}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-          
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-medium">Playlists populaires</h2>
-              <Button variant="link" size="sm" className="text-xs">
-                Voir tout <ArrowRight className="h-3 w-3 ml-1" />
-              </Button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {playlists.slice(0, 3).map(playlist => (
-                <Card 
-                  key={playlist.id} 
-                  className="overflow-hidden cursor-pointer"
-                  onClick={() => onSelectPlaylist?.(playlist)}
-                >
-                  <CardContent className="p-4">
-                    <h3 className="font-medium">{playlist.title || playlist.name}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                      {playlist.description || 'Collection de morceaux'}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </TabsContent>
         
-        <TabsContent value="library">
-          <LibraryTab 
-            playlists={playlists}
-            onSelectTrack={onSelectTrack}
-            onSelectPlaylist={onSelectPlaylist}
-          />
-        </TabsContent>
-        
-        <TabsContent value="mood" className="space-y-6">
-          <div>
-            <h2 className="text-lg font-medium mb-3">Calme et détente</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {playlists
-                .filter(p => p.emotion === 'calm' || p.category === 'relaxation')
-                .slice(0, 4)
-                .map(playlist => (
-                  <Card 
-                    key={playlist.id}
-                    className="cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => onSelectPlaylist?.(playlist)}
-                  >
-                    <CardContent className="p-4">
-                      <h3 className="font-medium">{playlist.title || playlist.name}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">Pour se détendre</p>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          </div>
-          
-          <div>
-            <h2 className="text-lg font-medium mb-3">Concentration</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {playlists
-                .filter(p => p.emotion === 'focused' || p.category === 'travail')
-                .slice(0, 4)
-                .map(playlist => (
-                  <Card 
-                    key={playlist.id}
-                    className="cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => onSelectPlaylist?.(playlist)}
-                  >
-                    <CardContent className="p-4">
-                      <h3 className="font-medium">{playlist.title || playlist.name}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">Pour la concentration</p>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          </div>
-          
-          <div>
-            <h2 className="text-lg font-medium mb-3">Énergie</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {playlists
-                .filter(p => p.emotion === 'energetic' || p.category === 'energie')
-                .slice(0, 4)
-                .map(playlist => (
-                  <Card 
-                    key={playlist.id}
-                    className="cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => onSelectPlaylist?.(playlist)}
-                  >
-                    <CardContent className="p-4">
-                      <h3 className="font-medium">{playlist.title || playlist.name}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">Pour s'énergiser</p>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
+        <TabsContent value="tracks" className="space-y-4">
+          <div className="grid grid-cols-1 gap-2">
+            {recentTracks.map((track) => (
+              <Card 
+                key={track.id}
+                className="overflow-hidden hover:bg-muted/50 transition-colors cursor-pointer"
+                onClick={() => handleTrackSelect(track)}
+              >
+                <CardContent className="p-3 flex items-center">
+                  <div className="h-12 w-12 bg-gradient-to-r from-blue-500 to-teal-500 rounded-md mr-3">
+                    {/* Track cover */}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium truncate">{track.title}</h4>
+                    <p className="text-sm text-muted-foreground truncate">{track.artist}</p>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-xs text-muted-foreground mr-3">
+                      {Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')}
+                    </span>
+                    <Button size="icon" variant="ghost" className="h-8 w-8">
+                      <Play className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </TabsContent>
         
-        <TabsContent value="recent">
-          <div className="text-center py-10">
-            <p className="text-muted-foreground">
-              Vous n'avez pas encore écouté de musique récemment.
-            </p>
-            <Button className="mt-4" onClick={() => onSelectPlaylist?.(defaultPlaylists[0])}>
-              Découvrir des playlists
+        <TabsContent value="favorites">
+          <div className="flex flex-col items-center justify-center p-6 text-center">
+            <p className="text-muted-foreground">Aucun favori pour le moment</p>
+            <Button variant="outline" className="mt-4">
+              Explorer la bibliothèque
             </Button>
           </div>
         </TabsContent>

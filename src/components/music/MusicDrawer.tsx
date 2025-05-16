@@ -1,17 +1,25 @@
 
-import React, { useState } from 'react';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
-import { MusicTrack, MusicPlaylist, MusicDrawerProps } from '@/types';
+import { 
+  Drawer, 
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerClose
+} from '@/components/ui/drawer';
+import { MusicDrawerProps, MusicTrack } from '@/types';
+import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import MusicProgressBar from './MusicProgressBar';
 import VolumeControl from './VolumeControl';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({
   children,
-  side = "right",
-  open,
-  isOpen,
+  side = 'bottom',
+  open = false,
+  isOpen = false,
   onClose,
   onOpenChange,
   currentTrack,
@@ -20,101 +28,180 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(50);
+  const [volume, setVolume] = useState(0.7);
   const [isMuted, setIsMuted] = useState(false);
-
+  const [activeTrackIndex, setActiveTrackIndex] = useState(0);
+  
+  const audioRef = useRef<HTMLAudioElement>(null);
+  
+  // Use either the open prop or isOpen prop
+  const drawerOpen = open || isOpen;
+  
+  // Handle prop changes
+  useEffect(() => {
+    if (currentTrack && playlist) {
+      // Find the index of the current track in the playlist
+      const index = playlist.tracks.findIndex(track => track.id === currentTrack.id);
+      if (index !== -1) {
+        setActiveTrackIndex(index);
+      }
+    }
+  }, [currentTrack, playlist]);
+  
+  // Audio event handlers
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    
+    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const handleDurationChange = () => setDuration(audio.duration);
+    const handleEnded = () => handleNext();
+    
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('durationchange', handleDurationChange);
+    audio.addEventListener('ended', handleEnded);
+    
+    return () => {
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('durationchange', handleDurationChange);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, []);
+  
+  // Play/pause control
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    
+    if (isPlaying) {
+      audio.play().catch(err => console.error('Play error:', err));
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying]);
+  
+  // Volume control
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    
+    audio.volume = isMuted ? 0 : volume;
+  }, [volume, isMuted]);
+  
+  // Get the current track URL
+  const getCurrentTrackUrl = () => {
+    if (!playlist || !playlist.tracks.length || activeTrackIndex >= playlist.tracks.length) {
+      return '';
+    }
+    
+    const track = playlist.tracks[activeTrackIndex];
+    return track.track_url || track.audioUrl || track.url || '';
+  };
+  
+  // Handlers
+  const handleTogglePlay = () => setIsPlaying(prev => !prev);
+  
   const handleSeek = (value: number) => {
-    setCurrentTime(value);
+    if (audioRef.current) {
+      audioRef.current.currentTime = value;
+      setCurrentTime(value);
+    }
   };
-
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
+  
+  const handlePrevious = () => {
+    if (!playlist || !playlist.tracks.length) return;
+    
+    const newIndex = activeTrackIndex <= 0 ? playlist.tracks.length - 1 : activeTrackIndex - 1;
+    setActiveTrackIndex(newIndex);
+    setIsPlaying(true);
   };
-
-  const handlePrev = () => {
-    // Implement previous track logic
-  };
-
+  
   const handleNext = () => {
-    // Implement next track logic
+    if (!playlist || !playlist.tracks.length) return;
+    
+    const newIndex = activeTrackIndex >= playlist.tracks.length - 1 ? 0 : activeTrackIndex + 1;
+    setActiveTrackIndex(newIndex);
+    setIsPlaying(true);
   };
-
+  
   const handleVolumeChange = (value: number) => {
     setVolume(value);
     if (value > 0 && isMuted) {
       setIsMuted(false);
     }
   };
-
-  const handleMuteToggle = () => {
-    setIsMuted(!isMuted);
+  
+  const handleToggleMute = () => setIsMuted(prev => !prev);
+  
+  const formatTime = (seconds: number) => {
+    if (isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+  
+  const getCurrentTrack = () => {
+    if (!playlist || !playlist.tracks.length || activeTrackIndex >= playlist.tracks.length) {
+      return null;
+    }
+    return playlist.tracks[activeTrackIndex];
+  };
+  
+  const track = getCurrentTrack();
 
   return (
-    <Drawer open={open || isOpen} onOpenChange={onOpenChange} direction={side}>
-      <DrawerContent className="h-[85vh] p-4 rounded-t-xl">
-        <div className="flex items-start justify-between mb-6">
-          <h2 className="text-xl font-semibold">Player musical</h2>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            onClick={onClose}
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
+    <>
+      <Drawer open={drawerOpen} onOpenChange={onOpenChange}>
+        <DrawerContent side={side}>
+          <div className="mx-auto w-full max-w-lg p-6">
+            <DrawerHeader>
+              <DrawerTitle>
+                {playlist?.name || playlist?.title || "Playlist musicale"}
+              </DrawerTitle>
+              <DrawerDescription>
+                {track ? `${activeTrackIndex + 1}/${playlist?.tracks.length} - ${track.title}` : "Aucune piste"}
+              </DrawerDescription>
+            </DrawerHeader>
 
-        <div className="flex flex-col h-full">
-          {currentTrack ? (
-            <>
-              <div className="flex-1 flex flex-col items-center justify-center space-y-6 mb-6">
-                <div className="w-64 h-64 rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/30">
-                  {currentTrack.cover || currentTrack.cover_url ? (
-                    <img
-                      src={currentTrack.cover || currentTrack.cover_url}
-                      alt={currentTrack.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/30">
-                      <Volume2 className="h-16 w-16 text-primary" />
-                    </div>
-                  )}
-                </div>
-
-                <div className="text-center">
-                  <h3 className="text-xl font-semibold">{currentTrack.title}</h3>
-                  <p className="text-muted-foreground">{currentTrack.artist}</p>
-                </div>
+            <div className="py-6">
+              <div className="flex justify-center mb-6">
+                <div className="w-32 h-32 rounded-lg bg-gradient-to-br from-blue-500 to-purple-700 shadow-lg" />
               </div>
-
-              <div className="space-y-6">
+              
+              {track && (
+                <div className="text-center mb-6">
+                  <h3 className="text-lg font-semibold">{track.title}</h3>
+                  <p className="text-muted-foreground">{track.artist}</p>
+                </div>
+              )}
+              
+              <div className="space-y-4">
                 <MusicProgressBar
-                  value={currentTime}
-                  max={duration}
+                  progress={currentTime}
+                  max={duration || track?.duration || 0}
                   currentTime={currentTime}
-                  duration={duration}
+                  duration={duration || track?.duration || 0}
                   onSeek={handleSeek}
+                  formatTime={formatTime}
+                  showTimestamps
                   className="w-full"
-                  showTimestamps={true}
                 />
-
-                <div className="flex items-center justify-center space-x-4">
+                
+                <div className="flex justify-center items-center space-x-4">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="icon"
-                    className="rounded-full"
-                    onClick={handlePrev}
+                    onClick={handlePrevious}
+                    disabled={!playlist?.tracks.length}
                   >
                     <SkipBack className="h-6 w-6" />
                   </Button>
-
+                  
                   <Button
-                    variant="default"
-                    size="icon"
-                    className="h-12 w-12 rounded-full"
-                    onClick={togglePlay}
+                    size="lg"
+                    className="h-14 w-14 rounded-full"
+                    onClick={handleTogglePlay}
+                    disabled={!playlist?.tracks.length}
                   >
                     {isPlaying ? (
                       <Pause className="h-6 w-6" />
@@ -122,89 +209,48 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
                       <Play className="h-6 w-6 ml-1" />
                     )}
                   </Button>
-
+                  
                   <Button
-                    variant="ghost"
+                    variant="outline" 
                     size="icon"
-                    className="rounded-full"
                     onClick={handleNext}
+                    disabled={!playlist?.tracks.length}
                   >
                     <SkipForward className="h-6 w-6" />
                   </Button>
                 </div>
-
-                <div className="flex justify-center">
+                
+                <div className="w-48 mx-auto mt-4">
                   <VolumeControl
                     volume={volume}
                     onChange={handleVolumeChange}
                     isMuted={isMuted}
-                    onMuteToggle={handleMuteToggle}
-                    className="w-48"
-                    showLabel={true}
+                    onMuteToggle={handleToggleMute}
+                    className="w-full"
+                    showLabel
                   />
                 </div>
               </div>
-            </>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center space-y-4 text-center">
-              <Volume2 className="h-16 w-16 text-muted-foreground" />
-              <div>
-                <h3 className="text-xl font-semibold">Aucun morceau</h3>
-                <p className="text-muted-foreground mt-1">
-                  Sélectionnez un morceau pour commencer à écouter
-                </p>
-              </div>
             </div>
-          )}
 
-          {playlist && playlist.tracks && playlist.tracks.length > 0 && (
-            <div className="mt-8">
-              <h3 className="text-lg font-medium mb-2">
-                {playlist.name || playlist.title || 'Playlist actuelle'}
-              </h3>
-              <div className="max-h-64 overflow-y-auto">
-                {playlist.tracks.map((track) => (
-                  <div
-                    key={track.id}
-                    className={`flex items-center p-2 rounded-md ${
-                      currentTrack && currentTrack.id === track.id
-                        ? 'bg-primary/10'
-                        : 'hover:bg-accent'
-                    } cursor-pointer`}
-                  >
-                    <div className="h-10 w-10 rounded overflow-hidden bg-muted flex-shrink-0">
-                      {track.cover || track.cover_url ? (
-                        <img
-                          src={track.cover || track.cover_url}
-                          alt={track.title}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center bg-primary/10">
-                          <Volume2 className="h-5 w-5 text-primary" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="ml-3 flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {track.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {track.artist}
-                      </p>
-                    </div>
-                    <div className="text-xs text-muted-foreground ml-2">
-                      {Math.floor(track.duration / 60)}:
-                      {String(Math.floor(track.duration % 60)).padStart(2, '0')}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </DrawerContent>
-    </Drawer>
+            <DrawerFooter>
+              <DrawerClose asChild>
+                <Button variant="outline" onClick={onClose}>Fermer</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      <audio
+        ref={audioRef}
+        src={getCurrentTrackUrl()}
+        preload="metadata"
+        style={{ display: 'none' }}
+      />
+
+      {children}
+    </>
   );
 };
 
