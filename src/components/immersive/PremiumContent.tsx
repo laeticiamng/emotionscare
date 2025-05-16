@@ -47,7 +47,7 @@ const PremiumContent: React.FC<PremiumContentProps> = ({ greeting }) => {
             title="Espace Particulier"
             description="Accédez à votre espace personnel pour explorer vos émotions, gérer votre journal et suivre votre progression."
             icon={Sparkles}
-            linkTo="/b2c/login"
+            linkTo="/home"
             buttonText="Accéder à mon espace"
             delay={1}
             initialX={-40}
@@ -57,7 +57,7 @@ const PremiumContent: React.FC<PremiumContentProps> = ({ greeting }) => {
             title="Espace Entreprise"
             description="Solutions de bien-être professionnel pour les collaborateurs et outils d'analyse pour les responsables RH."
             icon={Sparkles}
-            linkTo="/b2b/selection"
+            linkTo="/home"
             buttonText="Accéder à l'espace pro"
             buttonVariant="secondary"
             delay={1.1}
@@ -73,7 +73,7 @@ const PremiumContent: React.FC<PremiumContentProps> = ({ greeting }) => {
         transition={{ duration: 0.8, delay: 1.5 }}
       >
         <p className="text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} EmotionsCare • <Link to="/privacy-policy" className="hover:underline">Confidentialité</Link> • <Link to="/terms" className="hover:underline">Conditions d'utilisation</Link>
+          &copy; {new Date().getFullYear()} EmotionsCare • <Link to="/" className="hover:underline">Confidentialité</Link> • <Link to="/" className="hover:underline">Conditions d'utilisation</Link>
         </p>
       </motion.div>
     </div>

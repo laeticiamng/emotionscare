@@ -30,6 +30,7 @@ const ImmersiveHome = () => {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const { loadPlaylistForEmotion } = useMusic();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Set ambient audio
@@ -45,11 +46,8 @@ const ImmersiveHome = () => {
     // Simulate loading playlist on mount
     const loadAmbientMusic = async () => {
       try {
-        const emotion = { emotion: 'calm' };
-        const playlist = await loadPlaylistForEmotion(emotion);
-        if (playlist && playlist.tracks && playlist.tracks.length > 0) {
-          console.log('Ambient music ready to play');
-        }
+        await loadPlaylistForEmotion('calm');
+        console.log('Ambient music ready to play');
       } catch (error) {
         console.error('Error loading ambient music:', error);
       }

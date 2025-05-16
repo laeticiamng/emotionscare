@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { Story } from '@/types';
+import { Story } from '@/types/types';
 
 interface StorytellingContextType {
   storyQueue: Story[];

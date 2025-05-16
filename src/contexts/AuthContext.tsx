@@ -1,99 +1,90 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 
-export interface User {
+interface User {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
-  role?: string;
+  role: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  register: (name: string, email: string, password: string) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  login: async () => false,
-  logout: async () => {}
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  useEffect(() => {
-    // Simuler un chargement des données utilisateur
-    const checkAuth = async () => {
-      try {
-        // Simuler une vérification d'authentification
-        const savedUser = localStorage.getItem('emotionscare_user');
-        
-        if (savedUser) {
-          setUser(JSON.parse(savedUser));
-        }
-      } catch (error) {
-        console.error("Erreur d'authentification:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    checkAuth();
-  }, []);
-  
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
-      // Simulate login API call
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Pour la démo, accepter n'importe quelles identifiants
-      const mockUser: User = {
+      setUser({
         id: '1',
-        name: 'Utilisateur Demo',
+        name: 'Utilisateur Test',
         email,
         role: 'user'
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem('emotionscare_user', JSON.stringify(mockUser));
-      return true;
+      });
     } catch (error) {
-      console.error("Erreur de connexion:", error);
-      return false;
+      console.error('Login error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
-  
-  const logout = async (): Promise<void> => {
+
+  const logout = () => {
+    setUser(null);
+  };
+
+  const register = async (name: string, email: string, password: string) => {
+    setIsLoading(true);
     try {
-      // Simulate logout API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setUser(null);
-      localStorage.removeItem('emotionscare_user');
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setUser({
+        id: '1',
+        name,
+        email,
+        role: 'user'
+      });
     } catch (error) {
-      console.error("Erreur de déconnexion:", error);
+      console.error('Register error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
-  
+
   return (
-    <AuthContext.Provider value={{
-      user,
-      isAuthenticated: !!user,
-      isLoading,
-      login,
-      logout
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        logout,
+        register
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

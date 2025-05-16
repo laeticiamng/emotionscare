@@ -9,6 +9,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from './components/ui/toaster';
 import { StorytellingProvider } from './contexts/StorytellingContext';
+import ImmersiveHome from './pages/ImmersiveHome';
 
 const App: React.FC = () => {
   return (
@@ -19,6 +20,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/home" element={<Home />} />
+              <Route path="/immersive" element={<ImmersiveHome />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
             <Toaster />

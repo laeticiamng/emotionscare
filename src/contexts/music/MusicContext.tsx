@@ -38,16 +38,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Melody`,
           artist: "EmotionsCare Audio",
           duration: 180,
-          url: "/sounds/ambient-calm.mp3",
-          coverUrl: ""
+          url: "/sounds/ambient-calm.mp3"
         },
         {
           id: `track-${emotion}-2`,
           title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Harmony`,
           artist: "EmotionsCare Audio",
           duration: 210,
-          url: "/sounds/ambient-calm.mp3",
-          coverUrl: ""
+          url: "/sounds/ambient-calm.mp3"
         }
       ]
     };
@@ -63,7 +61,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentTrack(track);
     setIsPlaying(true);
     setProgress(0);
-    setDuration(track.duration);
+    setDuration(track.duration || 0);
   };
   
   // Pause the current track
@@ -87,6 +85,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Toggle play/pause
   const togglePlay = () => {
     setIsPlaying(prev => !prev);
+  };
+  
+  // Toggle mute
+  const toggleMute = () => {
+    setMuted(!muted);
   };
   
   // Go to next track
@@ -117,11 +120,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
   
-  // Toggle mute
-  const toggleMute = () => {
-    setMuted(prev => !prev);
-  };
-  
   // Seek to a specific position
   const seekTo = (position: number) => {
     setProgress(position);
@@ -139,7 +137,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     currentTrack,
     isPlaying,
     volume,
-    muted,
     isMuted: muted,
     progress,
     duration,
@@ -182,13 +179,4 @@ export const useMusic = () => {
   }
   
   return context;
-};
-
-// Exporter un wrapper pour faciliter l'utilisation
-export const MusicRoot: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <MusicProvider>
-      {children}
-    </MusicProvider>
-  );
 };

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { MicIcon, Speaker, VolumeX } from 'lucide-react';
-import { ModeToggle } from '@/components/ui/mode-toggle';
+import { useTheme } from '@/components/theme/ThemeProvider';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,6 +21,7 @@ const ImmersiveControls: React.FC<ImmersiveControlsProps> = ({
   setAudioEnabled,
   audioRef
 }) => {
+  const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -28,13 +29,11 @@ const ImmersiveControls: React.FC<ImmersiveControlsProps> = ({
     if (isListening) {
       setIsListening(false);
       toast({
-        title: "Commandes vocales désactivées",
         description: "Nous n'écoutons plus",
       });
     } else {
       setIsListening(true);
       toast({
-        title: "Commandes vocales activées",
         description: "Dites 'Particulier' ou 'Entreprise' pour naviguer",
       });
       
@@ -42,10 +41,9 @@ const ImmersiveControls: React.FC<ImmersiveControlsProps> = ({
       setTimeout(() => {
         setIsListening(false);
         toast({
-          title: "✓ Commande reconnue",
           description: "Redirection vers votre espace...",
         });
-        setTimeout(() => navigate('/b2c/login'), 1500);
+        setTimeout(() => navigate('/home'), 1500);
       }, 3000);
     }
   };
@@ -57,17 +55,19 @@ const ImmersiveControls: React.FC<ImmersiveControlsProps> = ({
       if (audioEnabled) {
         audioRef.current.pause();
         toast({
-          title: "Son désactivé",
           description: "Ambiance musicale coupée",
         });
       } else {
         audioRef.current.play().catch(e => console.error("Audio playback error:", e));
         toast({
-          title: "Son activé",
           description: "Ambiance musicale activée",
         });
       }
     }
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
@@ -97,7 +97,17 @@ const ImmersiveControls: React.FC<ImmersiveControlsProps> = ({
           <span className="sr-only">Audio</span>
         </Button>
         
-        <ModeToggle />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={toggleTheme}
+          className="control-button"
+        >
+          <span className="h-5 w-5 text-blue-300">
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </span>
+          <span className="sr-only">Theme</span>
+        </Button>
       </div>
     </div>
   );

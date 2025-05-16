@@ -12,7 +12,7 @@ const Shell: React.FC<ShellProps> = ({ children, hideNav = false }) => {
       {!hideNav && (
         <header className="border-b">
           <div className="container mx-auto p-4">
-            <nav>Navigation (Caché pour la page d'accueil immersive)</nav>
+            <nav>Navigation</nav>
           </div>
         </header>
       )}
