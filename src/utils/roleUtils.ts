@@ -1,4 +1,3 @@
-
 import { UserRole } from '@/types';
 
 /**
@@ -26,6 +25,11 @@ export const normalizeUserRole = (role: string): UserRole => {
   const normalizedRole = String(role).toLowerCase().trim();
   return roleMap[normalizedRole] || 'user';
 };
+
+/**
+ * Alias for normalizeUserRole for compatibility
+ */
+export const normalizeRole = normalizeUserRole;
 
 /**
  * Returns the home path for a given role
@@ -65,4 +69,43 @@ export const formatRoleForDisplay = (role: string): string => {
 
   const normalizedRole = normalizeUserRole(role);
   return roleDisplayMap[normalizedRole] || 'Utilisateur';
+};
+
+/**
+ * Alias for formatRoleForDisplay
+ */
+export const getRoleName = formatRoleForDisplay;
+
+/**
+ * Checks if a user with a given role has access to a required role
+ */
+export const hasRoleAccess = (userRole: UserRole, requiredRole: UserRole): boolean => {
+  // Admin has access to all roles
+  if (userRole === 'admin') return true;
+  
+  // B2B Admin has access to b2b_admin and b2b_user
+  if (userRole === 'b2b_admin' && (requiredRole === 'b2b_admin' || requiredRole === 'b2b_user')) return true;
+  
+  // Same role always has access to itself
+  if (userRole === requiredRole) return true;
+  
+  // Otherwise no access
+  return false;
+};
+
+/**
+ * Returns the login path for a given role
+ */
+export const getRoleLoginPath = (role: UserRole): string => {
+  switch (role) {
+    case 'admin':
+      return '/admin/login';
+    case 'b2b_admin':
+      return '/b2b/admin/login';
+    case 'b2b_user':
+      return '/b2b/user/login';
+    case 'user':
+    default:
+      return '/login';
+  }
 };

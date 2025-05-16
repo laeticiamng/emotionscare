@@ -28,7 +28,8 @@ const UserDashboard: React.FC = () => {
       category: 'daily',
       points: 50,
       progress: 0,
-      completed: false
+      completed: false,
+      isDaily: true
     },
     {
       id: '2',
@@ -37,7 +38,8 @@ const UserDashboard: React.FC = () => {
       category: 'weekly',
       points: 100,
       progress: 33,
-      completed: false
+      completed: false,
+      isWeekly: true
     },
     {
       id: '3',
@@ -46,7 +48,8 @@ const UserDashboard: React.FC = () => {
       category: 'special',
       points: 150,
       progress: 0,
-      completed: false
+      completed: false,
+      status: 'active'
     }
   ];
 

@@ -11,7 +11,8 @@ export type NotificationType =
   | 'success'
   | 'warning'
   | 'error'
-  | 'alert';
+  | 'alert'
+  | 'message';
 
 export type NotificationTone = 'professional' | 'casual' | 'supportive' | 'minimal';
 
@@ -24,9 +25,9 @@ export interface Notification {
   read: boolean;
   action_url?: string;
   action_label?: string;
+  date?: string; // Added for compatibility
   actionUrl?: string;  // Added for compatibility
   actionLabel?: string; // Added for compatibility
-  date?: string; // Added for compatibility
   priority?: 'high' | 'medium' | 'low';
   image?: string;
   related_id?: string;

@@ -16,10 +16,7 @@ export const filterNotifications = (
       return notifications.filter(notification => !notification.read);
     default:
       // For specific notification types (system, emotion, etc.)
-      if (typeof filter === 'string') {
-        return notifications.filter(notification => notification.type === filter);
-      }
-      return notifications;
+      return notifications.filter(notification => notification.type === filter);
   }
 };
 

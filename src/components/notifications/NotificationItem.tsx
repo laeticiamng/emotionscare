@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Bell, ScanLine, MessageSquare, Users, Award } from 'lucide-react';
@@ -8,7 +9,7 @@ import { NotificationItemProps, NotificationType } from '@/types/notification';
 const NotificationItem: React.FC<NotificationItemProps> = ({
   notification, onMarkAsRead, onDelete, onClick, compact = false, onRead
 }) => {
-  const getIcon = (type: NotificationType) => {
+  const getIcon = (type: string) => {
     // Handle all possible notification types
     switch (type) {
       case 'emotion':
@@ -97,15 +98,15 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           
           <div className="flex justify-between items-center mt-1">
             <span className="text-xs text-muted-foreground">
-              {typeof formattedDate === 'string' 
+              {formattedDate && typeof formattedDate === 'string' 
                 ? formatDistanceToNow(new Date(formattedDate), { addSuffix: true, locale: fr }) 
-                : formatDistanceToNow(formattedDate, { addSuffix: true, locale: fr })
+                : formatDistanceToNow(new Date(), { addSuffix: true, locale: fr })
               }
             </span>
             
-            {notification.actionUrl && notification.actionLabel && !compact && (
+            {(notification.action_url || notification.actionUrl) && (notification.action_label || notification.actionLabel) && !compact && (
               <Button variant="link" size="sm" className="h-auto p-0 text-xs">
-                {notification.actionLabel}
+                {notification.action_label || notification.actionLabel}
               </Button>
             )}
           </div>

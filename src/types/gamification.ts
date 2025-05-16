@@ -1,74 +1,50 @@
 
 export interface GamificationStats {
   points: number;
-  level: number;
+  level: number | string;
   badges: Badge[];
-  streak: number;
   completedChallenges: number;
   totalChallenges: number;
-  activeUsersPercent?: number;
-  totalBadges?: number;
-  badgeLevels?: { level: string; count: number; }[];
-  topChallenges?: (Challenge & { name: string; completions: number; })[];
-  completionRate?: number;
-  rewardsEarned?: number;
-  userEngagement?: number;
-  progress: number;
   challenges: Challenge[];
-  achievements: Badge[];
-  leaderboard: LeaderboardEntry[];
-  nextLevelPoints: number;
-  lastActivityDate?: string;
-  // Additional properties used in components
-  rank?: string;
-  activeChallenges?: number;
-  streakDays?: number;
-  pointsToNextLevel?: number;
-  progressToNextLevel?: number;
-  totalPoints?: number;
-  badgesCount?: number;
-  currentLevel?: number;
-  recentAchievements?: Badge[];
-  nextLevel?: {
+  streak: number;
+  nextLevel: {
     points: number;
+    level: number;
     rewards: string[];
   };
+  progress: number;
+  leaderboard: LeaderboardEntry[];
 }
 
 export interface Challenge {
   id: string;
-  title?: string;
-  name?: string;
+  title: string;
   description: string;
+  category: string;
   points: number;
+  progress: number;
   completed: boolean;
-  progress?: number;
-  totalSteps?: number;
-  deadline?: string;
-  startDate?: string;
-  category?: string;
-  difficulty?: 'easy' | 'medium' | 'hard';
-  completions?: number;
-  badge?: string;
-  requirement?: number;
-  current?: number;
-  goal?: number;
+  status?: 'active' | 'completed' | 'failed' | 'locked';
+  icon?: React.ReactNode;
+  isDaily?: boolean;
+  isWeekly?: boolean;
+  xp?: number;
 }
 
 export interface Badge {
   id: string;
   name: string;
   description: string;
-  image_url?: string;
-  earned_date?: string;
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
-  category?: string;
-  icon?: string;
-  // Add additional properties used in components
-  level?: number | string;
-  image?: string;
+  image: string;
+  imageUrl?: string;
+  category: string;
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
   unlockedAt?: string;
+  dateEarned?: string;
   progress?: number;
+  completed?: boolean;
+  rarity?: string;
+  unlocked?: boolean;
 }
 
 export interface LeaderboardEntry {
@@ -77,10 +53,10 @@ export interface LeaderboardEntry {
   avatar?: string;
   points: number;
   rank: number;
-  trend?: 'up' | 'down' | 'stable';
-  badges?: number;
-  level?: number;
-  score?: number;
-  change?: number;
+  level?: number | string;
+  isCurrentUser?: boolean;
   department?: string;
+  trend?: 'up' | 'down' | 'stable';
+  userId?: string;
+  username?: string;
 }

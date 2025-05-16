@@ -1,159 +1,159 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Microphone, MicrophoneOff, Waveform, Loader2 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { EmotionResult } from '@/types';
-import { motion } from 'framer-motion';
-import { useToast } from '@/hooks/use-toast';
+import { Slider } from '@/components/ui/slider';
+import { Mic, MicOff, WaveformIcon } from 'lucide-react';
 
 interface AudioProcessorProps {
-  onResult: (result: EmotionResult) => void;
-  headerText?: string;
-  subHeaderText?: string;
+  onAudioData?: (audioData: Float32Array) => void;
+  onVolumeChange?: (volume: number) => void;
+  autoStart?: boolean;
+  showControls?: boolean;
+  className?: string;
 }
 
 const AudioProcessor: React.FC<AudioProcessorProps> = ({
-  onResult,
-  headerText = "Comment vous sentez-vous aujourd'hui?",
-  subHeaderText = "Parlez naturellement pendant quelques secondes pour une analyse émotionnelle"
+  onAudioData,
+  onVolumeChange,
+  autoStart = false,
+  showControls = true,
+  className = ''
 }) => {
   const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
-  const timerRef = useRef<number | null>(null);
-  const { toast } = useToast();
+  const [volume, setVolume] = useState(0);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  
+  useEffect(() => {
+    if (autoStart) {
+      startRecording();
+    }
+    return () => {
+      stopRecording();
+    };
+  }, [autoStart]);
 
-  const startRecording = () => {
-    setIsRecording(true);
-    setRecordingTime(0);
-    
-    // Start timer
-    timerRef.current = window.setInterval(() => {
-      setRecordingTime(prev => prev + 1);
-    }, 1000);
-    
-    // In a real implementation, this would start actual audio recording
-    toast({
-      title: "Enregistrement démarré",
-      description: "Parlez pendant quelques secondes pour l'analyse",
-    });
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+      
+      // Create audio context if it doesn't exist
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      
+      // Create nodes
+      sourceRef.current = audioContextRef.current.createMediaStreamSource(stream);
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 256;
+      
+      // Connect nodes
+      sourceRef.current.connect(analyserRef.current);
+      
+      // Set up periodic sampling
+      setIsRecording(true);
+      setHasPermission(true);
+      
+      // Begin sampling audio data
+      sampleAudio();
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      setHasPermission(false);
+    }
   };
-
+  
   const stopRecording = () => {
-    setIsRecording(false);
-    setIsProcessing(true);
-    
-    // Stop timer
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      mediaStreamRef.current = null;
     }
     
-    // In a real implementation, this would stop recording and process audio
-    // Here we simulate processing with a timeout
-    setTimeout(() => {
-      setIsProcessing(false);
-      
-      // Mock result
-      const mockResult: EmotionResult = {
-        id: Math.random().toString(36).substring(2, 11),
-        emotion: getRandomEmotion(),
-        score: Math.random() * 0.5 + 0.5, // 0.5 - 1.0
-        confidence: Math.random() * 0.3 + 0.7, // 0.7 - 1.0
-        text: "Audio analysis",
-        date: new Date().toISOString(),
-        emojis: ['😊', '😌', '🙂'],
-        recommendations: [
-          "Prenez un moment pour vous détendre",
-          "Essayez d'écouter de la musique apaisante"
-        ]
-      };
-      
-      onResult(mockResult);
-    }, 2000);
+    if (sourceRef.current) {
+      sourceRef.current.disconnect();
+      sourceRef.current = null;
+    }
+    
+    setIsRecording(false);
+  };
+  
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+  
+  const sampleAudio = () => {
+    if (!isRecording || !analyserRef.current) return;
+    
+    const dataArray = new Float32Array(analyserRef.current.frequencyBinCount);
+    analyserRef.current.getFloatTimeDomainData(dataArray);
+    
+    // Calculate volume (RMS)
+    let sum = 0;
+    for (let i = 0; i < dataArray.length; i++) {
+      sum += dataArray[i] * dataArray[i];
+    }
+    const rms = Math.sqrt(sum / dataArray.length);
+    const volumeLevel = Math.min(1, rms * 10); // Scale up for better visualization
+    
+    setVolume(volumeLevel);
+    if (onVolumeChange) onVolumeChange(volumeLevel);
+    
+    // Send audio data to parent if callback provided
+    if (onAudioData) onAudioData(dataArray);
+    
+    // Continue sampling
+    requestAnimationFrame(sampleAudio);
   };
 
-  const getRandomEmotion = () => {
-    const emotions = ['joy', 'calm', 'anxiety', 'focus', 'neutral'];
-    return emotions[Math.floor(Math.random() * emotions.length)];
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  if (hasPermission === false) {
+    return (
+      <div className="text-center p-4 bg-red-50 dark:bg-red-900/20 rounded-md">
+        <p className="text-red-600 dark:text-red-400 mb-2">Microphone access denied</p>
+        <p className="text-sm text-muted-foreground">Please allow microphone access to use this feature.</p>
+      </div>
+    );
+  }
 
   return (
-    <Card>
-      <CardContent className="pt-6 space-y-6">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">{headerText}</h2>
-          <p className="text-muted-foreground">
-            {subHeaderText}
-          </p>
+    <div className={`space-y-4 ${className}`}>
+      {showControls && (
+        <div className="flex items-center justify-center">
+          <Button 
+            onClick={toggleRecording}
+            variant={isRecording ? "destructive" : "default"}
+            size="lg"
+            className="rounded-full h-14 w-14 flex items-center justify-center"
+          >
+            {isRecording ? <MicOff size={24} /> : <Mic size={24} />}
+          </Button>
         </div>
-        
-        <div className="flex justify-center">
-          {isRecording ? (
-            <motion.div 
-              className="h-20 w-full max-w-xs flex items-center justify-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Waveform className="h-12 w-12 text-primary animate-pulse" />
-              <p className="absolute bottom-0 text-sm text-muted-foreground">
-                {formatTime(recordingTime)}
-              </p>
-            </motion.div>
-          ) : isProcessing ? (
-            <div className="h-20 w-full max-w-xs flex flex-col items-center justify-center">
-              <Loader2 className="h-10 w-10 text-primary animate-spin" />
-              <p className="mt-2 text-sm text-muted-foreground">
-                Analyse en cours...
-              </p>
-            </div>
-          ) : (
-            <div className="h-20 w-full max-w-xs flex items-center justify-center">
-              <Microphone className="h-10 w-10 text-muted-foreground" />
-            </div>
-          )}
+      )}
+      
+      {isRecording && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <WaveformIcon className="h-5 w-5 text-primary animate-pulse" />
+            <span className="text-xs">
+              Volume: {Math.round(volume * 100)}%
+            </span>
+          </div>
+          
+          <div className="relative h-3 bg-muted rounded-full overflow-hidden">
+            <div 
+              className="absolute top-0 left-0 h-full bg-primary transition-all duration-100 ease-out"
+              style={{ width: `${volume * 100}%` }}
+            ></div>
+          </div>
         </div>
-        
-        <div className="flex justify-center">
-          {isRecording ? (
-            <Button 
-              variant="destructive" 
-              size="lg"
-              className="rounded-full px-6"
-              onClick={stopRecording}
-              disabled={isProcessing}
-            >
-              <MicrophoneOff className="mr-2 h-4 w-4" />
-              Arrêter l'enregistrement
-            </Button>
-          ) : (
-            <Button
-              variant="default"
-              size="lg"
-              className="rounded-full px-6"
-              onClick={startRecording}
-              disabled={isProcessing}
-            >
-              <Microphone className="mr-2 h-4 w-4" />
-              Commencer à parler
-            </Button>
-          )}
-        </div>
-        
-        <p className="text-xs text-center text-muted-foreground">
-          Votre voix est analysée uniquement pour détecter vos émotions et n'est pas stockée.
-          Pour de meilleurs résultats, parlez pendant au moins 10-15 secondes.
-        </p>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 };
 

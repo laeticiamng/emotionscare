@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -71,7 +72,7 @@ const NotificationsPanel: React.FC = () => {
         </div>
         <p className="text-sm text-muted-foreground line-clamp-2">{notification.message}</p>
         
-        {notification.actionUrl && notification.actionLabel && (
+        {(notification.action_url || notification.actionUrl) && (notification.action_label || notification.actionLabel) && (
           <Button
             variant="link"
             size="sm"
@@ -79,7 +80,7 @@ const NotificationsPanel: React.FC = () => {
             onClick={() => markAsRead(notification.id)}
             asChild
           >
-            <a href={notification.actionUrl}>{notification.actionLabel}</a>
+            <a href={notification.action_url || notification.actionUrl}>{notification.action_label || notification.actionLabel}</a>
           </Button>
         )}
       </div>
@@ -104,7 +105,7 @@ const NotificationsPanel: React.FC = () => {
         </div>
       </div>
       
-      <Tabs defaultValue="all" value={filter as string} onValueChange={(value) => setFilter(value as NotificationFilter)}>
+      <Tabs defaultValue="all" value={String(filter)} onValueChange={(value) => setFilter(value as NotificationFilter)}>
         <div className="px-4 pt-2">
           <TabsList className="w-full">
             <TabsTrigger value="all">All</TabsTrigger>
@@ -113,7 +114,7 @@ const NotificationsPanel: React.FC = () => {
           </TabsList>
         </div>
         
-        <TabsContent value={filter as string} className="m-0">
+        <TabsContent value={String(filter)} className="m-0">
           <div className="max-h-[60vh] overflow-y-auto">
             {notifications.length > 0 ? (
               <div className="divide-y">
@@ -137,9 +138,9 @@ const NotificationsPanel: React.FC = () => {
                 <Bell className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
                 <h3 className="font-medium text-lg">No notifications</h3>
                 <p className="text-muted-foreground text-sm mt-1">
-                  {filter === "all" as NotificationFilter
+                  {filter === "all"
                     ? "You don't have any notifications yet."
-                    : filter === "unread" as NotificationFilter
+                    : filter === "unread"
                     ? "You have read all your notifications."
                     : `You don't have any ${filter} notifications.`}
                 </p>

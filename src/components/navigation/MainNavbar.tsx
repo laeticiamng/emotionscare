@@ -35,7 +35,7 @@ import { Badge } from "@/components/ui/badge";
 import { useNotificationBadge } from "@/hooks/useNotificationBadge";
 import { motion } from "framer-motion";
 import { useUserMode } from '@/contexts/UserModeContext';
-import { normalizeRole, getRoleName, getRoleHomePath } from '@/utils/roleUtils';
+import { normalizeUserRole, getRoleName, getRoleHomePath } from '@/utils/roleUtils';
 
 const MainNavbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -45,7 +45,7 @@ const MainNavbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const normalizedUserMode = userMode ? normalizeRole(userMode) : '';
+  const normalizedUserMode = userMode ? normalizeUserRole(userMode) : '';
 
   const isAdmin = normalizedUserMode === 'b2b_admin';
   
