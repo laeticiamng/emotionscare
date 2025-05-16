@@ -15,7 +15,8 @@ export type NotificationType =
 export type NotificationFilter = 
   | 'all' 
   | 'unread' 
-  | NotificationType;
+  | NotificationType
+  | string;  // Adding string to avoid type comparison issues
 
 export interface Notification {
   id: string;
@@ -23,7 +24,7 @@ export interface Notification {
   message: string;
   type: NotificationType;
   read: boolean;
-  createdAt: string;
+  createdAt?: string;
   date?: string;
   action_url?: string;
   action_label?: string;

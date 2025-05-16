@@ -9,15 +9,16 @@ export const filterNotifications = (
     return [];
   }
 
-  switch (filter) {
-    case 'all':
-      return notifications;
-    case 'unread':
-      return notifications.filter(notification => !notification.read);
-    default:
-      // Handle notification types (emotion, journal, etc.)
-      return notifications.filter(notification => notification.type === filter);
+  if (filter === 'all') {
+    return notifications;
   }
+  
+  if (filter === 'unread') {
+    return notifications.filter(notification => !notification.read);
+  }
+  
+  // Handle notification types (emotion, journal, etc.)
+  return notifications.filter(notification => notification.type === filter as NotificationType);
 };
 
 export const getUnreadCount = (notifications: Notification[]): number => {

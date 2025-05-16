@@ -5,7 +5,7 @@ export interface UseGamificationReturn {
   badges: Badge[];
   challenges: Challenge[];
   stats: GamificationStats;
-  completeChallenge: (challengeId: string) => Promise<boolean> | void;
+  completeChallenge: (challengeId: string) => Promise<boolean>;
   isLoading: boolean;
   error: string | null;
   refresh?: () => void;

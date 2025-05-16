@@ -16,6 +16,7 @@ export interface Badge {
   unlocked?: boolean;
   level?: string | number;
   dateEarned?: string;
+  awarded_at?: string;
 }
 
 export interface Challenge {
@@ -28,7 +29,7 @@ export interface Challenge {
   completed: boolean;
   isDaily?: boolean;
   isWeekly?: boolean;
-  status?: 'active' | 'completed' | 'expired';
+  status?: 'active' | 'completed' | 'expired' | 'failed' | 'locked' | 'not-started';
   deadline?: string;
   name?: string;
   // Adding properties needed by components
@@ -37,6 +38,7 @@ export interface Challenge {
   icon?: React.ReactNode;
   difficulty?: string;
   completions?: number;
+  totalSteps?: number;
 }
 
 export interface LeaderboardEntry {
@@ -46,13 +48,15 @@ export interface LeaderboardEntry {
   avatar?: string;
   points: number;
   rank: number;
-  level: number;
+  level: number | string;
   isCurrentUser: boolean;
+  badges?: number;
+  trend?: 'up' | 'down' | 'stable';
 }
 
 export interface GamificationStats {
   points: number;
-  level: number;
+  level: number | string;
   badges: Badge[];
   completedChallenges: number;
   totalChallenges: number;
@@ -79,10 +83,17 @@ export interface GamificationStats {
   activeUsersPercent?: number;
   completionRate?: number;
   topChallenges?: Challenge[];
-  badgeLevels?: Record<string, number>[];
+  badgeLevels?: Record<string, number>[] | Array<{level: string, count: number}>;
   // Additional properties needed by the admin components
   rank?: string;
   nextLevelPoints?: number;
   recentAchievements?: Badge[];
   achievements?: Badge[];
+  rewardsEarned?: number;
+  userEngagement?: number;
+  emotional_balance?: number;
+  streak_days?: number;
+  total_scans?: number;
+  badges_earned?: Badge[];
+  next_milestone?: number;
 }

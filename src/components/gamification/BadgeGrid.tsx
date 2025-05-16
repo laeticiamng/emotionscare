@@ -63,7 +63,7 @@ const BadgeCard: React.FC<BadgeCardProps> = ({ badge, unlocked }) => {
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full bg-primary/10 text-primary">
-              {badge.icon ? badge.icon : <BadgeCheck className="w-12 h-12" />}
+              {badge.icon || <BadgeCheck className="w-12 h-12" />}
             </div>
           )}
           

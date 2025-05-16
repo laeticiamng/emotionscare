@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,11 +36,11 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
   };
 
   const isChallengeFailed = (challenge: Challenge): boolean => {
-    return false; // Default to false since 'failed' is optional
+    return challenge.status === 'failed';
   };
 
   const isChallengeLocked = (challenge: Challenge): boolean => {
-    return false; // Default to false since 'status' is optional
+    return challenge.status === 'locked';
   };
 
   const getChallengeStatus = (challenge: Challenge): 'completed' | 'failed' | 'locked' | 'active' => {
@@ -120,7 +121,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                     <Award className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-base">{challenge.title || challenge.name}</h3>
+                    <h3 className="font-medium text-base">{challenge.title || challenge.name || "Unnamed Challenge"}</h3>
                     <div className="flex items-center gap-x-2 text-xs text-muted-foreground mt-1">
                       {challenge.deadline && (
                         <span className="flex items-center gap-1">

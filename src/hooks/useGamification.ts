@@ -158,7 +158,7 @@ export const useGamification = (): UseGamificationReturn => {
       // Update challenges list
       setChallenges(prev => prev.map(c => {
         if (c.id === challengeId) {
-          return { ...c, status: 'completed', completed: true, progress: c.total || 0 };
+          return { ...c, status: 'completed', completed: true, progress: c.total || 100 };
         }
         return c;
       }));
