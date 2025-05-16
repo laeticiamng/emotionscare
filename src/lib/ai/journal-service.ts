@@ -1,113 +1,120 @@
 
-/**
- * Journal Émotionnel IA Service
- * 
- * Service pour interagir avec un conseiller émotionnel IA
- */
-import { chatCompletion } from './openai-client';
-import { toast } from '@/hooks/use-toast';
+import { EmotionResult } from '@/types/emotion';
 
-export interface EmotionalJournalResponse {
-  message: string;
-  detectedEmotion?: string;
-  advice?: string;
-  emotion?: string; // Adding the missing property
-  intensity?: number; // Adding the missing property
-  confidence?: number;
-  analysis?: string;
-}
-
-/**
- * Analyse une entrée de journal émotionnel et retourne des conseils adaptés
- */
-export async function analyzeEmotionalJournal(
-  journalEntry: string,
-  userContext?: { recentEmotions?: string, language?: string }
-): Promise<EmotionalJournalResponse> {
-  try {
-    const contextPrompt = userContext?.recentEmotions ? 
-      `L'utilisateur a récemment ressenti: ${userContext.recentEmotions}.` : 
-      '';
-    
-    const languagePrompt = userContext?.language ? 
-      `Réponds en ${userContext.language}.` : 
-      'Réponds en français.';
-    
-    const systemPrompt = `
-      Tu es un conseiller émotionnel empathique, spécialisé dans la gestion du stress et des émotions au travail.
-      Analyse l'entrée du journal émotionnel et fournis:
-      1. Une identification de l'émotion dominante
-      2. Un conseil court et bienveillant adapté à cette émotion
-      ${contextPrompt}
-      ${languagePrompt}
-      Format ta réponse en deux paragraphes séparés: d'abord l'identification de l'émotion, puis le conseil.
-      Retourne également l'émotion identifiée en tant que valeur distincte et une intensité entre 0 et 1.
-    `;
-    
-    const response = await chatCompletion(
-      [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: journalEntry }
-      ],
-      'journal'
-    );
-    
-    const content = response.choices[0].message.content;
-    const paragraphs = content.split('\n\n');
-    
-    // Extraire l'émotion détectée et le conseil
-    const detectedEmotion = paragraphs[0];
-    const advice = paragraphs.length > 1 ? paragraphs[1] : '';
-    
-    // Mock implementation for emotional analysis
-    // In a real implementation, these would be parsed from the AI response
-    let primaryEmotion = 'neutral';
-    let emotionIntensity = 0.5;
-    
-    // Simple detection logic for demo purposes
-    const lowerContent = content.toLowerCase();
-    if (lowerContent.includes('joie') || lowerContent.includes('heureux')) {
-      primaryEmotion = 'joy';
-      emotionIntensity = 0.8;
-    } else if (lowerContent.includes('calme') || lowerContent.includes('serein')) {
-      primaryEmotion = 'calm';
-      emotionIntensity = 0.7;
-    } else if (lowerContent.includes('triste') || lowerContent.includes('déprimé')) {
-      primaryEmotion = 'sad';
-      emotionIntensity = 0.6;
-    } else if (lowerContent.includes('anxie') || lowerContent.includes('inquiet')) {
-      primaryEmotion = 'anxiety';
-      emotionIntensity = 0.7;
-    } else if (lowerContent.includes('stress') || lowerContent.includes('tendu')) {
-      primaryEmotion = 'stress';
-      emotionIntensity = 0.8;
-    } else if (lowerContent.includes('énerg') || lowerContent.includes('dynamique')) {
-      primaryEmotion = 'energetic';
-      emotionIntensity = 0.9;
-    }
-    
-    return {
-      message: content,
-      detectedEmotion,
-      advice,
-      emotion: primaryEmotion,
-      intensity: emotionIntensity,
-      confidence: 0.8,
-      analysis: `Analyse basée sur le texte: "${journalEntry.substring(0, 50)}..."`
-    };
-  } catch (error) {
-    console.error('Error analyzing emotional journal:', error);
-    toast({
-      title: "Erreur d'analyse",
-      description: "Impossible d'analyser votre journal pour le moment.",
-      variant: "destructive"
-    });
-    
-    return {
-      message: "Je suis désolé, mais je rencontre des difficultés pour analyser votre journal émotionnel. Veuillez réessayer plus tard.",
-      emotion: "neutral",
-      intensity: 0.5,
-      confidence: 0.5
-    };
+export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
+  // This would typically be an API call to analyze text
+  // For demonstration, we'll return a mock result
+  console.log("Analyzing text:", text);
+  
+  // Simple keyword-based analysis for demo purposes
+  const lowerText = text.toLowerCase();
+  let emotion = 'neutral';
+  let score = 0.5;
+  let confidence = 0.7;
+  
+  if (lowerText.includes('happy') || lowerText.includes('joy') || lowerText.includes('excited')) {
+    emotion = 'joy';
+    score = 0.8;
+    confidence = 0.85;
+  } else if (lowerText.includes('sad') || lowerText.includes('depressed') || lowerText.includes('unhappy')) {
+    emotion = 'sadness';
+    score = 0.7;
+    confidence = 0.8;
+  } else if (lowerText.includes('angry') || lowerText.includes('furious') || lowerText.includes('mad')) {
+    emotion = 'anger';
+    score = 0.75;
+    confidence = 0.82;
+  } else if (lowerText.includes('afraid') || lowerText.includes('scared') || lowerText.includes('fear')) {
+    emotion = 'fear';
+    score = 0.65;
+    confidence = 0.75;
+  } else if (lowerText.includes('disgusted') || lowerText.includes('gross')) {
+    emotion = 'disgust';
+    score = 0.6;
+    confidence = 0.7;
+  } else if (lowerText.includes('surprised') || lowerText.includes('shocked')) {
+    emotion = 'surprise';
+    score = 0.7;
+    confidence = 0.75;
+  } else if (lowerText.includes('calm') || lowerText.includes('peaceful') || lowerText.includes('relaxed')) {
+    emotion = 'calm';
+    score = 0.9;
+    confidence = 0.9;
   }
-}
+  
+  // Wait a bit to simulate API call
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  return {
+    emotion,
+    score,
+    confidence,
+    text,
+    emojis: [getEmojiForEmotion(emotion)],
+    recommendations: getRecommendationsForEmotion(emotion)
+  };
+};
+
+// Helper function to get emoji for emotion
+const getEmojiForEmotion = (emotion: string): string => {
+  const emojiMap: Record<string, string> = {
+    joy: '😊',
+    sadness: '😢',
+    anger: '😠',
+    fear: '😨',
+    disgust: '🤢',
+    surprise: '😮',
+    neutral: '😐',
+    calm: '😌'
+  };
+  
+  return emojiMap[emotion] || '😐';
+};
+
+// Helper function to get recommendations based on emotion
+const getRecommendationsForEmotion = (emotion: string): string[] => {
+  const recommendationsMap: Record<string, string[]> = {
+    joy: [
+      'Partagez votre bonheur avec un proche',
+      'Notez ce qui vous rend heureux dans votre journal',
+      'Écoutez une playlist joyeuse pour prolonger ce sentiment'
+    ],
+    sadness: [
+      'Prenez un moment pour respirer profondément',
+      'Contactez un ami ou un proche',
+      'Écoutez une musique apaisante'
+    ],
+    anger: [
+      'Faites une pause et éloignez-vous de la situation',
+      'Pratiquez des exercices de respiration',
+      'Écrivez ce qui vous met en colère pour l\'extérioriser'
+    ],
+    fear: [
+      'Nommez précisément ce qui vous fait peur',
+      'Pratiquez une méditation guidée de 5 minutes',
+      'Rappelez-vous des moments où vous avez surmonté vos craintes'
+    ],
+    disgust: [
+      'Concentrez-vous sur quelque chose d\'agréable',
+      'Changez d\'environnement si possible',
+      'Écoutez une musique qui vous plaît'
+    ],
+    surprise: [
+      'Prenez le temps d\'assimiler cette nouvelle information',
+      'Notez vos réflexions dans votre journal',
+      'Discutez de cette surprise avec quelqu\'un de confiance'
+    ],
+    neutral: [
+      'C\'est un bon moment pour planifier votre journée',
+      'Essayez une activité qui stimule votre créativité',
+      'Prenez un moment pour vous reconnecter avec vos objectifs'
+    ],
+    calm: [
+      'Savourez ce moment de tranquillité',
+      'C\'est un bon moment pour pratiquer la pleine conscience',
+      'Notez dans votre journal ce qui contribue à votre sérénité'
+    ]
+  };
+  
+  return recommendationsMap[emotion] || recommendationsMap.neutral;
+};

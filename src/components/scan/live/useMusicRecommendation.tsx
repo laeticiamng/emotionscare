@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/contexts/music';
 import { EmotionResult, MusicTrack } from '@/types';
 
 export const EMOTION_TO_MUSIC: Record<string, string> = {

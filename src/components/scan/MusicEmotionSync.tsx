@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/contexts/music';
 import { useCoach } from '@/hooks/useCoach';
 import { useToast } from '@/hooks/use-toast';
 

@@ -1,82 +1,45 @@
 
-export interface Emotion {
-  id?: string;
-  user_id?: string;
-  date?: string | Date;
-  emotion?: string;
-  name?: string;
-  color?: string;
-  icon?: string;
-  description?: string;
-  category?: string;
-  score?: number;
-  confidence?: number;
-  intensity?: number;
-  text?: string;
-  emojis?: string[] | string;
-  transcript?: string;
-  audio_url?: string;
-  ai_feedback?: string;
-  recommendations?: string[];
-  triggers?: string[];
-  feedback?: string;
-  timestamp?: string;
-  anxiety?: number;
-  energy?: number;
-  [key: string]: any;  // Allow for flexible extension
-}
-
 export interface EmotionResult {
   id?: string;
-  user_id?: string;
-  emotion: string;
-  score?: number;
-  confidence?: number;
-  dominantEmotion?: string;
-  primaryEmotion?: string;
-  intensity?: number;
-  text?: string;
-  transcript?: string;
-  emojis?: string[] | string;
-  timestamp?: string;
   date?: string;
-  triggers?: string[];
-  feedback?: string;
-  ai_feedback?: string;
+  emotion: string; 
+  score: number;
+  intensity?: number;
+  confidence: number;
+  text?: string;
+  emojis: string[];
   recommendations?: string[];
-  audio_url?: string;
-  [key: string]: any;  // Allow for flexible extension
+  audioUrl?: string;
+  source?: 'text' | 'voice' | 'video' | 'manual';
 }
 
-export interface EnhancedEmotionResult extends EmotionResult {
-  recommendations?: string[];
-  insights?: string[];
-  icon?: string;
-  color?: string;
-  textColor?: string;
-  description?: string;
-  category?: string;
-  coping_strategies?: string[];
-  relatedActivities?: {
-    id: string;
-    title: string;
-    description: string;
-    duration: number;
-  }[];
+export interface Emotion {
+  emotion: string;
+  score: number;
+  confidence: number;
 }
 
-export interface EmotionalTeamViewProps {
-  teamId?: string;
-  departmentId?: string;
-  users?: any[];
-  anonymized?: boolean;
-  onUserClick?: (userId: string) => void;
-  period?: 'day' | 'week' | 'month' | 'year' | string;
-  userId?: string;
+export interface LiveVoiceScannerProps {
+  onResult?: (result: EmotionResult) => void;
+  onAnalysisComplete?: (result: EmotionResult) => void;
+  continuous?: boolean;
+  autoStart?: boolean;
+  renderControls?: boolean;
   className?: string;
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
-  onRefresh?: () => void;
+}
+
+export interface VoiceEmotionScannerProps {
+  onResult?: (result: EmotionResult) => void;
+  onAnalysisComplete?: (result: EmotionResult) => void;
+  continuous?: boolean;
+  autoStart?: boolean;
+  className?: string;
+}
+
+export interface AudioProcessorProps {
+  headerText?: string;
+  subHeaderText?: string;
+  onResult?: (result: EmotionResult) => void;
+  autoStart?: boolean;
+  continuous?: boolean;
 }

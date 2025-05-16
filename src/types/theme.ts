@@ -11,3 +11,16 @@ export interface ThemeSettings {
   reduceMotion: boolean;
   colorBlindMode: boolean;
 }
+
+export interface ThemeContextType {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  fontSize: FontSize;
+  setFontSize: (size: FontSize) => void;
+  fontFamily: FontFamily;
+  setFontFamily: (family: FontFamily) => void;
+  reduceMotion: boolean;
+  setReduceMotion: (reduce: boolean) => void;
+  colorBlindMode: boolean;
+  setColorBlindMode: (mode: boolean) => void;
+}
