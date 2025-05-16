@@ -1,40 +1,47 @@
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* Glass effects for UI components */
+@import 'tailwindcss/components';
+
 @layer components {
   .glass-dark {
     @apply bg-black/40 backdrop-blur-md border border-gray-800;
   }
   
+  .glass-light {
+    @apply bg-white/80 backdrop-blur-md border border-gray-200;
+  }
+  
   .glass-pastel {
-    @apply bg-blue-50/70 backdrop-blur-sm border border-blue-100;
+    @apply bg-blue-50/70 backdrop-blur-md border border-blue-200;
   }
   
   .glass-card {
-    @apply bg-white/60 backdrop-blur-md border border-gray-100 dark:bg-gray-900/40 dark:border-gray-800;
+    @apply bg-white/20 backdrop-blur-md border border-white/20;
   }
-}
-
-/* Premium shadows */
-@layer utilities {
+  
+  /* Glass effects for each theme */
+  .theme-light .glass-effect {
+    @apply glass-light;
+  }
+  
+  .theme-dark .glass-effect {
+    @apply glass-dark;
+  }
+  
+  .theme-pastel .glass-effect {
+    @apply glass-pastel;
+  }
+  
+  /* Glass shadow effects */
   .shadow-premium-light {
-    box-shadow: 
-      0 4px 12px rgba(0, 0, 0, 0.05),
-      0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   }
   
   .shadow-premium-dark {
-    box-shadow: 
-      0 4px 20px rgba(0, 0, 0, 0.3),
-      0 2px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
   }
   
   .shadow-premium-pastel {
-    box-shadow:
-      0 4px 15px rgba(96, 165, 250, 0.1),
-      0 2px 5px rgba(96, 165, 250, 0.05);
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.15);
   }
 }

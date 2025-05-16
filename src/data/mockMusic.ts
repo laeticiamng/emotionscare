@@ -1,111 +1,95 @@
-import { MusicPlaylist, MusicTrack } from '@/types/music';
+
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 export const mockTracks: MusicTrack[] = [
   {
-    id: '1',
+    id: 'track-1',
+    title: 'Deep Concentration',
+    artist: 'Focus Mind',
+    album: 'Productivity Sessions',
+    duration: 240,
+    url: 'https://example.com/track1.mp3',
+    coverUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=2070&auto=format&fit=crop',
+    emotionalTone: 'Focus',
+    mood: 'Calm',
+    tags: ['concentration', 'work', 'study']
+  },
+  {
+    id: 'track-2',
     title: 'Calm Waters',
     artist: 'Ocean Sounds',
-    url: '/audio/calm-waters.mp3',
-    coverUrl: '/images/covers/calm-waters.jpg',
+    album: 'Nature Ambience',
+    duration: 320,
+    url: 'https://example.com/track2.mp3',
+    coverUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=2022&auto=format&fit=crop',
+    emotionalTone: 'Relaxed',
+    mood: 'Peaceful',
+    tags: ['calm', 'nature', 'meditation']
+  },
+  {
+    id: 'track-3',
+    title: 'Energy Boost',
+    artist: 'Motivation Music',
+    album: 'Get Moving',
     duration: 180,
-    emotion: 'calm',
-    genre: 'ambient',  // Change to string instead of array
-    category: 'relaxation'
+    url: 'https://example.com/track3.mp3',
+    coverUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2074&auto=format&fit=crop',
+    emotionalTone: 'Energetic',
+    mood: 'Uplifting',
+    tags: ['energy', 'motivation', 'workout']
   },
   {
-    id: '2',
-    title: 'Morning Meditation',
-    artist: 'Zen Masters',
-    url: '/audio/morning-meditation.mp3',
-    coverUrl: '/images/covers/morning-meditation.jpg',
-    duration: 240,
-    emotion: 'peaceful',
-    genre: 'meditation',  // Change to string instead of array
-    category: 'focus'
+    id: 'track-4',
+    title: 'Creative Flow',
+    artist: 'Imagination Streams',
+    album: 'Idea Generation',
+    duration: 290,
+    url: 'https://example.com/track4.mp3',
+    coverUrl: 'https://images.unsplash.com/photo-1513682121497-80211f36a7d3?q=80&w=2076&auto=format&fit=crop',
+    emotionalTone: 'Creative',
+    mood: 'Inspired',
+    tags: ['creativity', 'inspiration', 'brainstorming']
   },
   {
-    id: '3',
-    title: 'Uplifting Piano',
-    artist: 'Emily Carter',
-    url: '/audio/uplifting-piano.mp3',
-    coverUrl: '/images/covers/uplifting-piano.jpg',
-    duration: 210,
-    emotion: 'joyful',
-    genre: 'classical',  // Change to string instead of array
-    category: 'motivation'
-  },
-  {
-    id: '4',
-    title: 'Forest Walk',
-    artist: 'Nature Collective',
-    url: '/audio/forest-walk.mp3',
-    coverUrl: '/images/covers/forest-walk.jpg',
-    duration: 300,
-    emotion: 'serene',
-    genre: 'nature',  // Change to string instead of array
-    category: 'relaxation'
-  },
-  {
-    id: '5',
-    title: 'Focus Flow',
-    artist: 'Brainwave Bliss',
-    url: '/audio/focus-flow.mp3',
-    coverUrl: '/images/covers/focus-flow.jpg',
-    duration: 270,
-    emotion: 'focused',
-    genre: 'electronic',  // Change to string instead of array
-    category: 'focus'
-  },
-  {
-    id: '6',
-    title: 'Evening Calm',
-    artist: 'Lofi Lounge',
-    url: '/audio/evening-calm.mp3',
-    coverUrl: '/images/covers/evening-calm.jpg',
-    duration: 200,
-    emotion: 'relaxed',
-    genre: 'lofi',  // Change to string instead of array
-    category: 'sleep'
-  },
-  {
-    id: '7',
-    title: 'Dream State',
-    artist: 'Sleepy Sounds',
-    url: '/audio/dream-state.mp3',
-    coverUrl: '/images/covers/dream-state.jpg',
-    duration: 330,
-    emotion: 'peaceful',
-    genre: 'ambient',  // Change to string instead of array
-    category: 'sleep'
+    id: 'track-5',
+    title: 'Sleep Well',
+    artist: 'Dream Makers',
+    album: 'Night Tunes',
+    duration: 450,
+    url: 'https://example.com/track5.mp3',
+    coverUrl: 'https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?q=80&w=2070&auto=format&fit=crop',
+    emotionalTone: 'Peaceful',
+    mood: 'Sleepy',
+    tags: ['sleep', 'night', 'relaxation']
   }
 ];
 
 export const mockPlaylists: MusicPlaylist[] = [
   {
-    id: 'relaxation',
-    title: 'Relaxation',  // Add title property
-    name: 'Relaxation', 
-    tracks: mockTracks.filter(track => track.category === 'relaxation' || track.emotion === 'calm'),
-    coverUrl: '/images/covers/relaxation-playlist.jpg',
-    description: 'Des sons apaisants pour vous aider à vous détendre',
-    category: 'relaxation'
+    id: 'pl-1',
+    title: 'Musique de concentration',
+    description: 'Parfait pour le travail et l\'étude',
+    coverUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=2070&auto=format&fit=crop',
+    tracks: [mockTracks[0], mockTracks[3]],
+    category: 'Focus',
+    mood: 'Concentration'
   },
   {
-    id: 'focus',
-    title: 'Focus',  // Add title property
-    name: 'Focus',
-    tracks: mockTracks.filter(track => track.category === 'focus' || track.mood === 'concentration'),
-    coverUrl: '/images/covers/focus-playlist.jpg',
-    description: 'De la musique pour améliorer votre concentration',
-    category: 'focus'
+    id: 'pl-2',
+    title: 'Détente Profonde',
+    description: 'Pour les moments de relaxation',
+    coverUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=2022&auto=format&fit=crop',
+    tracks: [mockTracks[1], mockTracks[4]],
+    category: 'Relaxation',
+    mood: 'Calme'
   },
   {
-    id: 'sleep',
-    title: 'Sleep',  // Add title property
-    name: 'Sleep',
-    tracks: mockTracks.filter(track => track.mood === 'sleepy' || track.mood === 'peaceful'),
-    coverUrl: '/images/covers/sleep-playlist.jpg',
-    description: 'Sons relaxants pour vous aider à vous endormir',
-    category: 'sleep'
+    id: 'pl-3',
+    title: 'Énergie Positive',
+    description: 'Boostez votre moral et votre énergie',
+    coverUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2074&auto=format&fit=crop',
+    tracks: [mockTracks[2]],
+    category: 'Motivation',
+    mood: 'Énergique'
   }
 ];

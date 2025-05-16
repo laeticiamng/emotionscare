@@ -23,6 +23,12 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
 }) => {
   const [activeFilter, setActiveFilter] = useState<NotificationFilter>('all');
 
+  // Define the available filters
+  const filters: NotificationFilter[] = [
+    'all', 'unread', 'read', 'urgent', 
+    'system', 'journal', 'emotion', 'user'
+  ];
+
   // Get counts for each filter
   const filterCounts: Record<NotificationFilter, number> = {
     all: notifications.length,
@@ -37,9 +43,6 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
 
   const filteredNotifications = filterNotifications(notifications, activeFilter);
 
-  // All available filters
-  const availableFilters: NotificationFilter[] = ['all', 'unread', 'read', 'urgent', 'system', 'journal', 'emotion', 'user'];
-
   return (
     <div>
       <Tabs 
@@ -48,7 +51,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
         className="w-full"
       >
         <TabsList className="grid grid-cols-4 mb-4">
-          {availableFilters.slice(0, 4).map((filter) => (
+          {filters.slice(0, 4).map((filter) => (
             <TabsTrigger 
               key={filter} 
               value={filter}
@@ -66,7 +69,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
         </TabsList>
 
         <TabsList className="grid grid-cols-4 mb-4">
-          {availableFilters.slice(4).map((filter) => (
+          {filters.slice(4).map((filter) => (
             <TabsTrigger 
               key={filter} 
               value={filter}
@@ -83,7 +86,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
           ))}
         </TabsList>
 
-        {availableFilters.map((filter) => (
+        {filters.map((filter) => (
           <TabsContent key={filter} value={filter} className="space-y-2">
             {filteredNotifications.length === 0 ? (
               <div className="text-center py-8">

@@ -1,7 +1,7 @@
 
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
-
 export type NotificationType = 'emotion' | 'journal' | 'system' | 'user' | 'urgent';
+
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
 
 export type NotificationTone = 'informative' | 'celebratory' | 'motivational' | 'urgent' | 'neutral';
 
@@ -28,14 +28,6 @@ export interface Notification {
   image_url?: string;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
   expires_at?: string;
-}
-
-export interface NotificationPreference {
-  type: NotificationType | 'all';
-  enabled: boolean;
-  frequency: NotificationFrequency;
-  channels: NotificationChannels;
-  tone?: NotificationTone;
 }
 
 export interface NotificationItemProps {

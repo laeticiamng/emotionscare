@@ -11,15 +11,18 @@ import './styles/glass.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from './components/theme-provider';
 import { MusicProvider } from './contexts/MusicContext';
-import AppRoutes from './router';
+import { CoachProvider } from './contexts/CoachContext';
+import AppRoutes from './router'; // Import from router not router/AppRoutes
 
 function App() {
   return (
     <ThemeProvider defaultTheme="system">
       <MusicProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
+        <CoachProvider>
+          <Router>
+            <AppRoutes />
+          </Router>
+        </CoachProvider>
       </MusicProvider>
     </ThemeProvider>
   );

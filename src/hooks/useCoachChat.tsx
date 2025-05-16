@@ -1,147 +1,112 @@
 
-import { useState, useEffect } from 'react';
-import { ChatMessage } from '@/types';
-import { CoachEvent, CoachAction } from '@/lib/coach/types';
+import { useState, useEffect, useCallback } from 'react';
+import { useCoach } from '@/contexts/CoachContext';
+import { ChatMessage } from '@/types/coach';
+import { v4 as uuidv4 } from 'uuid';
 
-interface UseCoachChatReturn {
+export interface UseCoachChatReturn {
   messages: ChatMessage[];
-  loading: boolean;
-  sendMessage: (text: string) => Promise<void>;
-  clearMessages: () => void;
-  loadMessages: () => Promise<void>;
-  events: CoachEvent[];
-  notifications: any[];
-  emotionalTrends: any[];
-  dispatchAction: (action: CoachAction) => Promise<void>;
-  lastEmotion: any;
-  recommendations: any[]; // Adding this missing property
-  generateRecommendation: (options: any) => Promise<void>; // Adding this missing method
+  isLoading: boolean;
+  typingIndicator: string;
+  userMessage: string;
+  setUserMessage: (message: string) => void;
+  handleSendMessage: (messageContent?: string) => void;
+  handleRegenerate: () => void;
+  handleKeyDown: (e: React.KeyboardEvent) => void;
+  resetMessages: () => void;
 }
 
-export const useCoachChat = (): UseCoachChatReturn => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [events, setEvents] = useState<CoachEvent[]>([]);
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [emotionalTrends, setEmotionalTrends] = useState<any[]>([]);
-  const [lastEmotion, setLastEmotion] = useState<any>(null);
-  const [recommendations, setRecommendations] = useState<any[]>([]);
+export const useCoachChat = (initialQuestion?: string): UseCoachChatReturn => {
+  const { messages: contextMessages, loading, sendMessage, clearMessages } = useCoach();
+  const [userMessage, setUserMessage] = useState('');
+  const [typingIndicator, setTypingIndicator] = useState('');
+  const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
 
-  // Load initial messages
   useEffect(() => {
-    loadMessages();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const loadMessages = async () => {
-    try {
-      setLoading(true);
-      // Simulate API call
-      setTimeout(() => {
-        setMessages([
-          {
-            id: '1',
-            content: "Bonjour ! Je suis votre coach émotionnel. Comment puis-je vous aider aujourd'hui ?",
-            sender: 'coach',
-            role: 'assistant',
-            timestamp: new Date().toISOString(),
-          }
-        ]);
-        setLoading(false);
-      }, 1000);
-    } catch (error) {
-      console.error('Error loading messages:', error);
-      setLoading(false);
+    if (contextMessages.length > 0) {
+      setLocalMessages(contextMessages);
     }
-  };
+  }, [contextMessages]);
 
-  const sendMessage = async (text: string) => {
-    if (!text.trim()) return;
+  // Handle sending a message
+  const handleSendMessage = useCallback((messageContent?: string) => {
+    const content = messageContent || userMessage;
     
-    try {
-      setLoading(true);
-      
-      // Add user message to state
-      const userMessage: ChatMessage = {
-        id: Date.now().toString(),
-        content: text,
-        sender: 'user',
-        role: 'user',
-        timestamp: new Date().toISOString(),
-      };
-      
-      setMessages(prev => [...prev, userMessage]);
-      
-      // Simulate API response delay
-      setTimeout(() => {
-        const botResponse: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          content: `Je comprends votre sentiment. Pouvez-vous m'en dire plus sur ce que vous ressentez actuellement ?`,
-          sender: 'coach',
-          role: 'assistant',
-          timestamp: new Date().toISOString(),
-        };
-        
-        setMessages(prev => [...prev, botResponse]);
-        setLoading(false);
-      }, 2000);
-      
-    } catch (error) {
-      console.error('Error sending message:', error);
-      setLoading(false);
+    if (!content.trim()) return;
+    
+    // Send message through context
+    sendMessage(content);
+    
+    // Clear input field
+    if (!messageContent) {
+      setUserMessage('');
     }
-  };
+    
+    // Show typing indicator
+    setTypingIndicator('Le coach est en train de répondre...');
+  }, [userMessage, sendMessage]);
 
-  const clearMessages = () => {
-    setMessages([]);
-  };
+  // Handle regenerating the last AI response
+  const handleRegenerate = useCallback(() => {
+    // Find the last user message
+    const lastUserMessageIndex = [...localMessages].reverse().findIndex(msg => msg.sender === 'user');
+    
+    if (lastUserMessageIndex === -1) return;
+    
+    // Calculate the actual index in the array
+    const actualIndex = localMessages.length - 1 - lastUserMessageIndex;
+    const userMessageToRepeat = localMessages[actualIndex];
+    
+    if (!userMessageToRepeat.text) return;
+    
+    // Remove all messages after the last user message
+    const newMessages = localMessages.slice(0, actualIndex + 1);
+    setLocalMessages(newMessages);
+    
+    // Resend the same user message to get a new response
+    handleSendMessage(userMessageToRepeat.text);
+  }, [localMessages, handleSendMessage]);
 
-  const dispatchAction = async (action: CoachAction) => {
-    console.log('Action dispatched:', action);
-    // Implementation would go here
-  };
+  // Handle key press events
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  }, [handleSendMessage]);
 
-  // Adding the missing method
-  const generateRecommendation = async (options: any) => {
-    console.log('Generating recommendation with options:', options);
-    // Simulate API call to generate recommendations
-    setTimeout(() => {
-      setRecommendations([
-        {
-          id: '1',
-          title: 'Méditation guidée',
-          description: 'Une séance de 10 minutes pour retrouver le calme',
-          priority: 1,
-          confidence: 0.85,
-          actionUrl: '/meditation/1',
-          actionLabel: 'Commencer'
-        },
-        {
-          id: '2',
-          title: 'Journal émotionnel',
-          description: 'Notez vos pensées pour prendre du recul',
-          priority: 2, 
-          confidence: 0.75,
-          actionUrl: '/journal',
-          actionLabel: 'Écrire'
-        }
-      ]);
-    }, 1000);
-  };
+  // Reset messages
+  const resetMessages = useCallback(() => {
+    clearMessages();
+    setLocalMessages([]);
+  }, [clearMessages]);
+
+  // Process initial question if provided
+  useEffect(() => {
+    if (initialQuestion && localMessages.length === 0) {
+      handleSendMessage(initialQuestion);
+    }
+  }, [initialQuestion, handleSendMessage, localMessages.length]);
+
+  // Update typing indicator based on loading state
+  useEffect(() => {
+    if (loading) {
+      setTypingIndicator('Le coach est en train de répondre...');
+    } else {
+      setTypingIndicator('');
+    }
+  }, [loading]);
 
   return {
-    messages,
-    loading,
-    sendMessage,
-    clearMessages,
-    loadMessages,
-    events,
-    notifications,
-    emotionalTrends,
-    dispatchAction,
-    lastEmotion,
-    recommendations, // Adding the recommendations array
-    generateRecommendation // Adding the generateRecommendation function
+    messages: localMessages,
+    isLoading: loading,
+    typingIndicator,
+    userMessage,
+    setUserMessage,
+    handleSendMessage,
+    handleRegenerate,
+    handleKeyDown,
+    resetMessages
   };
 };
 

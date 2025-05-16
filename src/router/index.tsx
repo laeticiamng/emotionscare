@@ -14,6 +14,17 @@ import B2BUserMusicPreferences from '../pages/b2b/user/MusicPreferences';
 // Import B2B Admin Music page
 import B2BAdminMusic from '../pages/b2b/admin/Music';
 
+// Import B2C Coach pages
+import B2CCoach from '../pages/b2c/Coach';
+import B2CCoachChat from '../pages/b2c/CoachChat';
+
+// Import B2B User Coach pages
+import B2BUserCoach from '../pages/b2b/user/Coach';
+import B2BUserCoachChat from '../pages/b2b/user/CoachChat';
+
+// Import B2B Admin Coach Analytics
+import B2BAdminCoachAnalytics from '../pages/b2b/admin/CoachAnalytics';
+
 // Other pages
 import Dashboard from '../pages/Dashboard';
 
@@ -35,6 +46,17 @@ const AppRoutes = () => {
       
       {/* B2B Admin Music Route */}
       <Route path="/b2b/admin/music" element={<B2BAdminMusic />} />
+      
+      {/* B2C Coach Routes */}
+      <Route path="/coach" element={<B2CCoach />} />
+      <Route path="/coach-chat" element={<B2CCoachChat />} />
+      
+      {/* B2B User Coach Routes */}
+      <Route path="/b2b/user/coach" element={<B2BUserCoach />} />
+      <Route path="/b2b/user/coach-chat" element={<B2BUserCoachChat />} />
+      
+      {/* B2B Admin Coach Analytics */}
+      <Route path="/b2b/admin/coach-analytics" element={<B2BAdminCoachAnalytics />} />
     </Routes>
   );
 };
