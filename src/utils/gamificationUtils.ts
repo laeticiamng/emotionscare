@@ -1,34 +1,58 @@
 
-import { Challenge } from '@/types/gamification';
-
 /**
- * Get color for a challenge category
+ * Returns a color based on challenge category
  */
 export const getCategoryColor = (category: string): string => {
-  const colors: Record<string, string> = {
-    'daily': 'bg-blue-600',
-    'weekly': 'bg-green-600',
-    'monthly': 'bg-purple-600',
-    'special': 'bg-amber-600',
-    'fitness': 'bg-red-600',
-    'mindfulness': 'bg-teal-600',
-    'social': 'bg-indigo-600',
-    'learning': 'bg-orange-600'
-  };
-
-  return colors[category.toLowerCase()] || 'bg-gray-600';
+  switch (category.toLowerCase()) {
+    case 'daily':
+      return 'text-blue-500';
+    case 'weekly':
+      return 'text-green-500';
+    case 'mental':
+      return 'text-purple-500';
+    case 'physical':
+      return 'text-orange-500';
+    case 'social':
+      return 'text-pink-500';
+    case 'emotional':
+      return 'text-indigo-500';
+    default:
+      return 'text-gray-500';
+  }
 };
 
 /**
- * Get a complete challenge object with a boolean return
+ * Returns a Tailwind background color class based on badge rarity
  */
-export const completeChallenge = async (id: string): Promise<boolean> => {
-  try {
-    // Mock implementation - in a real app this would call an API
-    console.log(`Completing challenge ${id}`);
-    return true;
-  } catch (error) {
-    console.error('Error completing challenge:', error);
-    return false;
+export const getBadgeRarityColor = (rarity: string): string => {
+  switch (rarity.toLowerCase()) {
+    case 'common':
+      return 'bg-slate-500';
+    case 'rare':
+      return 'bg-blue-500';
+    case 'epic':
+      return 'bg-purple-500';
+    case 'legendary':
+      return 'bg-amber-500';
+    default:
+      return 'bg-slate-500';
+  }
+};
+
+/**
+ * Returns a formatted string for challenge status
+ */
+export const getFormattedChallengeStatus = (status: string): string => {
+  switch (status.toLowerCase()) {
+    case 'active':
+      return 'En cours';
+    case 'completed':
+      return 'Terminé';
+    case 'failed':
+      return 'Échoué';
+    case 'locked':
+      return 'Verrouillé';
+    default:
+      return 'Inconnu';
   }
 };

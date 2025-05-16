@@ -1,96 +1,127 @@
 
-import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ChevronRight, ShieldCheck } from "lucide-react";
-import { Badge } from "@/types/gamification";
-import { BadgesWidgetProps } from "@/types/widgets";
-import { cn } from "@/lib/utils";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge as BadgeType } from '@/types';
+import { cn } from '@/lib/utils';
+import { Award, ChevronRight, Lock } from 'lucide-react';
+import { getBadgeRarityColor } from '@/utils/gamificationUtils';
+import { Button } from '@/components/ui/button';
+
+interface BadgesWidgetProps {
+  badges: BadgeType[];
+  title?: string;
+  className?: string;
+}
 
 const BadgesWidget: React.FC<BadgesWidgetProps> = ({
   badges,
   title = "Badges",
-  showSeeAll = true,
-  onSeeAll,
+  className
 }) => {
-  // Sort badges: first completed and unlocked, then completed but locked, then incomplete
-  const sortedBadges = [...badges].sort((a, b) => {
-    if ((a.completed && a.unlockedAt) && !(b.completed && b.unlockedAt)) return -1;
-    if (!(a.completed && a.unlockedAt) && (b.completed && b.unlockedAt)) return 1;
-    if ((a.completed && !a.unlockedAt) && !b.completed) return -1;
-    if (!a.completed && (b.completed && !b.unlockedAt)) return 1;
-    return 0;
-  });
-
-  // Calculate badges progress
-  const completedBadges = badges.filter(badge => badge.completed || badge.unlockedAt).length;
-  const totalBadges = badges.length;
-  const progress = Math.round((completedBadges / totalBadges) * 100);
+  const [selectedTab, setSelectedTab] = useState<string>('all');
   
-  // Display only the first 3 badges
-  const displayBadges = sortedBadges.slice(0, 3);
-
+  const completedBadges = badges.filter(badge => badge.completed || badge.unlocked);
+  const lockedBadges = badges.filter(badge => !badge.completed && !badge.unlocked);
+  
+  const displayBadges = selectedTab === 'all' ? badges :
+                        selectedTab === 'completed' ? completedBadges :
+                        lockedBadges;
+                      
+  const calculateProgress = () => {
+    if (badges.length === 0) return 0;
+    return Math.round((completedBadges.length / badges.length) * 100);
+  };
+  
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle>{title}</CardTitle>
-          {showSeeAll && (
-            <Button variant="ghost" size="sm" onClick={onSeeAll}>
-              Voir tout
-            </Button>
-          )}
+    <Card className={cn("h-full flex flex-col", className)}>
+      <CardHeader className="pb-2">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-lg">{title}</CardTitle>
+          <div className="text-sm text-muted-foreground">
+            {completedBadges.length}/{badges.length}
+          </div>
         </div>
-        <CardDescription>
-          {completedBadges} sur {totalBadges} badges débloqués
-        </CardDescription>
-        {/* Progress bar */}
-        <div className="w-full bg-muted rounded-full h-2 mt-2">
-          <div
-            className="bg-primary h-2 rounded-full"
-            style={{ width: `${progress}%` }}
-          ></div>
+        <div className="flex space-x-1 text-sm">
+          <button 
+            className={cn(
+              "px-2 py-1 rounded-md",
+              selectedTab === 'all' ? "bg-primary/10 text-primary" : "hover:bg-muted"
+            )}
+            onClick={() => setSelectedTab('all')}
+          >
+            Tous
+          </button>
+          <button 
+            className={cn(
+              "px-2 py-1 rounded-md",
+              selectedTab === 'completed' ? "bg-primary/10 text-primary" : "hover:bg-muted"
+            )}
+            onClick={() => setSelectedTab('completed')}
+          >
+            Déverrouillés
+          </button>
+          <button 
+            className={cn(
+              "px-2 py-1 rounded-md", 
+              selectedTab === 'locked' ? "bg-primary/10 text-primary" : "hover:bg-muted"
+            )}
+            onClick={() => setSelectedTab('locked')}
+          >
+            À obtenir
+          </button>
         </div>
       </CardHeader>
-      <CardContent className="grid grid-cols-3 gap-3">
-        {displayBadges.map((badge) => (
-          <div
-            key={badge.id}
-            className={cn(
-              "flex flex-col items-center text-center p-2 rounded-lg",
-              badge.completed || badge.unlockedAt
-                ? "text-foreground"
-                : "text-muted-foreground"
-            )}
-          >
-            <div className="relative mb-1">
-              <div
+      <CardContent className="flex-1 overflow-auto pb-2">
+        {displayBadges.length === 0 ? (
+          <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground p-4">
+            <Award className="h-10 w-10 mb-2 opacity-20" />
+            <p>Aucun badge {selectedTab === 'completed' ? 'déverrouillé' : selectedTab === 'locked' ? 'à obtenir' : ''} pour le moment.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {displayBadges.map((badge) => (
+              <div 
+                key={badge.id} 
                 className={cn(
-                  "h-12 w-12 rounded-full flex items-center justify-center",
-                  badge.completed || badge.unlockedAt
-                    ? "bg-primary/20"
-                    : "bg-muted"
+                  "group relative aspect-square rounded-lg border p-3 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-accent transition-colors",
+                  badge.completed ? "bg-accent/30" : ""
                 )}
               >
-                <ShieldCheck
-                  className={cn(
-                    "h-6 w-6",
-                    badge.completed || badge.unlockedAt
-                      ? "text-primary"
-                      : "text-muted-foreground/60"
+                <div className={cn(
+                  "w-12 h-12 rounded-full mb-2 flex items-center justify-center",
+                  badge.completed ? getBadgeRarityColor(badge.rarity) : "bg-muted"
+                )}>
+                  {badge.completed ? (
+                    <Award className="h-6 w-6 text-white" />
+                  ) : (
+                    <Lock className="h-5 w-5 text-muted-foreground" />
                   )}
-                />
-              </div>
-              {(badge.completed || badge.unlockedAt) && (
-                <div className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs">
-                  ✓
                 </div>
-              )}
-            </div>
-            <div className="text-xs font-medium mt-1 line-clamp-1">{badge.name}</div>
+                <div className="text-xs font-medium line-clamp-1">{badge.name}</div>
+                <div className={cn(
+                  "text-[10px] line-clamp-2 mt-1", 
+                  badge.completed ? "text-muted-foreground" : "text-muted-foreground/70"
+                )}>
+                  {badge.description}
+                </div>
+                
+                <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white opacity-0 group-hover:opacity-100 rounded-lg transition-opacity">
+                  <div className="p-2 text-xs">
+                    <p className="font-medium mb-1">{badge.name}</p>
+                    <p className="text-[10px]">{badge.description}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </CardContent>
+      <div className="p-3 pt-2 mt-auto border-t text-sm flex items-center justify-center">
+        <Button variant="ghost" size="sm" className="h-7 text-xs w-full">
+          Voir tous les badges
+          <ChevronRight className="h-3 w-3 ml-1" />
+        </Button>
+      </div>
     </Card>
   );
 };

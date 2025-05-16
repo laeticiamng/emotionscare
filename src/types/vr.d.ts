@@ -4,43 +4,47 @@ export interface VRSessionTemplate {
   title: string;
   description: string;
   duration: number;
-  thumbnail_url?: string;
-  thumbnailUrl?: string; // For compatibility
-  tags?: string[];
-  category?: string;
-  vr_url?: string;
+  tags: string[];
+  emotionTarget?: string;
   emotion_target?: string;
-  emotionTarget?: string; // For compatibility
-  intensity?: number;
+  difficulty?: string;
+  benefits?: string[];
+  thumbnailUrl?: string;
+  category?: string;
+  theme?: string;
+  completionRate?: number;
+  recommendedMood?: string;
+  is_audio_only?: boolean;
+  preview_url?: string;
+  audio_url?: string;
+  emotion?: string;
 }
 
-export interface VRSessionContextType {
-  sessions: VRSessionTemplate[];
-  currentSession: VRSessionTemplate | null;
-  isPlaying: boolean;
-  playSession: (session: VRSessionTemplate) => void;
-  pauseSession: () => void;
-  resumeSession: () => void;
-  endSession: () => void;
-  loadSessionsForEmotion: (emotion: string) => Promise<VRSessionTemplate[]>;
-  sessionProgress: number;
-  sessionDuration: number;
-  loading: boolean;
-  error: string | null;
-}
-
-export interface VRPlayerProps {
-  session?: VRSessionTemplate;
-  autoPlay?: boolean;
-  onComplete?: () => void;
-  onProgress?: (progress: number) => void;
-}
-
-export interface VRControlsProps {
-  isPlaying: boolean;
-  onPlay: () => void;
-  onPause: () => void;
-  onStop: () => void;
-  progress: number;
+export interface VRSession {
+  id: string;
+  template_id: string;
+  user_id: string;
+  date: string;
   duration: number;
+  completed: boolean;
+  feedback?: string;
+  score?: number;
+  mood_before?: string;
+  mood_after?: string;
+}
+
+export interface VRHistoryListProps {
+  sessions: VRSession[];
+  onSelect: (session: VRSession) => void;
+}
+
+export interface VRSessionHistoryProps {
+  session: VRSession;
+  template: VRSessionTemplate;
+}
+
+export interface VRSessionWithMusicProps {
+  template: VRSessionTemplate;
+  onComplete: (feedback: string, score: number) => void;
+  onExit: () => void;
 }

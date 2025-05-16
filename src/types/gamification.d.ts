@@ -18,6 +18,7 @@ export interface Challenge {
   description: string;
   category: string;
   xp: number;
+  points?: number;
   progress: number;
   status: 'active' | 'completed' | 'failed' | 'locked';
   deadline?: string;
@@ -25,6 +26,7 @@ export interface Challenge {
   isWeekly?: boolean;
   icon?: React.ReactNode;
   failed?: boolean;
+  goal?: number;
 }
 
 export interface LeaderboardEntry {
@@ -45,7 +47,7 @@ export interface LeaderboardEntry {
 export interface GamificationStats {
   points: number;
   level: number;
-  badges: number;
+  badges: Badge[];
   completedChallenges: number;
   totalChallenges: number;
   challenges: Challenge[];

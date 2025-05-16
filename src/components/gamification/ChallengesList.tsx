@@ -1,218 +1,201 @@
 
 import React, { useState } from 'react';
-import { Challenge } from '@/types/gamification';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, Clock, Calendar, Award } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { getCategoryColor } from '@/utils/gamificationUtils'; 
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { Challenge } from '@/types';
+import { getCategoryColor, getFormattedChallengeStatus } from '@/utils/gamificationUtils';
+import { Calendar, Clock, Award, ArrowRight, CheckCircle, XCircle } from 'lucide-react';
 
+// Update the function signature to match the expected return type
 interface ChallengesListProps {
   challenges: Challenge[];
+  onComplete?: (id: string) => Promise<boolean>;
+  onFail?: (id: string) => Promise<boolean>;
+  onRetry?: (id: string) => Promise<boolean>;
+  className?: string;
 }
 
-const ChallengesList: React.FC<ChallengesListProps> = ({ challenges }) => {
-  const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<string>('all');
-  
-  // Filter challenges based on active tab
-  const filteredChallenges = challenges.filter(challenge => {
-    if (activeTab === 'all') return true;
-    if (activeTab === 'active') return challenge.status === 'active';
-    if (activeTab === 'completed') return challenge.status === 'completed';
-    if (activeTab === 'failed') return challenge.status === 'failed' || challenge.failed;
-    return true;
-  });
-  
-  const getChallengeStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-blue-500';
-      case 'completed':
-        return 'bg-green-500';
-      case 'failed':
-        return 'bg-red-500';
-      case 'locked':
-        return 'bg-gray-500';
-      default:
-        return 'bg-blue-500';
-    }
+const ChallengesList: React.FC<ChallengesListProps> = ({
+  challenges,
+  onComplete,
+  onFail,
+  onRetry,
+  className
+}) => {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const toggleExpand = (id: string) => {
+    setExpandedId(expandedId === id ? null : id);
   };
-  
-  const getChallengeIcon = (challenge: Challenge) => {
-    if (challenge.icon) return challenge.icon;
-    
-    if (challenge.isDaily) return <Clock className="h-4 w-4" />;
-    if (challenge.isWeekly) return <Calendar className="h-4 w-4" />;
-    return <Award className="h-4 w-4" />;
+
+  const getStatusClass = (challenge: Challenge) => {
+    if (challenge.status === 'completed') return 'bg-green-50 border-green-200';
+    if (challenge.status === 'failed' || challenge.failed) return 'bg-red-50 border-red-200';
+    if (challenge.status === 'locked') return 'bg-gray-50 border-gray-200';
+    return 'bg-white border-slate-200';
   };
-  
-  const handleCompleteChallenge = async (challengeId: string) => {
-    try {
-      // Here you would normally call your API to complete the challenge
-      // For now, we'll just simulate a successful response
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      toast({
-        title: 'Défi complété',
-        description: 'Félicitations! Vous avez remporté ce défi.',
-      });
-      
-      return true;
-    } catch (error) {
-      console.error('Error completing challenge:', error);
-      
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de compléter le défi. Veuillez réessayer.',
-        variant: 'destructive',
-      });
-      
-      return false;
+
+  // Wrapper functions to handle the Promise<boolean> return type
+  const handleComplete = async (challengeId: string) => {
+    if (onComplete) {
+      try {
+        return await onComplete(challengeId);
+      } catch (error) {
+        console.error('Error completing challenge:', error);
+        return false;
+      }
     }
+    return false;
   };
-  
-  const handleRetryChallenge = async (challengeId: string) => {
-    try {
-      // Here you would call your API to retry the challenge
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      toast({
-        title: 'Défi réactivé',
-        description: 'Vous pouvez maintenant réessayer ce défi.',
-      });
-      
-      return true;
-    } catch (error) {
-      console.error('Error retrying challenge:', error);
-      
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de réactiver le défi. Veuillez réessayer.',
-        variant: 'destructive',
-      });
-      
-      return false;
+
+  const handleFail = async (challengeId: string) => {
+    if (onFail) {
+      try {
+        return await onFail(challengeId);
+      } catch (error) {
+        console.error('Error marking challenge as failed:', error);
+        return false;
+      }
     }
+    return false;
   };
-  
-  const handleAbandonChallenge = async (challengeId: string) => {
-    try {
-      // Here you would call your API to abandon the challenge
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      toast({
-        title: 'Défi abandonné',
-        description: 'Vous avez abandonné ce défi. Vous pourrez le reprendre plus tard.',
-      });
-      
-      return true;
-    } catch (error) {
-      console.error('Error abandoning challenge:', error);
-      
-      toast({
-        title: 'Erreur',
-        description: 'Impossible d\'abandonner le défi. Veuillez réessayer.',
-        variant: 'destructive',
-      });
-      
-      return false;
+
+  const handleRetry = async (challengeId: string) => {
+    if (onRetry) {
+      try {
+        return await onRetry(challengeId);
+      } catch (error) {
+        console.error('Error retrying challenge:', error);
+        return false;
+      }
     }
+    return false;
   };
 
   return (
-    <div className="space-y-4">
-      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="all">Tous</TabsTrigger>
-          <TabsTrigger value="active">En cours</TabsTrigger>
-          <TabsTrigger value="completed">Complétés</TabsTrigger>
-          <TabsTrigger value="failed">Échoués</TabsTrigger>
-        </TabsList>
-      </Tabs>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredChallenges.length > 0 ? (
-          filteredChallenges.map((challenge) => (
-            <Card key={challenge.id} className="overflow-hidden">
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-8 h-8 rounded-full ${getCategoryColor(challenge.category)} flex items-center justify-center`}>
-                      {getChallengeIcon(challenge)}
-                    </div>
-                    <CardTitle className="text-base">{challenge.title}</CardTitle>
+    <div className={cn("space-y-3", className)}>
+      {challenges.map((challenge) => (
+        <Card 
+          key={challenge.id}
+          className={cn("border overflow-hidden transition-all", getStatusClass(challenge))}
+        >
+          <CardContent className="p-0">
+            <div 
+              className="p-4 cursor-pointer"
+              onClick={() => toggleExpand(challenge.id)}
+            >
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className={cn("h-10 w-10 rounded-full flex items-center justify-center", 
+                    challenge.icon ? "" : "bg-primary/10")}>
+                    {challenge.icon || <Award className="h-5 w-5 text-primary" />}
                   </div>
-                  <Badge variant={
-                    challenge.status === 'completed' ? 'default' :
-                    challenge.status === 'active' ? 'outline' :
-                    challenge.failed || challenge.status === 'failed' ? 'destructive' : 'secondary'
-                  }>
-                    {challenge.status === 'completed' ? 'Complété' :
-                     challenge.status === 'active' ? 'En cours' :
-                     challenge.failed || challenge.status === 'failed' ? 'Échoué' : 'Verrouillé'}
-                  </Badge>
+                  <div>
+                    <h3 className="font-medium text-base">{challenge.title}</h3>
+                    <div className="flex items-center gap-x-2 text-xs text-muted-foreground mt-1">
+                      {challenge.isDaily && <Badge variant="outline" className="text-xs">Quotidien</Badge>}
+                      {challenge.isWeekly && <Badge variant="outline" className="text-xs">Hebdomadaire</Badge>}
+                      {challenge.deadline && (
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(challenge.deadline).toLocaleDateString()}
+                        </span>
+                      )}
+                      <span className={cn("font-medium", getCategoryColor(challenge.category))}>
+                        {challenge.category}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <CardDescription className="mt-1">
-                  {challenge.description}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pb-2">
-                {challenge.status !== 'completed' && challenge.status !== 'failed' && !challenge.failed && (
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span>Progression</span>
-                      <span>{challenge.progress}%</span>
-                    </div>
-                    <Progress value={challenge.progress} className="h-2" />
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="font-normal">
+                    {challenge.xp} XP
+                  </Badge>
+                  <ArrowRight className={cn(
+                    "h-5 w-5 transition-transform",
+                    expandedId === challenge.id ? "rotate-90" : "rotate-0"
+                  )} />
+                </div>
+              </div>
+            </div>
+            
+            {expandedId === challenge.id && (
+              <div className="px-4 pb-4 pt-2 border-t border-border/50">
+                <p className="text-sm text-muted-foreground mb-4">{challenge.description}</p>
+                
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm mb-1.5">
+                    <span>Progression</span>
+                    <span>{Math.round(challenge.progress)}%</span>
                   </div>
-                )}
-                {(challenge.status === 'completed') && (
-                  <div className="flex items-center gap-1 text-green-600 text-sm">
-                    <CheckCircle2 className="h-4 w-4" />
-                    <span>+{challenge.xp} XP gagnés</span>
+                  <Progress value={challenge.progress} className="h-2" />
+                </div>
+                
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-1.5">
+                    {challenge.status === 'completed' ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : challenge.failed || challenge.status === 'failed' ? (
+                      <XCircle className="h-4 w-4 text-red-500" />
+                    ) : (
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                    )}
+                    <span className="text-muted-foreground">
+                      {challenge.status === 'completed' ? 'Complété' : 
+                       challenge.status === 'failed' ? 'Échoué' :
+                       challenge.status === 'locked' ? 'Verrouillé' : 'En cours'}
+                    </span>
                   </div>
-                )}
-                {(challenge.failed || challenge.status === 'failed') && (
-                  <div className="flex items-center gap-1 text-red-600 text-sm">
-                    <XCircle className="h-4 w-4" />
-                    <span>Défi non complété à temps</span>
+                  
+                  <div className="flex gap-2">
+                    {challenge.status === 'active' && onComplete && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleComplete(challenge.id);
+                        }}
+                      >
+                        Marquer complété
+                      </Button>
+                    )}
+                    
+                    {challenge.status === 'active' && onFail && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFail(challenge.id);
+                        }}
+                      >
+                        Abandonner
+                      </Button>
+                    )}
+                    
+                    {(challenge.failed || challenge.status === 'failed') && onRetry && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRetry(challenge.id);
+                        }}
+                      >
+                        Réessayer
+                      </Button>
+                    )}
                   </div>
-                )}
-              </CardContent>
-              <CardFooter className="pt-2">
-                {challenge.status === 'active' && (
-                  <div className="flex justify-between w-full">
-                    <Button variant="outline" size="sm" onClick={() => handleAbandonChallenge(challenge.id)}>
-                      Abandonner
-                    </Button>
-                    <Button size="sm" onClick={() => handleCompleteChallenge(challenge.id)}>
-                      Compléter
-                    </Button>
-                  </div>
-                )}
-                {(challenge.failed || challenge.status === 'failed') && (
-                  <Button variant="outline" size="sm" className="w-full" onClick={() => handleRetryChallenge(challenge.id)}>
-                    Réessayer
-                  </Button>
-                )}
-                {challenge.status === 'completed' && (
-                  <Button variant="ghost" size="sm" className="w-full" disabled>
-                    <CheckCircle2 className="mr-2 h-4 w-4" /> Défi complété
-                  </Button>
-                )}
-              </CardFooter>
-            </Card>
-          ))
-        ) : (
-          <div className="col-span-full text-center py-8">
-            <p className="text-muted-foreground">Aucun défi trouvé dans cette catégorie.</p>
-          </div>
-        )}
-      </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };
