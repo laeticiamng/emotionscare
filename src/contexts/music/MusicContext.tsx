@@ -9,17 +9,23 @@ const defaultContextValue: MusicContextType = {
   isPlaying: false,
   volume: 1,
   isMuted: false,
+  muted: false,
   currentTime: 0,
   duration: 0,
   currentEmotion: null,
+  emotion: null,
   playTrack: () => {},
   pauseTrack: () => {},
+  resumeTrack: () => {},
   togglePlay: () => {},
   nextTrack: () => {},
   previousTrack: () => {},
   setVolume: () => {},
   toggleMute: () => {},
+  seekTo: () => {},
   loadPlaylistForEmotion: async () => null,
+  setEmotion: () => {},
+  setOpenDrawer: () => {},
 };
 
 // Create the context

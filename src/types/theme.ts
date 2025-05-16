@@ -1,7 +1,7 @@
 
-export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large';
-export type FontFamily = 'inter' | 'system' | 'serif' | 'mono' | 'sans-serif' | 'monospace';
+import { ThemeName, FontSize, FontFamily } from './preferences';
+
+export type Theme = ThemeName;
 
 export interface ThemeContextType {
   theme: Theme;
