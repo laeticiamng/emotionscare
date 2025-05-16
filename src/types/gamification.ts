@@ -6,6 +6,7 @@ export interface GamificationStats {
   rank: string;
   points: number;
   streakDays: number;
+  longestStreak?: number;
   completedChallenges: number;
   unlockedBadges: number;
   totalChallenges: number;
@@ -27,6 +28,7 @@ export interface Challenge {
   deadline?: string;
   completions?: number;
   tags?: string[];
+  category?: string;
 }
 
 export interface Badge {
@@ -34,13 +36,16 @@ export interface Badge {
   name: string;
   description: string;
   image: string;
+  imageUrl?: string;
   achieved?: boolean;
+  achievedAt?: string;
   dateAchieved?: string;
   progress?: number;
   maxProgress?: number;
   tier?: string;
   total?: number;
   category?: string;
+  icon?: React.ReactNode;
 }
 
 export interface LeaderboardEntry {

@@ -1,127 +1,131 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, UserRole } from '@/types/user';
+import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import { User } from '@/types/user';
 
-export interface AuthContextType {
+interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string, role?: UserRole) => Promise<void>;
+  login: (email: string, password: string) => Promise<User | null>;
   logout: () => Promise<void>;
   clearError: () => void;
-  updateUser: (user: User) => Promise<User>;
 }
 
-const initialState: AuthContextType = {
+const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
   isLoading: true,
   error: null,
-  login: async () => {},
-  register: async () => {},
+  login: async () => null,
   logout: async () => {},
-  clearError: () => {},
-  updateUser: async (user) => user,
-};
-
-export const AuthContext = createContext<AuthContextType>(initialState);
+  clearError: () => {}
+});
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Check if user is authenticated on mount
   useEffect(() => {
-    const checkAuth = async () => {
+    // Check for existing session on load
+    const checkSession = async () => {
       try {
-        // Simulate checking authentication
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
-          setIsAuthenticated(true);
+        const token = localStorage.getItem('auth_session');
+        const role = localStorage.getItem('user_role');
+        
+        if (token) {
+          // Mock user data based on role
+          const mockUser: User = {
+            id: '1',
+            name: role === 'b2b_admin' ? 'Admin Test' : role === 'b2b_user' ? 'Collaborateur Test' : 'Utilisateur Test',
+            email: role === 'b2b_admin' ? 'admin@exemple.fr' : role === 'b2b_user' ? 'collaborateur@exemple.fr' : 'user@exemple.fr',
+            role: role as any || 'b2c',
+            avatar_url: '/images/avatar.jpg'
+          };
+          
+          setUser(mockUser);
         }
       } catch (err) {
-        console.error('Authentication error:', err);
-        setError('Failed to authenticate');
+        console.error('Error checking session:', err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkAuth();
+    checkSession();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User | null> => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      // Simulate login API call
-      // Replace with actual authentication logic
-      const mockUser: User = {
-        id: '1',
-        name: 'Test User',
-        email: email,
-        role: 'user',
-        created_at: new Date().toISOString(),
-      };
-      
-      setUser(mockUser);
-      setIsAuthenticated(true);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-    } catch (err) {
-      console.error('Login error:', err);
-      setError('Invalid credentials');
-      throw err;
+      // Mock authentication for demo
+      if (email === 'admin@exemple.fr' && password === 'admin') {
+        const user: User = {
+          id: '1',
+          name: 'Admin Test',
+          email: 'admin@exemple.fr',
+          role: 'b2b_admin',
+          avatar_url: '/images/avatar-admin.jpg'
+        };
+        
+        localStorage.setItem('auth_session', 'mock_token_admin');
+        localStorage.setItem('user_role', 'b2b_admin');
+        setUser(user);
+        return user;
+      } 
+      else if (email === 'collaborateur@exemple.fr' && password === 'admin') {
+        const user: User = {
+          id: '2',
+          name: 'Collaborateur Test',
+          email: 'collaborateur@exemple.fr',
+          role: 'b2b_user',
+          avatar_url: '/images/avatar-user.jpg'
+        };
+        
+        localStorage.setItem('auth_session', 'mock_token_b2b_user');
+        localStorage.setItem('user_role', 'b2b_user');
+        setUser(user);
+        return user;
+      }
+      else if (email === 'user@exemple.fr' && password === 'password') {
+        const user: User = {
+          id: '3',
+          name: 'Utilisateur Test',
+          email: 'user@exemple.fr',
+          role: 'b2c',
+          avatar_url: '/images/avatar-b2c.jpg'
+        };
+        
+        localStorage.setItem('auth_session', 'mock_token_b2c');
+        localStorage.setItem('user_role', 'b2c');
+        setUser(user);
+        return user;
+      }
+      else {
+        throw new Error('Email ou mot de passe incorrect');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Erreur de connexion');
+      return null;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const register = async (email: string, password: string, name: string, role: UserRole = 'user') => {
+  const logout = async (): Promise<void> => {
     setIsLoading(true);
-    setError(null);
-    
     try {
-      // Simulate register API call
-      // Replace with actual registration logic
-      const mockUser: User = {
-        id: Date.now().toString(),
-        name: name,
-        email: email,
-        role: role,
-        created_at: new Date().toISOString(),
-      };
+      // Clear local storage
+      localStorage.removeItem('auth_session');
+      localStorage.removeItem('user_role');
+      localStorage.removeItem('userMode');
       
-      setUser(mockUser);
-      setIsAuthenticated(true);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-    } catch (err) {
-      console.error('Registration error:', err);
-      setError('Registration failed');
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const logout = async () => {
-    setIsLoading(true);
-    
-    try {
-      // Simulate logout API call
-      // Replace with actual logout logic
-      localStorage.removeItem('user');
       setUser(null);
-      setIsAuthenticated(false);
-    } catch (err) {
-      console.error('Logout error:', err);
-      setError('Logout failed');
+    } catch (err: any) {
+      setError(err.message || 'Erreur de déconnexion');
     } finally {
       setIsLoading(false);
     }
@@ -131,37 +135,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setError(null);
   };
 
-  const updateUser = async (updatedUser: User): Promise<User> => {
-    setIsLoading(true);
-    
-    try {
-      // Simulate user update API call
-      // Replace with actual user update logic
-      const mergedUser = { ...user, ...updatedUser };
-      setUser(mergedUser);
-      localStorage.setItem('user', JSON.stringify(mergedUser));
-      return mergedUser;
-    } catch (err) {
-      console.error('Update user error:', err);
-      setError('Failed to update user');
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated,
+        isAuthenticated: !!user,
         isLoading,
         error,
         login,
-        register,
         logout,
-        clearError,
-        updateUser,
+        clearError
       }}
     >
       {children}
@@ -169,12 +152,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
-export default AuthContext;
+export const useAuth = () => useContext(AuthContext);
