@@ -1,109 +1,68 @@
 
-import * as React from "react";
-import * as RechartsPrimitive from "recharts";
-import { cn } from "@/lib/utils";
-import { useChart } from "./context";
-import { getPayloadConfigFromPayload } from "./ChartTooltip";
+import React from 'react';
+import { Legend } from 'recharts';
+import { getPayloadConfigFromPayload } from './ChartTooltip';
 
-const ChartLegend = RechartsPrimitive.Legend;
+interface ChartLegendProps {
+  align?: 'left' | 'center' | 'right';
+  verticalAlign?: 'top' | 'middle' | 'bottom';
+  layout?: 'horizontal' | 'vertical';
+  iconType?: 'line' | 'plainline' | 'square' | 'rect' | 'circle' | 'cross' | 'diamond' | 'star' | 'triangle' | 'wye' | 'none';
+  iconSize?: number;
+  className?: string;
+}
 
-const ChartLegendContent = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-      hideIcon?: boolean;
-      nameKey?: string;
-      onClick?: (item: any) => void;
-      hiddenSeries?: string[];
-      activeClassName?: string;
-      inactiveClassName?: string;
-    }
->(
-  (
-    { 
-      className, 
-      hideIcon = false, 
-      payload, 
-      verticalAlign = "bottom", 
-      nameKey,
-      onClick,
-      hiddenSeries = [],
-      activeClassName = "",
-      inactiveClassName = ""
-    },
-    ref
-  ) => {
-    const { config } = useChart();
+interface RenderCustomLegendProps {
+  payload?: any[];
+}
 
-    if (!payload?.length) {
-      return null;
-    }
-
-    const handleClick = (item: any) => {
-      if (onClick) {
-        onClick(item);
-      }
-    };
-
-    const handleKeyDown = (event: React.KeyboardEvent, item: any) => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        if (onClick) {
-          onClick(item);
-        }
-      }
-    };
+export const ChartLegend: React.FC<ChartLegendProps> = ({
+  align = 'center',
+  verticalAlign = 'bottom',
+  layout = 'horizontal',
+  iconType = 'circle',
+  iconSize = 10,
+  className = '',
+}) => {
+  const renderCustomLegend = ({ payload }: RenderCustomLegendProps) => {
+    if (!payload || payload.length === 0) return null;
 
     return (
-      <div
-        ref={ref}
-        className={cn(
-          "flex items-center justify-center gap-4",
-          verticalAlign === "top" ? "pb-3" : "pt-3",
-          className
-        )}
-      >
-        {payload.map((item) => {
-          const key = `${nameKey || item.dataKey || "value"}`;
-          const itemConfig = getPayloadConfigFromPayload(config, item, key);
-          const isHidden = hiddenSeries.includes(key);
-          
+      <div className={`flex flex-wrap justify-${align} gap-4 pt-2 ${className}`}>
+        {payload.map((entry, index) => {
+          const config = {
+            color: entry.color,
+            name: entry.value,
+          };
+
           return (
-            <div
-              key={item.value}
-              className={cn(
-                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
-                onClick ? "cursor-pointer" : "",
-                isHidden ? inactiveClassName : activeClassName
-              )}
-              onClick={() => handleClick(item)}
-              onKeyDown={(e) => handleKeyDown(e, item)}
-              tabIndex={onClick ? 0 : undefined}
-              role={onClick ? "button" : undefined}
-              aria-pressed={isHidden}
-              aria-label={onClick ? `Basculer la série ${item.value}` : undefined}
-            >
-              {itemConfig?.icon && !hideIcon ? (
-                <itemConfig.icon />
-              ) : (
-                <div
-                  className={cn(
-                    "h-2 w-2 shrink-0 rounded-[2px]",
-                    isHidden && "opacity-40"
-                  )}
-                  style={{
-                    backgroundColor: item.color,
-                  }}
-                />
-              )}
-              {itemConfig?.label || item.value}
+            <div key={`legend-item-${index}`} className="flex items-center">
+              <div
+                className={`mr-2 ${iconType === 'circle' ? 'rounded-full' : 'rounded'}`}
+                style={{
+                  backgroundColor: config.color,
+                  width: iconSize,
+                  height: iconSize,
+                }}
+              />
+              <span className="text-xs text-muted-foreground">{config.name}</span>
             </div>
           );
         })}
       </div>
     );
-  }
-);
-ChartLegendContent.displayName = "ChartLegendContent";
+  };
 
-export { ChartLegend, ChartLegendContent };
+  return (
+    <Legend
+      content={renderCustomLegend}
+      align={align}
+      verticalAlign={verticalAlign}
+      layout={layout}
+      iconType={iconType}
+      iconSize={iconSize}
+    />
+  );
+};
+
+export default ChartLegend;

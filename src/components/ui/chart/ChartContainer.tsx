@@ -1,25 +1,33 @@
 
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { ResponsiveContainer } from 'recharts';
 
-export interface ChartContainerProps {
-  children: ReactNode;
-  width?: number | string;
-  height?: number | string;
+interface ChartContainerProps {
+  children: React.ReactNode;
+  aspectRatio?: number;
   className?: string;
 }
 
-export const ChartContainer: React.FC<ChartContainerProps> = ({
+const ChartContainer: React.FC<ChartContainerProps> = ({
   children,
-  width = '100%',
-  height = 300,
-  className,
+  aspectRatio = 2,
+  className = '',
 }) => {
+  // Safely handle children to ensure it's a valid React element
+  const safeChildren = React.Children.only(children);
+
   return (
-    <div className={className}>
-      <ResponsiveContainer width={width} height={height}>
-        {children}
+    <div
+      className={`w-full ${className}`}
+      style={{
+        aspectRatio: aspectRatio.toString(),
+      }}
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        {safeChildren}
       </ResponsiveContainer>
     </div>
   );
 };
+
+export default ChartContainer;

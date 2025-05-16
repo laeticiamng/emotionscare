@@ -1,48 +1,70 @@
 
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useSidebar } from './SidebarContext';
 
-interface SidebarItemProps {
+export interface SidebarItemProps {
+  href: string;
   icon?: React.ReactNode;
   title: string;
   active?: boolean;
-  href?: string;
+  disabled?: boolean;
+  external?: boolean;
+  className?: string;
   onClick?: () => void;
   children?: React.ReactNode;
-  disabled?: boolean;
-  badge?: React.ReactNode;
 }
 
-export function SidebarItem({
-  icon,
-  title,
-  active,
-  href,
-  onClick,
-  children,
-  disabled,
-  badge
-}: SidebarItemProps) {
-  const { collapsed } = useSidebar();
-
-  return (
-    <li className={cn("relative", disabled && "opacity-60 pointer-events-none")}>
-      <a
-        href={href}
-        onClick={onClick}
+export const SidebarItem = React.forwardRef<HTMLAnchorElement, SidebarItemProps>(
+  ({ href, icon, title, active, disabled, external, className, onClick, children, ...props }, ref) => {
+    const linkContent = (
+      <div
         className={cn(
-          "flex items-center gap-2 rounded-md p-2 text-sm font-semibold transition-colors hover:bg-secondary/50",
-          active && "bg-secondary/50",
-          !collapsed && "justify-center",
-          disabled && "cursor-not-allowed opacity-60 hover:bg-transparent"
+          'group flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground',
+          active && 'bg-accent',
+          disabled && 'pointer-events-none opacity-60',
+          className
         )}
       >
-        {icon}
-        {(!collapsed || (!icon && !collapsed)) && <span>{title}</span>}
-        {badge && <span className="ml-auto">{badge}</span>}
-      </a>
-      {children}
-    </li>
-  );
-}
+        {icon && <span className="mr-2 h-4 w-4">{icon}</span>}
+        <span>{title}</span>
+        {children}
+      </div>
+    );
+
+    if (external) {
+      return (
+        <a
+          ref={ref}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(disabled && 'pointer-events-none')}
+          onClick={onClick}
+          {...props}
+        >
+          {linkContent}
+        </a>
+      );
+    }
+
+    return (
+      <NavLink
+        ref={ref}
+        to={href}
+        className={({ isActive }) =>
+          cn(
+            isActive && 'bg-accent',
+            disabled && 'pointer-events-none'
+          )
+        }
+        onClick={onClick}
+        {...props}
+      >
+        {linkContent}
+      </NavLink>
+    );
+  }
+);
+
+SidebarItem.displayName = 'SidebarItem';

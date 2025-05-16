@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -103,10 +102,10 @@ const ColorPaletteDisplay: React.FC = () => {
                 <div className="flex flex-wrap gap-2">
                   <Button variant="default">Default</Button>
                   <Button variant="secondary">Secondary</Button>
-                  <Button variant="success">Success</Button>
-                  <Button variant="warning">Warning</Button>
-                  <Button variant="info">Info</Button>
-                  <Button variant="error">Error</Button>
+                  <Button variant="outline">Success</Button>
+                  <Button variant="outline">Warning</Button>
+                  <Button variant="outline">Info</Button>
+                  <Button variant="destructive">Error</Button>
                   <Button variant="outline">Outline</Button>
                   <Button variant="ghost">Ghost</Button>
                 </div>

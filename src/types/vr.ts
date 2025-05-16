@@ -23,6 +23,7 @@ export interface VRSessionTemplate {
   is_audio_only?: boolean;
   emotion_target?: string; // Added for dashboard components
   emotionTarget?: string; // Alternative naming
+  theme?: string; // Added for VRSessionView
 }
 
 export interface VRSession {
@@ -48,6 +49,8 @@ export interface VRSession {
   heart_rate_after?: number;
   heartRateBefore?: number;
   heartRateAfter?: number;
+  endTime?: string | Date;
+  notes?: string;
 }
 
 export interface VRHistoryListProps {
@@ -74,4 +77,7 @@ export interface VRSessionWithMusicProps {
   onComplete?: (sessionData: VRSession) => void;
   autoPlay?: boolean;
   className?: string;
+  template?: VRSessionTemplate;
+  session?: VRSession;
+  onSessionComplete?: (session: VRSession) => void;
 }

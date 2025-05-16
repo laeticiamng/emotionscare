@@ -25,6 +25,7 @@ export interface MusicTrack {
   dateAdded?: Date | string;
   playCount?: number;
   track_url?: string; // Alias pour compatibilité
+  emotionalTone?: string;
 }
 
 export interface MusicPlaylist {
@@ -71,6 +72,31 @@ export interface MusicPlayerControls {
   setPlaylist: (playlist: MusicPlaylist) => void;
 }
 
+export interface MusicContextType {
+  currentTrack: MusicTrack | null;
+  playlist: MusicPlaylist | null;
+  isPlaying: boolean;
+  volume: number;
+  isMuted: boolean;
+  currentTime: number;
+  duration: number;
+  repeat: 'off' | 'all' | 'one';
+  shuffle: boolean;
+  play: () => void;
+  pause: () => void;
+  togglePlay: () => void;
+  next: () => void;
+  previous: () => void;
+  seek: (time: number) => void;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
+  playTrack: (track: MusicTrack) => void;
+  setPlaylist: (playlist: MusicPlaylist) => void;
+  loadPlaylistForEmotion: (emotion: string, intensity?: number) => Promise<void>;
+}
+
 export interface MusicPlayerProps {
   onTrackChange?: (track: MusicTrack | null) => void;
   onPlayStateChange?: (isPlaying: boolean) => void;
@@ -114,6 +140,10 @@ export interface ProgressBarProps {
   duration: number;
   onSeek: (time: number) => void;
   className?: string;
+  progress?: number;
+  max?: number;
+  formatTime?: (seconds: number) => string;
+  showTimestamps?: boolean;
 }
 
 export interface MusicVolumeProps {
@@ -130,6 +160,9 @@ export interface VolumeControlProps {
   onChange: (volume: number) => void;
   onMuteToggle: () => void;
   className?: string;
+  onVolumeChange?: (volume: number) => void;
+  isMuted?: boolean;
+  showLabel?: boolean;
 }
 
 export interface MusicTrackInfoProps {

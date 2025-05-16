@@ -1,142 +1,173 @@
 
 import React from 'react';
-import { VRSession } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatDistance } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { VRSession } from '@/types/vr';
+import { Heart, Clock, Calendar, Star, FileText } from 'lucide-react';
 
 interface VRSessionStatsProps {
   session: VRSession;
+  className?: string;
 }
 
-const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session }) => {
-  // Format date for display
-  const formatDate = (dateString?: string | Date): string => {
-    if (!dateString) return 'N/A';
-    const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-    return date.toLocaleDateString(undefined, { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = '' }) => {
+  const formatDuration = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}min ${remainingSeconds}s`;
   };
 
-  // Calculate session duration in minutes
-  const getDurationInMinutes = (): number => {
-    if (session.duration) {
-      return Math.round(session.duration / 60);
-    }
-    if (session.duration_seconds) {
-      return Math.round(session.duration_seconds / 60);
-    }
+  const formatDate = (date: Date | string | undefined) => {
+    if (!date) return 'N/A';
     
-    if (session.start_time && session.end_time) {
-      const start = new Date(session.start_time);
-      const end = new Date(session.end_time);
-      return Math.round((end.getTime() - start.getTime()) / (60 * 1000));
+    try {
+      const dateObj = typeof date === 'string' ? new Date(date) : date;
+      return dateObj.toLocaleString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid date';
     }
-    
-    if (session.startTime && session.end_time) {
-      const start = new Date(session.startTime);
-      const end = new Date(session.end_time);
-      return Math.round((end.getTime() - start.getTime()) / (60 * 1000));
-    }
-    
-    return 0;
   };
-
-  // Get heart rate difference if available
-  const getHeartRateDifference = (): number | null => {
-    const before = session.heart_rate_before || session.heartRateBefore;
-    const after = session.heart_rate_after || session.heartRateAfter;
-    
-    if (before && after) {
-      return after - before;
-    }
-    return null;
-  };
-
-  // Check if session was completed
-  const isSessionCompleted = (): boolean => {
-    return session.completed || session.isCompleted || false;
-  };
-
-  // Get formatted date when session was completed
-  const getCompletedDate = (): string => {
-    // Check for completed timestamp
-    if (session.end_time) {
-      return formatDate(session.end_time);
-    }
-    
-    if (session.endTime) {
-      return formatDate(session.endTime);
-    }
-    
-    // Fallback to start time
-    return session.start_time ? formatDate(session.start_time) : 'Not completed';
-  };
-
-  const heartRateDiff = getHeartRateDifference();
-  const durationMinutes = getDurationInMinutes();
   
-  return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Session Statistics</h3>
+  const calculateSessionDuration = () => {
+    if (!session.startedAt) {
+      return 'N/A';
+    }
+    
+    const startDate = typeof session.startedAt === 'string' 
+      ? new Date(session.startedAt) 
+      : session.startedAt;
       
-      <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 bg-muted/20 rounded-md">
-          <div className="text-sm text-muted-foreground">Session Date</div>
-          <div className="font-medium">{formatDate(session.start_time || session.startTime)}</div>
-        </div>
-        
-        <div className="p-4 bg-muted/20 rounded-md">
-          <div className="text-sm text-muted-foreground">Duration</div>
-          <div className="font-medium">{durationMinutes} minutes</div>
-        </div>
-        
-        <div className="p-4 bg-muted/20 rounded-md">
-          <div className="text-sm text-muted-foreground">Status</div>
-          <div className="font-medium">
-            {isSessionCompleted() ? 
-              <span className="text-green-500">Completed</span> : 
-              <span className="text-amber-500">Not completed</span>
-            }
-          </div>
-        </div>
-        
-        <div className="p-4 bg-muted/20 rounded-md">
-          <div className="text-sm text-muted-foreground">Completion Date</div>
-          <div className="font-medium">{getCompletedDate()}</div>
-        </div>
-        
-        {heartRateDiff !== null && (
-          <>
-            <div className="p-4 bg-muted/20 rounded-md">
-              <div className="text-sm text-muted-foreground">Heart Rate Change</div>
-              <div className="font-medium">
-                {heartRateDiff > 0 ? '+' : ''}{heartRateDiff} BPM
-                <span className="text-xs ml-2 text-muted-foreground">
-                  ({session.heart_rate_before || session.heartRateBefore} → {session.heart_rate_after || session.heartRateAfter})
-                </span>
+    if (session.completed && (session.endedAt || session.end_time)) {
+      const endDate = session.endedAt 
+        ? (typeof session.endedAt === 'string' ? new Date(session.endedAt) : session.endedAt)
+        : (typeof session.end_time === 'string' ? new Date(session.end_time) : session.end_time);
+      
+      if (endDate) {
+        const durationMs = endDate.getTime() - startDate.getTime();
+        return formatDistance(0, durationMs, { includeSeconds: true, locale: fr });
+      }
+    }
+    
+    return formatDuration(session.duration);
+  };
+
+  // Safety check for empty session object
+  if (!session || !session.id) {
+    return (
+      <Card className={className}>
+        <CardContent className="pt-6">
+          <p className="text-center text-muted-foreground">Aucune donnée de session disponible</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className={className}>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xl">Détails de la session</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center space-x-2">
+              <Clock className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium">Durée</p>
+                <p className="text-sm text-muted-foreground">{calculateSessionDuration()}</p>
               </div>
             </div>
-          </>
-        )}
-        
-        {session.rating && (
-          <div className="p-4 bg-muted/20 rounded-md">
-            <div className="text-sm text-muted-foreground">User Rating</div>
-            <div className="font-medium">{session.rating}/5</div>
+            
+            <div className="flex items-center space-x-2">
+              <Calendar className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <p className="text-sm font-medium">Date</p>
+                <p className="text-sm text-muted-foreground">{formatDate(session.startedAt)}</p>
+              </div>
+            </div>
+
+            {(session.heart_rate_before || session.heartRateBefore) && (
+              <div className="flex items-center space-x-2">
+                <Heart className="h-5 w-5 text-rose-500" />
+                <div>
+                  <p className="text-sm font-medium">Fréquence cardiaque initiale</p>
+                  <p className="text-sm text-muted-foreground">
+                    {session.heart_rate_before || session.heartRateBefore} bpm
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {(session.heart_rate_after || session.heartRateAfter) && (
+              <div className="flex items-center space-x-2">
+                <Heart className="h-5 w-5 text-emerald-500" />
+                <div>
+                  <p className="text-sm font-medium">Fréquence cardiaque finale</p>
+                  <p className="text-sm text-muted-foreground">
+                    {session.heart_rate_after || session.heartRateAfter} bpm
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {session.rating !== undefined && (
+              <div className="flex items-center space-x-2">
+                <Star className="h-5 w-5 text-amber-500" />
+                <div>
+                  <p className="text-sm font-medium">Notation</p>
+                  <p className="text-sm text-muted-foreground">{session.rating} / 5</p>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-      
-      {session.notes && (
-        <div className="p-4 bg-muted/20 rounded-md">
-          <div className="text-sm text-muted-foreground mb-1">User Notes</div>
-          <div className="italic">{session.notes}</div>
+
+          {session.notes && (
+            <div className="pt-2">
+              <div className="flex items-center space-x-2 mb-1">
+                <FileText className="h-5 w-5 text-blue-500" />
+                <p className="text-sm font-medium">Notes</p>
+              </div>
+              <div className="bg-muted p-3 rounded-md">
+                <p className="text-sm whitespace-pre-wrap">{session.notes}</p>
+              </div>
+            </div>
+          )}
+
+          {session.feedback && (
+            <div className="pt-2">
+              <div className="flex items-center space-x-2 mb-1">
+                <FileText className="h-5 w-5 text-purple-500" />
+                <p className="text-sm font-medium">Feedback</p>
+              </div>
+              <div className="bg-muted p-3 rounded-md">
+                <p className="text-sm whitespace-pre-wrap">{session.feedback}</p>
+              </div>
+            </div>
+          )}
+
+          {session.emotionBefore && session.emotionAfter && (
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div>
+                <p className="text-sm font-medium">Émotion initiale</p>
+                <p className="text-sm text-muted-foreground capitalize">{session.emotionBefore}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium">Émotion finale</p>
+                <p className="text-sm text-muted-foreground capitalize">{session.emotionAfter}</p>
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
