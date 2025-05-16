@@ -1,10 +1,9 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { Button } from '@/components/ui/button';
-import { MicIcon, Speaker, SpeakerOff, Sparkles } from 'lucide-react';
+import { MicIcon, Speaker, Volume2, VolumeX, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Shell from '@/Shell';
 import '@/styles/immersive-home.css';
@@ -181,7 +180,7 @@ const ImmersiveHome = () => {
               {audioEnabled ? (
                 <Speaker className="h-5 w-5 text-blue-300" />
               ) : (
-                <SpeakerOff className="h-5 w-5 text-blue-300" />
+                <VolumeX className="h-5 w-5 text-blue-300" />
               )}
               <span className="sr-only">Audio</span>
             </Button>
