@@ -34,10 +34,10 @@ const mockUserData = {
     emotionalCamouflage: false,
     aiSuggestions: true,
     notifications: {
-      email: true,
-      push: true,
-      sms: false,
-      frequency: 'daily',
+      enabled: true,
+      emailEnabled: true,
+      pushEnabled: true,
+      inAppEnabled: true,
       types: {
         system: true,
         emotion: true,
@@ -45,7 +45,16 @@ const mockUserData = {
         journal: true,
         community: true,
         achievement: true
-      }
+      },
+      frequency: 'daily',
+      email: true,
+      push: true,
+      sms: false
+    },
+    privacy: {
+      shareData: true,
+      anonymizeReports: false,
+      profileVisibility: 'public'
     }
   }
 };
@@ -90,9 +99,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error("Le mot de passe doit avoir au moins 3 caractères");
       }
       
-      // Set mock data and session
-      setUser(mockUserData);
+      // En mode démo, accepte toutes les combinaisons avec un mot de passe valide
+      const userData = {
+        ...mockUserData,
+        email: email,
+        role: email.includes('admin') ? 'b2b_admin' : 
+              email.includes('user') || email.includes('entreprise') ? 'b2b_user' : 
+              'b2c'
+      };
+      
+      setUser(userData);
       localStorage.setItem('auth_session', 'mock_token');
+      return userData;
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Login failed'));
       throw err;
@@ -118,11 +136,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: `user-${Date.now()}`,
         name,
         email,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        role: email.includes('admin') ? 'b2b_admin' : 
+              email.includes('user') || email.includes('entreprise') ? 'b2b_user' : 
+              'b2c'
       };
       
       setUser(newUser);
       localStorage.setItem('auth_session', 'mock_token');
+      return newUser;
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Registration failed'));
       throw err;

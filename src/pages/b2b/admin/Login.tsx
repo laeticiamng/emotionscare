@@ -13,25 +13,37 @@ const B2BAdminLogin = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, error, clearError } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
+    if (clearError) clearError();
+    
     try {
-      await login(email, password);
+      const user = await login(email, password);
+      
+      if (user.role !== 'b2b_admin') {
+        toast({
+          title: "Accès refusé",
+          description: "Ce compte n'a pas les permissions nécessaires pour accéder à l'espace d'administration.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       toast({
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté à l'espace d'administration.",
         variant: "success",
       });
       navigate('/b2b/admin/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur de connexion:', error);
       toast({
         title: "Échec de la connexion",
-        description: "Veuillez vérifier vos identifiants et réessayer.",
+        description: error.message || "Veuillez vérifier vos identifiants et réessayer.",
         variant: "destructive",
       });
     } finally {

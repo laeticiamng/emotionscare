@@ -8,6 +8,7 @@ export * from './auth';
 export * from './widgets';
 export * from './dashboard';
 export * from './sidebar';
+export * from './navigation';
 
 export interface EmotionResult {
   emotion: string;

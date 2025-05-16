@@ -1,25 +1,26 @@
 
-import { UserRole } from '@/types/user';
-
-export const getRoleName = (role: UserRole | string): string => {
+export const getRoleName = (role: string): string => {
   switch (role) {
-    case 'b2b_admin':
-      return 'Administrateur';
+    case 'b2c':
+      return 'Particulier';
     case 'b2b_user':
       return 'Collaborateur';
-    case 'b2c':
-      return 'Utilisateur';
+    case 'b2b_admin':
+      return 'Administrateur';
     default:
       return 'Utilisateur';
   }
 };
 
-// Add the missing isAdminRole function
-export const isAdminRole = (role: UserRole | string): boolean => {
-  return role === 'b2b_admin' || role === 'admin';
-};
-
-// Utility function to check if user is a B2B user (admin or standard user)
-export const isB2bUser = (role: UserRole | string): boolean => {
-  return role === 'b2b_admin' || role === 'b2b_user';
+export const getRoleRoute = (role: string): string => {
+  switch (role) {
+    case 'b2c':
+      return '/b2c/dashboard';
+    case 'b2b_user':
+      return '/b2b/user/dashboard';
+    case 'b2b_admin':
+      return '/b2b/admin/dashboard';
+    default:
+      return '/';
+  }
 };
