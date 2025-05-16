@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Sheet,
@@ -22,7 +23,7 @@ import {
   User,
   BarChart3
 } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/hooks/use-theme";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -36,16 +37,22 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useSoundscape } from "@/contexts/SoundscapeContext";
-import NotificationsDrawer from "@/components/notifications/NotificationDrawer";
+import NotificationDrawer from "@/components/notifications/NotificationDrawer";
 
 const MobileNavigation: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
   const { playFunctionalSound } = useSoundscape();
   const [open, setOpen] = React.useState(false);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    playFunctionalSound("themeToggle");
+  };
 
   const handleLogout = async () => {
     try {
@@ -87,9 +94,9 @@ const MobileNavigation: React.FC = () => {
           <Separator />
 
           <NavLink
-            to="/"
+            to="/b2c"
             className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
-              isActive("/") ? "bg-secondary text-primary" : ""
+              isActive("/b2c") ? "bg-secondary text-primary" : ""
             }`}
             onClick={() => setOpen(false)}
           >
@@ -98,9 +105,9 @@ const MobileNavigation: React.FC = () => {
           </NavLink>
 
           <NavLink
-            to="/journal"
+            to="/b2c/journal"
             className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
-              isActive("/journal") ? "bg-secondary text-primary" : ""
+              isActive("/b2c/journal") ? "bg-secondary text-primary" : ""
             }`}
             onClick={() => setOpen(false)}
           >
@@ -109,9 +116,9 @@ const MobileNavigation: React.FC = () => {
           </NavLink>
 
           <NavLink
-            to="/scan"
+            to="/b2c/scan"
             className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
-              isActive("/scan") ? "bg-secondary text-primary" : ""
+              isActive("/b2c/scan") ? "bg-secondary text-primary" : ""
             }`}
             onClick={() => setOpen(false)}
           >
@@ -120,25 +127,14 @@ const MobileNavigation: React.FC = () => {
           </NavLink>
 
           <NavLink
-            to="/calendar"
+            to="/b2c/coach"
             className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
-              isActive("/calendar") ? "bg-secondary text-primary" : ""
-            }`}
-            onClick={() => setOpen(false)}
-          >
-            <Calendar className="w-4 h-4" />
-            <span>Calendrier</span>
-          </NavLink>
-
-          <NavLink
-            to="/messages"
-            className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
-              isActive("/messages") ? "bg-secondary text-primary" : ""
+              isActive("/b2c/coach") ? "bg-secondary text-primary" : ""
             }`}
             onClick={() => setOpen(false)}
           >
             <MessageSquare className="w-4 h-4" />
-            <span>Messages</span>
+            <span>Coach</span>
           </NavLink>
 
           <Separator />
@@ -170,7 +166,7 @@ const MobileNavigation: React.FC = () => {
           </div>
 
           <Link
-            to="/settings"
+            to="/b2c/settings"
             className="flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors"
             onClick={() => setOpen(false)}
           >

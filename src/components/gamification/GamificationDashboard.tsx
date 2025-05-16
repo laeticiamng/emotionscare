@@ -1,98 +1,97 @@
+
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/types/gamification';
-import { BadgesWidget } from '@/components/dashboard/widgets/BadgesWidget';
-import { ChallengesList } from '@/components/gamification/ChallengesList';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import BadgesWidget from '@/components/dashboard/widgets/BadgesWidget';
+import { Badge } from '@/types/badge';
 
-interface GamificationDashboardProps {
-  stats: any;
-}
+// Mock data
+const badges: Badge[] = [
+  {
+    id: '1',
+    name: 'Premier Pas',
+    description: 'Compléter votre première entrée de journal',
+    icon: '/icons/badges/first-step.svg',
+    rarity: 'common',
+    unlocked: true,
+  },
+  {
+    id: '2',
+    name: 'Zen Master',
+    description: '10 méditations complétées',
+    icon: '/icons/badges/zen-master.svg',
+    rarity: 'uncommon',
+    unlocked: true,
+  },
+  {
+    id: '3',
+    name: 'Explorateur Musical',
+    description: 'Écouter 5 types de musiques thérapeutiques',
+    icon: '/icons/badges/music-explorer.svg',
+    rarity: 'rare',
+    unlocked: false,
+    progress: 3,
+    maxProgress: 5,
+  }
+];
 
-const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ stats }) => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
-  // Add default values for properties that might not exist
-  const userStats = {
-    streak: stats?.streak || 0,
-    completedChallenges: stats?.completedChallenges || 0,
-    totalChallenges: stats?.totalChallenges || stats?.challenges?.length || 0,
-    badges: stats?.badges || [],
-    progress: stats?.progress || 0,
-    leaderboard: stats?.leaderboard || [],
-  };
-
+const GamificationDashboard: React.FC = () => {
   return (
     <div className="container mx-auto py-6">
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">
-            Bienvenue dans l'arène {user?.name}!
-          </CardTitle>
-          <CardDescription>
-            Suivez vos progrès et relevez de nouveaux défis pour améliorer votre bien-être émotionnel.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Niveau actuel</h3>
-              <span className="text-sm text-muted-foreground">
-                Niveau {stats.level} {stats.nextLevel ? `→ ${stats.nextLevel}` : ''}
-              </span>
-              <Progress value={stats.progress || 0} className="h-2" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Série actuelle</h3>
-              <div className="text-xl font-bold">{userStats.streak} jours</div>
-              <span className="text-sm text-muted-foreground">Continuez pour maintenir votre lancée!</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Défis</CardTitle>
-            <CardDescription>
-              Relevez des défis pour gagner des points et des badges.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-semibold">Progression</h4>
-              <span className="text-sm text-muted-foreground">
-                {stats.challenges.filter(challenge => challenge.status === "completed" || challenge.completed).length} / {stats.challenges.length}
-              </span>
-            </div>
-            <ChallengesList challenges={stats.challenges} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Badges</CardTitle>
-            <CardDescription>
-              Collectionnez des badges en atteignant des objectifs spécifiques.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-semibold">Badges débloqués</h4>
-              <span className="text-3xl font-bold">{userStats.completedChallenges}</span>
-            </div>
-            <BadgesWidget 
-              badges={stats.badges}
-              showSeeAll={stats.badges.length > 3}
-              onSeeAll={() => navigate('/gamification')}
-            />
-          </CardContent>
-        </Card>
-      </div>
+      <h1 className="text-3xl font-bold mb-6">Gamification</h1>
+      
+      <Tabs defaultValue="badges">
+        <TabsList className="mb-4">
+          <TabsTrigger value="badges">Badges</TabsTrigger>
+          <TabsTrigger value="challenges">Challenges</TabsTrigger>
+          <TabsTrigger value="rewards">Récompenses</TabsTrigger>
+          <TabsTrigger value="leaderboard">Classement</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="badges">
+          <Card>
+            <CardHeader>
+              <CardTitle>Vos badges</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <BadgesWidget badges={badges} showSeeAll={false} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="challenges">
+          <Card>
+            <CardHeader>
+              <CardTitle>Challenges en cours</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Contenu des challenges à venir</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="rewards">
+          <Card>
+            <CardHeader>
+              <CardTitle>Récompenses disponibles</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Contenu des récompenses à venir</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="leaderboard">
+          <Card>
+            <CardHeader>
+              <CardTitle>Classement</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Contenu du classement à venir</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

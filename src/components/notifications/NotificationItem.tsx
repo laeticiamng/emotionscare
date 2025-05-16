@@ -1,91 +1,107 @@
 
 import React from 'react';
 import { Notification, NotificationType } from '@/types/notification';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Bell, AlertCircle, MessageSquare, Book, Heart, Users } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { Bell, CheckCircle, AlertTriangle, Info, BookOpenCheck } from 'lucide-react';
+import { fr } from 'date-fns/locale';
 
-export interface NotificationItemProps {
+interface NotificationItemProps {
   notification: Notification;
   onMarkAsRead: (id: string) => void;
   onDelete: (id: string) => void;
-  onClick?: () => void;
 }
 
 const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
   onMarkAsRead,
   onDelete,
-  onClick
 }) => {
-  // Get notification icon based on type
-  const getIcon = (type: NotificationType) => {
-    switch (type) {
-      case 'emotion':
-        return <Bell className="h-5 w-5 text-blue-500" />;
+  // Function to determine icon based on notification type
+  const getIcon = () => {
+    switch (notification.type) {
       case 'system':
-        return <Info className="h-5 w-5 text-gray-500" />;
-      case 'user':
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
+        return <Bell className="h-4 w-4" />;
+      case 'community':
+        return <Users className="h-4 w-4" />;
+      case 'coach':
+        return <MessageSquare className="h-4 w-4" />;
       case 'journal':
-        return <BookOpenCheck className="h-5 w-5 text-purple-500" />;
-      case 'urgent':
-        return <AlertTriangle className="h-5 w-5 text-red-500" />;
+        return <Book className="h-4 w-4" />;
+      case 'emotion':
+        return <Heart className="h-4 w-4" />;
       default:
-        return <Bell className="h-5 w-5 text-blue-500" />;
+        return <Bell className="h-4 w-4" />;
     }
   };
 
-  // Get class name based on type and priority
-  const getBgClass = () => {
-    if (notification.type === 'urgent' || notification.priority === 'urgent') {
-      return 'bg-red-50 dark:bg-red-950/30';
+  // Function to determine badge color
+  const getBadgeVariant = () => {
+    if (notification.priority === 'urgent') {
+      return "destructive";
     }
-    if (!notification.read) {
-      return 'bg-blue-50 dark:bg-blue-950/30';
+    
+    switch (notification.type) {
+      case 'system':
+        return "secondary";
+      case 'emotion':
+        return "default";
+      case 'coach':
+        return "outline";
+      case 'journal':
+        return "secondary";
+      case 'community':
+        return "outline";
+      default:
+        return "secondary";
     }
-    return 'bg-white dark:bg-gray-950';
   };
-
-  // Format notification time as "X time ago"
-  const timeAgo = notification.created_at 
-    ? formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })
-    : '';
 
   return (
-    <div
-      className={`p-3 rounded-lg mb-2 border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors ${getBgClass()}`}
-      onClick={() => onClick && onClick()}
-    >
+    <div className={`p-4 border-b ${notification.read ? '' : 'bg-muted/30'}`}>
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 mt-1">
-          {getIcon(notification.type)}
+        <div className={`p-2 rounded-full bg-primary/10 flex-shrink-0`}>
+          {getIcon()}
         </div>
+        
         <div className="flex-grow">
-          <h4 className="font-medium text-sm">{notification.title}</h4>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{notification.message}</p>
-          <div className="flex items-center justify-between mt-2">
-            <span className="text-xs text-gray-500">{timeAgo}</span>
-            <div className="flex gap-2">
-              <button 
-                className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onMarkAsRead(notification.id);
-                }}
-              >
-                {notification.read ? 'Mark as unread' : 'Mark as read'}
-              </button>
-              <button 
-                className="text-xs text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(notification.id);
-                }}
-              >
-                Delete
-              </button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <h4 className="font-medium">{notification.title}</h4>
+              <Badge variant={getBadgeVariant()} className="text-xs">
+                {notification.type}
+              </Badge>
             </div>
+            <span className="text-xs text-muted-foreground">
+              {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: fr })}
+            </span>
           </div>
+          
+          <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
+          
+          {notification.action && (
+            <Button 
+              variant="link" 
+              className="p-0 h-auto text-sm mt-2" 
+              asChild
+            >
+              <a href={notification.action.url}>{notification.action.label}</a>
+            </Button>
+          )}
+          
+          {!notification.read && (
+            <div className="flex justify-end mt-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs"
+                onClick={() => onMarkAsRead(notification.id)}
+              >
+                Marquer comme lu
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

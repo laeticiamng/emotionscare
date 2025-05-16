@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { ThemeProvider } from '@/contexts/ThemeContext';
-import { MusicProvider } from '@/contexts/MusicContext';
+import { MusicProvider } from '@/contexts/music';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SidebarProvider } from '@/contexts/SidebarContext';
 import { RouterProvider } from 'react-router-dom';

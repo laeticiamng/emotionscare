@@ -1,57 +1,83 @@
 
 import React from 'react';
-import { Badge } from '@/types/gamification';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { ChevronRight } from 'lucide-react';
+import { Badge } from '@/types/badge';
 
-interface BadgesWidgetProps {
+export interface BadgesWidgetProps {
   badges: Badge[];
-  title?: string;
+  onSeeAll?: () => void;
+  showSeeAll?: boolean;
   className?: string;
-  showMore?: boolean;
-  onShowMore?: () => void;
 }
 
-const BadgesWidget: React.FC<BadgesWidgetProps> = ({
+const BadgesWidget: React.FC<BadgesWidgetProps> = ({ 
   badges,
-  title = "Badges débloqués",
-  className,
-  showMore = false,
-  onShowMore
+  onSeeAll,
+  showSeeAll = true,
+  className
 }) => {
+  // Get only unlocked badges
+  const unlockedBadges = badges.filter(badge => badge.unlocked);
+  
+  // Display only first 3 unlocked badges
+  const displayBadges = unlockedBadges.slice(0, 3);
+  
+  // Show the "and X more" text if there are more than 3 unlocked badges
+  const hasMoreBadges = unlockedBadges.length > 3;
+  const moreBadgesCount = unlockedBadges.length - 3;
+  
   return (
     <Card className={className}>
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-md font-medium">Vos badges récents</CardTitle>
+        {showSeeAll && onSeeAll && (
+          <Button variant="ghost" size="sm" className="text-sm" onClick={onSeeAll}>
+            Voir tout
+            <ChevronRight className="ml-1 h-4 w-4" />
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {badges.slice(0, 6).map((badge) => (
-            <div key={badge.id} className="flex flex-col items-center text-center p-2">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                {badge.icon ? (
-                  <span>{badge.icon}</span>
-                ) : (
-                  <span className="text-lg">🏆</span>
-                )}
+        {unlockedBadges.length === 0 ? (
+          <div className="text-center py-6 text-muted-foreground">
+            <p>Vous n'avez pas encore débloqué de badges.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-4">
+            {displayBadges.map((badge) => (
+              <div 
+                key={badge.id} 
+                className="flex flex-col items-center text-center"
+              >
+                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-2">
+                  <img 
+                    src={badge.icon} 
+                    alt={badge.name} 
+                    className="w-8 h-8" 
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholders/badge-placeholder.svg';
+                    }}
+                  />
+                </div>
+                <div className="text-xs font-medium">{badge.name}</div>
               </div>
-              <div className="text-xs font-medium line-clamp-1">{badge.name}</div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-      {showMore && (
-        <CardFooter>
+            ))}
+          </div>
+        )}
+        
+        {hasMoreBadges && (
           <Button 
             variant="ghost" 
             size="sm" 
-            className="w-full text-primary"
-            onClick={onShowMore}
+            className="w-full mt-2 text-muted-foreground" 
+            onClick={onSeeAll}
           >
-            Voir tous les badges
+            Et {moreBadgesCount} de plus...
           </Button>
-        </CardFooter>
-      )}
+        )}
+      </CardContent>
     </Card>
   );
 };

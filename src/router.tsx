@@ -8,6 +8,7 @@ import B2BSelectionPage from '@/pages/b2b/Selection';
 
 // Common pages
 import NotFound from '@/pages/common/NotFound';
+import Unauthorized from '@/pages/common/Unauthorized';
 
 // Layouts
 import B2CLayout from '@/layouts/B2CLayout';
@@ -29,6 +30,7 @@ import B2CVR from '@/pages/b2c/VR';
 import B2CGamification from '@/pages/b2c/Gamification';
 import B2CPreferences from '@/pages/b2c/Preferences';
 import B2CCocon from '@/pages/b2c/Cocon';
+import B2CSettings from '@/pages/b2c/Settings';
 
 // B2B User pages
 import B2BUserLogin from '@/pages/b2b/user/Login';
@@ -45,6 +47,7 @@ import B2BUserVR from '@/pages/b2b/user/VR';
 import B2BUserGamification from '@/pages/b2b/user/Gamification';
 import B2BUserPreferences from '@/pages/b2b/user/Preferences';
 import B2BUserCocon from '@/pages/b2b/user/Cocon';
+import B2BUserSettings from '@/pages/b2b/user/Settings';
 
 // B2B Admin pages
 import B2BAdminLogin from '@/pages/b2b/admin/Login';
@@ -56,9 +59,15 @@ import B2BAdminTeams from '@/pages/b2b/admin/Teams';
 import B2BAdminReports from '@/pages/b2b/admin/Reports';
 import B2BAdminEvents from '@/pages/b2b/admin/Events';
 import B2BAdminSettings from '@/pages/b2b/admin/Settings';
+import B2BAdminCoachAnalytics from '@/pages/b2b/admin/CoachAnalytics';
 
-// Error pages
-import Unauthorized from '@/pages/common/Unauthorized';
+// Create pages for settings sections
+const NotImplemented = () => (
+  <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <h1 className="text-2xl font-bold mb-4">Page en cours de développement</h1>
+    <p className="text-muted-foreground">Cette fonctionnalité sera disponible prochainement.</p>
+  </div>
+);
 
 export const router = createBrowserRouter([
   // Root route - Immersive Homepage
@@ -144,6 +153,26 @@ export const router = createBrowserRouter([
         path: 'cocon', 
         element: <B2CCocon /> 
       },
+      {
+        path: 'settings',
+        element: <B2CSettings />
+      },
+      {
+        path: 'settings/security',
+        element: <NotImplemented />
+      },
+      {
+        path: 'settings/notifications',
+        element: <NotImplemented />
+      },
+      {
+        path: 'settings/accessibility',
+        element: <NotImplemented />
+      },
+      {
+        path: 'settings/preferences',
+        element: <NotImplemented />
+      }
     ],
   },
 
@@ -212,6 +241,26 @@ export const router = createBrowserRouter([
         path: 'cocon', 
         element: <B2BUserCocon /> 
       },
+      {
+        path: 'settings',
+        element: <B2BUserSettings />
+      },
+      {
+        path: 'settings/security',
+        element: <NotImplemented />
+      },
+      {
+        path: 'settings/notifications',
+        element: <NotImplemented />
+      },
+      {
+        path: 'settings/accessibility',
+        element: <NotImplemented />
+      },
+      {
+        path: 'settings/preferences',
+        element: <NotImplemented />
+      }
     ],
   },
 
@@ -260,6 +309,10 @@ export const router = createBrowserRouter([
         path: 'settings', 
         element: <B2BAdminSettings /> 
       },
+      {
+        path: 'coach-analytics',
+        element: <B2BAdminCoachAnalytics />
+      }
     ],
   },
   

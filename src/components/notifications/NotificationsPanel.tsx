@@ -1,145 +1,169 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Bell, CheckCheck, Trash2 } from 'lucide-react';
 import NotificationItem from './NotificationItem';
-import { Badge } from '@/components/ui/badge';
-import { Bell, CheckCircle, AlertTriangle, Info, BookOpenCheck, BookOpen, UserCircle } from 'lucide-react';
 import { Notification, NotificationFilter } from '@/types/notification';
 
 interface NotificationsPanelProps {
   notifications: Notification[];
+  onMarkAllAsRead: () => void;
+  onDeleteAll: () => void;
   onMarkAsRead: (id: string) => void;
   onDelete: (id: string) => void;
-  onClearAll: () => void;
-  onMarkAllAsRead: () => void;
 }
 
 const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
   notifications,
+  onMarkAllAsRead,
+  onDeleteAll,
   onMarkAsRead,
   onDelete,
-  onClearAll,
-  onMarkAllAsRead
 }) => {
   const [activeFilter, setActiveFilter] = useState<NotificationFilter>('all');
 
-  const filters: NotificationFilter[] = [
-    'all',
-    'unread',
-    'urgent',
-    'system',
-    'emotion',
-    'journal',
-    'user'
-  ];
-
-  const filterNotifications = (filter: NotificationFilter) => {
-    switch (filter) {
-      case 'all':
-        return notifications;
-      case 'unread':
-        return notifications.filter(n => !n.read);
-      case 'urgent':
-        return notifications.filter(n => n.type === 'urgent' || n.priority === 'urgent');
-      case 'system':
-        return notifications.filter(n => n.type === 'system');
-      case 'emotion':
-        return notifications.filter(n => n.type === 'emotion');
-      case 'journal':
-        return notifications.filter(n => n.type === 'journal');
-      case 'user':
-        return notifications.filter(n => n.type === 'user');
-      default:
-        return notifications;
+  const unreadCount = notifications.filter(n => !n.read).length;
+  
+  // Filter notifications based on active tab
+  const filteredNotifications = notifications.filter(notification => {
+    if (activeFilter === 'all') {
+      return true;
+    } 
+    if (activeFilter === 'unread') {
+      return !notification.read;
     }
-  };
-
-  const filteredNotifications = filterNotifications(activeFilter);
-
-  const getIcon = (filter: NotificationFilter) => {
-    switch (filter) {
-      case 'all':
-        return <Bell className="h-4 w-4" />;
-      case 'unread':
-        return <CheckCircle className="h-4 w-4" />;
-      case 'urgent':
-        return <AlertTriangle className="h-4 w-4" />;
-      case 'system':
-        return <Info className="h-4 w-4" />;
-      case 'emotion':
-        return <Bell className="h-4 w-4" />;
-      case 'journal':
-        return <BookOpen className="h-4 w-4" />;
-      case 'user':
-        return <UserCircle className="h-4 w-4" />;
-      default:
-        return <Bell className="h-4 w-4" />;
+    if (activeFilter === 'system') {
+      return notification.type === 'system';
     }
-  };
+    if (activeFilter === 'emotion') {
+      return notification.type === 'emotion';
+    }
+    if (activeFilter === 'coach') {
+      return notification.type === 'coach';
+    }
+    if (activeFilter === 'journal') {
+      return notification.type === 'journal';
+    }
+    if (activeFilter === 'community') {
+      return notification.type === 'community';
+    }
+    if (activeFilter === 'urgent') {
+      return notification.priority === 'urgent';
+    }
+    return true;
+  });
 
   return (
-    <div className="w-full">
-      <div className="flex justify-between items-center mb-4 p-2">
-        <h3 className="font-semibold">Notifications</h3>
+    <div className="w-full h-full flex flex-col">
+      <div className="p-4 flex items-center justify-between">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
+          <Bell className="h-5 w-5" /> Notifications
+          {unreadCount > 0 && (
+            <span className="bg-primary text-primary-foreground rounded-full px-2 py-0.5 text-xs font-normal">
+              {unreadCount}
+            </span>
+          )}
+        </h2>
         <div className="flex gap-2">
-          <button 
-            className="text-xs text-blue-600 hover:text-blue-800" 
-            onClick={onMarkAllAsRead}
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={onMarkAllAsRead} 
+            disabled={unreadCount === 0}
+            className="text-xs flex items-center gap-1"
           >
-            Mark all as read
-          </button>
-          <button 
-            className="text-xs text-red-600 hover:text-red-800" 
-            onClick={onClearAll}
+            <CheckCheck className="h-4 w-4" />
+            <span className="hidden sm:inline">Tout marquer comme lu</span>
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={onDeleteAll}
+            disabled={notifications.length === 0}
+            className="text-xs flex items-center gap-1 text-destructive hover:text-destructive"
           >
-            Clear all
-          </button>
+            <Trash2 className="h-4 w-4" />
+            <span className="hidden sm:inline">Tout effacer</span>
+          </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="all" value={activeFilter as string} onValueChange={(value) => setActiveFilter(value as NotificationFilter)}>
-        <TabsList className="w-full grid grid-cols-7 mb-4">
-          {filters.map((filter) => (
-            <TabsTrigger key={filter} value={filter} className="flex items-center gap-1 text-xs">
-              {getIcon(filter)}
-              <span className="hidden sm:inline">{filter.charAt(0).toUpperCase() + filter.slice(1)}</span>
-              {filter === 'all' && (
-                <Badge variant="secondary" className="ml-1">
-                  {notifications.length}
-                </Badge>
-              )}
-              {filter === 'unread' && (
-                <Badge variant="secondary" className="ml-1">
-                  {notifications.filter(n => !n.read).length}
-                </Badge>
-              )}
+      <Tabs 
+        defaultValue="all" 
+        value={activeFilter}
+        onValueChange={(value) => setActiveFilter(value as NotificationFilter)}
+        className="w-full"
+      >
+        <div className="px-4">
+          <TabsList className="w-full">
+            <TabsTrigger value="all" className="flex-1">
+              Tout
             </TabsTrigger>
-          ))}
-        </TabsList>
+            <TabsTrigger value="unread" className="flex-1">
+              Non lu{unreadCount > 0 && ` (${unreadCount})`}
+            </TabsTrigger>
+            <TabsTrigger value="system" className="flex-1 hidden md:flex">
+              Système
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-        <ScrollArea className="h-[400px]">
-          {filteredNotifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-              <Bell className="h-12 w-12 mb-2 opacity-20" />
-              <p>No notifications in this category</p>
-            </div>
-          ) : (
-            filteredNotifications.map((notification) => (
-              <NotificationItem
-                key={notification.id}
-                notification={notification}
-                onMarkAsRead={onMarkAsRead}
-                onDelete={onDelete}
-                onClick={() => {
-                  // Handle notification click if needed
-                  if (!notification.read) {
-                    onMarkAsRead(notification.id);
-                  }
-                }}
-              />
-            ))
-          )}
+        <ScrollArea className="flex-1 h-[500px]">
+          <TabsContent value="all" className="m-0">
+            {filteredNotifications.length === 0 ? (
+              <div className="p-8 text-center text-muted-foreground">
+                <Bell className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                <p>Vous n'avez pas de notifications</p>
+              </div>
+            ) : (
+              filteredNotifications.map(notification => (
+                <NotificationItem
+                  key={notification.id}
+                  notification={notification}
+                  onMarkAsRead={onMarkAsRead}
+                  onDelete={onDelete}
+                />
+              ))
+            )}
+          </TabsContent>
+          
+          <TabsContent value="unread" className="m-0">
+            {filteredNotifications.length === 0 ? (
+              <div className="p-8 text-center text-muted-foreground">
+                <CheckCheck className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                <p>Vous n'avez pas de notifications non lues</p>
+              </div>
+            ) : (
+              filteredNotifications.map(notification => (
+                <NotificationItem
+                  key={notification.id}
+                  notification={notification}
+                  onMarkAsRead={onMarkAsRead}
+                  onDelete={onDelete}
+                />
+              ))
+            )}
+          </TabsContent>
+          
+          <TabsContent value="system" className="m-0">
+            {filteredNotifications.length === 0 ? (
+              <div className="p-8 text-center text-muted-foreground">
+                <Bell className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                <p>Vous n'avez pas de notifications système</p>
+              </div>
+            ) : (
+              filteredNotifications.map(notification => (
+                <NotificationItem
+                  key={notification.id}
+                  notification={notification}
+                  onMarkAsRead={onMarkAsRead}
+                  onDelete={onDelete}
+                />
+              ))
+            )}
+          </TabsContent>
         </ScrollArea>
       </Tabs>
     </div>

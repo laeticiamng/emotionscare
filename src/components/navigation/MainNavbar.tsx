@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Sheet,
@@ -84,24 +85,24 @@ const MainNavbar: React.FC<MainNavbarProps> = ({ isMobile }) => {
                   <Home className="w-4 h-4" />
                   <span>Accueil</span>
                 </Link>
-                <Link to="/journal" className="flex items-center space-x-2">
+                <Link to="/b2c/journal" className="flex items-center space-x-2">
                   <FileText className="w-4 h-4" />
                   <span>Journal</span>
                 </Link>
-                <Link to="/scan" className="flex items-center space-x-2">
+                <Link to="/b2c/scan" className="flex items-center space-x-2">
                   <BarChart3 className="w-4 h-4" />
                   <span>Scan</span>
                 </Link>
-                <Link to="/calendar" className="flex items-center space-x-2">
+                <Link to="/b2c/calendar" className="flex items-center space-x-2">
                   <Calendar className="w-4 h-4" />
                   <span>Calendrier</span>
                 </Link>
-                <Link to="/messages" className="flex items-center space-x-2">
+                <Link to="/b2c/coach" className="flex items-center space-x-2">
                   <MessageSquare className="w-4 h-4" />
-                  <span>Messages</span>
+                  <span>Coach</span>
                 </Link>
                 {isAdminRole(user?.role) && (
-                  <Link to="/admin" className="flex items-center space-x-2">
+                  <Link to="/b2b/admin" className="flex items-center space-x-2">
                     <Settings className="w-4 h-4" />
                     <span>Administration</span>
                   </Link>

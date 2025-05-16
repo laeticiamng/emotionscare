@@ -1,113 +1,23 @@
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Sparkles, MessageCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
-import { useApiConnection } from '@/hooks/dashboard/useApiConnection';
-import QuickSuggestions from './coach/QuickSuggestions';
-import CoachRecommendations from './coach/CoachRecommendations';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import MiniCoach from '@/components/coach/MiniCoach';
 
-interface CoachAssistantProps {
-  className?: string;
-  style?: React.CSSProperties;
-}
-
-// Create a mock hook for recommendations
-const useCoachRecommendations = () => {
-  const [isProcessing, setIsProcessing] = React.useState(false);
-  const recommendations = [
-    "Prenez 5 minutes pour méditer aujourd'hui",
-    "Essayez un exercice de respiration profonde",
-    "Écoutez de la musique relaxante"
+const CoachAssistant: React.FC = () => {
+  // Sample quick questions
+  const quickQuestions = [
+    "Comment me sentir mieux ?",
+    "Je me sens stressé(e)",
+    "Exercice de respiration"
   ];
-  const quickSuggestions = [
-    "Comment gérer mon stress ?",
-    "Exercice de respiration",
-    "Conseils pour mieux dormir"
-  ];
-  
-  const handleRefreshRecommendations = () => {
-    setIsProcessing(true);
-    setTimeout(() => setIsProcessing(false), 1000);
-  };
-  
-  const playRecommendedMusic = (emotion: string) => {
-    console.log("Playing music for emotion:", emotion);
-    return true;
-  };
-  
-  return {
-    recommendations,
-    isProcessing,
-    quickSuggestions,
-    playRecommendedMusic,
-    handleRefreshRecommendations
-  };
-};
-
-/**
- * Coach Assistant AI Component
- * Affiche une interface de chat interactive avec OpenAI API (GPT-4)
- * Fournit des réponses contextualisées basées sur l'état émotionnel de l'utilisateur
- */
-const CoachAssistant: React.FC<CoachAssistantProps> = ({ className, style }) => {
-  const navigate = useNavigate();
-  const { apiReady, apiCheckInProgress } = useApiConnection();
-  const { 
-    recommendations, 
-    isProcessing, 
-    quickSuggestions, 
-    playRecommendedMusic, 
-    handleRefreshRecommendations 
-  } = useCoachRecommendations();
-  
-  // Navigate to full coach chat
-  const handleOpenFullChat = () => {
-    navigate('/coach-chat');
-  };
 
   return (
-    <Card className={cn("flex flex-col premium-card h-full", className)} style={style}>
+    <Card className="h-full">
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center justify-between text-xl heading-premium">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            Coach IA {!apiReady && <span className="text-xs text-muted-foreground">(Limité)</span>}
-          </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-8 text-xs"
-            onClick={handleOpenFullChat}
-          >
-            <MessageCircle className="h-4 w-4 mr-1" />
-            Ouvrir
-          </Button>
-        </CardTitle>
+        <CardTitle className="text-lg font-medium">Assistant Coach</CardTitle>
       </CardHeader>
-      
-      <CardContent className="flex-1 p-0 flex flex-col">
-        <div className="flex-1 min-h-[200px]">
-          <MiniCoach 
-            quickQuestions={[
-              "Comment gérer mon stress ?",
-              "Exercice de respiration"
-            ]}
-          />
-        </div>
-        
-        <CoachRecommendations
-          recommendations={recommendations}
-          isProcessing={isProcessing}
-          apiCheckInProgress={apiCheckInProgress}
-          onRefresh={handleRefreshRecommendations}
-          onPlayMusic={() => playRecommendedMusic('calm')}
-        />
-        
-        <QuickSuggestions suggestions={quickSuggestions} />
+      <CardContent className="pt-0 h-full">
+        <MiniCoach quickQuestions={quickQuestions} />
       </CardContent>
     </Card>
   );
