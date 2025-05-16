@@ -17,8 +17,8 @@ const BadgesWidget = ({ badges, title = "Badges", showSeeAll = true, onSeeAll }:
   // Sort badges: first unlocked, then by progress
   const sortedBadges = [...badges].sort((a, b) => {
     // Prioritize completed/unlocked badges
-    if ((a.completed || a.unlocked) && !(b.completed || b.unlocked)) return -1;
-    if (!(a.completed || a.unlocked) && (b.completed || b.unlocked)) return 1;
+    if ((a.unlockedAt || a.earned_date || a.dateEarned) && !(b.unlockedAt || b.earned_date || b.dateEarned)) return -1;
+    if (!(a.unlockedAt || a.earned_date || a.dateEarned) && (b.unlockedAt || b.earned_date || b.dateEarned)) return 1;
     
     // If both are in same completion state, sort by progress (higher first)
     if (a.progress && b.progress) {
@@ -32,6 +32,11 @@ const BadgesWidget = ({ badges, title = "Badges", showSeeAll = true, onSeeAll }:
   // Get display image for the badge
   const getBadgeImage = (badge: Badge) => {
     return badge.image || badge.image_url || badge.imageUrl || `/badges/${badge.id}.png`;
+  };
+
+  // Check if badge is unlocked/completed
+  const isBadgeUnlocked = (badge: Badge) => {
+    return Boolean(badge.unlockedAt || badge.earned_date || badge.dateEarned);
   };
   
   return (
@@ -56,10 +61,10 @@ const BadgesWidget = ({ badges, title = "Badges", showSeeAll = true, onSeeAll }:
         <div className="grid grid-cols-3 gap-4">
           {sortedBadges.slice(0, 6).map((badge) => {
             // Determine if the badge is completed/unlocked
-            const isUnlocked = badge.completed || badge.unlocked || badge.unlockedAt;
+            const isUnlocked = isBadgeUnlocked(badge);
             
             // Get badge rarity class (for the badge border/glow)
-            const rarityColor = badge.rarity ? getBadgeRarityColor(badge.rarity) : 'bg-slate-500';
+            const rarityColor = badge.tier || badge.rarity ? getBadgeRarityColor(badge.tier || badge.rarity || 'common') : 'bg-slate-500';
             
             return (
               <div 

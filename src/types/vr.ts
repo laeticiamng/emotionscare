@@ -3,61 +3,37 @@ export interface VRSessionTemplate {
   id: string;
   title: string;
   description: string;
-  duration: number; // in minutes
-  category: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  thumbnail_url?: string;
+  duration: number;
   tags: string[];
-  is_premium: boolean;
-  environment: string;
-  objective: string;
-  // Add missing properties used in components
-  is_audio_only?: boolean;
-  theme?: string;
-  preview_url?: string;
-  audio_url?: string;
-  thumbnailUrl?: string;
-  image_url?: string;
+  thumbnailUrl: string;
+  category: string;
+  emotion_target?: string;
+  emotionTarget?: string;
 }
 
 export interface VRSession {
   id: string;
-  user_id: string;
-  template_id: string;
-  start_time: string; // ISO date string
-  end_time?: string; // ISO date string
-  duration_seconds: number;
+  templateId: string;
+  userId: string;
+  startDate: Date | string;
+  endDate?: Date | string;
   completed: boolean;
-  feedback?: {
-    rating: number;
-    comments?: string;
-    emotions?: string[];
-  };
-  emotion_before?: string;
-  emotion_after?: string;
-  metrics?: {
-    focus_score?: number;
-    relaxation_score?: number;
-    presence_score?: number;
-  };
-  template?: VRSessionTemplate;
+  rating?: number;
+  notes?: string;
+  emotions?: string[];
 }
 
 export interface VRHistoryListProps {
   sessions: VRSession[];
-  onSessionSelect?: (session: VRSession) => void;
-  isLoading?: boolean;
+  onSelectSession?: (session: VRSession) => void;
 }
 
 export interface VRSessionHistoryProps {
-  userId: string;
-  limit?: number;
-  showViewAll?: boolean;
+  sessions: VRSession[];
 }
 
 export interface VRSessionWithMusicProps {
   session: VRSessionTemplate;
-  onComplete?: (metrics: VRSession['metrics']) => void;
-  withMusic?: boolean;
-  musicEmotion?: string;
+  onComplete?: (feedback: { rating: number; notes?: string }) => void;
+  onExit?: () => void;
 }

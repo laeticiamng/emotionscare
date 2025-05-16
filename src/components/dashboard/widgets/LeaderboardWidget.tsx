@@ -20,13 +20,13 @@ const LeaderboardWidget = ({
   onSeeAll,
   highlightUserId
 }: LeaderboardWidgetProps) => {
-  // Sort leaderboard by position or rank or points
+  // Sort leaderboard by rank, ensuring backwards compatibility
   const sortedLeaderboard = [...leaderboard].sort((a, b) => {
-    if (a.position !== undefined && b.position !== undefined) {
-      return a.position - b.position;
-    }
     if (a.rank !== undefined && b.rank !== undefined) {
       return a.rank - b.rank;
+    }
+    if (a.position !== undefined && b.position !== undefined) {
+      return a.position - b.position;
     }
     return b.points - a.points;
   });
@@ -51,7 +51,14 @@ const LeaderboardWidget = ({
   
   // Calculate position for display
   const getPosition = (entry: LeaderboardEntry, index: number): number => {
-    return entry.position ?? entry.rank ?? index + 1;
+    return entry.rank || entry.position || index + 1;
+  };
+
+  // Check if entry is current user
+  const isCurrentUser = (entry: LeaderboardEntry): boolean => {
+    if (entry.isCurrentUser) return true;
+    if (highlightUserId && entry.userId === highlightUserId) return true;
+    return false;
   };
 
   return (
@@ -76,14 +83,14 @@ const LeaderboardWidget = ({
         <div className="space-y-3">
           {sortedLeaderboard.slice(0, 5).map((entry, index) => {
             const position = getPosition(entry, index);
-            const isCurrentUser = entry.isCurrentUser || entry.userId === highlightUserId;
+            const highlightCurrentUser = isCurrentUser(entry);
             
             return (
               <div 
                 key={entry.id}
                 className={`
                   flex items-center justify-between p-2 rounded-md
-                  ${isCurrentUser ? 'bg-primary/10' : 'hover:bg-muted/50'}
+                  ${highlightCurrentUser ? 'bg-primary/10' : 'hover:bg-muted/50'}
                 `}
               >
                 <div className="flex items-center gap-3">

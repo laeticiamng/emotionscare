@@ -28,10 +28,10 @@ const UserDashboard: React.FC = () => {
       description: 'Écrivez dans votre journal aujourd\'hui',
       category: 'daily',
       points: 50,
-      xp: 50,
       progress: 0,
       status: 'active',
       isDaily: true,
+      completed: false,
       icon: <Book className="h-4 w-4" />
     },
     {
@@ -40,10 +40,10 @@ const UserDashboard: React.FC = () => {
       description: 'Écoutez 3 séances de musique cette semaine',
       category: 'weekly',
       points: 100,
-      xp: 100,
       progress: 33,
       status: 'active',
       isWeekly: true,
+      completed: false,
       icon: <Music className="h-4 w-4" />
     },
     {
@@ -52,9 +52,9 @@ const UserDashboard: React.FC = () => {
       description: 'Terminez une séance de réalité virtuelle',
       category: 'special',
       points: 150,
-      xp: 150,
       progress: 0,
       status: 'active',
+      completed: false,
       icon: <Scan className="h-4 w-4" />
     }
   ];
@@ -66,7 +66,7 @@ const UserDashboard: React.FC = () => {
       description: 'Premier pas sur la plateforme',
       image: '/badges/beginner.png',
       category: 'progress',
-      rarity: 'common',
+      tier: 'bronze',
       unlockedAt: '2023-04-01',
       completed: true
     },
@@ -76,7 +76,7 @@ const UserDashboard: React.FC = () => {
       description: 'Écrit dans le journal 5 jours consécutifs',
       image: '/badges/journal.png',
       category: 'journal',
-      rarity: 'rare',
+      tier: 'silver',
       unlockedAt: '2023-04-15',
       completed: true
     },
@@ -86,7 +86,7 @@ const UserDashboard: React.FC = () => {
       description: 'Écoute 10 sessions de musique différentes',
       image: '/badges/music.png',
       category: 'music',
-      rarity: 'rare',
+      tier: 'gold',
       progress: 70,
       completed: false
     }
@@ -99,7 +99,7 @@ const UserDashboard: React.FC = () => {
       name: 'Thomas',
       avatar: '/avatars/thomas.jpg',
       points: 1250,
-      position: 1,
+      rank: 1,
       level: 5
     },
     {
@@ -108,7 +108,7 @@ const UserDashboard: React.FC = () => {
       name: 'Marie',
       avatar: '/avatars/marie.jpg',
       points: 980,
-      position: 2,
+      rank: 2,
       level: 4
     },
     {
@@ -117,7 +117,7 @@ const UserDashboard: React.FC = () => {
       name: 'Julien',
       avatar: '/avatars/julien.jpg',
       points: 760,
-      position: 3,
+      rank: 3,
       level: 3
     }
   ];
@@ -135,7 +135,8 @@ const UserDashboard: React.FC = () => {
       level: 5,
       rewards: ["Badge Premium", "Accès VIP"]
     },
-    progress: 75
+    progress: 75,
+    leaderboard: leaderboard
   };
 
   const emotionData = [
@@ -236,6 +237,7 @@ const UserDashboard: React.FC = () => {
             <BadgesWidget 
               badges={badges}
               title="Badges récents"
+              showSeeAll={true}
               onSeeAll={() => console.log('View all badges')} 
             />
           </div>
@@ -254,6 +256,7 @@ const UserDashboard: React.FC = () => {
             <LeaderboardWidget 
               leaderboard={leaderboard}
               title="Classement"
+              showSeeAll={true}
               onSeeAll={() => console.log('View all leaderboard')} 
             />
           </div>

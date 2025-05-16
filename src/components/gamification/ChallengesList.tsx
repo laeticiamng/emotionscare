@@ -30,10 +30,31 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
     setExpandedId(expandedId === id ? null : id);
   };
 
+  // Helper function to check status
+  const isChallengeCompleted = (challenge: Challenge): boolean => {
+    return challenge.completed || Boolean(challenge.status === 'completed');
+  };
+
+  const isChallengeFailed = (challenge: Challenge): boolean => {
+    return Boolean(challenge.failed) || Boolean(challenge.status === 'failed');
+  };
+
+  const isChallengeLocked = (challenge: Challenge): boolean => {
+    return Boolean(challenge.status === 'locked');
+  };
+
+  const getChallengeStatus = (challenge: Challenge): 'completed' | 'failed' | 'locked' | 'active' => {
+    if (isChallengeCompleted(challenge)) return 'completed';
+    if (isChallengeFailed(challenge)) return 'failed';
+    if (isChallengeLocked(challenge)) return 'locked';
+    return 'active';
+  };
+
   const getStatusClass = (challenge: Challenge) => {
-    if (challenge.status === 'completed' || challenge.completed) return 'bg-green-50 border-green-200';
-    if (challenge.status === 'failed' || challenge.failed) return 'bg-red-50 border-red-200';
-    if (challenge.status === 'locked') return 'bg-gray-50 border-gray-200';
+    const status = getChallengeStatus(challenge);
+    if (status === 'completed') return 'bg-green-50 border-green-200';
+    if (status === 'failed') return 'bg-red-50 border-red-200';
+    if (status === 'locked') return 'bg-gray-50 border-gray-200';
     return 'bg-white border-slate-200';
   };
 
@@ -76,9 +97,9 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
 
   // Helper to get status text
   const getStatusText = (challenge: Challenge): string => {
-    if (challenge.status === 'completed' || challenge.completed) return 'Complété';
-    if (challenge.status === 'failed' || challenge.failed) return 'Échoué';
-    if (challenge.status === 'locked') return 'Verrouillé';
+    if (isChallengeCompleted(challenge)) return 'Complété';
+    if (isChallengeFailed(challenge)) return 'Échoué';
+    if (isChallengeLocked(challenge)) return 'Verrouillé';
     return 'En cours';
   };
 
@@ -101,7 +122,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                     {challenge.icon || <Award className="h-5 w-5 text-primary" />}
                   </div>
                   <div>
-                    <h3 className="font-medium text-base">{challenge.title}</h3>
+                    <h3 className="font-medium text-base">{challenge.title || challenge.name}</h3>
                     <div className="flex items-center gap-x-2 text-xs text-muted-foreground mt-1">
                       {challenge.isDaily && <Badge variant="outline" className="text-xs">Quotidien</Badge>}
                       {challenge.isWeekly && <Badge variant="outline" className="text-xs">Hebdomadaire</Badge>}
@@ -111,9 +132,11 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                           {new Date(challenge.deadline).toLocaleDateString()}
                         </span>
                       )}
-                      <span className={cn("font-medium", getCategoryColor(challenge.category))}>
-                        {challenge.category}
-                      </span>
+                      {challenge.category && (
+                        <span className={cn("font-medium", getCategoryColor(challenge.category))}>
+                          {challenge.category}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -136,16 +159,16 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                 <div className="mb-4">
                   <div className="flex justify-between text-sm mb-1.5">
                     <span>Progression</span>
-                    <span>{Math.round(challenge.progress)}%</span>
+                    <span>{Math.round(challenge.progress || 0)}%</span>
                   </div>
                   <Progress value={challenge.progress} className="h-2" />
                 </div>
                 
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-1.5">
-                    {challenge.status === 'completed' || challenge.completed ? (
+                    {isChallengeCompleted(challenge) ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                    ) : challenge.failed || challenge.status === 'failed' ? (
+                    ) : isChallengeFailed(challenge) ? (
                       <XCircle className="h-4 w-4 text-red-500" />
                     ) : (
                       <Clock className="h-4 w-4 text-muted-foreground" />
@@ -156,7 +179,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                   </div>
                   
                   <div className="flex gap-2">
-                    {(challenge.status === 'active' || (!challenge.status && !challenge.completed && !challenge.failed)) && onComplete && (
+                    {(!isChallengeCompleted(challenge) && !isChallengeFailed(challenge) && !isChallengeLocked(challenge)) && onComplete && (
                       <Button 
                         variant="outline" 
                         size="sm"
@@ -169,7 +192,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                       </Button>
                     )}
                     
-                    {(challenge.status === 'active' || (!challenge.status && !challenge.completed && !challenge.failed)) && onFail && (
+                    {(!isChallengeCompleted(challenge) && !isChallengeFailed(challenge) && !isChallengeLocked(challenge)) && onFail && (
                       <Button 
                         variant="outline" 
                         size="sm"
@@ -182,7 +205,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                       </Button>
                     )}
                     
-                    {(challenge.failed || challenge.status === 'failed') && onRetry && (
+                    {isChallengeFailed(challenge) && onRetry && (
                       <Button 
                         variant="outline" 
                         size="sm"

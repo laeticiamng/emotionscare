@@ -14,7 +14,10 @@ const KpiCard: React.FC<KpiCardProps> = ({
   ariaLabel,
   onClick,
   isLoading,
-  className
+  className,
+  status,
+  trendText,
+  loading
 }) => {
   // CSS variant for trend colors
   const trendVariants = cva("text-xs flex items-center gap-1", {
@@ -42,6 +45,25 @@ const KpiCard: React.FC<KpiCardProps> = ({
   const handleClick = () => {
     if (onClick) onClick();
   };
+
+  // Helper to handle both types of delta (number or object)
+  const getDeltaTrend = () => {
+    if (!delta) return 'neutral';
+    if (typeof delta === 'number') {
+      return delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral';
+    }
+    return delta.trend;
+  };
+
+  const getDeltaValue = () => {
+    if (!delta) return 0;
+    return typeof delta === 'number' ? delta : delta.value;
+  };
+
+  const getDeltaLabel = () => {
+    if (!delta || typeof delta === 'number') return '';
+    return delta.label || '';
+  };
   
   return (
     <Card 
@@ -57,18 +79,18 @@ const KpiCard: React.FC<KpiCardProps> = ({
         {renderIcon()}
       </CardHeader>
       <CardContent>
-        {isLoading ? (
+        {isLoading || loading ? (
           <div className="h-10 bg-gray-100 animate-pulse rounded-md" />
         ) : (
           <>
             <div className="text-2xl font-bold mb-1">{value}</div>
             
             {delta && (
-              <div className={trendVariants({ trend: delta.trend })}>
-                {delta.trend === 'up' && <span>↑</span>}
-                {delta.trend === 'down' && <span>↓</span>}
-                {delta.trend === 'neutral' && <span>→</span>}
-                <span>{Math.abs(delta.value)}% {delta.label}</span>
+              <div className={trendVariants({ trend: getDeltaTrend() })}>
+                {getDeltaTrend() === 'up' && <span>↑</span>}
+                {getDeltaTrend() === 'down' && <span>↓</span>}
+                {getDeltaTrend() === 'neutral' && <span>→</span>}
+                <span>{Math.abs(getDeltaValue())}% {getDeltaLabel()}</span>
               </div>
             )}
             

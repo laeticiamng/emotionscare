@@ -3,89 +3,93 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  image: string;
-  category: string;
-  rarity?: 'common' | 'rare' | 'epic' | 'legendary';
-  unlockedAt?: string;
-  completed?: boolean;
-  unlocked?: boolean;
-  progress?: number;
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
   image_url?: string;
   earned_date?: string;
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
+  category?: string;
   icon?: string;
   level?: number | string;
-  threshold?: number;
-  points?: number;
-  user_id?: string;
-  icon_url?: string;
-  total_required?: number;
+  image?: string;
+  unlockedAt?: string;
+  progress?: number;
+  rarity?: 'common' | 'rare' | 'epic' | 'legendary';
+  completed?: boolean;
+  unlocked?: boolean;
   imageUrl?: string;
   dateEarned?: string;
 }
 
 export interface Challenge {
   id: string;
-  title: string;
+  title?: string;
+  name?: string;
   description: string;
-  category: string;
   points: number;
-  xp?: number;
-  progress: number;
-  status?: 'active' | 'completed' | 'failed' | 'locked';
+  completed: boolean;
+  progress?: number;
+  totalSteps?: number;
   deadline?: string;
-  isDaily?: boolean;
-  isWeekly?: boolean;
-  icon?: React.ReactNode;
-  failed?: boolean;
-  goal?: number;
-  type?: string;
+  startDate?: string;
+  category?: string;
   difficulty?: 'easy' | 'medium' | 'hard';
   completions?: number;
   badge?: string;
   requirement?: number;
   current?: number;
-  completed?: boolean;
-  name?: string;
-  totalSteps?: number;
-  startDate?: string;
+  goal?: number;
+  status?: 'active' | 'completed' | 'failed' | 'locked' | 'ongoing' | 'available';
+  isDaily?: boolean;
+  isWeekly?: boolean;
+  icon?: React.ReactNode;
+  failed?: boolean;
+  xp?: number;
+  type?: string;
 }
 
 export interface LeaderboardEntry {
   id: string;
-  userId?: string;
   name: string;
-  username?: string;
   avatar?: string;
   points: number;
-  level?: number;
-  rank?: number;
-  position?: number;
-  progress?: number;
-  change?: number;
-  isCurrentUser?: boolean;
+  rank: number;
   trend?: 'up' | 'down' | 'stable';
   badges?: number;
+  level?: number;
   score?: number;
+  change?: number;
   department?: string;
+  position?: number;
+  userId?: string;
+  username?: string;
+  isCurrentUser?: boolean;
 }
 
 export interface GamificationStats {
   points: number;
   level: number;
   badges: Badge[] | number;
+  streak: number;
   completedChallenges: number;
   totalChallenges: number;
+  activeUsersPercent?: number;
+  totalBadges?: number;
+  badgeLevels?: { level: string; count: number; }[];
+  topChallenges?: (Challenge & { name: string; completions: number; })[];
+  completionRate?: number;
+  rewardsEarned?: number;
+  userEngagement?: number;
+  progress: number;
   challenges: Challenge[];
-  streak: number;
-  nextLevel: {
+  achievements?: Badge[];
+  leaderboard?: LeaderboardEntry[];
+  nextLevelPoints?: number;
+  lastActivityDate?: string;
+  nextLevel?: {
     points: number;
     level?: number;
     rewards: string[];
   };
-  progress: number;
-  rewards?: string[];
-  // Additional properties
+  // Additional properties used in components
   rank?: string;
   activeChallenges?: number;
   streakDays?: number;
@@ -95,15 +99,4 @@ export interface GamificationStats {
   badgesCount?: number;
   currentLevel?: number;
   recentAchievements?: Badge[];
-  activeUsersPercent?: number;
-  totalBadges?: number;
-  badgeLevels?: { level: string; count: number; }[];
-  topChallenges?: (Challenge & { name: string; completions: number; })[];
-  completionRate?: number;
-  rewardsEarned?: number;
-  userEngagement?: number;
-  lastActivityDate?: string;
-  nextLevelPoints?: number;
-  achievements?: Badge[];
-  leaderboard?: LeaderboardEntry[];
 }

@@ -36,7 +36,7 @@ export const PopularSessionsSection: React.FC = () => {
       tags: [],
       thumbnailUrl: '/images/meditation.jpg',
       category: 'meditation',
-      emotionTarget: 'calme'
+      emotion_target: 'calme'
     },
     {
       id: 'session2',
@@ -46,7 +46,7 @@ export const PopularSessionsSection: React.FC = () => {
       tags: [],
       thumbnailUrl: '/images/breathing.jpg',
       category: 'breathing',
-      emotionTarget: 'relaxation'
+      emotion_target: 'relaxation'
     }
   ];
 

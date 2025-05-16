@@ -35,7 +35,7 @@ export const AdminTabContents: React.FC = () => {
       description: 'Soutenu 10 collègues',
       image: '/badges/team-champion.png',
       category: 'team',
-      rarity: 'rare',
+      tier: 'rare',
       unlockedAt: '2023-04-01'
     },
     {
@@ -44,7 +44,7 @@ export const AdminTabContents: React.FC = () => {
       description: 'Créé une initiative de bien-être',
       image: '/badges/wellbeing.png',
       category: 'wellness',
-      rarity: 'epic'
+      tier: 'epic'
     },
     {
       id: '3',
@@ -52,34 +52,34 @@ export const AdminTabContents: React.FC = () => {
       description: 'Guidé 5 nouveaux membres',
       image: '/badges/mentor.png',
       category: 'leadership',
-      rarity: 'legendary'
+      tier: 'legendary'
     }
   ];
 
   const leaderboard: LeaderboardEntry[] = [
     {
       id: '1',
-      userId: '1',
       name: 'Équipe Marketing',
       avatar: '/teams/marketing.jpg',
       points: 1850,
-      position: 1
+      rank: 1,
+      userId: '1'
     },
     {
       id: '2',
-      userId: '2',
       name: 'Équipe Développement',
       avatar: '/teams/development.jpg',
       points: 1680,
-      position: 2
+      rank: 2,
+      userId: '2'
     },
     {
       id: '3',
-      userId: '3',
       name: 'Équipe Design',
       avatar: '/teams/design.jpg',
       points: 1540,
-      position: 3
+      rank: 3,
+      userId: '3'
     }
   ];
 
@@ -124,6 +124,7 @@ export const AdminTabContents: React.FC = () => {
           <BadgesWidget 
             badges={badges}
             title="Badges d'équipe"
+            showSeeAll={true}
             onSeeAll={() => console.log('View all badges')}
           />
         </div>
@@ -143,6 +144,7 @@ export const AdminTabContents: React.FC = () => {
           <LeaderboardWidget 
             leaderboard={leaderboard}
             title="Classement des équipes"
+            showSeeAll={true}
             onSeeAll={() => console.log('View all leaderboard')}
           />
         </div>
