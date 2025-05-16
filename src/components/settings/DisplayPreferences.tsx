@@ -1,126 +1,144 @@
 
 import React from 'react';
-import { UserPreferences } from '@/types/types';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UserPreferences } from '@/types/preferences';
+import { ThemeName, FontSize, FontFamily } from '@/types/theme';
 
 interface DisplayPreferencesProps {
   preferences: UserPreferences;
-  onChange: (preferences: Partial<UserPreferences>) => void;
+  onChange: (value: Partial<UserPreferences>) => void;
 }
 
 const DisplayPreferences: React.FC<DisplayPreferencesProps> = ({ preferences, onChange }) => {
   return (
     <div className="space-y-6">
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="theme">Thème</Label>
-          <Select
-            value={preferences.theme}
-            onValueChange={(value) => onChange({ theme: value })}
-          >
-            <SelectTrigger className="w-full mt-1">
-              <SelectValue placeholder="Sélectionner un thème" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="light">Clair</SelectItem>
-              <SelectItem value="dark">Sombre</SelectItem>
-              <SelectItem value="system">Système</SelectItem>
-              <SelectItem value="pastel">Pastel</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label htmlFor="fontSize">Taille de police</Label>
-          <Select
-            value={preferences.fontSize}
-            onValueChange={(value) => onChange({ fontSize: value })}
-          >
-            <SelectTrigger className="w-full mt-1">
-              <SelectValue placeholder="Sélectionner une taille" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="small">Petite</SelectItem>
-              <SelectItem value="medium">Moyenne</SelectItem>
-              <SelectItem value="large">Grande</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label htmlFor="fontFamily">Police</Label>
-          <Select
-            value={preferences.fontFamily}
-            onValueChange={(value) => onChange({ fontFamily: value })}
-          >
-            <SelectTrigger className="w-full mt-1">
-              <SelectValue placeholder="Sélectionner une police" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="system">Système</SelectItem>
-              <SelectItem value="sans-serif">Sans Serif</SelectItem>
-              <SelectItem value="serif">Serif</SelectItem>
-              <SelectItem value="monospace">Monospace</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="reduceMotion">Réduire les animations</Label>
-            <p className="text-sm text-muted-foreground">
-              Minimiser les animations et transitions de l'interface
-            </p>
+      <div className="space-y-3">
+        <Label className="text-base">Thème</Label>
+        <RadioGroup
+          value={preferences.theme}
+          onValueChange={(value: ThemeName) => 
+            onChange({ theme: value })
+          }
+          className="flex flex-col space-y-2"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="light" id="light" />
+            <Label htmlFor="light">Clair</Label>
           </div>
-          <Switch
-            id="reduceMotion"
-            checked={preferences.reduceMotion}
-            onCheckedChange={(checked) => onChange({ reduceMotion: checked })}
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="colorBlindMode">Mode daltonien</Label>
-            <p className="text-sm text-muted-foreground">
-              Optimiser les couleurs pour le daltonisme
-            </p>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="dark" id="dark" />
+            <Label htmlFor="dark">Sombre</Label>
           </div>
-          <Switch
-            id="colorBlindMode"
-            checked={preferences.colorBlindMode}
-            onCheckedChange={(checked) => onChange({ colorBlindMode: checked })}
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="autoplayMedia">Lecture automatique des médias</Label>
-            <p className="text-sm text-muted-foreground">
-              Activer la lecture automatique des médias
-            </p>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="system" id="system" />
+            <Label htmlFor="system">Système</Label>
           </div>
-          <Switch
-            id="autoplayMedia"
-            checked={preferences.autoplayMedia}
-            onCheckedChange={(checked) => onChange({ autoplayMedia: checked })}
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="soundEnabled">Sons activés</Label>
-            <p className="text-sm text-muted-foreground">
-              Activer les sons de l'interface
-            </p>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="pastel" id="pastel" />
+            <Label htmlFor="pastel">Pastel</Label>
           </div>
-          <Switch
-            id="soundEnabled"
-            checked={preferences.soundEnabled}
-            onCheckedChange={(checked) => onChange({ soundEnabled: checked })}
-          />
+        </RadioGroup>
+      </div>
+
+      <div className="space-y-3">
+        <Label htmlFor="fontFamily" className="text-base">Police</Label>
+        <Select
+          value={preferences.fontFamily}
+          onValueChange={(value: FontFamily) => 
+            onChange({ fontFamily: value })
+          }
+        >
+          <SelectTrigger id="fontFamily">
+            <SelectValue placeholder="Choisir une police" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="system">Système</SelectItem>
+            <SelectItem value="sans-serif">Sans-serif</SelectItem>
+            <SelectItem value="serif">Serif</SelectItem>
+            <SelectItem value="monospace">Monospace</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-3">
+        <Label htmlFor="fontSize" className="text-base">Taille du texte</Label>
+        <Select
+          value={preferences.fontSize}
+          onValueChange={(value: FontSize) => 
+            onChange({ fontSize: value })
+          }
+        >
+          <SelectTrigger id="fontSize">
+            <SelectValue placeholder="Choisir une taille" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="small">Petite</SelectItem>
+            <SelectItem value="medium">Moyenne</SelectItem>
+            <SelectItem value="large">Grande</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-3">
+        <Label className="text-base">Accessibilité</Label>
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="reduceMotion"
+              checked={preferences.reduceMotion}
+              onCheckedChange={(checked) =>
+                onChange({ reduceMotion: checked === true })
+              }
+            />
+            <Label htmlFor="reduceMotion" className="font-normal">
+              Réduire les animations
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="colorBlindMode"
+              checked={preferences.colorBlindMode}
+              onCheckedChange={(checked) =>
+                onChange({ colorBlindMode: checked === true })
+              }
+            />
+            <Label htmlFor="colorBlindMode" className="font-normal">
+              Mode daltonisme
+            </Label>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <Label className="text-base">Média</Label>
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="autoplayMedia"
+              checked={preferences.autoplayMedia}
+              onCheckedChange={(checked) =>
+                onChange({ autoplayMedia: checked === true })
+              }
+            />
+            <Label htmlFor="autoplayMedia" className="font-normal">
+              Lecture automatique des médias
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="soundEnabled"
+              checked={preferences.soundEnabled}
+              onCheckedChange={(checked) =>
+                onChange({ soundEnabled: checked === true })
+              }
+            />
+            <Label htmlFor="soundEnabled" className="font-normal">
+              Sons activés
+            </Label>
+          </div>
         </div>
       </div>
     </div>

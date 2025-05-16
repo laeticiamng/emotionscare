@@ -1,7 +1,5 @@
 
-
-// Mise à jour de TeamOverviewProps pour inclure toutes les propriétés requises
-
+// Update TeamOverviewProps to include all required properties
 export interface TeamOverviewProps {
   userId?: string;
   period?: string;
@@ -14,10 +12,9 @@ export interface TeamOverviewProps {
 }
 
 export interface EmotionResult {
-  // Définissez votre type de résultat d'émotion ici
   id?: string;
   userId?: string;
-  user_id?: string; // Ajouté pour compatibilité
+  user_id?: string; // Added for compatibility
   emotion?: string;
   intensity?: number;
   timestamp?: string | Date;
@@ -32,4 +29,3 @@ export interface EmotionResult {
   confidence?: number;
   recommendations?: string[];
 }
-

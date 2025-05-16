@@ -1,133 +1,91 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+
+import React from 'react';
+import { UserPreferences } from '@/types/preferences';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Crown } from 'lucide-react';
 
-const PremiumFeatures = () => {
-  const { toast } = useToast();
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
-  
-  // Check if user has premium features
-  const hasPremium = user?.role === 'b2b_user' || user?.role === 'b2b_admin';
-  
-  // Initialize preferences with default values if they don't exist
-  const userPreferences = user?.preferences || {};
-  
-  const [preferences, setPreferences] = useState({
-    emotionalCamouflage: userPreferences.emotionalCamouflage || false,
-    aiSuggestions: userPreferences.aiSuggestions || true
-  });
-  
-  const handleUpdateUser = async () => {
-    if (!user) return;
-    
-    setLoading(true);
-    
-    // Simulate API call with a delay
-    setTimeout(() => {
-      toast({
-        title: 'Fonctionnalités mises à jour',
-        description: 'Vos préférences premium ont été mises à jour',
-        variant: 'success'
-      });
-      setLoading(false);
-    }, 1000);
+interface PremiumFeaturesProps {
+  preferences: UserPreferences;
+  onChange: (preferences: Partial<UserPreferences>) => void;
+  isPremium?: boolean;
+  onUpgrade?: () => void;
+}
+
+const PremiumFeatures: React.FC<PremiumFeaturesProps> = ({
+  preferences,
+  onChange,
+  isPremium = false,
+  onUpgrade
+}) => {
+  const handleEmotionalCamouflageChange = (enabled: boolean) => {
+    onChange({
+      emotionalCamouflage: enabled
+    });
   };
   
-  const handleToggleFeature = (feature: 'emotionalCamouflage' | 'aiSuggestions', value: boolean) => {
-    setPreferences(prev => ({
-      ...prev,
-      [feature]: value
-    }));
+  const handleAiSuggestionsChange = (enabled: boolean) => {
+    onChange({
+      aiSuggestions: enabled
+    });
   };
-  
-  if (!hasPremium) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Fonctionnalités Premium</CardTitle>
-          <CardDescription>
-            Accédez à des fonctionnalités avancées en passant à un compte premium.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="rounded-lg border p-4 bg-muted/50">
-            <h3 className="font-medium mb-2">Fonctionnalités Premium</h3>
-            <ul className="space-y-2 text-sm list-disc pl-5">
-              <li>Camouflage émotionnel (masquez vos émotions à certains moments)</li>
-              <li>Suggestions d'IA personnalisées</li>
-              <li>Sessions de coaching et conseils avancés</li>
-              <li>Rapports approfondis et analyses de tendances</li>
-            </ul>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button variant="default" className="w-full">
-            Passer à la version Premium
-          </Button>
-        </CardFooter>
-      </Card>
-    );
-  }
   
   return (
-    <Card>
+    <Card className={!isPremium ? "bg-muted/50" : undefined}>
       <CardHeader>
-        <CardTitle>Fonctionnalités Premium</CardTitle>
+        <div className="flex items-center gap-2">
+          <Crown className={isPremium ? "text-yellow-500" : "text-muted-foreground"} />
+          <CardTitle>Fonctionnalités premium</CardTitle>
+        </div>
         <CardDescription>
-          Gérez vos fonctionnalités premium
+          {isPremium 
+            ? "Vous avez accès aux fonctionnalités premium"
+            : "Débloquez des fonctionnalités avancées avec un abonnement premium"}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <Label htmlFor="emotionalCamouflage" className="block">Camouflage Émotionnel</Label>
+              <Label htmlFor="emotionalCamouflage">Camouflage émotionnel</Label>
               <p className="text-sm text-muted-foreground">
-                Masquez temporairement vos émotions détectées aux autres utilisateurs
+                Masque votre état émotionnel aux autres utilisateurs
               </p>
             </div>
-            <Switch 
-              id="emotionalCamouflage" 
-              checked={preferences.emotionalCamouflage}
-              onCheckedChange={(checked) => handleToggleFeature('emotionalCamouflage', checked)}
+            <Switch
+              id="emotionalCamouflage"
+              checked={preferences.emotionalCamouflage ?? false}
+              onCheckedChange={handleEmotionalCamouflageChange}
+              disabled={!isPremium}
             />
           </div>
           
           <div className="flex items-center justify-between">
             <div>
-              <Label htmlFor="aiSuggestions" className="block">Suggestions IA Avancées</Label>
+              <Label htmlFor="aiSuggestions">Suggestions IA avancées</Label>
               <p className="text-sm text-muted-foreground">
-                Recevez des recommandations personnalisées basées sur votre profil émotionnel
+                Recevoir des suggestions personnalisées pour améliorer votre bien-être
               </p>
             </div>
-            <Switch 
-              id="aiSuggestions" 
-              checked={preferences.aiSuggestions}
-              onCheckedChange={(checked) => handleToggleFeature('aiSuggestions', checked)}
+            <Switch
+              id="aiSuggestions"
+              checked={preferences.aiSuggestions ?? false}
+              onCheckedChange={handleAiSuggestionsChange}
+              disabled={!isPremium}
             />
           </div>
         </div>
-        
-        <div className="rounded-lg border p-4 bg-blue-50 dark:bg-blue-950/20">
-          <h3 className="font-medium text-blue-700 dark:text-blue-300 mb-2">
-            État de votre abonnement Premium
-          </h3>
-          <p className="text-sm text-blue-600 dark:text-blue-400">
-            Votre abonnement premium est actif et sera renouvelé le {' '}
-            {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}
-          </p>
-        </div>
       </CardContent>
-      <CardFooter>
-        <Button onClick={handleUpdateUser} disabled={loading} className="w-full">
-          {loading ? 'Mise à jour...' : 'Enregistrer les paramètres'}
-        </Button>
-      </CardFooter>
+      
+      {!isPremium && (
+        <CardFooter>
+          <Button onClick={onUpgrade} className="w-full">
+            Passer à l'offre premium
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 };

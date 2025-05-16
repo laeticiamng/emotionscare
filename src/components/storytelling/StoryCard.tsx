@@ -1,112 +1,102 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Story } from '@/types';
-import { useSoundscape } from '@/providers/SoundscapeProvider';
-import { useStorytelling } from '@/contexts/StorytellingContext';
+import { Story } from '@/types/types';
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface StoryCardProps {
   story: Story;
-  onClose?: () => void;
+  onSelect?: (story: Story) => void;
+  className?: string;
+  compact?: boolean;
 }
 
-const StoryCard: React.FC<StoryCardProps> = ({ story, onClose }) => {
-  const navigate = useNavigate();
-  const { markStorySeen } = useStorytelling();
-  const { playFunctionalSound } = useSoundscape();
-
-  const handleActionClick = () => {
-    if (story && story.cta) {
-      // Mark story as seen
-      markStorySeen(story.id);
-      
-      // Play sound effect
-      playFunctionalSound("click");
-      
-      // Navigate to route if provided
-      if (story.cta.route) {
-        navigate(story.cta.route);
-      }
-      
-      // Close dialog/modal if onClose provided
-      if (onClose) onClose();
+const StoryCard: React.FC<StoryCardProps> = ({
+  story,
+  onSelect,
+  className = '',
+  compact = false
+}) => {
+  const handleClick = () => {
+    if (onSelect) {
+      onSelect(story);
     }
   };
 
-  // Determine emotion-based styling
-  const getEmotionStyling = () => {
-    if (!story.emotion) return {};
+  // Helper function to get emotion color
+  const getEmotionColor = () => {
+    if (!story.emotion) return 'bg-primary/10';
 
-    const emotionStyles: Record<string, { bg: string; accent: string }> = {
-      'happy': { bg: 'from-yellow-50 to-orange-50 border-yellow-200', accent: 'bg-yellow-500' },
-      'peaceful': { bg: 'from-blue-50 to-cyan-50 border-blue-200', accent: 'bg-blue-500' },
-      'excited': { bg: 'from-orange-50 to-red-50 border-orange-200', accent: 'bg-orange-500' },
-      'focused': { bg: 'from-purple-50 to-indigo-50 border-purple-200', accent: 'bg-purple-500' },
-      'neutral': { bg: 'from-gray-50 to-slate-50 border-gray-200', accent: 'bg-gray-500' }
-    };
-
-    const style = emotionStyles[story.emotion.toLowerCase()] || emotionStyles.neutral;
-    return {
-      cardClass: `bg-gradient-to-br ${style.bg}`,
-      accentClass: style.accent
-    };
+    switch (story.emotion.toLowerCase()) {
+      case 'happy':
+      case 'joy':
+        return 'bg-yellow-100 dark:bg-yellow-900/30';
+      case 'sad':
+      case 'sadness':
+        return 'bg-blue-100 dark:bg-blue-900/30';
+      case 'angry':
+      case 'anger':
+        return 'bg-red-100 dark:bg-red-900/30';
+      case 'calm':
+        return 'bg-green-100 dark:bg-green-900/30';
+      default:
+        return 'bg-primary/10';
+    }
   };
 
-  const { cardClass, accentClass } = getEmotionStyling();
+  const formatDate = (date: Date) => {
+    try {
+      return formatDistanceToNow(date, { addSuffix: true, locale: fr });
+    } catch (error) {
+      return 'Date inconnue';
+    }
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
+    <Card
+      className={`overflow-hidden transition-all hover:shadow-md ${className} ${getEmotionColor()}`}
+      onClick={handleClick}
     >
-      <Card className={`overflow-hidden shadow-lg ${cardClass}`}>
-        {story.image && (
-          <div className="relative w-full h-48">
-            <img 
-              src={story.image} 
-              alt={story.title} 
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-            <CardTitle className="absolute bottom-4 left-4 text-white">{story.title}</CardTitle>
-          </div>
-        )}
-        
-        {!story.image && (
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              {accentClass && (
-                <div className={`w-2 h-10 rounded-full ${accentClass}`}></div>
-              )}
-              <CardTitle>{story.title}</CardTitle>
-            </div>
-          </CardHeader>
-        )}
-        
-        <CardContent className="pb-2">
-          <CardDescription className="text-foreground/80 whitespace-pre-line text-base">
-            {story.content}
-          </CardDescription>
-        </CardContent>
-        
-        {story.cta && (
-          <CardFooter>
-            <Button 
-              onClick={handleActionClick}
-              className="w-full"
-              variant="default"
-            >
-              {story.cta.label}
-            </Button>
-          </CardFooter>
-        )}
-      </Card>
-    </motion.div>
+      {story.image && (
+        <div className="relative w-full h-32 overflow-hidden">
+          <img
+            src={story.image}
+            alt={story.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+      <CardContent className={`p-4 ${compact ? 'space-y-1' : 'space-y-2'}`}>
+        <h3 className={`font-medium ${compact ? 'text-sm' : 'text-lg'}`}>{story.title}</h3>
+        <p className={`text-muted-foreground ${compact ? 'text-xs line-clamp-2' : 'text-sm line-clamp-3'}`}>
+          {story.content}
+        </p>
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>{formatDate(story.date)}</span>
+          {story.emotion && <span className="capitalize">{story.emotion}</span>}
+        </div>
+      </CardContent>
+      
+      {story.cta && !compact && (
+        <CardFooter className="p-4 pt-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (story.cta?.route) {
+                // Handle navigation or action
+              }
+            }}
+            className="w-full"
+          >
+            {story.cta.label}
+          </Button>
+        </CardFooter>
+      )}
+    </Card>
   );
 };
 

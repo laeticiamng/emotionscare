@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { User } from '@/types/user';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({
   if (!localUser.preferences) {
     localUser.preferences = {
       theme: 'system',
-      fontSize: 'md',
+      fontSize: 'medium',
       fontFamily: 'system',
       reduceMotion: false,
       colorBlindMode: false,
@@ -36,9 +37,9 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({
       privacyLevel: 'balanced',
       animations: true,
       notifications: {
-        email: true,
-        push: true,
-        sounds: true
+        enabled: true,
+        emailEnabled: true,
+        pushEnabled: true
       },
       sound: {
         volume: 0.5,

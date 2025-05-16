@@ -11,7 +11,7 @@ interface NotificationPreferencesProps {
 }
 
 const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ preferences, onChange }) => {
-  // Ensure we have the notifications object
+  // Ensure we have a notifications object
   const notifications = preferences.notifications || {
     enabled: false,
     emailEnabled: false,
@@ -23,65 +23,26 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ prefe
 
   // Helper to update nested notification preferences
   const handleNotificationChange = (key: string, value: any) => {
-    if (typeof notifications === 'object') {
-      onChange({
-        notifications: {
-          ...(notifications as NotificationPrefsType),
-          [key]: value
-        }
-      });
-    } else {
-      // If notifications is a boolean, convert to object
-      onChange({
-        notifications: {
-          enabled: notifications,
-          [key]: value
-        }
-      });
-    }
+    onChange({
+      notifications: {
+        ...notifications,
+        [key]: value
+      }
+    });
   };
 
   // Helper to update notification types
   const handleTypeChange = (type: string, enabled: boolean) => {
-    if (typeof notifications === 'object') {
-      const currentTypes = notifications.types || {};
-      
-      onChange({
-        notifications: {
-          ...notifications,
-          types: {
-            ...currentTypes,
-            [type]: enabled
-          }
+    onChange({
+      notifications: {
+        ...notifications,
+        types: {
+          ...notifications.types,
+          [type]: enabled
         }
-      });
-    }
+      }
+    });
   };
-
-  // Check if notifications is a boolean or an object
-  const isEnabled = typeof notifications === 'boolean' 
-    ? notifications 
-    : notifications.enabled;
-    
-  const emailEnabled = typeof notifications === 'object' 
-    ? notifications.emailEnabled 
-    : false;
-    
-  const pushEnabled = typeof notifications === 'object' 
-    ? notifications.pushEnabled 
-    : false;
-    
-  const inAppEnabled = typeof notifications === 'object' 
-    ? notifications.inAppEnabled 
-    : false;
-    
-  const frequency = typeof notifications === 'object' && notifications.frequency 
-    ? notifications.frequency 
-    : 'immediate';
-    
-  const types = typeof notifications === 'object' && notifications.types 
-    ? notifications.types 
-    : {};
 
   return (
     <div className="space-y-6">
@@ -94,18 +55,12 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ prefe
         </div>
         <Switch
           id="notificationsEnabled"
-          checked={isEnabled}
-          onCheckedChange={(checked) => {
-            if (typeof notifications === 'boolean') {
-              onChange({ notifications: checked });
-            } else {
-              handleNotificationChange('enabled', checked);
-            }
-          }}
+          checked={notifications.enabled}
+          onCheckedChange={(checked) => handleNotificationChange('enabled', checked)}
         />
       </div>
 
-      {isEnabled && (
+      {notifications.enabled && (
         <>
           <div className="flex items-center justify-between">
             <div>
@@ -116,7 +71,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ prefe
             </div>
             <Switch
               id="emailEnabled"
-              checked={emailEnabled}
+              checked={notifications.emailEnabled}
               onCheckedChange={(checked) => handleNotificationChange('emailEnabled', checked)}
             />
           </div>
@@ -130,7 +85,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ prefe
             </div>
             <Switch
               id="pushEnabled"
-              checked={pushEnabled}
+              checked={notifications.pushEnabled}
               onCheckedChange={(checked) => handleNotificationChange('pushEnabled', checked)}
             />
           </div>
@@ -144,7 +99,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ prefe
             </div>
             <Switch
               id="inAppEnabled"
-              checked={inAppEnabled}
+              checked={notifications.inAppEnabled}
               onCheckedChange={(checked) => handleNotificationChange('inAppEnabled', checked)}
             />
           </div>
@@ -152,7 +107,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ prefe
           <div>
             <Label htmlFor="frequency">Fréquence des notifications</Label>
             <Select
-              value={frequency}
+              value={notifications.frequency}
               onValueChange={(value) => handleNotificationChange('frequency', value)}
             >
               <SelectTrigger className="w-full mt-1">
@@ -167,11 +122,11 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ prefe
             </Select>
           </div>
 
-          {typeof types === 'object' && Object.keys(types).length > 0 && (
+          {notifications.types && (
             <div className="space-y-4">
               <Label>Types de notifications</Label>
-
-              {Object.entries(types).map(([type, enabled]) => (
+              
+              {Object.entries(notifications.types).map(([type, enabled]) => (
                 <div key={type} className="flex items-center justify-between">
                   <div>
                     <Label htmlFor={`notification-${type}`}>
@@ -180,7 +135,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ prefe
                   </div>
                   <Switch
                     id={`notification-${type}`}
-                    checked={Boolean(enabled)}
+                    checked={enabled}
                     onCheckedChange={(checked) => handleTypeChange(type, checked)}
                   />
                 </div>

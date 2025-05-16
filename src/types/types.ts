@@ -1,5 +1,4 @@
 
-
 import { UserRole } from "./user";
 import { ThemeName, FontSize, FontFamily, NotificationPreferences as NotificationPrefs } from "./preferences";
 
@@ -66,6 +65,8 @@ export interface Story {
   date: Date;
   seen: boolean;
   type?: string;
+  emotion?: string;
+  image?: string;
   cta?: {
     label: string;
     route: string;
@@ -74,13 +75,12 @@ export interface Story {
 
 export type Period = 'day' | 'week' | 'month' | 'year';
 export type UserModeType = 'b2c' | 'b2b-collaborator' | 'b2b-admin';
-export { UserRole } from './user'; // Exporter UserRole de user.ts
+export { UserRole } from './user';
 
-// Type pour la vérification des invitations
+// Type for invitation verification
 export interface InvitationVerificationResult {
   valid: boolean;
   message?: string;
   email?: string;
   role?: UserRole;
 }
-

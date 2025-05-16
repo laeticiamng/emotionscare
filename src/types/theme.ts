@@ -1,5 +1,4 @@
 
-
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large';
 export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'inter' | 'sans-serif' | 'monospace';
@@ -20,4 +19,3 @@ export interface ThemeOption {
   value: Theme;
   preview: string;
 }
-

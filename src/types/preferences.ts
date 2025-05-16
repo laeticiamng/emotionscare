@@ -1,22 +1,36 @@
 
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large';
-export type FontFamily = 'inter' | 'system' | 'serif' | 'mono' | 'sans-serif' | 'monospace';
+export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large';
+export type FontFamily = 'inter' | 'system' | 'serif' | 'mono' | 'rounded' | 'sans' | 'sans-serif' | 'monospace';
+export type PrivacyLevel = 'strict' | 'balanced' | 'relaxed';
+export type Theme = ThemeName;
+
+export interface NotificationPreference {
+  email: boolean;
+  push: boolean;
+  sounds: boolean;
+}
+
+export interface SoundPreference {
+  volume: number;
+  effects: boolean;
+  music: boolean;
+}
 
 export interface NotificationPreferences {
   enabled: boolean;
   emailEnabled?: boolean;
   pushEnabled?: boolean;
   inAppEnabled?: boolean;
-  types?: {
-    system?: boolean;
-    emotion?: boolean;
-    coach?: boolean;
-    journal?: boolean;
-    community?: boolean;
-    achievement?: boolean;
-  };
+  email?: boolean; // Added this for compatibility
+  types?: Record<string, boolean>;
   frequency?: string;
+  tone?: string;
+  quietHours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
 }
 
 export interface UserPreferences {
@@ -25,24 +39,28 @@ export interface UserPreferences {
   fontFamily?: FontFamily;
   language?: string;
   notifications?: NotificationPreferences;
-  emailEnabled?: boolean;
-  pushEnabled?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  autoplayVideos?: boolean;
-  autoplayMedia?: boolean;
+  haptics?: boolean;
+  dataCollection?: boolean;
+  privacyLevel?: PrivacyLevel;
+  animations?: boolean;
+  soundEffects?: boolean;
   reduceMotion?: boolean;
   colorBlindMode?: boolean;
-  dataCollection?: boolean;
+  autoplayMedia?: boolean;
+  sound?: SoundPreference | boolean;
+  
+  // Additional fields used in the application
+  ambientSound?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
+  displayName?: string;
+  pronouns?: string;
+  biography?: string;
+  avatarUrl?: string;
+  onboarded?: boolean;
   soundEnabled?: boolean;
-  accessibilityFeatures?: {
-    highContrast?: boolean;
-    reducedMotion?: boolean;
-    screenReader?: boolean;
-  };
-  dashboardLayout?: string;
-  onboardingCompleted?: boolean;
-  privacyLevel?: string;
+  
   privacy?: {
     shareData: boolean;
     anonymizeReports?: boolean;
@@ -51,13 +69,6 @@ export interface UserPreferences {
     shareActivity?: boolean;
     allowMessages?: boolean;
     allowNotifications?: boolean;
+    anonymousMode?: boolean;
   };
-}
-
-export interface UserPreferencesContextType {
-  preferences: UserPreferences;
-  updatePreferences: (newPreferences: Partial<UserPreferences>) => void;
-  resetPreferences?: () => void;
-  loading?: boolean;
-  setPreferences?: React.Dispatch<React.SetStateAction<UserPreferences>>;
 }

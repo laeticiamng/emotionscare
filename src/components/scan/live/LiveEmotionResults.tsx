@@ -1,81 +1,90 @@
-
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Smile, BarChart2 } from 'lucide-react';
-import { EmotionResult } from '@/types';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmotionResult } from '@/types/scan';
 
 interface LiveEmotionResultsProps {
-  result: EmotionResult;
+  result: EmotionResult | null;
+  isLoading?: boolean;
 }
 
-const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result }) => {
-  // Helper function to get emotion badge color
-  const getEmotionBadgeColor = (emotion: string) => {
-    switch (emotion.toLowerCase()) {
-      case 'happy':
-      case 'joy':
-      case 'excited':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'sad':
-      case 'depressed':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'angry':
-      case 'frustrated':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'anxious':
-      case 'stressed':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
-      case 'calm':
-      case 'relaxed':
-        return 'bg-indigo-100 text-indigo-800 border-indigo-200';
-      default:
-        return 'bg-slate-100 text-slate-800 border-slate-200';
-    }
-  };
+const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result, isLoading }) => {
+  if (isLoading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Analyse en cours...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Veuillez patienter pendant que nous analysons vos émotions.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
-  // Get score value with fallback
-  const scoreValue = result.score || 0;
-  const displayFeedback = result.feedback || result.ai_feedback;
+  if (!result) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Aucun résultat</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Aucune émotion détectée pour le moment.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-center gap-2 mb-4">
-          <Smile className="h-5 w-5 text-primary" />
-          <h3 className="font-medium">Analyse émotionnelle</h3>
-        </div>
-        
-        <div className="space-y-4">
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Résultats de l'analyse</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isLoading && (
           <div>
-            <div className="flex justify-between items-center">
-              <Badge className={`px-2 py-1 ${getEmotionBadgeColor(result.emotion)}`}>
-                {result.emotion}
-              </Badge>
-              <span className="text-sm text-muted-foreground">
-                Confiance: {Math.round((result.confidence || 0) * 100)}%
-              </span>
+            <p>Analyse en cours...</p>
+          </div>
+        )}
+        
+        {!isLoading && !result && (
+          <div>
+            <p>Aucun résultat pour le moment.</p>
+          </div>
+        )}
+        
+        {!isLoading && result && (
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-medium mb-2">Émotion détectée</h3>
+              <p className="text-xl font-bold">{result.emotion}</p>
             </div>
             
-            {displayFeedback && (
-              <div className="mt-4 p-3 bg-muted rounded-md">
-                <p className="text-sm">{displayFeedback}</p>
+            <div>
+              <h3 className="text-lg font-medium mb-2">Intensité</h3>
+              <div className="w-full bg-secondary rounded-full h-2.5">
+                <div
+                  className="bg-primary h-2.5 rounded-full"
+                  style={{ width: `${(result.intensity || 0) * 100}%` }}
+                ></div>
+              </div>
+              <p className="text-right text-sm text-muted-foreground mt-1">
+                {Math.round((result.intensity || 0) * 100)}%
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-medium mb-2">Score</h3>
+              <p className="text-xl font-bold">{result.score || 'N/A'}</p>
+            </div>
+            
+            {(result.feedback || result.ai_feedback) && (
+              <div>
+                <h3 className="text-lg font-medium mb-2">Feedback IA</h3>
+                <p className="text-muted-foreground">{result.feedback || result.ai_feedback}</p>
               </div>
             )}
           </div>
-          
-          <div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <BarChart2 className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Intensité</span>
-              </div>
-              <span className="text-sm">{typeof scoreValue === 'number' ? Math.round(scoreValue * 100) : scoreValue}%</span>
-            </div>
-            <Progress value={typeof scoreValue === 'number' ? scoreValue * 100 : 0} className="h-2 mt-2" />
-          </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );
