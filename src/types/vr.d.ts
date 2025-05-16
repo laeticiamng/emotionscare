@@ -10,14 +10,19 @@ export interface VRSessionTemplate {
   difficulty?: string;
   benefits?: string[];
   thumbnailUrl?: string;
+  imageUrl?: string;
+  coverUrl?: string;
+  cover_url?: string;
   category?: string;
   theme?: string;
   completionRate?: number;
+  completion_rate?: number;
   recommendedMood?: string;
+  recommended_mood?: string;
+  emotion?: string;
   is_audio_only?: boolean;
   preview_url?: string;
   audio_url?: string;
-  emotion?: string;
 }
 
 export interface VRSession {

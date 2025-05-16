@@ -2,7 +2,6 @@
 export type {
   User,
   UserPreferences,
-  UserPreferencesState,
   FontFamily,
   FontSize,
   ThemeName,
@@ -28,10 +27,9 @@ export type {
   MusicPlaylist,
   MusicContextType,
   MusicDrawerProps,
-  Track,
   ProgressBarProps,
-  TrackInfoProps,
   VolumeControlProps,
+  MusicControlsProps,
   MusicLibraryProps,
   EmotionMusicParams
 } from './types/music';

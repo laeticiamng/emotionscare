@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { VRSessionTemplate, VRSession } from '@/types';
+import { VRSessionTemplate, VRSession } from '@/types/vr';
 
 interface VRMusicIntegrationProps {
   session: VRSession | VRSessionTemplate;
@@ -13,10 +13,13 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
   onToggleMusic,
   musicEnabled = false
 }) => {
-  // Determine the target emotion either from emotionTarget or emotion_target
+  // Determine the target emotion either from emotionTarget or emotion_target or emotion
   const getTargetEmotion = (): string => {
     if ('emotionTarget' in session && session.emotionTarget) {
       return session.emotionTarget;
+    }
+    if ('emotion_target' in session && session.emotion_target) {
+      return session.emotion_target;
     }
     if ('emotion' in session && session.emotion) {
       return session.emotion;

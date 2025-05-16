@@ -1,19 +1,14 @@
 
 import React from 'react';
-import { Legend } from 'recharts';
-import { getPayloadConfigFromPayload } from './ChartTooltip';
 
 interface ChartLegendProps {
   align?: 'left' | 'center' | 'right';
   verticalAlign?: 'top' | 'middle' | 'bottom';
   layout?: 'horizontal' | 'vertical';
-  iconType?: 'line' | 'plainline' | 'square' | 'rect' | 'circle' | 'cross' | 'diamond' | 'star' | 'triangle' | 'wye' | 'none';
+  iconType?: 'line' | 'plainline' | 'square' | 'rect' | 'circle' | 'cross' | 'diamond' | 'star' | 'triangle' | 'wye';
   iconSize?: number;
   className?: string;
-}
-
-interface RenderCustomLegendProps {
-  payload?: any[];
+  payload?: Array<{ color: string, value: string }>;
 }
 
 export const ChartLegend: React.FC<ChartLegendProps> = ({
@@ -23,8 +18,9 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
   iconType = 'circle',
   iconSize = 10,
   className = '',
+  payload = [],
 }) => {
-  const renderCustomLegend = ({ payload }: RenderCustomLegendProps) => {
+  const renderCustomLegend = () => {
     if (!payload || payload.length === 0) return null;
 
     return (
@@ -53,16 +49,7 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
     );
   };
 
-  return (
-    <Legend
-      content={renderCustomLegend}
-      align={align}
-      verticalAlign={verticalAlign}
-      layout={layout}
-      iconType={iconType}
-      iconSize={iconSize}
-    />
-  );
+  return renderCustomLegend();
 };
 
 export default ChartLegend;

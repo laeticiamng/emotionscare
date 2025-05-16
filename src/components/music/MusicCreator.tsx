@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
 import { MusicTrack } from '@/types/music';
@@ -14,7 +13,7 @@ const MusicCreator: React.FC = () => {
   const [title, setTitle] = useState('');
   const [artist, setArtist] = useState('');
   const [tempo, setTempo] = useState(120);
-  const [mood, setMood] = useState('calm');
+  const [moodValue, setMoodValue] = useState('calm');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedTrack, setGeneratedTrack] = useState<MusicTrack | null>(null);
 
@@ -40,8 +39,7 @@ const MusicCreator: React.FC = () => {
         title,
         artist: artist || 'AI Composer',
         duration: Math.floor(Math.random() * 180) + 60, // 60-240 seconds
-        mood,
-        tempo,
+        emotion: moodValue,
         url: '/sounds/ambient-calm.mp3', // Placeholder
         coverUrl: '/images/music-cover.jpg', // Placeholder
         intensity: tempo / 180, // Normalize to 0-1 range
@@ -105,8 +103,8 @@ const MusicCreator: React.FC = () => {
           <select
             id="mood"
             className="w-full p-2 border rounded-md"
-            value={mood}
-            onChange={(e) => setMood(e.target.value)}
+            value={moodValue}
+            onChange={(e) => setMoodValue(e.target.value)}
           >
             <option value="calm">Calm</option>
             <option value="energetic">Energetic</option>
@@ -122,7 +120,7 @@ const MusicCreator: React.FC = () => {
           setTitle('');
           setArtist('');
           setTempo(120);
-          setMood('calm');
+          setMoodValue('calm');
         }}>
           Reset
         </Button>
@@ -136,7 +134,7 @@ const MusicCreator: React.FC = () => {
           <div className="bg-secondary p-4 rounded-lg">
             <h3 className="font-medium">Generated Track</h3>
             <p>"{generatedTrack.title}" by {generatedTrack.artist}</p>
-            <p>Duration: {Math.floor(generatedTrack.duration / 60)}:{(generatedTrack.duration % 60).toString().padStart(2, '0')}</p>
+            <p>Duration: {Math.floor(generatedTrack.duration! / 60)}:{(generatedTrack.duration! % 60).toString().padStart(2, '0')}</p>
             <audio src={generatedTrack.url} controls className="mt-2 w-full" />
           </div>
         </CardContent>

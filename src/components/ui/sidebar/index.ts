@@ -1,4 +1,26 @@
 
-export { default as Sidebar } from './Sidebar';
-export { SidebarSection } from './SidebarSection';
-export { SidebarItem } from './SidebarItem';
+import Sidebar from "./Sidebar";
+import SidebarContent from "./SidebarContent";
+import SidebarFooter from "./SidebarFooter";
+import SidebarGroup from "./SidebarGroup";
+import SidebarHeader from "./SidebarHeader";
+import SidebarSection from "./SidebarSection";
+import SidebarProvider from "./SidebarProvider";
+import SidebarTrigger from "./SidebarTrigger";
+import SidebarMenu from "./SidebarMenu";
+import SidebarMenuItem from "./SidebarMenuItem";
+import SidebarMenuButton from "./SidebarMenuButton";
+
+export {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarSection,
+  SidebarProvider,
+  SidebarTrigger,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+};

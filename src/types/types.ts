@@ -24,7 +24,7 @@ export interface User {
   emotional_score?: number;
 }
 
-export type UserRole = 'admin' | 'user' | 'guest' | 'premium';
+export type UserRole = 'admin' | 'user' | 'guest' | 'premium' | 'b2c' | 'b2b_user' | 'b2b_admin';
 
 export interface UserPreferences {
   theme: "system" | "light" | "dark" | "pastel";
@@ -62,8 +62,8 @@ export interface NotificationPreferences {
   frequency?: string;
 }
 
-export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans";
-export type FontSize = "small" | "medium" | "large" | "x-large" | "sm" | "lg" | "xl";
+export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "inter";
+export type FontSize = "small" | "medium" | "large" | "x-large" | "sm" | "md" | "lg" | "xl";
 export type ThemeName = "light" | "dark" | "system" | "pastel";
 
 export interface Period {

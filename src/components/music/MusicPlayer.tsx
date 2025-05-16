@@ -1,12 +1,11 @@
 
 import React from 'react';
-import { useMusic } from '@/contexts/music';
-import { Slider } from '@/components/ui/slider';
+import { useMusic } from '@/contexts/MusicContext';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music } from 'lucide-react';
-import ProgressBar from '@/components/music/player/ProgressBar';
+import { Play, Pause, SkipBack, SkipForward, Volume, VolumeX, Music } from 'lucide-react';
+import MusicProgressBar from './MusicProgressBar';
 
-const MusicPlayer = () => {
+const MusicPlayer: React.FC = () => {
   const { 
     currentTrack,
     isPlaying,
@@ -43,9 +42,9 @@ const MusicPlayer = () => {
         {/* Album cover and info */}
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="min-w-12 h-12 bg-blue-200 dark:bg-blue-800/30 rounded shadow-md overflow-hidden">
-            {currentTrack.coverUrl || currentTrack.cover_url ? (
+            {currentTrack.coverUrl ? (
               <img 
-                src={currentTrack.coverUrl || currentTrack.cover_url} 
+                src={currentTrack.coverUrl} 
                 alt={currentTrack.title} 
                 className="w-full h-full object-cover"
               />
@@ -90,7 +89,7 @@ const MusicPlayer = () => {
             </Button>
           </div>
 
-          <ProgressBar
+          <MusicProgressBar
             currentTime={currentTime || 0}
             duration={duration || 0}
             formatTime={formatTime}
@@ -106,13 +105,14 @@ const MusicPlayer = () => {
             onClick={toggleMute}
             className="text-blue-600 dark:text-blue-400 hover:bg-blue-200/50 dark:hover:bg-blue-800/30"
           >
-            {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            {muted ? <VolumeX className="h-4 w-4" /> : <Volume className="h-4 w-4" />}
           </Button>
-          <Slider
-            value={[muted ? 0 : volume * 100]}
-            max={100}
-            step={1}
-            onValueChange={(value) => setVolume(value[0] / 100)}
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={(muted ? 0 : volume) * 100}
+            onChange={(e) => setVolume(Number(e.target.value) / 100)}
             className="w-24"
           />
         </div>
