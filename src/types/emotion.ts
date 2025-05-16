@@ -1,95 +1,43 @@
 
+// Create emotion types file
 export interface Emotion {
-  emotion: string;
-  intensity?: number;
-  score?: number;
-  date?: string;
-  confidence?: number;
+  name: string;
+  score: number;
+  color: string;
+  icon?: string;
 }
 
 export interface EmotionResult {
-  id: string;
-  user_id?: string;
+  id: string; // Required prop
   emotion: string;
-  emojis?: string;
-  score?: number;
-  confidence?: number;
-  intensity?: number;
-  timestamp?: string;
-  date?: string;
+  score: number;
+  confidence: number;
   text?: string;
-  transcript?: string;
-  feedback?: string;
-  recommendations?: string[];
-  audioUrl?: string; // Ajouté pour AudioProcessor
+  feedback?: string; // Use feedback instead of ai_feedback
+  timestamp?: string;
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
   triggers?: string[];
-  suggestions?: string[];
-  risk_level?: 'low' | 'medium' | 'high';
+  recommendations?: string[];
 }
 
 export interface EmotionalTeamViewProps {
-  teamData: Array<{
-    user: { id: string; name: string; avatar?: string };
-    emotion: EmotionResult;
-  }>;
   teamId?: string;
   period?: string;
-  userId?: string;
-  anonymized?: boolean;
-  className?: string;
 }
 
 export interface LiveVoiceScannerProps {
   onResult?: (result: EmotionResult) => void;
   autoStart?: boolean;
-  stopAfterSeconds?: number;
-  duration?: number; // Ajouté pour UnifiedEmotionCheckin
-  className?: string;
 }
 
 export interface VoiceEmotionScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  autoStart?: boolean;
-  duration?: number;
-  showVisualizer?: boolean;
-  className?: string;
+  onComplete?: (result: EmotionResult) => void;
+  audioOnly?: boolean;
 }
 
 export interface TeamOverviewProps {
-  teamData?: Array<{
-    user: { id: string; name: string; avatar?: string };
-    emotion: EmotionResult;
-  }>;
   teamId?: string;
-  userId?: string;
-  period?: string;
-  anonymized?: boolean;
-  className?: string;
-  dateRange?: { start: Date; end: Date };
-  users?: any[];
-  showNames?: boolean;
-  compact?: boolean;
-}
-
-export interface AudioProcessorProps {
-  onResultReady?: (result: EmotionResult) => void;
-  autoStart?: boolean;
-  maxDuration?: number;
-  headerText?: string;
-  subHeaderText?: string;
-  onResult?: (result: EmotionResult) => void;
-}
-
-export interface EmotionTrendChartProps {
-  emotions: EmotionResult[];
-  period?: 'day' | 'week' | 'month' | 'year';
-}
-
-export interface MoodBasedRecommendationsProps {
-  mood: string;
-  standalone?: boolean;
-  intensity?: number; // Ajouté pour CompletionSection
+  period?: 'day' | 'week' | 'month';
 }

@@ -1,134 +1,93 @@
 
-// Music types
+// Create or update the file for music-related types
 export interface MusicTrack {
   id: string;
   title: string;
-  artist: string;
+  artist?: string;
   duration: number;
-  url?: string;
+  url: string;
   audioUrl?: string;
   coverUrl?: string;
-  cover_url?: string;
-  album?: string;
-  track_url?: string;
-  mood?: string;
-  genre?: string;
-  emotionalTone?: string;
-  coverImage?: string;
-  cover?: string;
   category?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
-  title?: string;
-  name?: string;
-  coverUrl?: string;
-  cover_url?: string;
-  description?: string;
+  name: string;
   tracks: MusicTrack[];
-  mood?: string;
-  emotion?: string;
-  category?: string;
-}
-
-export interface EmotionMusicParams {
-  emotion: string;
-  intensity?: number;
-  duration?: number;
+  coverUrl?: string;
 }
 
 export interface MusicContextType {
   isPlaying: boolean;
   currentTrack: MusicTrack | null;
-  playlists: MusicPlaylist[];
-  currentPlaylist: MusicPlaylist | null;
-  playlist?: MusicPlaylist | null;
-  togglePlay: () => void;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
+  play: (track: MusicTrack) => void;
+  pause: () => void;
+  resume: () => void;
+  stop: () => void;
+  next: () => void;
+  previous: () => void;
   volume: number;
   setVolume: (volume: number) => void;
-  toggleMute: () => void;
+  mute: () => void;
+  unmute: () => void;
   isMuted: boolean;
+  progress: number;
   duration: number;
-  currentTime: number;
-  seekTo: (time: number) => void;
-  queue?: MusicTrack[];
-  addToQueue?: (track: MusicTrack) => void;
-  clearQueue?: () => void;
-  toggleShuffle?: () => void;
-  toggleRepeat?: () => void;
-  isShuffled?: boolean;
-  isRepeating?: boolean;
-  openDrawer?: boolean;
-  setOpenDrawer?: (open: boolean) => void;
-  setEmotion: (emotion: string) => void;
-  loadPlaylistForEmotion: (emotion: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
-  currentEmotion: string | null;
-  progress?: number;
-  error?: Error | null;
-  muted?: boolean;
-  resumeTrack?: () => void;
-  loadTrack?: (track: MusicTrack) => void;
-  adjustVolume?: (increment: boolean) => void;
-  setPlaylist?: (playlist: MusicPlaylist) => void;
-  isInitialized?: boolean;
-  initializeMusicSystem?: () => void;
-  setProgress?: (time: number) => void;
-  togglePlayback?: () => void;
+  playlistId?: string;
+  playlist?: MusicPlaylist;
+  setPlaylist: (playlist: MusicPlaylist) => void;
 }
 
+export interface MusicDrawerProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+// Music library props
+export interface MusicLibraryProps {
+  playlists: MusicPlaylist[];
+  onSelectTrack: (track: MusicTrack) => void; // Add missing property
+  onSelectPlaylist: (playlist: MusicPlaylist) => void; // Add missing property
+}
+
+// Add missing Track interface
+export interface Track {
+  id: string;
+  title: string;
+  artist?: string;
+  url: string;
+  audioUrl?: string;
+  coverUrl?: string;
+  cover?: string;
+  duration?: number;
+  emotion?: string;
+  intensity?: number;
+  category?: string;
+}
+
+// Add missing ProgressBarProps interface
 export interface ProgressBarProps {
-  currentTime: number;
-  duration: number;
-  formatTime: (seconds: number) => string;
-  onSeek: (value: number) => void;
-  max?: number;
-  progress?: number;
-  className?: string;
-  showTimestamps?: boolean;
+  progress: number;
+  total: number;
+  onSeek?: (position: number) => void;
 }
 
+// Add missing TrackInfoProps interface
+export interface TrackInfoProps {
+  track: MusicTrack | null;
+}
+
+// Add missing VolumeControlProps interface
 export interface VolumeControlProps {
   volume: number;
-  onChange?: (volume: number) => void;
-  onVolumeChange?: (volume: number) => void;
-  isMuted?: boolean;
-  onMuteToggle?: () => void;
-  className?: string;
-  showLabel?: boolean;
+  onVolumeChange: (volume: number) => void;
+  isMuted: boolean;
+  onToggleMute: () => void;
 }
 
-export interface MusicControlsProps {
-  isPlaying?: boolean;
-  onPlay?: () => void;
-  onPause?: () => void;
-  onTogglePlay?: () => void;
-  onPrevious?: () => void;
-  onNext?: () => void;
-  currentTime?: number;
-  duration?: number;
-  onSeek?: (time: number) => void;
-  volume?: number;
-  isMuted?: boolean;
-  onToggleMute?: () => void;
-  onVolumeChange?: (volume: number) => void;
-  track?: MusicTrack;
-  showVolume?: boolean;
-  size?: 'sm' | 'md' | 'lg';
-  vertical?: boolean;
-  className?: string;
-}
-
-export interface MusicLibraryProps {
-  onTrackSelect?: (track: MusicTrack) => void;
-  currentTrack?: MusicTrack | null;
-  isPlaying?: boolean;
-  searchTerm?: string;
-  onSearchChange?: (term: string) => void;
-  tracks?: MusicTrack[];
-  playlists?: MusicPlaylist[];
+// Add missing EmotionMusicParams interface
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
 }

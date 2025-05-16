@@ -1,58 +1,53 @@
 
-import React, { useCallback, memo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { isAdminRole } from '@/utils/roleUtils';
-import useLogger from '@/hooks/useLogger';
 
 interface NavItemProps {
-  icon: React.ReactNode;
+  href: string;
   label: string;
-  to: string;
-  active?: boolean;
+  isActive: boolean;
+  icon?: React.ReactNode;
+  onClick?: () => void;
+  requiresAuth?: boolean;
+  adminOnly?: boolean;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user } = useAuth();
-  const logger = useLogger('NavItem');
-  const isAdmin = user ? isAdminRole(user.role) : false;
+const NavItem: React.FC<NavItemProps> = ({
+  href,
+  label,
+  isActive,
+  icon,
+  onClick,
+  requiresAuth = false,
+  adminOnly = false,
+}) => {
+  const { user, isAuthenticated } = useAuth();
   
-  // Si active n'est pas explicitement fourni, déterminer à partir de l'emplacement actuel
-  const isActive = active !== undefined 
-    ? active 
-    : location.pathname === to || (to !== '/' && location.pathname.startsWith(to));
-
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    
-    // Pour les utilisateurs admin, rediriger vers la version admin de certaines pages
-    let targetPath = to;
-    if (isAdmin && to === '/dashboard') {
-      // L'admin reste sur /dashboard qui contient déjà la vue admin
-      targetPath = '/dashboard';
-    }
-    
-    logger.debug(`Navigation item clicked`, { data: { label, to: targetPath } });
-    navigate(targetPath);
-  }, [to, isAdmin, navigate, label, logger]);
-
+  // Don't render if item requires authentication but user is not authenticated
+  if (requiresAuth && !isAuthenticated) return null;
+  
+  // Don't render if item is admin-only and user is not an admin
+  if (adminOnly && (!user || !isAdminRole(user.role))) return null;
+  
   return (
-    <button
-      className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary ${
-        isActive ? 'bg-secondary text-foreground' : 'text-muted-foreground'
-      }`}
-      onClick={handleClick}
-      data-active={isActive}
-      aria-current={isActive ? 'page' : undefined}
-      data-testid={`nav-item-${label.toLowerCase().replace(/\s+/g, '-')}`}
+    <Link
+      to={href}
+      onClick={onClick}
+      className={cn(
+        "flex items-center px-4 py-2 text-sm font-medium transition-colors",
+        isActive 
+          ? "bg-primary text-primary-foreground" 
+          : "hover:bg-accent hover:text-accent-foreground",
+        "rounded-md"
+      )}
     >
-      {icon}
+      {icon && <span className="mr-2">{icon}</span>}
       {label}
-    </button>
+    </Link>
   );
 };
 
-// Utiliser memo pour éviter les renders inutiles
-export default memo(NavItem);
+export default NavItem;

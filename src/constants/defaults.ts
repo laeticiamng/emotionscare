@@ -6,6 +6,9 @@ export enum TimeOfDay {
   NIGHT = 'night'
 }
 
+// Add DEFAULT_THEME constant
+export const DEFAULT_THEME = 'light';
+
 export const DEFAULT_PREFERENCES = {
   theme: 'system',
   fontSize: 'medium',
@@ -20,12 +23,21 @@ export const DEFAULT_PREFERENCES = {
   language: 'fr',
   privacy: {
     shareData: false,
-    allowAnalytics: true
+    allowAnalytics: true,
+    // Add missing properties for UserDetailView
+    showProfile: true,
+    shareActivity: true,
+    allowMessages: true
   },
   notifications: {
     email: true,
     push: true,
     sms: false,
-    frequency: 'daily'
+    frequency: 'daily',
+    enabled: true, // Add the missing enabled property
+    // Add properties needed by the components
+    emailEnabled: true,
+    pushEnabled: true,
+    inAppEnabled: true
   }
 };

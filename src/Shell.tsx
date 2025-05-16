@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -68,7 +67,7 @@ const Shell: React.FC = () => {
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[240px] sm:w-[300px]">
+              <SheetContent className="w-[240px] sm:w-[300px]">
                 <div className="py-6">
                   <h2 className="text-lg font-semibold mb-4 px-3">Menu</h2>
                   <nav className="space-y-2">

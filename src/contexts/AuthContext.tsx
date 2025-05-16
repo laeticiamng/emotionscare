@@ -1,155 +1,128 @@
 
-import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
-import { User } from '@/types/user';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, AuthContextType } from '@/types/user';
 
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-  login: (email: string, password: string) => Promise<User | null>;
-  logout: () => Promise<void>;
-  clearError: () => void;
-}
-
-const AuthContext = createContext<AuthContextType>({
+const initialState: AuthContextType = {
   user: null,
   isAuthenticated: false,
   isLoading: true,
   error: null,
   login: async () => null,
   logout: async () => {},
-  clearError: () => {}
-});
+  clearError: () => {},
+  updateUser: async () => {}  // Add updateUser implementation
+};
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthContext = createContext<AuthContextType>(initialState);
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Check for existing session on load
-    const checkSession = async () => {
-      try {
-        const token = localStorage.getItem('auth_session');
-        const role = localStorage.getItem('user_role');
-        
-        if (token) {
-          // Mock user data based on role
-          const mockUser: User = {
-            id: '1',
-            name: role === 'b2b_admin' ? 'Admin Test' : role === 'b2b_user' ? 'Collaborateur Test' : 'Utilisateur Test',
-            email: role === 'b2b_admin' ? 'admin@exemple.fr' : role === 'b2b_user' ? 'collaborateur@exemple.fr' : 'user@exemple.fr',
-            role: role as any || 'b2c',
-            avatar_url: '/images/avatar.jpg'
-          };
-          
-          setUser(mockUser);
-        }
-      } catch (err) {
-        console.error('Error checking session:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkSession();
-  }, []);
-
+  // Mock login function for demonstration
   const login = async (email: string, password: string): Promise<User | null> => {
     setIsLoading(true);
     setError(null);
-
+    
     try {
-      // Mock authentication for demo
-      if (email === 'admin@exemple.fr' && password === 'admin') {
-        const user: User = {
-          id: '1',
-          name: 'Admin Test',
-          email: 'admin@exemple.fr',
-          role: 'b2b_admin',
-          avatar_url: '/images/avatar-admin.jpg'
-        };
-        
-        localStorage.setItem('auth_session', 'mock_token_admin');
-        localStorage.setItem('user_role', 'b2b_admin');
-        setUser(user);
-        return user;
-      } 
-      else if (email === 'collaborateur@exemple.fr' && password === 'admin') {
-        const user: User = {
-          id: '2',
-          name: 'Collaborateur Test',
-          email: 'collaborateur@exemple.fr',
-          role: 'b2b_user',
-          avatar_url: '/images/avatar-user.jpg'
-        };
-        
-        localStorage.setItem('auth_session', 'mock_token_b2b_user');
-        localStorage.setItem('user_role', 'b2b_user');
-        setUser(user);
-        return user;
-      }
-      else if (email === 'user@exemple.fr' && password === 'password') {
-        const user: User = {
-          id: '3',
-          name: 'Utilisateur Test',
-          email: 'user@exemple.fr',
-          role: 'b2c',
-          avatar_url: '/images/avatar-b2c.jpg'
-        };
-        
-        localStorage.setItem('auth_session', 'mock_token_b2c');
-        localStorage.setItem('user_role', 'b2c');
-        setUser(user);
-        return user;
-      }
-      else {
-        throw new Error('Email ou mot de passe incorrect');
-      }
-    } catch (err: any) {
-      setError(err.message || 'Erreur de connexion');
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock user data
+      const userData: User = {
+        id: '1',
+        name: 'Test User',
+        email: email,
+        role: 'b2c',
+        avatar_url: '/avatars/default.png',
+        created_at: new Date().toISOString()
+      };
+      
+      setUser(userData);
+      setIsAuthenticated(true);
+      localStorage.setItem('user', JSON.stringify(userData));
+      
+      return userData;
+    } catch (err) {
+      setError('Login failed. Please check your credentials.');
       return null;
     } finally {
       setIsLoading(false);
     }
   };
-
+  
+  // Mock logout function
   const logout = async (): Promise<void> => {
-    setIsLoading(true);
-    try {
-      // Clear local storage
-      localStorage.removeItem('auth_session');
-      localStorage.removeItem('user_role');
-      localStorage.removeItem('userMode');
-      
-      setUser(null);
-    } catch (err: any) {
-      setError(err.message || 'Erreur de déconnexion');
-    } finally {
-      setIsLoading(false);
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    setUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('user');
   };
-
-  const clearError = () => {
+  
+  // Clear error state
+  const clearError = (): void => {
     setError(null);
   };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        isLoading,
-        error,
-        login,
-        logout,
-        clearError
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  
+  // Add updateUser function
+  const updateUser = async (userData: Partial<User>): Promise<void> => {
+    if (!user) return;
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const updatedUser = { ...user, ...userData };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    } catch (err) {
+      setError('Failed to update user data.');
+    }
+  };
+  
+  // Check for existing session on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      setIsLoading(true);
+      
+      try {
+        const storedUser = localStorage.getItem('user');
+        
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          setUser(userData);
+          setIsAuthenticated(true);
+        }
+      } catch (err) {
+        console.error('Authentication check failed', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+  
+  const value = {
+    user,
+    isAuthenticated,
+    isLoading,
+    error,
+    login,
+    logout,
+    clearError,
+    updateUser
+  };
+  
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);

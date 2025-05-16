@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { X, Menu, Home, Settings, Bell, User, Moon, Sun, Users, BookOpen } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import ThemeToggle from '../theme/ThemeToggle';
+import { ThemeToggle } from '../theme/ThemeToggle';
 
 interface MobileNavigationProps {
   className?: string;
