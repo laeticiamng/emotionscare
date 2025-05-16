@@ -7,7 +7,7 @@ import { isAdminRole } from '@/utils/roleUtils';
 
 interface NavItemProps {
   href?: string;
-  to?: string; // Add 'to' property to support newer components
+  to?: string;  // Support for both 'to' and 'href' props
   label: string;
   isActive?: boolean;
   active?: boolean; // Alternative name for isActive

@@ -1,16 +1,11 @@
 
 import React from 'react';
-import { useLocation, Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
-// Cette page est un routeur qui redirige vers le bon type de login en fonction de l'URL
+// This page redirects to the appropriate login page based on the URL
 const LoginPage: React.FC = () => {
   const location = useLocation();
   const path = location.pathname;
-
-  if (path === '/login') {
-    // Rediriger vers le login B2C par défaut
-    return <Navigate to="/b2c/login" replace />;
-  }
 
   if (path.includes('/b2c/login')) {
     return <Navigate to="/b2c/login" replace />;
@@ -19,7 +14,7 @@ const LoginPage: React.FC = () => {
   } else if (path.includes('/b2b/admin/login')) {
     return <Navigate to="/b2b/admin/login" replace />;
   } else {
-    // En cas de doute, rediriger vers le login B2C
+    // Redirect to B2C login as default
     return <Navigate to="/b2c/login" replace />;
   }
 };

@@ -2,7 +2,9 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import NotFoundPage from '@/pages/NotFoundPage';
-import Home from '@/pages/Home';
+import LandingPage from '@/pages/LandingPage';
+
+// Login pages
 import LoginPage from '@/pages/common/Login';
 import RegisterPage from '@/pages/common/Register';
 import OnboardingPage from '@/pages/common/Onboarding';
@@ -63,16 +65,19 @@ const NotImplemented = () => (
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      {/* Public routes */}
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/onboarding" element={<OnboardingPage />} />
+      {/* Root route - single home page */}
+      <Route path="/" element={<LandingPage />} />
+      
+      {/* Auth routes */}
+      <Route path="/b2c/login" element={<LoginPage />} />
+      <Route path="/b2b/user/login" element={<LoginPage />} />
+      <Route path="/b2b/admin/login" element={<LoginPage />} />
+      <Route path="/b2c/register" element={<RegisterPage />} />
+      <Route path="/b2c/onboarding" element={<OnboardingPage />} />
       <Route path="/b2b/selection" element={<B2BSelectionPage />} />
 
       {/* B2C Routes */}
       <Route path="/b2c" element={<B2CLayout />}>
-        <Route index element={<B2CDashboard />} />
         <Route path="dashboard" element={<B2CDashboard />} />
         <Route path="journal" element={<B2CJournal />} />
         <Route path="music" element={<B2CMusic />} />
@@ -94,7 +99,6 @@ export const AppRoutes: React.FC = () => {
 
       {/* B2B User Routes */}
       <Route path="/b2b/user" element={<B2BUserLayout />}>
-        <Route index element={<B2BUserDashboard />} />
         <Route path="dashboard" element={<B2BUserDashboard />} />
         <Route path="journal" element={<B2BUserJournal />} />
         <Route path="music" element={<B2BUserMusic />} />
@@ -116,7 +120,6 @@ export const AppRoutes: React.FC = () => {
 
       {/* B2B Admin Routes */}
       <Route path="/b2b/admin" element={<B2BAdminLayout />}>
-        <Route index element={<B2BAdminDashboard />} />
         <Route path="dashboard" element={<B2BAdminDashboard />} />
         <Route path="journal" element={<B2BAdminJournal />} />
         <Route path="scan" element={<B2BAdminScan />} />
@@ -128,7 +131,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="coach-analytics" element={<B2BAdminCoachAnalytics />} />
       </Route>
       
-      {/* Catch all */}
+      {/* Catch all - 404 */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

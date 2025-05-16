@@ -16,10 +16,17 @@ const LandingPage: React.FC = () => {
           </p>
         </div>
         
-        <div className="flex justify-center mt-8 space-x-4">
+        <div className="flex flex-col sm:flex-row justify-center mt-8 space-y-4 sm:space-y-0 sm:space-x-4">
           <Button asChild size="lg">
-            <Link to="/immersif">
-              Découvrir l'expérience immersive
+            <Link to="/b2c/login">
+              Espace Personnel
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+          
+          <Button asChild size="lg" variant="outline">
+            <Link to="/b2b/selection">
+              Espace Entreprise
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

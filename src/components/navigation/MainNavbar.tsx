@@ -28,10 +28,10 @@ const MainNavbar: React.FC = () => {
         
         <div className="flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
-            <Link to="/login">Connexion</Link>
+            <Link to="/b2c/login">Connexion</Link>
           </Button>
           <Button asChild size="sm">
-            <Link to="/immersif">Démarrer</Link>
+            <Link to="/b2c/dashboard">Démarrer</Link>
           </Button>
         </div>
       </div>

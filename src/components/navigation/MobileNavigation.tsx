@@ -44,31 +44,31 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ className }) => {
       requiresAuth: false,
     },
     {
-      href: '/scan',
+      href: '/b2c/scan',
       label: 'Scanner',
       icon: Bell,
       requiresAuth: true,
     },
     {
-      href: '/journal',
+      href: '/b2c/journal',
       label: 'Journal',
       icon: BookOpen,
       requiresAuth: true,
     },
     {
-      href: '/community',
+      href: '/b2c/community',
       label: 'Communauté',
       icon: Users,
       requiresAuth: true,
     },
     {
-      href: '/profile',
+      href: '/b2c/profile',
       label: 'Profil',
       icon: User,
       requiresAuth: true,
     },
     {
-      href: '/preferences',
+      href: '/b2c/preferences',
       label: 'Préférences',
       icon: Settings,
       requiresAuth: true,
@@ -114,12 +114,12 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ className }) => {
               </Button>
             ) : (
               <>
-                <Link to="/login">
+                <Link to="/b2c/login">
                   <Button variant="secondary" className="w-full mb-2">
                     Se connecter
                   </Button>
                 </Link>
-                <Link to="/register">
+                <Link to="/b2c/register">
                   <Button className="w-full">S'inscrire</Button>
                 </Link>
               </>
