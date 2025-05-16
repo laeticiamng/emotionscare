@@ -1,114 +1,105 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { ArrowDown, ArrowRight, ArrowUp, LucideIcon } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
+import { cva } from 'class-variance-authority';
 import { DraggableCardProps } from './types';
 
+const cardVariants = cva(
+  "text-card-foreground shadow-sm transition-all hover:shadow-md",
+  {
+    variants: {
+      status: {
+        default: "bg-card border",
+        success: "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900",
+        warning: "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-900",
+        danger: "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900",
+        info: "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900",
+      },
+    },
+    defaultVariants: {
+      status: "default",
+    },
+  }
+);
+
 const DraggableCard: React.FC<DraggableCardProps> = ({
-  id,
   title,
   value,
   icon,
   delta,
   subtitle,
+  ariaLabel,
   onClick,
-  status = 'primary'
+  status,
 }) => {
-  // Handle delta display
-  const getDeltaInfo = () => {
+  const getDeltaElement = () => {
     if (!delta) return null;
-
-    let deltaValue: number;
-    let trend: 'up' | 'down' | 'neutral';
-    let label: string | undefined;
-
+    
+    // Handle case where delta is a number
     if (typeof delta === 'number') {
-      deltaValue = delta;
-      trend = delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral';
-    } else {
-      deltaValue = delta.value;
-      trend = delta.trend;
-      label = delta.label;
+      const deltaObj = {
+        value: delta,
+        trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral'
+      } as const;
+      
+      return renderDelta(deltaObj);
     }
-
-    const colors = {
-      up: 'text-emerald-500',
-      down: 'text-red-500',
-      neutral: 'text-gray-500',
-    };
-
-    const icons = {
-      up: <ArrowUp className="h-4 w-4" />,
-      down: <ArrowDown className="h-4 w-4" />,
-      neutral: <ArrowRight className="h-4 w-4" />,
-    };
-
+    
+    return renderDelta(delta);
+  };
+  
+  const renderDelta = (deltaInfo: { value: number, trend: 'up' | 'down' | 'neutral', label?: string }) => {
+    const { value, trend, label } = deltaInfo;
+    
+    const trendColor = 
+      trend === 'up' 
+        ? 'text-green-600 dark:text-green-400' 
+        : trend === 'down' 
+          ? 'text-red-600 dark:text-red-400' 
+          : 'text-gray-500';
+    
+    const TrendIcon = 
+      trend === 'up' 
+        ? ArrowUpRight 
+        : trend === 'down' 
+          ? ArrowDownRight 
+          : Minus;
+    
     return (
-      <div className={`flex items-center gap-1 ${colors[trend]}`}>
-        {icons[trend]}
-        <span>
-          {deltaValue > 0 && '+'}
-          {deltaValue}%
-          {label && ` ${label}`}
-        </span>
+      <div className={`flex items-center ${trendColor} text-sm font-medium`}>
+        <TrendIcon className="h-4 w-4 mr-1" />
+        <span>{value > 0 ? '+' : ''}{value.toFixed(1)}%</span>
+        {label && <span className="ml-1 text-muted-foreground text-xs">({label})</span>}
       </div>
     );
   };
 
-  // Status colors
-  const statusColors = {
-    primary: 'bg-primary/10 text-primary',
-    secondary: 'bg-secondary/10 text-secondary',
-    success: 'bg-emerald-500/10 text-emerald-500',
-    warning: 'bg-amber-500/10 text-amber-500',
-    danger: 'bg-red-500/10 text-red-500',
-    info: 'bg-sky-500/10 text-sky-500',
-  };
-
-  // Determine icon component
-  const IconComponent = () => {
-    if (!icon) return null;
-    
-    // If icon is a ReactNode (already rendered component)
-    if (React.isValidElement(icon)) {
-      return <div className="p-2 rounded-full bg-muted">{icon}</div>;
-    }
-    
-    // If icon is a LucideIcon component type
-    const LucideIconComponent = icon as LucideIcon;
-    if (typeof LucideIconComponent === 'function') {
-      return (
-        <div className="p-2 rounded-full bg-muted">
-          <LucideIconComponent className="h-5 w-5" />
-        </div>
-      );
-    }
-    
-    // Fallback
-    return null;
-  };
-
   return (
     <Card 
-      className={cn(
-        "transition-all border shadow-sm hover:shadow-md cursor-grab active:cursor-grabbing",
-        onClick && "hover:border-primary"
-      )}
+      className={cardVariants({ status })}
+      aria-label={ariaLabel}
       onClick={onClick}
-      data-id={id}
     >
-      <CardHeader className="p-4 pb-2">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <IconComponent />
+      <CardContent className="p-6">
+        <div className="flex justify-between items-start">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
+            <h3 className="text-2xl font-bold">{value}</h3>
+          </div>
+          
+          {icon && (
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              {React.isValidElement(icon) ? icon : null}
+            </div>
+          )}
         </div>
-      </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <div className="space-y-1">
-          <p className="text-2xl font-bold">{value}</p>
-          {getDeltaInfo()}
-          {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+        
+        <div className="mt-2 space-y-1">
+          {getDeltaElement()}
+          {subtitle && (
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
+          )}
         </div>
       </CardContent>
     </Card>

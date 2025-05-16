@@ -1,229 +1,222 @@
-
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { VRSessionTemplate } from '@/types';
-import { Progress } from '@/components/ui/progress';
-import { Sparkles, Clock, Calendar } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { GamificationStats, VRSessionTemplate } from '@/types';
+import { CalendarDays, Edit, Medal, Star } from 'lucide-react';
 
-export const JournalLatestSection: React.FC = () => {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Votre dernier journal</CardTitle>
-        <CardDescription>Il y a 2 jours</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <h3 className="font-semibold text-lg">Ma journée productive</h3>
-          <p className="text-muted-foreground line-clamp-3">
-            Aujourd'hui a été une journée particulièrement productive. J'ai réussi à terminer plusieurs tâches
-            importantes et je me sens vraiment satisfait de mon travail...
-          </p>
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <span className="text-sm font-medium mr-2">Humeur:</span>
-              <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full dark:bg-green-800/30 dark:text-green-300">
-                Satisfaction
-              </span>
-            </div>
-            <Button variant="outline" size="sm">Continuer à écrire</Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
+export interface ProgressLatestSectionProps {
+  progress: GamificationStats;
+}
 
-export const RecommendedVRSection: React.FC = () => {
-  const recommendedSession: VRSessionTemplate = {
-    id: '123',
-    title: 'Méditation sur la plage',
-    description: 'Une session relaxante avec le bruit des vagues',
-    duration: 15,
-    tags: ['relaxation', 'nature', 'débutant'],
-    theme: 'nature',
-    is_audio_only: true,
-    preview_url: '/assets/previews/beach-meditation.mp4',
-    audio_url: '/assets/audio/beach-waves.mp3',
-    vr_url: '/vr/beach-scene',
-    thumbnailUrl: '/assets/thumbnails/beach.jpg',
-    emotionTarget: 'calm'
-  };
-
-  const audioOnlySession = {
-    id: '124',
-    title: 'Respiration guidée',
-    description: 'Technique de respiration pour la relaxation',
-    duration: 10,
-    tags: ['respiration', 'relaxation', 'débutant'],
-    theme: 'mindfulness',
-    is_audio_only: true,
-    preview_url: '/assets/previews/guided-breathing.mp4',
-    audio_url: '/assets/audio/guided-breathing.mp3',
-    vr_url: '',
-    thumbnailUrl: '/assets/thumbnails/breathing.jpg',
-    emotionTarget: 'calm'
-  };
+// Section for the latest VR sessions recommended
+export const RecommendedVRSection = () => {
+  const recommendedSessions: VRSessionTemplate[] = [
+    {
+      id: '1',
+      title: 'Méditation guidée',
+      description: 'Une session de méditation pour la détente et le bien-être',
+      duration: 10,
+      tags: ['relaxation', 'débutant'],
+      theme: 'nature',
+      is_audio_only: true,
+      preview_url: '/images/vr-preview-1.jpg',
+      audio_url: '/audio/meditation-1.mp3',
+      emotionTarget: 'calme',
+      thumbnailUrl: '/images/vr-banner-bg.jpg'
+    },
+    {
+      id: '2',
+      title: 'Booster de confiance',
+      description: 'Transformez votre état d\'esprit et augmentez votre confiance',
+      duration: 15,
+      tags: ['confiance', 'intermédiaire'],
+      theme: 'abstrait',
+      preview_url: '/images/vr-preview-2.jpg',
+      emotionTarget: 'confiance',
+      thumbnailUrl: '/images/vr-banner-bg.jpg'
+    }
+  ];
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Recommandations pour vous</CardTitle>
-        <CardDescription>Basées sur votre humeur récente</CardDescription>
+        <CardTitle className="flex items-center gap-2">
+          <Star className="h-5 w-5 text-primary" />
+          Sessions VR recommandées
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          <div>
-            <h3 className="font-semibold text-lg mb-1 flex items-center">
-              <Sparkles className="h-5 w-5 mr-2 text-amber-500" />
-              Session recommandée
-            </h3>
-            <div className="bg-muted rounded-lg p-4">
-              <div className="flex gap-4">
-                <div className="w-20 h-20 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0">
-                  {/* Placeholder for thumbnail */}
-                  <div className="w-full h-full bg-gradient-to-br from-blue-400 to-indigo-600"></div>
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-medium">{recommendedSession.title}</h4>
-                  <p className="text-sm text-muted-foreground">{recommendedSession.description}</p>
-                  <div className="flex items-center mt-2 text-xs text-muted-foreground">
-                    <Clock className="h-3 w-3 mr-1" />
-                    {recommendedSession.duration} minutes
-                  </div>
-                  <div className="flex gap-2 mt-2">
-                    {recommendedSession.tags?.map((tag) => (
-                      <span 
-                        key={tag}
-                        className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <Button className="w-full mt-4" size="sm">Démarrer la session</Button>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-muted/50 rounded-lg p-3">
-              <div className="flex gap-3">
-                <div className="w-12 h-12 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0">
-                  {/* Placeholder for thumbnail */}
-                  <div className="w-full h-full bg-gradient-to-br from-green-400 to-teal-600"></div>
-                </div>
-                <div>
-                  <h4 className="font-medium text-sm">Méditation guidée</h4>
-                  <div className="flex items-center mt-1 text-xs text-muted-foreground">
-                    <Clock className="h-3 w-3 mr-1" />
-                    8 minutes
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-muted/50 rounded-lg p-3">
-              <div className="flex gap-3">
-                <div className="w-12 h-12 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0">
-                  {/* Placeholder for thumbnail */}
-                  <div className="w-full h-full bg-gradient-to-br from-purple-400 to-pink-600"></div>
-                </div>
-                <div>
-                  <h4 className="font-medium text-sm">Forêt apaisante</h4>
-                  <div className="flex items-center mt-1 text-xs text-muted-foreground">
-                    <Clock className="h-3 w-3 mr-1" />
-                    12 minutes
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
+        <div className="grid gap-4">
+          {recommendedSessions.map(session => (
+            <div 
+              key={session.id}
+              className="flex flex-col md:flex-row md:items-center gap-4 p-3 bg-accent/40 rounded-lg"
+            >
+              <div 
+                className="w-full md:w-24 h-20 rounded-md bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url(${session.thumbnailUrl})` }}
+              />
 
-export const ProgressLatestSection: React.FC<{ progress: any }> = ({ progress }) => {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Votre progression</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div>
-            <div className="flex justify-between mb-1">
-              <span className="text-sm font-medium">Niveau {progress.level}</span>
-              <span className="text-sm text-muted-foreground">
-                {progress.points} / {progress.nextLevel.points} points
-              </span>
-            </div>
-            <Progress value={progress.progress * 100} className="h-2" />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-muted rounded-lg p-3 text-center">
-              <p className="text-xs text-muted-foreground">Streak actuel</p>
-              <p className="text-xl font-bold">{progress.streak} jours</p>
-            </div>
-            <div className="bg-muted rounded-lg p-3 text-center">
-              <p className="text-xs text-muted-foreground">Points</p>
-              <p className="text-xl font-bold">{progress.points}</p>
-            </div>
-          </div>
-          
-          <div>
-            <p className="text-sm text-muted-foreground mb-2">
-              Il vous manque {progress.nextLevel.points - progress.points} points pour le niveau {progress.nextLevel.level}
-            </p>
-            <Button variant="outline" size="sm" className="w-full">
-              Voir toutes vos récompenses
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-export const MoodHistorySection: React.FC = () => {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Historique d'humeur</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <div className="bg-muted w-10 h-10 rounded-full flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <div className="flex items-center">
-                  <span className="font-medium">
-                    {i === 0 ? 'Aujourd\'hui' : i === 1 ? 'Hier' : `Il y a ${i} jours`}
-                  </span>
-                  <span 
-                    className={`ml-2 w-2 h-2 rounded-full ${
-                      i % 3 === 0 ? 'bg-green-500' : i % 3 === 1 ? 'bg-blue-500' : 'bg-amber-500'
-                    }`}
-                  ></span>
+              <div className="flex-grow">
+                <h3 className="font-medium">{session.title}</h3>
+                <p className="text-sm text-muted-foreground line-clamp-1">{session.description}</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Badge variant="outline">{session.duration} min</Badge>
+                  {session.emotionTarget && (
+                    <Badge variant="secondary">{session.emotionTarget}</Badge>
+                  )}
+                  {session.is_audio_only && (
+                    <Badge variant="outline">Audio uniquement</Badge>
+                  )}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {i % 3 === 0 ? 'Calme' : i % 3 === 1 ? 'Joyeux' : 'Concentré'}
-                </p>
+              </div>
+
+              <div className="mt-3 md:mt-0">
+                <Button size="sm">Démarrer</Button>
               </div>
             </div>
           ))}
-          
-          <Button variant="link" size="sm" className="w-full mt-2">
-            Voir l'historique complet
-          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Section for the latest journal entries
+export const JournalLatestSection = () => {
+  const latestEntries = [
+    { id: '1', title: 'Journée productive', date: '2023-05-15', mood: 'Positif', content: 'Aujourd\'hui a été une journée très productive...' },
+    { id: '2', title: 'Réflexions sur le projet', date: '2023-05-14', mood: 'Neutre', content: 'Je dois revoir certains aspects du projet...' }
+  ];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Edit className="h-5 w-5 text-primary" />
+          Journal
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {latestEntries.length === 0 ? (
+          <p className="text-muted-foreground text-sm text-center py-4">
+            Aucune entrée de journal pour le moment.
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {latestEntries.map(entry => (
+              <div key={entry.id} className="p-3 bg-accent/40 rounded-lg">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="font-medium">{entry.title}</h3>
+                  <Badge variant="outline">{entry.mood}</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-2">
+                  {new Date(entry.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+                <p className="text-sm line-clamp-2">{entry.content}</p>
+                <div className="mt-3 text-right">
+                  <Button size="sm" variant="ghost">Lire plus</Button>
+                </div>
+              </div>
+            ))}
+            <div className="text-center pt-2">
+              <Button variant="outline">
+                <Edit className="mr-2 h-4 w-4" />
+                Nouvelle entrée
+              </Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export const MoodHistorySection = () => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <CalendarDays className="h-5 w-5 text-primary" />
+          Historique d'humeur
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-wrap gap-1">
+          {Array.from({ length: 28 }).map((_, i) => {
+            const value = Math.random();
+            let bgColor = 'bg-red-100 dark:bg-red-900/30';
+            
+            if (value > 0.7) bgColor = 'bg-green-100 dark:bg-green-900/30';
+            else if (value > 0.4) bgColor = 'bg-yellow-100 dark:bg-yellow-900/30';
+            
+            return (
+              <div 
+                key={i}
+                className={`w-6 h-6 rounded-sm ${bgColor} cursor-pointer`}
+                title={`${new Date(Date.now() - (27-i) * 24 * 60 * 60 * 1000).toLocaleDateString()}: ${Math.round(value * 100)}% positive`}
+              />
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export const ProgressLatestSection: React.FC<ProgressLatestSectionProps> = ({
+  progress
+}) => {
+  // Calculate progress percentage
+  const progressPercentage = progress.progress * 100;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Medal className="h-5 w-5 text-primary" />
+          Votre progression
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm font-medium">Niveau {progress.level}</p>
+              <p className="text-xs text-muted-foreground">
+                {progress.points} points
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
+              {progress.level}
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs">
+              <span>Vers Niveau {progress.nextLevel.level}</span>
+              <span>{Math.round(progressPercentage)}%</span>
+            </div>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-primary" 
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="pt-2 border-t border-border flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium">Série active</p>
+              <p className="text-xs text-muted-foreground">
+                {progress.streak} jours consécutifs
+              </p>
+            </div>
+            <Button size="sm" variant="outline">
+              Voir plus
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

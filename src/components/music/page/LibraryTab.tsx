@@ -1,9 +1,15 @@
 
 import React from 'react';
 import MusicLibrary from './MusicLibrary';
-import { MusicLibraryProps, MusicTrack, MusicPlaylist } from '@/types';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
-const LibraryTab: React.FC<MusicLibraryProps> = ({ 
+interface LibraryTabProps {
+  playlists?: MusicPlaylist[];
+  onSelectTrack?: (track: MusicTrack) => void;
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+}
+
+const LibraryTab: React.FC<LibraryTabProps> = ({ 
   playlists = [],
   onSelectTrack,
   onSelectPlaylist

@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Heart, HeartOff } from 'lucide-react';
-import { MusicPlaylist } from '@/types';
+import { MusicPlaylist } from '@/types/music';
 import { motion } from 'framer-motion';
 
 interface MoodBasedRecommendationsProps {
@@ -42,7 +42,7 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({
               <div 
                 className="h-32 bg-gradient-to-br from-indigo-500 to-purple-700 relative overflow-hidden"
                 style={{
-                  backgroundImage: playlist.coverUrl ? `url(${playlist.coverUrl})` : undefined,
+                  backgroundImage: playlist.cover_url ? `url(${playlist.cover_url})` : undefined,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center'
                 }}
@@ -62,7 +62,7 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({
                 <div className="flex justify-between items-start">
                   <div>
                     <h4 className="font-medium line-clamp-1">
-                      {playlist.name || playlist.title || "Playlist sans titre"}
+                      {playlist.name}
                     </h4>
                     <p className="text-xs text-muted-foreground mt-1">
                       {playlist.tracks.length} morceaux

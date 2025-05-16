@@ -6,7 +6,7 @@ export interface Badge {
   icon: string;
   category: string;
   level?: number;
-  unlocked?: boolean;
+  unlockedAt?: string;
   progress?: number;
   completed?: boolean;
 }
@@ -44,8 +44,5 @@ export interface GamificationStats {
     points: number;
     level: number;
   };
-  progress: {
-    current: number;
-    target: number;
-  };
+  progress: number;
 }

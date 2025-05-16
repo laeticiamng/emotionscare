@@ -11,7 +11,7 @@ import {
   RecommendedVRSection,
   MoodHistorySection
 } from './UserDashboardSections';
-import { Badge, LeaderboardEntry } from '@/types';
+import { Badge, LeaderboardEntry } from '@/types/gamification';
 import LeaderboardWidget from './widgets/LeaderboardWidget';
 import BadgesWidget from './widgets/BadgesWidget';
 import DailyInsightCard from './widgets/DailyInsightCard';
@@ -80,7 +80,7 @@ const UserDashboard: React.FC = () => {
       points: 1500,
       level: 6
     },
-    progress: 0.75 // This is now a simple number representing percentage (0-1)
+    progress: 0.75
   };
 
   // Sample badges
@@ -92,9 +92,8 @@ const UserDashboard: React.FC = () => {
       icon: '📝', 
       category: 'journal', 
       level: 1,
-      unlocked: true,
+      unlockedAt: new Date().toISOString(),
       progress: 100,
-      completed: true
     },
     { 
       id: '2', 
@@ -103,17 +102,16 @@ const UserDashboard: React.FC = () => {
       icon: '🎵', 
       category: 'music', 
       level: 1, 
-      unlocked: true,
+      unlockedAt: new Date().toISOString(),
       progress: 70,
-      completed: false
     }
   ];
 
   // Sample leaderboard
   const leaderboard: LeaderboardEntry[] = [
-    { id: '1', name: 'JohnDoe', points: 1500, level: 6, position: 1, avatar: '', username: 'john_doe' },
-    { id: '2', name: 'AliceW', points: 1350, level: 5, position: 2, avatar: '', username: 'alice_w' },
-    { id: '3', name: 'BobSmith', points: 1200, level: 5, position: 3, avatar: '', username: 'bob_smith' }
+    { id: '1', name: 'JohnDoe', points: 1500, level: 6, position: 1, avatar: '' },
+    { id: '2', name: 'AliceW', points: 1350, level: 5, position: 2, avatar: '' },
+    { id: '3', name: 'BobSmith', points: 1200, level: 5, position: 3, avatar: '' }
   ];
 
   return (

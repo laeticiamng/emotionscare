@@ -35,3 +35,22 @@ export interface VRProgress {
   lastSession?: Date | string;
   streak: number;
 }
+
+export interface VRHistoryListProps {
+  sessions: VRSession[];
+  onSelectSession?: (session: VRSession) => void;
+  isLoading?: boolean;
+}
+
+export interface VRSessionHistoryProps {
+  session?: VRSession;
+  template?: VRSessionTemplate;
+  onClose?: () => void;
+}
+
+export interface VRSessionWithMusicProps {
+  session?: VRSession;
+  template?: VRSessionTemplate;
+  onComplete?: (data: any) => void;
+  onClose?: () => void;
+}
