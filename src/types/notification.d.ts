@@ -13,10 +13,9 @@ export type NotificationType =
   | 'message';
 
 export type NotificationFilter = 
-  | 'all' 
-  | 'unread' 
-  | NotificationType
-  | string;  // Adding string to avoid type comparison issues
+  | 'all'
+  | 'unread'
+  | NotificationType;
 
 export interface Notification {
   id: string;
@@ -24,21 +23,32 @@ export interface Notification {
   message: string;
   type: NotificationType;
   read: boolean;
-  createdAt?: string;
+  time?: string;
   date?: string;
-  timestamp?: string;
+  createdAt?: string;
   action_url?: string;
-  action_label?: string;
-  // Add backwards compatibility properties
   actionUrl?: string;
+  action_label?: string;
   actionLabel?: string;
+  icon?: React.ReactNode;
+  userId?: string;
+  priority?: 'low' | 'medium' | 'high';
+  image?: string;
+  relatedEntityId?: string;
+  relatedEntityType?: string;
 }
 
 export interface NotificationItemProps {
   notification: Notification;
   onClick?: (notification: Notification) => void;
-  onMarkAsRead?: (id: string) => void;
-  onDelete?: (id: string) => void;
-  compact?: boolean;
   onRead?: (id: string) => void;
+  compact?: boolean;
+}
+
+export interface NotificationsPanelProps {
+  notifications: Notification[];
+  onMarkAllAsRead: () => void;
+  onMarkAsRead: (id: string) => void;
+  onClearAll: () => void;
+  loading?: boolean;
 }

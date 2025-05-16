@@ -54,6 +54,7 @@ const mockChallenges: Challenge[] = [
     points: 100,
     progress: 5,
     goal: 7,
+    total: 7,
     completed: false,
     status: "active",
     deadline: new Date(Date.now() + 86400000 * 2).toISOString()
@@ -66,6 +67,7 @@ const mockChallenges: Challenge[] = [
     points: 150,
     progress: 2,
     goal: 3,
+    total: 3,
     completed: false,
     status: "active",
     deadline: new Date(Date.now() + 86400000 * 5).toISOString()
@@ -78,6 +80,7 @@ const mockChallenges: Challenge[] = [
     points: 300,
     progress: 5,
     goal: 5,
+    total: 5,
     completed: true,
     status: "completed"
   }

@@ -18,15 +18,13 @@ export const filterNotifications = (
   }
 
   // Type-specific filtering
-  // Since NotificationFilter includes NotificationType, we can use it for type filtering
-  // We need to check if filter is one of our notification types
   const validTypes: NotificationType[] = [
     'emotion', 'journal', 'community', 'achievement', 'reminder', 
     'system', 'success', 'warning', 'error', 'alert', 'message'
   ];
   
   if (validTypes.includes(filter as NotificationType)) {
-    return notifications.filter(notification => notification.type === filter as NotificationType);
+    return notifications.filter(notification => notification.type === filter);
   }
 
   // Default: return all notifications

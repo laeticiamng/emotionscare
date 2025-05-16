@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types/theme';
 
@@ -9,7 +10,8 @@ export const ThemeContext = createContext<ThemeContextType>({
   fontSize: 'medium',
   setFontSize: () => {},
   fontFamily: 'system',
-  setFontFamily: () => {}
+  setFontFamily: () => {},
+  getContrastText: () => 'black',
 });
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
@@ -36,12 +38,22 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     if (savedFontFamily) {
       setFontFamily(savedFontFamily);
     }
+    
+    // Add global transition styles for theme changes
+    document.documentElement.style.transition = 'background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease';
+    document.body.style.transition = 'background-color 0.5s ease, color 0.5s ease';
+    
+    // Clean up transition styles on unmount
+    return () => {
+      document.documentElement.style.transition = '';
+      document.body.style.transition = '';
+    };
   }, []);
 
   useEffect(() => {
     // Apply theme to document
     const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
+    root.classList.remove('light', 'dark', 'pastel');
 
     let appliedTheme = theme;
 
@@ -52,7 +64,33 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     root.classList.add(appliedTheme);
     setIsDarkMode(appliedTheme === 'dark');
     localStorage.setItem('theme', theme);
-  }, [theme]);
+    
+    // Apply enhanced theme-specific styles
+    if (appliedTheme === 'dark') {
+      // Dark theme: deeper shadows, glows on interactive elements
+      document.body.classList.add('theme-dark');
+      document.body.classList.remove('theme-light', 'theme-pastel');
+      
+      // Adjust font size slightly larger for dark mode readability if needed
+      if (fontSize === 'medium') {
+        root.style.fontSize = '1.05rem';
+      }
+    } else if (appliedTheme === 'pastel') {
+      // Pastel theme: softer shadows, airy feel
+      document.body.classList.add('theme-pastel');
+      document.body.classList.remove('theme-light', 'theme-dark');
+      
+      // Reset font size
+      root.style.fontSize = '';
+    } else {
+      // Light theme: crisp shadows, airy feel
+      document.body.classList.add('theme-light');
+      document.body.classList.remove('theme-dark', 'theme-pastel');
+      
+      // Reset font size
+      root.style.fontSize = '';
+    }
+  }, [theme, fontSize]);
   
   useEffect(() => {
     // Save font settings to localStorage
@@ -68,19 +106,21 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     // Add new font size class
     switch (fontSize) {
       case 'small':
+      case 'sm':
         root.classList.add('text-sm');
         break;
       case 'medium':
+      case 'md':
         root.classList.add('text-base');
         break;
       case 'large':
+      case 'lg':
         root.classList.add('text-lg');
         break;
       case 'x-large':
       case 'xl':
         root.classList.add('text-xl');
         break;
-      case 'xx-large':
       case 'extra-large':
         root.classList.add('text-2xl');
         break;

@@ -1,14 +1,14 @@
 
 /**
  * theme.ts
- * Définit les palettes de couleurs pour les différents thèmes de l'application
- * Facilite l'accès aux couleurs dans les composants React
+ * Defines color palettes for the application's various themes
+ * Facilitates access to colors in React components
  */
 
-// Types pour les thèmes
+// Theme types
 export type ThemeName = 'light' | 'dark' | 'pastel';
 
-// Interface pour définir la structure d'une palette de couleurs
+// Interface for defining a color palette structure
 export interface ColorPalette {
   name: string;
   background: string;
@@ -49,65 +49,65 @@ export interface ColorPalette {
   };
 }
 
-// Palette de couleurs pour le thème clair premium
+// Premium light theme color palette - Apple-inspired clean design
 export const lightTheme: ColorPalette = {
   name: 'light',
-  background: 'hsl(0, 0%, 100%)', // Pure white for maximum clarity
-  foreground: 'hsl(220, 25%, 16%)',
-  card: 'hsl(0, 0%, 100%)',
-  cardForeground: 'hsl(220, 25%, 16%)',
-  primary: 'hsl(220, 100%, 50%)',
-  primaryForeground: 'hsl(210, 40%, 98%)',
-  secondary: 'hsl(210, 40%, 96.1%)',
-  secondaryForeground: 'hsl(220, 47%, 16%)',
-  accent: 'hsl(339, 90%, 65%)',
-  accentForeground: 'hsl(210, 40%, 98%)',
-  muted: 'hsl(210, 40%, 96.1%)',
-  mutedForeground: 'hsl(215.4, 16.3%, 46.9%)',
-  border: 'hsl(214.3, 31.8%, 91.4%)',
-  input: 'hsl(214.3, 31.8%, 91.4%)',
-  ring: 'hsl(220, 100%, 50%)',
+  background: '#FFFFFF', // Pure white for maximum clarity
+  foreground: '#18181B', // Soft black for text
+  card: '#FFFFFF', // Pure white for cards
+  cardForeground: '#18181B', // Soft black for card text
+  primary: '#2563EB', // Apple blue
+  primaryForeground: '#FFFFFF', // White text on primary buttons
+  secondary: '#F3F4F6', // Very light gray
+  secondaryForeground: '#1F2937', // Dark gray for secondary buttons
+  accent: '#3B82F6', // Slightly lighter blue for accents
+  accentForeground: '#FFFFFF', // White text on accent color
+  muted: '#F9FAFB', // Very light gray/white
+  mutedForeground: '#6B7280', // Medium gray for muted text
+  border: '#E5E7EB', // Light gray for borders
+  input: '#F3F4F6', // Very light gray for input backgrounds
+  ring: '#2563EB', // Apple blue for focus rings
   // Semantic colors
   success: {
-    light: '#D1FAE5',
+    light: '#ECFDF5',
     DEFAULT: '#10B981',
-    dark: '#047857',
+    dark: '#059669',
   },
   warning: {
-    light: '#FEF3C7',
+    light: '#FFFBEB',
     DEFAULT: '#F59E0B',
     dark: '#B45309',
   },
   info: {
-    light: '#DBEAFE',
+    light: '#EFF6FF',
     DEFAULT: '#3B82F6',
-    dark: '#1D4ED8',
+    dark: '#2563EB',
   },
   error: {
-    light: '#FEE2E2',
+    light: '#FEF2F2',
     DEFAULT: '#EF4444',
-    dark: '#B91C1C',
+    dark: '#DC2626',
   },
 };
 
-// Palette de couleurs pour le thème sombre premium
+// Premium dark theme color palette - Deep blacks with vibrant accents
 export const darkTheme: ColorPalette = {
   name: 'dark',
-  background: 'hsl(220, 20%, 12%)',
-  foreground: 'hsl(210, 40%, 98%)',
-  card: 'hsl(220, 20%, 14%)',
-  cardForeground: 'hsl(210, 40%, 98%)',
-  primary: 'hsl(217, 91%, 60%)',
-  primaryForeground: 'hsl(210, 40%, 98%)',
-  secondary: 'hsl(220, 15%, 25%)',
-  secondaryForeground: 'hsl(210, 40%, 98%)',
-  accent: 'hsl(339, 90%, 65%)',
-  accentForeground: 'hsl(210, 40%, 98%)',
-  muted: 'hsl(220, 15%, 25%)',
-  mutedForeground: 'hsl(215, 20%, 75%)',
-  border: 'hsl(220, 15%, 25%)',
-  input: 'hsl(220, 15%, 22%)',
-  ring: 'hsl(217, 91%, 60%)',
+  background: '#0F172A', // Deep rich blue-black
+  foreground: '#F8FAFC', // Pure white for text
+  card: '#1E293B', // Dark blue-gray for cards
+  cardForeground: '#F8FAFC', // Pure white for card text
+  primary: '#38BDF8', // Bright blue
+  primaryForeground: '#0F172A', // Dark background for text on primary
+  secondary: '#334155', // Medium dark blue-gray
+  secondaryForeground: '#F8FAFC', // White text
+  accent: '#22D3EE', // Cyan accent
+  accentForeground: '#0F172A', // Dark background for text on accent
+  muted: '#1E293B', // Dark blue-gray
+  mutedForeground: '#94A3B8', // Light blue-gray for muted text
+  border: '#334155', // Medium-dark blue-gray for borders
+  input: '#1E293B', // Dark blue-gray for input backgrounds
+  ring: '#38BDF8', // Bright blue for focus rings
   // Semantic colors with adjusted contrast for dark theme
   success: {
     light: '#064E3B', // Darker background for dark mode
@@ -121,80 +121,80 @@ export const darkTheme: ColorPalette = {
   },
   info: {
     light: '#1E3A8A',
-    DEFAULT: '#3B82F6',
-    dark: '#BFDBFE',
+    DEFAULT: '#38BDF8',
+    dark: '#BAE6FD',
   },
   error: {
     light: '#7F1D1D',
     DEFAULT: '#EF4444',
-    dark: '#FECACA',
+    dark: '#FCA5A5',
   },
 };
 
-// Palette de couleurs pour le thème pastel premium
+// Pastel theme color palette - Soft blue tones
 export const pastelTheme: ColorPalette = {
   name: 'pastel',
-  background: 'hsl(210, 60%, 98%)', // Very light blue-ish background
-  foreground: 'hsl(220, 25%, 20%)',
-  card: 'hsl(210, 50%, 99%)',
-  cardForeground: 'hsl(220, 25%, 20%)',
-  primary: 'hsl(210, 70%, 50%)',
-  primaryForeground: 'hsl(0, 0%, 100%)',
-  secondary: 'hsl(210, 50%, 92%)',
-  secondaryForeground: 'hsl(220, 47%, 16%)',
-  accent: 'hsl(339, 90%, 75%)',
-  accentForeground: 'hsl(220, 47%, 16%)',
-  muted: 'hsl(210, 50%, 92%)',
-  mutedForeground: 'hsl(220, 15%, 40%)',
-  border: 'hsl(210, 50%, 85%)',
-  input: 'hsl(210, 50%, 85%)',
-  ring: 'hsl(210, 70%, 50%)',
-  // Semantic colors with softer pastel tones
+  background: '#F0F9FF', // Very light blue background
+  foreground: '#1E293B', // Dark blue-gray for text
+  card: '#FFFFFF', // White cards for contrast against the light blue
+  cardForeground: '#1E293B', // Dark blue-gray for card text
+  primary: '#60A5FA', // Pastel blue
+  primaryForeground: '#FFFFFF', // White text on primary buttons
+  secondary: '#E0F2FE', // Very light blue for secondary elements
+  secondaryForeground: '#1E293B', // Dark blue-gray text
+  accent: '#93C5FD', // Slightly different pastel blue for accents
+  accentForeground: '#1E293B', // Dark text on accent color
+  muted: '#E0F2FE', // Very light blue for muted areas
+  mutedForeground: '#64748B', // Slate blue-gray for muted text
+  border: '#BAE6FD', // Light blue borders
+  input: '#F0F9FF', // Very light blue for input backgrounds
+  ring: '#60A5FA', // Pastel blue for focus rings
+  // Semantic colors with pastel tones
   success: {
     light: '#ECFDF5',
-    DEFAULT: '#10B981',
-    dark: '#047857',
+    DEFAULT: '#34D399', // Lighter green
+    dark: '#059669',
   },
   warning: {
     light: '#FFFBEB',
-    DEFAULT: '#F59E0B',
-    dark: '#92400E',
+    DEFAULT: '#FBBF24', // Lighter amber
+    dark: '#B45309',
   },
   info: {
     light: '#EFF6FF',
-    DEFAULT: '#3B82F6',
-    dark: '#1E40AF',
+    DEFAULT: '#60A5FA', // Pastel blue
+    dark: '#3B82F6',
   },
   error: {
     light: '#FEF2F2',
-    DEFAULT: '#EF4444',
-    dark: '#991B1B',
+    DEFAULT: '#F87171', // Lighter red
+    dark: '#DC2626',
   },
 };
 
-// Couleurs spécifiques pour le thème bien-être (wellness)
+// Wellness-specific colors
 export const wellnessColors = {
-  blue: 'hsl(210, 67%, 59%)',
-  mint: 'hsl(160, 79%, 85%)',
-  coral: 'hsl(11, 100%, 69%)',
-  peach: 'hsl(25, 100%, 94%)',
-  lavender: 'hsl(240, 67%, 94%)',
+  blue: '#60A5FA',
+  mint: '#A7F3D0',
+  coral: '#F87171',
+  peach: '#FECACA',
+  lavender: '#DDD6FE',
   darkPurple: '#7E69AB',
   softPurple: '#E5DEFF',
   softBlue: '#D3E4FD',
 };
 
-// Exportation de tous les thèmes dans un objet
+// Export all themes in an object
 export const themes: Record<ThemeName, ColorPalette> = {
   light: lightTheme,
   dark: darkTheme,
   pastel: pastelTheme,
 };
 
-// Fonction utilitaire pour obtenir un thème par son nom
+// Utility function to get a theme by name
 export const getTheme = (themeName: ThemeName): ColorPalette => {
   return themes[themeName];
 };
 
-// Exportation par défaut de tous les thèmes
+// Default export of all themes
 export default themes;
