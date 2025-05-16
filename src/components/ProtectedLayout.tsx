@@ -29,7 +29,7 @@ const ProtectedLayout = () => {
   }
 
   // If user hasn't completed onboarding yet (except when already on the onboarding page)
-  if (isAuthenticated && user && !user.onboarded && !location.pathname.includes('/onboarding')) {
+  if (isAuthenticated && user && user.onboarded === false && !location.pathname.includes('/onboarding')) {
     return <Navigate to="/onboarding" replace />;
   }
 

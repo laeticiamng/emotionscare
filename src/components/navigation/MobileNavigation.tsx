@@ -1,205 +1,166 @@
 
-import React from "react";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
-  Bell,
-  Calendar,
-  ChevronDown,
-  FileText,
-  Home,
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  Menu, 
+  Home, 
+  BarChart3, 
+  Heart, 
+  BookOpen, 
+  Music, 
+  Users, 
+  MessageSquare, 
+  Settings, 
   LogOut,
-  Menu,
-  MessageSquare,
-  Moon,
-  Settings,
-  Sun,
-  User,
-  BarChart3
-} from "lucide-react";
-import { useTheme } from "@/hooks/use-theme";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
-import { useSoundscape } from "@/contexts/SoundscapeContext";
-import NotificationDrawer from "@/components/notifications/NotificationDrawer";
+  User
+} from 'lucide-react';
+import { User as UserType } from '@/types/user';
 
-const MobileNavigation: React.FC = () => {
-  const { theme, setTheme } = useTheme();
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { toast } = useToast();
-  const { playFunctionalSound } = useSoundscape();
-  const [open, setOpen] = React.useState(false);
+interface MobileNavigationProps {
+  onLogout?: () => void;
+  user?: UserType;
+  userMode?: 'b2c' | 'b2b_user' | 'b2b_admin' | null;
+}
 
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    playFunctionalSound("themeToggle");
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast({
-        title: "Déconnexion réussie",
-        description: "Vous avez été déconnecté avec succès.",
-      });
-      navigate("/login");
-    } catch (error) {
-      toast({
-        title: "Erreur de déconnexion",
-        description: "Une erreur s'est produite lors de la déconnexion.",
-        variant: "destructive",
-      });
-    } finally {
-      playFunctionalSound("logout");
+const MobileNavigation = ({ onLogout, user, userMode = 'b2c' }: MobileNavigationProps) => {
+  const [open, setOpen] = useState(false);
+  
+  const getBaseRoute = () => {
+    switch (userMode) {
+      case 'b2b_user':
+        return '/b2b/user';
+      case 'b2b_admin':
+        return '/b2b/admin';
+      case 'b2c':
+      default:
+        return '/b2c';
     }
   };
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
+  const baseRoute = getBaseRoute();
+  
+  const menuItems = [
+    {
+      name: 'Accueil',
+      icon: <Home className="h-5 w-5" />,
+      path: `${baseRoute}/dashboard`
+    },
+    {
+      name: 'Scan Émotionnel',
+      icon: <Heart className="h-5 w-5" />,
+      path: `${baseRoute}/scan`,
+      hideInAdmin: true
+    },
+    {
+      name: 'Journal',
+      icon: <BookOpen className="h-5 w-5" />,
+      path: `${baseRoute}/journal`,
+      hideInAdmin: true
+    },
+    {
+      name: 'Musicothérapie',
+      icon: <Music className="h-5 w-5" />,
+      path: `${baseRoute}/music`,
+      hideInAdmin: true
+    },
+    {
+      name: 'Coach IA',
+      icon: <MessageSquare className="h-5 w-5" />,
+      path: `${baseRoute}/coach`,
+      hideInAdmin: true
+    },
+    {
+      name: 'Communauté',
+      icon: <Users className="h-5 w-5" />,
+      path: `${baseRoute}/community`,
+      hideInAdmin: true
+    },
+    {
+      name: 'Analytics',
+      icon: <BarChart3 className="h-5 w-5" />,
+      path: `${baseRoute}/analytics`,
+      onlyInAdmin: true
+    },
+    {
+      name: 'Utilisateurs',
+      icon: <User className="h-5 w-5" />,
+      path: `${baseRoute}/users`,
+      onlyInAdmin: true
+    },
+    {
+      name: 'Paramètres',
+      icon: <Settings className="h-5 w-5" />,
+      path: `${baseRoute}/settings`
+    }
+  ];
+  
+  const filteredMenuItems = menuItems.filter(item => {
+    if (userMode === 'b2b_admin') {
+      return !item.hideInAdmin;
+    } else {
+      return !item.onlyInAdmin;
+    }
+  });
+  
+  const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+    }
+    setOpen(false);
   };
-
+  
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Menu className="w-6 h-6 cursor-pointer" />
+        <Button variant="ghost" size="icon" className="lg:hidden">
+          <Menu className="h-5 w-5" />
+          <span className="sr-only">Menu</span>
+        </Button>
       </SheetTrigger>
-      <SheetContent className="sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>Menu</SheetTitle>
-          <SheetDescription>
-            Explorez les différentes sections de l'application.
-          </SheetDescription>
+      <SheetContent side="left" className="flex flex-col h-full">
+        <SheetHeader className="border-b pb-4">
+          <SheetTitle className="text-left">EmotionsCare</SheetTitle>
+          {user && (
+            <div className="flex items-center gap-3 pt-3">
+              <Avatar>
+                <AvatarImage src={user.avatar_url || user.avatar} alt={user.name} />
+                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="text-left">
+                <p className="text-sm font-medium">{user.name}</p>
+                <p className="text-xs text-muted-foreground">{user.email}</p>
+              </div>
+            </div>
+          )}
         </SheetHeader>
-
-        <div className="grid gap-4 py-4">
-          <Separator />
-
-          <NavLink
-            to="/b2c"
-            className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
-              isActive("/b2c") ? "bg-secondary text-primary" : ""
-            }`}
-            onClick={() => setOpen(false)}
-          >
-            <Home className="w-4 h-4" />
-            <span>Accueil</span>
-          </NavLink>
-
-          <NavLink
-            to="/b2c/journal"
-            className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
-              isActive("/b2c/journal") ? "bg-secondary text-primary" : ""
-            }`}
-            onClick={() => setOpen(false)}
-          >
-            <FileText className="w-4 h-4" />
-            <span>Journal</span>
-          </NavLink>
-
-          <NavLink
-            to="/b2c/scan"
-            className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
-              isActive("/b2c/scan") ? "bg-secondary text-primary" : ""
-            }`}
-            onClick={() => setOpen(false)}
-          >
-            <BarChart3 className="w-4 h-4" />
-            <span>Scan</span>
-          </NavLink>
-
-          <NavLink
-            to="/b2c/coach"
-            className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
-              isActive("/b2c/coach") ? "bg-secondary text-primary" : ""
-            }`}
-            onClick={() => setOpen(false)}
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>Coach</span>
-          </NavLink>
-
-          <Separator />
-
-          <div className="py-2 px-4">
-            <div className="text-sm font-medium text-muted-foreground">
-              Paramètres
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between py-2 px-4">
-            <div className="flex items-center space-x-2">
-              {theme === "light" ? (
-                <Sun className="w-4 h-4" />
-              ) : (
-                <Moon className="w-4 h-4" />
-              )}
-              <span>Mode {theme === "light" ? "Sombre" : "Clair"}</span>
-            </div>
-            <button
-              onClick={() => {
-                toggleTheme();
-                setOpen(false);
-              }}
-              className="rounded-full p-1 hover:bg-secondary transition-colors"
-            >
-              {theme === "light" ? "🌙" : "☀️"}
-            </button>
-          </div>
-
-          <Link
-            to="/b2c/settings"
-            className="flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors"
-            onClick={() => setOpen(false)}
-          >
-            <Settings className="w-4 h-4" />
-            <span>Paramètres</span>
-          </Link>
-
-          <Separator />
-
-          <div className="py-2 px-4">
-            <div className="text-sm font-medium text-muted-foreground">
-              Compte
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-2 py-2 px-4">
-            <Avatar className="w-8 h-8">
-              <AvatarImage src={user?.avatar} alt={user?.name} />
-              <AvatarFallback>{user?.name?.substring(0, 2)}</AvatarFallback>
-            </Avatar>
-            <div>
-              <div className="font-medium">{user?.name}</div>
-              <div className="text-muted-foreground text-sm">{user?.email}</div>
-            </div>
-          </div>
-
-          <button
+        
+        <nav className="flex-1 py-4">
+          <ul className="space-y-1 px-2">
+            {filteredMenuItems.map((item) => (
+              <li key={item.path}>
+                <Link to={item.path} onClick={() => setOpen(false)}>
+                  <Button variant="ghost" className="w-full justify-start gap-3">
+                    {item.icon}
+                    {item.name}
+                  </Button>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        
+        <div className="border-t pt-4 px-2">
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start gap-3 text-destructive hover:text-destructive"
             onClick={handleLogout}
-            className="flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors w-full justify-start"
           >
-            <LogOut className="w-4 h-4" />
-            <span>Déconnexion</span>
-          </button>
+            <LogOut className="h-5 w-5" />
+            Déconnexion
+          </Button>
         </div>
       </SheetContent>
     </Sheet>

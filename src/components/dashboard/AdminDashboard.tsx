@@ -1,115 +1,78 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  BarChart3, 
-  Users, 
-  Clock, 
-  Calendar, 
-  TrendingUp, 
-  Heart, 
-  Activity 
-} from 'lucide-react';
-import DraggableKpiCardsGrid from './admin/draggable/DraggableKpiCardsGrid';
-import AdminTabContents from './admin/AdminTabContents';
-import { Button } from '@/components/ui/button';
-import { DraggableCardProps } from '@/types/widgets';
+import AdminTabContent from '@/components/dashboard/admin/AdminTabContent';
 
-const AdminDashboard: React.FC = () => {
-  // KPI Card data
-  const kpiCards: DraggableCardProps[] = [
-    {
-      id: 'activeUsers',
-      title: 'Utilisateurs actifs',
-      value: '1,234',
-      icon: <Users className="h-4 w-4" />,
-      delta: {
-        value: 12,
-        trend: 'up',
-        label: 'vs last week'
-      },
-      subtitle: 'Utilisateurs uniques',
-      status: 'success'
-    },
-    {
-      id: 'totalSessions',
-      title: 'Sessions totales',
-      value: '5,678',
-      icon: <Calendar className="h-4 w-4" />,
-      delta: {
-        value: 8,
-        trend: 'up'
-      }
-    },
-    {
-      id: 'avgDuration',
-      title: 'Durée moyenne',
-      value: '12:34',
-      icon: <Clock className="h-4 w-4" />,
-      delta: {
-        value: 3,
-        trend: 'down'
-      },
-      status: 'warning'
-    },
-    {
-      id: 'completionRate',
-      title: 'Taux de complétion',
-      value: '87%',
-      icon: <BarChart3 className="h-4 w-4" />,
-      delta: {
-        value: 5,
-        trend: 'up'
-      }
-    },
-    {
-      id: 'weeklyTrend',
-      title: 'Tendance hebdo',
-      value: '+23%',
-      icon: <TrendingUp className="h-4 w-4" />,
-      delta: {
-        value: 15,
-        trend: 'up'
-      },
-      status: 'success'
-    },
-    {
-      id: 'emotionalBalance',
-      title: 'Score émotionnel',
-      value: '72/100',
-      icon: <Heart className="h-4 w-4" />,
-      delta: {
-        value: 4,
-        trend: 'up'
-      }
-    }
-  ];
+interface AdminDashboardProps {
+  className?: string;
+}
+
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ className }) => {
+  const [activeTab, setActiveTab] = useState('overview');
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Dashboard Admin</h1>
-        <div className="flex gap-2">
-          <Button variant="outline">Télécharger rapport</Button>
-          <Button>Nouvelle notification</Button>
-        </div>
-      </div>
-
-      {/* KPI Cards Section */}
-      <section className="mb-8">
-        <DraggableKpiCardsGrid cards={kpiCards} />
-      </section>
-
-      {/* Tabs Section */}
-      <Tabs defaultValue="global" className="space-y-4">
-        <TabsList className="grid grid-cols-4 mb-4">
-          <TabsTrigger value="global">Vue globale</TabsTrigger>
+    <div className={`space-y-6 ${className}`}>
+      <h1 className="text-3xl font-bold">Tableau de bord administrateur</h1>
+      
+      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid grid-cols-5 mb-8">
+          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="emotions">Émotions</TabsTrigger>
-          <TabsTrigger value="activity">Activité</TabsTrigger>
-          <TabsTrigger value="teams">Équipes</TabsTrigger>
+          <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+          <TabsTrigger value="gamification">Gamification</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
         
-        <AdminTabContents />
+        <AdminTabContent value="overview" title="Vue d'ensemble" description="Aperçu global de la plateforme">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Card>
+              <CardHeader>
+                <CardTitle>Utilisateurs actifs</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">2,841</p>
+                <p className="text-xs text-muted-foreground">+15% depuis le mois dernier</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Sessions quotidiennes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">12,483</p>
+                <p className="text-xs text-muted-foreground">+7% depuis la semaine dernière</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Scans émotionnels</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-3xl font-bold">8,674</p>
+                <p className="text-xs text-muted-foreground">5,234 heures d'analyse</p>
+              </CardContent>
+            </Card>
+          </div>
+        </AdminTabContent>
+        
+        <AdminTabContent value="emotions" title="Analyse émotionnelle" description="Aperçu des données émotionnelles des utilisateurs">
+          <p>Contenu du tab émotions</p>
+        </AdminTabContent>
+        
+        <AdminTabContent value="users" title="Gestion des utilisateurs" description="Liste et gestion des utilisateurs de la plateforme">
+          <p>Contenu du tab utilisateurs</p>
+        </AdminTabContent>
+        
+        <AdminTabContent value="gamification" title="Gamification" description="Défis, badges et tableau de classement">
+          <p>Contenu du tab gamification</p>
+        </AdminTabContent>
+        
+        <AdminTabContent value="analytics" title="Analytics" description="Statistiques détaillées et rapports">
+          <p>Contenu du tab analytics</p>
+        </AdminTabContent>
       </Tabs>
     </div>
   );

@@ -1,8 +1,8 @@
 
 // Theme types
 export type Theme = 'light' | 'dark' | 'pastel' | 'system';
-export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace';
-export type FontSize = 'small' | 'medium' | 'large';
+export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'system-ui' | 'sans-serif' | 'inter' | 'default';
+export type FontSize = 'small' | 'medium' | 'large' | 'x-large' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface ThemeSettings {
   theme: Theme;
@@ -23,4 +23,9 @@ export interface ThemeContextType {
   setReduceMotion: (reduce: boolean) => void;
   colorBlindMode: boolean;
   setColorBlindMode: (mode: boolean) => void;
+}
+
+export interface ThemeButtonProps {
+  theme: Theme;
+  label: string;
 }

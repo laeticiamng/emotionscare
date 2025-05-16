@@ -24,8 +24,10 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       case 'system':
         return <Bell className="h-4 w-4" />;
       case 'community':
+      case 'user':
         return <Users className="h-4 w-4" />;
       case 'coach':
+      case 'message':
         return <MessageSquare className="h-4 w-4" />;
       case 'journal':
         return <Book className="h-4 w-4" />;
@@ -48,18 +50,26 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       case 'emotion':
         return "default";
       case 'coach':
+      case 'message':
         return "outline";
       case 'journal':
         return "secondary";
       case 'community':
+      case 'user':
         return "outline";
       default:
         return "secondary";
     }
   };
 
+  // Check if notification is read, supporting both isRead and read properties
+  const isRead = notification.isRead || notification.read;
+
+  // Get timestamp from various properties
+  const timestamp = notification.created_at || notification.createdAt || (notification.timestamp instanceof Date ? notification.timestamp.toISOString() : notification.timestamp);
+
   return (
-    <div className={`p-4 border-b ${notification.read ? '' : 'bg-muted/30'}`}>
+    <div className={`p-4 border-b ${isRead ? '' : 'bg-muted/30'}`}>
       <div className="flex items-start gap-3">
         <div className={`p-2 rounded-full bg-primary/10 flex-shrink-0`}>
           {getIcon()}
@@ -74,7 +84,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
               </Badge>
             </div>
             <span className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: fr })}
+              {timestamp && formatDistanceToNow(new Date(timestamp), { addSuffix: true, locale: fr })}
             </span>
           </div>
           
@@ -90,7 +100,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             </Button>
           )}
           
-          {!notification.read && (
+          {!isRead && (
             <div className="flex justify-end mt-2">
               <Button
                 variant="ghost"

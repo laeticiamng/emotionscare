@@ -24,7 +24,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
 }) => {
   const [activeFilter, setActiveFilter] = useState<NotificationFilter>('all');
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !(n.read || n.isRead)).length;
   
   // Filter notifications based on active tab
   const filteredNotifications = notifications.filter(notification => {
@@ -32,7 +32,10 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
       return true;
     } 
     if (activeFilter === 'unread') {
-      return !notification.read;
+      return !(notification.read || notification.isRead);
+    }
+    if (activeFilter === 'read') {
+      return (notification.read || notification.isRead);
     }
     if (activeFilter === 'system') {
       return notification.type === 'system';
@@ -41,13 +44,13 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
       return notification.type === 'emotion';
     }
     if (activeFilter === 'coach') {
-      return notification.type === 'coach';
+      return notification.type === 'coach' || notification.type === 'message';
     }
     if (activeFilter === 'journal') {
       return notification.type === 'journal';
     }
     if (activeFilter === 'community') {
-      return notification.type === 'community';
+      return notification.type === 'community' || notification.type === 'user';
     }
     if (activeFilter === 'urgent') {
       return notification.priority === 'urgent';

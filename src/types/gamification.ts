@@ -1,58 +1,53 @@
 
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  icon: string; // Icon name or URL
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  unlocked: boolean;
-  progress?: number;
-  maxProgress?: number;
-  category?: string;
-  dateUnlocked?: string;
-}
-
 export interface GamificationStats {
   level: number;
-  xp: number;
-  xpToNextLevel: number;
+  points: number;
   streakDays: number;
   longestStreak: number;
   completedChallenges: number;
   totalChallenges: number;
   unlockedBadges: number;
   totalBadges: number;
-  points?: number; // Added for UserDashboard
-  badges?: number; // Added for AdminDashboard
-  activeUsersPercent?: number; // Added for GamificationSummaryCard
-  completionRate?: number; // Added for GamificationSummaryCard
+  rank?: string;
 }
 
 export interface Challenge {
   id: string;
-  name: string;
-  title?: string; // Added for ChallengesList
+  title: string;
   description: string;
-  reward: number;
+  points: number;
   progress: number;
-  goal: number;
   completed: boolean;
-  category: string;
-  endDate?: string;
-  deadline?: string; // Added for ChallengesList
-  status?: 'active' | 'completed' | 'expired'; // Added for ChallengesList
-  difficulty?: 'easy' | 'medium' | 'hard'; // Added for ChallengesList
-  completions?: number; // Added for ChallengesList
-  points?: number; // Added for ChallengesList
-  total?: number; // Added for ChallengesList
+  deadline?: Date | string;
+  category?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  tags?: string[];
+  icon?: string;
+  completedAt?: Date | string;
 }
 
-export interface Reward {
+export interface Badge {
   id: string;
   name: string;
   description: string;
-  cost: number;
-  available: boolean;
-  category: string;
-  unlocked: boolean;
+  image_url?: string;
+  imageUrl?: string;
+  achieved: boolean;
+  achievedAt?: Date | string;
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
+  progress?: number;
+  total?: number;
+  criteria?: string;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  rank: number;
+  name: string;
+  points: number;
+  avatar?: string;
+  level?: number;
+  department?: string;
+  streak?: number;
+  change?: number; // change in rank compared to previous period
 }

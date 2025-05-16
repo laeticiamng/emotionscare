@@ -12,9 +12,9 @@ export const filterNotifications = (
     case 'all':
       return notifications;
     case 'unread':
-      return notifications.filter(notification => !notification.read);
+      return notifications.filter(notification => !(notification.read || notification.isRead));
     case 'read':
-      return notifications.filter(notification => notification.read);
+      return notifications.filter(notification => (notification.read || notification.isRead));
     case 'urgent':
       return notifications.filter(notification => 
         notification.type === 'urgent' || notification.priority === 'urgent');

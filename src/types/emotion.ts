@@ -11,6 +11,7 @@ export interface EmotionResult {
   recommendations?: string[];
   audioUrl?: string;
   source?: 'text' | 'voice' | 'video' | 'manual';
+  feedback?: string;
 }
 
 export interface Emotion {
@@ -42,4 +43,20 @@ export interface AudioProcessorProps {
   onResult?: (result: EmotionResult) => void;
   autoStart?: boolean;
   continuous?: boolean;
+}
+
+export interface EnhancedEmotionResult extends EmotionResult {
+  triggers?: string[];
+  responseStrategy?: string;
+}
+
+export interface EmotionalTeamViewProps {
+  teamId?: string;
+  period?: 'day' | 'week' | 'month' | 'year';
+  showHeader?: boolean;
+}
+
+export interface TeamOverviewProps {
+  teamId: string;
+  period: 'day' | 'week' | 'month' | 'year';
 }

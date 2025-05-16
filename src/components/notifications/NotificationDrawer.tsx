@@ -15,6 +15,7 @@ const sampleNotifications: Notification[] = [
     message: 'Nous sommes ravis de vous accueillir sur la plateforme.',
     type: 'system',
     read: false,
+    isRead: false,
     created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
     action: {
       label: 'Explorer',
@@ -27,6 +28,7 @@ const sampleNotifications: Notification[] = [
     message: 'Découvrez notre nouvelle fonctionnalité de musicothérapie !',
     type: 'system',
     read: true,
+    isRead: true,
     created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString()
   },
   {
@@ -35,6 +37,7 @@ const sampleNotifications: Notification[] = [
     message: "Vous n'avez pas encore écrit dans votre journal aujourd'hui.",
     type: 'journal',
     read: false,
+    isRead: false,
     created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
     action: {
       label: 'Écrire maintenant',
@@ -48,7 +51,7 @@ export interface NotificationDrawerProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ open, onOpenChange }) => {
+export const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ open, onOpenChange }) => {
   const [notifications, setNotifications] = useState<Notification[]>(sampleNotifications);
   const [isOpen, setIsOpen] = useState(false);
   
@@ -59,13 +62,13 @@ const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ open, onOpenCha
     }
   };
   
-  const hasUnreadNotifications = notifications.some(notification => !notification.read);
+  const hasUnreadNotifications = notifications.some(notification => !notification.read && !notification.isRead);
   
   const handleMarkAsRead = (id: string) => {
     setNotifications(prev => 
       prev.map(notification => 
         notification.id === id 
-          ? { ...notification, read: true }
+          ? { ...notification, read: true, isRead: true }
           : notification
       )
     );
@@ -73,7 +76,7 @@ const NotificationDrawer: React.FC<NotificationDrawerProps> = ({ open, onOpenCha
   
   const handleMarkAllAsRead = () => {
     setNotifications(prev => 
-      prev.map(notification => ({ ...notification, read: true }))
+      prev.map(notification => ({ ...notification, read: true, isRead: true }))
     );
   };
   
