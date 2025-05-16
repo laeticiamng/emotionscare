@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Mic, MicOff, WaveformIcon } from 'lucide-react';
+import { Mic, MicOff, AudioWaveform } from 'lucide-react';
 
 interface AudioProcessorProps {
   onAudioData?: (audioData: Float32Array) => void;
@@ -139,7 +139,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       {isRecording && (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <WaveformIcon className="h-5 w-5 text-primary animate-pulse" />
+            <AudioWaveform className="h-5 w-5 text-primary animate-pulse" />
             <span className="text-xs">
               Volume: {Math.round(volume * 100)}%
             </span>
