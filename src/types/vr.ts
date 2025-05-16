@@ -8,6 +8,10 @@ export interface VRSessionTemplate {
   categoryId?: string;
   videoUrl?: string;
   audioUrl?: string;
+  audio_url?: string; // Backward compatibility
+  preview_url?: string;
+  benefits?: string[];
+  difficulty?: string;
   tags?: string[];
   type?: string;
   category?: string;
@@ -16,6 +20,8 @@ export interface VRSessionTemplate {
   featured?: boolean;
   name?: string; // Added for VRHistoryList, VRPromptWidget, VRRecommendations
   lastUsed?: string | Date; // Added for VRHistoryList
+  is_audio_only?: boolean;
+  emotion_target?: string; // Added for dashboard components
 }
 
 export interface VRSession {
@@ -24,8 +30,13 @@ export interface VRSession {
   userId: string;
   startedAt: Date;
   endedAt?: Date;
+  start_time?: string | Date;
+  end_time?: string | Date;
+  date?: string | Date;
   completed: boolean;
+  isCompleted?: boolean;
   duration: number;
+  duration_seconds?: number;
   feedback?: string;
   rating?: number;
   emotionBefore?: string;
@@ -48,6 +59,7 @@ export interface VRSessionHistoryProps {
   onSessionSelect?: (session: VRSession) => void;
   className?: string;
   sessions?: VRSession[]; // Added for compatibility
+  showHeader?: boolean;
 }
 
 export interface VRSessionWithMusicProps {

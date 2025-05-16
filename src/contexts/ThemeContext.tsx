@@ -9,11 +9,11 @@ export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   isDarkMode: boolean;
-  // Add missing properties
   fontSize: FontSize;
   setFontSize: (size: FontSize) => void;
   fontFamily: FontFamily;
   setFontFamily: (family: FontFamily) => void;
+  toggleTheme: () => void;
 }
 
 const initialState: ThemeContextType = {
@@ -23,7 +23,8 @@ const initialState: ThemeContextType = {
   fontSize: 'medium',
   setFontSize: () => null,
   fontFamily: 'system',
-  setFontFamily: () => null
+  setFontFamily: () => null,
+  toggleTheme: () => null
 };
 
 export const ThemeContext = createContext<ThemeContextType>(initialState);
@@ -68,6 +69,16 @@ export const ThemeProvider = ({
     document.documentElement.dataset.fontFamily = fontFamily;
   }, [fontFamily]);
 
+  const toggleTheme = () => {
+    if (theme === 'light') {
+      setTheme('dark');
+    } else if (theme === 'dark') {
+      setTheme('pastel');
+    } else {
+      setTheme('light');
+    }
+  };
+
   return (
     <ThemeContext.Provider value={{ 
       theme, 
@@ -76,7 +87,8 @@ export const ThemeProvider = ({
       fontSize,
       setFontSize,
       fontFamily,
-      setFontFamily
+      setFontFamily,
+      toggleTheme
     }}>
       {children}
     </ThemeContext.Provider>

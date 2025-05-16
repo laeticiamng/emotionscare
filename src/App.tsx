@@ -1,21 +1,24 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Toaster } from 'sonner';
-import { ThemeProvider } from './components/theme/ThemeProvider';
-import { MusicProvider } from './contexts/music/MusicContext';
-import SessionTimeoutAlert from './components/SessionTimeoutAlert';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import SessionTimeoutAlert from '@/components/SessionTimeoutAlert';
 
-function App() {
+const App: React.FC = () => {
+  useEffect(() => {
+    // Preload sound files if needed
+    const preloadAudio = new Audio('/sounds/welcome.mp3');
+    preloadAudio.preload = 'auto';
+  }, []);
+
   return (
-    <ThemeProvider>
-      <MusicProvider>
-        <SessionTimeoutAlert />
+    <>
+      <ThemeProvider>
         <Outlet />
-        <Toaster position="top-right" />
-      </MusicProvider>
-    </ThemeProvider>
+        <SessionTimeoutAlert />
+      </ThemeProvider>
+    </>
   );
-}
+};
 
 export default App;

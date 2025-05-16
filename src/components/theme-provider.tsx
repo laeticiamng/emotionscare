@@ -6,6 +6,11 @@ const ThemeContext = createContext<ThemeContextType>({
   theme: 'system',
   setTheme: () => null,
   toggleTheme: () => null,
+  isDarkMode: false,
+  fontSize: 'medium',
+  setFontSize: () => null,
+  fontFamily: 'system',
+  setFontFamily: () => null
 });
 
 export function ThemeProvider({
@@ -18,6 +23,13 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem('theme') as Theme) || defaultTheme
   );
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large' | 'x-large'>(
+    () => (localStorage.getItem('fontSize') as any) || 'medium'
+  );
+  const [fontFamily, setFontFamily] = useState<'system' | 'serif' | 'sans-serif' | 'monospace'>(
+    () => (localStorage.getItem('fontFamily') as any) || 'system'
+  );
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -28,14 +40,24 @@ export function ThemeProvider({
         ? 'dark'
         : 'light';
       root.classList.add(systemTheme);
+      setIsDarkMode(systemTheme === 'dark');
     } else {
       root.classList.add(theme);
+      setIsDarkMode(theme === 'dark');
     }
   }, [theme]);
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('fontSize', fontSize);
+  }, [fontSize]);
+
+  useEffect(() => {
+    localStorage.setItem('fontFamily', fontFamily);
+  }, [fontFamily]);
 
   const toggleTheme = () => {
     setTheme((prevTheme) => {
@@ -53,7 +75,16 @@ export function ThemeProvider({
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+    <ThemeContext.Provider value={{ 
+      theme, 
+      setTheme, 
+      toggleTheme, 
+      isDarkMode,
+      fontSize,
+      setFontSize,
+      fontFamily,
+      setFontFamily
+    }}>
       {children}
     </ThemeContext.Provider>
   );

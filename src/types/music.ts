@@ -86,15 +86,15 @@ export interface MusicControlsProps {
   onToggleMute: () => void;
   onVolumeChange: (volume: number) => void;
   track?: MusicTrack;
-  showVolume?: boolean; // Added for MusicControls.tsx
-  size?: 'sm' | 'md' | 'lg'; // Added for MusicControls.tsx
-  vertical?: boolean; // Added for MusicControls.tsx
-  className?: string; // Added for MusicControls.tsx
+  showVolume?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  vertical?: boolean;
+  className?: string;
 }
 
 export interface MusicLibraryProps {
   onTrackSelect?: (track: MusicTrack) => void;
-  onSelectTrack?: (track: MusicTrack) => void; // Added for LibraryTab.tsx
+  onSelectTrack?: (track: MusicTrack) => void;
   currentTrack?: MusicTrack;
   isPlaying?: boolean;
   searchTerm?: string;
@@ -102,6 +102,20 @@ export interface MusicLibraryProps {
   tracks?: MusicTrack[];
   playlists?: MusicPlaylist[];
   onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+}
+
+export interface MusicDrawerProps {
+  open?: boolean;
+  onClose?: () => void;
+}
+
+export interface Track extends MusicTrack {
+  // Additional fields
+}
+
+export interface TrackInfoProps {
+  track: MusicTrack;
+  className?: string;
 }
 
 export interface ProgressBarProps {

@@ -24,7 +24,7 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --radius: 1rem;
   }
 
   .dark {
@@ -121,68 +121,70 @@
   @apply transition-all duration-300 ease-in-out;
 }
 
-/* Time of day themes - UPDATED FOR BLUE */
-.bg-morning {
-  background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%);
-  color: var(--text-main-light);
+/* Premium UI Effects */
+.premium-card {
+  @apply rounded-2xl border border-white/40 bg-white/80 dark:bg-slate-900/80 dark:border-slate-800/40 shadow-lg backdrop-blur-sm;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
 }
 
-.bg-afternoon {
-  background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
-  color: var(--text-main-light);
+.premium-button {
+  @apply rounded-2xl font-medium shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1;
+  background: linear-gradient(45deg, var(--primary), color-mix(in srgb, var(--primary) 80%, white));
 }
 
-.bg-evening {
-  background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%);
-  color: var(--text-main-dark);
+.premium-glass {
+  @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl;
 }
 
-.bg-night {
-  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
-  color: var(--text-main-dark);
-}
-
-/* Premium button styles */
-.button-premium {
-  @apply rounded-full font-medium transition-all duration-300 shadow-lg hover:shadow-xl active:shadow-md;
-  background: linear-gradient(90deg, var(--primary), color-mix(in srgb, var(--primary) 80%, white));
-}
-
-/* Button hover effects */
-.hover-float {
-  @apply transition-all duration-300;
-}
-
-.hover-float:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-/* 3D Card effect */
-.card-3d {
-  @apply transition-all duration-500 hover:shadow-2xl;
-  transform-style: preserve-3d;
-  perspective: 1000px;
-}
-
-.card-3d:hover {
-  transform: rotateX(5deg) rotateY(5deg);
-}
-
-/* Glassmorphism */
-.glass {
-  @apply backdrop-blur-lg bg-white/10 border border-white/20;
-}
-
-.glass-blue {
-  @apply backdrop-blur-md bg-blue-500/10 border border-blue-300/30;
-}
-
-.premium-text-gradient {
+.text-gradient {
   @apply bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent;
 }
 
-/* Apple-like design utilities */
+/* Animation Effects */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.bg-gradient-animate {
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+/* Apple-style design utilities */
 .apple-card {
   @apply rounded-2xl shadow-md bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700;
   box-shadow: 0 4px 24px rgba(149, 157, 165, 0.1);
@@ -197,4 +199,18 @@
 .apple-button:hover {
   filter: brightness(1.05);
   transform: translateY(-1px);
+}
+
+/* Hover effects */
+.hover-lift {
+  @apply transition-transform hover:-translate-y-1;
+}
+
+.hover-glow {
+  @apply transition-shadow hover:shadow-lg;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }

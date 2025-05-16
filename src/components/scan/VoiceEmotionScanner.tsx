@@ -1,109 +1,109 @@
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mic, Square } from 'lucide-react';
-import { VoiceEmotionScannerProps, EmotionResult } from '@/types/emotion';
+import { VoiceEmotionScannerProps } from '@/types/emotion';
+import { MicIcon } from 'lucide-react';
 
-export const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({
+const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({
+  onComplete,
+  audioOnly = false,
   onResult,
   duration = 10,
   autoStart = false,
   showVisualizer = true,
-  className = ''
+  className = '',
 }) => {
-  const [recording, setRecording] = React.useState(false);
-  const [secondsLeft, setSecondsLeft] = React.useState(duration);
-  
+  const [isRecording, setIsRecording] = useState(autoStart);
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const startRecording = () => {
-    setRecording(true);
-    setSecondsLeft(duration);
+    setIsRecording(true);
     
-    // Simulate recording countdown
-    const interval = setInterval(() => {
-      setSecondsLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          stopRecording();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    // Simulate recording and processing
+    setTimeout(() => {
+      setIsRecording(false);
+      setIsProcessing(true);
+      
+      // Simulate processing time
+      setTimeout(() => {
+        setIsProcessing(false);
+        
+        // Generate a mock result
+        const result = {
+          id: crypto.randomUUID(), // Generate unique ID
+          emotion: 'calm',
+          score: 0.85,
+          confidence: 0.92,
+          text: "User audio sample processed successfully.",
+          feedback: "You sound calm and balanced. Your voice reflects inner peace.",
+        };
+        
+        if (onResult) onResult(result);
+        if (onComplete) onComplete(result);
+      }, 2000);
+    }, duration * 1000);
   };
-  
-  const stopRecording = () => {
-    setRecording(false);
-    
-    // Mock result for now
-    if (onResult) {
-      const mockResult: EmotionResult = {
-        emotion: 'calm',
-        score: 0.85,
-        confidence: 0.92,
-        text: 'Voice transcript would appear here in a real implementation',
-        feedback: 'You sound calm and collected.',
-      };
-      onResult(mockResult);
-    }
-  };
-  
-  // Auto-start recording if configured
-  React.useEffect(() => {
-    if (autoStart) {
-      startRecording();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  
+
+  if (autoStart && !isRecording && !isProcessing) {
+    startRecording();
+  }
+
   return (
     <Card className={className}>
-      <CardHeader>
-        <CardTitle>Analyse vocale</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {showVisualizer && (
-          <div className="h-20 bg-secondary/20 rounded-md flex items-center justify-center">
-            <div className="flex items-center space-x-1">
-              {recording && Array.from({ length: 10 }).map((_, i) => (
-                <div 
-                  key={i} 
-                  className="bg-primary h-8 w-1 animate-pulse"
-                  style={{
-                    height: `${Math.random() * 40 + 10}px`,
-                    animationDelay: `${i * 0.1}s`
-                  }}
-                />
-              ))}
-              {!recording && <p className="text-muted-foreground">Visualiseur audio</p>}
-            </div>
-          </div>
+      <CardContent className="pt-6 text-center">
+        <div 
+          className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-4 transition-colors
+            ${isRecording ? 'animate-pulse bg-red-100 dark:bg-red-900' : 
+              isProcessing ? 'bg-amber-100 dark:bg-amber-900' : 
+              'bg-muted'}`}
+        >
+          <MicIcon 
+            className={`h-10 w-10 
+              ${isRecording ? 'text-red-500' : 
+                isProcessing ? 'text-amber-500' : 
+                'text-muted-foreground'}`} 
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <h3 className="font-medium text-lg">
+            {isRecording ? 'Écoute en cours...' : 
+             isProcessing ? 'Analyse en cours...' : 
+             'Prêt à analyser votre voix'}
+          </h3>
+          
+          <p className="text-muted-foreground text-sm">
+            {isRecording ? `Parlez naturellement pendant ${duration} secondes` : 
+             isProcessing ? 'Traitement de votre échantillon vocal' : 
+             'Appuyez sur le bouton pour commencer l\'analyse vocale'}
+          </p>
+        </div>
+        
+        {!isRecording && !isProcessing && !autoStart && (
+          <Button 
+            className="mt-6"
+            onClick={startRecording}
+          >
+            Démarrer l'analyse
+          </Button>
         )}
         
-        <div className="text-center">
-          {recording ? (
-            <>
-              <p className="mb-2 text-lg font-semibold">{secondsLeft}</p>
-              <Button 
-                variant="destructive" 
-                className="flex items-center gap-2"
-                onClick={stopRecording}
-              >
-                <Square className="h-4 w-4" />
-                Arrêter l'enregistrement
-              </Button>
-            </>
-          ) : (
-            <Button 
-              variant="default" 
-              className="flex items-center gap-2"
-              onClick={startRecording}
-            >
-              <Mic className="h-4 w-4" />
-              Commencer l'enregistrement
-            </Button>
-          )}
-        </div>
+        {showVisualizer && isRecording && (
+          <div className="mt-4 flex justify-center items-end space-x-1 h-8">
+            {[...Array(12)].map((_, i) => (
+              <div 
+                key={i}
+                className="w-1 bg-primary"
+                style={{ 
+                  height: `${Math.random() * 100}%`,
+                  animationDelay: `${i * 0.1}s`,
+                  animationDuration: `${0.5 + Math.random() * 0.5}s`
+                }}
+              />
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

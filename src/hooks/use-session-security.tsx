@@ -17,6 +17,7 @@ export const useSessionSecurity = (options: Partial<UseSessionSecurityOptions> =
   const { logout, isAuthenticated } = useAuth();
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
   const [showWarning, setShowWarning] = useState<boolean>(false);
+  const [timeLeft, setTimeLeft] = useState<number>(0);
 
   // Merge default options with provided options
   const sessionOptions = {
@@ -67,6 +68,9 @@ export const useSessionSecurity = (options: Partial<UseSessionSecurityOptions> =
     const intervalId = setInterval(() => {
       const currentTime = Date.now();
       const timeSinceLastActivity = currentTime - lastActivity;
+      const remainingTime = sessionTimeout - timeSinceLastActivity;
+      
+      setTimeLeft(Math.max(0, remainingTime));
       
       if (timeSinceLastActivity > sessionTimeout) {
         // Session has expired, log user out
@@ -84,7 +88,8 @@ export const useSessionSecurity = (options: Partial<UseSessionSecurityOptions> =
   return {
     showWarning,
     resetTimer,
-    sessionExpiresIn: Math.max(0, sessionTimeout - (Date.now() - lastActivity))
+    sessionExpiresIn: Math.max(0, sessionTimeout - (Date.now() - lastActivity)),
+    timeLeft
   };
 };
 

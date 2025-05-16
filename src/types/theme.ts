@@ -1,21 +1,26 @@
 
-export type Theme = 'light' | 'dark' | 'pastel' | 'system';
+import { ReactNode } from 'react';
+
+export type Theme = 'light' | 'dark' | 'system' | 'pastel';
+export type FontFamily = 'system' | 'serif' | 'sans-serif' | 'monospace';
+export type FontSize = 'small' | 'medium' | 'large' | 'x-large';
 
 export interface ThemeContextType {
   theme: Theme;
-  isDarkMode: boolean;
   setTheme: (theme: Theme) => void;
+  isDarkMode: boolean;
   toggleTheme: () => void;
-  fontSize: FontSize;
-  setFontSize: (size: FontSize) => void;
-  fontFamily: FontFamily;
-  setFontFamily: (family: FontFamily) => void;
+  fontSize?: FontSize;
+  setFontSize?: (size: FontSize) => void;
+  fontFamily?: FontFamily;
+  setFontFamily?: (family: FontFamily) => void;
+  getContrastText?: (color: string) => 'black' | 'white';
 }
 
-export type FontSize = 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large' | 'x-large';
-export type FontFamily = 'system' | 'serif' | 'mono' | 'sans' | 'sans-serif' | 'monospace';
-
 export interface ThemeButtonProps {
-  variant?: string;
-  size?: string;
+  variant?: 'default' | 'outline' | 'ghost';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
+  children?: ReactNode;
+  className?: string;
+  onClick?: () => void;
 }
