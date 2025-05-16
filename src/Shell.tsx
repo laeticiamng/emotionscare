@@ -86,7 +86,7 @@ export default function Shell({ children, hideNav }: ShellProps) {
                     {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right">
+                <SheetContent>
                   <div className="flex flex-col gap-8 py-8">
                     <Link
                       to="/"

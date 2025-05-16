@@ -5,7 +5,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import LoginPage from '@/pages/LoginPage';
 import { ModeToggle } from '@/components/theme/ModeToggle';
 import { useLayout } from '@/contexts/LayoutContext';
-import { useSidebar } from '@/contexts/SidebarContext';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 
@@ -31,7 +30,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Import directly from the folders that exist */}
       <div className="hidden md:block">
         {/* Sidebar will be rendered separately using the SidebarProvider */}
       </div>

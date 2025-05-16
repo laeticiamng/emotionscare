@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
+import { LayoutProvider } from '@/contexts/LayoutContext';
 import { Toaster } from '@/components/ui/toaster';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -15,8 +16,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <ThemeProvider>
         <AuthProvider>
           <UserModeProvider>
-            <App />
-            <Toaster />
+            <LayoutProvider>
+              <App />
+              <Toaster />
+            </LayoutProvider>
           </UserModeProvider>
         </AuthProvider>
       </ThemeProvider>

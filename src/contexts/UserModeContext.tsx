@@ -7,22 +7,31 @@ interface UserModeContextType {
   userMode: UserMode;
   setUserMode: (mode: UserMode) => void;
   clearUserMode: () => void;
+  isLoading: boolean;
 }
 
 const UserModeContext = createContext<UserModeContextType>({
   userMode: null,
   setUserMode: () => {},
   clearUserMode: () => {},
+  isLoading: true
 });
 
 export const UserModeProvider = ({ children }: { children: ReactNode }) => {
   const [userMode, setUserModeState] = useState<UserMode>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     // Initialize from localStorage on mount
-    const savedMode = localStorage.getItem('userMode') as UserMode | null;
-    if (savedMode) {
-      setUserModeState(savedMode);
+    try {
+      const savedMode = localStorage.getItem('userMode') as UserMode | null;
+      if (savedMode) {
+        setUserModeState(savedMode);
+      }
+    } catch (error) {
+      console.error("Error reading userMode from localStorage:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
   
@@ -41,7 +50,7 @@ export const UserModeProvider = ({ children }: { children: ReactNode }) => {
   };
   
   return (
-    <UserModeContext.Provider value={{ userMode, setUserMode, clearUserMode }}>
+    <UserModeContext.Provider value={{ userMode, setUserMode, clearUserMode, isLoading }}>
       {children}
     </UserModeContext.Provider>
   );
