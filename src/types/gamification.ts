@@ -3,7 +3,7 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  icon: string;
+  icon: string; // Icon name or URL
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   unlocked: boolean;
   progress?: number;
@@ -22,11 +22,16 @@ export interface GamificationStats {
   totalChallenges: number;
   unlockedBadges: number;
   totalBadges: number;
+  points?: number; // Added for UserDashboard
+  badges?: number; // Added for AdminDashboard
+  activeUsersPercent?: number; // Added for GamificationSummaryCard
+  completionRate?: number; // Added for GamificationSummaryCard
 }
 
 export interface Challenge {
   id: string;
   name: string;
+  title?: string; // Added for ChallengesList
   description: string;
   reward: number;
   progress: number;
@@ -34,6 +39,12 @@ export interface Challenge {
   completed: boolean;
   category: string;
   endDate?: string;
+  deadline?: string; // Added for ChallengesList
+  status?: 'active' | 'completed' | 'expired'; // Added for ChallengesList
+  difficulty?: 'easy' | 'medium' | 'hard'; // Added for ChallengesList
+  completions?: number; // Added for ChallengesList
+  points?: number; // Added for ChallengesList
+  total?: number; // Added for ChallengesList
 }
 
 export interface Reward {

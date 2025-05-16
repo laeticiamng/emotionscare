@@ -1,3 +1,3 @@
 
-// Export all coach contexts from this barrel file
+// Export all coach-related components from this barrel file
 export * from './CoachContextProvider';

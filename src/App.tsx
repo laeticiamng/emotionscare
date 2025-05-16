@@ -10,9 +10,9 @@ import './styles/glass.css';
 // Import app components
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from './components/theme-provider';
-import { MusicProvider } from './contexts/music'; // Fixed import
-import { CoachProvider } from './contexts/coach'; // Fixed import
-import { AppRoutes } from './router'; // Fixed import
+import { MusicProvider } from './contexts/music'; 
+import { CoachProvider } from './contexts/coach';
+import { AppRoutes } from './router/index';
 
 function App() {
   return (

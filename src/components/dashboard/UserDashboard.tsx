@@ -1,272 +1,205 @@
+
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Challenge, GamificationStats } from '@/types/gamification';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Book, Calendar, Music, Scan, MessagesSquare } from 'lucide-react';
-import EmotionPieChart from '@/components/dashboard/charts/EmotionPieChart';
-import WeeklyActivityChart from '@/components/dashboard/charts/WeeklyActivityChart';
-import DashboardHero from '@/components/dashboard/DashboardHero';
-import { UserDashboardSections } from '@/components/dashboard/UserDashboardSections';
-import LeaderboardWidget from '@/components/dashboard/widgets/LeaderboardWidget';
-import BadgesWidget from '@/components/dashboard/widgets/BadgesWidget';
-import DailyInsightCard from '@/components/dashboard/widgets/DailyInsightCard';
-import QuickActionLinks from '@/components/dashboard/widgets/QuickActionLinks';
-import { normalizeBadges, visibleBadges } from '@/utils/badgeUtils';
+import UserSidePanel from './UserSidePanel';
+import EmotionalTrends from './EmotionalTrends';
+import RecentJournalEntries from './RecentJournalEntries';
+import { ChevronRight, Award, Zap } from 'lucide-react';
+import { GamificationStats, Badge } from '@/types/gamification';
 
-const { 
-  PopularSessionsSection, 
-  RecentActivitySection, 
-  UpcomingEventsSection
-} = UserDashboardSections;
+// Example data for badges
+const mockBadges: Partial<Badge>[] = [
+  {
+    id: '1',
+    name: 'Premier Pas',
+    description: 'Compléter votre première entrée de journal',
+    icon: '/icons/badges/firstStep.svg',
+    rarity: 'common',
+    unlocked: true,
+  },
+  {
+    id: '2',
+    name: 'Zen Master',
+    description: '10 méditations complétées',
+    icon: '/icons/badges/zenMaster.svg',
+    rarity: 'uncommon',
+    unlocked: true,
+  },
+  {
+    id: '3',
+    name: 'Explorateur Musical',
+    description: 'Écouter 5 types de musiques thérapeutiques',
+    icon: '/icons/badges/musicExplorer.svg',
+    rarity: 'rare',
+    unlocked: false,
+    progress: 3,
+    maxProgress: 5,
+  }
+];
 
-const UserDashboard: React.FC = () => {
-  const navigate = useNavigate();
+// Example gamification stats
+const mockGamificationStats: GamificationStats = {
+  level: 5,
+  xp: 2400,
+  xpToNextLevel: 1000,
+  streakDays: 7,
+  longestStreak: 14,
+  completedChallenges: 12,
+  totalChallenges: 20,
+  unlockedBadges: 8,
+  totalBadges: 25,
+  points: 1250 // Added to fix the error
+};
+
+// Example emotional assessment data
+const emotionalAssessment = {
+  currentMood: 'calm',
+  moodIntensity: 60,
+  lastUpdated: '2023-05-15T10:30:00',
+  suggestions: [
+    'Take a moment for deep breathing',
+    'Listen to calming music',
+    'Write in your journal'
+  ]
+};
+
+interface UserDashboardProps {
+  userName?: string;
+  userAvatar?: string;
+}
+
+const UserDashboard: React.FC<UserDashboardProps> = ({ 
+  userName = "Alex",
+  userAvatar = "/avatars/default.png"
+}) => {
+  const xpPercentage = (mockGamificationStats.xp / (mockGamificationStats.xp + mockGamificationStats.xpToNextLevel)) * 100;
   
-  // Mock data for dashboard
-  const userChallenges = [
-    {
-      id: "1",
-      title: "Méditation quotidienne",
-      name: "Méditation quotidienne",
-      description: "Méditez pendant 5 minutes",
-      category: "daily",
-      points: 10,
-      progress: 0,
-      completions: 0,
-      status: "active" as const
-    },
-    {
-      id: "2",
-      title: "Journal hebdomadaire",
-      name: "Journal hebdomadaire",
-      description: "Complétez 3 entrées de journal cette semaine",
-      category: "weekly",
-      points: 30,
-      progress: 33,
-      completions: 1,
-      status: "active" as const
-    },
-    {
-      id: "3",
-      title: "Quête mensuelle",
-      name: "Quête mensuelle",
-      description: "Atteignez 500 points ce mois-ci",
-      category: "monthly",
-      points: 50,
-      progress: 60,
-      completions: 0,
-      status: "active" as const
-    }
-  ];
-
-  const userProgress = 250;
-
-  const userBadges = normalizeBadges([
-    {
-      id: "1",
-      name: "Premier pas",
-      description: "Premier jour sur la plateforme",
-      image: "/badges/first-day.svg",
-      category: "milestone",
-      tier: "bronze",
-      unlockedAt: "2023-05-10T12:00:00Z",
-      completed: true
-    },
-    {
-      id: "2",
-      name: "Journal émotionnel",
-      description: "Écrit dans le journal 5 jours consécutifs",
-      image: "/badges/journal.png",
-      category: "journal",
-      tier: "silver",
-      unlockedAt: "2023-04-15",
-      completed: true
-    },
-    {
-      id: "3",
-      name: "Mélomane",
-      description: "Écoute 10 sessions de musique différentes",
-      image: "/badges/music.png",
-      category: "music",
-      tier: "gold",
-      progress: 70,
-      completed: false
-    }
-  ]);
-
-  const leaderboard = [
-    {
-      id: "1",
-      userId: "1",
-      name: "Thomas",
-      avatar: "/avatars/thomas.jpg",
-      points: 1250,
-      rank: 1,
-      level: 5,
-      isCurrentUser: false
-    },
-    {
-      id: "2",
-      userId: "2",
-      name: "Marie",
-      avatar: "/avatars/marie.jpg",
-      points: 980,
-      rank: 2,
-      level: 4,
-      isCurrentUser: true
-    },
-    {
-      id: "3",
-      userId: "3",
-      name: "Julien",
-      avatar: "/avatars/julien.jpg",
-      points: 760,
-      rank: 3,
-      level: 3,
-      isCurrentUser: false
-    }
-  ];
-
-  const userStat: GamificationStats = {
-    points: 980,
-    level: 4,
-    badges: userBadges,
-    completedChallenges: 24,
-    totalChallenges: 35,
-    challenges: userChallenges,
-    streak: 5,
-    nextLevel: {
-      points: 1200,
-      rewards: ["Badge Premium", "Accès VIP"],
-      level: 5
-    },
-    progress: userProgress,
-    leaderboard: leaderboard
-  };
-
-  const emotionData = [
-    { name: 'Joie', value: 35, color: '#4CAF50' },
-    { name: 'Calme', value: 25, color: '#2196F3' },
-    { name: 'Énergie', value: 15, color: '#FF9800' },
-    { name: 'Stress', value: 10, color: '#F44336' },
-    { name: 'Focus', value: 15, color: '#9C27B0' }
-  ];
-
-  const activityData = [
-    { day: 'Lun', value: 30 },
-    { day: 'Mar', value: 45 },
-    { day: 'Mer', value: 25 },
-    { day: 'Jeu', value: 60 },
-    { day: 'Ven', value: 35 },
-    { day: 'Sam', value: 15 },
-    { day: 'Dim', value: 20 }
-  ];
-
-  const quickLinks = [
-    {
-      title: 'Journal',
-      description: 'Exprimez vos émotions',
-      icon: <Book className="h-5 w-5 text-white" />,
-      href: '/journal',
-      color: 'bg-blue-500'
-    },
-    {
-      title: 'Musique',
-      description: 'Relaxez-vous en musique',
-      icon: <Music className="h-5 w-5 text-white" />,
-      href: '/music',
-      color: 'bg-purple-500'
-    },
-    {
-      title: 'Coach',
-      description: 'Parlez à votre coach IA',
-      icon: <MessagesSquare className="h-5 w-5 text-white" />,
-      href: '/coach',
-      color: 'bg-green-500'
-    },
-    {
-      title: 'Scan',
-      description: 'Analysez vos émotions',
-      icon: <Scan className="h-5 w-5 text-white" />,
-      href: '/scan',
-      color: 'bg-orange-500'
-    }
-  ];
-
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      {/* Hero section */}
-      <DashboardHero 
-        user={{ name: 'Thomas', avatar: '/avatars/thomas.jpg' }} 
-        points={userStat.points} 
-        level={userStat.level.toString()} 
-      />
-
-      {/* Insight card */}
-      <DailyInsightCard 
-        message="Aujourd'hui est un bon jour pour prendre soin de votre bien-être émotionnel. Avez-vous pensé à faire une séance de respiration ?" 
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Left side - User panel */}
+      <UserSidePanel 
+        userName={userName}
+        userAvatar={userAvatar}
+        stats={mockGamificationStats}
+        emotionalAssessment={emotionalAssessment}
       />
       
-      {/* Quick action links */}
-      <section className="mb-8">
-        <h2 className="text-lg font-medium mb-4">Actions rapides</h2>
-        <QuickActionLinks links={quickLinks} />
-      </section>
-
-      {/* Main dashboard content */}
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Aperçu</TabsTrigger>
-          <TabsTrigger value="emotions">Émotions</TabsTrigger>
-          <TabsTrigger value="activity">Activité</TabsTrigger>
-        </TabsList>
+      {/* Middle and Right - Main content */}
+      <div className="md:col-span-2 space-y-6">
+        {/* Welcome and level info */}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div className="w-20 h-20 relative">
+                <CircularProgressbar 
+                  value={xpPercentage} 
+                  text={`${mockGamificationStats.level}`}
+                  styles={buildStyles({
+                    textSize: '2rem',
+                    pathColor: '#6366f1',
+                    textColor: '#6366f1',
+                    trailColor: '#e2e8f0',
+                  })}
+                />
+              </div>
+              
+              <div className="flex-1 text-center sm:text-left">
+                <h2 className="text-2xl font-bold">Bienvenue, {userName}</h2>
+                <p className="text-muted-foreground mb-2">
+                  Vous êtes niveau {mockGamificationStats.level} avec {mockGamificationStats.points} points
+                </p>
+                <div className="flex items-center gap-2 justify-center sm:justify-start">
+                  <div className="text-xs text-muted-foreground">
+                    {mockGamificationStats.xp} XP
+                  </div>
+                  <div className="w-full max-w-xs h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary" 
+                      style={{ width: `${xpPercentage}%` }}
+                    ></div>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {mockGamificationStats.xp + mockGamificationStats.xpToNextLevel} XP
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
         
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <RecentActivitySection />
-            <UpcomingEventsSection />
-            <PopularSessionsSection />
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="emotions" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Tabs for different content */}
+        <Tabs defaultValue="overview" className="space-y-4">
+          <TabsList className="grid grid-cols-3">
+            <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+            <TabsTrigger value="emotional">État émotionnel</TabsTrigger>
+            <TabsTrigger value="activity">Activité</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="space-y-4">
+            {/* Badges section */}
             <Card>
-              <CardContent className="pt-6">
-                <h3 className="text-lg font-medium mb-4">Émotions cette semaine</h3>
-                <div className="h-[300px]">
-                  <EmotionPieChart data={emotionData} />
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-md font-medium">Vos badges récents</CardTitle>
+                <Button variant="ghost" size="sm" className="text-sm">
+                  Voir tout
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-4">
+                  {mockBadges.map((badge) => (
+                    <div 
+                      key={badge.id} 
+                      className="flex flex-col items-center text-center"
+                    >
+                      <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-2">
+                        {badge.icon ? (
+                          <img 
+                            src={badge.icon} 
+                            alt={badge.name} 
+                            className="w-8 h-8"
+                            onError={(e) => {
+                              // Fallback for image load errors
+                              const target = e.target as HTMLImageElement;
+                              target.src = '/icons/badges/default.svg';
+                            }}
+                          />
+                        ) : (
+                          <Award className="h-6 w-6 text-primary" />
+                        )}
+                      </div>
+                      <div className="text-xs font-medium">{badge.name}</div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
-            <BadgesWidget 
-              badges={normalizeBadges(visibleBadges)}
-              showSeeAll={true}
-              onSeeAll={() => navigate('/gamification')}
-            />
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="activity" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            {/* Recent journal entries */}
+            <RecentJournalEntries />
+          </TabsContent>
+          
+          <TabsContent value="emotional">
+            <EmotionalTrends />
+          </TabsContent>
+          
+          <TabsContent value="activity">
             <Card>
-              <CardContent className="pt-6">
-                <h3 className="text-lg font-medium mb-4">Activité hebdomadaire</h3>
-                <div className="h-[300px]">
-                  <WeeklyActivityChart data={activityData} />
-                </div>
+              <CardHeader>
+                <CardTitle>Activité récente</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>Visualisation de votre activité récente...</p>
               </CardContent>
             </Card>
-            <LeaderboardWidget 
-              entries={leaderboard}
-              title="Classement"
-              showSeeAll={true}
-              onSeeAll={() => console.log('View all leaderboard')} 
-            />
-          </div>
-        </TabsContent>
-      </Tabs>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };
