@@ -1,30 +1,25 @@
 
 import React, { ReactNode } from 'react';
+import { ResponsiveContainer } from 'recharts';
 
 export interface ChartContainerProps {
   children: ReactNode;
+  width?: number | string;
+  height?: number | string;
   className?: string;
-  title?: string;
-  description?: string;
 }
 
 export const ChartContainer: React.FC<ChartContainerProps> = ({
   children,
-  className = '',
-  title,
-  description
+  width = '100%',
+  height = 300,
+  className,
 }) => {
   return (
-    <div className={`rounded-lg border bg-card p-4 ${className}`}>
-      {(title || description) && (
-        <div className="mb-4">
-          {title && <h3 className="text-lg font-medium">{title}</h3>}
-          {description && <p className="text-sm text-muted-foreground">{description}</p>}
-        </div>
-      )}
-      <div className="h-full w-full">
+    <div className={className}>
+      <ResponsiveContainer width={width} height={height}>
         {children}
-      </div>
+      </ResponsiveContainer>
     </div>
   );
 };

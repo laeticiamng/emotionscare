@@ -1,334 +1,316 @@
-
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from "@/components/ui/button";
-import { 
-  Home, 
-  Menu, 
-  X, 
-  Settings, 
-  User, 
-  LogOut, 
-  Bell, 
-  Search,
-  Heart,
-  FileText,
-  Music,
-  MessageSquare,
-  Headphones,
-  Layout,
-  BarChart, 
-  Sparkles
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
+import { Link } from 'react-router-dom';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
-import { useNotificationBadge } from "@/hooks/useNotificationBadge";
-import { motion } from "framer-motion";
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ModeToggle } from "@/components/theme/ModeToggle"
+import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { normalizeUserRole, getRoleName, getRoleHomePath } from '@/utils/roleUtils';
+import { normalizeUserMode, getUserModeDisplayName } from '@/utils/userModeUtils';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/types/navigation';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlignJustify,
+  Home,
+  LayoutDashboard,
+  Book,
+  Music,
+  Camera,
+  Headphones,
+  Settings,
+  LogOut,
+  LogIn,
+  UserPlus,
+  Users,
+  Activity,
+  FileBarGraph,
+  Calendar,
+  SunMoon,
+} from 'lucide-react';
 
 const MainNavbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
-  const { count } = useNotificationBadge();
-  const navigate = useNavigate();
   const { userMode } = useUserMode();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
 
-  const normalizedUserMode = userMode ? normalizeUserRole(userMode) : '';
-
-  const isAdmin = normalizedUserMode === 'b2b_admin';
-  
-  const getNavItems = () => {
-    if (isAdmin) {
-      return [
-        { label: "Tableau de bord", icon: <Home className="h-4 w-4 mr-2" />, path: ROUTES.b2bAdmin.dashboard },
-        { label: "Équipes", icon: <User className="h-4 w-4 mr-2" />, path: ROUTES.b2bAdmin.teams },
-        { label: "Rapports", icon: <FileText className="h-4 w-4 mr-2" />, path: ROUTES.b2bAdmin.reports },
-        { label: "Événements", icon: <Layout className="h-4 w-4 mr-2" />, path: ROUTES.b2bAdmin.events },
-        { label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" />, path: ROUTES.b2bAdmin.settings }
-      ];
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+      toast({
+        title: "Déconnexion réussie",
+        description: "Vous avez été déconnecté avec succès.",
+      });
+    } catch (error) {
+      console.error("Logout failed", error);
+      toast({
+        title: "Erreur de déconnexion",
+        description: "Une erreur s'est produite lors de la déconnexion.",
+        variant: "destructive",
+      });
     }
-    
-    if (normalizedUserMode === 'b2b_user') {
-      return [
-        { label: "Accueil", icon: <Home className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.dashboard },
-        { label: "Scan", icon: <Heart className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.scan },
-        { label: "Journal", icon: <FileText className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.journal },
-        { label: "Musique", icon: <Music className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.music },
-        { label: "Coach", icon: <MessageSquare className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.coach },
-        { label: "VR", icon: <Layout className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.vr },
-        { label: "Défis", icon: <BarChart className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.gamification },
-        { label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.preferences }
-      ];
-    }
-    
-    return [
-      { label: "Accueil", icon: <Home className="h-4 w-4 mr-2" />, path: ROUTES.b2c.dashboard },
-      { label: "Scan", icon: <Heart className="h-4 w-4 mr-2" />, path: ROUTES.b2c.scan },
-      { label: "Journal", icon: <FileText className="h-4 w-4 mr-2" />, path: ROUTES.b2c.journal },
-      { label: "Musique", icon: <Music className="h-4 w-4 mr-2" />, path: ROUTES.b2c.music },
-      { label: "Coach", icon: <MessageSquare className="h-4 w-4 mr-2" />, path: ROUTES.b2c.coach },
-      { label: "VR", icon: <Layout className="h-4 w-4 mr-2" />, path: ROUTES.b2c.vr },
-      { label: "Défis", icon: <BarChart className="h-4 w-4 mr-2" />, path: ROUTES.b2c.gamification },
-      { label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" />, path: ROUTES.b2c.preferences }
-    ];
   };
 
-  const handleLogout = () => {
-    setShowConfirm(true);
+  const renderAuthButtons = () => {
+    if (isAuthenticated) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={user?.avatar} alt={user?.name} />
+                <AvatarFallback>{user?.name?.charAt(0).toUpperCase()}</AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuLabel>Mon Profil</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem disabled>
+              <span className="mr-2">Mode:</span> {getUserModeDisplayName(userMode)}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate(ROUTES[normalizeUserMode(userMode)].preferences)}>
+              <Settings className="mr-2 h-4 w-4" />
+              Paramètres
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Se déconnecter
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    } else {
+      return (
+        <>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2c.login}>Se connecter</Link>
+          </Button>
+          <Button asChild>
+            <Link to={ROUTES.b2c.register}>S'inscrire</Link>
+          </Button>
+        </>
+      );
+    }
   };
-  
-  const confirmLogout = async () => {
-    await logout();
-    setShowConfirm(false);
-    navigate('/');
+
+  const renderNavigationLinks = () => {
+    const normalizedMode = normalizeUserMode(userMode);
+
+    if (normalizedMode === 'b2b_admin') {
+      return (
+        <>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bAdmin.dashboard}>
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              Tableau de bord
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bAdmin.journal}>
+              <Book className="mr-2 h-4 w-4" />
+              Journal
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bAdmin.scan}>
+              <Camera className="mr-2 h-4 w-4" />
+              Analyse
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bAdmin.music}>
+              <Music className="mr-2 h-4 w-4" />
+              Musique
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bAdmin.teams}>
+              <Users className="mr-2 h-4 w-4" />
+              Équipes
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bAdmin.reports}>
+              <FileBarGraph className="mr-2 h-4 w-4" />
+              Rapports
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bAdmin.events}>
+              <Calendar className="mr-2 h-4 w-4" />
+              Événements
+            </Link>
+          </Button>
+        </>
+      );
+    } else if (normalizedMode === 'b2b_user') {
+      return (
+        <>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bUser.dashboard}>
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              Tableau de bord
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bUser.journal}>
+              <Book className="mr-2 h-4 w-4" />
+              Journal
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bUser.music}>
+              <Music className="mr-2 h-4 w-4" />
+              Musique
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bUser.scan}>
+              <Camera className="mr-2 h-4 w-4" />
+              Analyse
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bUser.coach}>
+              <Headphones className="mr-2 h-4 w-4" />
+              Coach IA
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2bUser.vr}>
+              <Activity className="mr-2 h-4 w-4" />
+              VR
+            </Link>
+          </Button>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2c.dashboard}>
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              Tableau de bord
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2c.journal}>
+              <Book className="mr-2 h-4 w-4" />
+              Journal
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2c.music}>
+              <Music className="mr-2 h-4 w-4" />
+              Musique
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2c.scan}>
+              <Camera className="mr-2 h-4 w-4" />
+              Analyse
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2c.coach}>
+              <Headphones className="mr-2 h-4 w-4" />
+              Coach IA
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to={ROUTES.b2c.vr}>
+              <Activity className="mr-2 h-4 w-4" />
+              VR
+            </Link>
+          </Button>
+        </>
+      );
+    }
   };
-  
-  const cancelLogout = () => {
-    setShowConfirm(false);
-  };
-  
-  const navItems = getNavItems();
-  
-  const userRole = user?.role ? getRoleName(user.role) : 'Utilisateur';
 
   return (
-    <header className="bg-background/95 backdrop-blur-md border-b sticky top-0 z-50 transition-all">
-      <div className="container mx-auto px-4 flex h-16 items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="relative flex items-center">
-            <motion.div 
-              className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center"
-              initial={{ scale: 1 }}
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Sparkles className="h-5 w-5 text-primary" />
-            </motion.div>
-            <motion.h1 
-              className="ml-2 text-lg font-bold"
-              initial={{ opacity: 1 }}
-              whileHover={{ opacity: 0.8 }}
-              transition={{ duration: 0.2 }}
-            >
-              EmotionsCare
-            </motion.h1>
-          </div>
+    <div className="border-b">
+      <div className="container flex h-16 items-center justify-between">
+        <Link to="/" className="mr-4 flex items-center space-x-2">
+          <span className="font-bold">EmotionsCare</span>
         </Link>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1">
-          {isAuthenticated && navItems.map((link) => (
-            <Button 
-              key={link.path} 
-              variant="ghost" 
-              size="sm"
-              asChild
-              className="px-3"
-            >
-              <Link to={link.path} className="flex items-center">
-                {link.icon}
-                <span>{link.label}</span>
-              </Link>
+        <div className="hidden md:flex items-center space-x-4">
+          {renderNavigationLinks()}
+        </div>
+        <div className="hidden md:flex items-center space-x-2">
+          {renderAuthButtons()}
+          <ModeToggle />
+        </div>
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild className="md:hidden">
+            <Button variant="ghost" size="sm">
+              <AlignJustify className="h-4 w-4" />
             </Button>
-          ))}
-        </nav>
-
-        {/* Right side actions */}
-        <div className="flex items-center gap-2">
-          {isAuthenticated ? (
-            <>
-              {/* Search button */}
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Search className="h-5 w-5" />
+          </SheetTrigger>
+          <SheetContent side="bottom" className="sm:hidden">
+            <SheetHeader>
+              <SheetTitle>EmotionsCare</SheetTitle>
+              <SheetDescription>
+                {user ? `Bienvenue, ${user.name}!` : "Menu"}
+              </SheetDescription>
+            </SheetHeader>
+            <div className="grid gap-4 py-4">
+              <Button variant="ghost" className="justify-start" asChild>
+                <Link to="/">
+                  <Home className="mr-2 h-4 w-4" />
+                  Accueil
+                </Link>
               </Button>
-              
-              {/* Podcast button */}
-              <Button variant="ghost" size="icon" className="rounded-full" onClick={() => navigate('/podcast')}>
-                <Headphones className="h-5 w-5" />
-              </Button>
-              
-              {/* Notifications */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full relative">
-                    <Bell className="h-5 w-5" />
-                    {count > 0 && (
-                      <Badge 
-                        className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-primary text-white"
-                      >
-                        {count}
-                      </Badge>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-80">
-                  <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <div className="max-h-80 overflow-auto p-2">
-                    <div className="text-center text-sm text-muted-foreground py-4">
-                      Aucune nouvelle notification
-                    </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <div className="p-2">
-                    <Button size="sm" variant="outline" className="w-full">
-                      Voir toutes les notifications
+              {renderNavigationLinks()}
+              <div className="flex flex-col items-center justify-center space-y-2">
+                {!isAuthenticated && (
+                  <>
+                    <Button variant="ghost" className="justify-start" asChild>
+                      <Link to={ROUTES.b2c.login}>
+                        <LogIn className="mr-2 h-4 w-4" />
+                        Se connecter
+                      </Link>
                     </Button>
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              
-              {/* User Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="relative h-9 w-9 rounded-full">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src={user?.avatar_url || undefined} alt={user?.name || 'Utilisateur'} />
-                      <AvatarFallback className="bg-primary/10">
-                        {user?.name?.charAt(0) || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      <User className="mr-2 h-4 w-4" />
-                      <span>{user?.name || 'Utilisateur'}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <BarChart className="mr-2 h-4 w-4" />
-                      <span>{userRole}</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={() => navigate(getRoleHomePath(user?.role))}>
-                      <Home className="mr-2 h-4 w-4" />
-                      <span>Tableau de bord</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/settings')}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Paramètres</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
+                    <Button variant="ghost" className="justify-start" asChild>
+                      <Link to={ROUTES.b2c.register}>
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        S'inscrire
+                      </Link>
+                    </Button>
+                  </>
+                )}
+                {isAuthenticated && (
+                  <Button variant="ghost" className="justify-start" onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Se déconnecter</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              
-              {/* Mobile Menu */}
-              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="md:hidden rounded-full">
-                    <Menu className="h-5 w-5" />
+                    Se déconnecter
                   </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="max-w-[300px]">
-                  <div className="flex flex-col h-full">
-                    <div className="py-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Sparkles className="h-5 w-5 text-primary" />
-                        </div>
-                        <h2 className="text-lg font-semibold">EmotionsCare</h2>
-                      </div>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="rounded-full"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        <X className="h-5 w-5" />
-                      </Button>
-                    </div>
-                    
-                    <nav className="flex-1 space-y-2 py-4">
-                      {navItems.map((link) => (
-                        <Button 
-                          key={link.path} 
-                          variant="ghost" 
-                          className="w-full justify-start"
-                          onClick={() => {
-                            navigate(link.path);
-                            setMobileMenuOpen(false);
-                          }}
-                        >
-                          {link.icon}
-                          {link.label}
-                        </Button>
-                      ))}
-                    </nav>
-                    
-                    <div className="border-t py-4">
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start mb-2"
-                        onClick={() => {
-                          navigate('/settings');
-                          setMobileMenuOpen(false);
-                        }}
-                      >
-                        <Settings className="mr-2 h-4 w-4" />
-                        Paramètres
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        className="w-full justify-start"
-                        onClick={handleLogout}
-                      >
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Se déconnecter
-                      </Button>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </>
-          ) : (
-            <>
-              <Button variant="outline" asChild>
-                <Link to="/login">Connexion</Link>
-              </Button>
-              <Button asChild>
-                <Link to="/register">S'inscrire</Link>
-              </Button>
-            </>
-          )}
-        </div>
+                )}
+                <ModeToggle />
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
-
-      {/* Logout Confirmation Modal */}
-      {showConfirm && (
-        <div className="modal">
-          <div className="modal-content">
-            <p>Êtes-vous sûr de vouloir vous déconnecter ?</p>
-            <Button variant="destructive" onClick={confirmLogout}>Oui</Button>
-            <Button variant="outline" onClick={cancelLogout}>Annuler</Button>
-          </div>
-        </div>
-      )}
-    </header>
+    </div>
   );
 };
 

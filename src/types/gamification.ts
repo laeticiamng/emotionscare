@@ -10,6 +10,7 @@ export interface Badge {
   category: string;
   tier: 'bronze' | 'silver' | 'gold' | 'platinum' | string;
   unlockedAt?: string;
+  unlocked?: boolean; // For backward compatibility
   completed?: boolean;
   progress?: number;
   level?: number; // For backward compatibility
@@ -30,6 +31,16 @@ export interface Challenge {
   difficulty?: 'easy' | 'medium' | 'hard' | string;
   completions?: number;
   type?: string;
+  completed?: boolean; // Add this field for backward compatibility
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  name: string;
+  avatar?: string;
+  points: number;
+  rank: number;
+  department?: string;
 }
 
 export interface GamificationStats {
@@ -41,15 +52,21 @@ export interface GamificationStats {
   activeUsersPercent?: number; // For backward compatibility
   completionRate?: number; // For backward compatibility
   topChallenges?: Challenge[]; // For backward compatibility
-  badgeLevels?: { [key: string]: number }; // For backward compatibility
+  totalChallenges?: number; // For backward compatibility
+  completedChallenges?: number; // For backward compatibility
+  badgeLevels?: { [key: string]: number } | { level: string; count: number }[]; // For backward compatibility
   currentLevel?: number; // For backward compatibility
   pointsToNextLevel?: number; // For backward compatibility
   progressToNextLevel?: number; // For backward compatibility
+  streak?: number;
   streakDays?: number; // For backward compatibility
   lastActivityDate?: string; // For backward compatibility
   activeChallenges?: number; // For backward compatibility 
   badgesCount?: number; // For backward compatibility
   totalPoints?: number; // For backward compatibility
+  progress?: number; // For backward compatibility
+  leaderboard?: LeaderboardEntry[]; // For backward compatibility
+  nextLevel?: number; // For backward compatibility
 }
 
 export interface ChallengesListProps {
