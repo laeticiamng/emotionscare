@@ -5,8 +5,7 @@ import GlobalOverviewTab from './tabs/GlobalOverviewTab';
 import EmotionsTab from './tabs/EmotionsTab';
 import ActivityTab from './tabs/ActivityTab';
 import TeamsTab from './tabs/TeamsTab';
-import { Badge } from '@/types';
-import { Challenge } from '@/types';
+import { Badge, Challenge } from '@/types';
 
 // Mock badge data for the gamification tab
 const mockBadges: Badge[] = [
@@ -55,10 +54,11 @@ const mockChallenges: Challenge[] = [
     progress: 5,
     completed: false,
     status: "active",
+    name: "Scan quotidien",
     goal: 7,
     total: 7,
     deadline: new Date(Date.now() + 86400000 * 2).toISOString(),
-    name: "Scan quotidien"
+    completions: 0
   },
   {
     id: "2",
@@ -69,10 +69,11 @@ const mockChallenges: Challenge[] = [
     progress: 2,
     completed: false,
     status: "active",
+    name: "Journal hebdomadaire",
     goal: 3, 
     total: 3,
     deadline: new Date(Date.now() + 86400000 * 5).toISOString(),
-    name: "Journal hebdomadaire"
+    completions: 0
   },
   {
     id: "3",
@@ -83,9 +84,10 @@ const mockChallenges: Challenge[] = [
     progress: 5,
     completed: true,
     status: "completed",
+    name: "Mentorat",
     goal: 5,
     total: 5,
-    name: "Mentorat"
+    completions: 5
   }
 ];
 

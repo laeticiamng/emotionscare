@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-interface ChartTooltipContentProps {
+export interface ChartTooltipContentProps {
   active?: boolean;
   payload?: any[];
   label?: string;

@@ -12,6 +12,7 @@ import { Challenge } from '@/types';
 interface ChallengesListProps {
   challenges: Challenge[];
   onCompleteChallenge?: (id: string) => void;
+  onComplete?: (id: string) => Promise<boolean> | void;
   className?: string;
   loading?: boolean;
 }
@@ -19,6 +20,7 @@ interface ChallengesListProps {
 const ChallengesList: React.FC<ChallengesListProps> = ({
   challenges,
   onCompleteChallenge,
+  onComplete,
   className = '',
   loading = false
 }) => {
@@ -30,6 +32,15 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
         ? prev.filter(expandedId => expandedId !== id)
         : [...prev, id]
     );
+  };
+
+  // Handle completion of challenge with either callback
+  const handleComplete = (id: string) => {
+    if (onComplete) {
+      onComplete(id);
+    } else if (onCompleteChallenge) {
+      onCompleteChallenge(id);
+    }
   };
 
   // Helper to get status label in French
@@ -212,11 +223,11 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                 {isExpanded ? 'Masquer' : 'Détails'}
               </Button>
 
-              {!isCompleted && onCompleteChallenge && (
+              {!isCompleted && (onCompleteChallenge || onComplete) && (
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onCompleteChallenge(challenge.id)}
+                  onClick={() => handleComplete(challenge.id)}
                   className="gap-1"
                 >
                   <CheckCircle className="h-4 w-4 mr-1" />

@@ -1,69 +1,83 @@
 
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { ChartTooltip, ChartTooltipContent, ChartInteractiveLegend } from "@/components/ui/chart";
-import { ZoomableChart } from '@/components/ui/chart/ZoomableChart';
-import { useMediaQuery } from '@/hooks/use-media-query';
+import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ChartTooltip, ChartTooltipContent, ChartInteractiveLegend } from '@/components/ui/chart';
+
+interface ProductivityChartData {
+  date: string;
+  value: number;
+}
 
 interface ProductivityChartProps {
-  data: Array<{ date: string; value: number }>;
+  data: ProductivityChartData[];
 }
 
 const ProductivityChart: React.FC<ProductivityChartProps> = ({ data }) => {
   const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
-  const isMobile = useMediaQuery("(max-width: 768px)");
 
-  // Enrich data with previous values for delta calculation
-  const enrichedData = data.map((point, idx) => ({
-    ...point,
-    previousValue: idx > 0 ? data[idx - 1].value : null
-  }));
-
-  const handleToggleSeries = (dataKey: string, isHidden: boolean) => {
+  const toggleSeries = (dataKey: string, isHidden: boolean) => {
     if (isHidden) {
-      setHiddenSeries(hiddenSeries.filter(key => key !== dataKey));
+      setHiddenSeries(prev => [...prev, dataKey]);
     } else {
-      setHiddenSeries([...hiddenSeries, dataKey]);
+      setHiddenSeries(prev => prev.filter(key => key !== dataKey));
     }
   };
 
-  const chartConfig = {
-    value: { 
-      theme: { light: '#4A90E2', dark: '#4A90E2' },
-      label: 'Productivité'
-    },
-  };
-
   return (
-    <ZoomableChart data={enrichedData} config={chartConfig}>
-      <BarChart margin={{ top: 15, right: 30, left: 20, bottom: 5 }}>
-        <defs>
-          <linearGradient id="wellnessBlueGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#4A90E2" stopOpacity={1}/>
-            <stop offset="95%" stopColor="#4A90E2" stopOpacity={0.7}/>
-          </linearGradient>
-        </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-        <XAxis dataKey="date" />
-        <YAxis />
-        <ChartTooltip content={<ChartTooltipContent />} />
-        <ChartInteractiveLegend
-          onToggleSeries={handleToggleSeries}
-          hiddenSeries={hiddenSeries}
-          verticalAlign={isMobile ? "bottom" : "top"}
-          align="right"
-          layout={isMobile ? "vertical" : "horizontal"}
-        />
-        {!hiddenSeries.includes('value') && (
-          <Bar 
-            dataKey="value" 
-            name="Productivité"
-            fill="url(#wellnessBlueGradient)" 
-            radius={[8, 8, 0, 0]}
-          />
-        )}
-      </BarChart>
-    </ZoomableChart>
+    <Card className="col-span-1">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-base font-medium">Index de productivité</CardTitle>
+      </CardHeader>
+      <CardContent className="px-2">
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={data}
+              margin={{
+                top: 5,
+                right: 10,
+                left: -25,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
+              <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={12} tickLine={false} />
+              <YAxis stroke="var(--muted-foreground)" fontSize={12} tickLine={false} />
+              <Tooltip
+                content={(props) => (
+                  <ChartTooltip>
+                    <ChartTooltipContent 
+                      active={props.active} 
+                      payload={props.payload} 
+                      label={props.label}
+                      labelFormatter={(label) => `Date: ${label}`}
+                      valueFormatter={(value) => `${value}`}
+                    />
+                  </ChartTooltip>
+                )}
+              />
+              <Line
+                type="monotone"
+                dataKey="value"
+                name="Productivité"
+                stroke="var(--accent)"
+                dot={true}
+                hide={hiddenSeries.includes("value")}
+                activeDot={{ r: 6, stroke: "var(--background)", strokeWidth: 2 }}
+              />
+              <ChartInteractiveLegend
+                onToggleSeries={toggleSeries}
+                hiddenSeries={hiddenSeries}
+                verticalAlign="top"
+                align="center"
+                layout="horizontal"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

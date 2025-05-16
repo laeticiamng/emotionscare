@@ -4,17 +4,26 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/types';
 import { Award } from 'lucide-react';
 
-interface BadgesWidgetProps {
+export interface BadgesWidgetProps {
   badges: Badge[];
   loading?: boolean;
+  title?: string;
+  showSeeAll?: boolean;
+  onSeeAll?: () => void;
 }
 
-const BadgesWidget: React.FC<BadgesWidgetProps> = ({ badges = [], loading = false }) => {
+const BadgesWidget: React.FC<BadgesWidgetProps> = ({ 
+  badges = [], 
+  loading = false,
+  title = "Vos badges",
+  showSeeAll = false,
+  onSeeAll
+}) => {
   if (loading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Vos badges</CardTitle>
+          <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2 justify-center">
           {[1, 2, 3].map((i) => (
@@ -32,7 +41,17 @@ const BadgesWidget: React.FC<BadgesWidgetProps> = ({ badges = [], loading = fals
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Vos badges</CardTitle>
+        <div className="flex justify-between items-center">
+          <CardTitle>{title}</CardTitle>
+          {showSeeAll && (
+            <button 
+              onClick={onSeeAll} 
+              className="text-sm text-primary hover:underline"
+            >
+              Voir tout
+            </button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {badges.length === 0 ? (

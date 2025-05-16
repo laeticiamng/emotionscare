@@ -42,7 +42,8 @@ const AdminDashboard: React.FC = () => {
     challenges: [],
     progress: 45,
     leaderboard: [],
-    // Additional properties needed by components
+    
+    // Additional properties required by components
     totalBadges: 24,
     activeUsersPercent: 68,
     completionRate: 65,
@@ -56,7 +57,9 @@ const AdminDashboard: React.FC = () => {
         points: 100,
         progress: 0,
         completed: false,
-        category: "daily"
+        category: "daily",
+        goal: 7,
+        total: 7
       },
       { 
         id: "challenge-2", 
@@ -67,7 +70,9 @@ const AdminDashboard: React.FC = () => {
         points: 150,
         progress: 0,
         completed: false,
-        category: "weekly"
+        category: "weekly",
+        goal: 5,
+        total: 5
       },
       { 
         id: "challenge-3", 
@@ -78,7 +83,9 @@ const AdminDashboard: React.FC = () => {
         points: 120,
         progress: 0,
         completed: false,
-        category: "special"
+        category: "special",
+        goal: 3,
+        total: 3
       }
     ],
     badgeLevels: [

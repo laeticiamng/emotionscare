@@ -1,7 +1,7 @@
 
 import React, { ReactNode } from 'react';
 
-interface ChartContainerProps {
+export interface ChartContainerProps {
   children: ReactNode;
   className?: string;
   title?: string;

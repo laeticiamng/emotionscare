@@ -35,7 +35,7 @@ const GamificationDashboard: React.FC = () => {
     leaderboard: stats.leaderboard || [],
     
     // Add default values for additional properties
-    currentLevel: stats.currentLevel || stats.level || 1,
+    currentLevel: stats.currentLevel || Number(stats.level) || 1,
     pointsToNextLevel: stats.pointsToNextLevel || (stats.nextLevel?.points || 0) - stats.points,
     progressToNextLevel: stats.progressToNextLevel || stats.progress || 0,
     streakDays: stats.streakDays || stats.streak || 0,
@@ -124,7 +124,7 @@ const GamificationDashboard: React.FC = () => {
           <div className="challenges-list">
             <ChallengesList 
               challenges={challenges} 
-              onCompleteChallenge={completeChallenge}
+              onComplete={completeChallenge}
             />
           </div>
         </TabsContent>
