@@ -1,51 +1,45 @@
+// Ré-export de tous les composants UI depuis ce fichier pour un import plus facile
 
-// Re-export all UI components for easier imports
-export { Avatar, AvatarImage, AvatarFallback } from "./avatar";
-export { Badge, badgeVariants } from "./badge";
-export { Button, buttonVariants } from "./button";
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from "./card";
-export { Checkbox } from "./checkbox";
-export { ToggleGroup, ToggleGroupItem } from "./toggle-group";
-export { Toggle, toggleVariants } from "./toggle";
-export { Textarea } from "./textarea";
-export { Tabs, TabsList, TabsTrigger, TabsContent } from "./tabs";
-export { Switch } from "./switch";
-export { Skeleton } from "./skeleton";
-export { Slider } from "./slider";
-export { ScrollArea, ScrollBar } from "./scroll-area";
-export { RadioGroup, RadioGroupItem } from "./radio-group";
-export { Progress } from "./progress";
-export { Popover, PopoverTrigger, PopoverContent } from "./popover";
-export { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "./sheet";
-export { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogAction, AlertDialogCancel } from "./alert-dialog";
-export { Alert, AlertTitle, AlertDescription } from "./alert";
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "./accordion";
-export { AspectRatio } from "./aspect-ratio";
-export { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator, BreadcrumbEllipsis } from "./breadcrumb";
-export { Calendar } from "./calendar";
-export { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./collapsible";
-export { Command } from "./command";
-export { Dialog } from "./dialog";
-export { Pagination } from "./pagination";
-export { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "./resizable";
-export { toast } from "./sonner";
-export { Separator } from "./separator";
-export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from "./table";
-export { Toaster } from "./toaster";
-export { Toast } from "./toast";
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./tooltip";
-export { YoutubeEmbed } from "./youtube-embed";
-export { default as TimeInput } from "./time-input";
-export { TimePickerInput } from "./time-picker";
-export { default as ThemeSwitcher } from "./ThemeSwitcher";
-export { ModeToggle } from "./mode-toggle";
-export { default as PageTitle } from "./page-title";
-export { default as LoadingSpinner } from "./LoadingSpinner";
-export { default as LoadingSkeleton } from "./LoadingSkeleton";
-export { default as ConfirmationModal } from "./confirmation-modal";
-export { default as StatusIndicator } from "./status/StatusIndicator";
-export { default as CircularProgress } from "./circular-progress";
-export { Confetti } from "./confetti";
-export { SecureConfirmationDialog } from "./secure-confirmation-dialog";
-export { Timeline, TimelineItem, TimelineHeader, TimelineIcon, TimelineTitle, TimelineContent, TimelineBody } from "./timeline";
-export { Label } from "./label";
+// Layouts
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './card';
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
+
+// Feedback
+export { Alert, AlertTitle, AlertDescription } from './alert';
+export { Toast, ToastAction, ToastDescription, ToastTitle, ToastProvider, ToastViewport } from './toast';
+export { Skeleton } from './skeleton';
+export { Progress } from './progress';
+export { Badge } from './badge';
+
+// Inputs
+export { Button } from './button';
+export { Input } from './input';
+export { Checkbox } from './checkbox';
+export { Switch } from './switch';
+export { RadioGroup, RadioGroupItem } from './radio-group';
+export { Slider } from './slider';
+export { Textarea } from './textarea';
+
+// Data display
+export { Avatar, AvatarImage, AvatarFallback } from './avatar';
+export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from './table';
+export { ScrollArea, ScrollBar } from './scroll-area';
+
+// Overlays
+export { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from './sheet';
+export { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './dialog';
+export { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem, DropdownMenuRadioItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuGroup, DropdownMenuRadioGroup } from './dropdown-menu';
+export { Popover, PopoverContent, PopoverTrigger } from './popover';
+
+// Navigation
+export { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from './navigation-menu';
+
+// Date and time
+export { Calendar } from './calendar';
+export { DatePicker } from './date-picker';
+
+// Other
+export { Separator } from './separator';
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
+export { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
+export { Command, CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut, CommandSeparator } from './command';

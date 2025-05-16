@@ -1,103 +1,16 @@
 
-export type NotificationType = 
-  | 'emotion' 
-  | 'journal' 
-  | 'community' 
-  | 'achievement' 
-  | 'reminder' 
-  | 'system'
-  | 'success'
-  | 'warning'
-  | 'error'
-  | 'alert'
-  | 'message';
-
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  imageUrl?: string;
-  image_url?: string;
-  category: 'progress' | 'journal' | 'music' | 'community' | 'activity' | 'special';
-  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
-  unlockedAt?: string;
-  dateEarned?: string;
-  awarded_at?: string;
-  progress?: number;
-  completed?: boolean;
-  icon?: React.ReactNode;
-  // Adding properties needed by components
-  unlocked?: boolean;
-  level?: string | number;
-}
-
-export interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  category: 'daily' | 'weekly' | 'monthly' | 'special';
-  points: number;
-  progress: number;
-  total?: number;
-  goal?: number;
-  completed: boolean;
-  isDaily?: boolean;
-  isWeekly?: boolean;
-  name?: string;
-  status?: 'active' | 'completed' | 'expired' | 'failed' | 'locked' | 'not-started';
-  deadline?: string;
-  icon?: React.ReactNode;
-  difficulty?: string;
-  completions?: number;
-  totalSteps?: number;
-}
-
-export interface LeaderboardEntry {
-  id: string;
-  userId?: string;
-  name: string;
-  avatar?: string;
-  points: number;
-  rank: number;
-  level: number | string;
-  isCurrentUser?: boolean;
-  badges?: number;
-  trend?: 'up' | 'down' | 'stable';
-  department?: string;
-}
-
 export interface GamificationStats {
   points: number;
   level: number | string;
   badges: Badge[];
+  streak: number;
   completedChallenges: number;
   totalChallenges: number;
   challenges: Challenge[];
-  streak: number;
-  nextLevel?: {
-    points: number;
-    rewards: string[];
-    level: number;
-  };
   progress: number;
   leaderboard: LeaderboardEntry[];
   
-  // Additional properties for various components
-  currentLevel?: number;
-  totalPoints?: number;
-  badgesCount?: number;
-  pointsToNextLevel?: number;
-  progressToNextLevel?: number;
-  streakDays?: number;
-  lastActivityDate?: string;
-  activeChallenges?: number;
-  totalBadges?: number;
-  activeUsersPercent?: number;
-  completionRate?: number;
-  topChallenges?: Challenge[];
-  badgeLevels?: Record<string, number>[] | Array<{level: string, count: number}>;
-  // Additional properties needed by the admin components
+  // Propriétés additionnelles utilisées dans les composants
   rank?: string;
   nextLevelPoints?: number;
   recentAchievements?: Badge[];
@@ -109,4 +22,97 @@ export interface GamificationStats {
   total_scans?: number;
   badges_earned?: Badge[];
   next_milestone?: number;
+  
+  // Propriétés pour la Dashboard admin
+  totalBadges?: number;
+  activeUsersPercent?: number;
+  completionRate?: number;
+  topChallenges?: Challenge[];
+  badgeLevels?: Array<{level: string, count: number}>;
+  
+  // Propriétés pour GamificationDashboard
+  currentLevel?: number;
+  pointsToNextLevel?: number;
+  progressToNextLevel?: number;
+  streakDays?: number;
+  lastActivityDate?: string;
+  activeChallenges?: number;
+  badgesCount?: number;
+  totalPoints?: number;
+  
+  // Propriété pour la rétrocompatibilité avec nextLevel
+  nextLevel?: {
+    points: number;
+    rewards: string[];
+    level?: number;
+  };
+}
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  points: number;
+  progress: number;
+  completed: boolean;
+  status?: 'active' | 'completed' | 'failed' | 'locked' | 'not-started' | 'expired' | 'ongoing' | 'available';
+  icon?: React.ReactNode;
+  
+  // Propriétés additionnelles
+  name?: string;
+  isDaily?: boolean;
+  isWeekly?: boolean;
+  xp?: number;
+  goal?: number;
+  total?: number;
+  deadline?: string;
+  difficulty?: string;
+  completions?: number;
+  totalSteps?: number;
+  type?: string;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  category?: string;
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
+  unlocked?: boolean;
+  level?: string | number;
+  
+  // Support pour différentes formes d'URL d'image
+  image?: string;
+  imageUrl?: string;
+  image_url?: string;
+  icon_url?: string;
+  
+  // Propriétés additionnelles
+  unlockedAt?: string;
+  dateEarned?: string;
+  awarded_at?: string;
+  progress?: number;
+  completed?: boolean;
+  rarity?: string;
+  icon?: React.ReactNode;
+  threshold?: number;
+  points?: number;
+  user_id?: string;
+  total_required?: number;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  name: string;
+  avatar?: string;
+  points: number;
+  rank: number;
+  level: number | string;
+  isCurrentUser?: boolean;
+  department?: string;
+  trend?: 'up' | 'down' | 'stable';
+  userId?: string;
+  username?: string;
+  badges?: number;
 }

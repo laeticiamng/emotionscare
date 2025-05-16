@@ -1,235 +1,231 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Progress, Badge, Button } from '@/components/ui';
-import { Calendar, ArrowUpRight, Clock, Award, Target, CheckCircle } from 'lucide-react';
-import { Challenge } from '@/types/gamification';
-import { formatDistanceToNow, isAfter } from 'date-fns';
+import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import { formatDistanceToNow, isPast, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { CheckCircle, Clock, Zap, Award, Target, Flag } from 'lucide-react';
+import { Challenge } from '@/types';
 
 interface ChallengesListProps {
   challenges: Challenge[];
-  onComplete?: (id: string) => void | Promise<boolean>;
-  hideCompletedChallenges?: boolean;
-  onChallengeClick?: (challenge: Challenge) => void;
-  filtersEnabled?: boolean;
+  onCompleteChallenge?: (id: string) => void;
   className?: string;
+  loading?: boolean;
 }
 
 const ChallengesList: React.FC<ChallengesListProps> = ({
   challenges,
-  onComplete,
-  hideCompletedChallenges = false,
-  onChallengeClick,
-  filtersEnabled = true,
+  onCompleteChallenge,
   className = '',
+  loading = false
 }) => {
-  const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'completed'>('all');
-  const [expandedChallenge, setExpandedChallenge] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<string[]>([]);
 
   const toggleExpand = (id: string) => {
-    setExpandedChallenge(expandedChallenge === id ? null : id);
+    setExpandedIds(prev =>
+      prev.includes(id)
+        ? prev.filter(expandedId => expandedId !== id)
+        : [...prev, id]
+    );
   };
 
-  const filteredChallenges = challenges.filter((challenge) => {
-    if (hideCompletedChallenges) return !challenge.completed;
-    if (activeFilter === 'all') return true;
-    return activeFilter === 'completed' ? challenge.completed : !challenge.completed;
-  });
-
-  const getCategoryLabel = (category: string) => {
-    switch (category) {
-      case 'daily':
-        return 'Quotidien';
-      case 'weekly':
-        return 'Hebdomadaire';
-      case 'monthly':
-        return 'Mensuel';
-      case 'special':
-        return 'Spécial';
+  // Helper to get status label in French
+  const getStatusLabel = (status?: string): string => {
+    switch (status) {
+      case 'active':
+      case 'ongoing':
+      case 'available':
+        return 'En cours';
+      case 'completed':
+        return 'Complété';
+      case 'failed':
+        return 'Échoué';
+      case 'locked':
+        return 'Verrouillé';
+      case 'expired':
+        return 'Expiré';
+      case 'not-started':
+        return 'À démarrer';
       default:
-        return category;
+        return 'À faire';
     }
   };
 
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'daily':
-        return 'bg-blue-500 text-white';
-      case 'weekly':
-        return 'bg-purple-500 text-white';
-      case 'monthly':
-        return 'bg-orange-500 text-white';
-      case 'special':
-        return 'bg-red-500 text-white';
+  // Helper to get badge variant based on status
+  const getStatusVariant = (status?: string): 'default' | 'outline' | 'secondary' | 'success' | 'warning' | 'error' => {
+    switch (status) {
+      case 'active':
+      case 'ongoing':
+      case 'available':
+        return 'default';
+      case 'completed':
+        return 'success';
+      case 'failed':
+      case 'expired':
+        return 'error';
+      case 'locked':
+        return 'outline';
       default:
-        return 'bg-gray-500 text-white';
+        return 'secondary';
     }
   };
 
-  const isOverdue = (deadline?: string) => {
-    if (!deadline) return false;
-    try {
-      return isAfter(new Date(), new Date(deadline));
-    } catch (e) {
-      return false;
-    }
-  };
-
-  const renderDeadline = (challenge: Challenge) => {
+  // Get time remaining if deadline is present
+  const getTimeRemaining = (challenge: Challenge): string | null => {
     if (!challenge.deadline) return null;
     
     try {
-      const date = new Date(challenge.deadline);
-      const isLate = isOverdue(challenge.deadline);
-      
-      return (
-        <div className={`flex items-center text-xs ${isLate ? 'text-red-500' : 'text-muted-foreground'}`}>
-          <Clock className="mr-1 h-3 w-3" />
-          {isLate ? 'Expiré depuis ' : 'Expire dans '}
-          {formatDistanceToNow(date, { locale: fr })}
-        </div>
-      );
+      const deadlineDate = parseISO(challenge.deadline);
+      if (isPast(deadlineDate)) {
+        return 'Délai expiré';
+      }
+      return `${formatDistanceToNow(deadlineDate, { locale: fr, addSuffix: false })} restant`;
     } catch (e) {
+      console.error("Error parsing deadline:", e);
       return null;
     }
   };
 
+  if (loading) {
+    return (
+      <div className={`space-y-4 ${className}`}>
+        {[1, 2, 3].map(i => (
+          <Card key={i} className="animate-pulse">
+            <CardHeader>
+              <div className="h-5 w-1/3 bg-muted rounded"></div>
+            </CardHeader>
+            <CardContent>
+              <div className="h-4 w-3/4 bg-muted rounded mb-4"></div>
+              <div className="h-2 w-full bg-muted rounded"></div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   if (!challenges || challenges.length === 0) {
     return (
-      <div className="text-center p-8 bg-muted/20 rounded-lg">
-        <Target className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
-        <h3 className="font-medium text-lg mb-1">Pas de défis disponibles</h3>
-        <p className="text-muted-foreground">Revenez plus tard pour découvrir de nouveaux défis.</p>
+      <div className="text-center text-muted-foreground py-8">
+        <Target className="mx-auto h-12 w-12 mb-4 opacity-20" />
+        <h3 className="text-lg font-medium">Aucun défi disponible</h3>
+        <p className="mt-2">De nouveaux défis seront bientôt disponibles.</p>
       </div>
     );
   }
 
   return (
-    <div className={className}>
-      {filtersEnabled && (
-        <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-          <Button
-            variant={activeFilter === 'all' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveFilter('all')}
-          >
-            Tous
-          </Button>
-          <Button
-            variant={activeFilter === 'active' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveFilter('active')}
-          >
-            En cours
-          </Button>
-          <Button
-            variant={activeFilter === 'completed' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveFilter('completed')}
-          >
-            Complétés
-          </Button>
-        </div>
-      )}
+    <div className={`space-y-4 ${className}`}>
+      {challenges.map((challenge) => {
+        const isExpanded = expandedIds.includes(challenge.id);
+        const timeRemaining = getTimeRemaining(challenge);
+        const progressValue = challenge.progress || 0;
+        const targetValue = challenge.goal || challenge.total || 100;
+        const progressPercent = Math.min(Math.round((progressValue / targetValue) * 100), 100);
+        const isCompleted = challenge.status === 'completed' || challenge.completed;
 
-      <div className="space-y-3">
-        {filteredChallenges.map((challenge) => (
-          <Card
+        return (
+          <Card 
             key={challenge.id}
-            className={`overflow-hidden transition-all cursor-pointer ${
-              expandedChallenge === challenge.id ? 'ring-2 ring-primary' : ''
-            } ${challenge.completed ? 'bg-muted/20' : ''}`}
-            onClick={() => {
-              if (onChallengeClick) {
-                onChallengeClick(challenge);
-              } else {
-                toggleExpand(challenge.id);
-              }
-            }}
+            className={`transition-all ${isCompleted ? 'bg-success/5 border-success/20' : ''}`}
           >
-            <CardHeader className="p-4 pb-0">
+            <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center mb-1">
-                    <Badge className={`mr-2 ${getCategoryColor(challenge.category)}`}>
-                      {getCategoryLabel(challenge.category)}
-                    </Badge>
-                    {challenge.completed && (
-                      <Badge variant="success-subtle" className="flex items-center gap-1">
-                        <CheckCircle className="h-3 w-3" />
-                        Complété
-                      </Badge>
-                    )}
-                  </div>
-                  <CardTitle className="text-base font-medium">
-                    {challenge.title || (challenge.name ? challenge.name : '')}
+                <div>
+                  <CardTitle className="text-lg">
+                    {challenge.title || challenge.name}
                   </CardTitle>
+                  <CardDescription>
+                    {challenge.description}
+                  </CardDescription>
                 </div>
-                <div className="text-lg font-semibold text-primary">
-                  +{challenge.points}
-                  <span className="text-xs ml-1">pts</span>
+                <div className="flex flex-col items-end gap-1.5">
+                  <Badge variant={getStatusVariant(challenge.status)}>
+                    {getStatusLabel(challenge.status)}
+                  </Badge>
+                  <span className="text-sm font-medium">
+                    {challenge.points} pts
+                  </span>
                 </div>
               </div>
             </CardHeader>
-            
-            <CardContent className="p-4 pt-2">
-              <p className="text-sm text-muted-foreground mb-3">{challenge.description}</p>
+
+            <CardContent className="pb-2">
+              {/* Progress display */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">Progression</span>
+                  <span className="font-medium">
+                    {progressValue} / {targetValue}
+                  </span>
+                </div>
+                <Progress value={progressPercent} className="h-2" />
+              </div>
+
+              {/* Time remaining info */}
+              {timeRemaining && (
+                <div className="flex items-center gap-1.5 mt-3 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span>{timeRemaining}</span>
+                </div>
+              )}
               
-              <div>
-                {(challenge.total !== undefined || challenge.goal !== undefined) ? (
-                  <div className="mb-1">
-                    <div className="flex justify-between mb-1">
-                      <span className="text-xs">Progression</span>
-                      <span className="text-xs font-medium">
-                        {challenge.progress}/{challenge.total !== undefined ? challenge.total : (challenge.goal !== undefined ? challenge.goal : 1)}
+              {/* Extra details when expanded */}
+              {isExpanded && (
+                <div className="mt-4 space-y-3 pt-3 border-t">
+                  <div className="flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-amber-500" />
+                    <span className="text-sm">
+                      {challenge.difficulty || 'Difficulté standard'}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Flag className="h-4 w-4 text-primary" />
+                    <span className="text-sm">
+                      {challenge.category || 'Catégorie générale'}
+                    </span>
+                  </div>
+                  
+                  {challenge.completions !== undefined && (
+                    <div className="flex items-center gap-2">
+                      <Award className="h-4 w-4 text-indigo-500" />
+                      <span className="text-sm">
+                        Complété {challenge.completions} fois
                       </span>
                     </div>
-                    <Progress
-                      value={(challenge.progress / (challenge.total !== undefined ? challenge.total : (challenge.goal !== undefined ? challenge.goal : 1))) * 100}
-                      className="h-1.5"
-                    />
-                  </div>
-                ) : (
-                  <Progress value={challenge.progress} className="h-1.5 mb-2" />
-                )}
-                
-                <div className="flex justify-between items-center mt-3">
-                  <div className="text-xs">
-                    {renderDeadline(challenge)}
-                  </div>
-                  
-                  {!challenge.completed && onComplete && expandedChallenge === challenge.id && (
-                    <Button
-                      size="sm"
-                      className="ml-auto"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onComplete(challenge.id);
-                      }}
-                    >
-                      <CheckCircle className="mr-1 h-4 w-4" />
-                      Marquer comme complété
-                    </Button>
-                  )}
-                  
-                  {challenge.completed && expandedChallenge === challenge.id && (
-                    <div className="flex items-center text-xs text-muted-foreground">
-                      <Award className="h-3 w-3 mr-1" />
-                      Défi terminé
-                    </div>
-                  )}
-
-                  {expandedChallenge !== challenge.id && (
-                    <Button variant="ghost" size="icon" className="h-6 w-6">
-                      <ArrowUpRight className="h-4 w-4" />
-                    </Button>
                   )}
                 </div>
-              </div>
+              )}
             </CardContent>
+
+            <CardFooter className="flex justify-between pt-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => toggleExpand(challenge.id)}
+              >
+                {isExpanded ? 'Masquer' : 'Détails'}
+              </Button>
+
+              {!isCompleted && onCompleteChallenge && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onCompleteChallenge(challenge.id)}
+                  className="gap-1"
+                >
+                  <CheckCircle className="h-4 w-4 mr-1" />
+                  Marquer complété
+                </Button>
+              )}
+            </CardFooter>
           </Card>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 };
