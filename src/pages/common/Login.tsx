@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 import { getRoleRoute } from '@/utils/roleUtils';
 
 interface LoginProps {
@@ -43,8 +43,7 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
         
         toast({
           title: "Connexion réussie",
-          description: "Vous êtes maintenant connecté.",
-          variant: "success"
+          description: "Vous êtes maintenant connecté."
         });
         
         // Redirection vers la dashboard appropriée en fonction du rôle
@@ -54,7 +53,7 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
       toast({
         title: "Erreur de connexion",
         description: error.message || "Une erreur s'est produite lors de la connexion",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);

@@ -24,7 +24,7 @@ const mockUserData = {
   role: 'user',
   created_at: new Date().toISOString(),
   preferences: {
-    theme: 'system',
+    theme: 'system' as "system" | "dark" | "light" | "pastel",
     fontSize: 'medium',
     fontFamily: 'system',
     reduceMotion: false,
@@ -153,7 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
   
-  const updatePreferences = async (preferences: UserPreferences) => {
+  const updatePreferences = async (preferences: Partial<UserPreferences>) => {
     if (!user) return;
     
     try {

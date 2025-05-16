@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 
 const B2CLogin = () => {
   const [email, setEmail] = useState('');
@@ -35,8 +35,7 @@ const B2CLogin = () => {
       
       toast({
         title: "Connexion réussie",
-        description: "Vous êtes maintenant connecté à votre espace personnel.",
-        variant: "success",
+        description: "Vous êtes maintenant connecté à votre espace personnel."
       });
       navigate('/b2c/dashboard');
     } catch (error: any) {
@@ -44,7 +43,7 @@ const B2CLogin = () => {
       toast({
         title: "Échec de la connexion",
         description: error.message || "Veuillez vérifier vos identifiants et réessayer.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);

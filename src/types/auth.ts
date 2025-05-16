@@ -43,9 +43,9 @@ export interface UserPreferences {
       achievement: boolean;
     };
     frequency: string;
-    email?: boolean;
-    push?: boolean;
-    sms?: boolean;
+    email: boolean;
+    push: boolean;
+    sms: boolean;
   };
   privacy?: {
     shareData: boolean;

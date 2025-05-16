@@ -1,25 +1,74 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { QuickActionLinksProps } from '@/types/widgets';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
 
-const QuickActionLinks: React.FC<QuickActionLinksProps> = ({ links }) => {
+interface QuickAction {
+  id: string;
+  name: string;
+  href: string;
+  icon?: React.ReactNode;
+  description?: string;
+  bgColor?: string;
+}
+
+const QuickActionLinks = () => {
+  const quickActions: QuickAction[] = [
+    {
+      id: 'journal',
+      name: 'Journal',
+      href: '/journal',
+      description: 'Notez vos émotions quotidiennes',
+      bgColor: 'bg-blue-100'
+    },
+    {
+      id: 'music',
+      name: 'Musique',
+      href: '/music',
+      description: 'Écoutez de la musique relaxante',
+      bgColor: 'bg-green-100'
+    },
+    {
+      id: 'coach',
+      name: 'Coach',
+      href: '/coach',
+      description: 'Discutez avec votre coach',
+      bgColor: 'bg-purple-100'
+    },
+    {
+      id: 'vr',
+      name: 'VR',
+      href: '/vr',
+      description: 'Explorez des environnements VR',
+      bgColor: 'bg-orange-100'
+    }
+  ];
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-      {links.map((link, index) => (
-        <Card key={index} className="hover:shadow-md transition-shadow">
-          <CardContent className="p-4">
-            <a href={link.href} className="flex flex-col h-full no-underline">
-              <div className={`w-10 h-10 rounded-lg ${link.color} flex items-center justify-center mb-3`}>
-                {link.icon}
-              </div>
-              <h3 className="font-medium text-base mb-1">{link.title}</h3>
-              <p className="text-xs text-muted-foreground">{link.description}</p>
-            </a>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">Accès rapides</CardTitle>
+      </CardHeader>
+      <CardContent className="grid grid-cols-2 gap-4">
+        {quickActions.map((action) => (
+          <Link key={action.id} to={action.href} className="block">
+            <Button
+              variant="outline"
+              className="w-full h-full flex flex-col items-center justify-center p-4 gap-2"
+            >
+              {action.icon && <div className="text-2xl">{action.icon}</div>}
+              <span className="font-medium">{action.name}</span>
+              {action.description && (
+                <span className="text-xs text-muted-foreground text-center">
+                  {action.description}
+                </span>
+              )}
+            </Button>
+          </Link>
+        ))}
+      </CardContent>
+    </Card>
   );
 };
 

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Building } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 
 const B2BUserLogin = () => {
   const [email, setEmail] = useState('');
@@ -28,15 +28,14 @@ const B2BUserLogin = () => {
         toast({
           title: "Accès refusé",
           description: "Ce compte n'a pas les permissions nécessaires pour accéder à l'espace collaborateur.",
-          variant: "destructive",
+          variant: "destructive"
         });
         return;
       }
       
       toast({
         title: "Connexion réussie",
-        description: "Vous êtes maintenant connecté à votre espace collaborateur.",
-        variant: "success",
+        description: "Vous êtes maintenant connecté à votre espace collaborateur."
       });
       navigate('/b2b/user/dashboard');
     } catch (error: any) {
@@ -44,7 +43,7 @@ const B2BUserLogin = () => {
       toast({
         title: "Échec de la connexion",
         description: error.message || "Veuillez vérifier vos identifiants et réessayer.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);

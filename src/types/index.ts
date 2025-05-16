@@ -66,6 +66,9 @@ export type NotificationPreference = {
     achievement: boolean;
   };
   frequency: NotificationFrequency;
+  email: boolean;
+  push: boolean;
+  sms: boolean;
 };
 
 export interface Theme {
@@ -82,4 +85,25 @@ export interface VRSessionWithMusicProps {
   duration?: number;
   environment?: string;
   musicTrackId?: string;
+}
+
+export type FontSize = "small" | "medium" | "large" | "x-large";
+
+export interface VRSessionTemplate {
+  id: string;
+  title: string;
+  description?: string;
+  duration: number;
+  tags?: string[];
+  emotion_target?: string;
+  emotionTarget?: string;
+  thumbnailUrl?: string;
+}
+
+export interface Story {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string;
+  author_id: string;
 }
