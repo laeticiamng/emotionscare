@@ -31,13 +31,34 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
     if (onOpenChange) onOpenChange(false);
   };
   
+  // Helper function to get playlist name/title safely
+  const getPlaylistTitle = () => {
+    if (!playlist) return '';
+    if (typeof playlist === 'object' && 'tracks' in playlist) {
+      return playlist.title || playlist.name || '';
+    }
+    return '';
+  };
+  
+  // Helper function to get tracks safely
+  const getTracks = () => {
+    if (!playlist) return [];
+    if (Array.isArray(playlist)) {
+      return playlist;
+    }
+    if (typeof playlist === 'object' && 'tracks' in playlist) {
+      return playlist.tracks;
+    }
+    return [];
+  };
+  
   return (
     <Drawer open={isDrawerOpen} onOpenChange={onOpenChange || handleClose}>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>Music Player</DrawerTitle>
           <DrawerDescription>
-            {playlist ? `Playing from ${playlist.title || playlist.name}` : 'Current track'}
+            {playlist ? `Playing from ${getPlaylistTitle()}` : 'Current track'}
           </DrawerDescription>
         </DrawerHeader>
         
@@ -69,11 +90,11 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
             </div>
           )}
           
-          {playlist && playlist.tracks && playlist.tracks.length > 0 && (
+          {playlist && getTracks().length > 0 && (
             <div className="mt-4">
-              <h4 className="font-medium mb-2">Playlist: {playlist.title || playlist.name}</h4>
+              <h4 className="font-medium mb-2">Playlist: {getPlaylistTitle()}</h4>
               <div className="max-h-[200px] overflow-y-auto">
-                {playlist.tracks.map((track) => (
+                {getTracks().map((track) => (
                   <div 
                     key={track.id}
                     className={`flex items-center p-2 rounded ${

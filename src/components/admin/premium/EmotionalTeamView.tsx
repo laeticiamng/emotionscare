@@ -1,96 +1,33 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { EmotionalTeamViewProps } from '@/types';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmotionalTeamViewProps } from '@/types/emotions';
 
-const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
-  teamId,
-  period = 'week',
-  userId,
-  anonymized = true,
-  className
+const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ 
+  teamId, 
+  period = '7d', // Add a default value to fix the property error
+  dateRange, 
+  showGraph = true, 
+  showMembers = true,
+  className = ''
 }) => {
-  const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<string>('overview');
-  const [loading, setLoading] = useState<boolean>(true);
-  
-  // Fetch team emotional data
-  useEffect(() => {
-    const fetchTeamData = async () => {
-      try {
-        setLoading(true);
-        // Mock data loading
-        setTimeout(() => {
-          setLoading(false);
-        }, 1500);
-      } catch (error) {
-        toast({
-          title: "Error loading team data",
-          description: "Please try again later",
-          variant: "destructive"
-        });
-        setLoading(false);
-      }
-    };
-    
-    fetchTeamData();
-  }, [teamId, period, toast]);
-  
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle>Team Emotional Health</CardTitle>
+        <CardTitle>Team Emotional State</CardTitle>
       </CardHeader>
       <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="trends">Trends</TabsTrigger>
-            <TabsTrigger value="individual">Individual</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview">
-            {loading ? (
-              <div className="h-[300px] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="bg-muted/30 p-4 rounded-md">
-                  <p className="text-center">Team emotional health overview for <strong>{anonymized ? 'Anonymous Team' : `Team ${teamId}`}</strong></p>
-                </div>
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {['Happiness', 'Stress', 'Engagement', 'Focus'].map(metric => (
-                    <div key={metric} className="bg-card p-4 rounded-md border shadow-sm">
-                      <h3 className="text-sm font-medium mb-2">{metric}</h3>
-                      <div className="text-2xl font-bold">
-                        {Math.floor(Math.random() * 100)}%
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {Math.random() > 0.5 ? '↑' : '↓'} {Math.floor(Math.random() * 10)}% from last {period}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="trends">
-            <div className="h-[300px] flex items-center justify-center bg-muted/30 rounded-md">
-              <p className="text-muted-foreground">Trend visualization will be displayed here</p>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="individual">
-            <div className="h-[300px] flex items-center justify-center bg-muted/30 rounded-md">
-              <p className="text-muted-foreground">Individual team member data will be displayed here</p>
-            </div>
-          </TabsContent>
-        </Tabs>
+        <div>
+          <p>Team ID: {teamId}</p>
+          <p>Period: {period}</p>
+          {dateRange && (
+            <p>
+              Date Range: {dateRange[0].toLocaleDateString()} - {dateRange[1].toLocaleDateString()}
+            </p>
+          )}
+          {showGraph && <div>Graph visualization would appear here</div>}
+          {showMembers && <div>Members list would appear here</div>}
+        </div>
       </CardContent>
     </Card>
   );

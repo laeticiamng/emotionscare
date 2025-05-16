@@ -1,203 +1,199 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { useTheme } from "@/hooks/use-theme";
-import { Theme, ThemeContextType, FontFamily, FontSize } from "@/types/theme";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import { Theme, FontFamily, FontSize } from '@/types/theme';
 
-const AVAILABLE_THEMES: Theme[] = [
-  { id: "light", name: "Light", value: "light", preview: "/themes/light.png" },
-  { id: "dark", name: "Dark", value: "dark", preview: "/themes/dark.png" },
-  { id: "pastel", name: "Pastel", value: "pastel", preview: "/themes/pastel.png" },
-  { id: "system", name: "System", value: "system", preview: "/themes/system.png" }
-];
+interface ThemeSettingsTabProps {
+  currentTheme: string;
+  onThemeChange: (theme: Theme) => void;
+  fontFamily?: FontFamily;
+  onFontFamilyChange?: (fontFamily: FontFamily) => void;
+  fontSize?: FontSize;
+  onFontSizeChange?: (fontSize: FontSize) => void;
+}
 
-const ThemeSettingsTab: React.FC = () => {
-  const { toast } = useToast();
-  const { theme, setTheme, isDarkMode, toggleTheme, fontFamily, setFontFamily, fontSize, setFontSize } = useTheme();
+const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
+  currentTheme,
+  onThemeChange,
+  fontFamily,
+  onFontFamilyChange,
+  fontSize,
+  onFontSizeChange
+}) => {
+  // Theme options
+  const themes: Theme[] = [
+    { name: 'Light', value: 'light', preview: '#ffffff' },
+    { name: 'Dark', value: 'dark', preview: '#1f2937' },
+    { name: 'System', value: 'system', preview: 'linear-gradient(to right, #ffffff 50%, #1f2937 50%)' }
+  ];
   
-  const [selectedTheme, setSelectedTheme] = useState<string>(theme || "system");
-  const [selectedFont, setSelectedFont] = useState<FontFamily>(fontFamily || "system");
-  const [selectedFontSize, setSelectedFontSize] = useState<FontSize>(fontSize || "medium");
-
   const handleThemeChange = (value: string) => {
-    setSelectedTheme(value);
-    setTheme(value);
-    
-    toast({
-      title: "Thème modifié",
-      description: `Le thème a été changé en ${value}.`,
-    });
+    const theme = themes.find(t => t.value === value) || themes[0];
+    onThemeChange(theme);
   };
-
-  const handleFontChange = (value: FontFamily) => {
-    setSelectedFont(value);
-    if (setFontFamily) {
-      setFontFamily(value);
+  
+  // Font family options
+  const fontFamilies: {value: FontFamily, label: string}[] = [
+    { value: "system", label: "System Default" },
+    { value: "sans", label: "Sans" },
+    { value: "serif", label: "Serif" },
+    { value: "monospace", label: "Monospace" },
+    { value: "rounded", label: "Rounded" }
+  ];
+  
+  const handleFontFamilyChange = (value: string) => {
+    if (onFontFamilyChange) {
+      onFontFamilyChange(value as FontFamily);
     }
-    
-    toast({
-      title: "Police modifiée",
-      description: `La police a été changée en ${value}.`,
-    });
   };
-
-  const handleFontSizeChange = (value: FontSize) => {
-    setSelectedFontSize(value);
-    if (setFontSize) {
-      setFontSize(value);
+  
+  // Font size options
+  const fontSizes: {value: FontSize, label: string}[] = [
+    { value: "sm", label: "Small" },
+    { value: "md", label: "Medium" },
+    { value: "lg", label: "Large" },
+    { value: "xl", label: "Extra Large" }
+  ];
+  
+  const handleFontSizeChange = (value: string) => {
+    if (onFontSizeChange) {
+      onFontSizeChange(value as FontSize);
     }
-    
-    toast({
-      title: "Taille de police modifiée",
-      description: `La taille de police a été changée en ${value}.`,
-    });
   };
-
+  
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="theme">
-        <TabsList>
-          <TabsTrigger value="theme">Thème</TabsTrigger>
-          <TabsTrigger value="typography">Typographie</TabsTrigger>
-          <TabsTrigger value="colors">Couleurs</TabsTrigger>
-        </TabsList>
+      <div>
+        <h3 className="text-lg font-medium">Theme</h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Select a theme for the dashboard.
+        </p>
         
-        <TabsContent value="theme" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Choisissez votre thème</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {AVAILABLE_THEMES.map((themeOption) => (
+        <RadioGroup
+          defaultValue={currentTheme}
+          onValueChange={handleThemeChange}
+          className="grid grid-cols-3 gap-4"
+        >
+          {themes.map((theme) => (
+            <div key={theme.value}>
+              <RadioGroupItem
+                value={theme.value}
+                id={`theme-${theme.value}`}
+                className="sr-only"
+              />
+              <Label
+                htmlFor={`theme-${theme.value}`}
+                className="cursor-pointer"
+              >
                 <div
-                  key={themeOption.id}
-                  className={`border rounded-lg p-2 cursor-pointer transition-all ${
-                    selectedTheme === themeOption.value
-                      ? "border-primary ring-2 ring-primary ring-opacity-50"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                  onClick={() => handleThemeChange(themeOption.value)}
+                  className={cn(
+                    "h-16 rounded-md border-2 flex items-center justify-center",
+                    currentTheme === theme.value && "border-primary"
+                  )}
+                  style={{ background: theme.preview }}
                 >
-                  <div 
-                    className="rounded-md bg-card aspect-video mb-2"
-                    style={{ 
-                      backgroundImage: themeOption.preview ? `url(${themeOption.preview})` : undefined,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center"
-                    }}
-                  />
-                  <p className="text-center text-sm font-medium">{themeOption.name}</p>
+                  <span 
+                    className={cn(
+                      "text-xs font-medium",
+                      theme.value === 'dark' ? "text-white" : null
+                    )}
+                  >
+                    {theme.name}
+                  </span>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
+              </Label>
+            </div>
+          ))}
+        </RadioGroup>
+      </div>
+      
+      {onFontFamilyChange && (
+        <div>
+          <h3 className="text-lg font-medium">Font Family</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Select a font family for the UI.
+          </p>
           
-          <Card>
-            <CardHeader>
-              <CardTitle>Mode sombre</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <p>Activer le mode sombre</p>
-                <Button variant={isDarkMode ? "default" : "outline"} onClick={toggleTheme}>
-                  {isDarkMode ? "Activé" : "Désactivé"}
-                </Button>
+          <RadioGroup
+            defaultValue={fontFamily}
+            onValueChange={handleFontFamilyChange}
+            className="grid grid-cols-2 gap-4"
+          >
+            {fontFamilies.map((font) => (
+              <div key={font.value}>
+                <RadioGroupItem
+                  value={font.value}
+                  id={`font-${font.value}`}
+                  className="sr-only"
+                />
+                <Label
+                  htmlFor={`font-${font.value}`}
+                  className="cursor-pointer"
+                >
+                  <div
+                    className={cn(
+                      "h-12 rounded-md border-2 flex items-center justify-center p-2",
+                      fontFamily === font.value && "border-primary"
+                    )}
+                  >
+                    <span className={cn("text-sm", font.value)}>
+                      {font.label}
+                    </span>
+                  </div>
+                </Label>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="typography" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Police</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <RadioGroup 
-                value={selectedFont} 
-                onValueChange={(value) => handleFontChange(value as FontFamily)}
-                className="grid grid-cols-1 md:grid-cols-2 gap-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="system" id="font-system" />
-                  <Label htmlFor="font-system" className="font-system text-lg">System</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="serif" id="font-serif" />
-                  <Label htmlFor="font-serif" className="font-serif text-lg">Serif</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="sans-serif" id="font-sans-serif" />
-                  <Label htmlFor="font-sans-serif" className="font-sans-serif text-lg">Sans Serif</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="monospace" id="font-monospace" />
-                  <Label htmlFor="font-monospace" className="font-mono text-lg">Monospace</Label>
-                </div>
-              </RadioGroup>
-            </CardContent>
-          </Card>
+            ))}
+          </RadioGroup>
+        </div>
+      )}
+      
+      {onFontSizeChange && (
+        <div>
+          <h3 className="text-lg font-medium">Font Size</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Select the font size for the UI.
+          </p>
           
-          <Card>
-            <CardHeader>
-              <CardTitle>Taille de police</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <RadioGroup 
-                value={selectedFontSize} 
-                onValueChange={(value) => handleFontSizeChange(value as FontSize)}
-              >
-                <div className="flex items-center justify-between border-b pb-4">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="small" id="font-size-small" />
-                    <Label htmlFor="font-size-small" className="text-sm">Petite</Label>
+          <RadioGroup
+            defaultValue={fontSize}
+            onValueChange={handleFontSizeChange}
+            className="grid grid-cols-4 gap-4"
+          >
+            {fontSizes.map((size) => (
+              <div key={size.value}>
+                <RadioGroupItem
+                  value={size.value}
+                  id={`size-${size.value}`}
+                  className="sr-only"
+                />
+                <Label
+                  htmlFor={`size-${size.value}`}
+                  className="cursor-pointer"
+                >
+                  <div
+                    className={cn(
+                      "h-10 rounded-md border-2 flex items-center justify-center",
+                      fontSize === size.value && "border-primary"
+                    )}
+                  >
+                    <span 
+                      className={cn(
+                        size.value === "sm" ? "text-xs" : 
+                        size.value === "md" ? "text-sm" : 
+                        size.value === "lg" ? "text-base" : "text-lg"
+                      )}
+                    >
+                      {size.label}
+                    </span>
                   </div>
-                  <span className="text-sm">Aa</span>
-                </div>
-                <div className="flex items-center justify-between border-b py-4">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="medium" id="font-size-medium" />
-                    <Label htmlFor="font-size-medium">Moyenne</Label>
-                  </div>
-                  <span>Aa</span>
-                </div>
-                <div className="flex items-center justify-between border-b py-4">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="large" id="font-size-large" />
-                    <Label htmlFor="font-size-large" className="text-lg">Grande</Label>
-                  </div>
-                  <span className="text-lg">Aa</span>
-                </div>
-                <div className="flex items-center justify-between pt-4">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="x-large" id="font-size-x-large" />
-                    <Label htmlFor="font-size-x-large" className="text-xl">Très grande</Label>
-                  </div>
-                  <span className="text-xl">Aa</span>
-                </div>
-              </RadioGroup>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="colors" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Couleurs du thème</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Cette section sera disponible prochainement.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+        </div>
+      )}
     </div>
   );
 };

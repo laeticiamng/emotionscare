@@ -4,7 +4,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import { KpiCardProps } from '@/types/dashboard';
-import { LucideIcon } from 'lucide-react';
+import { ReactNode } from 'react';
+
+// Adding this helper type to resolve LucideIcon issues
+type IconType = React.ReactNode;
 
 const KpiCard: React.FC<KpiCardProps> = ({
   id,
@@ -37,73 +40,46 @@ const KpiCard: React.FC<KpiCardProps> = ({
   
   const renderIcon = () => {
     if (!icon) return null;
-    return (
-      <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-        {icon}
-      </div>
-    );
-  };
-  
-  const handleClick = () => {
-    if (onClick) onClick();
-  };
-
-  // Helper to handle both types of delta (number or object)
-  const getDeltaTrend = () => {
-    if (!delta) return 'neutral';
-    if (typeof delta === 'number') {
-      return delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral';
-    }
-    return delta.trend;
-  };
-
-  const getDeltaValue = () => {
-    if (!delta) return 0;
-    return typeof delta === 'number' ? delta : delta.value;
-  };
-
-  const getDeltaLabel = () => {
-    if (!delta || typeof delta === 'number') return '';
-    return delta.label || '';
+    
+    // Convert the icon to a ReactNode to satisfy type requirements
+    const iconElement: ReactNode = icon;
+    return iconElement;
   };
   
   return (
     <Card 
-      className={cn(
-        "overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer", 
-        className
-      )}
-      onClick={handleClick}
-      aria-label={ariaLabel}
+      className={cn("hover:shadow-md transition-shadow", className)} 
+      onClick={onClick}
+      id={id}
     >
-      <CardHeader className="pb-2 flex flex-row justify-between items-start">
-        <CardTitle className="text-base font-medium">{title}</CardTitle>
-        {renderIcon()}
+      <CardHeader className="pb-2">
+        <div className="flex justify-between items-start">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            {title}
+          </CardTitle>
+          {renderIcon()}
+        </div>
       </CardHeader>
+      
       <CardContent>
-        {isLoading || loading ? (
-          <div className="h-10 bg-gray-100 animate-pulse rounded-md" />
-        ) : (
-          <>
-            <div className="text-2xl font-bold mb-1">{value}</div>
-            
-            {delta && (
-              <div className={trendVariants({ trend: getDeltaTrend() })}>
-                {getDeltaTrend() === 'up' && <span>↑</span>}
-                {getDeltaTrend() === 'down' && <span>↓</span>}
-                {getDeltaTrend() === 'neutral' && <span>→</span>}
-                <span>{Math.abs(getDeltaValue())}% {getDeltaLabel()}</span>
-              </div>
-            )}
-            
-            {subtitle && (
-              <div className="mt-2">
-                {subtitle}
-              </div>
-            )}
-          </>
+        <div className="text-2xl font-bold" aria-label={ariaLabel}>
+          {isLoading ? "Loading..." : value}
+        </div>
+        
+        {delta && (
+          <div className={trendVariants({ trend: delta.trend })}>
+            {delta.trend === "up" ? "↑" : delta.trend === "down" ? "↓" : ""}
+            {delta.value}%
+            {delta.label && <span className="text-muted-foreground ml-1">{delta.label}</span>}
+          </div>
         )}
       </CardContent>
+      
+      {subtitle && (
+        <CardFooter className="pt-0">
+          <p className="text-xs text-muted-foreground">{subtitle}</p>
+        </CardFooter>
+      )}
     </Card>
   );
 };

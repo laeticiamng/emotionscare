@@ -15,7 +15,7 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   showCover = true
 }) => {
   // Determine cover URL from various possible properties
-  const coverUrl = track.coverUrl || track.cover || track.coverImage || '';
+  const coverUrl = track.coverUrl || track.cover || track.coverImage || track.cover_url || '';
   
   return (
     <div className={`flex items-center gap-3 ${className}`}>

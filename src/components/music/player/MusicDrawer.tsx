@@ -10,7 +10,7 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { Button } from '@/components/ui/button';
-import { MusicDrawerProps, MusicTrack } from '@/types';
+import { MusicDrawerProps, MusicTrack, MusicPlaylist } from '@/types';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({
   open,
@@ -23,13 +23,34 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
   // Use either isOpen or open prop
   const isDrawerOpen = isOpen !== undefined ? isOpen : open;
   
+  // Helper function to get playlist name/title safely
+  const getPlaylistTitle = () => {
+    if (!playlist) return '';
+    if (typeof playlist === 'object' && 'tracks' in playlist) {
+      return playlist.title || playlist.name || '';
+    }
+    return '';
+  };
+  
+  // Helper function to get tracks safely
+  const getTracks = () => {
+    if (!playlist) return [];
+    if (Array.isArray(playlist)) {
+      return playlist;
+    }
+    if (typeof playlist === 'object' && 'tracks' in playlist) {
+      return playlist.tracks;
+    }
+    return [];
+  };
+  
   return (
     <Drawer open={isDrawerOpen} onOpenChange={onOpenChange || onClose}>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>Music Player</DrawerTitle>
           <DrawerDescription>
-            {playlist ? `Playing from ${playlist.title || playlist.name}` : 'Current track'}
+            {playlist ? `Playing from ${getPlaylistTitle()}` : 'Current track'}
           </DrawerDescription>
         </DrawerHeader>
         
@@ -37,9 +58,9 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
           {currentTrack ? (
             <div className="flex flex-col items-center">
               <div className="w-32 h-32 bg-muted rounded-lg overflow-hidden mb-4">
-                {(currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover) ? (
+                {(currentTrack.coverUrl || currentTrack.cover) ? (
                   <img 
-                    src={currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover} 
+                    src={currentTrack.coverUrl || currentTrack.cover} 
                     alt={currentTrack.title} 
                     className="w-full h-full object-cover"
                   />
@@ -61,11 +82,11 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
             </div>
           )}
           
-          {playlist && playlist.tracks && playlist.tracks.length > 0 && (
+          {playlist && getTracks().length > 0 && (
             <div className="mt-4">
-              <h4 className="font-medium mb-2">Playlist: {playlist.title || playlist.name}</h4>
+              <h4 className="font-medium mb-2">Playlist: {getPlaylistTitle()}</h4>
               <div className="max-h-[200px] overflow-y-auto">
-                {playlist.tracks.map((track) => (
+                {getTracks().map((track) => (
                   <div 
                     key={track.id}
                     className={`flex items-center p-2 rounded ${
@@ -73,9 +94,9 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
                     } cursor-pointer mb-1`}
                   >
                     <div className="w-8 h-8 bg-muted/50 rounded overflow-hidden mr-3">
-                      {(track.coverUrl || track.cover_url || track.cover) && (
+                      {(track.coverUrl || track.cover) && (
                         <img 
-                          src={track.coverUrl || track.cover_url || track.cover} 
+                          src={track.coverUrl || track.cover} 
                           alt={track.title} 
                           className="w-full h-full object-cover"
                         />

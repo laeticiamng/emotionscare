@@ -54,7 +54,7 @@ const MusicPlayer: React.FC = () => {
           {currentTrack && (
             <>
               <ProgressBar 
-                currentTime={currentTime} 
+                position={currentTime} 
                 duration={duration} 
                 onSeek={seekTo} 
                 formatTime={formatTime}

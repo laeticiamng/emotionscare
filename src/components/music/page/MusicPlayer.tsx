@@ -1,8 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { MusicTrack } from '@/types/music';
-import MusicControls from '../page/MusicControls';
-import { formatTime } from '@/utils/formatUtils';
+import MusicControls from './MusicControls';
 
 interface MusicPlayerProps {
   tracks: MusicTrack[];
@@ -87,7 +86,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
   
   const getCurrentTrackUrl = () => {
     if (!currentTrack) return '';
-    return currentTrack.audioUrl || '';
+    return currentTrack.url;
   };
   
   const handleTogglePlay = () => {

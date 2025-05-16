@@ -1,11 +1,12 @@
 
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
-import { KpiCardProps } from '@/types';
+import React, { ReactNode } from 'react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { cva } from "class-variance-authority";
+import { KpiCardProps } from '@/types/dashboard';
 
 const KpiCard: React.FC<KpiCardProps> = ({
+  id,
   title,
   value,
   icon,
@@ -18,83 +19,89 @@ const KpiCard: React.FC<KpiCardProps> = ({
   trendText,
   loading
 }) => {
-  // Process delta value
-  let deltaValue = 0;
-  let deltaLabel;
-  let deltaTrend: 'up' | 'down' | 'neutral' = 'neutral';
-  
-  if (typeof delta === 'number') {
-    deltaValue = delta;
-    deltaTrend = delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral';
-  } else if (delta && typeof delta === 'object') {
-    deltaValue = delta.value;
-    deltaLabel = delta.label;
-    deltaTrend = delta.trend;
-  }
-
-  // Status color classes
-  const statusColorClasses = {
-    positive: 'text-green-600',
-    negative: 'text-red-600',
-    neutral: 'text-gray-500',
-    success: 'text-green-600',
-    warning: 'text-amber-600',
-    danger: 'text-red-600',
-    info: 'text-blue-600'
-  };
-
-  // Helper to render trend indicator
-  const renderTrendIndicator = (trend: 'up' | 'down' | 'neutral') => {
-    if (trend === 'up') {
-      return <TrendingUp className="h-4 w-4 text-green-600" />;
-    } else if (trend === 'down') {
-      return <TrendingDown className="h-4 w-4 text-red-600" />;
-    } else {
-      return <Minus className="h-4 w-4 text-gray-400" />;
+  const trendVariants = cva("text-xs flex items-center gap-1", {
+    variants: {
+      trend: {
+        up: "text-green-500 dark:text-green-400",
+        down: "text-red-500 dark:text-red-400",
+        neutral: "text-gray-500 dark:text-gray-400"
+      }
+    },
+    defaultVariants: {
+      trend: "neutral"
     }
-  };
+  });
+  
+  const statusVariants = cva("absolute top-2 right-2 w-2 h-2 rounded-full", {
+    variants: {
+      status: {
+        success: "bg-green-500",
+        warning: "bg-yellow-500",
+        error: "bg-red-500",
+        info: "bg-blue-500",
+        default: "bg-gray-500"
+      }
+    },
+    defaultVariants: {
+      status: "default"
+    }
+  });
 
+  const renderIcon = () => {
+    if (!icon) return null;
+    // Convert the icon to a ReactNode to satisfy type requirements
+    const iconElement: ReactNode = icon;
+    return (
+      <div className="rounded-md w-8 h-8 flex items-center justify-center bg-primary/10 text-primary">
+        {iconElement}
+      </div>
+    );
+  };
+  
   return (
-    <Card
+    <Card 
       className={cn(
-        "overflow-hidden",
-        onClick && "cursor-pointer hover:border-primary/50 transition-colors",
+        "relative hover:shadow-md transition-shadow cursor-pointer", 
         className
-      )}
+      )} 
       onClick={onClick}
-      aria-label={ariaLabel || title}
+      id={id}
     >
-      <CardContent className="p-4 h-full flex flex-col justify-between">
-        <div className="flex justify-between items-start">
-          <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
-          {icon && <div className="text-muted-foreground">{icon}</div>}
+      {status && <span className={statusVariants({ status })} />}
+      
+      <CardHeader className="pb-2">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            {title}
+          </CardTitle>
+          {renderIcon()}
         </div>
+      </CardHeader>
+      
+      <CardContent>
+        {loading ? (
+          <div className="h-8 w-24 bg-muted animate-pulse rounded"></div>
+        ) : (
+          <div className="text-2xl font-bold" aria-label={ariaLabel}>
+            {value}
+          </div>
+        )}
         
-        <div className="mt-2">
-          {loading ? (
-            <div className="h-7 bg-muted animate-pulse rounded w-24" />
-          ) : (
-            <div className="text-2xl font-bold">
-              {value}
-            </div>
-          )}
-          
-          {(deltaValue !== 0 || deltaTrend !== 'neutral' || trendText) && (
-            <div className="flex items-center gap-1 mt-1 text-sm">
-              {renderTrendIndicator(deltaTrend)}
-              <span className={statusColorClasses[status || (deltaTrend === 'up' ? 'positive' : deltaTrend === 'down' ? 'negative' : 'neutral')]}>
-                {Math.abs(deltaValue)}% {deltaLabel || trendText || (deltaTrend === 'up' ? 'hausse' : deltaTrend === 'down' ? 'baisse' : '')}
-              </span>
-            </div>
-          )}
-          
-          {subtitle && (
-            <div className="text-xs text-muted-foreground mt-1">
-              {subtitle}
-            </div>
-          )}
-        </div>
+        {delta && (
+          <div className={trendVariants({ trend: delta.trend })}>
+            {delta.trend === "up" ? "↑" : delta.trend === "down" ? "↓" : "→"}
+            {delta.value}%
+            {delta.label && <span className="text-muted-foreground ml-1">{delta.label}</span>}
+            {trendText && <span className="text-muted-foreground ml-1">{trendText}</span>}
+          </div>
+        )}
       </CardContent>
+      
+      {subtitle && (
+        <CardFooter className="pt-0">
+          <p className="text-xs text-muted-foreground">{subtitle}</p>
+        </CardFooter>
+      )}
     </Card>
   );
 };

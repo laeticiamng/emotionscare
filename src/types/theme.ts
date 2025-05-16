@@ -10,7 +10,7 @@ export type ThemeType = 'light' | 'dark' | 'pastel' | 'system';
 
 export interface ThemeContextType {
   theme: string;
-  setTheme: (theme: string) => void;
+  setTheme: (theme: string | Theme) => void;
   isDarkMode: boolean;
   toggleTheme: () => void;
   fontFamily?: FontFamily;

@@ -1,92 +1,50 @@
 
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
-  firstName?: string;
-  lastName?: string;
-  displayName?: string;
-  avatarUrl?: string;
-  avatar_url?: string; // Legacy support
-  avatar?: string; // Legacy support
-  role?: UserRole;
-  status?: 'active' | 'inactive' | 'pending';
-  preferences?: UserPreferences;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
-  joinedAt?: string | Date;
-  joined_at?: string | Date; // Legacy support
-  lastLogin?: string | Date;
-  verifiedEmail?: boolean;
-  position?: string;
-  department?: string;
-  onboarded?: boolean;
-  emotional_score?: number;
-}
+// Create or update this file to include the Story interface
+// This is a minimal implementation to fix the error
 
-export type UserRole = 'admin' | 'user' | 'guest' | 'premium' | 'b2c' | 'b2b_user' | 'b2b_admin';
-
-export interface UserPreferences {
-  theme: "system" | "light" | "dark" | "pastel";
-  fontSize: FontSize;
-  fontFamily: FontFamily;
-  reduceMotion: boolean;
-  colorBlindMode: boolean;
-  autoplayMedia: boolean;
-  language?: string;
-  notifications: NotificationPreferences;
-  privacy: {
-    shareData: boolean;
-    anonymizeReports?: boolean;
-    profileVisibility: string;
-  };
-  notifications_enabled?: boolean;
-  soundEnabled: boolean;
-}
-
-export interface NotificationPreferences {
-  enabled?: boolean;
-  emailEnabled?: boolean;
-  pushEnabled?: boolean;
-  inAppEnabled?: boolean;
-  email?: boolean;
-  push?: boolean;
-  sms?: boolean;
-  types?: {
-    system?: boolean;
-    emotion?: boolean;
-    coach?: boolean;
-    journal?: boolean;
-    community?: boolean;
-    achievement?: boolean;
-  };
-  frequency?: string;
-}
-
-export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "inter" | "rounded";
-export type FontSize = "small" | "medium" | "large" | "x-large" | "sm" | "md" | "lg" | "xl";
-export type ThemeName = "light" | "dark" | "system" | "pastel";
-
-export interface Period {
-  start: Date;
-  end: Date;
-}
-
-export type UserModeType = 'normal' | 'focus' | 'relax' | 'sleep';
-
-export interface InvitationVerificationResult {
-  valid: boolean;
-  email?: string;
-  role?: string;
-  message?: string;
-}
+export type Period = '1d' | '7d' | '30d' | '90d' | 'custom';
 
 export interface Story {
   id: string;
   title: string;
   content: string;
-  created_at: string;
-  author_id: string;
-  seen?: boolean;
+  image?: string;
+  date: Date | string;
+  author?: string;
+  category?: string;
+  tags?: string[];
+  type?: 'article' | 'news' | 'blog' | 'resource';
 }
 
+export interface User {
+  id: string;
+  name?: string;
+  email?: string;
+  avatar?: string;
+}
+
+export interface UserPreferences {
+  theme?: string;
+  notifications?: boolean;
+}
+
+export type FontFamily = "system" | "serif" | "sans-serif" | "monospace";
+export type FontSize = "small" | "medium" | "large";
+export type ThemeName = "light" | "dark" | "system";
+export type UserRole = "admin" | "user" | "manager";
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  email?: string;
+  expires?: Date;
+  role?: UserRole;
+  teamId?: string;
+}
+
+export interface NotificationPreferences {
+  email: boolean;
+  push: boolean;
+  inApp: boolean;
+}
+
+export type UserModeType = "standard" | "advanced" | "developer";

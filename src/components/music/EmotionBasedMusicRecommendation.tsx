@@ -56,7 +56,7 @@ const EmotionBasedMusicRecommendation: React.FC<EmotionBasedMusicRecommendationP
       </CardHeader>
       <CardContent>
         <p className="text-sm mb-4">
-          {getMusicDescription(emotion.emotion)}
+          {getMusicDescription(emotion.emotion || '')}
         </p>
         <Button 
           onClick={handlePlayMusic} 

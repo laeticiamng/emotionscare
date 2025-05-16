@@ -1,63 +1,60 @@
 
 import { ReactNode } from 'react';
-import { LucideIcon } from 'lucide-react';
 
 export interface KpiCardProps {
   id: string;
   title: string;
   value: string | number;
-  icon?: ReactNode | LucideIcon;
-  delta?: number | {
+  icon?: ReactNode;
+  delta?: {
     value: number;
     label?: string;
     trend: 'up' | 'down' | 'neutral';
   };
-  subtitle?: string | ReactNode;
-  ariaLabel?: string;
+  subtitle?: ReactNode;
+  ariaLabel: string;
   onClick?: () => void;
-  status?: 'success' | 'warning' | 'danger' | 'info';
   className?: string;
-  isLoading?: boolean;
-  loading?: boolean;
+  status?: 'success' | 'warning' | 'error' | 'info';
   trendText?: string;
-  // Grid position props for drag and drop
-  x?: number;
-  y?: number;
-  w?: number;
-  h?: number;
+  loading?: boolean;
+  isLoading?: boolean;
 }
 
 export interface DraggableKpiCardsGridProps {
-  cards?: KpiCardProps[];
-  kpiCards?: KpiCardProps[];
-  onOrderChange?: (cards: KpiCardProps[]) => void;
-  onLayoutChange?: (layout: any[]) => void;
-  className?: string;
-  isEditable?: boolean;
-  editable?: boolean;
+  kpiCards: KpiCardProps[];
 }
 
 export interface GlobalOverviewTabProps {
-  period?: string;
-  department?: string;
+  period: string;
+  setPeriod: (period: string) => void;
 }
 
 export interface DashboardWidgetConfig {
   id: string;
-  type: 'kpi' | 'chart' | 'table' | 'list' | 'custom';
   title: string;
-  size: 'small' | 'medium' | 'large' | 'full';
-  position?: number;
+  type: 'kpi' | 'chart' | 'list' | 'table' | 'custom';
+  size: 'sm' | 'md' | 'lg' | 'full';
   data?: any;
-  settings?: any;
+  component?: ReactNode;
   visible?: boolean;
+  order?: number;
 }
 
 export interface GamificationData {
-  badges: any[];
-  points: number;
+  badges: number;
   level: number;
-  achievements: any[];
-  streaks: number;
-  challenges: any[];
+  points: number;
+  nextLevelPoints: number;
+  progress: number;
+  streaks: {
+    current: number;
+    longest: number;
+  };
+  recentAchievements: Array<{
+    id: string;
+    name: string;
+    description: string;
+    date: string;
+  }>;
 }
