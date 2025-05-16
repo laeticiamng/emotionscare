@@ -72,7 +72,7 @@ const NotificationsPanel: React.FC = () => {
         </div>
         <p className="text-sm text-muted-foreground line-clamp-2">{notification.message}</p>
         
-        {(notification.action_url || notification.actionUrl) && (notification.action_label || notification.actionLabel) && (
+        {((notification.action_url || notification.actionUrl) && (notification.action_label || notification.actionLabel)) && (
           <Button
             variant="link"
             size="sm"
@@ -105,7 +105,7 @@ const NotificationsPanel: React.FC = () => {
         </div>
       </div>
       
-      <Tabs defaultValue="all" value={String(filter)} onValueChange={(value) => setFilter(value as NotificationFilter)}>
+      <Tabs defaultValue="all" value={filter as string} onValueChange={(value) => setFilter(value as NotificationFilter)}>
         <div className="px-4 pt-2">
           <TabsList className="w-full">
             <TabsTrigger value="all">All</TabsTrigger>
@@ -114,7 +114,7 @@ const NotificationsPanel: React.FC = () => {
           </TabsList>
         </div>
         
-        <TabsContent value={String(filter)} className="m-0">
+        <TabsContent value={filter as string} className="m-0">
           <div className="max-h-[60vh] overflow-y-auto">
             {notifications.length > 0 ? (
               <div className="divide-y">

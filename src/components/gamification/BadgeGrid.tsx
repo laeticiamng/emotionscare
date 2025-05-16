@@ -45,6 +45,9 @@ interface BadgeCardProps {
 }
 
 const BadgeCard: React.FC<BadgeCardProps> = ({ badge, unlocked }) => {
+  // Get the image URL, handling various property names
+  const imageUrl = badge.imageUrl || badge.image_url || badge.image;
+  
   return (
     <Card className={cn(
       'overflow-hidden transition-all',
@@ -52,15 +55,15 @@ const BadgeCard: React.FC<BadgeCardProps> = ({ badge, unlocked }) => {
     )}>
       <div className="relative">
         <div className="w-full aspect-square flex items-center justify-center bg-muted">
-          {badge.image_url ? (
+          {imageUrl ? (
             <img 
-              src={badge.image_url} 
+              src={imageUrl} 
               alt={badge.name} 
               className="object-cover w-full h-full"
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full bg-primary/10 text-primary">
-              {badge.icon || <BadgeCheck className="w-12 h-12" />}
+              {badge.icon ? badge.icon : <BadgeCheck className="w-12 h-12" />}
             </div>
           )}
           

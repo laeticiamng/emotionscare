@@ -10,24 +10,28 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   notification, onMarkAsRead, onDelete, onClick, compact = false, onRead
 }) => {
   const getIcon = (type: NotificationType) => {
-    // Handle all possible notification types
     switch (type) {
-      case 'emotion':
+      case "emotion":
         return <ScanLine className="h-5 w-5 text-purple-500" />;
-      case 'journal':
+      case "journal":
         return <MessageSquare className="h-5 w-5 text-blue-500" />;
-      case 'community':
+      case "community":
         return <Users className="h-5 w-5 text-green-500" />;
-      case 'achievement':
+      case "achievement":
         return <Award className="h-5 w-5 text-amber-500" />;
-      case 'reminder':
+      case "reminder":
         return <Bell className="h-5 w-5 text-orange-500" />;
-      case 'success':
+      case "success":
         return <Bell className="h-5 w-5 text-green-500" />;
-      case 'warning':
+      case "warning":
         return <Bell className="h-5 w-5 text-yellow-500" />;
-      case 'error':
+      case "error":
         return <Bell className="h-5 w-5 text-red-500" />;
+      case "alert":
+        return <Bell className="h-5 w-5 text-red-500" />;
+      case "message":
+        return <MessageSquare className="h-5 w-5 text-blue-500" />;
+      case "system":
       default:
         return <Bell className="h-5 w-5 text-primary" />;
     }
@@ -50,7 +54,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     if (!notification.read && onRead) onRead(notification.id);
   };
   
-  const formattedDate = notification.timestamp || notification.date;
+  const formattedDate = notification.timestamp || notification.date || notification.createdAt;
   
   return (
     <div 
@@ -104,7 +108,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
               }
             </span>
             
-            {(notification.action_url || notification.actionUrl) && (notification.action_label || notification.actionLabel) && !compact && (
+            {((notification.action_url || notification.actionUrl) && (notification.action_label || notification.actionLabel)) && !compact && (
               <Button variant="link" size="sm" className="h-auto p-0 text-xs">
                 {notification.action_label || notification.actionLabel}
               </Button>

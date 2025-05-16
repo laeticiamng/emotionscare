@@ -1,16 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { GamificationStats, Badge, Challenge } from '@/types/types';
-
-interface UseGamificationReturn {
-  stats: GamificationStats;
-  badges: Badge[];
-  challenges: Challenge[];
-  isLoading: boolean;
-  error: string;
-  fetchGamificationStats: () => Promise<void>;
-  completeChallenge: (challengeId: string) => Promise<boolean>;
-}
+import { GamificationStats, Badge, Challenge } from '@/types/gamification';
+import { UseGamificationReturn } from '@/types/hooks';
 
 export const useGamification = (): UseGamificationReturn => {
   const [stats, setStats] = useState<GamificationStats>({
@@ -19,24 +10,27 @@ export const useGamification = (): UseGamificationReturn => {
     badges: [],
     completedChallenges: 0,
     totalChallenges: 0,
+    challenges: [],
     streak: 0,
+    progress: 0,
+    leaderboard: [],
     currentLevel: 1,
-    nextLevel: 2,
-    pointsToNextLevel: 100,
-    progressToNextLevel: 0,
-    activeChallenges: 0,
-    rank: 'Beginner'
+    nextLevel: {
+      points: 100,
+      rewards: [],
+      level: 2
+    }
   });
   
   const [badges, setBadges] = useState<Badge[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   // Mock fetch gamification data
   const fetchGamificationStats = useCallback(async () => {
     setIsLoading(true);
-    setError('');
+    setError(null);
     
     try {
       // Simulate API call delay
@@ -48,22 +42,28 @@ export const useGamification = (): UseGamificationReturn => {
           id: '1',
           name: 'Early Adopter',
           description: 'Joined during the beta phase',
-          icon: 'star',
           imageUrl: '/images/badges/early-adopter.png',
+          category: 'progress',
+          tier: 'bronze',
+          completed: true
         },
         {
           id: '2',
           name: 'Emotion Explorer',
           description: 'Recorded 10 different emotions',
-          icon: 'heart',
           imageUrl: '/images/badges/emotion-explorer.png',
+          category: 'activity',
+          tier: 'silver',
+          completed: false
         },
         {
           id: '3',
           name: 'Journaling Pro',
           description: 'Created 30 journal entries',
-          icon: 'book',
           imageUrl: '/images/badges/journaling-pro.png',
+          category: 'journal',
+          tier: 'gold',
+          completed: false
         }
       ];
       
@@ -71,42 +71,41 @@ export const useGamification = (): UseGamificationReturn => {
       const mockChallenges: Challenge[] = [
         {
           id: '1',
-          name: 'Daily Check-in',
           title: 'Daily Check-in',
+          name: 'Daily Check-in',
           description: 'Record your emotion every day for a week',
           points: 50,
-          type: 'streak',
-          category: 'emotion',
-          status: 'in-progress',
+          category: 'daily',
+          status: 'active',
           progress: 3,
           total: 7,
-          completions: 0
+          completed: false,
+          isDaily: true
         },
         {
           id: '2',
-          name: 'Journal Journey',
           title: 'Journal Journey',
+          name: 'Journal Journey',
           description: 'Write 5 journal entries',
           points: 100,
-          type: 'count',
-          category: 'journal',
-          status: 'in-progress',
+          category: 'weekly',
+          status: 'active',
           progress: 2,
           total: 5,
-          completions: 0
+          completed: false,
+          isWeekly: true
         },
         {
           id: '3',
-          name: 'VR Explorer',
           title: 'VR Explorer',
+          name: 'VR Explorer',
           description: 'Complete 3 different VR sessions',
           points: 150,
-          type: 'count',
-          category: 'vr',
-          status: 'not-started',
+          category: 'special',
+          status: 'active',
           progress: 0,
           total: 3,
-          completions: 0
+          completed: false
         }
       ];
       
@@ -114,19 +113,26 @@ export const useGamification = (): UseGamificationReturn => {
       setStats({
         points: 250,
         level: 3,
-        rank: 'Explorer',
         badges: mockBadges,
         completedChallenges: 2,
         totalChallenges: 5,
+        challenges: mockChallenges,
         streak: 3,
         currentLevel: 3,
-        nextLevel: 4,
+        nextLevel: {
+          points: 400,
+          rewards: ['Badge exclusive', 'New theme'],
+          level: 4
+        },
         pointsToNextLevel: 150,
         progressToNextLevel: 65,
-        activeChallenges: 3,
+        totalPoints: 250,
+        badgesCount: mockBadges.length,
         streakDays: 3,
         lastActivityDate: new Date().toISOString(),
-        badgesCount: mockBadges.length
+        activeChallenges: 3,
+        progress: 65,
+        leaderboard: []
       });
       
       setBadges(mockBadges);
@@ -183,7 +189,6 @@ export const useGamification = (): UseGamificationReturn => {
     challenges,
     isLoading,
     error,
-    fetchGamificationStats,
     completeChallenge
   };
 };

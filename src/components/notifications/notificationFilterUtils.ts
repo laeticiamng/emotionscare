@@ -1,5 +1,5 @@
 
-import { Notification, NotificationFilter } from '@/types/notification';
+import { Notification, NotificationFilter, NotificationType } from '@/types/notification';
 
 export const filterNotifications = (
   notifications: Notification[],
@@ -14,21 +14,9 @@ export const filterNotifications = (
       return notifications;
     case 'unread':
       return notifications.filter(notification => !notification.read);
-    case 'emotion':
-    case 'journal':
-    case 'community':
-    case 'achievement':
-    case 'reminder':
-    case 'system':
-    case 'success':
-    case 'warning':
-    case 'error':
-    case 'alert':
-    case 'message':
-      // Filter by specific notification type
-      return notifications.filter(notification => notification.type === filter);
     default:
-      return notifications;
+      // Handle notification types (emotion, journal, etc.)
+      return notifications.filter(notification => notification.type === filter);
   }
 };
 

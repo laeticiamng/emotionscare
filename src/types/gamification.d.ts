@@ -12,6 +12,10 @@ export interface Badge {
   progress?: number;
   completed: boolean;
   icon?: React.ReactNode;
+  // Adding properties needed by components
+  unlocked?: boolean;
+  level?: string | number;
+  dateEarned?: string;
 }
 
 export interface Challenge {
@@ -27,6 +31,12 @@ export interface Challenge {
   status?: 'active' | 'completed' | 'expired';
   deadline?: string;
   name?: string;
+  // Adding properties needed by components
+  goal?: number;
+  total?: number;
+  icon?: React.ReactNode;
+  difficulty?: string;
+  completions?: number;
 }
 
 export interface LeaderboardEntry {
@@ -69,5 +79,10 @@ export interface GamificationStats {
   activeUsersPercent?: number;
   completionRate?: number;
   topChallenges?: Challenge[];
-  badgeLevels?: Record<string, number>;
+  badgeLevels?: Record<string, number>[];
+  // Additional properties needed by the admin components
+  rank?: string;
+  nextLevelPoints?: number;
+  recentAchievements?: Badge[];
+  achievements?: Badge[];
 }

@@ -25,15 +25,19 @@ export interface Notification {
   read: boolean;
   createdAt: string;
   date?: string;
-  actionUrl?: string;
-  actionLabel?: string;
   action_url?: string;
   action_label?: string;
+  // Add backwards compatibility properties
+  actionUrl?: string;
+  actionLabel?: string;
+  timestamp?: string;
 }
 
 export interface NotificationItemProps {
   notification: Notification;
-  onClick?: () => void;
+  onClick?: (notification: Notification) => void;
+  onMarkAsRead?: (id: string) => void;
+  onDelete?: (id: string) => void;
   compact?: boolean;
   onRead?: (id: string) => void;
 }
