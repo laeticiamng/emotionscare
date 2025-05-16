@@ -3,12 +3,16 @@ import { createBrowserRouter } from 'react-router-dom';
 import App from './App';
 import LandingPage from './pages/LandingPage';
 import NotFoundPage from './pages/NotFoundPage';
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import SettingsPage from './pages/settings/SettingsPage';
+import AppLayout from './layouts/AppLayout';
 import B2CLogin from './pages/b2c/Login';
 import B2BUserLogin from './pages/b2b/user/Login';
 import B2BAdminLogin from './pages/b2b/admin/Login';
 import B2BUserRegister from './pages/b2b/user/Register';
 import B2BSelection from './pages/b2b/Selection';
-import LoginPage from './pages/common/LoginPage';
+import LoginCommon from './pages/common/LoginPage';
 import BusinessPage from './pages/BusinessPage';
 import Dashboard from './pages/Dashboard';
 import B2CDashboard from './pages/b2c/Dashboard';
@@ -27,11 +31,29 @@ export const router = createBrowserRouter([
       },
       {
         path: 'login',
+        element: <LoginCommon />
+      },
+      {
+        path: 'auth/login',
         element: <LoginPage />
+      },
+      {
+        path: 'auth/register',
+        element: <RegisterPage />
       },
       {
         path: 'dashboard',
         element: <Dashboard />
+      },
+      {
+        path: 'settings',
+        element: <AppLayout />,
+        children: [
+          {
+            index: true,
+            element: <SettingsPage />
+          }
+        ]
       },
       {
         path: 'b2c/login',

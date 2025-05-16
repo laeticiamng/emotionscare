@@ -1,182 +1,148 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { NotificationFrequency, NotificationTone } from '@/types';
+import React from 'react';
+import { UserPreferences } from '@/types/types';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const NotificationPreferences = () => {
-  const { user, updateUser } = useAuth();
-  const { toast } = useToast();
-  
-  // Default preferences if user has none
-  const defaultPreferences = {
-    enabled: true,
-    type: 'all' as 'all' | 'important' | 'none',
-    frequency: 'immediate' as NotificationFrequency,
-    tone: 'supportive' as unknown as NotificationTone,
-    emailEnabled: true,
-    pushEnabled: true,
-    soundEnabled: true
+interface NotificationPreferencesProps {
+  preferences: UserPreferences;
+  onChange: (preferences: Partial<UserPreferences>) => void;
+}
+
+const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ preferences, onChange }) => {
+  // Ensure we have the notifications object
+  const notifications = preferences.notifications || {
+    enabled: false,
+    emailEnabled: false,
+    pushEnabled: false,
+    inAppEnabled: false,
+    types: {},
+    frequency: 'immediate'
   };
-  
-  // Get existing preferences or use defaults
-  const userNotifPrefs = user?.preferences?.notifications || {};
-  
-  // Convert to object if it's a boolean
-  const notificationSettings = typeof userNotifPrefs === 'boolean' 
-    ? { enabled: userNotifPrefs } 
-    : userNotifPrefs;
-  
-  // State for the form
-  const [preferences, setPreferences] = useState({
-    ...defaultPreferences,
-    ...notificationSettings
-  });
-  
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-    
-    setIsSubmitting(true);
-    
-    try {
-      // Update user preferences
-      const updatedUser = {
-        ...user,
-        preferences: {
-          ...user.preferences,
-          notifications: preferences
+
+  // Helper to update nested notification preferences
+  const handleNotificationChange = (key: string, value: any) => {
+    onChange({
+      notifications: {
+        ...notifications,
+        [key]: value
+      }
+    });
+  };
+
+  // Helper to update notification types
+  const handleTypeChange = (type: string, enabled: boolean) => {
+    onChange({
+      notifications: {
+        ...notifications,
+        types: {
+          ...notifications.types,
+          [type]: enabled
         }
-      };
-      
-      await updateUser(updatedUser);
-      
-      toast({
-        title: "Préférences mises à jour",
-        description: "Vos préférences de notification ont été enregistrées."
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder vos préférences.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+      }
+    });
   };
-  
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Préférences de notification</CardTitle>
-        <CardDescription>Configurez comment et quand vous souhaitez être notifié</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <Label htmlFor="notificationsEnabled">Notifications</Label>
+          <p className="text-sm text-muted-foreground">
+            Activer ou désactiver toutes les notifications
+          </p>
+        </div>
+        <Switch
+          id="notificationsEnabled"
+          checked={notifications.enabled}
+          onCheckedChange={(checked) => handleNotificationChange('enabled', checked)}
+        />
+      </div>
+
+      {notifications.enabled && (
+        <>
+          <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-medium mb-3">Types de notifications</h3>
-              <RadioGroup 
-                value={preferences.type} 
-                onValueChange={(value: 'all' | 'important' | 'none') => setPreferences({...preferences, type: value})}
-                className="space-y-2"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="all" id="all" />
-                  <Label htmlFor="all">Toutes les notifications</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="important" id="important" />
-                  <Label htmlFor="important">Uniquement les notifications importantes</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="none" id="none" />
-                  <Label htmlFor="none">Aucune notification</Label>
-                </div>
-              </RadioGroup>
+              <Label htmlFor="emailEnabled">Notifications par email</Label>
+              <p className="text-sm text-muted-foreground">
+                Recevoir des notifications par email
+              </p>
             </div>
-            
-            <div>
-              <h3 className="text-sm font-medium mb-3">Fréquence des notifications</h3>
-              <Select 
-                value={preferences.frequency} 
-                onValueChange={(value) => setPreferences({...preferences, frequency: value as NotificationFrequency})}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir une fréquence" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="immediate">Immédiatement</SelectItem>
-                  <SelectItem value="daily">Résumé quotidien</SelectItem>
-                  <SelectItem value="weekly">Résumé hebdomadaire</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <h3 className="text-sm font-medium mb-3">Ton des notifications</h3>
-              <Select 
-                value={preferences.tone as unknown as string} 
-                onValueChange={(value) => setPreferences({...preferences, tone: value as unknown as NotificationTone})}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir un ton" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="professional">Professionnel</SelectItem>
-                  <SelectItem value="casual">Décontracté</SelectItem>
-                  <SelectItem value="supportive">Bienveillant</SelectItem>
-                  <SelectItem value="minimal">Minimaliste</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2 pt-2">
-              <h3 className="text-sm font-medium mb-3">Canaux de notification</h3>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="email-notifications">Notifications par email</Label>
-                <Switch 
-                  id="email-notifications" 
-                  checked={preferences.emailEnabled}
-                  onCheckedChange={(checked) => setPreferences({...preferences, emailEnabled: checked})}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <Label htmlFor="push-notifications">Notifications push</Label>
-                <Switch 
-                  id="push-notifications" 
-                  checked={preferences.pushEnabled}
-                  onCheckedChange={(checked) => setPreferences({...preferences, pushEnabled: checked})}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <Label htmlFor="sound-notifications">Sons de notification</Label>
-                <Switch 
-                  id="sound-notifications" 
-                  checked={preferences.soundEnabled}
-                  onCheckedChange={(checked) => setPreferences({...preferences, soundEnabled: checked})}
-                />
-              </div>
-            </div>
+            <Switch
+              id="emailEnabled"
+              checked={notifications.emailEnabled}
+              onCheckedChange={(checked) => handleNotificationChange('emailEnabled', checked)}
+            />
           </div>
-          
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Enregistrement..." : "Enregistrer les préférences"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="pushEnabled">Notifications push</Label>
+              <p className="text-sm text-muted-foreground">
+                Recevoir des notifications push sur votre appareil
+              </p>
+            </div>
+            <Switch
+              id="pushEnabled"
+              checked={notifications.pushEnabled}
+              onCheckedChange={(checked) => handleNotificationChange('pushEnabled', checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="inAppEnabled">Notifications dans l'application</Label>
+              <p className="text-sm text-muted-foreground">
+                Recevoir des notifications dans l'application
+              </p>
+            </div>
+            <Switch
+              id="inAppEnabled"
+              checked={notifications.inAppEnabled}
+              onCheckedChange={(checked) => handleNotificationChange('inAppEnabled', checked)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="frequency">Fréquence des notifications</Label>
+            <Select
+              value={notifications.frequency}
+              onValueChange={(value) => handleNotificationChange('frequency', value)}
+            >
+              <SelectTrigger className="w-full mt-1">
+                <SelectValue placeholder="Sélectionner une fréquence" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="immediate">Immédiatement</SelectItem>
+                <SelectItem value="hourly">Toutes les heures</SelectItem>
+                <SelectItem value="daily">Quotidien</SelectItem>
+                <SelectItem value="weekly">Hebdomadaire</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-4">
+            <Label>Types de notifications</Label>
+
+            {notifications.types && Object.entries(notifications.types).map(([type, enabled]) => (
+              <div key={type} className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor={`notification-${type}`}>
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </Label>
+                </div>
+                <Switch
+                  id={`notification-${type}`}
+                  checked={enabled}
+                  onCheckedChange={(checked) => handleTypeChange(type, checked)}
+                />
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 

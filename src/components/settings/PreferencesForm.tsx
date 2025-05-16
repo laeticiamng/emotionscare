@@ -16,7 +16,7 @@ interface PreferencesFormProps {
   className?: string;
 }
 
-const PreferencesForm: React.FC<PreferencesFormProps> = ({
+export const PreferencesForm: React.FC<PreferencesFormProps> = ({
   user,
   onPreferencesSave,
   className = ''
@@ -64,11 +64,11 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Appeler la fonction de sauvegarde si elle est fournie
+      // Call the save function if provided
       if (onPreferencesSave) {
         onPreferencesSave(preferences);
       } 
-      // Ou utiliser la fonction de mise à jour du contexte si disponible
+      // Or use the context update function if available
       else if (auth.updateUser) {
         await auth.updateUser({
           ...user,
