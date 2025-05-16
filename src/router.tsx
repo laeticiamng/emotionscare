@@ -8,6 +8,7 @@ import B2BUserLogin from './pages/b2b/user/Login';
 import B2BAdminLogin from './pages/b2b/admin/Login';
 import B2BUserRegister from './pages/b2b/user/Register';
 import B2BSelection from './pages/b2b/Selection';
+import LoginPage from './pages/common/LoginPage';
 
 // Create and export the router
 export const router = createBrowserRouter([
@@ -18,6 +19,10 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <LandingPage />
+      },
+      {
+        path: 'login',
+        element: <LoginPage />
       },
       {
         path: 'b2c/login',

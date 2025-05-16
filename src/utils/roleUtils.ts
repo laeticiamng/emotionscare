@@ -24,3 +24,7 @@ export const getRoleRoute = (role: string): string => {
       return '/';
   }
 };
+
+export const isAdminRole = (role?: string): boolean => {
+  return role === 'b2b_admin' || role === 'admin';
+};
