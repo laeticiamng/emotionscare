@@ -1,5 +1,5 @@
 
-import { Notification, NotificationFilter } from '@/types';
+import { Notification, NotificationFilter } from '@/types/notification';
 
 export const filterNotifications = (
   notifications: Notification[],

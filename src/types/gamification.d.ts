@@ -1,101 +1,59 @@
 
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  image_url?: string;
-  earned_date?: string;
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum' | 'rare' | 'epic' | 'legendary' | 'common';
-  category?: string;
-  icon?: string;
-  level?: number | string;
-  image?: string;
-  unlockedAt?: string;
-  dateEarned?: string;
-  progress?: number;
-  rarity?: 'common' | 'rare' | 'epic' | 'legendary';
-  completed?: boolean;
-  unlocked?: boolean;
-  imageUrl?: string;
+export interface GamificationStats {
+  totalPoints: number;
+  currentLevel: number;
+  nextLevel: number;
+  pointsToNextLevel: number;
+  progressToNextLevel: number;
+  streakDays: number;
+  badgesCount: number;
+  challenges: Challenge[];
+  activeChallenges: number;
+  completedChallenges: number;
+  recentBadges: Badge[];
+  totalBadges: number;
+  activeUsersPercent: number;
+  completionRate: number;
+  badges: Badge[];
+  badgeLevels: Record<string, Badge[]>;
+  points: number;
+  rewards: string[];
+  lastActivityDate: string;
 }
 
 export interface Challenge {
   id: string;
-  title?: string;
-  name?: string;
+  title: string;
   description: string;
   points: number;
+  progress: number;
   completed: boolean;
-  progress?: number;
-  totalSteps?: number;
   deadline?: string;
-  startDate?: string;
-  category?: string;
-  difficulty?: 'easy' | 'medium' | 'hard';
-  completions?: number;
-  badge?: string;
-  requirement?: number;
-  current?: number;
-  goal?: number;
-  status?: 'active' | 'completed' | 'failed' | 'locked' | 'ongoing' | 'available';
   isDaily?: boolean;
   isWeekly?: boolean;
-  icon?: React.ReactNode;
-  failed?: boolean;
-  xp?: number;
-  type?: string;
+  status?: 'active' | 'completed' | 'expired';
+  name?: string;
+}
+
+export interface Badge {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  image_url?: string; // Legacy support
+  earned: boolean;
+  date?: string;
+  level?: number;
+  points?: number;
+  category?: string;
+  icon?: any;
 }
 
 export interface LeaderboardEntry {
   id: string;
   name: string;
-  avatar?: string;
+  avatar: string;
   points: number;
   rank: number;
-  position?: number;
-  trend?: 'up' | 'down' | 'stable';
-  badges?: number;
-  level?: number;
-  score?: number;
-  change?: number;
-  department?: string;
-  userId?: string;
-  username?: string;
   isCurrentUser?: boolean;
-}
-
-export interface GamificationStats {
-  points: number;
-  level: number;
-  badges: Badge[] | number;
-  streak: number;
-  completedChallenges: number;
-  totalChallenges: number;
-  activeUsersPercent?: number;
-  totalBadges?: number;
-  badgeLevels?: { level: string; count: number; }[];
-  topChallenges?: (Challenge & { name: string; completions: number; })[];
-  completionRate?: number;
-  rewardsEarned?: number;
-  userEngagement?: number;
-  progress: number;
-  challenges: Challenge[];
-  achievements?: Badge[];
-  leaderboard?: LeaderboardEntry[];
-  nextLevelPoints?: number;
-  lastActivityDate?: string;
-  nextLevel?: {
-    points: number;
-    level?: number;
-    rewards: string[];
-  };
-  rank?: string;
-  activeChallenges?: number;
-  streakDays?: number;
-  pointsToNextLevel?: number;
-  progressToNextLevel?: number;
-  totalPoints?: number;
-  badgesCount?: number;
-  currentLevel?: number;
-  recentAchievements?: Badge[];
 }

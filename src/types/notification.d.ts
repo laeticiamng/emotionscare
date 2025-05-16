@@ -37,6 +37,8 @@ export interface NotificationPreference {
   enabled: boolean;
   pushEnabled: boolean;
   emailEnabled: boolean;
+  inAppEnabled?: boolean;
+  soundEnabled?: boolean;
   frequency: NotificationFrequency;
   types: Record<NotificationType, boolean>;
   tone?: NotificationTone;
@@ -45,8 +47,6 @@ export interface NotificationPreference {
     start: string;
     end: string;
   };
-  inAppEnabled?: boolean;
-  soundEnabled?: boolean;
   type?: 'all' | 'important' | 'none';
 }
 
