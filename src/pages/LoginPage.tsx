@@ -1,13 +1,10 @@
 
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
-// This page redirects to the appropriate login page based on the URL
+// On ne conserve plus cette page car on a des pages de login spécifiques
 const LoginPage: React.FC = () => {
-  const location = useLocation();
-  const path = location.pathname;
-
-  // Par défaut, rediriger vers la page d'accueil
+  // Rediriger vers la landing page
   return <Navigate to="/" replace />;
 };
 

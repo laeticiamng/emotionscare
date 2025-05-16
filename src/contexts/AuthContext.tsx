@@ -1,112 +1,131 @@
 
-import React, { createContext, useContext, useState } from 'react';
-import { User, UserPreferences } from '@/types/types';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { AuthContextType } from '@/types/auth';
 
-export interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  updateUser?: (userData: User) => Promise<void>;
-  updatePreferences?: (preferences: UserPreferences) => Promise<void>;
-}
+// Créer le contexte avec une valeur par défaut
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
+  error: null,
+  login: async () => {},
+  logout: () => {},
+  register: async () => {}
+});
 
-// Créer un utilisateur de test
-const testUser: User = {
-  id: 'test-user-id',
-  email: 'user@example.com',
-  name: 'Test User',
-  firstName: 'Test',
-  lastName: 'User',
-  role: 'b2c',
+// Mock user data for development
+const mockUserData = {
+  id: '123',
+  name: 'Demo User',
+  email: 'demo@emotionscare.app',
+  role: 'user',
+  created_at: new Date().toISOString(),
   preferences: {
-    theme: 'light',
+    theme: 'system',
     fontSize: 'medium',
     fontFamily: 'system',
     reduceMotion: false,
     colorBlindMode: false,
     autoplayMedia: true,
-    notifications: {
-      enabled: true,
-      emailEnabled: true,
-      pushEnabled: false,
-      inAppEnabled: true,
-      types: {
-        system: true,
-        emotion: true,
-        coach: true,
-        journal: true,
-        community: true,
-        achievement: true,
-      },
-      frequency: 'immediate',
-    },
-    privacy: {
-      shareData: true,
-      anonymizeReports: false,
-      profileVisibility: 'public',
-    },
     soundEnabled: true,
-  },
+    notifications: {
+      email: true,
+      push: true,
+      sms: false,
+      frequency: 'daily'
+    }
+  }
 };
-
-// Créer le contexte avec des valeurs par défaut
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  login: async () => false,
-  logout: () => {},
-});
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(testUser); // Utilisateur connecté pour la démo
-
-  // Simuler une connexion
-  const login = async (email: string, password: string): Promise<boolean> => {
-    // Pour la démo, on accepte n'importe quels identifiants
-    setUser(testUser);
-    return true;
-  };
-
-  // Déconnexion
-  const logout = () => {
-    setUser(null);
-  };
-
-  // Mettre à jour les informations utilisateur
-  const updateUser = async (userData: User) => {
-    setUser(userData);
-  };
-
-  // Mettre à jour uniquement les préférences
-  const updatePreferences = async (preferences: UserPreferences) => {
-    if (user) {
-      setUser({
-        ...user,
-        preferences,
-      });
+  const [user, setUser] = useState<typeof mockUserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  
+  useEffect(() => {
+    const checkAuth = async () => {
+      setIsLoading(true);
+      try {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const hasSession = localStorage.getItem('auth_session');
+        
+        if (hasSession) {
+          setUser(mockUserData);
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Authentication failed'));
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+  
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setUser(mockUserData);
+      localStorage.setItem('auth_session', 'mock_token');
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Login failed'));
+      throw err;
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const contextValue: AuthContextType = {
-    user,
-    isAuthenticated: !!user,
-    login,
-    logout,
-    updateUser,
-    updatePreferences,
+  
+  const logout = () => {
+    localStorage.removeItem('auth_session');
+    setUser(null);
   };
-
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
+  
+  const register = async (name: string, email: string, password: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const newUser = {
+        ...mockUserData,
+        id: `user-${Date.now()}`,
+        name,
+        email,
+        created_at: new Date().toISOString()
+      };
+      
+      setUser(newUser);
+      localStorage.setItem('auth_session', 'mock_token');
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Registration failed'));
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  return (
+    <AuthContext.Provider value={{
+      user,
+      isAuthenticated: !!user,
+      isLoading,
+      error,
+      login,
+      logout,
+      register
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
-// Hook personnalisé pour utiliser le contexte
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
 
 export default AuthContext;

@@ -11,6 +11,17 @@ export interface KpiCardProps {
   isLoading?: boolean;
   onClick?: () => void;
   period?: string;
+  delta?: number | {
+    value: number;
+    label?: string;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  subtitle?: string | ReactNode;
+  ariaLabel?: string;
+  className?: string;
+  status?: 'success' | 'warning' | 'danger' | 'info';
+  trendText?: string;
+  loading?: boolean;
 }
 
 export interface DashboardWidgetConfig {
@@ -24,6 +35,12 @@ export interface DashboardWidgetConfig {
   icon?: string;
   description?: string;
   component?: ReactNode;
+  settings?: {
+    title?: string;
+    value?: string | number;
+    trend?: string;
+    [key: string]: any;
+  };
 }
 
 export interface DraggableKpiCardsGridProps {
@@ -46,4 +63,9 @@ export interface GamificationData {
   progress: number;
   nextLevel: number;
   nextLevelPoints: number;
+}
+
+export interface EmotionalTeamViewProps {
+  departmentId?: string;
+  period?: "day" | "week" | "month" | "year";
 }
