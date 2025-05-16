@@ -6,9 +6,11 @@ import { Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
 interface VolumeControlProps {
   volume: number;
   onVolumeChange: (volume: number) => void;
-  className?: string;
   onChange?: (volume: number) => void;
   showLabel?: boolean;
+  className?: string;
+  isMuted?: boolean;
+  onMuteToggle?: () => void;
 }
 
 const VolumeControl: React.FC<VolumeControlProps> = ({
@@ -16,7 +18,9 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
   onVolumeChange,
   className = '',
   onChange,
-  showLabel = false
+  showLabel = false,
+  isMuted = false,
+  onMuteToggle
 }) => {
   // Use the callback provided, or fall back to onVolumeChange
   const handleVolumeChange = (value: number[]) => {
@@ -29,10 +33,10 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
   };
 
   const VolumeIcon = () => {
-    if (volume === 0) return <VolumeX className="h-4 w-4" />;
-    if (volume < 0.33) return <Volume className="h-4 w-4" />;
-    if (volume < 0.66) return <Volume1 className="h-4 w-4" />;
-    return <Volume2 className="h-4 w-4" />;
+    if (isMuted || volume === 0) return <VolumeX className="h-4 w-4" onClick={onMuteToggle} style={{cursor: onMuteToggle ? 'pointer' : 'default'}} />;
+    if (volume < 0.33) return <Volume className="h-4 w-4" onClick={onMuteToggle} style={{cursor: onMuteToggle ? 'pointer' : 'default'}} />;
+    if (volume < 0.66) return <Volume1 className="h-4 w-4" onClick={onMuteToggle} style={{cursor: onMuteToggle ? 'pointer' : 'default'}} />;
+    return <Volume2 className="h-4 w-4" onClick={onMuteToggle} style={{cursor: onMuteToggle ? 'pointer' : 'default'}} />;
   };
 
   return (

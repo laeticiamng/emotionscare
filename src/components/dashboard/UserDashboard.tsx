@@ -66,7 +66,7 @@ const UserDashboard: React.FC = () => {
       description: 'Premier pas sur la plateforme',
       image: '/badges/beginner.png',
       category: 'progress',
-      tier: 'bronze',
+      tier: 'bronze' as const,
       unlockedAt: '2023-04-01',
       completed: true
     },
@@ -76,7 +76,7 @@ const UserDashboard: React.FC = () => {
       description: 'Écrit dans le journal 5 jours consécutifs',
       image: '/badges/journal.png',
       category: 'journal',
-      tier: 'silver',
+      tier: 'silver' as const,
       unlockedAt: '2023-04-15',
       completed: true
     },
@@ -86,7 +86,7 @@ const UserDashboard: React.FC = () => {
       description: 'Écoute 10 sessions de musique différentes',
       image: '/badges/music.png',
       category: 'music',
-      tier: 'gold',
+      tier: 'gold' as const,
       progress: 70,
       completed: false
     }

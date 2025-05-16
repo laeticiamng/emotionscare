@@ -1,39 +1,11 @@
 
 /**
- * Returns a color based on challenge category
+ * Gets the Tailwind CSS color class for a badge rarity
  */
-export const getCategoryColor = (category: string): string => {
-  switch (category?.toLowerCase()) {
-    case 'daily':
-      return 'text-blue-500';
-    case 'weekly':
-      return 'text-green-500';
-    case 'mental':
-      return 'text-purple-500';
-    case 'physical':
-      return 'text-orange-500';
-    case 'social':
-      return 'text-pink-500';
-    case 'emotional':
-      return 'text-indigo-500';
-    default:
-      return 'text-gray-500';
-  }
-};
-
-/**
- * Returns a Tailwind background color class based on badge rarity
- */
-export const getBadgeRarityColor = (rarity: string): string => {
-  switch (rarity?.toLowerCase()) {
-    case 'common':
-      return 'bg-slate-500';
-    case 'rare':
-      return 'bg-blue-500';
-    case 'epic':
-      return 'bg-purple-500';
-    case 'legendary':
-      return 'bg-amber-500';
+export const getBadgeRarityColor = (rarity: string | undefined): string => {
+  if (!rarity) return 'bg-slate-500';
+  
+  switch (rarity.toLowerCase()) {
     case 'bronze':
       return 'bg-amber-700';
     case 'silver':
@@ -41,64 +13,38 @@ export const getBadgeRarityColor = (rarity: string): string => {
     case 'gold':
       return 'bg-yellow-400';
     case 'platinum':
-      return 'bg-cyan-400';
+      return 'bg-blue-300';
+    case 'rare':
+      return 'bg-blue-500';
+    case 'epic':
+      return 'bg-purple-500';
+    case 'legendary':
+      return 'bg-orange-500';
     default:
       return 'bg-slate-500';
   }
 };
 
 /**
- * Returns a formatted string for challenge status
+ * Gets the Tailwind CSS color class for a challenge category
  */
-export const getFormattedChallengeStatus = (status: string): string => {
-  switch (status?.toLowerCase()) {
-    case 'active':
-      return 'En cours';
-    case 'completed':
-      return 'Terminé';
-    case 'failed':
-      return 'Échoué';
-    case 'locked':
-      return 'Verrouillé';
-    default:
-      return 'Inconnu';
-  }
-};
-
-/**
- * Converts a numeric progress value to a completed/failed status object
- */
-export const progressToStatus = (progress: number, threshold: number = 100): { 
-  status: 'active' | 'completed' | 'failed',
-  completed: boolean, 
-  failed: boolean 
-} => {
-  if (progress >= threshold) {
-    return { status: 'completed', completed: true, failed: false };
-  } else if (progress < 0) {
-    return { status: 'failed', completed: false, failed: true };
-  }
-  return { status: 'active', completed: false, failed: false };
-};
-
-/**
- * Returns a formatted level name based on numeric level
- */
-export const getLevelName = (level: number): string => {
-  const levelNames = [
-    'Débutant',
-    'Apprenti',
-    'Explorateur',
-    'Adepte',
-    'Expert',
-    'Maître',
-    'Virtuose',
-    'Sage',
-    'Éclairé',
-    'Transcendant'
-  ];
+export const getCategoryColor = (category: string | undefined): string => {
+  if (!category) return 'text-slate-600';
   
-  if (level <= 0) return levelNames[0];
-  if (level > levelNames.length) return `${levelNames[levelNames.length - 1]} ${level - levelNames.length + 1}`;
-  return levelNames[level - 1];
+  switch (category.toLowerCase()) {
+    case 'daily':
+      return 'text-blue-600';
+    case 'weekly':
+      return 'text-purple-600';
+    case 'team':
+      return 'text-green-600';
+    case 'personal':
+      return 'text-amber-600';
+    case 'streak':
+      return 'text-red-600';
+    case 'special':
+      return 'text-pink-600';
+    default:
+      return 'text-slate-600';
+  }
 };

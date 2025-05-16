@@ -18,7 +18,7 @@ const BadgesWidget = ({ badges, title = "Badges", showSeeAll = true, onSeeAll }:
   const sortedBadges = [...badges].sort((a, b) => {
     // Prioritize completed/unlocked badges
     if ((a.unlockedAt || a.earned_date || a.dateEarned) && !(b.unlockedAt || b.earned_date || b.dateEarned)) return -1;
-    if (!(a.unlockedAt || a.earned_date || a.dateEarned) && (b.unlockedAt || b.earned_date || b.dateEarned)) return 1;
+    if (!(a.unlockedAt || a.earned_date || b.dateEarned) && (b.unlockedAt || b.earned_date || b.dateEarned)) return 1;
     
     // If both are in same completion state, sort by progress (higher first)
     if (a.progress && b.progress) {
@@ -36,7 +36,7 @@ const BadgesWidget = ({ badges, title = "Badges", showSeeAll = true, onSeeAll }:
 
   // Check if badge is unlocked/completed
   const isBadgeUnlocked = (badge: Badge) => {
-    return Boolean(badge.unlockedAt || badge.earned_date || badge.dateEarned);
+    return Boolean(badge.unlockedAt || badge.earned_date || badge.dateEarned || badge.completed || badge.unlocked);
   };
   
   return (
@@ -64,7 +64,7 @@ const BadgesWidget = ({ badges, title = "Badges", showSeeAll = true, onSeeAll }:
             const isUnlocked = isBadgeUnlocked(badge);
             
             // Get badge rarity class (for the badge border/glow)
-            const rarityColor = badge.tier || badge.rarity ? getBadgeRarityColor(badge.tier || badge.rarity || 'common') : 'bg-slate-500';
+            const rarityColor = badge.tier || badge.rarity ? getBadgeRarityColor(badge.tier || badge.rarity) : 'bg-slate-500';
             
             return (
               <div 

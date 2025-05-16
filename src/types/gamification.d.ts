@@ -5,7 +5,7 @@ export interface Badge {
   description: string;
   image_url?: string;
   earned_date?: string;
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum' | 'rare' | 'epic' | 'legendary';
   category?: string;
   icon?: string;
   level?: number | string;

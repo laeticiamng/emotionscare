@@ -1,29 +1,33 @@
 
-// Music type definitions
+import { ReactNode } from 'react';
+
 export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
   duration: number;
-  album?: string;
+  coverUrl?: string;
   cover_url?: string;
-  track_url: string;
-  genre?: string;
-  emotion?: string;
-  tempo?: number;
-  energy?: number;
-  valence?: number;
+  audioUrl: string;
+  category?: string;
+  isFavorited?: boolean;
+  emotionalTone?: string;
+  mood?: string;
+  emotions?: string[];
+  bpm?: number;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
   description?: string;
+  coverUrl?: string;
   cover_url?: string;
   tracks: MusicTrack[];
-  created_by?: string;
-  is_public?: boolean;
-  emotion?: string;
+  category?: string;
+  mood?: string;
+  createdBy?: string;
+  isFeatured?: boolean;
   duration?: number;
 }
 
@@ -31,61 +35,64 @@ export interface MusicContextType {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
   volume: number;
-  playlist: MusicTrack[];
+  currentTime: number;
+  duration: number;
+  isMuted: boolean;
+  repeatMode: 'none' | 'one' | 'all';
+  queue: MusicTrack[];
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
   setVolume: (volume: number) => void;
-  addToPlaylist: (track: MusicTrack) => void;
-  removeFromPlaylist: (trackId: string) => void;
-  clearPlaylist: () => void;
-  shuffle: () => void;
-  repeat: boolean;
+  toggleMute: () => void;
+  seekTo: (time: number) => void;
   toggleRepeat: () => void;
+  addToQueue: (track: MusicTrack) => void;
+  clearQueue: () => void;
+  removeFromQueue: (trackId: string) => void;
+  shuffle: () => void;
 }
 
 export interface MusicDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
+  children?: ReactNode;
+  side?: 'left' | 'right' | 'top' | 'bottom';
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  currentTrack?: MusicTrack | null;
+  playlist?: MusicPlaylist | null;
 }
 
-export interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  album?: string;
-  cover?: string;
-  src: string;
-  duration: number;
-}
+// Aliases for older/existing components
+export type Track = MusicTrack;
 
 export interface ProgressBarProps {
-  progress: number;
+  currentTime: number;
   duration: number;
-  onChange: (value: number) => void;
+  onSeek: (position: number) => void;
+  className?: string;
 }
 
+export type MusicProgressBarProps = ProgressBarProps;
+
 export interface TrackInfoProps {
-  title: string;
-  artist: string;
-  cover?: string;
+  track: MusicTrack;
+  className?: string;
 }
 
 export interface VolumeControlProps {
   volume: number;
-  onChange: (value: number) => void;
+  onVolumeChange: (volume: number) => void;
+  onChange?: (volume: number) => void;
+  isMuted?: boolean;
+  onMuteToggle?: () => void;
+  className?: string;
+  showLabel?: boolean;
 }
 
 export interface MusicLibraryProps {
   onSelectTrack: (track: MusicTrack) => void;
-}
-
-export interface EmotionMusicParams {
-  emotion: string;
-  intensity?: number;
-  tempo?: 'slow' | 'medium' | 'fast';
-  instrument?: string;
-  duration?: number;
+  onSelectPlaylist: (playlist: MusicPlaylist) => void;
+  playlists?: MusicPlaylist[];
 }
