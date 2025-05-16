@@ -7,7 +7,7 @@ export interface ToastProps {
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: React.ReactElement;
-  variant?: "default" | "success" | "destructive" | "warning" | "info";
+  variant?: "default" | "destructive" | "success" | "warning" | "info";
   duration?: number;
 }
 
@@ -16,7 +16,7 @@ export type Toast = {
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: React.ReactElement;
-  variant?: "default" | "success" | "destructive" | "warning" | "info";
+  variant?: "default" | "destructive" | "success" | "warning" | "info";
   duration?: number;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -35,10 +35,10 @@ export interface UseToastReturn {
   toast: typeof toast;
   toasts: Toast[];
   dismiss: (toastId?: string) => void;
-  error: typeof toast;
-  success: typeof toast;
-  warning: typeof toast;
-  info: typeof toast;
+  error: (props: Partial<Toast>) => typeof toast;
+  success: (props: Partial<Toast>) => typeof toast;
+  warning: (props: Partial<Toast>) => typeof toast;
+  info: (props: Partial<Toast>) => typeof toast;
 }
 
 export declare function useToast(): UseToastReturn;

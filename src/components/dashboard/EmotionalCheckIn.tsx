@@ -3,15 +3,14 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Emotion } from '@/types/emotion';
-
-// ... rest of imports
 
 const EmotionalCheckIn: React.FC = () => {
   const [emotion, setEmotion] = useState<string>('');
   const [text, setText] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,6 +34,7 @@ const EmotionalCheckIn: React.FC = () => {
       toast({
         title: "Émotion enregistrée",
         description: "Votre check-in émotionnel a été sauvegardé avec succès.",
+        variant: "success",
       });
       
       setText('');
@@ -51,8 +51,6 @@ const EmotionalCheckIn: React.FC = () => {
     }
   };
 
-  // ... rest of component
-  
   return (
     <Card>
       <CardHeader>
