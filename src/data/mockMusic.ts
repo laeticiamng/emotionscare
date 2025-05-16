@@ -1,95 +1,96 @@
 
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
+// Mock track data for development
 export const mockTracks: MusicTrack[] = [
   {
-    id: 'track-1',
-    title: 'Deep Concentration',
-    artist: 'Focus Mind',
-    album: 'Productivity Sessions',
-    duration: 240,
-    url: 'https://example.com/track1.mp3',
-    coverUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=2070&auto=format&fit=crop',
-    emotionalTone: 'Focus',
-    mood: 'Calm',
-    tags: ['concentration', 'work', 'study']
+    id: '1',
+    title: 'Peaceful Harmony',
+    artist: 'Ambient Sounds',
+    album: 'Relaxation Collection',
+    duration: 280,
+    url: '/audio/peaceful-harmony.mp3',
+    coverUrl: '/images/covers/peaceful-harmony.jpg',
+    mood: 'calm'
   },
   {
-    id: 'track-2',
-    title: 'Calm Waters',
-    artist: 'Ocean Sounds',
-    album: 'Nature Ambience',
-    duration: 320,
-    url: 'https://example.com/track2.mp3',
-    coverUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=2022&auto=format&fit=crop',
-    emotionalTone: 'Relaxed',
-    mood: 'Peaceful',
-    tags: ['calm', 'nature', 'meditation']
-  },
-  {
-    id: 'track-3',
+    id: '2',
     title: 'Energy Boost',
-    artist: 'Motivation Music',
-    album: 'Get Moving',
-    duration: 180,
-    url: 'https://example.com/track3.mp3',
-    coverUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2074&auto=format&fit=crop',
-    emotionalTone: 'Energetic',
-    mood: 'Uplifting',
-    tags: ['energy', 'motivation', 'workout']
+    artist: 'Electronic Beats',
+    album: 'Workout Mix',
+    duration: 195,
+    url: '/audio/energy-boost.mp3',
+    coverUrl: '/images/covers/energy-boost.jpg',
+    mood: 'energetic'
   },
   {
-    id: 'track-4',
-    title: 'Creative Flow',
-    artist: 'Imagination Streams',
-    album: 'Idea Generation',
-    duration: 290,
-    url: 'https://example.com/track4.mp3',
-    coverUrl: 'https://images.unsplash.com/photo-1513682121497-80211f36a7d3?q=80&w=2076&auto=format&fit=crop',
-    emotionalTone: 'Creative',
-    mood: 'Inspired',
-    tags: ['creativity', 'inspiration', 'brainstorming']
+    id: '3',
+    title: 'Deep Focus',
+    artist: 'Study Tunes',
+    album: 'Concentration',
+    duration: 340,
+    url: '/audio/deep-focus.mp3',
+    coverUrl: '/images/covers/deep-focus.jpg',
+    mood: 'focused'
   },
   {
-    id: 'track-5',
-    title: 'Sleep Well',
-    artist: 'Dream Makers',
-    album: 'Night Tunes',
-    duration: 450,
-    url: 'https://example.com/track5.mp3',
-    coverUrl: 'https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?q=80&w=2070&auto=format&fit=crop',
-    emotionalTone: 'Peaceful',
-    mood: 'Sleepy',
-    tags: ['sleep', 'night', 'relaxation']
+    id: '4',
+    title: 'Joyful Melodies',
+    artist: 'Happy Sounds',
+    album: 'Positive Vibes',
+    duration: 210,
+    url: '/audio/joyful-melodies.mp3',
+    coverUrl: '/images/covers/joyful-melodies.jpg',
+    mood: 'happy'
+  },
+  {
+    id: '5',
+    title: 'Gentle Reflection',
+    artist: 'Piano Dreams',
+    album: 'Mindful Moments',
+    duration: 305,
+    url: '/audio/gentle-reflection.mp3',
+    coverUrl: '/images/covers/gentle-reflection.jpg',
+    mood: 'calm'
   }
 ];
 
+// Mock playlist data for development
 export const mockPlaylists: MusicPlaylist[] = [
   {
-    id: 'pl-1',
-    title: 'Musique de concentration',
-    description: 'Parfait pour le travail et l\'étude',
-    coverUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=2070&auto=format&fit=crop',
-    tracks: [mockTracks[0], mockTracks[3]],
-    category: 'Focus',
-    mood: 'Concentration'
+    id: 'pl1',
+    title: 'Calm & Relaxation',
+    description: 'Soothing tracks to help you unwind and relax',
+    coverUrl: '/images/playlists/calm-relaxation.jpg',
+    tracks: mockTracks.filter(track => track.mood === 'calm'),
+    category: 'relaxation',
+    mood: 'calm'
   },
   {
-    id: 'pl-2',
-    title: 'Détente Profonde',
-    description: 'Pour les moments de relaxation',
-    coverUrl: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=2022&auto=format&fit=crop',
-    tracks: [mockTracks[1], mockTracks[4]],
-    category: 'Relaxation',
-    mood: 'Calme'
+    id: 'pl2',
+    title: 'Energy & Motivation',
+    description: 'Upbeat tracks to boost your energy',
+    coverUrl: '/images/playlists/energy-motivation.jpg',
+    tracks: mockTracks.filter(track => track.mood === 'energetic'),
+    category: 'workout',
+    mood: 'energetic'
   },
   {
-    id: 'pl-3',
-    title: 'Énergie Positive',
-    description: 'Boostez votre moral et votre énergie',
-    coverUrl: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2074&auto=format&fit=crop',
-    tracks: [mockTracks[2]],
-    category: 'Motivation',
-    mood: 'Énergique'
+    id: 'pl3',
+    title: 'Focus & Concentration',
+    description: 'Help maintain focus and concentration',
+    coverUrl: '/images/playlists/focus-concentration.jpg',
+    tracks: mockTracks.filter(track => track.mood === 'focused'),
+    category: 'focus',
+    mood: 'focused'
+  },
+  {
+    id: 'pl4',
+    title: 'Happy Vibes',
+    description: 'Music to boost your mood and make you smile',
+    coverUrl: '/images/playlists/happy-vibes.jpg',
+    tracks: mockTracks.filter(track => track.mood === 'happy'),
+    category: 'mood',
+    mood: 'happy'
   }
 ];

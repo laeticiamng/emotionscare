@@ -1,9 +1,12 @@
+
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { MusicContextType, MusicTrack, MusicPlaylist } from '@/types/music';
-import { mockTracks, mockPlaylists } from '@/data/mockMusic';
+import { mockPlaylists } from '@/data/mockMusic';
 import { useToast } from '@/hooks/use-toast';
+import { useAudioHandlers } from './useAudioHandlers';
 
-const MusicContext = createContext<MusicContextType>({
+// Create the context with default values
+export const MusicContext = createContext<MusicContextType>({
   isPlaying: false,
   currentTrack: null,
   playlists: [],
@@ -36,105 +39,32 @@ const MusicContext = createContext<MusicContextType>({
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { toast } = useToast();
-  // Player state
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
+  
+  // State variables
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
-  const [volume, setVolume] = useState(0.7); // 0 to 1
-  const [isMuted, setIsMuted] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [queue, setQueue] = useState<MusicTrack[]>([]);
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>(mockPlaylists);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const [isShuffled, setIsShuffled] = useState(false);
   const [isRepeating, setIsRepeating] = useState(false);
-  
-  // Drawer state
-  const [openDrawer, setOpenDrawer] = useState(false);
-  
-  // Queue management
-  const [queue, setQueue] = useState<MusicTrack[]>([]);
-  
-  // Playlists management
-  const [playlists, setPlaylists] = useState<MusicPlaylist[]>(mockPlaylists);
-  
-  // Emotional context
-  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
-  
-  // Audio element reference
-  const audioRef = React.useRef<HTMLAudioElement | null>(null);
-  
-  // Initialize audio element
-  useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.volume = volume;
-      
-      // Set up event listeners
-      audioRef.current.onended = handleTrackEnd;
-      audioRef.current.ontimeupdate = updateTime;
-      audioRef.current.onloadedmetadata = () => {
-        setDuration(audioRef.current?.duration || 0);
-      };
-    }
-    
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-      }
-    };
-  }, []);
-  
-  // Update volume when it changes
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
-    }
-  }, [volume, isMuted]);
-  
-  // Update time as track plays
-  const updateTime = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
-  
-  // Handle track end
-  const handleTrackEnd = () => {
-    if (isRepeating && audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(console.error);
-    } else {
-      nextTrack();
-    }
-  };
-  
-  // Play a specific track
-  const playTrack = useCallback((track: MusicTrack) => {
-    if (audioRef.current) {
-      audioRef.current.src = track.url || track.audioUrl || '';
-      audioRef.current.load();
-      audioRef.current.play().then(() => {
-        setIsPlaying(true);
-        setCurrentTrack(track);
-      }).catch(err => {
-        console.error('Error playing track:', err);
-        toast({
-          title: 'Erreur de lecture',
-          description: "Impossible de lire cette piste. Veuillez réessayer.",
-          variant: 'destructive'
-        });
-      });
-    }
-  }, [toast]);
-  
-  // Pause current track
-  const pauseTrack = useCallback(() => {
-    if (audioRef.current && isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-  }, [isPlaying]);
-  
+
+  // Use custom hook for audio handling
+  const { 
+    audioRef,
+    isPlaying, 
+    currentTrack, 
+    volume,
+    isMuted,
+    currentTime,
+    duration,
+    playTrack,
+    pauseTrack,
+    seekTo,
+    setVolume,
+    toggleMute
+  } = useAudioHandlers({ toast });
+
   // Toggle play/pause
   const togglePlay = useCallback(() => {
     if (isPlaying) {
@@ -142,14 +72,24 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } else if (currentTrack) {
       if (audioRef.current) {
         audioRef.current.play().then(() => {
-          setIsPlaying(true);
+          // setIsPlaying is handled in the hook
         }).catch(console.error);
       }
     } else if (playlists.length > 0 && playlists[0].tracks && playlists[0].tracks.length > 0) {
       // Play first track of first playlist if nothing is playing
       playTrack(playlists[0].tracks[0]);
     }
-  }, [isPlaying, currentTrack, pauseTrack, playTrack, playlists]);
+  }, [isPlaying, currentTrack, pauseTrack, playTrack, playlists, audioRef]);
+  
+  // Toggle shuffle
+  const toggleShuffle = useCallback(() => {
+    setIsShuffled(prev => !prev);
+  }, []);
+  
+  // Toggle repeat
+  const toggleRepeat = useCallback(() => {
+    setIsRepeating(prev => !prev);
+  }, []);
   
   // Go to next track
   const nextTrack = useCallback(() => {
@@ -158,7 +98,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
     
     const currentTrackIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
-    let nextIndex;
     
     if (isShuffled) {
       // Random track excluding current
@@ -169,7 +108,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     } else {
       // Sequential next track
-      nextIndex = (currentTrackIndex + 1) % currentPlaylist.tracks.length;
+      const nextIndex = (currentTrackIndex + 1) % currentPlaylist.tracks.length;
       playTrack(currentPlaylist.tracks[nextIndex]);
     }
   }, [currentTrack, currentPlaylist, isShuffled, playTrack]);
@@ -181,39 +120,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
     
     const currentTrackIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
-    let prevIndex;
     
     // Go to previous track or to the end if at beginning
-    prevIndex = (currentTrackIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
+    const prevIndex = (currentTrackIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
     playTrack(currentPlaylist.tracks[prevIndex]);
   }, [currentTrack, currentPlaylist, playTrack]);
-  
-  // Seek to a specific position
-  const seekTo = useCallback((time: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setCurrentTime(time);
-    }
-  }, []);
-  
-  // Toggle mute
-  const toggleMute = useCallback(() => {
-    if (audioRef.current) {
-      const newMuted = !isMuted;
-      audioRef.current.muted = newMuted;
-      setIsMuted(newMuted);
-    }
-  }, [isMuted]);
-  
-  // Toggle shuffle
-  const toggleShuffle = useCallback(() => {
-    setIsShuffled(prev => !prev);
-  }, []);
-  
-  // Toggle repeat
-  const toggleRepeat = useCallback(() => {
-    setIsRepeating(prev => !prev);
-  }, []);
   
   // Add track to queue
   const addToQueue = useCallback((track: MusicTrack) => {
@@ -269,7 +180,29 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [playlists, toast]);
   
-  // Expose context values
+  // Configure track end event handling
+  useEffect(() => {
+    if (!audioRef.current) return;
+    
+    const handleTrackEnd = () => {
+      if (isRepeating && audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(console.error);
+      } else {
+        nextTrack();
+      }
+    };
+    
+    audioRef.current.onended = handleTrackEnd;
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.onended = null;
+      }
+    };
+  }, [audioRef, isRepeating, nextTrack]);
+  
+  // Context value object
   const contextValue: MusicContextType = {
     isPlaying,
     currentTrack,
@@ -308,6 +241,5 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   );
 };
 
+// Custom hook to use the music context
 export const useMusic = () => useContext(MusicContext);
-
-// Remove the duplicate mock data declarations here - we already import them from @/data/mockMusic
