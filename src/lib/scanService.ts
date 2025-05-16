@@ -2,121 +2,124 @@
 import { v4 as uuid } from 'uuid';
 import { EmotionResult } from '@/types/emotion';
 
-// Simuler une base de données en mémoire
-const emotionDatabase: EmotionResult[] = [];
+// Mock emotion analysis service
+export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
+  // In a real implementation, this would call an API
+  // For demo purposes, we'll simulate a response
 
-// Fonction pour enregistrer une émotion
-export async function saveEmotion(emotion: EmotionResult): Promise<EmotionResult> {
-  // Assurez-vous que l'émotion a un ID et un timestamp
-  const completeEmotion = {
-    ...emotion,
-    id: emotion.id || uuid(),
-    timestamp: emotion.timestamp || new Date().toISOString()
+  // Await to simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  // Basic emotion detection based on keywords
+  const lowerText = text.toLowerCase();
+  
+  let emotion = 'neutral';
+  let score = 0.5;
+  let confidence = 0.5;
+
+  if (lowerText.includes('heureu') || lowerText.includes('conte') || lowerText.includes('joie')) {
+    emotion = 'happy';
+    score = 0.8;
+    confidence = 0.85;
+  } else if (lowerText.includes('triste') || lowerText.includes('déçu') || lowerText.includes('déprimé')) {
+    emotion = 'sad';
+    score = 0.7;
+    confidence = 0.82;
+  } else if (lowerText.includes('calm') || lowerText.includes('serein') || lowerText.includes('apais')) {
+    emotion = 'calm';
+    score = 0.9;
+    confidence = 0.9;
+  } else if (lowerText.includes('colère') || lowerText.includes('énerv') || lowerText.includes('frustr')) {
+    emotion = 'angry';
+    score = 0.75;
+    confidence = 0.8;
+  } else if (lowerText.includes('peur') || lowerText.includes('inqui') || lowerText.includes('anxi')) {
+    emotion = 'anxious';
+    score = 0.65;
+    confidence = 0.75;
+  } else if (lowerText.includes('fatigu') || lowerText.includes('épuis')) {
+    emotion = 'tired';
+    score = 0.6;
+    confidence = 0.7;
+  } else if (lowerText.includes('surpri') || lowerText.includes('étonn')) {
+    emotion = 'surprised';
+    score = 0.55;
+    confidence = 0.6;
+  }
+
+  return {
+    id: uuid(),
+    user_id: 'current-user',
+    date: new Date().toISOString(),
+    emotion,
+    score: Math.round(score * 100),
+    confidence,
+    intensity: score,
+    text,
+    feedback: '',
+    transcript: text,
   };
-  
-  // Ajouter à notre "base de données"
-  emotionDatabase.push(completeEmotion);
-  
-  return completeEmotion;
-}
+};
 
-// Fonction pour récupérer la dernière émotion
-export async function fetchLatestEmotion(userId: string): Promise<EmotionResult | null> {
-  // Filtrer par utilisateur et trier par date
-  const userEmotions = emotionDatabase
-    .filter(e => e.user_id === userId)
-    .sort((a, b) => {
-      const dateA = new Date(a.timestamp || a.date || '');
-      const dateB = new Date(b.timestamp || b.date || '');
-      return dateB.getTime() - dateA.getTime();
-    });
+// Mock emotion saving service
+export const saveEmotion = async (emotion: EmotionResult): Promise<void> => {
+  // In a real implementation, this would save to a database
+  console.log('Saving emotion:', emotion);
   
-  return userEmotions.length > 0 ? userEmotions[0] : null;
-}
+  // Simulate successful save with delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  return;
+};
 
-// Fonction pour analyser une émotion à partir d'un texte
-export async function analyzeEmotion(text: string): Promise<EmotionResult> {
-  // Simuler une analyse d'émotion avec un délai
+// Get emotion history for a user
+export const getEmotionHistory = async (userId: string, limit: number = 10): Promise<EmotionResult[]> => {
+  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 800));
   
-  // Liste d'émotions possibles à retourner aléatoirement
-  const emotions = ['joy', 'calm', 'focused', 'anxious', 'sad'];
-  const emotion = emotions[Math.floor(Math.random() * emotions.length)];
-  
-  return {
-    id: uuid(),
-    emotion,
-    score: Math.random() * 0.5 + 0.5,
-    confidence: Math.random() * 0.3 + 0.7,
-    intensity: Math.random(),
-    timestamp: new Date().toISOString(),
-    text,
-    feedback: `Votre texte indique une émotion de type "${emotion}" avec une intensité modérée.`,
-    emojis: emotion === 'joy' ? '😊' : emotion === 'calm' ? '😌' : emotion === 'focused' ? '🧠' : 
-            emotion === 'anxious' ? '😰' : '😔'
-  };
-}
+  // Return mock data
+  return [
+    {
+      id: '1',
+      user_id: userId,
+      date: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+      emotion: 'happy',
+      score: 85,
+      confidence: 0.85,
+      intensity: 0.85,
+      text: 'Je me sens vraiment bien aujourd\'hui !',
+    },
+    {
+      id: '2',
+      user_id: userId,
+      date: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+      emotion: 'calm',
+      score: 90,
+      confidence: 0.9,
+      intensity: 0.9,
+      text: 'Journée tranquille, très sereine',
+    },
+    {
+      id: '3',
+      user_id: userId,
+      date: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
+      emotion: 'frustrated',
+      score: 65,
+      confidence: 0.7,
+      intensity: 0.65,
+      text: 'Un peu stressé par la charge de travail',
+    }
+  ];
+};
 
-// Récupérer l'historique des émotions
-export async function fetchEmotionHistory(
-  userId: string,
-  period: 'day' | 'week' | 'month' | 'year' = 'week',
-  limit: number = 50
-): Promise<EmotionResult[]> {
-  // Filtrer par utilisateur
-  const userEmotions = emotionDatabase.filter(e => e.user_id === userId);
+// Get emotion average for a user
+export const getEmotionAverage = async (userId: string, period: string = '7d'): Promise<{ emotion: string; score: number }> => {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 600));
   
-  // Calculer la date limite selon la période
-  const now = new Date();
-  let cutoffDate = new Date();
-  
-  switch (period) {
-    case 'day':
-      cutoffDate.setDate(now.getDate() - 1);
-      break;
-    case 'week':
-      cutoffDate.setDate(now.getDate() - 7);
-      break;
-    case 'month':
-      cutoffDate.setMonth(now.getMonth() - 1);
-      break;
-    case 'year':
-      cutoffDate.setFullYear(now.getFullYear() - 1);
-      break;
-  }
-  
-  // Filtrer par date et limiter le nombre de résultats
-  return userEmotions
-    .filter(emotion => {
-      const emotionDate = new Date(emotion.timestamp || emotion.date || '');
-      return emotionDate >= cutoffDate;
-    })
-    .sort((a, b) => {
-      const dateA = new Date(a.timestamp || a.date || '');
-      const dateB = new Date(b.timestamp || b.date || '');
-      return dateA.getTime() - dateB.getTime();
-    })
-    .slice(0, limit);
-}
-
-// Fonction pour analyser les sentiments à partir d'un enregistrement audio
-export async function analyzeAudioEmotion(audioBlob: Blob): Promise<EmotionResult> {
-  // Simuler une analyse avec un délai
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Liste d'émotions possibles à retourner aléatoirement
-  const emotions = ['joy', 'calm', 'focused', 'anxious', 'sad'];
-  const emotion = emotions[Math.floor(Math.random() * emotions.length)];
-  
+  // Return mock data
   return {
-    id: uuid(),
-    emotion,
-    score: Math.random() * 0.5 + 0.5,
-    confidence: Math.random() * 0.3 + 0.7,
-    intensity: Math.random(),
-    timestamp: new Date().toISOString(),
-    feedback: `L'analyse de votre voix révèle une émotion principalement de type "${emotion}".`,
-    emojis: emotion === 'joy' ? '😊' : emotion === 'calm' ? '😌' : emotion === 'focused' ? '🧠' : 
-            emotion === 'anxious' ? '😰' : '😔'
+    emotion: 'balanced',
+    score: 75
   };
-}
+};

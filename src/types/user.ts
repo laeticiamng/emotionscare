@@ -1,5 +1,6 @@
 
-import { NotificationPreferences } from './types';
+import { UserPreferences } from './preferences';
+import { NotificationPreference } from './notification';
 
 export type UserRole = 'user' | 'admin' | 'b2b_user' | 'b2b_admin' | 'b2b-user' | 'b2b-admin' | 'collaborator' | 'b2c';
 
@@ -21,44 +22,6 @@ export interface User {
   preferences?: UserPreferences;
   emotional_score?: number;
   onboarded?: boolean;
-}
-
-export interface UserPreferences {
-  theme: "system" | "light" | "dark" | "pastel";
-  fontSize: string;
-  fontFamily: string;
-  reduceMotion?: boolean;
-  colorBlindMode?: boolean;
-  autoplayMedia?: boolean;
-  soundEnabled: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  shareData?: boolean;
-  allowAnalytics?: boolean;
-  showProfile?: boolean;
-  shareActivity?: boolean;
-  allowMessages?: boolean;
-  allowNotifications?: boolean;
-  notifications_enabled?: boolean;
-  language?: string;
-  notifications: NotificationPreferences;
-  ambientSound?: boolean;
-  displayName?: string;
-  pronouns?: string;
-  biography?: string;
-  avatarUrl?: string;
-  onboarded?: boolean;
-  fullAnonymity?: boolean;
-  privacy?: {
-    shareData: boolean;
-    anonymizeReports?: boolean;
-    profileVisibility: string;
-    showProfile?: boolean;
-    shareActivity?: boolean;
-    allowMessages?: boolean;
-    allowNotifications?: boolean;
-    anonymousMode?: boolean;
-  };
 }
 
 export interface UserPreferencesContextType {

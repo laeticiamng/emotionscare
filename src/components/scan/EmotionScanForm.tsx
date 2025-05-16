@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { v4 as uuid } from 'uuid';
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { saveEmotion, analyzeEmotion } from '@/lib/scanService';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/emotion';
 import EmojiPicker from './EmojiPicker';
 
 interface EmotionScanFormProps {

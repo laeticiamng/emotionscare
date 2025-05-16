@@ -1,51 +1,59 @@
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from 'lucide-react';
-import { EmotionResult } from '@/types';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { EmotionResult } from '@/types/emotion';
 
 interface EmotionFeedbackProps {
-  emotion: EmotionResult | null;
+  result: EmotionResult;
+  onSaveFeedback?: (feedback: string) => void;
 }
 
-const EmotionFeedback = ({ emotion }: EmotionFeedbackProps) => {
-  const navigate = useNavigate();
+const EmotionFeedback: React.FC<EmotionFeedbackProps> = ({
+  result,
+  onSaveFeedback
+}) => {
+  const [feedback, setFeedback] = useState(result.feedback || '');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  if (!emotion) {
-    return null;
-  }
-
+  const handleSaveFeedback = async () => {
+    if (!feedback.trim()) return;
+    
+    setIsSubmitting(true);
+    try {
+      if (onSaveFeedback) {
+        await onSaveFeedback(feedback);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
   return (
-    <Card className="mt-6">
-      <CardHeader>
-        <CardTitle>Votre état émotionnel</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <p className="font-medium">Émotion détectée : {emotion.emotion}</p>
-          {emotion.score && <p>Intensité : {emotion.score} / 100</p>}
-        </div>
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-lg font-medium mb-2">Votre ressenti</h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Ajouter votre propre ressenti sur cette analyse qui a détecté 
+          <span className="font-medium"> {result.emotion} </span> 
+          avec un score de {result.score}%.
+        </p>
         
-        <div>
-          <h3 className="font-medium mb-2">Recommandations personnalisées</h3>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Prenez un moment pour respirer profondément</li>
-            <li>Essayez une session de relaxation guidée</li>
-            <li>Écrivez dans votre journal ce qui vous a affecté</li>
-          </ul>
-        </div>
-        
-        <Button 
-          className="w-full"
-          onClick={() => navigate('/journal/new')}
-        >
-          Exprimer cette émotion dans mon journal
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
-      </CardContent>
-    </Card>
+        <Textarea
+          placeholder="Comment vous sentez-vous réellement ? Est-ce que l'analyse correspond à votre ressenti ?"
+          value={feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+          rows={4}
+        />
+      </div>
+      
+      <Button 
+        onClick={handleSaveFeedback} 
+        disabled={isSubmitting || !feedback.trim()}
+      >
+        {isSubmitting ? "Enregistrement..." : "Enregistrer mon ressenti"}
+      </Button>
+    </div>
   );
 };
 

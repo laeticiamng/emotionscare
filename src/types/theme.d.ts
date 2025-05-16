@@ -22,6 +22,6 @@ export interface ThemeButtonProps {
 
 export interface ThemeOption {
   name: string;
-  value: string;
+  value: Theme;
   preview: string;
 }

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UserPreferences } from '@/types/types';
+import { UserPreferences } from '@/types/preferences';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -23,29 +23,39 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ prefe
 
   // Helper to update nested notification preferences
   const handleNotificationChange = (key: string, value: any) => {
-    onChange({
-      notifications: {
-        ...(typeof notifications === 'object' ? notifications : {}),
-        [key]: value
-      }
-    });
+    if (typeof notifications === 'object') {
+      onChange({
+        notifications: {
+          ...notifications,
+          [key]: value
+        }
+      });
+    } else {
+      // If notifications is a boolean, convert to object
+      onChange({
+        notifications: {
+          enabled: notifications,
+          [key]: value
+        }
+      });
+    }
   };
 
   // Helper to update notification types
   const handleTypeChange = (type: string, enabled: boolean) => {
-    const currentTypes = typeof notifications === 'object' && notifications.types 
-      ? notifications.types 
-      : {};
+    if (typeof notifications === 'object') {
+      const currentTypes = notifications.types || {};
       
-    onChange({
-      notifications: {
-        ...(typeof notifications === 'object' ? notifications : {}),
-        types: {
-          ...currentTypes,
-          [type]: enabled
+      onChange({
+        notifications: {
+          ...notifications,
+          types: {
+            ...currentTypes,
+            [type]: enabled
+          }
         }
-      }
-    });
+      });
+    }
   };
 
   // Check if notifications is a boolean or an object
@@ -157,7 +167,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ prefe
             </Select>
           </div>
 
-          {Object.keys(types).length > 0 && (
+          {typeof types === 'object' && Object.keys(types).length > 0 && (
             <div className="space-y-4">
               <Label>Types de notifications</Label>
 

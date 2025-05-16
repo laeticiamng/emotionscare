@@ -22,7 +22,14 @@ export interface UserPreferences {
   fontSize: FontSize;
   fontFamily: FontFamily;
   language: string;
-  notifications: NotificationPreference;
+  notifications: NotificationPreference | {
+    enabled: boolean;
+    emailEnabled?: boolean;
+    pushEnabled?: boolean;
+    inAppEnabled?: boolean;
+    types?: Record<string, boolean>;
+    frequency?: string;
+  };
   haptics: boolean;
   dataCollection: boolean;
   privacyLevel: PrivacyLevel;
@@ -39,4 +46,16 @@ export interface UserPreferences {
   biography?: string;
   avatarUrl?: string;
   onboarded?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  privacy?: {
+    shareData: boolean;
+    anonymizeReports?: boolean;
+    profileVisibility: string;
+    showProfile?: boolean;
+    shareActivity?: boolean;
+    allowMessages?: boolean;
+    allowNotifications?: boolean;
+    anonymousMode?: boolean;
+  };
 }

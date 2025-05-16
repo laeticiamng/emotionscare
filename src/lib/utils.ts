@@ -1,42 +1,46 @@
 
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-export function formatTimeDisplay(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  return twMerge(clsx(inputs))
 }
 
 export function formatDate(date: Date | string): string {
-  if (typeof date === 'string') {
-    date = new Date(date);
-  }
-  return date.toLocaleDateString(undefined, { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
   });
 }
 
-export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(value);
+export function truncateString(str: string, maxLength: number = 50): string {
+  if (str.length <= maxLength) return str;
+  return str.slice(0, maxLength) + '...';
 }
 
-export function getRandomInt(min: number, max: number): number {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+// Get greeting based on time of day
+export function getGreeting(): string {
+  const hour = new Date().getHours();
+  
+  if (hour >= 5 && hour < 12) {
+    return "Bonjour";
+  } else if (hour >= 12 && hour < 18) {
+    return "Bon après-midi";
+  } else {
+    return "Bonsoir";
+  }
 }
 
-export function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength) + '...';
+// Format number with thousand separators
+export function formatNumber(num: number): string {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
+// Format API error message
+export function formatErrorMessage(error: any): string {
+  if (typeof error === 'string') return error;
+  if (error.message) return error.message;
+  return "Une erreur s'est produite";
 }

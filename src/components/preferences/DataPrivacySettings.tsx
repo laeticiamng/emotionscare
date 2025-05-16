@@ -1,271 +1,146 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import React from 'react';
+import { UserPreferences } from '@/types/preferences';
 import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useUserPreferences } from '@/contexts/UserPreferencesContext';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Shield, Download, Lock, UserX, Globe, Users } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 
-type DataExportFormat = 'pdf' | 'json' | 'csv';
+interface DataPrivacySettingsProps {
+  preferences: UserPreferences;
+  onChange: (preferences: Partial<UserPreferences>) => void;
+}
 
-const DataPrivacySettings = () => {
-  const { preferences, updatePreferences } = useUserPreferences();
-  const [dataFormat, setDataFormat] = useState<DataExportFormat>('json');
-  const [exportInProgress, setExportInProgress] = useState(false);
-  
-  const handleExportData = () => {
-    setExportInProgress(true);
-    
-    // Simuler l'exportation (à remplacer par une vraie exportation)
-    setTimeout(() => {
-      // Logique d'exportation ici
-      setExportInProgress(false);
-      // Notification ou téléchargement
-    }, 2000);
-  };
-  
-  const handlePrivacyChange = (key: string, value: boolean) => {
-    if (!preferences.privacy || typeof preferences.privacy === 'string') {
-      // Initialiser privacy si non défini ou si c'est une chaîne
-      updatePreferences({
-        privacy: {
-          shareData: key === 'shareData' ? value : false,
-          profileVisibility: 'team'
-        }
-      });
-    } else {
-      updatePreferences({
-        privacy: {
-          ...preferences.privacy,
-          [key]: value
-        }
-      });
-    }
-  };
-  
-  const handleProfileVisibilityChange = (visibility: 'public' | 'team' | 'private') => {
-    if (!preferences.privacy || typeof preferences.privacy === 'string') {
-      updatePreferences({
-        privacy: {
-          shareData: false,
-          profileVisibility: visibility
-        }
-      });
-    } else {
-      updatePreferences({
-        privacy: {
-          ...preferences.privacy,
-          profileVisibility: visibility
-        }
-      });
-    }
-  };
-
-  // Obtenir les valeurs actuelles de confidentialité, en tenant compte des structures potentiellement différentes
-  const privacy = preferences.privacy && typeof preferences.privacy === 'object' ? preferences.privacy : {
+const DataPrivacySettings: React.FC<DataPrivacySettingsProps> = ({
+  preferences,
+  onChange,
+}) => {
+  // Ensure privacy object exists
+  const privacy = preferences.privacy || {
     shareData: false,
-    profileVisibility: 'team'
+    anonymizeReports: false,
+    profileVisibility: 'private',
+    anonymousMode: false,
   };
   
-  // Récupérer les valeurs de manière sécurisée avec des valeurs par défaut
-  const shareData = privacy.shareData ?? false;
-  const anonymizeReports = privacy.anonymizeReports ?? true;
-  const profileVisibility = privacy.profileVisibility || 'team';
-  const anonymousMode = privacy.anonymousMode ?? false;
-  const fullAnonymity = preferences.fullAnonymity ?? false;
+  // Helper for updating privacy settings
+  const handlePrivacyChange = (key: string, value: any) => {
+    onChange({
+      privacy: {
+        ...privacy,
+        [key]: value
+      }
+    });
+  };
 
+  // Handle visibility change
+  const handleVisibilityChange = (visibility: string) => {
+    onChange({
+      privacy: {
+        ...privacy,
+        profileVisibility: visibility
+      }
+    });
+  };
+
+  // Handle fullAnonymity toggle
+  const handleFullAnonymityChange = (enabled: boolean) => {
+    onChange({
+      fullAnonymity: enabled
+    });
+  };
+  
   return (
     <div className="space-y-6">
-      {/* Partage de données */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            <span>Partage de données</span>
-          </CardTitle>
-          <CardDescription>
-            Contrôlez comment vos données sont utilisées et partagées
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <div>
+        <h3 className="text-lg font-medium mb-4">Paramètres de confidentialité</h3>
+
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <Label htmlFor="share-data" className="font-medium">
-                Partager les données anonymisées
-              </Label>
+              <Label htmlFor="shareData">Partage de données</Label>
               <p className="text-sm text-muted-foreground">
-                Contribuez à l'amélioration de nos services en partageant des données anonymisées
+                Autoriser le partage de données anonymisées pour améliorer les services
               </p>
             </div>
             <Switch
-              id="share-data"
-              checked={shareData}
+              id="shareData"
+              checked={privacy.shareData ?? false}
               onCheckedChange={(checked) => handlePrivacyChange('shareData', checked)}
             />
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div>
-              <Label htmlFor="anonymize-reports" className="font-medium">
-                Anonymiser les rapports d'équipe
-              </Label>
+              <Label htmlFor="anonymizeReports">Anonymiser les rapports</Label>
               <p className="text-sm text-muted-foreground">
                 Masquer votre identité dans les rapports d'équipe
               </p>
             </div>
             <Switch
-              id="anonymize-reports"
-              checked={anonymizeReports}
+              id="anonymizeReports"
+              checked={privacy.anonymizeReports ?? false}
               onCheckedChange={(checked) => handlePrivacyChange('anonymizeReports', checked)}
             />
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div>
-              <Label htmlFor="full-anonymity" className="font-medium">
-                Mode anonyme complet
-              </Label>
+              <Label htmlFor="anonymousMode">Mode anonyme</Label>
               <p className="text-sm text-muted-foreground">
-                Utiliser l'application en mode entièrement anonyme
+                Masquer votre identité lors des interactions avec la communauté
               </p>
             </div>
             <Switch
-              id="full-anonymity"
-              checked={fullAnonymity}
-              onCheckedChange={(checked) => updatePreferences({ fullAnonymity: checked })}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="anonymous-mode" className="font-medium">
-                Mode incognito
-              </Label>
-              <p className="text-sm text-muted-foreground">
-                Masquer temporairement votre activité aux autres utilisateurs
-              </p>
-            </div>
-            <Switch
-              id="anonymous-mode"
-              checked={anonymousMode}
+              id="anonymousMode"
+              checked={privacy.anonymousMode ?? false}
               onCheckedChange={(checked) => handlePrivacyChange('anonymousMode', checked)}
             />
           </div>
-        </CardContent>
-      </Card>
-      
-      {/* Visibilité du profil */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            <span>Visibilité du profil</span>
-          </CardTitle>
-          <CardDescription>
-            Déterminez qui peut voir votre profil et vos informations
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <RadioGroup 
-            value={profileVisibility}
-            onValueChange={(value) => handleProfileVisibilityChange(value as 'public' | 'team' | 'private')}
-            className="space-y-3"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="public" id="public" />
-              <Label htmlFor="public" className="flex items-center gap-2">
-                <Globe className="h-4 w-4" />
-                <div>
-                  <span className="font-medium">Public</span>
-                  <p className="text-xs text-muted-foreground">Visible par tous les utilisateurs</p>
-                </div>
-              </Label>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="fullAnonymity">Anonymat complet (Premium)</Label>
+              <p className="text-sm text-muted-foreground">
+                Anonymiser complètement votre utilisation (ne stocke aucune donnée identifiable)
+              </p>
             </div>
-            
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="team" id="team" />
-              <Label htmlFor="team" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                <div>
-                  <span className="font-medium">Équipe</span>
-                  <p className="text-xs text-muted-foreground">Visible par votre équipe uniquement</p>
-                </div>
-              </Label>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="private" id="private" />
-              <Label htmlFor="private" className="flex items-center gap-2">
-                <Lock className="h-4 w-4" />
-                <div>
-                  <span className="font-medium">Privé</span>
-                  <p className="text-xs text-muted-foreground">Visible uniquement par vous</p>
-                </div>
-              </Label>
-            </div>
-          </RadioGroup>
-        </CardContent>
-      </Card>
-      
-      {/* Exportation des données */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Download className="h-5 w-5" />
-            <span>Exportation des données</span>
-          </CardTitle>
-          <CardDescription>
-            Téléchargez vos données personnelles
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="export-format">Format d'exportation</Label>
-                <Select value={dataFormat} onValueChange={(value) => setDataFormat(value as DataExportFormat)}>
-                  <SelectTrigger id="export-format">
-                    <SelectValue placeholder="Sélectionnez un format" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="json">JSON</SelectItem>
-                    <SelectItem value="csv">CSV</SelectItem>
-                    <SelectItem value="pdf">PDF</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <Button 
-                onClick={handleExportData}
-                disabled={exportInProgress}
-                className="mt-auto"
-              >
-                {exportInProgress ? 'Exportation en cours...' : 'Exporter mes données'}
-              </Button>
-            </div>
+            <Switch
+              id="fullAnonymity"
+              checked={preferences.fullAnonymity ?? false}
+              onCheckedChange={handleFullAnonymityChange}
+            />
           </div>
-        </CardContent>
-      </Card>
-      
-      {/* Suppression du compte */}
-      <Card className="border-red-100 bg-red-50 dark:bg-red-900/10 dark:border-red-900/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
-            <UserX className="h-5 w-5" />
-            <span>Suppression du compte</span>
-          </CardTitle>
-          <CardDescription className="dark:text-red-300/80">
-            Cette action est irréversible et supprimera toutes vos données
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button variant="destructive">
-            Demander la suppression du compte
-          </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div>
+        <h3 className="text-lg font-medium mb-4">Visibilité du profil</h3>
+        
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="profileVisibility">Visibilité de mon profil</Label>
+            <Select
+              value={privacy.profileVisibility}
+              onValueChange={handleVisibilityChange}
+            >
+              <SelectTrigger className="w-full" id="profileVisibility">
+                <SelectValue placeholder="Sélectionnez la visibilité" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="public">Public</SelectItem>
+                <SelectItem value="team">Équipe uniquement</SelectItem>
+                <SelectItem value="private">Privé</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-muted-foreground mt-1">
+              Définit qui peut voir votre profil et votre activité
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

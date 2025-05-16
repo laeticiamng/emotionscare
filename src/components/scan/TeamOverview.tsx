@@ -1,41 +1,36 @@
 
 import React from 'react';
-import { TeamOverviewProps } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TeamOverviewProps } from '@/types/emotions';
 
 const TeamOverview: React.FC<TeamOverviewProps> = ({
-  teamId,
   userId,
-  period = 'week',
-  anonymized = false,
-  className = '',
+  period,
+  anonymized,
+  className,
   dateRange,
-  users = [],
-  showNames = true,
-  compact = false
+  users,
+  showNames,
+  compact
 }) => {
   return (
-    <div className={`team-overview ${className}`}>
-      <h2 className="text-lg font-semibold mb-4">Vue d'équipe {compact && "(compacte)"}</h2>
-      {users.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {users.map(user => (
-            <div key={user.id} className="bg-card p-4 rounded-lg shadow">
-              {showNames ? (
-                <div className="font-medium">{user.name}</div>
-              ) : (
-                <div className="font-medium">Utilisateur {user.anonymity_code || "anonyme"}</div>
-              )}
-              <div className="text-sm text-muted-foreground">{user.role}</div>
-              <div className="mt-2">
-                <div className="text-sm">Score émotionnel: {user.emotional_score || 'N/A'}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-muted-foreground">Aucun utilisateur trouvé pour cette équipe.</p>
-      )}
-    </div>
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle>Vue d'équipe</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p>Cette fonctionnalité montre l'état émotionnel global de l'équipe.</p>
+        {users && users.length > 0 ? (
+          <div className="mt-4">
+            <p>{users.length} membres dans l'équipe</p>
+            <p>Période: {period || 'Cette semaine'}</p>
+            <p>Mode anonymisé: {anonymized ? 'Oui' : 'Non'}</p>
+          </div>
+        ) : (
+          <p className="mt-4">Aucune donnée disponible pour l'équipe.</p>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

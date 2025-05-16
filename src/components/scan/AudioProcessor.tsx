@@ -1,219 +1,155 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Card, CardContent } from '@/components/ui/card';
-import { Mic, Square } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { v4 as uuid } from 'uuid';
 import { EmotionResult } from '@/types/emotion';
+import { useToast } from '@/hooks/use-toast';
 
 interface AudioProcessorProps {
-  onResultReady?: (result: EmotionResult) => void;
-  autoStart?: boolean;
-  maxDuration?: number; // in seconds
-  headerText?: string;
-  subHeaderText?: string;
+  isRecording: boolean;
   onResult?: (result: EmotionResult) => void;
+  onProcessingChange?: (isProcessing: boolean) => void;
+  maxRecordingTime?: number; // in milliseconds
 }
 
 const AudioProcessor: React.FC<AudioProcessorProps> = ({
-  onResultReady,
-  autoStart = false,
-  maxDuration = 15,
-  headerText,
-  subHeaderText,
-  onResult
+  isRecording,
+  onResult,
+  onProcessingChange,
+  maxRecordingTime = 30000 // 30 seconds default
 }) => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  const [transcript, setTranscript] = useState<string>('');
+  const { toast } = useToast();
   
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-  const intervalRef = useRef<number | null>(null);
-  
-  // Use the unified callback for results
-  const handleResultCallback = (result: EmotionResult) => {
-    if (onResultReady) {
-      onResultReady(result);
-    }
-    if (onResult) {
-      onResult(result);
-    }
-  };
-  
-  // Start recording automatically if autoStart is true
+  // Initialize media recorder
   useEffect(() => {
-    if (autoStart) {
-      startRecording();
-    }
+    let recordingTimeout: NodeJS.Timeout;
+    
+    const setupRecorder = async () => {
+      try {
+        if (isRecording) {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const recorder = new MediaRecorder(stream);
+          
+          recorder.addEventListener('dataavailable', (event) => {
+            if (event.data.size > 0) {
+              setAudioChunks(prev => [...prev, event.data]);
+            }
+          });
+          
+          recorder.addEventListener('stop', () => {
+            processAudio();
+            
+            // Close audio stream tracks
+            stream.getTracks().forEach(track => track.stop());
+          });
+          
+          setMediaRecorder(recorder);
+          recorder.start();
+          
+          if (onProcessingChange) {
+            onProcessingChange(false);
+          }
+          
+          // Set timeout to automatically stop recording
+          recordingTimeout = setTimeout(() => {
+            if (recorder.state === 'recording') {
+              recorder.stop();
+              toast({
+                title: "Enregistrement terminé",
+                description: "La durée maximale d'enregistrement a été atteinte"
+              });
+            }
+          }, maxRecordingTime);
+        } else if (mediaRecorder && mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+        }
+      } catch (error) {
+        console.error('Error accessing microphone:', error);
+        toast({
+          title: "Erreur d'accès au microphone",
+          description: "Veuillez autoriser l'accès au microphone",
+          variant: "destructive"
+        });
+      }
+    };
+    
+    setupRecorder();
     
     return () => {
-      stopRecording();
+      clearTimeout(recordingTimeout);
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+      }
     };
-  }, [autoStart]);
+  }, [isRecording, maxRecordingTime, toast]);
   
-  const startRecording = async () => {
-    try {
-      setError(null);
-      setProgress(0);
-      audioChunksRef.current = [];
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      
-      mediaRecorderRef.current = mediaRecorder;
-      
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
-          audioChunksRef.current.push(e.data);
-        }
-      };
-      
-      mediaRecorder.onstop = async () => {
-        // Stop all tracks
-        stream.getTracks().forEach(track => track.stop());
-        
-        setIsRecording(false);
-        setIsProcessing(true);
-        
-        if (audioChunksRef.current.length > 0) {
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-          
-          try {
-            // In a real app, send this blob to your server or API for analysis
-            // For demo, generate mock result after a delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            const result: EmotionResult = {
-              id: `live-${Date.now()}`,
-              user_id: 'user-123',
-              emotion: ['joy', 'calm', 'anxious', 'sad', 'focused'][Math.floor(Math.random() * 5)],
-              score: Math.random() * 0.5 + 0.5,
-              confidence: Math.random() * 0.3 + 0.7,
-              intensity: Math.random() * 0.8 + 0.2,
-              timestamp: new Date().toISOString(),
-              audioUrl: URL.createObjectURL(audioBlob),
-              text: "Votre voix révèle votre état émotionnel actuel.",
-              recommendations: [
-                "Prenez un moment pour respirer profondément",
-                "Écoutez une musique apaisante",
-                "Faites une courte marche"
-              ]
-            };
-            
-            handleResultCallback(result);
-          } catch (err) {
-            console.error('Error processing audio:', err);
-            setError('Une erreur est survenue lors de l\'analyse. Veuillez réessayer.');
-          } finally {
-            setIsProcessing(false);
-          }
-        } else {
-          setIsProcessing(false);
-          setError('Aucun audio enregistré. Veuillez réessayer.');
-        }
-      };
-      
-      // Start recording
-      mediaRecorder.start(1000); // Collect data every second
-      setIsRecording(true);
-      
-      // Set up progress tracking
-      intervalRef.current = window.setInterval(() => {
-        setProgress((prev) => {
-          const newValue = prev + (100 / maxDuration);
-          if (newValue >= 100) {
-            stopRecording();
-            return 100;
-          }
-          return newValue;
-        });
-      }, 1000);
-      
-      // Auto stop after maxDuration
-      setTimeout(() => {
-        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-          stopRecording();
-        }
-      }, maxDuration * 1000);
-      
-    } catch (err) {
-      console.error('Error accessing microphone:', err);
-      setError('Impossible d\'accéder au microphone. Vérifiez vos permissions.');
-    }
-  };
-  
-  const stopRecording = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
+  // Process recorded audio
+  const processAudio = async () => {
+    if (audioChunks.length === 0) return;
+    
+    if (onProcessingChange) {
+      onProcessingChange(true);
     }
     
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop();
+    try {
+      // Create audio blob
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      
+      // Simulate processing with Whisper API
+      // In a real implementation, send the audioBlob to a backend service
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Mock transcription result
+      const mockTranscript = "Je me sens plutôt bien aujourd'hui, même si j'ai eu une matinée un peu stressante.";
+      setTranscript(mockTranscript);
+      
+      // Mock emotion analysis result
+      const mockEmotionResult: EmotionResult = {
+        id: uuid(),
+        user_id: 'current-user',
+        date: new Date().toISOString(),
+        emotion: 'mixed',
+        score: 65,
+        confidence: 0.75,
+        intensity: 0.65,
+        text: mockTranscript,
+        transcript: mockTranscript
+      };
+      
+      if (onResult) {
+        onResult(mockEmotionResult);
+      }
+      
+      // Reset for next recording
+      setAudioChunks([]);
+      
+    } catch (error) {
+      console.error('Error processing audio:', error);
+      toast({
+        title: "Erreur de traitement",
+        description: "Une erreur est survenue lors du traitement de l'audio",
+        variant: "destructive"
+      });
+    } finally {
+      if (onProcessingChange) {
+        onProcessingChange(false);
+      }
     }
   };
   
   return (
-    <Card>
-      <CardContent className="p-4 space-y-4">
-        {(headerText || subHeaderText) && (
-          <div className="text-center mb-4">
-            {headerText && <h3 className="text-lg font-medium">{headerText}</h3>}
-            {subHeaderText && <p className="text-sm text-muted-foreground">{subHeaderText}</p>}
-          </div>
-        )}
-        <div className="text-center space-y-2">
-          <div className={`relative mx-auto w-20 h-20 rounded-full 
-            ${isRecording ? 'bg-primary/10' : 'bg-muted'}`}
-          >
-            {isRecording && (
-              <div className="absolute inset-0 rounded-full animate-ping bg-primary/20"></div>
-            )}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Mic className={`h-8 w-8 ${isRecording ? 'text-primary' : 'text-muted-foreground'}`} />
-            </div>
-          </div>
-          
-          <div className="text-sm">
-            {isRecording && `${Math.round(progress / 100 * maxDuration)}s / ${maxDuration}s`}
-            {isProcessing && 'Analyse en cours...'}
-          </div>
+    <div className="space-y-2">
+      {transcript && (
+        <div className="p-3 bg-muted rounded-md">
+          <p className="text-sm font-medium mb-1">Transcription:</p>
+          <p className="italic">{transcript}</p>
         </div>
-        
-        <div className="space-y-2">
-          <Progress value={progress} className="h-1.5" />
-          
-          {error && (
-            <div className="text-destructive text-sm text-center">{error}</div>
-          )}
-        </div>
-        
-        <div className="flex justify-center">
-          {!isRecording && !isProcessing && (
-            <Button onClick={startRecording}>
-              <Mic className="mr-2 h-4 w-4" />
-              Commencer
-            </Button>
-          )}
-          
-          {isRecording && (
-            <Button variant="destructive" onClick={stopRecording}>
-              <Square className="mr-2 h-4 w-4" />
-              Arrêter
-            </Button>
-          )}
-          
-          {isProcessing && (
-            <Button disabled>
-              <div className="mr-2 h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
-              Analyse...
-            </Button>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 };
 

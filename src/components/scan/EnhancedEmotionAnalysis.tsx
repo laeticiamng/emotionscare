@@ -1,83 +1,92 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Emotion } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { EmotionResult } from '@/types/emotion';
 
 interface EnhancedEmotionAnalysisProps {
-  emotion: string | Emotion;
-  score?: number;
-  confidence?: number;
-  triggers?: string[];
+  emotion: EmotionResult;
   recommendations?: string[];
+  className?: string;
 }
 
 const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({
   emotion,
-  score,
-  confidence,
-  triggers = [],
-  recommendations = []
+  recommendations = [],
+  className
 }) => {
-  // Handle emotion being either a string or an Emotion object
-  const emotionName = typeof emotion === 'string' ? emotion : emotion.emotion || 'unknown';
-  const emotionScore = score || (typeof emotion !== 'string' ? emotion.score || 0 : 0);
-  const confidenceValue = confidence || (typeof emotion !== 'string' && emotion.confidence ? emotion.confidence : 0.8);
+  // Generate complementary insights based on emotion
+  const generateInsights = (emotion: EmotionResult) => {
+    const insights = {
+      happy: [
+        "Vous êtes dans un état positif, propice à la créativité",
+        "Votre humeur actuelle favorise la collaboration"
+      ],
+      sad: [
+        "Prenez un moment pour vous recentrer",
+        "Considérez une courte pause méditative"
+      ],
+      calm: [
+        "Excellent état pour les tâches nécessitant de la concentration",
+        "Profitez de cette sérénité pour les décisions importantes"
+      ],
+      anxious: [
+        "Des exercices de respiration pourraient vous aider",
+        "Essayez de décomposer vos tâches en étapes plus petites"
+      ],
+      angry: [
+        "Une courte pause pourrait vous aider à retrouver votre calme",
+        "La musique apaisante peut contribuer à réduire cette tension"
+      ],
+      neutral: [
+        "Un bon moment pour planifier votre journée",
+        "Vous êtes dans un état équilibré, favorable à l'organisation"
+      ]
+    };
+    
+    return insights[emotion.emotion as keyof typeof insights] || 
+      ["Prenez conscience de votre état émotionnel", "Adaptez vos activités à votre humeur actuelle"];
+  };
+  
+  const insights = generateInsights(emotion);
+  const emotionIntensity = emotion.score / 100;
   
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-6">
-        <div className="mb-4">
-          <h2 className="text-2xl font-bold mb-2">Analyse émotionnelle</h2>
-          <p className="text-muted-foreground">
-            Votre état émotionnel actuel est principalement:
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle>Analyse émotionnelle détaillée</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-medium">Émotion principale : {emotion.emotion}</span>
+            <span className="text-sm">{emotion.score}%</span>
+          </div>
+          <Progress value={emotion.score} className="h-2" />
+          <p className="text-xs text-muted-foreground mt-1">
+            Fiabilité: {Math.round(emotion.confidence * 100)}%
           </p>
         </div>
         
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <Badge variant="outline" className="text-lg px-3 py-2 mb-2">
-              {emotionName.charAt(0).toUpperCase() + emotionName.slice(1)}
-            </Badge>
-            <div className="text-sm text-muted-foreground">
-              Intensité: {Math.round(emotionScore * 100)}%
-            </div>
-          </div>
-          
-          <div className="text-sm text-muted-foreground text-right">
-            Confiance: {Math.round(confidenceValue * 100)}%
-          </div>
+        <div className="space-y-2">
+          <h4 className="font-medium">Insights</h4>
+          <ul className="list-disc pl-5 space-y-1">
+            {insights.map((insight, index) => (
+              <li key={index} className="text-sm">{insight}</li>
+            ))}
+          </ul>
         </div>
         
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold mb-2">Déclencheurs</h3>
-          {triggers.length > 0 ? (
-            <ul className="list-disc list-inside text-sm text-muted-foreground">
-              {triggers.map((trigger, index) => (
-                <li key={index}>{trigger}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Aucun déclencheur détecté.
-            </p>
-          )}
-        </div>
-        
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Recommandations</h3>
-          {recommendations.length > 0 ? (
-            <ul className="list-disc list-inside text-sm text-muted-foreground">
+        {recommendations && recommendations.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="font-medium">Recommandations personnalisées</h4>
+            <ul className="list-disc pl-5 space-y-1">
               {recommendations.map((recommendation, index) => (
-                <li key={index}>{recommendation}</li>
+                <li key={index} className="text-sm">{recommendation}</li>
               ))}
             </ul>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Aucune recommandation disponible pour le moment.
-            </p>
-          )}
-        </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
