@@ -1,52 +1,56 @@
 
 import React from 'react';
-import { VRSessionTemplate, VRSession } from '@/types/vr';
 
 interface VRMusicIntegrationProps {
-  session: VRSession | VRSessionTemplate;
-  onToggleMusic?: (enabled: boolean) => void;
-  musicEnabled?: boolean;
+  sessionId: string;
+  emotionTarget: string;
+  onMusicReady?: () => void;
 }
 
-const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
-  session,
-  onToggleMusic,
-  musicEnabled = false
+const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({ 
+  sessionId, 
+  emotionTarget, 
+  onMusicReady 
 }) => {
-  // Determine the target emotion either from emotionTarget or emotion_target or emotion
-  const getTargetEmotion = (): string => {
-    if ('emotionTarget' in session && session.emotionTarget) {
-      return session.emotionTarget;
-    }
-    if ('emotion_target' in session && session.emotion_target) {
-      return session.emotion_target;
-    }
-    if ('emotion' in session && session.emotion) {
-      return session.emotion;
-    }
-    return 'calm'; // Default emotion if none specified
-  };
-
-  const targetEmotion = getTargetEmotion();
+  // These would be fetched from an API based on the emotion target
+  const recommendedTrackId: string = `track_${emotionTarget}_${sessionId}`;
   
-  const handleToggleMusic = () => {
-    if (onToggleMusic) {
-      onToggleMusic(!musicEnabled);
-    }
-  };
+  // Track information
+  const trackTitle: string = `Music for ${emotionTarget}`;
+  
+  // Artist information
+  const artistName: string = "EmotionalSounds";
+
+  // Audio URL (would come from an API)
+  const audioUrl: string = `/music/${emotionTarget}-ambient.mp3`;
+
+  React.useEffect(() => {
+    // Simulating music loading and preparation
+    const timer = setTimeout(() => {
+      if (onMusicReady) {
+        onMusicReady();
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [onMusicReady]);
 
   return (
-    <div className="p-4 border rounded-md bg-muted/20">
-      <h3 className="text-lg font-medium mb-2">Music Integration</h3>
+    <div className="p-4 bg-primary/5 rounded-lg">
+      <h3 className="font-medium mb-2">Music Integration</h3>
       <p className="text-sm text-muted-foreground mb-3">
-        Enhance your session with music designed for {targetEmotion} emotions.
+        Enhanced with music that complements your {emotionTarget} experience
       </p>
-      <button
-        className={`px-3 py-1 rounded-md ${musicEnabled ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
-        onClick={handleToggleMusic}
-      >
-        {musicEnabled ? 'Music On' : 'Music Off'}
-      </button>
+      
+      <div className="flex items-center gap-3 bg-card p-3 rounded-md">
+        <div className="h-12 w-12 bg-primary/20 rounded flex items-center justify-center">
+          <span className="text-primary">♪</span>
+        </div>
+        <div>
+          <p className="font-medium text-sm">{trackTitle}</p>
+          <p className="text-xs text-muted-foreground">{artistName}</p>
+        </div>
+      </div>
     </div>
   );
 };

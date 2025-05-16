@@ -1,147 +1,88 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { UserPreferences } from '@/types/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Theme, FontSize, FontFamily } from '@/types/theme';
 
-interface DisplayPreferencesProps {
-  preferences: UserPreferences;
-  onChange: (value: Partial<UserPreferences>) => void;
-}
+const DisplayPreferences: React.FC = () => {
+  const [theme, setTheme] = useState<Theme>('system');
+  const [fontSize, setFontSize] = useState<FontSize>('md');
+  const [fontFamily, setFontFamily] = useState<FontFamily>('system');
 
-const DisplayPreferences: React.FC<DisplayPreferencesProps> = ({ preferences, onChange }) => {
+  const handleThemeChange = (value: Theme) => {
+    setTheme(value);
+    // Apply theme change
+    document.documentElement.classList.remove('light', 'dark', 'system', 'pastel');
+    document.documentElement.classList.add(value);
+  };
+
+  const handleFontSizeChange = (value: FontSize) => {
+    setFontSize(value);
+    // Apply font size change
+    document.documentElement.dataset.fontSize = value;
+  };
+
+  const handleFontFamilyChange = (value: FontFamily) => {
+    setFontFamily(value);
+    // Apply font family change
+    document.documentElement.dataset.fontFamily = value;
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="space-y-3">
-        <Label className="text-base">Thème</Label>
-        <RadioGroup
-          value={preferences.theme}
-          onValueChange={(value: Theme) => 
-            onChange({ theme: value })
-          }
-          className="flex flex-col space-y-2"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="light" id="light" />
-            <Label htmlFor="light">Clair</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="dark" id="dark" />
-            <Label htmlFor="dark">Sombre</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="system" id="system" />
-            <Label htmlFor="system">Système</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="pastel" id="pastel" />
-            <Label htmlFor="pastel">Pastel</Label>
-          </div>
-        </RadioGroup>
-      </div>
-
-      <div className="space-y-3">
-        <Label htmlFor="fontFamily" className="text-base">Police</Label>
-        <Select
-          value={preferences.fontFamily}
-          onValueChange={(value: FontFamily) => 
-            onChange({ fontFamily: value })
-          }
-        >
-          <SelectTrigger id="fontFamily">
-            <SelectValue placeholder="Choisir une police" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="system">Système</SelectItem>
-            <SelectItem value="sans-serif">Sans-serif</SelectItem>
-            <SelectItem value="serif">Serif</SelectItem>
-            <SelectItem value="monospace">Monospace</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-3">
-        <Label htmlFor="fontSize" className="text-base">Taille du texte</Label>
-        <Select
-          value={preferences.fontSize}
-          onValueChange={(value: FontSize) => 
-            onChange({ fontSize: value })
-          }
-        >
-          <SelectTrigger id="fontSize">
-            <SelectValue placeholder="Choisir une taille" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="small">Petite</SelectItem>
-            <SelectItem value="medium">Moyenne</SelectItem>
-            <SelectItem value="large">Grande</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-3">
-        <Label className="text-base">Accessibilité</Label>
+    <Card>
+      <CardHeader>
+        <CardTitle>Préférences d'affichage</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
         <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="reduceMotion"
-              checked={preferences.reduceMotion}
-              onCheckedChange={(checked) =>
-                onChange({ reduceMotion: checked === true })
-              }
-            />
-            <Label htmlFor="reduceMotion" className="font-normal">
-              Réduire les animations
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="colorBlindMode"
-              checked={preferences.colorBlindMode}
-              onCheckedChange={(checked) =>
-                onChange({ colorBlindMode: checked === true })
-              }
-            />
-            <Label htmlFor="colorBlindMode" className="font-normal">
-              Mode daltonisme
-            </Label>
-          </div>
+          <Label htmlFor="theme-select">Thème</Label>
+          <Select value={theme} onValueChange={(value) => handleThemeChange(value as Theme)}>
+            <SelectTrigger id="theme-select">
+              <SelectValue placeholder="Sélectionnez un thème" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="light">Lumineux</SelectItem>
+              <SelectItem value="dark">Sombre</SelectItem>
+              <SelectItem value="system">Système</SelectItem>
+              <SelectItem value="pastel">Pastel</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </div>
 
-      <div className="space-y-3">
-        <Label className="text-base">Média</Label>
         <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="autoplayMedia"
-              checked={preferences.autoplayMedia}
-              onCheckedChange={(checked) =>
-                onChange({ autoplayMedia: checked === true })
-              }
-            />
-            <Label htmlFor="autoplayMedia" className="font-normal">
-              Lecture automatique des médias
-            </Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="soundEnabled"
-              checked={preferences.soundEnabled}
-              onCheckedChange={(checked) =>
-                onChange({ soundEnabled: checked === true })
-              }
-            />
-            <Label htmlFor="soundEnabled" className="font-normal">
-              Sons activés
-            </Label>
-          </div>
+          <Label htmlFor="font-size-select">Taille de police</Label>
+          <Select value={fontSize} onValueChange={(value) => handleFontSizeChange(value as FontSize)}>
+            <SelectTrigger id="font-size-select">
+              <SelectValue placeholder="Sélectionnez une taille de police" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="xs">Très petite</SelectItem>
+              <SelectItem value="sm">Petite</SelectItem>
+              <SelectItem value="md">Moyenne</SelectItem>
+              <SelectItem value="lg">Grande</SelectItem>
+              <SelectItem value="xl">Très grande</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </div>
-    </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="font-family-select">Police</Label>
+          <Select value={fontFamily} onValueChange={(value) => handleFontFamilyChange(value as FontFamily)}>
+            <SelectTrigger id="font-family-select">
+              <SelectValue placeholder="Sélectionnez une police" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="system">Système</SelectItem>
+              <SelectItem value="sans">Sans-serif</SelectItem>
+              <SelectItem value="serif">Serif</SelectItem>
+              <SelectItem value="mono">Monospace</SelectItem>
+              <SelectItem value="rounded">Arrondie</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

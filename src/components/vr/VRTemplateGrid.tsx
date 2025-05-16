@@ -1,96 +1,67 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Clock, Tag } from 'lucide-react';
-import { VRSessionTemplate } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { VRSessionTemplate, VRTemplateGridProps } from '@/types/vr';
 
-interface VRTemplateGridProps {
-  templates: VRSessionTemplate[];
-  onSelect: (template: VRSessionTemplate) => void;
-  emotion?: string;
-  filter?: string;
-}
-
-const VRTemplateGrid: React.FC<VRTemplateGridProps> = ({
-  templates,
+const VRTemplateGrid: React.FC<VRTemplateGridProps> = ({ 
+  templates, 
   onSelect,
-  emotion,
-  filter
+  filter,
+  emotion
 }) => {
-  // Filter templates by emotion if provided
-  let filteredTemplates = emotion 
-    ? templates.filter(t => t.emotionTarget === emotion || !t.emotionTarget)
+  // Filter templates based on emotion if provided
+  const filteredTemplates = emotion 
+    ? templates.filter(template => 
+        template.emotionTarget === emotion || 
+        template.emotion_target === emotion)
     : templates;
-    
-  // Further filter by search term if provided
-  if (filter && filter.trim() !== '') {
-    const searchTerm = filter.toLowerCase();
-    filteredTemplates = filteredTemplates.filter(t => 
-      t.title?.toLowerCase().includes(searchTerm) || 
-      t.description?.toLowerCase().includes(searchTerm) ||
-      t.tags?.some(tag => tag.toLowerCase().includes(searchTerm))
-    );
-  }
-  
-  if (filteredTemplates.length === 0) {
-    return (
-      <div className="text-center p-8">
-        <p className="text-muted-foreground">
-          Aucune séance VR disponible{emotion ? ` pour l'émotion "${emotion}"` : ''}.
-        </p>
-      </div>
-    );
-  }
-  
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {filteredTemplates.map((template) => (
-        <Card key={template.id} className="overflow-hidden flex flex-col h-full">
-          <div 
-            className="h-40 bg-muted relative"
-            style={template.thumbnailUrl ? { 
-              backgroundImage: `url(${template.thumbnailUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            } : {}}
-          >
-            {!template.thumbnailUrl && (
-              <div className="flex items-center justify-center h-full">
-                <span className="text-muted-foreground">Pas d'aperçu</span>
-              </div>
-            )}
-          </div>
-          <CardHeader>
-            <CardTitle>{template.title}</CardTitle>
-            <CardDescription className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              <span>{template.duration} minutes</span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex-grow">
-            <p className="text-muted-foreground text-sm">
-              {template.description}
-            </p>
-            {template.tags && template.tags.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {template.tags.map((tag, i) => (
-                  <div key={i} className="bg-muted text-muted-foreground text-xs px-2 py-1 rounded-md flex items-center">
-                    <Tag className="h-3 w-3 mr-1" />
-                    {tag}
-                  </div>
-                ))}
-              </div>
-            )}
+        <Card 
+          key={template.id} 
+          className="cursor-pointer hover:shadow-md transition-shadow duration-200"
+          onClick={() => onSelect(template)}
+        >
+          <CardContent className="p-4">
+            <div className="aspect-video bg-muted rounded-md mb-3 overflow-hidden">
+              {template.thumbnailUrl ? (
+                <img 
+                  src={template.thumbnailUrl} 
+                  alt={template.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-primary/10">
+                  {template.thumbnailUrl ? (
+                    <img src={template.thumbnailUrl} alt={template.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-primary">No Image</span>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            <h3 className="font-medium text-base mb-1 line-clamp-1">{template.title}</h3>
+            <p className="text-sm text-muted-foreground line-clamp-2">{template.description}</p>
+            
+            <div className="flex flex-wrap gap-1 mt-2">
+              {template.tags && template.tags.slice(0, 3).map((tag, index) => (
+                <span 
+                  key={index} 
+                  className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full"
+                >
+                  {tag}
+                </span>
+              ))}
+              {template.duration && (
+                <span className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full ml-auto">
+                  {template.duration} min
+                </span>
+              )}
+            </div>
           </CardContent>
-          <CardFooter>
-            <Button 
-              className="w-full"
-              onClick={() => onSelect(template)}
-            >
-              Commencer la séance
-            </Button>
-          </CardFooter>
         </Card>
       ))}
     </div>

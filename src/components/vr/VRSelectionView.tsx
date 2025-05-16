@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { VRTemplateGrid } from './VRTemplateGrid';
 import { VRSessionTemplate } from '@/types/vr';
+import VRTemplateGrid from './VRTemplateGrid';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';

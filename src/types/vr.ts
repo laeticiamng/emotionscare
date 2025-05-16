@@ -58,9 +58,9 @@ export interface VRSession {
   };
   notes?: string;
   completed?: boolean;
+  template?: VRSessionTemplate;
   
   // Additional properties needed by components
-  template?: VRSessionTemplate;
   start_time?: Date;
   startTime?: Date;
   date?: string;
