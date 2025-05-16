@@ -4,12 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useMusic } from '@/contexts/music';
 import { Music } from 'lucide-react';
+import { EmotionMusicParams, MusicPlaylist } from '@/types/music';
 
 interface MoodBasedRecommendationsProps {
   mood: string;
   intensity?: number;
   standalone?: boolean;
-  onSelect?: (playlist: any) => void;
+  onSelect?: (playlist: MusicPlaylist | null) => void;
 }
 
 const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ 
@@ -22,12 +23,14 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({
   
   const handleSelectPlaylist = async () => {
     try {
-      const playlist = await loadPlaylistForEmotion({
+      const params: EmotionMusicParams = {
         emotion: mood,
         intensity
-      });
+      };
       
-      if (onSelect && playlist) {
+      const playlist = await loadPlaylistForEmotion(params);
+      
+      if (onSelect) {
         onSelect(playlist);
       }
     } catch (error) {

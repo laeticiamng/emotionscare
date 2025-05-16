@@ -1,49 +1,47 @@
 
 import React from 'react';
+import { ProgressBarProps } from '@/types/music';
 
-interface ProgressBarProps {
-  currentTime: number;
-  duration: number;
-  formatTime: (seconds: number) => string;
-  onSeek: (time: number) => void;
-}
-
-const ProgressBar: React.FC<ProgressBarProps> = ({
-  currentTime,
-  duration,
-  formatTime,
-  onSeek
+const ProgressBar: React.FC<ProgressBarProps> = ({ 
+  currentTime, 
+  duration, 
+  onSeek,
+  formatTime
 }) => {
-  const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const progress = (currentTime / duration) * 100 || 0;
   
-  const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSeek(parseFloat(e.target.value));
+  // Default format function if none provided
+  const defaultFormatTime = (seconds: number) => {
+    if (isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-  
+
+  const timeFormatter = formatTime || defaultFormatTime;
+
+  // Handle click on the progress bar
+  const handleProgressBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+    onSeek(percent * duration);
+  };
+
   return (
     <div className="w-full space-y-1">
-      <div className="relative h-1 bg-primary/20 rounded-full overflow-hidden">
+      <div 
+        className="h-1 bg-blue-200 dark:bg-blue-800/30 rounded-full overflow-hidden cursor-pointer"
+        onClick={handleProgressBarClick}
+      >
         <div 
-          className="absolute top-0 left-0 h-full bg-primary transition-all duration-100 ease-out"
-          style={{ width: `${progressPercentage}%` }}
-        />
+          className="h-full bg-blue-500 transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        ></div>
       </div>
-      
-      <div className="flex justify-between text-xs text-muted-foreground">
-        <span>{formatTime(currentTime)}</span>
-        <span>{formatTime(duration)}</span>
+      <div className="flex justify-between text-xs text-blue-600/70 dark:text-blue-400/70">
+        <span>{timeFormatter(currentTime || 0)}</span>
+        <span>{timeFormatter(duration || 0)}</span>
       </div>
-      
-      <input
-        type="range"
-        min="0"
-        max={duration || 0}
-        step="0.1"
-        value={currentTime}
-        onChange={handleSeekChange}
-        className="absolute w-full opacity-0 cursor-pointer top-0 left-0 h-1"
-        style={{ margin: 0 }}
-      />
     </div>
   );
 };

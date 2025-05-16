@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Headphones, Music } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
 import { cn } from '@/lib/utils';
+import { EmotionMusicParams } from '@/types/music';
 
 interface MusicRecommendationCardProps {
   emotion: string;
@@ -22,8 +23,11 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
   const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
   
   const handlePlay = async () => {
-    await loadPlaylistForEmotion(emotion);
-    setOpenDrawer(true);
+    const params: EmotionMusicParams = { emotion };
+    await loadPlaylistForEmotion(params);
+    if (setOpenDrawer) {
+      setOpenDrawer(true);
+    }
   };
   
   return (

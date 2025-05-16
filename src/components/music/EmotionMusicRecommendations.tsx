@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
 import { Music, Play, Loader2 } from 'lucide-react';
-import { EmotionMusicParams } from '@/types/music';
+import { EmotionMusicParams, MusicPlaylist } from '@/types/music';
 
 interface EmotionMusicRecommendationsProps {
   emotion: string;
@@ -23,7 +23,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
     loadPlaylistForEmotion
   } = useMusic();
   
-  const [recommendation, setRecommendation] = useState<any>(null);
+  const [recommendation, setRecommendation] = useState<MusicPlaylist | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -53,8 +53,10 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
       try {
         // Call the loadPlaylistForEmotion function from MusicContext
         const params: EmotionMusicParams = { emotion };
-        const playlist = await loadPlaylistForEmotion(emotion);
-        setRecommendation(playlist);
+        const playlist = await loadPlaylistForEmotion(params);
+        if (playlist) {
+          setRecommendation(playlist);
+        }
       } catch (err) {
         console.error('Failed to load music recommendation:', err);
         setError('Impossible de charger les recommandations musicales.');
@@ -108,7 +110,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
             <h3 className="text-lg font-medium mb-1">
               Musique pour {emotion.charAt(0).toUpperCase() + emotion.slice(1)}
             </h3>
-            <p className="text-muted-foreground text-sm mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               {description || getEmotionMusicDescription(emotion)}
             </p>
             

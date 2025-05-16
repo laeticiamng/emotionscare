@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { useMusic } from '@/contexts/MusicContext';
 
@@ -10,46 +10,6 @@ export interface UseEmotionMusicReturn {
   activateMusicForEmotion: (params: EmotionMusicParams) => Promise<boolean>;
   getEmotionMusicDescription: (emotion: string) => string;
 }
-
-// This function is exported separately for direct use
-export const loadPlaylistForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
-  try {
-    // Normally this would call an API or service
-    // For now, we'll simulate a response
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    // Return a mock playlist based on emotion
-    return {
-      id: `${params.emotion}-${Date.now()}`,
-      title: `${params.emotion.charAt(0).toUpperCase() + params.emotion.slice(1)} Vibes`,
-      description: getEmotionMusicDescription(params.emotion),
-      cover_url: `/covers/${params.emotion.toLowerCase()}.jpg`,
-      tracks: [
-        {
-          id: `track1-${Date.now()}`,
-          title: 'Sérénité absolue',
-          artist: 'Nature Sounds',
-          album: 'Calm Collection',
-          duration: 180,
-          url: '/audio/track1.mp3',
-          cover_url: '/images/track1-cover.jpg'
-        },
-        {
-          id: `track2-${Date.now()}`,
-          title: 'Évasion mentale',
-          artist: 'Mindfulness Masters',
-          album: 'Deep Focus',
-          duration: 240,
-          url: '/audio/track2.mp3',
-          cover_url: '/images/track2-cover.jpg'
-        }
-      ]
-    };
-  } catch (error) {
-    console.error('Error loading playlist for emotion:', error);
-    return null;
-  }
-};
 
 // Helper function for descriptions
 export const getEmotionMusicDescription = (emotion: string): string => {
@@ -71,7 +31,7 @@ export const useEmotionMusic = (initialEmotion?: string): UseEmotionMusicReturn 
   const [recommendation, setRecommendation] = useState<MusicPlaylist | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-  const { setEmotion, openDrawer, setOpenDrawer } = useMusic();
+  const { setEmotion, setOpenDrawer, loadPlaylistForEmotion } = useMusic();
 
   // Function to activate music for a specific emotion
   const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<boolean> => {
@@ -90,7 +50,7 @@ export const useEmotionMusic = (initialEmotion?: string): UseEmotionMusicReturn 
       }
       
       // Open the music drawer
-      if (!openDrawer && setOpenDrawer) {
+      if (setOpenDrawer) {
         setOpenDrawer(true);
       }
       

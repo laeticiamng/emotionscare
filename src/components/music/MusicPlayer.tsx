@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useMusic } from '@/contexts/music';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ const MusicPlayer = () => {
     currentTrack,
     isPlaying,
     volume,
-    progress,
+    currentTime,
     duration,
     togglePlay,
     nextTrack,
@@ -43,9 +43,9 @@ const MusicPlayer = () => {
         {/* Album cover and info */}
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="min-w-12 h-12 bg-blue-200 dark:bg-blue-800/30 rounded shadow-md overflow-hidden">
-            {currentTrack.coverUrl || currentTrack.coverImage ? (
+            {currentTrack.coverUrl || currentTrack.cover_url ? (
               <img 
-                src={currentTrack.coverUrl || currentTrack.coverImage} 
+                src={currentTrack.coverUrl || currentTrack.cover_url} 
                 alt={currentTrack.title} 
                 className="w-full h-full object-cover"
               />
@@ -91,7 +91,7 @@ const MusicPlayer = () => {
           </div>
 
           <ProgressBar
-            currentTime={progress || 0}
+            currentTime={currentTime || 0}
             duration={duration || 0}
             formatTime={formatTime}
             onSeek={seekTo}

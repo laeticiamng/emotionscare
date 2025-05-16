@@ -1,15 +1,13 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { UserPreferences } from '@/types/user';
-import { NotificationPreferences } from '@/types/user';
+import { UserPreferences, NotificationPreferences } from '@/types/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ThemeSettingsForm from '@/components/preferences/ThemeSettingsForm';
 import NotificationPreferencesComponent from '@/components/preferences/NotificationPreferences';
 import DataPrivacySettings from '@/components/preferences/DataPrivacySettings';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Loader } from 'lucide-react';
 import { harmonizeUserType } from '@/utils/userUtils';
@@ -38,6 +36,8 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
       emailEnabled: true,
       pushEnabled: false,
       inAppEnabled: true,
+      email: true,
+      push: false,
       types: {
         system: true,
         emotion: true,
