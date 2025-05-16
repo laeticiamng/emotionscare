@@ -8,6 +8,7 @@ import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { LayoutProvider } from '@/contexts/LayoutContext';
+import { MusicProvider } from '@/contexts/MusicContext';
 import { Toaster } from '@/components/ui/toaster';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -17,8 +18,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <AuthProvider>
           <UserModeProvider>
             <LayoutProvider>
-              <App />
-              <Toaster />
+              <MusicProvider>
+                <App />
+                <Toaster />
+              </MusicProvider>
             </LayoutProvider>
           </UserModeProvider>
         </AuthProvider>

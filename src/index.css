@@ -49,9 +49,9 @@
     --ring: 224.3 76.3% 48%;
   }
   
-  /* Thème pastel (bleu) - Ajusté pour être plus bleu et moins vert */
+  /* Thème pastel bleu - revised to be more blue and premium */
   .pastel {
-    --background: 214 100% 98%;
+    --background: 210 100% 98%;
     --foreground: 222.2 84% 4.9%;
     --card: 210 100% 99%;
     --card-foreground: 222.2 84% 4.9%;
@@ -75,7 +75,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border font-inter;
   }
   body {
     @apply bg-background text-foreground;
@@ -83,7 +83,14 @@
   }
 }
 
-/* Classes spécifiques pour le thème pastel bleu - Ajusté pour être plus bleu */
+/* Adding Inter font throughout the application */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+.font-inter {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+/* Classes spécifiques pour le thème pastel bleu - Premium blue styling */
 .bg-pastel-gradient {
   @apply bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-900 dark:to-blue-900/20;
 }
@@ -112,4 +119,82 @@
 /* Animation de transition douce */
 .theme-transition {
   @apply transition-all duration-300 ease-in-out;
+}
+
+/* Time of day themes - UPDATED FOR BLUE */
+.bg-morning {
+  background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%);
+  color: var(--text-main-light);
+}
+
+.bg-afternoon {
+  background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+  color: var(--text-main-light);
+}
+
+.bg-evening {
+  background: linear-gradient(135deg, #5c6bc0 0%, #3949ab 100%);
+  color: var(--text-main-dark);
+}
+
+.bg-night {
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  color: var(--text-main-dark);
+}
+
+/* Premium button styles */
+.button-premium {
+  @apply rounded-full font-medium transition-all duration-300 shadow-lg hover:shadow-xl active:shadow-md;
+  background: linear-gradient(90deg, var(--primary), color-mix(in srgb, var(--primary) 80%, white));
+}
+
+/* Button hover effects */
+.hover-float {
+  @apply transition-all duration-300;
+}
+
+.hover-float:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* 3D Card effect */
+.card-3d {
+  @apply transition-all duration-500 hover:shadow-2xl;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.card-3d:hover {
+  transform: rotateX(5deg) rotateY(5deg);
+}
+
+/* Glassmorphism */
+.glass {
+  @apply backdrop-blur-lg bg-white/10 border border-white/20;
+}
+
+.glass-blue {
+  @apply backdrop-blur-md bg-blue-500/10 border border-blue-300/30;
+}
+
+.premium-text-gradient {
+  @apply bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent;
+}
+
+/* Apple-like design utilities */
+.apple-card {
+  @apply rounded-2xl shadow-md bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700;
+  box-shadow: 0 4px 24px rgba(149, 157, 165, 0.1);
+}
+
+.apple-button {
+  @apply rounded-full px-6 py-3 font-medium transition-all duration-300;
+  background: linear-gradient(90deg, #0066ff, #5e9dff);
+  color: white;
+}
+
+.apple-button:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
 }
