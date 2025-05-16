@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { CoachChatProps } from '@/types/coach';
-import { useCoach } from '@/contexts/CoachContext';
+import { useCoach } from '@/contexts/coach';
 import CoachMessage from './CoachMessage';
 import CoachChatInput from './CoachChatInput';
 import CoachCharacter from './CoachCharacter';
