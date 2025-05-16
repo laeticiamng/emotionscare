@@ -1,127 +1,99 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge as BadgeType } from '@/types';
-import { cn } from '@/lib/utils';
-import { Award, ChevronRight, Lock } from 'lucide-react';
-import { getBadgeRarityColor } from '@/utils/gamificationUtils';
 import { Button } from '@/components/ui/button';
+import { ChevronRight } from 'lucide-react';
+import { Badge } from '@/types/gamification';
+import { getBadgeRarityColor } from '@/utils/gamificationUtils';
 
 interface BadgesWidgetProps {
-  badges: BadgeType[];
+  badges: Badge[];
   title?: string;
-  className?: string;
+  showSeeAll?: boolean;
+  onSeeAll?: () => void;
 }
 
-const BadgesWidget: React.FC<BadgesWidgetProps> = ({
-  badges,
-  title = "Badges",
-  className
-}) => {
-  const [selectedTab, setSelectedTab] = useState<string>('all');
+const BadgesWidget = ({ badges, title = "Badges", showSeeAll = true, onSeeAll }: BadgesWidgetProps) => {
+  // Sort badges: first unlocked, then by progress
+  const sortedBadges = [...badges].sort((a, b) => {
+    // Prioritize completed/unlocked badges
+    if ((a.completed || a.unlocked) && !(b.completed || b.unlocked)) return -1;
+    if (!(a.completed || a.unlocked) && (b.completed || b.unlocked)) return 1;
+    
+    // If both are in same completion state, sort by progress (higher first)
+    if (a.progress && b.progress) {
+      return b.progress - a.progress;
+    }
+    
+    // Default sort by name
+    return a.name.localeCompare(b.name);
+  });
   
-  const completedBadges = badges.filter(badge => badge.completed || badge.unlocked);
-  const lockedBadges = badges.filter(badge => !badge.completed && !badge.unlocked);
-  
-  const displayBadges = selectedTab === 'all' ? badges :
-                        selectedTab === 'completed' ? completedBadges :
-                        lockedBadges;
-                      
-  const calculateProgress = () => {
-    if (badges.length === 0) return 0;
-    return Math.round((completedBadges.length / badges.length) * 100);
+  // Get display image for the badge
+  const getBadgeImage = (badge: Badge) => {
+    return badge.image || badge.image_url || badge.imageUrl || `/badges/${badge.id}.png`;
   };
   
   return (
-    <Card className={cn("h-full flex flex-col", className)}>
-      <CardHeader className="pb-2">
+    <Card>
+      <CardHeader className="pb-3">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-lg">{title}</CardTitle>
-          <div className="text-sm text-muted-foreground">
-            {completedBadges.length}/{badges.length}
-          </div>
-        </div>
-        <div className="flex space-x-1 text-sm">
-          <button 
-            className={cn(
-              "px-2 py-1 rounded-md",
-              selectedTab === 'all' ? "bg-primary/10 text-primary" : "hover:bg-muted"
-            )}
-            onClick={() => setSelectedTab('all')}
-          >
-            Tous
-          </button>
-          <button 
-            className={cn(
-              "px-2 py-1 rounded-md",
-              selectedTab === 'completed' ? "bg-primary/10 text-primary" : "hover:bg-muted"
-            )}
-            onClick={() => setSelectedTab('completed')}
-          >
-            Déverrouillés
-          </button>
-          <button 
-            className={cn(
-              "px-2 py-1 rounded-md", 
-              selectedTab === 'locked' ? "bg-primary/10 text-primary" : "hover:bg-muted"
-            )}
-            onClick={() => setSelectedTab('locked')}
-          >
-            À obtenir
-          </button>
+          <CardTitle>{title}</CardTitle>
+          {showSeeAll && onSeeAll && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="gap-1" 
+              onClick={onSeeAll}
+            >
+              <span className="text-sm">Voir tout</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </CardHeader>
-      <CardContent className="flex-1 overflow-auto pb-2">
-        {displayBadges.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground p-4">
-            <Award className="h-10 w-10 mb-2 opacity-20" />
-            <p>Aucun badge {selectedTab === 'completed' ? 'déverrouillé' : selectedTab === 'locked' ? 'à obtenir' : ''} pour le moment.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {displayBadges.map((badge) => (
+      <CardContent>
+        <div className="grid grid-cols-3 gap-4">
+          {sortedBadges.slice(0, 6).map((badge) => {
+            // Determine if the badge is completed/unlocked
+            const isUnlocked = badge.completed || badge.unlocked || badge.unlockedAt;
+            
+            // Get badge rarity class (for the badge border/glow)
+            const rarityColor = badge.rarity ? getBadgeRarityColor(badge.rarity) : 'bg-slate-500';
+            
+            return (
               <div 
-                key={badge.id} 
-                className={cn(
-                  "group relative aspect-square rounded-lg border p-3 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-accent transition-colors",
-                  badge.completed ? "bg-accent/30" : ""
-                )}
+                key={badge.id}
+                className="flex flex-col items-center text-center"
               >
-                <div className={cn(
-                  "w-12 h-12 rounded-full mb-2 flex items-center justify-center",
-                  badge.completed ? getBadgeRarityColor(badge.rarity) : "bg-muted"
-                )}>
-                  {badge.completed ? (
-                    <Award className="h-6 w-6 text-white" />
-                  ) : (
-                    <Lock className="h-5 w-5 text-muted-foreground" />
+                <div className={`
+                  relative w-16 h-16 md:w-18 md:h-18 rounded-full overflow-hidden
+                  ${isUnlocked ? 'ring-2 ring-offset-2 ' + rarityColor : 'opacity-50 grayscale'}
+                `}>
+                  <img 
+                    src={getBadgeImage(badge)}
+                    alt={badge.name}
+                    className="w-full h-full object-cover"
+                  />
+                  {!isUnlocked && badge.progress !== undefined && badge.progress > 0 && (
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold">
+                      {badge.progress}%
+                    </div>
                   )}
                 </div>
-                <div className="text-xs font-medium line-clamp-1">{badge.name}</div>
-                <div className={cn(
-                  "text-[10px] line-clamp-2 mt-1", 
-                  badge.completed ? "text-muted-foreground" : "text-muted-foreground/70"
-                )}>
-                  {badge.description}
-                </div>
-                
-                <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white opacity-0 group-hover:opacity-100 rounded-lg transition-opacity">
-                  <div className="p-2 text-xs">
-                    <p className="font-medium mb-1">{badge.name}</p>
-                    <p className="text-[10px]">{badge.description}</p>
-                  </div>
+                <div className="mt-2">
+                  <h4 className="text-xs font-medium">{badge.name}</h4>
+                  {isUnlocked && badge.unlockedAt && (
+                    <p className="text-[10px] text-muted-foreground">
+                      {new Date(badge.unlockedAt).toLocaleDateString()}
+                    </p>
+                  )}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            );
+          })}
+        </div>
       </CardContent>
-      <div className="p-3 pt-2 mt-auto border-t text-sm flex items-center justify-center">
-        <Button variant="ghost" size="sm" className="h-7 text-xs w-full">
-          Voir tous les badges
-          <ChevronRight className="h-3 w-3 ml-1" />
-        </Button>
-      </div>
     </Card>
   );
 };

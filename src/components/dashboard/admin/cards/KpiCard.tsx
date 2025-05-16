@@ -39,7 +39,8 @@ const KpiCard: React.FC<KpiCardProps> = ({
     neutral: 'text-gray-500',
     success: 'text-green-600',
     warning: 'text-amber-600',
-    danger: 'text-red-600'
+    danger: 'text-red-600',
+    info: 'text-blue-600'
   };
 
   // Helper to render trend indicator

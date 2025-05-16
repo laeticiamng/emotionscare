@@ -33,6 +33,7 @@ export const PopularSessionsSection: React.FC = () => {
       title: 'Méditation pleine conscience',
       description: 'Une séance guidée pour se reconnecter au moment présent',
       duration: 600,
+      tags: [],
       thumbnailUrl: '/images/meditation.jpg',
       category: 'meditation',
       emotionTarget: 'calme'
@@ -42,6 +43,7 @@ export const PopularSessionsSection: React.FC = () => {
       title: 'Respiration 4-7-8',
       description: 'Technique de respiration pour réduire l\'anxiété',
       duration: 300,
+      tags: [],
       thumbnailUrl: '/images/breathing.jpg',
       category: 'breathing',
       emotionTarget: 'relaxation'

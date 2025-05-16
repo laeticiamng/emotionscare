@@ -13,32 +13,34 @@ export interface KpiCardProps {
   description?: string;
   color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
   onClick?: () => void;
-  // Adding missing properties
   delta?: {
     value: number;
     label?: string;
     trend: 'up' | 'down' | 'neutral';
-  };
+  } | number;
   subtitle?: ReactNode | string;
   ariaLabel?: string;
   isLoading?: boolean;
   className?: string;
+  status?: 'success' | 'warning' | 'danger' | 'info';
+  trendText?: string;
+  loading?: boolean;
 }
 
 export interface DraggableKpiCardsGridProps {
   cards?: KpiCardProps[];
   onReorder?: (cards: KpiCardProps[]) => void;
   editable?: boolean;
-  // Add missing properties
   kpiCards?: KpiCardProps[];
   className?: string;
+  isEditable?: boolean;
+  onLayoutChange?: (layout: any[]) => void;
 }
 
 export interface GlobalOverviewTabProps {
   period?: 'day' | 'week' | 'month' | 'year';
   showTrends?: boolean;
   isLoading?: boolean;
-  // Add missing properties
   kpiCards?: KpiCardProps[];
   absenteeismChartData?: Array<{ date: string; value: number }>;
   emotionalScoreTrend?: Array<{ date: string; value: number }>;
@@ -50,9 +52,9 @@ export interface DashboardWidgetConfig {
   id: string;
   type: 'kpi' | 'chart' | 'table' | 'list' | 'map' | 'custom';
   title: string;
-  width: 1 | 2 | 3 | 4; // Grid width (out of 4 columns)
-  height: 'sm' | 'md' | 'lg' | 'xl'; // Height size
-  position: number; // Order in dashboard
+  width: 1 | 2 | 3 | 4;
+  height: 'sm' | 'md' | 'lg' | 'xl';
+  position: number;
   visible: boolean;
   settings?: {
     [key: string]: any;
@@ -67,7 +69,6 @@ export interface GamificationData {
   }[];
 }
 
-// Add missing GridPosition type
 export interface GridPosition {
   x: number;
   y: number;

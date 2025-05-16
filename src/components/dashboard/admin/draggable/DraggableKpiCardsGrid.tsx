@@ -5,48 +5,25 @@ import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import KpiCard from '@/components/dashboard/admin/cards/KpiCard';
-import { KpiCardProps } from '@/types';
-
-export interface DraggableCardProps {
-  id: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  title: string;
-  value: string | number;
-  icon?: React.ReactNode;
-  delta?: number | {
-    value: number;
-    label?: string;
-    trend: 'up' | 'down' | 'neutral';
-  };
-  subtitle?: React.ReactNode;
-  ariaLabel?: string;
-  onClick?: () => void;
-  status?: 'success' | 'warning' | 'danger';
-}
-
-interface DraggableKpiCardsGridProps {
-  cards: DraggableCardProps[];
-  onLayoutChange?: (layout: any[]) => void;
-  className?: string;
-  isEditable?: boolean;
-}
+import { DraggableCardProps, DraggableKpiCardsGridProps } from '@/types/widgets';
 
 const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
   cards,
+  kpiCards,
   onLayoutChange,
   className,
   isEditable = false
 }) => {
+  // Use either cards or kpiCards prop, prioritizing cards if both are provided
+  const cardsToUse = cards || kpiCards || [];
+
   const [layout, setLayout] = useState(
-    cards.map(card => ({
+    cardsToUse.map((card, index) => ({
       i: card.id,
-      x: card.x,
-      y: card.y,
-      w: card.w,
-      h: card.h,
+      x: card.x !== undefined ? card.x : (index % 3) * 4,
+      y: card.y !== undefined ? card.y : Math.floor(index / 3),
+      w: card.w !== undefined ? card.w : 4,
+      h: card.h !== undefined ? card.h : 1,
       minW: 1,
       maxW: 12,
       minH: 1,
@@ -75,13 +52,16 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
         isResizable={isEditable}
         onLayoutChange={handleLayoutChange}
       >
-        {cards.map(card => (
+        {cardsToUse.map(card => (
           <div key={card.id} className="shadow-sm">
             <KpiCard
               title={card.title}
               value={card.value}
               icon={card.icon}
-              delta={card.delta}
+              delta={typeof card.delta === 'number' ? 
+                { value: card.delta, trend: card.delta > 0 ? 'up' : card.delta < 0 ? 'down' : 'neutral' } : 
+                card.delta
+              }
               subtitle={card.subtitle}
               ariaLabel={card.ariaLabel}
               onClick={card.onClick}

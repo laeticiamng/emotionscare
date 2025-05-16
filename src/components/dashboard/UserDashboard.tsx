@@ -1,10 +1,9 @@
 
 import React from 'react';
-import { Badge, Challenge, GamificationStats, LeaderboardEntry } from '@/types/gamification';
+import { Challenge, GamificationStats } from '@/types/gamification';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Book, Calendar, HeartPulse, Lightbulb, MessagesSquare, Music, Scan } from 'lucide-react';
+import { Book, Calendar, Music, Scan, MessagesSquare } from 'lucide-react';
 import EmotionPieChart from '@/components/dashboard/charts/EmotionPieChart';
 import WeeklyActivityChart from '@/components/dashboard/charts/WeeklyActivityChart';
 import DashboardHero from '@/components/dashboard/DashboardHero';
@@ -28,6 +27,7 @@ const UserDashboard: React.FC = () => {
       title: 'Journal quotidien',
       description: 'Écrivez dans votre journal aujourd\'hui',
       category: 'daily',
+      points: 50,
       xp: 50,
       progress: 0,
       status: 'active',
@@ -39,6 +39,7 @@ const UserDashboard: React.FC = () => {
       title: '3 séances de musique',
       description: 'Écoutez 3 séances de musique cette semaine',
       category: 'weekly',
+      points: 100,
       xp: 100,
       progress: 33,
       status: 'active',
@@ -50,6 +51,7 @@ const UserDashboard: React.FC = () => {
       title: 'Séance de VR complète',
       description: 'Terminez une séance de réalité virtuelle',
       category: 'special',
+      points: 150,
       xp: 150,
       progress: 0,
       status: 'active',
@@ -57,7 +59,7 @@ const UserDashboard: React.FC = () => {
     }
   ];
 
-  const badges: Badge[] = [
+  const badges = [
     {
       id: '1',
       name: 'Débutant',
@@ -90,7 +92,7 @@ const UserDashboard: React.FC = () => {
     }
   ];
 
-  const leaderboard: LeaderboardEntry[] = [
+  const leaderboard = [
     {
       id: '1',
       userId: '1',
@@ -123,7 +125,7 @@ const UserDashboard: React.FC = () => {
   const userStat: GamificationStats = {
     points: 980,
     level: 4,
-    badges: 8,
+    badges: badges,
     completedChallenges: 24,
     totalChallenges: 35,
     challenges: challenges,
@@ -232,7 +234,8 @@ const UserDashboard: React.FC = () => {
               </CardContent>
             </Card>
             <BadgesWidget 
-              badges={badges} 
+              badges={badges}
+              title="Badges récents"
               onSeeAll={() => console.log('View all badges')} 
             />
           </div>
@@ -249,7 +252,8 @@ const UserDashboard: React.FC = () => {
               </CardContent>
             </Card>
             <LeaderboardWidget 
-              leaderboard={leaderboard} 
+              leaderboard={leaderboard}
+              title="Classement"
               onSeeAll={() => console.log('View all leaderboard')} 
             />
           </div>

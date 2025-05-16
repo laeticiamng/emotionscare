@@ -45,10 +45,22 @@ export interface KpiCardProps {
   status?: 'success' | 'warning' | 'danger';
   subtitle?: ReactNode;
   ariaLabel?: string;
+  delta?: number | {
+    value: number;
+    label?: string;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  className?: string;
+  trendText?: string;
+  loading?: boolean;
 }
 
 export interface DraggableCardProps {
   id: string;
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
   title: string;
   value: string | number;
   icon?: ReactNode;
@@ -64,5 +76,11 @@ export interface DraggableCardProps {
 }
 
 export interface DraggableKpiCardsGridProps {
-  kpiCards: DraggableCardProps[];
+  cards?: DraggableCardProps[];
+  kpiCards?: DraggableCardProps[];
+  onLayoutChange?: (layout: any[]) => void;
+  className?: string;
+  isEditable?: boolean;
+  onReorder?: (cards: DraggableCardProps[]) => void;
+  editable?: boolean;
 }

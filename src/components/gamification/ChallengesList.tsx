@@ -6,10 +6,9 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Challenge } from '@/types';
-import { getCategoryColor, getFormattedChallengeStatus } from '@/utils/gamificationUtils';
+import { getCategoryColor } from '@/utils/gamificationUtils';
 import { Calendar, Clock, Award, ArrowRight, CheckCircle, XCircle } from 'lucide-react';
 
-// Update the function signature to match the expected return type
 interface ChallengesListProps {
   challenges: Challenge[];
   onComplete?: (id: string) => Promise<boolean>;
@@ -32,7 +31,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
   };
 
   const getStatusClass = (challenge: Challenge) => {
-    if (challenge.status === 'completed') return 'bg-green-50 border-green-200';
+    if (challenge.status === 'completed' || challenge.completed) return 'bg-green-50 border-green-200';
     if (challenge.status === 'failed' || challenge.failed) return 'bg-red-50 border-red-200';
     if (challenge.status === 'locked') return 'bg-gray-50 border-gray-200';
     return 'bg-white border-slate-200';
@@ -75,6 +74,14 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
     return false;
   };
 
+  // Helper to get status text
+  const getStatusText = (challenge: Challenge): string => {
+    if (challenge.status === 'completed' || challenge.completed) return 'Complété';
+    if (challenge.status === 'failed' || challenge.failed) return 'Échoué';
+    if (challenge.status === 'locked') return 'Verrouillé';
+    return 'En cours';
+  };
+
   return (
     <div className={cn("space-y-3", className)}>
       {challenges.map((challenge) => (
@@ -112,7 +119,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary" className="font-normal">
-                    {challenge.xp} XP
+                    {challenge.xp || challenge.points} {challenge.xp ? 'XP' : 'pts'}
                   </Badge>
                   <ArrowRight className={cn(
                     "h-5 w-5 transition-transform",
@@ -136,7 +143,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                 
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-1.5">
-                    {challenge.status === 'completed' ? (
+                    {challenge.status === 'completed' || challenge.completed ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : challenge.failed || challenge.status === 'failed' ? (
                       <XCircle className="h-4 w-4 text-red-500" />
@@ -144,14 +151,12 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                       <Clock className="h-4 w-4 text-muted-foreground" />
                     )}
                     <span className="text-muted-foreground">
-                      {challenge.status === 'completed' ? 'Complété' : 
-                       challenge.status === 'failed' ? 'Échoué' :
-                       challenge.status === 'locked' ? 'Verrouillé' : 'En cours'}
+                      {getStatusText(challenge)}
                     </span>
                   </div>
                   
                   <div className="flex gap-2">
-                    {challenge.status === 'active' && onComplete && (
+                    {(challenge.status === 'active' || (!challenge.status && !challenge.completed && !challenge.failed)) && onComplete && (
                       <Button 
                         variant="outline" 
                         size="sm"
@@ -164,7 +169,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                       </Button>
                     )}
                     
-                    {challenge.status === 'active' && onFail && (
+                    {(challenge.status === 'active' || (!challenge.status && !challenge.completed && !challenge.failed)) && onFail && (
                       <Button 
                         variant="outline" 
                         size="sm"

@@ -11,10 +11,10 @@ import {
   Heart, 
   Activity 
 } from 'lucide-react';
-import { DraggableCardProps } from '@/types/widgets';
 import DraggableKpiCardsGrid from './draggable/DraggableKpiCardsGrid';
 import { AdminTabContents } from './AdminTabContents';
 import { Button } from '@/components/ui/button';
+import { DraggableCardProps } from '@/types/widgets';
 
 const AdminDashboard: React.FC = () => {
   // KPI Card data
@@ -98,7 +98,7 @@ const AdminDashboard: React.FC = () => {
 
       {/* KPI Cards Section */}
       <section className="mb-8">
-        <DraggableKpiCardsGrid kpiCards={kpiCards} />
+        <DraggableKpiCardsGrid cards={kpiCards} />
       </section>
 
       {/* Tabs Section */}

@@ -6,7 +6,7 @@ import EmotionPieChart from '@/components/dashboard/charts/EmotionPieChart';
 import WeeklyActivityChart from '@/components/dashboard/charts/WeeklyActivityChart';
 import BadgesWidget from '@/components/dashboard/widgets/BadgesWidget';
 import LeaderboardWidget from '@/components/dashboard/widgets/LeaderboardWidget';
-import { LeaderboardEntry, Badge } from '@/types/gamification';
+import { Badge, LeaderboardEntry } from '@/types/gamification';
 
 export const AdminTabContents: React.FC = () => {
   // Mock data
@@ -44,7 +44,7 @@ export const AdminTabContents: React.FC = () => {
       description: 'Créé une initiative de bien-être',
       image: '/badges/wellbeing.png',
       category: 'wellness',
-      rarity: 'epic',
+      rarity: 'epic'
     },
     {
       id: '3',
@@ -52,7 +52,7 @@ export const AdminTabContents: React.FC = () => {
       description: 'Guidé 5 nouveaux membres',
       image: '/badges/mentor.png',
       category: 'leadership',
-      rarity: 'legendary',
+      rarity: 'legendary'
     }
   ];
 
@@ -123,8 +123,8 @@ export const AdminTabContents: React.FC = () => {
           </Card>
           <BadgesWidget 
             badges={badges}
-            title="Badges d'équipe" 
-            onSeeAll={() => console.log('View all badges')} 
+            title="Badges d'équipe"
+            onSeeAll={() => console.log('View all badges')}
           />
         </div>
       </TabsContent>
@@ -142,8 +142,8 @@ export const AdminTabContents: React.FC = () => {
           </Card>
           <LeaderboardWidget 
             leaderboard={leaderboard}
-            title="Classement des équipes" 
-            onSeeAll={() => console.log('View all leaderboard')} 
+            title="Classement des équipes"
+            onSeeAll={() => console.log('View all leaderboard')}
           />
         </div>
       </TabsContent>
