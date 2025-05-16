@@ -1,60 +1,60 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
+type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | 'unknown';
 
-interface UserModeContextType {
+interface UserModeContextValue {
   userMode: UserMode;
   setUserMode: (mode: UserMode) => void;
-  isLoading: boolean;
+  clearUserMode: () => void;
 }
 
-const UserModeContext = createContext<UserModeContextType | undefined>(undefined);
+const UserModeContext = createContext<UserModeContextValue>({
+  userMode: 'unknown',
+  setUserMode: () => {},
+  clearUserMode: () => {}
+});
 
-export const UserModeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserMode>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export const useUserMode = () => useContext(UserModeContext);
 
+interface UserModeProviderProps {
+  children: React.ReactNode;
+}
+
+export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
+  const [userMode, setUserModeState] = useState<UserMode>('unknown');
+  
   useEffect(() => {
-    // Check localStorage for saved user mode
-    const savedMode = localStorage.getItem('userMode') as UserMode | null;
-    
-    if (savedMode) {
-      setUserMode(savedMode);
-    } else {
-      // Default to no mode
-      setUserMode(null);
+    // Load user mode from localStorage on component mount
+    const storedMode = localStorage.getItem('userMode');
+    if (storedMode === 'b2c' || storedMode === 'b2b_user' || storedMode === 'b2b_admin') {
+      setUserModeState(storedMode);
     }
-    
-    setIsLoading(false);
   }, []);
-
-  const handleSetUserMode = (mode: UserMode) => {
-    setUserMode(mode);
-    if (mode) {
+  
+  const setUserMode = (mode: UserMode) => {
+    setUserModeState(mode);
+    if (mode !== 'unknown') {
       localStorage.setItem('userMode', mode);
     } else {
       localStorage.removeItem('userMode');
     }
   };
-
+  
+  const clearUserMode = () => {
+    setUserModeState('unknown');
+    localStorage.removeItem('userMode');
+  };
+  
   return (
-    <UserModeContext.Provider
-      value={{
-        userMode,
-        setUserMode: handleSetUserMode,
-        isLoading
-      }}
-    >
+    <UserModeContext.Provider value={{
+      userMode,
+      setUserMode,
+      clearUserMode
+    }}>
       {children}
     </UserModeContext.Provider>
   );
 };
 
-export const useUserMode = (): UserModeContextType => {
-  const context = useContext(UserModeContext);
-  if (context === undefined) {
-    throw new Error('useUserMode must be used within a UserModeProvider');
-  }
-  return context;
-};
+export default UserModeProvider;

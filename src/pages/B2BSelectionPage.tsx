@@ -5,21 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { User, Shield } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useUserMode } from '@/contexts/UserModeContext';
 import Shell from '@/Shell';
 
 const B2BSelectionPage = () => {
   const navigate = useNavigate();
-  const { setUserMode } = useUserMode();
 
   const handleUserAccess = () => {
-    setUserMode('b2b_user');
     localStorage.setItem('userMode', 'b2b_user');
     navigate('/b2b/user/login');
   };
 
   const handleAdminAccess = () => {
-    setUserMode('b2b_admin');
     localStorage.setItem('userMode', 'b2b_admin');
     navigate('/b2b/admin/login');
   };

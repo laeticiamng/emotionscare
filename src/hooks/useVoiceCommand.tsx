@@ -10,6 +10,7 @@ interface UseVoiceCommandProps {
 export const useVoiceCommand = ({ commands = {}, autoStart = false }: UseVoiceCommandProps = {}) => {
   const [isListening, setIsListening] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
+  const [transcript, setTranscript] = useState('');
   const { toast } = useToast();
 
   // Check if browser supports speech recognition
@@ -40,15 +41,22 @@ export const useVoiceCommand = ({ commands = {}, autoStart = false }: UseVoiceCo
       setIsListening(true);
       toast({
         title: 'Commandes vocales activées',
-        description: 'Je vous écoute...',
+        description: 'Je vous écoute...'
       });
       
       // In a real implementation, this would initialize the WebSpeech API
       // or integrate with Whisper API for voice recognition
       console.log('Voice recognition started');
       
-      // For demo purposes only - this simulates voice recognition
-      // In a real app, you'd connect to Whisper API here
+      // For demo purposes - simulate receiving a command after 3 seconds
+      setTimeout(() => {
+        const phrases = Object.keys(commands);
+        if (phrases.length > 0) {
+          const randomCommand = phrases[Math.floor(Math.random() * phrases.length)];
+          processCommand(randomCommand);
+        }
+      }, 3000);
+      
     } catch (error) {
       console.error('Error starting voice recognition:', error);
       toast({
@@ -58,7 +66,7 @@ export const useVoiceCommand = ({ commands = {}, autoStart = false }: UseVoiceCo
       });
       setIsListening(false);
     }
-  }, [isSupported, toast]);
+  }, [isSupported, toast, commands]);
 
   const stopListening = useCallback(() => {
     if (!isListening) return;
@@ -82,30 +90,44 @@ export const useVoiceCommand = ({ commands = {}, autoStart = false }: UseVoiceCo
     }
   }, [isListening, startListening, stopListening]);
 
-  // For simulation purposes - execute a command
-  const executeCommand = useCallback((command: string) => {
-    const normalizedCommand = command.toLowerCase().trim();
+  // Process received command
+  const processCommand = useCallback((command: string) => {
+    setTranscript(command);
     
-    for (const [key, callback] of Object.entries(commands)) {
-      if (normalizedCommand.includes(key.toLowerCase())) {
+    // Check if command matches any registered commands
+    let commandExecuted = false;
+    for (const [phrase, callback] of Object.entries(commands)) {
+      if (command.toLowerCase().includes(phrase.toLowerCase())) {
+        toast({
+          title: 'Commande reconnue',
+          description: `"${command}"`,
+        });
+        
+        // Execute the command
         callback();
-        return;
+        commandExecuted = true;
+        break;
       }
     }
     
-    toast({
-      title: 'Commande non reconnue',
-      description: `Désolé, je n'ai pas compris "${command}"`,
-    });
+    // If no command matched
+    if (!commandExecuted) {
+      toast({
+        title: 'Commande non reconnue',
+        description: `Désolé, je n'ai pas compris "${command}"`,
+      });
+    }
+    
+    setIsListening(false);
   }, [commands, toast]);
 
   return {
     isListening,
     isSupported,
+    transcript,
     startListening,
     stopListening,
-    toggleListening,
-    executeCommand,
+    toggleListening
   };
 };
 

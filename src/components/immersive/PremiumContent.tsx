@@ -1,82 +1,95 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
-import PremiumOptionCard from './PremiumOptionCard';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { User, Building, ArrowRight } from 'lucide-react';
+import { MusicPlayer } from '@/components/audio/MusicPlayer';
 
 interface PremiumContentProps {
   greeting: string;
 }
 
 const PremiumContent: React.FC<PremiumContentProps> = ({ greeting }) => {
+  const navigate = useNavigate();
+  
+  const handleB2CNavigation = () => {
+    // Add haptic feedback on mobile if supported
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+    navigate('/b2c/login');
+  };
+  
+  const handleB2BNavigation = () => {
+    // Add haptic feedback on mobile if supported
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+    navigate('/b2b/selection');
+  };
+  
   return (
     <div className="premium-content">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
+      <motion.div 
         className="premium-header"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        <motion.h1 
-          className="premium-title"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-        >
-          EmotionsCare
-        </motion.h1>
-        <motion.p 
-          className="premium-subtitle"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-        >
-          {greeting}, votre espace de bien-être émotionnel
-        </motion.p>
+        <h1 className="premium-title">EmotionsCare</h1>
+        <p className="premium-subtitle">{greeting}</p>
       </motion.div>
-
+      
       <motion.div 
         className="premium-options"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 0.8 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
       >
-        <AnimatePresence>
-          <PremiumOptionCard
-            key="option-personal"
-            title="Espace Particulier"
-            description="Accédez à votre espace personnel pour explorer vos émotions, gérer votre journal et suivre votre progression."
-            icon={Sparkles}
-            linkTo="/home"
-            buttonText="Accéder à mon espace"
-            delay={1}
-            initialX={-40}
-          />
-
-          <PremiumOptionCard
-            key="option-business"
-            title="Espace Entreprise"
-            description="Solutions de bien-être professionnel pour les collaborateurs et outils d'analyse pour les responsables RH."
-            icon={Sparkles}
-            linkTo="/home"
-            buttonText="Accéder à l'espace pro"
-            buttonVariant="secondary"
-            delay={1.1}
-            initialX={40}
-          />
-        </AnimatePresence>
+        <motion.div
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          className="flex justify-center"
+        >
+          <Button 
+            size="lg" 
+            className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl flex items-center justify-center gap-2 min-w-[240px]"
+            onClick={handleB2CNavigation}
+          >
+            <User className="mr-2" />
+            Je suis un particulier
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </motion.div>
+        
+        <motion.div
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+          className="flex justify-center"
+        >
+          <Button 
+            variant="outline" 
+            size="lg" 
+            className="border-primary/20 bg-background/50 backdrop-blur hover:bg-primary/10 dark:hover:bg-primary/20 px-8 py-6 text-lg rounded-2xl shadow-md hover:shadow-lg flex items-center justify-center gap-2 min-w-[240px]"
+            onClick={handleB2BNavigation}
+          >
+            <Building className="mr-2" />
+            Je suis une entreprise
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        </motion.div>
       </motion.div>
-
+      
       <motion.div 
-        className="premium-footer"
+        className="premium-footer mt-12"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1.5 }}
+        transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
       >
-        <p className="text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} EmotionsCare • <Link to="/" className="hover:underline">Confidentialité</Link> • <Link to="/" className="hover:underline">Conditions d'utilisation</Link>
-        </p>
+        <MusicPlayer minimal={true} />
       </motion.div>
     </div>
   );

@@ -1,12 +1,15 @@
 
 import React, { useEffect } from 'react';
 import { ThemeProvider } from '@/contexts/ThemeContext';
-import { MusicProvider } from '@/contexts/music';
+import { MusicProvider } from '@/contexts/MusicContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SidebarProvider } from '@/contexts/SidebarContext';
+import { UserModeProvider } from '@/contexts/UserModeContext';
+import { UserPreferencesProvider } from '@/contexts/UserPreferencesContext';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 import { LayoutProvider } from '@/contexts/LayoutContext';
+import { Toaster } from '@/components/ui/toaster';
 
 const AppRouter: React.FC = () => {
   console.log('📋 AppRouter: Initialisation du routeur');
@@ -19,13 +22,18 @@ const AppRouter: React.FC = () => {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <LayoutProvider>
-          <SidebarProvider>
-            <MusicProvider>
-              <RouterProvider router={router} />
-            </MusicProvider>
-          </SidebarProvider>
-        </LayoutProvider>
+        <UserPreferencesProvider>
+          <UserModeProvider>
+            <LayoutProvider>
+              <SidebarProvider>
+                <MusicProvider>
+                  <RouterProvider router={router} />
+                  <Toaster />
+                </MusicProvider>
+              </SidebarProvider>
+            </LayoutProvider>
+          </UserModeProvider>
+        </UserPreferencesProvider>
       </ThemeProvider>
     </AuthProvider>
   );

@@ -39,15 +39,15 @@ export interface UserPreferences {
   colorBlindMode: boolean;
   autoplayMedia: boolean;
   sound: SoundPreference | boolean;
-  fullAnonymity?: boolean;
   ambientSound?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
   displayName?: string;
   pronouns?: string;
   biography?: string;
   avatarUrl?: string;
   onboarded?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
   privacy?: {
     shareData: boolean;
     anonymizeReports?: boolean;

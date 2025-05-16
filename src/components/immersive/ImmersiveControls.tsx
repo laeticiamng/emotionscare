@@ -1,17 +1,16 @@
 
-import React from 'react';
+import React, { MutableRefObject } from 'react';
 import { Button } from '@/components/ui/button';
-import { MicIcon, Speaker, VolumeX } from 'lucide-react';
-import { useTheme } from '@/components/theme/ThemeProvider';
-import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { Mic, MicOff, Volume2, VolumeX, Moon, Sun, Laptop } from 'lucide-react';
+import { useTheme } from '@/hooks/use-theme';
+import { useVoiceCommand } from '@/hooks/useVoiceCommand';
 
 interface ImmersiveControlsProps {
   isListening: boolean;
-  setIsListening: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsListening: (listening: boolean) => void;
   audioEnabled: boolean;
-  setAudioEnabled: React.Dispatch<React.SetStateAction<boolean>>;
-  audioRef: React.RefObject<HTMLAudioElement>;
+  setAudioEnabled: (enabled: boolean) => void;
+  audioRef: MutableRefObject<HTMLAudioElement | null>;
 }
 
 const ImmersiveControls: React.FC<ImmersiveControlsProps> = ({
@@ -22,96 +21,69 @@ const ImmersiveControls: React.FC<ImmersiveControlsProps> = ({
   audioRef
 }) => {
   const { theme, setTheme } = useTheme();
-  const { toast } = useToast();
-  const navigate = useNavigate();
-
-  const toggleVoiceRecognition = () => {
-    if (isListening) {
-      setIsListening(false);
-      toast({
-        title: "Information",
-        description: "Nous n'écoutons plus",
-      });
-    } else {
-      setIsListening(true);
-      toast({
-        title: "Information",
-        description: "Dites 'Particulier' ou 'Entreprise' pour naviguer",
-      });
-      
-      // Simulate voice recognition
-      setTimeout(() => {
-        setIsListening(false);
-        toast({
-          title: "Redirection",
-          description: "Redirection vers votre espace...",
-        });
-        setTimeout(() => navigate('/home'), 1500);
-      }, 3000);
-    }
-  };
-
-  const toggleAudio = () => {
-    setAudioEnabled(prev => !prev);
-    
+  const { toggleListening } = useVoiceCommand();
+  
+  const handleToggleAudio = () => {
     if (audioRef.current) {
       if (audioEnabled) {
         audioRef.current.pause();
-        toast({
-          title: "Audio",
-          description: "Ambiance musicale coupée",
-        });
       } else {
-        audioRef.current.play().catch(e => console.error("Audio playback error:", e));
-        toast({
-          title: "Audio",
-          description: "Ambiance musicale activée",
+        audioRef.current.play().catch(error => {
+          console.log("Audio play failed:", error);
         });
       }
+      setAudioEnabled(!audioEnabled);
     }
   };
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+  
+  const handleToggleVoice = () => {
+    setIsListening(!isListening);
+    toggleListening();
+  };
+  
+  const handleToggleTheme = () => {
+    if (theme === 'light') setTheme('dark');
+    else if (theme === 'dark') setTheme('pastel');
+    else setTheme('light');
+  };
+  
+  const getThemeIcon = () => {
+    if (theme === 'light') return <Sun size={16} />;
+    if (theme === 'dark') return <Moon size={16} />;
+    return <Laptop size={16} />;
   };
 
   return (
     <div className="controls-container">
       <div className="control-group">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           size="icon"
-          onClick={toggleVoiceRecognition}
+          className={`control-button ${audioEnabled ? 'active-control' : ''}`}
+          onClick={handleToggleAudio}
+          title={audioEnabled ? "Désactiver la musique" : "Activer la musique"}
+        >
+          {audioEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+        </Button>
+        
+        <Button
+          variant="ghost"
+          size="icon"
           className={`control-button ${isListening ? 'active-control' : ''}`}
+          onClick={handleToggleVoice}
+          title={isListening ? "Désactiver les commandes vocales" : "Activer les commandes vocales"}
         >
-          <MicIcon className={`h-5 w-5 ${isListening ? 'text-blue-500' : 'text-blue-300'}`} />
-          <span className="sr-only">Commandes vocales</span>
+          {isListening ? <MicOff size={16} /> : <Mic size={16} />}
         </Button>
         
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           size="icon"
-          onClick={toggleAudio}
           className="control-button"
+          onClick={handleToggleTheme}
+          title="Changer le thème"
         >
-          {audioEnabled ? (
-            <Speaker className="h-5 w-5 text-blue-300" />
-          ) : (
-            <VolumeX className="h-5 w-5 text-blue-300" />
-          )}
-          <span className="sr-only">Audio</span>
-        </Button>
-        
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={toggleTheme}
-          className="control-button"
-        >
-          <span className="h-5 w-5 text-blue-300">
-            {theme === 'dark' ? '☀️' : '🌙'}
-          </span>
-          <span className="sr-only">Theme</span>
+          {getThemeIcon()}
         </Button>
       </div>
     </div>
