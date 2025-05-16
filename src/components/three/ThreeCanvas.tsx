@@ -55,7 +55,6 @@ const ThreeCanvas: React.FC = () => {
     
     const colors = getColorScheme();
     scene.background = new THREE.Color(colors.background);
-    scene.background.setAlpha(0.5); // Semi-transparent background
     
     // Ambient light
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -146,7 +145,7 @@ const ThreeCanvas: React.FC = () => {
       blob.rotation.z += 0.002;
       
       // Add subtle waves to blob shape
-      const blobVertices = (blobGeometry as THREE.BufferGeometry).attributes.position as THREE.BufferAttribute;
+      const blobVertices = blobGeometry.attributes.position as THREE.BufferAttribute;
       const initialPositions = Array.from({ length: blobVertices.count * 3 }, (_, i) => {
         if (i % 3 === 0) return 2 * Math.sin(i / 3 * Math.PI / 16);
         if (i % 3 === 1) return 2 * Math.cos(i / 3 * Math.PI / 16);
