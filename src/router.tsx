@@ -29,6 +29,8 @@ import B2CVR from '@/pages/b2c/VR';
 import B2CGamification from '@/pages/b2c/Gamification';
 import B2CPreferences from '@/pages/b2c/Preferences';
 import B2CCocon from '@/pages/b2c/Cocon';
+import CoachPage from '@/pages/CoachPage';
+import CoachChatPage from '@/pages/CoachChatPage';
 
 // B2B User pages
 import B2BUserLogin from '@/pages/b2b/user/Login';
@@ -71,6 +73,16 @@ export const router = createBrowserRouter([
     path: '/unauthorized',
     element: <Unauthorized />,
   },
+  
+  // Coach Routes (accessible to all users)
+  {
+    path: '/coach',
+    element: <CoachPage />
+  },
+  {
+    path: '/coach-chat',
+    element: <CoachChatPage />
+  },
 
   // B2C Routes
   { 
@@ -83,7 +95,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/b2c',
-    element: <ProtectedRoute role="b2c" redirectTo="/b2c/login"><B2CLayout /></ProtectedRoute>,
+    element: <ProtectedRoute requiredRole="b2c" redirectTo="/b2c/login"><B2CLayout /></ProtectedRoute>,
     children: [
       { 
         index: true,
@@ -147,7 +159,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/b2b/user',
-    element: <ProtectedRoute role="b2b_user" redirectTo="/b2b/user/login"><B2BUserLayout /></ProtectedRoute>,
+    element: <ProtectedRoute requiredRole="b2b_user" redirectTo="/b2b/user/login"><B2BUserLayout /></ProtectedRoute>,
     children: [
       { 
         index: true,
@@ -207,7 +219,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/b2b/admin',
-    element: <ProtectedRoute role="b2b_admin" redirectTo="/b2b/admin/login"><B2BAdminLayout /></ProtectedRoute>,
+    element: <ProtectedRoute requiredRole="b2b_admin" redirectTo="/b2b/admin/login"><B2BAdminLayout /></ProtectedRoute>,
     children: [
       { 
         index: true,

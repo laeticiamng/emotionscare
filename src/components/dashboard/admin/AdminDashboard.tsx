@@ -1,106 +1,117 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Layers, Settings } from 'lucide-react';
-import { TeamOverviewTab, TeamDetailTab, SettingsTab } from './AdminTabContents';
-import { DraggableCardProps } from './draggable/types';
+import { 
+  BarChart3, 
+  Users, 
+  Clock, 
+  Calendar, 
+  TrendingUp, 
+  Heart, 
+  Activity 
+} from 'lucide-react';
+import { DraggableCardProps } from '@/types/widgets';
+import DraggableKpiCardsGrid from './draggable/DraggableKpiCardsGrid';
+import { AdminTabContents } from './AdminTabContents';
+import { Button } from '@/components/ui/button';
 
 const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  
-  // Sample KPI cards data
+  // KPI Card data
   const kpiCards: DraggableCardProps[] = [
     {
-      id: 'users',
+      id: 'activeUsers',
       title: 'Utilisateurs actifs',
-      value: '1,204',
-      icon: Users,
+      value: '1,234',
+      icon: <Users className="h-4 w-4" />,
       delta: {
         value: 12,
         trend: 'up',
-        label: 'vs mois dernier'
+        label: 'vs last week'
       },
-      subtitle: '85% taux d\'engagement',
+      subtitle: 'Utilisateurs uniques',
       status: 'success'
     },
     {
-      id: 'sessions',
-      title: 'Sessions journalières',
-      value: '348',
-      icon: Layers,
+      id: 'totalSessions',
+      title: 'Sessions totales',
+      value: '5,678',
+      icon: <Calendar className="h-4 w-4" />,
       delta: {
         value: 8,
-        trend: 'up',
-        label: 'vs semaine dernière'
-      },
-      subtitle: '24 min temps moyen',
-      status: 'info'
+        trend: 'up'
+      }
     },
     {
-      id: 'emotions',
-      title: 'Bien-être collectif',
-      value: '76%',
-      icon: Settings,
+      id: 'avgDuration',
+      title: 'Durée moyenne',
+      value: '12:34',
+      icon: <Clock className="h-4 w-4" />,
+      delta: {
+        value: 3,
+        trend: 'down'
+      },
+      status: 'warning'
+    },
+    {
+      id: 'completionRate',
+      title: 'Taux de complétion',
+      value: '87%',
+      icon: <BarChart3 className="h-4 w-4" />,
       delta: {
         value: 5,
-        trend: 'up',
-        label: 'vs semaine dernière'
+        trend: 'up'
+      }
+    },
+    {
+      id: 'weeklyTrend',
+      title: 'Tendance hebdo',
+      value: '+23%',
+      icon: <TrendingUp className="h-4 w-4" />,
+      delta: {
+        value: 15,
+        trend: 'up'
       },
-      subtitle: 'Basé sur 950 analyses',
       status: 'success'
     },
     {
-      id: 'retention',
-      title: 'Rétention mensuelle',
-      value: '92%',
-      icon: Users,
+      id: 'emotionalBalance',
+      title: 'Score émotionnel',
+      value: '72/100',
+      icon: <Heart className="h-4 w-4" />,
       delta: {
-        value: 2,
-        trend: 'up',
-        label: 'vs mois dernier'
-      },
-      subtitle: 'Objectif: 95%',
-      status: 'warning'
+        value: 4,
+        trend: 'up'
+      }
     }
   ];
-  
+
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold mb-6">Tableau de bord administrateur</h1>
-      
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="overview" className="flex items-center gap-2">
-                <Layers className="h-4 w-4" />
-                <span>Vue d'ensemble</span>
-              </TabsTrigger>
-              <TabsTrigger value="teams" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                <span>Équipes</span>
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                <span>Paramètres</span>
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="overview">
-              <TeamOverviewTab kpiCards={kpiCards} />
-            </TabsContent>
-            
-            <TabsContent value="teams">
-              <TeamDetailTab />
-            </TabsContent>
-            
-            <TabsContent value="settings">
-              <SettingsTab />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+    <div className="container mx-auto py-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Dashboard Admin</h1>
+        <div className="flex gap-2">
+          <Button variant="outline">Télécharger rapport</Button>
+          <Button>Nouvelle notification</Button>
+        </div>
+      </div>
+
+      {/* KPI Cards Section */}
+      <section className="mb-8">
+        <DraggableKpiCardsGrid kpiCards={kpiCards} />
+      </section>
+
+      {/* Tabs Section */}
+      <Tabs defaultValue="global" className="space-y-4">
+        <TabsList className="grid grid-cols-4 mb-4">
+          <TabsTrigger value="global">Vue globale</TabsTrigger>
+          <TabsTrigger value="emotions">Émotions</TabsTrigger>
+          <TabsTrigger value="activity">Activité</TabsTrigger>
+          <TabsTrigger value="teams">Équipes</TabsTrigger>
+        </TabsList>
+        
+        <AdminTabContents />
+      </Tabs>
     </div>
   );
 };

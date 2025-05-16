@@ -6,13 +6,15 @@ import { hasRoleAccess, getRoleLoginPath } from '@/utils/roleUtils';
 import { UserRole } from '@/types/user';
 
 interface ProtectedRouteProps {
-  requiredRole?: UserRole;
   children: React.ReactNode;
+  requiredRole?: UserRole;
+  redirectTo?: string;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  requiredRole = 'user', 
-  children
+  children,
+  requiredRole = 'user',
+  redirectTo
 }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
@@ -24,7 +26,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // If not authenticated, redirect to login
   if (!isAuthenticated) {
-    return <Navigate to={getRoleLoginPath(requiredRole)} state={{ from: location }} replace />;
+    return <Navigate to={redirectTo || getRoleLoginPath(requiredRole)} state={{ from: location }} replace />;
   }
 
   // Check if the user has the required role

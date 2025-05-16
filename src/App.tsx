@@ -29,7 +29,7 @@ function App() {
       <Route path="/b2c/login" element={<B2CLogin />} />
       <Route path="/b2c/register" element={<B2CRegister />} />
       <Route path="/b2c" element={
-        <ProtectedRoute role="b2c" redirectTo="/b2c/login">
+        <ProtectedRoute requiredRole="b2c" redirectTo="/b2c/login">
           <B2CLayout />
         </ProtectedRoute>
       }>

@@ -1,179 +1,186 @@
 
-import { useState, useCallback, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { ChatConversation, ChatMessage } from '@/types/chat';
-import { toast } from '@/hooks/use-toast';
-import { v4 as uuidv4 } from 'uuid';
+import { useState, useEffect } from 'react';
+import { ChatMessage } from '@/types';
+import { useToast } from '@/hooks/use-toast';
 
-/**
- * Hook pour gérer l'historique des conversations de chat
- */
-export function useChatHistory() {
-  const { user } = useAuth();
-  const [conversations, setConversations] = useState<ChatConversation[]>([]);
+export interface Conversation {
+  id: string;
+  title: string;
+  lastMessage?: string;
+  lastMessageTimestamp?: string;
+  messages?: ChatMessage[];
+}
+
+export const useChatHistory = () => {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
+  const { toast } = useToast();
 
-  // Charger les conversations
+  // Load conversations on mount
   useEffect(() => {
-    const loadConversations = async () => {
-      if (!user?.id) return;
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-        const { data, error } = await supabase
-          .from('chat_conversations')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('updated_at', { ascending: false });
-        
-        if (error) throw error;
-        
-        setConversations(data || []);
-        
-        // Si aucune conversation active n'est sélectionnée, prendre la première
-        if (!activeConversationId && data && data.length > 0) {
-          setActiveConversationId(data[0].id);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Erreur lors du chargement des conversations'));
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger vos conversations",
-          variant: "destructive"
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
     loadConversations();
-  }, [user?.id]);
+  }, []);
 
-  // Créer une nouvelle conversation
-  const createConversation = useCallback(async (title?: string) => {
-    if (!user?.id) return null;
-    
-    try {
-      const newConversation: Partial<ChatConversation> = {
-        id: uuidv4(),
-        user_id: user.id,
-        title: title || "Nouvelle conversation",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      
-      const { error } = await supabase
-        .from('chat_conversations')
-        .insert(newConversation);
-      
-      if (error) throw error;
-      
-      const created = newConversation as ChatConversation;
-      setConversations(prev => [created, ...prev]);
-      setActiveConversationId(created.id);
-      return created;
-    } catch (err) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer une nouvelle conversation",
-        variant: "destructive"
-      });
-      return null;
-    }
-  }, [user?.id]);
-
-  // Supprimer une conversation
-  const deleteConversation = useCallback(async (conversationId: string) => {
-    try {
-      const { error } = await supabase
-        .from('chat_conversations')
-        .delete()
-        .eq('id', conversationId);
-      
-      if (error) throw error;
-      
-      setConversations(prev => prev.filter(c => c.id !== conversationId));
-      
-      if (activeConversationId === conversationId) {
-        const remainingConversations = conversations.filter(c => c.id !== conversationId);
-        setActiveConversationId(remainingConversations.length > 0 ? remainingConversations[0].id : null);
-      }
-      
-      toast({
-        title: "Supprimé",
-        description: "Conversation supprimée avec succès"
-      });
-    } catch (err) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la conversation",
-        variant: "destructive"
-      });
-    }
-  }, [activeConversationId, conversations]);
-
-  // Charger les messages d'une conversation
-  const loadMessages = useCallback(async (conversationId: string) => {
+  // Load all conversations
+  const loadConversations = async () => {
     setIsLoading(true);
+    setError(null);
     
     try {
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .eq('conversation_id', conversationId)
-        .order('timestamp', { ascending: true });
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      if (error) throw error;
+      // Mock data
+      const mockConversations: Conversation[] = [
+        {
+          id: 'conv-1',
+          title: 'Gestion du stress',
+          lastMessage: 'Voici quelques techniques de respiration pour vous aider.',
+          lastMessageTimestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+        {
+          id: 'conv-2',
+          title: 'Amélioration du sommeil',
+          lastMessage: 'N\'hésitez pas à essayer cette méditation avant de dormir.',
+          lastMessageTimestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+        }
+      ];
       
+      setConversations(mockConversations);
+    } catch (error) {
+      console.error('Error loading conversations:', error);
+      setError(error instanceof Error ? error : new Error('Failed to load conversations'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load messages for a specific conversation
+  const loadMessages = async (conversationId: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 700));
+      
+      // Mock data
+      const mockMessages: ChatMessage[] = [
+        {
+          id: `${conversationId}-msg-1`,
+          text: 'Bonjour, comment puis-je vous aider aujourd\'hui ?',
+          content: 'Bonjour, comment puis-je vous aider aujourd\'hui ?',
+          sender: 'bot',
+          role: 'assistant',
+          timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+          conversation_id: conversationId
+        },
+        {
+          id: `${conversationId}-msg-2`,
+          text: 'J\'ai du mal à gérer mon stress au travail.',
+          content: 'J\'ai du mal à gérer mon stress au travail.',
+          sender: 'user',
+          role: 'user',
+          timestamp: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
+          conversation_id: conversationId
+        },
+        {
+          id: `${conversationId}-msg-3`,
+          text: 'Je comprends. Le stress au travail est très courant. Pouvez-vous me décrire plus précisément ce qui génère ce stress ?',
+          content: 'Je comprends. Le stress au travail est très courant. Pouvez-vous me décrire plus précisément ce qui génère ce stress ?',
+          sender: 'bot',
+          role: 'assistant',
+          timestamp: new Date(Date.now() - 7 * 60 * 1000).toISOString(),
+          conversation_id: conversationId
+        }
+      ];
+      
+      // Update active conversation
       setActiveConversationId(conversationId);
-      return data as ChatMessage[];
-    } catch (err) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les messages",
-        variant: "destructive"
-      });
+      
+      return mockMessages;
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      setError(error instanceof Error ? error : new Error('Failed to load messages'));
       return [];
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
-  // Mise à jour du titre de conversation
-  const updateConversationTitle = useCallback(async (conversationId: string, newTitle: string) => {
+  // Create new conversation
+  const createConversation = async (title: string) => {
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      const { error } = await supabase
-        .from('chat_conversations')
-        .update({ title: newTitle, updated_at: new Date().toISOString() })
-        .eq('id', conversationId);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      if (error) throw error;
+      const newConversation: Conversation = {
+        id: `conv-${Date.now()}`,
+        title,
+        lastMessageTimestamp: new Date().toISOString()
+      };
       
-      setConversations(prev => 
-        prev.map(conv => conv.id === conversationId ? { ...conv, title: newTitle } : conv)
-      );
-    } catch (err) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le titre",
-        variant: "destructive"
-      });
+      setConversations(prev => [newConversation, ...prev]);
+      setActiveConversationId(newConversation.id);
+      
+      return newConversation;
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      setError(error instanceof Error ? error : new Error('Failed to create conversation'));
+      throw error;
+    } finally {
+      setIsLoading(false);
     }
-  }, []);
+  };
+
+  // Delete conversation
+  const deleteConversation = async (conversationId: string) => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+      
+      // Reset active conversation if deleted
+      if (activeConversationId === conversationId) {
+        setActiveConversationId(null);
+      }
+      
+      toast({
+        title: 'Conversation supprimée',
+        description: 'La conversation a bien été supprimée.'
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de supprimer la conversation.',
+        variant: 'destructive'
+      });
+      
+      return false;
+    }
+  };
 
   return {
     conversations,
     activeConversationId,
+    setActiveConversationId,
     isLoading,
     error,
-    createConversation,
-    deleteConversation,
+    loadConversations,
     loadMessages,
-    setActiveConversationId,
-    updateConversationTitle
+    createConversation,
+    deleteConversation
   };
-}
+};
+
+export default useChatHistory;

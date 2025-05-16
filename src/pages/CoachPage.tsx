@@ -1,12 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useCoach } from '@/hooks/coach/useCoach';
+import { useCoach } from '@/contexts/CoachContext';
 import { ArrowRight, MessageSquare, ScrollText, Zap, Book, Music, Calendar } from 'lucide-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import CoachPresence from '@/components/coach/CoachPresence';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -37,11 +37,11 @@ const CoachPageContent = () => {
   }, [generateRecommendation]);
   
   const handleStartChat = () => {
-    navigate('/coach/chat');
+    navigate('/coach-chat');
   };
   
   const handleAskQuestion = (question: string) => {
-    navigate('/coach/chat', { state: { initialQuestion: question } });
+    navigate('/coach-chat', { state: { initialQuestion: question } });
   };
   
   // Predefined questions for quick access
@@ -84,7 +84,23 @@ const CoachPageContent = () => {
         {/* Enhanced Coach Presence */}
         <Card className="border shadow-lg mb-12">
           <CardContent className="p-0 overflow-hidden">
-            <CoachPresence className="min-h-[400px]" />
+            <div className="min-h-[400px] flex items-center justify-center bg-gradient-to-b from-primary/5 to-background p-8">
+              <div className="text-center">
+                <div className="relative mb-8">
+                  <div className="absolute -inset-4 rounded-full bg-primary/20 blur-xl animate-pulse"></div>
+                  <div className="relative z-10 h-32 w-32 mx-auto rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-xl">
+                    <Zap className="h-16 w-16 text-primary-foreground" />
+                  </div>
+                </div>
+                
+                <h2 className="text-2xl font-medium mb-3">Bonjour{firstName ? `, ${firstName}` : ''}</h2>
+                <p className="text-lg mb-6 max-w-md mx-auto">Comment puis-je vous accompagner aujourd'hui dans votre bien-être émotionnel ?</p>
+                
+                <Button size="lg" onClick={handleStartChat} className="animate-subtle-bounce">
+                  Commencer une conversation
+                </Button>
+              </div>
+            </div>
           </CardContent>
         </Card>
         
@@ -167,7 +183,7 @@ const CoachPageContent = () => {
                     <>
                       <div className="bg-muted/30 p-4 rounded-lg mb-4">
                         <p className="text-sm">
-                          {recommendations[0] || "Prenez quelques minutes pour vous aujourd'hui et pratiquez la respiration profonde."}
+                          {recommendations && recommendations.length > 0 ? recommendations[0]?.title || "Prenez quelques minutes pour vous aujourd'hui et pratiquez la respiration profonde." : "Prenez quelques minutes pour vous aujourd'hui et pratiquez la respiration profonde."}
                         </p>
                       </div>
                       <Button variant="link" className="p-0" onClick={() => navigate('/coach/recommendations')}>

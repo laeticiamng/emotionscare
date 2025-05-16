@@ -1,89 +1,97 @@
 
 import React from 'react';
-import { Badge as BadgeType } from '@/types/gamification';
-import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
-import { BadgesWidgetProps } from '@/types/widgets';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronRight, ShieldCheck } from "lucide-react";
+import { Badge } from "@/types/gamification";
+import { BadgesWidgetProps } from "@/types/widgets";
+import { cn } from "@/lib/utils";
 
-const BadgesWidget: React.FC<BadgesWidgetProps> = ({ 
+const BadgesWidget: React.FC<BadgesWidgetProps> = ({
   badges,
-  title = "Vos badges",
-  showSeeAll = false,
-  onSeeAll
+  title = "Badges",
+  showSeeAll = true,
+  onSeeAll,
 }) => {
-  if (!badges || badges.length === 0) {
-    return (
-      <div className="text-center py-6 text-muted-foreground">
-        Aucun badge débloqué pour le moment
-      </div>
-    );
-  }
-  
-  // Sort badges: unlocked first, then by level
+  // Sort badges: first completed and unlocked, then completed but locked, then incomplete
   const sortedBadges = [...badges].sort((a, b) => {
-    // First sort by completion status
-    if ((a.completed || a.unlocked) && !(b.completed || b.unlocked)) return -1;
-    if (!(a.completed || a.unlocked) && (b.completed || b.unlocked)) return 1;
-    
-    // Then sort by level if both have same completion status
-    const levelA = a.level || 0;
-    const levelB = b.level || 0;
-    return levelB - levelA;
+    if ((a.completed && a.unlockedAt) && !(b.completed && b.unlockedAt)) return -1;
+    if (!(a.completed && a.unlockedAt) && (b.completed && b.unlockedAt)) return 1;
+    if ((a.completed && !a.unlockedAt) && !b.completed) return -1;
+    if (!a.completed && (b.completed && !b.unlockedAt)) return 1;
+    return 0;
   });
+
+  // Calculate badges progress
+  const completedBadges = badges.filter(badge => badge.completed || badge.unlockedAt).length;
+  const totalBadges = badges.length;
+  const progress = Math.round((completedBadges / totalBadges) * 100);
   
+  // Display only the first 3 badges
+  const displayBadges = sortedBadges.slice(0, 3);
+
   return (
-    <div className="space-y-4">
-      {sortedBadges.slice(0, 3).map((badge) => (
-        <div 
-          key={badge.id}
-          className={`flex items-start p-2 rounded-lg ${
-            badge.completed || badge.unlocked ? 'bg-primary/5' : 'bg-muted/50'
-          }`}
-        >
-          <div className={`w-10 h-10 rounded-lg ${badge.completed || badge.unlocked ? 'bg-primary/20' : 'bg-muted'} flex items-center justify-center mr-3`}>
-            <span className="text-lg">{badge.icon}</span>
-          </div>
-          
-          <div>
-            <div className="flex items-center">
-              <h3 className="font-medium">
-                {badge.name}
-              </h3>
-              {badge.level && (
-                <span className="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">
-                  Niv. {badge.level}
-                </span>
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle>{title}</CardTitle>
+          {showSeeAll && (
+            <Button variant="ghost" size="sm" onClick={onSeeAll}>
+              Voir tout
+            </Button>
+          )}
+        </div>
+        <CardDescription>
+          {completedBadges} sur {totalBadges} badges débloqués
+        </CardDescription>
+        {/* Progress bar */}
+        <div className="w-full bg-muted rounded-full h-2 mt-2">
+          <div
+            className="bg-primary h-2 rounded-full"
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+      </CardHeader>
+      <CardContent className="grid grid-cols-3 gap-3">
+        {displayBadges.map((badge) => (
+          <div
+            key={badge.id}
+            className={cn(
+              "flex flex-col items-center text-center p-2 rounded-lg",
+              badge.completed || badge.unlockedAt
+                ? "text-foreground"
+                : "text-muted-foreground"
+            )}
+          >
+            <div className="relative mb-1">
+              <div
+                className={cn(
+                  "h-12 w-12 rounded-full flex items-center justify-center",
+                  badge.completed || badge.unlockedAt
+                    ? "bg-primary/20"
+                    : "bg-muted"
+                )}
+              >
+                <ShieldCheck
+                  className={cn(
+                    "h-6 w-6",
+                    badge.completed || badge.unlockedAt
+                      ? "text-primary"
+                      : "text-muted-foreground/60"
+                  )}
+                />
+              </div>
+              {(badge.completed || badge.unlockedAt) && (
+                <div className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs">
+                  ✓
+                </div>
               )}
             </div>
-            
-            <p className="text-xs text-muted-foreground">{badge.description}</p>
-            
-            {!(badge.completed || badge.unlocked) && badge.progress !== undefined && (
-              <div className="mt-1 flex items-center">
-                <div className="w-full bg-muted h-1.5 rounded-full">
-                  <div 
-                    className="bg-primary h-1.5 rounded-full"
-                    style={{ width: `${badge.progress}%` }}
-                  ></div>
-                </div>
-                <span className="ml-2 text-xs text-muted-foreground">{badge.progress}%</span>
-              </div>
-            )}
+            <div className="text-xs font-medium mt-1 line-clamp-1">{badge.name}</div>
           </div>
-        </div>
-      ))}
-      
-      {showSeeAll && badges.length > 3 && (
-        <Button 
-          variant="ghost" 
-          className="w-full justify-between"
-          onClick={onSeeAll}
-        >
-          Voir tous vos badges
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      )}
-    </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 };
 

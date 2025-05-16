@@ -1,26 +1,21 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Sparkles } from 'lucide-react';
-
-interface DailyInsightCardProps {
-  message?: string;
-}
+import { Lightbulb } from 'lucide-react';
+import { DailyInsightCardProps } from '@/types/widgets';
 
 const DailyInsightCard: React.FC<DailyInsightCardProps> = ({ 
-  message = "Prendre du temps pour soi n'est pas un luxe, c'est une nécessité pour votre équilibre émotionnel et mental. Aujourd'hui, essayez de consacrer au moins 15 minutes à une activité qui vous fait du bien."
+  message = "Prenez un moment pour vous aujourd'hui et pratiquez la respiration profonde."
 }) => {
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-start">
-          <div className="bg-primary/10 p-2 rounded-full mr-3">
-            <Sparkles className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h3 className="text-lg font-medium mb-1">Réflexion du jour</h3>
-            <p className="text-muted-foreground text-sm">{message}</p>
-          </div>
+    <Card className="bg-gradient-to-r from-primary/10 to-primary/5">
+      <CardContent className="p-4 flex items-start gap-4">
+        <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+          <Lightbulb className="h-5 w-5 text-primary" />
+        </div>
+        <div>
+          <h2 className="text-sm font-medium mb-1">Conseil du jour</h2>
+          <p className="text-sm text-muted-foreground">{message}</p>
         </div>
       </CardContent>
     </Card>

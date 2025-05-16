@@ -1,92 +1,131 @@
 
-import React from 'react';
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
-import DraggableCard from './DraggableCard';
+import React, { useState } from 'react';
+import { GridLayout, Layout } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+import { Card, CardContent } from '@/components/ui/card';
+import { DraggableCardProps, DraggableKpiCardsGridProps } from '@/types/widgets';
+import { DraggableCard } from './DraggableCard';
+import { ReactNode } from 'react';
+import { 
+  BarChart3, 
+  Users, 
+  Clock, 
+  Calendar, 
+  TrendingUp, 
+  Heart, 
+  Activity 
+} from 'lucide-react';
 
-export interface DraggableCardProps {
-  id: string;
-  title: string;
-  value: string | number;
-  icon?: React.ReactNode;
-  change?: {
-    value: number;
-    trend: 'up' | 'down' | 'neutral';
+const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ kpiCards }) => {
+  // Default layout for the KPI cards
+  const [layouts, setLayouts] = useState<Layout[]>([
+    { i: 'activeUsers', x: 0, y: 0, w: 1, h: 1 },
+    { i: 'totalSessions', x: 1, y: 0, w: 1, h: 1 },
+    { i: 'avgDuration', x: 2, y: 0, w: 1, h: 1 },
+    { i: 'completionRate', x: 3, y: 0, w: 1, h: 1 },
+    { i: 'weeklyTrend', x: 0, y: 1, w: 2, h: 1 },
+    { i: 'emotionalBalance', x: 2, y: 1, w: 2, h: 1 },
+  ]);
+
+  // Handle layout change
+  const handleLayoutChange = (newLayout: Layout[]) => {
+    setLayouts(newLayout);
+    // You can save the layout to user preferences here
   };
-  description?: string;
-  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
-  status?: 'positive' | 'negative' | 'neutral';
-}
-
-interface DraggableKpiCardsGridProps {
-  kpiCards: DraggableCardProps[];
-  onOrderChange?: (newOrder: string[]) => void;
-}
-
-const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ 
-  kpiCards, 
-  onOrderChange 
-}) => {
-  const [items, setItems] = React.useState<DraggableCardProps[]>(kpiCards);
   
-  React.useEffect(() => {
-    setItems(kpiCards);
-  }, [kpiCards]);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
+  // Default cards if no cards are provided
+  const defaultKpiCards: DraggableCardProps[] = [
+    {
+      id: 'activeUsers',
+      title: 'Utilisateurs actifs',
+      value: '1,234',
+      icon: <Users className="h-4 w-4" />,
+      delta: {
+        value: 12,
+        trend: 'up',
+        label: 'vs last week'
       },
-    })
-  );
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    
-    if (over && active.id !== over.id) {
-      const activeIndex = items.findIndex((item) => item.id === active.id);
-      const overIndex = items.findIndex((item) => item.id === over.id);
-      
-      const newItems = [...items];
-      newItems.splice(activeIndex, 1);
-      newItems.splice(overIndex, 0, items[activeIndex]);
-      
-      setItems(newItems);
-      
-      if (onOrderChange) {
-        onOrderChange(newItems.map(item => item.id));
+      subtitle: 'Utilisateurs uniques',
+      status: 'success'
+    },
+    {
+      id: 'totalSessions',
+      title: 'Sessions totales',
+      value: '5,678',
+      icon: <Calendar className="h-4 w-4" />,
+      delta: {
+        value: 8,
+        trend: 'up'
+      }
+    },
+    {
+      id: 'avgDuration',
+      title: 'Durée moyenne',
+      value: '12:34',
+      icon: <Clock className="h-4 w-4" />,
+      delta: {
+        value: 3,
+        trend: 'down'
+      },
+      status: 'warning'
+    },
+    {
+      id: 'completionRate',
+      title: 'Taux de complétion',
+      value: '87%',
+      icon: <BarChart3 className="h-4 w-4" />,
+      delta: {
+        value: 5,
+        trend: 'up'
+      }
+    },
+    {
+      id: 'weeklyTrend',
+      title: 'Tendance hebdo',
+      value: '+23%',
+      icon: <TrendingUp className="h-4 w-4" />,
+      delta: {
+        value: 15,
+        trend: 'up'
+      },
+      status: 'success'
+    },
+    {
+      id: 'emotionalBalance',
+      title: 'Score émotionnel',
+      value: '72/100',
+      icon: <Heart className="h-4 w-4" />,
+      delta: {
+        value: 4,
+        trend: 'up'
       }
     }
-  };
+  ];
+
+  // Use provided cards or default ones
+  const cardsToRender = kpiCards || defaultKpiCards;
 
   return (
-    <DndContext 
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext 
-        items={items.map(item => ({ id: item.id }))}
-        strategy={rectSortingStrategy}
+    <div className="w-full">
+      <GridLayout
+        className="layout"
+        layout={layouts}
+        cols={4}
+        rowHeight={120}
+        width={1200}
+        margin={[16, 16]}
+        isResizable={false}
+        onLayoutChange={handleLayoutChange}
+        draggableHandle=".drag-handle"
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {items.map((card) => (
-            <DraggableCard
-              key={card.id}
-              id={card.id}
-              title={card.title}
-              value={card.value}
-              icon={card.icon}
-              change={card.change}
-              description={card.description}
-              color={card.color}
-              status={card.status}
-            />
-          ))}
-        </div>
-      </SortableContext>
-    </DndContext>
+        {cardsToRender.map((card) => (
+          <div key={card.id} className="shadow-sm">
+            <DraggableCard {...card} />
+          </div>
+        ))}
+      </GridLayout>
+    </div>
   );
 };
 

@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
-import ProtectedLayoutWrapper from '@/components/ProtectedLayoutWrapper';
+
+import React, { useState, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -18,11 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { useCoach } from '@/hooks/coach/useCoach';
 import { useMusic } from '@/contexts/MusicContext';
-import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import { useEmotionMusic, loadPlaylistForEmotion } from '@/hooks/useEmotionMusic';
-import { EmotionMusicParams } from '@/types';
 
 // Message interface
 interface Message {
@@ -35,12 +31,9 @@ interface Message {
 
 const CoachChatPage: React.FC = () => {
   const location = useLocation();
-  const [searchParams] = useSearchParams();
-  const conversationId = searchParams.get('conversation');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
-  const { activateMusicForEmotion } = useMusicEmotionIntegration();
   const { setOpenDrawer } = useMusic();
   
   // Get initial question from location state if provided
@@ -66,7 +59,7 @@ const CoachChatPage: React.FC = () => {
   const lastTypingTime = useRef<number>(0);
   
   // Welcome message from coach
-  useEffect(() => {
+  React.useEffect(() => {
     // Initial greeting message customized for user
     const firstName = user?.email ? user.email.split('@')[0] : 'là';
     
@@ -91,7 +84,7 @@ const CoachChatPage: React.FC = () => {
   }, [user, initialPrompt]);
 
   // Scroll to bottom of messages
-  useEffect(() => {
+  React.useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
@@ -206,10 +199,7 @@ const CoachChatPage: React.FC = () => {
         // Show the music drawer after a small delay
         setTimeout(() => {
           // Activate music based on detected emotion
-          activateMusicForEmotion({
-            emotion: emotionalTone === 'positive' ? 'happy' : 
-                    emotionalTone === 'negative' ? 'calm' : 'focused'
-          });
+          setOpenDrawer(true);
         }, 1000);
       }
       else if (messageToSend.toLowerCase().includes('journal')) {
@@ -289,44 +279,6 @@ const CoachChatPage: React.FC = () => {
   // Exit breathing mode
   const exitBreathingMode = () => {
     setIsBreathingMode(false);
-  };
-
-  // Update any usage of EmotionMusicParams to include intensity
-  const handlePlayMoodMusic = (emotion: string) => {
-    if (loadPlaylistForEmotion) {
-      loadPlaylistForEmotion({
-        emotion,
-        intensity: 50 // Adding the required intensity
-      });
-    }
-  };
-
-  // Update another instance if it exists
-  const handleEmotionMusic = (emotion: string) => {
-    if (loadPlaylistForEmotion) {
-      loadPlaylistForEmotion({
-        emotion,
-        intensity: 50 // Adding the required intensity
-      });
-    }
-  };
-
-  // Fix the function calls that were causing errors
-  const handlePlayMusic = async (emotion: string) => {
-    // Add the required intensity parameter
-    const params: EmotionMusicParams = { 
-      emotion: emotion,
-      intensity: 50 // Default intensity
-    };
-    
-    try {
-      const playlist = await loadPlaylistForEmotion(params);
-      // ... handle the playlist
-      return true;
-    } catch (error) {
-      console.error("Error loading music:", error);
-      return false;
-    }
   };
 
   return (
@@ -416,7 +368,7 @@ const CoachChatPage: React.FC = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => navigate('/coach/chat')}>
+                  <DropdownMenuItem onClick={() => navigate('/coach-chat')}>
                     Nouvelle conversation
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={startBreathingMode}>
@@ -571,12 +523,7 @@ const CoachChatPage: React.FC = () => {
               variant="outline" 
               size="sm" 
               className="rounded-full h-8"
-              onClick={() => {
-                activateMusicForEmotion({
-                  emotion: emotionalTone === 'positive' ? 'happy' : 
-                          emotionalTone === 'negative' ? 'calm' : 'focused'
-                });
-              }}
+              onClick={() => setOpenDrawer(true)}
             >
               <Music className="mr-1 h-3 w-3" /> Musique
             </Button>
@@ -653,10 +600,4 @@ const CoachChatPage: React.FC = () => {
   );
 };
 
-export default function WrappedCoachChatPage() {
-  return (
-    <ProtectedLayoutWrapper>
-      <CoachChatPage />
-    </ProtectedLayoutWrapper>
-  );
-}
+export default CoachChatPage;

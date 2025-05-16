@@ -3,13 +3,13 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  icon: string;
+  image: string;
   category: string;
-  level?: number;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
   unlockedAt?: string;
-  progress?: number;
   completed?: boolean;
-  unlocked?: boolean; // For compatibility
+  unlocked?: boolean;
+  progress?: number;
 }
 
 export interface Challenge {
@@ -17,39 +17,44 @@ export interface Challenge {
   title: string;
   description: string;
   category: string;
-  points: number;
-  icon: string;
+  xp: number;
   progress: number;
+  status: 'active' | 'completed' | 'failed' | 'locked';
   deadline?: string;
-  completed?: boolean;
+  isDaily?: boolean;
+  isWeekly?: boolean;
+  icon?: React.ReactNode;
   failed?: boolean;
 }
 
 export interface LeaderboardEntry {
   id: string;
+  userId: string;
   name: string;
-  points: number;
-  level: number;
-  position: number;
-  avatar?: string;
-  badges?: Badge[];
   username?: string;
-  userId?: string;
+  avatar?: string;
+  points: number;
+  level?: number;
+  rank?: number;
+  position?: number;
+  progress?: number;
+  change?: number;
+  isCurrentUser?: boolean;
 }
 
 export interface GamificationStats {
   points: number;
   level: number;
+  badges: number;
+  completedChallenges: number;
+  totalChallenges: number;
+  challenges: Challenge[];
   streak: number;
   nextLevel: {
     points: number;
     level: number;
+    rewards: string[];
   };
   progress: number;
-  badges?: Badge[];
-  completedChallenges?: number;
-  totalChallenges?: number;
-  challenges?: Challenge[];
-  rank?: number;
-  xp?: number;
+  rewards?: string[];
 }

@@ -1,224 +1,239 @@
+
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { GamificationStats, VRSessionTemplate } from '@/types';
-import { CalendarDays, Edit, Medal, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { VRSessionTemplate } from '@/types/vr';
+import { Clock, Book, Music, Scan, MessagesSquare, HeartPulse, Calendar, Users, ChevronRight } from 'lucide-react';
 
-export interface ProgressLatestSectionProps {
-  progress: GamificationStats;
-}
+export const SessionCard: React.FC<{ session: VRSessionTemplate }> = ({ session }) => {
+  return (
+    <Card className="w-full hover:shadow-md transition-shadow">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg w-12 h-12 bg-muted flex items-center justify-center shrink-0">
+            <HeartPulse className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-medium">{session.title}</h3>
+            <p className="text-xs text-muted-foreground">{session.duration / 60} min · {session.emotion_target || session.emotionTarget || 'Bien-être'}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
-// Section for the latest VR sessions recommended
-export const RecommendedVRSection = () => {
-  const recommendedSessions: VRSessionTemplate[] = [
+export const PopularSessionsSection: React.FC = () => {
+  const navigate = useNavigate();
+  
+  const popularSessions: VRSessionTemplate[] = [
     {
-      id: '1',
-      title: 'Méditation guidée',
-      description: 'Une session de méditation pour la détente et le bien-être',
-      duration: 10,
-      tags: ['relaxation', 'débutant'],
-      theme: 'nature',
-      is_audio_only: true,
-      preview_url: '/images/vr-preview-1.jpg',
-      audio_url: '/audio/meditation-1.mp3',
-      emotionTarget: 'calme',
-      thumbnailUrl: '/images/vr-banner-bg.jpg'
+      id: 'session1',
+      title: 'Méditation pleine conscience',
+      description: 'Une séance guidée pour se reconnecter au moment présent',
+      duration: 600,
+      thumbnailUrl: '/images/meditation.jpg',
+      category: 'meditation',
+      emotionTarget: 'calme'
     },
     {
-      id: '2',
-      title: 'Booster de confiance',
-      description: 'Transformez votre état d\'esprit et augmentez votre confiance',
-      duration: 15,
-      tags: ['confiance', 'intermédiaire'],
-      theme: 'abstrait',
-      preview_url: '/images/vr-preview-2.jpg',
-      emotionTarget: 'confiance',
-      thumbnailUrl: '/images/vr-banner-bg.jpg'
+      id: 'session2',
+      title: 'Respiration 4-7-8',
+      description: 'Technique de respiration pour réduire l\'anxiété',
+      duration: 300,
+      thumbnailUrl: '/images/breathing.jpg',
+      category: 'breathing',
+      emotionTarget: 'relaxation'
     }
   ];
 
+  const handleViewAll = () => {
+    navigate('/vr');
+  };
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Star className="h-5 w-5 text-primary" />
-          Sessions VR recommandées
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4">
-          {recommendedSessions.map(session => (
-            <div 
-              key={session.id}
-              className="flex flex-col md:flex-row md:items-center gap-4 p-3 bg-accent/40 rounded-lg"
-            >
-              <div 
-                className="w-full md:w-24 h-20 rounded-md bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: `url(${session.thumbnailUrl})` }}
-              />
-
-              <div className="flex-grow">
-                <h3 className="font-medium">{session.title}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-1">{session.description}</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge variant="outline">{session.duration} min</Badge>
-                  {session.emotionTarget && (
-                    <Badge variant="secondary">{session.emotionTarget}</Badge>
-                  )}
-                  {session.is_audio_only && (
-                    <Badge variant="outline">Audio uniquement</Badge>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-3 md:mt-0">
-                <Button size="sm">Démarrer</Button>
-              </div>
-            </div>
-          ))}
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle>Sessions populaires</CardTitle>
+          <Button variant="ghost" size="sm" onClick={handleViewAll}>
+            Voir tout
+          </Button>
         </div>
+        <CardDescription>Sessions recommandées basées sur votre historique</CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-3">
+        {popularSessions.map(session => (
+          <div key={session.id} className="cursor-pointer" onClick={() => navigate(`/vr/session/${session.id}`)}>
+            <SessionCard session={session} />
+          </div>
+        ))}
       </CardContent>
     </Card>
   );
 };
 
-// Section for the latest journal entries
-export const JournalLatestSection = () => {
-  const latestEntries = [
-    { id: '1', title: 'Journée productive', date: '2023-05-15', mood: 'Positif', content: 'Aujourd\'hui a été une journée très productive...' },
-    { id: '2', title: 'Réflexions sur le projet', date: '2023-05-14', mood: 'Neutre', content: 'Je dois revoir certains aspects du projet...' }
+export const RecentActivitySection: React.FC = () => {
+  const activities = [
+    { id: 1, type: 'journal', title: 'Journal du soir', time: '2h' },
+    { id: 2, type: 'music', title: 'Musique apaisante', time: '5h' },
+    { id: 3, type: 'coach', title: 'Session de coaching', time: 'hier' }
   ];
-
+  
+  const getActivityIcon = (type: string) => {
+    switch(type) {
+      case 'journal': return <Book className="h-4 w-4" />;
+      case 'music': return <Music className="h-4 w-4" />;
+      case 'scan': return <Scan className="h-4 w-4" />;
+      case 'coach': return <MessagesSquare className="h-4 w-4" />;
+      default: return <Clock className="h-4 w-4" />;
+    }
+  };
+  
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Edit className="h-5 w-5 text-primary" />
-          Journal
-        </CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle>Activité récente</CardTitle>
+        <CardDescription>Votre activité sur la plateforme</CardDescription>
       </CardHeader>
-      <CardContent>
-        {latestEntries.length === 0 ? (
-          <p className="text-muted-foreground text-sm text-center py-4">
-            Aucune entrée de journal pour le moment.
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {latestEntries.map(entry => (
-              <div key={entry.id} className="p-3 bg-accent/40 rounded-lg">
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="font-medium">{entry.title}</h3>
-                  <Badge variant="outline">{entry.mood}</Badge>
-                </div>
-                <p className="text-xs text-muted-foreground mb-2">
-                  {new Date(entry.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                </p>
-                <p className="text-sm line-clamp-2">{entry.content}</p>
-                <div className="mt-3 text-right">
-                  <Button size="sm" variant="ghost">Lire plus</Button>
-                </div>
+      <CardContent className="grid gap-2">
+        {activities.map(activity => (
+          <div key={activity.id} className="flex items-center justify-between py-2 px-1">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                {getActivityIcon(activity.type)}
               </div>
-            ))}
-            <div className="text-center pt-2">
-              <Button variant="outline">
-                <Edit className="mr-2 h-4 w-4" />
-                Nouvelle entrée
-              </Button>
+              <div>
+                <div className="font-medium text-sm">{activity.title}</div>
+                <div className="text-xs text-muted-foreground">Il y a {activity.time}</div>
+              </div>
             </div>
           </div>
-        )}
+        ))}
       </CardContent>
     </Card>
   );
 };
 
-export const MoodHistorySection = () => {
+export const UpcomingEventsSection: React.FC = () => {
+  const events = [
+    { id: 1, title: 'Bilan hebdomadaire', date: 'Demain, 15:00' },
+    { id: 2, title: 'Nouvelle méditation guidée', date: 'Jeudi, 10:00' }
+  ];
+  
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <CalendarDays className="h-5 w-5 text-primary" />
-          Historique d'humeur
-        </CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle>Événements à venir</CardTitle>
+        <CardDescription>Votre planning des prochains jours</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-1">
-          {Array.from({ length: 28 }).map((_, i) => {
-            const value = Math.random();
-            let bgColor = 'bg-red-100 dark:bg-red-900/30';
-            
-            if (value > 0.7) bgColor = 'bg-green-100 dark:bg-green-900/30';
-            else if (value > 0.4) bgColor = 'bg-yellow-100 dark:bg-yellow-900/30';
-            
-            return (
-              <div 
-                key={i}
-                className={`w-6 h-6 rounded-sm ${bgColor} cursor-pointer`}
-                title={`${new Date(Date.now() - (27-i) * 24 * 60 * 60 * 1000).toLocaleDateString()}: ${Math.round(value * 100)}% positive`}
-              />
-            );
-          })}
-        </div>
+      <CardContent className="grid gap-2">
+        {events.map(event => (
+          <div key={event.id} className="flex items-center justify-between py-2 px-1">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                <Calendar className="h-4 w-4" />
+              </div>
+              <div>
+                <div className="font-medium text-sm">{event.title}</div>
+                <div className="text-xs text-muted-foreground">{event.date}</div>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </div>
+        ))}
       </CardContent>
     </Card>
   );
 };
 
-export const ProgressLatestSection: React.FC<ProgressLatestSectionProps> = ({
-  progress
-}) => {
-  // Calculate progress percentage
-  const progressPercentage = progress.progress * 100;
-
+export const TeamActivitySection: React.FC = () => {
+  const teamActivities = [
+    { id: 1, name: 'Anne', activity: 'a complété une session de respiration', time: '30 min' },
+    { id: 2, name: 'Marc', activity: 'a atteint un objectif de méditation', time: '1h' }
+  ];
+  
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Medal className="h-5 w-5 text-primary" />
-          Votre progression
-        </CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle>Activité de l'équipe</CardTitle>
+        <CardDescription>Suivez les progrès de votre équipe</CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-2">
+        {teamActivities.map(item => (
+          <div key={item.id} className="flex items-center justify-between py-2 px-1">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                <Users className="h-4 w-4" />
+              </div>
+              <div>
+                <div className="font-medium text-sm">{item.name} <span className="font-normal">{item.activity}</span></div>
+                <div className="text-xs text-muted-foreground">Il y a {item.time}</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+};
+
+export const LevelSection: React.FC = () => {
+  const currentLevel = {
+    points: 1250,
+    level: 5,
+    rewards: ['Badge "Explorateur émotionnel"', 'Nouvelles méditations']
+  };
+  
+  const nextLevel = {
+    points: 1500,
+    level: 6,
+    rewards: ['Badge "Maître de soi"', 'Accès à des sessions premium']
+  };
+  
+  const progress = ((currentLevel.points) / nextLevel.points) * 100;
+  
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle>Votre niveau</CardTitle>
+        <CardDescription>Niveau {currentLevel.level} · {currentLevel.points} points</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium">Niveau {progress.level}</p>
-              <p className="text-xs text-muted-foreground">
-                {progress.points} points
-              </p>
-            </div>
-            <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
-              {progress.level}
-            </div>
+          <div className="w-full bg-muted rounded-full h-2.5">
+            <div className="bg-primary h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
           </div>
-
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs">
-              <span>Vers Niveau {progress.nextLevel.level}</span>
-              <span>{Math.round(progressPercentage)}%</span>
-            </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary" 
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
+          
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Niveau {currentLevel.level}</span>
+            <span>{nextLevel.points - currentLevel.points} points pour niveau {nextLevel.level}</span>
           </div>
-
-          <div className="pt-2 border-t border-border flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">Série active</p>
-              <p className="text-xs text-muted-foreground">
-                {progress.streak} jours consécutifs
-              </p>
-            </div>
-            <Button size="sm" variant="outline">
-              Voir plus
-            </Button>
+          
+          <div className="mt-4">
+            <h4 className="text-sm font-medium mb-2">Récompenses du prochain niveau :</h4>
+            <ul className="text-sm space-y-1">
+              {nextLevel.rewards.map((reward, index) => (
+                <li key={index} className="flex items-center gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                  {reward}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </CardContent>
     </Card>
   );
 };
+
+export const UserDashboardSections = {
+  PopularSessionsSection,
+  RecentActivitySection,
+  UpcomingEventsSection,
+  TeamActivitySection,
+  LevelSection
+};
+
+export default UserDashboardSections;

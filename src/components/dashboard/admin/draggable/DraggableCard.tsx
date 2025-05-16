@@ -1,14 +1,11 @@
 
 import React from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ArrowDown, ArrowRight, ArrowUp, GripHorizontal } from 'lucide-react';
-import { DraggableCardProps } from '@/types/widgets';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { ArrowDown, ArrowUp, GripHorizontal, Minus } from 'lucide-react';
+import { DraggableCardProps } from '@/types/widgets';
 
 export const DraggableCard: React.FC<DraggableCardProps> = ({
-  id,
   title,
   value,
   icon,
@@ -18,104 +15,88 @@ export const DraggableCard: React.FC<DraggableCardProps> = ({
   onClick,
   status
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+  // Function to render the delta indicator
+  const renderDelta = () => {
+    if (!delta) return null;
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 10 : 1,
-    opacity: isDragging ? 0.8 : 1,
+    const deltaValue = typeof delta === 'number' ? delta : delta.value;
+    const deltaTrend = typeof delta === 'number' ? (delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral') : delta.trend;
+    const deltaLabel = typeof delta === 'object' && delta.label ? delta.label : '';
+    
+    let Icon;
+    let colorClass;
+    
+    switch (deltaTrend) {
+      case 'up':
+        Icon = <ArrowUp className="h-3 w-3" />;
+        colorClass = 'text-green-600';
+        break;
+      case 'down':
+        Icon = <ArrowDown className="h-3 w-3" />;
+        colorClass = 'text-red-600';
+        break;
+      default:
+        Icon = <Minus className="h-3 w-3" />;
+        colorClass = 'text-gray-500';
+    }
+
+    return (
+      <div className={cn("flex items-center gap-1 text-xs", colorClass)}>
+        {Icon}
+        <span>{deltaValue > 0 ? '+' : ''}{deltaValue}%</span>
+        {deltaLabel && <span className="text-muted-foreground ml-1">{deltaLabel}</span>}
+      </div>
+    );
   };
 
-  // Determine the color based on status
-  const getStatusClasses = () => {
+  // Determine card status styles
+  const getStatusStyles = () => {
     switch (status) {
       case 'success':
-        return 'border-green-200 bg-green-50 text-green-700';
+        return 'border-green-500/20 bg-green-500/10';
       case 'warning':
-        return 'border-amber-200 bg-amber-50 text-amber-700';
+        return 'border-amber-500/20 bg-amber-500/10';
       case 'danger':
-        return 'border-red-200 bg-red-50 text-red-700';
+        return 'border-red-500/20 bg-red-500/10';
       default:
         return '';
     }
   };
 
-  // Render the trend indicator if delta is provided
-  const renderTrend = () => {
-    if (!delta) return null;
-    
-    const deltaValue = typeof delta === 'number' ? delta : delta.value;
-    const deltaLabel = typeof delta === 'number' ? null : delta.label;
-    const trend = typeof delta === 'number' 
-      ? (delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral') 
-      : delta.trend;
-    
-    let TrendIcon;
-    let trendClass;
-    
-    switch (trend) {
-      case 'up':
-        TrendIcon = ArrowUp;
-        trendClass = 'text-green-600';
-        break;
-      case 'down':
-        TrendIcon = ArrowDown;
-        trendClass = 'text-red-600';
-        break;
-      default:
-        TrendIcon = ArrowRight;
-        trendClass = 'text-amber-600';
-    }
-    
-    return (
-      <div className={`flex items-center gap-1 text-sm ${trendClass}`}>
-        <TrendIcon className="h-4 w-4" />
-        <span>{Math.abs(deltaValue)}%</span>
-        {deltaLabel && <span className="text-muted-foreground text-xs">{deltaLabel}</span>}
-      </div>
-    );
-  };
-
   return (
-    <Card
-      ref={setNodeRef}
-      style={style}
-      className={cn(
-        'cursor-grab active:cursor-grabbing transition-colors',
-        getStatusClasses(),
-        onClick && 'hover:bg-muted/50 transition-colors'
-      )}
+    <Card 
+      className={cn("h-full transition-all", getStatusStyles())}
       onClick={onClick}
+      role={onClick ? 'button' : undefined}
       aria-label={ariaLabel}
     >
-      <CardHeader className="p-3 pb-0 flex flex-row items-center justify-between">
-        <div className="flex items-center gap-2">
-          {icon}
-          <span className="font-medium text-sm">{title}</span>
+      <div className="absolute top-2 right-2 drag-handle cursor-move text-muted-foreground hover:text-foreground">
+        <GripHorizontal className="h-4 w-4" />
+      </div>
+      
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {icon && (
+              <div className="rounded-md bg-muted p-1.5">
+                {icon}
+              </div>
+            )}
+            <div className="text-sm font-medium text-muted-foreground">{title}</div>
+          </div>
         </div>
-        <div
-          {...attributes}
-          {...listeners}
-          className="cursor-grab active:cursor-grabbing p-1 rounded hover:bg-muted/50"
-        >
-          <GripHorizontal className="h-4 w-4 text-muted-foreground" />
+        
+        <div className="mt-3">
+          <div className="text-2xl font-semibold">{value}</div>
+          {subtitle && <div className="text-xs text-muted-foreground">{subtitle}</div>}
         </div>
-      </CardHeader>
-      <CardContent className="p-3 pt-2">
-        <div className="flex justify-between items-center">
-          <div className="text-2xl font-bold">{value}</div>
-          {renderTrend()}
-        </div>
-        {subtitle && <div className="text-xs text-muted-foreground mt-1">{subtitle}</div>}
       </CardContent>
+      
+      {delta && (
+        <CardFooter className="p-4 pt-0">
+          {renderDelta()}
+        </CardFooter>
+      )}
     </Card>
   );
 };

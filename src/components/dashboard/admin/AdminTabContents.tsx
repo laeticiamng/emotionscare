@@ -1,148 +1,178 @@
 
 import React from 'react';
+import { TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import EmotionPieChart from '../charts/EmotionPieChart';
-import WeeklyActivityChart from '../charts/WeeklyActivityChart';
-import BadgesWidget from '../widgets/BadgesWidget';
-import LeaderboardWidget from '../widgets/LeaderboardWidget';
-import { Badge, LeaderboardEntry } from '@/types';
+import EmotionPieChart from '@/components/dashboard/charts/EmotionPieChart';
+import WeeklyActivityChart from '@/components/dashboard/charts/WeeklyActivityChart';
+import BadgesWidget from '@/components/dashboard/widgets/BadgesWidget';
+import LeaderboardWidget from '@/components/dashboard/widgets/LeaderboardWidget';
+import { LeaderboardEntry, Badge } from '@/types/gamification';
 
-export const TeamOverviewTab: React.FC = () => {
-  // Sample data for the charts
-  const emotions = [
-    { name: 'Calme', value: 35, color: '#4299E1' },
-    { name: 'Joie', value: 30, color: '#F6AD55' },
-    { name: 'Concentration', value: 20, color: '#9F7AEA' },
-    { name: 'Stress', value: 15, color: '#FC8181' },
+export const AdminTabContents: React.FC = () => {
+  // Mock data
+  const emotionData = [
+    { name: 'Joie', value: 35, color: '#4CAF50' },
+    { name: 'Calme', value: 25, color: '#2196F3' },
+    { name: 'Énergie', value: 15, color: '#FF9800' },
+    { name: 'Stress', value: 10, color: '#F44336' },
+    { name: 'Focus', value: 15, color: '#9C27B0' }
   ];
 
-  const weeklyActivity = [
-    { day: 'Lun', journal: 10, music: 15, scan: 5, coach: 3 },
-    { day: 'Mar', journal: 12, music: 14, scan: 6, coach: 4 },
-    { day: 'Mer', journal: 8, music: 20, scan: 4, coach: 2 },
-    { day: 'Jeu', journal: 15, music: 18, scan: 7, coach: 5 },
-    { day: 'Ven', journal: 11, music: 16, scan: 5, coach: 3 },
-    { day: 'Sam', journal: 5, music: 10, scan: 2, coach: 1 },
-    { day: 'Dim', journal: 6, music: 12, scan: 3, coach: 2 },
+  const activityData = [
+    { day: 'Lun', value: 55 },
+    { day: 'Mar', value: 70 },
+    { day: 'Mer', value: 45 },
+    { day: 'Jeu', value: 80 },
+    { day: 'Ven', value: 65 },
+    { day: 'Sam', value: 30 },
+    { day: 'Dim', value: 25 }
   ];
 
-  // Sample progress data
-  const userProgress = {
-    points: 1250,
-    level: 5,
-    streak: 7,
-    nextLevel: {
-      points: 1500,
-      level: 6
-    },
-    progress: 0.75 // This is now a simple number representing percentage (0-1)
-  };
-
-  // Sample badges
   const badges: Badge[] = [
-    { 
-      id: '1', 
-      name: 'Équipe active', 
-      description: '100 entrées de journal', 
-      icon: '📝', 
-      category: 'journal', 
-      level: 1,
-      unlocked: true,
-      progress: 100,
-      completed: true
+    {
+      id: '1',
+      name: 'Champion d\'équipe',
+      description: 'Soutenu 10 collègues',
+      image: '/badges/team-champion.png',
+      category: 'team',
+      rarity: 'rare',
+      unlockedAt: '2023-04-01'
     },
+    {
+      id: '2',
+      name: 'Bien-être collectif',
+      description: 'Créé une initiative de bien-être',
+      image: '/badges/wellbeing.png',
+      category: 'wellness',
+      rarity: 'epic',
+    },
+    {
+      id: '3',
+      name: 'Mentorat',
+      description: 'Guidé 5 nouveaux membres',
+      image: '/badges/mentor.png',
+      category: 'leadership',
+      rarity: 'legendary',
+    }
   ];
 
-  // Sample leaderboard
   const leaderboard: LeaderboardEntry[] = [
-    { id: '1', name: 'Équipe Marketing', points: 1500, level: 6, position: 1, userId: 'team1' },
-    { id: '2', name: 'Équipe Produit', points: 1350, level: 5, position: 2, userId: 'team2' },
-    { id: '3', name: 'Équipe Tech', points: 1200, level: 5, position: 3, userId: 'team3' }
+    {
+      id: '1',
+      userId: '1',
+      name: 'Équipe Marketing',
+      avatar: '/teams/marketing.jpg',
+      points: 1850,
+      position: 1
+    },
+    {
+      id: '2',
+      userId: '2',
+      name: 'Équipe Développement',
+      avatar: '/teams/development.jpg',
+      points: 1680,
+      position: 2
+    },
+    {
+      id: '3',
+      userId: '3',
+      name: 'Équipe Design',
+      avatar: '/teams/design.jpg',
+      points: 1540,
+      position: 3
+    }
   ];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <>
+      <TabsContent value="global">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardHeader>
-              <CardTitle>Émotions collectives</CardTitle>
+              <CardTitle>Tendances émotionnelles</CardTitle>
             </CardHeader>
             <CardContent>
-              <EmotionPieChart data={emotions} />
+              <div className="h-[300px]">
+                <EmotionPieChart data={emotionData} />
+              </div>
             </CardContent>
           </Card>
-
+          <Card>
+            <CardHeader>
+              <CardTitle>Activité de la plateforme</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <WeeklyActivityChart data={activityData} />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </TabsContent>
+      <TabsContent value="emotions">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Distribution des émotions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <EmotionPieChart data={emotionData} />
+              </div>
+            </CardContent>
+          </Card>
+          <BadgesWidget 
+            badges={badges}
+            title="Badges d'équipe" 
+            onSeeAll={() => console.log('View all badges')} 
+          />
+        </div>
+      </TabsContent>
+      <TabsContent value="activity">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardHeader>
               <CardTitle>Activité hebdomadaire</CardTitle>
             </CardHeader>
             <CardContent>
-              <WeeklyActivityChart data={weeklyActivity} />
+              <div className="h-[300px]">
+                <WeeklyActivityChart data={activityData} />
+              </div>
+            </CardContent>
+          </Card>
+          <LeaderboardWidget 
+            leaderboard={leaderboard}
+            title="Classement des équipes" 
+            onSeeAll={() => console.log('View all leaderboard')} 
+          />
+        </div>
+      </TabsContent>
+      <TabsContent value="teams">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Performance des équipes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                Graphique de performance des équipes
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Distribution des ressources</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+                Graphique de distribution des ressources
+              </div>
             </CardContent>
           </Card>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Statistiques d'usage</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {/* Usage stats content */}
-            <p>Statistiques détaillées d'utilisation par département.</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Badges d'équipe</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <BadgesWidget badges={badges} />
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Classement des équipes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <LeaderboardWidget leaderboard={leaderboard} />
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+      </TabsContent>
+    </>
   );
 };
 
-export const TeamDetailTab: React.FC = () => {
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Détail des équipes</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Contenu détaillé des équipes à venir...</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-export const SettingsTab: React.FC = () => {
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Paramètres administrateur</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Options de configuration à venir...</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
+export default AdminTabContents;
