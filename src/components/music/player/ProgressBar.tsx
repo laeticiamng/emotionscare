@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { ProgressBarProps } from '@/types/music';
@@ -12,9 +11,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   currentTime = 0,
   duration = 0,
   formatTime = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`,
-  handleProgressClick,
-  showTimestamps = true,
   onSeek,
+  showTimestamps = true,
 }) => {
   const handleSliderChange = (values: number[]) => {
     if (onSeek) {

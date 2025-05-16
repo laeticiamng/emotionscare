@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,14 +20,14 @@ export const AdminTabContents = ({
   gamificationData,
   onCompleteChallenge 
 }: AdminTabContentsProps) => {
-  // Mock badges data
+  // Mock badges data - update tiers to match the allowed values
   const badges: Badge[] = [
     {
       id: '1',
       name: 'Super admin',
       description: 'Gérer les paramètres administrateur avancés',
       image_url: '/badges/admin.png',
-      tier: 'bronze',
+      tier: 'platinum', // Changed from 'rare' to an allowed value
       unlockedAt: '2023-05-12'
     },
     {
@@ -36,7 +35,7 @@ export const AdminTabContents = ({
       name: 'Analytics Pro',
       description: 'Expertise en analyse des données',
       image_url: '/badges/analytics.png',
-      tier: 'silver',
+      tier: 'gold', // Changed from 'epic' to an allowed value
       unlockedAt: '2023-06-25'
     },
     {
@@ -44,7 +43,7 @@ export const AdminTabContents = ({
       name: 'Invitations Master',
       description: 'Inviter plus de 50 utilisateurs',
       image_url: '/badges/invite.png',
-      tier: 'gold'
+      tier: 'silver' // Changed from 'legendary' to an allowed value
     }
   ];
   
@@ -57,7 +56,8 @@ export const AdminTabContents = ({
       points: 1250,
       rank: 1,
       trend: 'up',
-      userId: 'user-001',
+      // Remove userId property to match interface
+      department: 'Marketing'
     },
     {
       id: '2',
@@ -66,7 +66,8 @@ export const AdminTabContents = ({
       points: 980,
       rank: 2,
       trend: 'stable',
-      userId: 'user-002',
+      // Remove userId property to match interface
+      department: 'Product'
     },
     {
       id: '3',
@@ -75,7 +76,8 @@ export const AdminTabContents = ({
       points: 760,
       rank: 3,
       trend: 'down',
-      userId: 'user-003',
+      // Remove userId property to match interface
+      department: 'Engineering'
     }
   ];
   
@@ -89,8 +91,8 @@ export const AdminTabContents = ({
       points: 200,
       completed: false,
       progress: 40,
-      deadline: new Date().toISOString(),
-      status: 'active'
+      deadline: new Date().toISOString()
+      // Remove status property to match interface
     },
     {
       id: '2',
@@ -99,8 +101,8 @@ export const AdminTabContents = ({
       category: 'Analytics',
       points: 150,
       completed: true,
-      progress: 100,
-      status: 'completed'
+      progress: 100
+      // Remove status property to match interface
     }
   ];
   

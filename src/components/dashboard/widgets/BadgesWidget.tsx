@@ -16,11 +16,9 @@ interface BadgesWidgetProps {
 const BadgesWidget = ({ badges, title = "Badges", showSeeAll = true, onSeeAll }: BadgesWidgetProps) => {
   // Sort badges: first unlocked, then by progress
   const sortedBadges = [...badges].sort((a, b) => {
-    // Prioritize completed/unlocked badges
-    if ((a.unlockedAt || a.earned_date || a.dateEarned || a.completed || a.unlocked) && 
-        !(b.unlockedAt || b.earned_date || b.dateEarned || b.completed || b.unlocked)) return -1;
-    if (!(a.unlockedAt || a.earned_date || a.dateEarned || a.completed || a.unlocked) && 
-        (b.unlockedAt || b.earned_date || b.dateEarned || b.completed || b.unlocked)) return 1;
+    // Prioritize badges with unlockedAt property
+    if (a.unlockedAt && !b.unlockedAt) return -1;
+    if (!a.unlockedAt && b.unlockedAt) return 1;
     
     // If both are in same completion state, sort by progress (higher first)
     if (a.progress && b.progress) {
@@ -33,12 +31,12 @@ const BadgesWidget = ({ badges, title = "Badges", showSeeAll = true, onSeeAll }:
   
   // Get display image for the badge
   const getBadgeImage = (badge: Badge) => {
-    return badge.image || badge.image_url || badge.imageUrl || `/badges/${badge.id}.png`;
+    return badge.image || badge.image_url || `/badges/${badge.id}.png`;
   };
 
-  // Check if badge is unlocked/completed
+  // Check if badge is unlocked
   const isBadgeUnlocked = (badge: Badge) => {
-    return Boolean(badge.unlockedAt || badge.earned_date || badge.dateEarned || badge.completed || badge.unlocked);
+    return Boolean(badge.unlockedAt);
   };
   
   return (
@@ -62,11 +60,11 @@ const BadgesWidget = ({ badges, title = "Badges", showSeeAll = true, onSeeAll }:
       <CardContent>
         <div className="grid grid-cols-3 gap-4">
           {sortedBadges.slice(0, 6).map((badge) => {
-            // Determine if the badge is completed/unlocked
+            // Determine if the badge is unlocked
             const isUnlocked = isBadgeUnlocked(badge);
             
             // Get badge rarity class (for the badge border/glow)
-            const rarityColor = badge.tier || badge.rarity ? getBadgeRarityColor(badge.tier || badge.rarity) : 'bg-slate-500';
+            const rarityColor = badge.tier ? getBadgeRarityColor(badge.tier) : 'bg-slate-500';
             
             return (
               <div 

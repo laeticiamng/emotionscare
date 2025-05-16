@@ -20,15 +20,9 @@ const LeaderboardWidget = ({
   onSeeAll,
   highlightUserId
 }: LeaderboardWidgetProps) => {
-  // Sort leaderboard by rank, ensuring backwards compatibility
+  // Sort leaderboard by rank
   const sortedLeaderboard = [...leaderboard].sort((a, b) => {
-    if (a.rank !== undefined && b.rank !== undefined) {
-      return a.rank - b.rank;
-    }
-    if (a.position !== undefined && b.position !== undefined) {
-      return a.position - b.position;
-    }
-    return b.points - a.points;
+    return a.rank - b.rank;
   });
   
   // Function to get medal for top positions
@@ -50,14 +44,14 @@ const LeaderboardWidget = ({
   };
   
   // Calculate position for display
-  const getPosition = (entry: LeaderboardEntry, index: number): number => {
-    return entry.rank || entry.position || index + 1;
+  const getPosition = (entry: LeaderboardEntry): number => {
+    return entry.rank;
   };
 
-  // Check if entry is current user
-  const isCurrentUser = (entry: LeaderboardEntry): boolean => {
+  // Check if entry is current user - adapted to work with our interface
+  const isCurrentUser = (entry: LeaderboardEntry, highlightId?: string): boolean => {
     if (entry.isCurrentUser) return true;
-    if (highlightUserId && entry.userId === highlightUserId) return true;
+    if (highlightId && entry.id === highlightId) return true;
     return false;
   };
 
@@ -82,8 +76,8 @@ const LeaderboardWidget = ({
       <CardContent>
         <div className="space-y-3">
           {sortedLeaderboard.slice(0, 5).map((entry, index) => {
-            const position = getPosition(entry, index);
-            const highlightCurrentUser = isCurrentUser(entry);
+            const position = getPosition(entry);
+            const highlightCurrentUser = isCurrentUser(entry, highlightUserId);
             
             return (
               <div 
@@ -113,7 +107,7 @@ const LeaderboardWidget = ({
                   <div>
                     <p className="font-medium text-sm">{entry.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {entry.username || entry.department || `Niveau ${entry.level || 1}`}
+                      {entry.department || `Niveau ${entry.level || 1}`}
                     </p>
                   </div>
                 </div>

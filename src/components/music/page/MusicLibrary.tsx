@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -119,6 +118,17 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({
     if (onSelectTrack) {
       onSelectTrack(track);
     }
+  };
+
+  // Update the track object to include the required audioUrl property
+  const trackWithRequiredFields: MusicTrack = {
+    id: "sample-1",
+    title: "Sample Track",
+    artist: "Sample Artist",
+    duration: 180,
+    audioUrl: "/sample-audio.mp3",  // Add this required field
+    track_url: "/sample-audio.mp3",
+    cover_url: "/images/music/cover.jpg"
   };
 
   return (

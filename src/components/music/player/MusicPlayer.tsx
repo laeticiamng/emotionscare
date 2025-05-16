@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -112,11 +111,8 @@ const MusicPlayer: React.FC = () => {
               currentTime={(progress / 100) * (currentTrack?.duration || 0)}
               duration={currentTrack?.duration || 0}
               formatTime={formatTime}
-              handleProgressClick={(e) => {
-                const container = e.currentTarget;
-                const rect = container.getBoundingClientRect();
-                const percent = ((e.clientX - rect.left) / rect.width) * 100;
-                setProgress(percent);
+              onSeek={(value) => {
+                setProgress(value);
               }}
             />
           </div>

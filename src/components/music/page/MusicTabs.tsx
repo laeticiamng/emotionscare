@@ -1,71 +1,45 @@
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import LibraryTab from './LibraryTab';
-import PlayerTab from './PlayerTab';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import React from 'react';
+import { TabsContent } from '@/components/ui/tabs';
+import { MusicTrack } from '@/types/music';
 
-const MusicTabs: React.FC = () => {
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
-  
-  // Mock data for demonstration
-  const demoPlaylists: MusicPlaylist[] = [
+const MusicTabs = () => {
+  // Example tracks adapted to the MusicTrack interface
+  const tracksWithAudioUrl: MusicTrack[] = [
     {
-      id: "playlist1",
-      title: "Relaxation",  // Add title property
-      name: "Relaxation",
-      description: "Playlists pour se détendre",
-      category: "relax",
-      tracks: [
-        {
-          id: '101',
-          title: 'Méditation guidée',
-          artist: 'Calm Voices',
-          duration: 600,
-          coverUrl: '/images/covers/meditation.jpg',
-          url: '/audio/meditation.mp3',
-          category: 'Relaxation'
-        },
-        {
-          id: '102',
-          title: 'Sons de la forêt',
-          artist: 'Nature Sounds',
-          duration: 480,
-          coverUrl: '/images/covers/forest.jpg',
-          url: '/audio/forest.mp3',
-          category: 'Nature'
-        }
-      ]
+      id: "1",
+      title: "Calm Morning",
+      artist: "Ambient Dreams",
+      duration: 180,
+      audioUrl: "/sample-audio/calm-1.mp3",
+      coverUrl: "/images/music/calm-1.jpg",
+      url: "/sample-audio/calm-1.mp3",
+      category: "calm"
+    },
+    {
+      id: "2",
+      title: "Ocean Waves",
+      artist: "Nature Sounds",
+      duration: 240,
+      audioUrl: "/sample-audio/calm-2.mp3",
+      coverUrl: "/images/music/calm-2.jpg",
+      url: "/sample-audio/calm-2.mp3",
+      category: "calm"
     }
   ];
-  
-  const handleSelectTrack = (track: MusicTrack) => {
-    setCurrentTrack(track);
-  };
-  
-  const handleSelectPlaylist = (playlist: MusicPlaylist) => {
-    setCurrentPlaylist(playlist);
-  };
-  
+
   return (
-    <Tabs defaultValue="player" className="w-full">
-      <TabsList className="mb-4">
-        <TabsTrigger value="player">Lecteur</TabsTrigger>
-        <TabsTrigger value="library">Bibliothèque</TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="player">
-        <PlayerTab currentTrack={currentTrack} playlist={currentPlaylist} />
-      </TabsContent>
-      
-      <TabsContent value="library">
-        <LibraryTab 
-          playlists={demoPlaylists}
-          onSelectTrack={handleSelectTrack}
-          onSelectPlaylist={handleSelectPlaylist}
-        />
-      </TabsContent>
-    </Tabs>
+    <TabsContent value="library">
+      {/* Display tracks with audioUrl */}
+      {tracksWithAudioUrl.map((track) => (
+        <div key={track.id}>
+          <h3>{track.title}</h3>
+          <p>Artist: {track.artist}</p>
+          <audio controls src={track.audioUrl}>
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      ))}
+    </TabsContent>
   );
 };
 
