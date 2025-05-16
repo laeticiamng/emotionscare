@@ -1,5 +1,4 @@
 
-import { useContext } from 'react';
-import { CoachContext } from '@/contexts/coach';
-
-export const useCoach = () => useContext(CoachContext);
+// This file re-exports the useCoach hook from contexts/coach
+// for backward compatibility
+export { useCoach } from '@/contexts/coach';

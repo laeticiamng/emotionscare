@@ -1,5 +1,5 @@
 
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext } from 'react';
 
 export interface CoachContextType {
   isActive: boolean;
@@ -30,13 +30,17 @@ export const CoachProvider = ({ children }: { children: React.ReactNode }) => {
     setIsActive(prev => !prev);
   };
   
+  // Create the value object to be passed to the Provider
+  const value: CoachContextType = {
+    isActive,
+    toggleCoach,
+    lastEmotion,
+    setLastEmotion
+  };
+  
+  // Return the Provider with the value
   return (
-    <CoachContext.Provider value={{ 
-      isActive, 
-      toggleCoach,
-      lastEmotion,
-      setLastEmotion
-    }}>
+    <CoachContext.Provider value={value}>
       {children}
     </CoachContext.Provider>
   );
