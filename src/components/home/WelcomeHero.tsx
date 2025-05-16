@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useStorytelling } from '@/contexts/StorytellingContext';
-import { Story } from '@/types';
+import { Story } from '@/types/types';
 
 interface WelcomeHeroProps {
   userName?: string;

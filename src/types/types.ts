@@ -1,6 +1,5 @@
 
-// Create or update this file to include the Story interface
-// This is a minimal implementation to fix the error
+// Create or update this file to include the Story interface and other types
 
 export type Period = '1d' | '7d' | '30d' | '90d' | 'custom';
 
@@ -13,7 +12,12 @@ export interface Story {
   author?: string;
   category?: string;
   tags?: string[];
-  type?: 'article' | 'news' | 'blog' | 'resource';
+  type?: 'article' | 'news' | 'blog' | 'resource' | 'onboarding';
+  seen?: boolean;
+  cta?: {
+    label: string;
+    route: string;
+  };
 }
 
 export interface User {
@@ -25,12 +29,44 @@ export interface User {
 
 export interface UserPreferences {
   theme?: string;
-  notifications?: boolean;
+  notifications?: boolean | {
+    enabled: boolean;
+    emailEnabled?: boolean;
+    pushEnabled?: boolean;
+    inAppEnabled?: boolean;
+    email?: boolean;
+    push?: boolean;
+    sms?: boolean;
+    types?: {
+      system?: boolean;
+      emotion?: boolean;
+      coach?: boolean;
+      journal?: boolean;
+      community?: boolean;
+      achievement?: boolean;
+    };
+    frequency?: string;
+  };
+  fontSize?: string;
+  fontFamily?: string;
+  reduceMotion?: boolean;
+  colorBlindMode?: boolean;
+  autoplayMedia?: boolean;
+  language?: string;
+  privacy?: {
+    shareData?: boolean;
+    anonymizeReports?: boolean;
+    profileVisibility?: string;
+    showProfile?: boolean;
+    shareActivity?: boolean;
+    allowMessages?: boolean;
+    allowNotifications?: boolean;
+  };
 }
 
-export type FontFamily = "system" | "serif" | "sans-serif" | "monospace";
-export type FontSize = "small" | "medium" | "large";
-export type ThemeName = "light" | "dark" | "system";
+export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "inter" | "rounded";
+export type FontSize = "small" | "medium" | "large" | "x-large" | "sm" | "md" | "lg" | "xl";
+
 export type UserRole = "admin" | "user" | "manager";
 
 export interface InvitationVerificationResult {
@@ -42,9 +78,12 @@ export interface InvitationVerificationResult {
 }
 
 export interface NotificationPreferences {
-  email: boolean;
-  push: boolean;
-  inApp: boolean;
+  enabled: boolean;
+  email?: boolean;
+  push?: boolean;
+  inApp?: boolean;
+  frequency?: 'immediate' | 'daily' | 'weekly';
+  types?: Record<string, boolean>;
 }
 
 export type UserModeType = "standard" | "advanced" | "developer";

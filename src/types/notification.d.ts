@@ -1,5 +1,5 @@
 
-export type NotificationType = 'emotion' | 'journal' | 'system' | 'user' | 'urgent';
+export type NotificationType = 'emotion' | 'journal' | 'system' | 'user' | 'urgent' | 'community' | 'coach' | 'message';
 
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
 
@@ -12,7 +12,7 @@ export interface NotificationChannels {
   sms?: boolean;
 }
 
-export type NotificationFilter = 'all' | 'unread' | 'read' | 'urgent' | 'system' | 'journal' | 'emotion' | 'user';
+export type NotificationFilter = 'all' | 'unread' | 'read' | 'urgent' | 'system' | 'journal' | 'emotion' | 'user' | 'community';
 
 export interface Notification {
   id: string;
@@ -28,6 +28,11 @@ export interface Notification {
   image_url?: string;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
   expires_at?: string;
+  timestamp?: string;
+  action?: {
+    label: string;
+    url: string;
+  };
 }
 
 export interface NotificationItemProps {
@@ -50,4 +55,9 @@ export interface NotificationPreference {
   channels: NotificationChannels;
   frequency: NotificationFrequency;
   muted: boolean;
+  quietHours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
 }

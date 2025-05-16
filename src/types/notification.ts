@@ -1,5 +1,5 @@
 
-export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never';
+export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never' | 'immediate';
 export type NotificationTone = 'friendly' | 'professional' | 'direct' | 'calm';
 
 export interface NotificationPreference {
@@ -9,6 +9,9 @@ export interface NotificationPreference {
   inAppEnabled?: boolean;
   frequency: NotificationFrequency;
   tone?: NotificationTone;
+  email?: boolean;
+  push?: boolean;
+  sms?: boolean;
   types?: {
     system?: boolean;
     emotion?: boolean;
@@ -17,9 +20,14 @@ export interface NotificationPreference {
     community?: boolean;
     achievement?: boolean;
   };
+  quietHours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
 }
 
-export type NotificationType = 'emotion' | 'journal' | 'system' | 'user' | 'urgent';
+export type NotificationType = 'emotion' | 'journal' | 'system' | 'user' | 'urgent' | 'community' | 'coach' | 'message';
 
 export interface Notification {
   id: string;
@@ -27,7 +35,7 @@ export interface Notification {
   message: string;
   type: NotificationType;
   read: boolean;
-  timestamp: string;
+  timestamp?: string;
   created_at: string;
   updated_at?: string;
   action_url?: string;
@@ -36,9 +44,13 @@ export interface Notification {
   image_url?: string;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
   expires_at?: string;
+  action?: {
+    label: string;
+    url: string;
+  };
 }
 
-export type NotificationFilter = 'all' | 'unread' | 'read' | 'urgent' | 'system' | 'journal' | 'emotion' | 'user';
+export type NotificationFilter = 'all' | 'unread' | 'read' | 'urgent' | 'system' | 'journal' | 'emotion' | 'user' | 'community';
 
 export interface NotificationItemProps {
   notification: Notification;

@@ -1,4 +1,6 @@
 
+import { ReactNode } from 'react';
+
 export interface Theme {
   id?: string;
   name: string;

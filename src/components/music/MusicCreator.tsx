@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { MusicTrack, EmotionMusicParams } from '@/types/music';
 
@@ -13,7 +14,7 @@ const MusicCreator = () => {
       duration: 180,
       url: '/sample/music.mp3',
       coverUrl: '/images/covers/generated.jpg',
-      emotion: emotion // This is now allowed by our updated type
+      mood: emotion // Utiliser mood au lieu de emotion
     };
     
     setGeneratedTracks(prev => [...prev, newTrack]);

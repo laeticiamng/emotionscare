@@ -15,6 +15,7 @@ const sampleNotifications: Notification[] = [
     message: 'Nous sommes ravis de vous accueillir sur la plateforme.',
     type: 'system',
     read: false,
+    timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
     created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
     action: {
       label: 'Explorer',
@@ -27,6 +28,7 @@ const sampleNotifications: Notification[] = [
     message: 'Découvrez notre nouvelle fonctionnalité de musicothérapie !',
     type: 'system',
     read: true,
+    timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
     created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString()
   },
   {
@@ -35,6 +37,7 @@ const sampleNotifications: Notification[] = [
     message: "Vous n'avez pas encore écrit dans votre journal aujourd'hui.",
     type: 'journal',
     read: false,
+    timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
     created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
     action: {
       label: 'Écrire maintenant',

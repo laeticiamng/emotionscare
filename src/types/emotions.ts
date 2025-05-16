@@ -11,12 +11,17 @@ export interface Emotion {
 }
 
 export interface EmotionResult {
-  emotion: string;
+  id?: string;
+  user_id?: string;
+  emotion?: string;
   emotions?: { [key: string]: number };
   intensity?: number;
   timestamp?: Date | string;
   confidence?: number;
   source?: 'voice' | 'text' | 'image' | 'manual';
+  emojis?: string;
+  score?: number;
+  feedback?: string;
 }
 
 export interface LiveVoiceScannerProps {
@@ -26,6 +31,9 @@ export interface LiveVoiceScannerProps {
   showControls?: boolean;
   showVisualizer?: boolean;
   theme?: 'light' | 'dark';
+  onScanComplete?: (result: EmotionResult) => void;
+  autoStart?: boolean;
+  scanDuration?: number;
 }
 
 export interface TeamOverviewProps {

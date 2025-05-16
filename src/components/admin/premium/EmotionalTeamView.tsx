@@ -5,7 +5,7 @@ import { EmotionalTeamViewProps } from '@/types/emotions';
 
 const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ 
   teamId, 
-  period = '7d', // Add a default value to fix the property error
+  period = '7d', // Ajout d'une valeur par défaut
   dateRange, 
   showGraph = true, 
   showMembers = true,

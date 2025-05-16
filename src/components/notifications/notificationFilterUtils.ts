@@ -21,6 +21,7 @@ export const filterNotifications = (
     case 'system':
     case 'emotion':
     case 'journal':
+    case 'user':
     case 'community':
       return notifications.filter(notification => notification.type === filter);
     default:
@@ -47,6 +48,8 @@ export const getFilterLabel = (filter: NotificationFilter): string => {
       return 'Journal';
     case 'emotion':
       return 'Émotions';
+    case 'user':
+      return 'Utilisateur';
     case 'community':
       return 'Communauté';
     default:

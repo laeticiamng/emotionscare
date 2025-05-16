@@ -23,6 +23,10 @@ export interface KpiCardProps {
 
 export interface DraggableKpiCardsGridProps {
   kpiCards: KpiCardProps[];
+  cards?: KpiCardProps[];
+  onLayoutChange?: (layout: any) => void;
+  className?: string;
+  isEditable?: boolean;
 }
 
 export interface GlobalOverviewTabProps {
@@ -39,6 +43,7 @@ export interface DashboardWidgetConfig {
   component?: ReactNode;
   visible?: boolean;
   order?: number;
+  settings?: Record<string, any>;
 }
 
 export interface GamificationData {

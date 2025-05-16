@@ -8,8 +8,8 @@ import KpiCard from '@/components/dashboard/admin/KpiCard';
 import { KpiCardProps, DraggableKpiCardsGridProps } from '@/types/dashboard';
 
 const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
-  cards,
   kpiCards,
+  cards,
   onLayoutChange,
   className,
   isEditable = false

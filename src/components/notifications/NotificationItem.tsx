@@ -20,7 +20,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 }) => {
   // Function to determine icon based on notification type
   const getIcon = () => {
-    switch (notification.type) {
+    const type = notification.type as NotificationType;
+    switch (type) {
       case 'system':
         return <Bell className="h-4 w-4" />;
       case 'community':
@@ -44,7 +45,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       return "destructive";
     }
     
-    switch (notification.type) {
+    const type = notification.type as NotificationType;
+    switch (type) {
       case 'system':
         return "secondary";
       case 'emotion':
