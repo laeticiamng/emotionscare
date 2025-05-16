@@ -1,7 +1,8 @@
 
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 import { useCallback } from 'react';
+import { EmotionMusicParams } from '@/types/music';
 
 interface EmotionMusicOptions {
   emotion: string;
@@ -16,9 +17,10 @@ export function useMusicEmotionIntegration() {
     const { emotion, intensity = 0.5 } = options;
     
     try {
-      const playlist = await loadPlaylistForEmotion(emotion);
+      const params: EmotionMusicParams = { emotion, intensity };
+      const playlist = await loadPlaylistForEmotion(params);
       
-      if (playlist) {
+      if (playlist && setOpenDrawer) {
         setOpenDrawer(true);
         
         toast({
@@ -57,3 +59,5 @@ export function useMusicEmotionIntegration() {
     getEmotionMusicDescription
   };
 }
+
+export default useMusicEmotionIntegration;

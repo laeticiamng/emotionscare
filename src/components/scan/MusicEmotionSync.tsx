@@ -1,24 +1,25 @@
 
 import React, { useEffect, useState } from 'react';
-import { useMusic } from '@/contexts/music';
-import { useCoach } from '@/contexts/coach';
+import { useMusic } from '@/contexts/MusicContext';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
 interface MusicEmotionSyncProps {
   className?: string;
+  lastEmotion?: string;
 }
 
-const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({ className }) => {
+const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({ className, lastEmotion }) => {
   const [isSynced, setIsSynced] = useState(false);
   const { loadPlaylistForEmotion, setEmotion } = useMusic();
-  const { lastEmotion } = useCoach();
   
   // Sync music with emotion when enabled and emotion changes
   useEffect(() => {
     if (isSynced && lastEmotion) {
-      loadPlaylistForEmotion(lastEmotion);
-      setEmotion(lastEmotion);
+      loadPlaylistForEmotion({ emotion: lastEmotion });
+      if (setEmotion) {
+        setEmotion(lastEmotion);
+      }
     }
   }, [isSynced, lastEmotion, loadPlaylistForEmotion, setEmotion]);
   
@@ -27,8 +28,10 @@ const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({ className }) => {
     
     if (checked && lastEmotion) {
       // Immediately sync when enabling
-      loadPlaylistForEmotion(lastEmotion);
-      setEmotion(lastEmotion);
+      loadPlaylistForEmotion({ emotion: lastEmotion });
+      if (setEmotion) {
+        setEmotion(lastEmotion);
+      }
     }
   };
   

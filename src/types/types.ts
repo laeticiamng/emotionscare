@@ -28,8 +28,8 @@ export type UserRole = 'admin' | 'user' | 'guest' | 'premium';
 
 export interface UserPreferences {
   theme: "system" | "light" | "dark" | "pastel";
-  fontSize: string;
-  fontFamily: string;
+  fontSize: FontSize;
+  fontFamily: FontFamily;
   reduceMotion: boolean;
   colorBlindMode: boolean;
   autoplayMedia: boolean;

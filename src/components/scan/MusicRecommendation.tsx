@@ -3,15 +3,15 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Music, PlayCircle } from 'lucide-react';
-import { Emotion } from '@/types';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface MusicRecommendationProps {
-  emotion: Emotion;
+  emotion: string;
+  intensity?: number;
 }
 
-const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) => {
+const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion, intensity = 0.5 }) => {
   const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
   const { toast } = useToast();
 
@@ -19,8 +19,8 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
     try {
       if (emotion) {
         const result = await activateMusicForEmotion({
-          emotion: emotion.emotion,
-          intensity: emotion.intensity || 0.5
+          emotion: emotion,
+          intensity: intensity
         });
         
         if (!result) {
@@ -34,30 +34,33 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion }) =>
       console.error("Erreur lors du chargement de la musique:", error);
       toast({
         title: "Erreur",
-        description: "Impossible de charger la musique recommandée.",
-        variant: "destructive"
+        description: "Impossible de charger la musique recommandée."
       });
     }
   };
 
-  // Obtenir la description de la musique pour cette émotion
-  const musicDescription = getEmotionMusicDescription(emotion.emotion);
-
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Music className="h-4 w-4" />
-          Musique pour votre humeur
+      <CardHeader>
+        <CardTitle className="text-lg flex items-center">
+          <Music className="mr-2 h-5 w-5" />
+          Recommandation musicale
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <p className="text-sm mb-4">
-          {musicDescription}
-        </p>
-        <Button onClick={handlePlayMusic} className="w-full flex items-center gap-2">
-          <PlayCircle className="h-4 w-4" />
-          Écouter une musique adaptée
+      <CardContent className="space-y-4">
+        <div>
+          <p className="font-medium">Basée sur votre état: {emotion}</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {getEmotionMusicDescription(emotion)}
+          </p>
+        </div>
+        
+        <Button 
+          onClick={handlePlayMusic}
+          className="w-full flex items-center justify-center gap-2"
+        >
+          <PlayCircle size={16} />
+          Jouer la musique recommandée
         </Button>
       </CardContent>
     </Card>

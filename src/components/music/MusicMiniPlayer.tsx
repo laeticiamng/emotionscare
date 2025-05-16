@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipForward } from 'lucide-react';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/contexts/MusicContext';
 
 interface MusicMiniPlayerProps {
   onOpen: () => void;
@@ -59,7 +59,7 @@ const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ onOpen }) => {
           variant="ghost" 
           size="sm" 
           className="h-8 w-8" 
-          onClick={() => nextTrack()}
+          onClick={nextTrack}
         >
           <SkipForward className="h-4 w-4" />
         </Button>

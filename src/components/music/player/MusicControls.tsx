@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/contexts/MusicContext';
 import { Play, Pause, SkipBack, SkipForward, Volume, VolumeX } from 'lucide-react';
 
 interface MusicControlsProps {
@@ -39,7 +39,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({ size = 'md', className = 
         variant="ghost"
         size="icon"
         className={buttonSize}
-        onClick={() => previousTrack && previousTrack()}
+        onClick={previousTrack}
         disabled={!currentTrack}
       >
         <SkipBack className={iconSize} />
@@ -63,7 +63,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({ size = 'md', className = 
         variant="ghost"
         size="icon"
         className={buttonSize}
-        onClick={() => nextTrack && nextTrack()}
+        onClick={nextTrack}
         disabled={!currentTrack}
       >
         <SkipForward className={iconSize} />

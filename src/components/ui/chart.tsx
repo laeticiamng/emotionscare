@@ -47,3 +47,34 @@ export const ChartTooltip: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
     </div>
   );
 };
+
+// Ajout des composants manquants
+export const ChartInteractiveLegend: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
+  children,
+  className,
+  ...props 
+}) => {
+  return (
+    <div 
+      className={`flex flex-wrap gap-2 items-center justify-center mt-4 ${className || ''}`} 
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};
+
+export const ZoomableChart: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ 
+  children,
+  className,
+  ...props 
+}) => {
+  return (
+    <div 
+      className={`w-full h-full overflow-hidden ${className || ''}`} 
+      {...props}
+    >
+      {children}
+    </div>
+  );
+};

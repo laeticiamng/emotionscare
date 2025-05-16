@@ -1,31 +1,109 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { UserPreferences, NotificationPreferences } from '@/types/user';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { UserPreferences, FontSize, FontFamily, ThemeName, NotificationPreferences } from '@/types/types';
 
-interface PreferencesFormProps {
-  preferences?: UserPreferences;
-  onSave?: (preferences: UserPreferences) => void;
-  loading?: boolean;
-}
+const FONT_SIZES: { value: FontSize; label: string }[] = [
+  { value: 'small', label: 'Petit' },
+  { value: 'medium', label: 'Moyen' },
+  { value: 'large', label: 'Grand' },
+  { value: 'x-large', label: 'Très Grand' },
+  { value: 'sm', label: 'SM' },
+  { value: 'lg', label: 'LG' },
+  { value: 'xl', label: 'XL' }
+];
 
-const PreferencesForm: React.FC<PreferencesFormProps> = ({ 
-  preferences: initialPreferences = {},
-  onSave,
-  loading = false 
-}) => {
-  const [preferences, setPreferences] = useState<UserPreferences>(initialPreferences);
+const FONT_FAMILIES: { value: FontFamily; label: string }[] = [
+  { value: 'sans-serif', label: 'Sans-serif' },
+  { value: 'serif', label: 'Serif' },
+  { value: 'monospace', label: 'Monospace' },
+  { value: 'system', label: 'Système' },
+  { value: 'sans', label: 'Sans' }
+];
+
+const PreferencesForm: React.FC = () => {
+  const { user, updatePreferences } = useAuth();
   const { toast } = useToast();
   
-  const handleToggle = (key: string, value: boolean) => {
-    setPreferences(prev => ({
-      ...prev,
-      [key]: value
-    }));
+  const defaultPreferences: UserPreferences = {
+    theme: 'system',
+    fontSize: 'medium',
+    fontFamily: 'system',
+    reduceMotion: false,
+    colorBlindMode: false,
+    autoplayMedia: true,
+    soundEnabled: true,
+    notifications: {
+      enabled: true,
+      emailEnabled: true,
+      pushEnabled: false,
+      email: true,
+      push: false,
+      types: {
+        system: true,
+        emotion: true,
+        coach: true,
+        journal: true,
+        community: true,
+        achievement: true
+      },
+      frequency: 'immediate'
+    },
+    privacy: {
+      shareData: true,
+      anonymizeReports: false,
+      profileVisibility: 'public'
+    }
+  };
+
+  const [preferences, setPreferences] = useState<UserPreferences>(
+    user?.preferences || defaultPreferences
+  );
+  
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      await updatePreferences(preferences);
+      
+      toast({
+        title: "Préférences mises à jour",
+        description: "Vos préférences ont été enregistrées avec succès.",
+        variant: "success"
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour vos préférences.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleThemeChange = (theme: ThemeName) => {
+    setPreferences(prev => ({ ...prev, theme }));
+  };
+  
+  const handleFontSizeChange = (fontSize: FontSize) => {
+    setPreferences(prev => ({ ...prev, fontSize }));
+  };
+  
+  const handleFontFamilyChange = (fontFamily: FontFamily) => {
+    setPreferences(prev => ({ ...prev, fontFamily }));
+  };
+  
+  const handleToggleChange = (key: keyof UserPreferences, value: boolean) => {
+    setPreferences(prev => ({ ...prev, [key]: value }));
   };
   
   const handleNotificationToggle = (key: keyof NotificationPreferences, value: boolean) => {
@@ -38,154 +116,217 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
     }));
   };
   
-  const handlePrivacyToggle = (key: string, value: boolean) => {
+  const handleNotificationTypeToggle = (type: string, value: boolean) => {
     setPreferences(prev => ({
       ...prev,
-      privacy: {
-        ...prev.privacy,
-        [key]: value
+      notifications: {
+        ...prev.notifications,
+        types: {
+          ...prev.notifications.types,
+          [type]: value
+        }
       }
     }));
   };
-  
-  const handleSave = () => {
-    if (onSave) {
-      onSave(preferences);
-    } else {
-      // Mock save
-      toast({
-        title: 'Préférences enregistrées',
-        description: 'Vos préférences ont été mises à jour.',
-        variant: 'success'
-      });
-    }
-  };
-  
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Préférences</CardTitle>
-        <CardDescription>
-          Personnalisez votre expérience sur la plateforme selon vos besoins.
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Affichage</h3>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="darkMode">Mode sombre</Label>
-            <Switch 
-              id="darkMode" 
-              checked={preferences.theme === 'dark'}
-              onCheckedChange={(checked) => handleToggle('theme', checked ? 'dark' : 'light')}
-            />
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Apparence</h3>
+        
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="theme">Thème</Label>
+            <Select 
+              value={preferences.theme} 
+              onValueChange={(value) => handleThemeChange(value as ThemeName)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner un thème" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">Clair</SelectItem>
+                <SelectItem value="dark">Sombre</SelectItem>
+                <SelectItem value="system">Système</SelectItem>
+                <SelectItem value="pastel">Pastel</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           
+          <div className="space-y-2">
+            <Label htmlFor="fontSize">Taille de police</Label>
+            <Select 
+              value={preferences.fontSize} 
+              onValueChange={(value) => handleFontSizeChange(value as FontSize)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner une taille" />
+              </SelectTrigger>
+              <SelectContent>
+                {FONT_SIZES.map(size => (
+                  <SelectItem key={size.value} value={size.value}>
+                    {size.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="fontFamily">Police</Label>
+            <Select 
+              value={preferences.fontFamily} 
+              onValueChange={(value) => handleFontFamilyChange(value as FontFamily)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner une police" />
+              </SelectTrigger>
+              <SelectContent>
+                {FONT_FAMILIES.map(font => (
+                  <SelectItem key={font.value} value={font.value}>
+                    {font.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Accessibilité</h3>
+        
+        <div className="grid gap-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="reduceMotion">Réduire les animations</Label>
-            <Switch 
-              id="reduceMotion" 
+            <Switch
+              id="reduceMotion"
               checked={preferences.reduceMotion}
-              onCheckedChange={(checked) => handleToggle('reduceMotion', checked)}
+              onCheckedChange={(checked) => handleToggleChange('reduceMotion', checked)}
             />
           </div>
           
           <div className="flex items-center justify-between">
-            <Label htmlFor="colorBlindMode">Mode daltonien</Label>
-            <Switch 
-              id="colorBlindMode" 
+            <Label htmlFor="colorBlindMode">Mode daltonisme</Label>
+            <Switch
+              id="colorBlindMode"
               checked={preferences.colorBlindMode}
-              onCheckedChange={(checked) => handleToggle('colorBlindMode', checked)}
+              onCheckedChange={(checked) => handleToggleChange('colorBlindMode', checked)}
             />
           </div>
         </div>
+      </div>
+      
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Médias</h3>
         
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Médias</h3>
-          
+        <div className="grid gap-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="autoplayMedia">Lecture automatique des médias</Label>
-            <Switch 
-              id="autoplayMedia" 
+            <Switch
+              id="autoplayMedia"
               checked={preferences.autoplayMedia}
-              onCheckedChange={(checked) => handleToggle('autoplayMedia', checked)}
+              onCheckedChange={(checked) => handleToggleChange('autoplayMedia', checked)}
             />
           </div>
           
           <div className="flex items-center justify-between">
             <Label htmlFor="soundEnabled">Sons activés</Label>
-            <Switch 
-              id="soundEnabled" 
+            <Switch
+              id="soundEnabled"
               checked={preferences.soundEnabled}
-              onCheckedChange={(checked) => handleToggle('soundEnabled', checked)}
+              onCheckedChange={(checked) => handleToggleChange('soundEnabled', checked)}
             />
           </div>
         </div>
-        
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Notifications</h3>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="notifications_enabled">Activer les notifications</Label>
-            <Switch 
-              id="notifications_enabled" 
-              checked={preferences.notifications_enabled}
-              onCheckedChange={(checked) => handleToggle('notifications_enabled', checked)}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="emailNotifications">Notifications par email</Label>
-            <Switch 
-              id="emailNotifications" 
-              checked={preferences.notifications?.email}
-              onCheckedChange={(checked) => handleNotificationToggle('email', checked)}
-              disabled={!preferences.notifications_enabled}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="pushNotifications">Notifications push</Label>
-            <Switch 
-              id="pushNotifications" 
-              checked={preferences.notifications?.push}
-              onCheckedChange={(checked) => handleNotificationToggle('push', checked)}
-              disabled={!preferences.notifications_enabled}
-            />
-          </div>
-        </div>
-        
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Confidentialité</h3>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="shareData">Partager mes données anonymisées</Label>
-            <Switch 
-              id="shareData" 
-              checked={preferences.privacy?.shareData}
-              onCheckedChange={(checked) => handlePrivacyToggle('shareData', checked)}
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="allowAnalytics">Autoriser les analytiques</Label>
-            <Switch 
-              id="allowAnalytics" 
-              checked={preferences.privacy?.allowAnalytics}
-              onCheckedChange={(checked) => handlePrivacyToggle('allowAnalytics', checked)}
-            />
-          </div>
-        </div>
-      </CardContent>
+      </div>
       
-      <CardFooter>
-        <Button onClick={handleSave} disabled={loading}>
-          {loading ? 'Enregistrement...' : 'Enregistrer les préférences'}
-        </Button>
-      </CardFooter>
-    </Card>
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Notifications</h3>
+        
+        <div className="grid gap-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="notificationsEnabled">Notifications activées</Label>
+            <Switch
+              id="notificationsEnabled"
+              checked={preferences.notifications.enabled || false}
+              onCheckedChange={(checked) => handleNotificationToggle('enabled', checked)}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="emailEnabled">Notifications par email</Label>
+            <Switch
+              id="emailEnabled"
+              checked={preferences.notifications.emailEnabled || false}
+              onCheckedChange={(checked) => handleNotificationToggle('emailEnabled', checked)}
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="pushEnabled">Notifications push</Label>
+            <Switch
+              id="pushEnabled"
+              checked={preferences.notifications.pushEnabled || false}
+              onCheckedChange={(checked) => handleNotificationToggle('pushEnabled', checked)}
+            />
+          </div>
+        </div>
+        
+        <div className="grid gap-2">
+          <h4 className="text-sm font-medium">Types de notifications</h4>
+          
+          {Object.entries(preferences.notifications.types || {}).map(([type, enabled]) => (
+            <div key={type} className="flex items-center justify-between">
+              <Label htmlFor={`notification-${type}`}>{type.charAt(0).toUpperCase() + type.slice(1)}</Label>
+              <Switch
+                id={`notification-${type}`}
+                checked={enabled || false}
+                onCheckedChange={(checked) => handleNotificationTypeToggle(type, checked)}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Confidentialité</h3>
+        
+        <div className="grid gap-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="shareData">Partager les données anonymisées</Label>
+            <Switch
+              id="shareData"
+              checked={preferences.privacy.shareData}
+              onCheckedChange={(checked) => 
+                setPreferences(prev => ({
+                  ...prev,
+                  privacy: { ...prev.privacy, shareData: checked }
+                }))
+              }
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="anonymizeReports">Anonymiser les rapports</Label>
+            <Switch
+              id="anonymizeReports"
+              checked={preferences.privacy.anonymizeReports || false}
+              onCheckedChange={(checked) => 
+                setPreferences(prev => ({
+                  ...prev,
+                  privacy: { ...prev.privacy, anonymizeReports: checked }
+                }))
+              }
+            />
+          </div>
+        </div>
+      </div>
+      
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? "Enregistrement..." : "Enregistrer les préférences"}
+      </Button>
+    </form>
   );
 };
 

@@ -23,10 +23,17 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
   const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
   
   const handlePlay = async () => {
-    const params: EmotionMusicParams = { emotion };
-    await loadPlaylistForEmotion(params);
-    if (setOpenDrawer) {
-      setOpenDrawer(true);
+    if (!emotion) return;
+    
+    try {
+      const params = { emotion, intensity: intensity / 100 };
+      const result = await loadPlaylistForEmotion(params);
+      
+      if (result && setOpenDrawer) {
+        setOpenDrawer(true);
+      }
+    } catch (error) {
+      console.error("Error loading music recommendation:", error);
     }
   };
   

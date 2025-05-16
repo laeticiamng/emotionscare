@@ -10,35 +10,51 @@ const defaultValue: MusicContextType = {
   playTrack: () => {},
   pauseTrack: () => {},
   setVolume: () => {},
-  playlist: null,
-  setPlaylist: () => {},
   togglePlay: () => {},
   nextTrack: () => {},
-  prevTrack: () => {},
   previousTrack: () => {},
   duration: 0,
   currentTime: 0,
-  progress: 0,
-  seek: () => {},
   seekTo: () => {},
   loadPlaylistForEmotion: async () => null,
   setEmotion: () => {},
-  muted: false,
   toggleMute: () => {},
+  muted: false,
+  isMuted: false,
+  setOpenDrawer: () => {},
+  openDrawer: false,
+  currentEmotion: null,
+  playlists: [],
+  isInitialized: true,
+  initializeMusicSystem: async () => {},
+  error: null,
+  currentPlaylist: null,
+  isShuffled: false,
+  isRepeating: false,
+  setProgress: () => {},
+  progress: 0
 };
 
 const MusicContext = createContext<MusicContextType>(defaultValue);
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
+  const [playlist, setPlaylist] = useState<MusicTrack[]>([]);
+  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7);
   const [muted, setMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [isOpenDrawer, setOpenDrawer] = useState(false);
-  const [currentEmotion, setCurrentEmotion] = useState<string | undefined>();
+  const [progress, setProgress] = useState(0);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [isRepeating, setIsRepeating] = useState(false);
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(true);
+  
   const { toast } = useToast();
   
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
@@ -55,6 +71,17 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         audioRef.current.src = '';
       }
     };
+  }, []);
+
+  const initializeMusicSystem = useCallback(async () => {
+    try {
+      // Mock initialization
+      setIsInitialized(true);
+      return Promise.resolve();
+    } catch (err) {
+      setError("Erreur d'initialisation du système de musique");
+      return Promise.reject(err);
+    }
   }, []);
   
   // Play track function
@@ -94,26 +121,26 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [isPlaying, currentTrack, playTrack, pauseTrack]);
   
   const nextTrack = useCallback(() => {
-    if (!playlist || !currentTrack) return;
+    if (!playlist || !currentTrack || playlist.length === 0) return;
     
-    const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
-    if (currentIndex > -1 && currentIndex < playlist.tracks.length - 1) {
-      playTrack(playlist.tracks[currentIndex + 1]);
+    const currentIndex = playlist.findIndex(t => t.id === currentTrack.id);
+    if (currentIndex > -1 && currentIndex < playlist.length - 1) {
+      playTrack(playlist[currentIndex + 1]);
     } else {
       // Loop to beginning
-      playTrack(playlist.tracks[0]);
+      playTrack(playlist[0]);
     }
   }, [playlist, currentTrack, playTrack]);
   
   const previousTrack = useCallback(() => {
-    if (!playlist || !currentTrack) return;
+    if (!playlist || !currentTrack || playlist.length === 0) return;
     
-    const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
+    const currentIndex = playlist.findIndex(t => t.id === currentTrack.id);
     if (currentIndex > 0) {
-      playTrack(playlist.tracks[currentIndex - 1]);
+      playTrack(playlist[currentIndex - 1]);
     } else {
       // Loop to end
-      playTrack(playlist.tracks[playlist.tracks.length - 1]);
+      playTrack(playlist[playlist.length - 1]);
     }
   }, [playlist, currentTrack, playTrack]);
   
@@ -135,45 +162,53 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentEmotion(emotion);
   }, []);
 
-  // To provide backward compatibility with loadPlaylistForEmotion function that accepts either string or EmotionMusicParams
+  // Load playlist for an emotion (mock function)
   const loadPlaylistForEmotion = useCallback(async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
     try {
       // Extract emotion from params
       const emotion = typeof params === 'string' ? params : params.emotion;
       
-      // Mock function that creates a playlist based on emotion
+      // Simuler un chargement asynchrone
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Créer une playlist factice
       const mockPlaylist: MusicPlaylist = {
         id: `playlist-${Date.now()}`,
-        title: `${emotion} Playlist`,
-        emotion,
+        title: `Playlist ${emotion}`,
+        emotion: emotion,
         tracks: [
           {
             id: `track1-${Date.now()}`,
-            title: 'Tranquility',
+            title: 'Tranquillité',
             artist: 'Ambient Masters',
             duration: 180,
-            source: 'streaming',
-            coverUrl: 'https://via.placeholder.com/300'
+            url: '/sounds/welcome.mp3', // Utiliser le son préchargé dans App.tsx
+            coverUrl: 'https://via.placeholder.com/300',
+            coverImage: 'https://via.placeholder.com/300'
           },
           {
             id: `track2-${Date.now()}`,
-            title: 'Serenity',
+            title: 'Sérénité',
             artist: 'Peaceful Melodies',
             duration: 240,
-            source: 'streaming',
-            coverUrl: 'https://via.placeholder.com/300'
+            url: '/sounds/welcome.mp3', // Utiliser le son préchargé dans App.tsx
+            coverUrl: 'https://via.placeholder.com/300',
+            coverImage: 'https://via.placeholder.com/300'
           }
         ]
       };
       
-      setPlaylist(mockPlaylist);
+      // Mettre à jour l'état
+      setCurrentPlaylist(mockPlaylist);
+      setPlaylist(mockPlaylist.tracks);
+      
       return mockPlaylist;
     } catch (error) {
       console.error("Error loading playlist for emotion:", error);
       return null;
     }
   }, []);
-  
+
   const value = useMemo(() => ({
     currentTrack,
     isPlaying,
@@ -182,32 +217,54 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     pauseTrack,
     setVolume,
     playlist,
-    setPlaylist,
     togglePlay,
     nextTrack,
-    prevTrack: previousTrack,
     previousTrack,
+    prevTrack: previousTrack,
     duration,
     currentTime,
-    progress: currentTime,
-    seek: seekTo,
     seekTo,
-    isOpenDrawer,
-    setOpenDrawer,
     loadPlaylistForEmotion,
     setEmotion,
-    currentEmotion,
     muted,
+    isMuted: muted,
     toggleMute,
-    playlists: [],
-    isInitialized: true,
-    initializeMusicSystem: async () => {},
-    error: null
+    openDrawer,
+    setOpenDrawer,
+    currentEmotion,
+    playlists,
+    currentPlaylist,
+    isInitialized,
+    initializeMusicSystem,
+    error,
+    isShuffled,
+    isRepeating,
+    progress,
+    setProgress,
+    play: playTrack,
+    pause: pauseTrack,
+    resume: () => playTrack(currentTrack!),
+    stop: pauseTrack,
+    next: nextTrack,
+    previous: previousTrack,
+    mute: () => setMuted(true),
+    unmute: () => setMuted(false),
+    toggleShuffle: () => setIsShuffled(prev => !prev),
+    toggleRepeat: () => setIsRepeating(prev => !prev),
+    setPlaylist: (playlist: MusicPlaylist) => {
+      setCurrentPlaylist(playlist);
+      setPlaylist(playlist.tracks);
+    },
+    findRecommendedTracksForEmotion: (emotion: string) => {
+      return currentPlaylist?.tracks || [];
+    }
   }), [
     currentTrack, isPlaying, volume, playTrack, pauseTrack, setVolume,
-    playlist, setPlaylist, togglePlay, nextTrack, previousTrack,
-    duration, currentTime, seekTo, isOpenDrawer, setOpenDrawer,
-    loadPlaylistForEmotion, setEmotion, currentEmotion, muted, toggleMute
+    playlist, togglePlay, nextTrack, previousTrack,
+    duration, currentTime, seekTo, loadPlaylistForEmotion, setEmotion,
+    muted, toggleMute, openDrawer, setOpenDrawer, currentEmotion,
+    playlists, currentPlaylist, isInitialized, initializeMusicSystem, error,
+    isShuffled, isRepeating, progress, setProgress
   ]);
   
   return (

@@ -2,9 +2,10 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/contexts/MusicContext';
 import { Music } from 'lucide-react';
 import { EmotionMusicParams, MusicPlaylist } from '@/types/music';
+import { toast } from '@/hooks/use-toast';
 
 interface MoodBasedRecommendationsProps {
   mood: string;
@@ -30,11 +31,22 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({
       
       const playlist = await loadPlaylistForEmotion(params);
       
-      if (onSelect) {
+      if (playlist && onSelect) {
         onSelect(playlist);
+      } else if (!playlist) {
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger la playlist correspondante.",
+          variant: "destructive"
+        });
       }
     } catch (error) {
       console.error("Error loading mood-based playlist:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur s'est produite lors du chargement de la playlist.",
+        variant: "destructive"
+      });
     }
   };
   
