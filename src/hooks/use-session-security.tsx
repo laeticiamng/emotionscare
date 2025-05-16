@@ -3,8 +3,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface UseSessionSecurityOptions {
-  sessionTimeout: number;
-  warningTime: number;
+  sessionTimeout?: number;
+  warningTime?: number;
 }
 
 // Default options
@@ -83,6 +83,9 @@ export const useSessionSecurity = (options: Partial<UseSessionSecurityOptions> =
   return {
     showWarning,
     resetTimer,
-    timeLeft
+    timeLeft,
+    sessionExpiresIn: Math.max(0, sessionTimeout - (Date.now() - lastActivity))
   };
 };
+
+export default useSessionSecurity;
