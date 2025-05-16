@@ -21,7 +21,7 @@ const SessionTimeoutAlert: React.FC = () => {
           <div className="flex flex-col space-y-2">
             <div className="flex items-center text-destructive">
               <AlertCircle className="w-4 h-4 mr-1" />
-              <span>Votre session va expirer dans moins d'une minute.</span>
+              <span>Votre session va expirer dans {Math.round(timeLeft)} secondes.</span>
             </div>
             <Button 
               size="sm" 
@@ -36,7 +36,7 @@ const SessionTimeoutAlert: React.FC = () => {
         duration: 10000
       });
     }
-  }, [showWarning, toast, resetTimer, auth.isAuthenticated]);
+  }, [showWarning, toast, resetTimer, auth.isAuthenticated, timeLeft]);
   
   return null; // This is a non-visual component
 };

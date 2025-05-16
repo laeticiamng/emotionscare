@@ -1,28 +1,17 @@
 
-export interface EmotionRecord {
+export interface EmotionResult {
   id: string;
-  user_id: string;
-  date: string;
   emotion: string;
-  name: string;
   score: number;
-  intensity?: number;
-  confidence?: number;
-  category?: string;
-  source?: string;
+  confidence: number;
   text?: string;
-  emojis?: string;
-  audio_url?: string;
-  ai_feedback?: string;
+  feedback?: string;
+  audioUrl?: string; // Added to fix error
+  ai_feedback?: string; // Added to fix error
 }
 
-export interface EmotionResultRecord {
+export interface EmotionMusicParams {
   emotion: string;
-  score: number;
-  text?: string;
-  emojis?: string;
-  feedback?: string;
-  ai_feedback?: string;
-  timestamp?: string;
-  confidence?: number;
+  intensity: number;
+  duration?: number;
 }

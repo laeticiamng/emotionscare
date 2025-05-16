@@ -22,6 +22,7 @@ export interface VRSessionTemplate {
   lastUsed?: string | Date; // Added for VRHistoryList
   is_audio_only?: boolean;
   emotion_target?: string; // Added for dashboard components
+  emotionTarget?: string; // Alternative naming
 }
 
 export interface VRSession {
@@ -42,6 +43,11 @@ export interface VRSession {
   emotionBefore?: string;
   emotionAfter?: string;
   template?: VRSessionTemplate;
+  startTime?: string | Date; // Added for compatibility
+  heart_rate_before?: number;
+  heart_rate_after?: number;
+  heartRateBefore?: number;
+  heartRateAfter?: number;
 }
 
 export interface VRHistoryListProps {

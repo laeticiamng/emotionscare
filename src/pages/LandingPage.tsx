@@ -32,7 +32,7 @@ const LandingPage: React.FC = () => {
     renderer.setSize(containerRef.current.offsetWidth, containerRef.current.offsetHeight);
     renderer.setClearColor(0x000000, 0);
 
-    // Create particles
+    // Create particles with blue color theme
     const particlesGeometry = new THREE.BufferGeometry();
     const particlesCount = 1000;
     
@@ -47,7 +47,7 @@ const LandingPage: React.FC = () => {
     const particlesMaterial = new THREE.PointsMaterial({
       size: 0.2,
       transparent: true,
-      color: 0x6495ED, // Blue color
+      color: 0x3b82f6, // Blue color (tailwind blue-500)
       blending: THREE.AdditiveBlending,
       opacity: 0.8
     });
@@ -59,8 +59,8 @@ const LandingPage: React.FC = () => {
     const animate = () => {
       requestAnimationFrame(animate);
       
-      particlesMesh.rotation.x += 0.0005;
-      particlesMesh.rotation.y += 0.0005;
+      particlesMesh.rotation.x += 0.0003;
+      particlesMesh.rotation.y += 0.0003;
       
       renderer.render(scene, camera);
     };
@@ -96,17 +96,22 @@ const LandingPage: React.FC = () => {
 
   const handleVoiceCommand = () => {
     // Placeholder for voice command functionality
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = 'fr-FR';
-    recognition.onresult = (event) => {
-      const command = event.results[0][0].transcript.toLowerCase();
-      if (command.includes('personnel') || command.includes('particulier')) {
-        navigate('/b2c/login');
-      } else if (command.includes('entreprise') || command.includes('professionnel')) {
-        navigate('/b2b/selection');
-      }
-    };
-    recognition.start();
+    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'fr-FR';
+      recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript.toLowerCase();
+        if (command.includes('personnel') || command.includes('particulier')) {
+          navigate('/b2c/login');
+        } else if (command.includes('entreprise') || command.includes('professionnel')) {
+          navigate('/b2b/selection');
+        }
+      };
+      recognition.start();
+    } else {
+      console.log('Speech recognition not supported');
+    }
   };
 
   return (

@@ -1,79 +1,72 @@
 
-import { useState, useEffect } from 'react';
-import { useToast } from './use-toast';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect, useCallback } from 'react';
 
-interface SessionSecurityOptions {
-  timeout?: number; // In minutes
-  showWarning?: boolean;
-  warningTime?: number; // Minutes before timeout to show warning
+export interface UseSessionSecurityOptions {
+  warningTimeBeforeExpire?: number;
+  sessionDuration?: number;
 }
 
-export const useSessionSecurity = (options: SessionSecurityOptions = {}) => {
-  const {
-    timeout = 30, // Default timeout of 30 minutes
-    showWarning = true,
-    warningTime = 5, // Warning 5 minutes before timeout
-  } = options;
-
-  const { toast } = useToast();
-  const { logout, isAuthenticated } = useAuth();
+export function useSessionSecurity({
+  warningTimeBeforeExpire = 60, // Default: 60 seconds
+  sessionDuration = 30 * 60, // Default: 30 minutes
+}: UseSessionSecurityOptions = {}) {
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
-  const [showWarningState, setShowWarningState] = useState<boolean>(false);
-
-  // Convert minutes to milliseconds
-  const timeoutMs = timeout * 60 * 1000;
-  const warningTimeMs = warningTime * 60 * 1000;
-
-  // Update last activity time on user interaction
-  const updateActivity = () => {
+  const [showWarning, setShowWarning] = useState<boolean>(false);
+  const [timeLeft, setTimeLeft] = useState<number>(sessionDuration);
+  
+  const resetTimer = useCallback(() => {
     setLastActivity(Date.now());
-    setShowWarningState(false);
-  };
+    setShowWarning(false);
+    setTimeLeft(sessionDuration);
+  }, [sessionDuration]);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
-
-    // Set up event listeners for user activity
     const activityEvents = ['mousedown', 'keypress', 'scroll', 'touchstart'];
+    
+    const handleUserActivity = () => {
+      if (!showWarning) {
+        resetTimer();
+      }
+    };
+    
+    // Add event listeners for user activity
     activityEvents.forEach(event => {
-      window.addEventListener(event, updateActivity);
+      window.addEventListener(event, handleUserActivity);
     });
-
-    // Check session status periodically
-    const checkInterval = setInterval(() => {
+    
+    // Check session status every second
+    const interval = setInterval(() => {
       const now = Date.now();
-      const timeSinceLastActivity = now - lastActivity;
-
-      // Show warning before timeout
-      if (showWarning && timeSinceLastActivity > timeoutMs - warningTimeMs && !showWarningState) {
-        setShowWarningState(true);
-        toast('Votre session va expirer bientôt. Souhaitez-vous rester connecté ?', 'warning', {
-          duration: 10000,
-          // You could add action buttons here in a real implementation
-        });
+      const idle = (now - lastActivity) / 1000;
+      const remainingTime = sessionDuration - idle;
+      setTimeLeft(Math.max(0, remainingTime));
+      
+      if (remainingTime <= warningTimeBeforeExpire && !showWarning) {
+        setShowWarning(true);
       }
-
-      // Log out user after inactivity
-      if (timeSinceLastActivity > timeoutMs) {
-        logout();
-        toast('Vous avez été déconnecté en raison d\'inactivité', 'info');
+      
+      // If session expired, handle it
+      if (remainingTime <= 0) {
+        // Session expired, you can add logic here to log out the user
+        console.log('Session expired');
+        // Clear the warning
+        setShowWarning(false);
       }
-    }, 30000); // Check every 30 seconds
-
+    }, 1000);
+    
+    // Cleanup
     return () => {
       activityEvents.forEach(event => {
-        window.removeEventListener(event, updateActivity);
+        window.removeEventListener(event, handleUserActivity);
       });
-      clearInterval(checkInterval);
+      clearInterval(interval);
     };
-  }, [isAuthenticated, lastActivity, logout, showWarning, showWarningState, timeoutMs, warningTimeMs]);
-
+  }, [lastActivity, resetTimer, sessionDuration, showWarning, warningTimeBeforeExpire]);
+  
   return {
-    resetTimer: updateActivity,
-    sessionExpiresIn: Math.max(0, timeoutMs - (Date.now() - lastActivity)),
-    showWarning: showWarningState,
+    resetTimer,
+    sessionExpiresIn: timeLeft,
+    showWarning,
+    timeLeft
   };
-};
-
-export default useSessionSecurity;
+}
