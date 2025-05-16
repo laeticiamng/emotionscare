@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Heart, FileText, Headphones, Video, MessageCircle, ArrowRight, BarChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const TherapyModules: React.FC = () => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
   const modules = [
     {
@@ -89,11 +90,13 @@ const TherapyModules: React.FC = () => {
               </div>
               <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors duration-300">{module.title}</h3>
               <p className="text-gray-600 mb-4">{module.description}</p>
-              <Button asChild variant="outline" className="w-full transition-all duration-300 overflow-hidden group-hover:bg-primary/10">
-                <Link to={isAuthenticated ? module.path : "/login"} className="relative">
-                  {isAuthenticated ? 'Accéder' : 'Connexion requise'}
-                  <ArrowRight className="h-4 w-4 ml-2 inline transition-transform duration-300 group-hover:translate-x-1" />
-                </Link>
+              <Button 
+                variant="outline" 
+                className="w-full transition-all duration-300 overflow-hidden group-hover:bg-primary/10"
+                onClick={() => navigate(isAuthenticated ? module.path : "/login")}
+              >
+                {isAuthenticated ? 'Accéder' : 'Connexion requise'}
+                <ArrowRight className="h-4 w-4 ml-2 inline transition-transform duration-300 group-hover:translate-x-1" />
               </Button>
             </div>
           );

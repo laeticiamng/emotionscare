@@ -22,7 +22,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
   onMarkAsRead,
   onDelete,
 }) => {
-  const [activeFilter, setActiveFilter] = useState<NotificationFilter>('all');
+  const [activeFilter, setActiveFilter] = useState<string>('all');
 
   const unreadCount = notifications.filter(n => !n.read).length;
   
@@ -78,7 +78,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
       <Tabs 
         defaultValue="all" 
         value={activeFilter}
-        onValueChange={(value) => setActiveFilter(value as NotificationFilter)}
+        onValueChange={(value) => setActiveFilter(value)}
         className="w-full"
       >
         <div className="px-4">

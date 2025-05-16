@@ -1,43 +1,75 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useMusic } from '@/contexts/music/MusicContextProvider';
-import { MusicTrack, MusicPlaylist, MusicLibraryProps } from '@/types/music';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { PlayCircle, Heart, Search, Plus } from 'lucide-react';
+import { Search, Music } from 'lucide-react';
+import { MusicTrack, MusicLibraryProps } from '@/types/music';
 
 const MusicLibrary: React.FC<MusicLibraryProps> = ({
+  tracks = [],
   onTrackSelect,
-  currentTrack,
-  playlists = []
+  className = '',
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('all');
-  const { playlists: contextPlaylists } = useMusic();
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   
-  // Use playlists from props or context
-  const libraryPlaylists = playlists.length > 0 ? playlists : (contextPlaylists || []);
+  const categories = [
+    { id: 'all', name: 'Tous' },
+    { id: 'calm', name: 'Calme' },
+    { id: 'focus', name: 'Concentration' },
+    { id: 'energy', name: 'Énergie' },
+    { id: 'sleep', name: 'Sommeil' }
+  ];
   
-  // Get all tracks from all playlists
-  const allTracks = libraryPlaylists.flatMap(playlist => playlist.tracks);
+  // Sample tracks if none provided
+  const defaultTracks: MusicTrack[] = [
+    {
+      id: '1',
+      title: 'Méditation matinale',
+      artist: 'Zen Dreams',
+      duration: 180,
+      url: '/path/to/audio1.mp3',
+      coverUrl: '/images/cover1.jpg',
+    },
+    {
+      id: '2',
+      title: 'Concentration profonde',
+      artist: 'Focus Mind',
+      duration: 240,
+      url: '/path/to/audio2.mp3',
+      coverUrl: '/images/cover2.jpg',
+    },
+    {
+      id: '3',
+      title: 'Énergie positive',
+      artist: 'Good Vibes',
+      duration: 200,
+      url: '/path/to/audio3.mp3',
+      coverUrl: '/images/cover3.jpg',
+    },
+    {
+      id: '4',
+      title: 'Sommeil réparateur',
+      artist: 'Dream State',
+      duration: 300,
+      url: '/path/to/audio4.mp3',
+      coverUrl: '/images/cover4.jpg',
+    },
+  ];
   
-  // Filter tracks based on search term
-  const filteredTracks = allTracks.filter(track => 
-    track.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (track.artist && track.artist.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const displayTracks: MusicTrack[] = tracks.length > 0 ? tracks : defaultTracks;
   
-  // Group tracks by mood/emotion
-  const tracksByMood = filteredTracks.reduce((acc, track) => {
-    const mood = track.mood || track.emotion || 'unknown';
-    if (!acc[mood]) {
-      acc[mood] = [];
-    }
-    acc[mood].push(track);
-    return acc;
-  }, {} as Record<string, MusicTrack[]>);
+  // Filter tracks by search and category
+  const filteredTracks = displayTracks.filter(track => {
+    const matchesSearch = 
+      track.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      track.artist.toLowerCase().includes(searchTerm.toLowerCase());
+      
+    const matchesCategory = activeCategory === 'all' ? true : 
+      (track.emotion === activeCategory);
+      
+    return matchesSearch && matchesCategory;
+  });
   
   const handleTrackSelect = (track: MusicTrack) => {
     if (onTrackSelect) {
@@ -46,156 +78,77 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({
   };
   
   return (
-    <div>
-      <div className="mb-6">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+    <div className={`space-y-6 ${className}`}>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-grow">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Rechercher une musique..."
-            className="pl-9"
+            type="search"
+            placeholder="Rechercher par titre ou artiste..."
+            className="pl-8"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-4">
-          <TabsTrigger value="all">Tous</TabsTrigger>
-          <TabsTrigger value="moods">Par ambiance</TabsTrigger>
-          <TabsTrigger value="playlists">Playlists</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="all" className="space-y-4">
-          {filteredTracks.length > 0 ? (
-            <div className="grid grid-cols-1 gap-2">
-              {filteredTracks.map((track) => (
-                <div
-                  key={track.id}
-                  className={`flex items-center justify-between p-3 rounded-md hover:bg-muted transition-colors cursor-pointer ${
-                    currentTrack?.id === track.id ? 'bg-muted' : ''
-                  }`}
-                  onClick={() => handleTrackSelect(track)}
-                >
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-primary/10 rounded-md flex items-center justify-center mr-3 overflow-hidden">
-                      {track.coverUrl || track.cover_url ? (
-                        <img src={track.coverUrl || track.cover_url} alt={track.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <PlayCircle className="h-5 w-5 text-primary" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">{track.title}</p>
-                      <p className="text-xs text-muted-foreground">{track.artist}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Heart className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <PlayCircle className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">Aucune musique trouvée</p>
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="moods">
-          {Object.keys(tracksByMood).length > 0 ? (
-            <div className="space-y-6">
-              {Object.entries(tracksByMood).map(([mood, tracks]) => (
-                <Card key={mood}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg capitalize">{mood}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 gap-2">
-                      {tracks.slice(0, 3).map((track) => (
-                        <div
-                          key={track.id}
-                          className="flex items-center justify-between p-2 rounded-md hover:bg-muted transition-colors cursor-pointer"
-                          onClick={() => handleTrackSelect(track)}
-                        >
-                          <div className="flex items-center">
-                            <div className="w-8 h-8 bg-primary/10 rounded-md flex items-center justify-center mr-2 overflow-hidden">
-                              {track.coverUrl || track.cover_url ? (
-                                <img src={track.coverUrl || track.cover_url} alt={track.title} className="w-full h-full object-cover" />
-                              ) : (
-                                <PlayCircle className="h-4 w-4 text-primary" />
-                              )}
-                            </div>
-                            <div>
-                              <p className="font-medium text-sm">{track.title}</p>
-                              <p className="text-xs text-muted-foreground">{track.artist}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {tracks.length > 3 && (
-                        <Button variant="ghost" className="w-full mt-2 text-sm">
-                          Voir {tracks.length - 3} de plus
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">Aucune ambiance trouvée</p>
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="playlists">
-          {libraryPlaylists.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {libraryPlaylists.map((playlist) => (
-                <Card key={playlist.id} className="overflow-hidden">
-                  <div className="aspect-square bg-muted relative">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <PlayCircle className="h-12 w-12 text-primary/50" />
-                    </div>
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-medium">{playlist.title || playlist.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {playlist.tracks.length} titres
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
+      <div className="flex overflow-auto pb-2 gap-2">
+        {categories.map(category => (
+          <Button
+            key={category.id}
+            variant={activeCategory === category.id ? "default" : "outline"}
+            size="sm"
+            onClick={() => setActiveCategory(category.id)}
+            className="whitespace-nowrap"
+          >
+            {category.name}
+          </Button>
+        ))}
+      </div>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredTracks.length === 0 ? (
+          <div className="col-span-full text-center py-10">
+            <Music className="mx-auto h-10 w-10 text-muted-foreground opacity-50" />
+            <p className="mt-2 text-muted-foreground">Aucune musique ne correspond à votre recherche</p>
+          </div>
+        ) : (
+          filteredTracks.map(track => (
+            <div 
+              key={track.id}
+              className="flex items-center gap-3 p-3 border rounded-md hover:bg-accent/50 cursor-pointer transition-colors"
+              onClick={() => handleTrackSelect(track)}
+            >
+              <div className="w-12 h-12 bg-muted rounded-md flex items-center justify-center overflow-hidden">
+                {track.coverUrl ? (
+                  <img 
+                    src={track.coverUrl} 
+                    alt={track.title} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Music className="h-6 w-6 text-muted-foreground" />
+                )}
+              </div>
               
-              <Card className="overflow-hidden border-dashed">
-                <div className="aspect-square bg-muted/50 flex items-center justify-center">
-                  <Button variant="ghost" size="lg" className="rounded-full h-16 w-16">
-                    <Plus className="h-8 w-8 text-muted-foreground" />
-                  </Button>
-                </div>
-                <CardContent className="p-4 text-center">
-                  <h3 className="font-medium">Créer une playlist</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Personnalisez votre expérience
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="flex-grow min-w-0">
+                <p className="font-medium truncate">{track.title}</p>
+                <p className="text-sm text-muted-foreground truncate">{track.artist}</p>
+              </div>
+              
+              <div className="text-xs text-muted-foreground">
+                {Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')}
+              </div>
             </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">Aucune playlist trouvée</p>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+          ))
+        )}
+      </div>
+      
+      {filteredTracks.length > 0 && (
+        <p className="text-center text-sm text-muted-foreground py-2">
+          Affichage de {filteredTracks.length} morceaux
+        </p>
+      )}
     </div>
   );
 };

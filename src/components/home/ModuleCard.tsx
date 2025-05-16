@@ -50,12 +50,10 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
       <Button 
         variant="outline" 
         className="mt-auto justify-between group" 
-        asChild
+        onClick={() => window.location.href = to}
       >
-        <Link to={to}>
-          <span>Accéder</span>
-          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-        </Link>
+        <span>Accéder</span>
+        <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
       </Button>
     </div>
   );

@@ -16,11 +16,7 @@ const sampleNotifications: Notification[] = [
     type: 'system',
     read: false,
     timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-    created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-    action: {
-      label: 'Explorer',
-      url: '/b2c/dashboard'
-    }
+    created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString()
   },
   {
     id: uuidv4(),

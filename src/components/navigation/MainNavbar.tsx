@@ -1,9 +1,12 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const MainNavbar: React.FC = () => {
+  const navigate = useNavigate();
+  
   return (
     <header className="bg-background border-b">
       <div className="container flex h-16 items-center justify-between py-4">
@@ -27,11 +30,11 @@ const MainNavbar: React.FC = () => {
         </nav>
         
         <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link to="/b2c/login">Connexion</Link>
+          <Button variant="outline" size="sm" onClick={() => navigate('/b2c/login')}>
+            Connexion
           </Button>
-          <Button asChild size="sm">
-            <Link to="/b2c/dashboard">Démarrer</Link>
+          <Button size="sm" onClick={() => navigate('/b2c/dashboard')}>
+            Démarrer
           </Button>
         </div>
       </div>

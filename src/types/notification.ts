@@ -1,44 +1,24 @@
 
-export type NotificationFrequency = 'immediate' | 'hourly' | 'daily' | 'weekly' | 'never';
-export type NotificationTone = 'informational' | 'success' | 'warning' | 'error';
-
-export interface NotificationPreference {
-  enabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled: boolean;
-  frequency: string;
-  types?: {
-    [key: string]: boolean;
-  };
-}
+import { ReactNode } from 'react';
 
 export interface Notification {
   id: string;
   title: string;
-  body: string;
+  message: string;
   type: NotificationType;
-  timestamp: Date | string;
   read: boolean;
-  userId?: string;
-  link?: string;
-  icon?: string;
-  priority?: 'low' | 'normal' | 'high' | 'urgent';
-  category?: string;
-  actions?: NotificationAction[];
+  timestamp?: string;
+  created_at?: string;
+  priority?: 'normal' | 'high' | 'urgent';
+  action?: {
+    label: string;
+    url: string;
+  };
+  actions?: {
+    label: string;
+    url: string;
+  }[];
 }
 
-export type NotificationType = 'system' | 'emotion' | 'coach' | 'journal' | 'community' | 'achievement';
-
-export interface NotificationAction {
-  label: string;
-  action: string;
-  url?: string;
-  variant?: 'default' | 'outline' | 'ghost';
-}
-
-export interface NotificationFilter {
-  type?: NotificationType | 'all';
-  read?: boolean;
-  date?: 'today' | 'week' | 'month' | 'all';
-  priority?: 'low' | 'normal' | 'high' | 'urgent' | 'all';
-}
+export type NotificationType = 'system' | 'emotion' | 'coach' | 'journal' | 'community' | 'user' | 'message';
+export type NotificationFilter = 'all' | 'unread' | 'read' | NotificationType;
