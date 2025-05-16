@@ -14,7 +14,7 @@ const defaultOptions: UseSessionSecurityOptions = {
 };
 
 export const useSessionSecurity = (options: Partial<UseSessionSecurityOptions> = {}) => {
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   const [lastActivity, setLastActivity] = useState<number>(Date.now());
   const [showWarning, setShowWarning] = useState<boolean>(false);
   const [timeLeft, setTimeLeft] = useState<number>(0);
@@ -36,6 +36,9 @@ export const useSessionSecurity = (options: Partial<UseSessionSecurityOptions> =
 
   // Effect to handle user activity tracking
   useEffect(() => {
+    // Only track activity if authenticated
+    if (!isAuthenticated) return;
+
     // Events to track for user activity
     const activityEvents = ['mousedown', 'keypress', 'scroll', 'touchstart'];
     
@@ -55,10 +58,13 @@ export const useSessionSecurity = (options: Partial<UseSessionSecurityOptions> =
         window.removeEventListener(event, updateActivity);
       });
     };
-  }, [resetTimer]);
+  }, [resetTimer, isAuthenticated]);
   
   // Effect to check session timeout
   useEffect(() => {
+    // Only check timeout if authenticated
+    if (!isAuthenticated) return;
+
     const intervalId = setInterval(() => {
       const currentTime = Date.now();
       const timeSinceLastActivity = currentTime - lastActivity;
@@ -78,7 +84,7 @@ export const useSessionSecurity = (options: Partial<UseSessionSecurityOptions> =
     }, 1000);
     
     return () => clearInterval(intervalId);
-  }, [lastActivity, sessionTimeout, warningThreshold, showWarning, logout]);
+  }, [lastActivity, sessionTimeout, warningThreshold, showWarning, logout, isAuthenticated]);
 
   return {
     showWarning,

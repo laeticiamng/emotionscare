@@ -6,6 +6,12 @@ interface User {
   name: string;
   email: string;
   role: string;
+  avatar?: string; // Added this property
+  avatar_url?: string; // Added this property
+  preferences?: any; // Added this property
+  position?: string; // Added this property
+  department?: string; // Added this property
+  joined_at?: string; // Added this property
 }
 
 interface AuthContextType {
@@ -15,6 +21,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (name: string, email: string, password: string) => Promise<void>;
+  updateUser?: (userData: Partial<User>) => Promise<void>; // Added this method
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,7 +39,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         id: '1',
         name: 'Utilisateur Test',
         email,
-        role: 'user'
+        role: 'user',
+        avatar: '/path/to/avatar.jpg',
+        avatar_url: '/path/to/avatar.jpg',
+        preferences: {
+          theme: 'system',
+          fontSize: 'medium',
+          fontFamily: 'system',
+          reduceMotion: false,
+          colorBlindMode: false,
+          autoplayMedia: true,
+          soundEnabled: true,
+        },
+        position: 'Developer',
+        department: 'Engineering',
+        joined_at: new Date().toISOString(),
       });
     } catch (error) {
       console.error('Login error:', error);
@@ -55,13 +76,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         id: '1',
         name,
         email,
-        role: 'user'
+        role: 'user',
+        avatar: '/path/to/avatar.jpg',
+        avatar_url: '/path/to/avatar.jpg',
       });
     } catch (error) {
       console.error('Register error:', error);
       throw error;
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const updateUser = async (userData: Partial<User>) => {
+    if (user) {
+      setUser({ ...user, ...userData });
     }
   };
 
@@ -73,7 +102,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isLoading,
         login,
         logout,
-        register
+        register,
+        updateUser,
       }}
     >
       {children}

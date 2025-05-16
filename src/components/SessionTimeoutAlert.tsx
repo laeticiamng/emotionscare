@@ -4,13 +4,17 @@ import { useSessionSecurity } from '@/hooks/use-session-security';
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SessionTimeoutAlert: React.FC = () => {
-  const { showWarning, resetTimer, timeLeft } = useSessionSecurity();
+  const auth = useAuth();
   const { toast } = useToast();
   
+  // Only proceed if user is authenticated
+  const { showWarning, resetTimer, timeLeft } = useSessionSecurity();
+  
   useEffect(() => {
-    if (showWarning) {
+    if (auth.isAuthenticated && showWarning) {
       toast({
         title: "Session expiration",
         description: (
@@ -32,7 +36,7 @@ const SessionTimeoutAlert: React.FC = () => {
         duration: 10000
       });
     }
-  }, [showWarning, toast, resetTimer]);
+  }, [showWarning, toast, resetTimer, auth.isAuthenticated]);
   
   return null; // This is a non-visual component
 };
