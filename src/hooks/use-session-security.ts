@@ -1,74 +1,76 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-export const useSessionSecurity = (options = {}) => {
+interface SessionSecurityOptions {
+  timeout?: number;
+  warningTime?: number;
+}
+
+export const useSessionSecurity = (options: SessionSecurityOptions = {}) => {
   const {
-    warningTime = 50000, // 50 seconds
-    logoutTime = 60000,  // 60 seconds
+    timeout = 900000, // 15 minutes par défaut
+    warningTime = 60000, // 1 minute d'avertissement par défaut
   } = options;
 
-  const [lastActivity, setLastActivity] = useState(Date.now());
-  const [showWarning, setShowWarning] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(logoutTime);
+  const [lastActivity, setLastActivity] = useState<number>(Date.now());
+  const [showWarning, setShowWarning] = useState<boolean>(false);
+  const [timeLeft, setTimeLeft] = useState<number>(timeout);
 
-  // Reset timer when user activity is detected
-  const resetTimer = () => {
+  // Réinitialise le minuteur d'activité
+  const resetTimer = useCallback(() => {
     setLastActivity(Date.now());
     setShowWarning(false);
-  };
+  }, []);
 
-  // Listen for user activity
+  // Surveille l'activité de l'utilisateur
   useEffect(() => {
-    const events = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
+    const activityEvents = ['mousedown', 'keypress', 'scroll', 'touchstart'];
     
     const handleActivity = () => {
       resetTimer();
     };
 
-    // Add event listeners
-    events.forEach(event => {
+    // Ajoute des écouteurs d'événements pour toutes les activités pertinentes
+    activityEvents.forEach(event => {
       window.addEventListener(event, handleActivity);
     });
 
+    // Nettoie les écouteurs d'événements
     return () => {
-      // Remove event listeners
-      events.forEach(event => {
+      activityEvents.forEach(event => {
         window.removeEventListener(event, handleActivity);
       });
     };
-  }, []);
+  }, [resetTimer]);
 
-  // Check session timeout
+  // Vérifie le délai d'inactivité
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const idle = now - lastActivity;
+    const intervalId = setInterval(() => {
+      const elapsed = Date.now() - lastActivity;
+      const remaining = Math.max(0, timeout - elapsed);
       
-      // Show warning when approaching timeout
-      if (idle >= warningTime && idle < logoutTime) {
-        if (!showWarning) {
-          setShowWarning(true);
-        }
-        setTimeLeft(logoutTime - idle);
+      setTimeLeft(remaining);
+
+      // Affiche l'avertissement quand on approche du délai d'inactivité
+      if (elapsed >= timeout - warningTime && !showWarning && remaining > 0) {
+        setShowWarning(true);
       }
 
-      // Logout when timeout is reached
-      if (idle >= logoutTime) {
-        // In a real app, this would log the user out
-        console.log('Session timeout: User would be logged out');
-        // Reset the timer after "logging out"
-        resetTimer();
+      // Déconnecte l'utilisateur après le délai d'inactivité
+      if (elapsed >= timeout && remaining <= 0) {
+        // La déconnexion peut être implémentée ici
+        console.log("Session expirée - Déconnexion");
+        // logout();
       }
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [lastActivity, warningTime, logoutTime, showWarning]);
+    return () => clearInterval(intervalId);
+  }, [lastActivity, timeout, warningTime, showWarning]);
 
   return {
-    showWarning,
     resetTimer,
+    showWarning,
     timeLeft,
+    isActive: timeLeft > 0
   };
 };
-
-export default useSessionSecurity;

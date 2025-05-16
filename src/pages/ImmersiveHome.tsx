@@ -1,13 +1,13 @@
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '@/components/theme/ThemeProvider';
-import { useMusic } from '@/contexts/music/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 import Shell from '@/Shell';
 import '@/styles/immersive-home.css';
 import AnimatedBackground from '@/components/immersive/AnimatedBackground';
 import ImmersiveControls from '@/components/immersive/ImmersiveControls';
 import PremiumContent from '@/components/immersive/PremiumContent';
+import { useMusic } from '@/contexts/music';
 
 const generateGreeting = () => {
   const hour = new Date().getHours();
