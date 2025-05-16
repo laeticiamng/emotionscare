@@ -4,14 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { User, UserPreferences } from '@/types/types';
+import { User } from '@/types/types';
+import { UserPreferences } from '@/types/preferences';
 import DisplayPreferences from './DisplayPreferences';
 import NotificationPreferences from './NotificationPreferences';
 import PrivacyPreferences from './PrivacyPreferences';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Define allowed font size values in TypeScript
-export type FontSize = 'small' | 'medium' | 'large';
+export type FontSize = 'small' | 'medium' | 'large' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 interface PreferencesFormProps {
   user: User;
@@ -27,13 +28,15 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
   const { toast } = useToast();
   const auth = useAuth();
   const [activeTab, setActiveTab] = useState('display');
-  const [preferences, setPreferences] = useState<UserPreferences>(user.preferences || {
+  
+  const defaultPreferences: UserPreferences = {
     theme: 'system',
     fontSize: 'medium',
     fontFamily: 'system',
     reduceMotion: false,
     colorBlindMode: false,
     autoplayMedia: true,
+    soundEnabled: true,
     notifications: {
       enabled: true,
       emailEnabled: true,
@@ -53,9 +56,12 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
       shareData: true,
       anonymizeReports: false,
       profileVisibility: 'public',
-    },
-    soundEnabled: true,
-  });
+    }
+  };
+  
+  const [preferences, setPreferences] = useState<UserPreferences>(
+    user.preferences || defaultPreferences
+  );
 
   const handlePreferencesChange = (newPartialPreferences: Partial<UserPreferences>) => {
     setPreferences(prev => ({

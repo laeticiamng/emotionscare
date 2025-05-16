@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -62,6 +61,7 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
       onFontSizeChange(value as FontSize);
     }
   };
+
   
   return (
     <div className="space-y-6">

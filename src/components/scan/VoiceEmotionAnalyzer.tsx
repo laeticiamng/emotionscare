@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/scan';
 import { Mic, StopCircle } from 'lucide-react';
 
 interface VoiceEmotionAnalyzerProps {
@@ -33,7 +32,7 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult })
       if (onResult) {
         const mockResult: EmotionResult = {
           id: 'voice-analysis-' + Date.now(),
-          user_id: 'user-123',
+          userId: 'user-123',
           emotion: ['joy', 'calm', 'anxious', 'sad'][Math.floor(Math.random() * 4)],
           score: Math.random() * 0.5 + 0.5,
           confidence: Math.random() * 0.3 + 0.7,

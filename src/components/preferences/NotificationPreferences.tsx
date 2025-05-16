@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UserPreferences } from '@/types/preferences';
+import { UserPreferences, NotificationPreferences as NotificationPrefsType } from '@/types/preferences';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -26,7 +26,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ prefe
     if (typeof notifications === 'object') {
       onChange({
         notifications: {
-          ...notifications,
+          ...(notifications as NotificationPrefsType),
           [key]: value
         }
       });

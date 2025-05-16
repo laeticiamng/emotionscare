@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { UserPreferences } from '@/types/preferences';
 import { Button } from '@/components/ui/button';

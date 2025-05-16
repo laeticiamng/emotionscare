@@ -1,5 +1,5 @@
 
-// Add this to your existing scan.ts file or create it if it doesn't exist
+// Updated TeamOverviewProps to include all the required properties
 
 export interface TeamOverviewProps {
   userId?: string;
@@ -16,6 +16,7 @@ export interface EmotionResult {
   // Define your emotion result type here
   id?: string;
   userId?: string;
+  user_id?: string; // Added for compatibility
   emotion?: string;
   intensity?: number;
   timestamp?: string | Date;
@@ -24,8 +25,9 @@ export interface EmotionResult {
   tags?: string[];
   notes?: string;
   category?: string;
-  score?: number; // Added based on error
-  feedback?: string; // Added based on error
-  ai_feedback?: string; // Added based on error
-  user_id?: string; // Added based on error
+  score?: number;
+  feedback?: string;
+  ai_feedback?: string;
+  confidence?: number;
+  recommendations?: string[];
 }
