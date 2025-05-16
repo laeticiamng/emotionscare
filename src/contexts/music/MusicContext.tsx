@@ -11,6 +11,7 @@ const defaultContextValue: MusicContextType = {
   isMuted: false,
   currentTime: 0,
   duration: 0,
+  currentEmotion: null,
   playTrack: () => {},
   pauseTrack: () => {},
   togglePlay: () => {},

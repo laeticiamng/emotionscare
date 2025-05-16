@@ -15,6 +15,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [emotion, setEmotionState] = useState<string | null>(null);
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const [openDrawer, setOpenDrawerState] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -173,6 +174,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // For now, just a mock implementation - in a real app, this would call an API
       const emotionName = typeof params === 'string' ? params : params.emotion;
       setEmotionState(emotionName);
+      setCurrentEmotion(emotionName); // Mettre à jour currentEmotion
       
       // Mock data for demonstration
       const mockPlaylist: MusicPlaylist = {
@@ -217,6 +219,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   
   const setEmotion = (newEmotion: string) => {
     setEmotionState(newEmotion);
+    setCurrentEmotion(newEmotion);
   };
   
   const setOpenDrawer = (open: boolean) => {
@@ -235,6 +238,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     isLoading,
     error,
     emotion,
+    currentEmotion,
     openDrawer,
     playTrack,
     pauseTrack,

@@ -1,25 +1,11 @@
 
-import { ReactNode } from 'react';
-
-export interface Theme {
-  id?: string;
-  name: string;
-  value: string;
-  preview?: string;
-}
-
-export type ThemeType = 'light' | 'dark' | 'pastel' | 'system';
+export type Theme = 'light' | 'dark' | 'system' | 'pastel';
+export type FontSize = 'small' | 'medium' | 'large';
+export type FontFamily = 'inter' | 'system' | 'serif' | 'mono' | 'sans-serif' | 'monospace';
 
 export interface ThemeContextType {
-  theme: string;
-  setTheme: (theme: string | Theme) => void;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
   isDarkMode: boolean;
   toggleTheme: () => void;
-  fontFamily?: FontFamily;
-  setFontFamily?: (fontFamily: FontFamily) => void;
-  fontSize?: FontSize;
-  setFontSize?: (fontSize: FontSize) => void;
 }
-
-export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "inter" | "rounded";
-export type FontSize = "small" | "medium" | "large" | "x-large" | "sm" | "md" | "lg" | "xl";

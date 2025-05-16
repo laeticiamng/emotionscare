@@ -23,6 +23,10 @@ export interface LiveVoiceScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
   onBack?: () => void;
   className?: string;
+  period?: string;
+  dateRange?: {start: Date, end: Date};
+  showGraph?: boolean;
+  showMembers?: boolean;
 }
 
 export interface TeamOverviewProps {
@@ -31,4 +35,9 @@ export interface TeamOverviewProps {
 
 export interface EmotionalTeamViewProps {
   teamId: string;
+  period?: string;
+  dateRange?: {start: Date, end: Date};
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
 }

@@ -49,6 +49,7 @@ export interface MusicContextType {
   isInitialized?: boolean;
   openDrawer?: boolean;
   emotion?: string | null;
+  currentEmotion?: string | null; // Ajout de cette propriété manquante
   initializeMusicSystem?: () => Promise<void>;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
