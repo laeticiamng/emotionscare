@@ -13,7 +13,7 @@ const SessionTimeoutAlert: React.FC = () => {
     if (showWarning) {
       toast({
         title: "Alerte de sécurité",
-        description: 
+        description: (
           <div className="flex flex-col space-y-2">
             <div className="flex items-center text-destructive">
               <AlertCircle className="w-4 h-4 mr-1" />
@@ -27,6 +27,9 @@ const SessionTimeoutAlert: React.FC = () => {
               Prolonger la session
             </Button>
           </div>
+        ),
+        variant: "warning",
+        duration: 10000
       });
     }
   }, [showWarning, toast, resetTimer]);

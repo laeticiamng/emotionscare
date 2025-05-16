@@ -1,23 +1,20 @@
 
 import * as React from "react";
-import { 
-  toast as sonnerToast, 
-  Toast,
-  ToastT, 
-  Toaster as SonnerToaster 
-} from "sonner";
+import { toast as sonnerToast } from "sonner";
 
-export type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
+export type ToastProps = React.ComponentPropsWithoutRef<typeof sonnerToast>;
 
 const TOAST_LIMIT = 20;
 const TOAST_REMOVE_DELAY = 1000000;
 
-type ToasterToast = ToastT & {
+type ToasterToast = {
   id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: React.ReactNode;
   open: boolean;
+  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
+  duration?: number;
 };
 
 const actionTypes = {
@@ -133,10 +130,22 @@ function dispatch(action: Action) {
   });
 }
 
-type Toast = Omit<ToasterToast, "id">;
+type Toast = Omit<ToasterToast, "id" | "open">;
 
-function toast({ ...props }: Toast) {
+function toast(props: Toast) {
   const id = props.id || crypto.randomUUID();
+  const variant = props.variant || "default";
+  
+  // Map variant to sonner variant if needed
+  const sonnerVariant = variant === "destructive" ? "error" : variant;
+  
+  // Use sonner toast for immediate visual feedback
+  sonnerToast[sonnerVariant as keyof typeof sonnerToast]?.(props.title || "", {
+    id,
+    description: props.description,
+    duration: props.duration || 5000,
+    action: props.action,
+  });
 
   const update = (props: ToasterToast) =>
     dispatch({

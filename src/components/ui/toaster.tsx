@@ -1,27 +1,19 @@
 
 import React from "react";
 import { useToast } from "@/hooks/use-toast";
-import { toast as sonnerToast, Toaster as SonnerToaster } from "sonner";
+import { Toaster as SonnerToaster } from "sonner";
 
 export function Toaster() {
   const { toasts } = useToast();
 
-  React.useEffect(() => {
-    // Vérifier si toasts existe avant d'itérer
-    if (toasts && Array.isArray(toasts)) {
-      toasts.forEach((toast) => {
-        if (toast && toast.open) {
-          sonnerToast(toast.title || "", {
-            id: toast.id,
-            description: toast.description,
-            duration: toast.duration,
-          });
-        }
-      });
-    }
-  }, [toasts]);
-
-  return <SonnerToaster position="bottom-right" closeButton />;
+  return (
+    <SonnerToaster 
+      position="bottom-right" 
+      closeButton 
+      richColors 
+      theme="light" 
+    />
+  );
 }
 
 export { Toaster as Toast };

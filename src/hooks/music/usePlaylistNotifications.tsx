@@ -8,14 +8,17 @@ export function usePlaylistNotifications() {
     toast({
       title: "Error",
       description: message,
-      variant: "destructive"
+      variant: "destructive",
+      duration: 5000
     });
   };
   
   const notifyPlaylistLoaded = (playlistName: string) => {
     toast({
       title: "Playlist loaded",
-      description: `The playlist "${playlistName}" has been loaded successfully`
+      description: `The playlist "${playlistName}" has been loaded successfully`,
+      variant: "success",
+      duration: 3000
     });
   };
   

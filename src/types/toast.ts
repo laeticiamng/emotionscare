@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 export interface Toast {
   id: string;
   title?: string;
-  description?: string;
+  description?: string | ReactNode;
   action?: ReactNode;
   variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
   duration?: number;

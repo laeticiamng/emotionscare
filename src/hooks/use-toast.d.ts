@@ -7,8 +7,8 @@ export interface ToastProps {
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: React.ReactElement;
-  variant?: "default" | "success" | "destructive";
-  duration?: number; // Added missing property
+  variant?: "default" | "success" | "destructive" | "warning" | "info";
+  duration?: number;
 }
 
 export type Toast = ToastProps;
