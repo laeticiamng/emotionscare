@@ -1,61 +1,49 @@
 
-import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { toast } from '@/hooks/use-toast';
-import { formatDate } from '@/lib/utils';
+import * as XLSX from 'xlsx';
 
-export const exportToExcel = (data: any[], filename = 'activity-logs') => {
+export const exportActivityData = (data: any[], format: 'csv' | 'xlsx' = 'xlsx', filename = 'activity-logs') => {
   try {
-    // Create workbook
-    const wb = XLSX.utils.book_new();
-    
-    // Convert data to worksheet
-    const ws = XLSX.utils.json_to_sheet(data);
-    
-    // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(wb, ws, 'Activity Logs');
-    
-    // Generate file and save
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    
-    // Create blob and save
-    const blob = new Blob([wbout], { type: 'application/octet-stream' });
-    saveAs(blob, `${filename}-${formatDate(new Date())}.xlsx`);
-    
-    toast({
-      title: 'Exported Successfully',
-      description: `${data.length} records exported to Excel.`,
-    });
+    if (!data || data.length === 0) {
+      console.error('No data to export');
+      return false;
+    }
+
+    switch (format) {
+      case 'xlsx': {
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Activity Logs');
+        
+        // Generate Excel file
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const excelData = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        
+        // Save the file
+        saveAs(excelData, `${filename}.xlsx`);
+        return true;
+      }
+      
+      case 'csv': {
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const csvData = XLSX.utils.sheet_to_csv(worksheet);
+        const csvBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8' });
+        
+        // Save the file
+        saveAs(csvBlob, `${filename}.csv`);
+        return true;
+      }
+      
+      default:
+        console.error('Unsupported format');
+        return false;
+    }
   } catch (error) {
-    console.error('Error exporting Excel file:', error);
-    toast({
-      title: 'Export Failed',
-      description: 'There was an error exporting data to Excel.',
-      variant: 'destructive',
-    });
+    console.error('Error exporting data:', error);
+    return false;
   }
 };
 
-export const exportToCSV = (data: any[], filename = 'activity-logs') => {
-  try {
-    // Convert data to CSV
-    const ws = XLSX.utils.json_to_sheet(data);
-    const csv = XLSX.utils.sheet_to_csv(ws);
-    
-    // Create blob and save
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-    saveAs(blob, `${filename}-${formatDate(new Date())}.csv`);
-    
-    toast({
-      title: 'Exported Successfully',
-      description: `${data.length} records exported to CSV.`,
-    });
-  } catch (error) {
-    console.error('Error exporting CSV file:', error);
-    toast({
-      title: 'Export Failed',
-      description: 'There was an error exporting data to CSV.',
-      variant: 'destructive',
-    });
-  }
+export default {
+  exportActivityData
 };

@@ -1,66 +1,37 @@
 
+import { UserRole } from "./user";
+import { ThemeName, FontSize, FontFamily } from "./preferences";
+
 export interface User {
   id: string;
-  name?: string;
-  email?: string;
-  avatar_url?: string;
+  name: string;
+  email: string;
+  avatar?: string;
   role?: UserRole;
   preferences?: UserPreferences;
+  onboarded?: boolean;
 }
-
-export type UserRole = "admin" | "user" | "b2b_user" | "b2b_admin" | "guest";
 
 export interface UserPreferences {
-  theme?: "light" | "dark" | "system" | "pastel";
-  fontSize?: "small" | "medium" | "large";
-  fontFamily?: "system" | "serif" | "sans-serif" | "monospace";
-  reduceMotion?: boolean;
-  colorBlindMode?: boolean;
-  autoplayMedia?: boolean;
-  notifications?: {
-    enabled: boolean;
-    emailEnabled?: boolean;
-    pushEnabled?: boolean;
-    inAppEnabled?: boolean;
-    email?: boolean;
-    push?: boolean;
-    sms?: boolean;
-    types?: {
-      system?: boolean;
-      emotion?: boolean;
-      coach?: boolean;
-      journal?: boolean;
-      community?: boolean;
-      achievement?: boolean;
-    },
-    frequency?: string;
-  };
-  privacy?: {
-    shareData: boolean;
-    anonymizeReports: boolean;
-    profileVisibility: "public" | "private" | "friends";
-  };
+  theme?: ThemeName;
+  fontSize?: FontSize;
+  fontFamily?: FontFamily;
+  language?: string;
+  notifications?: boolean;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
   soundEnabled?: boolean;
+  onboardingCompleted?: boolean;
+  dashboardLayout?: string;
+  privacyLevel?: string;
+  notificationPreferences?: NotificationPreferences;
 }
 
-export type ThemeName = "light" | "dark" | "system" | "pastel";
-export type FontFamily = "system" | "serif" | "sans-serif" | "monospace";
-export type FontSize = "small" | "medium" | "large";
-
-export interface InvitationVerificationResult {
-  valid: boolean;
-  message: string;
-  role?: UserRole;
-}
-
-export interface NotificationPreferences {
+export type NotificationPreferences = {
   enabled: boolean;
   emailEnabled?: boolean;
   pushEnabled?: boolean;
   inAppEnabled?: boolean;
-  email?: boolean;
-  push?: boolean;
-  sms?: boolean;
   types?: {
     system?: boolean;
     emotion?: boolean;
@@ -70,10 +41,7 @@ export interface NotificationPreferences {
     achievement?: boolean;
   },
   frequency?: string;
-}
-
-export type Period = "day" | "week" | "month" | "year";
-export type UserModeType = "light" | "dark" | "system";
+};
 
 export interface Story {
   id: string;
@@ -86,4 +54,15 @@ export interface Story {
     label: string;
     route: string;
   };
+}
+
+export type Period = 'day' | 'week' | 'month' | 'year';
+export type UserModeType = 'b2c' | 'b2b-collaborator' | 'b2b-admin';
+
+// Type pour la vérification des invitations
+export interface InvitationVerificationResult {
+  valid: boolean;
+  message?: string;
+  email?: string;
+  role?: UserRole;
 }

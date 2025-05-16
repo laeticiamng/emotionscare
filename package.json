@@ -47,6 +47,7 @@
     "@supabase/supabase-js": "^2.49.4",
     "@tanstack/react-query": "^5.56.2",
     "@tanstack/react-table": "^8.21.3",
+    "@types/file-saver": "^2.0.5",
     "@types/uuid": "^10.0.0",
     "canvas-confetti": "^1.9.2",
     "class-variance-authority": "^0.7.1",
@@ -79,6 +80,7 @@
     "ts-node": "^10.9.2",
     "uuid": "^11.1.0",
     "vaul": "^0.9.9",
+    "xlsx": "^0.18.5",
     "zod": "^3.23.8",
     "zustand": "^5.0.4"
   },
