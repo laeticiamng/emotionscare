@@ -19,6 +19,7 @@ export interface GamificationStats {
   totalBadges?: number;
   unlockedBadges?: number;
   badges?: Badge[];
+  unlockedBadges?: Badge[];
   activeUsers?: number;
   activeUsersPercent?: number;
   completionRate?: number;
@@ -47,4 +48,15 @@ export interface Challenge {
   endDate?: string;
   total?: number;
   status: 'active' | 'completed' | 'failed';
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  name: string;
+  avatar?: string;
+  points: number;
+  rank: number;
+  level: number;
+  isCurrentUser: boolean;
 }

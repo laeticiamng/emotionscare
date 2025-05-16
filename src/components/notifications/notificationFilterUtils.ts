@@ -16,7 +16,9 @@ export const filterNotifications = (
     case 'read':
       return notifications.filter(notification => notification.read);
     case 'urgent':
-      return notifications.filter(notification => notification.priority === 'urgent');
+      return notifications.filter(notification => 
+        notification.type === 'urgent' || notification.priority === 'urgent'
+      );
     case 'system':
       return notifications.filter(notification => notification.type === 'system');
     case 'journal':

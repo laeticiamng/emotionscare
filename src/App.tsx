@@ -11,7 +11,7 @@ import './styles/glass.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from './components/theme-provider';
 import { MusicProvider } from './contexts/MusicContext';
-import AppRoutes from './router/AppRoutes';
+import AppRoutes from './router';
 
 function App() {
   return (

@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Trophy, Crown } from 'lucide-react';
 
-interface LeaderboardEntry {
+export interface LeaderboardEntry {
   id: string;
   userId: string;
   name: string;
