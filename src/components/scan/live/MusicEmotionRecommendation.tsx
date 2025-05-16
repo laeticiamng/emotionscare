@@ -3,6 +3,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, Heart } from 'lucide-react';
+import { useMusic } from '@/contexts/music';
+import { EmotionMusicParams } from '@/types/music';
 
 interface MusicEmotionRecommendationProps {
   emotion: string;
@@ -10,6 +12,8 @@ interface MusicEmotionRecommendationProps {
 }
 
 const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({ emotion, onSelect }) => {
+  const { loadPlaylistForEmotion } = useMusic();
+  
   // Mock playlists based on emotions
   const playlists = {
     happy: { id: 'happy-1', name: 'Énergie positive', tracks: 12 },
@@ -22,6 +26,17 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
   
   // Get playlist based on emotion or fallback to neutral
   const playlist = playlists[emotion as keyof typeof playlists] || playlists.neutral;
+  
+  const handleSelectPlaylist = async () => {
+    try {
+      const params: EmotionMusicParams = { emotion };
+      const musicPlaylist = await loadPlaylistForEmotion(params);
+      onSelect(musicPlaylist || playlist);
+    } catch (error) {
+      console.error("Error loading emotion-based playlist:", error);
+      onSelect(playlist);
+    }
+  };
   
   return (
     <Card className="mt-4">
@@ -52,7 +67,7 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
         </div>
       </CardContent>
       <CardFooter className="pt-0">
-        <Button className="w-full" onClick={() => onSelect(playlist)}>
+        <Button className="w-full" onClick={handleSelectPlaylist}>
           Écouter cette playlist
         </Button>
       </CardFooter>

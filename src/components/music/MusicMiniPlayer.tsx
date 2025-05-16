@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipForward } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/contexts/music';
 
 interface MusicMiniPlayerProps {
   onOpen: () => void;
@@ -15,7 +15,7 @@ const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ onOpen }) => {
     playTrack, 
     pauseTrack, 
     nextTrack,
-    currentPlaylist 
+    playlist
   } = useMusic();
 
   const handleTogglePlay = () => {

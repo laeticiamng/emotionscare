@@ -10,15 +10,15 @@ const MusicPlayer = () => {
     currentTrack,
     isPlaying,
     volume,
-    muted,
     progress,
     duration,
     togglePlayback,
     nextTrack,
-    prevTrack,
+    previousTrack,
     setProgress,
     setVolume,
-    toggleMute
+    toggleMute,
+    muted
   } = useMusic();
 
   const [displayedTime, setDisplayedTime] = useState('0:00');
@@ -27,7 +27,7 @@ const MusicPlayer = () => {
   useEffect(() => {
     if (currentTrack) {
       setDisplayedTime(formatTime(progress));
-      setDisplayedDuration(formatTime(duration));
+      setDisplayedDuration(formatTime(duration || 0));
     }
   }, [progress, duration, currentTrack]);
 
@@ -52,9 +52,9 @@ const MusicPlayer = () => {
         {/* Album cover and info */}
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="min-w-12 h-12 bg-blue-200 dark:bg-blue-800/30 rounded shadow-md overflow-hidden">
-            {currentTrack.coverImage ? (
+            {currentTrack.coverUrl || currentTrack.coverImage ? (
               <img 
-                src={currentTrack.coverImage} 
+                src={currentTrack.coverUrl || currentTrack.coverImage} 
                 alt={currentTrack.title} 
                 className="w-full h-full object-cover"
               />
@@ -76,7 +76,7 @@ const MusicPlayer = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={prevTrack}
+              onClick={previousTrack}
               className="text-blue-700 dark:text-blue-300 hover:bg-blue-200/50 dark:hover:bg-blue-800/30"
             >
               <SkipBack className="h-5 w-5" />

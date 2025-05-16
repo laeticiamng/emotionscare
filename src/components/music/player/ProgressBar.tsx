@@ -3,60 +3,43 @@ import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { ProgressBarProps } from '@/types/music';
 
-const ProgressBar: React.FC<ProgressBarProps> = ({
-  value,
-  max = 100,
-  showLabel = false,
-  className = '',
-  variant = 'default',
-  currentTime = 0,
-  duration = 0,
-  formatTime = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`,
-  onSeek,
-  showTimestamps = true,
+const ProgressBar: React.FC<ProgressBarProps> = ({ 
+  progress, 
+  total, 
+  currentTime, 
+  duration, 
+  onSeek, 
+  max = 100, 
+  className = '', 
+  formatTime,
+  showTimestamps = true
 }) => {
-  const handleSliderChange = (values: number[]) => {
-    if (onSeek) {
-      onSeek(values[0]);
-    }
+  
+  // Create a default formatTime function if none is provided
+  const formatTimeDefault = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  const handleInternalProgressClick = (e: React.MouseEvent) => {
-    // Internal handler for progress bar clicks
-    const rect = e.currentTarget.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
-    const seekValue = percent * duration;
-    
-    if (onSeek) {
-      onSeek(seekValue);
-    }
-  };
-
+  
+  const timeFormatter = formatTime || formatTimeDefault;
+  
   return (
-    <div className={className}>
-      <div
-        className="relative w-full"
-        onClick={handleInternalProgressClick}
-      >
+    <div className={`w-full space-y-1 ${className}`}>
+      <div className="flex w-full items-center">
         <Slider
-          value={[value]}
+          value={[progress]}
           max={max}
-          step={0.1}
-          className="mb-1"
-          onValueChange={handleSliderChange}
+          step={1}
+          onValueChange={values => onSeek(values[0])}
+          className="flex-1"
         />
       </div>
       
-      {showTimestamps && (
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
-        </div>
-      )}
-      
-      {showLabel && (
-        <div className="text-center text-xs text-muted-foreground mt-1">
-          {Math.round(value)}%
+      {showTimestamps && currentTime !== undefined && duration !== undefined && (
+        <div className="flex w-full justify-between text-xs text-muted-foreground">
+          <span>{timeFormatter(currentTime)}</span>
+          <span>{timeFormatter(duration)}</span>
         </div>
       )}
     </div>

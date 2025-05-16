@@ -12,6 +12,8 @@ export interface MusicTrack {
   track_url?: string;
   cover?: string;
   emotionalTone?: string;
+  category?: string;
+  tags?: string[];
 }
 
 export interface MusicPlaylist {
@@ -21,12 +23,15 @@ export interface MusicPlaylist {
   tracks: MusicTrack[];
   coverUrl: string;
   cover_url?: string;
+  category?: string;
+  mood?: string;
 }
 
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   playlist: MusicPlaylist | null;
   currentPlaylist?: MusicPlaylist | null;
+  playlists: MusicPlaylist[];
   isPlaying: boolean;
   volume: number;
   progress: number;
@@ -34,7 +39,11 @@ export interface MusicContextType {
   muted?: boolean;
   error?: Error | null;
   isInitialized?: boolean;
-  currentEmotion?: string;
+  currentEmotion?: string | null;
+  currentTime: number;
+  queue: MusicTrack[];
+  isShuffled: boolean;
+  isRepeating: boolean;
   loadTrack: (track: MusicTrack) => void;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
@@ -56,6 +65,10 @@ export interface MusicContextType {
   setOpenDrawer?: (open: boolean) => void;
   initializeMusicSystem?: () => void;
   isMuted?: boolean;
+  addToQueue: (track: MusicTrack) => void;
+  clearQueue: () => void;
+  toggleShuffle: () => void;
+  toggleRepeat: () => void;
 }
 
 export interface MusicDrawerProps {
@@ -105,6 +118,7 @@ export interface Track {
   emotion?: string;
   intensity?: number;
   category?: string;
+  coverImage?: string;
 }
 
 export interface ProgressBarProps {

@@ -10,6 +10,7 @@ import B2CLogin from './pages/b2c/Login';
 import B2BAdminLogin from './pages/b2b/admin/Login';
 import B2BUserLogin from './pages/b2b/user/Login';
 import B2BUserRegister from './pages/b2b/user/Register';
+import LandingPage from './pages/LandingPage';
 
 // Create and export the router
 export const router = createBrowserRouter([
@@ -19,6 +20,10 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
+        element: <LandingPage />
+      },
+      {
+        path: 'home',
         element: <Home />
       },
       {

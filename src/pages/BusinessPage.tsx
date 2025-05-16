@@ -1,76 +1,49 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Building, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { User, Shield, ArrowLeft } from 'lucide-react';
-import { useUserMode } from '@/contexts/UserModeContext';
-import Shell from '@/Shell';
 
 const BusinessPage = () => {
   const navigate = useNavigate();
-  const { setUserMode } = useUserMode();
-  
-  const handleUserAccess = () => {
-    setUserMode('b2b-collaborator');
-    localStorage.setItem('userMode', 'b2b-collaborator');
-    // In a real app, this would redirect to the login page
-    // For test purposes, we're going to simulate a successful login
-    localStorage.setItem('auth_session', 'mock_token_collaborateur');
-    localStorage.setItem('user_role', 'b2b-collaborator');
-    navigate('/dashboard');
-  };
-  
-  const handleAdminAccess = () => {
-    setUserMode('b2b-admin');
-    localStorage.setItem('userMode', 'b2b-admin');
-    // In a real app, this would redirect to the login page
-    // For test purposes, we're going to simulate a successful login
-    localStorage.setItem('auth_session', 'mock_token_admin');
-    localStorage.setItem('user_role', 'b2b-admin');
-    navigate('/admin/dashboard');
-  };
-  
+
   return (
-    <Shell>
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-purple-50 to-white dark:from-gray-900 dark:to-purple-900/20">
-        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">Espace Entreprise</h1>
-            <p className="text-muted-foreground">Veuillez sélectionner votre type d'accès</p>
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-blue-50 dark:bg-slate-900">
+      <h1 className="text-4xl font-bold mb-12 text-center">Accès Espace Entreprise</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full">
+        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/b2b/user/login')}>
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+              <Building className="h-8 w-8 text-blue-600" />
+            </div>
+            <h2 className="text-2xl font-bold">Espace Collaborateur</h2>
+            <p className="text-muted-foreground">
+              Accédez à votre espace personnel au sein de l'entreprise pour suivre votre bien-être et vos émotions.
+            </p>
+            <Button className="w-full">Connexion Collaborateur</Button>
           </div>
-          
-          <div className="space-y-4">
-            <Button 
-              onClick={handleUserAccess}
-              className="w-full h-16 text-lg"
-            >
-              <User className="mr-3 h-6 w-6" />
-              Collaborateur
-              <span className="ml-2 text-xs opacity-70">(collaborateur@exemple.fr / admin)</span>
-            </Button>
-            
-            <Button 
-              onClick={handleAdminAccess}
-              className="w-full h-16 text-lg"
-              variant="secondary"
-            >
-              <Shield className="mr-3 h-6 w-6" />
-              Administration / RH
-              <span className="ml-2 text-xs opacity-70">(admin@exemple.fr / admin)</span>
-            </Button>
-            
-            <Button 
-              onClick={() => navigate('/')} 
-              variant="ghost" 
-              className="w-full mt-6"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour à l'accueil
-            </Button>
+        </Card>
+
+        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/b2b/admin/login')}>
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+              <Shield className="h-8 w-8 text-blue-600" />
+            </div>
+            <h2 className="text-2xl font-bold">Espace Administrateur</h2>
+            <p className="text-muted-foreground">
+              Visualisez les données agrégées et anonymisées de votre organisation et planifiez des actions ciblées.
+            </p>
+            <Button variant="outline" className="w-full">Connexion Administrateur</Button>
           </div>
-        </div>
+        </Card>
       </div>
-    </Shell>
+
+      <Button variant="ghost" className="mt-8" onClick={() => navigate('/')}>
+        Retour à l'accueil
+      </Button>
+    </div>
   );
 };
 

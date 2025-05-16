@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useMusic } from '@/contexts/music';
-import { EmotionResult, MusicTrack } from '@/types';
+import { EmotionResult, MusicTrack, EmotionMusicParams } from '@/types';
 
 export const EMOTION_TO_MUSIC: Record<string, string> = {
   joy: 'upbeat',
@@ -32,7 +32,8 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
     setIsLoading(true);
     try {
       const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-      const playlist = await loadPlaylistForEmotion?.(musicType);
+      const params: EmotionMusicParams = { emotion: musicType };
+      const playlist = await loadPlaylistForEmotion?.(params);
       if (playlist?.tracks) {
         // Make sure all tracks have required properties
         const tracksWithRequiredProps = playlist.tracks.map(track => ({
