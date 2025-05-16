@@ -13,6 +13,7 @@ export interface ThemeContextType {
   setFontSize?: (size: FontSize) => void;
   fontFamily?: FontFamily;
   setFontFamily?: (family: FontFamily) => void;
+  getContrastText?: (color: string) => 'black' | 'white';
 }
 
 export interface ThemeOption {

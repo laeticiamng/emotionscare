@@ -3,17 +3,35 @@ import React from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { Theme } from '@/types/theme';
-
-export interface ThemeSettingsTabProps {
-  currentTheme: Theme;
-  onThemeChange: (theme: Theme) => void;
-}
+import { Theme, ThemeSettingsTabProps } from '@/types/theme';
 
 const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   currentTheme,
   onThemeChange
 }) => {
+  const themeOptions: { value: Theme, label: string, description: string }[] = [
+    { 
+      value: 'light', 
+      label: 'Clair', 
+      description: 'Idéal pour une utilisation en journée avec un contraste optimal'
+    },
+    { 
+      value: 'dark', 
+      label: 'Sombre', 
+      description: 'Réduit la fatigue oculaire dans les environnements peu éclairés'
+    },
+    { 
+      value: 'system', 
+      label: 'Système', 
+      description: 'S\'adapte automatiquement aux préférences de votre appareil'
+    },
+    { 
+      value: 'pastel', 
+      label: 'Pastel', 
+      description: 'Une ambiance douce et colorée pour une expérience apaisante'
+    }
+  ];
+
   return (
     <Card>
       <CardContent className="pt-6">
@@ -23,27 +41,17 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
           <RadioGroup
             value={currentTheme}
             onValueChange={(value: Theme) => onThemeChange(value)}
-            className="grid grid-cols-2 gap-4"
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
           >
-            <div className="relative flex items-center space-x-2">
-              <RadioGroupItem value="light" id="theme-light" />
-              <Label htmlFor="theme-light">Clair</Label>
-            </div>
-            
-            <div className="relative flex items-center space-x-2">
-              <RadioGroupItem value="dark" id="theme-dark" />
-              <Label htmlFor="theme-dark">Sombre</Label>
-            </div>
-            
-            <div className="relative flex items-center space-x-2">
-              <RadioGroupItem value="system" id="theme-system" />
-              <Label htmlFor="theme-system">Système</Label>
-            </div>
-            
-            <div className="relative flex items-center space-x-2">
-              <RadioGroupItem value="pastel" id="theme-pastel" />
-              <Label htmlFor="theme-pastel">Pastel</Label>
-            </div>
+            {themeOptions.map((option) => (
+              <div key={option.value} className="relative flex items-center space-x-2 rounded-lg border p-3 shadow-sm transition-all hover:bg-accent">
+                <RadioGroupItem value={option.value} id={`theme-${option.value}`} />
+                <div className="ml-2">
+                  <Label htmlFor={`theme-${option.value}`} className="font-medium">{option.label}</Label>
+                  <p className="text-xs text-muted-foreground">{option.description}</p>
+                </div>
+              </div>
+            ))}
           </RadioGroup>
         </div>
       </CardContent>

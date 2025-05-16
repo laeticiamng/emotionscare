@@ -15,6 +15,7 @@ export interface VRSessionTemplate {
   benefits?: string[];
   isPublic?: boolean;
   isPremium?: boolean;
+  
   // Additional properties needed by components
   name?: string;
   is_audio_only?: boolean;
@@ -22,7 +23,7 @@ export interface VRSessionTemplate {
   preview_url?: string;
   lastUsed?: Date;
   
-  // Properties used in VRTemplateDetail and other components
+  // Properties used in detail and other components
   thumbnailUrl?: string;
   imageUrl?: string;
   coverUrl?: string;
@@ -58,7 +59,7 @@ export interface VRSession {
   notes?: string;
   completed?: boolean;
   
-  // Additional properties needed by VRSessionHistory and VRSessionStats
+  // Additional properties needed by components
   template?: VRSessionTemplate;
   start_time?: Date;
   startTime?: Date;

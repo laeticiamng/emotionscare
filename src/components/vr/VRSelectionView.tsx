@@ -1,44 +1,74 @@
 
-import React from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import React, { useState } from 'react';
+import { VRTemplateGrid } from './VRTemplateGrid';
+import { VRSessionTemplate } from '@/types/vr';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
-import VRTemplateGrid from './VRTemplateGrid';
-import { VRSessionTemplate } from '@/types';
 
 interface VRSelectionViewProps {
   templates: VRSessionTemplate[];
-  onSelectTemplate: (template: VRSessionTemplate) => void;
-  className?: string;
+  onSelect: (template: VRSessionTemplate) => void;
+  title?: string;
+  showSearch?: boolean;
 }
 
-const VRSelectionView: React.FC<VRSelectionViewProps> = ({
+export const VRSelectionView: React.FC<VRSelectionViewProps> = ({
   templates,
-  onSelectTemplate,
-  className = ''
+  onSelect,
+  title = "Sessions VR",
+  showSearch = true
 }) => {
-  const [searchTerm, setSearchTerm] = React.useState('');
-  
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredTemplates = templates.filter(template => 
+    template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (template.description && template.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (template.tags && template.tags.some(tag => 
+      tag.toLowerCase().includes(searchTerm.toLowerCase())
+    ))
+  );
+
   return (
-    <div className={`flex flex-col h-full ${className}`}>
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Rechercher par nom, émotion ou catégorie..."
-          className="pl-9"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h2 className="text-2xl font-bold">{title}</h2>
+        
+        {showSearch && (
+          <div className="relative w-full md:w-64">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input 
+              type="text" 
+              placeholder="Rechercher..."
+              className="pl-8"
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                onClick={() => setSearchTerm('')}
+              >
+                &times;
+              </Button>
+            )}
+          </div>
+        )}
       </div>
       
-      <ScrollArea className="flex-1 pr-4">
-        <VRTemplateGrid 
-          templates={templates} 
-          onSelect={onSelectTemplate}
-          filter={searchTerm}
-        />
-      </ScrollArea>
+      <VRTemplateGrid 
+        templates={filteredTemplates} 
+        onSelect={onSelect} 
+        filter={searchTerm}
+      />
+      
+      {filteredTemplates.length === 0 && (
+        <div className="text-center py-12 text-muted-foreground">
+          Aucune session trouvée pour "{searchTerm}"
+        </div>
+      )}
     </div>
   );
 };
