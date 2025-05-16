@@ -1,125 +1,108 @@
 
-import React, { useEffect, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
-import CoachChatInput from './CoachChatInput';
-import CoachMessage from './CoachMessage';
-import CoachCharacter from './CoachCharacter';
-import { useCoachChat } from '@/hooks/useCoachChat';
+import React, { useState, useEffect, useRef } from 'react';
 import { CoachChatProps } from '@/types/coach';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useCoach } from '@/contexts/CoachContext';
+import CoachMessage from './CoachMessage';
+import CoachChatInput from './CoachChatInput';
+import CoachCharacter from './CoachCharacter';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 
 const CoachChat: React.FC<CoachChatProps> = ({
-  initialQuestion,
-  simpleMode = false,
+  initialMessage,
+  showCharacter = true,
+  characterSize = "md",
   className,
-  onBackClick
+  showControls = true,
+  showHeader = true,
+  showInput = true,
+  embedded = false
 }) => {
-  const {
-    messages,
-    isLoading,
-    typingIndicator,
-    userMessage,
-    setUserMessage,
-    handleSendMessage,
-    handleRegenerate,
-    handleKeyDown
-  } = useCoachChat(initialQuestion);
-  
+  const { messages, sendMessage, isProcessing, clearMessages } = useCoach();
+  const { toast } = useToast();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  // Auto scroll to bottom on new messages
   useEffect(() => {
+    // Scroll to bottom when messages change
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, typingIndicator]);
+  }, [messages]);
   
-  // Determine coach's current mood based on the last message
-  const determineCoachMood = () => {
-    if (messages.length === 0) return 'neutral';
+  useEffect(() => {
+    // Send initial message from coach if provided
+    if (initialMessage && messages.length === 0) {
+      // Add initial message from coach to the chat
+      sendMessage(initialMessage, 'coach');
+    }
+  }, [initialMessage, messages.length, sendMessage]);
+  
+  const handleSendMessage = (text: string) => {
+    if (!text.trim()) return;
     
-    const lastMessage = messages[messages.length - 1];
-    if (lastMessage.sender === 'user') return 'focused';
-    
-    const content = (lastMessage.text || lastMessage.content || '').toLowerCase();
-    
-    if (content.includes('merci') || content.includes('super') || content.includes('excellent')) {
-      return 'happy';
-    } else if (content.includes('désolé') || content.includes('problème') || content.includes('erreur')) {
-      return 'sad';
-    } else if (content.includes('respire') || content.includes('calme') || content.includes('détend')) {
-      return 'calm';
-    } else if (content.includes('stress') || content.includes('anxiété') || content.includes('inquiétude')) {
-      return 'anxious';
-    } else {
-      return 'neutral';
+    try {
+      // Send user message
+      sendMessage(text, 'user');
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer votre message. Veuillez réessayer.",
+        variant: "destructive"
+      });
     }
   };
   
   return (
-    <Card className={`flex flex-col h-full overflow-hidden ${className}`}>
-      <CardHeader className="border-b shrink-0">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {onBackClick && (
-              <Button variant="ghost" size="icon" onClick={onBackClick}>
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            )}
-            <div className="flex items-center">
-              <CoachCharacter 
-                mood={determineCoachMood()} 
-                speaking={isLoading} 
-                size="sm" 
-              />
-              <CardTitle className="ml-3">Coach IA</CardTitle>
-            </div>
+    <div className="flex flex-col h-full">
+      {/* Chat header */}
+      {showHeader && (
+        <div className="border-b p-4 flex items-center gap-3">
+          {showCharacter && <CoachCharacter size="sm" />}
+          <div>
+            <h3 className="font-medium">Coach IA</h3>
+            <p className="text-xs text-muted-foreground">
+              {isProcessing ? 'En train d\'écrire...' : 'En ligne'}
+            </p>
           </div>
         </div>
-      </CardHeader>
+      )}
       
-      <ScrollArea className="flex-grow">
-        <div className="p-4 space-y-1">
-          {messages.map((msg, index) => (
-            <CoachMessage 
-              key={msg.id}
-              message={msg} 
-              isLast={index === messages.length - 1}
-            />
-          ))}
-          
-          {/* Typing indicator */}
-          {isLoading && typingIndicator && (
-            <div className="animate-fade-in text-sm flex items-center gap-2 text-muted-foreground pl-12 mt-1">
-              <div className="loading-dots">
-                <div className="bg-primary-foreground"></div>
-                <div className="bg-primary-foreground"></div>
-                <div className="bg-primary-foreground"></div>
+      {/* Messages container */}
+      <div className="flex-1 overflow-y-auto p-4">
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center p-6 text-muted-foreground">
+            <CoachCharacter size="lg" animate={true} />
+            <h3 className="font-medium mt-4">Bonjour, je suis votre coach IA</h3>
+            <p className="mt-1">Comment puis-je vous aider aujourd'hui ?</p>
+          </div>
+        ) : (
+          <>
+            {messages.map((message, index) => (
+              <CoachMessage
+                key={message.id || index}
+                message={message}
+                isLast={index === messages.length - 1}
+              />
+            ))}
+            {isProcessing && (
+              <div className="flex items-center justify-center py-2">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
-              {typingIndicator}
-            </div>
-          )}
-          
-          {/* Auto-scroll anchor */}
-          <div ref={messagesEndRef} />
-        </div>
-      </ScrollArea>
-      
-      <div className="p-3 border-t shrink-0">
-        <CoachChatInput
-          message={userMessage}
-          setMessage={setUserMessage}
-          onSend={handleSendMessage}
-          onRegenerate={handleRegenerate}
-          isLoading={isLoading}
-          onKeyDown={handleKeyDown}
-          canRegenerate={messages.length > 1}
-          placeholder="Écrivez votre message au coach IA..."
-        />
+            )}
+            <div ref={messagesEndRef} />
+          </>
+        )}
       </div>
-    </Card>
+      
+      {/* Input area */}
+      {showInput && (
+        <CoachChatInput
+          onSendMessage={handleSendMessage}
+          isProcessing={isProcessing}
+        />
+      )}
+    </div>
   );
 };
 

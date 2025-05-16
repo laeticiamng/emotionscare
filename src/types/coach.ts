@@ -1,53 +1,34 @@
 
-export interface CoachMessage {
+import { ReactNode } from 'react';
+
+export interface ChatMessage {
   id: string;
-  content: string;
-  timestamp: string;
-  type: 'text' | 'question' | 'suggestion' | 'info';
-  isBot: boolean;
+  text?: string;
+  content?: string;
+  sender: string;
+  sender_type?: string;
+  timestamp?: string;
+  conversation_id?: string;
+  role?: string;
 }
 
-export interface CoachEvent {
-  id: string;
-  type: 'session' | 'emotion' | 'achievement' | 'milestone';
-  date: string;
-  title: string;
-  description: string;
+export interface CoachCharacterProps {
+  name?: string;
+  avatar?: string;
+  mood?: string;
+  size?: 'sm' | 'md' | 'lg';
+  animate?: boolean;
+  className?: string;
+  onClick?: () => void;
 }
 
-export interface CoachAction {
-  id: string;
-  title: string;
-  description: string;
-  urgency: 'low' | 'medium' | 'high';
-  completed: boolean;
-  due?: string;
-}
-
-export interface EmotionalData {
-  emotion: string;
-  intensity: number;
-  date: string;
-}
-
-export interface EmotionalTrend {
-  trend: 'improving' | 'declining' | 'stable';
-  primaryEmotion: string;
-  secondaryEmotion?: string;
-  startDate: string;
-  endDate: string;
-  data: EmotionalData[];
-}
-
-export interface CoachNotification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'alert' | 'suggestion' | 'achievement';
-  timestamp: string;
-  read: boolean;
-  action?: {
-    label: string;
-    url: string;
-  };
+export interface CoachChatProps {
+  initialMessage?: string;
+  showCharacter?: boolean;
+  characterSize?: 'sm' | 'md' | 'lg';
+  className?: string;
+  showControls?: boolean;
+  showHeader?: boolean;
+  showInput?: boolean;
+  embedded?: boolean;
 }

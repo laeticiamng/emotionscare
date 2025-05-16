@@ -1,71 +1,76 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { format } from 'date-fns';
 import { ChatMessage } from '@/types/coach';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Copy, CheckCheck } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { User, Bot } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface CoachMessageProps {
   message: ChatMessage;
   isLast?: boolean;
+  className?: string;
 }
 
-const CoachMessage: React.FC<CoachMessageProps> = ({ message, isLast = false }) => {
-  const [copied, setCopied] = useState(false);
-  const isBot = message.sender === 'coach' || message.sender === 'assistant';
-  const messageText = message.text || message.content || '';
-
-  const handleCopy = () => {
-    if (!messageText) return;
-    navigator.clipboard.writeText(messageText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
+const CoachMessage: React.FC<CoachMessageProps> = ({
+  message,
+  isLast = false,
+  className
+}) => {
+  const isUser = message.sender === 'user' || message.role === 'user';
+  
+  // Format timestamp if available
+  const formattedTime = message.timestamp 
+    ? format(new Date(message.timestamp), 'HH:mm')
+    : '';
+    
   return (
-    <div className={`py-2 px-1 ${isLast ? 'pb-4' : ''} animate-fade-in`}>
-      <div className={`flex items-start gap-3 max-w-3xl ${isBot ? 'mr-auto' : 'ml-auto flex-row-reverse'}`}>
+    <div className={cn(
+      "flex w-full mb-4",
+      isUser ? "justify-end" : "justify-start",
+      className
+    )}>
+      <div className={cn(
+        "flex gap-2",
+        isUser ? "flex-row-reverse" : "flex-row",
+        "max-w-[80%]"
+      )}>
         {/* Avatar */}
-        <Avatar className={`${isBot ? 'bg-primary/10' : 'bg-secondary/10'} h-8 w-8 rounded-full`}>
-          {isBot ? (
+        <Avatar className={cn(
+          "h-8 w-8",
+          isUser ? "bg-primary/20" : "bg-secondary"
+        )}>
+          {isUser ? (
             <>
-              <AvatarFallback>IA</AvatarFallback>
-              <AvatarImage src="/coach-avatar.png" alt="Coach AI" />
+              <AvatarFallback>U</AvatarFallback>
+              <User className="h-4 w-4" />
             </>
           ) : (
-            <AvatarFallback>
-              {message.sender?.substring(0, 1)?.toUpperCase() || 'U'}
-            </AvatarFallback>
+            <>
+              <AvatarFallback>C</AvatarFallback>
+              <AvatarImage src="/avatar-coach.png" alt="Coach" />
+            </>
           )}
         </Avatar>
-
-        {/* Message Content */}
-        <div 
-          className={`relative p-3 rounded-lg ${
-            isBot 
-              ? 'bg-muted text-foreground' 
-              : 'bg-primary text-primary-foreground'
-          } shadow-sm max-w-[calc(100%-4rem)]`}
-        >
-          <p className="whitespace-pre-wrap text-sm break-words leading-relaxed">
-            {messageText}
-          </p>
+        
+        {/* Message bubble */}
+        <div className={cn(
+          "py-2 px-4 rounded-2xl",
+          isUser 
+            ? "bg-primary text-primary-foreground rounded-tr-none" 
+            : "bg-muted rounded-tl-none",
+          isLast && "mb-8"
+        )}>
+          <div className="text-sm whitespace-pre-wrap">
+            {message.content || message.text}
+          </div>
           
-          {isBot && messageText.length > 50 && (
-            <div className="mt-1.5 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={handleCopy}
-                title="Copier le message"
-              >
-                {copied ? (
-                  <CheckCheck className="h-3.5 w-3.5 text-green-500" />
-                ) : (
-                  <Copy className="h-3.5 w-3.5" />
-                )}
-              </Button>
+          {formattedTime && (
+            <div className={cn(
+              "text-[10px] mt-1 text-right",
+              isUser ? "text-primary-foreground/70" : "text-muted-foreground"
+            )}>
+              {formattedTime}
             </div>
           )}
         </div>

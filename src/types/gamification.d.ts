@@ -1,62 +1,65 @@
 
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  category?: string;
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
-  imageUrl?: string;
-  image_url?: string;
-  image?: string;
-  icon_url?: string;
-  unlockedAt?: string;
-  unlocked?: boolean;
-  completed?: boolean;
-  progress?: number;
-}
-
 export interface GamificationStats {
-  totalBadges?: number;
-  unlockedBadges?: number;
-  badges?: Badge[];
-  unlockedBadges?: Badge[];
-  activeUsers?: number;
-  activeUsersPercent?: number;
-  completionRate?: number;
-  streakDays?: number;
-  level?: number;
-  xp?: number;
-  nextLevelXp?: number;
-  totalChallenges?: number;
-  completedChallenges?: number;
+  points: number;
+  level: number;
+  streak: number;
+  daysActive: number;
+  totalChallenges: number;
+  completedChallenges: number;
+  rank: number;
+  nextLevelPoints: number;
+  nextLevelProgress: number;
+  badges: Badge[];
+  unlockedBadges: Badge[];
+  weeklyProgress: number;
+  activeDays: string[];
 }
 
 export interface Challenge {
   id: string;
-  title?: string;
-  name?: string;
+  title: string;
   description: string;
-  points?: number;
-  progress: number;
-  goal: number;
-  completed?: boolean;
-  failed?: boolean;
-  category?: string;
-  type?: string;
-  deadline?: string;
-  startDate?: string;
-  endDate?: string;
-  total?: number;
-  status: 'active' | 'completed' | 'failed';
+  points: number;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  completed: boolean;
+  progress?: number;
+  expires_at?: string;
+  created_at: string;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  image?: string;
+  icon?: string;
+  rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
+  unlocked: boolean;
+  progress?: number;
+  unlock_date?: string;
 }
 
 export interface LeaderboardEntry {
   id: string;
-  userId: string;
   name: string;
-  avatar?: string;
   points: number;
-  rank: number;
   level: number;
-  isCurrentUser: boolean;
+  rank: number;
+  avatar?: string;
+  isCurrentUser?: boolean;
+  streak?: number;
+}
+
+export interface GamificationContextType {
+  stats: GamificationStats;
+  challenges: Challenge[];
+  badges: Badge[];
+  leaderboard: LeaderboardEntry[];
+  completeChallenge: (id: string) => Promise<void>;
+  resetStreak: () => Promise<void>;
+  incrementStreak: () => Promise<void>;
+  addPoints: (points: number) => Promise<void>;
+  refreshStats: () => Promise<void>;
 }

@@ -1,254 +1,333 @@
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  LineChart, Line, PieChart, Pie, Cell
+import DashboardLayout from '@/components/DashboardLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
 } from 'recharts';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { HelpCircle, BarChart3, Activity, Users } from 'lucide-react';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
 
-// Mock data for dashboard
-const usageData = [
-  { day: 'Lun', count: 65, activeUsers: 32 },
-  { day: 'Mar', count: 78, activeUsers: 40 },
-  { day: 'Mer', count: 95, activeUsers: 45 },
-  { day: 'Jeu', count: 72, activeUsers: 38 },
-  { day: 'Ven', count: 83, activeUsers: 43 },
-  { day: 'Sam', count: 41, activeUsers: 22 },
-  { day: 'Dim', count: 38, activeUsers: 20 },
-];
-
-const topicsData = [
-  { topic: 'Stress', value: 35 },
-  { topic: 'Productivité', value: 25 },
-  { topic: 'Équilibre', value: 20 },
-  { topic: 'Communication', value: 15 },
-  { topic: 'Autres', value: 5 },
-];
-
-const emotionTrendData = [
-  { month: 'Jan', positivity: 65, negativity: 35 },
-  { month: 'Fév', positivity: 60, negativity: 40 },
-  { month: 'Mar', positivity: 70, negativity: 30 },
-  { month: 'Avr', positivity: 75, negativity: 25 },
-  { month: 'Mai', positivity: 72, negativity: 28 },
-  { month: 'Jun', positivity: 78, negativity: 22 },
-];
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
-
-const B2BAdminCoachAnalytics: React.FC = () => {
+const CoachAnalyticsPage: React.FC = () => {
+  const [period, setPeriod] = React.useState('month');
+  
+  // Dummy data for demonstration
+  const usageData = [
+    { name: 'Lun', value: 24 },
+    { name: 'Mar', value: 32 },
+    { name: 'Mer', value: 18 },
+    { name: 'Jeu', value: 29 },
+    { name: 'Ven', value: 43 },
+    { name: 'Sam', value: 12 },
+    { name: 'Dim', value: 9 },
+  ];
+  
+  const topicsData = [
+    { name: 'Stress', value: 40 },
+    { name: 'Équilibre', value: 25 },
+    { name: 'Organisation', value: 15 },
+    { name: 'Relations', value: 12 },
+    { name: 'Autres', value: 8 },
+  ];
+  
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+  
   return (
-    <div className="container mx-auto p-4 md:px-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <div>
+    <DashboardLayout>
+      <div className="container mx-auto py-6 space-y-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <h1 className="text-3xl font-bold">Analytics Coach IA</h1>
-          <p className="text-muted-foreground">
-            Vue d'ensemble des tendances et de l'utilisation du coach IA dans votre entreprise
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <Select defaultValue="30">
+          
+          <Select value={period} onValueChange={setPeriod}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Période" />
+              <SelectValue placeholder="Sélectionner une période" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="7">7 derniers jours</SelectItem>
-              <SelectItem value="30">30 derniers jours</SelectItem>
-              <SelectItem value="90">3 derniers mois</SelectItem>
-              <SelectItem value="365">Année</SelectItem>
+              <SelectItem value="week">7 derniers jours</SelectItem>
+              <SelectItem value="month">30 derniers jours</SelectItem>
+              <SelectItem value="quarter">Trimestre</SelectItem>
+              <SelectItem value="year">Année</SelectItem>
             </SelectContent>
           </Select>
-          
-          <Button variant="outline">
-            <HelpCircle className="h-4 w-4 mr-2" />
-            Aide
-          </Button>
         </div>
-      </div>
-      
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Utilisation Total</p>
-                <p className="text-3xl font-bold mt-2">472</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-green-500">↑ 18%</span> vs mois précédent
-                </p>
-              </div>
-              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <BarChart3 className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
         
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Utilisateurs Actifs</p>
-                <p className="text-3xl font-bold mt-2">78%</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-green-500">↑ 5%</span> vs mois précédent
-                </p>
-              </div>
-              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Users className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <Alert variant="warning" className="bg-yellow-100 dark:bg-yellow-900/20">
+          <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
+          <AlertDescription>
+            Toutes les données sont anonymisées. Aucune conversation individuelle ou contenu précis n'est accessible.
+          </AlertDescription>
+        </Alert>
         
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Indice Bien-être</p>
-                <p className="text-3xl font-bold mt-2">72/100</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <span className="text-green-500">↑ 3%</span> vs mois précédent
-                </p>
-              </div>
-              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Activity className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <Tabs defaultValue="usage" className="space-y-8">
-        <TabsList>
-          <TabsTrigger value="usage">Utilisation</TabsTrigger>
-          <TabsTrigger value="topics">Thématiques</TabsTrigger>
-          <TabsTrigger value="trends">Tendances</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="usage">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Utilisation du Coach IA</CardTitle>
-              <CardDescription>
-                Nombre total d'interactions et d'utilisateurs actifs par jour
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={usageData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="count" name="Interactions" fill="#8884d8" />
-                    <Bar dataKey="activeUsers" name="Utilisateurs Actifs" fill="#82ca9d" />
-                  </BarChart>
-                </ResponsiveContainer>
+            <CardContent className="pt-6">
+              <div className="text-center mb-4">
+                <h3 className="text-2xl font-bold">78%</h3>
+                <p className="text-muted-foreground">Taux d'engagement</p>
               </div>
+              <div className="h-2 bg-gray-200 rounded-full">
+                <div className="h-2 bg-primary rounded-full" style={{ width: '78%' }}></div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2 text-center">Utilisateurs actifs / utilisateurs totaux</p>
             </CardContent>
           </Card>
-        </TabsContent>
-        
-        <TabsContent value="topics">
+          
           <Card>
-            <CardHeader>
-              <CardTitle>Thématiques abordées</CardTitle>
-              <CardDescription>
-                Distribution des sujets discutés avec le Coach IA
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col md:flex-row items-center gap-8">
-              <div className="w-full md:w-1/2 h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={topicsData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
+            <CardContent className="pt-6">
+              <div className="text-center mb-4">
+                <h3 className="text-2xl font-bold">12.3</h3>
+                <p className="text-muted-foreground">Minutes/session en moyenne</p>
+              </div>
+              <div className="h-2 bg-gray-200 rounded-full">
+                <div className="h-2 bg-primary rounded-full" style={{ width: '65%' }}></div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2 text-center">+15% vs mois précédent</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-center mb-4">
+                <h3 className="text-2xl font-bold">243</h3>
+                <p className="text-muted-foreground">Sessions totales</p>
+              </div>
+              <div className="h-2 bg-gray-200 rounded-full">
+                <div className="h-2 bg-primary rounded-full" style={{ width: '85%' }}></div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2 text-center">+22% vs mois précédent</p>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <Tabs defaultValue="usage">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="usage">Utilisation</TabsTrigger>
+            <TabsTrigger value="topics">Sujets abordés</TabsTrigger>
+            <TabsTrigger value="feedback">Impact & Feedback</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="usage" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Utilisation du Coach IA par jour</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={usageData}
+                      margin={{
+                        top: 5,
+                        right: 30,
+                        left: 20,
+                        bottom: 5,
+                      }}
                     >
-                      {topicsData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="value" fill="#8884d8" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Heures d'utilisation</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center space-y-2">
+                    <div>
+                      <span className="text-sm font-medium">Pic d'utilisation:</span>
+                      <span className="ml-2">10h-12h & 14h-16h</span>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium">Plus faible:</span>
+                      <span className="ml-2">19h-7h</span>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium">Durée moyenne:</span>
+                      <span className="ml-2">12.3 minutes</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
               
-              <div className="w-full md:w-1/2 space-y-4">
-                <h3 className="text-lg font-medium">Insights</h3>
-                <ul className="space-y-3">
-                  <li className="p-3 rounded-lg bg-muted/50">
-                    <span className="font-medium">35% des interactions</span> concernent la gestion du stress
-                  </li>
-                  <li className="p-3 rounded-lg bg-muted/50">
-                    <span className="font-medium">Hausse de 12%</span> des questions liées à l'équilibre travail-vie personnelle
-                  </li>
-                  <li className="p-3 rounded-lg bg-muted/50">
-                    <span className="font-medium">20% des utilisateurs</span> reviennent pour des conseils de productivité
-                  </li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="trends">
-          <Card>
-            <CardHeader>
-              <CardTitle>Tendance émotionnelle</CardTitle>
-              <CardDescription>
-                Évolution des sentiments positifs et négatifs exprimés
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={emotionTrendData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="positivity" name="Sentiments Positifs" stroke="#82ca9d" activeDot={{ r: 8 }} strokeWidth={2} />
-                    <Line type="monotone" dataKey="negativity" name="Sentiments Négatifs" stroke="#ff8042" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-              
-              <div className="mt-6 p-4 rounded-lg bg-muted">
-                <h3 className="font-medium mb-2">Analyse des tendances</h3>
-                <p className="text-sm text-muted-foreground">
-                  On observe une amélioration globale du bien-être avec une augmentation de 13% des sentiments positifs 
-                  depuis janvier. Cette tendance coïncide avec l'introduction des ateliers de gestion du stress et 
-                  l'adoption croissante du Coach IA par les équipes.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-      
-      <div className="mt-8 text-center text-xs text-muted-foreground">
-        <p>Toutes les données sont anonymisées et agrégées. Aucun contenu de message individuel n'est accessible.</p>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Utilisateurs</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center space-y-2">
+                    <div>
+                      <span className="text-sm font-medium">Utilisateurs uniques:</span>
+                      <span className="ml-2">87</span>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium">Utilisateurs récurrents:</span>
+                      <span className="ml-2">62 (71%)</span>
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium">Sessions/utilisateur:</span>
+                      <span className="ml-2">2.8</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="topics">
+            <Card>
+              <CardHeader>
+                <CardTitle>Principaux sujets abordés</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={topicsData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {topicsData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <p className="text-sm">Les sujets liés à la <span className="font-medium">gestion du stress</span> sont les plus abordés, représentant 40% des conversations.</p>
+                    <p className="text-sm">Les questions d'<span className="font-medium">équilibre vie pro/vie perso</span> sont en hausse de 15% par rapport au mois dernier.</p>
+                    <p className="text-sm">Certains départements montrent des tendances spécifiques:</p>
+                    <ul className="list-disc pl-5 text-sm space-y-1">
+                      <li>Marketing: plus de questions sur la créativité</li>
+                      <li>Développement: focus sur la concentration</li>
+                      <li>Service client: gestion des émotions</li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="feedback">
+            <Card>
+              <CardHeader>
+                <CardTitle>Impact & satisfaction</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="font-semibold mb-4">Satisfaction utilisateurs</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-sm font-medium">Très satisfait</span>
+                          <span className="text-sm font-medium">67%</span>
+                        </div>
+                        <div className="h-2 bg-gray-200 rounded-full">
+                          <div className="h-2 bg-green-500 rounded-full" style={{ width: '67%' }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-sm font-medium">Satisfait</span>
+                          <span className="text-sm font-medium">24%</span>
+                        </div>
+                        <div className="h-2 bg-gray-200 rounded-full">
+                          <div className="h-2 bg-blue-500 rounded-full" style={{ width: '24%' }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-sm font-medium">Neutre</span>
+                          <span className="text-sm font-medium">7%</span>
+                        </div>
+                        <div className="h-2 bg-gray-200 rounded-full">
+                          <div className="h-2 bg-yellow-500 rounded-full" style={{ width: '7%' }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-sm font-medium">Insatisfait</span>
+                          <span className="text-sm font-medium">2%</span>
+                        </div>
+                        <div className="h-2 bg-gray-200 rounded-full">
+                          <div className="h-2 bg-red-500 rounded-full" style={{ width: '2%' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-semibold mb-4">Impact mesuré</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-sm font-medium">Réduction stress perçu</span>
+                          <span className="text-sm font-medium">-22%</span>
+                        </div>
+                        <div className="h-2 bg-gray-200 rounded-full">
+                          <div className="h-2 bg-green-500 rounded-full" style={{ width: '78%' }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-sm font-medium">Amélioration équilibre</span>
+                          <span className="text-sm font-medium">+18%</span>
+                        </div>
+                        <div className="h-2 bg-gray-200 rounded-full">
+                          <div className="h-2 bg-blue-500 rounded-full" style={{ width: '68%' }}></div>
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-sm font-medium">Adoption techniques</span>
+                          <span className="text-sm font-medium">54%</span>
+                        </div>
+                        <div className="h-2 bg-gray-200 rounded-full">
+                          <div className="h-2 bg-purple-500 rounded-full" style={{ width: '54%' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 
-export default B2BAdminCoachAnalytics;
+export default CoachAnalyticsPage;

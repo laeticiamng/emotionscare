@@ -12,7 +12,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from './components/theme-provider';
 import { MusicProvider } from './contexts/MusicContext';
 import { CoachProvider } from './contexts/CoachContext';
-import AppRoutes from './router'; // Import from router not router/AppRoutes
+import AppRoutes from './router'; // Import from router index.ts
 
 function App() {
   return (

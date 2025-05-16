@@ -44,3 +44,10 @@ export interface NotificationDrawerProps {
   onMarkAsRead: (id: string) => void;
   onDelete: (id: string) => void;
 }
+
+export interface NotificationPreference {
+  type: NotificationType;
+  channels: NotificationChannels;
+  frequency: NotificationFrequency;
+  muted: boolean;
+}

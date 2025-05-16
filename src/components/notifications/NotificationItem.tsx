@@ -1,97 +1,94 @@
 
 import React from 'react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { Bell, Info, Check, Trash2, Book, HeartPulse, User, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { NotificationItemProps, NotificationType } from '@/types/notification';
+import { Notification, NotificationType } from '@/types/notification';
+import { formatDistanceToNow } from 'date-fns';
+import { Bell, CheckCircle, AlertTriangle, Info, BookOpenCheck } from 'lucide-react';
 
-const NotificationItem: React.FC<NotificationItemProps> = ({ 
-  notification, 
+export interface NotificationItemProps {
+  notification: Notification;
+  onMarkAsRead: (id: string) => void;
+  onDelete: (id: string) => void;
+  onClick?: () => void;
+}
+
+const NotificationItem: React.FC<NotificationItemProps> = ({
+  notification,
   onMarkAsRead,
   onDelete,
   onClick
 }) => {
+  // Get notification icon based on type
   const getIcon = (type: NotificationType) => {
     switch (type) {
-      case 'system':
-        return <Info className="h-4 w-4" />;
-      case 'journal':
-        return <Book className="h-4 w-4" />;
       case 'emotion':
-        return <HeartPulse className="h-4 w-4" />;
+        return <Bell className="h-5 w-5 text-blue-500" />;
+      case 'system':
+        return <Info className="h-5 w-5 text-gray-500" />;
       case 'user':
-        return <User className="h-4 w-4" />;
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
+      case 'journal':
+        return <BookOpenCheck className="h-5 w-5 text-purple-500" />;
       case 'urgent':
-        return <AlertTriangle className="h-4 w-4 text-red-500" />;
+        return <AlertTriangle className="h-5 w-5 text-red-500" />;
       default:
-        return <Bell className="h-4 w-4" />;
+        return <Bell className="h-5 w-5 text-blue-500" />;
     }
   };
 
-  const isUrgent = notification.type === 'urgent' || notification.priority === 'urgent';
-  
+  // Get class name based on type and priority
+  const getBgClass = () => {
+    if (notification.type === 'urgent' || notification.priority === 'urgent') {
+      return 'bg-red-50 dark:bg-red-950/30';
+    }
+    if (!notification.read) {
+      return 'bg-blue-50 dark:bg-blue-950/30';
+    }
+    return 'bg-white dark:bg-gray-950';
+  };
+
+  // Format notification time as "X time ago"
+  const timeAgo = notification.created_at 
+    ? formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })
+    : '';
+
   return (
-    <Card 
-      className={`mb-2 ${notification.read ? 'opacity-80' : ''} ${isUrgent ? 'border-red-400' : ''}`}
-      onClick={onClick}
+    <div
+      className={`p-3 rounded-lg mb-2 border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors ${getBgClass()}`}
+      onClick={() => onClick && onClick()}
     >
-      <CardContent className="p-3">
-        <div className="flex items-start gap-3">
-          <div className={`mt-1 p-1.5 rounded-full ${
-            isUrgent ? 'bg-red-100' : 'bg-primary/10'
-          }`}>
-            {getIcon(notification.type)}
-          </div>
-          
-          <div className="flex-1 min-w-0">
-            <h4 className={`text-sm font-medium ${!notification.read ? 'font-semibold' : ''}`}>
-              {notification.title}
-            </h4>
-            <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-              {notification.message}
-            </p>
-            <div className="flex items-center text-xs text-muted-foreground mt-1.5">
-              {notification.created_at && (
-                <span className="flex-shrink-0">
-                  {format(new Date(notification.created_at), 'dd MMM, HH:mm', { locale: fr })}
-                </span>
-              )}
-            </div>
-          </div>
-          
-          <div className="flex flex-shrink-0 gap-1">
-            {!notification.read && (
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-7 w-7" 
+      <div className="flex items-start gap-3">
+        <div className="flex-shrink-0 mt-1">
+          {getIcon(notification.type)}
+        </div>
+        <div className="flex-grow">
+          <h4 className="font-medium text-sm">{notification.title}</h4>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{notification.message}</p>
+          <div className="flex items-center justify-between mt-2">
+            <span className="text-xs text-gray-500">{timeAgo}</span>
+            <div className="flex gap-2">
+              <button 
+                className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                 onClick={(e) => {
                   e.stopPropagation();
                   onMarkAsRead(notification.id);
                 }}
               >
-                <Check className="h-3.5 w-3.5" />
-                <span className="sr-only">Marquer comme lu</span>
-              </Button>
-            )}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-7 w-7 text-muted-foreground hover:text-destructive" 
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(notification.id);
-              }}
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-              <span className="sr-only">Supprimer</span>
-            </Button>
+                {notification.read ? 'Mark as unread' : 'Mark as read'}
+              </button>
+              <button 
+                className="text-xs text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(notification.id);
+                }}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

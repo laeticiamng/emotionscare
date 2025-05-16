@@ -1,156 +1,90 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Sparkles, MessageSquare, HeartPulse, Brain, Lightbulb, Music } from 'lucide-react';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
+import React from 'react';
+import DashboardLayout from '@/components/DashboardLayout';
+import { Card, CardContent } from '@/components/ui/card';
 import CoachCharacter from '@/components/coach/CoachCharacter';
-import { useCoach } from '@/contexts/CoachContext';
+import CoachPresence from '@/components/coach/CoachPresence';
+import { Button } from '@/components/ui/button';
+import { MessageSquare, Smile, Brain, Music } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-const B2CCoach: React.FC = () => {
-  const navigate = useNavigate();
-  const { sendMessage } = useCoach();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
-  const categories = [
-    { id: 'talk', label: 'Parler', icon: <MessageSquare className="h-5 w-5" />, description: 'Discuter avec votre coach IA de vos préoccupations' },
-    { id: 'emotion', label: 'Emotions', icon: <HeartPulse className="h-5 w-5" />, description: 'Explorer et comprendre vos émotions' },
-    { id: 'focus', label: 'Concentration', icon: <Brain className="h-5 w-5" />, description: 'Améliorer votre focus et votre productivité' },
-    { id: 'inspire', label: 'Inspiration', icon: <Lightbulb className="h-5 w-5" />, description: 'Trouver de nouvelles idées et perspectives' },
-    { id: 'relax', label: 'Relaxation', icon: <Music className="h-5 w-5" />, description: 'Des exercices pour vous aider à vous détendre' },
-  ];
-
-  const handleCategorySelect = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-  };
-
-  const handleStartChat = () => {
-    if (selectedCategory) {
-      const categoryObj = categories.find(cat => cat.id === selectedCategory);
-      if (categoryObj) {
-        navigate('/coach-chat', { state: { initialTopic: categoryObj.label } });
-      } else {
-        navigate('/coach-chat');
-      }
-    } else {
-      navigate('/coach-chat');
-    }
-  };
-
+const CoachPage: React.FC = () => {
   return (
-    <div className="container mx-auto py-6 px-4 md:px-0">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-2">Coach IA Personnel</h1>
-        <p className="text-muted-foreground mb-6">
-          Votre compagnon émotionnel intelligent qui vous aide à mieux comprendre et gérer vos émotions
-        </p>
-
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <Card className="overflow-hidden border-none shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-            <AspectRatio ratio={4/3} className="flex items-center justify-center">
-              <div className="flex flex-col items-center justify-center p-6 text-center">
-                <CoachCharacter mood="neutral" size="xl" className="mb-6 animate-float" />
-                <h2 className="text-2xl font-bold mb-2">Je suis là pour vous aider</h2>
-                <p className="text-muted-foreground mb-6">
-                  Comment puis-je vous accompagner aujourd'hui?
-                </p>
-                <Button 
-                  size="lg" 
-                  onClick={handleStartChat}
-                  className="animate-pulse-subtle"
-                >
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Commencer une discussion
-                </Button>
+    <DashboardLayout>
+      <div className="container mx-auto py-6 space-y-8">
+        <h1 className="text-3xl font-bold">Coach IA</h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="col-span-1 md:col-span-2">
+            <CardContent className="pt-6 flex flex-col items-center text-center">
+              <CoachCharacter size="lg" animate={true} />
+              <h2 className="text-2xl font-semibold mt-4">Bonjour, comment puis-je vous aider aujourd'hui ?</h2>
+              <p className="text-muted-foreground mt-2">Je suis votre coach personnel, là pour vous accompagner dans votre bien-être émotionnel.</p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-xl mt-6">
+                <Link to="/coach-chat">
+                  <Button variant="default" className="w-full flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5" />
+                    Discuter
+                  </Button>
+                </Link>
+                <Link to="/scan">
+                  <Button variant="outline" className="w-full flex items-center gap-2">
+                    <Smile className="h-5 w-5" />
+                    Analyser mon humeur
+                  </Button>
+                </Link>
+                <Link to="/journal">
+                  <Button variant="outline" className="w-full flex items-center gap-2">
+                    <Brain className="h-5 w-5" />
+                    S'inspirer
+                  </Button>
+                </Link>
+                <Link to="/music">
+                  <Button variant="outline" className="w-full flex items-center gap-2">
+                    <Music className="h-5 w-5" />
+                    Musique adaptée
+                  </Button>
+                </Link>
               </div>
-            </AspectRatio>
+            </CardContent>
           </Card>
-
-          <div className="space-y-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center">
-                  <Sparkles className="h-5 w-5 mr-2 text-primary" />
-                  Explorez des sujets
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {categories.map(category => (
-                    <Button
-                      key={category.id}
-                      variant={selectedCategory === category.id ? "default" : "outline"}
-                      className="h-auto flex-col py-3 px-2"
-                      onClick={() => handleCategorySelect(category.id)}
-                    >
-                      {category.icon}
-                      <span className="mt-2 text-xs">{category.label}</span>
-                    </Button>
-                  ))}
-                </div>
-                {selectedCategory && (
-                  <div className="mt-4">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {categories.find(c => c.id === selectedCategory)?.description}
-                    </p>
-                    <Button 
-                      onClick={handleStartChat}
-                      className="w-full"
-                    >
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Discuter de ce sujet
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Suggestions pour vous</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start h-auto py-3"
-                  onClick={() => {
-                    sendMessage("Je me sens stressé aujourd'hui, que puis-je faire?");
-                    navigate('/coach-chat');
-                  }}
-                >
-                  <HeartPulse className="mr-2 h-4 w-4 text-rose-500" />
-                  Je me sens stressé aujourd'hui, que puis-je faire?
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start h-auto py-3"
-                  onClick={() => {
-                    sendMessage("Comment améliorer ma concentration au travail?");
-                    navigate('/coach-chat');
-                  }}
-                >
-                  <Brain className="mr-2 h-4 w-4 text-blue-500" />
-                  Comment améliorer ma concentration au travail?
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start h-auto py-3"
-                  onClick={() => {
-                    sendMessage("J'ai besoin d'un exercice de respiration rapide");
-                    navigate('/coach-chat');
-                  }}
-                >
-                  <Music className="mr-2 h-4 w-4 text-emerald-500" />
-                  J'ai besoin d'un exercice de respiration rapide
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <h3 className="text-lg font-semibold mb-3">Suggestions personnalisées</h3>
+              <ul className="space-y-3">
+                <li className="p-3 bg-primary/10 rounded-md">
+                  <h4 className="font-medium">Séance de respiration</h4>
+                  <p className="text-sm text-muted-foreground">5 minutes pour retrouver votre calme</p>
+                </li>
+                <li className="p-3 bg-primary/10 rounded-md">
+                  <h4 className="font-medium">Journal émotionnel</h4>
+                  <p className="text-sm text-muted-foreground">Notez vos émotions du jour</p>
+                </li>
+                <li className="p-3 bg-primary/10 rounded-md">
+                  <h4 className="font-medium">Pause musicale</h4>
+                  <p className="text-sm text-muted-foreground">Écoutez des sons relaxants</p>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <h3 className="text-lg font-semibold mb-3">Insights récents</h3>
+              <CoachPresence />
+              <div className="mt-4 space-y-3">
+                <p className="text-sm">Votre niveau de stress semble en baisse cette semaine, continuez vos exercices de respiration.</p>
+                <p className="text-sm">Votre humeur fluctue moins qu'avant, signe d'une plus grande stabilité émotionnelle.</p>
+                <p className="text-sm">Pensez à prendre un moment pour vous aujourd'hui.</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 
-export default B2CCoach;
+export default CoachPage;

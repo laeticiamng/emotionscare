@@ -1,112 +1,146 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import NotificationItem from './NotificationItem';
-import { filterNotifications, getFilterLabel } from './notificationFilterUtils';
+import { Badge } from '@/components/ui/badge';
+import { Bell, CheckCircle, AlertTriangle, Info, BookOpenCheck, BookOpen, UserCircle } from 'lucide-react';
 import { Notification, NotificationFilter } from '@/types/notification';
 
 interface NotificationsPanelProps {
   notifications: Notification[];
   onMarkAsRead: (id: string) => void;
   onDelete: (id: string) => void;
-  onClickNotification?: (notification: Notification) => void;
+  onClearAll: () => void;
+  onMarkAllAsRead: () => void;
 }
 
-/**
- * Displays notifications grouped by filters with tabs
- */
 const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
   notifications,
   onMarkAsRead,
   onDelete,
-  onClickNotification
+  onClearAll,
+  onMarkAllAsRead
 }) => {
   const [activeFilter, setActiveFilter] = useState<NotificationFilter>('all');
 
-  // Define the available filters
   const filters: NotificationFilter[] = [
-    'all', 'unread', 'read', 'urgent', 
-    'system', 'journal', 'emotion', 'user'
+    'all',
+    'unread',
+    'urgent',
+    'system',
+    'emotion',
+    'journal',
+    'user'
   ];
 
-  // Get counts for each filter
-  const filterCounts: Record<NotificationFilter, number> = {
-    all: notifications.length,
-    unread: filterNotifications(notifications, 'unread').length,
-    read: filterNotifications(notifications, 'read').length,
-    urgent: filterNotifications(notifications, 'urgent').length,
-    system: filterNotifications(notifications, 'system').length,
-    journal: filterNotifications(notifications, 'journal').length,
-    emotion: filterNotifications(notifications, 'emotion').length,
-    user: filterNotifications(notifications, 'user').length,
+  const filterNotifications = (filter: NotificationFilter) => {
+    switch (filter) {
+      case 'all':
+        return notifications;
+      case 'unread':
+        return notifications.filter(n => !n.read);
+      case 'urgent':
+        return notifications.filter(n => n.type === 'urgent' || n.priority === 'urgent');
+      case 'system':
+        return notifications.filter(n => n.type === 'system');
+      case 'emotion':
+        return notifications.filter(n => n.type === 'emotion');
+      case 'journal':
+        return notifications.filter(n => n.type === 'journal');
+      case 'user':
+        return notifications.filter(n => n.type === 'user');
+      default:
+        return notifications;
+    }
   };
 
-  const filteredNotifications = filterNotifications(notifications, activeFilter);
+  const filteredNotifications = filterNotifications(activeFilter);
+
+  const getIcon = (filter: NotificationFilter) => {
+    switch (filter) {
+      case 'all':
+        return <Bell className="h-4 w-4" />;
+      case 'unread':
+        return <CheckCircle className="h-4 w-4" />;
+      case 'urgent':
+        return <AlertTriangle className="h-4 w-4" />;
+      case 'system':
+        return <Info className="h-4 w-4" />;
+      case 'emotion':
+        return <Bell className="h-4 w-4" />;
+      case 'journal':
+        return <BookOpen className="h-4 w-4" />;
+      case 'user':
+        return <UserCircle className="h-4 w-4" />;
+      default:
+        return <Bell className="h-4 w-4" />;
+    }
+  };
 
   return (
-    <div>
-      <Tabs 
-        defaultValue={activeFilter} 
-        onValueChange={(value) => setActiveFilter(value as NotificationFilter)}
-        className="w-full"
-      >
-        <TabsList className="grid grid-cols-4 mb-4">
-          {filters.slice(0, 4).map((filter) => (
-            <TabsTrigger 
-              key={filter} 
-              value={filter}
-              className="text-xs"
-              disabled={filterCounts[filter] === 0}
-            >
-              {getFilterLabel(filter)}
-              {filterCounts[filter] > 0 && (
-                <span className="ml-1 text-xs bg-primary/10 px-1.5 py-0.5 rounded-full">
-                  {filterCounts[filter]}
-                </span>
+    <div className="w-full">
+      <div className="flex justify-between items-center mb-4 p-2">
+        <h3 className="font-semibold">Notifications</h3>
+        <div className="flex gap-2">
+          <button 
+            className="text-xs text-blue-600 hover:text-blue-800" 
+            onClick={onMarkAllAsRead}
+          >
+            Mark all as read
+          </button>
+          <button 
+            className="text-xs text-red-600 hover:text-red-800" 
+            onClick={onClearAll}
+          >
+            Clear all
+          </button>
+        </div>
+      </div>
+
+      <Tabs defaultValue="all" value={activeFilter as string} onValueChange={(value) => setActiveFilter(value as NotificationFilter)}>
+        <TabsList className="w-full grid grid-cols-7 mb-4">
+          {filters.map((filter) => (
+            <TabsTrigger key={filter} value={filter} className="flex items-center gap-1 text-xs">
+              {getIcon(filter)}
+              <span className="hidden sm:inline">{filter.charAt(0).toUpperCase() + filter.slice(1)}</span>
+              {filter === 'all' && (
+                <Badge variant="secondary" className="ml-1">
+                  {notifications.length}
+                </Badge>
+              )}
+              {filter === 'unread' && (
+                <Badge variant="secondary" className="ml-1">
+                  {notifications.filter(n => !n.read).length}
+                </Badge>
               )}
             </TabsTrigger>
           ))}
         </TabsList>
 
-        <TabsList className="grid grid-cols-4 mb-4">
-          {filters.slice(4).map((filter) => (
-            <TabsTrigger 
-              key={filter} 
-              value={filter}
-              className="text-xs"
-              disabled={filterCounts[filter] === 0}
-            >
-              {getFilterLabel(filter)}
-              {filterCounts[filter] > 0 && (
-                <span className="ml-1 text-xs bg-primary/10 px-1.5 py-0.5 rounded-full">
-                  {filterCounts[filter]}
-                </span>
-              )}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        {filters.map((filter) => (
-          <TabsContent key={filter} value={filter} className="space-y-2">
-            {filteredNotifications.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-sm text-muted-foreground">
-                  Aucune notification {activeFilter !== 'all' ? `de type "${getFilterLabel(activeFilter).toLowerCase()}"` : ''}
-                </p>
-              </div>
-            ) : (
-              filteredNotifications.map((notification) => (
-                <NotificationItem
-                  key={notification.id}
-                  notification={notification}
-                  onMarkAsRead={onMarkAsRead}
-                  onDelete={onDelete}
-                  onClick={onClickNotification ? () => onClickNotification(notification) : undefined}
-                />
-              ))
-            )}
-          </TabsContent>
-        ))}
+        <ScrollArea className="h-[400px]">
+          {filteredNotifications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+              <Bell className="h-12 w-12 mb-2 opacity-20" />
+              <p>No notifications in this category</p>
+            </div>
+          ) : (
+            filteredNotifications.map((notification) => (
+              <NotificationItem
+                key={notification.id}
+                notification={notification}
+                onMarkAsRead={onMarkAsRead}
+                onDelete={onDelete}
+                onClick={() => {
+                  // Handle notification click if needed
+                  if (!notification.read) {
+                    onMarkAsRead(notification.id);
+                  }
+                }}
+              />
+            ))
+          )}
+        </ScrollArea>
       </Tabs>
     </div>
   );

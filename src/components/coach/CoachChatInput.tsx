@@ -1,128 +1,117 @@
 
 import React, { useState } from 'react';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Send, RefreshCcw, Mic, MicOff, Wand2 } from 'lucide-react';
+import { SendHorizontal, Mic, Paperclip, Smile } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface CoachChatInputProps {
-  message: string;
-  setMessage: (value: string) => void;
-  onSend: () => void;
-  onRegenerate?: () => void;
-  isLoading: boolean;
-  onKeyDown?: (e: React.KeyboardEvent) => void;
-  canRegenerate?: boolean;
-  className?: string;
+  onSendMessage: (text: string) => void;
+  isProcessing?: boolean;
   placeholder?: string;
+  className?: string;
 }
 
 const CoachChatInput: React.FC<CoachChatInputProps> = ({
-  message,
-  setMessage,
-  onSend,
-  onRegenerate,
-  isLoading,
-  onKeyDown,
-  canRegenerate = false,
-  className = '',
-  placeholder = "Écrivez votre message..."
+  onSendMessage,
+  isProcessing = false,
+  placeholder = "Écrivez votre message...",
+  className
 }) => {
-  const [isRecording, setIsRecording] = useState(false);
-
-  const handleMicClick = () => {
-    setIsRecording(!isRecording);
-    // In a real implementation, we would start/stop speech recognition here
-    if (!isRecording) {
-      // Start recording
-      setTimeout(() => {
-        setMessage(message + " (transcription simulée)");
-        setIsRecording(false);
-      }, 2000);
+  const [message, setMessage] = useState('');
+  
+  const handleSend = () => {
+    if (message.trim() && !isProcessing) {
+      onSendMessage(message.trim());
+      setMessage('');
     }
   };
-
-  const suggestionPrompts = [
-    "Comment puis-je gérer mon stress ?",
-    "J'ai besoin de motivation aujourd'hui",
-    "Un exercice de respiration rapide"
+  
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+  
+  // Quick responses
+  const quickResponses = [
+    "Oui", 
+    "Non", 
+    "Je ne suis pas sûr(e)", 
+    "Pouvez-vous m'en dire plus ?", 
+    "Merci !",
+    "Comment puis-je me sentir mieux ?",
+    "J'ai besoin de respirer"
   ];
-
+  
   return (
-    <div className={`rounded-lg border bg-background p-3 ${className}`}>
-      {canRegenerate && (
-        <div className="flex justify-center mb-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRegenerate}
-            disabled={isLoading || !onRegenerate}
-            className="text-xs"
-          >
-            <RefreshCcw className="mr-2 h-3.5 w-3.5" />
-            Régénérer la réponse
-          </Button>
-        </div>
-      )}
-
-      {/* Quick suggestions */}
-      <div className="flex flex-wrap gap-2 mb-3">
-        {suggestionPrompts.map((prompt, index) => (
-          <Button
-            key={index}
-            variant="outline"
-            size="sm"
-            onClick={() => setMessage(prompt)}
-            className="text-xs"
-          >
-            <Wand2 className="mr-1 h-3 w-3" />
-            {prompt}
-          </Button>
-        ))}
-      </div>
-
-      <div className="relative">
-        <Textarea
-          placeholder={placeholder}
+    <div className="w-full border-t bg-background p-4">
+      <div className="relative flex flex-col rounded-lg border bg-background">
+        <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={onKeyDown}
-          rows={3}
-          className="resize-none pr-20"
-          disabled={isLoading}
+          onKeyPress={handleKeyPress}
+          placeholder={placeholder}
+          disabled={isProcessing}
+          className="min-h-[80px] w-full resize-none bg-transparent px-4 py-3 focus:outline-none"
+          rows={2}
         />
         
-        <div className="absolute right-1.5 bottom-1.5 flex gap-1.5">
-          <Button
-            size="icon"
-            variant="outline"
-            className="h-8 w-8"
-            onClick={handleMicClick}
-            title={isRecording ? "Stop recording" : "Start recording"}
-            disabled={isLoading}
-            data-recording={isRecording}
-          >
-            {isRecording ? (
-              <MicOff className="h-4 w-4 text-red-500" />
-            ) : (
+        <div className="flex items-center justify-between p-2 px-3">
+          <div className="flex gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" type="button">
+                  <Smile className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80" align="start" alignOffset={11} sideOffset={5}>
+                <div className="grid grid-cols-2 gap-2">
+                  {quickResponses.map((response, index) => (
+                    <Button 
+                      key={index}
+                      variant="outline" 
+                      className="justify-start"
+                      onClick={() => {
+                        onSendMessage(response);
+                        setMessage('');
+                      }}
+                    >
+                      {response}
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+            
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              type="button"
+              disabled={isProcessing}
+            >
               <Mic className="h-4 w-4" />
-            )}
-          </Button>
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              type="button"
+              disabled={isProcessing}
+            >
+              <Paperclip className="h-4 w-4" />
+            </Button>
+          </div>
           
-          <Button
-            size="icon"
-            className="h-8 w-8"
-            onClick={onSend}
-            disabled={isLoading || message.trim() === ''}
+          <Button 
+            type="submit" 
+            size="sm" 
+            className="gap-1"
+            onClick={handleSend}
+            disabled={!message.trim() || isProcessing}
           >
-            {isLoading ? (
-              <div className="loading-dots">
-                <div className="bg-white"></div>
-                <div className="bg-white"></div>
-                <div className="bg-white"></div>
-              </div>
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
+            <span>Envoyer</span>
+            <SendHorizontal className="h-4 w-4" />
           </Button>
         </div>
       </div>
