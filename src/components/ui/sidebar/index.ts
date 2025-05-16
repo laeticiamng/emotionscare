@@ -1,11 +1,11 @@
 
 import Sidebar from "./Sidebar";
 import SidebarContent from "./SidebarContent";
-import SidebarFooter from "./SidebarFooter";
+import { SidebarFooter } from "./SidebarFooter";
 import SidebarGroup from "./SidebarGroup";
 import SidebarHeader from "./SidebarHeader";
 import SidebarSection from "./SidebarSection";
-import SidebarProvider from "./SidebarProvider";
+import SidebarProvider, { useSidebar } from "./SidebarProvider";
 import SidebarTrigger from "./SidebarTrigger";
 import SidebarMenu from "./SidebarMenu";
 import SidebarMenuItem from "./SidebarMenuItem";
@@ -19,6 +19,7 @@ export {
   SidebarHeader,
   SidebarSection,
   SidebarProvider,
+  useSidebar,
   SidebarTrigger,
   SidebarMenu,
   SidebarMenuItem,

@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useSessionSecurity } from '@/hooks/use-session-security';
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
 const SessionTimeoutAlert: React.FC = () => {
@@ -11,6 +11,7 @@ const SessionTimeoutAlert: React.FC = () => {
   
   // Only proceed if user is authenticated
   const { showWarning, resetTimer, timeLeft } = useSessionSecurity();
+  const { toast } = useToast();
   
   useEffect(() => {
     if (auth.isAuthenticated && showWarning) {
@@ -31,11 +32,10 @@ const SessionTimeoutAlert: React.FC = () => {
             </Button>
           </div>
         ),
-        variant: "warning",
-        duration: 10000
+        variant: "warning"
       });
     }
-  }, [showWarning, resetTimer, auth.isAuthenticated, timeLeft]);
+  }, [showWarning, resetTimer, auth.isAuthenticated, timeLeft, toast]);
   
   return null; // This is a non-visual component
 };

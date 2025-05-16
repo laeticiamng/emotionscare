@@ -1,4 +1,3 @@
-
 export interface VRSessionTemplate {
   id: string;
   title: string;
@@ -6,6 +5,8 @@ export interface VRSessionTemplate {
   description: string;
   duration: number;
   thumbnailUrl?: string;
+  imageUrl?: string; // Ajout pour compatibilité
+  coverUrl?: string; // Ajout pour compatibilité
   categoryId?: string;
   videoUrl?: string;
   audioUrl?: string;
@@ -19,11 +20,17 @@ export interface VRSessionTemplate {
   level?: string;
   rating?: number;
   featured?: boolean;
-  lastUsed?: string | Date; // Added for VRHistoryList
+  lastUsed?: string | Date;
   is_audio_only?: boolean;
-  emotion_target?: string; // Added for dashboard components
-  emotionTarget?: string; // Alternative naming
-  theme?: string; // Added for VRSessionView
+  emotion_target?: string;
+  emotionTarget?: string;
+  theme?: string;
+  completion_rate?: number; // Ajout pour compatibilité
+  completionRate?: number; // Ajout pour compatibilité
+  recommendedMood?: string;
+  recommended_mood?: string;
+  emotion?: string; // Ajout pour compatibilité
+  cover_url?: string; // Ajout pour compatibilité
 }
 
 export interface VRSession {

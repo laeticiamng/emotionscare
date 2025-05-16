@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { UserPreferences, NotificationPreferences } from '@/types/types';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ThemeSettingsForm from '@/components/preferences/ThemeSettingsForm';
-import NotificationPreferencesComponent from '@/components/preferences/NotificationPreferences';
-import DataPrivacySettings from '@/components/preferences/DataPrivacySettings';
-import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Loader } from 'lucide-react';
-import { harmonizeUserType } from '@/utils/userUtils';
 
-type PreferencesFormProps = {
-  defaultActiveTab?: string;
-  onSave?: (preferences: UserPreferences) => void;
-  onCancel?: () => void;
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { User, UserPreferences } from '@/types/types';
+import DisplayPreferences from './DisplayPreferences';
+import NotificationPreferences from './NotificationPreferences';
+import PrivacyPreferences from './PrivacyPreferences';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface PreferencesFormProps {
+  user: User;
+  onPreferencesSave?: (preferences: UserPreferences) => void;
+  className?: string;
 }
 
-const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "theme", onSave, onCancel }) => {
-  const { user, updateUser } = useAuth();
+const PreferencesForm: React.FC<PreferencesFormProps> = ({
+  user,
+  onPreferencesSave,
+  className = ''
+}) => {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  
-  // Initial preferences (used if user has no preferences defined)
-  const initialPreferences: UserPreferences = {
-    theme: 'system', 
+  const auth = useAuth();
+  const [activeTab, setActiveTab] = useState('display');
+  const [preferences, setPreferences] = useState<UserPreferences>(user.preferences || {
+    theme: 'system',
     fontSize: 'medium',
     fontFamily: 'system',
     reduceMotion: false,
@@ -34,165 +34,105 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ defaultActiveTab = "t
     notifications: {
       enabled: true,
       emailEnabled: true,
-      pushEnabled: false,
+      pushEnabled: true,
       inAppEnabled: true,
-      email: true,
-      push: false,
       types: {
         system: true,
         emotion: true,
         coach: true,
         journal: true,
         community: true,
-        achievement: true
+        achievement: true,
       },
-      frequency: 'daily'
+      frequency: 'immediate',
     },
     privacy: {
-      shareData: false,
-      anonymizeReports: true,
-      profileVisibility: 'team'
+      shareData: true,
+      anonymizeReports: false,
+      profileVisibility: 'public',
     },
-    soundEnabled: false
-  };
+    soundEnabled: true,
+  });
 
-  // Use harmonized user preferences
-  const harmonizedUser = user ? harmonizeUserType(user) : null;
-  // Use user preferences or default values
-  const userPreferences = harmonizedUser?.preferences || initialPreferences;
-
-  // Local state for current modifications
-  const [formPreferences, setFormPreferences] = useState<UserPreferences>(userPreferences);
-
-  // Function to update a specific property
-  const updatePreference = (key: keyof UserPreferences, value: any) => {
-    setFormPreferences(prev => ({ ...prev, [key]: value }));
-  };
-
-  // Function to update notifications
-  const updateNotifications = (notificationData: Partial<NotificationPreferences>) => {
-    const currentNotifications = 
-      typeof formPreferences.notifications === 'boolean' 
-        ? { enabled: formPreferences.notifications, emailEnabled: false }
-        : formPreferences.notifications || { enabled: true, emailEnabled: false };
-
-    setFormPreferences(prev => ({
+  const handlePreferencesChange = (newPartialPreferences: Partial<UserPreferences>) => {
+    setPreferences(prev => ({
       ...prev,
-      notifications: {
-        ...currentNotifications,
-        ...notificationData
-      }
+      ...newPartialPreferences,
     }));
   };
 
-  // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    
     try {
-      if (user) {
-        // Ensure correct type conversion using our utility
-        const updatedUser = harmonizeUserType({
+      // Appeler la fonction de sauvegarde si elle est fournie
+      if (onPreferencesSave) {
+        onPreferencesSave(preferences);
+      } 
+      // Ou utiliser la fonction de mise à jour du contexte si disponible
+      else if (auth.updateUser) {
+        await auth.updateUser({
           ...user,
-          preferences: formPreferences
+          preferences,
         });
-        
-        await updateUser(updatedUser);
-        
-        toast({
-          title: "Préférences mises à jour",
-          description: "Vos préférences ont été enregistrées avec succès.",
-          variant: "default",
-        });
-        
-        if (onSave) {
-          onSave(formPreferences);
-        }
       }
+
+      toast({
+        title: 'Préférences mises à jour',
+        description: 'Vos préférences ont été enregistrées avec succès.',
+        variant: 'success',
+      });
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour les préférences.",
-        variant: "destructive",
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour vos préférences.',
+        variant: 'destructive',
       });
-      console.error("Erreur lors de la mise à jour des préférences:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <Tabs defaultValue={defaultActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-3 md:grid-cols-5 w-full">
-          <TabsTrigger value="theme">Thème</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
-          <TabsTrigger value="accessibility" className="hidden md:flex">Accessibilité</TabsTrigger>
-          <TabsTrigger value="account" className="hidden md:flex">Compte</TabsTrigger>
-        </TabsList>
-        
-        <div className="mt-6">
-          <TabsContent value="theme">
-            <ThemeSettingsForm />
-          </TabsContent>
-          
-          <TabsContent value="notifications">
-            <NotificationPreferencesComponent />
-          </TabsContent>
-          
-          <TabsContent value="privacy">
-            <DataPrivacySettings />
-          </TabsContent>
-          
-          <TabsContent value="accessibility">
-            <Card>
-              <CardHeader>
-                <CardTitle>Accessibilité</CardTitle>
-                <CardDescription>
-                  Personnalisez l'application pour améliorer votre expérience d'utilisation
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-center py-8 text-muted-foreground">
-                  Les paramètres d'accessibilité seront disponibles prochainement.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="account">
-            <Card>
-              <CardHeader>
-                <CardTitle>Paramètres du compte</CardTitle>
-                <CardDescription>
-                  Gérez les paramètres de votre compte
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-center py-8 text-muted-foreground">
-                  Les paramètres de compte seront disponibles prochainement.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </div>
-      </Tabs>
-      
-      <Separator />
-      
-      <div className="flex justify-end gap-4">
-        {onCancel && (
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Annuler
-          </Button>
-        )}
-        <Button type="submit" disabled={loading}>
-          {loading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-          Enregistrer les préférences
-        </Button>
-      </div>
+    <form onSubmit={handleSubmit} className={className}>
+      <Card>
+        <CardHeader>
+          <CardTitle>Préférences utilisateur</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="mb-6">
+              <TabsTrigger value="display">Affichage</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
+            </TabsList>
+            <TabsContent value="display">
+              <DisplayPreferences
+                preferences={preferences}
+                onChange={handlePreferencesChange}
+              />
+            </TabsContent>
+            <TabsContent value="notifications">
+              <NotificationPreferences
+                preferences={preferences}
+                onChange={handlePreferencesChange}
+              />
+            </TabsContent>
+            <TabsContent value="privacy">
+              <PrivacyPreferences
+                preferences={preferences}
+                onChange={handlePreferencesChange}
+              />
+            </TabsContent>
+          </Tabs>
+
+          <div className="mt-6 flex justify-end gap-2">
+            <Button variant="outline" type="button">
+              Annuler
+            </Button>
+            <Button type="submit">
+              Enregistrer les préférences
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </form>
   );
 };

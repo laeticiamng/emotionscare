@@ -14,6 +14,7 @@ const SAMPLE_TRACKS: MusicTrack[] = [
     intensity: 0.7,
     coverUrl: "/images/covers/happy.jpg",
     url: "/audio/happy.mp3",
+    mood: "happy"
   },
   {
     id: "track-2",
@@ -24,6 +25,7 @@ const SAMPLE_TRACKS: MusicTrack[] = [
     intensity: 0.3,
     coverUrl: "/images/covers/calm.jpg",
     url: "/audio/calm.mp3",
+    mood: "calm"
   },
   {
     id: "track-3",
@@ -34,7 +36,28 @@ const SAMPLE_TRACKS: MusicTrack[] = [
     intensity: 0.5,
     coverUrl: "/images/covers/focus.jpg",
     url: "/audio/focus.mp3",
+    mood: "focus"
   },
+];
+
+// Sample playlists
+const SAMPLE_PLAYLISTS: MusicPlaylist[] = [
+  {
+    id: "playlist-1",
+    title: "Happy Vibes",
+    emotion: "happy",
+    mood: "happy",
+    tracks: SAMPLE_TRACKS.filter(track => track.emotion === "happy"),
+    category: "mood"
+  },
+  {
+    id: "playlist-2", 
+    title: "Calm & Relaxing",
+    emotion: "calm",
+    mood: "calm",
+    tracks: SAMPLE_TRACKS.filter(track => track.emotion === "calm"),
+    category: "mood"
+  }
 ];
 
 const MusicContext = createContext<MusicContextType>({
@@ -65,8 +88,12 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [playlist, setPlaylist] = useState<MusicTrack[]>([]);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [progress, setProgress] = useState(0);
   const [currentEmotion, setCurrentEmotion] = useState<string | undefined>(undefined);
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>(SAMPLE_PLAYLISTS);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -76,6 +103,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     const updateTime = () => {
       setCurrentTime(audio.currentTime);
+      setProgress((audio.currentTime / audio.duration) * 100);
     };
     
     const loadedData = () => {
@@ -89,6 +117,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     audio.addEventListener('timeupdate', updateTime);
     audio.addEventListener('loadeddata', loadedData);
     audio.addEventListener('ended', ended);
+    
+    setIsInitialized(true);
     
     return () => {
       audio.pause();
@@ -199,6 +229,18 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setMuted(prev => !prev);
   }, []);
   
+  const initializeMusicSystem = useCallback(async () => {
+    try {
+      // Simulation d'initialisation
+      await new Promise(resolve => setTimeout(resolve, 300));
+      setIsInitialized(true);
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+      return false;
+    }
+  }, []);
+  
   const loadPlaylistForEmotion = useCallback(async (params: EmotionMusicParams | string) => {
     try {
       let emotion: string;
@@ -212,12 +254,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
       
       // Simule une API call pour obtenir des chansons basées sur l'émotion
-      // Dans un vrai cas, cela serait une requête API
       await new Promise(resolve => setTimeout(resolve, 500));
       
       // Filtrer les pistes pour cette émotion
       const matchingTracks = SAMPLE_TRACKS.filter(track => 
-        track.emotion === emotion.toLowerCase()
+        track.emotion?.toLowerCase() === emotion.toLowerCase()
       );
       
       // Si aucune piste n'est trouvée, utiliser toutes les pistes
@@ -227,6 +268,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         id: `playlist-${emotion}-${Date.now()}`,
         title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Vibes`,
         emotion: emotion,
+        mood: emotion,
         tracks: playlistTracks,
       };
       
@@ -268,8 +310,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     playlist,
     duration,
     currentTime,
+    progress,
     playTrack,
+    play: playTrack, // Alias pour compatibilité
     pauseTrack,
+    pause: pauseTrack, // Alias pour compatibilité
     setVolume,
     togglePlay,
     nextTrack,
@@ -280,6 +325,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setEmotion,
     setOpenDrawer,
     currentEmotion,
+    playlists,
+    isInitialized,
+    initializeMusicSystem,
+    error
   };
   
   return (

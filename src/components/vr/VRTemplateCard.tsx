@@ -1,109 +1,120 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Tag, Percent } from 'lucide-react';
+import { Clock, Heart, Star } from 'lucide-react';
 import { VRSessionTemplate } from '@/types';
+import { getVRTemplateThumbnail, getVRTemplateCompletionRate, getVRTemplateEmotionTarget } from '@/utils/compatibility';
 
 interface VRTemplateCardProps {
   template: VRSessionTemplate;
-  onClick?: () => void;
-  selected?: boolean;
-  minimal?: boolean;
+  onSelect?: (template: VRSessionTemplate) => void;
+  className?: string;
+  compact?: boolean;
+  showActions?: boolean;
 }
 
-const VRTemplateCard: React.FC<VRTemplateCardProps> = ({
-  template,
-  onClick,
-  selected = false,
-  minimal = false
+const VRTemplateCard: React.FC<VRTemplateCardProps> = ({ 
+  template, 
+  onSelect, 
+  className = '',
+  compact = false,
+  showActions = true
 }) => {
-  // Format duration in minutes
-  const formatDuration = (seconds?: number): string => {
-    if (!seconds) return '5 min';
-    const minutes = Math.round(seconds / 60);
-    return `${minutes} min`;
+  const formatDuration = (minutes: number): string => {
+    if (minutes < 60) {
+      return `${minutes} min`;
+    } else {
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+    }
   };
+
+  // Get thumbnail using helper
+  const thumbnailUrl = getVRTemplateThumbnail(template);
   
-  // Safely get template image URL
-  const getImageUrl = (): string => {
-    return template.imageUrl || 
-           template.thumbnailUrl || 
-           template.coverUrl || 
-           template.preview_url ||
-           '/images/vr-template-placeholder.jpg';
+  // Get emotion target using helper
+  const emotionTarget = getVRTemplateEmotionTarget(template);
+
+  const handleClick = () => {
+    if (onSelect) {
+      onSelect(template);
+    }
   };
-  
-  const cardClasses = `
-    relative cursor-pointer transition-all 
-    ${selected ? 'ring-2 ring-primary' : 'hover:shadow-md'} 
-    ${minimal ? 'p-1' : ''}
-  `;
-  
+
   return (
     <Card 
-      className={cardClasses} 
-      onClick={onClick}
+      className={`overflow-hidden transition-shadow hover:shadow-md ${compact ? 'h-full' : ''} ${className}`}
+      onClick={handleClick}
     >
-      <CardContent className={minimal ? 'p-0' : 'p-3'}>
-        <div className="flex gap-3">
-          {/* Template Image */}
-          <div 
-            className={`rounded-md overflow-hidden flex-shrink-0 ${minimal ? 'w-16 h-16' : 'w-24 h-24'}`}
-            style={{
-              backgroundImage: `url(${getImageUrl()})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}
+      <div className={`relative ${compact ? 'h-32' : 'h-48'}`}>
+        {thumbnailUrl ? (
+          <img
+            src={thumbnailUrl}
+            alt={template.title}
+            className="w-full h-full object-cover"
           />
-          
-          {/* Template Details */}
-          <div className="flex flex-col justify-between flex-grow">
-            <div>
-              <h3 className={`font-medium line-clamp-1 ${minimal ? 'text-sm' : 'text-base'}`}>
-                {template.title}
-              </h3>
-              
-              {!minimal && (
-                <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
-                  {template.description || 'Immersive experience for emotional well-being'}
-                </p>
-              )}
-            </div>
-            
-            <div className="flex flex-wrap gap-2 mt-2">
-              {/* Duration */}
-              <Badge variant="outline" className="text-xs flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {formatDuration(template.duration)}
-              </Badge>
-              
-              {/* Category/Difficulty */}
-              {!minimal && template.difficulty && (
-                <Badge variant="outline" className="text-xs">
-                  {template.difficulty}
-                </Badge>
-              )}
-              
-              {/* Completion Rate */}
-              {!minimal && (template.completionRate !== undefined || template.completion_rate !== undefined) && (
-                <Badge variant="outline" className="text-xs flex items-center gap-1">
-                  <Percent className="h-3 w-3" />
-                  {template.completionRate || template.completion_rate || 0}% complete
-                </Badge>
-              )}
-              
-              {/* Emotion Tag */}
-              {!minimal && template.emotion && (
-                <Badge className="text-xs bg-primary/20 text-primary flex items-center gap-1">
-                  <Tag className="h-3 w-3" />
-                  {template.emotion}
-                </Badge>
-              )}
-            </div>
+        ) : (
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <span className="text-2xl text-muted-foreground">VR</span>
           </div>
+        )}
+        
+        {template.difficulty && (
+          <Badge variant="secondary" className="absolute top-3 right-3">
+            {template.difficulty}
+          </Badge>
+        )}
+        
+        {emotionTarget && (
+          <Badge variant="outline" className="absolute top-3 left-3 bg-background/80">
+            {emotionTarget}
+          </Badge>
+        )}
+      </div>
+      
+      <CardContent className={compact ? 'p-3' : 'p-4'}>
+        <h3 className={`font-semibold ${compact ? 'text-sm' : 'text-lg'} mb-1`}>{template.title}</h3>
+        
+        {!compact && template.description && (
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{template.description}</p>
+        )}
+        
+        <div className="flex flex-wrap gap-2 mt-2">
+          <Badge variant="outline" className="flex items-center gap-1">
+            <Clock className="w-3 h-3" /> 
+            {formatDuration(template.duration)}
+          </Badge>
+          
+          {template.tags && template.tags.slice(0, compact ? 1 : 2).map((tag) => (
+            <Badge key={tag} variant="secondary" className="text-xs">
+              {tag}
+            </Badge>
+          ))}
+          
+          {getVRTemplateCompletionRate(template) > 0 && (
+            <Badge variant="outline" className="ml-auto flex items-center gap-1">
+              <Star className="w-3 h-3 fill-primary text-primary" /> 
+              {Math.round(getVRTemplateCompletionRate(template) * 100)}%
+            </Badge>
+          )}
         </div>
       </CardContent>
+      
+      {showActions && !compact && (
+        <CardFooter className="p-3 pt-0 flex justify-between">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full"
+            onClick={handleClick}
+          >
+            Démarrer
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 };

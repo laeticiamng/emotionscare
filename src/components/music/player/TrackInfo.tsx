@@ -33,7 +33,9 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   // Use provided info or track info
   const displayTitle = title || track?.title || currentTrack?.title || 'Aucun titre';
   const displayArtist = artist || track?.artist || currentTrack?.artist || 'Artiste inconnu';
-  const displayCover = coverUrl || track?.coverUrl || track?.cover_url || currentTrack?.coverUrl || currentTrack?.cover_url || '/images/music/default-cover.jpg';
+  const displayCover = coverUrl || track?.coverUrl || track?.cover_url || track?.cover || 
+                      currentTrack?.coverUrl || currentTrack?.cover_url || currentTrack?.cover || 
+                      '/images/music/default-cover.jpg';
   
   return (
     <div className={`flex items-center gap-3 ${className}`}>

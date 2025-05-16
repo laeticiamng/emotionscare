@@ -7,11 +7,16 @@ export interface MusicTrack {
   url?: string;
   audioUrl?: string;
   coverUrl?: string;
+  cover_url?: string; // Pour la compatibilité
+  cover?: string; // Pour la compatibilité
+  coverImage?: string; // Pour la compatibilité
   emotion?: string;
   intensity?: number;
   category?: string;
   source?: string;
-  track_url?: string; // Legacy support
+  genre?: string;
+  mood?: string;
+  track_url?: string; // Pour la compatibilité
 }
 
 export interface MusicPlaylist {
@@ -19,7 +24,10 @@ export interface MusicPlaylist {
   title?: string;
   name?: string;
   emotion?: string;
+  mood?: string;
   tracks: MusicTrack[];
+  coverUrl?: string;
+  category?: string;
 }
 
 export interface EmotionMusicParams {
@@ -65,6 +73,7 @@ export interface MusicControlsProps {
   showVolume?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  vertical?: boolean; // Ajout de la propriété manquante
 }
 
 export interface MusicLibraryProps {
@@ -74,6 +83,7 @@ export interface MusicLibraryProps {
   searchTerm?: string;
   onSearchChange?: (term: string) => void;
   tracks?: MusicTrack[];
+  playlists?: MusicPlaylist[]; // Ajout de la propriété manquante
 }
 
 export interface MusicContextType {
@@ -96,6 +106,13 @@ export interface MusicContextType {
   setEmotion: (emotion: string) => void;
   setOpenDrawer?: (open: boolean) => void;
   currentEmotion?: string;
+  playlists?: MusicPlaylist[];
+  progress?: number; // Ajout pour compatibilité
+  play?: (track: MusicTrack) => void; // Alias pour playTrack
+  pause?: () => void; // Alias pour pauseTrack
+  isInitialized?: boolean;
+  initializeMusicSystem?: () => Promise<void>;
+  error?: Error | null;
 }
 
 export interface MusicDrawerProps {

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
-import { MusicTrack } from '@/types';
+import { MusicTrack } from '@/types/music';
 
 interface VRMusicTrackInfoProps {
   currentTrack: MusicTrack;
@@ -9,13 +9,14 @@ interface VRMusicTrackInfoProps {
 
 const VRMusicTrackInfo: React.FC<VRMusicTrackInfoProps> = ({ currentTrack }) => {
   // Format duration from seconds to MM:SS
-  const formatDuration = (seconds: number): string => {
+  const formatDuration = (seconds?: number): string => {
+    if (!seconds) return '0:00';
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = Math.floor(seconds % 60);
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  // Get cover URL with fallback, handling both camelCase and snake_case properties
+  // Get cover URL with fallback
   const getCoverUrl = () => {
     return currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover || '';
   };
@@ -51,7 +52,7 @@ const VRMusicTrackInfo: React.FC<VRMusicTrackInfoProps> = ({ currentTrack }) => 
           )}
         </div>
         <p className="text-xs text-muted-foreground flex items-center justify-between">
-          <span>{currentTrack.artist}</span>
+          <span>{currentTrack.artist || 'Unknown Artist'}</span>
           {currentTrack.duration && <span>{formatDuration(currentTrack.duration)}</span>}
         </p>
       </div>

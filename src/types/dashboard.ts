@@ -1,77 +1,49 @@
 
-import { ReactNode } from 'react';
-import { GamificationStats } from './gamification';
+import { ReactNode } from "react";
 
 export interface KpiCardProps {
   title: string;
   value: string | number;
+  change?: number;
+  unit?: string;
   icon?: ReactNode;
-  change?: {
-    value: number;
-    trend: 'up' | 'down' | 'neutral';
-  };
-  description?: string;
-  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
+  trend?: "up" | "down" | "neutral";
+  isLoading?: boolean;
   onClick?: () => void;
-  delta?: {
-    value: number;
-    label?: string;
-    trend: 'up' | 'down' | 'neutral';
-  } | number;
-  subtitle?: ReactNode | string;
-  ariaLabel?: string;
-  isLoading?: boolean;
-  className?: string;
-  status?: 'success' | 'warning' | 'danger' | 'info';
-  trendText?: string;
-  loading?: boolean;
-}
-
-export interface DraggableKpiCardsGridProps {
-  cards?: KpiCardProps[];
-  onReorder?: (cards: KpiCardProps[]) => void;
-  editable?: boolean;
-  kpiCards?: KpiCardProps[];
-  className?: string;
-  isEditable?: boolean;
-  onLayoutChange?: (layout: any[]) => void;
-}
-
-export interface GlobalOverviewTabProps {
-  period?: 'day' | 'week' | 'month' | 'year';
-  showTrends?: boolean;
-  isLoading?: boolean;
-  kpiCards?: KpiCardProps[];
-  absenteeismChartData?: Array<{ date: string; value: number }>;
-  emotionalScoreTrend?: Array<{ date: string; value: number }>;
-  dashboardStats?: any;
-  gamificationData?: GamificationStats;
+  period?: string;
 }
 
 export interface DashboardWidgetConfig {
   id: string;
-  type: 'kpi' | 'chart' | 'table' | 'list' | 'map' | 'custom';
   title: string;
-  width: 1 | 2 | 3 | 4;
-  height: 'sm' | 'md' | 'lg' | 'xl';
-  position: number;
+  type: "kpi" | "chart" | "table" | "list" | "calendar" | "custom";
+  size: "small" | "medium" | "large" | "full";
   visible: boolean;
-  settings?: {
-    [key: string]: any;
-  };
+  priority: number;
+  data?: any;
+  icon?: string;
+  description?: string;
+  component?: ReactNode;
+}
+
+export interface DraggableKpiCardsGridProps {
+  widgets: DashboardWidgetConfig[];
+  onWidgetsChange?: (widgets: DashboardWidgetConfig[]) => void;
+  isEditing?: boolean;
+}
+
+export interface GlobalOverviewTabProps {
+  period?: "day" | "week" | "month" | "year";
+  userId?: string;
 }
 
 export interface GamificationData {
-  stats: GamificationStats;
-  challengeHistory?: {
-    date: string;
-    completions: number;
-  }[];
-}
-
-export interface GridPosition {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
+  points: number;
+  level: number;
+  badge?: string;
+  streakDays: number;
+  lastActivity?: Date;
+  progress: number;
+  nextLevel: number;
+  nextLevelPoints: number;
 }

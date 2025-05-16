@@ -4,7 +4,8 @@
  * across component interfaces.
  */
 
-import { MusicTrack, MusicPlaylist, VRSessionTemplate } from '@/types';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { VRSessionTemplate } from '@/types/vr';
 
 /**
  * Gets coverUrl from a MusicTrack using either naming convention
@@ -19,7 +20,7 @@ export function getTrackCoverUrl(track?: MusicTrack | null): string | undefined 
  */
 export function getTrackAudioUrl(track?: MusicTrack | null): string | undefined {
   if (!track) return undefined;
-  return track.audioUrl || track.audio_url || track.url;
+  return track.audioUrl || track.url || track.track_url;
 }
 
 /**
@@ -43,7 +44,7 @@ export function getVRTemplateTitle(template?: VRSessionTemplate | null): string 
  */
 export function getVRTemplateThumbnail(template?: VRSessionTemplate | null): string | undefined {
   if (!template) return undefined;
-  return template.thumbnailUrl || template.thumbnail || template.imageUrl || template.preview_url;
+  return template.thumbnailUrl || template.imageUrl || template.coverUrl || template.preview_url;
 }
 
 /**

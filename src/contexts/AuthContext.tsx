@@ -1,119 +1,106 @@
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar?: string; 
-  avatar_url?: string;
-  preferences?: any;
-  position?: string;
-  department?: string;
-  joined_at?: string;
-}
+import React, { createContext, useContext, useState } from 'react';
+import { User, UserPreferences } from '@/types/types';
 
 export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  register: (name: string, email: string, password: string) => Promise<void>;
-  updateUser?: (userData: Partial<User>) => Promise<void>;
+  updateUser?: (userData: User) => Promise<void>;
+  updatePreferences?: (preferences: UserPreferences) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Créer un utilisateur de test
+const testUser: User = {
+  id: 'test-user-id',
+  email: 'user@example.com',
+  name: 'Test User',
+  firstName: 'Test',
+  lastName: 'User',
+  role: 'b2c',
+  preferences: {
+    theme: 'light',
+    fontSize: 'medium',
+    fontFamily: 'system',
+    reduceMotion: false,
+    colorBlindMode: false,
+    autoplayMedia: true,
+    notifications: {
+      enabled: true,
+      emailEnabled: true,
+      pushEnabled: false,
+      inAppEnabled: true,
+      types: {
+        system: true,
+        emotion: true,
+        coach: true,
+        journal: true,
+        community: true,
+        achievement: true,
+      },
+      frequency: 'immediate',
+    },
+    privacy: {
+      shareData: true,
+      anonymizeReports: false,
+      profileVisibility: 'public',
+    },
+    soundEnabled: true,
+  },
+};
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+// Créer le contexte avec des valeurs par défaut
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  isAuthenticated: false,
+  login: async () => false,
+  logout: () => {},
+});
 
-  const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setUser({
-        id: '1',
-        name: 'Utilisateur Test',
-        email,
-        role: 'user',
-        avatar: '/path/to/avatar.jpg',
-        avatar_url: '/path/to/avatar.jpg',
-        preferences: {
-          theme: 'system',
-          fontSize: 'medium',
-          fontFamily: 'system',
-          reduceMotion: false,
-          colorBlindMode: false,
-          autoplayMedia: true,
-          soundEnabled: true,
-        },
-        position: 'Developer',
-        department: 'Engineering',
-        joined_at: new Date().toISOString(),
-      });
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(testUser); // Utilisateur connecté pour la démo
+
+  // Simuler une connexion
+  const login = async (email: string, password: string): Promise<boolean> => {
+    // Pour la démo, on accepte n'importe quels identifiants
+    setUser(testUser);
+    return true;
   };
 
+  // Déconnexion
   const logout = () => {
     setUser(null);
   };
 
-  const register = async (name: string, email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setUser({
-        id: '1',
-        name,
-        email,
-        role: 'user',
-        avatar: '/path/to/avatar.jpg',
-        avatar_url: '/path/to/avatar.jpg',
-        position: 'User',
-        department: 'General',
-        joined_at: new Date().toISOString(),
-      });
-    } catch (error) {
-      console.error('Register error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+  // Mettre à jour les informations utilisateur
+  const updateUser = async (userData: User) => {
+    setUser(userData);
   };
 
-  const updateUser = async (userData: Partial<User>) => {
+  // Mettre à jour uniquement les préférences
+  const updatePreferences = async (preferences: UserPreferences) => {
     if (user) {
-      setUser({ ...user, ...userData });
+      setUser({
+        ...user,
+        preferences,
+      });
     }
   };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        isLoading,
-        login,
-        logout,
-        register,
-        updateUser,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  const contextValue: AuthContextType = {
+    user,
+    isAuthenticated: !!user,
+    login,
+    logout,
+    updateUser,
+    updatePreferences,
+  };
+
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 };
 
+// Hook personnalisé pour utiliser le contexte
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -122,4 +109,4 @@ export const useAuth = () => {
   return context;
 };
 
-export default useAuth;
+export default AuthContext;

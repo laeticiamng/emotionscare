@@ -7,16 +7,8 @@ const LoginPage: React.FC = () => {
   const location = useLocation();
   const path = location.pathname;
 
-  if (path.includes('/b2c/login')) {
-    return <Navigate to="/b2c/login" replace />;
-  } else if (path.includes('/b2b/user/login')) {
-    return <Navigate to="/b2b/user/login" replace />;
-  } else if (path.includes('/b2b/admin/login')) {
-    return <Navigate to="/b2b/admin/login" replace />;
-  } else {
-    // Redirect to B2C login as default
-    return <Navigate to="/b2c/login" replace />;
-  }
+  // Par défaut, rediriger vers la page d'accueil
+  return <Navigate to="/" replace />;
 };
 
 export default LoginPage;
