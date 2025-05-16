@@ -17,8 +17,10 @@ const BadgesWidget = ({ badges, title = "Badges", showSeeAll = true, onSeeAll }:
   // Sort badges: first unlocked, then by progress
   const sortedBadges = [...badges].sort((a, b) => {
     // Prioritize completed/unlocked badges
-    if ((a.unlockedAt || a.earned_date || a.dateEarned) && !(b.unlockedAt || b.earned_date || b.dateEarned)) return -1;
-    if (!(a.unlockedAt || a.earned_date || b.dateEarned) && (b.unlockedAt || b.earned_date || b.dateEarned)) return 1;
+    if ((a.unlockedAt || a.earned_date || a.dateEarned || a.completed || a.unlocked) && 
+        !(b.unlockedAt || b.earned_date || b.dateEarned || b.completed || b.unlocked)) return -1;
+    if (!(a.unlockedAt || a.earned_date || a.dateEarned || a.completed || a.unlocked) && 
+        (b.unlockedAt || b.earned_date || b.dateEarned || b.completed || b.unlocked)) return 1;
     
     // If both are in same completion state, sort by progress (higher first)
     if (a.progress && b.progress) {

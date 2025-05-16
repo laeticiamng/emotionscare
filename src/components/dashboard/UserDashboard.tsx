@@ -29,10 +29,10 @@ const UserDashboard: React.FC = () => {
       category: 'daily',
       points: 50,
       progress: 0,
-      status: 'active',
-      isDaily: true,
       completed: false,
-      icon: <Book className="h-4 w-4" />
+      icon: <Book className="h-4 w-4" />,
+      isDaily: true,
+      status: 'active'
     },
     {
       id: '2',
@@ -41,10 +41,10 @@ const UserDashboard: React.FC = () => {
       category: 'weekly',
       points: 100,
       progress: 33,
-      status: 'active',
-      isWeekly: true,
       completed: false,
-      icon: <Music className="h-4 w-4" />
+      icon: <Music className="h-4 w-4" />,
+      isWeekly: true,
+      status: 'active'
     },
     {
       id: '3',
@@ -53,9 +53,9 @@ const UserDashboard: React.FC = () => {
       category: 'special',
       points: 150,
       progress: 0,
-      status: 'active',
       completed: false,
-      icon: <Scan className="h-4 w-4" />
+      icon: <Scan className="h-4 w-4" />,
+      status: 'active'
     }
   ];
 

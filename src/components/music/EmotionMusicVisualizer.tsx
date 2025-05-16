@@ -36,7 +36,7 @@ const EmotionMusicVisualizer: React.FC<EmotionMusicVisualizerProps> = ({
     audio.crossOrigin = 'anonymous';
     
     // Use the appropriate track URL property
-    const trackUrl = track.track_url;
+    const trackUrl = track.audioUrl || track.url || track.track_url;
     
     if (!trackUrl) {
       console.error('No URL available for track:', track);

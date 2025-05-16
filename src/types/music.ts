@@ -9,17 +9,21 @@ export interface MusicTrack {
   coverUrl?: string;
   cover_url?: string;
   audioUrl: string;
+  url?: string;
+  track_url?: string;
   category?: string;
   isFavorited?: boolean;
   emotionalTone?: string;
   mood?: string;
   emotions?: string[];
   bpm?: number;
+  cover?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
+  title?: string;
   description?: string;
   coverUrl?: string;
   cover_url?: string;
@@ -59,7 +63,9 @@ export interface MusicDrawerProps {
   children?: ReactNode;
   side?: 'left' | 'right' | 'top' | 'bottom';
   open?: boolean;
+  isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
   currentTrack?: MusicTrack | null;
   playlist?: MusicPlaylist | null;
 }
@@ -72,6 +78,12 @@ export interface ProgressBarProps {
   duration: number;
   onSeek: (position: number) => void;
   className?: string;
+  progress?: number;
+  max?: number;
+  formatTime?: (seconds: number) => string;
+  showTimestamps?: boolean;
+  value?: number;
+  onChange?: (value: number) => void;
 }
 
 export type MusicProgressBarProps = ProgressBarProps;
@@ -83,7 +95,7 @@ export interface TrackInfoProps {
 
 export interface VolumeControlProps {
   volume: number;
-  onVolumeChange: (volume: number) => void;
+  onVolumeChange?: (volume: number) => void;
   onChange?: (volume: number) => void;
   isMuted?: boolean;
   onMuteToggle?: () => void;
@@ -92,7 +104,27 @@ export interface VolumeControlProps {
 }
 
 export interface MusicLibraryProps {
-  onSelectTrack: (track: MusicTrack) => void;
-  onSelectPlaylist: (playlist: MusicPlaylist) => void;
+  onSelectTrack?: (track: MusicTrack) => void;
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
   playlists?: MusicPlaylist[];
+}
+
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
+}
+
+export interface MusicControlsProps {
+  isPlaying: boolean;
+  onPlay: () => void;
+  onPause: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
+  onVolumeChange?: (volume: number) => void;
+  volume?: number;
+  progress?: number;
+  duration?: number;
+  onProgressChange?: (value: number) => void;
+  currentTrack?: MusicTrack;
+  track?: MusicTrack;
 }

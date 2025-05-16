@@ -1,15 +1,110 @@
 
 import React from 'react';
-import { TabsContent } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import EmotionPieChart from '@/components/dashboard/charts/EmotionPieChart';
-import WeeklyActivityChart from '@/components/dashboard/charts/WeeklyActivityChart';
-import BadgesWidget from '@/components/dashboard/widgets/BadgesWidget';
-import LeaderboardWidget from '@/components/dashboard/widgets/LeaderboardWidget';
-import { Badge, LeaderboardEntry } from '@/types/gamification';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import LineChart from '@/components/dashboard/charts/LineChart';
+import { Badge as BadgeComponent } from '@/components/ui/badge';
+import { Badge, Challenge, LeaderboardEntry, GamificationStats } from '@/types/gamification';
+import LeaderboardWidget from '../widgets/LeaderboardWidget';
+import BadgesWidget from '../widgets/BadgesWidget';
+import ChallengesList from '@/components/gamification/ChallengesList';
 
-export const AdminTabContents: React.FC = () => {
-  // Mock data
+interface AdminTabContentsProps {
+  dashboardStats?: any;
+  gamificationData?: GamificationStats;
+  onCompleteChallenge?: (id: string) => Promise<boolean>;
+}
+
+export const AdminTabContents = ({ 
+  dashboardStats, 
+  gamificationData,
+  onCompleteChallenge 
+}: AdminTabContentsProps) => {
+  // Mock badges data
+  const badges: Badge[] = [
+    {
+      id: '1',
+      name: 'Super admin',
+      description: 'Gérer les paramètres administrateur avancés',
+      image_url: '/badges/admin.png',
+      tier: 'bronze',
+      unlockedAt: '2023-05-12'
+    },
+    {
+      id: '2',
+      name: 'Analytics Pro',
+      description: 'Expertise en analyse des données',
+      image_url: '/badges/analytics.png',
+      tier: 'silver',
+      unlockedAt: '2023-06-25'
+    },
+    {
+      id: '3',
+      name: 'Invitations Master',
+      description: 'Inviter plus de 50 utilisateurs',
+      image_url: '/badges/invite.png',
+      tier: 'gold'
+    }
+  ];
+  
+  // Mock leaderboard data
+  const leaderboard: LeaderboardEntry[] = [
+    {
+      id: '1',
+      name: 'Thomas Martin',
+      avatar: '/avatars/user1.jpg',
+      points: 1250,
+      rank: 1,
+      trend: 'up',
+      userId: 'user-001',
+    },
+    {
+      id: '2',
+      name: 'Sophie Durand',
+      avatar: '/avatars/user2.jpg',
+      points: 980,
+      rank: 2,
+      trend: 'stable',
+      userId: 'user-002',
+    },
+    {
+      id: '3',
+      name: 'Jean Petit',
+      avatar: '/avatars/user3.jpg',
+      points: 760,
+      rank: 3,
+      trend: 'down',
+      userId: 'user-003',
+    }
+  ];
+  
+  // Mock challenges
+  const challenges: Challenge[] = [
+    {
+      id: '1',
+      title: 'Engagement personnel',
+      description: 'Participer aux défis de la semaine',
+      category: 'Admin',
+      points: 200,
+      completed: false,
+      progress: 40,
+      deadline: new Date().toISOString(),
+      status: 'active'
+    },
+    {
+      id: '2',
+      title: 'Analyser les données',
+      description: 'Examiner les rapports hebdomadaires',
+      category: 'Analytics',
+      points: 150,
+      completed: true,
+      progress: 100,
+      status: 'completed'
+    }
+  ];
+  
+  // Mock emotions data for pie chart
   const emotionData = [
     { name: 'Joie', value: 35, color: '#4CAF50' },
     { name: 'Calme', value: 25, color: '#2196F3' },
@@ -17,164 +112,165 @@ export const AdminTabContents: React.FC = () => {
     { name: 'Stress', value: 10, color: '#F44336' },
     { name: 'Focus', value: 15, color: '#9C27B0' }
   ];
-
-  const activityData = [
-    { day: 'Lun', value: 55 },
-    { day: 'Mar', value: 70 },
-    { day: 'Mer', value: 45 },
-    { day: 'Jeu', value: 80 },
-    { day: 'Ven', value: 65 },
-    { day: 'Sam', value: 30 },
-    { day: 'Dim', value: 25 }
-  ];
-
-  const badges: Badge[] = [
-    {
-      id: '1',
-      name: 'Champion d\'équipe',
-      description: 'Soutenu 10 collègues',
-      image: '/badges/team-champion.png',
-      category: 'team',
-      tier: 'rare',
-      unlockedAt: '2023-04-01'
-    },
-    {
-      id: '2',
-      name: 'Bien-être collectif',
-      description: 'Créé une initiative de bien-être',
-      image: '/badges/wellbeing.png',
-      category: 'wellness',
-      tier: 'epic'
-    },
-    {
-      id: '3',
-      name: 'Mentorat',
-      description: 'Guidé 5 nouveaux membres',
-      image: '/badges/mentor.png',
-      category: 'leadership',
-      tier: 'legendary'
-    }
-  ];
-
-  const leaderboard: LeaderboardEntry[] = [
-    {
-      id: '1',
-      name: 'Équipe Marketing',
-      avatar: '/teams/marketing.jpg',
-      points: 1850,
-      rank: 1,
-      userId: '1'
-    },
-    {
-      id: '2',
-      name: 'Équipe Développement',
-      avatar: '/teams/development.jpg',
-      points: 1680,
-      rank: 2,
-      userId: '2'
-    },
-    {
-      id: '3',
-      name: 'Équipe Design',
-      avatar: '/teams/design.jpg',
-      points: 1540,
-      rank: 3,
-      userId: '3'
-    }
-  ];
-
+  
+  // Mock data for line chart
+  const lineData = Array.from({ length: 30 }, (_, i) => ({
+    date: new Date(2023, 4, i + 1).toISOString().split('T')[0],
+    value: Math.floor(Math.random() * 50) + 50
+  }));
+  
   return (
-    <>
-      <TabsContent value="global">
+    <Tabs defaultValue="overview" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+        <TabsTrigger value="emotions">Émotions</TabsTrigger>
+        <TabsTrigger value="engagement">Engagement</TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="overview" className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardHeader>
-              <CardTitle>Tendances émotionnelles</CardTitle>
+              <CardTitle>Défis à venir</CardTitle>
+              <CardDescription>Défis planifiés pour les prochains jours</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
-                <EmotionPieChart data={emotionData} />
+              <ChallengesList 
+                challenges={challenges} 
+                onComplete={onCompleteChallenge}
+              />
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Badges d'administration</CardTitle>
+              <CardDescription>Badges disponibles pour les administrateurs</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <BadgesWidget 
+                badges={badges}
+                title="Badges Admin"
+                onSeeAll={() => console.log('View all admin badges')}
+              />
+            </CardContent>
+          </Card>
+        </div>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Classement des Utilisateurs</CardTitle>
+            <CardDescription>Les utilisateurs les plus actifs cette semaine</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LeaderboardWidget 
+              leaderboard={leaderboard}
+              title="Classement"
+              onSeeAll={() => console.log('View all leaderboard')}
+            />
+          </CardContent>
+        </Card>
+      </TabsContent>
+      
+      <TabsContent value="emotions" className="space-y-4">
+        <Card className="col-span-2">
+          <CardHeader>
+            <CardTitle>Distribution des émotions</CardTitle>
+            <CardDescription>Répartition des émotions signalées par les utilisateurs</CardDescription>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={emotionData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={true}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                >
+                  {emotionData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Tendance émotionnelle</CardTitle>
+            <CardDescription>Évolution des scores émotionnels moyens au fil du temps</CardDescription>
+          </CardHeader>
+          <CardContent className="h-[300px]">
+            <LineChart data={lineData} />
+          </CardContent>
+        </Card>
+      </TabsContent>
+      
+      <TabsContent value="engagement" className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Sessions les plus populaires</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center">
+                        {i + 1}
+                      </div>
+                      <div>
+                        <p className="font-medium">Session #{i + 1}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {Math.floor(Math.random() * 100) + 100} utilisateurs
+                        </p>
+                      </div>
+                    </div>
+                    <BadgeComponent variant="outline">{['Facile', 'Moyen', 'Difficile'][i % 3]}</BadgeComponent>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
+          
           <Card>
             <CardHeader>
-              <CardTitle>Activité de la plateforme</CardTitle>
+              <CardTitle>Statistiques d'engagement</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
-                <WeeklyActivityChart data={activityData} />
-              </div>
+              <ul className="space-y-4">
+                <li className="flex justify-between">
+                  <span className="text-muted-foreground">Sessions terminées:</span>
+                  <span className="font-medium">1,234</span>
+                </li>
+                <li className="flex justify-between">
+                  <span className="text-muted-foreground">Temps moyen par session:</span>
+                  <span className="font-medium">24 min</span>
+                </li>
+                <li className="flex justify-between">
+                  <span className="text-muted-foreground">Taux de complétion:</span>
+                  <span className="font-medium">87%</span>
+                </li>
+                <li className="flex justify-between">
+                  <span className="text-muted-foreground">Utilisateurs actifs:</span>
+                  <span className="font-medium">342</span>
+                </li>
+                <li className="flex justify-between">
+                  <span className="text-muted-foreground">Nouvelles inscriptions:</span>
+                  <span className="font-medium">45</span>
+                </li>
+              </ul>
             </CardContent>
           </Card>
         </div>
       </TabsContent>
-      <TabsContent value="emotions">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Distribution des émotions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <EmotionPieChart data={emotionData} />
-              </div>
-            </CardContent>
-          </Card>
-          <BadgesWidget 
-            badges={badges}
-            title="Badges d'équipe"
-            showSeeAll={true}
-            onSeeAll={() => console.log('View all badges')}
-          />
-        </div>
-      </TabsContent>
-      <TabsContent value="activity">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Activité hebdomadaire</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px]">
-                <WeeklyActivityChart data={activityData} />
-              </div>
-            </CardContent>
-          </Card>
-          <LeaderboardWidget 
-            leaderboard={leaderboard}
-            title="Classement des équipes"
-            showSeeAll={true}
-            onSeeAll={() => console.log('View all leaderboard')}
-          />
-        </div>
-      </TabsContent>
-      <TabsContent value="teams">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance des équipes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                Graphique de performance des équipes
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Distribution des ressources</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                Graphique de distribution des ressources
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </TabsContent>
-    </>
+    </Tabs>
   );
 };
-
-export default AdminTabContents;

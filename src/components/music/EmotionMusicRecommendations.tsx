@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useMusic } from '@/contexts/MusicContext';
-import { EmotionMusicParams } from '@/types/music';
 import { Music, Play, Loader2 } from 'lucide-react';
 
 interface EmotionMusicRecommendationsProps {
@@ -52,7 +51,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
       
       try {
         // Call the loadPlaylistForEmotion function from MusicContext
-        const playlist = await loadPlaylistForEmotion(emotion);
+        const playlist = await loadPlaylistForEmotion({ emotion });
         setRecommendation(playlist);
       } catch (err) {
         console.error('Failed to load music recommendation:', err);

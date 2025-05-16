@@ -11,12 +11,12 @@ export interface Badge {
   level?: number | string;
   image?: string;
   unlockedAt?: string;
+  dateEarned?: string;
   progress?: number;
   rarity?: 'common' | 'rare' | 'epic' | 'legendary';
   completed?: boolean;
   unlocked?: boolean;
   imageUrl?: string;
-  dateEarned?: string;
 }
 
 export interface Challenge {
@@ -52,13 +52,13 @@ export interface LeaderboardEntry {
   avatar?: string;
   points: number;
   rank: number;
+  position?: number;
   trend?: 'up' | 'down' | 'stable';
   badges?: number;
   level?: number;
   score?: number;
   change?: number;
   department?: string;
-  position?: number;
   userId?: string;
   username?: string;
   isCurrentUser?: boolean;

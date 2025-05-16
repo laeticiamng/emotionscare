@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Challenge } from '@/types';
+import { Challenge } from '@/types/gamification';
 import { getCategoryColor } from '@/utils/gamificationUtils';
 import { Calendar, Clock, Award, ArrowRight, CheckCircle, XCircle } from 'lucide-react';
 

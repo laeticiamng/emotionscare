@@ -1,39 +1,54 @@
 
+import { ReactNode } from 'react';
+import { MusicTrack } from './music';
+
 export interface VRSessionTemplate {
   id: string;
   title: string;
   description: string;
   duration: number;
   tags: string[];
-  thumbnailUrl: string;
-  category: string;
-  emotion_target?: string;
   emotionTarget?: string;
+  emotion_target?: string;
+  difficulty?: string;
+  benefits?: string[];
+  thumbnailUrl?: string;
+  category?: string;
+  theme?: string;
+  completionRate?: number;
+  recommendedMood?: string;
+  is_audio_only?: boolean;
+  preview_url?: string;
+  audio_url?: string;
+  emotion?: string;
 }
 
 export interface VRSession {
   id: string;
-  templateId: string;
-  userId: string;
-  startDate: Date | string;
-  endDate?: Date | string;
-  completed: boolean;
+  template_id: string;
+  user_id: string;
+  start_time: string;
+  end_time?: string;
   rating?: number;
-  notes?: string;
-  emotions?: string[];
+  feedback?: string;
+  mood_before?: number;
+  mood_after?: number;
+  completed: boolean;
 }
 
 export interface VRHistoryListProps {
   sessions: VRSession[];
-  onSelectSession?: (session: VRSession) => void;
+  onSessionClick?: (session: VRSession) => void;
 }
 
 export interface VRSessionHistoryProps {
-  sessions: VRSession[];
+  userId?: string;
+  limit?: number;
+  showViewAll?: boolean;
 }
 
 export interface VRSessionWithMusicProps {
   session: VRSessionTemplate;
-  onComplete?: (feedback: { rating: number; notes?: string }) => void;
-  onExit?: () => void;
+  music?: MusicTrack[];
+  onComplete?: (rating: number, feedback?: string) => void;
 }

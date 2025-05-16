@@ -8,11 +8,23 @@ import { VolumeControlProps } from '@/types/music';
 const VolumeControl: React.FC<VolumeControlProps> = ({
   volume,
   onChange,
-  isMuted,
+  onVolumeChange,
+  isMuted = false,
   onMuteToggle,
   className = '',
   showLabel = false
 }) => {
+  // Handle volume change - use both onChange and onVolumeChange for backward compatibility
+  const handleVolumeChange = (value: number[]) => {
+    const newVolume = value[0];
+    if (onChange) {
+      onChange(newVolume);
+    }
+    if (onVolumeChange) {
+      onVolumeChange(newVolume);
+    }
+  };
+
   // Get appropriate volume icon based on level or mute status
   const VolumeIcon = () => {
     if (isMuted || volume === 0) return <VolumeX className="h-4 w-4" />;
@@ -35,7 +47,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
         value={[isMuted ? 0 : volume]}
         max={1}
         step={0.01}
-        onValueChange={(values) => onChange(values[0])}
+        onValueChange={handleVolumeChange}
         className="flex-1"
       />
       {showLabel && (
