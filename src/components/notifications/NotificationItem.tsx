@@ -1,64 +1,109 @@
 
 import React from 'react';
-import { Bell, Check, Info, AlertCircle } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Check, Trash2, Bell, FileText, Box, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Notification } from '@/types/notification';
 
 export interface NotificationItemProps {
-  id: string;
-  title: string;
-  message?: string;
-  type?: 'info' | 'success' | 'warning' | 'error';
-  time?: string;
-  read?: boolean;
+  notification: Notification;
+  onMarkAsRead: (id: string) => void;
+  onDelete: (id: string) => void;
   onClick?: () => void;
-  compact?: boolean;
 }
 
-export const NotificationItem: React.FC<NotificationItemProps> = ({
-  title,
-  message,
-  type = 'info',
-  time,
-  read = false,
+const NotificationItem: React.FC<NotificationItemProps> = ({
+  notification,
+  onMarkAsRead,
+  onDelete,
   onClick,
-  compact = false
 }) => {
+  // Format the date
+  const formattedDate = new Date(notification.created_at).toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  
+  // Get icon based on notification type
   const getIcon = () => {
-    switch (type) {
-      case 'success':
-        return <Check className="h-5 w-5 text-green-500" />;
-      case 'warning':
-        return <AlertCircle className="h-5 w-5 text-amber-500" />;
-      case 'error':
-        return <AlertCircle className="h-5 w-5 text-red-500" />;
-      case 'info':
+    switch (notification.type) {
+      case 'journal':
+        return <FileText className="h-5 w-5" />;
+      case 'system':
+        return <Bell className="h-5 w-5" />;
+      case 'emotion':
+        return <Box className="h-5 w-5" />;
+      case 'urgent':
+        return <AlertTriangle className="h-5 w-5" />;
       default:
-        return <Info className="h-5 w-5 text-blue-500" />;
+        return <Bell className="h-5 w-5" />;
     }
   };
-
+  
   return (
-    <div
-      onClick={onClick}
+    <Card
       className={cn(
-        "flex items-start p-3 gap-3 rounded-md hover:bg-muted/60 transition-colors cursor-pointer",
-        !read && "bg-muted/40"
+        "flex items-start justify-between p-4 cursor-pointer transition-colors hover:bg-accent",
+        !notification.read && "border-l-4 border-l-primary"
       )}
+      onClick={onClick}
     >
-      <div className="mt-0.5">{getIcon()}</div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between gap-2">
-          <p className={cn("font-medium line-clamp-1", !read && "font-semibold")}>{title}</p>
-          {time && !compact && <span className="text-xs text-muted-foreground whitespace-nowrap">{time}</span>}
+      <div className="flex items-start gap-3">
+        <div className={cn(
+          "p-2 rounded-md",
+          notification.type === 'urgent' ? "bg-red-100 text-red-600" :
+          notification.type === 'journal' ? "bg-blue-100 text-blue-600" :
+          notification.type === 'emotion' ? "bg-purple-100 text-purple-600" :
+          "bg-gray-100 text-gray-600"
+        )}>
+          {getIcon()}
         </div>
-        {message && !compact && (
-          <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
-            {message}
-          </p>
-        )}
+        
+        <div>
+          <h4 className={cn(
+            "font-medium",
+            !notification.read && "font-semibold"
+          )}>
+            {notification.title}
+          </h4>
+          <p className="text-muted-foreground text-sm">{notification.message}</p>
+          <span className="text-xs text-muted-foreground mt-1 block">{formattedDate}</span>
+        </div>
       </div>
-      {!read && <span className="block w-2 h-2 rounded-full bg-primary flex-shrink-0" />}
-    </div>
+      
+      <div className="flex items-center gap-2">
+        {!notification.read && (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={(e) => {
+              e.stopPropagation();
+              onMarkAsRead(notification.id);
+            }}
+            title="Marquer comme lu"
+          >
+            <Check className="h-4 w-4" />
+            <span className="sr-only">Marquer comme lu</span>
+          </Button>
+        )}
+        
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(notification.id);
+          }}
+          title="Supprimer"
+        >
+          <Trash2 className="h-4 w-4" />
+          <span className="sr-only">Supprimer</span>
+        </Button>
+      </div>
+    </Card>
   );
 };
 

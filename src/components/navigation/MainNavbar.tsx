@@ -1,7 +1,4 @@
 import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -10,6 +7,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,134 +18,149 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from "@/components/ui/avatar";
-import {
   Bell,
   Calendar,
-  Code,
-  Cog,
-  FileBarGraph,
-  Plus,
-  Settings,
-  CreditCard,
-  Keyboard,
-  HelpCircle,
+  ChevronDown,
+  FileText,
+  Home,
   LogOut,
-  BarChart3,
+  Menu,
+  MessageSquare,
+  Moon,
+  Settings,
+  Sun,
+  User,
+  BarChart3
 } from "lucide-react";
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "@/components/theme-provider";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  isAdminRole,
+  getRoleName,
+  getRoleLoginPath,
+} from "@/utils/roleUtils";
+import { useSoundscape } from "@/contexts/SoundscapeContext";
+import NotificationDrawer from "@/components/notifications/NotificationDrawer";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
-const MainNavbar: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { toast } = useToast();
+interface MainNavbarProps {
+  isMobile?: boolean;
+}
+
+const MainNavbar: React.FC<MainNavbarProps> = ({ isMobile }) => {
+  const { theme, setTheme } = useTheme();
   const { user, logout } = useAuth();
-  
-  const handleLogout = () => {
-    localStorage.removeItem("auth_session");
-    localStorage.removeItem("user_role");
-    
-    logout();
-    
-    toast({
-      title: "Déconnexion réussie",
-      description: "À bientôt sur EmotionsCare !",
-    });
-    
-    navigate("/");
+  const navigate = useNavigate();
+  const { playFunctionalSound } = useSoundscape();
+  const [open, setOpen] = React.useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+    playFunctionalSound("logout");
+    const loginPath = getRoleLoginPath(user?.role || "b2c");
+    navigate(loginPath);
   };
-  
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase();
-  };
-  
+
   return (
-    <div className="border-b">
+    <div className="border-b bg-background sticky top-0 z-50">
       <div className="flex h-16 items-center px-4">
-        <Link to="/" className="mr-6 flex items-center space-x-2">
-          <Code className="h-6 w-6" />
-          <span className="font-bold">EmotionsCare</span>
-        </Link>
-        <nav className="ml-auto flex items-center space-x-4 sm:space-x-6">
-          <Button variant="ghost" size="sm">
-            <Calendar className="mr-2 h-4 w-4" />
-            Calendrier
-          </Button>
-          <Button variant="ghost" size="sm">
-            <HelpCircle className="mr-2 h-4 w-4" />
-            Aide
-          </Button>
+        {isMobile ? (
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <Settings className="mr-2 h-4 w-4" />
-                Paramètres
+              <Button variant="ghost" size="icon">
+                <Menu />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+            <SheetContent className="sm:max-w-sm" side="left">
               <SheetHeader>
-                <SheetTitle>Paramètres</SheetTitle>
+                <SheetTitle>Menu</SheetTitle>
                 <SheetDescription>
-                  Gérez les paramètres de votre compte et définissez vos préférences.
+                  Explorez les différentes sections de l'application.
                 </SheetDescription>
               </SheetHeader>
               <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <label htmlFor="name" className="text-right">
-                    Nom
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    value={user?.name}
-                    className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <label htmlFor="username" className="text-right">
-                    Nom d'utilisateur
-                  </label>
-                  <input
-                    type="text"
-                    id="username"
-                    value={user?.email}
-                    className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  />
-                </div>
+                <Link to="/" className="flex items-center space-x-2">
+                  <Home className="w-4 h-4" />
+                  <span>Accueil</span>
+                </Link>
+                <Link to="/journal" className="flex items-center space-x-2">
+                  <FileText className="w-4 h-4" />
+                  <span>Journal</span>
+                </Link>
+                <Link to="/scan" className="flex items-center space-x-2">
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Scan</span>
+                </Link>
+                <Link to="/calendar" className="flex items-center space-x-2">
+                  <Calendar className="w-4 h-4" />
+                  <span>Calendrier</span>
+                </Link>
+                <Link to="/messages" className="flex items-center space-x-2">
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Messages</span>
+                </Link>
+                {isAdminRole(user?.role) && (
+                  <Link to="/admin" className="flex items-center space-x-2">
+                    <Settings className="w-4 h-4" />
+                    <span>Administration</span>
+                  </Link>
+                )}
               </div>
             </SheetContent>
           </Sheet>
+        ) : (
+          <Link to="/" className="mr-6 font-bold">
+            EmotionsCare
+          </Link>
+        )}
+        <div className="ml-auto flex items-center space-x-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              setTheme(theme === "light" ? "dark" : "light");
+              playFunctionalSound("themeToggle");
+            }}
+          >
+            {theme === "light" ? <Moon /> : <Sun />}
+          </Button>
+
+          <NotificationDrawer />
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button variant="ghost" className="h-8 w-8 p-0 lg:h-auto lg:w-auto">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={user?.avatar_url} alt={user?.name} />
-                  <AvatarFallback>{getInitials(user?.name || '??')}</AvatarFallback>
+                  <AvatarImage src={user?.avatar} alt={user?.name} />
+                  <AvatarFallback>{user?.name?.slice(0, 2)}</AvatarFallback>
                 </Avatar>
+                {!isMobile && (
+                  <span className="ml-2 text-sm font-normal">
+                    {user?.name}
+                  </span>
+                )}
+                <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+              <DropdownMenuLabel>Mon profil</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                <span>{user?.email}</span>
+              </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
-                Paramètres
+                <span>{getRoleName(user?.role)}</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
-                Déconnexion
+                <span>Se déconnecter</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </nav>
+        </div>
       </div>
     </div>
   );

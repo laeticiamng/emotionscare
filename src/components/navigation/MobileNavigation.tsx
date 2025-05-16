@@ -7,158 +7,203 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
 import {
-  User,
+  Bell,
+  Calendar,
+  ChevronDown,
+  FileText,
   Home,
-  BookOpen,
-  Music,
-  Heart,
-  Settings,
   LogOut,
+  Menu,
   MessageSquare,
-  Glasses,
-  Trophy,
-  HeartHandshake
+  Moon,
+  Settings,
+  Sun,
+  User,
+  BarChart3
 } from "lucide-react";
-import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from "@/contexts/ThemeContext";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate, Link, useLocation } from "react-router-dom";
-import { ROUTES } from "@/types/navigation";
-import { cn } from "@/lib/utils";
+import { useSoundscape } from "@/contexts/SoundscapeContext";
+import NotificationsDrawer from "@/components/notifications/NotificationDrawer";
 
 const MobileNavigation: React.FC = () => {
-  const { logout } = useAuth();
-  const { toast } = useToast();
+  const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
-  const handleLogout = () => {
-    localStorage.removeItem("auth_session");
-    localStorage.removeItem("user_role");
-    
-    logout();
-    
-    toast({
-      title: "Déconnexion réussie",
-      description: "À bientôt sur EmotionsCare !",
-    });
-    
-    navigate("/");
+  const { toast } = useToast();
+  const { playFunctionalSound } = useSoundscape();
+  const [open, setOpen] = React.useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast({
+        title: "Déconnexion réussie",
+        description: "Vous avez été déconnecté avec succès.",
+      });
+      navigate("/login");
+    } catch (error) {
+      toast({
+        title: "Erreur de déconnexion",
+        description: "Une erreur s'est produite lors de la déconnexion.",
+        variant: "destructive",
+      });
+    } finally {
+      playFunctionalSound("logout");
+    }
   };
-  
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Menu">
-          <User className="h-5 w-5" />
-        </Button>
+        <Menu className="w-6 h-6 cursor-pointer" />
       </SheetTrigger>
-      <SheetContent side="bottom" className="h-[85%] rounded-t-xl">
-        <SheetHeader className="space-y-2 text-left">
+      <SheetContent className="sm:max-w-md">
+        <SheetHeader>
           <SheetTitle>Menu</SheetTitle>
           <SheetDescription>
-            Explorez votre espace EmotionsCare
+            Explorez les différentes sections de l'application.
           </SheetDescription>
         </SheetHeader>
+
         <div className="grid gap-4 py-4">
-          <Link to={ROUTES.b2c.dashboard}>
-            <Button
-              variant={location.pathname === ROUTES.b2c.dashboard ? "default" : "ghost"}
-              className={cn("w-full justify-start", {
-                "bg-accent": location.pathname === ROUTES.b2c.dashboard,
-              })}
-            >
-              <Home className="mr-2 h-4 w-4" />
-              Accueil
-            </Button>
-          </Link>
-          
-          <Link to={ROUTES.b2c.journal}>
-            <Button
-              variant={location.pathname === ROUTES.b2c.journal ? "default" : "ghost"}
-              className="w-full justify-start"
-            >
-              <BookOpen className="mr-2 h-4 w-4" />
-              Journal émotionnel
-            </Button>
-          </Link>
-          
-          <Link to={ROUTES.b2c.music}>
-            <Button
-              variant={location.pathname === ROUTES.b2c.music ? "default" : "ghost"}
-              className="w-full justify-start"
-            >
-              <Music className="mr-2 h-4 w-4" />
-              Musicothérapie
-            </Button>
-          </Link>
-          
-          <Link to={ROUTES.b2c.scan}>
-            <Button
-              variant={location.pathname === ROUTES.b2c.scan ? "default" : "ghost"}
-              className="w-full justify-start"
-            >
-              <Heart className="mr-2 h-4 w-4" />
-              Scan émotionnel
-            </Button>
-          </Link>
+          <Separator />
 
-          <Link to={ROUTES.b2c.coach}>
-            <Button
-              variant={location.pathname === ROUTES.b2c.coach ? "default" : "ghost"}
-              className="w-full justify-start"
-            >
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Coach
-            </Button>
-          </Link>
-
-          <Link to={ROUTES.b2c.vr}>
-            <Button
-              variant={location.pathname === ROUTES.b2c.vr ? "default" : "ghost"}
-              className="w-full justify-start"
-            >
-              <Glasses className="mr-2 h-4 w-4" />
-              Réalité virtuelle
-            </Button>
-          </Link>
-
-          <Link to={ROUTES.b2c.gamification}>
-            <Button
-              variant={location.pathname === ROUTES.b2c.gamification ? "default" : "ghost"}
-              className="w-full justify-start"
-            >
-              <Trophy className="mr-2 h-4 w-4" />
-              Défis
-            </Button>
-          </Link>
-
-          <Link to={ROUTES.b2c.cocon}>
-            <Button
-              variant={location.pathname === ROUTES.b2c.cocon ? "default" : "ghost"}
-              className="w-full justify-start"
-            >
-              <HeartHandshake className="mr-2 h-4 w-4" />
-              Cocon
-            </Button>
-          </Link>
-          
-          <Link to={ROUTES.b2c.preferences}>
-            <Button variant="ghost" className="w-full justify-start">
-              <Settings className="mr-2 h-4 w-4" />
-              Préférences
-            </Button>
-          </Link>
-          
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-red-500 dark:text-red-400"
-            onClick={handleLogout}
+          <NavLink
+            to="/"
+            className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
+              isActive("/") ? "bg-secondary text-primary" : ""
+            }`}
+            onClick={() => setOpen(false)}
           >
-            <LogOut className="mr-2 h-4 w-4" />
-            Déconnexion
-          </Button>
+            <Home className="w-4 h-4" />
+            <span>Accueil</span>
+          </NavLink>
+
+          <NavLink
+            to="/journal"
+            className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
+              isActive("/journal") ? "bg-secondary text-primary" : ""
+            }`}
+            onClick={() => setOpen(false)}
+          >
+            <FileText className="w-4 h-4" />
+            <span>Journal</span>
+          </NavLink>
+
+          <NavLink
+            to="/scan"
+            className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
+              isActive("/scan") ? "bg-secondary text-primary" : ""
+            }`}
+            onClick={() => setOpen(false)}
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span>Scan</span>
+          </NavLink>
+
+          <NavLink
+            to="/calendar"
+            className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
+              isActive("/calendar") ? "bg-secondary text-primary" : ""
+            }`}
+            onClick={() => setOpen(false)}
+          >
+            <Calendar className="w-4 h-4" />
+            <span>Calendrier</span>
+          </NavLink>
+
+          <NavLink
+            to="/messages"
+            className={`flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors ${
+              isActive("/messages") ? "bg-secondary text-primary" : ""
+            }`}
+            onClick={() => setOpen(false)}
+          >
+            <MessageSquare className="w-4 h-4" />
+            <span>Messages</span>
+          </NavLink>
+
+          <Separator />
+
+          <div className="py-2 px-4">
+            <div className="text-sm font-medium text-muted-foreground">
+              Paramètres
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between py-2 px-4">
+            <div className="flex items-center space-x-2">
+              {theme === "light" ? (
+                <Sun className="w-4 h-4" />
+              ) : (
+                <Moon className="w-4 h-4" />
+              )}
+              <span>Mode {theme === "light" ? "Sombre" : "Clair"}</span>
+            </div>
+            <button
+              onClick={() => {
+                toggleTheme();
+                setOpen(false);
+              }}
+              className="rounded-full p-1 hover:bg-secondary transition-colors"
+            >
+              {theme === "light" ? "🌙" : "☀️"}
+            </button>
+          </div>
+
+          <Link
+            to="/settings"
+            className="flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors"
+            onClick={() => setOpen(false)}
+          >
+            <Settings className="w-4 h-4" />
+            <span>Paramètres</span>
+          </Link>
+
+          <Separator />
+
+          <div className="py-2 px-4">
+            <div className="text-sm font-medium text-muted-foreground">
+              Compte
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 py-2 px-4">
+            <Avatar className="w-8 h-8">
+              <AvatarImage src={user?.avatar} alt={user?.name} />
+              <AvatarFallback>{user?.name?.substring(0, 2)}</AvatarFallback>
+            </Avatar>
+            <div>
+              <div className="font-medium">{user?.name}</div>
+              <div className="text-muted-foreground text-sm">{user?.email}</div>
+            </div>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-2 py-2 px-4 rounded-md hover:bg-secondary transition-colors w-full justify-start"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Déconnexion</span>
+          </button>
         </div>
       </SheetContent>
     </Sheet>

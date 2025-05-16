@@ -1,82 +1,74 @@
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Trophy } from 'lucide-react';
-import { GamificationSummaryCard } from '../GamificationSummaryCard';
-import { Skeleton } from '@/components/ui/skeleton';
-import { GamificationStats, Challenge } from '@/types/gamification';
+import { BarChart3, Trophy, Users } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { GamificationSummaryCard } from '@/components/dashboard/admin/GamificationSummaryCard';
+import { GamificationStats } from '@/types/gamification';
 
-export interface GamificationTabProps {
+interface GamificationTabProps {
   gamificationData: GamificationStats;
-  isLoading?: boolean;
 }
 
-const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData, isLoading = false }) => {
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Skeleton className="h-64 w-full" />
-        <Skeleton className="h-64 w-full" />
-        <Skeleton className="h-80 w-full col-span-1 md:col-span-2" />
-      </div>
-    );
-  }
-
-  // Safely access properties with fallbacks
-  const topChallenges = gamificationData.challenges || [];
-  const badgeLevels = gamificationData.badgeLevels || [
-    { level: "bronze", count: 245 },
-    { level: "silver", count: 120 },
-    { level: "gold", count: 45 }
-  ];
-
+export const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <GamificationSummaryCard gamificationData={gamificationData} />
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Badges débloqués</CardTitle>
+            <Trophy className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">
+              {gamificationData.unlockedBadges || gamificationData.badges?.length || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              +{Math.floor(Math.random() * 10) + 1} depuis le mois dernier
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Taux d'engagement</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">
+              {gamificationData.activeUsersPercent || 67}%
+            </div>
+            <p className="text-xs text-muted-foreground">
+              +{Math.floor(Math.random() * 10) + 1}% depuis le mois dernier
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Défis complétés</CardTitle>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold">
+              {gamificationData.completedChallenges || 234}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              +{Math.floor(Math.random() * 20) + 10} depuis le mois dernier
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <GamificationSummaryCard stats={gamificationData} />
       
-      <Card className="glass-card">
+      <Card>
         <CardHeader>
-          <CardTitle>Top Défis</CardTitle>
-          <CardDescription>Les défis les plus réussis</CardDescription>
+          <CardTitle>Analyse des tendances</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {topChallenges.map((challenge, index) => (
-              <div key={index} className="flex items-center justify-between mb-2">
-                <div className="flex flex-col gap-1">
-                  <span className="font-medium">{challenge.title || challenge.name}</span>
-                  <span className="text-muted-foreground text-sm">{challenge.completions || 0} completions</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="col-span-1 md:col-span-2 glass-card">
-        <CardHeader>
-          <CardTitle>Distribution des badges</CardTitle>
-          <CardDescription>Répartition des niveaux de badges obtenus</CardDescription>
-        </CardHeader>
-        <CardContent className="h-60 flex items-center justify-center">
-          <div className="bg-white/80 rounded-xl p-6 w-full h-full flex items-center justify-around">
-            {Array.isArray(badgeLevels) && badgeLevels.map((level, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div 
-                  className={`w-24 h-24 rounded-full flex items-center justify-center mb-3 ${
-                    index === 0 ? 'bg-amber-100 text-amber-800' :
-                    index === 1 ? 'bg-gray-200 text-gray-700' : 'bg-yellow-100 text-yellow-800'
-                  }`}
-                >
-                  <Trophy size={48} />
-                </div>
-                <div className="text-center">
-                  <p className="font-medium">{level.level}</p>
-                  <p className="text-2xl font-bold">{level.count}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <p>
+            Cette section affichera des graphiques détaillés sur l'utilisation des fonctionnalités de gamification.
+          </p>
         </CardContent>
       </Card>
     </div>

@@ -1,30 +1,36 @@
 
-import React, { useState } from 'react';
-import type { JournalEntry } from '@/types';
-import MoodTimeRangeSelector from './chart/MoodTimeRangeSelector';
-import MoodLineChart from './chart/MoodLineChart';
-import MoodChartFooter from './chart/MoodChartFooter';
-import { useMoodChartData } from '@/hooks/useMoodChartData';
+import React from 'react';
+import { MoodLineChart, MoodLineChartProps, MoodData } from '@/components/charts/MoodLineChart';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 interface JournalMoodChartProps {
-  entries: JournalEntry[];
+  data: MoodData[];
+  showControls?: boolean;
+  title?: string;
+  description?: string;
+  className?: string;
 }
 
-const JournalMoodChart: React.FC<JournalMoodChartProps> = ({ entries }) => {
-  const [timeRange, setTimeRange] = useState<'7' | '30' | '90'>('30');
-  const { moodData } = useMoodChartData(entries, timeRange);
-  
+export const JournalMoodChart: React.FC<JournalMoodChartProps> = ({
+  data,
+  showControls = true,
+  title = "Évolution émotionnelle",
+  description = "Suivi de vos émotions au fil du temps",
+  className,
+}) => {
   return (
-    <div>
-      <MoodTimeRangeSelector 
-        timeRange={timeRange} 
-        setTimeRange={setTimeRange} 
-      />
-      
-      <MoodLineChart data={moodData} />
-      
-      <MoodChartFooter />
-    </div>
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <MoodLineChart 
+          data={data} 
+          showControls={showControls}
+        />
+      </CardContent>
+    </Card>
   );
 };
 
