@@ -1,68 +1,44 @@
 
-export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never' | 'immediate';
-export type NotificationTone = 'friendly' | 'professional' | 'direct' | 'calm';
+export type NotificationFrequency = 'immediate' | 'hourly' | 'daily' | 'weekly' | 'never';
+export type NotificationTone = 'informational' | 'success' | 'warning' | 'error';
 
 export interface NotificationPreference {
   enabled: boolean;
-  emailEnabled?: boolean;
-  pushEnabled?: boolean;
-  inAppEnabled?: boolean;
-  frequency: NotificationFrequency;
-  tone?: NotificationTone;
-  email?: boolean;
-  push?: boolean;
-  sms?: boolean;
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  frequency: string;
   types?: {
-    system?: boolean;
-    emotion?: boolean;
-    coach?: boolean;
-    journal?: boolean;
-    community?: boolean;
-    achievement?: boolean;
-  };
-  quietHours?: {
-    enabled: boolean;
-    start: string;
-    end: string;
+    [key: string]: boolean;
   };
 }
-
-export type NotificationType = 'emotion' | 'journal' | 'system' | 'user' | 'urgent' | 'community' | 'coach' | 'message';
 
 export interface Notification {
   id: string;
   title: string;
-  message: string;
+  body: string;
   type: NotificationType;
+  timestamp: Date | string;
   read: boolean;
-  timestamp?: string;
-  created_at: string;
-  updated_at?: string;
-  action_url?: string;
-  user_id?: string;
-  metadata?: Record<string, any>;
-  image_url?: string;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
-  expires_at?: string;
-  action?: {
-    label: string;
-    url: string;
-  };
+  userId?: string;
+  link?: string;
+  icon?: string;
+  priority?: 'low' | 'normal' | 'high' | 'urgent';
+  category?: string;
+  actions?: NotificationAction[];
 }
 
-export type NotificationFilter = 'all' | 'unread' | 'read' | 'urgent' | 'system' | 'journal' | 'emotion' | 'user' | 'community';
+export type NotificationType = 'system' | 'emotion' | 'coach' | 'journal' | 'community' | 'achievement';
 
-export interface NotificationItemProps {
-  notification: Notification;
-  onMarkAsRead: (id: string) => void;
-  onDelete: (id: string) => void;
-  onClick?: () => void;
+export interface NotificationAction {
+  label: string;
+  action: string;
+  url?: string;
+  variant?: 'default' | 'outline' | 'ghost';
 }
 
-export interface NotificationDrawerProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  notifications: Notification[];
-  onMarkAsRead: (id: string) => void;
-  onDelete: (id: string) => void;
+export interface NotificationFilter {
+  type?: NotificationType | 'all';
+  read?: boolean;
+  date?: 'today' | 'week' | 'month' | 'all';
+  priority?: 'low' | 'normal' | 'high' | 'urgent' | 'all';
 }

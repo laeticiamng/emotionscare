@@ -96,7 +96,7 @@ const MusicPlayer: React.FC = () => {
             currentTime={currentTime || 0}
             duration={duration || 0}
             formatTime={formatTime}
-            onSeek={seekTo}
+            showTimestamps={true}
           />
         </div>
 

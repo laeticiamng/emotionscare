@@ -1,35 +1,30 @@
 
-// Create or update this file to include the Story interface and other types
-
-export type Period = '1d' | '7d' | '30d' | '90d' | 'custom';
-
-export interface Story {
-  id: string;
-  title: string;
-  content: string;
-  image?: string;
-  date: Date | string;
-  author?: string;
-  category?: string;
-  tags?: string[];
-  type?: 'article' | 'news' | 'blog' | 'resource' | 'onboarding';
-  seen?: boolean;
-  cta?: {
-    label: string;
-    route: string;
-  };
-}
+import { ReactNode } from 'react';
 
 export interface User {
   id: string;
-  name?: string;
-  email?: string;
-  avatar?: string;
+  name: string;
+  email: string;
+  role?: UserRole;
+  preferences?: UserPreferences;
+  created_at?: string;
 }
 
+export type UserRole = 'user' | 'admin' | 'b2c' | 'b2b_user' | 'b2b_admin';
+
+export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "inter" | "rounded";
+export type FontSize = "small" | "medium" | "large" | "x-large" | "sm" | "md" | "lg" | "xl";
+export type ThemeName = "light" | "dark" | "pastel" | "system";
+
 export interface UserPreferences {
-  theme?: string;
-  notifications?: boolean | {
+  theme?: ThemeName;
+  fontSize?: FontSize;
+  fontFamily?: FontFamily;
+  reduceMotion?: boolean;
+  colorBlindMode?: boolean;
+  autoplayMedia?: boolean;
+  soundEnabled?: boolean;
+  notifications?: {
     enabled: boolean;
     emailEnabled?: boolean;
     pushEnabled?: boolean;
@@ -47,43 +42,51 @@ export interface UserPreferences {
     };
     frequency?: string;
   };
-  fontSize?: string;
-  fontFamily?: string;
-  reduceMotion?: boolean;
-  colorBlindMode?: boolean;
-  autoplayMedia?: boolean;
-  language?: string;
   privacy?: {
-    shareData?: boolean;
-    anonymizeReports?: boolean;
-    profileVisibility?: string;
-    showProfile?: boolean;
-    shareActivity?: boolean;
-    allowMessages?: boolean;
-    allowNotifications?: boolean;
+    shareData: boolean;
+    anonymizeReports: boolean;
+    profileVisibility: string;
   };
 }
 
-export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "inter" | "rounded";
-export type FontSize = "small" | "medium" | "large" | "x-large" | "sm" | "md" | "lg" | "xl";
-
-export type UserRole = "admin" | "user" | "manager";
-
 export interface InvitationVerificationResult {
   valid: boolean;
-  email?: string;
-  expires?: Date;
-  role?: UserRole;
+  expired: boolean;
   teamId?: string;
+  teamName?: string;
+  role?: string;
+  invitedBy?: string;
 }
 
+export type Period = 'day' | 'week' | 'month' | 'year' | '24h' | '7d' | '30d' | '90d' | '12m';
+export type UserModeType = 'b2c' | 'b2b_user' | 'b2b_admin';
+
+export interface Story {
+  id: string;
+  title: string;
+  content: string;
+  date?: Date;
+  type?: "onboarding" | "achievement" | "tip" | "update";
+  seen?: boolean;
+  cta?: {
+    label: string;
+    route: string;
+  };
+}
+
+// Additional types
 export interface NotificationPreferences {
   enabled: boolean;
-  email?: boolean;
-  push?: boolean;
-  inApp?: boolean;
-  frequency?: 'immediate' | 'daily' | 'weekly';
-  types?: Record<string, boolean>;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  inAppEnabled?: boolean;
+  types?: {
+    system?: boolean;
+    emotion?: boolean;
+    coach?: boolean;
+    journal?: boolean;
+    community?: boolean;
+    achievement?: boolean;
+  };
+  frequency: string;
 }
-
-export type UserModeType = "standard" | "advanced" | "developer";

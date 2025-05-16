@@ -12,13 +12,18 @@ export interface KpiCardProps {
     trend: 'up' | 'down' | 'neutral';
   };
   subtitle?: ReactNode;
-  ariaLabel: string;
+  ariaLabel?: string;
   onClick?: () => void;
   className?: string;
   status?: 'success' | 'warning' | 'error' | 'info';
   trendText?: string;
   loading?: boolean;
   isLoading?: boolean;
+  // Position properties for grid layout
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
 }
 
 export interface DraggableKpiCardsGridProps {

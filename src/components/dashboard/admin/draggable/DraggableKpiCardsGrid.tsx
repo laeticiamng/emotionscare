@@ -61,7 +61,7 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
               icon={card.icon}
               delta={card.delta}
               subtitle={card.subtitle}
-              ariaLabel={card.ariaLabel}
+              ariaLabel={card.ariaLabel || card.title}
               onClick={card.onClick}
               status={card.status}
             />

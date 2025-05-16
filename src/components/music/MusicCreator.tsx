@@ -6,7 +6,7 @@ const MusicCreator = () => {
   const [generatedTracks, setGeneratedTracks] = useState<MusicTrack[]>([]);
   
   const generateMusicForEmotion = async (emotion: string) => {
-    // Example of generating a track with emotion property
+    // Example of generating a track with mood property
     const newTrack: MusicTrack = {
       id: `track-${Date.now()}`,
       title: `${emotion} Melody`,
@@ -14,7 +14,7 @@ const MusicCreator = () => {
       duration: 180,
       url: '/sample/music.mp3',
       coverUrl: '/images/covers/generated.jpg',
-      mood: emotion // Utiliser mood au lieu de emotion
+      mood: emotion
     };
     
     setGeneratedTracks(prev => [...prev, newTrack]);

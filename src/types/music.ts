@@ -5,20 +5,20 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  duration: number; // en secondes
+  duration: number; // in seconds
   url: string;
   coverUrl?: string;
+  cover?: string; // alias for coverUrl
+  coverImage?: string; // alias for coverUrl
+  cover_url?: string; // alias for coverUrl
+  audioUrl?: string; // alias for url
+  track_url?: string; // alias for url
   category?: string;
   tags?: string[];
   mood?: string;
+  emotion?: string;
   isFavorite?: boolean;
   playCount?: number;
-  audioUrl?: string; // alias de url pour compatibilité
-  cover?: string; // alias de coverUrl pour compatibilité
-  cover_url?: string; // alias de coverUrl pour compatibilité
-  coverImage?: string; // alias de coverUrl pour compatibilité
-  track_url?: string; // alias de url pour compatibilité
-  emotion?: string; // Permet de lier une piste à une émotion
 }
 
 export interface MusicPlaylist {
@@ -28,32 +28,10 @@ export interface MusicPlaylist {
   description?: string;
   coverUrl?: string;
   tracks: MusicTrack[];
+  emotion?: string;
 }
 
 export type MusicMood = 'calm' | 'happy' | 'sad' | 'energetic' | 'focused';
-
-export interface MusicContextType {
-  currentTrack: MusicTrack | null;
-  isPlaying: boolean;
-  volume: number;
-  duration: number;
-  currentTime: number;
-  togglePlay: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-  seekTo: (time: number) => void;
-  setVolume: (volume: number) => void;
-  toggleMute: () => void;
-  muted: boolean;
-  playlist: MusicTrack[];
-  playlists?: MusicPlaylist[];
-  setOpenDrawer: (open: boolean) => void;
-  pauseTrack: () => void;
-  isInitialized: boolean;
-  initializeMusicSystem: () => void;
-  currentEmotion?: string;
-  error?: Error;
-}
 
 export interface ProgressBarProps {
   position: number;
@@ -64,6 +42,68 @@ export interface ProgressBarProps {
   duration?: number;
   formatTime?: (seconds: number) => string;
   showTimestamps?: boolean;
+  className?: string;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  onChange?: (volume: number) => void;
+  onVolumeChange: (volume: number) => void;
+  isMuted?: boolean;
+  muted?: boolean;
+  onMuteToggle?: () => void;
+  className?: string;
+  showLabel?: boolean;
+}
+
+export interface MusicControlsProps {
+  isPlaying: boolean;
+  onTogglePlay: () => void;
+  onNext: () => void;
+  onPrevious: () => void;
+  onPlay?: () => void;
+  onPause?: () => void;
+  currentTime?: number;
+  duration?: number;
+  onSeek?: (position: number) => void;
+  volume?: number;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
+  onVolumeChange?: (volume: number) => void;
+  track?: MusicTrack | null;
+  showVolume?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  vertical?: boolean;
+  className?: string;
+}
+
+export interface MusicLibraryProps {
+  onSelectTrack?: (track: MusicTrack) => void;
+  currentTrack?: MusicTrack | null;
+  isPlaying?: boolean;
+  searchTerm?: string;
+  onSearchChange?: (term: string) => void;
+  tracks?: MusicTrack[];
+  onTrackSelect?: (track: MusicTrack) => void;
+  playlists?: MusicPlaylist[];
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+}
+
+export interface MusicDrawerProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
+  playlist?: MusicPlaylist | MusicTrack[];
+  currentTrack?: MusicTrack | null;
+  children?: React.ReactNode;
+  side?: 'left' | 'right';
+}
+
+export interface TrackInfoProps {
+  track: MusicTrack;
+  className?: string;
+  showCover?: boolean;
 }
 
 export interface EmotionMusicParams {

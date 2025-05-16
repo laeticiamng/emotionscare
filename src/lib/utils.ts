@@ -6,36 +6,37 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatTime(seconds: number): string {
+export function formatTimeDisplay(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-export function getGreeting(): string {
-  const hour = new Date().getHours();
-  
-  if (hour >= 5 && hour < 12) {
-    return "Bonjour";
-  } else if (hour >= 12 && hour < 18) {
-    return "Bel après-midi";
-  } else if (hour >= 18 && hour < 22) {
-    return "Bonsoir";
-  } else {
-    return "Bienvenue";
+export function formatDate(date: Date | string): string {
+  if (typeof date === 'string') {
+    date = new Date(date);
   }
+  return date.toLocaleDateString(undefined, { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  });
 }
 
-export function getThemeFromTime(): string {
-  const hour = new Date().getHours();
-  
-  if (hour >= 6 && hour < 10) {
-    return "morning";
-  } else if (hour >= 10 && hour < 16) {
-    return "afternoon";
-  } else if (hour >= 16 && hour < 20) {
-    return "evening";
-  } else {
-    return "night";
-  }
+export function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(value);
+}
+
+export function getRandomInt(min: number, max: number): number {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export function truncateText(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
 }

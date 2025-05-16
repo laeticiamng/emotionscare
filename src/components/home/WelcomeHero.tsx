@@ -1,112 +1,100 @@
 
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useStorytelling } from '@/contexts/StorytellingContext';
 import { Story } from '@/types/types';
 
 interface WelcomeHeroProps {
   userName?: string;
-  userRole?: string;
-  onboardingComplete?: boolean;
+  onboardingCompleted?: boolean;
 }
 
 const WelcomeHero: React.FC<WelcomeHeroProps> = ({ 
-  userName = '',
-  userRole = '',
-  onboardingComplete = false
+  userName = 'There', 
+  onboardingCompleted = false 
 }) => {
   const navigate = useNavigate();
-  const { storyQueue, addStory, markStorySeen } = useStorytelling();
-  const [greeting, setGreeting] = useState('');
   
-  // Set greeting based on time of day
-  useEffect(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) {
-      setGreeting('Bonjour');
-    } else if (hour < 18) {
-      setGreeting('Bon après-midi');
-    } else {
-      setGreeting('Bonsoir');
-    }
-  }, []);
-  
-  // Add welcome story if it's the user's first visit and onboarding is complete
-  useEffect(() => {
-    if (onboardingComplete && userName) {
-      // Check if welcome story exists and has not been seen
-      const welcomeStoryExists = storyQueue.some(
-        story => story.id === 'welcome' && !story.seen
-      );
-      
-      if (!welcomeStoryExists) {
-        const welcomeStory: Story = {
-          id: 'welcome',
-          title: 'Bienvenue sur EmotionsCare',
-          content: `${userName}, bienvenue dans votre espace personnel de bien-être émotionnel. Vous pouvez maintenant accéder à tous les outils pour prendre soin de votre santé émotionnelle.`,
-          type: 'onboarding',
-          seen: false,
-          cta: {
-            label: "Explorer les fonctionnalités",
-            route: "/dashboard"
-          }
-        };
-        
-        addStory(welcomeStory);
-      }
-    }
-  }, [onboardingComplete, userName, storyQueue, addStory]);
-
   const handleGetStarted = () => {
     navigate('/dashboard');
-    
-    // Mark welcome story as seen when user clicks get started
-    const welcomeStory = storyQueue.find(story => story.id === 'welcome');
-    if (welcomeStory) {
-      markStorySeen(welcomeStory.id);
-    }
   };
   
+  const handleContinueOnboarding = () => {
+    navigate('/onboarding');
+  };
+
+  const welcomeStories: Story[] = [
+    {
+      id: '1',
+      title: 'Bienvenue sur EmotionsCare',
+      content: 'Découvrez comment votre bien-être émotionnel peut être transformé par notre technologie.',
+      date: new Date(),
+      seen: false
+    },
+    {
+      id: '2',
+      title: 'Explorez vos émotions',
+      content: 'Notre plateforme vous aide à identifier, comprendre et gérer vos émotions au quotidien.',
+      date: new Date(),
+      seen: false
+    }
+  ];
+  
+  const onboardingStory: Story = {
+    id: 'onboarding-1',
+    title: 'Complétez votre profil',
+    content: 'Finalisez votre profil pour obtenir des recommandations personnalisées adaptées à vos besoins.',
+    date: new Date(),
+    type: "onboarding",
+    seen: false,
+    cta: {
+      label: 'Continuer',
+      route: '/onboarding'
+    }
+  };
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-background to-muted/20 dark:from-background dark:to-primary/5 py-20">
-      <div className="container max-w-5xl relative z-10">
-        <motion.div 
-          className="text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-3xl md:text-5xl font-light mb-4">
-            {greeting}, <span className="font-semibold">{userName || 'Bienvenue'}</span>
+    <div className="py-6 md:py-10">
+      <div className="container px-4 mx-auto">
+        <div className="max-w-4xl">
+          <h1 className="text-4xl font-bold tracking-tight mb-4">
+            Hello, <span className="text-primary">{userName}</span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            {userName ? 
-              'Prenez soin de votre équilibre émotionnel et explorez toutes nos fonctionnalités.' : 
-              'EmotionsCare vous accompagne dans la gestion de votre bien-être émotionnel quotidien.'
-            }
+          <p className="text-xl text-muted-foreground mb-8">
+            {onboardingCompleted 
+              ? "Bienvenue sur votre espace personnel EmotionsCare. Que souhaitez-vous explorer aujourd'hui ?" 
+              : "Nous sommes ravis de vous accueillir. Commençons par explorer vos émotions ensemble."}
           </p>
           
-          <Button 
-            onClick={handleGetStarted} 
-            size="lg" 
-            className="group px-8"
-          >
-            {userName ? 'Accéder au tableau de bord' : 'Commencer maintenant'}
-            <ArrowRight className="ml-2 transition-transform group-hover:translate-x-1" size={18} />
-          </Button>
-        </motion.div>
+          {!onboardingCompleted && (
+            <Card className="mb-8 border-l-4 border-primary">
+              <CardContent className="pt-6">
+                <h3 className="text-lg font-medium mb-2">{onboardingStory.title}</h3>
+                <p className="text-muted-foreground mb-4">{onboardingStory.content}</p>
+                <Button onClick={handleContinueOnboarding} className="flex items-center">
+                  {onboardingStory.cta?.label}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+          
+          <div className="flex flex-wrap gap-4">
+            <Button size="lg" onClick={handleGetStarted} className="flex items-center">
+              Commencer
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            
+            <Button size="lg" variant="outline" onClick={() => navigate('/music')}>
+              Explorer la musicothérapie
+            </Button>
+          </div>
+        </div>
       </div>
-      
-      {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
-        <div className="absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-80 h-80 bg-accent/5 rounded-full blur-3xl"></div>
-      </div>
-    </section>
+    </div>
   );
 };
 

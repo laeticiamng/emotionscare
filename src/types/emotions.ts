@@ -26,14 +26,13 @@ export interface EmotionResult {
 
 export interface LiveVoiceScannerProps {
   onEmotionDetected?: (result: EmotionResult) => void;
+  onScanComplete?: (result: EmotionResult) => void;
   autoStart?: boolean;
   duration?: number;
+  scanDuration?: number;
   showControls?: boolean;
   showVisualizer?: boolean;
   theme?: 'light' | 'dark';
-  onScanComplete?: (result: EmotionResult) => void;
-  autoStart?: boolean;
-  scanDuration?: number;
 }
 
 export interface TeamOverviewProps {
