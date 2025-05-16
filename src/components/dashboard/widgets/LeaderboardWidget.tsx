@@ -1,70 +1,57 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Trophy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ChevronRight } from 'lucide-react';
 import { LeaderboardEntry } from '@/types/gamification';
-
-interface LeaderboardWidgetProps {
-  entries: LeaderboardEntry[];
-  title?: string;
-  limit?: number;
-}
+import { LeaderboardWidgetProps } from '@/types/widgets';
 
 const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = ({
-  entries,
+  leaderboard,
   title = "Classement",
-  limit = 5
+  showSeeAll = false,
+  onSeeAll,
+  highlightUserId
 }) => {
-  // Take only the top N entries
-  const topEntries = entries.slice(0, limit);
+  if (!leaderboard || leaderboard.length === 0) {
+    return (
+      <div className="text-center py-6 text-muted-foreground">
+        Aucune donnée de classement disponible
+      </div>
+    );
+  }
   
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-yellow-500" />
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="space-y-4">
-          {topEntries.map((entry) => (
-            <div 
-              key={entry.id}
-              className="flex items-center justify-between border-b border-border pb-2 last:border-0 last:pb-0"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-7 h-7 bg-muted rounded-full">
-                  <span className="text-sm font-medium">
-                    {entry.position}
-                  </span>
-                </div>
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={entry.avatar} />
-                  <AvatarFallback>
-                    {entry.name.substring(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm font-medium line-clamp-1">{entry.name}</p>
-                  {entry.username && (
-                    <p className="text-xs text-muted-foreground">@{entry.username}</p>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="font-mono">
-                  {entry.points} pts
-                </Badge>
-                <span className="text-xs font-medium">Niv. {entry.level}</span>
-              </div>
-            </div>
-          ))}
+    <div className="space-y-4">
+      {leaderboard.slice(0, 3).map((entry) => (
+        <div 
+          key={entry.id} 
+          className={`flex items-center p-2 rounded-lg ${
+            entry.id === highlightUserId ? 'bg-primary/10' : 'hover:bg-muted/50'
+          }`}
+        >
+          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center mr-3 flex-shrink-0">
+            {entry.position}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-medium truncate">
+              {entry.username || entry.name}
+            </p>
+            <p className="text-sm text-muted-foreground">Niveau {entry.level} • {entry.points} pts</p>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      ))}
+      
+      {showSeeAll && (
+        <Button 
+          variant="ghost" 
+          className="w-full justify-between" 
+          onClick={onSeeAll}
+        >
+          Voir tout le classement
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
   );
 };
 

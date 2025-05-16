@@ -5,6 +5,7 @@ export interface VRSessionTemplate {
   description: string;
   duration: number;
   thumbnail_url?: string;
+  thumbnailUrl?: string; // For compatibility
   tags?: string[];
   category?: string;
   vr_url?: string;

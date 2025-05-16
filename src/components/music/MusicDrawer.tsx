@@ -10,7 +10,7 @@ import {
   DrawerFooter,
   DrawerClose
 } from '@/components/ui/drawer';
-import { MusicDrawerProps, MusicTrack } from '@/types';
+import { MusicDrawerProps, MusicTrack } from '@/types/music';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import MusicProgressBar from './MusicProgressBar';
 import VolumeControl from './VolumeControl';
@@ -95,7 +95,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
     }
     
     const track = playlist.tracks[activeTrackIndex];
-    return track.track_url || track.audioUrl || track.url || '';
+    return track.url || track.track_url || track.audioUrl || '';
   };
   
   // Handlers
@@ -151,8 +151,8 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
 
   return (
     <>
-      <Drawer open={drawerOpen} onOpenChange={onOpenChange}>
-        <DrawerContent side={side}>
+      <Drawer open={drawerOpen} onOpenChange={onOpenChange || onClose}>
+        <DrawerContent>
           <div className="mx-auto w-full max-w-lg p-6">
             <DrawerHeader>
               <DrawerTitle>

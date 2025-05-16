@@ -1,202 +1,281 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Brain, Calendar, BarChart, Target, Award, Music, Headphones } from 'lucide-react';
+import { User } from '@/types/user';
+import { Badge, Challenge, LeaderboardEntry } from '@/types/gamification';
 import DashboardHero from './DashboardHero';
-import { useAuth } from '@/contexts/AuthContext';
 import EmotionPieChart from './charts/EmotionPieChart';
 import WeeklyActivityChart from './charts/WeeklyActivityChart';
-import { 
-  ProgressLatestSection, 
-  JournalLatestSection,
-  RecommendedVRSection,
-  MoodHistorySection
-} from './UserDashboardSections';
-import { Badge, LeaderboardEntry } from '@/types/gamification';
-import LeaderboardWidget from './widgets/LeaderboardWidget';
+import { UserDashboardSections } from './UserDashboardSections';
+import { GamificationStats } from '@/types/gamification';
 import BadgesWidget from './widgets/BadgesWidget';
+import LeaderboardWidget from './widgets/LeaderboardWidget';
 import DailyInsightCard from './widgets/DailyInsightCard';
 import QuickActionLinks from './widgets/QuickActionLinks';
-import { PenLine, Headphones, BarChart, Sparkles } from 'lucide-react';
 
-const UserDashboard: React.FC = () => {
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
+interface UserDashboardProps {
+  user?: User;
+}
 
-  // Placeholder data for the dashboard
-  const emotions = [
-    { name: 'Calme', value: 35, color: '#4299E1' },
-    { name: 'Joie', value: 30, color: '#F6AD55' },
-    { name: 'Concentration', value: 20, color: '#9F7AEA' },
-    { name: 'Stress', value: 15, color: '#FC8181' },
+const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
+  // Mock data - in a real app this would come from an API
+  const mockChallenges: Challenge[] = [
+    {
+      id: "1",
+      title: "Méditation quotidienne",
+      description: "Pratiquez la méditation pendant 10 minutes",
+      category: "daily",
+      points: 50,
+      progress: 100,
+      completed: true,
+      icon: "meditation"
+    },
+    {
+      id: "2",
+      title: "Journal des émotions",
+      description: "Notez vos émotions 5 jours de suite",
+      category: "weekly",
+      points: 100,
+      progress: 60,
+      completed: false,
+      icon: "journal"
+    },
+    {
+      id: "3",
+      title: "Session VR complète",
+      description: "Terminez une session VR de détente",
+      category: "daily",
+      points: 75,
+      progress: 100,
+      completed: true,
+      icon: "vr"
+    }
   ];
-
-  const weeklyActivity = [
-    { day: 'Lun', journal: 1, music: 2, scan: 1, coach: 0 },
-    { day: 'Mar', journal: 1, music: 1, scan: 0, coach: 1 },
-    { day: 'Mer', journal: 0, music: 3, scan: 0, coach: 0 },
-    { day: 'Jeu', journal: 2, music: 2, scan: 1, coach: 1 },
-    { day: 'Ven', journal: 1, music: 1, scan: 0, coach: 0 },
-    { day: 'Sam', journal: 0, music: 4, scan: 0, coach: 0 },
-    { day: 'Dim', journal: 1, music: 2, scan: 1, coach: 2 },
+  
+  const userBadges: Badge[] = [
+    {
+      id: "1",
+      name: "Premier pas",
+      description: "Première connexion à la plateforme",
+      icon: "star",
+      category: "onboarding",
+      unlockedAt: new Date().toISOString(),
+      completed: true
+    },
+    {
+      id: "2",
+      name: "Explorateur VR",
+      description: "A essayé 5 expériences VR différentes",
+      icon: "compass",
+      category: "vr",
+      progress: 3,
+      level: 1,
+      completed: false
+    },
+    {
+      id: "3",
+      name: "Journal assidu",
+      description: "A écrit dans son journal 7 jours de suite",
+      icon: "book",
+      category: "journal",
+      progress: 5,
+      level: 2,
+      unlockedAt: new Date().toISOString(),
+      completed: true
+    }
   ];
-
+  
+  const leaderboard: LeaderboardEntry[] = [
+    {
+      id: "1",
+      name: "Thomas M.",
+      points: 1250,
+      level: 5,
+      position: 1,
+      username: "thomas_m",
+      avatar: "/avatars/avatar-1.png"
+    },
+    {
+      id: "2",
+      name: "Sophie L.",
+      points: 980,
+      level: 4,
+      position: 2,
+      username: "sophie_l"
+    },
+    {
+      id: "3",
+      name: "Marc D.",
+      points: 840,
+      level: 4,
+      position: 3,
+      username: "marc_d"
+    }
+  ];
+  
+  // Quick action links
   const quickLinks = [
     {
-      title: 'Journal',
-      description: 'Écrivez une entrée de journal',
-      icon: <PenLine className="h-5 w-5" />,
-      href: '/journal',
-      color: 'bg-blue-500'
+      title: "Journal des émotions",
+      description: "Notez vos pensées et émotions",
+      icon: <Brain className="h-5 w-5" />,
+      href: "/journal",
+      color: "bg-blue-50 text-blue-600"
     },
     {
-      title: 'Musique',
-      description: 'Créez une ambiance musicale',
-      icon: <Headphones className="h-5 w-5" />,
-      href: '/music',
-      color: 'bg-purple-500'
+      title: "Planifier une session",
+      description: "Réservez un créneau de thérapie",
+      icon: <Calendar className="h-5 w-5" />,
+      href: "/scheduler",
+      color: "bg-purple-50 text-purple-600"
     },
     {
-      title: 'Stats',
-      description: 'Consultez vos statistiques',
+      title: "Statistiques bien-être",
+      description: "Consultez vos tendances",
       icon: <BarChart className="h-5 w-5" />,
-      href: '/stats',
-      color: 'bg-emerald-500'
+      href: "/stats",
+      color: "bg-emerald-50 text-emerald-600"
     },
     {
-      title: 'Inspiration',
-      description: 'Découvrez des idées',
-      icon: <Sparkles className="h-5 w-5" />,
-      href: '/inspiration',
-      color: 'bg-amber-500'
+      title: "Objectifs personnels",
+      description: "Suivez votre progression",
+      icon: <Target className="h-5 w-5" />,
+      href: "/goals",
+      color: "bg-amber-50 text-amber-600"
     }
   ];
-
-  // Sample progress data
-  const userProgress = {
-    points: 1250,
-    level: 5,
+  
+  // Weekly activity data - transform to expected format
+  const rawActivityData = [
+    { day: "Lun", journal: 1, music: 0, scan: 1, coach: 0 },
+    { day: "Mar", journal: 1, music: 1, scan: 0, coach: 0 },
+    { day: "Mer", journal: 0, music: 1, scan: 1, coach: 1 },
+    { day: "Jeu", journal: 1, music: 0, scan: 0, coach: 0 },
+    { day: "Ven", journal: 1, music: 1, scan: 0, coach: 0 },
+    { day: "Sam", journal: 0, music: 1, scan: 1, coach: 0 },
+    { day: "Dim", journal: 1, music: 1, scan: 0, coach: 0 },
+  ];
+  
+  // Transform raw data to the format expected by WeeklyActivityChart
+  const weeklyActivityData = rawActivityData.map(item => ({
+    day: item.day,
+    value: item.journal + item.music + item.scan + item.coach
+  }));
+  
+  const stats: GamificationStats = {
+    points: 850,
+    level: 4,
     streak: 7,
     nextLevel: {
-      points: 1500,
-      level: 6
+      points: 1000,
+      level: 5
     },
-    progress: 0.75
+    progress: 85,
+    badges: userBadges,
+    completedChallenges: 8,
+    totalChallenges: 12,
+    challenges: mockChallenges,
+    rank: 7
   };
-
-  // Sample badges
-  const badges: Badge[] = [
-    { 
-      id: '1', 
-      name: 'Journaliste débutant', 
-      description: '5 entrées de journal', 
-      icon: '📝', 
-      category: 'journal', 
-      level: 1,
-      unlockedAt: new Date().toISOString(),
-      progress: 100,
-    },
-    { 
-      id: '2', 
-      name: 'Mélomane', 
-      description: '10 musiques créées', 
-      icon: '🎵', 
-      category: 'music', 
-      level: 1, 
-      unlockedAt: new Date().toISOString(),
-      progress: 70,
-    }
-  ];
-
-  // Sample leaderboard
-  const leaderboard: LeaderboardEntry[] = [
-    { id: '1', name: 'JohnDoe', points: 1500, level: 6, position: 1, avatar: '' },
-    { id: '2', name: 'AliceW', points: 1350, level: 5, position: 2, avatar: '' },
-    { id: '3', name: 'BobSmith', points: 1200, level: 5, position: 3, avatar: '' }
-  ];
-
+  
   return (
     <div className="container mx-auto py-6">
       <DashboardHero 
+        points={stats.points} 
+        level={stats.level}
         user={user}
-        points={userProgress.points}
-        level={userProgress.level}
       />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Bienvenue, {user?.name || 'Utilisateur'}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DailyInsightCard />
-            </CardContent>
-          </Card>
-        </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Award className="mr-2 h-5 w-5 text-primary" />
+              Vos badges
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <BadgesWidget badges={userBadges} showSeeAll />
+          </CardContent>
+        </Card>
         
-        <div className="lg:col-span-1">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Actions rapides</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <QuickActionLinks links={quickLinks} />
-            </CardContent>
-          </Card>
-        </div>
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Headphones className="mr-2 h-5 w-5 text-primary" />
+              Musique recommandée
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-muted/50 rounded-lg p-4 flex items-center">
+              <div className="w-12 h-12 bg-primary/20 flex items-center justify-center rounded-lg mr-3">
+                <Music className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-medium">Méditation guidée</h3>
+                <p className="text-xs text-muted-foreground">10:30 • Relaxation</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="col-span-1">
+          <CardContent className="p-0">
+            <DailyInsightCard />
+          </CardContent>
+        </Card>
       </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <JournalLatestSection />
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Émotions cette semaine</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <EmotionPieChart data={emotions} />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Activité hebdomadaire</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <WeeklyActivityChart data={weeklyActivity} />
-              </CardContent>
-            </Card>
-          </div>
-
-          <RecommendedVRSection />
-        </div>
-
-        <div className="space-y-6">
-          <ProgressLatestSection progress={userProgress} />
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Vos badges</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <BadgesWidget badges={badges} />
-            </CardContent>
-          </Card>
-          
-          <MoodHistorySection />
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Classement</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <LeaderboardWidget leaderboard={leaderboard} />
-            </CardContent>
-          </Card>
-        </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <Card className="col-span-1 md:col-span-3">
+          <CardHeader>
+            <CardTitle>Activité hebdomadaire</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <WeeklyActivityChart data={weeklyActivityData} />
+          </CardContent>
+        </Card>
+        
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle>Classement</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <LeaderboardWidget leaderboard={leaderboard} showSeeAll />
+          </CardContent>
+        </Card>
       </div>
+      
+      <div className="mb-6">
+        <QuickActionLinks links={quickLinks} />
+      </div>
+      
+      <Tabs defaultValue="emotions" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="emotions">Émotions</TabsTrigger>
+          <TabsTrigger value="vr">Réalité Virtuelle</TabsTrigger>
+          <TabsTrigger value="music">Musicothérapie</TabsTrigger>
+          <TabsTrigger value="goals">Objectifs</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="emotions" className="space-y-4">
+          <UserDashboardSections.EmotionsSection />
+        </TabsContent>
+        
+        <TabsContent value="vr" className="space-y-4">
+          <UserDashboardSections.VRSection />
+        </TabsContent>
+        
+        <TabsContent value="music" className="space-y-4">
+          <UserDashboardSections.MusicSection />
+        </TabsContent>
+        
+        <TabsContent value="goals" className="space-y-4">
+          <UserDashboardSections.GoalsSection />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

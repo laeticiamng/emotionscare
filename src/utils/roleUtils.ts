@@ -2,47 +2,64 @@
 import { UserRole } from '@/types/user';
 
 /**
- * Check if the given role is an admin role
+ * Compare two roles to determine if role1 is higher than or equal to role2
  */
-export function isAdminRole(role?: UserRole | string): boolean {
-  return role === 'b2b_admin';
-}
-
-/**
- * Check if the given role is a B2B user role
- */
-export function isB2BUserRole(role?: UserRole | string): boolean {
-  return role === 'b2b_user';
-}
-
-/**
- * Check if the given role is a B2C user role
- */
-export function isB2CUserRole(role?: UserRole | string): boolean {
-  return role === 'b2c';
-}
-
-/**
- * Compare two roles to determine access level
- * @returns true if role1 has equal or higher privileges than role2
- */
-export function compareRoles(role1: UserRole | string, role2: UserRole | string): boolean {
-  const roleHierarchy: Record<string, number> = {
-    'b2b_admin': 3,
-    'b2b_user': 2,
-    'b2c': 1,
+export function compareRoles(role1: UserRole, role2: UserRole): boolean {
+  const roleHierarchy: Record<UserRole, number> = {
+    'admin': 100,
+    'therapist': 50,
+    'user': 10,
     'guest': 0
   };
-
-  return (roleHierarchy[role1] || 0) >= (roleHierarchy[role2] || 0);
+  
+  return roleHierarchy[role1] >= roleHierarchy[role2];
 }
 
 /**
- * Normalize user role to ensure it matches expected UserRole type
+ * Get user-friendly name for a role
  */
-export function normalizeUserRole(role?: string): UserRole {
-  if (role === 'b2b_admin' || role === 'b2b_user' || role === 'b2c') {
-    return role as UserRole;
+export function getRoleName(role: UserRole): string {
+  const roleNames: Record<UserRole, string> = {
+    'admin': 'Administrateur',
+    'therapist': 'Thérapeute',
+    'user': 'Utilisateur',
+    'guest': 'Invité'
+  };
+  
+  return roleNames[role] || 'Utilisateur';
+}
+
+/**
+ * Check if the user has access to specific routes based on their role
+ */
+export function hasRoleAccess(role: UserRole, requiredRole: UserRole): boolean {
+  return compareRoles(role, requiredRole);
+}
+
+/**
+ * Get login path for a specific role
+ */
+export function getRoleLoginPath(role: UserRole): string {
+  switch (role) {
+    case 'admin':
+      return '/b2b/admin/login';
+    case 'therapist':
+      return '/b2b/therapist/login';
+    default:
+      return '/b2c/login';
   }
-  return 'guest' as UserRole;
+}
+
+/**
+ * Get dashboard path for a specific role
+ */
+export function getRoleDashboardPath(role: UserRole): string {
+  switch (role) {
+    case 'admin':
+      return '/b2b/admin/dashboard';
+    case 'therapist':
+      return '/b2b/therapist/dashboard';
+    default:
+      return '/dashboard';
+  }
 }

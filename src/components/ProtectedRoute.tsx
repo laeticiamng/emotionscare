@@ -1,36 +1,41 @@
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { hasRoleAccess, getRoleLoginPath } from '@/utils/roleUtils';
+import { UserRole } from '@/types/user';
 
 interface ProtectedRouteProps {
+  requiredRole?: UserRole;
   children: React.ReactNode;
-  role: string;
-  redirectTo?: string;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  children,
-  role,
-  redirectTo
+  requiredRole = 'user', 
+  children
 }) => {
-  // Check if user is authenticated
-  const authSession = localStorage.getItem('auth_session');
-  const userRole = localStorage.getItem('user_role');
-  
-  // Determine redirect path
-  const redirectPath = redirectTo || getRoleLoginPath(role);
-  
-  if (!authSession) {
-    // Not authenticated
-    return <Navigate to={redirectPath} replace />;
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+
+  // Show loading state if auth state is still being determined
+  if (isLoading) {
+    return <div className="p-8 text-center">Chargement...</div>;
   }
-  
-  // Check role-based access
-  if (!hasRoleAccess(userRole, role)) {
-    return <Navigate to="/unauthorized" replace />;
+
+  // If not authenticated, redirect to login
+  if (!isAuthenticated) {
+    return <Navigate to={getRoleLoginPath(requiredRole)} state={{ from: location }} replace />;
   }
-  
+
+  // Check if the user has the required role
+  const hasRequiredRole = user && user.role && hasRoleAccess(user.role, requiredRole);
+
+  if (!hasRequiredRole) {
+    // Redirect to appropriate dashboard based on user's role
+    return <Navigate to="/" replace />;
+  }
+
+  // User is authenticated and has the required role, render the children
   return <>{children}</>;
 };
 

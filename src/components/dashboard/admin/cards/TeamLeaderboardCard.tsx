@@ -2,83 +2,61 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 
 interface TeamMember {
   id: string;
   name: string;
+  role: string;
+  points: number;
+  progress: number;
   avatar?: string;
-  department?: string;
-  score: number;
-  change?: number;
 }
 
 interface TeamLeaderboardCardProps {
   title?: string;
   members: TeamMember[];
-  metric?: string;
 }
 
 const TeamLeaderboardCard: React.FC<TeamLeaderboardCardProps> = ({
   title = "Performance d'équipe",
-  members,
-  metric = "Score"
+  members = []
 }) => {
-  // Sort members by score (highest first)
-  const sortedMembers = [...members].sort((a, b) => b.score - a.score);
-
+  // Sort members by points in descending order
+  const sortedMembers = [...members].sort((a, b) => b.points - a.points);
+  
   return (
     <Card>
-      <CardHeader className="pb-2">
+      <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent className="p-0">
-        <div className="space-y-1">
+      <CardContent>
+        <div className="space-y-4">
           {sortedMembers.map((member, index) => (
-            <div
-              key={member.id}
-              className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-muted-foreground font-mono w-5 text-right">
-                  #{index + 1}
-                </span>
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={member.avatar} />
-                  <AvatarFallback>
-                    {member.name.substring(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="text-sm font-medium">{member.name}</p>
-                  {member.department && (
-                    <p className="text-xs text-muted-foreground">
-                      {member.department}
-                    </p>
-                  )}
+            <div key={member.id} className="flex items-center space-x-4">
+              <div className="font-medium text-sm w-5">{index + 1}</div>
+              <Avatar className="h-9 w-9">
+                <AvatarImage src={member.avatar} alt={member.name} />
+                <AvatarFallback>
+                  {member.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{member.name}</p>
+                <p className="text-xs text-muted-foreground">{member.role}</p>
+                <div className="mt-1">
+                  <Progress value={member.progress} className="h-1" />
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline">
-                  {member.score} {metric}
-                </Badge>
-                {member.change !== undefined && (
-                  <span
-                    className={`text-xs ${
-                      member.change > 0
-                        ? 'text-green-500'
-                        : member.change < 0
-                        ? 'text-red-500'
-                        : 'text-muted-foreground'
-                    }`}
-                  >
-                    {member.change > 0 ? '+' : ''}
-                    {member.change}%
-                  </span>
-                )}
-              </div>
+              <div className="font-semibold text-sm">{member.points}</div>
             </div>
           ))}
+
+          {members.length === 0 && (
+            <div className="text-center py-6 text-muted-foreground">
+              Aucune donnée d'équipe disponible
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

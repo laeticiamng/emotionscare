@@ -1,79 +1,89 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge as UIBadge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Medal } from 'lucide-react';
-import { Badge } from '@/types/gamification';
+import { Badge as BadgeType } from '@/types/gamification';
+import { Button } from '@/components/ui/button';
+import { ChevronRight } from 'lucide-react';
+import { BadgesWidgetProps } from '@/types/widgets';
 
-interface BadgesWidgetProps {
-  badges: Badge[];
-  title?: string;
-  limit?: number;
-}
-
-const BadgesWidget: React.FC<BadgesWidgetProps> = ({
+const BadgesWidget: React.FC<BadgesWidgetProps> = ({ 
   badges,
-  title = "Badges récents",
-  limit = 6
+  title = "Vos badges",
+  showSeeAll = false,
+  onSeeAll
 }) => {
-  // Take only the specified number of badges
-  const displayedBadges = badges.slice(0, limit);
+  if (!badges || badges.length === 0) {
+    return (
+      <div className="text-center py-6 text-muted-foreground">
+        Aucun badge débloqué pour le moment
+      </div>
+    );
+  }
+  
+  // Sort badges: unlocked first, then by level
+  const sortedBadges = [...badges].sort((a, b) => {
+    // First sort by completion status
+    if ((a.completed || a.unlocked) && !(b.completed || b.unlocked)) return -1;
+    if (!(a.completed || a.unlocked) && (b.completed || b.unlocked)) return 1;
+    
+    // Then sort by level if both have same completion status
+    const levelA = a.level || 0;
+    const levelB = b.level || 0;
+    return levelB - levelA;
+  });
   
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl flex items-center gap-2">
-          <Medal className="h-5 w-5 text-primary" />
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="grid grid-cols-3 gap-4">
-          {displayedBadges.map((badge) => (
-            <TooltipProvider key={badge.id}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex flex-col items-center">
-                    <div 
-                      className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
-                        badge.completed || badge.unlockedAt ? 'bg-primary/20' : 'bg-muted'
-                      }`}
-                    >
-                      <span className="text-lg">
-                        {badge.icon}
-                      </span>
-                    </div>
-                    <span className="text-xs text-center line-clamp-1">
-                      {badge.name}
-                    </span>
-                    {badge.level && (
-                      <UIBadge variant="outline" className="text-xs mt-1">
-                        Niv. {badge.level}
-                      </UIBadge>
-                    )}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <div className="space-y-1 max-w-[200px]">
-                    <p className="font-medium">{badge.name}</p>
-                    <p className="text-xs">{badge.description}</p>
-                    {badge.unlockedAt && (
-                      <p className="text-xs text-muted-foreground">
-                        Débloqué le {new Date(badge.unlockedAt).toLocaleDateString()}
-                      </p>
-                    )}
-                    {badge.progress !== undefined && !badge.completed && !badge.unlockedAt && (
-                      <p className="text-xs">Progression: {badge.progress}%</p>
-                    )}
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ))}
+    <div className="space-y-4">
+      {sortedBadges.slice(0, 3).map((badge) => (
+        <div 
+          key={badge.id}
+          className={`flex items-start p-2 rounded-lg ${
+            badge.completed || badge.unlocked ? 'bg-primary/5' : 'bg-muted/50'
+          }`}
+        >
+          <div className={`w-10 h-10 rounded-lg ${badge.completed || badge.unlocked ? 'bg-primary/20' : 'bg-muted'} flex items-center justify-center mr-3`}>
+            <span className="text-lg">{badge.icon}</span>
+          </div>
+          
+          <div>
+            <div className="flex items-center">
+              <h3 className="font-medium">
+                {badge.name}
+              </h3>
+              {badge.level && (
+                <span className="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">
+                  Niv. {badge.level}
+                </span>
+              )}
+            </div>
+            
+            <p className="text-xs text-muted-foreground">{badge.description}</p>
+            
+            {!(badge.completed || badge.unlocked) && badge.progress !== undefined && (
+              <div className="mt-1 flex items-center">
+                <div className="w-full bg-muted h-1.5 rounded-full">
+                  <div 
+                    className="bg-primary h-1.5 rounded-full"
+                    style={{ width: `${badge.progress}%` }}
+                  ></div>
+                </div>
+                <span className="ml-2 text-xs text-muted-foreground">{badge.progress}%</span>
+              </div>
+            )}
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      ))}
+      
+      {showSeeAll && badges.length > 3 && (
+        <Button 
+          variant="ghost" 
+          className="w-full justify-between"
+          onClick={onSeeAll}
+        >
+          Voir tous vos badges
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
   );
 };
 
