@@ -7,12 +7,14 @@ interface UserModeContextValue {
   userMode: UserMode;
   setUserMode: (mode: UserMode) => void;
   clearUserMode: () => void;
+  isLoading: boolean; // Added isLoading property
 }
 
 const UserModeContext = createContext<UserModeContextValue>({
   userMode: 'unknown',
   setUserMode: () => {},
-  clearUserMode: () => {}
+  clearUserMode: () => {},
+  isLoading: true // Default value for isLoading
 });
 
 export const useUserMode = () => useContext(UserModeContext);
@@ -23,6 +25,7 @@ interface UserModeProviderProps {
 
 export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
   const [userMode, setUserModeState] = useState<UserMode>('unknown');
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     // Load user mode from localStorage on component mount
@@ -30,6 +33,7 @@ export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) 
     if (storedMode === 'b2c' || storedMode === 'b2b_user' || storedMode === 'b2b_admin') {
       setUserModeState(storedMode);
     }
+    setIsLoading(false);
   }, []);
   
   const setUserMode = (mode: UserMode) => {
@@ -50,7 +54,8 @@ export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) 
     <UserModeContext.Provider value={{
       userMode,
       setUserMode,
-      clearUserMode
+      clearUserMode,
+      isLoading
     }}>
       {children}
     </UserModeContext.Provider>

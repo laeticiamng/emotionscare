@@ -1,88 +1,135 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-interface VoiceCommandOptions {
+interface UseVoiceCommandProps {
   commands?: Record<string, () => void>;
-  language?: string;
-  autoStop?: boolean;
+  autoStart?: boolean;
 }
 
-const useVoiceCommand = (options: VoiceCommandOptions = {}) => {
+const useVoiceCommand = ({ commands = {}, autoStart = false }: UseVoiceCommandProps = {}) => {
   const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(false);
+  const [transcript, setTranscript] = useState('');
   const { toast } = useToast();
-
-  const {
-    commands = {},
-    language = 'fr-FR',
-    autoStop = true
-  } = options;
 
   // Check if browser supports speech recognition
   useEffect(() => {
-    const supported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
-    setIsSupported(supported);
+    const hasSpeechRecognition = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+    setIsSupported(hasSpeechRecognition);
+    
+    if (!hasSpeechRecognition) {
+      console.log('Speech recognition not supported in this browser');
+    }
+    
+    if (autoStart && hasSpeechRecognition) {
+      startListening();
+    }
+    
+    return () => {
+      if (isListening) {
+        stopListening();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Function to execute a command based on the transcript
-  const executeCommand = useCallback((text: string) => {
-    const normalizedText = text.toLowerCase().trim();
+  const startListening = useCallback(() => {
+    if (!isSupported) return;
     
-    // Check if the transcript matches any command
-    for (const [phrase, action] of Object.entries(commands)) {
-      if (normalizedText.includes(phrase.toLowerCase())) {
-        action();
-        return true;
-      }
+    try {
+      setIsListening(true);
+      toast({
+        title: 'Commandes vocales activées',
+        description: 'Je vous écoute...'
+      });
+      
+      // In a real implementation, this would initialize the WebSpeech API
+      // or integrate with Whisper API for voice recognition
+      console.log('Voice recognition started');
+      
+      // For demo purposes - simulate receiving a command after 3 seconds
+      setTimeout(() => {
+        const phrases = Object.keys(commands);
+        if (phrases.length > 0) {
+          const randomCommand = phrases[Math.floor(Math.random() * phrases.length)];
+          processCommand(randomCommand);
+        }
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Error starting voice recognition:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'activer la reconnaissance vocale',
+        variant: 'destructive',
+      });
+      setIsListening(false);
     }
+  }, [isSupported, toast, commands]);
 
-    return false;
-  }, [commands]);
+  const stopListening = useCallback(() => {
+    if (!isListening) return;
+    
+    setIsListening(false);
+    toast({
+      title: 'Commandes vocales désactivées',
+      description: 'Le microphone est maintenant éteint',
+    });
+    
+    // In a real implementation, this would stop the WebSpeech API
+    // or disconnect from Whisper API
+    console.log('Voice recognition stopped');
+  }, [isListening, toast]);
 
-  // Toggle listening state
   const toggleListening = useCallback(() => {
     if (isListening) {
-      setIsListening(false);
-    } else if (isSupported) {
-      setIsListening(true);
-      
-      // Simulate speech recognition with a simple toast
-      // In a real implementation, this would use the Whisper API
-      toast({
-        title: "Commandes vocales activées",
-        description: "Parlez maintenant pour naviguer"
-      });
-      
-      // Simulate a command after 3 seconds (for development purposes)
-      setTimeout(() => {
-        const simulatedCommand = "je suis un particulier";
-        setTranscript(simulatedCommand);
-        executeCommand(simulatedCommand);
-        setIsListening(false);
-        
-        toast({
-          title: "Commande reconnue",
-          description: `"${simulatedCommand}"`,
-        });
-      }, 3000);
+      stopListening();
     } else {
+      startListening();
+    }
+  }, [isListening, startListening, stopListening]);
+
+  // Process received command
+  const processCommand = useCallback((command: string) => {
+    setTranscript(command);
+    
+    // Check if command matches any registered commands
+    let commandExecuted = false;
+    for (const [phrase, callback] of Object.entries(commands)) {
+      if (command.toLowerCase().includes(phrase.toLowerCase())) {
+        toast({
+          title: 'Commande reconnue',
+          description: `"${command}"`,
+        });
+        
+        // Execute the command
+        callback();
+        commandExecuted = true;
+        break;
+      }
+    }
+    
+    // If no command matched
+    if (!commandExecuted) {
       toast({
-        title: "Commandes vocales non disponibles",
-        description: "Votre navigateur ne supporte pas cette fonctionnalité",
-        variant: "destructive"
+        title: 'Commande non reconnue',
+        description: `Désolé, je n'ai pas compris "${command}"`,
       });
     }
-  }, [isListening, isSupported, executeCommand, toast]);
+    
+    setIsListening(false);
+  }, [commands, toast]);
 
   return {
     isListening,
-    toggleListening,
-    transcript,
     isSupported,
-    executeCommand
+    transcript,
+    startListening,
+    stopListening,
+    toggleListening
   };
 };
 
+// Make sure to export as default
 export default useVoiceCommand;

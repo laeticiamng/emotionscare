@@ -39,6 +39,8 @@ export interface UserPreferences {
   colorBlindMode: boolean;
   autoplayMedia: boolean;
   sound: SoundPreference | boolean;
+  
+  // Adding missing fields that are used in the app
   ambientSound?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
@@ -48,6 +50,7 @@ export interface UserPreferences {
   biography?: string;
   avatarUrl?: string;
   onboarded?: boolean;
+  
   privacy?: {
     shareData: boolean;
     anonymizeReports?: boolean;

@@ -47,7 +47,8 @@ export function useAmbientSound(soundUrl: string, options: UseAmbientSoundOption
       audio.remove();
       audioRef.current = null;
     };
-  }, [soundUrl, autoPlay, volume, preferences.ambientSound]);
+  // Use a safe check for ambientSound property since it might be undefined
+  }, [soundUrl, autoPlay, volume, preferences?.ambientSound]);
   
   // Play/pause controls
   const play = () => {
