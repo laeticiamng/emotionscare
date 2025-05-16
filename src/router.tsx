@@ -7,7 +7,6 @@ import Home from '@/pages/Home';
 import B2BSelectionPage from '@/pages/b2b/Selection';
 
 // Common pages
-import Unauthorized from '@/pages/common/Unauthorized';
 import NotFound from '@/pages/common/NotFound';
 
 // Layouts
@@ -25,12 +24,11 @@ import B2CMusicCreate from '@/pages/b2c/MusicCreate';
 import B2CMusicPreferences from '@/pages/b2c/MusicPreferences';
 import B2CScan from '@/pages/b2c/Scan';
 import B2CCoach from '@/pages/b2c/Coach';
+import B2CCoachChat from '@/pages/b2c/CoachChat';
 import B2CVR from '@/pages/b2c/VR';
 import B2CGamification from '@/pages/b2c/Gamification';
 import B2CPreferences from '@/pages/b2c/Preferences';
 import B2CCocon from '@/pages/b2c/Cocon';
-import CoachPage from '@/pages/CoachPage';
-import CoachChatPage from '@/pages/CoachChatPage';
 
 // B2B User pages
 import B2BUserLogin from '@/pages/b2b/user/Login';
@@ -42,6 +40,7 @@ import B2BUserMusicCreate from '@/pages/b2b/user/MusicCreate';
 import B2BUserMusicPreferences from '@/pages/b2b/user/MusicPreferences';
 import B2BUserScan from '@/pages/b2b/user/Scan';
 import B2BUserCoach from '@/pages/b2b/user/Coach';
+import B2BUserCoachChat from '@/pages/b2b/user/CoachChat';
 import B2BUserVR from '@/pages/b2b/user/VR';
 import B2BUserGamification from '@/pages/b2b/user/Gamification';
 import B2BUserPreferences from '@/pages/b2b/user/Preferences';
@@ -50,13 +49,16 @@ import B2BUserCocon from '@/pages/b2b/user/Cocon';
 // B2B Admin pages
 import B2BAdminLogin from '@/pages/b2b/admin/Login';
 import B2BAdminDashboard from '@/pages/b2b/admin/Dashboard';
+import B2BAdminJournal from '@/pages/b2b/admin/Journal';
+import B2BAdminScan from '@/pages/b2b/admin/Scan';
+import B2BAdminMusic from '@/pages/b2b/admin/Music';
 import B2BAdminTeams from '@/pages/b2b/admin/Teams';
 import B2BAdminReports from '@/pages/b2b/admin/Reports';
 import B2BAdminEvents from '@/pages/b2b/admin/Events';
 import B2BAdminSettings from '@/pages/b2b/admin/Settings';
-import B2BAdminJournal from '@/pages/b2b/admin/Journal';
-import B2BAdminScan from '@/pages/b2b/admin/Scan';
-import B2BAdminMusic from '@/pages/b2b/admin/Music';
+
+// Error pages
+import Unauthorized from '@/pages/common/Unauthorized';
 
 export const router = createBrowserRouter([
   // Root route - Immersive Homepage
@@ -64,24 +66,17 @@ export const router = createBrowserRouter([
     path: '/',
     element: <Home />,
   },
-  // B2B selection page for choosing between user and admin
+  
+  // B2B selection page
   {
     path: '/b2b/selection',
     element: <B2BSelectionPage />,
   },
+  
+  // Error pages
   {
     path: '/unauthorized',
     element: <Unauthorized />,
-  },
-  
-  // Coach Routes (accessible to all users)
-  {
-    path: '/coach',
-    element: <CoachPage />
-  },
-  {
-    path: '/coach-chat',
-    element: <CoachChatPage />
   },
 
   // B2C Routes
@@ -95,7 +90,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/b2c',
-    element: <ProtectedRoute requiredRole="b2c" redirectTo="/b2c/login"><B2CLayout /></ProtectedRoute>,
+    element: <ProtectedRoute requiredRole="user" redirectTo="/b2c/login"><B2CLayout /></ProtectedRoute>,
     children: [
       { 
         index: true,
@@ -128,6 +123,10 @@ export const router = createBrowserRouter([
       { 
         path: 'coach', 
         element: <B2CCoach /> 
+      },
+      { 
+        path: 'coach-chat', 
+        element: <B2CCoachChat /> 
       },
       { 
         path: 'vr', 
@@ -192,6 +191,10 @@ export const router = createBrowserRouter([
       { 
         path: 'coach', 
         element: <B2BUserCoach /> 
+      },
+      { 
+        path: 'coach-chat', 
+        element: <B2BUserCoachChat /> 
       },
       { 
         path: 'vr', 

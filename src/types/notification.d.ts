@@ -25,9 +25,9 @@ export interface Notification {
   read: boolean;
   action_url?: string;
   action_label?: string;
-  date?: string; // Added for compatibility
-  actionUrl?: string;  // Added for compatibility
-  actionLabel?: string; // Added for compatibility
+  date?: string; // Deprecated, use timestamp instead
+  actionUrl?: string;  // Deprecated, use action_url instead
+  actionLabel?: string; // Deprecated, use action_label instead
   priority?: 'high' | 'medium' | 'low';
   image?: string;
   related_id?: string;
@@ -50,7 +50,7 @@ export interface NotificationPreference {
   type?: 'all' | 'important' | 'none';
 }
 
-export type NotificationFilter = 'all' | 'unread' | NotificationType | string;
+export type NotificationFilter = 'all' | 'unread' | NotificationType;
 
 export interface NotificationChannels {
   email: boolean;

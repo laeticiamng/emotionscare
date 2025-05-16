@@ -17,7 +17,7 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, to, active }) => {
   const location = useLocation();
   const { user } = useAuth();
   const logger = useLogger('NavItem');
-  const isAdmin = isAdminRole(user?.role);
+  const isAdmin = user ? isAdminRole(user.role) : false;
   
   // Si active n'est pas explicitement fourni, déterminer à partir de l'emplacement actuel
   const isActive = active !== undefined 

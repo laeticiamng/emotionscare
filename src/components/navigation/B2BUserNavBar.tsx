@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Music, Scan, MessageCircle, Glasses, Trophy, Settings, Users } from 'lucide-react';
+import { Home, BookOpen, Music, Scan, MessageSquare, Glasses, Trophy, Settings, HeartHandshake } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import ConfirmationModal from '@/components/ui/confirmation-modal';
@@ -28,10 +28,10 @@ const B2BUserNavBar: React.FC = () => {
       <NavItem to={ROUTES.b2bUser.journal} isActive={isActive(ROUTES.b2bUser.journal)} icon={<BookOpen className="h-5 w-5" />} label="Journal" />
       <NavItem to={ROUTES.b2bUser.music} isActive={isActive(ROUTES.b2bUser.music)} icon={<Music className="h-5 w-5" />} label="Musique" />
       <NavItem to={ROUTES.b2bUser.scan} isActive={isActive(ROUTES.b2bUser.scan)} icon={<Scan className="h-5 w-5" />} label="Scan" />
-      <NavItem to={ROUTES.b2bUser.coach} isActive={isActive(ROUTES.b2bUser.coach)} icon={<MessageCircle className="h-5 w-5" />} label="Coach" />
+      <NavItem to={ROUTES.b2bUser.coach} isActive={isActive(ROUTES.b2bUser.coach)} icon={<MessageSquare className="h-5 w-5" />} label="Coach" />
       <NavItem to={ROUTES.b2bUser.vr} isActive={isActive(ROUTES.b2bUser.vr)} icon={<Glasses className="h-5 w-5" />} label="VR" />
       <NavItem to={ROUTES.b2bUser.gamification} isActive={isActive(ROUTES.b2bUser.gamification)} icon={<Trophy className="h-5 w-5" />} label="Défis" />
-      <NavItem to={ROUTES.b2bUser.cocon} isActive={isActive(ROUTES.b2bUser.cocon)} icon={<Users className="h-5 w-5" />} label="Cocon" />
+      <NavItem to={ROUTES.b2bUser.cocon} isActive={isActive(ROUTES.b2bUser.cocon)} icon={<HeartHandshake className="h-5 w-5" />} label="Cocon" />
       <NavItem to={ROUTES.b2bUser.preferences} isActive={isActive(ROUTES.b2bUser.preferences)} icon={<Settings className="h-5 w-5" />} label="Paramètres" />
       
       <button 

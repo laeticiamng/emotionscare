@@ -14,9 +14,21 @@ export const filterNotifications = (
       return notifications;
     case 'unread':
       return notifications.filter(notification => !notification.read);
-    default:
-      // For specific notification types (system, emotion, etc.)
+    case 'emotion':
+    case 'journal':
+    case 'community':
+    case 'achievement':
+    case 'reminder':
+    case 'system':
+    case 'success':
+    case 'warning':
+    case 'error':
+    case 'alert':
+    case 'message':
+      // Filter by specific notification type
       return notifications.filter(notification => notification.type === filter);
+    default:
+      return notifications;
   }
 };
 

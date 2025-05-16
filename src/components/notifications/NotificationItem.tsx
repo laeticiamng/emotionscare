@@ -9,7 +9,7 @@ import { NotificationItemProps, NotificationType } from '@/types/notification';
 const NotificationItem: React.FC<NotificationItemProps> = ({
   notification, onMarkAsRead, onDelete, onClick, compact = false, onRead
 }) => {
-  const getIcon = (type: string) => {
+  const getIcon = (type: NotificationType) => {
     // Handle all possible notification types
     switch (type) {
       case 'emotion':

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,7 @@ import { useNotificationBadge } from "@/hooks/useNotificationBadge";
 import { motion } from "framer-motion";
 import { useUserMode } from '@/contexts/UserModeContext';
 import { normalizeUserRole, getRoleName, getRoleHomePath } from '@/utils/roleUtils';
+import { ROUTES } from '@/types/navigation';
 
 const MainNavbar: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -52,36 +54,36 @@ const MainNavbar: React.FC = () => {
   const getNavItems = () => {
     if (isAdmin) {
       return [
-        { label: "Tableau de bord", icon: <Home className="h-4 w-4 mr-2" />, path: "/b2b/admin/dashboard" },
-        { label: "Équipes", icon: <User className="h-4 w-4 mr-2" />, path: "/b2b/admin/teams" },
-        { label: "Rapports", icon: <FileText className="h-4 w-4 mr-2" />, path: "/b2b/admin/reports" },
-        { label: "Événements", icon: <Layout className="h-4 w-4 mr-2" />, path: "/b2b/admin/events" },
-        { label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" />, path: "/b2b/admin/settings" }
+        { label: "Tableau de bord", icon: <Home className="h-4 w-4 mr-2" />, path: ROUTES.b2bAdmin.dashboard },
+        { label: "Équipes", icon: <User className="h-4 w-4 mr-2" />, path: ROUTES.b2bAdmin.teams },
+        { label: "Rapports", icon: <FileText className="h-4 w-4 mr-2" />, path: ROUTES.b2bAdmin.reports },
+        { label: "Événements", icon: <Layout className="h-4 w-4 mr-2" />, path: ROUTES.b2bAdmin.events },
+        { label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" />, path: ROUTES.b2bAdmin.settings }
       ];
     }
     
     if (normalizedUserMode === 'b2b_user') {
       return [
-        { label: "Accueil", icon: <Home className="h-4 w-4 mr-2" />, path: "/b2b/user/dashboard" },
-        { label: "Scan", icon: <Heart className="h-4 w-4 mr-2" />, path: "/b2b/user/scan" },
-        { label: "Journal", icon: <FileText className="h-4 w-4 mr-2" />, path: "/b2b/user/journal" },
-        { label: "Musique", icon: <Music className="h-4 w-4 mr-2" />, path: "/b2b/user/music" },
-        { label: "Coach", icon: <MessageSquare className="h-4 w-4 mr-2" />, path: "/b2b/user/coach" },
-        { label: "VR", icon: <Layout className="h-4 w-4 mr-2" />, path: "/b2b/user/vr" },
-        { label: "Défis", icon: <BarChart className="h-4 w-4 mr-2" />, path: "/b2b/user/gamification" },
-        { label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" />, path: "/b2b/user/preferences" }
+        { label: "Accueil", icon: <Home className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.dashboard },
+        { label: "Scan", icon: <Heart className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.scan },
+        { label: "Journal", icon: <FileText className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.journal },
+        { label: "Musique", icon: <Music className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.music },
+        { label: "Coach", icon: <MessageSquare className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.coach },
+        { label: "VR", icon: <Layout className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.vr },
+        { label: "Défis", icon: <BarChart className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.gamification },
+        { label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" />, path: ROUTES.b2bUser.preferences }
       ];
     }
     
     return [
-      { label: "Accueil", icon: <Home className="h-4 w-4 mr-2" />, path: "/b2c/dashboard" },
-      { label: "Scan", icon: <Heart className="h-4 w-4 mr-2" />, path: "/b2c/scan" },
-      { label: "Journal", icon: <FileText className="h-4 w-4 mr-2" />, path: "/b2c/journal" },
-      { label: "Musique", icon: <Music className="h-4 w-4 mr-2" />, path: "/b2c/music" },
-      { label: "Coach", icon: <MessageSquare className="h-4 w-4 mr-2" />, path: "/b2c/coach" },
-      { label: "VR", icon: <Layout className="h-4 w-4 mr-2" />, path: "/b2c/vr" },
-      { label: "Défis", icon: <BarChart className="h-4 w-4 mr-2" />, path: "/b2c/gamification" },
-      { label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" />, path: "/b2c/preferences" }
+      { label: "Accueil", icon: <Home className="h-4 w-4 mr-2" />, path: ROUTES.b2c.dashboard },
+      { label: "Scan", icon: <Heart className="h-4 w-4 mr-2" />, path: ROUTES.b2c.scan },
+      { label: "Journal", icon: <FileText className="h-4 w-4 mr-2" />, path: ROUTES.b2c.journal },
+      { label: "Musique", icon: <Music className="h-4 w-4 mr-2" />, path: ROUTES.b2c.music },
+      { label: "Coach", icon: <MessageSquare className="h-4 w-4 mr-2" />, path: ROUTES.b2c.coach },
+      { label: "VR", icon: <Layout className="h-4 w-4 mr-2" />, path: ROUTES.b2c.vr },
+      { label: "Défis", icon: <BarChart className="h-4 w-4 mr-2" />, path: ROUTES.b2c.gamification },
+      { label: "Paramètres", icon: <Settings className="h-4 w-4 mr-2" />, path: ROUTES.b2c.preferences }
     ];
   };
 

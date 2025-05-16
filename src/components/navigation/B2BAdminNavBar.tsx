@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, FileBarChart, Calendar, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, FileBarChart, Calendar, Settings, BookOpen, Scan, Music } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import ConfirmationModal from '@/components/ui/confirmation-modal';
@@ -25,6 +25,9 @@ const B2BAdminNavBar: React.FC = () => {
   return (
     <nav className="flex flex-col space-y-1 p-2 bg-slate-800 text-white border-r h-full">
       <NavItem to={ROUTES.b2bAdmin.dashboard} isActive={isActive(ROUTES.b2bAdmin.dashboard)} icon={<LayoutDashboard className="h-5 w-5" />} label="Tableau de bord" />
+      <NavItem to={ROUTES.b2bAdmin.journal} isActive={isActive(ROUTES.b2bAdmin.journal)} icon={<BookOpen className="h-5 w-5" />} label="Journal" />
+      <NavItem to={ROUTES.b2bAdmin.scan} isActive={isActive(ROUTES.b2bAdmin.scan)} icon={<Scan className="h-5 w-5" />} label="Scan" />
+      <NavItem to={ROUTES.b2bAdmin.music} isActive={isActive(ROUTES.b2bAdmin.music)} icon={<Music className="h-5 w-5" />} label="Musique" />
       <NavItem to={ROUTES.b2bAdmin.teams} isActive={isActive(ROUTES.b2bAdmin.teams)} icon={<Users className="h-5 w-5" />} label="Équipes" />
       <NavItem to={ROUTES.b2bAdmin.reports} isActive={isActive(ROUTES.b2bAdmin.reports)} icon={<FileBarChart className="h-5 w-5" />} label="Rapports" />
       <NavItem to={ROUTES.b2bAdmin.events} isActive={isActive(ROUTES.b2bAdmin.events)} icon={<Calendar className="h-5 w-5" />} label="Événements" />

@@ -24,6 +24,7 @@ export interface RouteConfig {
     music: string;
     scan: string;
     coach: string;
+    coachChat: string;
     vr: string;
     gamification: string;
     preferences: string;
@@ -38,6 +39,7 @@ export interface RouteConfig {
     music: string;
     scan: string;
     coach: string;
+    coachChat: string;
     vr: string;
     gamification: string;
     preferences: string;
@@ -47,6 +49,9 @@ export interface RouteConfig {
     home: string;
     login: string;
     dashboard: string;
+    journal: string;
+    scan: string;
+    music: string;
     teams: string;
     reports: string;
     events: string;
@@ -56,6 +61,7 @@ export interface RouteConfig {
     home: string;
     b2bSelection: string;
     unauthorized: string;
+    notFound: string;
   };
 }
 
@@ -69,6 +75,7 @@ export const ROUTES: RouteConfig = {
     music: '/b2c/music',
     scan: '/b2c/scan',
     coach: '/b2c/coach',
+    coachChat: '/b2c/coach-chat',
     vr: '/b2c/vr',
     gamification: '/b2c/gamification',
     preferences: '/b2c/preferences',
@@ -83,6 +90,7 @@ export const ROUTES: RouteConfig = {
     music: '/b2b/user/music',
     scan: '/b2b/user/scan',
     coach: '/b2b/user/coach',
+    coachChat: '/b2b/user/coach-chat',
     vr: '/b2b/user/vr',
     gamification: '/b2b/user/gamification',
     preferences: '/b2b/user/preferences',
@@ -92,6 +100,9 @@ export const ROUTES: RouteConfig = {
     home: '/b2b/admin',
     login: '/b2b/admin/login',
     dashboard: '/b2b/admin/dashboard',
+    journal: '/b2b/admin/journal',
+    scan: '/b2b/admin/scan',
+    music: '/b2b/admin/music',
     teams: '/b2b/admin/teams',
     reports: '/b2b/admin/reports',
     events: '/b2b/admin/events',
@@ -100,6 +111,7 @@ export const ROUTES: RouteConfig = {
   common: {
     home: '/',
     b2bSelection: '/b2b/selection',
-    unauthorized: '/unauthorized'
+    unauthorized: '/unauthorized',
+    notFound: '/not-found'
   }
 };
