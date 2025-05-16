@@ -10,6 +10,7 @@ export * from './dashboard';
 export * from './sidebar';
 export * from './navigation';
 
+// Types essentiels pour les composants d'émotion
 export interface EmotionResult {
   emotion: string;
   confidence?: number;

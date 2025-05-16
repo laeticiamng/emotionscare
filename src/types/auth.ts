@@ -14,13 +14,13 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<any>;
   logout: () => void;
   register: (name: string, email: string, password: string) => Promise<any>;
-  updatePreferences?: (preferences: UserPreferences) => Promise<void>;
+  updatePreferences?: (preferences: Partial<UserPreferences>) => Promise<void>;
   updateUser?: (user: any) => Promise<void>;
   clearError?: () => void;
 }
 
 export interface UserPreferences {
-  theme: string;
+  theme: "system" | "dark" | "light" | "pastel";
   fontSize: string;
   fontFamily: string;
   reduceMotion: boolean;
@@ -30,11 +30,11 @@ export interface UserPreferences {
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   notifications: {
-    enabled?: boolean;
-    emailEnabled?: boolean;
-    pushEnabled?: boolean;
-    inAppEnabled?: boolean;
-    types?: {
+    enabled: boolean;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+    inAppEnabled: boolean;
+    types: {
       system: boolean;
       emotion: boolean;
       coach: boolean;
@@ -42,7 +42,7 @@ export interface UserPreferences {
       community: boolean;
       achievement: boolean;
     };
-    frequency?: string;
+    frequency: string;
     email?: boolean;
     push?: boolean;
     sms?: boolean;

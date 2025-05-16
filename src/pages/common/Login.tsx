@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
+import { getRoleRoute } from '@/utils/roleUtils';
 
 interface LoginProps {
   role?: 'b2c' | 'b2b_user' | 'b2b_admin';
@@ -19,22 +20,6 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
   const navigate = useNavigate();
   const { login, error, clearError } = useAuth();
   
-  const getRoleName = () => {
-    switch(role) {
-      case 'b2b_admin': return 'Administrateur';
-      case 'b2b_user': return 'Collaborateur';
-      case 'b2c': default: return 'Particulier';
-    }
-  };
-  
-  const getRedirectPath = () => {
-    switch(role) {
-      case 'b2b_admin': return '/b2b/admin/dashboard';
-      case 'b2b_user': return '/b2b/user/dashboard';
-      case 'b2c': default: return '/b2c/dashboard';
-    }
-  };
-  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -45,27 +30,30 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
       const user = await login(email, password);
       
       if (user) {
-        // Check if the user has the correct role
-        if (user.role !== role) {
+        // Vérifier que l'utilisateur a le rôle correct
+        if (role && role !== user.role) {
           toast({
             title: "Accès refusé",
-            description: "Vous n'avez pas les permissions nécessaires pour accéder à cet espace.",
+            description: `Ce compte n'a pas les permissions nécessaires pour accéder à cet espace.`,
             variant: "destructive"
           });
+          setIsLoading(false);
           return;
         }
         
         toast({
           title: "Connexion réussie",
           description: "Vous êtes maintenant connecté.",
+          variant: "success"
         });
         
-        navigate(getRedirectPath());
+        // Redirection vers la dashboard appropriée en fonction du rôle
+        navigate(getRoleRoute(user.role));
       }
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",
-        description: error.message || "Une erreur s'est produite",
+        description: error.message || "Une erreur s'est produite lors de la connexion",
         variant: "destructive",
       });
     } finally {
@@ -73,72 +61,57 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
     }
   };
   
-  const getRegisterPath = () => {
-    switch(role) {
-      case 'b2b_admin': return '/b2b/admin/register';
-      case 'b2b_user': return '/b2b/user/register';
-      case 'b2c': default: return '/b2c/register';
-    }
-  };
-  
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
+    <div className="flex min-h-screen items-center justify-center bg-blue-50 p-4 dark:bg-slate-900">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Connexion {getRoleName()}</CardTitle>
-          <CardDescription>Connectez-vous pour accéder à votre espace {getRoleName()}</CardDescription>
+        <CardHeader className="space-y-1 text-center">
+          <div className="flex justify-center">
+            <User className="h-10 w-10 text-blue-600" />
+          </div>
+          <CardTitle className="text-2xl font-bold">Connexion</CardTitle>
+          <CardDescription>Connectez-vous pour accéder à votre espace</CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
-                {error}
-              </div>
-            )}
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <label htmlFor="email" className="text-sm font-medium">Email</label>
               <Input 
                 id="email" 
+                placeholder="votre@email.fr" 
                 type="email" 
-                placeholder="email@exemple.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
+                required 
               />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Mot de passe</Label>
-                <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                <label htmlFor="password" className="text-sm font-medium">Mot de passe</label>
+                <Button variant="link" className="text-xs p-0 h-auto" type="button">
                   Mot de passe oublié?
-                </Link>
+                </Button>
               </div>
               <Input 
                 id="password" 
-                type="password"
+                type="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
+                required 
               />
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Connexion en cours..." : "Se connecter"}
             </Button>
-            <div className="text-sm text-center">
-              Pas encore de compte?{' '}
-              <Link to={getRegisterPath()} className="text-primary hover:underline">
-                S'inscrire
-              </Link>
-            </div>
-            <div className="text-sm text-center mt-2">
-              <Link to="/" className="text-muted-foreground hover:underline">
-                Retour à la sélection du profil
-              </Link>
-            </div>
-          </CardFooter>
-        </form>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col gap-4">
+          <Button variant="outline" className="w-full" type="button">
+            Créer un compte
+          </Button>
+          <Button variant="ghost" className="w-full" type="button" onClick={() => navigate('/')}>
+            Retour à l'accueil
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );

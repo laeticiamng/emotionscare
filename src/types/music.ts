@@ -9,10 +9,14 @@ export interface MusicTrack {
   audioUrl?: string;
   coverUrl?: string;
   url?: string;
-  cover_url?: string; // Pour compatibilité avec ancien code
+  cover_url?: string; 
+  cover?: string;
+  coverImage?: string;
   mood?: string;
   category?: string;
   intensity?: number;
+  emotion?: string;
+  track_url?: string;
 }
 
 export interface MusicPlaylist {
@@ -40,6 +44,7 @@ export interface MusicContextType {
   currentPlaylist?: MusicPlaylist | null;
   currentEmotion?: string | null;
   playlist?: MusicPlaylist | null;
+  playlists?: MusicPlaylist[];
   
   // Fonctions pour contrôler la musique
   play?: (track: MusicTrack) => void;
@@ -67,13 +72,18 @@ export interface MusicContextType {
   // États et erreurs
   isInitialized?: boolean;
   initializeMusicSystem?: () => Promise<void>;
-  error?: string | null;
+  error?: Error | null;
 }
 
 export interface MusicDrawerProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   children?: React.ReactNode;
+  onClose?: () => void;
+  isOpen?: boolean;
+  playlist?: MusicPlaylist;
+  currentTrack?: MusicTrack | null;
+  side?: "left" | "right" | "top" | "bottom";
 }
 
 export interface ProgressBarProps {
@@ -82,6 +92,7 @@ export interface ProgressBarProps {
   onSeek: (position: number) => void;
   formatTime?: (seconds: number) => string;
   showTimestamps?: boolean;
+  className?: string;
 }
 
 export interface VolumeControlProps {
@@ -90,6 +101,9 @@ export interface VolumeControlProps {
   isMuted?: boolean;
   onMuteToggle?: () => void;
   showLabel?: boolean;
+  className?: string;
+  muted?: boolean;
+  onChange?: (volume: number) => void;
 }
 
 export interface MusicControlsProps {
@@ -118,4 +132,8 @@ export interface MusicLibraryProps {
   filter?: string;
   sortBy?: 'title' | 'artist' | 'duration';
   filterByMood?: string;
+  currentTrack?: MusicTrack | null;
+  playlists?: MusicPlaylist[];
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+  tracks?: MusicTrack[];
 }
