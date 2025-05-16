@@ -12,7 +12,7 @@ const B2BUserRegister = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Add registration logic here
-    navigate('/b2b/user/login');
+    navigate('/b2b/user/login'); 
   };
 
   return (
@@ -22,38 +22,36 @@ const B2BUserRegister = () => {
           <div className="flex justify-center">
             <Building className="h-10 w-10 text-blue-600" />
           </div>
-          <CardTitle className="text-2xl font-bold">Inscription - Espace Entreprise</CardTitle>
-          <CardDescription>Demandez un accès à votre espace professionnel</CardDescription>
+          <CardTitle className="text-2xl font-bold">Demande d'accès entreprise</CardTitle>
+          <CardDescription>Créez votre compte collaborateur</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label htmlFor="firstName" className="text-sm font-medium">Prénom</label>
-                <Input id="firstName" required />
-              </div>
-              <div className="space-y-2">
-                <label htmlFor="lastName" className="text-sm font-medium">Nom</label>
-                <Input id="lastName" required />
-              </div>
-            </div>
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">Email professionnel</label>
-              <Input id="email" placeholder="prenom.nom@entreprise.com" type="email" required />
+              <label htmlFor="fullName" className="text-sm font-medium">Nom complet</label>
+              <Input id="fullName" placeholder="Prénom Nom" type="text" required />
             </div>
             <div className="space-y-2">
               <label htmlFor="company" className="text-sm font-medium">Entreprise</label>
-              <Input id="company" required />
+              <Input id="company" placeholder="Nom de l'entreprise" type="text" required />
             </div>
             <div className="space-y-2">
-              <label htmlFor="position" className="text-sm font-medium">Poste occupé</label>
-              <Input id="position" required />
+              <label htmlFor="email" className="text-sm font-medium">Email professionnel</label>
+              <Input id="email" placeholder="nom@entreprise.fr" type="email" required />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium">Mot de passe</label>
+              <Input id="password" type="password" required />
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="confirmPassword" className="text-sm font-medium">Confirmer le mot de passe</label>
+              <Input id="confirmPassword" type="password" required />
             </div>
             <Button type="submit" className="w-full">Demander un accès</Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button variant="outline" className="w-full" type="button" onClick={() => navigate('/b2b/user/login')}>
+          <Button variant="ghost" className="w-full" type="button" onClick={() => navigate('/b2b/user/login')}>
             J'ai déjà un compte
           </Button>
           <Button variant="ghost" className="w-full" type="button" onClick={() => navigate('/')}>

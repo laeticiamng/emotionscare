@@ -1,3 +1,3 @@
 
-// This file redirects to the newly refactored structure in /contexts/music/
+// Re-export from the refactored structure
 export * from './music';
