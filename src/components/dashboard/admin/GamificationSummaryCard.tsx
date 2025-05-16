@@ -1,82 +1,35 @@
-
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Trophy, Users, Award, Zap } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { GamificationStats } from '@/types/gamification';
 
-export interface GamificationSummaryCardProps {
-  gamificationData: GamificationStats;
+interface GamificationSummaryCardProps {
+  stats: Partial<GamificationStats>;
 }
 
-const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({ gamificationData }) => {
-  // Get default values for properties that might be missing
-  const totalBadges = gamificationData.totalBadges || 0;
-  const activeUsersPercent = gamificationData.activeUsersPercent || 0;
-  const completedChallenges = gamificationData.completedChallenges || 0;
-  const completionRate = gamificationData.completionRate || 0;
-
+export const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({ stats }) => {
   return (
-    <Card className="glass-card">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center">
-          <Trophy className="mr-2 h-5 w-5 text-primary" />
-          Aperçu de la Gamification
-        </CardTitle>
-        <CardDescription>Statistiques globales de l'engagement</CardDescription>
+        <CardTitle>Résumé de la gamification</CardTitle>
+        <CardDescription>Aperçu des statistiques clés</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col p-4 rounded-lg bg-background/80 shadow-sm">
-            <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
-                <Trophy className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Badges Débloqués</p>
-                <h3 className="text-2xl font-bold">{totalBadges}</h3>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex flex-col p-4 rounded-lg bg-background/80 shadow-sm">
-            <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
-                <Users className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Utilisateurs Actifs</p>
-                <h3 className="text-2xl font-bold">{activeUsersPercent}%</h3>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex flex-col p-4 rounded-lg bg-background/80 shadow-sm">
-            <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
-                <Award className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Défis Complétés</p>
-                <h3 className="text-2xl font-bold">{completedChallenges}</h3>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex flex-col p-4 rounded-lg bg-background/80 shadow-sm">
-            <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
-                <Zap className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Taux de Complétion</p>
-                <h3 className="text-2xl font-bold">{completionRate}%</h3>
-              </div>
-            </div>
-          </div>
+      <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <div className="text-2xl font-medium">Badges</div>
+          <div className="text-3xl font-bold">{stats.badges?.length || 0}</div>
+          <div className="text-muted-foreground text-sm">Total de badges débloqués</div>
+        </div>
+        <div>
+          <div className="text-2xl font-medium">Engagement</div>
+          <div className="text-3xl font-bold">{stats.activeUsersPercent || 85}%</div>
+          <div className="text-muted-foreground text-sm">Utilisateurs actifs</div>
+        </div>
+        <div>
+          <div className="text-2xl font-medium">Complétion</div>
+          <div className="text-3xl font-bold">{stats.completionRate || 72}%</div>
+          <div className="text-muted-foreground text-sm">Taux de complétion des défis</div>
         </div>
       </CardContent>
     </Card>
   );
 };
-
-export default GamificationSummaryCard;

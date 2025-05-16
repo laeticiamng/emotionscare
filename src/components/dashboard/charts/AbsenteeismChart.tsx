@@ -1,84 +1,83 @@
-
 import React, { useState } from 'react';
-import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ChartTooltip, ChartTooltipContent, ChartInteractiveLegend } from '@/components/ui/chart';
-
-interface AbsenteeismChartData {
-  date: string;
-  value: number;
-}
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ChartTooltipContent } from '@/components/ui/chart/ChartTooltipContent';
+import { ChartInteractiveLegend } from '@/components/ui/chart/ChartInteractiveLegend';
+import { ChartTooltip } from '@/components/ui/chart';
 
 interface AbsenteeismChartProps {
-  data: AbsenteeismChartData[];
+  data: { date: string; absences: number; presence: number; productivity: number }[];
 }
 
-const AbsenteeismChart: React.FC<AbsenteeismChartProps> = ({ data }) => {
+const CustomTooltip = ({ active, payload, label }: any) => {
+  return (
+    <ChartTooltipContent
+      active={active}
+      payload={payload}
+      label={label}
+      valueFormatter={(value) => `${value}`}
+      labelFormatter={(label) => label}
+    />
+  );
+};
+
+export const AbsenteeismChart: React.FC<AbsenteeismChartProps> = ({ data }) => {
   const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
 
-  const toggleSeries = (dataKey: string, isHidden: boolean) => {
-    if (isHidden) {
-      setHiddenSeries(prev => [...prev, dataKey]);
-    } else {
-      setHiddenSeries(prev => prev.filter(key => key !== dataKey));
-    }
+  const handleToggleSeries = (dataKey: string, isHidden: boolean) => {
+    setHiddenSeries(isHidden
+      ? [...hiddenSeries, dataKey]
+      : hiddenSeries.filter(key => key !== dataKey)
+    );
   };
 
   return (
-    <Card className="col-span-1">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-base font-medium">Taux d'absentéisme</CardTitle>
+    <Card>
+      <CardHeader>
+        <CardTitle>Taux d'absentéisme</CardTitle>
+        <CardDescription>Visualisation des absences et de la productivité</CardDescription>
       </CardHeader>
-      <CardContent className="px-2">
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={data}
-              margin={{
-                top: 5,
-                right: 10,
-                left: -25,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
-              <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={12} tickLine={false} />
-              <YAxis stroke="var(--muted-foreground)" fontSize={12} tickLine={false} />
-              <Tooltip
-                content={(props) => (
-                  <ChartTooltip>
-                    <ChartTooltipContent 
-                      active={props.active} 
-                      payload={props.payload} 
-                      label={props.label}
-                      labelFormatter={(label) => `Date: ${label}`}
-                      valueFormatter={(value) => `${value}%`}
-                    />
-                  </ChartTooltip>
-                )}
-              />
-              <Line
-                type="monotone"
-                dataKey="value"
-                name="Absentéisme"
-                stroke="var(--primary)"
-                dot={true}
-                hide={hiddenSeries.includes("value")}
-                activeDot={{ r: 6, stroke: "var(--background)", strokeWidth: 2 }}
-              />
-              <ChartInteractiveLegend
-                onToggleSeries={toggleSeries}
-                hiddenSeries={hiddenSeries}
-                verticalAlign="top"
-                align="center"
-                layout="horizontal"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+      <CardContent className="pl-2">
+        <ResponsiveContainer width="100%" height={300}>
+          <AreaChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <ChartTooltip content={<CustomTooltip />} />
+            <Area
+              type="monotone"
+              dataKey="absences"
+              stroke="#8884d8"
+              fill="#8884d8"
+              name="Absences"
+              hide={hiddenSeries.includes('absences')}
+            />
+            <Area
+              type="monotone"
+              dataKey="presence"
+              stroke="#82ca9d"
+              fill="#82ca9d"
+              name="Présence"
+              hide={hiddenSeries.includes('presence')}
+            />
+            <Area
+              type="monotone"
+              dataKey="productivity"
+              stroke="#ffc658"
+              fill="#ffc658"
+              name="Productivité"
+              hide={hiddenSeries.includes('productivity')}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+        <ChartInteractiveLegend 
+          onToggleSeries={handleToggleSeries} 
+          hiddenSeries={hiddenSeries} 
+          verticalAlign="bottom"
+          align="center"
+          layout="horizontal"
+        />
       </CardContent>
     </Card>
   );
 };
-
-export default AbsenteeismChart;

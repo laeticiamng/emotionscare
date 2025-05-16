@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { ChartContainer, ChartInteractiveLegend, ZoomableChart } from '@/components/ui/chart';
@@ -8,9 +7,10 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 
 interface MoodLineChartProps {
   data: MoodData[];
+  showControls: boolean;
 }
 
-const MoodLineChart: React.FC<MoodLineChartProps> = ({ data }) => {
+const MoodLineChart: React.FC<MoodLineChartProps> = ({ data, showControls }) => {
   const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
   const isMobile = useMediaQuery("(max-width: 768px)");
 
@@ -48,10 +48,9 @@ const MoodLineChart: React.FC<MoodLineChartProps> = ({ data }) => {
   return (
     <div className="h-80">
       <ZoomableChart 
-        data={enrichedData} 
-        config={chartConfig} 
+        data={data} 
         brushDataKey="date"
-        showControls={!isMobile}
+        showControls={showControls}
       >
         <LineChart
           margin={{ top: 15, right: 30, left: 20, bottom: 5 }}

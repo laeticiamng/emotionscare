@@ -1,172 +1,168 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import {
+  User,
+  Home,
+  BookOpen,
+  Music,
+  Heart,
+  Settings,
+  LogOut,
+  MessageSquare,
+  Glasses,
+  Trophy,
+  HeartHandshake
+} from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
-import { Menu, X, User, Settings, LogOut, Moon, Sun } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useTheme } from '@/contexts/ThemeContext';
-import { getUserAvatarUrl, getUserInitials, harmonizeUserType } from '@/utils/userUtils';
-import { toast } from 'sonner';
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { ROUTES } from "@/types/navigation";
+import { cn } from "@/lib/utils";
 
-interface NavItem {
-  label: string;
-  href: string;
-  icon?: React.ReactNode;
-}
-
-interface MobileNavigationProps {
-  items: NavItem[];
-}
-
-export default function MobileNavigation({ items }: MobileNavigationProps) {
-  const [open, setOpen] = useState(false);
-  const { user, logout } = useAuth();
+const MobileNavigation: React.FC = () => {
+  const { logout } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
-
-  const handleLinkClick = (href: string) => {
-    navigate(href);
-    setOpen(false);
+  const location = useLocation();
+  
+  const handleLogout = () => {
+    localStorage.removeItem("auth_session");
+    localStorage.removeItem("user_role");
+    
+    logout();
+    
+    toast({
+      title: "Déconnexion réussie",
+      description: "À bientôt sur EmotionsCare !",
+    });
+    
+    navigate("/");
   };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success('Déconnexion réussie');
-      navigate('/');
-      setOpen(false);
-    } catch (error) {
-      toast.error('Erreur lors de la déconnexion');
-      console.error(error);
-    }
-  };
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
-
-  // Use harmonizeUserType to ensure type compatibility
-  const userForAvatar = user ? harmonizeUserType(user) : null;
-  const avatarUrl = getUserAvatarUrl(userForAvatar);
-  const userInitials = getUserInitials(userForAvatar);
-
+  
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" aria-label="Menu">
-          <Menu className="h-5 w-5" />
+          <User className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="p-0 flex flex-col">
-        <div className="p-4 border-b">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-lg">Menu</h2>
-            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
-              <X className="h-5 w-5" />
+      <SheetContent side="bottom" className="h-[85%] rounded-t-xl">
+        <SheetHeader className="space-y-2 text-left">
+          <SheetTitle>Menu</SheetTitle>
+          <SheetDescription>
+            Explorez votre espace EmotionsCare
+          </SheetDescription>
+        </SheetHeader>
+        <div className="grid gap-4 py-4">
+          <Link to={ROUTES.b2c.dashboard}>
+            <Button
+              variant={location.pathname === ROUTES.b2c.dashboard ? "default" : "ghost"}
+              className={cn("w-full justify-start", {
+                "bg-accent": location.pathname === ROUTES.b2c.dashboard,
+              })}
+            >
+              <Home className="mr-2 h-4 w-4" />
+              Accueil
             </Button>
-          </div>
-        </div>
+          </Link>
+          
+          <Link to={ROUTES.b2c.journal}>
+            <Button
+              variant={location.pathname === ROUTES.b2c.journal ? "default" : "ghost"}
+              className="w-full justify-start"
+            >
+              <BookOpen className="mr-2 h-4 w-4" />
+              Journal émotionnel
+            </Button>
+          </Link>
+          
+          <Link to={ROUTES.b2c.music}>
+            <Button
+              variant={location.pathname === ROUTES.b2c.music ? "default" : "ghost"}
+              className="w-full justify-start"
+            >
+              <Music className="mr-2 h-4 w-4" />
+              Musicothérapie
+            </Button>
+          </Link>
+          
+          <Link to={ROUTES.b2c.scan}>
+            <Button
+              variant={location.pathname === ROUTES.b2c.scan ? "default" : "ghost"}
+              className="w-full justify-start"
+            >
+              <Heart className="mr-2 h-4 w-4" />
+              Scan émotionnel
+            </Button>
+          </Link>
 
-        {user && (
-          <div className="p-4 border-b">
-            <div className="flex items-center gap-4">
-              <Avatar>
-                <AvatarImage src={avatarUrl} />
-                <AvatarFallback>{userInitials}</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">{user.name}</p>
-                <p className="text-sm text-muted-foreground">{user.email}</p>
-              </div>
-            </div>
-          </div>
-        )}
+          <Link to={ROUTES.b2c.coach}>
+            <Button
+              variant={location.pathname === ROUTES.b2c.coach ? "default" : "ghost"}
+              className="w-full justify-start"
+            >
+              <MessageSquare className="mr-2 h-4 w-4" />
+              Coach
+            </Button>
+          </Link>
 
-        <nav className="flex-1 overflow-auto py-2">
-          <ul className="grid gap-1 p-2">
-            {items.map((item, index) => (
-              <li key={index}>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start text-base" 
-                  onClick={() => handleLinkClick(item.href)}
-                >
-                  {item.icon}
-                  {item.label}
-                </Button>
-              </li>
-            ))}
-          </ul>
-        </nav>
+          <Link to={ROUTES.b2c.vr}>
+            <Button
+              variant={location.pathname === ROUTES.b2c.vr ? "default" : "ghost"}
+              className="w-full justify-start"
+            >
+              <Glasses className="mr-2 h-4 w-4" />
+              Réalité virtuelle
+            </Button>
+          </Link>
 
-        <div className="p-4 border-t mt-auto">
-          <ul className="grid gap-2">
-            <li>
-              <Button 
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={toggleTheme}
-              >
-                {theme === 'dark' ? (
-                  <>
-                    <Sun className="mr-2 h-4 w-4" />
-                    <span>Mode clair</span>
-                  </>
-                ) : (
-                  <>
-                    <Moon className="mr-2 h-4 w-4" />
-                    <span>Mode sombre</span>
-                  </>
-                )}
-              </Button>
-            </li>
-            {user ? (
-              <>
-                <li>
-                  <Button 
-                    variant="ghost"
-                    className="w-full justify-start"
-                    onClick={() => handleLinkClick('/profile')}
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Mon profil</span>
-                  </Button>
-                </li>
-                <li>
-                  <Button 
-                    variant="ghost"
-                    className="w-full justify-start"
-                    onClick={() => handleLinkClick('/settings')}
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Paramètres</span>
-                  </Button>
-                </li>
-                <li>
-                  <Button 
-                    variant="destructive"
-                    className="w-full justify-start"
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Déconnexion</span>
-                  </Button>
-                </li>
-              </>
-            ) : (
-              <li>
-                <Button 
-                  className="w-full"
-                  onClick={() => handleLinkClick('/login')}
-                >
-                  Se connecter
-                </Button>
-              </li>
-            )}
-          </ul>
+          <Link to={ROUTES.b2c.gamification}>
+            <Button
+              variant={location.pathname === ROUTES.b2c.gamification ? "default" : "ghost"}
+              className="w-full justify-start"
+            >
+              <Trophy className="mr-2 h-4 w-4" />
+              Défis
+            </Button>
+          </Link>
+
+          <Link to={ROUTES.b2c.cocon}>
+            <Button
+              variant={location.pathname === ROUTES.b2c.cocon ? "default" : "ghost"}
+              className="w-full justify-start"
+            >
+              <HeartHandshake className="mr-2 h-4 w-4" />
+              Cocon
+            </Button>
+          </Link>
+          
+          <Link to={ROUTES.b2c.preferences}>
+            <Button variant="ghost" className="w-full justify-start">
+              <Settings className="mr-2 h-4 w-4" />
+              Préférences
+            </Button>
+          </Link>
+          
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-red-500 dark:text-red-400"
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Déconnexion
+          </Button>
         </div>
       </SheetContent>
     </Sheet>
   );
-}
+};
+
+export default MobileNavigation;

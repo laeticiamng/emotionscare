@@ -5,20 +5,27 @@ import { TimeOfDay, determineTimeOfDay, DEFAULT_WELCOME_MESSAGES } from '@/const
 interface WelcomeMessageProps {
   className?: string;
   customMessages?: string[];
+  customMessage?: string;
 }
 
 export const WelcomeMessage: React.FC<WelcomeMessageProps> = ({ 
   className = '', 
-  customMessages 
+  customMessages,
+  customMessage 
 }) => {
   const [message, setMessage] = useState<string>('');
   
   useEffect(() => {
+    if (customMessage) {
+      setMessage(customMessage);
+      return;
+    }
+    
     const timeOfDay = determineTimeOfDay();
     const messages = customMessages || DEFAULT_WELCOME_MESSAGES[timeOfDay];
     const randomIndex = Math.floor(Math.random() * messages.length);
     setMessage(messages[randomIndex]);
-  }, [customMessages]);
+  }, [customMessages, customMessage]);
 
   return (
     <p className={className}>

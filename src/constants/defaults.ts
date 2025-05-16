@@ -1,50 +1,42 @@
 
+export type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night';
 
-export enum TimeOfDay {
-  MORNING = 'MORNING',
-  AFTERNOON = 'AFTERNOON',
-  EVENING = 'EVENING',
-  NIGHT = 'NIGHT'
-}
-
-export const determineTimeOfDay = (): TimeOfDay => {
+export function determineTimeOfDay(): TimeOfDay {
   const hour = new Date().getHours();
   
-  if (hour >= 5 && hour < 12) {
-    return TimeOfDay.MORNING;
-  } else if (hour >= 12 && hour < 18) {
-    return TimeOfDay.AFTERNOON;
-  } else if (hour >= 18 && hour < 22) {
-    return TimeOfDay.EVENING;
-  } else {
-    return TimeOfDay.NIGHT;
-  }
-};
+  if (hour >= 5 && hour < 12) return 'morning';
+  if (hour >= 12 && hour < 17) return 'afternoon';
+  if (hour >= 17 && hour < 22) return 'evening';
+  return 'night';
+}
 
 export const DEFAULT_WELCOME_MESSAGES = {
-  [TimeOfDay.MORNING]: [
-    "Bonjour ! Comment vous sentez-vous ce matin ?",
-    "Bienvenue dans votre espace de bien-être matinal",
-    "Commencez votre journée avec un moment pour vous",
-    "Un nouveau jour, de nouvelles émotions à explorer"
+  morning: [
+    "Bonjour et bienvenue dans votre espace de bien-être.",
+    "Une belle journée s'annonce, comment vous sentez-vous aujourd'hui ?",
+    "Le matin est parfait pour prendre soin de soi. Bienvenue !",
+    "Un nouveau jour, de nouvelles possibilités de bien-être.",
+    "Prenez quelques instants pour vous connecter à vos émotions ce matin."
   ],
-  [TimeOfDay.AFTERNOON]: [
-    "Bonjour ! Comment se passe votre journée ?",
-    "Un moment de pause bien mérité cet après-midi ?",
-    "Prenez un instant pour vous reconnecter à vos émotions",
-    "Bienvenue dans votre espace de bien-être"
+  afternoon: [
+    "Bon après-midi, c'est le moment idéal pour faire une pause bien-être.",
+    "Comment se déroule votre journée ? Prenez un moment pour vous.",
+    "Bienvenue dans votre espace de reconnexion émotionnelle.",
+    "Le milieu de journée est parfait pour se recentrer. Bienvenue !",
+    "Accordez-vous une pause bien méritée dans votre cocon émotionnel."
   ],
-  [TimeOfDay.EVENING]: [
-    "Bonsoir ! Comment s'est passée votre journée ?",
-    "Un moment pour vous détendre ce soir",
-    "Bienvenue dans votre espace de bien-être nocturne",
-    "Le soir est parfait pour un moment d'introspection"
+  evening: [
+    "Bonsoir, c'est le moment de vous détendre après cette journée.",
+    "Bienvenue dans votre espace de détente du soir.",
+    "La soirée est propice à la relaxation. Prenez soin de vous.",
+    "Prenez un moment pour faire le point sur vos émotions de la journée.",
+    "La journée touche à sa fin, accordez-vous un moment de bien-être."
   ],
-  [TimeOfDay.NIGHT]: [
-    "Bonsoir ! Un moment de détente avant de dormir ?",
-    "La nuit est propice à l'exploration de vos émotions",
-    "Bienvenue dans votre espace de bien-être nocturne",
-    "Préparez-vous à une nuit sereine"
+  night: [
+    "Bienvenue dans votre espace nocturne de détente.",
+    "Une séance de relaxation avant le sommeil vous attend.",
+    "La nuit est propice à l'introspection et au lâcher-prise.",
+    "Avant de dormir, prenez le temps de vous reconnecter à vos émotions.",
+    "Bienvenue dans votre cocon nocturne. Apaisez votre esprit avant le repos."
   ]
 };
-

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Trophy } from 'lucide-react';
@@ -23,8 +22,12 @@ const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData, isL
   }
 
   // Safely access properties with fallbacks
-  const topChallenges: Challenge[] = gamificationData.topChallenges || [];
-  const badgeLevels = gamificationData.badgeLevels || [];
+  const topChallenges = gamificationData.challenges || [];
+  const badgeLevels = gamificationData.badgeLevels || [
+    { level: "bronze", count: 245 },
+    { level: "silver", count: 120 },
+    { level: "gold", count: 45 }
+  ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -39,12 +42,10 @@ const GamificationTab: React.FC<GamificationTabProps> = ({ gamificationData, isL
           <div className="space-y-4">
             {topChallenges.map((challenge, index) => (
               <div key={index} className="flex items-center justify-between mb-2">
-                <span className="font-medium">
-                  {challenge.name || challenge.title}
-                </span>
-                <span className="text-muted-foreground">
-                  {challenge.completions || 0} complétions
-                </span>
+                <div className="flex flex-col gap-1">
+                  <span className="font-medium">{challenge.title || challenge.name}</span>
+                  <span className="text-muted-foreground text-sm">{challenge.completions || 0} completions</span>
+                </div>
               </div>
             ))}
           </div>

@@ -20,98 +20,103 @@ const {
 
 const UserDashboard: React.FC = () => {
   // Mock data for dashboard
-  const challenges: Challenge[] = [
+  const userChallenges = [
     {
-      id: '1',
-      title: 'Journal quotidien',
-      description: 'Écrivez dans votre journal aujourd\'hui',
-      category: 'daily',
-      points: 50,
+      id: "1",
+      title: "Méditation quotidienne",
+      name: "Méditation quotidienne",
+      description: "Méditez pendant 5 minutes",
+      category: "daily",
+      points: 10,
       progress: 0,
-      completed: false,
-      isDaily: true
+      completions: 0,
+      status: "active" as const
     },
     {
-      id: '2',
-      title: '3 séances de musique',
-      description: 'Écoutez 3 séances de musique cette semaine',
-      category: 'weekly',
-      points: 100,
+      id: "2",
+      title: "Journal hebdomadaire",
+      name: "Journal hebdomadaire",
+      description: "Complétez 3 entrées de journal cette semaine",
+      category: "weekly",
+      points: 30,
       progress: 33,
-      completed: false,
-      isWeekly: true
+      completions: 1,
+      status: "active" as const
     },
     {
-      id: '3',
-      title: 'Séance de VR complète',
-      description: 'Terminez une séance de réalité virtuelle',
-      category: 'special',
-      points: 150,
-      progress: 0,
-      completed: false,
-      status: 'active'
+      id: "3",
+      title: "Quête mensuelle",
+      name: "Quête mensuelle",
+      description: "Atteignez 500 points ce mois-ci",
+      category: "monthly",
+      points: 50,
+      progress: 60,
+      completions: 0,
+      status: "active" as const
     }
   ];
 
-  const badges = [
+  const userProgress = 250;
+
+  const userBadges = normalizeBadges([
     {
-      id: '1',
-      name: 'Débutant',
-      description: 'Premier pas sur la plateforme',
-      image: '/badges/beginner.png',
-      category: 'progress',
-      tier: 'bronze' as const,
-      unlockedAt: '2023-04-01',
+      id: "1",
+      name: "Premier pas",
+      description: "Premier jour sur la plateforme",
+      image: "/badges/first-day.svg",
+      category: "milestone",
+      tier: "bronze",
+      unlockedAt: "2023-05-10T12:00:00Z",
       completed: true
     },
     {
-      id: '2',
-      name: 'Journal émotionnel',
-      description: 'Écrit dans le journal 5 jours consécutifs',
-      image: '/badges/journal.png',
-      category: 'journal',
-      tier: 'silver' as const,
-      unlockedAt: '2023-04-15',
+      id: "2",
+      name: "Journal émotionnel",
+      description: "Écrit dans le journal 5 jours consécutifs",
+      image: "/badges/journal.png",
+      category: "journal",
+      tier: "silver",
+      unlockedAt: "2023-04-15",
       completed: true
     },
     {
-      id: '3',
-      name: 'Mélomane',
-      description: 'Écoute 10 sessions de musique différentes',
-      image: '/badges/music.png',
-      category: 'music',
-      tier: 'gold' as const,
+      id: "3",
+      name: "Mélomane",
+      description: "Écoute 10 sessions de musique différentes",
+      image: "/badges/music.png",
+      category: "music",
+      tier: "gold",
       progress: 70,
       completed: false
     }
-  ];
+  ]);
 
   const leaderboard = [
     {
-      id: '1',
-      userId: '1',
-      name: 'Thomas',
-      avatar: '/avatars/thomas.jpg',
+      id: "1",
+      userId: "1",
+      name: "Thomas",
+      avatar: "/avatars/thomas.jpg",
       points: 1250,
       rank: 1,
       level: 5,
       isCurrentUser: false
     },
     {
-      id: '2',
-      userId: '2',
-      name: 'Marie',
-      avatar: '/avatars/marie.jpg',
+      id: "2",
+      userId: "2",
+      name: "Marie",
+      avatar: "/avatars/marie.jpg",
       points: 980,
       rank: 2,
       level: 4,
       isCurrentUser: true
     },
     {
-      id: '3',
-      userId: '3',
-      name: 'Julien',
-      avatar: '/avatars/julien.jpg',
+      id: "3",
+      userId: "3",
+      name: "Julien",
+      avatar: "/avatars/julien.jpg",
       points: 760,
       rank: 3,
       level: 3,
@@ -122,17 +127,17 @@ const UserDashboard: React.FC = () => {
   const userStat: GamificationStats = {
     points: 980,
     level: 4,
-    badges: badges,
+    badges: userBadges,
     completedChallenges: 24,
     totalChallenges: 35,
-    challenges: challenges,
+    challenges: userChallenges,
     streak: 5,
     nextLevel: {
       points: 1200,
       rewards: ["Badge Premium", "Accès VIP"],
       level: 5
     },
-    progress: 75,
+    progress: userProgress,
     leaderboard: leaderboard
   };
 
@@ -232,10 +237,9 @@ const UserDashboard: React.FC = () => {
               </CardContent>
             </Card>
             <BadgesWidget 
-              badges={badges}
-              title="Badges récents"
-              showSeeAll={true}
-              onSeeAll={() => console.log('View all badges')} 
+              badges={normalizeBadges(visibleBadges)}
+              showSeeAll={userBadges.length > 3}
+              onSeeAll={() => navigate('/gamification')}
             />
           </div>
         </TabsContent>

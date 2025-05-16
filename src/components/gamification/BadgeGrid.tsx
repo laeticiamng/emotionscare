@@ -1,69 +1,54 @@
-
 import React from 'react';
-import { Badge } from '@/types';
-import { Award, Lock } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Card, CardContent } from '@/components/ui/card';
+import { Lock } from 'lucide-react';
+
+// Use the badge normalization utility
+import { normalizeBadge, normalizeBadges } from '@/utils/badgeUtils';
 
 interface BadgeGridProps {
-  badges: Badge[];
+  badges: any[];
   className?: string;
-  emptyMessage?: string;
 }
 
-const BadgeGrid: React.FC<BadgeGridProps> = ({
-  badges,
-  className,
-  emptyMessage = "Aucun badge débloqué pour le moment"
-}) => {
-  if (!badges || badges.length === 0) {
-    return (
-      <div className="text-center text-muted-foreground py-8">
-        {emptyMessage}
-      </div>
-    );
-  }
-
-  const getBadgeImageUrl = (badge: Badge): string | undefined => {
-    return badge.imageUrl || badge.image_url || badge.image || badge.icon_url;
-  };
-
+export const BadgeGrid: React.FC<BadgeGridProps> = ({ badges, className = '' }) => {
   return (
-    <div className={cn("grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4", className)}>
-      {badges.map((badge) => (
-        <div key={badge.id} className="flex flex-col items-center text-center">
-          <div className={`relative h-16 w-16 rounded-full flex items-center justify-center mb-2 ${
-            badge.unlocked ? 'bg-primary/10 border-2 border-primary/30' : 'bg-muted border border-muted-foreground/20'
-          }`}>
-            {getBadgeImageUrl(badge) ? (
-              <img 
-                src={getBadgeImageUrl(badge)} 
-                alt={badge.name} 
-                className="h-10 w-10 object-contain"
-              />
-            ) : (
-              <Award 
-                className={`h-8 w-8 ${badge.unlocked ? 'text-primary' : 'text-muted-foreground/60'}`}
-              />
-            )}
-            
-            {!badge.unlocked && (
-              <div className="absolute -right-1 -top-1 bg-background rounded-full p-0.5">
-                <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+    <Card className={className}>
+      <CardContent className="grid gap-4 grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+        {badges.map((badge, index) => {
+          // Replace image_url with imageUrl
+          const badgeImage = badge.imageUrl || badge.image || badge.image_url || badge.icon_url || '/badges/placeholder.svg';
+
+          // Replace unlocked with completed or unlockedAt check
+          const isUnlocked = badge.completed || badge.unlocked || !!badge.unlockedAt;
+
+          return (
+            <div key={badge.id} className="relative">
+              {/* Replace unlocked with completed or unlockedAt check */}
+              <div className={`${isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'} transition-all`}>
+                <img
+                  src={badgeImage}
+                  alt={badge.name}
+                  className="w-full aspect-square rounded-xl object-cover"
+                />
               </div>
-            )}
-          </div>
-          
-          <h3 className="text-sm font-medium">{badge.name}</h3>
-          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{badge.description}</p>
-          
-          {badge.level !== undefined && (
-            <span className="mt-2 inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold">
-              {badge.level}
-            </span>
-          )}
-        </div>
-      ))}
-    </div>
+
+              {/* Replace unlocked with completed or unlockedAt check */}
+              {!isUnlocked && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-xl">
+                  <Lock className="h-6 w-6 text-white" />
+                </div>
+              )}
+
+              <div className="absolute bottom-0 left-0 w-full bg-black/50 text-white text-xs p-1 rounded-b-xl">
+                {/* Replace level with tier if needed */}
+                <span className="font-medium">{badge.name}</span>
+                <span className="block text-muted-foreground">{badge.tier || 'bronze'}</span>
+              </div>
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
   );
 };
 

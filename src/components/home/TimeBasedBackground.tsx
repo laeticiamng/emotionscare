@@ -1,65 +1,48 @@
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { TimeOfDay, determineTimeOfDay } from '@/constants/defaults';
+import React, { useEffect, useState } from 'react';
+import { determineTimeOfDay } from '@/constants/defaults';
 
 interface TimeBasedBackgroundProps {
   children: React.ReactNode;
   className?: string;
 }
 
-export const TimeBasedBackground: React.FC<TimeBasedBackgroundProps> = ({ children, className = '' }) => {
-  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(determineTimeOfDay());
-
+export const TimeBasedBackground: React.FC<TimeBasedBackgroundProps> = ({
+  children,
+  className = '',
+}) => {
+  const [timeOfDay, setTimeOfDay] = useState(determineTimeOfDay());
+  
   useEffect(() => {
-    // Update based on time of day
-    setTimeOfDay(determineTimeOfDay());
-
-    // Update every 15 minutes
-    const intervalId = setInterval(() => {
+    // Update the time of day every hour
+    const interval = setInterval(() => {
       setTimeOfDay(determineTimeOfDay());
-    }, 15 * 60 * 1000);
-
-    return () => clearInterval(intervalId);
+    }, 60 * 60 * 1000);
+    
+    return () => clearInterval(interval);
   }, []);
-
+  
+  const getBackgroundStyle = () => {
+    switch (timeOfDay) {
+      case 'morning':
+        return 'bg-gradient-to-br from-blue-50 via-amber-50 to-blue-100 dark:from-blue-950/50 dark:via-blue-900/30 dark:to-indigo-950/40';
+      case 'afternoon':
+        return 'bg-gradient-to-br from-blue-100 via-sky-100 to-indigo-100 dark:from-blue-900/40 dark:via-purple-900/20 dark:to-blue-900/30';
+      case 'evening':
+        return 'bg-gradient-to-br from-purple-100 via-pink-100 to-amber-100 dark:from-purple-950/50 dark:via-blue-950/30 dark:to-indigo-950/40';
+      case 'night':
+        return 'bg-gradient-to-br from-slate-100 via-blue-100 to-slate-200 dark:from-slate-950 dark:via-blue-950/30 dark:to-slate-900';
+      default:
+        return 'bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/50 dark:to-indigo-900/30';
+    }
+  };
+  
   return (
-    <div 
-      className={`min-h-screen w-full relative overflow-hidden transition-colors duration-1000 
-        ${timeOfDay === TimeOfDay.MORNING ? 'bg-morning' : 
-          timeOfDay === TimeOfDay.AFTERNOON ? 'bg-afternoon' : 
-          timeOfDay === TimeOfDay.EVENING ? 'bg-evening' : 
-          'bg-night'} ${className}`}
-    >
-      {/* Background animation elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ 
-            opacity: [0.1, 0.2, 0.1], 
-            scale: [1, 1.1, 1],
-            x: ['-10%', '5%', '-10%'],
-            y: ['-10%', '5%', '-10%']
-          }}
-          transition={{ duration: 30, repeat: Infinity, repeatType: "reverse" }}
-          className="absolute -top-[30%] -left-[20%] w-[80%] h-[80%] rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 blur-3xl"
-        />
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ 
-            opacity: [0.1, 0.15, 0.1], 
-            scale: [0.9, 1.1, 0.9],
-            x: ['10%', '-5%', '10%'],
-            y: ['20%', '5%', '20%']
-          }}
-          transition={{ duration: 25, repeat: Infinity, repeatType: "reverse", delay: 1 }}
-          className="absolute -bottom-[30%] -right-[20%] w-[70%] h-[70%] rounded-full bg-gradient-to-r from-secondary/10 to-primary/10 blur-3xl"
-        />
+    <div className={`min-h-screen ${getBackgroundStyle()} ${className}`}>
+      <div className="absolute inset-0 bg-background/10 backdrop-blur-[2px]"></div>
+      <div className="relative z-10">
+        {children}
       </div>
-      
-      {children}
     </div>
   );
 };
-
-export default TimeBasedBackground;

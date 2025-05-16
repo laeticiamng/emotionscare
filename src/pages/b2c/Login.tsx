@@ -11,7 +11,7 @@ import { TimeBasedBackground } from '@/components/home/TimeBasedBackground';
 import { WelcomeMessage } from '@/components/home/WelcomeMessage';
 import { VoiceCommandButton } from '@/components/home/voice/VoiceCommandButton';
 import { AudioController } from '@/components/home/audio/AudioController';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function B2CLogin() {
@@ -23,7 +23,7 @@ export default function B2CLogin() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Preload dashboard in the background
+    // Preload dashboard in the background for faster transition
     const link = document.createElement('link');
     link.rel = 'prefetch';
     link.href = '/b2c/dashboard';
@@ -137,15 +137,18 @@ export default function B2CLogin() {
                   transition={{ delay: 0.4, duration: 0.7 }}
                 >
                   <Label htmlFor="email">Email</Label>
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="votre@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="bg-background/60"
-                  />
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      placeholder="votre@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10 bg-background/60"
+                      required
+                    />
+                  </div>
                 </motion.div>
                 <motion.div 
                   className="space-y-2"
@@ -160,13 +163,14 @@ export default function B2CLogin() {
                     </Link>
                   </div>
                   <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
                       id="password" 
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10 bg-background/60"
                       required
-                      className="bg-background/60"
                     />
                     <Button 
                       type="button"

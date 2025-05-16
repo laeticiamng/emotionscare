@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent } from "@/components/ui";
@@ -94,6 +93,59 @@ const AdminDashboard: React.FC = () => {
       { level: "Gold", count: 23 }
     ]
   };
+
+  // Update challenge definitions to include status
+  const challenges = [
+    {
+      id: "1",
+      title: "Méditation quotidienne",
+      name: "Méditation quotidienne",
+      description: "Faites 10 minutes de méditation chaque jour cette semaine",
+      points: 50,
+      progress: 65,
+      completed: false,
+      completions: 45,
+      category: "daily",
+      goal: 100,
+      total: 150,
+      status: "active" as const
+    },
+    {
+      id: "2",
+      title: "Journal émotionnel",
+      name: "Journal émotionnel",
+      description: "Complétez votre journal émotionnel 5 jours de suite",
+      points: 100,
+      progress: 40,
+      completed: false,
+      completions: 32,
+      category: "weekly",
+      goal: 50,
+      total: 125,
+      status: "active" as const
+    },
+    {
+      id: "3",
+      title: "Scan bien-être",
+      name: "Scan bien-être",
+      description: "Réalisez 3 scans bien-être cette semaine",
+      points: 75,
+      progress: 90,
+      completed: false,
+      completions: 67,
+      category: "special",
+      goal: 75,
+      total: 80,
+      status: "active" as const
+    }
+  ];
+
+  // Update badgeLevels to use the correct type
+  const badgeLevels = [
+    { level: "bronze", count: 245 },
+    { level: "silver", count: 120 },
+    { level: "gold", count: 45 }
+  ];
 
   useEffect(() => {
     async function loadDashboardData() {

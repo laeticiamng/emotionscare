@@ -1,84 +1,79 @@
-
 import React, { useState } from 'react';
-import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ChartTooltip, ChartTooltipContent, ChartInteractiveLegend } from '@/components/ui/chart';
-
-interface ProductivityChartData {
-  date: string;
-  value: number;
-}
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { ChartTooltip } from '@/components/ui/chart/ChartTooltip';
+import { ChartTooltipContent } from '@/components/ui/chart/ChartTooltipContent';
+import { ChartInteractiveLegend } from '@/components/ui/chart/ChartInteractiveLegend';
 
 interface ProductivityChartProps {
-  data: ProductivityChartData[];
+  className?: string;
 }
 
-const ProductivityChart: React.FC<ProductivityChartProps> = ({ data }) => {
+const data = [
+  { date: '01/01', series1: 400, series2: 240 },
+  { date: '01/08', series1: 300, series2: 139 },
+  { date: '01/15', series1: 200, series2: 980 },
+  { date: '01/22', series1: 278, series2: 390 },
+  { date: '01/29', series1: 189, series2: 480 },
+  { date: '02/05', series1: 239, series2: 380 },
+  { date: '02/12', series1: 349, series2: 430 },
+];
+
+const CustomTooltip: React.FC = () => {
+  return (
+    <ChartTooltipContent />
+  );
+};
+
+export const ProductivityChart: React.FC<ProductivityChartProps> = ({ className }) => {
   const [hiddenSeries, setHiddenSeries] = useState<string[]>([]);
 
-  const toggleSeries = (dataKey: string, isHidden: boolean) => {
-    if (isHidden) {
-      setHiddenSeries(prev => [...prev, dataKey]);
-    } else {
-      setHiddenSeries(prev => prev.filter(key => key !== dataKey));
-    }
+  const handleToggleSeries = (dataKey: string, isHidden: boolean) => {
+    setHiddenSeries(prev => isHidden ? [...prev, dataKey] : prev.filter(key => key !== dataKey));
   };
 
   return (
-    <Card className="col-span-1">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-base font-medium">Index de productivité</CardTitle>
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle>Productivité</CardTitle>
+        <CardDescription>Aperçu de la productivité hebdomadaire</CardDescription>
       </CardHeader>
-      <CardContent className="px-2">
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={data}
-              margin={{
-                top: 5,
-                right: 10,
-                left: -25,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.3} />
-              <XAxis dataKey="date" stroke="var(--muted-foreground)" fontSize={12} tickLine={false} />
-              <YAxis stroke="var(--muted-foreground)" fontSize={12} tickLine={false} />
-              <Tooltip
-                content={(props) => (
-                  <ChartTooltip>
-                    <ChartTooltipContent 
-                      active={props.active} 
-                      payload={props.payload} 
-                      label={props.label}
-                      labelFormatter={(label) => `Date: ${label}`}
-                      valueFormatter={(value) => `${value}`}
-                    />
-                  </ChartTooltip>
-                )}
-              />
-              <Line
-                type="monotone"
-                dataKey="value"
-                name="Productivité"
-                stroke="var(--accent)"
-                dot={true}
-                hide={hiddenSeries.includes("value")}
-                activeDot={{ r: 6, stroke: "var(--background)", strokeWidth: 2 }}
-              />
-              <ChartInteractiveLegend
-                onToggleSeries={toggleSeries}
-                hiddenSeries={hiddenSeries}
-                verticalAlign="top"
-                align="center"
-                layout="horizontal"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+      <CardContent className="pl-2">
+        <ResponsiveContainer width="100%" height={300}>
+          <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            
+            <ChartTooltip content={<CustomTooltip />} />
+            
+            <Area
+              type="monotone"
+              dataKey="series1"
+              stroke="#8884d8"
+              fill="#8884d8"
+              name="Série 1"
+              hidden={hiddenSeries.includes('series1')}
+            />
+            <Area
+              type="monotone"
+              dataKey="series2"
+              stroke="#82ca9d"
+              fill="#82ca9d"
+              name="Série 2"
+              hidden={hiddenSeries.includes('series2')}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+        
+        <ChartInteractiveLegend 
+          onToggleSeries={handleToggleSeries} 
+          hiddenSeries={hiddenSeries} 
+          verticalAlign="bottom"
+          align="center"
+          layout="horizontal"
+        />
       </CardContent>
     </Card>
   );
 };
-
-export default ProductivityChart;

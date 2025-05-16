@@ -1,123 +1,200 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Headphones } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import { useToast } from '@/hooks/use-toast';
-import { TimeOfDay, determineTimeOfDay } from '@/constants/defaults';
+import { Music, Volume2, VolumeX } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface AudioControllerProps {
+  initialVolume?: number;
+  autoplay?: boolean;
   minimal?: boolean;
   className?: string;
-  autoplay?: boolean;
-  initialVolume?: number;
 }
 
 export const AudioController: React.FC<AudioControllerProps> = ({
+  initialVolume = 0.5,
+  autoplay = false,
   minimal = false,
   className = '',
-  autoplay = false,
-  initialVolume = 0.5
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(autoplay);
   const [volume, setVolume] = useState(initialVolume);
-  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(determineTimeOfDay());
-  const { toast } = useToast();
+  const [isMuted, setIsMuted] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  
+  // Demo audio URLs - in production would be from a proper audio service
+  const ambientTracks = [
+    'https://cdn.pixabay.com/download/audio/2022/03/15/audio_8cb749d484.mp3?filename=peaceful-garden-healing-light-piano-for-meditation-yoga-spa-zen-32999.mp3',
+    'https://cdn.pixabay.com/download/audio/2022/07/18/audio_62e918df4c.mp3?filename=emotional-piano-141356.mp3',
+    'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d16737dc28.mp3?filename=relaxing-mountains-rivers-meditation-music-22530.mp3'
+  ];
+  
+  // Select a track based on the time of day
+  const getTimeBasedTrack = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return ambientTracks[0]; // Morning
+    if (hour >= 12 && hour < 17) return ambientTracks[1]; // Afternoon
+    return ambientTracks[2]; // Evening/Night
+  };
 
   useEffect(() => {
-    // Initialize audio context on first user interaction
-    const handleFirstInteraction = () => {
-      if (audioContext) return;
+    // Create audio element if it doesn't exist
+    if (!audioRef.current) {
+      const audio = new Audio(getTimeBasedTrack());
+      audio.volume = initialVolume;
+      audio.loop = true;
+      audioRef.current = audio;
       
-      try {
-        const context = new (window.AudioContext || (window as any).webkitAudioContext)();
-        setAudioContext(context);
-        
-        if (autoplay) {
-          setIsPlaying(true);
+      // Handle autoplay
+      if (autoplay) {
+        const playPromise = audio.play();
+        if (playPromise) {
+          playPromise.catch(() => {
+            // Autoplay was prevented, update state
+            setIsPlaying(false);
+          });
         }
-        
-        document.removeEventListener('click', handleFirstInteraction);
-        document.removeEventListener('touchstart', handleFirstInteraction);
-      } catch (error) {
-        console.error("Error initializing audio context:", error);
       }
-    };
-    
-    document.addEventListener('click', handleFirstInteraction);
-    document.addEventListener('touchstart', handleFirstInteraction);
+    }
     
     return () => {
-      document.removeEventListener('click', handleFirstInteraction);
-      document.removeEventListener('touchstart', handleFirstInteraction);
+      // Clean up on component unmount
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
     };
-  }, [audioContext, autoplay]);
-
+  }, [autoplay, initialVolume]);
+  
   useEffect(() => {
-    // Update music based on time of day
-    setTimeOfDay(determineTimeOfDay());
-  }, []);
-
+    // Update audio volume when volume state changes
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted]);
+  
   const togglePlayback = () => {
-    // In a real implementation, this would control the Music Generator API
-    setIsPlaying(!isPlaying);
-    
-    if (!isPlaying) {
-      // Starting music
-      toast({
-        title: "Ambiance musicale",
-        description: "Votre musique personnalisée est en cours de lecture.",
-      });
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        const playPromise = audioRef.current.play();
+        if (playPromise) {
+          playPromise.catch((error) => {
+            console.error("Playback error:", error);
+          });
+        }
+      }
+      setIsPlaying(!isPlaying);
     }
   };
-
-  const handleVolumeChange = (newVolume: number[]) => {
-    setVolume(newVolume[0]);
-    // In a real implementation, adjust the volume of the Music Generator API
+  
+  const toggleMute = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
   };
-
+  
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0]);
+    if (isMuted && value[0] > 0) {
+      setIsMuted(false);
+      if (audioRef.current) {
+        audioRef.current.muted = false;
+      }
+    }
+  };
+  
   if (minimal) {
     return (
-      <Button 
-        onClick={togglePlayback}
-        variant="ghost" 
-        size="icon"
-        className={className}
+      <div 
+        className={cn("relative", className)}
+        onMouseEnter={() => setExpanded(true)}
+        onMouseLeave={() => setExpanded(false)}
       >
-        {isPlaying ? (
-          <Headphones className="h-5 w-5 text-primary" />
-        ) : (
-          <Headphones className="h-5 w-5 text-muted-foreground" />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={togglePlayback}
+          className={`${isPlaying ? 'text-primary' : 'text-muted-foreground'}`}
+        >
+          <Music className="h-4 w-4" />
+          <span className="sr-only">{isPlaying ? 'Pause' : 'Play'} ambiance</span>
+        </Button>
+        
+        {expanded && (
+          <div className="absolute right-0 top-10 z-50 bg-background/80 backdrop-blur-md border rounded-lg p-3 shadow-lg flex flex-col items-center gap-2 w-48">
+            <Button
+              variant={isPlaying ? "default" : "outline"}
+              size="sm"
+              onClick={togglePlayback}
+              className="w-full"
+            >
+              {isPlaying ? 'Pause' : 'Play'}
+            </Button>
+            <div className="flex items-center gap-2 w-full">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleMute}
+                className="flex-shrink-0"
+              >
+                {isMuted || volume === 0 ? (
+                  <VolumeX className="h-4 w-4 text-muted-foreground" />
+                ) : (
+                  <Volume2 className="h-4 w-4" />
+                )}
+              </Button>
+              <Slider
+                value={[volume]}
+                max={1}
+                step={0.01}
+                onValueChange={handleVolumeChange}
+                className="flex-1"
+              />
+            </div>
+          </div>
         )}
-      </Button>
+      </div>
     );
   }
-
+  
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <Button 
+    <div className={cn("flex items-center gap-2", className)}>
+      <Button
+        variant={isPlaying ? "default" : "outline"}
         onClick={togglePlayback}
-        variant="outline" 
-        size="icon" 
-        className="rounded-full h-8 w-8"
+        size="sm"
+        className="flex-shrink-0"
       >
-        {isPlaying ? (
-          <Volume2 className="h-4 w-4" />
-        ) : (
-          <VolumeX className="h-4 w-4" />
-        )}
+        <Music className="mr-2 h-4 w-4" />
+        {isPlaying ? 'Pause' : 'Play'}
       </Button>
-
-      {isPlaying && (
+      
+      <div className="flex items-center gap-2 min-w-[150px]">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleMute}
+          className="flex-shrink-0"
+        >
+          {isMuted || volume === 0 ? (
+            <VolumeX className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <Volume2 className="h-4 w-4" />
+          )}
+        </Button>
         <Slider
-          defaultValue={[volume]}
+          value={[volume]}
           max={1}
           step={0.01}
           onValueChange={handleVolumeChange}
-          className="w-24 h-2"
+          className="flex-1"
         />
-      )}
+      </div>
     </div>
   );
 };
