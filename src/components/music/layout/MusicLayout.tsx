@@ -4,7 +4,7 @@ import { useMusic } from '@/contexts/music';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle } from 'lucide-react';
-import MusicPlayer from '../MusicPlayer';
+import MusicPlayer from '../player/MusicPlayer';
 
 interface MusicLayoutProps {
   children: React.ReactNode;
@@ -33,7 +33,7 @@ const MusicLayout: React.FC<MusicLayoutProps> = ({ children }) => {
       <Alert variant="destructive" className="max-w-md mx-auto my-8">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Erreur: {error}. Veuillez actualiser la page ou vérifier les paramètres de votre navigateur.
+          Erreur: {error.toString()}. Veuillez actualiser la page ou vérifier les paramètres de votre navigateur.
         </AlertDescription>
       </Alert>
     );

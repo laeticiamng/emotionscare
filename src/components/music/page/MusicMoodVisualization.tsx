@@ -1,84 +1,95 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Slider } from '@/components/ui/slider';
+import { useMusic } from '@/contexts/music';
 import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
+import { Volume2 } from 'lucide-react';
 
 interface MusicMoodVisualizationProps {
-  mood: string;
-  intensity?: number; // 0-100
-  height?: number;
-  volume?: number;
+  mood?: string;
+  intensity?: number;
+  showControls?: boolean;
 }
 
 const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({
-  mood,
-  intensity = 50,
-  height = 160,
-  volume = 0.5
+  mood = 'calm',
+  intensity = 0.5,
+  showControls = true
 }) => {
-  // Map moods to colors and patterns
-  const getMoodStyles = () => {
-    switch (mood.toLowerCase()) {
-      case 'happy':
-        return {
-          primaryColor: '#FDE68A', // Yellow
-          secondaryColor: '#FBBF24', 
-          background: 'radial-gradient(circle at center, #FDE68A 0%, #FBBF24 100%)',
-          animation: 'pulse 3s infinite'
-        };
-      case 'calm':
-        return {
-          primaryColor: '#93C5FD', // Light blue
-          secondaryColor: '#3B82F6',
-          background: 'linear-gradient(135deg, #93C5FD 0%, #3B82F6 100%)',
-          animation: 'wave 6s infinite ease-in-out'
-        };
-      case 'focused':
-        return {
-          primaryColor: '#A78BFA', // Purple
-          secondaryColor: '#7C3AED',
-          background: 'linear-gradient(90deg, #A78BFA 0%, #7C3AED 100%)',
-          animation: 'pulse 4s infinite alternate'
-        };
-      case 'energetic':
-        return {
-          primaryColor: '#FCA5A5', // Red
-          secondaryColor: '#EF4444',
-          background: 'radial-gradient(circle at center, #FCA5A5 0%, #EF4444 100%)',
-          animation: 'bounce 2s infinite'
-        };
-      case 'melancholic':
-        return {
-          primaryColor: '#6B7280', // Gray
-          secondaryColor: '#4B5563',
-          background: 'linear-gradient(180deg, #6B7280 0%, #4B5563 100%)',
-          animation: 'slowPulse 8s infinite'
-        };
-      default:
-        return {
-          primaryColor: '#D1D5DB', // Default gray
-          secondaryColor: '#9CA3AF',
-          background: 'linear-gradient(135deg, #D1D5DB 0%, #9CA3AF 100%)',
-          animation: 'none'
-        };
-    }
-  };
-
-  const styles = getMoodStyles();
+  const { volume, setVolume, isPlaying, currentEmotion } = useMusic();
+  const [visualizerHeight, setVisualizerHeight] = useState(200);
+  const [activeMood, setActiveMood] = useState(mood);
+  const [activeIntensity, setActiveIntensity] = useState(intensity);
   
-  // Adjust animation speed based on intensity
-  const animationDuration = Math.max(1, 10 - intensity / 10); // 1-10 seconds inverse to intensity
+  // Use the current emotion from context if available
+  useEffect(() => {
+    if (currentEmotion) {
+      setActiveMood(currentEmotion);
+    }
+  }, [currentEmotion]);
+  
+  // Adjust visualizer height based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setVisualizerHeight(140);
+      } else {
+        setVisualizerHeight(200);
+      }
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // If there's music playing, visualize it
+  const isActive = isPlaying;
+  
+  // Get mood color based on mood
+  const getMoodColor = (mood: string): string => {
+    const colors: Record<string, string> = {
+      calm: 'bg-blue-500/20',
+      happy: 'bg-yellow-500/20',
+      sad: 'bg-purple-500/20',
+      angry: 'bg-red-500/20',
+      focus: 'bg-green-500/20'
+    };
+    
+    return colors[mood.toLowerCase()] || 'bg-blue-500/20';
+  };
   
   return (
-    <Card className="overflow-hidden">
+    <Card className={`w-full overflow-hidden ${getMoodColor(activeMood)}`}>
       <CardContent className="p-0">
-        <EnhancedMusicVisualizer 
-          mood={mood}
-          height={height}
-          showControls={false}
-          intensity={intensity} 
-          volume={volume}
-        />
+        <div className="relative">
+          <EnhancedMusicVisualizer 
+            mood={activeMood}
+            height={visualizerHeight}
+            showControls={false}
+            intensity={activeIntensity}
+            volume={volume}
+          />
+          
+          {showControls && (
+            <div className="absolute bottom-4 left-4 right-4">
+              <div className="bg-background/80 backdrop-blur-sm p-3 rounded-lg flex items-center gap-3">
+                <Volume2 className="h-4 w-4 text-muted-foreground" />
+                <Slider
+                  value={[volume * 100]}
+                  max={100}
+                  step={1}
+                  onValueChange={(values) => setVolume(values[0] / 100)}
+                  className="flex-1"
+                />
+                <span className="text-xs text-muted-foreground w-8 text-right">
+                  {Math.round(volume * 100)}%
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

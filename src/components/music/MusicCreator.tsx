@@ -1,98 +1,81 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useMusic } from '@/contexts/music';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Music, Wand2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { MusicTrack } from '@/types/music';
-import { useMusic } from '@/contexts/MusicContext';
+import { useToast } from '@/hooks/use-toast';
 
 const MusicCreator: React.FC = () => {
   const { playTrack } = useMusic();
+  const { toast } = useToast();
   const [generating, setGenerating] = useState(false);
-  const [intensity, setIntensity] = useState(50);
-  const [emotion, setEmotion] = useState('calm');
-  
-  const emotions = [
-    { value: 'calm', label: 'Calme' },
-    { value: 'happy', label: 'Joyeux' },
-    { value: 'focus', label: 'Concentration' },
-    { value: 'energetic', label: 'Énergique' },
-    { value: 'melancholic', label: 'Mélancolique' }
-  ];
+  const [prompt, setPrompt] = useState('');
   
   const handleGenerate = () => {
+    if (!prompt.trim()) {
+      toast({
+        title: 'Prompt requis',
+        description: 'Veuillez entrer une description pour générer de la musique',
+        variant: 'warning'
+      });
+      return;
+    }
+    
     setGenerating(true);
     
-    // Simulate AI music generation
+    // Demo: Mock generation that takes 2 seconds
     setTimeout(() => {
-      const newTrack: MusicTrack = {
-        id: `generated-${Date.now()}`,
-        title: `${emotions.find(e => e.value === emotion)?.label || 'Generated'} Music`,
-        artist: 'AI Composer',
+      // Create a mock track
+      const track: MusicTrack = {
+        id: `gen-${Date.now()}`,
+        title: `Musique basée sur "${prompt.slice(0, 20)}${prompt.length > 20 ? '...' : ''}"`,
+        artist: 'IA Compositeur',
         duration: 180,
-        audioUrl: '/sample-audio.mp3',
-        coverUrl: '/music-cover-placeholder.jpg',
-        emotionalTone: emotion
+        url: '/sounds/ambient-calm.mp3',
+        audioUrl: '/sounds/ambient-calm.mp3', 
+        coverUrl: '/images/tracks/generated.jpg',
+        emotionalTone: 'calm'
       };
       
-      playTrack(newTrack);
+      // Play the generated track
+      playTrack(track);
+      
+      toast({
+        title: 'Musique générée',
+        description: 'Votre musique personnalisée est maintenant en lecture',
+        variant: 'success'
+      });
+      
       setGenerating(false);
+      setPrompt('');
     }, 2000);
   };
   
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Music className="h-5 w-5" />
-          Créer une musique personnalisée
-        </CardTitle>
+        <CardTitle>Créer de la Musique avec l'IA</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Émotion</label>
-          <Select 
-            value={emotion} 
-            onValueChange={setEmotion}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Choisissez une émotion" />
-            </SelectTrigger>
-            <SelectContent>
-              {emotions.map(emotion => (
-                <SelectItem key={emotion.value} value={emotion.value}>
-                  {emotion.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <label className="text-sm font-medium">Intensité</label>
-            <span className="text-sm text-muted-foreground">{intensity}%</span>
-          </div>
-          <Slider
-            value={[intensity]}
-            min={10}
-            max={100}
-            step={10}
-            onValueChange={(values) => setIntensity(values[0])}
-          />
-        </div>
-        
+      <CardContent>
+        <Textarea
+          placeholder="Décrivez la musique que vous souhaitez créer... Par exemple : 'Une mélodie relaxante avec des sons de pluie et de piano doux'"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          className="min-h-[120px]"
+        />
+      </CardContent>
+      <CardFooter>
         <Button 
+          onClick={handleGenerate} 
           className="w-full" 
-          onClick={handleGenerate}
           disabled={generating}
         >
-          <Wand2 className="mr-2 h-4 w-4" />
           {generating ? 'Génération en cours...' : 'Générer une musique'}
         </Button>
-      </CardContent>
+      </CardFooter>
     </Card>
   );
 };

@@ -7,7 +7,7 @@ export function Toaster() {
   const { toasts } = useToast();
 
   React.useEffect(() => {
-    // Synchronize our toasts with sonner
+    // Synchronize our toasts with sonner, handling null or undefined toasts
     if (toasts && Array.isArray(toasts)) {
       toasts.forEach((toast) => {
         if (toast && toast.open) {

@@ -1,139 +1,165 @@
 
-import React from 'react';
-import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmotionTrendChartProps } from '@/types/emotion';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps, Legend } from 'recharts';
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
-export const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({ 
-  emotions, 
-  period = 'week' 
+// Sample data for the chart
+const emotionData = [
+  { date: '01/05', joy: 60, calm: 40, focus: 30, energy: 10, anxiety: 15 },
+  { date: '02/05', joy: 55, calm: 45, focus: 35, energy: 15, anxiety: 20 },
+  { date: '03/05', joy: 45, calm: 50, focus: 40, energy: 20, anxiety: 25 },
+  { date: '04/05', joy: 40, calm: 60, focus: 45, energy: 30, anxiety: 20 },
+  { date: '05/05', joy: 50, calm: 55, focus: 50, energy: 35, anxiety: 15 },
+  { date: '06/05', joy: 60, calm: 50, focus: 45, energy: 30, anxiety: 10 },
+  { date: '07/05', joy: 65, calm: 45, focus: 40, energy: 25, anxiety: 5 },
+];
+
+interface EmotionTrendChartProps {
+  title?: string;
+  description?: string;
+  data?: any[];
+  height?: number;
+}
+
+const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({
+  title = "Tendances Émotionnelles",
+  description = "Évolution de vos émotions ces 7 derniers jours",
+  data = emotionData,
+  height = 300
 }) => {
-  // Process data for chart
-  const processChartData = () => {
-    // Group by date
-    const groupedByDate: Record<string, any> = {};
-    
-    emotions.forEach(emotion => {
-      const date = emotion.date || (emotion.timestamp ? new Date(emotion.timestamp).toISOString().split('T')[0] : 'unknown');
-      
-      if (!groupedByDate[date]) {
-        groupedByDate[date] = {
-          date,
-          joy: 0,
-          anxiety: 0,
-          sadness: 0,
-          frustration: 0,
-          neutral: 0,
-          excitement: 0,
-          gratitude: 0,
-          calmness: 0
-        };
-      }
-      
-      // Increment the counter for this emotion
-      const emotionType = emotion.emotion || 'neutral';
-      groupedByDate[date][emotionType] = (groupedByDate[date][emotionType] || 0) + 1;
-    });
-    
-    // Convert to array and sort by date
-    return Object.values(groupedByDate).sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
+  const [timeRange, setTimeRange] = useState('week');
+  
+  // Colors for the emotions
+  const emotionColors = {
+    joy: '#F59E0B',     // Amber
+    calm: '#3B82F6',    // Blue
+    focus: '#10B981',   // Emerald
+    energy: '#EF4444',  // Red
+    anxiety: '#6366F1'  // Indigo
   };
 
-  const chartData = processChartData();
-  
-  const formatDate = (dateString: string) => {
-    if (!dateString || dateString === 'unknown') return 'N/A';
-    
-    const date = new Date(dateString);
-    
-    if (period === 'week') {
-      return new Intl.DateTimeFormat('fr-FR', { weekday: 'short' }).format(date);
-    } else if (period === 'month') {
-      return `${date.getDate()}/${date.getMonth() + 1}`;
-    } else {
-      return `${date.getMonth() + 1}/${date.getFullYear().toString().substring(2)}`;
+  // Custom tooltip
+  const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-background p-3 border rounded shadow-lg">
+          <p className="font-medium">{`${label}`}</p>
+          <div className="space-y-1 mt-2">
+            {payload.map((entry, index) => (
+              <div key={`item-${index}`} className="flex items-center gap-2">
+                <div 
+                  className="w-3 h-3 rounded-full" 
+                  style={{ backgroundColor: entry.color }}
+                ></div>
+                <span className="text-xs capitalize">{entry.name}: </span>
+                <span className="text-xs font-medium">{entry.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
     }
+    return null;
   };
-  
-  const getEmotionColor = (emotion: string): string => {
-    const colors: Record<string, string> = {
-      joy: '#22c55e',
-      neutral: '#6b7280',
-      anxiety: '#ef4444',
-      sadness: '#3b82f6',
-      frustration: '#f97316',
-      excitement: '#8b5cf6',
-      gratitude: '#f59e0b',
-      calmness: '#0ea5e9'
-    };
-    return colors[emotion] || '#6b7280';
-  };
-  
-  const getEmotionName = (emotion: string): string => {
-    const names: Record<string, string> = {
-      joy: 'Joie',
-      neutral: 'Neutre',
-      anxiety: 'Anxiété',
-      sadness: 'Tristesse',
-      frustration: 'Frustration',
-      excitement: 'Enthousiasme',
-      gratitude: 'Gratitude',
-      calmness: 'Calme'
-    };
-    return names[emotion] || emotion;
-  };
-
-  // Get all emotions that have data
-  const activeEmotions = ['joy', 'neutral', 'anxiety', 'sadness', 'frustration', 'excitement', 'gratitude', 'calmness']
-    .filter(emotion => 
-      chartData.some(day => day[emotion] > 0)
-    );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Tendance des émotions</CardTitle>
+    <Card className="w-full">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div className="space-y-1">
+          <CardTitle>{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
+        </div>
+        <Select
+          value={timeRange}
+          onValueChange={setTimeRange}
+        >
+          <SelectTrigger className="w-[130px]">
+            <SelectValue placeholder="Période" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="day">24 heures</SelectItem>
+            <SelectItem value="week">7 jours</SelectItem>
+            <SelectItem value="month">30 jours</SelectItem>
+          </SelectContent>
+        </Select>
       </CardHeader>
       <CardContent>
-        <div className="h-72">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart 
-              data={chartData} 
-              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-            >
-              <defs>
-                {activeEmotions.map(emotion => (
-                  <linearGradient key={emotion} id={`color-${emotion}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={getEmotionColor(emotion)} stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor={getEmotionColor(emotion)} stopOpacity={0.1}/>
-                  </linearGradient>
-                ))}
-              </defs>
-              <XAxis dataKey="date" tickFormatter={formatDate} />
-              <YAxis />
-              <CartesianGrid strokeDasharray="3 3" />
-              <Tooltip 
-                labelFormatter={formatDate}
-                formatter={(value, name) => [value, getEmotionName(name)]}
-              />
-              <Legend formatter={(value) => getEmotionName(value)} />
-              {activeEmotions.map(emotion => (
-                <Area 
-                  key={emotion}
-                  type="monotone" 
-                  dataKey={emotion} 
-                  name={emotion}
-                  stroke={getEmotionColor(emotion)} 
-                  fillOpacity={1}
-                  fill={`url(#color-${emotion})`} 
-                />
-              ))}
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+        <ResponsiveContainer width="100%" height={height}>
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+            <XAxis 
+              dataKey="date" 
+              tickLine={false} 
+              axisLine={false}
+              tick={{ fontSize: 12 }}
+            />
+            <YAxis 
+              tickLine={false} 
+              axisLine={false} 
+              tick={{ fontSize: 12 }}
+              domain={[0, 'dataMax + 10']}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend 
+              wrapperStyle={{ paddingTop: 15 }}
+              formatter={(value) => <span className="capitalize">{value}</span>}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="joy" 
+              name="Joie"
+              stroke={emotionColors.joy} 
+              fill={emotionColors.joy} 
+              fillOpacity={0.2} 
+              strokeWidth={2}
+              activeDot={{ r: 6 }}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="calm" 
+              name="Calme"
+              stroke={emotionColors.calm} 
+              fill={emotionColors.calm} 
+              fillOpacity={0.2} 
+              strokeWidth={2}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="focus" 
+              name="Concentration"
+              stroke={emotionColors.focus} 
+              fill={emotionColors.focus} 
+              fillOpacity={0.2} 
+              strokeWidth={2}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="energy" 
+              name="Énergie"
+              stroke={emotionColors.energy} 
+              fill={emotionColors.energy} 
+              fillOpacity={0.2} 
+              strokeWidth={2}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="anxiety" 
+              name="Anxiété"
+              stroke={emotionColors.anxiety} 
+              fill={emotionColors.anxiety} 
+              fillOpacity={0.2} 
+              strokeWidth={2}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </CardContent>
     </Card>
   );
 };
+
+export default EmotionTrendChart;

@@ -11,6 +11,7 @@ const MusicTabs = () => {
       title: "Calm Morning",
       artist: "Ambient Dreams",
       duration: 180,
+      url: "/sample-audio/calm-1.mp3",
       audioUrl: "/sample-audio/calm-1.mp3",
       coverUrl: "/images/music/calm-1.jpg",
       category: "calm"
@@ -20,6 +21,7 @@ const MusicTabs = () => {
       title: "Ocean Waves",
       artist: "Nature Sounds",
       duration: 240,
+      url: "/sample-audio/calm-2.mp3",
       audioUrl: "/sample-audio/calm-2.mp3",
       coverUrl: "/images/music/calm-2.jpg",
       category: "calm"

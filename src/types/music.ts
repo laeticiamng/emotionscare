@@ -5,9 +5,9 @@ export interface MusicTrack {
   title: string;
   artist: string;
   duration: number;
-  url: string;
+  url?: string;
   audioUrl?: string;
-  coverUrl: string;
+  coverUrl?: string;
   cover_url?: string;
   album?: string;
   track_url?: string;
@@ -15,6 +15,7 @@ export interface MusicTrack {
   genre?: string;
   emotionalTone?: string;
   coverImage?: string;
+  cover?: string;
   category?: string;
 }
 
@@ -74,6 +75,10 @@ export interface MusicContextType {
   loadTrack?: (track: MusicTrack) => void;
   adjustVolume?: (increment: boolean) => void;
   setPlaylist?: (playlist: MusicPlaylist) => void;
+  isInitialized?: boolean;
+  initializeMusicSystem?: () => void;
+  setProgress?: (time: number) => void;
+  togglePlayback?: () => void;
 }
 
 export interface ProgressBarProps {
@@ -82,4 +87,48 @@ export interface ProgressBarProps {
   formatTime: (seconds: number) => string;
   onSeek: (value: number) => void;
   max?: number;
+  progress?: number;
+  className?: string;
+  showTimestamps?: boolean;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  onChange?: (volume: number) => void;
+  onVolumeChange?: (volume: number) => void;
+  isMuted?: boolean;
+  onMuteToggle?: () => void;
+  className?: string;
+  showLabel?: boolean;
+}
+
+export interface MusicControlsProps {
+  isPlaying?: boolean;
+  onPlay?: () => void;
+  onPause?: () => void;
+  onTogglePlay?: () => void;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  currentTime?: number;
+  duration?: number;
+  onSeek?: (time: number) => void;
+  volume?: number;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
+  onVolumeChange?: (volume: number) => void;
+  track?: MusicTrack;
+  showVolume?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  vertical?: boolean;
+  className?: string;
+}
+
+export interface MusicLibraryProps {
+  onTrackSelect?: (track: MusicTrack) => void;
+  currentTrack?: MusicTrack | null;
+  isPlaying?: boolean;
+  searchTerm?: string;
+  onSearchChange?: (term: string) => void;
+  tracks?: MusicTrack[];
+  playlists?: MusicPlaylist[];
 }

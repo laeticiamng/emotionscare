@@ -1,159 +1,116 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useTheme } from '@/components/theme/ThemeProvider';
+import React, { useRef, useEffect, useState } from 'react';
 
-interface EnhancedMusicVisualizerProps {
-  showControls?: boolean;
+export interface EnhancedMusicVisualizerProps {
+  intensity?: number;
+  volume?: number;
   height?: number;
+  showControls?: boolean;
+  mood?: string;
 }
 
-const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({ 
-  showControls = true,
-  height = 120
+const EnhancedMusicVisualizer: React.FC<EnhancedMusicVisualizerProps> = ({
+  intensity = 0.5,
+  volume = 0.5,
+  height = 120,
+  showControls = false,
+  mood = 'calm'
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { theme, isDarkMode } = useTheme();
-  const [visualizerType, setVisualizerType] = useState<'bars' | 'wave' | 'circles'>('bars');
+  const [isActive, setIsActive] = useState(true);
   
-  // Simulate audio data for demo purposes
   useEffect(() => {
-    if (!canvasRef.current) return;
-    
     const canvas = canvasRef.current;
+    if (!canvas || !isActive) return;
+    
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     
-    // Get canvas dimensions
-    const width = canvas.width;
-    const height = canvas.height;
+    const width = canvas.width = canvas.offsetWidth;
+    const height = canvas.height = canvas.offsetHeight;
     
-    // Set base color based on theme
-    let baseColor = isDarkMode ? 'rgba(59, 130, 246, 0.8)' : 'rgba(37, 99, 235, 0.7)';
-    if (theme === 'pastel') {
-      baseColor = 'rgba(147, 197, 253, 0.7)';
+    // Colors based on mood
+    const colors: Record<string, {primary: string, secondary: string}> = {
+      calm: {primary: '#3b82f6', secondary: '#60a5fa'},
+      happy: {primary: '#f59e0b', secondary: '#fbbf24'},
+      focus: {primary: '#10b981', secondary: '#34d399'},
+      energetic: {primary: '#ef4444', secondary: '#f87171'},
+      sad: {primary: '#6366f1', secondary: '#818cf8'}
+    };
+    
+    const selectedColors = colors[mood] || colors.calm;
+    
+    // Animation variables
+    let animationId: number;
+    const particles: {x: number, y: number, radius: number, speed: number, color: string}[] = [];
+    
+    // Create initial particles
+    const particleCount = Math.floor(20 * intensity);
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 3 + 1,
+        speed: Math.random() * 1 + 0.2,
+        color: Math.random() > 0.5 ? selectedColors.primary : selectedColors.secondary
+      });
     }
     
-    // Animation frame ID for cleanup
-    let animationId: number;
-    
-    // Function to generate random data (simulating audio frequency data)
-    const generateRandomData = (size: number) => {
-      return Array.from({ length: size }, () => Math.random() * height * 0.8);
-    };
-    
-    // Render function based on visualizer type
-    const render = () => {
-      // Clear canvas
+    // Animation function
+    const animate = () => {
       ctx.clearRect(0, 0, width, height);
       
-      // Generate simulated audio data
-      const dataSize = Math.floor(width / 4);
-      const data = generateRandomData(dataSize);
-      
-      // Choose visualization based on type
-      switch (visualizerType) {
-        case 'bars':
-          renderBars(data);
-          break;
-        case 'wave':
-          renderWave(data);
-          break;
-        case 'circles':
-          renderCircles(data);
-          break;
-      }
-      
-      // Continue animation
-      animationId = requestAnimationFrame(render);
-    };
-    
-    // Render bar visualization
-    const renderBars = (data: number[]) => {
-      const barWidth = width / data.length;
-      
-      ctx.fillStyle = baseColor;
-      
-      data.forEach((value, index) => {
-        const x = index * barWidth;
-        const barHeight = value;
-        ctx.fillRect(x, height - barHeight, barWidth - 1, barHeight);
-      });
-    };
-    
-    // Render wave visualization
-    const renderWave = (data: number[]) => {
-      ctx.strokeStyle = baseColor;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      
-      data.forEach((value, index) => {
-        const x = index * (width / data.length);
-        const y = height - value;
+      // Draw particles
+      particles.forEach(particle => {
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = particle.color;
+        ctx.fill();
         
-        if (index === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
+        // Move particles
+        particle.y -= particle.speed * (volume + 0.3);
+        
+        // Reset particles when they go off screen
+        if (particle.y < -particle.radius) {
+          particle.y = height + particle.radius;
+          particle.x = Math.random() * width;
         }
       });
       
-      ctx.stroke();
+      animationId = requestAnimationFrame(animate);
     };
     
-    // Render circles visualization
-    const renderCircles = (data: number[]) => {
-      // Use subset of data for circles
-      const circleData = data.filter((_, index) => index % 5 === 0);
-      
-      circleData.forEach((value, index) => {
-        const x = (index / (circleData.length - 1)) * width;
-        const y = height / 2;
-        const radius = value / 3;
-        
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `${baseColor.slice(0, -4)}, ${0.6 - (index / circleData.length) * 0.4})`;
-        ctx.fill();
-      });
-    };
+    animate();
     
-    // Start animation
-    render();
-    
-    // Cleanup
     return () => {
       cancelAnimationFrame(animationId);
     };
-  }, [visualizerType, theme, isDarkMode]);
+  }, [intensity, volume, isActive, mood]);
   
   return (
     <div className="relative">
       <canvas 
         ref={canvasRef} 
-        width={500} 
-        height={height}
-        className="w-full h-full rounded-lg bg-opacity-10 bg-primary"
+        className="w-full rounded-lg shadow-inner"
+        style={{ height: `${height}px` }}
       />
       
       {showControls && (
-        <div className="absolute bottom-2 right-2 flex gap-1">
+        <div className="absolute bottom-2 right-2 flex gap-2">
           <button 
-            className={`text-xs px-2 py-1 rounded ${visualizerType === 'bars' ? 'bg-primary text-white' : 'bg-muted'}`}
-            onClick={() => setVisualizerType('bars')}
+            onClick={() => setIsActive(!isActive)}
+            className="rounded-full bg-white/20 backdrop-blur-sm p-1 hover:bg-white/40 transition-colors"
           >
-            Bars
-          </button>
-          <button 
-            className={`text-xs px-2 py-1 rounded ${visualizerType === 'wave' ? 'bg-primary text-white' : 'bg-muted'}`}
-            onClick={() => setVisualizerType('wave')}
-          >
-            Wave
-          </button>
-          <button 
-            className={`text-xs px-2 py-1 rounded ${visualizerType === 'circles' ? 'bg-primary text-white' : 'bg-muted'}`}
-            onClick={() => setVisualizerType('circles')}
-          >
-            Circles
+            {isActive ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            )}
           </button>
         </div>
       )}

@@ -4,6 +4,7 @@ import { useMusic } from '@/contexts/music';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music } from 'lucide-react';
+import ProgressBar from '@/components/music/player/ProgressBar';
 
 const MusicPlayer = () => {
   const { 
@@ -12,24 +13,14 @@ const MusicPlayer = () => {
     volume,
     progress,
     duration,
-    togglePlayback,
+    togglePlay,
     nextTrack,
     previousTrack,
-    setProgress,
+    seekTo,
     setVolume,
     toggleMute,
     muted
   } = useMusic();
-
-  const [displayedTime, setDisplayedTime] = useState('0:00');
-  const [displayedDuration, setDisplayedDuration] = useState('0:00');
-
-  useEffect(() => {
-    if (currentTrack) {
-      setDisplayedTime(formatTime(progress));
-      setDisplayedDuration(formatTime(duration || 0));
-    }
-  }, [progress, duration, currentTrack]);
 
   const formatTime = (seconds: number) => {
     const min = Math.floor(seconds / 60);
@@ -84,7 +75,7 @@ const MusicPlayer = () => {
             <Button
               variant="outline"
               size="icon"
-              onClick={togglePlayback}
+              onClick={togglePlay}
               className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-full h-10 w-10 flex items-center justify-center"
             >
               {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
@@ -99,21 +90,12 @@ const MusicPlayer = () => {
             </Button>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-blue-600 dark:text-blue-400 min-w-12 text-center">
-              {displayedTime}
-            </span>
-            <Slider
-              value={[progress]}
-              max={duration || 1}
-              step={1}
-              onValueChange={(value) => setProgress(value[0])}
-              className="flex-1"
-            />
-            <span className="text-xs text-blue-600 dark:text-blue-400 min-w-12 text-center">
-              {displayedDuration}
-            </span>
-          </div>
+          <ProgressBar
+            currentTime={progress || 0}
+            duration={duration || 0}
+            formatTime={formatTime}
+            onSeek={seekTo}
+          />
         </div>
 
         {/* Volume control */}

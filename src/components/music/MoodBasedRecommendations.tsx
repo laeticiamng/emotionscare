@@ -1,95 +1,89 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Heart, HeartOff } from 'lucide-react';
-import { MusicPlaylist } from '@/types/music';
-import { motion } from 'framer-motion';
+import { useMusic } from '@/contexts/music';
+import { Music } from 'lucide-react';
 
 interface MoodBasedRecommendationsProps {
-  mood?: string;
-  playlists: MusicPlaylist[];
-  onPlayPlaylist: (playlist: MusicPlaylist) => void;
-  onToggleFavorite?: (id: string, isFavorite: boolean) => void;
-  favorites?: string[];
+  mood: string;
+  intensity?: number;
+  standalone?: boolean;
+  onSelect?: (playlist: any) => void;
 }
 
 const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ 
-  mood = "relaxed",
-  playlists = [],
-  onPlayPlaylist,
-  onToggleFavorite,
-  favorites = []
+  mood, 
+  intensity = 0.5,
+  standalone = false,
+  onSelect
 }) => {
-  // Filter playlists based on the mood
-  const filteredPlaylists = playlists.slice(0, 4);
+  const { loadPlaylistForEmotion } = useMusic();
   
-  const isFavorite = (playlistId: string) => favorites.includes(playlistId);
-
-  return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Recommandations pour vous</h3>
+  const handleSelectPlaylist = async () => {
+    try {
+      const playlist = await loadPlaylistForEmotion({
+        emotion: mood,
+        intensity
+      });
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-        {filteredPlaylists.map((playlist, index) => (
-          <motion.div 
-            key={playlist.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <Card className="h-full overflow-hidden">
-              <div 
-                className="h-32 bg-gradient-to-br from-indigo-500 to-purple-700 relative overflow-hidden"
-                style={{
-                  backgroundImage: playlist.cover_url ? `url(${playlist.cover_url})` : undefined,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
-                }}
-              >
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Button 
-                    size="icon" 
-                    className="h-10 w-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm"
-                    onClick={() => onPlayPlaylist(playlist)}
-                  >
-                    <Play className="h-5 w-5 text-white" fill="white" />
-                  </Button>
-                </div>
-              </div>
-              
-              <CardContent className="p-3">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-medium line-clamp-1">
-                      {playlist.name}
-                    </h4>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {playlist.tracks.length} morceaux
-                    </p>
-                  </div>
-                  
-                  {onToggleFavorite && (
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => onToggleFavorite(playlist.id, !isFavorite(playlist.id))}
-                    >
-                      {isFavorite(playlist.id) ? (
-                        <Heart className="h-4 w-4 text-red-500" fill="#ef4444" />
-                      ) : (
-                        <Heart className="h-4 w-4" />
-                      )}
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
-    </div>
+      if (onSelect && playlist) {
+        onSelect(playlist);
+      }
+    } catch (error) {
+      console.error("Error loading mood-based playlist:", error);
+    }
+  };
+  
+  const getMoodEmoji = (mood: string): string => {
+    const emojiMap: Record<string, string> = {
+      happy: '😊',
+      sad: '😢',
+      angry: '😠',
+      calm: '😌',
+      anxious: '😰',
+      focused: '🧐',
+      neutral: '😐',
+      energetic: '⚡'
+    };
+    
+    return emojiMap[mood.toLowerCase()] || '🎵';
+  };
+  
+  const getMoodDescription = (mood: string): string => {
+    const descriptionMap: Record<string, string> = {
+      happy: "Musique joyeuse pour amplifier votre bonne humeur",
+      sad: "Mélodies apaisantes pour vous accompagner dans ce moment",
+      angry: "Sons relaxants pour aider à gérer les émotions fortes",
+      calm: "Ambiance sereine pour maintenir votre tranquillité",
+      anxious: "Compositions douces pour réduire le stress",
+      focused: "Rythmes ambiants pour améliorer votre concentration",
+      neutral: "Sélection équilibrée adaptée à votre journée",
+      energetic: "Beats dynamiques pour booster votre énergie"
+    };
+    
+    return descriptionMap[mood.toLowerCase()] || "Musique adaptée à votre état d'esprit";
+  };
+  
+  return (
+    <Card className={standalone ? "w-full" : "mt-4"}>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Music className="h-5 w-5" />
+          Musique recommandée : {mood} {getMoodEmoji(mood)}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col space-y-4">
+          <p className="text-sm">
+            {getMoodDescription(mood)}
+          </p>
+          <Button onClick={handleSelectPlaylist} className="w-full">
+            Écouter cette playlist
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

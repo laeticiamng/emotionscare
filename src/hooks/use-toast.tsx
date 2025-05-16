@@ -85,7 +85,7 @@ toast.dismiss = (id?: string) => {
 };
 
 const useToast = () => {
-  const [toasts, setToasts] = React.useState<ToastProps[]>(state.toasts);
+  const [toasts, setToasts] = React.useState<ToastProps[]>([]);
   
   React.useEffect(() => {
     const listener = () => {

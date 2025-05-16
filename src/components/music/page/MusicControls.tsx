@@ -2,27 +2,36 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
-import { MusicTrack, MusicControlsProps } from '@/types/music';
-import { formatTime } from '@/utils/formatUtils';
+import { MusicControlsProps } from '@/types/music';
+import { Play, Pause, SkipBack, SkipForward, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
 
 const MusicControls: React.FC<MusicControlsProps> = ({
-  isPlaying,
+  isPlaying = false,
   onPlay,
   onPause,
   onTogglePlay,
   onPrevious,
   onNext,
-  volume = 0.5,
-  onVolumeChange,
-  track,
-  currentTrack,
   currentTime = 0,
   duration = 0,
   onSeek,
+  volume = 1,
   isMuted = false,
-  onToggleMute
+  onToggleMute,
+  onVolumeChange,
+  track,
+  showVolume = true,
+  size = 'md',
+  vertical = false,
+  className = ''
 }) => {
+  const formatTime = (seconds: number) => {
+    if (isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+  
   const handleTogglePlay = () => {
     if (onTogglePlay) {
       onTogglePlay();
@@ -32,105 +41,105 @@ const MusicControls: React.FC<MusicControlsProps> = ({
       onPlay();
     }
   };
-
-  const handleVolumeChange = (value: number[]) => {
-    if (onVolumeChange) {
-      onVolumeChange(value[0]);
-    }
+  
+  const buttonClasses = {
+    sm: 'h-8 w-8',
+    md: 'h-10 w-10',
+    lg: 'h-12 w-12'
   };
-
-  const displayTrack = currentTrack || track;
+  
+  const iconClasses = {
+    sm: 'h-4 w-4',
+    md: 'h-5 w-5',
+    lg: 'h-6 w-6'
+  };
+  
+  // Volume icon selection based on state
+  const VolumeIcon = () => {
+    if (isMuted || volume === 0) return <VolumeX className={iconClasses[size]} />;
+    if (volume < 0.3) return <Volume className={iconClasses[size]} />;
+    if (volume < 0.7) return <Volume1 className={iconClasses[size]} />;
+    return <Volume2 className={iconClasses[size]} />;
+  };
+  
+  const containerClasses = vertical
+    ? `flex flex-col items-center gap-4 ${className}`
+    : `flex items-center gap-4 ${className}`;
   
   return (
-    <div className="flex flex-col space-y-4">
-      {/* Track info */}
-      {displayTrack && (
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-md overflow-hidden bg-muted">
-            {displayTrack.coverUrl || displayTrack.cover_url || displayTrack.cover ? (
-              <img 
-                src={displayTrack.coverUrl || displayTrack.cover_url || displayTrack.cover} 
-                alt={displayTrack.title} 
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="h-full w-full bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center">
-                <span className="text-lg">♪</span>
-              </div>
-            )}
-          </div>
-          
-          <div className="flex-1 min-w-0">
-            <div className="font-medium truncate">{displayTrack.title}</div>
-            <div className="text-sm text-muted-foreground truncate">{displayTrack.artist}</div>
-          </div>
-        </div>
-      )}
-      
-      {/* Progress bar */}
-      {onSeek && (
-        <div className="w-full">
-          <div className="flex justify-between text-xs text-muted-foreground mb-1">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(duration)}</span>
-          </div>
-          <Slider
-            value={[currentTime]}
-            max={duration || 100}
-            step={1}
-            onValueChange={(values) => onSeek(values[0])}
-          />
-        </div>
-      )}
-      
-      {/* Controls */}
-      <div className="flex items-center justify-center gap-2">
+    <div className={containerClasses}>
+      {/* Playback controls */}
+      <div className="flex items-center gap-2">
         {onPrevious && (
-          <Button variant="ghost" size="icon" onClick={onPrevious}>
-            <SkipBack className="h-5 w-5" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className={buttonClasses[size]}
+            onClick={onPrevious}
+          >
+            <SkipBack className={iconClasses[size]} />
           </Button>
         )}
         
-        <Button 
-          className="h-10 w-10 rounded-full" 
+        <Button
+          variant={isPlaying ? "secondary" : "default"}
+          size="icon"
+          className={`${buttonClasses[size]} rounded-full`}
           onClick={handleTogglePlay}
         >
           {isPlaying ? (
-            <Pause className="h-5 w-5" />
+            <Pause className={iconClasses[size]} />
           ) : (
-            <Play className="h-5 w-5 ml-0.5" />
+            <Play className={iconClasses[size]} />
           )}
         </Button>
         
         {onNext && (
-          <Button variant="ghost" size="icon" onClick={onNext}>
-            <SkipForward className="h-5 w-5" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className={buttonClasses[size]}
+            onClick={onNext}
+          >
+            <SkipForward className={iconClasses[size]} />
           </Button>
         )}
       </div>
       
-      {/* Volume control */}
-      {onVolumeChange && (
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8" 
-            onClick={onToggleMute}
-          >
-            {isMuted ? (
-              <VolumeX className="h-4 w-4" />
-            ) : (
-              <Volume2 className="h-4 w-4" />
-            )}
-          </Button>
-          
-          <Slider
-            className="flex-1"
-            value={[volume * 100]}
-            max={100}
+      {/* Progress slider */}
+      {onSeek && (
+        <div className={`flex items-center ${vertical ? 'w-full' : 'flex-1'} gap-2`}>
+          <span className="text-xs w-8 text-right">{formatTime(currentTime)}</span>
+          <Slider 
+            value={[currentTime]} 
+            max={duration || 1} 
             step={1}
-            onValueChange={(values) => handleVolumeChange([values[0] / 100])}
+            onValueChange={(values) => onSeek(values[0])} 
+            className="flex-1"
+          />
+          <span className="text-xs w-8">{formatTime(duration)}</span>
+        </div>
+      )}
+      
+      {/* Volume control */}
+      {showVolume && onVolumeChange && (
+        <div className="flex items-center gap-2">
+          {onToggleMute && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              onClick={onToggleMute}
+            >
+              <VolumeIcon />
+            </Button>
+          )}
+          <Slider 
+            value={[isMuted ? 0 : volume * 100]} 
+            max={100} 
+            step={1}
+            onValueChange={(values) => onVolumeChange(values[0] / 100)} 
+            className="w-24"
           />
         </div>
       )}
