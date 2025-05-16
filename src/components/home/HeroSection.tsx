@@ -1,86 +1,69 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Heart, ArrowRight, User, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-const HeroSection: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  
+const HeroSection = () => {
+  const navigate = useNavigate();
+
   return (
-    <section className="relative py-20 px-4 rounded-3xl bg-gradient-to-br from-background via-background to-muted/20 dark:from-background dark:via-background/80 dark:to-primary/5 mb-16 overflow-hidden transform transition-all duration-700 hover:shadow-xl border border-primary/10">
-      <div 
-        className="absolute inset-0 rounded-3xl bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB4PSIwIiB5PSIwIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSgxMCkiPjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjEiIGZpbGw9IiMzQjgyRjYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==')]"
-        style={{ opacity: "0.4", mixBlendMode: "overlay" }}
-      />
-      
-      {/* Cercles d'ambiance animés */}
-      <div className="absolute top-[-20%] left-[-10%] w-[40%] h-[40%] rounded-full bg-gradient-to-r from-purple-100/30 to-blue-100/30 dark:from-purple-900/20 dark:to-blue-900/20 blur-[70px] animate-pulse-slow"></div>
-      <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-gradient-to-r from-rose-100/30 to-amber-100/30 dark:from-rose-900/20 dark:to-amber-900/20 blur-[70px] animate-pulse-slow animation-delay-2000"></div>
-      
-      <div className="max-w-4xl mx-auto text-center relative z-10">
-        <motion.h1 
-          className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          Prenez soin de votre <span className="text-primary bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70 dark:from-primary dark:to-primary/70">état émotionnel</span>
-        </motion.h1>
-        
-        <motion.p 
-          className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          Votre journal, votre musique, votre calme. Trouvez l'équilibre dont vous avez besoin.
-        </motion.p>
-        
-        <motion.div 
-          className="flex flex-col sm:flex-row justify-center gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          {isAuthenticated ? (
-            <Button asChild size="lg" className="shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.02]">
-              <Link to="/dashboard">
-                Accéder à mon espace
-                <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </Button>
-          ) : (
-            <>
-              <Button asChild size="lg" className="shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.05] border-2 border-primary/20 bg-primary py-7">
-                <Link to="/login" className="flex items-center text-lg">
-                  <User className="h-5 w-5 mr-2" />
-                  <span className="font-bold">Espace Personnel</span>
-                </Link>
-              </Button>
-              
-              <Button asChild variant="outline" size="lg" className="shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.05] border-2 border-secondary/50 py-7">
-                <Link to="/business" className="flex items-center text-lg">
-                  <Building className="h-5 w-5 mr-2" />
-                  <span className="font-bold">Espace Entreprise</span>
-                </Link>
-              </Button>
-            </>
-          )}
-          
-          {isAuthenticated && (
-            <Button asChild variant="outline" size="lg" className="transition-all duration-300 transform hover:-translate-y-1">
-              <Link to="/scan">
-                Faire un scan émotionnel
-                <Heart className="h-4 w-4 ml-2 transition-all group-hover:scale-110 group-hover:text-rose-500" />
-              </Link>
-            </Button>
-          )}
-        </motion.div>
+    <div className="relative overflow-hidden py-12 md:py-16 lg:py-20">
+      <div className="absolute inset-0 z-0 opacity-30 dark:opacity-20">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/20 dark:to-slate-900"></div>
+        <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white to-transparent dark:from-slate-900 dark:to-transparent"></div>
       </div>
-    </section>
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.8 }}
+        >
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-blue-800 dark:text-blue-300 mb-6">
+            Prenez soin de votre <span className="text-blue-600 dark:text-blue-400">bien-être émotionnel</span>
+          </h1>
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.8 }}
+        >
+          <p className="text-lg md:text-xl text-blue-700/80 dark:text-blue-400/80 max-w-3xl mx-auto mb-8">
+            Découvrez comment notre plateforme utilise l'intelligence artificielle pour analyser vos émotions et vous proposer des solutions personnalisées pour améliorer votre bien-être quotidien.
+          </p>
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+          className="flex flex-col sm:flex-row gap-4 justify-center"
+        >
+          <Button 
+            onClick={() => navigate('/login')}
+            size="lg" 
+            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white px-8 py-6 text-lg"
+          >
+            Commencer maintenant
+          </Button>
+          <Button 
+            onClick={() => navigate('/b2b/selection')}
+            variant="outline" 
+            size="lg"
+            className="border-blue-400 hover:bg-blue-50 dark:border-blue-700 dark:hover:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-8 py-6 text-lg"
+          >
+            Solutions entreprise
+          </Button>
+        </motion.div>
+      </motion.div>
+    </div>
   );
 };
 

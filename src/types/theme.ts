@@ -16,7 +16,7 @@ export interface ThemeContextType {
 }
 
 export interface ThemeButtonProps {
-  variant?: 'default' | 'outline';
+  variant?: 'default' | 'outline' | 'ghost';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   className?: string;
 }

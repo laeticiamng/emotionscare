@@ -25,6 +25,10 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     const savedTheme = localStorage.getItem('theme') as Theme | null;
     if (savedTheme) {
       setTheme(savedTheme);
+    } else {
+      // Default to pastel theme for this application
+      setTheme('pastel');
+      localStorage.setItem('theme', 'pastel');
     }
     
     // Initialize font size from localStorage or default
@@ -167,10 +171,19 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     return brightness > 128 ? 'black' : 'white';
   };
 
+  const toggleTheme = () => {
+    setTheme((prevTheme) => {
+      if (prevTheme === 'light') return 'dark';
+      if (prevTheme === 'dark') return 'pastel';
+      return 'light';
+    });
+  };
+
   return (
     <ThemeContext.Provider value={{ 
       theme, 
-      setTheme, 
+      setTheme,
+      toggleTheme,
       isDarkMode,
       fontSize,
       setFontSize,

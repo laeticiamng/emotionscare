@@ -28,7 +28,7 @@ export default function B2BAdminLogin() {
         
         localStorage.setItem('auth_session', 'mock_token_admin');
         localStorage.setItem('user_role', 'b2b_admin');
-        localStorage.setItem('userMode', 'b2b-admin');
+        localStorage.setItem('userMode', 'b2b_admin');
         
         toast({
           title: "Connexion réussie",
@@ -59,7 +59,7 @@ export default function B2BAdminLogin() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-          <Card className="shadow-lg border-blue-100 dark:border-blue-800/30">
+          <Card className="shadow-lg border-blue-200 dark:border-blue-800/30">
             <CardHeader className="text-center">
               <motion.div 
                 className="flex justify-center mb-4"
@@ -72,7 +72,7 @@ export default function B2BAdminLogin() {
                 </div>
               </motion.div>
               <CardTitle className="text-2xl text-blue-800 dark:text-blue-300">Administration RH</CardTitle>
-              <CardDescription>Accédez à votre console de gestion</CardDescription>
+              <CardDescription className="text-blue-600/70 dark:text-blue-400/70">Accédez à votre console de gestion</CardDescription>
             </CardHeader>
             <form onSubmit={handleLogin}>
               <CardContent className="space-y-4">
@@ -82,14 +82,14 @@ export default function B2BAdminLogin() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3, duration: 0.5 }}
                 >
-                  <Label htmlFor="email">Email professionnel</Label>
+                  <Label htmlFor="email" className="text-blue-700 dark:text-blue-300">Email professionnel</Label>
                   <Input 
                     id="email" 
                     type="email" 
                     placeholder="admin@entreprise.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="border-blue-100 dark:border-blue-900/30 focus:border-blue-300"
+                    className="border-blue-200 dark:border-blue-900/30 focus:border-blue-300"
                     required
                   />
                 </motion.div>
@@ -100,7 +100,7 @@ export default function B2BAdminLogin() {
                   transition={{ delay: 0.4, duration: 0.5 }}
                 >
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Mot de passe</Label>
+                    <Label htmlFor="password" className="text-blue-700 dark:text-blue-300">Mot de passe</Label>
                     <Button variant="link" className="px-0 text-xs text-blue-600 dark:text-blue-400" type="button">
                       Mot de passe oublié?
                     </Button>
@@ -110,7 +110,7 @@ export default function B2BAdminLogin() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="border-blue-100 dark:border-blue-900/30 focus:border-blue-300"
+                    className="border-blue-200 dark:border-blue-900/30 focus:border-blue-300"
                     required
                   />
                 </motion.div>

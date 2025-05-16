@@ -1,50 +1,79 @@
 
 import React from 'react';
-import { ThumbsUp, User, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
-const CtaSection: React.FC = () => {
+const CtaSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-primary/10 rounded-2xl p-8 md:p-12 mb-16 transform transition-all duration-500 hover:bg-primary/15 hover:shadow-xl overflow-hidden relative border-2 border-primary/20">
-      {/* Éléments décoratifs animés */}
-      <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full bg-primary/20 animate-float"></div>
-      <div className="absolute -bottom-16 -left-16 w-40 h-40 rounded-full bg-primary/15 animate-float-delay"></div>
-      
-      <div className="flex flex-col md:flex-row gap-8 items-center relative z-10">
-        <div className="flex-1 animate-fade-in">
-          <h2 className="text-3xl font-bold mb-4">Améliorez votre bien-être dès aujourd'hui</h2>
-          <p className="text-lg mb-6 text-gray-600 dark:text-gray-300">
-            Rejoignez notre communauté d'utilisateurs qui ont trouvé un meilleur équilibre émotionnel grâce à EmotionsCare.
-          </p>
-          <div className="flex flex-wrap gap-6 justify-center md:justify-start">
-            <Button 
-              onClick={() => navigate('/login')} 
-              size="lg"
-              className="w-full md:w-auto flex items-center gap-2 bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-            >
-              <User className="h-5 w-5" />
-              Accès Particulier
-            </Button>
-            <Button 
-              onClick={() => navigate('/business')} 
-              variant="outline"
-              size="lg"
-              className="w-full md:w-auto flex items-center gap-2 border-2 hover:bg-secondary/20 hover:scale-105 transition-all shadow-lg hover:shadow-xl"
-            >
-              <Building className="h-5 w-5" />
-              Accès Entreprise
-            </Button>
+    <section className="py-16">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true }}
+        className="max-w-5xl mx-auto px-4"
+      >
+        <div className="relative rounded-2xl overflow-hidden">
+          {/* Background with gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-400 dark:from-blue-800 dark:to-blue-600 opacity-90"></div>
+          
+          {/* Content */}
+          <div className="relative p-8 md:p-12 lg:p-16">
+            <div className="max-w-3xl mx-auto text-center text-white">
+              <motion.h2 
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                viewport={{ once: true }}
+                className="text-3xl md:text-4xl font-bold mb-6"
+              >
+                Prêt à améliorer votre bien-être émotionnel ?
+              </motion.h2>
+              
+              <motion.p 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                viewport={{ once: true }}
+                className="text-lg mb-8 text-blue-50"
+              >
+                Rejoignez notre communauté et découvrez des outils personnalisés pour mieux comprendre et gérer vos émotions au quotidien.
+              </motion.p>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                viewport={{ once: true }}
+                className="flex flex-col sm:flex-row gap-4 justify-center"
+              >
+                <Button 
+                  onClick={() => navigate('/register')}
+                  size="lg"
+                  className="bg-white hover:bg-blue-50 text-blue-700 px-8 py-6 text-lg"
+                >
+                  S'inscrire gratuitement
+                </Button>
+                <Button 
+                  onClick={() => navigate('/login')}
+                  variant="outline"
+                  size="lg"
+                  className="border-white hover:bg-white/10 text-white px-8 py-6 text-lg"
+                >
+                  Se connecter
+                </Button>
+              </motion.div>
+            </div>
           </div>
+          
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 w-32 h-32 md:w-64 md:h-64 rounded-full bg-blue-400/30 -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-40 h-40 md:w-80 md:h-80 rounded-full bg-blue-400/20 translate-x-1/3 translate-y-1/3"></div>
         </div>
-        <div className="flex-1 flex justify-center animate-fade-in" style={{ animationDelay: "200ms" }}>
-          <div className="w-full max-w-md aspect-video bg-gradient-to-br from-primary/50 to-primary/30 rounded-xl flex items-center justify-center transform transition-all duration-500 hover:scale-[1.03] hover:shadow-lg border border-primary/20">
-            <ThumbsUp className="h-16 w-16 text-primary animate-pulse" />
-          </div>
-        </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

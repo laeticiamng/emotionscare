@@ -1,16 +1,25 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Toaster } from '@/components/ui/toaster';
 import App from './App';
-import ThemeLayout from './layouts/ThemeLayout';
 import './index.css';
+import { BrowserRouter } from 'react-router-dom';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { UserModeProvider } from '@/contexts/UserModeContext';
+import { Toaster } from '@/components/ui/toaster';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ThemeLayout>
-      <App />
-      <Toaster />
-    </ThemeLayout>
+    <BrowserRouter>
+      <ThemeProvider>
+        <AuthProvider>
+          <UserModeProvider>
+            <App />
+            <Toaster />
+          </UserModeProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   </React.StrictMode>
 );

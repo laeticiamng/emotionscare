@@ -1,45 +1,58 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserModeType, normalizeUserMode } from '@/types/userMode';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
-interface UserModeContextProps {
-  userMode: UserModeType;
-  setUserMode: (mode: UserModeType | string) => void;
-  isLoading: boolean;
+type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
+
+interface UserModeContextType {
+  userMode: UserMode;
+  setUserMode: (mode: UserMode) => void;
+  clearUserMode: () => void;
 }
 
-const UserModeContext = createContext<UserModeContextProps>({
-  userMode: 'b2c',
+const UserModeContext = createContext<UserModeContextType>({
+  userMode: null,
   setUserMode: () => {},
-  isLoading: true
+  clearUserMode: () => {},
 });
 
-export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserModeState] = useState<UserModeType>('b2c');
-  const [isLoading, setIsLoading] = useState(true);
-
+export const UserModeProvider = ({ children }: { children: ReactNode }) => {
+  const [userMode, setUserModeState] = useState<UserMode>(null);
+  
   useEffect(() => {
-    // Load user mode from localStorage
-    const storedMode = localStorage.getItem('userMode');
-    if (storedMode) {
-      setUserModeState(normalizeUserMode(storedMode));
+    // Initialize from localStorage on mount
+    const savedMode = localStorage.getItem('userMode') as UserMode | null;
+    if (savedMode) {
+      setUserModeState(savedMode);
     }
-    setIsLoading(false);
   }, []);
-
-  const setUserMode = (mode: UserModeType | string) => {
-    const normalizedMode = normalizeUserMode(mode);
-    setUserModeState(normalizedMode);
-    localStorage.setItem('userMode', normalizedMode);
+  
+  const setUserMode = (mode: UserMode) => {
+    setUserModeState(mode);
+    if (mode) {
+      localStorage.setItem('userMode', mode);
+    } else {
+      localStorage.removeItem('userMode');
+    }
   };
-
+  
+  const clearUserMode = () => {
+    setUserModeState(null);
+    localStorage.removeItem('userMode');
+  };
+  
   return (
-    <UserModeContext.Provider value={{ userMode, setUserMode, isLoading }}>
+    <UserModeContext.Provider value={{ userMode, setUserMode, clearUserMode }}>
       {children}
     </UserModeContext.Provider>
   );
 };
 
-export const useUserMode = () => useContext(UserModeContext);
+export const useUserMode = () => {
+  const context = useContext(UserModeContext);
+  if (!context) {
+    throw new Error('useUserMode must be used within a UserModeProvider');
+  }
+  return context;
+};
 
 export default UserModeContext;

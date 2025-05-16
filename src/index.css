@@ -49,27 +49,27 @@
     --ring: 224.3 76.3% 48%;
   }
   
-  /* Thème pastel (bleu) */
+  /* Thème pastel (bleu) - Ajusté pour être plus bleu et moins vert */
   .pastel {
-    --background: 214 100% 97%;
+    --background: 214 100% 98%;
     --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
+    --card: 210 100% 99%;
     --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
+    --popover: 210 100% 99%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 217.2 91.2% 59.8%;
+    --primary: 215 94% 68%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 213.1 100% 95.7%;
+    --secondary: 213.5 100% 95.7%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 213.1 100% 95.7%;
+    --muted: 213.5 100% 95.7%;
     --muted-foreground: 215.4 16.3% 56.9%;
-    --accent: 212 96% 78%;
+    --accent: 213 96% 87%;
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 213.5 100% 91%;
-    --input: 213.5 100% 91%;
-    --ring: 217.2 91.2% 59.8%;
+    --border: 214 100% 91%;
+    --input: 214 100% 91%;
+    --ring: 215 94% 68%;
   }
 }
 
@@ -83,11 +83,33 @@
   }
 }
 
-/* Classes spécifiques pour le thème pastel bleu */
+/* Classes spécifiques pour le thème pastel bleu - Ajusté pour être plus bleu */
 .bg-pastel-gradient {
   @apply bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-900 dark:to-blue-900/20;
 }
 
 .bg-pastel-card {
-  @apply bg-white/90 dark:bg-slate-900/70 border-blue-100 dark:border-blue-900/30 backdrop-blur-md shadow-md;
+  @apply bg-white/90 dark:bg-slate-900/70 border-blue-200 dark:border-blue-900/30 backdrop-blur-md shadow-md;
+}
+
+/* Nouvelles classes pour les différentes sections pastel blue */
+.pastel-blue-section {
+  @apply bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20;
+}
+
+.pastel-blue-card {
+  @apply bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 shadow-sm hover:shadow-md transition-all duration-300;
+}
+
+.pastel-blue-button {
+  @apply bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-200;
+}
+
+.pastel-blue-input {
+  @apply border-blue-200 dark:border-blue-700 focus:border-blue-400 focus:ring-blue-300 bg-white dark:bg-slate-800;
+}
+
+/* Animation de transition douce */
+.theme-transition {
+  @apply transition-all duration-300 ease-in-out;
 }
