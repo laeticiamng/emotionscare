@@ -1,11 +1,12 @@
 
-import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Check, Clock, Trophy } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Challenge } from '@/types/gamification';
+import { Trophy, Clock, CheckCircle, XCircle } from 'lucide-react';
 
 interface ChallengesListProps {
   challenges: Challenge[];
@@ -13,107 +14,170 @@ interface ChallengesListProps {
 }
 
 const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, onComplete }) => {
-  const activeFilter = 'all';
-  
-  const filteredChallenges = challenges.filter((challenge) => {
-    if (activeFilter === 'completed') return challenge.completed;
-    if (activeFilter === 'active') return !challenge.completed;
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
+  const [isCompleting, setIsCompleting] = useState<string | null>(null);
+
+  const filteredChallenges = challenges.filter(challenge => {
+    if (filter === 'all') return true;
+    if (filter === 'completed') return challenge.completed;
+    if (filter === 'active') return !challenge.completed && !challenge.failed;
     return true;
   });
-  
-  // Adding failed property to Challenge type
-  const checkIsFailed = (challenge: Challenge & {failed?: boolean}) => {
-    return challenge.failed === true;
+
+  const handleCompleteChallenge = async (challengeId: string) => {
+    if (!onComplete) return;
+    
+    setIsCompleting(challengeId);
+    try {
+      const success = await onComplete(challengeId);
+      if (!success) {
+        console.error('Failed to complete challenge');
+      }
+    } catch (error) {
+      console.error('Error completing challenge:', error);
+    } finally {
+      setIsCompleting(null);
+    }
   };
 
-  const getChallengeStatusColor = (challenge: Challenge & {failed?: boolean}) => {
-    if (challenge.completed) return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-    if (checkIsFailed(challenge)) return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
-    return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
-  };
-
-  const getChallengeStatus = (challenge: Challenge & {failed?: boolean}) => {
-    if (challenge.completed) return 'Terminé';
-    if (checkIsFailed(challenge)) return 'Échoué';
-    return 'En cours';
+  const getCategoryColor = (category: string) => {
+    const categories: Record<string, string> = {
+      'daily': 'bg-blue-500',
+      'weekly': 'bg-purple-500',
+      'monthly': 'bg-amber-500',
+      'special': 'bg-emerald-500',
+      'streak': 'bg-rose-500',
+      'social': 'bg-cyan-500',
+      'achievement': 'bg-indigo-500'
+    };
+    
+    return categories[category.toLowerCase()] || 'bg-gray-500';
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredChallenges.map((challenge) => (
-          <Card key={challenge.id} className="h-full">
-            <CardHeader className="pb-2">
-              <div className="flex justify-between items-start">
-                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-lg mb-2">
-                  {challenge.icon || '🏆'}
-                </div>
-                <Badge 
-                  variant="outline" 
-                  className={getChallengeStatusColor(challenge as Challenge & {failed?: boolean})}
-                >
-                  {getChallengeStatus(challenge as Challenge & {failed?: boolean})}
-                </Badge>
-              </div>
-              <h3 className="font-semibold text-lg">{challenge.title}</h3>
-              <p className="text-sm text-muted-foreground">{challenge.description}</p>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>Progression</span>
-                    <span>{Math.round(challenge.progress)}%</span>
-                  </div>
-                  <Progress
-                    value={challenge.progress}
-                    className={`h-2 ${
-                      checkIsFailed(challenge as Challenge & {failed?: boolean})
-                        ? 'bg-red-100 dark:bg-red-950'
-                        : challenge.completed
-                          ? 'bg-green-100 dark:bg-green-950'
-                          : 'bg-blue-100 dark:bg-blue-950'
-                    }`}
-                  />
-                </div>
-                
-                <div className="flex justify-between items-center pt-2">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <Trophy className="h-4 w-4 mr-1" />
-                    <span>{challenge.points} pts</span>
-                  </div>
-                  
-                  {challenge.deadline && (
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Clock className="h-4 w-4 mr-1" />
-                      <span>
-                        {new Date(challenge.deadline).toLocaleDateString()}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                
-                {onComplete && !challenge.completed && !checkIsFailed(challenge as Challenge & {failed?: boolean}) && (
-                  <Button 
-                    variant="outline" 
-                    className="w-full mt-2"
-                    onClick={() => onComplete(challenge.id)}
-                  >
-                    <Check className="h-4 w-4 mr-2" />
-                    Valider
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Trophy className="h-5 w-5 text-amber-500" />
+          Défis
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="all" value={filter} onValueChange={(v) => setFilter(v as 'all' | 'active' | 'completed')}>
+          <TabsList className="grid grid-cols-3 mb-6">
+            <TabsTrigger value="all">Tous</TabsTrigger>
+            <TabsTrigger value="active">En cours</TabsTrigger>
+            <TabsTrigger value="completed">Complétés</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="all" className="space-y-4">
+            {filteredChallenges.map(challenge => (
+              <ChallengeCard 
+                key={challenge.id} 
+                challenge={challenge} 
+                onComplete={handleCompleteChallenge}
+                isCompleting={isCompleting === challenge.id}
+              />
+            ))}
+          </TabsContent>
+          
+          <TabsContent value="active" className="space-y-4">
+            {filteredChallenges.map(challenge => (
+              <ChallengeCard 
+                key={challenge.id} 
+                challenge={challenge} 
+                onComplete={handleCompleteChallenge}
+                isCompleting={isCompleting === challenge.id}
+              />
+            ))}
+          </TabsContent>
+          
+          <TabsContent value="completed" className="space-y-4">
+            {filteredChallenges.map(challenge => (
+              <ChallengeCard 
+                key={challenge.id} 
+                challenge={challenge} 
+                onComplete={handleCompleteChallenge}
+                isCompleting={isCompleting === challenge.id}
+              />
+            ))}
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
+  );
+};
+
+interface ChallengeCardProps {
+  challenge: Challenge;
+  onComplete?: (id: string) => Promise<boolean>;
+  isCompleting?: boolean;
+}
+
+const ChallengeCard: React.FC<ChallengeCardProps> = ({ challenge, onComplete, isCompleting = false }) => {
+  return (
+    <div className="border rounded-lg p-4">
+      <div className="flex items-start justify-between">
+        <div className="flex items-center space-x-3">
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getCategoryColor(challenge.category)}`}>
+            <span className="text-white">
+              {challenge.icon || '🏆'}
+            </span>
+          </div>
+          <div>
+            <h3 className="font-medium">{challenge.title}</h3>
+            <p className="text-sm text-muted-foreground">{challenge.description}</p>
+          </div>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          {challenge.completed && (
+            <Badge variant="outline" className="gap-1 bg-green-50 text-green-700 border-green-200">
+              <CheckCircle className="h-3 w-3" />
+              Complété
+            </Badge>
+          )}
+          
+          {challenge.failed && (
+            <Badge variant="outline" className="gap-1 bg-red-50 text-red-700 border-red-200">
+              <XCircle className="h-3 w-3" />
+              Échoué
+            </Badge>
+          )}
+          
+          {(!challenge.completed && !challenge.failed) && challenge.deadline && (
+            <Badge variant="outline" className="gap-1">
+              <Clock className="h-3 w-3" />
+              {new Date(challenge.deadline).toLocaleDateString()}
+            </Badge>
+          )}
+          
+          <Badge variant="secondary">{challenge.points} pts</Badge>
+        </div>
       </div>
       
-      {filteredChallenges.length === 0 && (
-        <div className="text-center py-8 text-muted-foreground">
-          Aucun défi disponible pour le moment.
-        </div>
-      )}
+      <div className="mt-4 space-y-2">
+        {!challenge.completed && !challenge.failed && (
+          <>
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Progrès</span>
+              <span>{challenge.progress}%</span>
+            </div>
+            <Progress value={challenge.progress} className="h-2" />
+            
+            {challenge.progress === 100 && onComplete && (
+              <Button 
+                size="sm" 
+                className="w-full mt-2"
+                onClick={() => onComplete(challenge.id)}
+                disabled={isCompleting}
+              >
+                {isCompleting ? 'Validation...' : 'Valider le défi'}
+              </Button>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

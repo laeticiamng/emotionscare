@@ -1,55 +1,50 @@
 
 import React from 'react';
-import { Slider } from '@/components/ui/slider';
-import { ProgressBarProps } from '@/types';
+import { Slider } from "@/components/ui/slider";
+import { ProgressBarProps } from '@/types/music';
 
 const MusicProgressBar: React.FC<ProgressBarProps> = ({
-  progress,
-  max,
-  onChange,
-  className = '',
-  formatTime,
-  currentTime,
-  duration,
+  progress = 0,
+  max = 100,
+  value = 0,
+  currentTime = 0,
+  duration = 0,
   onSeek,
-  value,
+  className = "",
+  formatTime = (seconds) => {
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec.toString().padStart(2, '0')}`;
+  },
+  onChange,
   showTimestamps = false
 }) => {
-  // Use provided props or fallbacks
-  const actualProgress = value !== undefined ? value : progress;
-  const actualMax = max || 100;
-  const handleChange = onChange || onSeek || (() => {});
+  // Use either progress or value
+  const currentValue = value || progress;
+  const maxValue = max || duration;
   
-  const defaultFormatTime = (seconds: number) => {
-    if (isNaN(seconds)) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const handleValueChange = (values: number[]) => {
+    if (onSeek) {
+      onSeek(values[0]);
+    }
+    if (onChange) {
+      onChange(values[0]);
+    }
   };
   
-  const timeFormatter = formatTime || defaultFormatTime;
-  
   return (
-    <div className={`flex items-center ${className}`}>
-      {showTimestamps && currentTime !== undefined && (
-        <span className="text-xs text-muted-foreground mr-2">
-          {timeFormatter(currentTime)}
-        </span>
-      )}
-      
+    <div className={`space-y-1 ${className}`}>
       <Slider
-        value={[actualProgress || 0]}
-        min={0}
-        max={actualMax}
+        value={[currentValue]}
+        max={maxValue}
         step={1}
-        onValueChange={(value) => handleChange(value[0])}
-        className="cursor-pointer"
+        onValueChange={handleValueChange}
       />
-      
-      {showTimestamps && duration !== undefined && (
-        <span className="text-xs text-muted-foreground ml-2">
-          {timeFormatter(duration)}
-        </span>
+      {showTimestamps && (
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>{formatTime(currentTime || currentValue)}</span>
+          <span>{formatTime(duration || maxValue)}</span>
+        </div>
       )}
     </div>
   );

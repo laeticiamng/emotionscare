@@ -1,108 +1,116 @@
 
 import React from 'react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
-import { cva } from 'class-variance-authority';
-import { DraggableCardProps } from './types';
+import { GripVertical, TrendingDown, TrendingUp, Minus } from 'lucide-react';
 
-const cardVariants = cva(
-  "text-card-foreground shadow-sm transition-all hover:shadow-md",
-  {
-    variants: {
-      status: {
-        default: "bg-card border",
-        success: "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900",
-        warning: "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-900",
-        danger: "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900",
-        info: "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900",
-      },
-    },
-    defaultVariants: {
-      status: "default",
-    },
-  }
-);
+interface DraggableCardProps {
+  id: string;
+  title: string;
+  value: string | number;
+  icon?: React.ReactNode;
+  change?: {
+    value: number;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  description?: string;
+  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
+  status?: 'positive' | 'negative' | 'neutral';
+}
 
 const DraggableCard: React.FC<DraggableCardProps> = ({
+  id,
   title,
   value,
   icon,
-  delta,
-  subtitle,
-  ariaLabel,
-  onClick,
-  status,
+  change,
+  description,
+  color = 'primary',
+  status
 }) => {
-  const getDeltaElement = () => {
-    if (!delta) return null;
-    
-    // Handle case where delta is a number
-    if (typeof delta === 'number') {
-      const deltaObj = {
-        value: delta,
-        trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral'
-      } as const;
-      
-      return renderDelta(deltaObj);
-    }
-    
-    return renderDelta(delta);
-  };
-  
-  const renderDelta = (deltaInfo: { value: number, trend: 'up' | 'down' | 'neutral', label?: string }) => {
-    const { value, trend, label } = deltaInfo;
-    
-    const trendColor = 
-      trend === 'up' 
-        ? 'text-green-600 dark:text-green-400' 
-        : trend === 'down' 
-          ? 'text-red-600 dark:text-red-400' 
-          : 'text-gray-500';
-    
-    const TrendIcon = 
-      trend === 'up' 
-        ? ArrowUpRight 
-        : trend === 'down' 
-          ? ArrowDownRight 
-          : Minus;
-    
-    return (
-      <div className={`flex items-center ${trendColor} text-sm font-medium`}>
-        <TrendIcon className="h-4 w-4 mr-1" />
-        <span>{value > 0 ? '+' : ''}{value.toFixed(1)}%</span>
-        {label && <span className="ml-1 text-muted-foreground text-xs">({label})</span>}
-      </div>
-    );
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1 : 0,
   };
 
+  // Map status if provided, otherwise use change trend to determine color
+  let colorClass = '';
+  let statusIcon = null;
+  
+  if (status) {
+    switch (status) {
+      case 'positive':
+        colorClass = 'text-green-500';
+        statusIcon = <TrendingUp className="h-4 w-4" />;
+        break;
+      case 'negative':
+        colorClass = 'text-red-500';
+        statusIcon = <TrendingDown className="h-4 w-4" />;
+        break;
+      default:
+        colorClass = 'text-gray-500';
+        statusIcon = <Minus className="h-4 w-4" />;
+    }
+  } else if (change) {
+    switch (change.trend) {
+      case 'up':
+        colorClass = 'text-green-500';
+        statusIcon = <TrendingUp className="h-4 w-4" />;
+        break;
+      case 'down':
+        colorClass = 'text-red-500';
+        statusIcon = <TrendingDown className="h-4 w-4" />;
+        break;
+      default:
+        colorClass = 'text-gray-500';
+        statusIcon = <Minus className="h-4 w-4" />;
+    }
+  }
+
   return (
-    <Card 
-      className={cardVariants({ status })}
-      aria-label={ariaLabel}
-      onClick={onClick}
-    >
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">{title}</p>
-            <h3 className="text-2xl font-bold">{value}</h3>
-          </div>
-          
-          {icon && (
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              {React.isValidElement(icon) ? icon : null}
+    <div ref={setNodeRef} style={style} className="touch-none">
+      <Card className="group relative">
+        <div
+          className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity cursor-move"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="h-5 w-5 text-muted-foreground" />
+        </div>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center">
+              {icon && <div className="mr-3 text-muted-foreground">{icon}</div>}
+              <h3 className="text-sm font-medium">{title}</h3>
             </div>
-          )}
-        </div>
-        
-        <div className="mt-2 space-y-1">
-          {getDeltaElement()}
-          {subtitle && (
-            <p className="text-sm text-muted-foreground">{subtitle}</p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+          </div>
+          <div className="flex items-baseline justify-between">
+            <div>
+              <p className="text-2xl font-bold">{value}</p>
+              {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
+            </div>
+            {(change || status) && (
+              <div className={`flex items-center ${colorClass}`}>
+                {statusIcon}
+                {change && <span className="ml-1 text-xs">{change.value > 0 ? '+' : ''}{change.value}%</span>}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

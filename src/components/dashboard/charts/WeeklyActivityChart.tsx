@@ -1,32 +1,30 @@
 
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface WeeklyActivityChartProps {
   data: Array<{
     day: string;
-    journal: number;
-    music: number;
-    scan: number;
-    coach: number;
+    value: number;
   }>;
+  color?: string;
 }
 
-const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({ data }) => {
+const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({ 
+  data, 
+  color = "#8884d8" 
+}) => {
   return (
     <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={data} barSize={12} barGap={2}>
-        <XAxis dataKey="day" fontSize={12} tickLine={false} axisLine={false} />
+      <BarChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+        <XAxis dataKey="day" />
         <YAxis hide />
         <Tooltip 
-          cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }} 
-          contentStyle={{ borderRadius: '8px', fontSize: '12px' }} 
+          formatter={(value) => [`${value} activités`, 'Activités']}
+          labelFormatter={(label) => `${label}`}
         />
-        <Legend iconSize={8} iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
-        <Bar dataKey="journal" name="Journal" fill="#4F46E5" radius={[4, 4, 0, 0]} />
-        <Bar dataKey="music" name="Musique" fill="#EC4899" radius={[4, 4, 0, 0]} />
-        <Bar dataKey="scan" name="Scan" fill="#EAB308" radius={[4, 4, 0, 0]} />
-        <Bar dataKey="coach" name="Coach" fill="#10B981" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="value" fill={color} radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );

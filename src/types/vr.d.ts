@@ -2,55 +2,44 @@
 export interface VRSessionTemplate {
   id: string;
   title: string;
-  description?: string;
+  description: string;
   duration: number;
+  thumbnail_url?: string;
   tags?: string[];
-  theme?: string;
-  environment?: string;
-  is_audio_only?: boolean;
-  preview_url?: string;
-  audio_url?: string;
+  category?: string;
   vr_url?: string;
-  thumbnailUrl?: string;
-  emotionTarget?: string;
+  emotion_target?: string;
+  emotionTarget?: string; // For compatibility
+  intensity?: number;
 }
 
-export interface VRSession {
-  id: string;
-  template_id: string;
-  user_id: string;
-  started_at: Date | string;
-  completed_at?: Date | string;
-  duration_seconds: number;
-  emotion_before?: string;
-  emotion_after?: string;
-  notes?: string;
-  rating?: number;
+export interface VRSessionContextType {
+  sessions: VRSessionTemplate[];
+  currentSession: VRSessionTemplate | null;
+  isPlaying: boolean;
+  playSession: (session: VRSessionTemplate) => void;
+  pauseSession: () => void;
+  resumeSession: () => void;
+  endSession: () => void;
+  loadSessionsForEmotion: (emotion: string) => Promise<VRSessionTemplate[]>;
+  sessionProgress: number;
+  sessionDuration: number;
+  loading: boolean;
+  error: string | null;
 }
 
-export interface VRProgress {
-  sessionsCompleted: number;
-  minutesSpent: number;
-  favoriteEnvironment?: string;
-  lastSession?: Date | string;
-  streak: number;
+export interface VRPlayerProps {
+  session?: VRSessionTemplate;
+  autoPlay?: boolean;
+  onComplete?: () => void;
+  onProgress?: (progress: number) => void;
 }
 
-export interface VRHistoryListProps {
-  sessions: VRSession[];
-  onSelectSession?: (session: VRSession) => void;
-  isLoading?: boolean;
-}
-
-export interface VRSessionHistoryProps {
-  session?: VRSession;
-  template?: VRSessionTemplate;
-  onClose?: () => void;
-}
-
-export interface VRSessionWithMusicProps {
-  session?: VRSession;
-  template?: VRSessionTemplate;
-  onComplete?: (data: any) => void;
-  onClose?: () => void;
+export interface VRControlsProps {
+  isPlaying: boolean;
+  onPlay: () => void;
+  onPause: () => void;
+  onStop: () => void;
+  progress: number;
+  duration: number;
 }

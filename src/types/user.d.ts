@@ -1,70 +1,58 @@
 
-import { NotificationFrequency, NotificationTone } from './notification';
+export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'guest';
 
-export type UserRole = 'user' | 'admin' | 'manager' | 'coach' | 'guest';
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  notifications: boolean;
+  language: string;
+  privacyLevel: 'public' | 'friends' | 'private';
+  musicVolume?: number;
+  autoPlayMusic?: boolean;
+  soundEffects?: boolean;
+  animationLevel?: 'none' | 'minimal' | 'full';
+}
 
 export interface User {
   id: string;
-  name?: string;
+  name: string;
   email: string;
   role: UserRole;
   avatar_url?: string;
-  created_at?: string;
-  updated_at?: string;
-  emotional_score?: number;
+  company?: string;
   department?: string;
   position?: string;
-  preferences?: UserPreferences;
-}
-
-export interface UserPreferences {
-  dashboardLayout?: string;
-  onboardingCompleted?: boolean;
-  theme: 'light' | 'dark' | 'system';
-  fontSize: 'small' | 'medium' | 'large';
-  fontFamily: 'sans-serif' | 'serif' | 'monospace' | 'system';
-  reduceMotion: boolean;
-  colorBlindMode: boolean;
-  autoplayMedia: boolean;
-  notifications: boolean | NotificationPreferences;
-  privacy?: {
-    shareData: boolean;
-    anonymizeReports: boolean;
-    profileVisibility: string | { [key: string]: any };
-  };
-  language?: string;
-  soundEnabled?: boolean;
-  sound?: boolean | {
-    volume?: number;
-    effects?: boolean;
-    music?: boolean;
-  };
-}
-
-export interface NotificationPreferences {
-  enabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled?: boolean;
-  inAppEnabled?: boolean;
-  frequency: NotificationFrequency | string;
-  types?: {
-    system: boolean;
-    emotion: boolean;
-    journal: boolean;
-    coach: boolean;
-    community: boolean;
-    achievement: boolean;
-  };
-  tone?: NotificationTone;
-  quietHours?: {
-    enabled: boolean;
-    start: string;
-    end: string;
-  };
-}
-
-export interface UserPreferencesState {
   preferences: UserPreferences;
-  updatePreferences: (newPrefs: Partial<UserPreferences>) => void;
-  resetPreferences: () => void;
+  created_at: string;
+  last_login?: string;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updateUser: (data: Partial<User>) => Promise<void>;
+  setUserRole: (role: UserRole) => void;
+}
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  role?: UserRole;
+  company?: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+  role?: UserRole;
+}
+
+export interface ResetPasswordData {
+  email: string;
 }

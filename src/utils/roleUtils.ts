@@ -1,52 +1,48 @@
 
-import { UserRole } from "@/types/types";
+import { UserRole } from '@/types/user';
 
-export const hasRoleAccess = (userRole: UserRole | undefined, requiredRole: UserRole): boolean => {
-  if (!userRole) return false;
-  
-  const roleHierarchy = {
-    'admin': 3,
-    'manager': 2,
-    'user': 1,
+/**
+ * Check if the given role is an admin role
+ */
+export function isAdminRole(role?: UserRole | string): boolean {
+  return role === 'b2b_admin';
+}
+
+/**
+ * Check if the given role is a B2B user role
+ */
+export function isB2BUserRole(role?: UserRole | string): boolean {
+  return role === 'b2b_user';
+}
+
+/**
+ * Check if the given role is a B2C user role
+ */
+export function isB2CUserRole(role?: UserRole | string): boolean {
+  return role === 'b2c';
+}
+
+/**
+ * Compare two roles to determine access level
+ * @returns true if role1 has equal or higher privileges than role2
+ */
+export function compareRoles(role1: UserRole | string, role2: UserRole | string): boolean {
+  const roleHierarchy: Record<string, number> = {
+    'b2b_admin': 3,
+    'b2b_user': 2,
+    'b2c': 1,
     'guest': 0
   };
-  
-  return roleHierarchy[userRole] >= roleHierarchy[requiredRole];
-};
 
-export const getRoleLoginPath = (role: UserRole): string => {
-  switch (role) {
-    case 'admin':
-      return '/admin/dashboard';
-    case 'manager':
-      return '/manager/dashboard';
-    case 'user':
-      return '/dashboard';
-    default:
-      return '/';
+  return (roleHierarchy[role1] || 0) >= (roleHierarchy[role2] || 0);
+}
+
+/**
+ * Normalize user role to ensure it matches expected UserRole type
+ */
+export function normalizeUserRole(role?: string): UserRole {
+  if (role === 'b2b_admin' || role === 'b2b_user' || role === 'b2c') {
+    return role as UserRole;
   }
-};
-
-export const getRoleName = (role: UserRole): string => {
-  switch (role) {
-    case 'admin':
-      return 'Administrateur';
-    case 'manager':
-      return 'Manager';
-    case 'user':
-      return 'Utilisateur';
-    default:
-      return 'Invité';
-  }
-};
-
-export const compareRoles = (roleA: UserRole, roleB: UserRole): number => {
-  const roleHierarchy = {
-    'admin': 3,
-    'manager': 2,
-    'user': 1,
-    'guest': 0
-  };
-  
-  return roleHierarchy[roleA] - roleHierarchy[roleB];
-};
+  return 'guest' as UserRole;
+}

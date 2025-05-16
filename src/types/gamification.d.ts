@@ -9,6 +9,7 @@ export interface Badge {
   unlockedAt?: string;
   progress?: number;
   completed?: boolean;
+  unlocked?: boolean; // For compatibility
 }
 
 export interface Challenge {
@@ -45,4 +46,10 @@ export interface GamificationStats {
     level: number;
   };
   progress: number;
+  badges?: Badge[];
+  completedChallenges?: number;
+  totalChallenges?: number;
+  challenges?: Challenge[];
+  rank?: number;
+  xp?: number;
 }

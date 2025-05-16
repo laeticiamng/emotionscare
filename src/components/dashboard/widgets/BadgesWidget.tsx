@@ -1,41 +1,79 @@
 
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge as UIBadge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Medal } from 'lucide-react';
 import { Badge } from '@/types/gamification';
 
 interface BadgesWidgetProps {
   badges: Badge[];
+  title?: string;
+  limit?: number;
 }
 
-const BadgesWidget: React.FC<BadgesWidgetProps> = ({ badges }) => {
+const BadgesWidget: React.FC<BadgesWidgetProps> = ({
+  badges,
+  title = "Badges récents",
+  limit = 6
+}) => {
+  // Take only the specified number of badges
+  const displayedBadges = badges.slice(0, limit);
+  
   return (
-    <div className="space-y-3">
-      {badges.length === 0 ? (
-        <p className="text-muted-foreground text-sm">Aucun badge débloqué pour le moment.</p>
-      ) : (
-        <div className="space-y-3">
-          {badges.map((badge) => (
-            <div key={badge.id} className="flex items-center gap-3 p-2 rounded-md hover:bg-accent">
-              <div className="h-10 w-10 flex items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
-                {badge.icon}
-              </div>
-              <div className="space-y-1 flex-1 min-w-0">
-                <p className="text-sm font-medium">{badge.name}</p>
-                <div className="text-xs text-muted-foreground truncate">{badge.description}</div>
-                
-                {badge.progress !== undefined && badge.progress < 100 && (
-                  <div className="w-full bg-secondary h-1 rounded-full overflow-hidden">
+    <Card className="h-full">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-xl flex items-center gap-2">
+          <Medal className="h-5 w-5 text-primary" />
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="grid grid-cols-3 gap-4">
+          {displayedBadges.map((badge) => (
+            <TooltipProvider key={badge.id}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex flex-col items-center">
                     <div 
-                      className="bg-primary h-1 rounded-full" 
-                      style={{ width: `${badge.progress}%` }}
-                    ></div>
+                      className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
+                        badge.completed || badge.unlockedAt ? 'bg-primary/20' : 'bg-muted'
+                      }`}
+                    >
+                      <span className="text-lg">
+                        {badge.icon}
+                      </span>
+                    </div>
+                    <span className="text-xs text-center line-clamp-1">
+                      {badge.name}
+                    </span>
+                    {badge.level && (
+                      <UIBadge variant="outline" className="text-xs mt-1">
+                        Niv. {badge.level}
+                      </UIBadge>
+                    )}
                   </div>
-                )}
-              </div>
-            </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="space-y-1 max-w-[200px]">
+                    <p className="font-medium">{badge.name}</p>
+                    <p className="text-xs">{badge.description}</p>
+                    {badge.unlockedAt && (
+                      <p className="text-xs text-muted-foreground">
+                        Débloqué le {new Date(badge.unlockedAt).toLocaleDateString()}
+                      </p>
+                    )}
+                    {badge.progress !== undefined && !badge.completed && !badge.unlockedAt && (
+                      <p className="text-xs">Progression: {badge.progress}%</p>
+                    )}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           ))}
         </div>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

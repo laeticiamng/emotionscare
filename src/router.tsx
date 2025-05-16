@@ -21,6 +21,8 @@ import B2CRegister from '@/pages/b2c/Register';
 import B2CDashboard from '@/pages/b2c/Dashboard';
 import B2CJournal from '@/pages/b2c/Journal';
 import B2CMusic from '@/pages/b2c/Music';
+import B2CMusicCreate from '@/pages/b2c/MusicCreate';
+import B2CMusicPreferences from '@/pages/b2c/MusicPreferences';
 import B2CScan from '@/pages/b2c/Scan';
 import B2CCoach from '@/pages/b2c/Coach';
 import B2CVR from '@/pages/b2c/VR';
@@ -34,6 +36,8 @@ import B2BUserRegister from '@/pages/b2b/user/Register';
 import B2BUserDashboard from '@/pages/b2b/user/Dashboard';
 import B2BUserJournal from '@/pages/b2b/user/Journal';
 import B2BUserMusic from '@/pages/b2b/user/Music';
+import B2BUserMusicCreate from '@/pages/b2b/user/MusicCreate';
+import B2BUserMusicPreferences from '@/pages/b2b/user/MusicPreferences';
 import B2BUserScan from '@/pages/b2b/user/Scan';
 import B2BUserCoach from '@/pages/b2b/user/Coach';
 import B2BUserVR from '@/pages/b2b/user/VR';
@@ -50,6 +54,7 @@ import B2BAdminEvents from '@/pages/b2b/admin/Events';
 import B2BAdminSettings from '@/pages/b2b/admin/Settings';
 import B2BAdminJournal from '@/pages/b2b/admin/Journal';
 import B2BAdminScan from '@/pages/b2b/admin/Scan';
+import B2BAdminMusic from '@/pages/b2b/admin/Music';
 
 export const router = createBrowserRouter([
   // Root route - Immersive Homepage
@@ -95,6 +100,14 @@ export const router = createBrowserRouter([
       { 
         path: 'music', 
         element: <B2CMusic /> 
+      },
+      { 
+        path: 'music/create', 
+        element: <B2CMusicCreate /> 
+      },
+      { 
+        path: 'music/preferences', 
+        element: <B2CMusicPreferences /> 
       },
       { 
         path: 'scan', 
@@ -153,6 +166,14 @@ export const router = createBrowserRouter([
         element: <B2BUserMusic /> 
       },
       { 
+        path: 'music/create', 
+        element: <B2BUserMusicCreate /> 
+      },
+      { 
+        path: 'music/preferences', 
+        element: <B2BUserMusicPreferences /> 
+      },
+      { 
         path: 'scan', 
         element: <B2BUserScan /> 
       },
@@ -203,6 +224,10 @@ export const router = createBrowserRouter([
       { 
         path: 'scan', 
         element: <B2BAdminScan /> 
+      },
+      { 
+        path: 'music', 
+        element: <B2BAdminMusic /> 
       },
       { 
         path: 'teams', 

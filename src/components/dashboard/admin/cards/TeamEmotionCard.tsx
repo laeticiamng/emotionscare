@@ -1,86 +1,71 @@
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
-const TeamEmotionCard: React.FC = () => {
-  const emotionalScore = 76;
-  const positivePercentage = 65;
-  const neutralPercentage = 25;
-  const negativePercentage = 10;
+interface TeamEmotionCardProps {
+  title?: string;
+  emotions: Array<{
+    name: string;
+    value: number;
+    color: string;
+  }>;
+}
+
+const TeamEmotionCard: React.FC<TeamEmotionCardProps> = ({
+  title = "Émotions de l'équipe",
+  emotions
+}) => {
+  // Find the dominant emotion (highest value)
+  const dominantEmotion = emotions.reduce(
+    (max, emotion) => (emotion.value > max.value ? emotion : max),
+    emotions[0] || { name: 'Neutre', value: 0, color: '#888' }
+  );
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Climat Émotionnel</CardTitle>
+      <CardHeader className="pb-2">
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold">Score global</h3>
-            <div className="flex items-baseline mt-1">
-              <span className="text-3xl font-bold">{emotionalScore}</span>
-              <span className="text-sm text-muted-foreground ml-1">/100</span>
-            </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Score positif à maintenir
-            </p>
-          </div>
-          
+        <div className="flex items-center justify-around mb-4">
           <div className="w-24 h-24">
             <CircularProgressbar
-              value={emotionalScore}
-              text={`${emotionalScore}%`}
+              value={dominantEmotion.value}
+              maxValue={100}
+              text={`${Math.round(dominantEmotion.value)}%`}
               styles={buildStyles({
-                textSize: '16px',
-                pathColor: emotionalScore > 70 ? '#10B981' : emotionalScore > 50 ? '#F59E0B' : '#EF4444',
-                textColor: '#6B7280',
-                trailColor: '#E5E7EB',
+                pathColor: dominantEmotion.color,
+                textColor: dominantEmotion.color,
+                trailColor: '#eee',
               })}
             />
           </div>
+          <div>
+            <h3 className="text-xl font-medium">{dominantEmotion.name}</h3>
+            <p className="text-muted-foreground text-sm">Émotion dominante</p>
+          </div>
         </div>
-
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">Émotions positives</span>
-              <span>{positivePercentage}%</span>
+        
+        <div className="space-y-3">
+          {emotions.map((emotion) => (
+            <div key={emotion.name}>
+              <div className="flex justify-between mb-1">
+                <span className="text-sm">{emotion.name}</span>
+                <span className="text-sm text-muted-foreground">{emotion.value}%</span>
+              </div>
+              <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${emotion.value}%`,
+                    backgroundColor: emotion.color,
+                  }}
+                />
+              </div>
             </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-green-500 rounded-full" 
-                style={{ width: `${positivePercentage}%` }}
-              ></div>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">Émotions neutres</span>
-              <span>{neutralPercentage}%</span>
-            </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gray-400 rounded-full" 
-                style={{ width: `${neutralPercentage}%` }}
-              ></div>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">Émotions négatives</span>
-              <span>{negativePercentage}%</span>
-            </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-red-500 rounded-full" 
-                style={{ width: `${negativePercentage}%` }}
-              ></div>
-            </div>
-          </div>
+          ))}
         </div>
       </CardContent>
     </Card>

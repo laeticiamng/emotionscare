@@ -1,46 +1,81 @@
 
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
-const TeamLeaderboardCard: React.FC = () => {
-  const teamMembers = [
-    { id: '1', name: 'Équipe Marketing', score: 85, trend: 'up', members: 12 },
-    { id: '2', name: 'R&D', score: 82, trend: 'up', members: 8 },
-    { id: '3', name: 'Ventes', score: 78, trend: 'down', members: 15 },
-    { id: '4', name: 'Support Client', score: 76, trend: 'up', members: 6 },
-    { id: '5', name: 'Développement', score: 73, trend: 'down', members: 9 }
-  ];
+interface TeamMember {
+  id: string;
+  name: string;
+  avatar?: string;
+  department?: string;
+  score: number;
+  change?: number;
+}
+
+interface TeamLeaderboardCardProps {
+  title?: string;
+  members: TeamMember[];
+  metric?: string;
+}
+
+const TeamLeaderboardCard: React.FC<TeamLeaderboardCardProps> = ({
+  title = "Performance d'équipe",
+  members,
+  metric = "Score"
+}) => {
+  // Sort members by score (highest first)
+  const sortedMembers = [...members].sort((a, b) => b.score - a.score);
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Classement des équipes</CardTitle>
+      <CardHeader className="pb-2">
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {teamMembers.map((team, index) => (
-            <div key={team.id} className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-6 h-6 flex items-center justify-center bg-primary/10 text-primary rounded-full text-sm font-medium mr-3">
-                  {index + 1}
-                </div>
+      <CardContent className="p-0">
+        <div className="space-y-1">
+          {sortedMembers.map((member, index) => (
+            <div
+              key={member.id}
+              className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-muted-foreground font-mono w-5 text-right">
+                  #{index + 1}
+                </span>
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={member.avatar} />
+                  <AvatarFallback>
+                    {member.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <div>
-                  <div className="font-medium">{team.name}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {team.members} membres
-                  </div>
+                  <p className="text-sm font-medium">{member.name}</p>
+                  {member.department && (
+                    <p className="text-xs text-muted-foreground">
+                      {member.department}
+                    </p>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center">
-                <Badge 
-                  variant={team.trend === 'up' ? 'success' : 'destructive'}
-                  className="mr-2"
-                >
-                  {team.trend === 'up' ? '↑' : '↓'}
+              <div className="flex items-center gap-2">
+                <Badge variant="outline">
+                  {member.score} {metric}
                 </Badge>
-                <span className="font-medium">{team.score}</span>
+                {member.change !== undefined && (
+                  <span
+                    className={`text-xs ${
+                      member.change > 0
+                        ? 'text-green-500'
+                        : member.change < 0
+                        ? 'text-red-500'
+                        : 'text-muted-foreground'
+                    }`}
+                  >
+                    {member.change > 0 ? '+' : ''}
+                    {member.change}%
+                  </span>
+                )}
               </div>
             </div>
           ))}

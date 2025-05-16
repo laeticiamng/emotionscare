@@ -1,67 +1,92 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import DraggableCard from './DraggableCard';
-import { DraggableCardProps, DraggableKpiCardsGridProps } from './types';
+
+export interface DraggableCardProps {
+  id: string;
+  title: string;
+  value: string | number;
+  icon?: React.ReactNode;
+  change?: {
+    value: number;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  description?: string;
+  color?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info';
+  status?: 'positive' | 'negative' | 'neutral';
+}
+
+interface DraggableKpiCardsGridProps {
+  kpiCards: DraggableCardProps[];
+  onOrderChange?: (newOrder: string[]) => void;
+}
 
 const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({ 
-  cards,
-  kpiCards,
+  kpiCards, 
   onOrderChange 
 }) => {
-  // Use either cards or kpiCards prop
-  const cardsList = cards || kpiCards || [];
-  const [draggableCards, setDraggableCards] = useState<DraggableCardProps[]>(cardsList);
+  const [items, setItems] = React.useState<DraggableCardProps[]>(kpiCards);
+  
+  React.useEffect(() => {
+    setItems(kpiCards);
+  }, [kpiCards]);
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
-    e.dataTransfer.setData('text/plain', index.toString());
-  };
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, dropIndex: number) => {
-    e.preventDefault();
-    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
-    if (dragIndex === dropIndex) return;
-
-    const newCards = [...draggableCards];
-    const draggedCard = newCards[dragIndex];
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
     
-    // Remove the dragged card
-    newCards.splice(dragIndex, 1);
-    // Insert it at the drop position
-    newCards.splice(dropIndex, 0, draggedCard);
-
-    setDraggableCards(newCards);
-    if (onOrderChange) {
-      onOrderChange(newCards);
+    if (over && active.id !== over.id) {
+      const activeIndex = items.findIndex((item) => item.id === active.id);
+      const overIndex = items.findIndex((item) => item.id === over.id);
+      
+      const newItems = [...items];
+      newItems.splice(activeIndex, 1);
+      newItems.splice(overIndex, 0, items[activeIndex]);
+      
+      setItems(newItems);
+      
+      if (onOrderChange) {
+        onOrderChange(newItems.map(item => item.id));
+      }
     }
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {draggableCards.map((card, index) => (
-        <div
-          key={card.id || `card-${index}`}
-          draggable
-          onDragStart={(e) => handleDragStart(e, index)}
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, index)}
-          className="transition-all"
-        >
-          <DraggableCard
-            id={card.id || `card-${index}`}
-            title={card.title}
-            value={card.value}
-            icon={card.icon}
-            delta={card.delta}
-            subtitle={card.subtitle}
-            status={card.status}
-          />
+    <DndContext 
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext 
+        items={items.map(item => ({ id: item.id }))}
+        strategy={rectSortingStrategy}
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {items.map((card) => (
+            <DraggableCard
+              key={card.id}
+              id={card.id}
+              title={card.title}
+              value={card.value}
+              icon={card.icon}
+              change={card.change}
+              description={card.description}
+              color={card.color}
+              status={card.status}
+            />
+          ))}
         </div>
-      ))}
-    </div>
+      </SortableContext>
+    </DndContext>
   );
 };
 
