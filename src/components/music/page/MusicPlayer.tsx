@@ -1,7 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types';
-import MusicControls from './MusicControls';
+import { MusicTrack } from '@/types/music';
+import MusicControls from '../page/MusicControls';
+import { formatTime } from '@/utils/formatUtils';
 
 interface MusicPlayerProps {
   tracks: MusicTrack[];
@@ -86,12 +87,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
   
   const getCurrentTrackUrl = () => {
     if (!currentTrack) return '';
-    return currentTrack.track_url || currentTrack.audioUrl || currentTrack.url || '';
-  };
-  
-  const getCurrentTrackCover = () => {
-    if (!currentTrack) return '';
-    return currentTrack.cover_url || '';
+    return currentTrack.audioUrl || '';
   };
   
   const handleTogglePlay = () => {
@@ -136,6 +132,10 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
     setIsMuted(prev => !prev);
   };
   
+  if (tracks.length === 0 || !currentTrack) {
+    return <div className="text-center text-muted-foreground p-4">No tracks available</div>;
+  }
+  
   return (
     <>
       <audio
@@ -147,10 +147,11 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
       
       <MusicControls
         isPlaying={isPlaying}
-        currentTrack={currentTrack}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
         onTogglePlay={handleTogglePlay}
-        onPrevious={handlePrevious}
-        onNext={handleNext}
+        onPrevious={tracks.length > 1 ? handlePrevious : undefined}
+        onNext={tracks.length > 1 ? handleNext : undefined}
         currentTime={currentTime}
         duration={duration || (currentTrack?.duration || 0)}
         onSeek={handleSeek}
@@ -158,6 +159,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
         isMuted={isMuted}
         onToggleMute={handleToggleMute}
         onVolumeChange={handleVolumeChange}
+        track={currentTrack}
       />
     </>
   );

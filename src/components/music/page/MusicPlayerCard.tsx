@@ -1,19 +1,21 @@
-import React from 'react';
-import { Card } from '@/components/ui/card';
-import { MusicTrack } from '@/types/music';
 
-interface MusicPlayerProps {
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { MusicTrack } from '@/types/music';
+import MusicPlayer from './MusicPlayer';
+
+interface MusicPlayerCardProps {
   tracks: MusicTrack[];
 }
 
-const MusicPlayerCard: React.FC<MusicPlayerProps> = ({ 
+const MusicPlayerCard: React.FC<MusicPlayerCardProps> = ({ 
   tracks = [] // Provide default empty array
 }) => {
   return (
     <Card>
-      {/* You can add content here to display the music player */}
-      {/* For example, a list of tracks or a simple message */}
-      <p>Music Player Card</p>
+      <CardContent className="p-4">
+        <MusicPlayer tracks={tracks} />
+      </CardContent>
     </Card>
   );
 };

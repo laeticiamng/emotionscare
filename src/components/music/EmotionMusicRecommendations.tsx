@@ -53,7 +53,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
       try {
         // Call the loadPlaylistForEmotion function from MusicContext
         const params: EmotionMusicParams = { emotion };
-        const playlist = await loadPlaylistForEmotion(params);
+        const playlist = await loadPlaylistForEmotion(emotion);
         setRecommendation(playlist);
       } catch (err) {
         console.error('Failed to load music recommendation:', err);

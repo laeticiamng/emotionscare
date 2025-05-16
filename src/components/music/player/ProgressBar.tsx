@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { ProgressBarProps } from '@/types/music';
@@ -20,11 +21,22 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     }
   };
 
+  const handleInternalProgressClick = (e: React.MouseEvent) => {
+    // Internal handler for progress bar clicks
+    const rect = e.currentTarget.getBoundingClientRect();
+    const percent = (e.clientX - rect.left) / rect.width;
+    const seekValue = percent * duration;
+    
+    if (onSeek) {
+      onSeek(seekValue);
+    }
+  };
+
   return (
     <div className={className}>
       <div
         className="relative w-full"
-        onClick={handleProgressClick}
+        onClick={handleInternalProgressClick}
       >
         <Slider
           value={[value]}

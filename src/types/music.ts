@@ -95,6 +95,9 @@ export interface MusicControlsProps {
   track?: MusicTrack;
   currentTime?: number;
   onSeek?: (position: number) => void;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
+  onTogglePlay?: () => void;
 }
 
 export interface MusicDrawerProps {
@@ -110,6 +113,17 @@ export interface MusicDrawerProps {
 
 export interface MusicPlayerProps {
   tracks: MusicTrack[];
+  autoPlay?: boolean;
+  initialTrack?: MusicTrack;
+  onTrackChange?: (track: MusicTrack) => void;
+  onPlay?: () => void;
+  onPause?: () => void;
+}
+
+export interface MoodBasedRecommendationsProps {
+  mood: string;
+  standalone?: boolean;
+  intensity?: number;
 }
 
 // Aliases for older/existing components

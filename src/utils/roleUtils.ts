@@ -1,79 +1,68 @@
 
-import { UserRole } from '@/types/user';
+import { UserRole } from '@/types';
 
 /**
- * Normalize the user role to a standard format
+ * Normalizes user role string to a consistent format
  */
-export const normalizeUserRole = (role: string | null): UserRole => {
-  if (!role) return 'user';
-  
-  const normalizedRole = role.toLowerCase().trim();
-  
-  if (normalizedRole.includes('admin') || normalizedRole === 'b2b_admin') {
-    return 'b2b_admin';
-  } else if (normalizedRole.includes('b2b') || normalizedRole === 'b2b_user') {
-    return 'b2b_user';
-  } else {
-    return 'b2c';
-  }
-};
-
-/**
- * Compare roles for access permissions
- */
-export const compareRoles = (userRole: UserRole, requiredRole: UserRole): number => {
-  const roleHierarchy: Record<UserRole, number> = {
-    'b2b_admin': 3,
-    'b2b_user': 2,
-    'b2c': 1,
-    'user': 1
+export const normalizeUserRole = (role: string): UserRole => {
+  const roleMap: Record<string, UserRole> = {
+    'admin': 'admin',
+    'administrator': 'admin',
+    'user': 'user',
+    'standard': 'user',
+    'b2b_admin': 'b2b_admin',
+    'b2b_admin_role': 'b2b_admin',
+    'admin_b2b': 'b2b_admin',
+    'b2b_user': 'b2b_user',
+    'user_b2b': 'b2b_user',
+    'employee': 'b2b_user',
+    'collaborator': 'b2b_user',
+    'b2c': 'user',
+    'b2c_user': 'user',
+    'client': 'user',
+    'customer': 'user'
   };
-  
-  return roleHierarchy[userRole] - roleHierarchy[requiredRole];
+
+  const normalizedRole = String(role).toLowerCase().trim();
+  return roleMap[normalizedRole] || 'user';
 };
 
 /**
- * Check if user has access to required role (equal or higher role)
+ * Returns the home path for a given role
  */
-export const hasRoleAccess = (userRole: UserRole, requiredRole: UserRole): boolean => {
-  return compareRoles(userRole, requiredRole) >= 0;
-};
-
-/**
- * Get a descriptive name for a role
- */
-export const getRoleName = (role: UserRole): string => {
+export const getRoleHomePath = (role: UserRole): string => {
   switch (role) {
+    case 'admin':
+      return '/admin';
     case 'b2b_admin':
-      return 'Administrateur';
+      return '/b2b/admin';
     case 'b2b_user':
-      return 'Professionnel';
-    case 'b2c':
+      return '/b2b/user';
     case 'user':
     default:
-      return 'Utilisateur';
+      return '/home';
   }
 };
 
 /**
- * Check if role is an admin role
+ * Checks if user has admin privileges
  */
-export const isAdminRole = (role: UserRole | null | undefined): boolean => {
-  return role === 'b2b_admin';
+export const isAdminRole = (role: string): boolean => {
+  const normalizedRole = normalizeUserRole(role);
+  return normalizedRole === 'admin' || normalizedRole === 'b2b_admin';
 };
 
 /**
- * Get the login path for a specific role
+ * Formats role for display
  */
-export const getRoleLoginPath = (role: UserRole): string => {
-  switch (role) {
-    case 'b2b_admin':
-      return '/b2b/admin/login';
-    case 'b2b_user':
-      return '/b2b/user/login';
-    case 'b2c':
-    case 'user':
-    default:
-      return '/b2c/login';
-  }
+export const formatRoleForDisplay = (role: string): string => {
+  const roleDisplayMap: Record<string, string> = {
+    'admin': 'Administrateur',
+    'b2b_admin': 'Admin B2B',
+    'b2b_user': 'Utilisateur B2B',
+    'user': 'Utilisateur'
+  };
+
+  const normalizedRole = normalizeUserRole(role);
+  return roleDisplayMap[normalizedRole] || 'Utilisateur';
 };

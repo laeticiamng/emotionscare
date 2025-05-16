@@ -28,10 +28,7 @@ const UserDashboard: React.FC = () => {
       category: 'daily',
       points: 50,
       progress: 0,
-      completed: false,
-      isDaily: true,
-      status: 'active'
-      // Removed icon property that was causing errors
+      completed: false
     },
     {
       id: '2',
@@ -40,10 +37,7 @@ const UserDashboard: React.FC = () => {
       category: 'weekly',
       points: 100,
       progress: 33,
-      completed: false,
-      isWeekly: true,
-      status: 'active'
-      // Removed icon property that was causing errors
+      completed: false
     },
     {
       id: '3',
@@ -52,9 +46,7 @@ const UserDashboard: React.FC = () => {
       category: 'special',
       points: 150,
       progress: 0,
-      completed: false,
-      status: 'active'
-      // Removed icon property that was causing errors
+      completed: false
     }
   ];
 
@@ -99,7 +91,8 @@ const UserDashboard: React.FC = () => {
       avatar: '/avatars/thomas.jpg',
       points: 1250,
       rank: 1,
-      level: 5
+      level: 5,
+      isCurrentUser: false
     },
     {
       id: '2',
@@ -108,7 +101,8 @@ const UserDashboard: React.FC = () => {
       avatar: '/avatars/marie.jpg',
       points: 980,
       rank: 2,
-      level: 4
+      level: 4,
+      isCurrentUser: true
     },
     {
       id: '3',
@@ -117,7 +111,8 @@ const UserDashboard: React.FC = () => {
       avatar: '/avatars/julien.jpg',
       points: 760,
       rank: 3,
-      level: 3
+      level: 3,
+      isCurrentUser: false
     }
   ];
 
@@ -131,8 +126,8 @@ const UserDashboard: React.FC = () => {
     streak: 5,
     nextLevel: {
       points: 1200,
-      level: 5, // Added the level property to match interface
-      rewards: ["Badge Premium", "Accès VIP"]
+      rewards: ["Badge Premium", "Accès VIP"],
+      level: 5
     },
     progress: 75,
     leaderboard: leaderboard

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TabsContent } from '@/components/ui/tabs';
 import { MusicTrack } from '@/types/music';
@@ -12,7 +13,6 @@ const MusicTabs = () => {
       duration: 180,
       audioUrl: "/sample-audio/calm-1.mp3",
       coverUrl: "/images/music/calm-1.jpg",
-      url: "/sample-audio/calm-1.mp3",
       category: "calm"
     },
     {
@@ -22,7 +22,6 @@ const MusicTabs = () => {
       duration: 240,
       audioUrl: "/sample-audio/calm-2.mp3",
       coverUrl: "/images/music/calm-2.jpg",
-      url: "/sample-audio/calm-2.mp3",
       category: "calm"
     }
   ];

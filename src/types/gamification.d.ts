@@ -5,7 +5,7 @@ export interface Badge {
   description: string;
   image_url?: string;
   earned_date?: string;
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum' | 'rare' | 'epic' | 'legendary';
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum' | 'rare' | 'epic' | 'legendary' | 'common';
   category?: string;
   icon?: string;
   level?: number | string;
@@ -89,7 +89,6 @@ export interface GamificationStats {
     level?: number;
     rewards: string[];
   };
-  // Additional properties used in components
   rank?: string;
   activeChallenges?: number;
   streakDays?: number;
