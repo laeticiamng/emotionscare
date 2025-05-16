@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import SessionTimeoutAlert from '@/components/SessionTimeoutAlert';
+import { Toaster } from '@/components/ui/toaster';
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -16,6 +17,7 @@ const App: React.FC = () => {
       <ThemeProvider>
         <Outlet />
         <SessionTimeoutAlert />
+        <Toaster />
       </ThemeProvider>
     </>
   );
