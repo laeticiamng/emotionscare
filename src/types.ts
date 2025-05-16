@@ -9,7 +9,8 @@ export type {
   UserRole,
   NotificationPreferences,
   Period,
-  UserModeType
+  UserModeType,
+  Story
 } from './types/types';
 
 export type {
@@ -82,7 +83,7 @@ export type {
   ChatMessage,
   MoodData,
   JournalEntry,
-  Story,
+  Story as OtherStory,
   EmotionPrediction,
   Recommendation,
   InvitationStats,

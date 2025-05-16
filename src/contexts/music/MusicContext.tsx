@@ -3,18 +3,41 @@ import React, { createContext, useContext, useState } from 'react';
 import { MusicContextType, MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
 
 // Créer un contexte par défaut
-const MusicContext = createContext<MusicContextType | undefined>(undefined);
+const MusicContext = createContext<MusicContextType>({
+  currentTrack: null,
+  isPlaying: false,
+  volume: 0.7,
+  muted: false,
+  duration: 0,
+  playTrack: () => {},
+  togglePlay: () => {},
+  setVolume: () => {},
+  nextTrack: () => {},
+  previousTrack: () => {},
+  seekTo: () => {}
+});
 
 // Créer un provider pour le contexte
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.7);
+  const [volume, setVolumeState] = useState(0.7);
   const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  // Initialisation du système de musique
+  const initializeMusicSystem = async () => {
+    setIsInitialized(true);
+    return true;
+  };
 
   // Simulation de chargement d'une playlist basée sur l'émotion
   const loadPlaylistForEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
@@ -61,6 +84,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentTrack(track);
     setIsPlaying(true);
     setProgress(0);
+    setCurrentTime(0);
     setDuration(track.duration || 0);
   };
   
@@ -80,6 +104,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const stopTrack = () => {
     setIsPlaying(false);
     setProgress(0);
+    setCurrentTime(0);
   };
   
   // Toggle play/pause
@@ -90,6 +115,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Toggle mute
   const toggleMute = () => {
     setMuted(!muted);
+  };
+
+  // Set volume
+  const setVolume = (level: number) => {
+    setVolumeState(level);
   };
   
   // Go to next track
@@ -122,7 +152,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   
   // Seek to a specific position
   const seekTo = (position: number) => {
-    setProgress(position);
+    setCurrentTime(position);
+    setProgress((position / duration) * 100);
   };
   
   // Set a playlist
@@ -137,8 +168,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     currentTrack,
     isPlaying,
     volume,
+    muted,
     isMuted: muted,
     progress,
+    currentTime,
     duration,
     currentPlaylist,
     currentEmotion,
@@ -152,6 +185,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     nextTrack,
     previous: previousTrack,
     previousTrack,
+    prevTrack: previousTrack,
     setVolume,
     togglePlay,
     toggleMute,
@@ -160,7 +194,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     seekTo,
     setPlaylist,
     loadPlaylistForEmotion,
-    setEmotion: setCurrentEmotion
+    setEmotion: setCurrentEmotion,
+    openDrawer,
+    setOpenDrawer,
+    playlists,
+    isInitialized,
+    initializeMusicSystem,
+    error
   };
 
   return (
@@ -173,10 +213,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 // Hook pour utiliser le contexte de musique
 export const useMusic = () => {
   const context = useContext(MusicContext);
-  
-  if (!context) {
-    throw new Error("useMusic must be used within a MusicProvider");
-  }
-  
   return context;
 };
+
+export default MusicContext;

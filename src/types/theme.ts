@@ -1,8 +1,8 @@
 
 export interface Theme {
-  id: string;
-  name: string;
-  value: string;
+  id?: string;
+  name?: string;
+  value?: string;
   preview?: string;
 }
 
@@ -11,7 +11,11 @@ export type ThemeContextType = {
   setTheme: (theme: string) => void;
   isDarkMode: boolean;
   toggleTheme: () => void;
+  fontFamily?: FontFamily;
+  setFontFamily?: (fontFamily: FontFamily) => void;
+  fontSize?: FontSize;
+  setFontSize?: (fontSize: FontSize) => void;
 };
 
-export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "inter";
+export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "inter" | "rounded";
 export type FontSize = "small" | "medium" | "large" | "x-large" | "sm" | "md" | "lg" | "xl";

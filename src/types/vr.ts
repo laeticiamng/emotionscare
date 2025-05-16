@@ -1,35 +1,20 @@
 
+import { MusicTrack } from './music';
+
 export interface VRSessionTemplate {
   id: string;
   title: string;
   description?: string;
   duration: number;
-  tags?: string[];
-  emotion_target?: string;
-  emotionTarget?: string;
-  thumbnailUrl?: string;
+  environment: string;
+  musicTrackId?: string;
+  musicTrack?: MusicTrack;
 }
 
-export interface VRSession {
-  id: string;
-  templateId: string;
-  title: string;
-  description?: string;
-  duration: number;
-  startTime?: Date;
-  endTime?: Date;
-  environment?: string;
-  completionRate?: number;
-}
-
-export interface VRHistoryListProps {
-  sessions: VRSession[];
-  onSelect?: (session: VRSession) => void;
-}
-
-export interface VRSessionHistoryProps {
+export interface VRSession extends VRSessionTemplate {
+  startedAt?: string | Date;
+  completedAt?: string | Date;
   userId?: string;
-  limit?: number;
 }
 
 export interface VRSessionWithMusicProps {
@@ -41,8 +26,14 @@ export interface VRSessionWithMusicProps {
   musicTrackId?: string;
 }
 
+export interface VRHistoryListProps {
+  userId?: string;
+}
+
+export interface VRSessionHistoryProps {
+  sessionId: string;
+}
+
 export interface VRTemplateGridProps {
-  templates: VRSessionTemplate[];
-  onSelect: (template: VRSessionTemplate) => void;
-  filter?: string;
+  onSelect?: (template: VRSessionTemplate) => void;
 }

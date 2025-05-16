@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   email: string;
@@ -62,7 +63,7 @@ export interface NotificationPreferences {
   frequency?: string;
 }
 
-export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "inter";
+export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "inter" | "rounded";
 export type FontSize = "small" | "medium" | "large" | "x-large" | "sm" | "md" | "lg" | "xl";
 export type ThemeName = "light" | "dark" | "system" | "pastel";
 
@@ -88,3 +89,4 @@ export interface Story {
   author_id: string;
   seen?: boolean;
 }
+

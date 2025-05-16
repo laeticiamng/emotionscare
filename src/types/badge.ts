@@ -11,4 +11,5 @@ export interface Badge {
   unlocked?: boolean;
   achieved_at?: string | Date;
   rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  seen?: boolean;
 }

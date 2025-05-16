@@ -38,6 +38,9 @@ export interface TeamOverviewProps {
 }
 
 export interface EmotionalTeamViewProps {
-  departmentId?: string;
+  teamId?: string;
   period?: "day" | "week" | "month" | "year";
+  userId?: string;
+  anonymized?: boolean;
+  className?: string;
 }
