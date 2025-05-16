@@ -1,7 +1,8 @@
-
 import { ActivityTabView, AnonymousActivity, ActivityStats } from './types';
 import { getActivityLabel } from './activityUtils';
 import { toast } from '@/hooks/use-toast';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 export const formatCsvData = (
   tabView: ActivityTabView,

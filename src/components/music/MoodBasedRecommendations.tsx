@@ -1,102 +1,53 @@
-
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useMusic } from '@/contexts/MusicContext';
-import { Music } from 'lucide-react';
-import { EmotionMusicParams, MusicPlaylist } from '@/types/music';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
+import { useMusicContext } from '@/contexts/MusicContext';
 import { toast } from '@/hooks/use-toast';
 
 interface MoodBasedRecommendationsProps {
   mood: string;
-  intensity?: number;
-  standalone?: boolean;
-  onSelect?: (playlist: MusicPlaylist | null) => void;
 }
 
-const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ 
-  mood, 
-  intensity = 0.5,
-  standalone = false,
-  onSelect
-}) => {
-  const { loadPlaylistForEmotion } = useMusic();
-  
-  const handleSelectPlaylist = async () => {
-    try {
-      const params: EmotionMusicParams = {
-        emotion: mood,
-        intensity
-      };
-      
-      const playlist = await loadPlaylistForEmotion(params);
-      
-      if (playlist && onSelect) {
-        onSelect(playlist);
-      } else if (!playlist) {
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger la playlist correspondante.",
-          variant: "destructive"
-        });
-      }
-    } catch (error) {
-      console.error("Error loading mood-based playlist:", error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors du chargement de la playlist.",
-        variant: "destructive"
-      });
+const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ mood }) => {
+  const { getRecommendations, recommendations, isLoading, error } = useMusicContext();
+
+  React.useEffect(() => {
+    if (mood) {
+      getRecommendations(mood);
     }
+  }, [mood, getRecommendations]);
+
+  const handlePlay = (trackId: string) => {
+    toast({
+      title: "Lecture de la musique",
+      description: `Lecture de la musique avec l'ID: ${trackId}`,
+    });
   };
-  
-  const getMoodEmoji = (mood: string): string => {
-    const emojiMap: Record<string, string> = {
-      happy: '😊',
-      sad: '😢',
-      angry: '😠',
-      calm: '😌',
-      anxious: '😰',
-      focused: '🧐',
-      neutral: '😐',
-      energetic: '⚡'
-    };
-    
-    return emojiMap[mood.toLowerCase()] || '🎵';
-  };
-  
-  const getMoodDescription = (mood: string): string => {
-    const descriptionMap: Record<string, string> = {
-      happy: "Musique joyeuse pour amplifier votre bonne humeur",
-      sad: "Mélodies apaisantes pour vous accompagner dans ce moment",
-      angry: "Sons relaxants pour aider à gérer les émotions fortes",
-      calm: "Ambiance sereine pour maintenir votre tranquillité",
-      anxious: "Compositions douces pour réduire le stress",
-      focused: "Rythmes ambiants pour améliorer votre concentration",
-      neutral: "Sélection équilibrée adaptée à votre journée",
-      energetic: "Beats dynamiques pour booster votre énergie"
-    };
-    
-    return descriptionMap[mood.toLowerCase()] || "Musique adaptée à votre état d'esprit";
-  };
-  
+
   return (
-    <Card className={standalone ? "w-full" : "mt-4"}>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Music className="h-5 w-5" />
-          Musique recommandée : {mood} {getMoodEmoji(mood)}
-        </CardTitle>
+    <Card>
+      <CardHeader>
+        <CardTitle>Recommandations musicales basées sur l'humeur</CardTitle>
+        <CardDescription>Découvrez de nouvelles musiques en fonction de votre humeur actuelle.</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col space-y-4">
-          <p className="text-sm">
-            {getMoodDescription(mood)}
-          </p>
-          <Button onClick={handleSelectPlaylist} className="w-full">
-            Écouter cette playlist
-          </Button>
-        </div>
+      <CardContent className="space-y-4">
+        {isLoading && <p>Chargement des recommandations...</p>}
+        {error && <p className="text-red-500">Erreur: {error}</p>}
+        {recommendations && recommendations.length > 0 ? (
+          <div className="grid gap-4">
+            {recommendations.map((track) => (
+              <div key={track.id} className="border rounded-md p-4">
+                <h3 className="text-lg font-semibold">{track.title}</h3>
+                <p className="text-sm text-muted-foreground">Artiste: {track.artist}</p>
+                <Button onClick={() => handlePlay(track.id)}>Écouter</Button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>Aucune recommandation disponible pour l'humeur actuelle.</p>
+        )}
       </CardContent>
     </Card>
   );
