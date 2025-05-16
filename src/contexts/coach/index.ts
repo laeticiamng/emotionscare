@@ -1,3 +1,5 @@
 
-// Export all coach-related components from this barrel file
-export * from './CoachContextProvider';
+// Réexportation des éléments du contexte coach
+import { CoachContext, CoachProvider, CoachContextType } from './CoachContext';
+export { CoachContext, CoachProvider };
+export type { CoachContextType };

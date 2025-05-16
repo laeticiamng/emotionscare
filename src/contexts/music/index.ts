@@ -1,4 +1,4 @@
 
-// Export all music-related components from this barrel file
-export * from './MusicContextProvider';
-export * from './useAudioHandlers';
+// Réexportation des éléments du contexte musical
+import { MusicContext, MusicProvider, useMusicContext } from './MusicContext';
+export { MusicContext, MusicProvider, useMusicContext };

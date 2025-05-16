@@ -36,6 +36,11 @@ export interface NotificationPreference {
   email: boolean;
   push: boolean;
   inApp: boolean;
+  enabled?: boolean;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  inAppEnabled?: boolean;
+  frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
 }
 
-export type NotificationPreferences = Record<NotificationType, boolean>;
+export type NotificationPreferences = Record<NotificationType, NotificationPreference>;

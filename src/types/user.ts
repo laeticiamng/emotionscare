@@ -25,7 +25,16 @@ export interface User {
       profileVisibility?: 'public' | 'private' | 'team';
     };
     profileVisibility?: 'public' | 'private' | 'team';
+    emotionalCamouflage?: boolean;
+    aiSuggestions?: boolean;
   };
   company_id?: string;
   settings?: Record<string, any>;
+}
+
+export interface NotificationPreferences {
+  email: boolean;
+  push: boolean;
+  inApp: boolean;
+  frequency: 'immediate' | 'daily' | 'weekly' | 'never';
 }

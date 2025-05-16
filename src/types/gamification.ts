@@ -9,6 +9,8 @@ export interface GamificationStats {
   unlockedBadges: number;
   totalBadges: number;
   rank?: string;
+  xp?: number;
+  xpToNextLevel?: number;
 }
 
 export interface Challenge {
@@ -24,6 +26,11 @@ export interface Challenge {
   tags?: string[];
   icon?: string;
   completedAt?: Date | string;
+  status?: 'active' | 'completed' | 'expired' | 'locked';
+  name?: string;
+  completions?: number;
+  goal?: number;
+  total?: number;
 }
 
 export interface Badge {
@@ -38,6 +45,7 @@ export interface Badge {
   progress?: number;
   total?: number;
   criteria?: string;
+  icon?: string;
 }
 
 export interface LeaderboardEntry {

@@ -54,9 +54,18 @@ export interface EmotionalTeamViewProps {
   teamId?: string;
   period?: 'day' | 'week' | 'month' | 'year';
   showHeader?: boolean;
+  userId?: string;
+  anonymized?: boolean;
+  className?: string;
 }
 
 export interface TeamOverviewProps {
   teamId: string;
   period: 'day' | 'week' | 'month' | 'year';
+}
+
+export interface MoodBasedRecommendationsProps {
+  mood: string;
+  standalone?: boolean;
+  intensity?: number;
 }

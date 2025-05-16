@@ -18,19 +18,23 @@ const ProtectedLayout = () => {
     );
   }
 
-  // If user is not authenticated, redirect to login
+  // If user is not authenticated, redirect to appropriate login page
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    // Determine which login page to redirect to based on the path
+    let loginPath = '/b2c/login'; // default to B2C login
+    
+    if (location.pathname.includes('/b2b/admin')) {
+      loginPath = '/b2b/admin/login';
+    } else if (location.pathname.includes('/b2b/user')) {
+      loginPath = '/b2b/user/login';
+    }
+
+    return <Navigate to={loginPath} state={{ from: location }} replace />;
   }
 
-  // If user is authenticated but hasn't selected a mode yet (except when on the onboarding page)
-  if (isAuthenticated && !userMode && !location.pathname.includes('/onboarding')) {
+  // If user is authenticated but hasn't selected a mode yet (except when on the mode selection page)
+  if (isAuthenticated && !userMode && !location.pathname.includes('/choose-mode')) {
     return <Navigate to="/choose-mode" replace />;
-  }
-
-  // If user hasn't completed onboarding yet (except when already on the onboarding page)
-  if (isAuthenticated && user && user.onboarded === false && !location.pathname.includes('/onboarding')) {
-    return <Navigate to="/onboarding" replace />;
   }
 
   // User is authenticated and has completed necessary steps, show protected content
