@@ -17,6 +17,21 @@ export const DEFAULT_WELCOME_MESSAGES = {
   night: "Bonne soirée ! Comment vous sentez-vous avant de vous reposer ?"
 };
 
+// Add the missing determineTimeOfDay function
+export function determineTimeOfDay(): TimeOfDay {
+  const hour = new Date().getHours();
+  
+  if (hour >= 5 && hour < 12) {
+    return TimeOfDay.MORNING;
+  } else if (hour >= 12 && hour < 18) {
+    return TimeOfDay.AFTERNOON;
+  } else if (hour >= 18 && hour < 22) {
+    return TimeOfDay.EVENING;
+  } else {
+    return TimeOfDay.NIGHT;
+  }
+}
+
 export const DEFAULT_PREFERENCES = {
   theme: 'system',
   fontSize: 'medium',
