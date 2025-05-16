@@ -15,9 +15,9 @@ const PopularSessionsSection = () => {
       description: 'Une séance de méditation guidée pour débutants.',
       duration: 10,
       tags: ['meditation', 'débutant'],
-      emotion_target: 'calm',
-      emotionTarget: 'calm',
+      environment: 'forest',
       thumbnailUrl: '/sessions/meditation.jpg',
+      emotionTarget: 'calm',
     },
     {
       id: '2',
@@ -25,9 +25,9 @@ const PopularSessionsSection = () => {
       description: 'Techniques de respiration pour réduire le stress.',
       duration: 5,
       tags: ['respiration', 'anti-stress'],
-      emotion_target: 'relaxed',
-      emotionTarget: 'relaxed',
+      environment: 'beach',
       thumbnailUrl: '/sessions/breathing.jpg',
+      emotionTarget: 'relaxed',
     }
   ];
 

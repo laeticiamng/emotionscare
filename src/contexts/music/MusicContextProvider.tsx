@@ -1,6 +1,4 @@
 
-import React from 'react';
-import { MusicProvider, useMusic } from './MusicContext';
-
-export { MusicProvider };
+import { MusicProvider, useMusic } from '../MusicContext';
+export { MusicProvider, useMusic };
 export default useMusic;

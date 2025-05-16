@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { cn } from "@/lib/utils";
 import { cva } from "class-variance-authority";
 import { KpiCardProps } from '@/types/dashboard';
+import { LucideIcon } from 'lucide-react';
 
 const KpiCard: React.FC<KpiCardProps> = ({
   id,

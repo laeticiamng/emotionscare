@@ -90,6 +90,9 @@ const MusicPlayer: React.FC = () => {
           </div>
 
           <MusicProgressBar
+            position={currentTime || 0}
+            max={duration || 100}
+            onChange={seekTo}
             currentTime={currentTime || 0}
             duration={duration || 0}
             formatTime={formatTime}

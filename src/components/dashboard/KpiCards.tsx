@@ -47,6 +47,7 @@ const KpiCards: React.FC<KpiCardsProps> = ({
         // Actual content using our new KpiCard component
         <>
           <KpiCard
+            id="emotion-score-card"
             title="Score émotionnel moyen"
             value={avgEmotionalScore}
             icon={<Brain className="h-6 w-6" />}
@@ -58,6 +59,7 @@ const KpiCards: React.FC<KpiCardsProps> = ({
           />
           
           <KpiCard
+            id="vr-sessions-card"
             title="Sessions VR ce mois"
             value={vrSessionsThisMonth}
             icon={<CalendarDays className="h-6 w-6" />}
@@ -71,6 +73,7 @@ const KpiCards: React.FC<KpiCardsProps> = ({
           />
           
           <KpiCard
+            id="badges-card"
             title="Badges gagnés"
             value={userBadgesCount}
             icon={<Trophy className="h-6 w-6" />}

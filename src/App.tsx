@@ -1,26 +1,21 @@
 
 import React from 'react';
-import { Outlet } from 'react-router-dom';
-import { Toaster } from 'sonner';
-import { MusicProvider } from './contexts/music/MusicContextProvider';
-import { SessionProvider } from './contexts/SessionContext';
-import { ThemeProvider } from './contexts/theme';
-import { AuthProvider } from './contexts/AuthContext';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import DashboardPage from './pages/DashboardPage';
+import B2CDashboardPage from './pages/b2c/DashboardPage';
+import B2CLayout from './layouts/B2CLayout';
 
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <SessionProvider>
-          <MusicProvider>
-            <div className="min-h-screen bg-background">
-              <Outlet />
-              <Toaster position="top-right" />
-            </div>
-          </MusicProvider>
-        </SessionProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <Routes>
+      <Route path="/" element={<Navigate to="/b2c/dashboard" replace />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
+      
+      {/* B2C Routes */}
+      <Route path="/b2c" element={<B2CLayout />}>
+        <Route path="dashboard" element={<B2CDashboardPage />} />
+      </Route>
+    </Routes>
   );
 }
 

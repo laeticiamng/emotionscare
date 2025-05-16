@@ -20,6 +20,11 @@ export interface KpiCardProps {
   isLoading?: boolean;
   loading?: boolean;
   trendText?: string;
+  // Grid position props for drag and drop
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
 }
 
 export interface DraggableKpiCardsGridProps {

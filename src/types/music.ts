@@ -1,121 +1,96 @@
 
+import { ReactNode } from 'react';
+
 export interface MusicTrack {
   id: string;
   title: string;
+  artist: string;
+  duration: number;
   url: string;
-  artist?: string;
   coverUrl?: string;
-  cover?: string;
-  audioUrl?: string;
-  track_url?: string;
-  duration?: number;
-  emotion?: string;
-  intensity?: number;
-  category?: string;
-  emotionalTone?: string;
   genre?: string;
-  bpm?: number;
   mood?: string;
+  tags?: string[];
+  playCount?: number;
+  isFavorite?: boolean;
+  source?: 'local' | 'remote' | 'spotify' | 'youtube';
+  album?: string;
+  year?: number;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
-  title?: string;
-  tracks: MusicTrack[];
-  emotion?: string;
-  coverUrl?: string;
   description?: string;
-  category?: string;
-  mood?: string;
-}
-
-export interface EmotionMusicParams {
-  emotion: string;
-  intensity?: number;
-  duration?: number;
+  coverUrl?: string;
+  tracks: MusicTrack[];
+  createdAt: string | Date;
+  updatedAt?: string | Date;
+  isPublic?: boolean;
+  userId?: string;
+  tags?: string[];
 }
 
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
   volume: number;
-  muted?: boolean;
-  isMuted?: boolean;
-  playlist?: MusicTrack[];
-  currentPlaylist?: MusicPlaylist | null;
   duration: number;
-  currentTime?: number;
-  position?: number;
-  progress?: number;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack?: () => void;
-  pause?: () => void;
-  play?: (track: MusicTrack) => void;
-  resume?: () => void;
-  stop?: () => void;
-  setVolume: (level: number) => void;
+  currentTime: number;
   togglePlay: () => void;
   nextTrack: () => void;
-  prevTrack?: () => void;
-  previousTrack?: () => void;
-  previous?: () => void;
-  next?: () => void;
+  previousTrack: () => void;
   seekTo: (time: number) => void;
-  toggleMute?: () => void;
-  mute?: () => void;
-  unmute?: () => void;
-  loadPlaylistForEmotion?: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
-  setEmotion?: (emotion: string) => void;
-  currentEmotion?: string | null;
-  setOpenDrawer?: (open: boolean) => void;
-  openDrawer?: boolean;
-  playlists?: MusicPlaylist[];
-  setPlaylist?: (playlist: MusicPlaylist) => void;
-  isInitialized?: boolean;
-  initializeMusicSystem?: () => Promise<boolean>;
-  error?: Error | null;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
+  muted: boolean;
+  playlist: MusicTrack[];
+  setOpenDrawer: (open: boolean) => void;
+  pauseTrack: () => void;
+  currentEmotion?: string;
+  isInitialized: boolean;
+  initializeMusicSystem: () => void;
+  error?: Error;
 }
 
 export interface MusicDrawerProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  isOpen?: boolean;
-  onClose?: () => void;
-  playlist?: MusicPlaylist;
-  currentTrack?: MusicTrack | null;
-  children?: React.ReactNode;
-  side?: 'left' | 'right';
+  playlist?: MusicTrack[];
+  currentTrack?: MusicTrack;
+  children?: ReactNode;
+  side?: 'left' | 'right' | 'top' | 'bottom';
 }
 
 export interface ProgressBarProps {
   position: number;
-  duration: number;
-  onSeek: (position: number) => void;
-  currentTime?: number; 
-  formatTime?: (seconds: number) => string;
+  max?: number;
+  onChange?: (value: number) => void;
+  currentTime?: number;
+  duration?: number;
+  onSeek?: (time: number) => void;
   className?: string;
+  formatTime?: (seconds: number) => string;
   showTimestamps?: boolean;
 }
 
 export interface VolumeControlProps {
   volume: number;
-  onChange?: (volume: number) => void;
-  onVolumeChange?: (volume: number) => void;
-  isMuted?: boolean;
-  muted?: boolean;
-  onMuteToggle?: () => void;
+  onVolumeChange: (volume: number) => void;
+  isMuted: boolean;
+  onMuteToggle: () => void;
   className?: string;
   showLabel?: boolean;
+  muted?: boolean;
 }
 
 export interface MusicControlsProps {
   isPlaying: boolean;
-  onTogglePlay: () => void;
-  onNext: () => void;
+  onPlay: () => void;
+  onPause: () => void;
+  onTogglePlay?: () => void;
+  onNext?: () => void;
   onPrevious?: () => void;
-  onPlay?: () => void;
-  onPause?: () => void;
   currentTime?: number;
   duration?: number;
   onSeek?: (position: number) => void;
@@ -123,7 +98,7 @@ export interface MusicControlsProps {
   isMuted?: boolean;
   onToggleMute?: () => void;
   onVolumeChange?: (volume: number) => void;
-  track?: MusicTrack | null;
+  track?: MusicTrack;
   showVolume?: boolean;
   size?: 'sm' | 'md' | 'lg';
   vertical?: boolean;
@@ -131,19 +106,24 @@ export interface MusicControlsProps {
 }
 
 export interface MusicLibraryProps {
-  onSelectTrack?: (track: MusicTrack) => void;
-  currentTrack?: MusicTrack | null;
-  isPlaying?: boolean;
-  searchTerm?: string;
-  onSearchChange?: (term: string) => void;
   tracks?: MusicTrack[];
-  onTrackSelect?: (track: MusicTrack) => void;
+  onTrackSelect: (track: MusicTrack) => void;
+  selectedTrackId?: string;
   playlists?: MusicPlaylist[];
   onSelectPlaylist?: (playlist: MusicPlaylist) => void;
 }
 
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
+  duration?: number;
+  purpose?: 'relax' | 'focus' | 'energize' | 'sleep';
+}
+
 export interface TrackInfoProps {
   track: MusicTrack;
-  className?: string;
   showCover?: boolean;
+  showArtist?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
 }

@@ -4,6 +4,9 @@ import { Slider } from '@/components/ui/slider';
 import { ProgressBarProps } from '@/types/music';
 
 const MusicProgressBar: React.FC<ProgressBarProps> = ({
+  position,
+  max = 100,
+  onChange,
   currentTime,
   duration,
   onSeek,
@@ -24,18 +27,20 @@ const MusicProgressBar: React.FC<ProgressBarProps> = ({
   };
 
   const handleValueCommit = (value: number[]) => {
-    onSeek(value[0]);
+    if (onSeek) onSeek(value[0]);
+    if (onChange) onChange(value[0]);
     setIsDragging(false);
   };
   
-  const displayValue = isDragging ? localValue : currentTime;
+  const displayValue = isDragging ? localValue : position || currentTime || 0;
+  const displayMax = max || duration || 100;
   
   return (
     <div className={`flex flex-col w-full ${className}`}>
       <Slider
         defaultValue={[0]}
         value={[displayValue]}
-        max={duration || 100}
+        max={displayMax}
         step={1}
         onValueChange={handleValueChange}
         onValueCommit={handleValueCommit}
@@ -45,7 +50,7 @@ const MusicProgressBar: React.FC<ProgressBarProps> = ({
       {showTimestamps && (
         <div className="flex justify-between text-xs text-muted-foreground mt-1">
           <span>{formatTime(displayValue)}</span>
-          <span>{formatTime(duration)}</span>
+          <span>{formatTime(displayMax)}</span>
         </div>
       )}
     </div>

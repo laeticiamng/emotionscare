@@ -11,6 +11,8 @@ export interface VRSessionTemplate {
   musicTrack?: MusicTrack;
   tags?: string[];
   thumbnailUrl?: string;
+  emotion_target?: string;
+  emotionTarget?: string;
 }
 
 export interface VRSession extends VRSessionTemplate {

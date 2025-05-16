@@ -5,7 +5,7 @@ export interface ChatMessage {
   sender: 'user' | 'ai' | 'system' | 'assistant';
   timestamp: string | Date;
   seen?: boolean;
-  role?: string;
+  role?: 'user' | 'ai' | 'system' | 'assistant';
 }
 
 export interface MoodData {
@@ -14,6 +14,9 @@ export interface MoodData {
   score: number;
   timestamp: string | Date;
   notes?: string;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
 }
 
 export interface JournalEntry {
@@ -25,6 +28,10 @@ export interface JournalEntry {
   updated_at?: string | Date;
   tags?: string[];
   user_id?: string;
+  date?: string | Date;
+  text?: string;
+  mood_score?: number;
+  ai_feedback?: string;
 }
 
 export interface Story {
@@ -34,6 +41,7 @@ export interface Story {
   created_at: string;
   author_id: string;
   seen?: boolean;
+  type?: string;
 }
 
 export interface EmotionPrediction {
@@ -70,7 +78,7 @@ export interface InvitationData {
   id: string;
   email: string;
   role: string;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: 'pending' | 'accepted' | 'rejected' | 'expired';
   created_at: string | Date;
   expires_at?: string | Date;
   accepted_at?: string | Date;
@@ -89,3 +97,15 @@ export interface UserPreference {
   label?: string;
   description?: string;
 }
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'success' | 'info' | 'warning' | 'error';
+  read: boolean;
+  created_at: string | Date;
+  link?: string;
+}
+
+export type NotificationType = 'success' | 'info' | 'warning' | 'error';

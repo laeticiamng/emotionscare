@@ -1,45 +1,36 @@
 
 export interface Emotion {
-  id: string;
   name: string;
-  color: string;
-  icon?: string;
+  score: number;
   description?: string;
-  score?: number;
-  confidence?: number;
+  color?: string;
+  icon?: string;
 }
 
 export interface EmotionResult {
-  id?: string;
-  emotion: string;
-  score?: number;
-  confidence?: number;
-  timestamp?: string | Date;
-  date?: string;
-  source?: 'text' | 'voice' | 'face' | 'manual';
-  user_id?: string;
-  text?: string;
-  feedback?: string;
-  transcript?: string;
-  intensity?: number;
-  recommendations?: string[];
-  seen?: boolean;
+  dominant: string;
+  emotions: {
+    [key: string]: number;
+  };
+  timestamp: string | Date;
+  userId?: string;
+  notes?: string;
 }
 
 export interface LiveVoiceScannerProps {
-  onResult: (result: EmotionResult) => void;
-  autoStart?: boolean;
-  duration?: number;
+  onResult?: (result: EmotionResult) => void;
+  streamingMode?: boolean;
+  showVisualizer?: boolean;
+  className?: string;
 }
 
 export interface TeamOverviewProps {
   teamId?: string;
-  period?: "day" | "week" | "month" | "year";
+  period?: 'day' | 'week' | 'month';
 }
 
 export interface EmotionalTeamViewProps {
   teamId?: string;
-  period?: "day" | "week" | "month" | "year";
   userId?: string;
   anonymized?: boolean;
   className?: string;
