@@ -5,7 +5,11 @@ export interface MusicTrack {
   artist?: string;
   url: string;
   coverUrl?: string;
+  audioUrl?: string;
   duration?: number;
+  coverImage?: string;
+  track_url?: string;
+  emotionalTone?: string;
 }
 
 export interface MusicPlaylist {
@@ -13,6 +17,7 @@ export interface MusicPlaylist {
   name: string;
   title?: string;
   tracks: MusicTrack[];
+  coverUrl?: string;
 }
 
 export interface EmotionMusicParams {
@@ -29,6 +34,10 @@ export interface MusicContextType {
   duration: number;
   currentPlaylist: MusicPlaylist | null;
   currentEmotion: string | null;
+  playlist?: MusicPlaylist | null;
+  error?: Error | null;
+  openDrawer?: boolean;
+  setOpenDrawer?: (open: boolean) => void;
   play: (track: MusicTrack) => void;
   playTrack: (track: MusicTrack) => void;
   pause: () => void;
@@ -48,4 +57,7 @@ export interface MusicContextType {
   setPlaylist: (playlist: MusicPlaylist) => void;
   loadPlaylistForEmotion: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
   setEmotion: (emotion: string | null) => void;
+  loadTrack?: (track: MusicTrack) => void;
+  resumeTrack?: () => void;
+  adjustVolume?: (increment: boolean) => void;
 }

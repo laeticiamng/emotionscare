@@ -1,24 +1,30 @@
 
-import { MusicPlaylist } from './music';
-
-export { MusicPlaylist };
+export interface Story {
+  id: string;
+  title: string;
+  content: string;
+  type: 'onboarding' | 'notification' | 'achievement' | 'tip';
+  seen: boolean;
+  date?: Date | string;
+  cta?: {
+    label: string;
+    route: string;
+  };
+}
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
-  role?: 'user' | 'admin' | 'guest';
-}
-
-export interface Story {
-  id: string;
-  title: string;
-  content: string;
-  type: 'onboarding' | 'tip' | 'notification';
-  seen: boolean;
-  cta?: {
-    label: string;
-    route: string;
+  role: string;
+  avatar_url?: string;
+  preferences?: {
+    theme: string;
+    fontSize: string;
+    fontFamily: string;
+    reduceMotion: boolean;
+    colorBlindMode: boolean;
+    autoplayMedia: boolean;
+    soundEnabled: boolean;
   };
 }

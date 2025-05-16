@@ -44,6 +44,7 @@ const PremiumContent: React.FC<PremiumContentProps> = ({ greeting }) => {
       >
         <AnimatePresence>
           <PremiumOptionCard
+            key="option-personal"
             title="Espace Particulier"
             description="Accédez à votre espace personnel pour explorer vos émotions, gérer votre journal et suivre votre progression."
             icon={Sparkles}
@@ -54,6 +55,7 @@ const PremiumContent: React.FC<PremiumContentProps> = ({ greeting }) => {
           />
 
           <PremiumOptionCard
+            key="option-business"
             title="Espace Entreprise"
             description="Solutions de bien-être professionnel pour les collaborateurs et outils d'analyse pour les responsables RH."
             icon={Sparkles}

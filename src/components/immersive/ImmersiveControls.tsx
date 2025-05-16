@@ -29,11 +29,13 @@ const ImmersiveControls: React.FC<ImmersiveControlsProps> = ({
     if (isListening) {
       setIsListening(false);
       toast({
+        title: "Information",
         description: "Nous n'écoutons plus",
       });
     } else {
       setIsListening(true);
       toast({
+        title: "Information",
         description: "Dites 'Particulier' ou 'Entreprise' pour naviguer",
       });
       
@@ -41,6 +43,7 @@ const ImmersiveControls: React.FC<ImmersiveControlsProps> = ({
       setTimeout(() => {
         setIsListening(false);
         toast({
+          title: "Redirection",
           description: "Redirection vers votre espace...",
         });
         setTimeout(() => navigate('/home'), 1500);
@@ -55,11 +58,13 @@ const ImmersiveControls: React.FC<ImmersiveControlsProps> = ({
       if (audioEnabled) {
         audioRef.current.pause();
         toast({
+          title: "Audio",
           description: "Ambiance musicale coupée",
         });
       } else {
         audioRef.current.play().catch(e => console.error("Audio playback error:", e));
         toast({
+          title: "Audio",
           description: "Ambiance musicale activée",
         });
       }
