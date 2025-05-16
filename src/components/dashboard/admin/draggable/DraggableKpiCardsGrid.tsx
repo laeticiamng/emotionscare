@@ -4,8 +4,8 @@ import { cn } from '@/lib/utils';
 import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
-import KpiCard from '@/components/dashboard/admin/cards/KpiCard';
-import { DraggableCardProps, DraggableKpiCardsGridProps } from '@/types/widgets';
+import KpiCard from '@/components/dashboard/admin/KpiCard';
+import { KpiCardProps, DraggableKpiCardsGridProps } from '@/types/dashboard';
 
 const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
   cards,
@@ -55,17 +55,14 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
         {cardsToUse.map(card => (
           <div key={card.id} className="shadow-sm">
             <KpiCard
+              id={card.id}
               title={card.title}
               value={card.value}
               icon={card.icon}
-              delta={typeof card.delta === 'number' ? 
-                { value: card.delta, trend: card.delta > 0 ? 'up' : card.delta < 0 ? 'down' : 'neutral' } : 
-                card.delta
-              }
+              delta={card.delta}
               subtitle={card.subtitle}
               ariaLabel={card.ariaLabel}
               onClick={card.onClick}
-              className="h-full"
               status={card.status}
             />
           </div>

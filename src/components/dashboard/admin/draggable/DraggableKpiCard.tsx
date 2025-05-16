@@ -6,7 +6,7 @@ import { KpiCardProps } from '@/types';
 import KpiCard from '../KpiCard';
 
 // Component for a draggable KPI card
-const DraggableKpiCard = (props: KpiCardProps & { id: string }) => {
+const DraggableKpiCard = (props: KpiCardProps) => {
   const {
     attributes,
     listeners,
@@ -14,7 +14,7 @@ const DraggableKpiCard = (props: KpiCardProps & { id: string }) => {
     transform,
     transition,
     isDragging
-  } = useSortable({ id: props.id || props.title });
+  } = useSortable({ id: props.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -24,18 +24,6 @@ const DraggableKpiCard = (props: KpiCardProps & { id: string }) => {
     position: 'relative' as 'relative',
   };
 
-  // Pass only the KpiCard props without DnD specific props
-  const cardProps: KpiCardProps = {
-    title: props.title,
-    value: props.value,
-    icon: props.icon,
-    delta: props.delta,
-    subtitle: props.subtitle,
-    ariaLabel: props.ariaLabel,
-    onClick: props.onClick,
-    className: props.className
-  };
-
   return (
     <div 
       ref={setNodeRef} 
@@ -43,7 +31,7 @@ const DraggableKpiCard = (props: KpiCardProps & { id: string }) => {
       className={`transition-all duration-300 ${isDragging ? 'scale-105 shadow-md' : ''}`}
     >
       <div {...attributes} {...listeners}>
-        <KpiCard {...cardProps} />
+        <KpiCard {...props} />
       </div>
     </div>
   );

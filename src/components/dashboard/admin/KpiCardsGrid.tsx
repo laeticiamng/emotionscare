@@ -35,6 +35,7 @@ const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ dashboardStats }) => {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 col-span-1 md:col-span-2">
       {/* Productivity Card */}
       <KpiCard 
+        id="productivity-card"
         title="Productivité"
         value={`${dashboardStats.productivity.current}%`}
         icon={<TrendingUp className="h-6 w-6" />}
@@ -49,6 +50,7 @@ const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ dashboardStats }) => {
       
       {/* Emotional Score Card */}
       <KpiCard 
+        id="emotional-score-card"
         title="Score émotionnel moyen"
         value={`${dashboardStats.emotionalScore.current}/100`}
         icon={<Activity className="h-6 w-6" />}
@@ -63,6 +65,7 @@ const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ dashboardStats }) => {
       
       {/* Engagement Gamification Card */}
       <KpiCard 
+        id="engagement-card"
         title="Engagement gamification"
         value={`${dashboardStats.gamification.activeUsersPercent}%`}
         icon={<Users className="h-6 w-6" />}

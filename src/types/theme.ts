@@ -6,7 +6,9 @@ export interface Theme {
   preview?: string;
 }
 
-export type ThemeContextType = {
+export type ThemeType = 'light' | 'dark' | 'pastel' | 'system';
+
+export interface ThemeContextType {
   theme: string;
   setTheme: (theme: string) => void;
   isDarkMode: boolean;
@@ -15,7 +17,7 @@ export type ThemeContextType = {
   setFontFamily?: (fontFamily: FontFamily) => void;
   fontSize?: FontSize;
   setFontSize?: (fontSize: FontSize) => void;
-};
+}
 
 export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "inter" | "rounded";
 export type FontSize = "small" | "medium" | "large" | "x-large" | "sm" | "md" | "lg" | "xl";

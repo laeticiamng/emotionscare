@@ -40,9 +40,9 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
               />
               <StatCard 
                 title="Expirées" 
-                value={stats.expired + stats.rejected} 
+                value={(stats.expired || 0) + stats.rejected} 
                 icon="⛔"
-                percentage={stats.total > 0 ? ((stats.expired + stats.rejected) / stats.total) * 100 : 0}
+                percentage={stats.total > 0 ? (((stats.expired || 0) + stats.rejected) / stats.total) * 100 : 0}
               />
             </div>
             
@@ -53,10 +53,10 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium">Taux de conversion</h3>
-                        <p className="text-2xl font-bold">{stats.conversionRate}%</p>
+                        <p className="text-2xl font-bold">{stats.conversionRate || 0}%</p>
                       </div>
                       <CircularProgress 
-                        value={stats.conversionRate} 
+                        value={stats.conversionRate || 0} 
                         size={70}
                         thickness={8}
                         color="var(--primary)"
@@ -72,7 +72,7 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium">Temps moyen d'acceptation</h3>
-                        <p className="text-2xl font-bold">{stats.averageTimeToAccept} heures</p>
+                        <p className="text-2xl font-bold">{stats.averageTimeToAccept || 0} heures</p>
                       </div>
                       <div className="text-3xl">⏱️</div>
                     </div>
@@ -84,7 +84,7 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
           
           <TabsContent value="teams">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {Object.entries(stats.teams).map(([team, count]) => (
+              {stats.teams && Object.entries(stats.teams).map(([team, count]) => (
                 <Card key={team}>
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between">

@@ -29,8 +29,8 @@ const InvitationsTab = () => {
     total: 0,
     pending: 0,
     accepted: 0,
-    expired: 0,
     rejected: 0,
+    expired: 0,
     sent: 0,
     completed: 0,
     conversionRate: 0,
@@ -134,30 +134,33 @@ const InvitationsTab = () => {
               <TabsTrigger value="all">Toutes ({invitationStats.total})</TabsTrigger>
               <TabsTrigger value="pending">En attente ({invitationStats.pending})</TabsTrigger>
               <TabsTrigger value="accepted">Acceptées ({invitationStats.accepted})</TabsTrigger>
-              <TabsTrigger value="expired">Expirées ({invitationStats.expired + invitationStats.rejected})</TabsTrigger>
+              <TabsTrigger value="expired">Expirées ({(invitationStats.expired || 0) + invitationStats.rejected})</TabsTrigger>
             </TabsList>
             
             <TabsContent value="all">
-              <InvitationList invitations={invitationStats.recent_invites} isLoading={loading} />
+              <InvitationList 
+                invitations={invitationStats.recent_invites || []} 
+                isLoading={loading} 
+              />
             </TabsContent>
             
             <TabsContent value="pending">
               <InvitationList 
-                invitations={invitationStats.recent_invites.filter(inv => inv.status === 'pending')}
+                invitations={(invitationStats.recent_invites || []).filter(inv => inv.status === 'pending')}
                 isLoading={loading} 
               />
             </TabsContent>
             
             <TabsContent value="accepted">
               <InvitationList 
-                invitations={invitationStats.recent_invites.filter(inv => inv.status === 'accepted')}
+                invitations={(invitationStats.recent_invites || []).filter(inv => inv.status === 'accepted')}
                 isLoading={loading} 
               />
             </TabsContent>
             
             <TabsContent value="expired">
               <InvitationList 
-                invitations={invitationStats.recent_invites.filter(inv => 
+                invitations={(invitationStats.recent_invites || []).filter(inv => 
                   inv.status === 'expired' || inv.status === 'rejected'
                 )}
                 isLoading={loading} 

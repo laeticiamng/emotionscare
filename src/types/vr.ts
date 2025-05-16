@@ -9,6 +9,8 @@ export interface VRSessionTemplate {
   environment: string;
   musicTrackId?: string;
   musicTrack?: MusicTrack;
+  tags?: string[];
+  thumbnailUrl?: string;
 }
 
 export interface VRSession extends VRSessionTemplate {

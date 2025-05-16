@@ -16,12 +16,20 @@ export interface KpiCardProps {
   ariaLabel?: string;
   onClick?: () => void;
   status?: 'success' | 'warning' | 'danger' | 'info';
+  className?: string;
+  isLoading?: boolean;
+  loading?: boolean;
+  trendText?: string;
 }
 
 export interface DraggableKpiCardsGridProps {
   cards?: KpiCardProps[];
   kpiCards?: KpiCardProps[];
   onOrderChange?: (cards: KpiCardProps[]) => void;
+  onLayoutChange?: (layout: any[]) => void;
+  className?: string;
+  isEditable?: boolean;
+  editable?: boolean;
 }
 
 export interface GlobalOverviewTabProps {

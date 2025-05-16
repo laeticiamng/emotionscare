@@ -6,6 +6,7 @@ import { cva } from "class-variance-authority";
 import { KpiCardProps } from '@/types/dashboard';
 
 const KpiCard: React.FC<KpiCardProps> = ({
+  id,
   title,
   value,
   icon,

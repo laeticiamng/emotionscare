@@ -2,9 +2,10 @@
 export interface ChatMessage {
   id: string;
   content: string;
-  sender: 'user' | 'ai' | 'system';
+  sender: 'user' | 'ai' | 'system' | 'assistant';
   timestamp: string | Date;
   seen?: boolean;
+  role?: string;
 }
 
 export interface MoodData {
@@ -56,6 +57,13 @@ export interface InvitationStats {
   pending: number;
   accepted: number;
   rejected: number;
+  expired?: number;
+  sent?: number;
+  completed?: number;
+  conversionRate?: number;
+  averageTimeToAccept?: number;
+  teams?: Record<string, number>;
+  recent_invites?: InvitationData[];
 }
 
 export interface InvitationData {
@@ -65,6 +73,7 @@ export interface InvitationData {
   status: 'pending' | 'accepted' | 'rejected';
   created_at: string | Date;
   expires_at?: string | Date;
+  accepted_at?: string | Date;
 }
 
 export interface InvitationFormData {

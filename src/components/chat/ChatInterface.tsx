@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -59,7 +60,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           id: "system-message",
           content: systemMessageContent,
           sender: "system",
-          role: "system",
           timestamp: new Date().toISOString(),
         }
       ]);
@@ -93,7 +93,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           const assistantMessage: ChatMessage = {
             id: `assistant-${Date.now()}`,
             content: typeof response === 'string' ? response : JSON.stringify(response),
-            sender: "assistant",
+            sender: "ai", // Change from "assistant" to "ai" to match the type
             timestamp: new Date().toISOString(),
           };
           setMessages(prevMessages => [...prevMessages, assistantMessage]);
@@ -142,7 +142,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     switch (message.sender) {
       case 'user':
         return "bg-primary/10 ml-auto max-w-[80%] md:max-w-[70%] rounded-lg p-3";
-      case 'assistant':
+      case 'ai':
         return "bg-muted max-w-[80%] md:max-w-[70%] rounded-lg p-3";
       case 'system':
         return "bg-accent/20 max-w-full rounded-lg p-3 text-center";
