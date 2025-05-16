@@ -13,6 +13,7 @@ const defaultPreferences: UserPreferences = {
   autoplayMedia: true,
   language: 'fr',
   ambientSound: false,
+  dashboardLayout: 'default',
   notifications: {
     enabled: true,
     emailEnabled: true,
@@ -37,7 +38,6 @@ const defaultPreferences: UserPreferences = {
 // Create context with default values
 export const UserPreferencesContext = createContext<UserPreferencesContextType>({
   preferences: defaultPreferences,
-  setPreferences: () => {},
   updatePreferences: () => {},
   resetPreferences: () => {},
   loading: false,
@@ -101,7 +101,6 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
     <UserPreferencesContext.Provider
       value={{
         preferences,
-        setPreferences,
         updatePreferences,
         resetPreferences,
         loading,

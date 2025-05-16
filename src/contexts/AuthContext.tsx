@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { User } from '@/types/types';
+import { User, UserPreferences } from '@/types/user';
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +10,8 @@ interface AuthContextType {
   logout: () => void;
   register: (userData: Partial<User>) => Promise<void>;
   updateUser: (userData: User) => Promise<void>;
+  clearError?: () => void;
+  error?: Error | null;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -27,6 +29,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   // Check for existing user session on mount
   useEffect(() => {
@@ -54,9 +57,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // In a real app, this would make an API call to authenticate
       const mockUser: User = {
         id: '1',
+        name: 'Test User',
         email,
-        firstName: 'Test',
-        lastName: 'User',
         role: 'user',
         preferences: {
           theme: 'system',
@@ -110,9 +112,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // In a real app, this would make an API call to register
       const mockUser: User = {
         id: '1',
+        name: userData.name || '',
         email: userData.email || '',
-        firstName: userData.firstName || '',
-        lastName: userData.lastName || '',
         role: 'user',
         preferences: {
           theme: 'system',
@@ -168,6 +169,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
     }
   }, []);
+  
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -179,6 +184,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         register,
         updateUser,
+        error,
+        clearError,
       }}
     >
       {children}

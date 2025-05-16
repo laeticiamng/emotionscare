@@ -9,6 +9,8 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  firstName?: string;  // Added
+  lastName?: string;   // Added
   role: UserRole;
   created_at?: string;
   updated_at?: string;
@@ -28,5 +30,11 @@ export interface User {
 export interface UserPreferencesContextType {
   preferences: UserPreferences;
   updatePreferences: (newPreferences: Partial<UserPreferences>) => void;
+  setPreferences?: (preferences: UserPreferences) => void; // Added
+  resetPreferences?: () => void; // Added
+  loading?: boolean; // Added
 }
+
+// Export UserPreferences to make it accessible
+export type { UserPreferences } from './preferences';
 

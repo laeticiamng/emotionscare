@@ -1,43 +1,41 @@
 
 export interface Emotion {
   id: string;
+  date: string;
+  emotion: string;
   name: string;
+  score: number;
+  confidence: number;
   intensity: number;
   color: string;
-  icon?: string;
+  text: string;
+  userId?: string;
+  user_id?: string;
 }
 
 export interface EmotionResult {
-  id?: string;
   emotion: string;
-  intensity: number;
+  score: number;
   confidence?: number;
-  date?: Date;
-  text?: string;
-  transcript?: string;
-  recommendations?: string[];
-  audioUrl?: string;
+  intensity?: number;
+  color?: string;
+  suggestions?: string[];
 }
 
 export interface LiveVoiceScannerProps {
-  onScanComplete?: (result: EmotionResult) => void;
-  onBack?: () => void;
-  className?: string;
-  period?: string;
-  dateRange?: {start: Date, end: Date};
-  showGraph?: boolean;
-  showMembers?: boolean;
+  onEmotionDetected?: (emotion: EmotionResult) => void;
+  autoStart?: boolean;
+  duration?: number;
 }
 
 export interface TeamOverviewProps {
-  teamId: string;
+  departmentId?: string;
+  period?: 'day' | 'week' | 'month' | 'year';
 }
 
 export interface EmotionalTeamViewProps {
-  teamId: string;
-  period?: string;
-  dateRange?: {start: Date, end: Date};
-  showGraph?: boolean;
-  showMembers?: boolean;
-  className?: string;
+  teamId?: string;
+  displayMode?: 'chart' | 'grid' | 'list';
+  period?: 'day' | 'week' | 'month' | 'year';
+  anonymized?: boolean;
 }

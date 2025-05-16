@@ -1,34 +1,29 @@
 
-export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large';
-export type FontFamily = 'inter' | 'system' | 'serif' | 'mono' | 'rounded' | 'sans' | 'sans-serif' | 'monospace';
-export type PrivacyLevel = 'strict' | 'balanced' | 'relaxed' | string;
-export type Theme = ThemeName;
-
-export interface NotificationPreference {
-  email: boolean;
-  push: boolean;
-  sounds: boolean;
-}
-
-export interface SoundPreference {
-  volume: number;
-  effects: boolean;
-  music: boolean;
-}
+export type ThemeName = 'light' | 'dark' | 'system' | 'blue-pastel' | 'pastel';
+export type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
+export type FontFamily = 'system' | 'sans' | 'serif' | 'mono';
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
+export type NotificationTone = 'formal' | 'friendly' | 'minimal';
+export type PrivacyLevel = 'public' | 'private' | 'friends' | 'organization';
 
 export interface NotificationPreferences {
   enabled: boolean;
   emailEnabled?: boolean;
   pushEnabled?: boolean;
   inAppEnabled?: boolean;
-  email?: boolean; // Added this for compatibility
-  types?: Record<string, boolean>;
-  frequency?: string;
-  tone?: string;
+  types?: {
+    system: boolean;
+    emotion: boolean;
+    coach: boolean;
+    journal: boolean;
+    community: boolean;
+    achievement?: boolean;
+  };
+  frequency: NotificationFrequency;
+  tone?: NotificationTone;
   quietHours?: {
     enabled: boolean;
-    start: string;
+    start: string; // Time format 'HH:MM'
     end: string;
   };
 }
@@ -37,30 +32,27 @@ export interface UserPreferences {
   theme?: ThemeName;
   fontSize?: FontSize;
   fontFamily?: FontFamily;
-  language?: string;
-  notifications?: NotificationPreferences;
-  haptics?: boolean;
-  dataCollection?: boolean;
-  privacyLevel?: PrivacyLevel;
-  animations?: boolean;
-  soundEffects?: boolean;
   reduceMotion?: boolean;
   colorBlindMode?: boolean;
   autoplayMedia?: boolean;
-  sound?: SoundPreference | boolean;
-  
-  // Additional fields used in the application
+  soundEnabled?: boolean;
+  language?: string;
+  notifications?: NotificationPreferences;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  notificationsEnabled?: boolean;
+  onboardingCompleted?: boolean;
+  dashboardLayout?: string;
+  privacyLevel?: PrivacyLevel;
+  notifications_enabled?: boolean;
   ambientSound?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
-  fullAnonymity?: boolean;
   displayName?: string;
   pronouns?: string;
   biography?: string;
   avatarUrl?: string;
-  onboarded?: boolean;
-  soundEnabled?: boolean;
-  
+  fullAnonymity?: boolean;
   privacy?: {
     shareData: boolean;
     anonymizeReports?: boolean;
@@ -71,4 +63,5 @@ export interface UserPreferences {
     allowNotifications?: boolean;
     anonymousMode?: boolean;
   };
+  [key: string]: any; // To allow for future extensions
 }
