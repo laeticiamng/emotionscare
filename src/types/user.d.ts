@@ -16,6 +16,7 @@ export interface User {
   position?: string;
   settings?: Record<string, any>;
   preferences?: UserPreferences;
+  onboarded?: boolean;
 }
 
 export interface UserPreferences {
@@ -37,6 +38,13 @@ export interface UserPreferences {
   language?: string;
   notifications_enabled?: boolean;
   notifications: NotificationPreferences;
+  ambientSound?: boolean;
+  displayName?: string;
+  pronouns?: string;
+  biography?: string;
+  avatarUrl?: string;
+  fullAnonymity?: boolean;
+  onboarded?: boolean;
   privacy: {
     shareData: boolean;
     anonymizeReports?: boolean;
@@ -45,6 +53,7 @@ export interface UserPreferences {
     shareActivity?: boolean;
     allowMessages?: boolean;
     allowNotifications?: boolean;
+    anonymousMode?: boolean;
   };
 }
 

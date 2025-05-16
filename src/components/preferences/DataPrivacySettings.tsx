@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -32,7 +31,8 @@ const DataPrivacySettings = () => {
       // Initialiser privacy si non défini ou si c'est une chaîne
       updatePreferences({
         privacy: {
-          [key]: value
+          shareData: key === 'shareData' ? value : false,
+          profileVisibility: 'team'
         }
       });
     } else {
@@ -49,6 +49,7 @@ const DataPrivacySettings = () => {
     if (!preferences.privacy || typeof preferences.privacy === 'string') {
       updatePreferences({
         privacy: {
+          shareData: false,
           profileVisibility: visibility
         }
       });
@@ -63,7 +64,10 @@ const DataPrivacySettings = () => {
   };
 
   // Obtenir les valeurs actuelles de confidentialité, en tenant compte des structures potentiellement différentes
-  const privacy = preferences.privacy && typeof preferences.privacy === 'object' ? preferences.privacy : {};
+  const privacy = preferences.privacy && typeof preferences.privacy === 'object' ? preferences.privacy : {
+    shareData: false,
+    profileVisibility: 'team'
+  };
   
   // Récupérer les valeurs de manière sécurisée avec des valeurs par défaut
   const shareData = privacy.shareData ?? false;

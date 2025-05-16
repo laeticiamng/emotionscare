@@ -8,6 +8,10 @@ export interface ThemeContextType {
   setTheme: (theme: Theme) => void;
   isDarkMode: boolean;
   toggleTheme: () => void;
+  fontSize?: FontSize;
+  setFontSize?: (size: FontSize) => void;
+  fontFamily?: FontFamily;
+  setFontFamily?: (family: FontFamily) => void;
 }
 
 // Re-export these types to avoid errors in ThemeSettingsTab
@@ -19,3 +23,4 @@ export interface ThemeOption {
   value: string;
   preview: string;
 }
+

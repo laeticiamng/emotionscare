@@ -20,6 +20,7 @@ export interface User {
   settings?: Record<string, any>;
   preferences?: UserPreferences;
   emotional_score?: number;
+  onboarded?: boolean;
 }
 
 export interface UserPreferences {
@@ -41,6 +42,13 @@ export interface UserPreferences {
   notifications_enabled?: boolean;
   language?: string;
   notifications: NotificationPreferences;
+  ambientSound?: boolean;
+  displayName?: string;
+  pronouns?: string;
+  biography?: string;
+  avatarUrl?: string;
+  onboarded?: boolean;
+  fullAnonymity?: boolean;
   privacy?: {
     shareData: boolean;
     anonymizeReports?: boolean;
@@ -49,6 +57,7 @@ export interface UserPreferences {
     shareActivity?: boolean;
     allowMessages?: boolean;
     allowNotifications?: boolean;
+    anonymousMode?: boolean;
   };
 }
 

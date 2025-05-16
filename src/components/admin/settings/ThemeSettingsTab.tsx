@@ -3,7 +3,7 @@ import React from 'react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Theme, FontFamily, FontSize } from '@/types/theme';
+import { Theme, FontFamily, FontSize, ThemeOption } from '@/types/theme';
 
 interface ThemeSettingsTabProps {
   currentTheme: string;
@@ -23,15 +23,14 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   onFontSizeChange
 }) => {
   // Theme options
-  const themes: Theme[] = [
+  const themes: ThemeOption[] = [
     { name: 'Light', value: 'light', preview: '#ffffff' },
     { name: 'Dark', value: 'dark', preview: '#1f2937' },
     { name: 'System', value: 'system', preview: 'linear-gradient(to right, #ffffff 50%, #1f2937 50%)' }
   ];
   
   const handleThemeChange = (value: string) => {
-    const theme = themes.find(t => t.value === value) || themes[0];
-    onThemeChange(theme);
+    onThemeChange(value as Theme);
   };
   
   // Font family options
@@ -39,7 +38,7 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
     { value: "system", label: "System Default" },
     { value: "sans", label: "Sans" },
     { value: "serif", label: "Serif" },
-    { value: "monospace", label: "Monospace" },
+    { value: "mono", label: "Monospace" },
     { value: "rounded", label: "Rounded" }
   ];
   
@@ -51,6 +50,7 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   
   // Font size options
   const fontSizes: {value: FontSize, label: string}[] = [
+    { value: "xs", label: "Extra Small" },
     { value: "sm", label: "Small" },
     { value: "md", label: "Medium" },
     { value: "lg", label: "Large" },
@@ -180,9 +180,11 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
                   >
                     <span 
                       className={cn(
-                        size.value === "sm" ? "text-xs" : 
-                        size.value === "md" ? "text-sm" : 
-                        size.value === "lg" ? "text-base" : "text-lg"
+                        size.value === "xs" ? "text-xs" : 
+                        size.value === "sm" ? "text-sm" : 
+                        size.value === "md" ? "text-base" : 
+                        size.value === "lg" ? "text-lg" :
+                        "text-xl"
                       )}
                     >
                       {size.label}

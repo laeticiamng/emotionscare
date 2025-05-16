@@ -1,206 +1,182 @@
 
 import React from 'react';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { UserPreferences } from '@/types/types';
-import { NotificationPreferences as NotificationPrefsType } from '@/types/notification';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface NotificationPreferencesProps {
   preferences: UserPreferences;
-  onChange: (value: Partial<UserPreferences>) => void;
+  onChange: (preferences: Partial<UserPreferences>) => void;
 }
 
 const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ preferences, onChange }) => {
+  // Ensure we have the notifications object
   const notifications = preferences.notifications || {
-    enabled: true,
-    emailEnabled: true,
-    pushEnabled: true,
-    inAppEnabled: true,
-    types: {
-      system: true,
-      emotion: true,
-      coach: true,
-      journal: true,
-      community: true,
-      achievement: true,
-    },
-    frequency: 'immediate',
+    enabled: false,
+    emailEnabled: false,
+    pushEnabled: false,
+    inAppEnabled: false,
+    types: {},
+    frequency: 'immediate'
   };
-  
-  // Helper to update notification settings
-  const updateNotifications = (updates: Partial<NotificationPrefsType>) => {
+
+  // Helper to update nested notification preferences
+  const handleNotificationChange = (key: string, value: any) => {
     onChange({
       notifications: {
-        ...notifications,
-        ...updates,
-      },
+        ...(typeof notifications === 'object' ? notifications : {}),
+        [key]: value
+      }
     });
   };
-  
+
   // Helper to update notification types
-  const updateNotificationType = (type: string, value: boolean) => {
-    updateNotifications({
-      types: {
-        ...notifications.types,
-        [type]: value,
-      },
+  const handleTypeChange = (type: string, enabled: boolean) => {
+    const currentTypes = typeof notifications === 'object' && notifications.types 
+      ? notifications.types 
+      : {};
+      
+    onChange({
+      notifications: {
+        ...(typeof notifications === 'object' ? notifications : {}),
+        types: {
+          ...currentTypes,
+          [type]: enabled
+        }
+      }
     });
   };
-  
+
+  // Check if notifications is a boolean or an object
+  const isEnabled = typeof notifications === 'boolean' 
+    ? notifications 
+    : notifications.enabled;
+    
+  const emailEnabled = typeof notifications === 'object' 
+    ? notifications.emailEnabled 
+    : false;
+    
+  const pushEnabled = typeof notifications === 'object' 
+    ? notifications.pushEnabled 
+    : false;
+    
+  const inAppEnabled = typeof notifications === 'object' 
+    ? notifications.inAppEnabled 
+    : false;
+    
+  const frequency = typeof notifications === 'object' && notifications.frequency 
+    ? notifications.frequency 
+    : 'immediate';
+    
+  const types = typeof notifications === 'object' && notifications.types 
+    ? notifications.types 
+    : {};
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between space-x-2">
-        <Label htmlFor="notifications-enabled" className="text-base font-medium">
-          Activer les notifications
-        </Label>
-        <Checkbox
-          id="notifications-enabled"
-          checked={notifications.enabled}
-          onCheckedChange={(checked) => updateNotifications({ enabled: checked === true })}
+      <div className="flex items-center justify-between">
+        <div>
+          <Label htmlFor="notificationsEnabled">Notifications</Label>
+          <p className="text-sm text-muted-foreground">
+            Activer ou désactiver toutes les notifications
+          </p>
+        </div>
+        <Switch
+          id="notificationsEnabled"
+          checked={isEnabled}
+          onCheckedChange={(checked) => {
+            if (typeof notifications === 'boolean') {
+              onChange({ notifications: checked });
+            } else {
+              handleNotificationChange('enabled', checked);
+            }
+          }}
         />
       </div>
-      
-      {notifications.enabled && (
+
+      {isEnabled && (
         <>
-          <div className="space-y-3">
-            <Label className="text-base">Méthodes de notification</Label>
-            
-            <div className="ml-4 space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="email-notifications"
-                  checked={notifications.emailEnabled}
-                  onCheckedChange={(checked) => updateNotifications({ emailEnabled: checked === true })}
-                />
-                <Label htmlFor="email-notifications" className="font-normal">Email</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="push-notifications"
-                  checked={notifications.pushEnabled}
-                  onCheckedChange={(checked) => updateNotifications({ pushEnabled: checked === true })}
-                />
-                <Label htmlFor="push-notifications" className="font-normal">
-                  Notifications push
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="inapp-notifications"
-                  checked={notifications.inAppEnabled}
-                  onCheckedChange={(checked) => updateNotifications({ inAppEnabled: checked === true })}
-                />
-                <Label htmlFor="inapp-notifications" className="font-normal">
-                  Notifications dans l'application
-                </Label>
-              </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="emailEnabled">Notifications par email</Label>
+              <p className="text-sm text-muted-foreground">
+                Recevoir des notifications par email
+              </p>
             </div>
+            <Switch
+              id="emailEnabled"
+              checked={emailEnabled}
+              onCheckedChange={(checked) => handleNotificationChange('emailEnabled', checked)}
+            />
           </div>
-          
-          <div className="space-y-3">
-            <Label className="text-base">Types de notifications</Label>
-            
-            <div className="ml-4 space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="system-notifications"
-                  checked={notifications.types?.system}
-                  onCheckedChange={(checked) => updateNotificationType('system', checked === true)}
-                />
-                <Label htmlFor="system-notifications" className="font-normal">
-                  Système
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="emotion-notifications"
-                  checked={notifications.types?.emotion}
-                  onCheckedChange={(checked) => updateNotificationType('emotion', checked === true)}
-                />
-                <Label htmlFor="emotion-notifications" className="font-normal">
-                  Émotions
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="coach-notifications"
-                  checked={notifications.types?.coach}
-                  onCheckedChange={(checked) => updateNotificationType('coach', checked === true)}
-                />
-                <Label htmlFor="coach-notifications" className="font-normal">
-                  Coach
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="journal-notifications"
-                  checked={notifications.types?.journal}
-                  onCheckedChange={(checked) => updateNotificationType('journal', checked === true)}
-                />
-                <Label htmlFor="journal-notifications" className="font-normal">
-                  Journal
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="community-notifications"
-                  checked={notifications.types?.community}
-                  onCheckedChange={(checked) => updateNotificationType('community', checked === true)}
-                />
-                <Label htmlFor="community-notifications" className="font-normal">
-                  Communauté
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="achievement-notifications"
-                  checked={notifications.types?.achievement}
-                  onCheckedChange={(checked) => updateNotificationType('achievement', checked === true)}
-                />
-                <Label htmlFor="achievement-notifications" className="font-normal">
-                  Récompenses
-                </Label>
-              </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="pushEnabled">Notifications push</Label>
+              <p className="text-sm text-muted-foreground">
+                Recevoir des notifications push sur votre appareil
+              </p>
             </div>
+            <Switch
+              id="pushEnabled"
+              checked={pushEnabled}
+              onCheckedChange={(checked) => handleNotificationChange('pushEnabled', checked)}
+            />
           </div>
-          
-          <div className="space-y-3">
-            <Label className="text-base">Fréquence des notifications</Label>
-            
-            <RadioGroup
-              value={notifications.frequency || 'immediate'}
-              onValueChange={(value) => updateNotifications({ frequency: value })}
-              className="ml-4 space-y-2"
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="inAppEnabled">Notifications dans l'application</Label>
+              <p className="text-sm text-muted-foreground">
+                Recevoir des notifications dans l'application
+              </p>
+            </div>
+            <Switch
+              id="inAppEnabled"
+              checked={inAppEnabled}
+              onCheckedChange={(checked) => handleNotificationChange('inAppEnabled', checked)}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="frequency">Fréquence des notifications</Label>
+            <Select
+              value={frequency}
+              onValueChange={(value) => handleNotificationChange('frequency', value)}
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="immediate" id="immediate" />
-                <Label htmlFor="immediate" className="font-normal">Immédiatement</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="hourly" id="hourly" />
-                <Label htmlFor="hourly" className="font-normal">Toutes les heures</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="daily" id="daily" />
-                <Label htmlFor="daily" className="font-normal">Une fois par jour</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="weekly" id="weekly" />
-                <Label htmlFor="weekly" className="font-normal">Une fois par semaine</Label>
-              </div>
-            </RadioGroup>
+              <SelectTrigger className="w-full mt-1">
+                <SelectValue placeholder="Sélectionner une fréquence" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="immediate">Immédiatement</SelectItem>
+                <SelectItem value="hourly">Toutes les heures</SelectItem>
+                <SelectItem value="daily">Quotidien</SelectItem>
+                <SelectItem value="weekly">Hebdomadaire</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+
+          {Object.keys(types).length > 0 && (
+            <div className="space-y-4">
+              <Label>Types de notifications</Label>
+
+              {Object.entries(types).map(([type, enabled]) => (
+                <div key={type} className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor={`notification-${type}`}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </Label>
+                  </div>
+                  <Switch
+                    id={`notification-${type}`}
+                    checked={Boolean(enabled)}
+                    onCheckedChange={(checked) => handleTypeChange(type, checked)}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>

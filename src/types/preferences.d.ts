@@ -1,7 +1,7 @@
 
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large';
-export type FontFamily = 'inter' | 'sans' | 'serif' | 'mono';
+export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded';
 export type PrivacyLevel = 'strict' | 'balanced' | 'relaxed';
 export type Theme = ThemeName;
 
@@ -32,4 +32,11 @@ export interface UserPreferences {
   colorBlindMode: boolean;
   autoplayMedia: boolean;
   sound: SoundPreference | boolean;
+  fullAnonymity?: boolean;
+  ambientSound?: boolean;
+  displayName?: string;
+  pronouns?: string;
+  biography?: string;
+  avatarUrl?: string;
+  onboarded?: boolean;
 }
