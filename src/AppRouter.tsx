@@ -17,8 +17,8 @@ const AppRouter: React.FC = () => {
   }, []);
 
   return (
-    <ThemeProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
         <LayoutProvider>
           <SidebarProvider>
             <MusicProvider>
@@ -26,8 +26,8 @@ const AppRouter: React.FC = () => {
             </MusicProvider>
           </SidebarProvider>
         </LayoutProvider>
-      </AuthProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
 

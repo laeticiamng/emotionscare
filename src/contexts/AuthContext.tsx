@@ -6,12 +6,12 @@ interface User {
   name: string;
   email: string;
   role: string;
-  avatar?: string; // Added this property
-  avatar_url?: string; // Added this property
-  preferences?: any; // Added this property
-  position?: string; // Added this property
-  department?: string; // Added this property
-  joined_at?: string; // Added this property
+  avatar?: string; 
+  avatar_url?: string;
+  preferences?: any;
+  position?: string;
+  department?: string;
+  joined_at?: string;
 }
 
 interface AuthContextType {
@@ -21,7 +21,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   register: (name: string, email: string, password: string) => Promise<void>;
-  updateUser?: (userData: Partial<User>) => Promise<void>; // Added this method
+  updateUser?: (userData: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

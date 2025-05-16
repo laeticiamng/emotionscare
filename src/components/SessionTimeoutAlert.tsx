@@ -11,7 +11,7 @@ const SessionTimeoutAlert: React.FC = () => {
   const { toast } = useToast();
   
   // Only proceed if user is authenticated
-  const { showWarning, resetTimer, timeLeft } = useSessionSecurity();
+  const { showWarning, resetTimer, sessionExpiresIn } = useSessionSecurity();
   
   useEffect(() => {
     if (auth.isAuthenticated && showWarning) {
