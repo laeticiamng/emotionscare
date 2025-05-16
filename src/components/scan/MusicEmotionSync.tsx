@@ -1,45 +1,47 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMusic } from '@/contexts/music';
-import { useCoach } from '@/hooks/useCoach';
-import { useToast } from '@/hooks/use-toast';
+import { useCoach } from '@/contexts/coach';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface MusicEmotionSyncProps {
-  emotion?: string;
-  intensity?: number;
-  autoSync?: boolean;
+  className?: string;
 }
 
-/**
- * Composant permettant de synchroniser l'état émotionnel avec l'ambiance musicale
- * Peut fonctionner en mode automatique ou sur demande
- */
-const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({
-  emotion = 'neutral',
-  intensity = 50,
-  autoSync = false
-}) => {
-  const { loadPlaylistForEmotion } = useMusic();
-  const coach = useCoach();
-  const { toast } = useToast();
+const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({ className }) => {
+  const [isSynced, setIsSynced] = useState(false);
+  const { loadPlaylistForEmotion, setCurrentEmotion } = useMusic();
+  const { lastEmotion } = useCoach();
   
-  // Access lastEmotion from coach (assuming it exists in the coach context/hook)
-  const emotionToUse = coach?.lastEmotion || emotion;
-  
-  // Synchronisation automatique si activée
+  // Sync music with emotion when enabled and emotion changes
   useEffect(() => {
-    if (autoSync && emotionToUse && emotionToUse !== 'neutral') {
-      console.log(`Synchronisation automatique de la musique avec l'émotion: ${emotionToUse}`);
-      loadPlaylistForEmotion(emotionToUse.toLowerCase());
-      
-      toast({
-        title: "Musique adaptée",
-        description: `L'ambiance musicale s'est adaptée automatiquement à votre humeur: ${emotionToUse}`
-      });
+    if (isSynced && lastEmotion) {
+      loadPlaylistForEmotion(lastEmotion);
+      setCurrentEmotion(lastEmotion);
     }
-  }, [autoSync, emotionToUse, loadPlaylistForEmotion, toast]);
+  }, [isSynced, lastEmotion, loadPlaylistForEmotion, setCurrentEmotion]);
   
-  return null; // Composant sans rendu visuel
+  const handleToggle = (checked: boolean) => {
+    setIsSynced(checked);
+    
+    if (checked && lastEmotion) {
+      // Immediately sync when enabling
+      loadPlaylistForEmotion(lastEmotion);
+      setCurrentEmotion(lastEmotion);
+    }
+  };
+  
+  return (
+    <div className={`flex items-center space-x-2 ${className}`}>
+      <Switch
+        id="emotion-music-sync"
+        checked={isSynced}
+        onCheckedChange={handleToggle}
+      />
+      <Label htmlFor="emotion-music-sync">Synchroniser la musique avec mes émotions</Label>
+    </div>
+  );
 };
 
 export default MusicEmotionSync;

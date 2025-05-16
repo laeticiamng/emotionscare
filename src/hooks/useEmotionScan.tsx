@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createEmotionEntry, fetchLatestEmotion } from '@/lib/scanService';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/emotion';
 import { v4 as uuid } from 'uuid';
 
 export function useEmotionScan() {

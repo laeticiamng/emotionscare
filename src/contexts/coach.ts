@@ -1,12 +1,11 @@
 
-import { createContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 
 export interface CoachContextType {
   isActive: boolean;
   toggleCoach: () => void;
   lastEmotion?: string | null;
   setLastEmotion?: (emotion: string | null) => void;
-  // Add other coach-related properties and functions
 }
 
 export const CoachContext = createContext<CoachContextType>({
@@ -15,7 +14,30 @@ export const CoachContext = createContext<CoachContextType>({
   lastEmotion: null
 });
 
+export const useCoach = () => {
+  const context = useContext(CoachContext);
+  if (context === undefined) {
+    throw new Error('useCoach must be used within a CoachProvider');
+  }
+  return context;
+};
+
 export const CoachProvider = ({ children }: { children: React.ReactNode }) => {
-  // Implementation will be in a separate file
-  return null;
+  const [isActive, setIsActive] = useState(false);
+  const [lastEmotion, setLastEmotion] = useState<string | null>(null);
+  
+  const toggleCoach = () => {
+    setIsActive(prev => !prev);
+  };
+  
+  return (
+    <CoachContext.Provider value={{ 
+      isActive, 
+      toggleCoach,
+      lastEmotion,
+      setLastEmotion
+    }}>
+      {children}
+    </CoachContext.Provider>
+  );
 };
