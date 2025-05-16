@@ -1,3 +1,3 @@
 
 // Re-export from the refactored structure
-export * from './music';
+export * from './music/MusicContextProvider';

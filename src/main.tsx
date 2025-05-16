@@ -8,7 +8,7 @@ import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { LayoutProvider } from '@/contexts/LayoutContext';
-import { MusicProvider } from '@/contexts/MusicContext';
+import { MusicProvider } from '@/contexts/music/MusicContextProvider';
 import { Toaster } from '@/components/ui/toaster';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

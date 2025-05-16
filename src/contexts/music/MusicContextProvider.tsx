@@ -43,7 +43,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // State variables
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [queue, setQueue] = useState<MusicTrack[]>([]);
-  const [playlists, setPlaylists] = useState<MusicPlaylist[]>(mockPlaylists);
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>(mockPlaylists || []);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const [isShuffled, setIsShuffled] = useState(false);
@@ -241,5 +241,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   );
 };
 
-// Custom hook to use the music context
-export const useMusic = () => useContext(MusicContext);
+// Export the context for easier imports
+export const useMusic = () => {
+  const context = useContext(MusicContext);
+  if (context === undefined) {
+    throw new Error('useMusic must be used within a MusicProvider');
+  }
+  return context;
+};

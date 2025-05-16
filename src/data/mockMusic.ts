@@ -1,96 +1,83 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicPlaylist, MusicTrack } from '@/types/music';
 
-// Mock track data for development
-export const mockTracks: MusicTrack[] = [
-  {
-    id: '1',
-    title: 'Peaceful Harmony',
-    artist: 'Ambient Sounds',
-    album: 'Relaxation Collection',
-    duration: 280,
-    url: '/audio/peaceful-harmony.mp3',
-    coverUrl: '/images/covers/peaceful-harmony.jpg',
-    mood: 'calm'
-  },
-  {
-    id: '2',
-    title: 'Energy Boost',
-    artist: 'Electronic Beats',
-    album: 'Workout Mix',
-    duration: 195,
-    url: '/audio/energy-boost.mp3',
-    coverUrl: '/images/covers/energy-boost.jpg',
-    mood: 'energetic'
-  },
-  {
-    id: '3',
-    title: 'Deep Focus',
-    artist: 'Study Tunes',
-    album: 'Concentration',
-    duration: 340,
-    url: '/audio/deep-focus.mp3',
-    coverUrl: '/images/covers/deep-focus.jpg',
-    mood: 'focused'
-  },
-  {
-    id: '4',
-    title: 'Joyful Melodies',
-    artist: 'Happy Sounds',
-    album: 'Positive Vibes',
-    duration: 210,
-    url: '/audio/joyful-melodies.mp3',
-    coverUrl: '/images/covers/joyful-melodies.jpg',
-    mood: 'happy'
-  },
-  {
-    id: '5',
-    title: 'Gentle Reflection',
-    artist: 'Piano Dreams',
-    album: 'Mindful Moments',
-    duration: 305,
-    url: '/audio/gentle-reflection.mp3',
-    coverUrl: '/images/covers/gentle-reflection.jpg',
-    mood: 'calm'
-  }
+// Helper function to ensure all tracks have required properties
+const createTrack = (track: Partial<MusicTrack>): MusicTrack => {
+  return {
+    id: track.id || `track-${Math.random().toString(36).substr(2, 9)}`,
+    title: track.title || 'Unknown Title',
+    artist: track.artist || 'Unknown Artist',
+    duration: track.duration || 180,
+    url: track.url || track.audioUrl || '',
+    audioUrl: track.audioUrl || track.url || '',
+    coverUrl: track.coverUrl || track.cover_url || 'https://via.placeholder.com/100',
+    cover_url: track.cover_url || track.coverUrl || 'https://via.placeholder.com/100'
+  };
+};
+
+// Sample calm tracks
+const calmTracks: MusicTrack[] = [
+  createTrack({
+    id: 'calm1',
+    title: 'Ocean Waves',
+    artist: 'Nature Sounds',
+    duration: 240,
+    url: 'https://example.com/audio/ocean-waves.mp3',
+    coverUrl: 'https://via.placeholder.com/100?text=Ocean',
+    emotionalTone: 'calming'
+  }),
+  createTrack({
+    id: 'calm2',
+    title: 'Gentle Rain',
+    artist: 'Relaxing Sounds',
+    duration: 300,
+    url: 'https://example.com/audio/gentle-rain.mp3',
+    coverUrl: 'https://via.placeholder.com/100?text=Rain',
+    emotionalTone: 'peaceful'
+  })
 ];
 
-// Mock playlist data for development
+// Sample happy tracks
+const happyTracks: MusicTrack[] = [
+  createTrack({
+    id: 'happy1',
+    title: 'Sunny Day',
+    artist: 'Happy Vibes',
+    duration: 180,
+    url: 'https://example.com/audio/sunny-day.mp3',
+    coverUrl: 'https://via.placeholder.com/100?text=Sunny',
+    emotionalTone: 'joyful'
+  }),
+  createTrack({
+    id: 'happy2',
+    title: 'Good Times',
+    artist: 'Positive Energy',
+    duration: 210,
+    url: 'https://example.com/audio/good-times.mp3',
+    coverUrl: 'https://via.placeholder.com/100?text=Good',
+    emotionalTone: 'upbeat'
+  })
+];
+
+// Mock playlists
 export const mockPlaylists: MusicPlaylist[] = [
   {
-    id: 'pl1',
-    title: 'Calm & Relaxation',
-    description: 'Soothing tracks to help you unwind and relax',
-    coverUrl: '/images/playlists/calm-relaxation.jpg',
-    tracks: mockTracks.filter(track => track.mood === 'calm'),
-    category: 'relaxation',
-    mood: 'calm'
+    id: 'playlist-calm',
+    title: 'Calm & Relaxing',
+    coverUrl: 'https://via.placeholder.com/200?text=Calm',
+    tracks: calmTracks,
+    mood: 'calm',
+    category: 'relaxation'
   },
   {
-    id: 'pl2',
-    title: 'Energy & Motivation',
-    description: 'Upbeat tracks to boost your energy',
-    coverUrl: '/images/playlists/energy-motivation.jpg',
-    tracks: mockTracks.filter(track => track.mood === 'energetic'),
-    category: 'workout',
-    mood: 'energetic'
-  },
-  {
-    id: 'pl3',
-    title: 'Focus & Concentration',
-    description: 'Help maintain focus and concentration',
-    coverUrl: '/images/playlists/focus-concentration.jpg',
-    tracks: mockTracks.filter(track => track.mood === 'focused'),
-    category: 'focus',
-    mood: 'focused'
-  },
-  {
-    id: 'pl4',
-    title: 'Happy Vibes',
-    description: 'Music to boost your mood and make you smile',
-    coverUrl: '/images/playlists/happy-vibes.jpg',
-    tracks: mockTracks.filter(track => track.mood === 'happy'),
-    category: 'mood',
-    mood: 'happy'
+    id: 'playlist-happy',
+    title: 'Happy & Uplifting',
+    coverUrl: 'https://via.placeholder.com/200?text=Happy',
+    tracks: happyTracks,
+    mood: 'happy',
+    category: 'energizing'
   }
 ];
+
+// Ensure we always return a non-empty array
+export default mockPlaylists;
