@@ -42,11 +42,11 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({
       );
     }
     
-    // Fallback to icon if provided or default Award icon
+    // Fallback to default Award icon
     return (
       <div className={`w-16 h-16 mx-auto flex items-center justify-center rounded-full 
         ${badge.completed ? 'bg-primary/20' : 'bg-muted'}`}>
-        {badge.icon || <Award size={32} className={badge.completed ? 'text-primary' : 'text-muted-foreground'} />}
+        <Award size={32} className={badge.completed ? 'text-primary' : 'text-muted-foreground'} />
       </div>
     );
   };

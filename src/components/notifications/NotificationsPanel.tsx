@@ -77,7 +77,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
           <p className="text-muted-foreground mt-2">
             {activeFilter === 'all' 
               ? "Vous n'avez pas encore reçu de notifications." 
-              : `Aucune notification de type "${activeFilter as string}" n'a été trouvée.`}
+              : `Aucune notification de ce type n'a été trouvée.`}
           </p>
           {activeFilter !== 'all' && (
             <Button 
@@ -101,6 +101,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
             notification={notification}
             onMarkAsRead={onMarkAsRead}
             onDelete={onDeleteNotification}
+            onClick={() => handleActionButton(notification)}
           />
         ))}
       </div>
@@ -114,7 +115,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({
         <div className="space-y-1">
           {filterOptions.map((option) => (
             <button
-              key={option.value as string}
+              key={typeof option.value === 'string' ? option.value : 'filter'}
               className={`w-full text-left px-2 py-1.5 rounded-md flex items-center justify-between hover:bg-muted transition-colors ${
                 activeFilter === option.value ? 'bg-muted font-medium' : ''
               }`}

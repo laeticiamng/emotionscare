@@ -25,7 +25,7 @@ export interface Badge {
   dateEarned?: string;
   awarded_at?: string;
   progress?: number;
-  completed: boolean;
+  completed?: boolean;
   icon?: React.ReactNode;
   // Adding properties needed by components
   unlocked?: boolean;

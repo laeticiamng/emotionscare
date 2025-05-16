@@ -162,7 +162,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
                     )}
                   </div>
                   <CardTitle className="text-base font-medium">
-                    {challenge.title || challenge.name}
+                    {challenge.title || (challenge.name ? challenge.name : '')}
                   </CardTitle>
                 </div>
                 <div className="text-lg font-semibold text-primary">
@@ -176,16 +176,16 @@ const ChallengesList: React.FC<ChallengesListProps> = ({
               <p className="text-sm text-muted-foreground mb-3">{challenge.description}</p>
               
               <div>
-                {challenge.total || challenge.goal ? (
+                {(challenge.total !== undefined || challenge.goal !== undefined) ? (
                   <div className="mb-1">
                     <div className="flex justify-between mb-1">
                       <span className="text-xs">Progression</span>
                       <span className="text-xs font-medium">
-                        {challenge.progress}/{challenge.total || challenge.goal}
+                        {challenge.progress}/{challenge.total !== undefined ? challenge.total : (challenge.goal !== undefined ? challenge.goal : 1)}
                       </span>
                     </div>
                     <Progress
-                      value={(challenge.progress / (challenge.total || challenge.goal || 1)) * 100}
+                      value={(challenge.progress / (challenge.total !== undefined ? challenge.total : (challenge.goal !== undefined ? challenge.goal : 1))) * 100}
                       className="h-1.5"
                     />
                   </div>

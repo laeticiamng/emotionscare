@@ -29,7 +29,7 @@ export { Pagination } from "./pagination";
 export { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "./resizable";
 export { toast } from "./sonner";
 export { Separator } from "./separator";
-export { Sheet } from "./sheet";
+export { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "./sheet";
 export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from "./table";
 export { Toaster } from "./toaster";
 export { Toast } from "./toast";

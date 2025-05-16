@@ -2,7 +2,7 @@
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Notification, NotificationItemProps, NotificationType } from '@/types/notification';
+import { Notification, NotificationItemProps } from '@/types/notification';
 import { Button } from '@/components/ui/button';
 import {
   Heart, BookOpen, Users, Award, Bell, Info, CheckCircle, AlertTriangle, XCircle, AlertOctagon, MessageSquare
@@ -17,7 +17,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   onRead
 }) => {
 
-  const getIcon = (type: NotificationType) => {
+  const getIcon = (type: string) => {
     switch (type) {
       case 'emotion':
         return <Heart className="h-5 w-5 text-rose-500" />;

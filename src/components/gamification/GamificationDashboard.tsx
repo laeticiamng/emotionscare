@@ -33,14 +33,16 @@ const GamificationDashboard: React.FC = () => {
     challenges: stats.challenges || [],
     progress: stats.progress || 0,
     leaderboard: stats.leaderboard || [],
-    currentLevel: stats.currentLevel || 1,
-    pointsToNextLevel: stats.pointsToNextLevel || 0,
-    progressToNextLevel: stats.progressToNextLevel || 0,
-    streakDays: stats.streakDays || 0,
+    
+    // Add default values for additional properties
+    currentLevel: stats.currentLevel || stats.level || 1,
+    pointsToNextLevel: stats.pointsToNextLevel || (stats.nextLevel?.points || 0) - stats.points,
+    progressToNextLevel: stats.progressToNextLevel || stats.progress || 0,
+    streakDays: stats.streakDays || stats.streak || 0,
     lastActivityDate: stats.lastActivityDate || new Date().toISOString(),
-    activeChallenges: stats.activeChallenges || 0,
-    badgesCount: stats.badgesCount || 0,
-    totalPoints: stats.totalPoints || 0
+    activeChallenges: stats.activeChallenges || (stats.challenges || []).filter(c => !c.completed).length,
+    badgesCount: stats.badgesCount || (stats.badges || []).length,
+    totalPoints: stats.totalPoints || stats.points || 0
   };
 
   return (
