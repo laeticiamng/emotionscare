@@ -46,6 +46,7 @@ export interface Badge {
   total?: number;
   criteria?: string;
   icon?: string;
+  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 }
 
 export interface LeaderboardEntry {

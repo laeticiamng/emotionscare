@@ -1,169 +1,133 @@
-
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Menu, 
-  Home, 
-  BarChart3, 
-  Heart, 
-  BookOpen, 
-  Music, 
-  Users, 
-  MessageSquare, 
-  Settings, 
-  LogOut,
-  User
-} from 'lucide-react';
-import { User as UserType } from '@/types/user';
+import { Dialog, DialogContent, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { X, Menu, Home, Settings, Bell, User, Moon, Sun, Users, BookOpen } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { ThemeToggle } from '../theme/ThemeToggle';
 
 interface MobileNavigationProps {
-  onLogout?: () => void;
-  user?: UserType;
-  userMode?: 'b2c' | 'b2b_user' | 'b2b_admin' | null;
+  className?: string;
 }
 
-const MobileNavigation = ({ onLogout, user, userMode = 'b2c' }: MobileNavigationProps) => {
+const MobileDrawer: React.FC<{
+  open: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+  className?: string;
+}> = ({ open, onClose, children, className = '' }) => {
+  return (
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className={`sm:max-w-[425px] ${className}`}>
+        {children}
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const MobileNavigation: React.FC<MobileNavigationProps> = ({ className }) => {
   const [open, setOpen] = useState(false);
-  
-  const getBaseRoute = () => {
-    switch (userMode) {
-      case 'b2b_user':
-        return '/b2b/user';
-      case 'b2b_admin':
-        return '/b2b/admin';
-      case 'b2c':
-      default:
-        return '/b2c';
-    }
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
   };
 
-  const baseRoute = getBaseRoute();
-  
   const menuItems = [
     {
-      name: 'Accueil',
-      icon: <Home className="h-5 w-5" />,
-      path: `${baseRoute}/dashboard`
+      href: '/',
+      label: 'Accueil',
+      icon: Home,
+      requiresAuth: false,
     },
     {
-      name: 'Scan Émotionnel',
-      icon: <Heart className="h-5 w-5" />,
-      path: `${baseRoute}/scan`,
-      hideInAdmin: true
+      href: '/scan',
+      label: 'Scanner',
+      icon: Bell,
+      requiresAuth: true,
     },
     {
-      name: 'Journal',
-      icon: <BookOpen className="h-5 w-5" />,
-      path: `${baseRoute}/journal`,
-      hideInAdmin: true
+      href: '/journal',
+      label: 'Journal',
+      icon: BookOpen,
+      requiresAuth: true,
     },
     {
-      name: 'Musicothérapie',
-      icon: <Music className="h-5 w-5" />,
-      path: `${baseRoute}/music`,
-      hideInAdmin: true
+      href: '/community',
+      label: 'Communauté',
+      icon: Users,
+      requiresAuth: true,
     },
     {
-      name: 'Coach IA',
-      icon: <MessageSquare className="h-5 w-5" />,
-      path: `${baseRoute}/coach`,
-      hideInAdmin: true
+      href: '/profile',
+      label: 'Profil',
+      icon: User,
+      requiresAuth: true,
     },
     {
-      name: 'Communauté',
-      icon: <Users className="h-5 w-5" />,
-      path: `${baseRoute}/community`,
-      hideInAdmin: true
+      href: '/preferences',
+      label: 'Préférences',
+      icon: Settings,
+      requiresAuth: true,
     },
-    {
-      name: 'Analytics',
-      icon: <BarChart3 className="h-5 w-5" />,
-      path: `${baseRoute}/analytics`,
-      onlyInAdmin: true
-    },
-    {
-      name: 'Utilisateurs',
-      icon: <User className="h-5 w-5" />,
-      path: `${baseRoute}/users`,
-      onlyInAdmin: true
-    },
-    {
-      name: 'Paramètres',
-      icon: <Settings className="h-5 w-5" />,
-      path: `${baseRoute}/settings`
-    }
   ];
-  
-  const filteredMenuItems = menuItems.filter(item => {
-    if (userMode === 'b2b_admin') {
-      return !item.hideInAdmin;
-    } else {
-      return !item.onlyInAdmin;
-    }
-  });
-  
-  const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
-    }
-    setOpen(false);
-  };
-  
+
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="lg:hidden">
-          <Menu className="h-5 w-5" />
-          <span className="sr-only">Menu</span>
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="flex flex-col h-full">
-        <SheetHeader className="border-b pb-4">
-          <SheetTitle className="text-left">EmotionsCare</SheetTitle>
-          {user && (
-            <div className="flex items-center gap-3 pt-3">
-              <Avatar>
-                <AvatarImage src={user.avatar_url || user.avatar} alt={user.name} />
-                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div className="text-left">
-                <p className="text-sm font-medium">{user.name}</p>
-                <p className="text-xs text-muted-foreground">{user.email}</p>
-              </div>
+    <div className={`sm:hidden ${className}`}>
+      <Button variant="ghost" size="icon" onClick={() => setOpen(true)}>
+        <Menu className="h-5 w-5" />
+      </Button>
+
+      <MobileDrawer open={open} onClose={() => setOpen(false)}>
+        <div className="flex flex-col h-full">
+          <div className="p-4 border-b flex justify-between items-center">
+            <span className="font-bold text-lg">EmotionsCare</span>
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+
+          <nav className="flex flex-col space-y-1 p-4">
+            {menuItems.map(
+              (item) =>
+                (!item.requiresAuth || isAuthenticated) && (
+                  <Link key={item.href} to={item.href} onClick={() => setOpen(false)}>
+                    <Button variant="ghost" className="justify-start w-full">
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {item.label}
+                    </Button>
+                  </Link>
+                )
+            )}
+          </nav>
+
+          <div className="mt-auto p-4 border-t">
+            <div className="flex items-center justify-between mb-3">
+              <ThemeToggle />
             </div>
-          )}
-        </SheetHeader>
-        
-        <nav className="flex-1 py-4">
-          <ul className="space-y-1 px-2">
-            {filteredMenuItems.map((item) => (
-              <li key={item.path}>
-                <Link to={item.path} onClick={() => setOpen(false)}>
-                  <Button variant="ghost" className="w-full justify-start gap-3">
-                    {item.icon}
-                    {item.name}
+            {isAuthenticated ? (
+              <Button variant="outline" className="w-full" onClick={handleLogout}>
+                Déconnexion
+              </Button>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="secondary" className="w-full mb-2">
+                    Se connecter
                   </Button>
                 </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        
-        <div className="border-t pt-4 px-2">
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start gap-3 text-destructive hover:text-destructive"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-5 w-5" />
-            Déconnexion
-          </Button>
+                <Link to="/register">
+                  <Button className="w-full">S'inscrire</Button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </MobileDrawer>
+    </div>
   );
 };
 

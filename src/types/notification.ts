@@ -41,6 +41,11 @@ export interface NotificationPreference {
   pushEnabled?: boolean;
   inAppEnabled?: boolean;
   frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
+  quietHours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
 }
 
 export type NotificationPreferences = Record<NotificationType, NotificationPreference>;

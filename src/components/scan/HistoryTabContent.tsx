@@ -1,86 +1,84 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useAuth } from '@/contexts/AuthContext';
-import { useQuery } from 'react-query';
-import { fetchEmotionsHistory } from '@/lib/scanService';
-import { EmotionResult } from '@/types';
-import { getEmotionIcon } from '@/lib/emotionUtils';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
 
-interface HistoryTabContentProps {
-  userId?: string;
-}
+import React, { useEffect, useState } from 'react';
+import { EmotionResult } from '@/types/emotion';
+import { fetchEmotionHistory } from '@/lib/scanService';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import EmotionHistory from './EmotionHistory';
+import EmotionTrendChart from './EmotionTrendChart';
+import { Loader2 } from 'lucide-react';
 
-const HistoryTabContent: React.FC<HistoryTabContentProps> = ({ userId }) => {
-  const { user } = useAuth();
-  const currentUserId = userId || user?.id || '';
-  
-  const { data: emotions, isLoading, error } = useQuery(
-    ['emotionsHistory', currentUserId],
-    () => fetchEmotionsHistory(currentUserId),
-    {
-      enabled: !!currentUserId,
-    }
-  );
-  
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="p-4">
-          Chargement de l'historique...
-        </CardContent>
-      </Card>
-    );
-  }
-  
-  if (error) {
-    return (
-      <Card>
-        <CardContent className="p-4">
-          Erreur lors du chargement de l'historique.
-        </CardContent>
-      </Card>
-    );
-  }
-  
+const HistoryTabContent: React.FC = () => {
+  const [emotions, setEmotions] = useState<EmotionResult[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedPeriod, setSelectedPeriod] = useState('week');
+
+  useEffect(() => {
+    const loadEmotionHistory = async () => {
+      setIsLoading(true);
+      try {
+        // Call fetchEmotionHistory without arguments
+        const history = await fetchEmotionHistory();
+        setEmotions(history);
+      } catch (error) {
+        console.error('Error loading emotion history:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadEmotionHistory();
+  }, []);
+
+  const handleEmotionSelect = (emotion: EmotionResult) => {
+    console.log('Selected emotion:', emotion);
+    // Handle emotion selection, e.g., show details
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Historique des émotions</CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <ScrollArea className="h-[400px]">
-          <div className="divide-y">
-            {emotions && emotions.length > 0 ? (
-              emotions.map((emotion: EmotionResult) => {
-                const EmotionIcon = getEmotionIcon(emotion.emotion);
-                const formattedDate = emotion.date
-                  ? format(new Date(emotion.date), 'dd MMMM yyyy, HH:mm', { locale: fr })
-                  : 'Date inconnue';
-                
-                return (
-                  <div key={emotion.id} className="p-4 flex items-center space-x-4">
-                    {EmotionIcon && <EmotionIcon className="h-6 w-6 text-gray-500" />}
-                    <div>
-                      <div className="text-sm font-medium">{emotion.emotion}</div>
-                      <div className="text-xs text-muted-foreground">{formattedDate}</div>
-                      <div className="text-sm text-muted-foreground mt-2">
-                        {emotion.feedback || "No AI feedback available"}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="p-4 text-center text-muted-foreground">
-                Aucune émotion enregistrée.
+    <Card className="p-4">
+      <Tabs defaultValue="chart" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="chart">Tendances</TabsTrigger>
+          <TabsTrigger value="list">Historique</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="chart" className="pt-2">
+          <div className="mb-4">
+            <div className="flex gap-2 mb-4">
+              {['week', 'month', 'year'].map((period) => (
+                <Button 
+                  key={period}
+                  variant={selectedPeriod === period ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedPeriod(period)}
+                >
+                  {period === 'week' ? 'Semaine' : 
+                   period === 'month' ? 'Mois' : 'Année'}
+                </Button>
+              ))}
+            </div>
+            
+            {isLoading ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               </div>
+            ) : (
+              <EmotionTrendChart emotions={emotions} period={selectedPeriod as 'week' | 'month' | 'year'} />
             )}
           </div>
-        </ScrollArea>
-      </CardContent>
+        </TabsContent>
+
+        <TabsContent value="list">
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <EmotionHistory emotions={emotions} onSelectEmotion={handleEmotionSelect} />
+          )}
+        </TabsContent>
+      </Tabs>
     </Card>
   );
 };

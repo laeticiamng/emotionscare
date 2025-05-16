@@ -63,3 +63,54 @@ export const getRoleHomeRoute = (role: UserRole): string => {
       return '/b2c/dashboard';
   }
 };
+
+// Function to check if a role is an admin role
+export const isAdminRole = (role: UserRole): boolean => {
+  return role === 'admin' || role === 'b2b_admin' || role === 'b2b-admin';
+};
+
+// Function to get a human-readable role name
+export const getRoleName = (role: UserRole): string => {
+  switch (role) {
+    case 'admin':
+      return 'Administrateur';
+    case 'b2b_admin':
+    case 'b2b-admin':
+      return 'Admin B2B';
+    case 'b2b_user':
+    case 'b2b-user':
+      return 'Utilisateur B2B';
+    case 'coach':
+      return 'Coach';
+    case 'moderator':
+      return 'Modérateur';
+    case 'wellbeing_manager':
+      return 'Manager Bien-être';
+    case 'team_lead':
+      return 'Chef d\'équipe';
+    case 'professional':
+      return 'Professionnel';
+    case 'collaborator':
+      return 'Collaborateur';
+    case 'employee':
+      return 'Employé';
+    case 'individual':
+    case 'b2c':
+    case 'user':
+    default:
+      return 'Utilisateur';
+  }
+};
+
+// Function to normalize user roles (fix inconsistencies in role naming)
+export const normalizeUserRole = (role: UserRole): string => {
+  // Handle hyphen vs underscore inconsistency
+  if (role === 'b2b-admin') return 'b2b_admin';
+  if (role === 'b2b-user') return 'b2b_user';
+  
+  // Individual users are treated as standard users
+  if (role === 'individual') return 'user';
+  if (role === 'b2c') return 'user';
+  
+  return role;
+};

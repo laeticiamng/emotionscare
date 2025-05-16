@@ -1,31 +1,35 @@
 
-// Theme types
-export type Theme = 'light' | 'dark' | 'pastel' | 'system';
-export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'system-ui' | 'sans-serif' | 'inter' | 'default';
-export type FontSize = 'small' | 'medium' | 'large' | 'x-large' | 'sm' | 'md' | 'lg' | 'xl';
+export type Theme = 'light' | 'dark' | 'system' | 'purple' | 'blue' | 'green' | 'orange' | 'pink' | 'red' | 'yellow' | 'pastel';
 
-export interface ThemeSettings {
-  theme: Theme;
-  fontSize: FontSize;
-  fontFamily: FontFamily;
-  reduceMotion: boolean;
-  colorBlindMode: boolean;
-}
+export type FontFamily = 
+  | 'system'
+  | 'sans'
+  | 'serif'
+  | 'mono'
+  | 'rounded';
+
+export type FontSize = 
+  | 'xs'
+  | 'sm'
+  | 'md'
+  | 'lg'
+  | 'xl';
 
 export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  fontSize: FontSize;
-  setFontSize: (size: FontSize) => void;
+  systemTheme: 'light' | 'dark';
+  resolvedTheme: 'light' | 'dark';
   fontFamily: FontFamily;
-  setFontFamily: (family: FontFamily) => void;
-  reduceMotion: boolean;
-  setReduceMotion: (reduce: boolean) => void;
-  colorBlindMode: boolean;
-  setColorBlindMode: (mode: boolean) => void;
+  setFontFamily: (fontFamily: FontFamily) => void;
+  fontSize: FontSize;
+  setFontSize: (fontSize: FontSize) => void;
+  resetTheme: () => void;
 }
 
 export interface ThemeButtonProps {
-  theme: Theme;
-  label: string;
+  theme?: Theme;
+  onClick?: () => void;
+  active?: boolean;
+  className?: string;
 }

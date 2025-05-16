@@ -12,12 +12,17 @@ export interface EmotionResult {
   audioUrl?: string;
   source?: 'text' | 'voice' | 'video' | 'manual';
   feedback?: string;
+  timestamp?: string;
+  transcript?: string;
+  user_id?: string;
 }
 
 export interface Emotion {
   emotion: string;
   score: number;
   confidence: number;
+  intensity?: number;
+  date?: string;
 }
 
 export interface LiveVoiceScannerProps {
@@ -27,6 +32,7 @@ export interface LiveVoiceScannerProps {
   autoStart?: boolean;
   renderControls?: boolean;
   className?: string;
+  stopAfterSeconds?: number;
 }
 
 export interface VoiceEmotionScannerProps {
@@ -62,6 +68,7 @@ export interface EmotionalTeamViewProps {
 export interface TeamOverviewProps {
   teamId: string;
   period: 'day' | 'week' | 'month' | 'year';
+  userId?: string;
 }
 
 export interface MoodBasedRecommendationsProps {
