@@ -62,11 +62,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     }
   };
 
-  // Check if notification is read, supporting both isRead and read properties
-  const isRead = notification.isRead || notification.read;
+  // Check if notification is read
+  const isRead = notification.read;
 
   // Get timestamp from various properties
-  const timestamp = notification.created_at || notification.createdAt || (notification.timestamp instanceof Date ? notification.timestamp.toISOString() : notification.timestamp);
+  const timestamp = notification.created_at || notification.timestamp;
 
   return (
     <div className={`p-4 border-b ${isRead ? '' : 'bg-muted/30'}`}>

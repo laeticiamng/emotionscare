@@ -12,20 +12,17 @@ export const filterNotifications = (
     case 'all':
       return notifications;
     case 'unread':
-      return notifications.filter(notification => !(notification.read || notification.isRead));
+      return notifications.filter(notification => !notification.read);
     case 'read':
-      return notifications.filter(notification => (notification.read || notification.isRead));
+      return notifications.filter(notification => notification.read);
     case 'urgent':
       return notifications.filter(notification => 
         notification.type === 'urgent' || notification.priority === 'urgent');
     case 'system':
-      return notifications.filter(notification => notification.type === 'system');
-    case 'journal':
-      return notifications.filter(notification => notification.type === 'journal');
     case 'emotion':
-      return notifications.filter(notification => notification.type === 'emotion');
-    case 'user':
-      return notifications.filter(notification => notification.type === 'user');
+    case 'journal':
+    case 'community':
+      return notifications.filter(notification => notification.type === filter);
     default:
       return notifications;
   }
@@ -50,8 +47,8 @@ export const getFilterLabel = (filter: NotificationFilter): string => {
       return 'Journal';
     case 'emotion':
       return 'Émotions';
-    case 'user':
-      return 'Utilisateur';
+    case 'community':
+      return 'Communauté';
     default:
       return 'Toutes';
   }

@@ -1,10 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, SkipForward, SkipBack, Volume2, Music, VolumeX } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
-import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
-import { useActivityLogging } from '@/hooks/useActivityLogging';
+import { useMusic } from '@/contexts/music/MusicContextProvider';
 import ProgressBar from './ProgressBar';
 
 const MusicPlayer: React.FC = () => {
@@ -18,32 +17,20 @@ const MusicPlayer: React.FC = () => {
     volume,
     setVolume,
     isMuted,
-    toggleMute
+    toggleMute,
+    currentTime,
+    duration,
+    seekTo
   } = useMusic();
   
-  const { logUserAction } = useActivityLogging('music');
   const [progress, setProgress] = useState(0);
   
-  // Simulate track playback for demo purposes
+  // Simulate track playback for demo purposes if needed
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    
-    if (isPlaying && currentTrack) {
-      interval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(interval!);
-            return 0;
-          }
-          return prev + 0.5;
-        });
-      }, 500);
+    if (currentTrack) {
+      setProgress(currentTime);
     }
-    
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isPlaying, currentTrack]);
+  }, [currentTime, currentTrack]);
   
   const handleVolumeChange = (value: number[]) => {
     const newVolume = value[0] / 100;
@@ -58,10 +45,8 @@ const MusicPlayer: React.FC = () => {
   const togglePlayPause = () => {
     if (isPlaying) {
       pauseTrack();
-      logUserAction('pause_music');
     } else if (currentTrack) {
       playTrack(currentTrack);
-      logUserAction('play_music');
     }
   };
 
@@ -96,24 +81,20 @@ const MusicPlayer: React.FC = () => {
       
       <div className="flex-1 p-6">
         <div className="h-[180px] mb-6">
-          <EnhancedMusicVisualizer 
-            showControls={false}
-            height={180}
-          />
+          {/* Placeholder for music visualizer */}
+          <div className="w-full h-full bg-primary/5 rounded-lg flex items-center justify-center">
+            <span className="text-muted-foreground">Visualisation audio</span>
+          </div>
         </div>
         
         {/* Progress bar */}
         {currentTrack && (
           <div className="mb-4">
             <ProgressBar
-              value={progress}
-              max={100}
-              currentTime={(progress / 100) * (currentTrack?.duration || 0)}
-              duration={currentTrack?.duration || 0}
+              currentTime={currentTime}
+              duration={duration || currentTrack.duration || 0}
               formatTime={formatTime}
-              onSeek={(value) => {
-                setProgress(value);
-              }}
+              onSeek={seekTo}
             />
           </div>
         )}

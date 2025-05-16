@@ -1,5 +1,5 @@
 
-export type NotificationType = 'system' | 'emotion' | 'recommendation' | 'team' | 'goal';
+export type NotificationType = 'system' | 'emotion' | 'recommendation' | 'team' | 'goal' | 'urgent' | 'journal' | 'message' | 'coach' | 'user' | 'community';
 
 export type NotificationFilter = 'all' | 'unread' | 'read' | 'system' | 'emotion' | 'coach' | 'journal' | 'community' | 'urgent';
 
