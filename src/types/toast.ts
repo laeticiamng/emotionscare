@@ -6,8 +6,9 @@ export interface Toast {
   title?: string;
   description?: string;
   action?: ReactNode;
-  variant?: 'default' | 'destructive' | 'success';
+  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
   duration?: number;
+  open?: boolean;
 }
 
 export interface ToastAction {

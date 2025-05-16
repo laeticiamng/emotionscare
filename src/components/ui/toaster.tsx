@@ -8,15 +8,17 @@ export function Toaster() {
 
   React.useEffect(() => {
     // Synchronize our toasts with sonner
-    toasts.forEach((toast) => {
-      if (toast.open) {
-        sonnerToast(toast.title || "", {
-          id: toast.id,
-          description: toast.description,
-          duration: toast.duration,
-        });
-      }
-    });
+    if (toasts && Array.isArray(toasts)) {
+      toasts.forEach((toast) => {
+        if (toast && toast.open) {
+          sonnerToast(toast.title || "", {
+            id: toast.id,
+            description: toast.description,
+            duration: toast.duration,
+          });
+        }
+      });
+    }
   }, [toasts]);
 
   return <SonnerToaster position="bottom-right" closeButton />;

@@ -1,3 +1,3 @@
 
-// Cette fichier re-exporte depuis MusicContextProvider
+// Re-export from the provider file
 export * from './MusicContextProvider';

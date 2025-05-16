@@ -20,7 +20,7 @@ export interface MusicTrack {
 
 export interface MusicPlaylist {
   id: string;
-  title: string;
+  title?: string;
   name?: string;
   coverUrl?: string;
   cover_url?: string;
@@ -43,7 +43,7 @@ export interface MusicContextType {
   playlists: MusicPlaylist[];
   currentPlaylist: MusicPlaylist | null;
   playlist?: MusicPlaylist | null;
-  togglePlay?: () => void;
+  togglePlay: () => void;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   nextTrack: () => void;
@@ -62,8 +62,8 @@ export interface MusicContextType {
   toggleRepeat?: () => void;
   isShuffled?: boolean;
   isRepeating?: boolean;
-  openDrawer: boolean;
-  setOpenDrawer: (open: boolean) => void;
+  openDrawer?: boolean;
+  setOpenDrawer?: (open: boolean) => void;
   setEmotion: (emotion: string) => void;
   loadPlaylistForEmotion: (emotion: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
   currentEmotion: string | null;
