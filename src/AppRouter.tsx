@@ -4,8 +4,8 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SidebarProvider } from '@/contexts/SidebarContext';
-import { router } from './router';
 import { RouterProvider } from 'react-router-dom';
+import { router } from './router';
 import { LayoutProvider } from '@/contexts/LayoutContext';
 
 const AppRouter: React.FC = () => {

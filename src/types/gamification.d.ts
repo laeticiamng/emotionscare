@@ -1,59 +1,73 @@
 
-export interface GamificationStats {
-  totalPoints: number;
-  currentLevel: number;
-  nextLevel: number;
-  pointsToNextLevel: number;
-  progressToNextLevel: number;
-  streakDays: number;
-  badgesCount: number;
-  challenges: Challenge[];
-  activeChallenges: number;
-  completedChallenges: number;
-  recentBadges: Badge[];
-  totalBadges: number;
-  activeUsersPercent: number;
-  completionRate: number;
-  badges: Badge[];
-  badgeLevels: Record<string, Badge[]>;
-  points: number;
-  rewards: string[];
-  lastActivityDate: string;
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  image?: string;
+  imageUrl?: string;
+  image_url?: string;
+  category: 'progress' | 'journal' | 'music' | 'community' | 'activity' | 'special';
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+  unlockedAt?: string;
+  progress?: number;
+  completed: boolean;
+  icon?: React.ReactNode;
 }
 
 export interface Challenge {
   id: string;
   title: string;
   description: string;
+  category: 'daily' | 'weekly' | 'monthly' | 'special';
   points: number;
   progress: number;
   completed: boolean;
-  deadline?: string;
   isDaily?: boolean;
   isWeekly?: boolean;
   status?: 'active' | 'completed' | 'expired';
+  deadline?: string;
   name?: string;
-}
-
-export interface Badge {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  image_url?: string; // Legacy support
-  earned: boolean;
-  date?: string;
-  level?: number;
-  points?: number;
-  category?: string;
-  icon?: any;
 }
 
 export interface LeaderboardEntry {
   id: string;
+  userId: string;
   name: string;
-  avatar: string;
+  avatar?: string;
   points: number;
   rank: number;
-  isCurrentUser?: boolean;
+  level: number;
+  isCurrentUser: boolean;
+}
+
+export interface GamificationStats {
+  points: number;
+  level: number;
+  badges: Badge[];
+  completedChallenges: number;
+  totalChallenges: number;
+  challenges: Challenge[];
+  streak: number;
+  nextLevel?: {
+    points: number;
+    rewards: string[];
+    level: number;
+  };
+  progress: number;
+  leaderboard: LeaderboardEntry[];
+  
+  // Additional properties for various components
+  currentLevel?: number;
+  totalPoints?: number;
+  badgesCount?: number;
+  pointsToNextLevel?: number;
+  progressToNextLevel?: number;
+  streakDays?: number;
+  lastActivityDate?: string;
+  activeChallenges?: number;
+  totalBadges?: number;
+  activeUsersPercent?: number;
+  completionRate?: number;
+  topChallenges?: Challenge[];
+  badgeLevels?: Record<string, number>;
 }

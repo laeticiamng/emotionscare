@@ -1,7 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { RouterProvider } from 'react-router-dom';
-import { router } from './router';
+import AppRouter from './AppRouter';
 import './App.css';
 
 function App() {
@@ -9,7 +8,7 @@ function App() {
     console.log('App mounted');
   }, []);
 
-  return <RouterProvider router={router} />;
+  return <AppRouter />;
 }
 
 export default App;
