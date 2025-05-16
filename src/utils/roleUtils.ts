@@ -62,3 +62,7 @@ export function isB2C(role?: UserRole): boolean {
 export function isAdmin(role?: UserRole): boolean {
   return role === 'admin';
 }
+
+export function isAdminRole(role?: UserRole): boolean {
+  return role === 'admin' || role === 'b2b_admin' || role === 'b2b-admin';
+}

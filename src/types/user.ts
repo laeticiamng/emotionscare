@@ -1,5 +1,4 @@
 
-
 import { UserPreferences } from './preferences';
 import { NotificationPreferences } from './preferences';
 
@@ -30,11 +29,9 @@ export interface User {
 export interface UserPreferencesContextType {
   preferences: UserPreferences;
   updatePreferences: (newPreferences: Partial<UserPreferences>) => void;
-  setPreferences?: (preferences: UserPreferences) => void; // Added
-  resetPreferences?: () => void; // Added
-  loading?: boolean; // Added
+  loading?: boolean;
+  resetPreferences?: () => void;
 }
 
 // Export UserPreferences to make it accessible
-export type { UserPreferences } from './preferences';
-
+export { UserPreferences } from './preferences';

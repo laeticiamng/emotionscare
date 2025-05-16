@@ -1,67 +1,87 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { VRSessionTemplate, VRTemplateGridProps } from '@/types/vr';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Clock, Tag } from 'lucide-react';
 
-const VRTemplateGrid: React.FC<VRTemplateGridProps> = ({ 
-  templates, 
-  onSelect,
-  filter,
-  emotion
-}) => {
-  // Filter templates based on emotion if provided
-  const filteredTemplates = emotion 
-    ? templates.filter(template => 
-        template.emotionTarget === emotion || 
-        template.emotion_target === emotion)
-    : templates;
+interface VRSessionTemplate {
+  id: string;
+  title: string;
+  description: string;
+  duration: number;
+  tags: string[];
+  environment: string;
+  thumbnailUrl: string;
+  emotionTarget: string;
+  category: string;
+}
+
+interface VRTemplateGridProps {
+  templates: VRSessionTemplate[];
+  onSelectTemplate: (template: VRSessionTemplate) => void;
+}
+
+export const VRTemplateGrid: React.FC<VRTemplateGridProps> = ({ templates, onSelectTemplate }) => {
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) {
+      return `${minutes} min`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours}h${remainingMinutes ? ` ${remainingMinutes}min` : ''}`;
+  };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {filteredTemplates.map((template) => (
-        <Card 
-          key={template.id} 
-          className="cursor-pointer hover:shadow-md transition-shadow duration-200"
-          onClick={() => onSelect(template)}
-        >
-          <CardContent className="p-4">
-            <div className="aspect-video bg-muted rounded-md mb-3 overflow-hidden">
-              {template.thumbnailUrl ? (
-                <img 
-                  src={template.thumbnailUrl} 
-                  alt={template.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                  {template.thumbnailUrl ? (
-                    <img src={template.thumbnailUrl} alt={template.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-primary">No Image</span>
-                  )}
-                </div>
-              )}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {templates.map((template) => (
+        <Card key={template.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
+          <div className="relative h-48 overflow-hidden">
+            <img
+              src={template.thumbnailUrl}
+              alt={template.title}
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            />
+            <div className="absolute top-2 right-2">
+              <Badge variant="secondary" className="bg-white/80 backdrop-blur-sm">
+                {template.category}
+              </Badge>
+            </div>
+          </div>
+          
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">{template.title}</CardTitle>
+            <CardDescription className="line-clamp-2">{template.description}</CardDescription>
+          </CardHeader>
+          
+          <CardContent className="pb-2 flex-grow">
+            <div className="flex items-center text-sm text-muted-foreground mb-2">
+              <Clock className="mr-1 h-4 w-4" />
+              <span>{formatDuration(template.duration)}</span>
             </div>
             
-            <h3 className="font-medium text-base mb-1 line-clamp-1">{template.title}</h3>
-            <p className="text-sm text-muted-foreground line-clamp-2">{template.description}</p>
-            
-            <div className="flex flex-wrap gap-1 mt-2">
-              {template.tags && template.tags.slice(0, 3).map((tag, index) => (
-                <span 
-                  key={index} 
-                  className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full"
-                >
+            <div className="flex flex-wrap gap-1">
+              {template.tags.slice(0, 3).map((tag) => (
+                <Badge key={tag} variant="outline" className="text-xs">
                   {tag}
-                </span>
+                </Badge>
               ))}
-              {template.duration && (
-                <span className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full ml-auto">
-                  {template.duration} min
-                </span>
+              {template.tags.length > 3 && (
+                <Badge variant="outline" className="text-xs">
+                  +{template.tags.length - 3}
+                </Badge>
               )}
             </div>
           </CardContent>
+          
+          <CardFooter>
+            <Button 
+              onClick={() => onSelectTemplate(template)} 
+              className="w-full"
+            >
+              Commencer
+            </Button>
+          </CardFooter>
         </Card>
       ))}
     </div>

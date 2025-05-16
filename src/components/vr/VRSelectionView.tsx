@@ -1,74 +1,75 @@
 
-import React, { useState } from 'react';
-import { VRSessionTemplate } from '@/types/vr';
+import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import VRTemplateGrid from './VRTemplateGrid';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
 
-interface VRSelectionViewProps {
-  templates: VRSessionTemplate[];
-  onSelect: (template: VRSessionTemplate) => void;
-  title?: string;
-  showSearch?: boolean;
-}
+const VR_TEMPLATES = [
+  {
+    id: '1',
+    title: 'Méditation en forêt',
+    description: 'Une expérience de méditation apaisante dans une forêt luxuriante avec des sons de la nature.',
+    duration: 15,
+    tags: ['Méditation', 'Nature', 'Débutant', 'Relaxation'],
+    environment: 'forest',
+    thumbnailUrl: '/images/vr/forest-meditation.jpg',
+    emotionTarget: 'calm',
+    category: 'Méditation'
+  },
+  {
+    id: '2',
+    title: 'Plage au coucher de soleil',
+    description: 'Relaxez-vous sur une plage tranquille au coucher du soleil avec le son des vagues.',
+    duration: 20,
+    tags: ['Relaxation', 'Plage', 'Coucher de soleil', 'Apaisant'],
+    environment: 'beach',
+    thumbnailUrl: '/images/vr/sunset-beach.jpg',
+    emotionTarget: 'peaceful',
+    category: 'Relaxation'
+  }
+];
 
-export const VRSelectionView: React.FC<VRSelectionViewProps> = ({
-  templates,
-  onSelect,
-  title = "Sessions VR",
-  showSearch = true
-}) => {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const filteredTemplates = templates.filter(template => 
-    template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (template.description && template.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (template.tags && template.tags.some(tag => 
-      tag.toLowerCase().includes(searchTerm.toLowerCase())
-    ))
-  );
+const VRSelectionView = () => {
+  const handleSelectTemplate = (template: any) => {
+    console.log('Selected template:', template);
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h2 className="text-2xl font-bold">{title}</h2>
+    <div className="container mx-auto py-6">
+      <h1 className="text-3xl font-bold mb-6">Expériences VR immersives</h1>
+      
+      <Tabs defaultValue="all" className="mb-8">
+        <TabsList className="mb-4">
+          <TabsTrigger value="all">Toutes</TabsTrigger>
+          <TabsTrigger value="meditation">Méditation</TabsTrigger>
+          <TabsTrigger value="relaxation">Relaxation</TabsTrigger>
+          <TabsTrigger value="focus">Concentration</TabsTrigger>
+        </TabsList>
         
-        {showSearch && (
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input 
-              type="text" 
-              placeholder="Rechercher..."
-              className="pl-8"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-            {searchTerm && (
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                onClick={() => setSearchTerm('')}
-              >
-                &times;
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
-      
-      <VRTemplateGrid 
-        templates={filteredTemplates} 
-        onSelect={onSelect} 
-        filter={searchTerm}
-      />
-      
-      {filteredTemplates.length === 0 && (
-        <div className="text-center py-12 text-muted-foreground">
-          Aucune session trouvée pour "{searchTerm}"
-        </div>
-      )}
+        <TabsContent value="all">
+          <VRTemplateGrid 
+            templates={VR_TEMPLATES} 
+            onSelectTemplate={handleSelectTemplate} 
+          />
+        </TabsContent>
+        
+        <TabsContent value="meditation">
+          <VRTemplateGrid 
+            templates={VR_TEMPLATES.filter(t => t.category === 'Méditation')} 
+            onSelectTemplate={handleSelectTemplate} 
+          />
+        </TabsContent>
+        
+        <TabsContent value="relaxation">
+          <VRTemplateGrid 
+            templates={VR_TEMPLATES.filter(t => t.category === 'Relaxation')} 
+            onSelectTemplate={handleSelectTemplate} 
+          />
+        </TabsContent>
+        
+        <TabsContent value="focus">
+          <p className="text-muted-foreground">Aucune expérience disponible dans cette catégorie pour le moment.</p>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

@@ -10,7 +10,8 @@ export interface Badge {
   dateEarned?: string;
   category?: string;
   type?: string;
-  rarity?: 'common' | 'rare' | 'epic' | 'legendary';
+  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   threshold?: number;
   level?: number;
+  unlocked?: boolean;
 }

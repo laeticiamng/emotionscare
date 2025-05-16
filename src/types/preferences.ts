@@ -1,10 +1,10 @@
 
 export type ThemeName = 'light' | 'dark' | 'system' | 'blue-pastel' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
-export type FontFamily = 'system' | 'sans' | 'serif' | 'mono';
+export type FontSize = 'small' | 'medium' | 'large' | 'xlarge' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded';
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
 export type NotificationTone = 'formal' | 'friendly' | 'minimal';
-export type PrivacyLevel = 'public' | 'private' | 'friends' | 'organization';
+export type PrivacyLevel = 'public' | 'private' | 'friends' | 'organization' | 'balanced';
 
 export interface NotificationPreferences {
   enabled: boolean;

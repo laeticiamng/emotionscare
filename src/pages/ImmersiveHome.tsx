@@ -1,16 +1,18 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/contexts/theme';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, User, Building, Mic, Volume2, VolumeX } from 'lucide-react';
 import Shell from '@/Shell';
 import * as THREE from 'three';
 import { motion } from 'framer-motion';
+import { useToast } from '@/hooks/use-toast';
 
 const ImmersiveHome: React.FC = () => {
   const navigate = useNavigate();
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
+  const { toast } = useToast();
   const [greeting, setGreeting] = useState<string>('Bienvenue dans votre espace de bien-être émotionnel');
   const [isListening, setIsListening] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
@@ -37,11 +39,21 @@ const ImmersiveHome: React.FC = () => {
   };
 
   const handlePersonalClick = () => {
+    // Vibration tactile pour mobile
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+    
     localStorage.setItem('userMode', 'b2c');
     navigate('/b2c/login');
   };
 
   const handleBusinessClick = () => {
+    // Vibration tactile pour mobile
+    if (navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+    
     navigate('/b2b/selection');
   };
 
@@ -60,6 +72,10 @@ const ImmersiveHome: React.FC = () => {
       
       recognition.onstart = () => {
         setIsListening(true);
+        toast({
+          title: "Commande vocale activée",
+          description: "Dites 'particulier' ou 'entreprise' pour naviguer"
+        });
       };
       
       recognition.onresult = (event: any) => {
@@ -81,6 +97,11 @@ const ImmersiveHome: React.FC = () => {
       
       recognition.onerror = () => {
         setIsListening(false);
+        toast({
+          title: "Erreur",
+          description: "Impossible de reconnaître la commande vocale",
+          variant: "destructive"
+        });
       };
       
       recognition.onend = () => {
@@ -90,7 +111,11 @@ const ImmersiveHome: React.FC = () => {
       recognition.start();
     } else {
       console.log('Speech recognition not supported');
-      alert('Commande vocale non supportée sur votre navigateur.');
+      toast({
+        title: "Non supporté",
+        description: "Commande vocale non supportée sur votre navigateur",
+        variant: "destructive"
+      });
     }
   };
 
@@ -99,7 +124,13 @@ const ImmersiveHome: React.FC = () => {
       if (audioEnabled) {
         audioRef.current.pause();
       } else {
-        audioRef.current.play().catch(e => console.log('Autoplay prevented by browser'));
+        audioRef.current.play().catch(e => {
+          console.log('Autoplay prevented by browser');
+          toast({
+            title: "Interaction requise",
+            description: "Cliquez à nouveau pour activer l'audio"
+          });
+        });
       }
       setAudioEnabled(!audioEnabled);
     }
@@ -142,10 +173,16 @@ const ImmersiveHome: React.FC = () => {
             secondary: 0x1E40AF, // deep blue
             accent: 0x6366F1     // indigo
           };
-        case 'pastel':
+        case 'blue-pastel':
           return {
             primary: 0x93C5FD,   // blue-300
             secondary: 0xBFDBFE,  // blue-200
+            accent: 0xC7D2FE     // indigo-200
+          };
+        case 'pastel':
+          return {
+            primary: 0xFDE68A,   // yellow-200
+            secondary: 0xA7F3D0,  // green-200
             accent: 0xC7D2FE     // indigo-200
           };
         default: // light
@@ -161,7 +198,7 @@ const ImmersiveHome: React.FC = () => {
 
     // Create particles for cosmos effect
     const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 1000;
+    const particlesCount = 1500;
     const posArray = new Float32Array(particlesCount * 3);
     
     for (let i = 0; i < particlesCount * 3; i++) {
@@ -302,88 +339,125 @@ const ImmersiveHome: React.FC = () => {
   const primaryButtonClass = 
     theme === 'dark' 
       ? 'bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900'
-      : theme === 'pastel'
+      : theme === 'blue-pastel' || theme === 'pastel'
         ? 'bg-gradient-to-r from-blue-300 to-blue-400 hover:from-blue-400 hover:to-blue-500'
         : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600';
   
   const secondaryButtonClass = 
     theme === 'dark' 
       ? 'bg-gray-800 border border-gray-700 hover:bg-gray-700 text-gray-100'
-      : theme === 'pastel'
+      : theme === 'blue-pastel' || theme === 'pastel'
         ? 'bg-white/70 backdrop-blur-sm border border-blue-200 hover:bg-blue-50 text-blue-600'
         : 'bg-white/90 backdrop-blur-sm border border-gray-200 hover:bg-gray-50 text-gray-800';
 
+  const getBgClass = () => {
+    switch (theme) {
+      case 'dark':
+        return 'bg-gradient-to-br from-gray-900 to-blue-900/30';
+      case 'blue-pastel':
+        return 'bg-gradient-to-br from-blue-100 to-indigo-100';
+      case 'pastel':
+        return 'bg-gradient-to-br from-yellow-50 to-green-50';
+      default: // light
+        return 'bg-gradient-to-br from-white to-blue-50';
+    }
+  };
+
+  const getTextColorClass = () => {
+    switch (theme) {
+      case 'dark':
+        return 'text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300';
+      case 'blue-pastel':
+        return 'text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-400';
+      case 'pastel':
+        return 'text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-400';
+      default: // light
+        return 'text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-600';
+    }
+  };
+  
+  const getDescriptionClass = () => {
+    switch (theme) {
+      case 'dark':
+        return 'text-blue-300';
+      case 'blue-pastel':
+        return 'text-blue-600';
+      case 'pastel':
+        return 'text-emerald-600';
+      default: // light
+        return 'text-blue-900';
+    }
+  };
+
+  const audioPath = theme === 'pastel' 
+    ? '/sounds/ambient-gentle.mp3' 
+    : theme === 'dark' 
+      ? '/sounds/ambient-dark.mp3' 
+      : '/sounds/ambient-calm.mp3';
+
   return (
     <Shell hideNav>
-      <div className={`min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden ${
-        theme === 'dark'
-          ? 'bg-gradient-to-br from-gray-900 to-blue-900/30'
-          : theme === 'pastel'
-            ? 'bg-gradient-to-br from-blue-50 to-indigo-100'
-            : 'bg-gradient-to-br from-white to-blue-50'
-      }`}>
-        {/* Background Canvas */}
+      {/* Main background based on theme */}
+      <div className={`min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden ${getBgClass()}`}>
+        {/* Background Canvas for 3D animation */}
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full -z-10" />
         
         {/* Audio element for background music */}
         <audio 
           ref={audioRef}
-          src="/sounds/ambient-calm.mp3" 
+          src={audioPath}
           loop 
         />
 
         {/* Main Content */}
-        <div className="z-10 px-4 max-w-6xl mx-auto text-center relative">
+        <div className="z-10 px-4 max-w-6xl mx-auto text-center relative" role="main">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h1 className={`text-5xl md:text-7xl font-bold mb-4 ${
-              theme === 'dark'
-                ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300'
-                : theme === 'pastel'
-                  ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-400'
-                  : 'text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-600'
-            }`}>
+            {/* Title with dynamic styling based on theme */}
+            <h1 className={`text-5xl md:text-7xl font-bold mb-4 ${getTextColorClass()}`}
+                aria-label="EmotionsCare">
               EmotionsCare
             </h1>
             
+            {/* Dynamic greeting that changes based on time of day */}
             <motion.p 
-              className={`text-xl md:text-2xl max-w-3xl mx-auto font-light mb-12 ${
-                theme === 'dark'
-                  ? 'text-blue-300'
-                  : theme === 'pastel'
-                    ? 'text-blue-600'
-                    : 'text-blue-900'
-              }`}
+              className={`text-xl md:text-2xl max-w-3xl mx-auto font-light mb-12 ${getDescriptionClass()}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 0.4 }}
+              aria-live="polite"
             >
               {greeting}
             </motion.p>
           </motion.div>
           
+          {/* Call-to-action buttons with animations */}
           <motion.div 
             className="flex flex-col sm:flex-row justify-center mt-12 space-y-4 sm:space-y-0 sm:space-x-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
           >
+            {/* B2C Button */}
             <Button 
               onClick={handlePersonalClick}
               className={`px-8 py-7 text-lg rounded-3xl shadow-lg flex items-center justify-center transform transition-all duration-300 hover:scale-105 hover:shadow-xl ${primaryButtonClass}`}
+              aria-label="Je suis un particulier"
             >
               <User className="mr-2 h-5 w-5" />
               Je suis un particulier
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             
+            {/* B2B Button */}
             <Button 
               onClick={handleBusinessClick} 
               variant="outline" 
               className={`px-8 py-7 text-lg rounded-3xl shadow-md flex items-center justify-center transform transition-all duration-300 hover:scale-105 hover:shadow-lg ${secondaryButtonClass}`}
+              aria-label="Je suis une entreprise"
             >
               <Building className="mr-2 h-5 w-5" />
               Je suis une entreprise
@@ -391,12 +465,14 @@ const ImmersiveHome: React.FC = () => {
             </Button>
           </motion.div>
           
+          {/* Utility controls: voice commands and sound */}
           <motion.div 
             className="mt-12 flex justify-center space-x-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.7 }}
           >
+            {/* Voice Command Button */}
             <Button
               onClick={handleVoiceCommand}
               variant="ghost"
@@ -406,15 +482,17 @@ const ImmersiveHome: React.FC = () => {
                   ? 'bg-red-500/20 text-red-500 animate-pulse' 
                   : theme === 'dark'
                     ? 'bg-gray-800/50 text-gray-300 hover:bg-gray-700'
-                    : theme === 'pastel'
+                    : theme === 'blue-pastel' || theme === 'pastel'
                       ? 'bg-blue-100/70 text-blue-600 hover:bg-blue-200/70'
                       : 'bg-gray-100/70 text-gray-700 hover:bg-gray-200/70'
               }`}
               aria-label="Activer la commande vocale"
             >
               <Mic className="h-5 w-5" />
+              <span className="sr-only">Commande vocale</span>
             </Button>
             
+            {/* Sound Toggle Button */}
             <Button
               onClick={toggleAudio}
               variant="ghost"
@@ -422,7 +500,7 @@ const ImmersiveHome: React.FC = () => {
               className={`rounded-full w-12 h-12 ${
                 theme === 'dark'
                   ? 'bg-gray-800/50 text-gray-300 hover:bg-gray-700'
-                  : theme === 'pastel'
+                  : theme === 'blue-pastel' || theme === 'pastel'
                     ? 'bg-blue-100/70 text-blue-600 hover:bg-blue-200/70'
                     : 'bg-gray-100/70 text-gray-700 hover:bg-gray-200/70'
               }`}
@@ -433,9 +511,11 @@ const ImmersiveHome: React.FC = () => {
               ) : (
                 <VolumeX className="h-5 w-5" />
               )}
+              <span className="sr-only">{audioEnabled ? "Désactiver la musique" : "Activer la musique"}</span>
             </Button>
           </motion.div>
           
+          {/* Subtle footer message */}
           <motion.div 
             className="absolute bottom-4 left-0 right-0 text-center"
             initial={{ opacity: 0 }}
@@ -445,9 +525,11 @@ const ImmersiveHome: React.FC = () => {
             <p className={`text-sm ${
               theme === 'dark' 
                 ? 'text-blue-400/50' 
-                : theme === 'pastel'
+                : theme === 'blue-pastel'
                   ? 'text-blue-500/50'
-                  : 'text-blue-700/50'
+                  : theme === 'pastel'
+                    ? 'text-emerald-500/50'
+                    : 'text-blue-700/50'
             }`}>
               Découvrez la technologie qui comprend vos émotions
             </p>

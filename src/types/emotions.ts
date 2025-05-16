@@ -38,4 +38,8 @@ export interface EmotionalTeamViewProps {
   displayMode?: 'chart' | 'grid' | 'list';
   period?: 'day' | 'week' | 'month' | 'year';
   anonymized?: boolean;
+  dateRange?: [Date, Date];
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
 }
