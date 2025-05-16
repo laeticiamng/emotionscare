@@ -11,7 +11,7 @@ import './styles/glass.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from './components/theme-provider';
 import { MusicProvider } from './contexts/music/MusicContextProvider';
-import { CoachProvider } from './contexts/CoachContext';
+import { CoachProvider } from './contexts/coach/CoachContextProvider';
 import * as AppRoutes from './router'; // Import all exports from router index.ts
 
 function App() {
