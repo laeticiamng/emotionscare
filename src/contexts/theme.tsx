@@ -1,27 +1,11 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types/theme';
 
-// Types de thèmes possibles
-export type Theme = "light" | "dark" | "system";
-export type FontFamily = "sans" | "serif" | "mono";
-export type FontSize = "sm" | "md" | "lg";
-
-interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  fontFamily: FontFamily;
-  setFontFamily: (font: FontFamily) => void;
-  fontSize: FontSize;
-  setFontSize: (size: FontSize) => void;
-}
-
-const ThemeContext = createContext<ThemeContextType>({
-  theme: "system",
+export const ThemeContext = createContext<ThemeContextType>({
+  theme: 'system',
   setTheme: () => {},
-  fontFamily: "sans",
-  setFontFamily: () => {},
-  fontSize: "md", 
-  setFontSize: () => {}
+  isDarkMode: false,
 });
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -52,6 +36,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     return "md";
   });
 
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
   // Update the theme when the state changes
   useEffect(() => {
     const root = window.document.documentElement;
@@ -62,11 +48,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
         ? "dark"
         : "light";
       
-      root.classList.remove("dark", "light");
+      root.classList.remove("dark", "light", "pastel");
       root.classList.add(systemTheme);
+      setIsDarkMode(systemTheme === "dark");
     } else {
-      root.classList.remove("dark", "light");
+      root.classList.remove("dark", "light", "pastel");
       root.classList.add(theme);
+      setIsDarkMode(theme === "dark");
     }
     
     localStorage.setItem("theme", theme);
@@ -77,7 +65,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     const root = window.document.documentElement;
     
     // Remove all font classes and add the selected one
-    root.classList.remove("font-sans", "font-serif", "font-mono");
+    root.classList.remove("font-sans", "font-serif", "font-mono", "font-rounded");
     root.classList.add(`font-${fontFamily}`);
     
     localStorage.setItem("fontFamily", fontFamily);
@@ -90,8 +78,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     // Remove all size classes and add the selected one
     root.classList.remove("text-sm", "text-base", "text-lg");
     
-    if (fontSize === "sm") root.classList.add("text-sm");
-    if (fontSize === "lg") root.classList.add("text-lg");
+    if (fontSize === "sm" || fontSize === "small") root.classList.add("text-sm");
+    if (fontSize === "lg" || fontSize === "large") root.classList.add("text-lg");
     // Medium is the default, no class needed
     
     localStorage.setItem("fontSize", fontSize);
@@ -110,14 +98,39 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     setFontSizeState(newSize);
   };
 
+  const getContrastText = (color: string): 'black' | 'white' => {
+    // Simple contrast calculation - can be improved
+    // Convert hex to RGB
+    let r = 0, g = 0, b = 0;
+    
+    if (color.startsWith('#')) {
+      if (color.length === 4) {
+        r = parseInt(color[1] + color[1], 16);
+        g = parseInt(color[2] + color[2], 16);
+        b = parseInt(color[3] + color[3], 16);
+      } else {
+        r = parseInt(color.slice(1, 3), 16);
+        g = parseInt(color.slice(3, 5), 16);
+        b = parseInt(color.slice(5, 7), 16);
+      }
+    }
+    
+    // Calculate luminance (simplified)
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    
+    return luminance > 0.5 ? 'black' : 'white';
+  };
+
   return (
     <ThemeContext.Provider value={{ 
       theme, 
       setTheme, 
+      isDarkMode,
       fontFamily, 
       setFontFamily, 
       fontSize, 
-      setFontSize 
+      setFontSize,
+      getContrastText
     }}>
       {children}
     </ThemeContext.Provider>

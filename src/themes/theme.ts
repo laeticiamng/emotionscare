@@ -175,13 +175,14 @@ export const pastelTheme: ColorPalette = {
 // Wellness-specific colors
 export const wellnessColors = {
   blue: '#60A5FA',
+  softBlue: '#D3E4FD',
+  lightBlue: '#EBF5FF',
   mint: '#A7F3D0',
   coral: '#F87171',
   peach: '#FECACA',
   lavender: '#DDD6FE',
   darkPurple: '#7E69AB',
   softPurple: '#E5DEFF',
-  softBlue: '#D3E4FD',
 };
 
 // Export all themes in an object

@@ -1,128 +1,173 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Mic, Square } from 'lucide-react';
-import { LiveVoiceScannerProps, EmotionResult } from '@/types/emotion';
+import React, { useEffect, useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Mic, MicOff, Loader2 } from "lucide-react";
+import { LiveVoiceScannerProps, EmotionResult } from "@/types/emotion";
+import { scanService } from '@/services/scanService';
+import { Progress } from '@/components/ui/progress';
 
-export const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
+const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
   onResult,
-  className = '',
-  stopAfterSeconds = 30
+  autoStart = false,
+  stopAfterSeconds = 30,
+  duration = 30, // Default duration
+  className = ""
 }) => {
-  const [listening, setListening] = useState(false);
-  const [remainingTime, setRemainingTime] = useState(stopAfterSeconds);
-  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(autoStart);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [audioData, setAudioData] = useState<Blob | null>(null);
   
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    let emotionUpdateInterval: NodeJS.Timeout;
-    
-    if (listening) {
-      // Countdown timer
-      interval = setInterval(() => {
-        setRemainingTime(time => {
-          if (time <= 1) {
-            clearInterval(interval);
-            setListening(false);
-            return 0;
-          }
-          return time - 1;
-        });
-      }, 1000);
+  let mediaRecorder: MediaRecorder | null = null;
+  let chunks: BlobPart[] = [];
+
+  const startRecording = async () => {
+    try {
+      chunks = [];
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
       
-      // Simulate emotion detection at intervals
-      emotionUpdateInterval = setInterval(() => {
-        // Mock emotion detection
-        const emotions = ['neutral', 'calm', 'happy', 'anxious', 'sad'];
-        const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-        setCurrentEmotion(randomEmotion);
-        
-        if (onResult) {
-          const result: EmotionResult = {
-            emotion: randomEmotion,
-            score: Math.random() * 0.4 + 0.6, // Random score between 0.6 and 1.0
-            confidence: Math.random() * 0.3 + 0.7, // Random confidence between 0.7 and 1.0
-            timestamp: new Date().toISOString(),
-          };
-          
-          onResult(result);
-        }
-      }, 3000); // Update every 3 seconds
+      mediaRecorder.addEventListener("dataavailable", (e) => {
+        chunks.push(e.data);
+      });
+      
+      mediaRecorder.addEventListener("stop", async () => {
+        const blob = new Blob(chunks, { type: "audio/webm" });
+        setAudioData(blob);
+        processAudio(blob);
+      });
+      
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingTime(0);
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+      
+      // Stop all audio tracks
+      if (mediaRecorder.stream) {
+        mediaRecorder.stream.getTracks().forEach((track) => track.stop());
+      }
+      
+      setIsRecording(false);
+    }
+  };
+
+  const processAudio = async (audioBlob: Blob) => {
+    setIsProcessing(true);
+    try {
+      // Simulating emotion detection API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const result: EmotionResult = {
+        id: `emo-${Date.now()}`,
+        emotion: ['joy', 'neutral', 'calm', 'excitement'][Math.floor(Math.random() * 4)],
+        score: Math.random() * 0.6 + 0.4,
+        confidence: Math.random() * 0.5 + 0.5,
+        timestamp: new Date().toISOString()
+      };
+      
+      if (onResult) {
+        onResult(result);
+      }
+    } catch (error) {
+      console.error("Error processing audio:", error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  useEffect(() => {
+    if (autoStart) {
+      startRecording();
     }
     
     return () => {
-      clearInterval(interval);
-      clearInterval(emotionUpdateInterval);
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+      }
     };
-  }, [listening, onResult]);
-  
-  const toggleListening = () => {
-    if (listening) {
-      setListening(false);
-    } else {
-      setListening(true);
-      setRemainingTime(stopAfterSeconds);
+  }, []);
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+
+    if (isRecording) {
+      interval = setInterval(() => {
+        setRecordingTime((prev) => {
+          if (prev >= stopAfterSeconds) {
+            stopRecording();
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 1000);
     }
-  };
-  
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isRecording, stopAfterSeconds]);
+
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle>Scanner vocal en direct</CardTitle>
+    <Card className={`w-full max-w-md ${className}`}>
+      <CardHeader className="text-center">
+        <h3 className="font-semibold text-lg">Analyse vocale en direct</h3>
+        <p className="text-sm text-muted-foreground">
+          Parlez naturellement et votre ton de voix sera analysé pour détecter vos émotions
+        </p>
       </CardHeader>
+      
       <CardContent className="space-y-4">
-        <div className="h-20 bg-secondary/10 rounded-lg flex items-center justify-center relative overflow-hidden">
-          {listening && (
-            <div className="flex items-end space-x-1 h-full py-2">
-              {Array.from({ length: 12 }).map((_, i) => (
-                <div 
-                  key={i} 
-                  className="bg-primary w-1 transition-all duration-300 ease-in-out"
-                  style={{
-                    height: `${Math.random() * 70 + 10}%`,
-                    animationDelay: `${i * 0.05}s`
-                  }}
-                />
-              ))}
-            </div>
-          )}
-          
-          {!listening && (
-            <p className="text-muted-foreground">Microphone désactivé</p>
-          )}
+        {/* Voice Indicator */}
+        <div className="flex justify-center my-4">
+          <div className={`h-24 w-24 rounded-full flex items-center justify-center transition-all duration-300 ${isRecording ? 'bg-red-100 dark:bg-red-900/30 animate-pulse' : 'bg-blue-100 dark:bg-blue-900/30'}`}>
+            {isProcessing ? (
+              <Loader2 className="h-10 w-10 text-blue-500 animate-spin" />
+            ) : isRecording ? (
+              <Mic className="h-10 w-10 text-red-500" />
+            ) : (
+              <MicOff className="h-10 w-10 text-blue-500" />
+            )}
+          </div>
         </div>
         
-        {currentEmotion && listening && (
-          <div className="text-center p-2 bg-secondary/20 rounded-md">
-            <p className="font-medium">Émotion détectée: {currentEmotion}</p>
+        {/* Progress bar */}
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs">
+            <span>{recordingTime} s</span>
+            <span>{stopAfterSeconds} s</span>
           </div>
-        )}
+          <Progress value={(recordingTime / stopAfterSeconds) * 100} />
+        </div>
         
-        <div className="flex justify-between items-center">
-          <p className="text-sm text-muted-foreground">
-            {listening ? `Temps restant: ${remainingTime}s` : 'Prêt à analyser'}
-          </p>
-          
-          <Button 
-            onClick={toggleListening}
-            variant={listening ? "destructive" : "default"}
-            className="flex items-center gap-2"
-          >
-            {listening ? (
-              <>
-                <Square className="h-4 w-4" />
-                Arrêter
-              </>
-            ) : (
-              <>
-                <Mic className="h-4 w-4" />
-                Commencer l'analyse
-              </>
-            )}
-          </Button>
+        <div className="text-center text-sm">
+          {isRecording ? (
+            <p>Enregistrement en cours... {stopAfterSeconds - recordingTime}s restantes</p>
+          ) : isProcessing ? (
+            <p>Traitement de l'audio...</p>
+          ) : (
+            <p>Appuyez sur le bouton pour commencer l'analyse</p>
+          )}
         </div>
       </CardContent>
+      
+      <CardFooter className="justify-center">
+        <Button
+          variant={isRecording ? "destructive" : "default"}
+          onClick={isRecording ? stopRecording : startRecording}
+          disabled={isProcessing}
+          className="w-full"
+        >
+          {isRecording ? "Arrêter l'enregistrement" : "Commencer l'analyse"}
+        </Button>
+      </CardFooter>
     </Card>
   );
 };

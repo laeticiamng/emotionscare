@@ -1,40 +1,61 @@
 
-export type UserRole = 'admin' | 'user' | 'manager' | 'coach' | 'guest' | 'b2b_user' | 'b2b_admin' | 'b2b-user' | 'b2b-admin' | 'collaborator' | 'b2c' | 'moderator' | 'wellbeing_manager' | 'employee' | 'team_lead' | 'professional' | 'individual';
+export type UserRole = 'user' | 'admin' | 'therapist' | 'coach' | 'b2c' | 'b2b_admin' | 'b2b_user';
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  avatar_url?: string;
-  avatar?: string;
   role: UserRole;
   created_at: string;
-  updated_at?: string;
-  last_login?: string;
-  is_active?: boolean;
+  avatar_url?: string;
   position?: string;
   department?: string;
-  joined_at?: string;
   emotional_score?: number;
-  onboarded?: boolean;
-  preferences?: {
-    theme?: string;
-    language?: string;
-    notifications_enabled?: boolean;
-    privacy?: {
-      profileVisibility?: 'public' | 'private' | 'team';
-    };
-    profileVisibility?: 'public' | 'private' | 'team';
-    emotionalCamouflage?: boolean;
-    aiSuggestions?: boolean;
-  };
-  company_id?: string;
-  settings?: Record<string, any>;
 }
 
-export interface NotificationPreferences {
-  email: boolean;
-  push: boolean;
-  inApp: boolean;
-  frequency: 'immediate' | 'daily' | 'weekly' | 'never';
+export interface UserPreferences {
+  theme: string;
+  fontSize: string;
+  fontFamily: string;
+  reduceMotion: boolean;
+  colorBlindMode: boolean;
+  autoplayMedia: boolean;
+  soundEnabled: boolean;
+  notifications: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+    frequency: string;
+  };
+}
+
+export interface UserPreferencesState {
+  theme: string;
+  fontSize: string;
+  fontFamily: string;
+  accessibility: {
+    reduceMotion: boolean;
+    colorBlindMode: boolean;
+  };
+  media: {
+    autoplay: boolean;
+    sound: boolean;
+  };
+  notifications: {
+    channels: {
+      email: boolean;
+      push: boolean;
+      sms: boolean;
+    };
+    frequency: string;
+  };
+}
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  email?: string;
+  role?: UserRole;
+  message?: string;
+  invitationId?: string;
+  expires_at?: string;
 }

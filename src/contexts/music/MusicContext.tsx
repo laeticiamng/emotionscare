@@ -1,221 +1,355 @@
 
-import React, { createContext, useState, useContext, useCallback } from 'react';
-import { Track, Playlist, EmotionMusicParams } from './types';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { MusicContextType, MusicTrack } from '@/types/music';
 
-// Mock data for playlists
-const MOCK_PLAYLISTS: Record<string, Playlist> = {
-  calm: {
-    id: 'playlist-calm',
-    name: 'Calme et détente',
-    emotion: 'calm',
-    tracks: [
-      { id: 'track-1', title: 'Peaceful Morning', artist: 'Nature Sounds', url: '/assets/audio/peaceful-morning.mp3', duration: 180, emotion: 'calm' },
-      { id: 'track-2', title: 'Ocean Waves', artist: 'Relaxation', url: '/assets/audio/ocean-waves.mp3', duration: 240, emotion: 'calm' },
-      { id: 'track-3', title: 'Meditation', artist: 'Zen Garden', url: '/assets/audio/meditation.mp3', duration: 300, emotion: 'calm' }
-    ]
-  },
-  happy: {
-    id: 'playlist-happy',
-    name: 'Bonne humeur',
-    emotion: 'happy',
-    tracks: [
-      { id: 'track-4', title: 'Sunny Day', artist: 'Happy Tunes', url: '/assets/audio/sunny-day.mp3', duration: 180, emotion: 'happy' },
-      { id: 'track-5', title: 'Dancing Joy', artist: 'Feel Good', url: '/assets/audio/dancing-joy.mp3', duration: 210, emotion: 'happy' },
-      { id: 'track-6', title: 'Celebration', artist: 'Party Time', url: '/assets/audio/celebration.mp3', duration: 240, emotion: 'happy' }
-    ]
-  },
-  focus: {
-    id: 'playlist-focus',
-    name: 'Concentration',
-    emotion: 'focus',
-    tracks: [
-      { id: 'track-7', title: 'Deep Work', artist: 'Productivity', url: '/assets/audio/deep-work.mp3', duration: 300, emotion: 'focus' },
-      { id: 'track-8', title: 'Flow State', artist: 'Mind Masters', url: '/assets/audio/flow-state.mp3', duration: 360, emotion: 'focus' },
-      { id: 'track-9', title: 'Clarity', artist: 'Brain Waves', url: '/assets/audio/clarity.mp3', duration: 270, emotion: 'focus' }
-    ]
-  },
-  sad: {
-    id: 'playlist-sad',
-    name: 'Mélancolie',
-    emotion: 'sad',
-    tracks: [
-      { id: 'track-10', title: 'Rainy Day', artist: 'Melancholy', url: '/assets/audio/rainy-day.mp3', duration: 240, emotion: 'sad' },
-      { id: 'track-11', title: 'Blue Mood', artist: 'Soul Touch', url: '/assets/audio/blue-mood.mp3', duration: 300, emotion: 'sad' },
-      { id: 'track-12', title: 'Reflections', artist: 'Deep Thoughts', url: '/assets/audio/reflections.mp3', duration: 270, emotion: 'sad' }
-    ]
-  },
-  anxious: {
-    id: 'playlist-anxious',
-    name: 'Apaisement',
-    emotion: 'anxious',
-    tracks: [
-      { id: 'track-13', title: 'Calming Breeze', artist: 'Anxiety Relief', url: '/assets/audio/calming-breeze.mp3', duration: 300, emotion: 'anxious' },
-      { id: 'track-14', title: 'Safe Haven', artist: 'Comfort Zone', url: '/assets/audio/safe-haven.mp3', duration: 330, emotion: 'anxious' },
-      { id: 'track-15', title: 'Letting Go', artist: 'Peace Within', url: '/assets/audio/letting-go.mp3', duration: 270, emotion: 'anxious' }
-    ]
-  },
-  neutral: {
-    id: 'playlist-neutral',
-    name: 'Équilibre',
-    emotion: 'neutral',
-    tracks: [
-      { id: 'track-16', title: 'Balanced Mind', artist: 'Harmony', url: '/assets/audio/balanced-mind.mp3', duration: 240, emotion: 'neutral' },
-      { id: 'track-17', title: 'Middle Path', artist: 'Zen Flow', url: '/assets/audio/middle-path.mp3', duration: 270, emotion: 'neutral' },
-      { id: 'track-18', title: 'Centered', artist: 'Equilibrium', url: '/assets/audio/centered.mp3', duration: 300, emotion: 'neutral' }
-    ]
-  }
+// Exemple de données musicales
+const musicSamples: Record<string, MusicTrack[]> = {
+  joy: [
+    {
+      id: 'joy-1',
+      title: 'Happy Day',
+      artist: 'Sunshine',
+      album: 'Good Vibes',
+      duration: 180,
+      mood: 'joy',
+      coverImage: 'https://via.placeholder.com/150?text=Happy',
+      url: 'https://assets.mixkit.co/music/preview/mixkit-games-worldbeat-466.mp3'
+    },
+    {
+      id: 'joy-2',
+      title: 'Celebration',
+      artist: 'Party People',
+      album: 'Festivities',
+      duration: 210,
+      mood: 'joy',
+      coverImage: 'https://via.placeholder.com/150?text=Party',
+      url: 'https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3'
+    }
+  ],
+  anxiety: [
+    {
+      id: 'anx-1',
+      title: 'Calm Waters',
+      artist: 'Peace',
+      album: 'Tranquility',
+      duration: 240,
+      mood: 'anxiety',
+      coverImage: 'https://via.placeholder.com/150?text=Calm',
+      url: 'https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3'
+    },
+    {
+      id: 'anx-2',
+      title: 'Deep Breath',
+      artist: 'Mindful',
+      album: 'Relaxation',
+      duration: 260,
+      mood: 'anxiety',
+      coverImage: 'https://via.placeholder.com/150?text=Breath',
+      url: 'https://assets.mixkit.co/music/preview/mixkit-comforting-ambience-444.mp3'
+    }
+  ],
+  sadness: [
+    {
+      id: 'sad-1',
+      title: 'Reflection',
+      artist: 'Blue Sky',
+      album: 'Memories',
+      duration: 230,
+      mood: 'sadness',
+      coverImage: 'https://via.placeholder.com/150?text=Reflect',
+      url: 'https://assets.mixkit.co/music/preview/mixkit-lo-fi-03-739.mp3'
+    },
+    {
+      id: 'sad-2',
+      title: 'Gentle Rain',
+      artist: 'Nature',
+      album: 'Elements',
+      duration: 200,
+      mood: 'sadness',
+      coverImage: 'https://via.placeholder.com/150?text=Rain',
+      url: 'https://assets.mixkit.co/music/preview/mixkit-rainy-night-chill-145.mp3'
+    }
+  ],
+  neutral: [
+    {
+      id: 'neu-1',
+      title: 'Background Music',
+      artist: 'Ambient Sounds',
+      album: 'Focus',
+      duration: 190,
+      mood: 'neutral',
+      coverImage: 'https://via.placeholder.com/150?text=Focus',
+      url: 'https://assets.mixkit.co/music/preview/mixkit-deep-urban-623.mp3'
+    },
+    {
+      id: 'neu-2',
+      title: 'Productivity',
+      artist: 'Work Mode',
+      album: 'Efficiency',
+      duration: 220,
+      mood: 'neutral',
+      coverImage: 'https://via.placeholder.com/150?text=Work',
+      url: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3'
+    }
+  ]
 };
 
-export interface MusicContextType {
-  currentTrack: Track | null;
-  currentPlaylist: Playlist | null;
-  isPlaying: boolean;
-  volume: number;
-  isMuted: boolean;
-  openDrawer: boolean;
-  currentEmotion: string | null;
-  loadPlaylistForEmotion: (emotion: string | EmotionMusicParams) => Promise<Playlist | null>;
-  playTrack: (track: Track) => void;
-  pauseTrack: () => void;
-  togglePlay: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-  setVolume: (volume: number) => void;
-  toggleMute: () => void;
-  setOpenDrawer: (open: boolean) => void;
-  setEmotion: (emotion: string) => void;
-  adjustVolume: (amount: number) => void;
-}
+const defaultTracks = [
+  {
+    id: 'default-1',
+    title: 'Peaceful Melody',
+    artist: 'Relaxation',
+    album: 'Calm Collection',
+    duration: 180,
+    mood: 'neutral',
+    coverImage: 'https://via.placeholder.com/150?text=Default',
+    url: 'https://assets.mixkit.co/music/preview/mixkit-raising-me-higher-34.mp3'
+  },
+  {
+    id: 'default-2',
+    title: 'Gentle Flow',
+    artist: 'Harmony',
+    album: 'Balance',
+    duration: 200,
+    mood: 'neutral',
+    coverImage: 'https://via.placeholder.com/150?text=Flow',
+    url: 'https://assets.mixkit.co/music/preview/mixkit-dreaming-big-31.mp3'
+  }
+];
 
+// Contexte pour la musique
 export const MusicContext = createContext<MusicContextType>({
   currentTrack: null,
-  currentPlaylist: null,
+  playlist: [],
   isPlaying: false,
   volume: 0.5,
-  isMuted: false,
-  openDrawer: false,
-  currentEmotion: null,
-  loadPlaylistForEmotion: async () => null,
+  muted: false,
+  progress: 0,
+  duration: 0,
+  emotion: null,
+  setEmotion: () => {},
   playTrack: () => {},
   pauseTrack: () => {},
-  togglePlay: () => {},
+  resumeTrack: () => {},
   nextTrack: () => {},
-  previousTrack: () => {},
+  prevTrack: () => {},
+  togglePlayback: () => {},
+  setProgress: () => {},
   setVolume: () => {},
   toggleMute: () => {},
-  setOpenDrawer: () => {},
-  setEmotion: () => {},
-  adjustVolume: () => {}
+  loadPlaylist: () => {},
+  loadPlaylistForEmotion: () => {},
+  isInitialized: false,
+  initializeMusicSystem: () => {},
+  error: null
 });
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [currentPlaylist, setCurrentPlaylist] = useState<Playlist | null>(null);
+  const [audio] = useState<HTMLAudioElement | null>(
+    typeof window !== 'undefined' ? new Audio() : null
+  );
+  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
+  const [playlist, setPlaylist] = useState<MusicTrack[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.5);
-  const [isMuted, setIsMuted] = useState(false);
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
+  const [volume, setVolumeState] = useState(0.5);
+  const [muted, setMuted] = useState(false);
+  const [progress, setProgressState] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [emotion, setEmotion] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fonction pour charger une playlist basée sur une émotion
-  const loadPlaylistForEmotion = useCallback(async (emotionParam: string | EmotionMusicParams): Promise<Playlist | null> => {
-    // Extraction de l'émotion à partir du paramètre
-    const emotion = typeof emotionParam === 'string' ? emotionParam : emotionParam.emotion;
-    
-    // Recherche de la playlist correspondante
-    const playlist = MOCK_PLAYLISTS[emotion.toLowerCase()] || MOCK_PLAYLISTS.neutral;
-    
-    if (playlist) {
-      setCurrentPlaylist(playlist);
-      setCurrentEmotion(emotion);
+  const initializeMusicSystem = () => {
+    if (audio) {
+      // Configurer les gestionnaires d'événements audio
+      audio.addEventListener('timeupdate', handleTimeUpdate);
+      audio.addEventListener('loadedmetadata', handleMetadataLoaded);
+      audio.addEventListener('ended', handleTrackEnded);
       
-      // Si aucune piste n'est en cours de lecture, on charge la première piste
-      if (!currentTrack && playlist.tracks.length > 0) {
-        setCurrentTrack(playlist.tracks[0]);
-      }
-      
-      return playlist;
+      // Commencer avec une playlist par défaut
+      loadPlaylist(defaultTracks);
+      setIsInitialized(true);
+    } else {
+      setError("Le navigateur ne prend pas en charge l'audio HTML5");
+    }
+  };
+
+  useEffect(() => {
+    if (audio && !isInitialized) {
+      initializeMusicSystem();
     }
     
-    return null;
-  }, [currentTrack]);
-
-  // Jouer une piste
-  const playTrack = useCallback((track: Track) => {
-    setCurrentTrack(track);
-    setIsPlaying(true);
+    return () => {
+      if (audio) {
+        audio.pause();
+        audio.removeEventListener('timeupdate', handleTimeUpdate);
+        audio.removeEventListener('loadedmetadata', handleMetadataLoaded);
+        audio.removeEventListener('ended', handleTrackEnded);
+      }
+    };
   }, []);
 
-  // Mettre en pause
-  const pauseTrack = useCallback(() => {
-    setIsPlaying(false);
-  }, []);
+  // Mettre à jour le volume quand il change
+  useEffect(() => {
+    if (audio) {
+      audio.volume = muted ? 0 : volume;
+    }
+  }, [volume, muted, audio]);
 
-  // Basculer lecture/pause
-  const togglePlay = useCallback(() => {
-    setIsPlaying(prev => !prev);
-  }, []);
+  const handleTimeUpdate = () => {
+    if (audio) {
+      setProgressState(audio.currentTime);
+    }
+  };
 
-  // Piste suivante
-  const nextTrack = useCallback(() => {
-    if (!currentPlaylist || !currentTrack) return;
-    
-    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
-    if (currentIndex === -1) return;
-    
-    const nextIndex = (currentIndex + 1) % currentPlaylist.tracks.length;
-    setCurrentTrack(currentPlaylist.tracks[nextIndex]);
-  }, [currentPlaylist, currentTrack]);
+  const handleMetadataLoaded = () => {
+    if (audio) {
+      setDuration(audio.duration);
+    }
+  };
 
-  // Piste précédente
-  const previousTrack = useCallback(() => {
-    if (!currentPlaylist || !currentTrack) return;
-    
-    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
-    if (currentIndex === -1) return;
-    
-    const prevIndex = (currentIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
-    setCurrentTrack(currentPlaylist.tracks[prevIndex]);
-  }, [currentPlaylist, currentTrack]);
+  const handleTrackEnded = () => {
+    nextTrack();
+  };
 
-  // Activer/désactiver le son
-  const toggleMute = useCallback(() => {
-    setIsMuted(prev => !prev);
-  }, []);
+  const playTrack = (track: MusicTrack) => {
+    if (audio) {
+      if (track.url) {
+        audio.src = track.url;
+        audio.play()
+          .then(() => {
+            setCurrentTrack(track);
+            setIsPlaying(true);
+          })
+          .catch(err => {
+            console.error("Erreur lors de la lecture de la piste:", err);
+            setError("Impossible de lire la piste audio");
+          });
+      } else {
+        setError("URL de la piste audio manquante");
+      }
+    }
+  };
 
-  // Définir l'émotion
-  const setEmotion = useCallback((emotion: string) => {
-    setCurrentEmotion(emotion);
-  }, []);
-  
-  // Ajuster le volume
-  const adjustVolume = useCallback((amount: number) => {
-    setVolume(prev => {
-      const newVolume = Math.max(0, Math.min(1, prev + amount));
-      return newVolume;
-    });
-  }, []);
+  const pauseTrack = () => {
+    if (audio && isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const resumeTrack = () => {
+    if (audio && !isPlaying && currentTrack) {
+      audio.play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch(err => {
+          console.error("Erreur lors de la reprise de la lecture:", err);
+        });
+    }
+  };
+
+  const nextTrack = () => {
+    if (currentTrack && playlist.length > 0) {
+      const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
+      if (currentIndex > -1 && currentIndex < playlist.length - 1) {
+        playTrack(playlist[currentIndex + 1]);
+      } else {
+        playTrack(playlist[0]); // Revenir au début de la playlist
+      }
+    }
+  };
+
+  const prevTrack = () => {
+    if (currentTrack && playlist.length > 0) {
+      const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
+      if (currentIndex > 0) {
+        playTrack(playlist[currentIndex - 1]);
+      } else {
+        playTrack(playlist[playlist.length - 1]); // Aller à la dernière piste
+      }
+    }
+  };
+
+  const togglePlayback = () => {
+    if (isPlaying) {
+      pauseTrack();
+    } else {
+      resumeTrack();
+    }
+  };
+
+  const setProgress = (newProgress: number) => {
+    if (audio) {
+      audio.currentTime = newProgress;
+      setProgressState(newProgress);
+    }
+  };
+
+  const setVolume = (newVolume: number) => {
+    const clampedVolume = Math.max(0, Math.min(1, newVolume));
+    if (audio) {
+      audio.volume = clampedVolume;
+    }
+    setVolumeState(clampedVolume);
+  };
+
+  const toggleMute = () => {
+    if (audio) {
+      const newMuted = !muted;
+      audio.muted = newMuted;
+      setMuted(newMuted);
+    }
+  };
+
+  const loadPlaylist = (newPlaylist: MusicTrack[]) => {
+    if (newPlaylist && newPlaylist.length > 0) {
+      setPlaylist(newPlaylist);
+      // Jouer automatiquement la première piste si aucune n'est en cours
+      if (!currentTrack) {
+        playTrack(newPlaylist[0]);
+      }
+    }
+  };
+
+  const loadPlaylistForEmotion = (emotion: string) => {
+    const emotionPlaylist = musicSamples[emotion];
+    if (emotionPlaylist && emotionPlaylist.length > 0) {
+      setPlaylist(emotionPlaylist);
+      playTrack(emotionPlaylist[0]);
+    } else {
+      // Utiliser une playlist par défaut si aucune n'est trouvée pour l'émotion
+      setPlaylist(defaultTracks);
+      playTrack(defaultTracks[0]);
+    }
+  };
 
   return (
     <MusicContext.Provider value={{
       currentTrack,
-      currentPlaylist,
+      playlist,
       isPlaying,
       volume,
-      isMuted,
-      openDrawer,
-      currentEmotion,
-      loadPlaylistForEmotion,
+      muted,
+      progress,
+      duration,
+      emotion,
+      setEmotion,
       playTrack,
       pauseTrack,
-      togglePlay,
+      resumeTrack,
       nextTrack,
-      previousTrack,
+      prevTrack,
+      togglePlayback,
+      setProgress,
       setVolume,
       toggleMute,
-      setOpenDrawer,
-      setEmotion,
-      adjustVolume
+      loadPlaylist,
+      loadPlaylistForEmotion,
+      isInitialized,
+      initializeMusicSystem,
+      error
     }}>
       {children}
     </MusicContext.Provider>
@@ -224,8 +358,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 export const useMusicContext = () => {
   const context = useContext(MusicContext);
-  if (context === undefined) {
-    throw new Error('useMusicContext must be used within a MusicProvider');
+  if (!context) {
+    throw new Error('useMusicContext doit être utilisé dans un MusicProvider');
   }
   return context;
 };

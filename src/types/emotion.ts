@@ -3,6 +3,8 @@ export interface Emotion {
   emotion: string;
   intensity?: number;
   score?: number;
+  date?: string;
+  confidence?: number;
 }
 
 export interface EmotionResult {
@@ -19,6 +21,7 @@ export interface EmotionResult {
   transcript?: string;
   feedback?: string;
   recommendations?: string[];
+  audioUrl?: string; // Ajouté pour AudioProcessor
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -32,12 +35,18 @@ export interface EmotionalTeamViewProps {
     user: { id: string; name: string; avatar?: string };
     emotion: EmotionResult;
   }>;
+  teamId?: string;
+  period?: string;
+  userId?: string;
+  anonymized?: boolean;
+  className?: string;
 }
 
 export interface LiveVoiceScannerProps {
   onResult?: (result: EmotionResult) => void;
   autoStart?: boolean;
   stopAfterSeconds?: number;
+  duration?: number; // Ajouté pour UnifiedEmotionCheckin
   className?: string;
 }
 
@@ -54,6 +63,9 @@ export interface TeamOverviewProps {
     user: { id: string; name: string; avatar?: string };
     emotion: EmotionResult;
   }>;
+  teamId?: string;
+  userId?: string;
+  period?: string;
   anonymized?: boolean;
   className?: string;
   dateRange?: { start: Date; end: Date };
@@ -74,4 +86,10 @@ export interface AudioProcessorProps {
 export interface EmotionTrendChartProps {
   emotions: EmotionResult[];
   period?: 'day' | 'week' | 'month' | 'year';
+}
+
+export interface MoodBasedRecommendationsProps {
+  mood: string;
+  standalone?: boolean;
+  intensity?: number; // Ajouté pour CompletionSection
 }

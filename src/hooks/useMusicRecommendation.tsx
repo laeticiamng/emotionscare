@@ -1,139 +1,226 @@
 
-import { useCallback, useState } from 'react';
-import { useToast } from "@/hooks/use-toast";
-import { useMusic } from '@/contexts/music';
-import { EmotionResult } from '@/types/emotion';
-import { Track } from '@/contexts/music/types';
+import { useState, useEffect } from 'react';
+import { MusicTrack } from '@/types/music';
 
-// Define emotion to music mapping for consistent recommendations
-const EMOTION_TO_MUSIC_TYPE: Record<string, string> = {
-  'happy': 'happy',
-  'joy': 'happy',
-  'excited': 'happy',
-  'sad': 'sad',
-  'melancholic': 'sad',
-  'depressed': 'sad',
-  'angry': 'anxious',
-  'frustrated': 'anxious',
-  'anxious': 'calm',
-  'worried': 'calm',
-  'scared': 'calm',
-  'neutral': 'neutral',
-  'calm': 'calm',
-  'relaxed': 'calm',
-  'stressed': 'calm',
-  'focused': 'focus',
-  'concentrated': 'focus',
-  'energetic': 'happy',
-  'tired': 'calm',
-  'bored': 'focus',
-  'default': 'neutral'
+// Mockup music tracks
+const musicLibrary: Record<string, MusicTrack[]> = {
+  joy: [
+    {
+      id: 'joy1',
+      title: 'Happy Days',
+      artist: 'Sunshine Band',
+      album: 'Positive Vibes',
+      mood: 'joy',
+      genre: 'Pop',
+      coverImage: 'https://via.placeholder.com/100?text=Happy',
+      url: 'https://example.com/music/happy.mp3'
+    },
+    {
+      id: 'joy2',
+      title: 'Celebration',
+      artist: 'Party People',
+      album: 'Good Times',
+      mood: 'joy',
+      genre: 'Dance',
+      coverImage: 'https://via.placeholder.com/100?text=Party',
+      url: 'https://example.com/music/celebration.mp3'
+    }
+  ],
+  calm: [
+    {
+      id: 'calm1',
+      title: 'Ocean Waves',
+      artist: 'Nature Sounds',
+      album: 'Relaxation',
+      mood: 'calm',
+      genre: 'Ambient',
+      coverImage: 'https://via.placeholder.com/100?text=Calm',
+      url: 'https://example.com/music/ocean.mp3'
+    },
+    {
+      id: 'calm2',
+      title: 'Gentle Rain',
+      artist: 'Dream Orchestra',
+      album: 'Peaceful Sleep',
+      mood: 'calm',
+      genre: 'Classical',
+      coverImage: 'https://via.placeholder.com/100?text=Rain',
+      url: 'https://example.com/music/rain.mp3'
+    }
+  ],
+  sadness: [
+    {
+      id: 'sad1',
+      title: 'Rainy Day',
+      artist: 'Melancholy Mood',
+      album: 'Reflections',
+      mood: 'sadness',
+      genre: 'Jazz',
+      coverImage: 'https://via.placeholder.com/100?text=Rainy',
+      url: 'https://example.com/music/rainy.mp3'
+    },
+    {
+      id: 'sad2',
+      title: 'Lost in Thoughts',
+      artist: 'Deep Soul',
+      album: 'Introspection',
+      mood: 'sadness',
+      genre: 'Blues',
+      coverImage: 'https://via.placeholder.com/100?text=Lost',
+      url: 'https://example.com/music/lost.mp3'
+    }
+  ],
+  anxiety: [
+    {
+      id: 'anx1',
+      title: 'Breathe In, Breathe Out',
+      artist: 'Mindfulness',
+      album: 'Calming Anxiety',
+      mood: 'anxiety',
+      genre: 'Meditation',
+      coverImage: 'https://via.placeholder.com/100?text=Breathe',
+      url: 'https://example.com/music/breathe.mp3'
+    },
+    {
+      id: 'anx2',
+      title: 'Let Go',
+      artist: 'Healing Sounds',
+      album: 'Release',
+      mood: 'anxiety',
+      genre: 'Ambient',
+      coverImage: 'https://via.placeholder.com/100?text=Let+Go',
+      url: 'https://example.com/music/letgo.mp3'
+    }
+  ],
+  neutral: [
+    {
+      id: 'neu1',
+      title: 'Ambient Study',
+      artist: 'Focus Mind',
+      album: 'Concentration',
+      mood: 'neutral',
+      genre: 'Electronic',
+      coverImage: 'https://via.placeholder.com/100?text=Study',
+      url: 'https://example.com/music/study.mp3'
+    },
+    {
+      id: 'neu2',
+      title: 'Background Harmony',
+      artist: 'Subtle Sounds',
+      album: 'Easy Listening',
+      mood: 'neutral',
+      genre: 'Instrumental',
+      coverImage: 'https://via.placeholder.com/100?text=Harmony',
+      url: 'https://example.com/music/harmony.mp3'
+    }
+  ],
+  excitement: [
+    {
+      id: 'exc1',
+      title: 'Energy Rush',
+      artist: 'Power Band',
+      album: 'Motivation',
+      mood: 'excitement',
+      genre: 'Rock',
+      coverImage: 'https://via.placeholder.com/100?text=Energy',
+      url: 'https://example.com/music/energy.mp3'
+    },
+    {
+      id: 'exc2',
+      title: 'Breakthrough',
+      artist: 'Inspirational Beats',
+      album: 'Success',
+      mood: 'excitement',
+      genre: 'Electronic',
+      coverImage: 'https://via.placeholder.com/100?text=Success',
+      url: 'https://example.com/music/breakthrough.mp3'
+    }
+  ]
 };
 
-export default function useMusicRecommendation() {
-  const { toast } = useToast();
-  const { 
-    currentTrack, 
-    isPlaying, 
-    setOpenDrawer, 
-    loadPlaylistForEmotion,
-    playTrack,
-    togglePlay
-  } = useMusic();
-  
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-  const [recommendedTracks, setRecommendedTracks] = useState<Track[]>([]);
+// Fallback tracks if no mood matches
+const defaultTracks: MusicTrack[] = [
+  {
+    id: 'default1',
+    title: 'Peaceful Melody',
+    artist: 'Wellness Sounds',
+    album: 'Balance',
+    mood: 'neutral',
+    genre: 'Instrumental',
+    coverImage: 'https://via.placeholder.com/100?text=Peaceful',
+    url: 'https://example.com/music/peaceful.mp3'
+  },
+  {
+    id: 'default2',
+    title: 'Harmony Flow',
+    artist: 'Serenity',
+    album: 'Inner Peace',
+    mood: 'calm',
+    genre: 'New Age',
+    coverImage: 'https://via.placeholder.com/100?text=Harmony',
+    url: 'https://example.com/music/harmony.mp3'
+  }
+];
 
-  // Charger des recommandations de musique pour une humeur
-  const loadMusicForMood = useCallback(async (mood: string) => {
-    setLoading(true);
-    setError('');
-    
-    try {
-      const musicType = EMOTION_TO_MUSIC_TYPE[mood.toLowerCase()] || EMOTION_TO_MUSIC_TYPE.default;
-      const playlist = await loadPlaylistForEmotion(musicType);
+export function useMusicRecommendation(emotion: string | null, intensity?: number) {
+  const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getRecommendations = async () => {
+      setIsLoading(true);
+      setError(null);
       
-      if (playlist && playlist.tracks) {
-        setRecommendedTracks(playlist.tracks);
-      }
-      
-      setLoading(false);
-      return playlist;
-    } catch (err) {
-      console.error("Error loading music:", err);
-      setError("Impossible de charger la musique pour cette émotion");
-      setLoading(false);
-      return null;
-    }
-  }, [loadPlaylistForEmotion]);
-
-  // Gérer le clic sur "Play Music" depuis les écrans d'émotion
-  const handlePlayMusic = useCallback((emotionResult: EmotionResult) => {
-    if (!emotionResult || !emotionResult.emotion) {
-      toast({
-        title: "Pas d'émotion détectée",
-        description: "Nous n'avons pas pu détecter votre émotion pour vous recommander une musique",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const { emotion } = emotionResult;
-    loadMusicForMood(emotion.toLowerCase())
-      .then(playlist => {
-        if (playlist) {
-          setOpenDrawer(true);
-          
-          toast({
-            title: "Musique recommandée",
-            description: `Nous vous suggérons d'écouter la playlist "${playlist.name}" adaptée à votre humeur actuelle`,
-          });
+      try {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        if (!emotion) {
+          setRecommendedTracks(defaultTracks);
+          return;
         }
-      });
-  }, [toast, loadMusicForMood, setOpenDrawer]);
-
-  // Jouer la première recommandation
-  const playFirstRecommendation = useCallback(() => {
-    if (recommendedTracks.length > 0) {
-      playTrack(recommendedTracks[0]);
-      return true;
-    }
-    return false;
-  }, [recommendedTracks, playTrack]);
-
-  // Basculer lecture/pause
-  const togglePlayPause = useCallback(() => {
-    togglePlay();
-  }, [togglePlay]);
-
-  // Obtenir une description pour une émotion
-  const getEmotionMusicDescription = useCallback((emotion: string): string => {
-    const descriptions: Record<string, string> = {
-      'happy': 'Des mélodies joyeuses pour amplifier votre bonne humeur',
-      'sad': 'Des mélodies douces pour vous accompagner dans ce moment',
-      'calm': 'Des sonorités apaisantes pour maintenir votre tranquillité',
-      'focus': 'Des rythmes qui favorisent la concentration et la productivité',
-      'energetic': 'Des tempos dynamiques pour stimuler votre énergie',
-      'angry': 'De la musique apaisante pour aider à gérer les émotions fortes',
-      'anxious': 'Des mélodies relaxantes pour réduire l'anxiété',
-      'neutral': 'Une sélection musicale équilibrée adaptée à votre journée'
+        
+        // Check if we have tracks for this emotion
+        const emotionTracks = musicLibrary[emotion];
+        
+        if (emotionTracks && emotionTracks.length > 0) {
+          setRecommendedTracks(emotionTracks);
+        } else {
+          // If no exact match, try to find related emotions
+          const relatedEmotions: Record<string, string[]> = {
+            joy: ['excitement', 'neutral'],
+            sadness: ['anxiety', 'neutral'],
+            anxiety: ['sadness', 'neutral'],
+            calm: ['neutral', 'joy'],
+            excitement: ['joy', 'neutral'],
+            neutral: ['calm', 'joy']
+          };
+          
+          const related = relatedEmotions[emotion] || ['neutral', 'calm'];
+          
+          // Try to get tracks from related emotions
+          for (const relatedEmotion of related) {
+            if (musicLibrary[relatedEmotion] && musicLibrary[relatedEmotion].length > 0) {
+              setRecommendedTracks(musicLibrary[relatedEmotion]);
+              return;
+            }
+          }
+          
+          // Fallback to default tracks if no related emotions found
+          setRecommendedTracks(defaultTracks);
+        }
+      } catch (err) {
+        console.error('Error getting music recommendations:', err);
+        setError('Error retrieving music recommendations');
+        setRecommendedTracks(defaultTracks);
+      } finally {
+        setIsLoading(false);
+      }
     };
     
-    return descriptions[emotion.toLowerCase()] || descriptions.neutral;
-  }, []);
+    getRecommendations();
+  }, [emotion, intensity]);
 
-  return {
-    isLoading: loading,
-    currentTrack,
-    error,
-    isPlaying,
-    loadMusicForMood,
-    togglePlayPause,
-    handlePlayMusic,
-    recommendedTracks,
-    playFirstRecommendation,
-    getEmotionMusicDescription,
-    EMOTION_TO_MUSIC_TYPE
-  };
+  return { recommendedTracks, isLoading, error };
 }

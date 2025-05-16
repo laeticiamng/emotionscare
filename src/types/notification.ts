@@ -1,46 +1,19 @@
 
-export type NotificationType = 'system' | 'message' | 'reminder' | 'alert' | 'update' | 'achievement' | 'emotion' | 'journal' | 'coach' | 'community' | 'user' | 'urgent' | 'info' | 'warning' | 'error' | 'success';
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
+export type NotificationType = 'emotion' | 'recommendation' | 'team' | 'goal' | 'coach' | 'system';
+export type NotificationTone = 'positive' | 'neutral' | 'urgent' | 'informational';
 
-export type NotificationFilter = 'all' | 'unread' | 'important' | 'system' | 'message' | 'read' | 'urgent' | 'journal' | 'emotion' | 'user' | 'coach' | 'community';
-
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: NotificationType;
-  isRead?: boolean;
-  read?: boolean;
-  isImportant?: boolean;
-  createdAt?: string;
-  created_at: string;
-  userId?: string;
-  user_id?: string;
-  recipient_id?: string;
-  action?: {
-    label: string;
-    url: string;
-  };
-  action_url?: string;
-  icon?: string;
-  source?: 'system' | 'user' | 'coach' | 'community';
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
-  image_url?: string;
-  expires_at?: string;
-  metadata?: Record<string, any>;
-  timestamp?: string | Date;
-  updated_at?: string;
-}
-
-export interface NotificationPreference {
-  type: NotificationType;
+export interface NotificationChannels {
   email: boolean;
   push: boolean;
   inApp: boolean;
+  sms?: boolean;
+}
+
+export interface NotificationPreference extends NotificationChannels {
+  type: NotificationType;
   enabled?: boolean;
   emailEnabled?: boolean;
-  pushEnabled?: boolean;
-  inAppEnabled?: boolean;
-  frequency?: 'immediate' | 'daily' | 'weekly' | 'never';
   quietHours?: {
     enabled: boolean;
     start: string;
@@ -48,4 +21,29 @@ export interface NotificationPreference {
   };
 }
 
-export type NotificationPreferences = Record<NotificationType, NotificationPreference>;
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  tone?: NotificationTone;
+  read: boolean;
+  timestamp: string;
+  actionUrl?: string;
+  actionLabel?: string;
+  image?: string;
+  sender?: string;
+}
+
+export interface NotificationFilter {
+  type?: NotificationType;
+  read?: boolean;
+  dateFrom?: Date;
+  dateTo?: Date;
+}
+
+export interface NotificationItemProps {
+  notification: Notification;
+  onMarkAsRead?: (id: string) => void;
+  onDelete?: (id: string) => void;
+}

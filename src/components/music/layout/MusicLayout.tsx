@@ -1,8 +1,10 @@
 
 import React, { useEffect } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
-import { Loader2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useMusic } from '@/contexts/music';
+import { Card } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, AlertCircle } from 'lucide-react';
+import MusicPlayer from '../MusicPlayer';
 
 interface MusicLayoutProps {
   children: React.ReactNode;
@@ -10,52 +12,41 @@ interface MusicLayoutProps {
 
 const MusicLayout: React.FC<MusicLayoutProps> = ({ children }) => {
   const { isInitialized, initializeMusicSystem, error } = useMusic();
-  const { toast } = useToast();
 
   useEffect(() => {
-    const loadMusic = async () => {
-      try {
-        await initializeMusicSystem();
-      } catch (err) {
-        console.error('Error initializing music system:', err);
-        toast({
-          title: 'Error',
-          description: 'Failed to initialize music system. Please try again.',
-          variant: 'destructive'
-        });
-      }
-    };
-
-    if (!isInitialized) {
-      loadMusic();
+    if (!isInitialized && initializeMusicSystem) {
+      initializeMusicSystem();
     }
-  }, [isInitialized, initializeMusicSystem, toast]);
+  }, [isInitialized, initializeMusicSystem]);
 
   if (!isInitialized) {
     return (
-      <div className="flex items-center justify-center w-full h-64">
-        <Loader2 className="h-8 w-8 text-primary animate-spin" />
-        <span className="ml-2 text-muted-foreground">Loading music system...</span>
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2">Chargement du système musical...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-6 text-center">
-        <h2 className="text-xl font-medium text-destructive mb-2">Error loading music system</h2>
-        <p className="text-muted-foreground">{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-4 px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors"
-        >
-          Try again
-        </button>
-      </div>
+      <Alert variant="destructive" className="max-w-md mx-auto my-8">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Erreur: {error}. Veuillez actualiser la page ou vérifier les paramètres de votre navigateur.
+        </AlertDescription>
+      </Alert>
     );
   }
 
-  return <div>{children}</div>;
+  return (
+    <div className="space-y-6">
+      <Card className="p-4 shadow-md bg-card">
+        <MusicPlayer />
+      </Card>
+      {children}
+    </div>
+  );
 };
 
 export default MusicLayout;

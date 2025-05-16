@@ -1,124 +1,319 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { fetchEmotionHistory } from '@/lib/scanService';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmotionResult } from '@/types/emotion';
-import { useAuth } from '@/contexts/AuthContext';
+import { scanService } from '@/services/scanService';
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { EmotionTrendChart } from './EmotionTrendChart';
 
-interface HistoryTabContentProps {
-  userId?: string;
-}
-
-const HistoryTabContent: React.FC<HistoryTabContentProps> = ({ userId }) => {
-  const { user } = useAuth();
-  const currentUserId = userId || user?.id || '';
-  
-  const [emotions, setEmotions] = useState<EmotionResult[]>([]);
+const HistoryTabContent = () => {
+  const [emotionHistory, setEmotionHistory] = useState<EmotionResult[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [period, setPeriod] = useState<'week' | 'month' | 'year'>('week');
-  const [loading, setLoading] = useState(false);
-  
+  const [chartData, setChartData] = useState<any[]>([]);
+
   useEffect(() => {
-    if (currentUserId) {
-      loadEmotionHistory();
-    }
-  }, [currentUserId, period]);
-  
-  const loadEmotionHistory = async () => {
-    if (!currentUserId) return;
-    
-    setLoading(true);
-    try {
-      const history = await fetchEmotionHistory(currentUserId, period);
-      setEmotions(history);
-    } catch (error) {
-      console.error('Error loading emotion history:', error);
-    } finally {
-      setLoading(false);
-    }
+    const fetchHistory = async () => {
+      setIsLoading(true);
+      try {
+        const history = await scanService.getEmotionalHistory('user-1', period);
+        setEmotionHistory(history);
+
+        // Process data for the chart
+        const processedData = history.map(item => ({
+          date: new Date(item.timestamp as string).toLocaleDateString(),
+          emotion: item.emotion,
+          score: item.score,
+          value: item.score,
+        }));
+        
+        setChartData(processedData);
+      } catch (error) {
+        console.error("Error fetching emotional history:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchHistory();
+  }, [period]);
+
+  const getEmotionColor = (emotion: string): string => {
+    const colors: Record<string, string> = {
+      joy: '#22c55e',
+      neutral: '#6b7280',
+      anxiety: '#ef4444',
+      sadness: '#3b82f6',
+      frustration: '#f97316',
+      excitement: '#8b5cf6',
+      gratitude: '#f59e0b',
+    };
+    return colors[emotion] || '#6b7280';
   };
-  
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
+
+  const getEmotionName = (emotion: string): string => {
+    const names: Record<string, string> = {
+      joy: 'Joie',
+      neutral: 'Neutre',
+      anxiety: 'Anxiété',
+      sadness: 'Tristesse',
+      frustration: 'Frustration',
+      excitement: 'Enthousiasme',
+      gratitude: 'Gratitude',
+    };
+    return names[emotion] || emotion;
   };
-  
+
+  const countEmotions = () => {
+    const counts: Record<string, number> = {};
+    emotionHistory.forEach(item => {
+      counts[item.emotion] = (counts[item.emotion] || 0) + 1;
+    });
+    return counts;
+  };
+
+  const emotionCounts = countEmotions();
+  const dominantEmotion = Object.entries(emotionCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'neutral';
+
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-          <CardTitle>Historique des émotions</CardTitle>
-          
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setPeriod('week')}
-              className={period === 'week' ? 'bg-primary text-primary-foreground' : ''}
-            >
-              7 jours
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setPeriod('month')}
-              className={period === 'month' ? 'bg-primary text-primary-foreground' : ''}
-            >
-              30 jours
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setPeriod('year')}
-              className={period === 'year' ? 'bg-primary text-primary-foreground' : ''}
-            >
-              12 mois
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent>
-        {loading ? (
-          <div className="text-center py-8">
-            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-            <p className="text-muted-foreground mt-4">Chargement de l'historique...</p>
-          </div>
-        ) : emotions.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Aucune émotion enregistrée durant cette période.</p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            <div className="grid gap-4">
-              {emotions.map((emotion) => (
-                <div key={emotion.id} className="flex items-center p-3 rounded-lg border">
-                  <div className="text-2xl mr-4">{emotion.emojis || '😐'}</div>
-                  <div className="flex-1">
-                    <div className="font-medium">{emotion.emotion}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {formatDate(emotion.timestamp || emotion.date)}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold">{Math.round((emotion.score || 0.5) * 100)}%</div>
-                    <div className="text-xs text-muted-foreground">Intensité</div>
-                  </div>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-semibold">Historique Émotionnel</h2>
+        <Select defaultValue={period} onValueChange={(value) => setPeriod(value as 'week' | 'month' | 'year')}>
+          <SelectTrigger className="w-32">
+            <SelectValue placeholder="Période" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="week">Semaine</SelectItem>
+            <SelectItem value="month">Mois</SelectItem>
+            <SelectItem value="year">Année</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle>Tendance émotionnelle</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="h-64 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+              </div>
+            ) : (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData}>
+                    <XAxis dataKey="date" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                    <Tooltip
+                      formatter={(value: any, name: any, props: any) => {
+                        const entry = props.payload;
+                        return [
+                          `Score: ${value}`,
+                          `Émotion: ${getEmotionName(entry.emotion)}`
+                        ];
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#2563EB" 
+                      strokeWidth={2} 
+                      dot={(props) => {
+                        const emotion = props.payload.emotion;
+                        const color = getEmotionColor(emotion);
+                        return (
+                          <circle 
+                            cx={props.cx} 
+                            cy={props.cy} 
+                            r={4} 
+                            fill={color} 
+                            stroke="white" 
+                            strokeWidth={2} 
+                          />
+                        );
+                      }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Aperçu</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Émotion dominante</p>
+                <div className="flex items-center">
+                  <div 
+                    className="w-4 h-4 rounded-full mr-2" 
+                    style={{ backgroundColor: getEmotionColor(dominantEmotion) }}
+                  ></div>
+                  <span className="font-medium">{getEmotionName(dominantEmotion)}</span>
                 </div>
-              ))}
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Total des entrées</p>
+                <p className="font-medium">{emotionHistory.length}</p>
+              </div>
+              
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Répartition</p>
+                <div className="space-y-1">
+                  {Object.entries(emotionCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([emotion, count]) => (
+                      <div key={emotion} className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div 
+                            className="w-3 h-3 rounded-full mr-2" 
+                            style={{ backgroundColor: getEmotionColor(emotion) }}
+                          ></div>
+                          <span className="text-sm">{getEmotionName(emotion)}</span>
+                        </div>
+                        <span className="text-sm font-medium">{count}</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {emotionHistory.length > 0 && (
+        <EmotionTrendChart emotions={emotionHistory} period={period} />
+      )}
+
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="all">Toutes</TabsTrigger>
+          <TabsTrigger value="joy">Joie</TabsTrigger>
+          <TabsTrigger value="anxiety">Anxiété</TabsTrigger>
+          <TabsTrigger value="sadness">Tristesse</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="all" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {isLoading ? (
+              Array(6).fill(0).map((_, i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader className="pb-2">
+                    <div className="h-4 w-1/2 bg-muted rounded"></div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-4 w-3/4 bg-muted rounded mb-2"></div>
+                    <div className="h-4 w-1/2 bg-muted rounded"></div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              emotionHistory.slice(0, 6).map((item) => (
+                <Card key={item.id}>
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-center">
+                      <div 
+                        className="px-2 py-1 text-xs rounded-full"
+                        style={{ 
+                          backgroundColor: `${getEmotionColor(item.emotion)}20`,
+                          color: getEmotionColor(item.emotion)
+                        }}
+                      >
+                        {getEmotionName(item.emotion)}
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(item.timestamp as string).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-2">
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className="h-2 rounded-full"
+                          style={{ 
+                            width: `${(item.score || 0) * 100}%`,
+                            backgroundColor: getEmotionColor(item.emotion)
+                          }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium">
+                        {Math.round((item.score || 0) * 100)}%
+                      </span>
+                    </div>
+                    {item.feedback && (
+                      <p className="text-sm text-muted-foreground mt-2">{item.feedback}</p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </TabsContent>
+        
+        <TabsContent value="joy" className="space-y-4">
+          {emotionHistory.filter(item => item.emotion === 'joy').length === 0 ? (
+            <p className="text-center py-8 text-muted-foreground">Aucune entrée avec cette émotion</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {emotionHistory
+                .filter(item => item.emotion === 'joy')
+                .map((item) => (
+                  <Card key={item.id}>
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-center">
+                        <div 
+                          className="px-2 py-1 text-xs rounded-full"
+                          style={{ 
+                            backgroundColor: `${getEmotionColor(item.emotion)}20`,
+                            color: getEmotionColor(item.emotion)
+                          }}
+                        >
+                          {getEmotionName(item.emotion)}
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(item.timestamp as string).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-2">
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div
+                            className="h-2 rounded-full"
+                            style={{ 
+                              width: `${(item.score || 0) * 100}%`,
+                              backgroundColor: getEmotionColor(item.emotion)
+                            }}
+                          />
+                        </div>
+                        <span className="text-xs font-medium">
+                          {Math.round((item.score || 0) * 100)}%
+                        </span>
+                      </div>
+                      {item.feedback && (
+                        <p className="text-sm text-muted-foreground mt-2">{item.feedback}</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+            </div>
+          )}
+        </TabsContent>
+        
+        {/* Similar TabsContent for other emotion tabs */}
+      </Tabs>
+    </div>
   );
 };
 

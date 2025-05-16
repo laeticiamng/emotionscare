@@ -1,260 +1,248 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Theme, FontFamily, FontSize } from '@/types/theme';
+import React from 'react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { useTheme } from '@/contexts/theme';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Moon, Sun, Monitor, PenTool, Type, TextCursorInput } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { FontSize, FontFamily, Theme } from '@/types/theme';
 
-// Theme settings tab component
-const ThemeSettingsTab: React.FC = () => {
-  const { preferences, updatePreferences } = useUserPreferences();
-  const [currentTab, setCurrentTab] = useState('theme');
+export function ThemeSettingsTab() {
+  const { theme, setTheme, fontSize, setFontSize, fontFamily, setFontFamily } = useTheme();
+  const [reducedMotion, setReducedMotion] = React.useState(false);
+  const [highContrast, setHighContrast] = React.useState(false);
 
-  const handleThemeChange = (theme: Theme) => {
-    updatePreferences({ theme });
+  // Map display names for better readability
+  const fontFamilyMap: Record<string, string> = {
+    sans: 'Sans-Serif',
+    serif: 'Serif',
+    mono: 'Monospace',
+    rounded: 'Arrondie'
   };
 
-  const handleFontChange = (font: FontFamily) => {
-    updatePreferences({ fontFamily: font });
-  };
-
-  const handleFontSizeChange = (fontSize: FontSize) => {
-    updatePreferences({ fontSize });
+  const fontSizeMap: Record<string, string> = {
+    sm: 'Petite',
+    md: 'Moyenne',
+    lg: 'Grande',
+    xl: 'Très grande'
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Appearance Settings</CardTitle>
-        <CardDescription>
-          Customize the appearance of your application
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue={currentTab} onValueChange={setCurrentTab} className="w-full">
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="theme">Theme</TabsTrigger>
-            <TabsTrigger value="font">Font</TabsTrigger>
-            <TabsTrigger value="accessibility">Accessibility</TabsTrigger>
-          </TabsList>
-          
-          {/* Theme tab content */}
-          <TabsContent value="theme">
-            <div className="grid gap-4">
-              <div>
-                <h3 className="text-sm font-medium mb-3">Color Theme</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    className={`p-3 rounded-md border flex items-center justify-center ${
-                      preferences.theme === 'light' ? 'border-primary bg-primary/10' : ''
-                    }`}
-                    onClick={() => handleThemeChange('light')}
-                  >
-                    <span className="mr-2">☀️</span> Light
-                  </button>
-                  <button
-                    className={`p-3 rounded-md border flex items-center justify-center ${
-                      preferences.theme === 'dark' ? 'border-primary bg-primary/10' : ''
-                    }`}
-                    onClick={() => handleThemeChange('dark')}
-                  >
-                    <span className="mr-2">🌙</span> Dark
-                  </button>
-                  <button
-                    className={`p-3 rounded-md border flex items-center justify-center ${
-                      preferences.theme === 'system' ? 'border-primary bg-primary/10' : ''
-                    }`}
-                    onClick={() => handleThemeChange('system')}
-                  >
-                    <span className="mr-2">💻</span> System
-                  </button>
-                  <button
-                    className={`p-3 rounded-md border flex items-center justify-center ${
-                      preferences.theme === 'pastel' ? 'border-primary bg-primary/10' : ''
-                    }`}
-                    onClick={() => handleThemeChange('pastel')}
-                  >
-                    <span className="mr-2">🎨</span> Pastel
-                  </button>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-sm font-medium mb-3">Color Accent</h3>
-                <div className="grid grid-cols-4 gap-2">
-                  {['blue', 'purple', 'green', 'orange', 'pink', 'red', 'teal', 'yellow'].map((color) => (
-                    <button
-                      key={color}
-                      className={`h-10 rounded-md border ${
-                        preferences.colorAccent === color ? 'ring-2 ring-primary' : ''
-                      }`}
-                      style={{ backgroundColor: `var(--${color})` }}
-                      onClick={() => updatePreferences({ colorAccent: color })}
-                      aria-label={`${color} accent color`}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-          
-          {/* Font tab content */}
-          <TabsContent value="font">
-            <div className="grid gap-4">
-              <div>
-                <h3 className="text-sm font-medium mb-3">Font Family</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    className={`p-3 rounded-md border ${
-                      preferences.fontFamily === 'system' ? 'border-primary bg-primary/10' : ''
-                    }`}
-                    onClick={() => handleFontChange('system')}
-                    style={{ fontFamily: 'system-ui' }}
-                  >
-                    System
-                  </button>
-                  <button
-                    className={`p-3 rounded-md border ${
-                      preferences.fontFamily === 'serif' ? 'border-primary bg-primary/10' : ''
-                    }`}
-                    onClick={() => handleFontChange('serif')}
-                    style={{ fontFamily: 'serif' }}
-                  >
-                    Serif
-                  </button>
-                  <button
-                    className={`p-3 rounded-md border ${
-                      preferences.fontFamily === 'monospace' ? 'border-primary bg-primary/10' : ''
-                    }`}
-                    onClick={() => handleFontChange('monospace')}
-                    style={{ fontFamily: 'monospace' }}
-                  >
-                    Monospace
-                  </button>
-                  <button
-                    className={`p-3 rounded-md border ${
-                      preferences.fontFamily === 'rounded' ? 'border-primary bg-primary/10' : ''
-                    }`}
-                    onClick={() => handleFontChange('rounded')}
-                    style={{ fontFamily: 'var(--font-rounded, sans-serif)' }}
-                  >
-                    Rounded
-                  </button>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-sm font-medium mb-3">Font Size</h3>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    className={`p-3 rounded-md border ${
-                      preferences.fontSize === 'small' ? 'border-primary bg-primary/10' : ''
-                    }`}
-                    onClick={() => handleFontSizeChange('small')}
-                    style={{ fontSize: '0.875rem' }}
-                  >
-                    Small
-                  </button>
-                  <button
-                    className={`p-3 rounded-md border ${
-                      preferences.fontSize === 'medium' ? 'border-primary bg-primary/10' : ''
-                    }`}
-                    onClick={() => handleFontSizeChange('medium')}
-                    style={{ fontSize: '1rem' }}
-                  >
-                    Medium
-                  </button>
-                  <button
-                    className={`p-3 rounded-md border ${
-                      preferences.fontSize === 'large' ? 'border-primary bg-primary/10' : ''
-                    }`}
-                    onClick={() => handleFontSizeChange('large')}
-                    style={{ fontSize: '1.125rem' }}
-                  >
-                    Large
-                  </button>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-          
-          {/* Accessibility tab content */}
-          <TabsContent value="accessibility">
-            <div className="grid gap-4">
-              <div className="flex items-center justify-between p-3 border rounded-md">
-                <div>
-                  <h3 className="font-medium">High Contrast</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Increase contrast for better readability
-                  </p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    className="sr-only peer"
-                    checked={preferences.accessibilityFeatures?.highContrast || false}
-                    onChange={() => updatePreferences({
-                      accessibilityFeatures: {
-                        ...preferences.accessibilityFeatures,
-                        highContrast: !(preferences.accessibilityFeatures?.highContrast || false)
-                      }
-                    })}
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                </label>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 border rounded-md">
-                <div>
-                  <h3 className="font-medium">Reduced Motion</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Minimize animations and transitions
-                  </p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    className="sr-only peer"
-                    checked={preferences.accessibilityFeatures?.reducedMotion || false}
-                    onChange={() => updatePreferences({
-                      accessibilityFeatures: {
-                        ...preferences.accessibilityFeatures,
-                        reducedMotion: !(preferences.accessibilityFeatures?.reducedMotion || false)
-                      }
-                    })}
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                </label>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 border rounded-md">
-                <div>
-                  <h3 className="font-medium">Screen Reader Optimization</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Improve compatibility with screen readers
-                  </p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    className="sr-only peer"
-                    checked={preferences.accessibilityFeatures?.screenReader || false}
-                    onChange={() => updatePreferences({
-                      accessibilityFeatures: {
-                        ...preferences.accessibilityFeatures,
-                        screenReader: !(preferences.accessibilityFeatures?.screenReader || false)
-                      }
-                    })}
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                </label>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
-  );
-};
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-2xl font-bold mb-6">Paramètres d'affichage</h2>
+        <p className="text-muted-foreground mb-6">
+          Personnalisez l'apparence de l'application selon vos préférences.
+        </p>
+      </div>
 
-export default ThemeSettingsTab;
+      <div className="grid gap-6">
+        {/* Thème */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sun className="h-5 w-5" />
+              <span>Thème</span>
+            </CardTitle>
+            <CardDescription>
+              Choisissez le thème qui vous convient le mieux.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className={`relative cursor-pointer rounded-lg border p-4 text-center hover:bg-accent ${theme === 'light' ? 'bg-accent border-primary' : ''}`}
+                   onClick={() => setTheme('light')}>
+                <div className="mx-auto mb-2 h-12 w-12 rounded-full bg-white flex items-center justify-center">
+                  <Sun className="h-6 w-6 text-amber-500" />
+                </div>
+                <div className="font-medium">Clair</div>
+                <RadioGroupItem value="light" id="theme-light" className="sr-only" checked={theme === 'light'} />
+              </div>
+
+              <div className={`relative cursor-pointer rounded-lg border p-4 text-center hover:bg-accent ${theme === 'dark' ? 'bg-accent border-primary' : ''}`}
+                   onClick={() => setTheme('dark')}>
+                <div className="mx-auto mb-2 h-12 w-12 rounded-full bg-slate-900 flex items-center justify-center">
+                  <Moon className="h-6 w-6 text-blue-400" />
+                </div>
+                <div className="font-medium">Sombre</div>
+                <RadioGroupItem value="dark" id="theme-dark" className="sr-only" checked={theme === 'dark'} />
+              </div>
+
+              <div className={`relative cursor-pointer rounded-lg border p-4 text-center hover:bg-accent ${theme === 'system' ? 'bg-accent border-primary' : ''}`}
+                   onClick={() => setTheme('system')}>
+                <div className="mx-auto mb-2 h-12 w-12 rounded-full bg-gradient-to-br from-white to-slate-900 flex items-center justify-center">
+                  <Monitor className="h-6 w-6 text-indigo-500" />
+                </div>
+                <div className="font-medium">Système</div>
+                <RadioGroupItem value="system" id="theme-system" className="sr-only" checked={theme === 'system'} />
+              </div>
+
+              <div className={`relative cursor-pointer rounded-lg border p-4 text-center hover:bg-accent ${theme === 'pastel' ? 'bg-accent border-primary' : ''}`}
+                   onClick={() => setTheme('pastel')}>
+                <div className="mx-auto mb-2 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                  <PenTool className="h-6 w-6 text-blue-500" />
+                </div>
+                <div className="font-medium">Pastel</div>
+                <RadioGroupItem value="pastel" id="theme-pastel" className="sr-only" checked={theme === 'pastel'} />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Police */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Type className="h-5 w-5" />
+              <span>Police</span>
+            </CardTitle>
+            <CardDescription>
+              Sélectionnez votre police préférée.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4">
+              <RadioGroup 
+                value={fontFamily || 'sans'} 
+                onValueChange={(value) => setFontFamily(value as FontFamily)}
+                className="grid grid-cols-2 md:grid-cols-4 gap-3"
+              >
+                <Label
+                  className={`flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 hover:bg-accent ${fontFamily === 'sans' ? 'border-primary' : 'border-muted'}`}
+                  htmlFor="font-sans"
+                >
+                  <RadioGroupItem value="sans" id="font-sans" className="sr-only" />
+                  <span className="font-sans text-xl">Aa</span>
+                  <span className="mt-2 text-center text-xs">Sans-Serif</span>
+                </Label>
+
+                <Label
+                  className={`flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 hover:bg-accent ${fontFamily === 'serif' ? 'border-primary' : 'border-muted'}`}
+                  htmlFor="font-serif"
+                >
+                  <RadioGroupItem value="serif" id="font-serif" className="sr-only" />
+                  <span className="font-serif text-xl">Aa</span>
+                  <span className="mt-2 text-center text-xs">Serif</span>
+                </Label>
+
+                <Label
+                  className={`flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 hover:bg-accent ${fontFamily === 'mono' ? 'border-primary' : 'border-muted'}`}
+                  htmlFor="font-mono"
+                >
+                  <RadioGroupItem value="mono" id="font-mono" className="sr-only" />
+                  <span className="font-mono text-xl">Aa</span>
+                  <span className="mt-2 text-center text-xs">Monospace</span>
+                </Label>
+
+                <Label
+                  className={`flex cursor-pointer flex-col items-center justify-between rounded-md border-2 p-4 hover:bg-accent ${fontFamily === 'rounded' ? 'border-primary' : 'border-muted'}`}
+                  htmlFor="font-rounded"
+                >
+                  <RadioGroupItem value="rounded" id="font-rounded" className="sr-only" />
+                  <span className="font-sans text-xl tracking-wide" style={{ borderRadius: '0.2rem' }}>Aa</span>
+                  <span className="mt-2 text-center text-xs">Arrondie</span>
+                </Label>
+              </RadioGroup>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Taille de texte */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TextCursorInput className="h-5 w-5" />
+              <span>Taille du texte</span>
+            </CardTitle>
+            <CardDescription>
+              Ajustez la taille du texte selon vos préférences.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RadioGroup 
+              value={fontSize || 'md'} 
+              onValueChange={(value) => setFontSize(value as FontSize)}
+              className="grid grid-cols-4 gap-2"
+            >
+              <Label
+                className={`flex h-16 cursor-pointer flex-col items-center justify-center rounded-md border-2 p-2 ${fontSize === 'sm' ? 'border-primary' : 'border-muted'} hover:bg-accent`}
+                htmlFor="font-size-sm"
+              >
+                <RadioGroupItem value="sm" id="font-size-sm" className="sr-only" />
+                <span className="text-sm">Aa</span>
+                <span className="mt-1 text-[10px]">Petite</span>
+              </Label>
+
+              <Label
+                className={`flex h-16 cursor-pointer flex-col items-center justify-center rounded-md border-2 p-2 ${fontSize === 'md' ? 'border-primary' : 'border-muted'} hover:bg-accent`}
+                htmlFor="font-size-md"
+              >
+                <RadioGroupItem value="md" id="font-size-md" className="sr-only" />
+                <span className="text-base">Aa</span>
+                <span className="mt-1 text-[10px]">Moyenne</span>
+              </Label>
+
+              <Label
+                className={`flex h-16 cursor-pointer flex-col items-center justify-center rounded-md border-2 p-2 ${fontSize === 'lg' ? 'border-primary' : 'border-muted'} hover:bg-accent`}
+                htmlFor="font-size-lg"
+              >
+                <RadioGroupItem value="lg" id="font-size-lg" className="sr-only" />
+                <span className="text-lg">Aa</span>
+                <span className="mt-1 text-[10px]">Grande</span>
+              </Label>
+
+              <Label
+                className={`flex h-16 cursor-pointer flex-col items-center justify-center rounded-md border-2 p-2 ${fontSize === 'xl' ? 'border-primary' : 'border-muted'} hover:bg-accent`}
+                htmlFor="font-size-xl"
+              >
+                <RadioGroupItem value="xl" id="font-size-xl" className="sr-only" />
+                <span className="text-xl">Aa</span>
+                <span className="mt-1 text-[10px]">XL</span>
+              </Label>
+            </RadioGroup>
+          </CardContent>
+        </Card>
+
+        {/* Accessibilité */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Accessibilité</CardTitle>
+            <CardDescription>
+              Options pour améliorer l'accessibilité de l'application.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="reduced-motion">Réduire les animations</Label>
+                <p className="text-sm text-muted-foreground">
+                  Réduit ou élimine les effets d'animation
+                </p>
+              </div>
+              <Switch 
+                id="reduced-motion" 
+                checked={reducedMotion}
+                onCheckedChange={setReducedMotion}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="high-contrast">Contraste élevé</Label>
+                <p className="text-sm text-muted-foreground">
+                  Augmente le contraste des couleurs pour une meilleure lisibilité
+                </p>
+              </div>
+              <Switch 
+                id="high-contrast" 
+                checked={highContrast}
+                onCheckedChange={setHighContrast}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

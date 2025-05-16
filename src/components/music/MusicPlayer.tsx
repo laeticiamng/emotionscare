@@ -1,42 +1,141 @@
 
-import React from 'react';
-import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
-import MusicControls from './MusicControls';
+import React, { useState, useEffect } from 'react';
+import { useMusic } from '@/contexts/music';
+import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music } from 'lucide-react';
 
-interface MusicPlayerProps {
-  // Add props if needed
-}
+const MusicPlayer = () => {
+  const { 
+    currentTrack,
+    isPlaying,
+    volume,
+    muted,
+    progress,
+    duration,
+    togglePlayback,
+    nextTrack,
+    prevTrack,
+    setProgress,
+    setVolume,
+    toggleMute
+  } = useMusic();
 
-const MusicPlayer: React.FC<MusicPlayerProps> = () => {
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  
-  const handlePlay = () => {
-    console.log("Play triggered");
-    setIsPlaying(true);
+  const [displayedTime, setDisplayedTime] = useState('0:00');
+  const [displayedDuration, setDisplayedDuration] = useState('0:00');
+
+  useEffect(() => {
+    if (currentTrack) {
+      setDisplayedTime(formatTime(progress));
+      setDisplayedDuration(formatTime(duration));
+    }
+  }, [progress, duration, currentTrack]);
+
+  const formatTime = (seconds: number) => {
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
   };
-  
-  const handlePause = () => {
-    console.log("Pause triggered");
-    setIsPlaying(false);
-  };
+
+  if (!currentTrack) {
+    return (
+      <div className="flex flex-col items-center justify-center h-32 bg-card text-card-foreground p-4 rounded-md">
+        <Music className="h-10 w-10 text-primary/50 mb-2" />
+        <p className="text-muted-foreground">Aucune musique sélectionnée</p>
+      </div>
+    );
+  }
 
   return (
-    <Card className="music-player">
-      <CardHeader>
-        <CardTitle className="text-lg">Lecteur musical</CardTitle>
-      </CardHeader>
-      <CardContent className="text-center space-y-4">
-        <div className="py-4">
-          <p className="text-muted-foreground mb-2">Aucun titre en cours de lecture</p>
+    <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-900 dark:to-blue-900/20 p-4 rounded-lg shadow-inner">
+      <div className="flex flex-col md:flex-row items-center gap-4">
+        {/* Album cover and info */}
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <div className="min-w-12 h-12 bg-blue-200 dark:bg-blue-800/30 rounded shadow-md overflow-hidden">
+            {currentTrack.coverImage ? (
+              <img 
+                src={currentTrack.coverImage} 
+                alt={currentTrack.title} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-blue-200 dark:bg-blue-800/30">
+                <Music className="h-6 w-6 text-blue-700 dark:text-blue-300" />
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col overflow-hidden">
+            <p className="font-medium text-blue-800 dark:text-blue-200 truncate">{currentTrack.title}</p>
+            <p className="text-sm text-blue-600/70 dark:text-blue-400/70 truncate">{currentTrack.artist}</p>
+          </div>
         </div>
-        
-        <MusicControls 
-          isPlaying={isPlaying} 
-          onPlay={handlePlay}
-          onPause={handlePause}
-        />
-      </CardContent>
-    </Card>
+
+        {/* Controls and progress */}
+        <div className="flex-1 w-full space-y-2">
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={prevTrack}
+              className="text-blue-700 dark:text-blue-300 hover:bg-blue-200/50 dark:hover:bg-blue-800/30"
+            >
+              <SkipBack className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={togglePlayback}
+              className="bg-blue-500 hover:bg-blue-600 text-white border-none rounded-full h-10 w-10 flex items-center justify-center"
+            >
+              {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={nextTrack}
+              className="text-blue-700 dark:text-blue-300 hover:bg-blue-200/50 dark:hover:bg-blue-800/30"
+            >
+              <SkipForward className="h-5 w-5" />
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-blue-600 dark:text-blue-400 min-w-12 text-center">
+              {displayedTime}
+            </span>
+            <Slider
+              value={[progress]}
+              max={duration || 1}
+              step={1}
+              onValueChange={(value) => setProgress(value[0])}
+              className="flex-1"
+            />
+            <span className="text-xs text-blue-600 dark:text-blue-400 min-w-12 text-center">
+              {displayedDuration}
+            </span>
+          </div>
+        </div>
+
+        {/* Volume control */}
+        <div className="flex items-center gap-2 min-w-[120px]">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleMute}
+            className="text-blue-600 dark:text-blue-400 hover:bg-blue-200/50 dark:hover:bg-blue-800/30"
+          >
+            {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          </Button>
+          <Slider
+            value={[muted ? 0 : volume * 100]}
+            max={100}
+            step={1}
+            onValueChange={(value) => setVolume(value[0] / 100)}
+            className="w-24"
+          />
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,62 +1,47 @@
 
 export interface GamificationStats {
+  score: number;
   level: number;
-  points: number;
+  xp: number;
+  nextLevelXp: number;
   streakDays: number;
   longestStreak: number;
+  activeChallenges: number;
   completedChallenges: number;
-  totalChallenges: number;
-  unlockedBadges: number;
-  totalBadges: number;
-  rank?: string;
-  xp?: number;
-  xpToNextLevel?: number;
 }
 
 export interface Challenge {
   id: string;
   title: string;
   description: string;
-  points: number;
+  xpReward: number;
   progress: number;
+  goal: number;
   completed: boolean;
-  deadline?: Date | string;
-  category?: string;
-  difficulty?: 'easy' | 'medium' | 'hard';
-  tags?: string[];
+  deadline?: string;
+  category: string;
   icon?: string;
-  completedAt?: Date | string;
-  status?: 'active' | 'completed' | 'expired' | 'locked';
-  name?: string;
-  completions?: number;
-  goal?: number;
-  total?: number;
 }
 
 export interface Badge {
   id: string;
   name: string;
   description: string;
-  image_url?: string;
-  imageUrl?: string;
-  achieved: boolean;
-  achievedAt?: Date | string;
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
-  progress?: number;
-  total?: number;
-  criteria?: string;
-  icon?: string;
+  icon: string;
+  unlocked?: boolean;
+  unlockedAt?: string;
+  category?: string;
   rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  progress?: number;
+  goal?: number;
 }
 
 export interface LeaderboardEntry {
   id: string;
+  userId: string;
+  username: string;
+  avatarUrl?: string;
+  score: number;
   rank: number;
-  name: string;
-  points: number;
-  avatar?: string;
-  level?: number;
-  department?: string;
-  streak?: number;
-  change?: number; // change in rank compared to previous period
+  change?: number;
 }

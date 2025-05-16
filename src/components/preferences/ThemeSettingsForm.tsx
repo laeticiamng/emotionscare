@@ -2,36 +2,13 @@
 import React from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/contexts/theme';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Moon, Sun, Monitor, PenTool } from 'lucide-react';
-import { FontSize, FontFamily, ThemeName } from '@/types';
+import { FontSize, FontFamily, Theme } from '@/types/theme';
 
 const ThemeSettingsForm = () => {
   const { theme, setTheme, fontSize, setFontSize, fontFamily, setFontFamily } = useTheme();
-  
-  // Map display names
-  const fontSizeDisplayNames: Record<string, string> = {
-    sm: 'Small',
-    md: 'Medium',
-    lg: 'Large',
-    xl: 'Extra Large',
-    small: 'Small',
-    medium: 'Medium',
-    large: 'Large',
-    'x-large': 'Extra Large'
-  };
-  
-  const fontFamilyDisplayNames: Record<string, string> = {
-    sans: 'Sans-Serif',
-    serif: 'Serif',
-    mono: 'Monospace',
-    rounded: 'Rounded',
-    system: 'System',
-    'sans-serif': 'Sans-Serif',
-    monospace: 'Monospace',
-    inter: 'Inter'
-  };
 
   return (
     <div className="space-y-6">
@@ -39,33 +16,33 @@ const ThemeSettingsForm = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sun className="h-5 w-5" />
-            <span>Theme</span>
+            <span>Thème</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <RadioGroup
             value={theme}
-            onValueChange={(value) => setTheme(value as ThemeName)}
+            onValueChange={(value) => setTheme(value as Theme)}
             className="grid grid-cols-2 sm:grid-cols-4 gap-2"
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="light" id="light" />
               <Label htmlFor="light" className="flex items-center gap-1">
-                <Sun className="h-4 w-4" /> Light
+                <Sun className="h-4 w-4" /> Clair
               </Label>
             </div>
             
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="dark" id="dark" />
               <Label htmlFor="dark" className="flex items-center gap-1">
-                <Moon className="h-4 w-4" /> Dark
+                <Moon className="h-4 w-4" /> Sombre
               </Label>
             </div>
             
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="system" id="system" />
               <Label htmlFor="system" className="flex items-center gap-1">
-                <Monitor className="h-4 w-4" /> System
+                <Monitor className="h-4 w-4" /> Système
               </Label>
             </div>
             
@@ -82,7 +59,7 @@ const ThemeSettingsForm = () => {
       {/* Font Size */}
       <Card>
         <CardHeader>
-          <CardTitle>Font Size</CardTitle>
+          <CardTitle>Taille de police</CardTitle>
         </CardHeader>
         <CardContent>
           <RadioGroup
@@ -92,22 +69,22 @@ const ThemeSettingsForm = () => {
           >
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="sm" id="size-sm" />
-              <Label htmlFor="size-sm">Small</Label>
+              <Label htmlFor="size-sm">Petite</Label>
             </div>
             
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="md" id="size-md" />
-              <Label htmlFor="size-md">Medium</Label>
+              <Label htmlFor="size-md">Moyenne</Label>
             </div>
             
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="lg" id="size-lg" />
-              <Label htmlFor="size-lg">Large</Label>
+              <Label htmlFor="size-lg">Grande</Label>
             </div>
             
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="xl" id="size-xl" />
-              <Label htmlFor="size-xl">Extra Large</Label>
+              <Label htmlFor="size-xl">Très grande</Label>
             </div>
           </RadioGroup>
         </CardContent>
@@ -116,7 +93,7 @@ const ThemeSettingsForm = () => {
       {/* Font Family */}
       <Card>
         <CardHeader>
-          <CardTitle>Font Family</CardTitle>
+          <CardTitle>Police de caractères</CardTitle>
         </CardHeader>
         <CardContent>
           <RadioGroup
@@ -141,7 +118,7 @@ const ThemeSettingsForm = () => {
             
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="rounded" id="font-rounded" />
-              <Label htmlFor="font-rounded">Rounded</Label>
+              <Label htmlFor="font-rounded">Arrondie</Label>
             </div>
           </RadioGroup>
         </CardContent>
