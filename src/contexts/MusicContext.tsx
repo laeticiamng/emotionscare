@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { MusicContextType, MusicTrack, MusicPlaylist } from '@/types/music';
 import { mockTracks, mockPlaylists } from '@/data/mockMusic';
@@ -32,6 +31,7 @@ const MusicContext = createContext<MusicContextType>({
   setOpenDrawer: () => {},
   setEmotion: () => {},
   loadPlaylistForEmotion: () => Promise.resolve(null),
+  currentEmotion: null,
 });
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -310,43 +310,4 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 export const useMusic = () => useContext(MusicContext);
 
-// Mock data for development
-export const mockTracks = [
-  {
-    id: '1',
-    title: 'Peaceful Harmony',
-    artist: 'Ambient Minds',
-    duration: 180,
-    url: 'https://example.com/track1.mp3',
-    coverUrl: 'https://via.placeholder.com/300'
-  },
-  {
-    id: '2',
-    title: 'Deep Focus',
-    artist: 'Concentration Masters',
-    duration: 240,
-    url: 'https://example.com/track2.mp3',
-    coverUrl: 'https://via.placeholder.com/300'
-  }
-];
-
-export const mockPlaylists = [
-  {
-    id: 'pl1',
-    title: 'Focus & Productivity',
-    description: 'Enhance your concentration and work efficiency',
-    tracks: mockTracks,
-    coverUrl: 'https://via.placeholder.com/300',
-    category: 'focus',
-    mood: 'calm'
-  },
-  {
-    id: 'pl2',
-    title: 'Relaxation',
-    description: 'Unwind and de-stress with calming melodies',
-    tracks: mockTracks,
-    coverUrl: 'https://via.placeholder.com/300',
-    category: 'relaxation',
-    mood: 'calm'
-  }
-];
+// Remove the duplicate mock data declarations here - we already import them from @/data/mockMusic
