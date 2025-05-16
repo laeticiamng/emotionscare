@@ -3,11 +3,15 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'b2c' | 'b2b_user' | 'b2b_admin';
+  role: UserRole;
   avatar_url?: string;
   avatar?: string;
   joined_at?: string;
+  created_at?: string; 
   onboarded?: boolean;
+  department?: string;
+  position?: string;
+  emotional_score?: number;
   preferences?: {
     theme?: 'light' | 'dark' | 'system' | 'pastel';
     fontSize?: 'small' | 'medium' | 'large';
@@ -16,6 +20,14 @@ export interface User {
     colorBlindMode?: boolean;
     autoplayMedia?: boolean;
     soundEnabled?: boolean;
+    language?: string;
+    notifications_enabled?: boolean;
+    privacy?: {
+      showProfile?: boolean;
+      shareActivity?: boolean;
+      allowMessages?: boolean;
+      allowNotifications?: boolean;
+    };
     notifications?: {
       email?: boolean;
       push?: boolean;

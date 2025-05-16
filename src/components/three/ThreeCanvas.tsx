@@ -1,205 +1,195 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { useTheme } from '@/components/theme/ThemeProvider';
 
-interface ThreeCanvasProps {
-  className?: string;
-}
+const ThreeCanvas: React.FC = () => {
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
 
-const ThreeCanvas: React.FC<ThreeCanvasProps> = ({ className }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { isDarkMode, theme } = useTheme();
-  
   useEffect(() => {
-    if (!containerRef.current) return;
-    
-    // Initialize scene
-    const scene = new THREE.Scene();
-    
-    // Initialize camera
-    const camera = new THREE.PerspectiveCamera(
-      75, 
-      window.innerWidth / window.innerHeight, 
-      0.1, 
-      1000
-    );
-    camera.position.z = 20;
-    
-    // Initialize renderer
+    if (!canvasRef.current) return;
+
+    // Setup renderer
     const renderer = new THREE.WebGLRenderer({ 
       antialias: true,
       alpha: true 
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    canvasRef.current.appendChild(renderer.domElement);
+
+    // Setup scene
+    const scene = new THREE.Scene();
     
-    containerRef.current.appendChild(renderer.domElement);
-    
-    // Create particle material
-    const getColorBasedOnTheme = () => {
-      if (theme === 'dark') return 0x3b82f6; // blue for dark mode
-      if (theme === 'pastel') return 0x93c5fd; // light blue for pastel mode
-      return 0x60a5fa; // default blue
+    // Setup camera
+    const camera = new THREE.PerspectiveCamera(
+      60,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.z = 20;
+
+    // Choose colors based on theme
+    const getColorScheme = () => {
+      switch(theme) {
+        case 'dark':
+          return {
+            particles: 0x4268ff,
+            background: 0x0f172a
+          };
+        case 'pastel':
+          return {
+            particles: 0x6495ed,
+            background: 0xe6f0ff
+          };
+        case 'light':
+        default:
+          return {
+            particles: 0x3651ff,
+            background: 0xf0f9ff
+          };
+      }
     };
     
-    // Create particles
-    const particlesGeometry = new THREE.BufferGeometry();
-    const count = 2000;
+    const colors = getColorScheme();
+    scene.background = new THREE.Color(colors.background);
+    scene.background.setAlpha(0.5); // Semi-transparent background
     
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
-    
-    const color = new THREE.Color(getColorBasedOnTheme());
-    
-    for (let i = 0; i < count * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 50;
-      positions[i + 1] = (Math.random() - 0.5) * 50;
-      positions[i + 2] = (Math.random() - 0.5) * 50;
-      
-      colors[i] = color.r;
-      colors[i + 1] = color.g;
-      colors[i + 2] = color.b;
-    }
-    
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    
-    // Create texture loader
-    const textureLoader = new THREE.TextureLoader();
-    let particleTexture;
-    
-    try {
-      particleTexture = textureLoader.load('/assets/textures/particle.png');
-    } catch (e) {
-      console.error('Failed to load particle texture, using default');
-      // Create a default particle texture
-      const canvas = document.createElement('canvas');
-      canvas.width = 32;
-      canvas.height = 32;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.fillStyle = 'white';
-        ctx.beginPath();
-        ctx.arc(16, 16, 8, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      particleTexture = new THREE.CanvasTexture(canvas);
-    }
-    
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.1,
-      sizeAttenuation: true,
-      transparent: true,
-      alphaMap: particleTexture,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      opacity: 0.6,
-      vertexColors: true
-    });
-    
-    // Create particles mesh
-    const particles = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particles);
-    
-    // Add ambient light
-    const ambientLight = new THREE.AmbientLight(getColorBasedOnTheme(), 0.5);
+    // Ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
     
-    // Add directional light
+    // Directional light
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(1, 1, 1);
+    directionalLight.position.set(0, 10, 10);
     scene.add(directionalLight);
+
+    // Create particles
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCount = 2000;
+    const posArray = new Float32Array(particlesCount * 3);
+    const scaleArray = new Float32Array(particlesCount);
     
-    // Create a wave effect
-    const waveGeometry = new THREE.PlaneGeometry(60, 60, 32, 32);
-    const waveMaterial = new THREE.MeshPhongMaterial({
-      color: getColorBasedOnTheme(),
+    for (let i = 0; i < particlesCount * 3; i += 3) {
+      // Position
+      posArray[i] = (Math.random() - 0.5) * 50;     // x
+      posArray[i + 1] = (Math.random() - 0.5) * 50; // y
+      posArray[i + 2] = (Math.random() - 0.5) * 50; // z
+      
+      // Scale (size variation)
+      scaleArray[i / 3] = Math.random();
+    }
+    
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    particlesGeometry.setAttribute('scale', new THREE.BufferAttribute(scaleArray, 1));
+    
+    // Shader material for particles
+    const particlesMaterial = new THREE.PointsMaterial({
+      size: 0.1,
+      color: new THREE.Color(colors.particles),
       transparent: true,
-      opacity: 0.2,
-      side: THREE.DoubleSide,
-      wireframe: true
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending
     });
     
-    const wave = new THREE.Mesh(waveGeometry, waveMaterial);
-    wave.rotation.x = -Math.PI / 2;
-    wave.position.y = -10;
-    scene.add(wave);
+    const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particleSystem);
     
-    // Handle mouse movement
+    // Central blob
+    const blobGeometry = new THREE.SphereGeometry(2, 32, 32);
+    const blobMaterial = new THREE.MeshPhongMaterial({
+      color: new THREE.Color(colors.particles),
+      transparent: true,
+      opacity: 0.5,
+      flatShading: false,
+    });
+    const blob = new THREE.Mesh(blobGeometry, blobMaterial);
+    scene.add(blob);
+
+    // Mouse interaction
     const mouse = {
       x: 0,
       y: 0
     };
     
-    const onMouseMove = (event: MouseEvent) => {
+    const handleMouseMove = (event: MouseEvent) => {
+      // Normalize mouse coordinates
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     };
     
-    window.addEventListener('mousemove', onMouseMove);
-    
+    window.addEventListener('mousemove', handleMouseMove);
+
     // Handle window resize
-    const onWindowResize = () => {
+    const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
     
-    window.addEventListener('resize', onWindowResize);
+    window.addEventListener('resize', handleResize);
     
     // Animation loop
-    const clock = new THREE.Clock();
-    
+    let frame = 0;
     const animate = () => {
-      const elapsedTime = clock.getElapsedTime();
+      requestAnimationFrame(animate);
+      frame += 0.01;
       
-      // Rotate particles
-      particles.rotation.y = elapsedTime * 0.05;
+      // Rotate particles system
+      particleSystem.rotation.x = frame * 0.1;
+      particleSystem.rotation.y = frame * 0.05;
       
-      // Move particles based on mouse position
+      // Deform the blob
+      blob.rotation.y += 0.005;
+      blob.rotation.z += 0.002;
+      
+      // Add subtle waves to blob shape
+      const blobVertices = (blobGeometry as THREE.BufferGeometry).attributes.position as THREE.BufferAttribute;
+      const initialPositions = Array.from({ length: blobVertices.count * 3 }, (_, i) => {
+        if (i % 3 === 0) return 2 * Math.sin(i / 3 * Math.PI / 16);
+        if (i % 3 === 1) return 2 * Math.cos(i / 3 * Math.PI / 16);
+        return 2 * Math.sin(i / 3 * Math.PI / 16);
+      });
+      
+      for (let i = 0; i < blobVertices.count; i++) {
+        const ix = i * 3;
+        const iy = i * 3 + 1;
+        const iz = i * 3 + 2;
+        
+        // Apply subtle wave effect
+        blobVertices.array[ix] = initialPositions[ix] + Math.sin(frame + i * 0.1) * 0.1;
+        blobVertices.array[iy] = initialPositions[iy] + Math.sin(frame + i * 0.1) * 0.1;
+        blobVertices.array[iz] = initialPositions[iz] + Math.cos(frame + i * 0.1) * 0.1;
+      }
+      
+      blobVertices.needsUpdate = true;
+      
+      // Add interactivity with mouse
       const targetX = mouse.x * 0.5;
       const targetY = mouse.y * 0.5;
-      particles.rotation.x += (targetY - particles.rotation.x) * 0.02;
-      particles.rotation.y += (targetX - particles.rotation.y) * 0.02;
+      camera.position.x += (targetX - camera.position.x) * 0.05;
+      camera.position.y += (targetY - camera.position.y) * 0.05;
+      camera.lookAt(scene.position);
       
-      // Animate wave
-      const positions = waveGeometry.attributes.position;
-      for (let i = 0; i < positions.count; i++) {
-        const x = positions.getX(i);
-        const y = positions.getY(i);
-        const z = Math.sin(elapsedTime + x * 0.5) * 0.5;
-        positions.setZ(i, z);
-      }
-      positions.needsUpdate = true;
-      
-      // Render
       renderer.render(scene, camera);
-      
-      // Call animate recursively
-      requestAnimationFrame(animate);
     };
     
     animate();
     
-    // Cleanup
     return () => {
-      if (containerRef.current) {
-        containerRef.current.removeChild(renderer.domElement);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      renderer.dispose();
+      scene.clear();
+      if (canvasRef.current) {
+        canvasRef.current.innerHTML = '';
       }
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('resize', onWindowResize);
-      
-      // Dispose resources
-      particlesGeometry.dispose();
-      particlesMaterial.dispose();
-      waveGeometry.dispose();
-      waveMaterial.dispose();
     };
-  }, [isDarkMode, theme]);
-  
-  return <div ref={containerRef} className={`absolute inset-0 -z-10 ${className}`} />;
+  }, [theme]);
+
+  return <div ref={canvasRef} className="w-full h-full absolute inset-0 z-0" />;
 };
 
 export default ThreeCanvas;

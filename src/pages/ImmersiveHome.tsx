@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import Shell from '@/Shell';
 import '@/styles/immersive-home.css';
 import { ModeToggle } from '@/components/ui/mode-toggle';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/contexts/music/MusicContext';
 import ThreeCanvas from '@/components/three/ThreeCanvas';
 
 const generateGreeting = () => {

@@ -38,6 +38,7 @@ export interface Badge {
   description: string;
   image: string;
   imageUrl?: string;
+  unlocked?: boolean;
   achieved?: boolean;
   achievedAt?: string;
   dateAchieved?: string;

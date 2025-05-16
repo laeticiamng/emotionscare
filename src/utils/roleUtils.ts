@@ -1,116 +1,66 @@
 
 import { UserRole } from '@/types/user';
 
-// Function to check if a user role has access to a protected resource
+// Helper function to determine if the user has access based on role hierarchy
 export const hasRoleAccess = (userRole: UserRole, requiredRole: UserRole): boolean => {
-  // Admin role has access to everything
-  if (userRole === 'admin') {
-    return true;
-  }
-
-  // B2B admin has access to B2B admin and B2B user resources
-  if (userRole === 'b2b_admin' || userRole === 'b2b-admin') {
-    return requiredRole === 'b2b_admin' || requiredRole === 'b2b_user' || 
-           requiredRole === 'b2b-admin' || requiredRole === 'b2b-user';
-  }
-
-  // B2B user has access only to B2B user resources
-  if (userRole === 'b2b_user' || userRole === 'b2b-user') {
-    return requiredRole === 'b2b_user' || requiredRole === 'b2b-user';
-  }
-
-  // B2C user has access only to B2C resources
-  if (userRole === 'b2c' || userRole === 'user') {
-    return requiredRole === 'b2c' || requiredRole === 'user';
-  }
-
-  // Direct role match
+  // Admin has access to all resources
+  if (userRole === 'b2b_admin') return true;
+  
+  // B2B user has access to b2b_user and b2c resources
+  if (userRole === 'b2b_user') return requiredRole !== 'b2b_admin';
+  
+  // B2C users only have access to b2c resources
   return userRole === requiredRole;
 };
 
-// Function to get the login path for different roles
+// Helper function to get the login path based on role
 export const getRoleLoginPath = (role: UserRole): string => {
-  switch (role) {
+  switch(role) {
     case 'b2b_admin':
-    case 'b2b-admin':
       return '/b2b/admin/login';
     case 'b2b_user':
-    case 'b2b-user':
-    case 'collaborator':
       return '/b2b/user/login';
     case 'b2c':
-    case 'user':
-    case 'individual':
     default:
       return '/b2c/login';
   }
 };
 
-// Function to get the home route for a specific role
-export const getRoleHomeRoute = (role: UserRole): string => {
-  switch (role) {
+// Helper function to get the display name for a role
+export const getRoleName = (role: UserRole): string => {
+  switch(role) {
     case 'b2b_admin':
-    case 'b2b-admin':
+      return 'Administrateur';
+    case 'b2b_user':
+      return 'Collaborateur';
+    case 'b2c':
+    default:
+      return 'Particulier';
+  }
+};
+
+// Helper function to get the dashboard path based on role
+export const getRoleDashboardPath = (role: UserRole): string => {
+  switch(role) {
+    case 'b2b_admin':
       return '/b2b/admin/dashboard';
     case 'b2b_user':
-    case 'b2b-user':
-    case 'collaborator':
       return '/b2b/user/dashboard';
     case 'b2c':
-    case 'user':
-    case 'individual':
     default:
       return '/b2c/dashboard';
   }
 };
 
-// Function to check if a role is an admin role
-export const isAdminRole = (role: UserRole): boolean => {
-  return role === 'admin' || role === 'b2b_admin' || role === 'b2b-admin';
-};
-
-// Function to get a human-readable role name
-export const getRoleName = (role: UserRole): string => {
-  switch (role) {
-    case 'admin':
-      return 'Administrateur';
+// Get the correct route for account creation based on role
+export const getRoleRegisterPath = (role: UserRole): string => {
+  switch(role) {
     case 'b2b_admin':
-    case 'b2b-admin':
-      return 'Admin B2B';
+      return '/b2b/admin/register';
     case 'b2b_user':
-    case 'b2b-user':
-      return 'Utilisateur B2B';
-    case 'coach':
-      return 'Coach';
-    case 'moderator':
-      return 'Modérateur';
-    case 'wellbeing_manager':
-      return 'Manager Bien-être';
-    case 'team_lead':
-      return 'Chef d\'équipe';
-    case 'professional':
-      return 'Professionnel';
-    case 'collaborator':
-      return 'Collaborateur';
-    case 'employee':
-      return 'Employé';
-    case 'individual':
+      return '/b2b/user/register';
     case 'b2c':
-    case 'user':
     default:
-      return 'Utilisateur';
+      return '/b2c/register';
   }
-};
-
-// Function to normalize user roles (fix inconsistencies in role naming)
-export const normalizeUserRole = (role: UserRole): string => {
-  // Handle hyphen vs underscore inconsistency
-  if (role === 'b2b-admin') return 'b2b_admin';
-  if (role === 'b2b-user') return 'b2b_user';
-  
-  // Individual users are treated as standard users
-  if (role === 'individual') return 'user';
-  if (role === 'b2c') return 'user';
-  
-  return role;
 };

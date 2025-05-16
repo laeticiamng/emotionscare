@@ -1,5 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/contexts/music/MusicContext';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -10,7 +11,7 @@ interface ARExperienceProps {
 }
 
 const ARExperience: React.FC<ARExperienceProps> = ({ emotionTrigger = 'calm' }) => {
-  const { loadPlaylistForEmotion, playTrack, pauseTrack, isPlaying, volume, setVolume } = useMusic();
+  const { loadPlaylistForEmotion, playTrack, pauseTrack, isPlaying, volume, setVolume, adjustVolume } = useMusic();
   const [isMuted, setIsMuted] = useState(false);
   const { isDarkMode } = useTheme();
   const { toast } = useToast();
@@ -20,7 +21,7 @@ const ARExperience: React.FC<ARExperienceProps> = ({ emotionTrigger = 'calm' }) 
     // Initialiser l'audio immersif basé sur l'émotion
     const initializeImmersiveAudio = async () => {
       try {
-        const emotionPlaylist = await loadPlaylistForEmotion(currentEmotion);
+        const emotionPlaylist = await loadPlaylistForEmotion({ emotion: currentEmotion });
         
         if (emotionPlaylist && emotionPlaylist.tracks && emotionPlaylist.tracks.length > 0) {
           playTrack(emotionPlaylist.tracks[0]);
@@ -44,11 +45,17 @@ const ARExperience: React.FC<ARExperienceProps> = ({ emotionTrigger = 'calm' }) 
 
   const toggleMute = () => {
     if (isMuted) {
-      setVolume(0.5); // Restore previous volume
+      if (setVolume) setVolume(0.5); // Restore previous volume
     } else {
-      setVolume(0); // Mute
+      if (setVolume) setVolume(0); // Mute
     }
     setIsMuted(!isMuted);
+  };
+
+  const handleVolumeAdjustment = (delta: number) => {
+    if (adjustVolume) {
+      adjustVolume(delta);
+    }
   };
 
   return (

@@ -92,11 +92,8 @@ const LandingPage = () => {
   return (
     <Shell>
       <div 
-        className={`min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors duration-1000 
-          ${backgroundState === TimeOfDay.MORNING ? 'bg-morning' : 
-          backgroundState === TimeOfDay.AFTERNOON ? 'bg-afternoon' : 
-          backgroundState === TimeOfDay.EVENING ? 'bg-evening' : 
-          'bg-night'}`}
+        className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden transition-colors duration-1000 
+          bg-blue-50 dark:bg-slate-900"
       >
         {/* Theme selector position in top-right */}
         <div className="absolute top-4 right-4 z-20 flex items-center gap-4">
@@ -115,7 +112,7 @@ const LandingPage = () => {
               y: ['-10%', '5%', '-10%']
             }}
             transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
-            className="absolute -top-[30%] -left-[20%] w-[80%] h-[80%] rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 blur-3xl"
+            className="absolute -top-[30%] -left-[20%] w-[80%] h-[80%] rounded-full bg-gradient-to-r from-blue-300/20 to-blue-200/10 blur-3xl"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -126,7 +123,7 @@ const LandingPage = () => {
               y: ['20%', '5%', '20%']
             }}
             transition={{ duration: 25, repeat: Infinity, repeatType: "reverse", delay: 1 }}
-            className="absolute -bottom-[50%] -right-[20%] w-[90%] h-[90%] rounded-full bg-gradient-to-r from-secondary/10 to-primary/10 blur-3xl"
+            className="absolute -bottom-[50%] -right-[20%] w-[90%] h-[90%] rounded-full bg-gradient-to-r from-blue-200/10 to-blue-300/20 blur-3xl"
           />
         </div>
 
@@ -137,7 +134,7 @@ const LandingPage = () => {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400">
               EmotionsCare
             </h1>
             <WelcomeMessage className="text-xl max-w-3xl mx-auto" />
@@ -149,10 +146,10 @@ const LandingPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            <Card className="border-primary/20 hover:border-primary hover:shadow-xl transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 pastel:bg-blue-50/80">
+            <Card className="border-blue-200/20 hover:border-blue-300 hover:shadow-xl transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm bg-white/80 dark:bg-gray-900/80">
               <CardContent className="p-8 flex flex-col items-center text-center space-y-6">
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="w-10 h-10 text-primary" />
+                <div className="w-20 h-20 rounded-full bg-blue-100/50 flex items-center justify-center">
+                  <User className="w-10 h-10 text-blue-600" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold mb-2">Je suis un particulier</h2>
@@ -163,17 +160,17 @@ const LandingPage = () => {
                 <Button 
                   onClick={handlePersonalAccess} 
                   size="lg" 
-                  className="w-full py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="w-full py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300 bg-blue-600 hover:bg-blue-700"
                 >
                   <User className="mr-2 h-5 w-5" /> Espace Personnel
                 </Button>
               </CardContent>
             </Card>
 
-            <Card className="border-secondary/20 hover:border-secondary hover:shadow-xl transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 pastel:bg-blue-50/80">
+            <Card className="border-blue-400/20 hover:border-blue-300 hover:shadow-xl transition-all duration-500 hover:scale-[1.02] backdrop-blur-sm bg-white/80 dark:bg-gray-900/80">
               <CardContent className="p-8 flex flex-col items-center text-center space-y-6">
-                <div className="w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center">
-                  <Building className="w-10 h-10 text-secondary" />
+                <div className="w-20 h-20 rounded-full bg-blue-100/50 flex items-center justify-center">
+                  <Building className="w-10 h-10 text-blue-600" />
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold mb-2">Je suis une entreprise</h2>
@@ -185,7 +182,7 @@ const LandingPage = () => {
                   onClick={handleBusinessAccess} 
                   variant="outline" 
                   size="lg"
-                  className="w-full py-6 text-lg shadow border-2 border-secondary/50 hover:border-secondary/80 hover:shadow-xl transition-all duration-300"
+                  className="w-full py-6 text-lg shadow border-2 border-blue-500/50 hover:border-blue-500/80 hover:shadow-xl transition-all duration-300"
                 >
                   <Building className="mr-2 h-5 w-5" /> Espace Entreprise
                 </Button>

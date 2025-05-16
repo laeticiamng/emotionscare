@@ -1,210 +1,174 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Challenge, Badge } from '@/types/gamification';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-
-// Définir les données de test
-const testChallenges: Challenge[] = [
-  {
-    id: '1',
-    title: 'Marathon du scanner émotionnel',
-    description: 'Effectuez un scan émotionnel tous les jours pendant 7 jours consécutifs',
-    points: 150,
-    progress: 70,
-    completed: false,
-    category: 'régularité',
-    difficulty: 'medium',
-    tags: ['scan', 'streak', 'hebdomadaire']
-  },
-  {
-    id: '2',
-    title: 'Maître journaliste',
-    description: 'Écrivez 10 entrées de journal avec analyse d\'émotions',
-    points: 200,
-    progress: 100,
-    completed: true,
-    category: 'journal',
-    difficulty: 'hard',
-    completedAt: new Date().toISOString(),
-    tags: ['writing', 'reflection']
-  }
-];
-
-const testBadges: Badge[] = [
-  {
-    id: '1',
-    name: 'Premier pas',
-    description: 'Première analyse émotionnelle complétée',
-    achieved: true,
-    achievedAt: new Date().toISOString(),
-    tier: 'bronze',
-    imageUrl: '/badges/first-step.svg'
-  },
-  {
-    id: '2',
-    name: 'Introspection',
-    description: 'Compléter 10 entrées de journal',
-    achieved: false,
-    progress: 7,
-    total: 10,
-    tier: 'silver',
-    imageUrl: '/badges/journal-master.svg'
-  }
-];
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge, Progress } from '@/components/ui/progress';
+import { Challenge, Badge as BadgeType } from '@/types/gamification';
 
 const GamificationTab: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('challenges');
-  const [challenges] = useState<Challenge[]>(testChallenges);
-  const [badges] = useState<Badge[]>(testBadges);
-  
-  const completedChallenges = challenges.filter(challenge => challenge.completed);
-  const unlockedBadges = badges.filter(badge => badge.achieved);
-  
+  // Mock data - in a real app, this would come from an API
+  const challenges: Challenge[] = [
+    {
+      id: '1',
+      title: 'Journal quotidien',
+      name: 'Journal quotidien',
+      description: 'Remplissez votre journal émotionnel chaque jour pendant une semaine',
+      progress: 100,
+      completed: true,
+      status: 'completed',
+      points: 50,
+      difficulty: 'easy',
+      category: 'journal',
+      completedAt: '2023-05-12T10:30:00Z',
+      tags: ['journal', 'quotidien']
+    },
+    {
+      id: '2',
+      title: 'Méditation matinale',
+      name: 'Méditation matinale',
+      description: 'Effectuez une méditation de 5 minutes chaque matin pendant 5 jours',
+      progress: 60,
+      completed: false,
+      status: 'active',
+      points: 100,
+      difficulty: 'medium',
+      category: 'meditation',
+      tags: ['méditation', 'matin']
+    }
+  ];
+
+  const badges: BadgeType[] = [
+    {
+      id: '1',
+      name: 'Maître de la pleine conscience',
+      description: 'Vous avez pratiqué 30 jours de méditation',
+      image: '/images/badges/mindfulness-master.svg',
+      imageUrl: '/images/badges/mindfulness-master.svg',
+      achieved: true,
+      unlocked: true,
+      achievedAt: '2023-05-10T14:30:00Z',
+      tier: 'gold',
+      category: 'méditation',
+      rarity: 'rare'
+    },
+    {
+      id: '2',
+      name: 'Explorateur émotionnel',
+      description: 'Vous avez identifié 20 émotions différentes',
+      image: '/images/badges/emotion-explorer.svg',
+      imageUrl: '/images/badges/emotion-explorer.svg',
+      achieved: false,
+      unlocked: false,
+      progress: 12,
+      maxProgress: 20,
+      total: 20,
+      tier: 'silver',
+      category: 'émotions',
+      rarity: 'uncommon'
+    }
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold">Gamification</h2>
-          <p className="text-muted-foreground">
-            Gérez les défis, badges et récompenses pour les utilisateurs
-          </p>
-        </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> Créer un défi
-        </Button>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Défis</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{challenges.length}</div>
-            <p className="text-sm text-muted-foreground">
-              {completedChallenges.length} complétés par des utilisateurs
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Badges</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{badges.length}</div>
-            <p className="text-sm text-muted-foreground">
-              {unlockedBadges.length} débloqués par des utilisateurs
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Score moyen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">257</div>
-            <p className="text-sm text-muted-foreground">
-              +14% depuis le mois dernier
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="challenges">Défis</TabsTrigger>
-          <TabsTrigger value="badges">Badges</TabsTrigger>
-          <TabsTrigger value="leaderboard">Classement</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="challenges" className="mt-6">
-          <Card>
-            <CardContent className="pt-6">
-              {challenges.map(challenge => (
-                <div key={challenge.id} className="border-b py-4 last:border-0">
-                  <div className="flex justify-between mb-1">
-                    <div>
-                      <h3 className="font-medium">{challenge.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {challenge.description}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-bold">{challenge.points} pts</span>
-                      <p className="text-xs text-muted-foreground">
-                        {challenge.difficulty}
-                      </p>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-bold mb-4">Challenges actifs et complétés</h3>
+            <div className="space-y-4">
+              {challenges.map((challenge) => (
+                <div key={challenge.id} className="border-b pb-4 last:border-0 last:pb-0">
+                  <div className="flex justify-between items-start mb-1">
+                    <div className="font-medium">{challenge.title}</div>
+                    <div className={`text-sm font-medium px-2 py-1 rounded-full ${
+                      challenge.status === 'completed' 
+                        ? 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400' 
+                        : challenge.status === 'active'
+                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-400'
+                        : 'bg-gray-100 text-gray-800 dark:bg-gray-800/20 dark:text-gray-400'
+                    }`}>
+                      {challenge.status === 'completed' ? 'Complété' : challenge.status === 'active' ? 'Actif' : 'Verrouillé'}
                     </div>
                   </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <div className="flex gap-1">
-                      {challenge.tags?.map(tag => (
-                        <span key={tag} className="text-xs bg-secondary/30 px-2 py-0.5 rounded-full">
+                  <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">{challenge.description}</div>
+                  <div className="flex justify-between text-xs mb-1.5">
+                    <div className="flex items-center">
+                      <span className={`mr-2 px-1.5 py-0.5 rounded ${
+                        challenge.difficulty === 'easy' 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400'
+                          : challenge.difficulty === 'medium'
+                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-400'
+                          : 'bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400'
+                      }`}>
+                        {challenge.difficulty}
+                      </span>
+                      {challenge.tags && challenge.tags.map(tag => (
+                        <span key={tag} className="mr-1 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-400">
                           {tag}
                         </span>
                       ))}
                     </div>
-                    {challenge.completed ? 
-                      <span className="text-xs text-green-500">Complété</span> : 
-                      <span className="text-xs">{challenge.progress}% complété</span>
-                    }
+                    <div className="font-medium">{challenge.points} pts</div>
+                  </div>
+                  <Progress value={challenge.progress} className="h-1.5" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-lg font-bold mb-4">Badges</h3>
+            <div className="space-y-4">
+              {badges.map((badge) => (
+                <div key={badge.id} className="flex items-center border-b pb-4 last:border-0 last:pb-0">
+                  <div className={`w-14 h-14 rounded-full mr-4 flex items-center justify-center ${
+                    badge.achieved || badge.unlocked
+                      ? 'bg-purple-100 dark:bg-purple-900/20'
+                      : 'bg-gray-100 dark:bg-gray-800/30'
+                  }`}>
+                    {badge.imageUrl && (
+                      <img 
+                        src={badge.imageUrl} 
+                        alt={badge.name} 
+                        className={`w-8 h-8 ${!(badge.achieved || badge.unlocked) && 'opacity-50 grayscale'}`}
+                      />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <div className="font-medium">{badge.name}</div>
+                      <div className={`text-xs px-2 py-0.5 rounded-full ${
+                        badge.tier === 'gold' 
+                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-800/20 dark:text-amber-400'
+                          : badge.tier === 'silver'
+                          ? 'bg-gray-200 text-gray-700 dark:bg-gray-700/20 dark:text-gray-400'
+                          : badge.tier === 'bronze'
+                          ? 'bg-orange-100 text-orange-800 dark:bg-orange-800/20 dark:text-orange-400'
+                          : 'bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-400'
+                      }`}>
+                        {badge.tier}
+                      </div>
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">{badge.description}</div>
+                    {!(badge.achieved || badge.unlocked) && badge.progress !== undefined && badge.total !== undefined && (
+                      <div className="mt-2">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span>Progression</span>
+                          <span>{badge.progress} / {badge.total}</span>
+                        </div>
+                        <Progress 
+                          value={(badge.progress / badge.total) * 100}
+                          className="h-1.5" 
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="badges" className="mt-6">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {badges.map(badge => (
-                  <div key={badge.id} className={`border rounded-lg p-4 ${badge.achieved ? 'border-primary' : 'border-muted'}`}>
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="h-12 w-12 bg-muted rounded-md flex items-center justify-center">
-                        {/* Placeholder pour image de badge */}
-                        <span className="text-lg font-bold">{badge.tier?.charAt(0).toUpperCase()}</span>
-                      </div>
-                      <div>
-                        <h3 className="font-medium">{badge.name}</h3>
-                        <p className="text-xs text-muted-foreground">
-                          {badge.tier?.charAt(0).toUpperCase() + badge.tier?.slice(1)}
-                        </p>
-                      </div>
-                    </div>
-                    <p className="text-sm">{badge.description}</p>
-                    {badge.achieved ? (
-                      <p className="text-xs text-green-500 mt-2">Obtenu</p>
-                    ) : badge.progress !== undefined ? (
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Progression : {badge.progress}/{badge.total}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-muted-foreground mt-2">Non débloqué</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="leaderboard" className="mt-6">
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">
-                Tableau des scores des utilisateurs
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

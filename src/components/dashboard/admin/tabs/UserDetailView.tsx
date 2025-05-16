@@ -1,342 +1,328 @@
+
 import React, { useState } from 'react';
-import { User } from '@/types/user';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { formatDate } from '@/lib/utils';
+import { 
+  Card, CardContent, CardFooter, CardHeader, CardTitle 
+} from '@/components/ui/card';
+import {
+  Tabs, TabsContent, TabsList, TabsTrigger
+} from '@/components/ui/tabs';
+import {
+  Avatar, 
+  AvatarImage,
+  AvatarFallback
+} from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { AlertTriangle, Mail, Shield, User as UserIcon } from 'lucide-react';
-import UserActivityTab from './UserActivityTab';
-import UserEmotionsTab from './UserEmotionsTab';
-import UserNotesTab from './UserNotesTab';
-import UserSessionsTab from './UserSessionsTab';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { 
+  User, 
+  Mail, 
+  Calendar, 
+  MapPin,
+  Building,
+  Award,
+  Briefcase,
+  Activity
+} from 'lucide-react';
+import { User as UserType } from '@/types/user';
 
 interface UserDetailViewProps {
-  user: User;
-  onUpdate?: (user: User) => void;
+  user: UserType;
   onClose?: () => void;
 }
 
-const UserDetailView: React.FC<UserDetailViewProps> = ({ user, onUpdate, onClose }) => {
+// Mocked user data for the component example with all fields properly typed
+const mockUser: UserType = {
+  id: "user123",
+  name: "Sophie Martin",
+  email: "sophie.martin@example.com",
+  role: "b2b_user",
+  avatar_url: "/images/avatars/sophie.jpg",
+  joined_at: "2023-03-15T09:30:00Z",
+  created_at: "2023-03-15T09:30:00Z",
+  department: "Marketing",
+  position: "Content Strategist",
+  emotional_score: 82,
+  onboarded: true,
+  preferences: {
+    theme: "light",
+    fontSize: "medium",
+    fontFamily: "sans",
+    reduceMotion: false,
+    colorBlindMode: false,
+    autoplayMedia: true,
+    soundEnabled: true,
+    language: "fr",
+    notifications_enabled: true,
+    privacy: {
+      showProfile: true,
+      shareActivity: true,
+      allowMessages: true,
+      allowNotifications: true
+    },
+    notifications: {
+      email: true,
+      push: true,
+      sms: false,
+      frequency: "daily"
+    }
+  }
+};
+
+const UserDetailView: React.FC<UserDetailViewProps> = ({ user = mockUser, onClose }) => {
   const [activeTab, setActiveTab] = useState('profile');
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState<User>(user);
-  const { toast } = useToast();
 
-  const handleSaveChanges = () => {
-    if (onUpdate) {
-      onUpdate(editedUser);
-      toast({
-        title: "Utilisateur mis à jour",
-        description: "Les informations de l'utilisateur ont été mises à jour avec succès."
-      });
-    }
-    setIsEditing(false);
+  // Format date to readable string
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('fr-FR', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setEditedUser(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleRoleChange = (role: string) => {
-    // Check if the role is one of the valid User role types
-    const validRole = role as User['role'];
+  // Calculate user account age
+  const calculateAccountAge = (dateString?: string) => {
+    if (!dateString) return 'N/A';
     
-    setEditedUser(prev => ({
-      ...prev,
-      role: validRole
-    }));
-  };
-
-  const getRoleBadgeVariant = (role: string) => {
-    switch (role.toLowerCase()) {
-      case 'admin':
-        return 'destructive';
-      case 'manager':
-      case 'wellbeing_manager':
-        return 'default';
-      case 'coach':
-        return 'outline';
-      default:
-        return 'secondary';
+    const joinedDate = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - joinedDate.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 30) {
+      return `${diffDays} jours`;
+    } else {
+      const diffMonths = Math.floor(diffDays / 30);
+      return diffMonths === 1 ? '1 mois' : `${diffMonths} mois`;
     }
   };
 
-  const getRoleLabel = (role: string) => {
-    switch (role.toLowerCase()) {
-      case 'admin':
-        return 'Administrateur';
-      case 'manager':
-        return 'Manager';
-      case 'wellbeing_manager':
-        return 'Manager bien-être';
-      case 'coach':
-        return 'Coach';
-      case 'employee':
-        return 'Employé';
-      default:
-        return 'Utilisateur';
+  // Get role display name
+  const getRoleName = (role: string) => {
+    switch(role) {
+      case 'b2c': return 'Particulier';
+      case 'b2b_user': return 'Collaborateur';
+      case 'b2b_admin': return 'Administrateur';
+      default: return role;
     }
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-start">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16">
-            <AvatarImage src={user.avatar_url || user.avatar || ''} alt={user.name} />
-            <AvatarFallback>{user.name?.charAt(0) || 'U'}</AvatarFallback>
+    <Card className="w-full shadow-lg">
+      <CardHeader className="pb-3">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-xl">Détails de l'utilisateur</CardTitle>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            Fermer
+          </Button>
+        </div>
+      </CardHeader>
+      
+      <div className="px-6 pb-2">
+        <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+          <Avatar className="w-24 h-24 border-2 border-primary/10">
+            <AvatarImage src={user?.avatar_url || user?.avatar} />
+            <AvatarFallback>
+              {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+            </AvatarFallback>
           </Avatar>
-          <div>
-            <h2 className="text-2xl font-bold">{user.name}</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge variant={getRoleBadgeVariant(user.role)}>{getRoleLabel(user.role)}</Badge>
-              <span className="text-sm text-muted-foreground">ID: {user.id}</span>
+          
+          <div className="flex-1 text-center md:text-left">
+            <h3 className="text-2xl font-bold mb-1">{user.name || 'Utilisateur'}</h3>
+            <div className="text-muted-foreground flex items-center gap-1 justify-center md:justify-start mb-1">
+              <Mail className="h-3.5 w-3.5" />
+              <span>{user.email || 'Email non renseigné'}</span>
+            </div>
+            
+            <div className="flex flex-wrap gap-2 mt-3 justify-center md:justify-start">
+              <Badge variant="outline" className="bg-primary/10">
+                {getRoleName(user.role)}
+              </Badge>
+              {user.department && (
+                <Badge variant="outline" className="bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+                  {user.department}
+                </Badge>
+              )}
+              {user.position && (
+                <Badge variant="outline" className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                  {user.position}
+                </Badge>
+              )}
+              {user.onboarded && (
+                <Badge variant="outline" className="bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
+                  Onboarding complété
+                </Badge>
+              )}
             </div>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Dialog open={isEditing} onOpenChange={setIsEditing}>
-            <DialogTrigger asChild>
-              <Button variant="outline">Modifier</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Modifier l'utilisateur</DialogTitle>
-                <DialogDescription>
-                  Modifiez les informations de l'utilisateur. Cliquez sur sauvegarder lorsque vous avez terminé.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Nom
-                  </Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={editedUser.name}
-                    onChange={handleInputChange}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    value={editedUser.email}
-                    onChange={handleInputChange}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="role" className="text-right">
-                    Rôle
-                  </Label>
-                  <Select
-                    value={editedUser.role}
-                    onValueChange={handleRoleChange}
-                  >
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Sélectionner un rôle" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="user">Utilisateur</SelectItem>
-                      <SelectItem value="employee">Employé</SelectItem>
-                      <SelectItem value="manager">Manager</SelectItem>
-                      <SelectItem value="wellbeing_manager">Manager bien-être</SelectItem>
-                      <SelectItem value="coach">Coach</SelectItem>
-                      <SelectItem value="admin">Administrateur</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="department" className="text-right">
-                    Département
-                  </Label>
-                  <Input
-                    id="department"
-                    name="department"
-                    value={editedUser.department || ''}
-                    onChange={handleInputChange}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="position" className="text-right">
-                    Poste
-                  </Label>
-                  <Input
-                    id="position"
-                    name="position"
-                    value={editedUser.position || ''}
-                    onChange={handleInputChange}
-                    className="col-span-3"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>Annuler</Button>
-                <Button onClick={handleSaveChanges}>Sauvegarder</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-          {onClose && (
-            <Button variant="ghost" onClick={onClose}>Fermer</Button>
-          )}
-        </div>
       </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 mb-8">
-          <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="activity">Activité</TabsTrigger>
-          <TabsTrigger value="emotions">Émotions</TabsTrigger>
-          <TabsTrigger value="sessions">Sessions</TabsTrigger>
-          <TabsTrigger value="notes">Notes</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="profile" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Informations personnelles</CardTitle>
-              <CardDescription>Détails du profil de l'utilisateur</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Nom complet</p>
-                  <p>{user.name}</p>
+      
+      <CardContent className="p-0">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <div className="px-6">
+            <TabsList className="w-full grid grid-cols-3">
+              <TabsTrigger value="profile" className="text-sm">Profil</TabsTrigger>
+              <TabsTrigger value="activity" className="text-sm">Activité</TabsTrigger>
+              <TabsTrigger value="preferences" className="text-sm">Préférences</TabsTrigger>
+            </TabsList>
+          </div>
+          
+          <TabsContent value="profile" className="p-6">
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6">
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <Calendar className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Date d'inscription</div>
+                    <div className="font-medium">{formatDate(user.created_at || user.joined_at)}</div>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Email</p>
-                  <p>{user.email}</p>
+                
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <User className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Statut de l'onboarding</div>
+                    <div className="font-medium">{user.onboarded ? 'Complété' : 'Non complété'}</div>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Rôle</p>
-                  <p>{getRoleLabel(user.role)}</p>
+                
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <Building className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Département</div>
+                    <div className="font-medium">{user.department || 'Non renseigné'}</div>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Département</p>
-                  <p>{user.department || 'Non spécifié'}</p>
+                
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <Briefcase className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Poste</div>
+                    <div className="font-medium">{user.position || 'Non renseigné'}</div>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Poste</p>
-                  <p>{user.position || 'Non spécifié'}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Date d'inscription</p>
-                  <p>{formatDate(user.created_at || user.joined_at || '')}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Onboarding complété</p>
-                  <p>{user.onboarded ? 'Oui' : 'Non'}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Score émotionnel</p>
-                  <p>{user.emotional_score ? `${user.emotional_score}/100` : 'Non disponible'}</p>
+                
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 p-2 rounded-full">
+                    <Activity className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Score émotionnel</div>
+                    <div className="font-medium">
+                      {user.emotional_score !== undefined ? `${user.emotional_score}/100` : 'Non calculé'}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Préférences</CardTitle>
-              <CardDescription>Paramètres et préférences de l'utilisateur</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {user.preferences ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">Thème</p>
-                    <p className="capitalize">{user.preferences.theme || 'Système'}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">Langue</p>
-                    <p>{user.preferences.language === 'fr' ? 'Français' : user.preferences.language === 'en' ? 'Anglais' : user.preferences.language || 'Non spécifié'}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">Notifications</p>
-                    <p>{user.preferences.notifications_enabled ? 'Activées' : 'Désactivées'}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">Confidentialité</p>
-                    <span className="text-xs">
-                      {typeof user.preferences?.privacy === 'object' && user.preferences?.privacy?.profileVisibility === 'public' ? 'Public' : 
-                       typeof user.preferences?.privacy === 'object' && user.preferences?.privacy?.profileVisibility === 'private' ? 'Privé' : 
-                       typeof user.preferences?.privacy === 'object' && user.preferences?.privacy?.profileVisibility === 'team' ? 'Équipe' : 
-                       user.preferences?.profileVisibility === 'public' ? 'Public' :
-                       user.preferences?.profileVisibility === 'private' ? 'Privé' :
-                       user.preferences?.profileVisibility === 'team' ? 'Équipe' : 'Inconnu'}
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-muted-foreground">Aucune préférence définie</p>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Actions administratives</CardTitle>
-              <CardDescription>Gérer le compte utilisateur</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm">
-                  <Mail className="mr-2 h-4 w-4" />
-                  Envoyer un email
-                </Button>
-                <Button variant="outline" size="sm">
-                  <Shield className="mr-2 h-4 w-4" />
-                  Réinitialiser le mot de passe
-                </Button>
-                <Button variant="outline" size="sm">
-                  <UserIcon className="mr-2 h-4 w-4" />
-                  Désactiver le compte
-                </Button>
-                <Button variant="destructive" size="sm">
-                  <AlertTriangle className="mr-2 h-4 w-4" />
-                  Supprimer le compte
-                </Button>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="activity" className="p-6">
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm text-muted-foreground mb-2">Activité récente</h4>
+              
+              {/* Placeholder for activity data */}
+              <div className="text-center text-muted-foreground py-8">
+                Les données d'activité seront disponibles bientôt
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="activity">
-          <UserActivityTab userId={user.id} />
-        </TabsContent>
-        
-        <TabsContent value="emotions">
-          <UserEmotionsTab userId={user.id} />
-        </TabsContent>
-        
-        <TabsContent value="sessions">
-          <UserSessionsTab userId={user.id} />
-        </TabsContent>
-        
-        <TabsContent value="notes">
-          <UserNotesTab userId={user.id} userName={user.name} />
-        </TabsContent>
-      </Tabs>
-    </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="preferences" className="p-6">
+            <div className="space-y-4">
+              <h4 className="font-medium text-sm text-muted-foreground mb-2">Préférences utilisateur</h4>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6">
+                <div className="flex items-center justify-between py-2 border-b">
+                  <span className="text-sm">Thème</span>
+                  <span className="text-sm font-medium">
+                    {user.preferences?.theme === 'light' ? 'Clair' : 
+                     user.preferences?.theme === 'dark' ? 'Sombre' : 
+                     user.preferences?.theme === 'pastel' ? 'Pastel' : 'Système'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between py-2 border-b">
+                  <span className="text-sm">Langue</span>
+                  <span className="text-sm font-medium">
+                    {user.preferences?.language === 'fr' ? 'Français' : 
+                     user.preferences?.language === 'en' ? 'Anglais' : 
+                     user.preferences?.language || 'Français'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between py-2 border-b">
+                  <span className="text-sm">Notifications</span>
+                  <span className="text-sm font-medium">
+                    {user.preferences?.notifications_enabled ? 'Activées' : 'Désactivées'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between py-2 border-b">
+                  <span className="text-sm">Autoplay média</span>
+                  <span className="text-sm font-medium">
+                    {user.preferences?.autoplayMedia ? 'Activé' : 'Désactivé'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between py-2 border-b">
+                  <span className="text-sm">Mode privé</span>
+                  <span className="text-sm font-medium">
+                    {user.preferences?.privacy?.showProfile === false ? 'Activé' : 'Désactivé'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between py-2 border-b">
+                  <span className="text-sm">Partage d'activité</span>
+                  <span className="text-sm font-medium">
+                    {user.preferences?.privacy?.shareActivity ? 'Activé' : 'Désactivé'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between py-2 border-b">
+                  <span className="text-sm">Messagerie</span>
+                  <span className="text-sm font-medium">
+                    {user.preferences?.privacy?.allowMessages ? 'Autorisée' : 'Bloquée'}
+                  </span>
+                </div>
+                
+                <div className="flex items-center justify-between py-2 border-b">
+                  <span className="text-sm">Son</span>
+                  <span className="text-sm font-medium">{user.preferences?.soundEnabled ? 'Activé' : 'Désactivé'}</span>
+                </div>
+                
+                <div className="flex items-center justify-between py-2 border-b">
+                  <span className="text-sm">Mode daltonien</span>
+                  <span className="text-sm font-medium">{user.preferences?.colorBlindMode ? 'Activé' : 'Désactivé'}</span>
+                </div>
+                
+                <div className="flex items-center justify-between py-2 border-b">
+                  <span className="text-sm">Réduction d'animation</span>
+                  <span className="text-sm font-medium">{user.preferences?.reduceMotion ? 'Activée' : 'Désactivée'}</span>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+      
+      <CardFooter className="flex justify-end pt-4">
+        <Button variant="outline" className="mr-2" onClick={onClose}>Fermer</Button>
+        <Button>Modifier</Button>
+      </CardFooter>
+    </Card>
   );
 };
 
