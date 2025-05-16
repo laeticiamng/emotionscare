@@ -3,11 +3,10 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  icon: string; // Icon name or URL
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  unlocked: boolean;
+  image_url: string;
+  icon?: string;
+  level?: number;
   progress?: number;
-  maxProgress?: number;
-  category?: string;
-  dateUnlocked?: string;
+  unlocked?: boolean;
+  achieved_at?: string | Date;
 }

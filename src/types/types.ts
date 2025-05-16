@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   email: string;
@@ -51,6 +50,7 @@ export interface NotificationPreferences {
   inAppEnabled?: boolean;
   email?: boolean;
   push?: boolean;
+  sms?: boolean;
   types?: {
     system?: boolean;
     emotion?: boolean;
@@ -78,4 +78,12 @@ export interface InvitationVerificationResult {
   email?: string;
   role?: string;
   message?: string;
+}
+
+export interface Story {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string;
+  author_id: string;
 }

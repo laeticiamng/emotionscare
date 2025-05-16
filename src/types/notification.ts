@@ -1,21 +1,23 @@
 
-export type NotificationType = 'system' | 'emotion' | 'recommendation' | 'team' | 'goal' | 'urgent' | 'journal' | 'message' | 'coach' | 'user' | 'community';
+export type NotificationFrequency = "immediate" | "hourly" | "daily" | "weekly" | "never";
+export type NotificationTone = "standard" | "friendly" | "professional" | "minimal";
 
-export type NotificationFilter = 'all' | 'unread' | 'read' | 'system' | 'emotion' | 'coach' | 'journal' | 'community' | 'urgent';
-
-export interface NotificationAction {
-  label: string;
-  url: string;
-}
-
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: NotificationType;
-  read: boolean;
-  timestamp?: string;
-  created_at?: string;
-  action?: NotificationAction;
-  priority?: 'normal' | 'urgent';
+export interface NotificationPreference {
+  enabled: boolean;
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  inAppEnabled: boolean;
+  types: {
+    system: boolean;
+    emotion: boolean;
+    coach: boolean;
+    journal: boolean;
+    community: boolean;
+    achievement: boolean;
+  };
+  frequency: NotificationFrequency;
+  email: boolean;
+  push: boolean;
+  sms: boolean;
+  tone?: NotificationTone;
 }

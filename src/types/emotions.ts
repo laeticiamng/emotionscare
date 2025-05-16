@@ -1,17 +1,42 @@
 
-export interface EmotionResult {
-  emotion: string;
+export interface Emotion {
+  id: string;
+  name: string;
+  color: string;
+  icon?: string;
+  description?: string;
+  score?: number;
   confidence?: number;
-  timestamp?: Date | string;
-  id?: string;
-  source?: 'text' | 'voice' | 'face' | 'manual';
 }
 
-export interface EmotionData {
+export interface EmotionResult {
+  id?: string;
   emotion: string;
-  intensity: number;
-  timestamp: Date | string;
-  source: 'text' | 'voice' | 'face' | 'manual';
-  userId: string;
-  notes?: string;
+  score?: number;
+  confidence?: number;
+  timestamp?: string | Date;
+  date?: string;
+  source?: 'text' | 'voice' | 'face' | 'manual';
+  user_id?: string;
+  text?: string;
+  feedback?: string;
+  transcript?: string;
+  intensity?: number;
+  recommendations?: string[];
+}
+
+export interface LiveVoiceScannerProps {
+  onResult: (result: EmotionResult) => void;
+  autoStart?: boolean;
+  duration?: number;
+}
+
+export interface TeamOverviewProps {
+  teamId?: string;
+  period?: "day" | "week" | "month" | "year";
+}
+
+export interface EmotionalTeamViewProps {
+  departmentId?: string;
+  period?: "day" | "week" | "month" | "year";
 }

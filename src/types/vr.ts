@@ -1,90 +1,48 @@
+
 export interface VRSessionTemplate {
   id: string;
   title: string;
-  name?: string;
-  description: string;
+  description?: string;
   duration: number;
-  thumbnailUrl?: string;
-  imageUrl?: string; // Ajout pour compatibilité
-  coverUrl?: string; // Ajout pour compatibilité
-  categoryId?: string;
-  videoUrl?: string;
-  audioUrl?: string;
-  audio_url?: string; // Backward compatibility
-  preview_url?: string;
-  benefits?: string[];
-  difficulty?: string;
   tags?: string[];
-  type?: string;
-  category?: string;
-  level?: string;
-  rating?: number;
-  featured?: boolean;
-  lastUsed?: string | Date;
-  is_audio_only?: boolean;
   emotion_target?: string;
   emotionTarget?: string;
-  theme?: string;
-  completion_rate?: number; // Ajout pour compatibilité
-  completionRate?: number; // Ajout pour compatibilité
-  recommendedMood?: string;
-  recommended_mood?: string;
-  emotion?: string; // Ajout pour compatibilité
-  cover_url?: string; // Ajout pour compatibilité
+  thumbnailUrl?: string;
 }
 
 export interface VRSession {
   id: string;
   templateId: string;
-  userId: string;
-  startedAt: Date;
-  endedAt?: Date;
-  start_time?: string | Date;
-  end_time?: string | Date;
-  date?: string | Date;
-  completed: boolean;
-  isCompleted?: boolean;
+  title: string;
+  description?: string;
   duration: number;
-  duration_seconds?: number;
-  feedback?: string;
-  rating?: number;
-  emotionBefore?: string;
-  emotionAfter?: string;
-  template?: VRSessionTemplate;
-  startTime?: string | Date; // Added for compatibility
-  heart_rate_before?: number;
-  heart_rate_after?: number;
-  heartRateBefore?: number;
-  heartRateAfter?: number;
-  endTime?: string | Date;
-  notes?: string;
+  startTime?: Date;
+  endTime?: Date;
+  environment?: string;
+  completionRate?: number;
 }
 
 export interface VRHistoryListProps {
-  limit?: number;
-  userId?: string;
-  onSessionSelect?: (session: VRSession) => void;
-  className?: string;
-  templates?: VRSessionTemplate[]; // Added for HistoryList component
-  sessions?: VRSession[]; // Added for VRSessionHistory component
+  sessions: VRSession[];
+  onSelect?: (session: VRSession) => void;
 }
 
 export interface VRSessionHistoryProps {
   userId?: string;
   limit?: number;
-  onSessionSelect?: (session: VRSession) => void;
-  className?: string;
-  sessions?: VRSession[]; // Added for compatibility
-  showHeader?: boolean;
 }
 
 export interface VRSessionWithMusicProps {
-  sessionId: string;
-  templateId?: string;
-  onComplete?: (sessionData: VRSession) => void;
-  autoPlay?: boolean;
-  className?: string;
-  template?: VRSessionTemplate;
-  session?: VRSession;
-  onSessionComplete?: (session: VRSession) => void;
+  sessionId?: string;
+  title?: string;
+  description?: string;
+  duration?: number;
+  environment?: string;
+  musicTrackId?: string;
+}
+
+export interface VRTemplateGridProps {
+  templates: VRSessionTemplate[];
+  onSelect: (template: VRSessionTemplate) => void;
+  filter?: string;
 }

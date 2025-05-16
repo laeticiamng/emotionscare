@@ -1,12 +1,11 @@
-
-import React, { useEffect, useState } from 'react';
-import { VRSessionWithMusicPropsType } from '@/types';
+import React from 'react';
+import { VRSessionWithMusicProps } from '@/types';
 import { useMusic } from '@/contexts/MusicContext';
 import VRMusicTrackInfo from './VRMusicTrackInfo';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import VRMusicIntegration from './VRMusicIntegration';
 
-const VRSessionWithMusic: React.FC<VRSessionWithMusicPropsType> = ({ 
+const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({ 
   template,
   onComplete,
   onExit
