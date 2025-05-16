@@ -18,7 +18,7 @@ const LandingPage: React.FC = () => {
         
         <div className="flex justify-center mt-8 space-x-4">
           <Button asChild size="lg">
-            <Link to="/immersive">
+            <Link to="/immersif">
               Découvrir l'expérience immersive
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

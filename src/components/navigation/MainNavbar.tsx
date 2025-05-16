@@ -31,7 +31,7 @@ const MainNavbar: React.FC = () => {
             <Link to="/login">Connexion</Link>
           </Button>
           <Button asChild size="sm">
-            <Link to="/immersive">Démarrer</Link>
+            <Link to="/immersif">Démarrer</Link>
           </Button>
         </div>
       </div>

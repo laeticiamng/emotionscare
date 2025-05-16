@@ -26,7 +26,7 @@ export const router = createBrowserRouter([
         element: <LoginPage />
       },
       {
-        path: 'immersive',
+        path: 'immersif',
         element: <ImmersiveHome />
       },
       {

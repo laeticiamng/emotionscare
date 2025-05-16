@@ -8,7 +8,7 @@ import { isAdminRole } from '@/utils/roleUtils';
 interface NavItemProps {
   href: string;
   label: string;
-  isActive: boolean;
+  isActive?: boolean;
   icon?: React.ReactNode;
   onClick?: () => void;
   requiresAuth?: boolean;
@@ -18,7 +18,7 @@ interface NavItemProps {
 const NavItem: React.FC<NavItemProps> = ({
   href,
   label,
-  isActive,
+  isActive = false,
   icon,
   onClick,
   requiresAuth = false,

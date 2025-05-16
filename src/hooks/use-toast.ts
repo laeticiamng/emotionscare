@@ -1,27 +1,38 @@
 
-import { toast as sonnerToast } from "sonner";
+import { toast } from 'sonner';
 
-type ToastProps = {
-  title?: string;
-  description?: React.ReactNode;
-  action?: React.ReactNode;
-  variant?: "default" | "destructive" | "success" | "warning" | "info";
+type ToastType = 'default' | 'success' | 'error' | 'warning' | 'info';
+
+interface ToastOptions {
   duration?: number;
-};
-
-export function toast(props: ToastProps) {
-  const { title, description, variant, duration = 3000 } = props;
-  
-  sonnerToast(title || "", {
-    description,
-    duration,
-    className: variant ? `toast-${variant}` : "",
-  });
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top-center' | 'bottom-center';
+  // Add other Sonner options as needed
 }
 
-export function useToast() {
-  return {
-    toast,
-    toasts: []
+export const useToast = () => {
+  const showToast = (message: string, type: ToastType = 'default', options?: ToastOptions) => {
+    switch (type) {
+      case 'success':
+        toast.success(message, options);
+        break;
+      case 'error':
+        toast.error(message, options);
+        break;
+      case 'warning':
+        toast.warning(message, options);
+        break;
+      case 'info':
+        toast.info(message, options);
+        break;
+      default:
+        toast(message, options);
+        break;
+    }
   };
-}
+
+  return {
+    toast: showToast,
+    dismiss: toast.dismiss,
+    // Expose other Sonner methods as needed
+  };
+};
