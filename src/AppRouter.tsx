@@ -9,7 +9,7 @@ import { UserPreferencesProvider } from '@/contexts/UserPreferencesContext';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 import { LayoutProvider } from '@/contexts/LayoutContext';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from '@/components/ui/sonner';
 
 const AppRouter: React.FC = () => {
   console.log('📋 AppRouter: Initialisation du routeur');

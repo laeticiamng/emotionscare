@@ -3,7 +3,7 @@ import React, { MutableRefObject } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff, Volume2, VolumeX, Moon, Sun, Laptop } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
-import useVoiceCommand from '@/hooks/useVoiceCommand'; // Fixed import statement
+import useVoiceCommand from '@/hooks/useVoiceCommand'; // Imported as default
 
 interface ImmersiveControlsProps {
   isListening: boolean;
