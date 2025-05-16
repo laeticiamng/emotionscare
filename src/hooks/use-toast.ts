@@ -1,12 +1,5 @@
 
-// This is a simplified version of the use-toast hook to satisfy imports
-// In a real application, this would be connected to a Toast provider
-import { toast } from './use-toast.tsx';
+import { toast } from "@/components/ui/toast";
+import { useToast } from "@/components/ui/use-toast";
 
-export const useToast = () => {
-  return { toast };
-};
-
-export { toast };
-
-export default useToast;
+export { toast, useToast };

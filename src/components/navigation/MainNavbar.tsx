@@ -30,10 +30,10 @@ const MainNavbar: React.FC = () => {
         </nav>
         
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => navigate('/b2c/login')}>
+          <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
             Connexion
           </Button>
-          <Button size="sm" onClick={() => navigate('/b2c/dashboard')}>
+          <Button size="sm" onClick={() => navigate('/dashboard')}>
             Démarrer
           </Button>
         </div>

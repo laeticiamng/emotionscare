@@ -1,73 +1,61 @@
-import { ActivityTabView, AnonymousActivity, ActivityStats } from './types';
-import { getActivityLabel } from './activityUtils';
-import { toast } from '@/hooks/use-toast';
+
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { toast } from '@/hooks/use-toast';
+import { formatDate } from '@/lib/utils';
 
-export const formatCsvData = (
-  tabView: ActivityTabView,
-  data: AnonymousActivity[] | ActivityStats[]
-): Record<string, string>[] => {
-  if (tabView === 'daily') {
-    return (data as AnonymousActivity[]).map(item => ({
-      'Type d\'activité': getActivityLabel(item.activity_type),
-      'Catégorie': item.category,
-      'Nombre': item.count.toString(),
-      'Date': new Date(item.timestamp_day).toLocaleDateString('fr-FR')
-    }));
-  } else {
-    return (data as ActivityStats[]).map(item => ({
-      'Type d\'activité': getActivityLabel(item.activity_type),
-      'Total': item.total_count.toString(),
-      'Pourcentage': `${item.percentage.toFixed(1)}%`
-    }));
+export const exportToExcel = (data: any[], filename = 'activity-logs') => {
+  try {
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    
+    // Convert data to worksheet
+    const ws = XLSX.utils.json_to_sheet(data);
+    
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Activity Logs');
+    
+    // Generate file and save
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    
+    // Create blob and save
+    const blob = new Blob([wbout], { type: 'application/octet-stream' });
+    saveAs(blob, `${filename}-${formatDate(new Date())}.xlsx`);
+    
+    toast({
+      title: 'Exported Successfully',
+      description: `${data.length} records exported to Excel.`,
+    });
+  } catch (error) {
+    console.error('Error exporting Excel file:', error);
+    toast({
+      title: 'Export Failed',
+      description: 'There was an error exporting data to Excel.',
+      variant: 'destructive',
+    });
   }
 };
 
-export const getDefaultCsvFileName = (tabView: ActivityTabView): string => {
-  const date = new Date().toISOString().split('T')[0];
-  return tabView === 'daily'
-    ? `activites-journalieres-${date}.csv`
-    : `statistiques-activites-${date}.csv`;
-};
-
-export const exportActivityData = (
-  activeTab: ActivityTabView, 
-  data: AnonymousActivity[] | ActivityStats[]
-): void => {
+export const exportToCSV = (data: any[], filename = 'activity-logs') => {
   try {
-    const formattedData = formatCsvData(activeTab, data);
-    const fileName = getDefaultCsvFileName(activeTab);
+    // Convert data to CSV
+    const ws = XLSX.utils.json_to_sheet(data);
+    const csv = XLSX.utils.sheet_to_csv(ws);
     
-    // Convert to CSV and download
-    const headers = Object.keys(formattedData[0]);
-    const csvRows = [
-      headers.join(','),
-      ...formattedData.map(row => Object.values(row).join(','))
-    ];
-    
-    const csvContent = csvRows.join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', fileName);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Create blob and save
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    saveAs(blob, `${filename}-${formatDate(new Date())}.csv`);
     
     toast({
-      title: "Export réussi",
-      description: `Les données ont été exportées dans ${fileName}`
+      title: 'Exported Successfully',
+      description: `${data.length} records exported to CSV.`,
     });
   } catch (error) {
-    console.error("Export error:", error);
+    console.error('Error exporting CSV file:', error);
     toast({
-      title: "Erreur lors de l'export",
-      description: "Impossible d'exporter les données",
-      variant: "destructive"
+      title: 'Export Failed',
+      description: 'There was an error exporting data to CSV.',
+      variant: 'destructive',
     });
   }
 };

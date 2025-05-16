@@ -9,16 +9,18 @@ import { toast } from '@/hooks/use-toast';
 
 interface MoodBasedRecommendationsProps {
   mood: string;
+  intensity?: number;
+  standalone?: boolean;
 }
 
-const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ mood }) => {
+const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ mood, intensity = 0.5, standalone = true }) => {
   const { loadPlaylistForEmotion, recommendations, isLoading, error } = useMusic();
 
   React.useEffect(() => {
     if (mood) {
-      loadPlaylistForEmotion({ emotion: mood });
+      loadPlaylistForEmotion({ emotion: mood, intensity });
     }
-  }, [mood, loadPlaylistForEmotion]);
+  }, [mood, loadPlaylistForEmotion, intensity]);
 
   const handlePlay = (trackId: string) => {
     toast({
@@ -35,7 +37,7 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ moo
       </CardHeader>
       <CardContent className="space-y-4">
         {isLoading && <p>Chargement des recommandations...</p>}
-        {error && <p className="text-red-500">Erreur: {error}</p>}
+        {error && <p className="text-red-500">Erreur: {error.message}</p>}
         {/* Pour éviter l'erreur, utilisons les données du contexte correctement */}
         <div className="grid gap-4">
           <div className="border rounded-md p-4">

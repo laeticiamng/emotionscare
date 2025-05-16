@@ -1,55 +1,57 @@
 
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
-import { Volume, VolumeX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { VolumeControlProps } from '@/types/music';
+import { Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
+
+interface VolumeControlProps {
+  volume: number;
+  onVolumeChange: (volume: number) => void;
+  onChange?: (volume: number) => void;
+  showLabel?: boolean;
+  className?: string;
+  isMuted?: boolean;
+  onMuteToggle?: () => void;
+}
 
 const VolumeControl: React.FC<VolumeControlProps> = ({
   volume,
   onVolumeChange,
-  isMuted,
-  onMuteToggle,
   className = '',
+  onChange,
   showLabel = false,
-  muted = isMuted,
-  onChange
+  isMuted = false,
+  onMuteToggle
 }) => {
+  // Use the callback provided, or fall back to onVolumeChange
   const handleVolumeChange = (value: number[]) => {
-    const handler = onVolumeChange || onChange;
-    if (handler) {
-      handler(value[0]);
+    const newVolume = value[0];
+    if (onChange) {
+      onChange(newVolume);
+    } else {
+      onVolumeChange(newVolume);
     }
   };
 
+  const VolumeIcon = () => {
+    if (isMuted || volume === 0) return <VolumeX className="h-4 w-4" onClick={onMuteToggle} style={{cursor: onMuteToggle ? 'pointer' : 'default'}} />;
+    if (volume < 0.33) return <Volume className="h-4 w-4" onClick={onMuteToggle} style={{cursor: onMuteToggle ? 'pointer' : 'default'}} />;
+    if (volume < 0.66) return <Volume1 className="h-4 w-4" onClick={onMuteToggle} style={{cursor: onMuteToggle ? 'pointer' : 'default'}} />;
+    return <Volume2 className="h-4 w-4" onClick={onMuteToggle} style={{cursor: onMuteToggle ? 'pointer' : 'default'}} />;
+  };
+
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="h-8 w-8"
-        onClick={onMuteToggle}
-        title={isMuted ? 'Unmute' : 'Mute'}
-      >
-        {isMuted ? (
-          <VolumeX className="h-4 w-4" />
-        ) : (
-          <Volume className="h-4 w-4" />
-        )}
-        <span className="sr-only">{isMuted ? 'Unmute' : 'Mute'}</span>
-      </Button>
-      
+    <div className={`flex items-center space-x-2 ${className}`}>
+      <VolumeIcon />
       <Slider 
-        defaultValue={[isMuted ? 0 : volume]} 
-        value={[isMuted ? 0 : volume]} 
-        max={1} 
-        step={0.01} 
-        className="w-20"
-        onValueChange={(value) => handleVolumeChange(value)}
+        value={[volume]}
+        onValueChange={handleVolumeChange}
+        min={0}
+        max={1}
+        step={0.01}
+        className="w-24" 
       />
-      
       {showLabel && (
-        <span className="text-xs text-muted-foreground w-8 text-right">
+        <span className="text-xs text-muted-foreground w-9">
           {Math.round(volume * 100)}%
         </span>
       )}

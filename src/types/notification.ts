@@ -21,4 +21,23 @@ export interface Notification {
 }
 
 export type NotificationType = 'system' | 'emotion' | 'coach' | 'journal' | 'community' | 'user' | 'message';
-export type NotificationFilter = 'all' | 'unread' | 'read' | NotificationType;
+export type NotificationFilter = 'all' | 'unread' | 'read' | NotificationType | 'urgent';
+
+export interface NotificationPreferences {
+  enabled: boolean;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  inAppEnabled?: boolean;
+  email?: boolean;
+  push?: boolean;
+  sms?: boolean;
+  types?: {
+    system?: boolean;
+    emotion?: boolean;
+    coach?: boolean;
+    journal?: boolean;
+    community?: boolean;
+    achievement?: boolean;
+  },
+  frequency?: string;
+}
