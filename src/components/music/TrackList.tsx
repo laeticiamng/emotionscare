@@ -56,9 +56,9 @@ const TrackList: React.FC<TrackListProps> = ({
               </Button>
             </TableCell>
             <TableCell className="flex items-center gap-2">
-              {track.cover_url ? (
+              {track.coverUrl ? (
                 <img 
-                  src={track.cover_url} 
+                  src={track.coverUrl} 
                   alt={track.title} 
                   className="w-8 h-8 rounded object-cover"
                 />

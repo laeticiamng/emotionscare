@@ -18,6 +18,7 @@ export interface MusicPlaylist {
   name: string;
   tracks: MusicTrack[];
   coverUrl?: string;
+  title?: string;
 }
 
 export interface MusicContextType {
@@ -55,7 +56,7 @@ export interface MusicContextType {
   isInitialized?: boolean;
   initializeMusicSystem?: () => Promise<void>;
   error?: Error | null;
-  loadPlaylistForEmotion?: (emotion: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
+  loadPlaylistForEmotion?: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
   currentEmotion?: string | null;
   setEmotion?: (emotion: string) => void;
 }
@@ -149,4 +150,6 @@ export interface MusicControlsProps {
   track?: MusicTrack | null;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  showVolume?: boolean;
+  vertical?: boolean;
 }

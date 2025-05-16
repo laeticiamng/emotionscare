@@ -45,8 +45,9 @@ const ImmersiveHome = () => {
     // Simulate loading playlist on mount
     const loadAmbientMusic = async () => {
       try {
-        const playlist = await loadPlaylistForEmotion({ emotion: 'calm' });
-        if (playlist && playlist.tracks.length > 0) {
+        const emotion = { emotion: 'calm' };
+        const playlist = await loadPlaylistForEmotion(emotion);
+        if (playlist && playlist.tracks && playlist.tracks.length > 0) {
           console.log('Ambient music ready to play');
         }
       } catch (error) {

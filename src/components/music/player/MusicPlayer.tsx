@@ -4,7 +4,6 @@ import { useMusic } from '@/contexts/music';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music } from 'lucide-react';
-import ProgressBar from '@/components/music/player/ProgressBar';
 
 const MusicPlayer = () => {
   const { 
@@ -90,12 +89,26 @@ const MusicPlayer = () => {
             </Button>
           </div>
 
-          <ProgressBar
-            currentTime={progress}
-            duration={duration || 0}
-            formatTime={formatTime}
-            onSeek={seekTo}
-          />
+          <div className="w-full relative">
+            <div className="h-1 bg-blue-200 dark:bg-blue-800/30 rounded overflow-hidden">
+              <div 
+                className="h-full bg-blue-500 transition-all duration-300"
+                style={{ width: `${(progress / duration) * 100}%` }}
+              ></div>
+            </div>
+            <div className="flex justify-between text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">
+              <span>{formatTime(progress || 0)}</span>
+              <span>{formatTime(duration || 0)}</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max={duration || 0}
+              value={progress || 0}
+              onChange={(e) => seekTo(Number(e.target.value))}
+              className="absolute top-0 left-0 w-full h-1 opacity-0 cursor-pointer"
+            />
+          </div>
         </div>
 
         {/* Volume control */}

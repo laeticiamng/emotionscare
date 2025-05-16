@@ -14,9 +14,9 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       <div className="flex-shrink-0 w-10 h-10">
-        {track.cover_url ? (
+        {track.coverUrl ? (
           <img 
-            src={track.cover_url} 
+            src={track.coverUrl} 
             alt={track.title} 
             className="w-full h-full object-cover rounded-md"
           />
