@@ -49,7 +49,7 @@ export interface UserPreferences {
   autoplayMedia?: boolean;
   sound?: SoundPreference | boolean;
   
-  // Add missing fields that are used in the app
+  // Ajout des champs manquants qui sont utilisés dans l'application
   ambientSound?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;

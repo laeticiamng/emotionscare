@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmotionResult } from '@/types/scan';
@@ -6,7 +7,7 @@ interface EmotionHistoryProps {
   history: EmotionResult[];
 }
 
-// Update the formatDate function to handle both string and Date types
+// Mise à jour de la fonction formatDate pour gérer à la fois les types string et Date
 export const formatDate = (timestamp: string | Date): string => {
   const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
   return date.toLocaleDateString(undefined, {
