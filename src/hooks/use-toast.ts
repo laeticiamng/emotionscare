@@ -1,8 +1,10 @@
 
-import { toast } from "@/components/ui/use-toast";
+// This file re-exports from the tsx implementation file
+// Import directly from the implementation to avoid circular dependencies
+import { toast as toastImpl } from "@/hooks/use-toast.tsx";
 
-export { toast };
+// Export the toast function directly, not as a re-export
+export const toast = toastImpl;
 
-// We need to export the full useToast hook from this file directly
-// rather than re-exporting from itself which causes the circular dependency
+// Export the hook directly from the implementation file
 export { useToast } from "@/hooks/use-toast.tsx";
