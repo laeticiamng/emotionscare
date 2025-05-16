@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,24 +27,30 @@ export const AdminTabContents = ({
       id: '1',
       name: 'Super admin',
       description: 'Gérer les paramètres administrateur avancés',
-      image_url: '/badges/admin.png',
-      tier: 'platinum', // Changed from 'rare' to an allowed value
-      unlockedAt: '2023-05-12'
+      imageUrl: '/badges/admin.png',
+      category: 'progress',
+      tier: 'platinum',
+      unlockedAt: '2023-05-12',
+      completed: true
     },
     {
       id: '2',
       name: 'Analytics Pro',
       description: 'Expertise en analyse des données',
-      image_url: '/badges/analytics.png',
-      tier: 'gold', // Changed from 'epic' to an allowed value
-      unlockedAt: '2023-06-25'
+      imageUrl: '/badges/analytics.png',
+      category: 'activity',
+      tier: 'gold',
+      unlockedAt: '2023-06-25',
+      completed: true
     },
     {
       id: '3',
       name: 'Invitations Master',
       description: 'Inviter plus de 50 utilisateurs',
-      image_url: '/badges/invite.png',
-      tier: 'silver' // Changed from 'legendary' to an allowed value
+      imageUrl: '/badges/invite.png',
+      category: 'special',
+      tier: 'silver',
+      completed: false
     }
   ];
   
@@ -56,7 +63,7 @@ export const AdminTabContents = ({
       points: 1250,
       rank: 1,
       trend: 'up',
-      // Remove userId property to match interface
+      level: 5,
       department: 'Marketing'
     },
     {
@@ -66,7 +73,7 @@ export const AdminTabContents = ({
       points: 980,
       rank: 2,
       trend: 'stable',
-      // Remove userId property to match interface
+      level: 4,
       department: 'Product'
     },
     {
@@ -76,7 +83,7 @@ export const AdminTabContents = ({
       points: 760,
       rank: 3,
       trend: 'down',
-      // Remove userId property to match interface
+      level: 3,
       department: 'Engineering'
     }
   ];
@@ -87,22 +94,20 @@ export const AdminTabContents = ({
       id: '1',
       title: 'Engagement personnel',
       description: 'Participer aux défis de la semaine',
-      category: 'Admin',
+      category: 'daily',
       points: 200,
       completed: false,
       progress: 40,
-      deadline: new Date().toISOString()
-      // Remove status property to match interface
+      status: 'active'
     },
     {
       id: '2',
       title: 'Analyser les données',
       description: 'Examiner les rapports hebdomadaires',
-      category: 'Analytics',
+      category: 'weekly',
       points: 150,
       completed: true,
       progress: 100
-      // Remove status property to match interface
     }
   ];
   
@@ -276,3 +281,5 @@ export const AdminTabContents = ({
     </Tabs>
   );
 };
+
+export default AdminTabContents;

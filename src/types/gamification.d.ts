@@ -1,4 +1,17 @@
 
+export type NotificationType = 
+  | 'emotion' 
+  | 'journal' 
+  | 'community' 
+  | 'achievement' 
+  | 'reminder' 
+  | 'system'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'alert'
+  | 'message';
+
 export interface Badge {
   id: string;
   name: string;
@@ -9,14 +22,14 @@ export interface Badge {
   category: 'progress' | 'journal' | 'music' | 'community' | 'activity' | 'special';
   tier: 'bronze' | 'silver' | 'gold' | 'platinum';
   unlockedAt?: string;
+  dateEarned?: string;
+  awarded_at?: string;
   progress?: number;
   completed: boolean;
   icon?: React.ReactNode;
   // Adding properties needed by components
   unlocked?: boolean;
   level?: string | number;
-  dateEarned?: string;
-  awarded_at?: string;
 }
 
 export interface Challenge {
@@ -26,15 +39,14 @@ export interface Challenge {
   category: 'daily' | 'weekly' | 'monthly' | 'special';
   points: number;
   progress: number;
+  total?: number;
+  goal?: number;
   completed: boolean;
   isDaily?: boolean;
   isWeekly?: boolean;
+  name?: string;
   status?: 'active' | 'completed' | 'expired' | 'failed' | 'locked' | 'not-started';
   deadline?: string;
-  name?: string;
-  // Adding properties needed by components
-  goal?: number;
-  total?: number;
   icon?: React.ReactNode;
   difficulty?: string;
   completions?: number;
@@ -43,15 +55,16 @@ export interface Challenge {
 
 export interface LeaderboardEntry {
   id: string;
-  userId: string;
+  userId?: string;
   name: string;
   avatar?: string;
   points: number;
   rank: number;
   level: number | string;
-  isCurrentUser: boolean;
+  isCurrentUser?: boolean;
   badges?: number;
   trend?: 'up' | 'down' | 'stable';
+  department?: string;
 }
 
 export interface GamificationStats {

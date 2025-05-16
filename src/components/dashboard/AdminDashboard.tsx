@@ -49,37 +49,42 @@ const AdminDashboard: React.FC = () => {
     topChallenges: [
       { 
         id: "challenge-1", 
+        title: "Méditation quotidienne", 
         name: "Méditation quotidienne", 
         completions: 89,
         description: "Méditez tous les jours pendant une semaine",
         points: 100,
-        completed: false
+        progress: 0,
+        completed: false,
+        category: "daily"
       },
       { 
         id: "challenge-2", 
+        title: "Journal émotionnel", 
         name: "Journal émotionnel", 
         completions: 76,
         description: "Complétez votre journal pendant 5 jours consécutifs",
         points: 150,
-        completed: false
+        progress: 0,
+        completed: false,
+        category: "weekly"
       },
       { 
         id: "challenge-3", 
+        title: "Scan émotionnel", 
         name: "Scan émotionnel", 
         completions: 45,
         description: "Effectuez 3 scans émotionnels en une semaine",
         points: 120,
-        completed: false
+        progress: 0,
+        completed: false,
+        category: "special"
       }
     ],
     completionRate: 65,
     progress: 45,
     challenges: [],
-    achievements: [],
-    leaderboard: [],
-    nextLevelPoints: 100,
-    rewardsEarned: 12,
-    userEngagement: 78
+    leaderboard: []
   };
 
   useEffect(() => {

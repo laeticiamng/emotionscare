@@ -24,26 +24,24 @@ const GamificationDashboard: React.FC = () => {
   }
 
   // Ensure stats has all required properties with default values
-  const safeStats: GamificationStats = stats || {
-    level: 1,
-    points: 0,
-    badges: [],
-    streak: 0,
-    completedChallenges: 0,
-    totalChallenges: 0,
-    nextLevel: 2,
-    pointsToNextLevel: 100,
-    nextLevelPoints: 100,
-    challenges: [],
-    totalPoints: 0,
-    currentLevel: 1,
-    progressToNextLevel: 0,
-    streakDays: 0,
-    lastActivityDate: new Date().toISOString(),
-    activeChallenges: 0,
-    badgesCount: 0,
-    rank: 'Beginner',
-    recentAchievements: []
+  const safeStats: GamificationStats = {
+    level: stats.level || 1,
+    points: stats.points || 0,
+    badges: stats.badges || [],
+    streak: stats.streak || 0,
+    completedChallenges: stats.completedChallenges || 0,
+    totalChallenges: stats.totalChallenges || 0,
+    challenges: stats.challenges || [],
+    progress: stats.progress || 0,
+    leaderboard: stats.leaderboard || [],
+    currentLevel: stats.currentLevel || 1,
+    pointsToNextLevel: stats.pointsToNextLevel || 0,
+    progressToNextLevel: stats.progressToNextLevel || 0,
+    streakDays: stats.streakDays || 0,
+    lastActivityDate: stats.lastActivityDate || new Date().toISOString(),
+    activeChallenges: stats.activeChallenges || 0,
+    badgesCount: stats.badgesCount || 0,
+    totalPoints: stats.totalPoints || 0
   };
 
   return (

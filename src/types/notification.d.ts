@@ -26,12 +26,12 @@ export interface Notification {
   read: boolean;
   createdAt?: string;
   date?: string;
+  timestamp?: string;
   action_url?: string;
   action_label?: string;
   // Add backwards compatibility properties
   actionUrl?: string;
   actionLabel?: string;
-  timestamp?: string;
 }
 
 export interface NotificationItemProps {

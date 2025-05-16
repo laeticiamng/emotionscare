@@ -19,7 +19,9 @@ export const useGamification = (): UseGamificationReturn => {
       points: 100,
       rewards: [],
       level: 2
-    }
+    },
+    pointsToNextLevel: 100,
+    progressToNextLevel: 0
   });
   
   const [badges, setBadges] = useState<Badge[]>([]);
@@ -79,8 +81,7 @@ export const useGamification = (): UseGamificationReturn => {
           status: 'active',
           progress: 3,
           total: 7,
-          completed: false,
-          isDaily: true
+          completed: false
         },
         {
           id: '2',
@@ -92,8 +93,7 @@ export const useGamification = (): UseGamificationReturn => {
           status: 'active',
           progress: 2,
           total: 5,
-          completed: false,
-          isWeekly: true
+          completed: false
         },
         {
           id: '3',
