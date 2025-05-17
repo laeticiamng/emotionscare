@@ -1,3 +1,4 @@
+
 export interface LeaderboardEntry {
   id: string;
   userId: string;
