@@ -1,9 +1,9 @@
 
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
-import { AudioContextValue, AudioPlayerState, AudioTrack } from '@/types/audio';
+import React, { createContext, useState, useContext, useCallback } from 'react';
+import { AudioTrack, AudioPlayerState, AudioContextValue } from '@/types/audio';
 
-// Contexte d'audio par défaut
-const defaultAudioState: AudioPlayerState = {
+// Initial state
+const initialState: AudioPlayerState = {
   currentTrack: null,
   isPlaying: false,
   volume: 0.7,
@@ -15,9 +15,9 @@ const defaultAudioState: AudioPlayerState = {
   shuffleMode: false,
 };
 
-// Création du contexte
+// Create context
 export const AudioContext = createContext<AudioContextValue>({
-  audioState: defaultAudioState,
+  audioState: initialState,
   play: () => {},
   pause: () => {},
   stop: () => {},
@@ -32,191 +32,168 @@ export const AudioContext = createContext<AudioContextValue>({
 });
 
 export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [audioState, setAudioState] = useState<AudioPlayerState>(defaultAudioState);
-  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const [audioState, setAudioState] = useState<AudioPlayerState>(initialState);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
 
-  // Initialiser l'élément audio
-  useEffect(() => {
-    const audio = new Audio();
-    setAudioElement(audio);
+  React.useEffect(() => {
+    audioRef.current = new Audio();
     
     return () => {
-      audio.pause();
-      audio.src = '';
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
     };
   }, []);
 
-  // Mettre à jour la progression de la lecture
-  useEffect(() => {
-    if (!audioElement) return;
-
-    const updateProgress = () => {
-      setAudioState(state => ({
-        ...state,
-        progress: audioElement.currentTime,
-        duration: audioElement.duration || 0
-      }));
-    };
-
-    const handleEnded = () => {
-      switch (audioState.repeatMode) {
-        case 'one':
-          audioElement.currentTime = 0;
-          audioElement.play().catch(console.error);
-          break;
-        case 'all':
-          next();
-          break;
-        default:
-          // Si on n'est pas à la fin de la playlist, passer à la piste suivante
-          if (getNextTrackIndex() !== null) {
-            next();
-          } else {
-            setAudioState(state => ({ ...state, isPlaying: false }));
-          }
-      }
-    };
-
-    audioElement.addEventListener('timeupdate', updateProgress);
-    audioElement.addEventListener('ended', handleEnded);
-    
-    return () => {
-      audioElement.removeEventListener('timeupdate', updateProgress);
-      audioElement.removeEventListener('ended', handleEnded);
-    };
-  }, [audioElement, audioState.repeatMode]);
-
-  // Contrôle du volume et du mute
-  useEffect(() => {
-    if (!audioElement) return;
-    
-    audioElement.volume = audioState.isMuted ? 0 : audioState.volume;
-  }, [audioElement, audioState.volume, audioState.isMuted]);
-
-  // Charger et jouer une piste
-  const playTrack = useCallback((track: AudioTrack) => {
-    if (!audioElement) return;
-    
-    audioElement.src = track.url;
-    audioElement.play().catch(e => console.error("Erreur lors de la lecture:", e));
-    
-    setAudioState(state => ({
-      ...state,
-      currentTrack: track,
-      isPlaying: true,
-      progress: 0
-    }));
-  }, [audioElement]);
-
-  // Jouer/reprendre la lecture
   const play = useCallback(() => {
-    if (!audioElement || !audioState.currentTrack) return;
-    
-    audioElement.play().catch(console.error);
-    setAudioState(state => ({ ...state, isPlaying: true }));
-  }, [audioElement, audioState.currentTrack]);
+    if (audioRef.current && audioState.currentTrack) {
+      audioRef.current.play().catch(error => console.error("Error playing audio:", error));
+      setAudioState(prev => ({ ...prev, isPlaying: true }));
+    }
+  }, [audioState.currentTrack]);
 
-  // Mettre en pause
   const pause = useCallback(() => {
-    if (!audioElement) return;
-    
-    audioElement.pause();
-    setAudioState(state => ({ ...state, isPlaying: false }));
-  }, [audioElement]);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setAudioState(prev => ({ ...prev, isPlaying: false }));
+    }
+  }, []);
 
-  // Arrêter la lecture
   const stop = useCallback(() => {
-    if (!audioElement) return;
-    
-    audioElement.pause();
-    audioElement.currentTime = 0;
-    setAudioState(state => ({ ...state, isPlaying: false, progress: 0 }));
-  }, [audioElement]);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setAudioState(prev => ({ ...prev, isPlaying: false, progress: 0 }));
+    }
+  }, []);
 
-  // Obtenir l'index de la piste suivante
-  const getNextTrackIndex = useCallback((): number | null => {
-    if (!audioState.currentTrack || audioState.playlist.length === 0) {
-      return null;
+  const setVolume = useCallback((volume: number) => {
+    if (audioRef.current) {
+      audioRef.current.volume = Math.min(1, Math.max(0, volume));
+      setAudioState(prev => ({ ...prev, volume, isMuted: volume === 0 }));
     }
-    
-    const currentIndex = audioState.playlist.findIndex(
-      track => track.id === audioState.currentTrack?.id
-    );
-    
-    if (currentIndex === -1 || currentIndex === audioState.playlist.length - 1) {
-      return audioState.repeatMode === 'all' ? 0 : null;
-    }
-    
-    return currentIndex + 1;
-  }, [audioState.currentTrack, audioState.playlist, audioState.repeatMode]);
+  }, []);
 
-  // Obtenir l'index de la piste précédente
-  const getPrevTrackIndex = useCallback((): number | null => {
-    if (!audioState.currentTrack || audioState.playlist.length === 0) {
-      return null;
+  const toggleMute = useCallback(() => {
+    if (audioRef.current) {
+      const newMuted = !audioState.isMuted;
+      audioRef.current.muted = newMuted;
+      setAudioState(prev => ({ ...prev, isMuted: newMuted }));
     }
-    
-    const currentIndex = audioState.playlist.findIndex(
-      track => track.id === audioState.currentTrack?.id
-    );
-    
-    if (currentIndex === -1 || currentIndex === 0) {
-      return audioState.repeatMode === 'all' ? audioState.playlist.length - 1 : null;
-    }
-    
-    return currentIndex - 1;
-  }, [audioState.currentTrack, audioState.playlist, audioState.repeatMode]);
+  }, [audioState.isMuted]);
 
-  // Passer à la piste suivante
+  const seekTo = useCallback((position: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = position;
+      setAudioState(prev => ({ ...prev, progress: position }));
+    }
+  }, []);
+
+  const findTrackIndex = useCallback((track: AudioTrack | null) => {
+    if (!track || !audioState.playlist.length) return -1;
+    return audioState.playlist.findIndex(t => t.id === track.id);
+  }, [audioState.playlist]);
+
   const next = useCallback(() => {
-    const nextIndex = getNextTrackIndex();
+    if (!audioState.playlist.length) return;
     
-    if (nextIndex !== null) {
+    const currentIndex = findTrackIndex(audioState.currentTrack);
+    
+    if (currentIndex >= 0) {
+      let nextIndex: number;
+      
+      if (audioState.shuffleMode) {
+        // Random but not the same as current
+        nextIndex = Math.floor(Math.random() * (audioState.playlist.length - 1));
+        if (nextIndex >= currentIndex) nextIndex++;
+      } else if (currentIndex < audioState.playlist.length - 1) {
+        // Next track
+        nextIndex = currentIndex + 1;
+      } else if (audioState.repeatMode === 'all') {
+        // Loop back to beginning
+        nextIndex = 0;
+      } else {
+        // End of playlist and no repeat
+        return;
+      }
+      
       const nextTrack = audioState.playlist[nextIndex];
       playTrack(nextTrack);
     }
-  }, [getNextTrackIndex, audioState.playlist, playTrack]);
+  }, [audioState.playlist, audioState.currentTrack, audioState.repeatMode, audioState.shuffleMode]);
 
-  // Passer à la piste précédente
   const previous = useCallback(() => {
-    const prevIndex = getPrevTrackIndex();
+    if (!audioState.playlist.length) return;
     
-    if (prevIndex !== null) {
-      const prevTrack = audioState.playlist[prevIndex];
-      playTrack(prevTrack);
+    const currentIndex = findTrackIndex(audioState.currentTrack);
+    
+    if (currentIndex > 0) {
+      // Previous track
+      const previousTrack = audioState.playlist[currentIndex - 1];
+      playTrack(previousTrack);
+    } else if (currentIndex === 0 && audioState.repeatMode === 'all') {
+      // Loop to end
+      const lastTrack = audioState.playlist[audioState.playlist.length - 1];
+      playTrack(lastTrack);
+    } else {
+      // Start current track from beginning
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        setAudioState(prev => ({ ...prev, progress: 0 }));
+      }
     }
-  }, [getPrevTrackIndex, audioState.playlist, playTrack]);
+  }, [audioState.playlist, audioState.currentTrack, audioState.repeatMode]);
 
-  // Régler le volume
-  const setVolume = useCallback((volume: number) => {
-    setAudioState(state => ({ ...state, volume, isMuted: volume === 0 }));
-  }, []);
-
-  // Activer/désactiver le son
-  const toggleMute = useCallback(() => {
-    setAudioState(state => ({ ...state, isMuted: !state.isMuted }));
-  }, []);
-
-  // Se positionner à un moment précis
-  const seekTo = useCallback((position: number) => {
-    if (!audioElement) return;
+  const playTrack = useCallback((track: AudioTrack) => {
+    if (!track || !track.url) {
+      console.error("Cannot play track: Invalid track or missing URL");
+      return;
+    }
     
-    audioElement.currentTime = position;
-    setAudioState(state => ({ ...state, progress: position }));
-  }, [audioElement]);
-
-  // Activer/désactiver la lecture aléatoire
-  const toggleShuffle = useCallback(() => {
-    setAudioState(state => ({ ...state, shuffleMode: !state.shuffleMode }));
+    const newUrl = track.url || track.audioUrl;
+    
+    if (audioRef.current) {
+      // Stop current audio
+      audioRef.current.pause();
+      
+      // Set up new audio
+      audioRef.current.src = newUrl as string;
+      audioRef.current.load();
+      
+      // Update state with new track
+      setAudioState(prev => ({
+        ...prev,
+        currentTrack: track,
+        progress: 0,
+        duration: track.duration || 0,
+        isPlaying: true
+      }));
+      
+      // Play new track
+      audioRef.current.play().catch(error => {
+        console.error("Error playing track:", error);
+        setAudioState(prev => ({ ...prev, isPlaying: false }));
+      });
+    }
   }, []);
 
-  // Changer le mode de répétition
+  const toggleShuffle = useCallback(() => {
+    setAudioState(prev => ({
+      ...prev,
+      shuffleMode: !prev.shuffleMode
+    }));
+  }, []);
+
   const changeRepeatMode = useCallback(() => {
-    setAudioState(state => {
+    setAudioState(prev => {
       const modes: ('off' | 'one' | 'all')[] = ['off', 'one', 'all'];
-      const currentIndex = modes.indexOf(state.repeatMode);
+      const currentIndex = modes.indexOf(prev.repeatMode);
       const nextIndex = (currentIndex + 1) % modes.length;
-      return { ...state, repeatMode: modes[nextIndex] };
+      return {
+        ...prev,
+        repeatMode: modes[nextIndex]
+      };
     });
   }, []);
 
@@ -243,4 +220,3 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 };
 
 export const useAudio = () => useContext(AudioContext);
-export const useMusic = useAudio; // Alias pour clarté contextuelle dans certains composants

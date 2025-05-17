@@ -12,4 +12,5 @@ export interface Challenge {
   category: string;
   tags: string[];
   goal: number | string;
+  totalSteps?: number;
 }

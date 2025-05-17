@@ -1,88 +1,75 @@
 
-import { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useQueryClient } from '@tanstack/react-query';
 import { ChatMessage } from '@/types/chat';
+import { useState, useCallback } from 'react';
 
-export const useCoachChatActions = (conversationId: string) => {
+export const useCoachChatActions = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
-  const [responseContent, setResponseContent] = useState<string>('');
-  const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Add user message
-  const addUserMessage = useCallback((content: string) => {
+  const addUserMessage = useCallback((text: string, conversationId: string): ChatMessage => {
     const newMessage: ChatMessage = {
       id: uuidv4(),
-      text: content,
-      content: content,
+      text,
+      content: text,
       sender: 'user',
+      role: 'user',
       conversation_id: conversationId,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toISOString()
     };
     
+    setMessages(prev => [...prev, newMessage]);
     return newMessage;
-  }, [conversationId]);
-  
-  // Add AI response
-  const addAIResponse = useCallback((content: string) => {
+  }, []);
+
+  const addAssistantMessage = useCallback((text: string, conversationId: string): ChatMessage => {
     const newMessage: ChatMessage = {
       id: uuidv4(),
-      text: content,
-      content: content,
-      sender: 'bot',
+      text,
+      content: text,
+      sender: 'assistant',
+      role: 'assistant',
       conversation_id: conversationId,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toISOString()
     };
     
+    setMessages(prev => [...prev, newMessage]);
     return newMessage;
-  }, [conversationId]);
+  }, []);
 
-  // This simulates the AI thinking and responding
-  const simulateTyping = useCallback((messagePromise: Promise<string>) => {
-    setIsTyping(true);
-    
-    // Create temporary message object while response is loading
-    const tempMessage: ChatMessage = {
-      id: uuidv4(),
-      text: '...',
-      content: '...',
-      sender: 'bot',
+  const addSystemMessage = useCallback((text: string, conversationId: string): ChatMessage => {
+    const newMessage: ChatMessage = {
+      id: uuidv4(), 
+      text,
+      content: text,
+      sender: 'system',
+      role: 'system',
       conversation_id: conversationId,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toISOString()
     };
     
-    // Process the actual response when ready
-    messagePromise.then(response => {
-      // Store response content for streaming visualization
-      setResponseContent(response);
-      
-      // Invalidate query cache if needed
-      queryClient.invalidateQueries({ queryKey: ['conversations', conversationId] });
-    })
-    .catch(error => {
-      console.error('Error processing message:', error);
-    })
-    .finally(() => {
-      setIsTyping(false);
-    });
-    
-    return tempMessage;
-  }, [conversationId, queryClient]);
+    setMessages(prev => [...prev, newMessage]);
+    return newMessage;
+  }, []);
 
-  // Clear all messages
   const clearMessages = useCallback(() => {
     setMessages([]);
-    setResponseContent('');
+  }, []);
+
+  const removeMessage = useCallback((messageId: string) => {
+    setMessages(prev => prev.filter(msg => msg.id !== messageId));
   }, []);
 
   return {
     messages,
-    isTyping,
-    responseContent,
+    isLoading,
+    setIsLoading,
     addUserMessage,
-    addAIResponse,
-    simulateTyping,
-    clearMessages
+    addAssistantMessage,
+    addSystemMessage,
+    clearMessages,
+    removeMessage
   };
 };
+
+export default useCoachChatActions;

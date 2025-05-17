@@ -3,7 +3,7 @@
 
 export { ThemeProvider, useTheme, ThemeContext, type ThemeContextType } from './ThemeContext';
 export { UserPreferencesProvider, useUserPreferences, UserPreferencesContext } from './UserPreferencesContext';
-export { UserModeProvider, useUserMode, UserModeContext } from './UserModeContext';
+export { UserModeProvider, useUserMode } from './UserModeContext';
 export { LayoutProvider, useLayout, LayoutContext } from './LayoutContext';
 export { SidebarProvider, useSidebar } from './SidebarContext';
 export { AuthProvider, useAuth } from './AuthContext';

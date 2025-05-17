@@ -3,61 +3,42 @@ import { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
 
-export type MessageSender = 'user' | 'bot';
+type MessageSender = 'user' | 'assistant' | 'system';
 
-interface UseMessageHandlingOptions {
-  initialMessages?: ChatMessage[];
-}
+export const useMessageHandling = () => {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [conversationId, setConversationId] = useState(uuidv4());
 
-export function useMessageHandling({ initialMessages = [] }: UseMessageHandlingOptions = {}) {
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  
-  // Add a new message to the chat
-  const addMessage = useCallback((content: string, sender: MessageSender, metadata?: Record<string, any>) => {
+  const addMessage = useCallback((content: string, sender: MessageSender) => {
     const newMessage: ChatMessage = {
       id: uuidv4(),
       content,
       text: content,
       sender,
-      conversation_id: 'default',
-      timestamp: new Date().toISOString(),
-      ...metadata
+      role: sender,
+      conversation_id: conversationId,
+      timestamp: new Date().toISOString()
     };
     
-    setMessages(prev => [...prev, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
     return newMessage;
-  }, []);
-  
-  // Clear all messages
+  }, [conversationId]);
+
   const clearMessages = useCallback(() => {
     setMessages([]);
+    setConversationId(uuidv4());
   }, []);
-  
-  // Replace all messages
-  const replaceMessages = useCallback((newMessages: ChatMessage[]) => {
-    setMessages(newMessages);
+
+  const removeMessage = useCallback((messageId: string) => {
+    setMessages((prev) => prev.filter(msg => msg.id !== messageId));
   }, []);
-  
-  // Get the last message from a specific sender
-  const getLastMessageFrom = useCallback((sender: MessageSender): ChatMessage | undefined => {
-    return [...messages].reverse().find(msg => msg.sender === sender);
-  }, [messages]);
-  
-  // Format time display for a message
-  const formatMessageTime = useCallback((timestamp: string): string => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }, []);
-  
-  // Export
+
   return {
     messages,
+    conversationId,
     addMessage,
     clearMessages,
-    replaceMessages,
-    getLastMessageFrom,
-    formatMessageTime
+    removeMessage,
+    setConversationId
   };
-}
-
-export default useMessageHandling;
+};

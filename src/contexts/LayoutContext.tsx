@@ -1,16 +1,18 @@
 
 import React, { createContext, useState, useContext } from 'react';
 
-type LayoutContextType = {
+export type LayoutContextType = {
   sidebarCollapsed: boolean;
   toggleSidebar: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
+  sidebarOpen?: boolean; // Added for compatibility
 };
 
-const LayoutContext = createContext<LayoutContextType>({
+export const LayoutContext = createContext<LayoutContextType>({
   sidebarCollapsed: false,
   toggleSidebar: () => {},
   setSidebarCollapsed: () => {},
+  sidebarOpen: true,
 });
 
 export const LayoutProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -21,7 +23,12 @@ export const LayoutProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   return (
-    <LayoutContext.Provider value={{ sidebarCollapsed, toggleSidebar, setSidebarCollapsed }}>
+    <LayoutContext.Provider value={{ 
+      sidebarCollapsed, 
+      toggleSidebar, 
+      setSidebarCollapsed,
+      sidebarOpen: !sidebarCollapsed 
+    }}>
       {children}
     </LayoutContext.Provider>
   );

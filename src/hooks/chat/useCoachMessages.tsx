@@ -1,48 +1,48 @@
 
 import { useState, useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
 
-/**
- * Hook spécialisé pour gérer les messages du chat avec le coach
- */
 export function useCoachMessages() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  
-  // Ajouter un nouveau message à la conversation
-  const addMessage = useCallback((message: ChatMessage) => {
-    setMessages(prev => [...prev, message]);
-  }, []);
-  
-  // Remplacer tous les messages (utile lors du chargement d'une conversation existante)
-  const resetMessages = useCallback(() => {
-    setMessages([]);
-  }, []);
-  
-  // Ajouter un message du système (non visible par l'utilisateur)
-  const addSystemMessage = useCallback((text: string) => {
-    const systemMessage: ChatMessage = {
-      id: `system-${Date.now()}`,
-      text,
-      content: text,
-      sender: 'bot',
-      conversation_id: 'system',
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentConversationId, setCurrentConversationId] = useState(uuidv4());
+
+  const addMessage = useCallback((message: string, role: 'user' | 'system' | 'assistant' = 'user') => {
+    const newMessage: ChatMessage = {
+      id: uuidv4(),
+      text: message,
+      content: message,
+      sender: role,
+      role: role,
+      conversation_id: currentConversationId,
       timestamp: new Date().toISOString()
     };
     
-    setMessages(prev => [...prev, systemMessage]);
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    return newMessage;
+  }, [currentConversationId]);
+
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+    setCurrentConversationId(uuidv4());
   }, []);
-  
-  // Supprimer le dernier message (utile pour annuler une action)
-  const removeLastMessage = useCallback(() => {
-    setMessages(prev => prev.slice(0, -1));
+
+  const startNewConversation = useCallback(() => {
+    const newConversationId = uuidv4();
+    setCurrentConversationId(newConversationId);
+    return newConversationId;
   }, []);
-  
+
   return {
     messages,
-    setMessages,
+    isLoading,
+    setIsLoading,
     addMessage,
-    resetMessages,
-    addSystemMessage,
-    removeLastMessage
+    clearMessages,
+    currentConversationId,
+    startNewConversation
   };
 }
+
+export default useCoachMessages;

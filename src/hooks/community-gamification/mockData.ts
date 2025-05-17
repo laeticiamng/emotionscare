@@ -1,83 +1,93 @@
-
-import { Badge } from '@/types/badge';
-import { Challenge, LeaderboardEntry } from '@/types/gamification';
+import { Badge, Challenge } from '@/types';
 
 // Mock data for community gamification
 
 export const mockChallenges: Challenge[] = [
   {
-    id: 'challenge1',
-    title: 'Partage quotidien',
-    description: 'Partagez votre ressenti dans la communauté chaque jour pendant 5 jours',
-    points: 50,
-    progress: 3,
-    totalSteps: 5,
-    completed: false,
-    difficulty: 'medium',
-    category: 'community'
-  },
-  {
-    id: 'challenge2',
-    title: 'Supporter actif',
-    description: 'Apportez votre soutien à 3 publications de la communauté',
-    points: 30,
-    progress: 2,
-    totalSteps: 3,
-    completed: false,
-    difficulty: 'easy',
-    category: 'community'
-  },
-  {
-    id: 'challenge3',
-    title: 'Première connexion',
-    description: 'Bienvenue dans la communauté !',
-    points: 10,
-    progress: 1,
-    totalSteps: 1,
+    id: "challenge-1",
+    title: "Première connexion",
+    name: "Première connexion",
+    description: "Connectez-vous pour la première fois à l'application",
+    progress: 100,
     completed: true,
-    difficulty: 'easy',
-    category: 'onboarding'
+    status: "completed",
+    points: 10,
+    difficulty: "easy",
+    category: "onboarding",
+    tags: ["débutant", "connexion"],
+    goal: "1",
+    totalSteps: 1
+  },
+  {
+    id: "challenge-2",
+    title: "Remplir son profil",
+    name: "Remplir son profil",
+    description: "Complétez votre profil à 100%",
+    progress: 75,
+    completed: false,
+    status: "in-progress",
+    points: 15,
+    difficulty: "medium",
+    category: "profile",
+    tags: ["profile", "données"],
+    goal: "100%",
+    totalSteps: 4
+  },
+  {
+    id: "challenge-3",
+    title: "Méditation quotidienne",
+    name: "Méditation quotidienne",
+    description: "Faites 7 jours consécutifs de méditation",
+    progress: 40,
+    completed: false,
+    status: "in-progress",
+    points: 25,
+    difficulty: "hard",
+    category: "wellbeing",
+    tags: ["méditation", "régularité", "bien-être"],
+    goal: "7",
+    totalSteps: 7
   }
 ];
 
 export const mockBadges: Badge[] = [
   {
-    id: 'badge1',
-    name: 'Membre de la communauté',
-    description: 'A rejoint la communauté EmotionsCare',
-    imageUrl: '/badges/community-member.svg',
-    category: 'community',
-    level: 'bronze',
+    id: "badge-1",
+    name: "Explorateur Novice",
+    description: "A complété sa première session sur la plateforme",
     unlocked: true,
-    unlockedAt: '2025-04-01T10:00:00Z',
-    earned: true, 
-    progress: 1,
-    threshold: 1
-  },
-  {
-    id: 'badge2',
-    name: 'Entraide',
-    description: 'A aidé 5 membres de la communauté',
-    imageUrl: '/badges/helper.svg',
-    category: 'community',
-    level: 'silver',
-    unlocked: true,
-    unlockedAt: '2025-04-15T14:30:00Z',
     earned: true,
-    progress: 5,
-    threshold: 5
+    earnedAt: "2023-04-15",
+    category: "engagement",
+    level: 1,
+    progress: 100,
+    threshold: 1,
+    tier: "bronze"
   },
   {
-    id: 'badge3',
-    name: 'Influenceur',
-    description: 'Publier 10 messages qui ont reçu des réactions',
-    imageUrl: '/badges/influencer.svg',
-    category: 'community',
-    level: 'gold',
-    unlocked: false,
-    progress: 7,
+    id: "badge-2",
+    name: "Apprenti Méditant",
+    description: "A complété 10 minutes de méditation",
+    unlocked: true,
+    earned: true,
+    earnedAt: "2023-04-18",
+    category: "méditation",
+    level: 1,
+    progress: 100,
     threshold: 10,
-    earned: false
+    tier: "bronze"
+  },
+  {
+    id: "badge-3",
+    name: "Journal Intime",
+    description: "A écrit 3 entrées dans son journal émotionnel",
+    unlocked: false,
+    earned: false,
+    category: "journal",
+    level: 2,
+    progress: 30,
+    threshold: 3,
+    tier: "silver"
   }
 ];
 

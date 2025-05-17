@@ -24,6 +24,7 @@ export interface AudioTrack {
     danceability?: number;
     acousticness?: number;
   };
+  audioUrl?: string;
 }
 
 export interface AudioPlayerState {

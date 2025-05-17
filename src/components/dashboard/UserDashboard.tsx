@@ -1,182 +1,183 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge as BadgeType } from '@/types/badge';
-import { GamificationStats } from '@/types/gamification';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Plus, Zap, Trophy, ArrowRight } from 'lucide-react';
+import { mockChallenges } from '@/hooks/community-gamification/mockData';
+import DashboardContent from './DashboardContent';
 
-const UserDashboard = () => {
-  // Mock data - in a real app, this would come from an API/context
-  const badges: BadgeType[] = [
-    {
-      id: '1',
-      name: 'Explorateur Émotionnel',
-      description: 'Vous avez exploré vos émotions pendant 7 jours consécutifs',
-      image: '/images/badges/explorer.svg',
-      imageUrl: '/images/badges/explorer.svg',
-      unlocked: true,
-      achieved: true,
-      earnedAt: '2023-05-10',
-      earned: true,
-      category: 'engagement',
-      icon: '🧭',
-      level: 1
-    },
-    {
-      id: '2',
-      name: 'Maître de la Pleine Conscience',
-      description: 'Vous avez complété 10 sessions de pleine conscience',
-      image: '/images/badges/mindfulness.svg',
-      imageUrl: '/images/badges/mindfulness.svg',
-      unlocked: true,
-      achieved: true,
-      earned: true,
-      progress: 10,
-      threshold: 10,
-      category: 'mindfulness',
-      icon: '🧘‍♂️',
-      level: 2
-    },
-    {
-      id: '3',
-      name: 'Ami des Émotions',
-      description: 'Vous avez aidé 5 autres utilisateurs dans leur parcours émotionnel',
-      image: '/images/badges/friend.svg',
-      imageUrl: '/images/badges/friend.svg',
-      unlocked: false,
-      achieved: false,
-      earned: false,
-      progress: 3,
-      threshold: 5,
-      category: 'social',
-      icon: '🤝',
-      level: 1
-    }
+const UserDashboard: React.FC = () => {
+  const userPoints = 150;
+  const userStreak = 7;
+  const userBadges = 5;
+  
+  const recentChallenges = mockChallenges.slice(0, 3).map((challenge) => ({
+    id: challenge.id,
+    title: challenge.title,
+    progress: challenge.progress,
+    points: challenge.points.toString(),
+    difficulty: challenge.difficulty
+  }));
+  
+  const moodData = [
+    { date: '2023-08-01', mood: 3 },
+    { date: '2023-08-02', mood: 4 },
+    { date: '2023-08-03', mood: 5 },
+    { date: '2023-08-04', mood: 4 },
+    { date: '2023-08-05', mood: 3 },
+    { date: '2023-08-06', mood: 4 },
+    { date: '2023-08-07', mood: 5 }
   ];
   
-  const stats: GamificationStats = {
-    level: 4,
-    xp: 356,
-    xpToNextLevel: 500,
-    rank: 4,
-    points: 780,
-    streakDays: 7,
-    longestStreak: 14,
-    completedChallenges: 12,
-    totalChallenges: 25,
-    unlockedBadges: 8,
-    totalBadges: 20,
-    nextLevelPoints: 500,
-    totalPoints: 780,
-    challengesCompleted: 12,
-    challenges: [],
-    streak: 7,
-    badges: []
-  };
-
+  const todaysMoodScore = 4;
+  const moodAverage = moodData.reduce((sum, entry) => sum + entry.mood, 0) / moodData.length;
+  
+  const completedSessions = 12;
+  const totalSessionsGoal = 20;
+  
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Tableau de bord</h1>
+    <DashboardContent>
+      {/* Dashboard Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">Tableau de bord</h1>
+        <p className="text-muted-foreground">
+          Bienvenue ! Voici votre progression et activités récentes.
+        </p>
+      </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mb-6">
         <Card>
-          <CardContent className="p-4">
-            <div className="text-lg font-medium">Niveau</div>
-            <div className="text-3xl font-bold">{stats.level}</div>
-            <div className="text-sm text-gray-500">{stats.xp} / {stats.xpToNextLevel} XP</div>
-            <div className="mt-2 h-2 bg-gray-200 rounded-full">
-              <div 
-                className="h-2 bg-blue-500 rounded-full" 
-                style={{ width: `${(stats.xp / stats.xpToNextLevel) * 100}%` }}
-              ></div>
-            </div>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Points Totaux</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{userPoints.toString()}</div>
+            <p className="text-xs text-muted-foreground">
+              + 25 cette semaine
+            </p>
           </CardContent>
         </Card>
-        
         <Card>
-          <CardContent className="p-4">
-            <div className="text-lg font-medium">Série actuelle</div>
-            <div className="text-3xl font-bold">{stats.streakDays} jours</div>
-            <div className="text-sm text-gray-500">
-              Série la plus longue: {stats.longestStreak} jours
-            </div>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Série Actuelle</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{userStreak.toString()} jours</div>
+            <p className="text-xs text-muted-foreground">
+              Votre meilleur: 9 jours
+            </p>
           </CardContent>
         </Card>
-        
         <Card>
-          <CardContent className="p-4">
-            <div className="text-lg font-medium">Points</div>
-            <div className="text-3xl font-bold">{stats.points}</div>
-            <div className="text-sm text-gray-500">
-              Rang: {stats.rank}
-            </div>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Badges Débloqués</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{userBadges.toString()}/15</div>
+            <p className="text-xs text-muted-foreground">
+              2 badges proches du déblocage
+            </p>
           </CardContent>
         </Card>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Today's Mood */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Humeur du jour</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            {[1, 2, 3, 4, 5].map((level) => (
+              <div
+                key={level}
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-lg 
+                ${level === todaysMoodScore 
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'bg-muted text-muted-foreground'}`}
+              >
+                {level}
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-muted-foreground">
+            Votre moyenne sur 7 jours: {moodAverage.toFixed(1)}/5
+          </p>
+        </CardContent>
+      </Card>
+      
+      {/* Challenges */}
+      <div className="grid gap-6 md:grid-cols-2">
         <Card>
-          <CardContent className="p-4">
-            <h2 className="text-xl font-bold mb-3">Challenges</h2>
-            <div className="flex items-center justify-between mb-2">
-              <div>Challenges complétés</div>
-              <div className="font-bold">{stats.completedChallenges} / {stats.totalChallenges}</div>
-            </div>
-            <div className="h-2 bg-gray-200 rounded-full mb-4">
-              <div 
-                className="h-2 bg-green-500 rounded-full" 
-                style={{ width: `${(stats.completedChallenges / stats.totalChallenges) * 100}%` }}
-              ></div>
-            </div>
-            
-            <div className="text-sm text-blue-600 hover:underline cursor-pointer">
-              Voir tous les challenges
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-4">
-            <h2 className="text-xl font-bold mb-3">Badges</h2>
-            <div className="flex items-center justify-between mb-2">
-              <div>Badges débloqués</div>
-              <div className="font-bold">{stats.unlockedBadges} / {stats.totalBadges}</div>
-            </div>
-            <div className="h-2 bg-gray-200 rounded-full mb-4">
-              <div 
-                className="h-2 bg-purple-500 rounded-full" 
-                style={{ width: `${(stats.unlockedBadges / stats.totalBadges) * 100}%` }}
-              ></div>
-            </div>
-            
-            <div className="flex space-x-4 mt-4">
-              {badges.map((badge) => (
-                <div key={badge.id} className="text-center">
-                  <div 
-                    className={`w-12 h-12 rounded-full mx-auto mb-1 flex items-center justify-center 
-                    ${badge.unlocked ? 'bg-purple-100' : 'bg-gray-100'}`}
-                  >
-                    {badge.image && (
-                      <img
-                        src={badge.image}
-                        alt={badge.name}
-                        className={`w-8 h-8 ${!badge.unlocked && 'opacity-50 grayscale'}`}
-                      />
-                    )}
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Défis en cours</CardTitle>
+            <Button variant="ghost" size="icon">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {recentChallenges.map((challenge) => (
+                <div key={challenge.id} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">{challenge.title}</span>
+                    <span className="text-xs bg-muted px-2 py-1 rounded-md">
+                      {challenge.points} pts
+                    </span>
                   </div>
-                  <div className="text-xs font-medium truncate w-16">
-                    {badge.name}
-                  </div>
+                  <Progress value={challenge.progress} className="h-2" />
                 </div>
               ))}
+              <Button variant="outline" className="w-full mt-2" size="sm">
+                Voir tous les défis
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </div>
-            
-            <div className="text-sm text-blue-600 hover:underline cursor-pointer mt-2">
-              Voir tous les badges
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Sessions de bien-être</CardTitle>
+            <Button variant="ghost" size="icon">
+              <Zap className="h-4 w-4" />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold">{completedSessions}/{totalSessionsGoal}</div>
+                <p className="text-xs text-muted-foreground">
+                  Sessions réalisées ce mois-ci
+                </p>
+                <Progress 
+                  value={completedSessions} 
+                  max={totalSessionsGoal}
+                  className="h-2 mt-2"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                <Button variant="outline" className="w-full" size="sm">
+                  Méditation
+                </Button>
+                <Button variant="outline" className="w-full" size="sm">
+                  Relaxation
+                </Button>
+                <Button variant="outline" className="w-full" size="sm">
+                  Journal
+                </Button>
+                <Button variant="outline" className="w-full" size="sm">
+                  Exercices
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardContent>
   );
 };
 
