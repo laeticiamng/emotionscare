@@ -11,7 +11,10 @@ const MusicContext = createContext<MusicContextType>({
   currentTime: 0,
   muted: false,
   playlist: [],
-  currentPlaylist: null, // Initialize with null instead of undefined[]
+  currentPlaylist: {
+    id: 'empty',
+    tracks: []
+  },
   togglePlay: () => {},
   nextTrack: () => {},
   previousTrack: () => {},
@@ -40,7 +43,10 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
   const [currentEmotion, setCurrentEmotion] = useState<string | undefined>(undefined);
-  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
+  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist>({
+    id: 'default',
+    tracks: []
+  });
   
   // Audio element reference
   const audioRef = React.useRef<HTMLAudioElement | null>(null);

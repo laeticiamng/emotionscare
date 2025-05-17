@@ -19,7 +19,7 @@ export const useCoachChat = () => {
       
       setMessages(prevMessages => {
         const updatedMessages = [...prevMessages, { text: message, sender: 'user' }];
-        return [...updatedMessages, { text: response, sender: 'coach' }];
+        return [...updatedMessages, { text: response, sender: 'assistant' }];
       });
       return response;
     } catch (error) {

@@ -18,3 +18,4 @@ export interface Notification {
 }
 
 export type NotificationType = string;
+
