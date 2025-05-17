@@ -7,8 +7,8 @@ import { Sun, Moon, Laptop, Palette } from 'lucide-react';
 import { Theme } from '@/types/theme';
 
 export interface ThemeSettingsTabProps {
-  currentTheme: string;
-  onThemeChange: (theme: string) => void;
+  currentTheme: Theme;
+  onThemeChange: (theme: Theme) => void;
 }
 
 export const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({

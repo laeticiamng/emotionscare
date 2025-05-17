@@ -1,9 +1,10 @@
+
 import React, { createContext, useState, useCallback, useContext } from 'react';
 
 interface CoachHandlersOptions {
   sendMessageHandler: (message: string, conversationHistory: any[]) => Promise<string>;
   analyzeEmotionHandler: (text: string) => Promise<{ emotion: string; score: number }>;
-  getRecommendationsHandler: (category: string) => string[];
+  getRecommendationsHandler: (category: string) => string[]; // Changed return type from Promise<string[]> to string[]
   processUserMessage?: (message: string) => Promise<void>;
   setIsProcessing?: (isProcessing: boolean) => void;
 }
@@ -38,7 +39,7 @@ export const CoachContextProvider: React.FC<CoachContextProviderProps> = ({ chil
     return analyzeEmotionHandler(text);
   }, [analyzeEmotionHandler]);
 
-  const getRecommendations = useCallback(async (category: string) => {
+  const getRecommendations = useCallback((category: string) => {
     if (!getRecommendationsHandler) {
       throw new Error('getRecommendationsHandler is required in handlers');
     }

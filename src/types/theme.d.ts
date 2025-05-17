@@ -1,24 +1,23 @@
 
-import { ThemeName, FontSize, FontFamily } from './preferences';
-
-export type Theme = ThemeName;
+export type Theme = 'light' | 'dark' | 'system' | 'blue-pastel' | 'pastel';
+export type FontSize = 'small' | 'medium' | 'large' | 'xlarge' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'sans-serif';
 
 export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
-  isDarkMode: boolean;
-  fontSize: FontSize;
-  setFontSize: (size: FontSize) => void;
-  fontFamily: FontFamily;
-  setFontFamily: (family: FontFamily) => void;
+  isDarkMode?: boolean;
+  fontSize?: FontSize;
+  setFontSize?: (size: FontSize) => void;
+  fontFamily?: FontFamily;
+  setFontFamily?: (family: FontFamily) => void;
+  toggleTheme?: () => void;
+  getContrastText?: (color: string) => 'black' | 'white';
 }
 
-export { ThemeName, FontSize, FontFamily };
-
 export interface ThemeSettingsTabProps {
-  currentTheme: string;
-  onThemeChange: (theme: string) => void;
+  currentTheme: Theme;
+  onThemeChange: (theme: Theme) => void;
 }
 
 export interface ThemeOption {
