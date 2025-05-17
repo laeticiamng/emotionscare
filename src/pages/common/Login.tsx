@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { getRoleHomePath } from '@/hooks/use-role-redirect';
 
 interface LoginProps {
@@ -17,9 +17,11 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const { toast } = useToast();
   
   // Determine the current mode based on URL
   const getCurrentMode = () => {
@@ -36,6 +38,7 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setLoginError('');
     
     try {
       const user = await login(email, password);
@@ -49,9 +52,13 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
       const redirectPath = getRoleHomePath(user?.role || currentMode);
       navigate(redirectPath);
     } catch (error: any) {
+      console.error("Login error:", error);
+      setLoginError(error.message || "Une erreur s'est produite lors de la connexion");
+      
       toast({
         title: "Erreur de connexion",
         description: error.message || "Une erreur s'est produite lors de la connexion",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
@@ -104,6 +111,13 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
                 required 
               />
             </div>
+            
+            {loginError && (
+              <div className="p-3 text-sm rounded-md bg-destructive/10 text-destructive">
+                {loginError}
+              </div>
+            )}
+            
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Connexion en cours..." : "Se connecter"}
             </Button>

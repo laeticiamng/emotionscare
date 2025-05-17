@@ -5,14 +5,16 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
+// Using placeholder config since we're using the mock authentication in AuthContext
+// In production, this would be replaced with actual Firebase credentials
 export const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
-  measurementId: "YOUR_MEASUREMENT_ID"
+  apiKey: "AIzaSyD_8dx4meyAFo7K_vAV6HUoQn215hzHtkE",
+  authDomain: "emotions-care.firebaseapp.com",
+  projectId: "emotions-care",
+  storageBucket: "emotions-care.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef1234567890abcdef",
+  measurementId: "G-ABCD1234EF"
 };
 
 // Initialize Firebase

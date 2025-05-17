@@ -21,15 +21,15 @@ export interface AuthContextType {
 
 export interface UserPreferences {
   theme: "system" | "dark" | "light" | "pastel";
-  fontSize: string;
-  fontFamily: string;
-  reduceMotion: boolean;
-  colorBlindMode: boolean;
-  autoplayMedia: boolean;
-  soundEnabled: boolean;
+  fontSize?: string;
+  fontFamily?: string;
+  reduceMotion?: boolean;
+  colorBlindMode?: boolean;
+  autoplayMedia?: boolean;
+  soundEnabled?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
-  notifications: {
+  notifications?: {
     enabled: boolean;
     emailEnabled: boolean;
     pushEnabled: boolean;
@@ -54,5 +54,6 @@ export interface UserPreferences {
   };
   dashboardLayout?: Record<string, any> | string;
   onboardingCompleted?: boolean;
+  language?: string;
   [key: string]: any;
 }

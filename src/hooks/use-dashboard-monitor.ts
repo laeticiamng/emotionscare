@@ -3,60 +3,42 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { normalizeUserMode } from '@/utils/userModeHelpers';
 
 /**
- * Hook to monitor dashboard access and potential routing issues
- * This helps debug any issues with accessing dashboards based on roles
+ * A hook that monitors dashboard access for debugging purposes
+ * Logs information about the current user, route, and authentication state
  */
-export function useDashboardMonitor() {
+export const useDashboardMonitor = () => {
   const location = useLocation();
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-  const { userMode, isLoading: userModeLoading } = useUserMode();
+  const { user, isAuthenticated } = useAuth();
+  const { userMode } = useUserMode();
 
   useEffect(() => {
-    // Only log after everything is loaded
-    if (!authLoading && !userModeLoading) {
-      // Check if we're on a dashboard page
-      const isDashboardPage = 
-        location.pathname.includes('/dashboard') || 
-        location.pathname === '/b2c' || 
-        location.pathname === '/b2b/user' || 
-        location.pathname === '/b2b/admin';
+    // Only log for dashboard routes
+    if (location.pathname.includes('/dashboard') || 
+        location.pathname.includes('/b2c') || 
+        location.pathname.includes('/b2b')) {
       
-      if (isDashboardPage) {
-        console.group('Dashboard Navigation Monitoring');
-        console.log('Current path:', location.pathname);
-        console.log('Authentication state:', { isAuthenticated, authLoading });
-        console.log('User info:', user ? { 
-          id: user.id,
-          name: user.name,
-          role: user.role
-        } : 'No user');
-        console.log('User mode:', { userMode, userModeLoading });
+      console.log('[DashboardMonitor] Current route:', location.pathname);
+      console.log('[DashboardMonitor] User authenticated:', isAuthenticated);
+      console.log('[DashboardMonitor] User role:', user?.role);
+      console.log('[DashboardMonitor] User mode:', userMode);
+      
+      // Check for role/mode consistency
+      if (user?.role && userMode) {
+        const normalizedRole = normalizeUserMode(user.role);
+        const normalizedMode = normalizeUserMode(userMode);
         
-        // Check for potential issues
-        if (isAuthenticated && user) {
-          // Check if on the correct dashboard for user role
-          if (user.role === 'b2c' && !location.pathname.startsWith('/b2c')) {
-            console.warn('B2C user accessing non-B2C dashboard!');
-          } else if (user.role === 'b2b_user' && !location.pathname.startsWith('/b2b/user')) {
-            console.warn('B2B user accessing non-B2B-user dashboard!');
-          } else if (user.role === 'b2b_admin' && !location.pathname.startsWith('/b2b/admin')) {
-            console.warn('B2B admin accessing non-B2B-admin dashboard!');
-          }
-          
-          // Check for role/mode inconsistency
-          if (userMode !== user.role) {
-            console.warn('User role and mode mismatch!', { role: user.role, mode: userMode });
-          }
+        if (normalizedRole !== normalizedMode) {
+          console.warn('[DashboardMonitor] ⚠️ User role and mode mismatch:', {
+            role: user.role,
+            normalizedRole,
+            userMode,
+            normalizedMode
+          });
         }
-        
-        console.groupEnd();
       }
     }
-  }, [location.pathname, isAuthenticated, user, userMode, authLoading, userModeLoading]);
-  
-  return null;
-}
-
-export default useDashboardMonitor;
+  }, [location.pathname, isAuthenticated, user, userMode]);
+};

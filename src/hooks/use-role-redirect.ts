@@ -35,6 +35,7 @@ export function useRoleRedirect() {
       location.pathname === '/b2b/admin/login';
     
     if (isAuthenticated && user && isExplicitLoginPage) {
+      console.log('[useRoleRedirect] Redirecting authenticated user to:', getRoleHomePath(user.role));
       navigate(getRoleHomePath(user.role));
     }
   }, [isAuthenticated, user, isLoading, navigate, location.pathname]);

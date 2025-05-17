@@ -1,28 +1,18 @@
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, UserPreferences } from '@/types/user';
 import { useToast } from '@/hooks/use-toast';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
+import { AuthContextType, UserPreferences } from '@/types/auth';
+import { User } from '@/types/user';
 
-interface AuthContextProps {
-  user: User | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<User>;
-  register: (email: string, password: string, name: string) => Promise<User>;
-  logout: () => Promise<void>;
-  updateUser: (userData: Partial<User>) => Promise<void>;
-  error: string | null;
-  clearError: () => void;
-}
-
-const AuthContext = createContext<AuthContextProps | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -105,8 +95,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       return userData;
     } catch (err: any) {
-      setError(err.message);
-      throw err;
+      const error = new Error(err.message || 'Failed to login');
+      setError(error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -137,8 +128,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       navigate('/');
     } catch (err: any) {
-      setError(err.message);
-      throw err;
+      const error = new Error(err.message || 'Failed to logout');
+      setError(error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -186,8 +178,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       return userData;
     } catch (err: any) {
-      setError(err.message);
-      throw err;
+      const error = new Error(err.message || 'Failed to register');
+      setError(error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -211,7 +204,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
     } catch (error: any) {
-      setError(error.message);
+      setError(error);
       toast({
         title: "Erreur de mise à jour",
         description: "Il y a eu une erreur lors de la mise à jour de votre profil.",
@@ -220,7 +213,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const value: AuthContextProps = {
+  const value: AuthContextType = {
     user,
     isLoading,
     isAuthenticated,
