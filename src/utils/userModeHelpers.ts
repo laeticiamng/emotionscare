@@ -4,22 +4,25 @@ import { UserModeType } from '@/types/userMode';
 export const normalizeUserMode = (mode?: string): UserModeType | string => {
   if (!mode) return 'b2c';
 
-  // Normaliser les différentes versions possibles des modes utilisateur
-  const normalizedMode = mode.toLowerCase().replace('-', '_');
+  // Normalize different possible versions of user modes
+  const normalizedMode = mode.toLowerCase();
   
-  if (normalizedMode.includes('b2b') && normalizedMode.includes('admin')) {
+  // Convert hyphenated formats to underscore format
+  const formattedMode = normalizedMode.replace('-', '_');
+  
+  if (formattedMode.includes('b2b') && formattedMode.includes('admin')) {
     return 'b2b_admin';
   }
   
-  if (normalizedMode.includes('b2b') && normalizedMode.includes('user')) {
+  if (formattedMode.includes('b2b') && formattedMode.includes('user')) {
     return 'b2b_user';
   }
   
-  if (normalizedMode === 'b2c' || normalizedMode === 'user') {
+  if (formattedMode === 'b2c' || formattedMode === 'user') {
     return 'b2c';
   }
   
-  // Retourner le mode tel quel si aucune correspondance n'est trouvée
+  // Return the mode as is if no match is found
   return mode;
 };
 

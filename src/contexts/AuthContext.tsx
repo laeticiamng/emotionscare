@@ -1,17 +1,8 @@
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '@/config/firebase';
-import { 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
-  User as FirebaseUser
-} from 'firebase/auth';
 import { User, UserPreferences } from '@/types/user';
 import { useToast } from '@/hooks/use-toast';
+import { normalizeUserMode } from '@/utils/userModeHelpers';
 
 interface AuthContextProps {
   user: User | null;
@@ -34,160 +25,185 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const clearError = () => {
     setError(null);
   };
 
+  // Add debug logging to track authentication state
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setIsLoading(true);
-      if (firebaseUser) {
-        // Extract user role from local storage
-        const userRole = localStorage.getItem('user_role') as User['role'];
-        
-        // Default preferences
-        const defaultPreferences: UserPreferences = {
-          theme: 'light',
-          language: 'fr',
-          notifications_enabled: true,
-          email_notifications: true
-        };
-        
-        const userData: User = {
-          id: firebaseUser.uid,
-          email: firebaseUser.email || '',
-          name: firebaseUser.displayName || 'Utilisateur',
-          role: userRole || 'b2c',
-          created_at: firebaseUser.metadata.creationTime || new Date().toISOString(),
-          preferences: defaultPreferences
-        };
-        
-        setUser(userData);
-        setIsAuthenticated(true);
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-      }
-      setIsLoading(false);
-    });
+    console.log('[AuthContext] Authentication state:', { isAuthenticated, user });
+  }, [isAuthenticated, user]);
 
-    return () => unsubscribe();
+  useEffect(() => {
+    // Check for existing user session in localStorage
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        
+        // Normalize the user role to ensure consistency
+        if (parsedUser.role) {
+          parsedUser.role = normalizeUserMode(parsedUser.role);
+        }
+        
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+        console.log('[AuthContext] Restored user session:', parsedUser);
+      }
+    } catch (error) {
+      console.error('[AuthContext] Error restoring session:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const login = async (email: string, password: string): Promise<User> => {
     try {
       clearError();
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const firebaseUser = userCredential.user;
+      setIsLoading(true);
       
-      // Extract user role from local storage
-      const userRole = localStorage.getItem('user_role') as User['role'];
+      // Simulate API request
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Default preferences
-      const defaultPreferences: UserPreferences = {
-        theme: 'light',
-        language: 'fr',
-        notifications_enabled: true,
-        email_notifications: true
-      };
-
+      // Determine role based on email for demo purposes
+      let role = 'b2c';
+      if (email.includes('admin')) {
+        role = 'b2b_admin';
+      } else if (email.includes('b2b') || email.includes('collaborateur')) {
+        role = 'b2b_user';
+      }
+      
+      // Mock user data
       const userData: User = {
-        id: firebaseUser.uid,
-        email: firebaseUser.email || '',
-        name: firebaseUser.displayName || 'Utilisateur',
-        role: userRole || 'b2c',
-        created_at: firebaseUser.metadata.creationTime || new Date().toISOString(),
-        preferences: defaultPreferences
+        id: `user-${Date.now()}`,
+        email,
+        name: email.split('@')[0],
+        role,
+        created_at: new Date().toISOString(),
+        preferences: {
+          theme: 'system',
+          language: 'fr',
+          notifications_enabled: true,
+          email_notifications: true,
+          soundEnabled: true,
+          reduceMotion: false,
+          colorBlindMode: false,
+          autoplayMedia: true
+        }
       };
       
       setUser(userData);
       setIsAuthenticated(true);
+      
+      // Store in localStorage
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('user_role', role);
+      localStorage.setItem('userMode', role);
+      
+      console.log('[AuthContext] User logged in:', userData);
+      
       return userData;
     } catch (err: any) {
       setError(err.message);
       throw err;
-    }
-  };
-
-  const register = async (email: string, password: string, name: string): Promise<User> => {
-    try {
-      clearError();
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const firebaseUser = userCredential.user;
-
-      await updateProfile(firebaseUser, {
-        displayName: name
-      });
-      
-      // Default preferences
-      const defaultPreferences: UserPreferences = {
-        theme: 'light',
-        language: 'fr',
-        notifications_enabled: true,
-        email_notifications: true
-      };
-
-      const userData: User = {
-        id: firebaseUser.uid,
-        email: firebaseUser.email || '',
-        name: name,
-        role: 'b2c', // Default role
-        created_at: firebaseUser.metadata.creationTime || new Date().toISOString(),
-        preferences: defaultPreferences
-      };
-      
-      setUser(userData);
-      setIsAuthenticated(true);
-      return userData;
-    } catch (err: any) {
-      setError(err.message);
-      throw err;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const logout = async (): Promise<void> => {
     try {
       clearError();
-      await signOut(auth);
+      setIsLoading(true);
+      
+      // Simulate API request
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       setUser(null);
       setIsAuthenticated(false);
       
-      localStorage.removeItem('auth_session');
+      // Clear stored data
+      localStorage.removeItem('user');
       localStorage.removeItem('user_role');
       localStorage.removeItem('userMode');
       
+      console.log('[AuthContext] User logged out');
+      
       toast({
         title: "Déconnexion réussie",
-        description: "À bientôt !",
+        description: "À bientôt !"
       });
       
       navigate('/');
     } catch (err: any) {
       setError(err.message);
       throw err;
+    } finally {
+      setIsLoading(false);
     }
   };
-  
+
+  const register = async (email: string, password: string, name: string): Promise<User> => {
+    try {
+      clearError();
+      setIsLoading(true);
+      
+      // Simulate API request
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Default role for new users
+      const role = 'b2c';
+      
+      // Create user
+      const userData: User = {
+        id: `user-${Date.now()}`,
+        email,
+        name,
+        role,
+        created_at: new Date().toISOString(),
+        preferences: {
+          theme: 'system',
+          language: 'fr',
+          notifications_enabled: true,
+          email_notifications: true,
+          soundEnabled: true,
+          reduceMotion: false,
+          colorBlindMode: false,
+          autoplayMedia: true
+        }
+      };
+      
+      setUser(userData);
+      setIsAuthenticated(true);
+      
+      // Store in localStorage
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('user_role', role);
+      localStorage.setItem('userMode', role);
+      
+      console.log('[AuthContext] User registered:', userData);
+      
+      return userData;
+    } catch (err: any) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const updateUser = async (userData: Partial<User>): Promise<void> => {
     try {
-      if (auth.currentUser) {
-        if (userData.name) {
-          await updateProfile(auth.currentUser, {
-            displayName: userData.name,
-            photoURL: userData.avatar_url || userData.avatarUrl || auth.currentUser.photoURL
-          });
-        }
+      if (user) {
+        // Update user data
+        const updatedUser = { ...user, ...userData };
+        setUser(updatedUser);
         
-        setUser(prevUser => {
-          if (prevUser) {
-            return {
-              ...prevUser,
-              ...userData
-            };
-          }
-          return prevUser;
-        });
+        // Update localStorage
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        
+        console.log('[AuthContext] User updated:', updatedUser);
         
         toast({
           title: "Profil mis à jour",

@@ -59,7 +59,7 @@ export const routes: RouteObject[] = [
   {
     path: 'b2c',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requiredRole="b2c">
         <B2CLayout />
       </ProtectedRoute>
     ),
@@ -82,7 +82,7 @@ export const routes: RouteObject[] = [
   {
     path: 'b2b/user',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requiredRole="b2b_user">
         <B2BUserLayout />
       </ProtectedRoute>
     ),
@@ -105,7 +105,7 @@ export const routes: RouteObject[] = [
   {
     path: 'b2b/admin',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute requiredRole="b2b_admin">
         <B2BAdminLayout />
       </ProtectedRoute>
     ),

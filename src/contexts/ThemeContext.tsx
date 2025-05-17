@@ -1,160 +1,161 @@
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { ThemeName, Theme } from '@/types/theme';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { UserPreferences } from '@/types/preferences';
 
-// Export the ThemeContext so it can be imported directly
-export const ThemeContext = createContext<ThemeContextType>({
-  theme: 'system' as ThemeName,
-  setTheme: () => null,
-  toggleTheme: () => null,
-  themes: {} as Record<ThemeName, Theme>
-});
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 
-interface ThemeContextType {
-  theme: ThemeName;
-  setTheme: (theme: ThemeName) => void;
-  toggleTheme: () => void;
-  themes: Record<ThemeName, Theme>;
-  soundEnabled?: boolean;
-  setSoundEnabled?: (enabled: boolean) => void;
-  reduceMotion?: boolean;
-  setReduceMotion?: (reduced: boolean) => void;
-  isDarkMode?: boolean;
+export interface Theme {
+  name: string;
+  value: ThemeName;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    text: string;
+  };
 }
 
-const defaultTheme: ThemeName = 'system';
+export interface ThemeContextType {
+  theme: Theme;
+  setTheme: (theme: ThemeName) => void;
+  systemTheme: 'dark' | 'light';
+  preferences: UserPreferences;
+  updatePreferences: (preferences: Partial<UserPreferences>) => void;
+}
 
-const defaultThemes: Record<ThemeName, Theme> = {
-  light: {
-    name: 'light',
-    value: 'light',
+const themes: Theme[] = [
+  {
+    name: "Light",
+    value: "light",
     colors: {
-      primary: '#0070f3',
-      secondary: '#ff0080',
-      accent: '#1fb2a6',
-      background: '#ffffff',
-      text: '#1a1a1a'
+      primary: "#3b82f6",
+      secondary: "#10b981",
+      accent: "#8b5cf6",
+      background: "#ffffff",
+      text: "#1f2937"
     }
   },
-  dark: {
-    name: 'dark',
-    value: 'dark',
+  {
+    name: "Dark",
+    value: "dark",
     colors: {
-      primary: '#0070f3',
-      secondary: '#ff0080',
-      accent: '#1fb2a6',
-      background: '#000000',
-      text: '#ffffff'
+      primary: "#60a5fa",
+      secondary: "#34d399",
+      accent: "#a78bfa",
+      background: "#111827",
+      text: "#f3f4f6"
     }
   },
-  system: {
-    name: 'system',
-    value: 'system',
+  {
+    name: "System",
+    value: "system",
     colors: {
-      primary: '#0070f3',
-      secondary: '#ff0080',
-      accent: '#1fb2a6',
-      background: 'system-defined',
-      text: 'system-defined'
+      primary: "#3b82f6",
+      secondary: "#10b981",
+      accent: "#8b5cf6",
+      background: "#ffffff",
+      text: "#1f2937"
     }
   },
-  pastel: {
-    name: 'pastel',
-    value: 'pastel',
+  {
+    name: "Pastel",
+    value: "pastel",
     colors: {
-      primary: '#a0d2eb',
-      secondary: '#e5eaf5',
-      accent: '#d0bdf4',
-      background: '#fcf4ff',
-      text: '#494949'
+      primary: "#a5b4fc",
+      secondary: "#a7f3d0",
+      accent: "#ddd6fe",
+      background: "#f5f7ff",
+      text: "#4b5563"
     }
   }
+];
+
+const getDefaultTheme = (): Theme => {
+  const savedTheme = localStorage.getItem("theme") as ThemeName;
+  if (savedTheme && themes.find((t) => t.value === savedTheme)) {
+    return themes.find((t) => t.value === savedTheme) || themes[0];
+  }
+
+  return themes[0]; // Default to light theme
 };
 
-export const useTheme = () => useContext(ThemeContext);
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<ThemeName>(defaultTheme);
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(false);
-  const [reduceMotion, setReduceMotion] = useState<boolean>(false);
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [theme, setThemeState] = useState<Theme>(getDefaultTheme());
+  const [systemTheme, setSystemTheme] = useState<'dark' | 'light'>('light');
+  const [preferences, setPreferences] = useState<UserPreferences>({
+    theme: "system",
+    soundEnabled: true,
+    autoplayMedia: true,
+    reduceMotion: false,
+    colorBlindMode: false
+  });
   
+  // Detect system theme
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as ThemeName;
-    const savedSoundEnabled = localStorage.getItem('soundEnabled') === 'true';
-    const savedReduceMotion = localStorage.getItem('reduceMotion') === 'true';
-    
-    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'system' || savedTheme === 'pastel')) {
-      setTheme(savedTheme);
-    }
-    
-    setSoundEnabled(savedSoundEnabled);
-    setReduceMotion(savedReduceMotion);
-    
-    // Apply the theme class to the document
-    applyTheme(savedTheme || theme);
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    setSystemTheme(mediaQuery.matches ? "dark" : "light");
+
+    const listener = (e: MediaQueryListEvent) => {
+      setSystemTheme(e.matches ? "dark" : "light");
+    };
+
+    mediaQuery.addEventListener("change", listener);
+    return () => mediaQuery.removeEventListener("change", listener);
   }, []);
-  
-  useEffect(() => {
-    // Apply theme when it changes
-    applyTheme(theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
 
+  // Apply theme to document
   useEffect(() => {
-    localStorage.setItem('soundEnabled', soundEnabled.toString());
-  }, [soundEnabled]);
-
-  useEffect(() => {
-    localStorage.setItem('reduceMotion', reduceMotion.toString());
-  }, [reduceMotion]);
-  
-  const applyTheme = (currentTheme: ThemeName) => {
-    const root = window.document.documentElement;
-    const isDarkTheme = 
-      currentTheme === 'dark' ||
-      (currentTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    let effectiveTheme = theme;
     
-    if (isDarkTheme) {
-      root.classList.add('dark');
-      setIsDarkMode(true);
-    } else {
-      root.classList.remove('dark');
-      setIsDarkMode(false);
+    if (theme.value === "system") {
+      effectiveTheme = themes.find((t) => t.value === systemTheme) || themes[0];
     }
     
-    // Apply special pastel theme if selected
-    if (currentTheme === 'pastel') {
-      root.classList.add('theme-pastel');
-    } else {
-      root.classList.remove('theme-pastel');
+    document.documentElement.classList.remove("light", "dark", "pastel");
+    document.documentElement.classList.add(effectiveTheme.value);
+    
+    localStorage.setItem("theme", theme.value);
+  }, [theme, systemTheme]);
+
+  const setTheme = (themeName: ThemeName) => {
+    const newTheme = themes.find((t) => t.value === themeName) || themes[0];
+    setThemeState(newTheme);
+    updatePreferences({ theme: themeName });
+  };
+
+  const updatePreferences = (newPreferences: Partial<UserPreferences>) => {
+    setPreferences(prev => ({ ...prev, ...newPreferences }));
+    
+    // Apply theme if it's being updated
+    if (newPreferences.theme) {
+      setTheme(newPreferences.theme as ThemeName);
     }
   };
-  
-  const toggleTheme = () => {
-    setTheme(prevTheme => {
-      if (prevTheme === 'light') return 'dark';
-      if (prevTheme === 'dark') return 'system';
-      if (prevTheme === 'system') return 'pastel';
-      return 'light';
-    });
-  };
-  
-  const value = {
-    theme,
-    setTheme,
-    toggleTheme,
-    themes: defaultThemes,
-    soundEnabled,
-    setSoundEnabled,
-    reduceMotion,
-    setReduceMotion,
-    isDarkMode
-  };
-  
+
   return (
-    <ThemeContext.Provider value={value}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        setTheme,
+        systemTheme,
+        preferences,
+        updatePreferences
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );
-}
+};
+
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error("useTheme must be used within a ThemeProvider");
+  }
+  return context;
+};
+
+export default ThemeContext;

@@ -52,5 +52,7 @@ export interface UserPreferences {
     anonymizeReports: boolean;
     profileVisibility: string;
   };
+  dashboardLayout?: Record<string, any> | string;
+  onboardingCompleted?: boolean;
   [key: string]: any;
 }

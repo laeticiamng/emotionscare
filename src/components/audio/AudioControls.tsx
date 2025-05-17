@@ -11,7 +11,8 @@ interface AudioControlsProps {
 }
 
 const AudioControls: React.FC<AudioControlsProps> = ({ minimal = false, className = '' }) => {
-  const { soundEnabled, setSoundEnabled } = useTheme();
+  const { preferences, updatePreferences } = useTheme();
+  const soundEnabled = preferences?.soundEnabled !== undefined ? preferences.soundEnabled : true;
   const [volume, setVolume] = React.useState(0.5);
 
   const handleVolumeChange = (value: number[]) => {
@@ -19,9 +20,9 @@ const AudioControls: React.FC<AudioControlsProps> = ({ minimal = false, classNam
   };
 
   const toggleMute = () => {
-    if (setSoundEnabled) {
-      setSoundEnabled(!soundEnabled);
-    }
+    updatePreferences({
+      soundEnabled: !soundEnabled
+    });
   };
 
   if (minimal) {

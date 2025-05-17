@@ -3,12 +3,16 @@ import React, { Suspense } from 'react';
 import { useRoutes } from 'react-router-dom';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { routes } from './router';
+import { useDashboardMonitor } from './hooks/use-dashboard-monitor';
 
 const AppRouter: React.FC = () => {
   const content = useRoutes(routes);
   
+  // Add monitoring for dashboard access issues
+  useDashboardMonitor();
+  
   if (!content) {
-    console.error("Aucune route ne correspond au chemin actuel");
+    console.error("No route matches the current path");
   }
 
   return (

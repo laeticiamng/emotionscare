@@ -37,7 +37,6 @@ export function useRoleRedirect() {
     if (isAuthenticated && user && isExplicitLoginPage) {
       navigate(getRoleHomePath(user.role));
     }
-    // Never redirect just because the menu is opened
   }, [isAuthenticated, user, isLoading, navigate, location.pathname]);
   
   return { user, isAuthenticated, isLoading };

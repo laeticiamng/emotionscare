@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { 
@@ -14,6 +13,7 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { useUserModeHelpers } from '@/hooks/useUserModeHelpers';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ModeSwitcherProps {
   variant?: "default" | "outline" | "secondary" | "ghost" | "link";
@@ -29,15 +29,34 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
   const { isB2C, isB2BUser, isB2BAdmin } = useUserModeHelpers();
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
+  const { user, updateUser } = useAuth();
   
-  const handleSwitchMode = (mode: string) => {
+  // Add debug logging
+  useEffect(() => {
+    console.log('[ModeSwitcher] Current user mode:', userMode);
+    console.log('[ModeSwitcher] Current user role:', user?.role);
+  }, [userMode, user?.role]);
+  
+  const handleSwitchMode = async (mode: string) => {
     const normalizedMode = normalizeUserMode(mode);
     
     if (normalizedMode === normalizeUserMode(userMode)) {
       return; // Do nothing if selecting the same mode
     }
     
+    // Update UserModeContext
     setUserMode(normalizedMode);
+    
+    // Update user role in AuthContext to keep them in sync
+    if (user && updateUser) {
+      // This ensures role and userMode are consistent
+      await updateUser({ role: normalizedMode as any });
+    }
+    
+    // Update localStorage values
+    localStorage.setItem('userMode', normalizedMode as string);
+    localStorage.setItem('user_role', normalizedMode as string);
+    
     setIsOpen(false);
     
     toast({
@@ -63,6 +82,8 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
       default:
         navigate('/choose-mode');
     }
+    
+    console.log('[ModeSwitcher] Mode switched:', normalizedMode);
   };
   
   return (

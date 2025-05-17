@@ -24,7 +24,7 @@ export interface UserPreferences {
     profileVisibility: 'public' | 'team' | 'private';
     anonymousMode?: boolean;
   };
-  // Préférences supplémentaires
+  // Additional preferences
   avatarUrl?: string;
   displayName?: string;
   pronouns?: string;

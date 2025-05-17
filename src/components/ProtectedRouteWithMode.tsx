@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
+import { useAuth } from '@/contexts/AuthContext';
 import { UserModeType } from '@/types/userMode';
 
 interface ProtectedRouteWithModeProps {
@@ -15,13 +15,37 @@ interface ProtectedRouteWithModeProps {
 const ProtectedRouteWithMode: React.FC<ProtectedRouteWithModeProps> = ({
   children,
   requiredMode,
-  redirectTo = '/choose-mode'
+  redirectTo = '/'
 }) => {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { userMode, isLoading: userModeLoading } = useUserMode();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const location = useLocation();
-  
-  // Show loading state if auth or userMode is still loading
+
+  // Add debug logging to track dashboard access issues
+  useEffect(() => {
+    console.log('[ProtectedRouteWithMode] Current location:', location.pathname);
+    console.log('[ProtectedRouteWithMode] User authenticated:', isAuthenticated);
+    console.log('[ProtectedRouteWithMode] User role:', user?.role);
+    console.log('[ProtectedRouteWithMode] User mode:', userMode);
+    console.log('[ProtectedRouteWithMode] Required mode:', requiredMode);
+    
+    // Check if the user mode and role are consistent
+    if (user?.role) {
+      const normalizedRole = normalizeUserMode(user.role);
+      const normalizedMode = normalizeUserMode(userMode);
+      
+      if (normalizedRole !== normalizedMode) {
+        console.warn('[ProtectedRouteWithMode] User role and mode mismatch:', {
+          role: user.role,
+          normalizedRole,
+          userMode,
+          normalizedMode
+        });
+      }
+    }
+  }, [location.pathname, isAuthenticated, user?.role, userMode, requiredMode]);
+
+  // Show loading state if still loading
   if (authLoading || userModeLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -29,32 +53,24 @@ const ProtectedRouteWithMode: React.FC<ProtectedRouteWithModeProps> = ({
       </div>
     );
   }
-  
+
   // If not authenticated, redirect to login
   if (!isAuthenticated) {
-    let loginPath = '/login';
-    
-    // Determine which login page to redirect to based on the required mode
-    if (requiredMode === 'b2b_admin') {
-      loginPath = '/b2b/admin/login';
-    } else if (requiredMode === 'b2b_user') {
-      loginPath = '/b2b/user/login';
-    } else {
-      loginPath = '/b2c/login';
-    }
-    
-    return <Navigate to={loginPath} state={{ from: location }} />;
+    console.log('[ProtectedRouteWithMode] Redirecting to login: user not authenticated');
+    return <Navigate to="/login" state={{ from: location }} />;
   }
-  
-  // If authenticated but wrong user mode, redirect to choose mode
-  const normalizedUserMode = normalizeUserMode(userMode);
-  const normalizedRequiredMode = normalizeUserMode(requiredMode);
-  
-  if (normalizedUserMode !== normalizedRequiredMode) {
-    return <Navigate to={redirectTo} state={{ from: location }} />;
+
+  // If user is authenticated but doesn't have the required mode, redirect to the specified page
+  if (normalizeUserMode(userMode) !== normalizeUserMode(requiredMode)) {
+    console.log('[ProtectedRouteWithMode] Redirecting: incorrect user mode', {
+      userMode: normalizeUserMode(userMode),
+      requiredMode: normalizeUserMode(requiredMode),
+      redirectTo
+    });
+    return <Navigate to={redirectTo} />;
   }
-  
-  // User is authenticated and has the required mode
+
+  // If user is authenticated and has the required mode, proceed
   return <>{children}</>;
 };
 

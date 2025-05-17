@@ -4,9 +4,15 @@ export interface MusicTrack {
   title: string;
   artist: string;
   duration: number;
-  src?: string;
+  src?: string; // Adding src property that was missing but used
+  audioUrl?: string;
+  track_url?: string;
+  coverUrl?: string;
+  coverImage?: string;
+  cover?: string;
   emotion?: string;
-  coverArt?: string;
+  intensity?: number;
+  category?: string;
   album?: string;
   year?: number;
   genre?: string;
@@ -22,6 +28,8 @@ export interface MusicPlaylist {
   createdAt?: string;
   isPublic?: boolean;
   tags?: string[];
+  title?: string;
+  emotion?: string;
 }
 
 export interface MusicContextType {
@@ -48,6 +56,7 @@ export interface MusicContextType {
   loadPlaylist?: (playlistId: string) => void;
 }
 
+// Additional interfaces kept the same
 export interface MusicDrawerProps {
   open: boolean;
   onClose: () => void;
