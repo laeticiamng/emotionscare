@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useMusic } from '@/contexts';
 import { MusicTrack, EmotionMusicParams, MusicPlaylist } from '@/types/music';
-import { EmotionResult } from '@/types/emotions';
+import { EmotionResult } from '@/types/emotion';
 
 export const EMOTION_TO_MUSIC: Record<string, string> = {
   joy: 'upbeat',
@@ -34,18 +34,21 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
     try {
       const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
       const params: EmotionMusicParams = { emotion: musicType };
-      const playlist = await loadPlaylistForEmotion(params);
       
-      if (playlist && playlist.tracks) {
-        // Make sure all tracks have required properties
-        const tracksWithRequiredProps = playlist.tracks.map(track => ({
-          ...track,
-          url: track.url || track.audioUrl || '',
-          duration: track.duration || 0
-        }));
-        setRecommendedTracks(tracksWithRequiredProps);
-      } else {
-        setRecommendedTracks([]);
+      if (loadPlaylistForEmotion) {
+        const playlist = await loadPlaylistForEmotion(params);
+        
+        if (playlist && playlist.tracks) {
+          // Make sure all tracks have required properties
+          const tracksWithRequiredProps = playlist.tracks.map(track => ({
+            ...track,
+            url: track.url || track.audioUrl || '',
+            duration: track.duration || 0
+          }));
+          setRecommendedTracks(tracksWithRequiredProps);
+        } else {
+          setRecommendedTracks([]);
+        }
       }
     } catch (error) {
       console.error('Error loading music recommendations:', error);
@@ -56,7 +59,7 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
   };
   
   const playRecommendedTrack = (track: MusicTrack) => {
-    if (track) {
+    if (track && playTrack) {
       playTrack({
         ...track,
         url: track.url || track.audioUrl || '',
@@ -76,7 +79,9 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
   const handlePlayMusic = (emotion: string) => {
     const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
     const params: EmotionMusicParams = { emotion: musicType };
-    loadPlaylistForEmotion(params);
+    if (loadPlaylistForEmotion) {
+      loadPlaylistForEmotion(params);
+    }
     return playFirstRecommendation();
   };
   

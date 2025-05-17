@@ -8,6 +8,7 @@ export interface Invitation {
   expires_at: string;
   accepted_at?: string;
   token: string;
+  sent_at?: string;
 }
 
 export interface InvitationVerificationResult {
@@ -35,4 +36,12 @@ export interface InvitationStats {
   pending: number;
   accepted: number;
   expired: number;
+  rejected?: number;
+  sent?: number;
+  completed?: number;
+  conversionRate?: number;
+  conversion_rate?: number;
+  averageTimeToAccept?: number;
+  teams?: Record<string, number>;
+  recent_invites?: any[];
 }

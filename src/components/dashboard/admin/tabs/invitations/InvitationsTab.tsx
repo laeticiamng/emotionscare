@@ -13,10 +13,12 @@ const InvitationsTab = () => {
     total: 0,
     pending: 0,
     accepted: 0,
-    rejected: 0,
     expired: 0,
+    rejected: 0,
     sent: 0,
-    completed: 0
+    completed: 0,
+    conversion_rate: 0,
+    last_sent: []
   });
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -38,29 +40,34 @@ const InvitationsTab = () => {
       {
         id: 'inv1',
         email: 'johndoe@example.com',
+        name: 'John Doe',
         status: 'accepted',
-        sentAt: '2023-10-15T14:30:00Z',
-        acceptedAt: '2023-10-16T09:12:00Z',
+        sent_at: '2023-10-15T14:30:00Z',
+        accepted_at: '2023-10-16T09:12:00Z',
         role: 'user',
+        sent_by: 'admin',
         created_at: '2023-10-15T14:30:00Z',
         expires_at: '2023-10-22T14:30:00Z',
-        accepted_at: '2023-10-16T09:12:00Z'
       },
       {
         id: 'inv2',
         email: 'janedoe@example.com',
+        name: 'Jane Doe',
         status: 'pending',
-        sentAt: '2023-10-16T11:20:00Z',
+        sent_at: '2023-10-16T11:20:00Z',
         role: 'user',
+        sent_by: 'admin',
         created_at: '2023-10-16T11:20:00Z',
         expires_at: '2023-10-23T11:20:00Z'
       },
       {
         id: 'inv3',
         email: 'robert@example.com',
+        name: 'Robert Smith',
         status: 'expired',
-        sentAt: '2023-09-29T08:45:00Z',
+        sent_at: '2023-09-29T08:45:00Z',
         role: 'manager',
+        sent_by: 'admin',
         created_at: '2023-09-29T08:45:00Z',
         expires_at: '2023-10-06T08:45:00Z'
       }
@@ -74,6 +81,7 @@ const InvitationsTab = () => {
       rejected: 5,
       sent: 120,
       completed: 67,
+      conversion_rate: 51.7,
       conversionRate: 51.7,
       averageTimeToAccept: 32, // hours
       teams: {
@@ -83,7 +91,8 @@ const InvitationsTab = () => {
         'HR': 15,
         'Management': 20
       },
-      recent_invites: mockInvites
+      recent_invites: mockInvites,
+      last_sent: []
     });
     
     setLoading(false);

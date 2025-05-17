@@ -2,53 +2,38 @@
 export interface MusicTrack {
   id: string;
   title: string;
-  artist: string;
-  duration: number;
+  artist?: string;
+  duration?: number;
   url?: string;
   audioUrl?: string;
   coverUrl?: string;
-  cover?: string;
   coverImage?: string;
-  emotion?: string;
-  genre?: string;
   album?: string;
-  category?: string;
+  genre?: string;
+  emotion?: string;
+  intensity?: number;
 }
 
 export interface MusicPlaylist {
   id: string;
-  name?: string;
+  name: string;
   title?: string;
+  description?: string;
   emotion?: string;
   mood?: string;
   tracks: MusicTrack[];
-  description?: string;
   coverUrl?: string;
-  coverImage?: string;
-  category?: string;
-}
-
-export interface EmotionMusicParams {
-  emotion: string;
-  intensity?: number;
 }
 
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   playlist: MusicPlaylist | null;
-  playlists?: MusicPlaylist[];
   isPlaying: boolean;
   volume: number;
-  isMuted?: boolean;
   muted: boolean;
+  isMuted?: boolean;
   currentTime: number;
   duration: number;
-  recommendations?: MusicTrack[];
-  isLoading?: boolean;
-  error?: Error | null;
-  isInitialized?: boolean;
-  openDrawer: boolean;
-  emotion: string | null;
   playTrack: (track: MusicTrack) => void;
   pauseTrack?: () => void;
   resumeTrack?: () => void;
@@ -58,65 +43,58 @@ export interface MusicContextType {
   setVolume: (volume: number) => void;
   toggleMute?: () => void;
   seekTo: (time: number) => void;
-  loadPlaylistForEmotion?: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null> | MusicPlaylist | null;
+  loadPlaylistForEmotion?: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
+  loadPlaylist?: (playlist: MusicPlaylist) => void;
+  recommendByEmotion?: (emotion: string, intensity?: number) => MusicPlaylist;
+  playlists?: MusicPlaylist[];
+  openDrawer?: boolean;
+  emotion?: string | null;
   setEmotion?: (emotion: string) => void;
   setOpenDrawer?: (open: boolean) => void;
-  loadPlaylist?: (playlist: MusicPlaylist) => void;
-  recommendByEmotion?: (emotion: string, intensity?: number) => MusicPlaylist | null;
-}
-
-export interface ProgressBarProps {
-  currentTime?: number;
-  duration?: number;
-  onSeek?: (time: number) => void;
-  className?: string;
-  formatTime?: (seconds: number) => string;
-  showTimestamps?: boolean;
-  position?: number;
-  max?: number;
-  onChange?: (time: number) => void;
+  recommendations?: MusicTrack[];
+  isLoading?: boolean;
+  error?: Error | null;
+  isInitialized?: boolean;
+  initializeMusicSystem?: () => Promise<void>;
 }
 
 export interface MusicDrawerProps {
   open?: boolean;
-  isOpen?: boolean;
-  onClose?: () => void;
-  onOpen?: () => void;
   onOpenChange?: (open: boolean) => void;
-  children?: React.ReactNode;
-  position?: 'left' | 'right' | 'top' | 'bottom';
-  className?: string;
-  playlist?: MusicPlaylist;
-  currentTrack?: MusicTrack | null;
+}
+
+export interface ProgressBarProps {
+  currentTime: number;
+  duration: number;
+  onSeek: (time: number) => void;
 }
 
 export interface VolumeControlProps {
   volume: number;
-  onVolumeChange: (volume: number) => void;
-  muted: boolean;
-  onMuteToggle: () => void;
-  className?: string;
+  onChange: (volume: number) => void;
+  onMuteToggle?: () => void;
+  isMuted?: boolean;
 }
 
 export interface MusicControlsProps {
   isPlaying: boolean;
-  onPlayPause: () => void;
-  onNext: () => void;
-  onPrevious: () => void;
+  onPlay: () => void;
+  onPause: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
   className?: string;
-  size?: 'sm' | 'md' | 'lg';
 }
 
 export interface MusicLibraryProps {
   playlists?: MusicPlaylist[];
-  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
-  className?: string;
+  onSelect?: (playlist: MusicPlaylist) => void;
+}
+
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
 }
 
 export interface TrackInfoProps {
   track: MusicTrack | null;
-  className?: string;
-  showCover?: boolean;
-  showArtist?: boolean;
-  showTitle?: boolean;
 }

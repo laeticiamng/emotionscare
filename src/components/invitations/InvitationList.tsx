@@ -71,17 +71,17 @@ const InvitationList: React.FC<InvitationListProps> = ({
             
             <div className="mt-2 text-sm text-muted-foreground">
               <span>
-                Envoyée {formatDistanceToNow(new Date(invitation.sentAt || invitation.created_at || ''), { addSuffix: true, locale: fr })}
+                Envoyée {formatDistanceToNow(new Date(invitation.sent_at || invitation.created_at || ''), { addSuffix: true, locale: fr })}
               </span>
               <span className="mx-2">•</span>
               <span>
-                Expire {formatDistanceToNow(new Date(invitation.expires_at || ''), { addSuffix: true, locale: fr })}
+                Expire {formatDistanceToNow(new Date(invitation.expired_at || invitation.expires_at || ''), { addSuffix: true, locale: fr })}
               </span>
-              {(invitation.acceptedAt || invitation.accepted_at) && (
+              {(invitation.accepted_at) && (
                 <>
                   <span className="mx-2">•</span>
                   <span>
-                    Acceptée {formatDistanceToNow(new Date(invitation.acceptedAt || invitation.accepted_at || ''), { addSuffix: true, locale: fr })}
+                    Acceptée {formatDistanceToNow(new Date(invitation.accepted_at || ''), { addSuffix: true, locale: fr })}
                   </span>
                 </>
               )}

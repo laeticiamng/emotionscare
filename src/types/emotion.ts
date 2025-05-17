@@ -37,7 +37,7 @@ export interface EmotionResult {
   duration?: number;
   facialExpression?: string;
   textInput?: string;
-  category?: string; // Add missing property
+  category?: string; 
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
@@ -125,5 +125,5 @@ export interface EmotionInterface {
   category?: string;
 }
 
-// Export type for backward compatibility
-export type { EmotionalData } from './emotional-data';
+// Exporter EmotionalData
+export * from './emotional-data';

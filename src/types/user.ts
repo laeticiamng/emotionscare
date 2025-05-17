@@ -1,38 +1,42 @@
 
-import { UserPreferences } from './preferences';
-
-export type UserRole = 'user' | 'admin' | 'b2b_user' | 'b2b_admin' | 'b2b-user' | 'b2b-admin' | 'collaborator' | 'b2c';
+import { NotificationPreference } from './notification';
 
 export interface User {
   id: string;
-  name: string;
+  name?: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  role: UserRole;
-  created_at?: string;
-  updated_at?: string;
-  joined_at?: string;
   avatar?: string;
-  avatar_url?: string;
-  avatarUrl?: string;
-  company_id?: string;
+  role: UserRole;
+  preferences?: UserPreferences;
+  teams?: string[];
   department?: string;
   position?: string;
-  job_title?: string;
-  settings?: Record<string, any>;
-  preferences?: UserPreferences;
-  emotional_score?: number;
-  onboarded?: boolean;
-  createdAt?: string;
+  location?: string;
+  status?: 'active' | 'inactive' | 'pending' | 'blocked';
 }
+
+export type UserRole = 'admin' | 'user' | 'manager' | 'viewer' | 'coach' | 'b2c' | 'b2b_admin' | 'b2b_user';
+
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  fontSize: FontSize;
+  fontFamily: FontFamily;
+  reduceMotion: boolean;
+  colorBlindMode: boolean;
+  autoplayMedia: boolean;
+  soundEnabled: boolean;
+  notifications: NotificationPreference;
+  privacy: {
+    shareData: boolean;
+    anonymizeReports: boolean;
+    profileVisibility: 'public' | 'team' | 'private';
+  };
+}
+
+export type FontFamily = 'system' | 'serif' | 'mono';
+export type FontSize = 'small' | 'medium' | 'large';
 
 export interface UserPreferencesContextType {
   preferences: UserPreferences;
-  updatePreferences: (newPreferences: Partial<UserPreferences>) => void;
-  loading?: boolean;
-  resetPreferences?: () => void;
+  updatePreferences: (preferences: Partial<UserPreferences>) => void;
 }
-
-// Export UserPreferences to make it accessible
-export { UserPreferences } from './preferences';

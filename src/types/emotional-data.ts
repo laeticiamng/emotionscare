@@ -5,9 +5,10 @@ export interface EmotionalData {
   timestamp: Date | string;
   context?: string;
   userId?: string;
+  user_id?: string;
   id?: string;
-  source?: string;  // Add missing property
-  feedback?: string; // Add missing property
+  source?: string;
+  feedback?: string;
 }
 
 export interface EmotionalTrend {

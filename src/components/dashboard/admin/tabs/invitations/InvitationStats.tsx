@@ -53,10 +53,10 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium">Taux de conversion</h3>
-                        <p className="text-2xl font-bold">{stats.conversionRate || 0}%</p>
+                        <p className="text-2xl font-bold">{stats.conversionRate || stats.conversion_rate || 0}%</p>
                       </div>
                       <CircularProgress 
-                        value={stats.conversionRate || 0} 
+                        value={(stats.conversionRate || stats.conversion_rate || 0) as number} 
                         size={70}
                         thickness={8}
                         color="var(--primary)"
@@ -93,8 +93,8 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
                         <p className="text-2xl font-bold">{count}</p>
                       </div>
                       <CircularProgress 
-                        value={count} 
-                        max={stats.total || stats.sent || 100} 
+                        value={count as number} 
+                        max={(stats.total || stats.sent || 100) as number} 
                         size={60}
                         thickness={6}
                       />

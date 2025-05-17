@@ -32,6 +32,7 @@ export interface JournalEntry {
   emotion?: string;
   mood_score?: number;
   ai_feedback?: string;
+  text?: string;
 }
 
 export interface Story {
@@ -53,6 +54,7 @@ export interface EmotionPrediction {
   predictedEmotion?: string;
   triggers?: string[];
   recommendations?: string[];
+  category?: string;
 }
 
 export interface Recommendation {
@@ -71,18 +73,28 @@ export interface InvitationStats {
   pending: number;
   conversion_rate: number;
   last_sent: string[];
+  total?: number;
+  expired?: number;
+  rejected?: number;
+  completed?: number;
+  conversionRate?: number;
+  averageTimeToAccept?: number;
+  teams?: Record<string, number>;
+  recent_invites?: InvitationData[];
 }
 
 export interface InvitationData {
   id: string;
   email: string;
   name: string;
-  status: 'sent' | 'accepted' | 'expired';
+  status: 'pending' | 'accepted' | 'expired';
   sent_at: string;
   accepted_at?: string;
   expired_at?: string;
   sent_by: string;
   role: string;
+  created_at?: string;
+  expires_at?: string;
 }
 
 export interface InvitationFormData {
