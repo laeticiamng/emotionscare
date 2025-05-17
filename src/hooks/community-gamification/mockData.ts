@@ -1,3 +1,4 @@
+
 import { Challenge, LeaderboardEntry } from '@/types/challenge';
 import { Badge } from '@/types/badge';
 
@@ -86,10 +87,10 @@ export const mockBadges: Badge[] = [
     description: "One of the first users",
     icon: "star",
     rarity: "rare",
-    dateEarned: "2023-01-15",
     category: "achievement",
-    level: 1,
-    unlocked: true
+    level: "bronze",
+    unlocked: true,
+    dateEarned: "2023-01-15"
   },
   {
     id: "2",
@@ -97,10 +98,10 @@ export const mockBadges: Badge[] = [
     description: "Logged in 10 days in a row",
     icon: "calendar",
     rarity: "uncommon",
-    dateEarned: "2023-02-20",
     category: "engagement",
-    level: 2,
-    unlocked: true
+    level: "silver",
+    unlocked: true,
+    dateEarned: "2023-02-20"
   },
   {
     id: "3",
@@ -108,10 +109,10 @@ export const mockBadges: Badge[] = [
     description: "Recorded 100 emotions",
     icon: "heart",
     rarity: "epic",
-    dateEarned: "2023-03-05",
     category: "emotions",
-    level: 3, 
-    unlocked: true
+    level: "gold", 
+    unlocked: true,
+    dateEarned: "2023-03-05"
   }
 ];
 
@@ -119,9 +120,11 @@ export const mockLeaderboard: LeaderboardEntry[] = [
   {
     id: "1",
     userId: "user123",
+    name: "EmotionMaster",
     username: "EmotionMaster",
     avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=Emma",
     points: 1250,
+    score: 1250,
     rank: 1,
     badges: 8,
     streak: 14
@@ -129,9 +132,11 @@ export const mockLeaderboard: LeaderboardEntry[] = [
   {
     id: "2",
     userId: "user456",
+    name: "MindfulSoul",
     username: "MindfulSoul",
     avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=John",
     points: 980,
+    score: 980,
     rank: 2,
     badges: 6,
     streak: 7
@@ -139,9 +144,11 @@ export const mockLeaderboard: LeaderboardEntry[] = [
   {
     id: "3",
     userId: "user789",
+    name: "SereneSpirit",
     username: "SereneSpirit",
     avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=Sophia",
     points: 870,
+    score: 870,
     rank: 3,
     badges: 5,
     streak: 12
@@ -149,9 +156,11 @@ export const mockLeaderboard: LeaderboardEntry[] = [
   {
     id: "4",
     userId: "user101",
+    name: "CalmExplorer",
     username: "CalmExplorer",
     avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=Lucas",
     points: 720,
+    score: 720,
     rank: 4,
     badges: 4,
     streak: 5
@@ -159,9 +168,11 @@ export const mockLeaderboard: LeaderboardEntry[] = [
   {
     id: "5",
     userId: "user202",
+    name: "HarmonySeeker",
     username: "HarmonySeeker",
     avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=Olivia",
     points: 650,
+    score: 650,
     rank: 5,
     badges: 3,
     streak: 3

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import InvitationForm from '@/components/invitations/InvitationForm';
 import InvitationStatsDisplay from './InvitationStats';
-import { InvitationStats, InvitationData } from '@/types';
+import { InvitationStats, InvitationData } from '@/types/invitation';
 import InvitationModal from './InvitationModal';
 import InvitationList from '@/components/invitations/InvitationList';
 
@@ -17,6 +17,7 @@ const InvitationsTab = () => {
     rejected: 0,
     sent: 0,
     conversion_rate: 0,
+    conversionRate: 0,
     recent_invites: [],
     last_sent: []
   });

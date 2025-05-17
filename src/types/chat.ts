@@ -1,53 +1,41 @@
 
 export interface ChatMessage {
   id: string;
-  text: string;
-  content?: string;
-  sender: string;
+  conversation_id: string;
   timestamp: string;
+  sender: 'user' | 'assistant' | 'system';
+  text: string;
+  content: string;
   role: 'user' | 'assistant' | 'system';
-  sender_id?: string;
-  conversation_id?: string;
-  sender_type?: string;
-  is_read?: boolean;
-  isLoading?: boolean;
+  attachments?: string[];
+  isError?: boolean;
+  isTyping?: boolean;
 }
-
-export interface ChatResponse {
-  id?: string;
-  content?: string;
-  message?: string;
-  role?: string;
-  timestamp?: string;
-  emotion?: string;
-  text?: string;
-  sentiment?: string;
-  recommendations?: string[];
-}
-
-export type ChatResponseType = ChatResponse;
 
 export interface ChatConversation {
   id: string;
+  user_id: string;
   title: string;
   created_at: string;
   updated_at: string;
-  user_id: string;
-  assistant_id?: string;
-  messages?: ChatMessage[];
-  status?: 'active' | 'archived' | 'deleted';
-  context?: string;
   last_message?: string;
-  lastMessage?: string;
-  userId?: string;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
-export interface ChatParticipant {
+export interface ChatMessageRequest {
+  message: string;
+  conversation_id: string;
+  user_id: string;
+}
+
+export interface ChatMessageResponse {
   id: string;
-  name: string;
-  avatar?: string;
-  type: 'user' | 'assistant' | 'system';
-  status?: 'online' | 'offline' | 'away';
+  message: string;
+  created_at: string;
+}
+
+export interface ChatHistoryItem {
+  id: string;
+  title: string;
+  timestamp: string;
+  preview: string;
 }

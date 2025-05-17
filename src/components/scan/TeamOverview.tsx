@@ -1,40 +1,59 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TeamOverviewProps } from '@/types/scan';
+
+export interface TeamOverviewProps {
+  teamId?: string;
+  userId?: string;
+  anonymized?: boolean;
+  className?: string;
+  dateRange?: [Date, Date];
+  users?: any[];
+  showNames?: boolean;
+  compact?: boolean;
+}
 
 const TeamOverview: React.FC<TeamOverviewProps> = ({
   teamId,
-  period = 'week',
   userId,
-  anonymized,
-  className,
+  anonymized = false,
+  className = '',
   dateRange,
-  users,
-  showNames,
-  compact
+  users = [],
+  showNames = false,
+  compact = false
 }) => {
+  // Convertir les valeurs numériques ou objets en ReactNode sécurisé
+  const safeValue = (value: any): React.ReactNode => {
+    if (typeof value === 'string' || typeof value === 'number') {
+      return value.toString();
+    }
+    if (typeof value === 'object' && value !== null) {
+      return JSON.stringify(value);
+    }
+    return String(value);
+  };
+
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle>Aperçu de l'équipe</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {/* Implement the team overview visualization based on props */}
-        <p>Période: {period || 'Semaine'}</p>
-        {users && users.length > 0 ? (
-          <div>
-            {users.map((user, index) => (
-              <div key={user.id || index} className="mb-2">
-                {showNames ? user.name : `Membre ${index + 1}`}: {user.emotionalScore || 'N/A'}
+    <div className={`team-overview ${className}`}>
+      <h2 className="text-xl font-bold">Aperçu de l'équipe</h2>
+      {users.length === 0 ? (
+        <p className="text-muted-foreground">Aucune donnée disponible</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          {users.map((user, index) => (
+            <div key={user.id || index} className="p-4 border rounded">
+              <h3 className="font-medium">{showNames ? user.name : `Membre #${index + 1}`}</h3>
+              <div className="mt-2">
+                <div className="text-sm">
+                  <span>Score émotionnel: </span>
+                  <span className="font-bold">{safeValue(user.emotionalScore || 'N/A')}</span>
+                </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <p>Aucune donnée d'équipe disponible</p>
-        )}
-      </CardContent>
-    </Card>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

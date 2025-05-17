@@ -2,49 +2,34 @@
 export interface Challenge {
   id: string;
   title: string;
+  name?: string;
   description: string;
-  points: number;
-  status: 'active' | 'completed' | 'failed' | 'ongoing' | string;
-  category: string;
+  points?: number;
   progress: number;
-  goal: number;
   completed: boolean;
-  dueDate?: string;
-  deadline?: string;
-  reward?: string;
-  icon?: string;
-  name?: string; // For compatibility
+  goal: string | number;
+  totalSteps?: number;
+  status: 'completed' | 'failed' | 'locked' | 'ongoing' | 'active' | 'available' | 'in-progress';
+  category: string;
   difficulty?: string;
   tags?: string[];
-  completions?: number;
-  total?: number;
-  totalSteps?: number;
 }
 
-export type ChallengeType = 'daily' | 'weekly' | 'monthly' | 'special' | 'onetime';
-
-export interface UserChallenge {
-  userId: string;
+export interface ChallengeProgress {
   challengeId: string;
+  userId: string;
   progress: number;
   completed: boolean;
-  startedAt: string;
-  completedAt?: string;
+  updatedAt: string;
 }
 
-export interface ChallengeCompletion {
-  challenge: Challenge;
-  completedAt: string;
-  reward: number;
-  bonuses?: {
-    name: string;
-    points: number;
-  }[];
+export interface ChallengeGroup {
+  title: string;
+  challenges: Challenge[];
 }
 
-export interface ChallengeCollection {
-  daily: Challenge[];
-  weekly: Challenge[];
-  monthly: Challenge[];
-  special: Challenge[];
+export interface ChallengeAward {
+  type: 'badge' | 'points' | 'level' | 'item';
+  value: number | string;
+  description: string;
 }

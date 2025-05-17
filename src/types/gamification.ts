@@ -1,15 +1,16 @@
 
 export interface LeaderboardEntry {
   id: string;
-  user_id: string;
-  displayName: string;
+  userId: string;
+  displayName?: string;
+  name?: string;
   avatar?: string;
   score: number;
   rank: number;
   team?: string;
   department?: string;
   level?: number;
-  badges?: string[];
+  badges?: number | string[];
   position?: number; // Pour compatibilité
 }
 

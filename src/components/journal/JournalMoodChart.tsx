@@ -1,171 +1,115 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { JournalEntry } from '@/types';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  ReferenceLine
-} from 'recharts';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { format, subDays, parseISO } from 'date-fns';
+import React, { useMemo } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { JournalEntry } from '@/types/other';
 
-export interface JournalMoodChartProps {
+interface JournalMoodChartProps {
   entries: JournalEntry[];
   className?: string;
 }
 
 const JournalMoodChart: React.FC<JournalMoodChartProps> = ({ entries, className }) => {
-  const [timeRange, setTimeRange] = useState('7days');
-  
-  // Process entries for chart data
-  const processEntries = () => {
-    // Sort entries by date
-    const sortedEntries = [...entries].sort((a, b) => {
-      const dateA = new Date(a.date).getTime();
-      const dateB = new Date(b.date).getTime();
-      return dateA - dateB;
-    });
-    
-    // Get mood score from entries
-    const chartData = sortedEntries.map(entry => {
-      let moodScore = 50;
-      if (typeof entry.mood_score === 'number') {
-        moodScore = entry.mood_score;
-      } else if (entry.mood) {
-        // Map string moods to scores if needed
-        switch (entry.mood.toLowerCase()) {
-          case 'happy': moodScore = 80; break;
-          case 'sad': moodScore = 20; break;
-          case 'angry': moodScore = 10; break;
-          case 'calm': moodScore = 60; break;
-          case 'anxious': moodScore = 30; break;
-          default: moodScore = 50;
+  // Convertir les données pour le graphique
+  const chartData = useMemo(() => {
+    return entries
+      .filter(entry => entry.mood !== undefined || entry.mood_score !== undefined)
+      .map(entry => {
+        let value: number;
+        let category: string;
+        
+        // Utiliser mood_score s'il existe, sinon convertir mood
+        if (typeof entry.mood_score === 'number') {
+          value = entry.mood_score;
+          category = getMoodCategory(value);
+        } else if (typeof entry.mood === 'number') {
+          value = entry.mood;
+          category = getMoodCategory(value);
+        } else if (typeof entry.mood === 'string') {
+          // Convertir la chaîne de caractères en nombre
+          category = entry.mood;
+          value = getMoodValue(category);
+        } else {
+          // Valeur par défaut
+          value = 5;
+          category = "neutre";
         }
-      }
-      
-      return {
-        date: typeof entry.date === 'string' ? entry.date : format(entry.date, 'yyyy-MM-dd'),
-        value: moodScore,
-        mood: entry.mood,
-        id: entry.id
-      };
-    });
+        
+        return {
+          date: new Date(entry.date).toLocaleDateString(),
+          value,
+          category
+        };
+      });
+  }, [entries]);
+
+  // Fonction pour obtenir la catégorie d'humeur basée sur une valeur numérique
+  function getMoodCategory(value: number): string {
+    if (value >= 8) return 'excellent';
+    if (value >= 6) return 'bon';
+    if (value >= 4) return 'neutre';
+    if (value >= 2) return 'mauvais';
+    return 'terrible';
+  }
+
+  // Fonction pour obtenir une valeur numérique basée sur une catégorie d'humeur
+  function getMoodValue(category: string): number {
+    const lowerCategory = typeof category === 'string' ? category.toLowerCase() : '';
     
-    // Filter by time range
-    const now = new Date();
-    let filterDate;
-    switch (timeRange) {
-      case '7days':
-        filterDate = subDays(now, 7);
-        break;
-      case '30days':
-        filterDate = subDays(now, 30);
-        break;
-      case '90days':
-        filterDate = subDays(now, 90);
-        break;
-      default:
-        filterDate = subDays(now, 7);
+    switch (lowerCategory) {
+      case 'excellent': return 9;
+      case 'bon': return 7;
+      case 'neutre': return 5;
+      case 'mauvais': return 3;
+      case 'terrible': return 1;
+      default: return 5;
     }
-    
-    return chartData.filter(entry => {
-      const entryDate = parseISO(entry.date);
-      return entryDate >= filterDate;
-    });
+  }
+
+  // Fonction pour personnaliser la couleur de la ligne en fonction de la valeur
+  const getLineColor = (value: number) => {
+    if (value >= 8) return "#4ade80"; // vert
+    if (value >= 6) return "#22d3ee"; // cyan
+    if (value >= 4) return "#a78bfa"; // violet
+    if (value >= 2) return "#fb923c"; // orange
+    return "#f87171"; // rouge
   };
-  
-  const chartData = processEntries();
-  
-  // Get mood color based on value
-  const getMoodColor = (value: number) => {
-    if (value >= 80) return '#22c55e';
-    if (value >= 60) return '#84cc16';
-    if (value >= 40) return '#eab308';
-    if (value >= 20) return '#f97316';
-    return '#ef4444';
-  };
-  
-  // Custom tooltip
-  const renderTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white p-2 border rounded shadow-sm">
-          <p className="text-sm">{format(parseISO(data.date), 'dd MMM yyyy')}</p>
-          <p className="text-sm font-medium">{data.mood || 'Mood'}: {data.value}</p>
-        </div>
-      );
-    }
-    return null;
-  };
-  
+
   return (
     <Card className={className}>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg">Tendances d'humeur</CardTitle>
-        <Select
-          value={timeRange}
-          onValueChange={setTimeRange}
-        >
-          <SelectTrigger className="w-[120px] h-8">
-            <SelectValue placeholder="Période" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7days">7 jours</SelectItem>
-            <SelectItem value="30days">30 jours</SelectItem>
-            <SelectItem value="90days">90 jours</SelectItem>
-          </SelectContent>
-        </Select>
+      <CardHeader>
+        <CardTitle>Évolution de l'humeur</CardTitle>
+        <CardDescription>
+          Visualisez l'évolution de votre humeur au fil du temps
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        {chartData.length > 0 ? (
-          <div className="h-[200px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={chartData}
-                margin={{
-                  top: 5,
-                  right: 10,
-                  left: 0,
-                  bottom: 5,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={(date) => format(parseISO(date), 'dd/MM')}
-                  stroke="#888"
-                  fontSize={12}
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  ticks={[0, 25, 50, 75, 100]}
-                  stroke="#888"
-                  fontSize={12}
-                />
-                <Tooltip content={renderTooltip} />
-                <ReferenceLine y={50} stroke="#888" strokeDasharray="3 3" />
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#3b82f6"
-                  strokeWidth={2}
-                  dot={{ r: 4, strokeWidth: 2, stroke: "#3b82f6", fill: "white" }}
-                  activeDot={{ r: 6, stroke: "#3b82f6", strokeWidth: 2, fill: "#3b82f6" }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+        {chartData.length === 0 ? (
+          <div className="flex items-center justify-center h-64 text-muted-foreground">
+            Pas assez de données pour afficher le graphique
           </div>
         ) : (
-          <div className="h-[200px] flex items-center justify-center">
-            <p className="text-muted-foreground">Pas assez d'entrées pour afficher un graphique</p>
-          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis domain={[0, 10]} />
+              <Tooltip
+                formatter={(value: number) => [`${value}/10`, 'Humeur']}
+              />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#8884d8"
+                dot={{ fill: (entry) => getLineColor(entry.value) }}
+                strokeWidth={2}
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         )}
       </CardContent>
     </Card>

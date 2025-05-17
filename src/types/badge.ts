@@ -8,12 +8,12 @@ export interface Badge {
   category: string;
   unlocked: boolean;
   unlockedAt?: string;
-  unlocked_at?: string; // For compatibility
+  unlocked_at?: string; // Pour compatibilité
   progress?: number;
   total?: number;
   image?: string;
   imageUrl?: string;
-  image_url?: string; // For compatibility
+  image_url?: string; // Pour compatibilité
   requirements?: {
     description: string;
     progress: number;

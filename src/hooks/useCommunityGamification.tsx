@@ -1,159 +1,117 @@
 
-import { useState, useCallback, useEffect } from 'react';
-import { Badge } from '@/types/badge';
-import { Challenge, LeaderboardEntry } from '@/types/gamification';
+import { useState, useEffect } from 'react';
+import { Badge, Challenge } from '@/types/gamification';
+import { LeaderboardEntry } from '@/types/badge';
 
 export const useCommunityGamification = () => {
-  // État des badges
-  const [badges, setBadges] = useState<Badge[]>([
+  // Données simulées pour les badges
+  const mockBadges: Badge[] = [
     {
-      id: '1',
-      name: 'Contributeur',
-      description: 'A participé à 5 discussions',
-      imageUrl: '/badges/contributor.png',
-      image_url: '/badges/contributor.png',
-      tier: 'bronze',
-      icon: 'message-circle',
+      id: "1",
+      name: "Early Adopter",
+      description: "Vous êtes parmi les premiers à rejoindre notre communauté",
+      imageUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=badge1",
+      image_url: "https://api.dicebear.com/7.x/shapes/svg?seed=badge1",
+      tier: "gold",
+      icon: "trophy",
       earned: true,
+      level: "gold",
+      category: "engagement",
       progress: 100,
-      threshold: 5,
-      level: 1,
-      category: 'community',
-      unlocked: true
+      threshold: 1,
+      unlocked: true,
+      completed: true
     },
     {
-      id: '2',
-      name: 'Mentor',
-      description: 'A aidé 3 utilisateurs',
-      imageUrl: '/badges/mentor.png',
-      image_url: '/badges/mentor.png',
-      tier: 'silver',
-      icon: 'heart-handshake',
+      id: "2",
+      name: "Journal Master",
+      description: "Vous avez écrit 20 entrées de journal",
+      imageUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=badge2",
+      image_url: "https://api.dicebear.com/7.x/shapes/svg?seed=badge2",
+      tier: "silver",
+      icon: "book",
       earned: false,
-      progress: 67,
-      threshold: 3,
-      level: 2,
-      category: 'community',
-      unlocked: false
-    },
-  ]);
-
-  // État des défis
-  const [challenges, setChallenges] = useState<Challenge[]>([
-    {
-      id: '1',
-      title: 'Bienvenue dans la communauté',
-      name: 'Bienvenue dans la communauté',
-      description: 'Présentez-vous dans la section Introduction',
-      points: 10,
-      progress: 0,
-      completed: false,
-      status: 'active',
-      category: 'community',
-      goal: 1
-    },
-    {
-      id: '2',
-      title: 'Entraide hebdomadaire',
-      name: 'Entraide hebdomadaire',
-      description: 'Répondez à une question dans le forum d\'entraide',
-      points: 25,
-      progress: 0,
-      completed: false,
-      status: 'active',
-      category: 'community',
-      goal: 1
+      level: "silver",
+      category: "journal",
+      progress: 14,
+      threshold: 20,
+      unlocked: false,
+      completed: false
     }
-  ]);
+  ];
 
-  // État du classement
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([
+  // Données simulées pour les défis
+  const mockChallenges: Challenge[] = [
     {
-      id: '1',
-      userId: 'user1',
+      id: "1",
+      title: "7 jours de méditation",
+      name: "meditation-week",
+      description: "Complétez une session de méditation chaque jour pendant une semaine",
+      points: 100,
+      progress: 5,
+      completed: false,
+      status: "in-progress",
+      category: "meditation",
+      goal: 7
+    },
+    {
+      id: "2",
+      title: "Journal quotidien",
+      name: "daily-journal",
+      description: "Écrivez dans votre journal tous les jours pendant 5 jours",
+      points: 50,
+      progress: 2,
+      completed: false,
+      status: "in-progress",
+      category: "journal",
+      goal: 5
+    }
+  ];
+
+  // Données simulées pour le classement
+  const mockLeaderboard: LeaderboardEntry[] = [
+    {
+      id: "1",
+      userId: "user1",
+      name: "TheMindfulOne",
+      score: 780,
       rank: 1,
-      score: 730,
-      points: 730,
-      avatar: '/avatars/user1.png',
-      username: 'Sophie M.',
-      badges: 5
+      badges: 5,
+      avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Felix"
     },
     {
-      id: '2',
-      userId: 'user2',
+      id: "2",
+      userId: "user2",
+      name: "EmotionNavigator",
+      score: 650,
       rank: 2,
-      score: 685,
-      points: 685,
-      avatar: '/avatars/user2.png',
-      username: 'Thomas L.',
-      badges: 4
+      badges: 4,
+      avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Emma"
     },
     {
-      id: '3',
-      userId: 'user3',
-      rank: 3,
+      id: "3",
+      userId: "user3",
+      name: "SereneSpirit",
       score: 520,
-      points: 520,
-      avatar: '/avatars/user3.png',
-      username: 'Vous',
-      badges: 3
+      rank: 3,
+      badges: 3,
+      avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Sophie"
     }
-  ]);
-
-  // Statistiques utilisateur
-  const [stats, setStats] = useState({
-    level: 3,
-    points: 520,
-    streak: 5,
-    progress: 65,
-    nextLevelPoints: 750
-  });
-
-  // Fonction pour accomplir un défi
-  const completeChallenge = useCallback((challengeId: string) => {
-    setChallenges(prevChallenges => 
-      prevChallenges.map(challenge => 
-        challenge.id === challengeId
-          ? { ...challenge, completed: true, progress: 100, status: 'completed' as const }
-          : challenge
-      )
-    );
-
-    // Mise à jour des points
-    const challenge = challenges.find(c => c.id === challengeId);
-    if (challenge) {
-      setStats(prev => ({
-        ...prev,
-        points: prev.points + (challenge.points || 0)
-      }));
-    }
-  }, [challenges]);
-
-  // Fonction pour déverrouiller un badge
-  const unlockBadge = useCallback((badgeId: string) => {
-    setBadges(prevBadges => 
-      prevBadges.map(badge => 
-        badge.id === badgeId
-          ? { ...badge, earned: true, progress: 100, unlocked: true }
-          : badge
-      )
-    );
-  }, []);
-
-  // Fonction pour vérifier les progrès et déverrouiller les badges si nécessaire
-  useEffect(() => {
-    // Logique pour vérifier et débloquer automatiquement les badges
-    // basée sur les progrès de l'utilisateur
-    // Dans un vrai système, cela serait fait côté serveur
-  }, [stats, badges, challenges]);
+  ];
 
   return {
-    badges,
-    challenges,
-    leaderboard,
-    stats,
-    completeChallenge,
-    unlockBadge
+    badges: mockBadges,
+    challenges: mockChallenges,
+    leaderboard: mockLeaderboard,
+    loading: false,
+    error: null,
+    stats: {
+      points: 350,
+      level: 4,
+      badges: mockBadges.filter(badge => badge.earned).length,
+      streak: 3,
+      streakDays: 3
+    }
   };
 };
 

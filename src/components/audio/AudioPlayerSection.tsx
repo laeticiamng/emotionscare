@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { AudioTrack } from '@/types/audio';
-import { useAudio } from '@/hooks'; // Fixed import
+import { useAudio } from '@/hooks'; // Importation corrigée
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -13,22 +13,28 @@ const AudioPlayerSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState('relaxation');
   const { toast } = useToast();
   
+  const audio = useAudio();
   const { 
-    currentTrack, 
     isPlaying, 
-    playTrack, 
-    pauseTrack, 
-    togglePlay, 
     volume, 
+    togglePlay, 
     setVolume, 
-    isMuted, 
+    muted: isMuted,  // Renommé pour correspondre à l'utilisation
     toggleMute, 
-    progress, 
+    currentTime: progress, // Renommé pour correspondre à l'utilisation
     duration, 
     seekTo,
-    formatTime,
-    loading
-  } = useAudio();
+    currentTrack,
+    playTrack,
+  } = audio;
+  
+  // Formatage du temps
+  const formatTime = (time: number): string => {
+    if (isNaN(time)) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
   
   // Exemples de pistes audio pour chaque catégorie
   const audioTracks = {
@@ -93,6 +99,9 @@ const AudioPlayerSection: React.FC = () => {
       });
     }
   }, [isPlaying, currentTrack, toast]);
+  
+  // Variable pour vérifier si le chargement est en cours
+  const loading = !currentTrack;
   
   return (
     <div className="space-y-6">

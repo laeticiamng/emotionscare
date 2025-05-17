@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CircularProgress from '@/components/ui/circular-progress';
-import { InvitationStats } from '@/types';
+import { InvitationStats } from '@/types/invitation';
 
 interface InvitationStatsDisplayProps {
   stats: InvitationStats;
@@ -54,10 +54,10 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium">Taux de conversion</h3>
-                        <p className="text-2xl font-bold">{(stats.conversionRate || stats.conversion_rate || 0) as number}%</p>
+                        <p className="text-2xl font-bold">{(stats.conversionRate || stats.conversion_rate || 0).toString()}%</p>
                       </div>
                       <CircularProgress 
-                        value={(stats.conversionRate || stats.conversion_rate || 0) as number} 
+                        value={Number(stats.conversionRate || stats.conversion_rate || 0)} 
                         size={70}
                         thickness={8}
                         color="var(--primary)"
@@ -85,17 +85,17 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
           
           <TabsContent value="teams">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {stats.teams && Object.entries(stats.teams || {}).map(([team, count]) => (
+              {stats.teams && Object.entries(stats.teams).map(([team, count]) => (
                 <Card key={team}>
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium">{team}</h3>
-                        <p className="text-2xl font-bold">{count}</p>
+                        <p className="text-2xl font-bold">{String(count)}</p>
                       </div>
                       <CircularProgress 
-                        value={(count as number)} 
-                        max={((stats.total || (stats.sent || 100)) as number)} 
+                        value={Number(count)} 
+                        max={Number(stats.total || (stats.sent || 100))} 
                         size={60}
                         thickness={6}
                       />

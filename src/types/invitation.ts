@@ -43,8 +43,8 @@ export interface InvitationStats {
   conversion_rate?: number;
   averageTimeToAccept?: number;
   teams?: Record<string, number>;
-  recent_invites?: any[];
-  last_sent?: any[];
+  recent_invites?: InvitationData[];
+  last_sent?: InvitationData[];
 }
 
 export interface InvitationData {
