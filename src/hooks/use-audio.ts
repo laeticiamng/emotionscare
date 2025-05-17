@@ -39,7 +39,7 @@ export const useAudioHandlers = ({ toast = true }: UseAudioProps = {}) => {
     const onError = (e: ErrorEvent) => {
       setError(new Error("Audio playback error"));
       setIsLoading(false);
-      if (toast) {
+      if (toast && showToast) {
         showToast({
           title: "Erreur de lecture audio",
           description: "Impossible de lire ce fichier audio",
@@ -81,7 +81,7 @@ export const useAudioHandlers = ({ toast = true }: UseAudioProps = {}) => {
     if (!audioUrl) {
       setError(new Error("No audio URL provided"));
       setIsLoading(false);
-      if (toast) {
+      if (toast && showToast) {
         showToast({
           title: "Erreur de lecture",
           description: "Aucune URL audio trouvée",
@@ -111,7 +111,7 @@ export const useAudioHandlers = ({ toast = true }: UseAudioProps = {}) => {
         .catch((error) => {
           setError(error);
           setIsLoading(false);
-          if (toast) {
+          if (toast && showToast) {
             showToast({
               title: "Erreur de lecture",
               description: error.message || "Impossible de lire ce morceau",
