@@ -5,7 +5,6 @@ import MainNavbar from './navigation/MainNavbar';
 import MainFooter from './navigation/MainFooter';
 import { useTheme } from '@/contexts/ThemeContext';
 import AudioControls from './audio/AudioControls';
-import ParticlesBackground from './three/ParticlesBackground';
 
 interface ShellProps {
   children?: React.ReactNode;
@@ -27,7 +26,9 @@ const Shell: React.FC<ShellProps> = ({
   return (
     <div className={`flex flex-col min-h-screen ${className} ${theme}`}>
       {/* Fond animé pour les pages immersives */}
-      {immersive && !reduceMotion && <ParticlesBackground />}
+      {immersive && !reduceMotion && (
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-blue-50 to-blue-100 dark:from-blue-950 dark:to-indigo-900"></div>
+      )}
       
       {/* Arrière-plan adaptatif selon le thème */}
       <div className={`absolute inset-0 -z-20 transition-colors duration-500 ${

@@ -1,65 +1,61 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Music } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Volume2, VolumeX } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface AudioControlsProps {
   minimal?: boolean;
-  className?: string;
 }
 
-const AudioControls: React.FC<AudioControlsProps> = ({ minimal = false, className = '' }) => {
+const AudioControls: React.FC<AudioControlsProps> = ({ minimal = false }) => {
   const { soundEnabled, setSoundEnabled } = useTheme();
+  const [volume, setVolume] = React.useState(0.5);
 
-  const toggleSound = () => {
-    setSoundEnabled(!soundEnabled);
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0]);
+  };
+
+  const toggleMute = () => {
+    if (setSoundEnabled) {
+      setSoundEnabled(!soundEnabled);
+    }
   };
 
   if (minimal) {
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleSound}
-              className={className}
-            >
-              {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{soundEnabled ? 'Désactiver le son' : 'Activer le son'}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="rounded-full bg-background/80 backdrop-blur-sm"
+        onClick={toggleMute}
+      >
+        {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+      </Button>
     );
   }
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={toggleSound}
-        className="flex items-center gap-2"
+    <div className="flex items-center space-x-2 bg-background/80 backdrop-blur-sm p-2 rounded-full">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="rounded-full"
+        onClick={toggleMute}
       >
         {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-        <span>{soundEnabled ? 'Son activé' : 'Son désactivé'}</span>
       </Button>
       
-      <Button variant="outline" size="sm" className="flex items-center gap-2">
-        <Music className="h-4 w-4" />
-        <span>Musique</span>
-      </Button>
+      {soundEnabled && (
+        <Slider
+          className="w-24"
+          value={[volume]}
+          max={1}
+          step={0.01}
+          onValueChange={handleVolumeChange}
+        />
+      )}
     </div>
   );
 };
