@@ -1,7 +1,7 @@
 
 export type NotificationFrequency = 'daily' | 'weekly' | 'monthly' | 'never' | 'immediate';
 export type NotificationTone = 'friendly' | 'neutral' | 'formal' | 'casual' | 'direct' | 'professional' | 'motivational';
-export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'achievement' | 'reminder' | 'badge' | 'streak';
+export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'achievement' | 'reminder' | 'badge' | 'streak' | 'system' | 'emotion';
 
 export interface NotificationPreference {
   type: string;
@@ -23,7 +23,6 @@ export interface NotificationSettings {
   emailNotifications?: boolean;
 }
 
-// Add missing Notification interface
 export interface Notification {
   id: string;
   user_id: string;
@@ -36,5 +35,4 @@ export interface Notification {
   created_at?: string;
 }
 
-// Add missing NotificationFilter type
 export type NotificationFilter = 'all' | 'unread' | NotificationType;

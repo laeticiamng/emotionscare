@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { EmotionResult } from '@/types/scan';
-import { default as LiveVoiceScanner } from './LiveVoiceScanner';
+import { EmotionResult } from '@/types/emotion';
+import LiveVoiceScanner from './LiveVoiceScanner';
 
 interface UnifiedEmotionCheckinProps {
   onResult?: (result: EmotionResult) => void;
@@ -109,9 +109,9 @@ const UnifiedEmotionCheckin: React.FC<UnifiedEmotionCheckinProps> = ({
           <div className="space-y-4">
             {isScanning ? (
               <LiveVoiceScanner 
-                onResult={handleScanResult} 
+                onScanComplete={handleScanResult} 
                 autoStart={true} 
-                duration={30} 
+                scanDuration={30} 
               />
             ) : (
               <Button onClick={() => setIsScanning(true)}>

@@ -1,81 +1,125 @@
 
-import { LeaderboardEntry, Badge } from '@/types/gamification';
+import { Badge, Challenge, LeaderboardEntry } from '@/types/badge';
 
-export const leaderboardEntries: LeaderboardEntry[] = [
+// Données de classement simulées
+export const mockLeaderboardData: LeaderboardEntry[] = [
   {
     id: '1',
-    userId: 'user1',
-    score: 1850,
+    name: 'Sarah K.',
+    avatar: '/images/avatars/avatar-1.jpg',
+    points: 2450,
     rank: 1,
-    name: 'Sophie Martin',
-    avatarUrl: '/images/avatars/avatar-1.png',
-    points: 1850,
-    level: 8,
-    progress: 75
+    level: 12,
+    streak: 28,
+    trend: 'up',
+    badges: [
+      { id: 'badge-1', name: 'Expert en méditation', description: 'Méditation quotidienne pendant 30 jours', imageUrl: '/images/badges/meditation.svg' },
+      { id: 'badge-2', name: 'Génie émotionnel', description: 'Analyser 100 émotions', imageUrl: '/images/badges/emotions.svg' }
+    ]
   },
   {
     id: '2',
-    userId: 'user2',
-    score: 1720,
+    name: 'Marc D.',
+    avatar: '/images/avatars/avatar-2.jpg',
+    points: 2100,
     rank: 2,
-    name: 'Antoine Dubois',
-    avatarUrl: '/images/avatars/avatar-2.png',
-    points: 1720,
-    level: 7,
-    progress: 90
+    level: 10,
+    streak: 14,
+    trend: 'up',
+    badges: [
+      { id: 'badge-3', name: 'Journal assidu', description: 'Écrire dans le journal pendant 20 jours consécutifs', imageUrl: '/images/badges/journal.svg' }
+    ]
   },
   {
     id: '3',
-    userId: 'user3',
-    score: 1680,
+    name: 'Lucie B.',
+    avatar: '/images/avatars/avatar-3.jpg',
+    points: 1850,
     rank: 3,
-    name: 'Chloé Leclerc',
-    avatarUrl: '/images/avatars/avatar-3.png',
-    points: 1680,
-    level: 7,
-    progress: 60
+    level: 9,
+    streak: 7,
+    trend: 'stable',
+    badges: []
   },
+  // Utilisateurs supplémentaires pour remplir le classement
+  { id: '4', name: 'Thomas L.', avatar: '/images/avatars/avatar-4.jpg', points: 1700, rank: 4, level: 8, streak: 5 },
+  { id: '5', name: 'Emma V.', avatar: '/images/avatars/avatar-5.jpg', points: 1600, rank: 5, level: 8, streak: 3 }
 ];
 
-export const badges: Badge[] = [
+// Badges simulés
+export const mockBadges: Badge[] = [
   {
-    id: '1',
-    name: 'First Week',
-    description: 'Completed your first week of emotional tracking',
-    icon: 'star',
-    level: 1,
-    earnedDate: '2023-04-15',
-    progress: 100,
-    total: 100,
+    id: 'badge1',
+    name: "Débutant conscient",
+    description: "Complétez votre première semaine d'analyse émotionnelle",
+    imageUrl: "/images/badges/starter.svg",
+    category: "progression",
+    level: "débutant",
     unlocked: true,
-    threshold: 7
+    unlockedAt: "2023-06-15T10:30:00Z"
   },
   {
-    id: '2',
-    name: 'Mood Master',
-    description: 'Tracked your mood for 30 consecutive days',
-    icon: 'heart',
-    level: 2,
-    earnedDate: '2023-05-01',
-    progress: 100,
-    total: 100,
+    id: 'badge2',
+    name: "Maître de la méditation",
+    description: "Effectuez 30 sessions de méditation guidée",
+    imageUrl: "/images/badges/meditation-master.svg",
+    category: "activités",
+    level: "intermédiaire",
     unlocked: true,
-    threshold: 30
+    unlockedAt: "2023-07-02T16:45:00Z"
   },
   {
-    id: '3',
-    name: 'Challenge Champion',
-    description: 'Completed 10 challenges',
-    icon: 'check',
-    level: 3,
-    earnedDate: '2023-05-10',
-    progress: 100,
-    total: 100,
-    unlocked: true,
-    threshold: 10
-  },
+    id: 'badge3',
+    name: "Équilibre émotionnel",
+    description: "Maintenez un état émotionnel équilibré pendant 14 jours",
+    imageUrl: "/images/badges/balance.svg",
+    category: "bien-être",
+    level: "avancé",
+    unlocked: false,
+    progress: 65,
+    threshold: 100
+  }
 ];
 
-// Add the missing exports
-export const mockBadges = badges;
-export const mockLeaderboard = leaderboardEntries;
+// Défis simulés
+export const mockChallenges: Challenge[] = [
+  {
+    id: 'challenge1',
+    title: "Journal quotidien",
+    name: "Journal quotidien",
+    description: "Écrivez dans votre journal émotionnel tous les jours pendant une semaine",
+    points: 100,
+    status: 'ongoing',
+    category: "journal",
+    progress: 3,
+    goal: 7,
+    icon: "book",
+    totalSteps: 7
+  },
+  {
+    id: 'challenge2',
+    title: "Méditation matinale",
+    name: "Méditation matinale",
+    description: "Pratiquez la méditation le matin pendant 5 jours d'affilée",
+    points: 150,
+    status: 'ongoing',
+    category: "méditation",
+    progress: 2,
+    goal: 5,
+    icon: "sun",
+    totalSteps: 5
+  },
+  {
+    id: 'challenge3',
+    title: "Diversité émotionnelle",
+    name: "Diversité émotionnelle",
+    description: "Identifiez et analysez 10 émotions différentes",
+    points: 200,
+    status: 'ongoing',
+    category: "émotions",
+    progress: 6,
+    goal: 10,
+    icon: "heart",
+    totalSteps: 10
+  }
+];

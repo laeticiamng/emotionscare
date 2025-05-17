@@ -1,183 +1,225 @@
-import { User, UserRole } from '@/types/user';
+import { User, UserPreferences } from '@/types/user';
 
-// Create some mock users for testing purposes
+// Mock user data for development
 export const mockUsers: User[] = [
   {
-    id: "user-1",
-    name: 'Alice Martin',
-    email: 'alice.martin@example.com',
-    role: 'admin' as UserRole,
-    avatar_url: '/images/avatars/alice.jpg',
-    created_at: '2023-01-15T09:00:00Z',
-    emotional_score: 82,
-    department: 'Marketing',
-    position: 'Marketing Director',
+    id: '1',
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    role: 'b2c',
+    created_at: new Date().toISOString(),
     preferences: {
-      dashboardLayout: 'standard',
-      onboardingCompleted: true,
-      theme: 'system',
+      theme: 'light',
       fontSize: 'medium',
-      language: 'fr',
       fontFamily: 'system',
-      sound: {
-        volume: 0.7,
-        effects: true,
-        music: true
-      },
       reduceMotion: false,
       colorBlindMode: false,
       autoplayMedia: true,
+      soundEnabled: true,
       notifications: {
         enabled: true,
         emailEnabled: true,
         pushEnabled: true,
-        frequency: 'daily',
+        inAppEnabled: true,
         types: {
           system: true,
           emotion: true,
-          journal: true,
           coach: true,
+          journal: true,
           community: true,
-          achievement: true
+          achievement: true,
         },
-        tone: 'friendly',
-        quietHours: {
-          enabled: true,
-          start: '22:00',
-          end: '07:00'
-        }
-      }
-    }
+        frequency: 'daily',
+        email: true,
+        push: true,
+        sms: false,
+      },
+      privacy: {
+        shareData: true,
+        anonymizeReports: false,
+        profileVisibility: 'public',
+      },
+    },
   },
   {
     id: '2',
-    name: 'Bob Johnson',
-    email: 'bob.johnson@example.com',
-    role: 'user' as UserRole,
-    avatar_url: '/images/avatars/bob.jpg',
-    created_at: '2023-02-20T14:30:00Z',
-    emotional_score: 65,
-    department: 'Engineering',
-    position: 'Senior Developer',
+    name: 'Jane Smith',
+    email: 'jane.smith@example.com',
+    role: 'b2b_user',
+    created_at: new Date().toISOString(),
     preferences: {
-      dashboardLayout: 'focused',
-      onboardingCompleted: true,
       theme: 'dark',
       fontSize: 'large',
-      language: 'fr',
-      fontFamily: 'sans-serif',
-      sound: false,
-      reduceMotion: true,
-      colorBlindMode: false,
-      autoplayMedia: false,
-      notifications: {
-        enabled: true,
-        emailEnabled: false,
-        pushEnabled: true,
-        frequency: 'immediate',
-        types: {
-          system: true,
-          emotion: true,
-          journal: false,
-          coach: true,
-          community: false,
-          achievement: true
-        },
-        tone: 'direct',
-        quietHours: {
-          enabled: false,
-          start: '23:00',
-          end: '06:00'
-        }
-      }
-    }
-  },
-  {
-    id: '3',
-    name: 'Carol Williams',
-    email: 'carol.williams@example.com',
-    role: 'manager' as UserRole,
-    avatar_url: '/images/avatars/carol.jpg',
-    created_at: '2023-03-10T11:15:00Z',
-    emotional_score: 78,
-    department: 'Human Resources',
-    position: 'HR Manager',
-    preferences: {
-      dashboardLayout: 'compact',
-      onboardingCompleted: false,
-      theme: 'light',
-      fontSize: 'small',
-      language: 'fr',
       fontFamily: 'serif',
-      sound: true,
-      reduceMotion: false,
+      reduceMotion: true,
       colorBlindMode: true,
-      autoplayMedia: true,
+      autoplayMedia: false,
+      soundEnabled: false,
       notifications: {
         enabled: false,
         emailEnabled: false,
         pushEnabled: false,
-        frequency: 'weekly',
+        inAppEnabled: false,
         types: {
-          system: true,
-          emotion: true,
-          journal: true,
-          coach: true,
-          community: true,
-          achievement: true
+          system: false,
+          emotion: false,
+          coach: false,
+          journal: false,
+          community: false,
+          achievement: false,
         },
-        tone: 'professional',
-        quietHours: {
-          enabled: true,
-          start: '21:00',
-          end: '08:00'
-        }
-      }
-    }
+        frequency: 'weekly',
+        email: false,
+        push: false,
+        sms: false,
+      },
+      privacy: {
+        shareData: false,
+        anonymizeReports: true,
+        profileVisibility: 'private',
+      },
+    },
   },
   {
-    id: '4',
-    name: 'David Brown',
-    email: 'david.brown@example.com',
-    role: 'coach' as UserRole,
-    avatar_url: '/images/avatars/david.jpg',
-    created_at: '2023-04-05T16:45:00Z',
-    emotional_score: 90,
-    department: 'Coaching',
-    position: 'Senior Well-being Coach',
+    id: '3',
+    name: 'Admin User',
+    email: 'admin@example.com',
+    role: 'b2b_admin',
+    created_at: new Date().toISOString(),
     preferences: {
-      dashboardLayout: 'standard',
-      onboardingCompleted: true,
       theme: 'system',
-      fontSize: 'medium',
-      language: 'fr',
+      fontSize: 'small',
       fontFamily: 'monospace',
-      sound: true,
       reduceMotion: false,
       colorBlindMode: false,
       autoplayMedia: true,
+      soundEnabled: true,
       notifications: {
         enabled: true,
         emailEnabled: true,
         pushEnabled: true,
-        frequency: 'daily',
+        inAppEnabled: true,
         types: {
           system: true,
           emotion: true,
-          journal: true,
           coach: true,
+          journal: true,
           community: true,
-          achievement: true
+          achievement: true,
         },
-        tone: 'motivational',
-        quietHours: {
-          enabled: false,
-          start: '22:00',
-          end: '07:00'
-        }
-      }
-    }
-  }
+        frequency: 'immediate',
+        email: true,
+        push: true,
+        sms: true,
+      },
+      privacy: {
+        shareData: true,
+        anonymizeReports: false,
+        profileVisibility: 'public',
+      },
+    },
+  },
 ];
 
-export default mockUsers;
+// Mettre à jour les préférences de notification pour utiliser les bonnes valeurs de NotificationTone
+const mockUserPreferences = [
+  {
+    theme: 'light',
+    fontSize: 'medium',
+    fontFamily: 'system',
+    reduceMotion: false,
+    colorBlindMode: false,
+    autoplayMedia: true,
+    soundEnabled: true,
+    notifications: {
+      enabled: true,
+      emailEnabled: true,
+      pushEnabled: true,
+      inAppEnabled: true,
+      types: {
+        system: true,
+        emotion: true,
+        coach: true,
+        journal: true,
+        community: true,
+        achievement: true,
+      },
+      frequency: 'daily',
+      tone: 'friendly' as const,  // Utiliser une valeur valide
+      email: true,
+      push: true,
+      sms: false,
+    },
+    privacy: {
+      shareData: true,
+      anonymizeReports: false,
+      profileVisibility: 'public',
+    },
+  },
+  {
+    theme: 'dark',
+    fontSize: 'large',
+    fontFamily: 'serif',
+    reduceMotion: true,
+    colorBlindMode: true,
+    autoplayMedia: false,
+    soundEnabled: false,
+    notifications: {
+      enabled: false,
+      emailEnabled: false,
+      pushEnabled: false,
+      inAppEnabled: false,
+      types: {
+        system: false,
+        emotion: false,
+        coach: false,
+        journal: false,
+        community: false,
+        achievement: false,
+      },
+      frequency: 'weekly',
+      tone: 'neutral' as const,  // Utiliser une valeur valide
+      email: false,
+      push: false,
+      sms: false,
+    },
+    privacy: {
+      shareData: false,
+      anonymizeReports: true,
+      profileVisibility: 'private',
+    },
+  },
+  {
+    theme: 'system',
+    fontSize: 'small',
+    fontFamily: 'monospace',
+    reduceMotion: false,
+    colorBlindMode: false,
+    autoplayMedia: true,
+    soundEnabled: true,
+    notifications: {
+      enabled: true,
+      emailEnabled: true,
+      pushEnabled: true,
+      inAppEnabled: true,
+      types: {
+        system: true,
+        emotion: true,
+        coach: true,
+        journal: true,
+        community: true,
+        achievement: true,
+      },
+      frequency: 'immediate',
+      tone: 'formal' as const,  // Utiliser une valeur valide
+      email: true,
+      push: true,
+      sms: true,
+    },
+    privacy: {
+      shareData: true,
+      anonymizeReports: false,
+      profileVisibility: 'public',
+    },
+  }
+]

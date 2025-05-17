@@ -1,3 +1,4 @@
 
 export { default as MusicProvider } from './MusicProvider';
-export { useMusic, MusicContext } from '@/contexts/MusicContext'; // Importing from the main MusicContext file
+export { useMusic } from '@/contexts/MusicContext';
+export { default as MusicContext } from '@/contexts/MusicContext';

@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/contexts/MusicContext';
 import MusicPlayer from '../MusicPlayer';
 
 interface MusicLayoutProps {
@@ -12,10 +12,9 @@ const MusicLayout: React.FC<MusicLayoutProps> = ({ children }) => {
   
   useEffect(() => {
     // Initialize music system on component mount
-    // This is now a safe check since we've added this property to MusicContextType
-    if (music && music.isInitialized === false) {
+    if (music && music.isInitialized === false && music.initializeMusicSystem) {
       console.log('Initializing music system');
-      // Don't call initializeMusicSystem directly as it may not exist
+      music.initializeMusicSystem();
     }
   }, [music]);
   

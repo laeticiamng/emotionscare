@@ -15,6 +15,7 @@ export interface Badge {
   type?: 'achievement' | 'milestone' | 'special';
   threshold?: number;
   userId?: string;
+  unlocked?: boolean; // Ajout de cette propriété pour compatibilité
 }
 
 export interface Challenge {

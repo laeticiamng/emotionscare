@@ -1,26 +1,32 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { EmotionResult } from '@/types/emotion';
 import { Mic, Square } from 'lucide-react';
-import { useCoach } from '@/contexts/coach';
 
 interface LiveVoiceScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
   autoStart?: boolean;
-  scanDuration?: number; // in seconds
+  scanDuration?: number;
+  duration?: number;
 }
 
 const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
   onScanComplete,
+  onResult,
   autoStart = false,
-  scanDuration = 10
+  scanDuration = 10,
+  duration = 10
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { setLastEmotion } = useCoach();
+  
+  // Use either scanDuration or duration prop
+  const finalDuration = scanDuration || duration;
 
   const processAudioData = useCallback(() => {
     setIsProcessing(true);
@@ -29,34 +35,33 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
     setTimeout(() => {
       setIsProcessing(false);
       
+      // Create mock result
+      const emotions = ['joy', 'calm', 'focused', 'anxious', 'sad'];
+      const emotion = emotions[Math.floor(Math.random() * emotions.length)];
+      
+      const emotionResult: EmotionResult = {
+        id: `scan-${Date.now()}`,
+        user_id: 'user-123',
+        emotion: emotion,
+        emojis: '😊',
+        score: Math.random() * 0.5 + 0.5,
+        confidence: Math.random() * 0.3 + 0.7,
+        intensity: Math.random(),
+        timestamp: new Date().toISOString(),
+        feedback: "Votre analyse vocale révèle un état émotionnel équilibré avec de légères tendances vers le spectre positif."
+      };
+      
       if (onScanComplete) {
-        // Create mock result
-        const emotions = ['joy', 'calm', 'focused', 'anxious', 'sad'];
-        const emotion = emotions[Math.floor(Math.random() * emotions.length)];
-        
-        const emotionResult: EmotionResult = {
-          id: `scan-${Date.now()}`,
-          user_id: 'user-123',
-          emotion: emotion,
-          emojis: ['😊'],
-          score: Math.random() * 0.5 + 0.5,
-          confidence: Math.random() * 0.3 + 0.7,
-          intensity: Math.random(),
-          timestamp: new Date().toISOString(),
-          feedback: "Your voice analysis reveals a balanced emotional state with slight tendencies toward the positive spectrum."
-        };
-        
-        // Mettre à jour le contexte Coach avec l'émotion détectée
-        if (setLastEmotion) {
-          setLastEmotion(emotion);
-        }
-        
         onScanComplete(emotionResult);
       }
+      
+      if (onResult) {
+        onResult(emotionResult);
+      }
+      
     }, 1500);
-  }, [onScanComplete, setLastEmotion]);
+  }, [onScanComplete, onResult]);
 
-  // start/stop recording functions and effects
   const startRecording = useCallback(() => {
     setIsRecording(true);
     setProgress(0);
@@ -78,7 +83,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
     
     if (isRecording) {
       const interval = 100; // Update every 100ms for smoother progress
-      const steps = (scanDuration * 1000) / interval;
+      const steps = (finalDuration * 1000) / interval;
       let currentStep = 0;
       
       timer = window.setInterval(() => {
@@ -97,7 +102,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
         clearInterval(timer);
       }
     };
-  }, [isRecording, scanDuration, stopRecording]);
+  }, [isRecording, finalDuration, stopRecording]);
 
   return (
     <Card className="w-full">
@@ -106,7 +111,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
           <span>Scan vocal en direct</span>
           {isRecording && (
             <span className="text-sm font-normal text-muted-foreground">
-              {Math.round((progress / 100) * scanDuration)}s / {scanDuration}s
+              {Math.round((progress / 100) * finalDuration)}s / {finalDuration}s
             </span>
           )}
         </CardTitle>
@@ -131,7 +136,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
           <Button 
             variant={isRecording ? "destructive" : "default"}
             disabled={isProcessing}
-            onClick={isRecording ? () => processAudioData() : () => setIsRecording(true)}
+            onClick={isRecording ? stopRecording : startRecording}
             className="mt-4"
           >
             {isRecording ? (
