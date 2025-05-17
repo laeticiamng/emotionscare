@@ -17,12 +17,21 @@ export interface EmotionResult {
   user_id: string;
   date: string;
   score?: number;
-  emojis?: string;
+  emojis?: string | string[];
   text?: string;
   audio_url?: string;
+  audioUrl?: string;
   ai_feedback?: string;
+  feedback?: string;
   primary_emotion?: string;
+  emotion?: string;
   emotions?: EmotionValues;
+  confidence?: number;
+  intensity?: number;
+  transcript?: string;
+  recommendations?: string[];
+  timestamp?: string;
+  userId?: string;
 }
 
 export interface LiveVoiceScannerProps {
@@ -35,6 +44,7 @@ export interface LiveVoiceScannerProps {
 
 export interface TeamOverviewProps {
   teamId: string;
+  period?: 'day' | 'week' | 'month';
 }
 
 export interface EmotionalTeamViewProps {

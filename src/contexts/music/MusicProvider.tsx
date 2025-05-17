@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import MusicContext from './MusicContext';
 import { MusicTrack, MusicPlaylist, EmotionMusicParams, MusicContextType } from '@/types/music';
@@ -74,7 +75,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   
   // Music playback controls
   const playTrack = (track: MusicTrack) => {
-    if (!track.audioUrl && !track.url && !track.track_url) {
+    // Use all possible URL properties
+    const trackUrl = track.audioUrl || track.url || track.track_url || '';
+    
+    if (!trackUrl) {
       setError(new Error('No audio URL provided for this track'));
       return;
     }
@@ -82,8 +86,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentTrack(track);
     
     if (audioRef.current) {
-      // Utiliser la propriété URL appropriée
-      const trackUrl = track.audioUrl || track.url || track.track_url || '';
       audioRef.current.src = trackUrl;
       audioRef.current.volume = volume;
       audioRef.current.play()

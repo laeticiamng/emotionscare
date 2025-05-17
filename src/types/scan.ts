@@ -44,3 +44,31 @@ export interface EmotionTrend {
   surprise?: number;
   [key: string]: string | number | undefined;
 }
+
+// Add the missing EmotionResult type that's imported by various scan components
+export interface EmotionResult {
+  id: string;
+  user_id?: string;
+  userId?: string;
+  date?: string;
+  timestamp?: string;
+  emotion?: string;
+  primary_emotion?: string;
+  score?: number;
+  confidence?: number;
+  intensity?: number;
+  emojis?: string | string[];
+  text?: string;
+  transcript?: string;
+  audio_url?: string;
+  audioUrl?: string;
+  feedback?: string;
+  recommendations?: string[];
+}
+
+// Add TeamOverviewProps type
+export interface TeamOverviewProps {
+  teamId: string;
+  period?: 'day' | 'week' | 'month';
+  filter?: string;
+}

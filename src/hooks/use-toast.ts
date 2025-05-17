@@ -70,4 +70,5 @@ export const useToast = () => {
   };
 };
 
-export { toast, ToastProps, ToastActionElement };
+export { toast };
+export type { ToastProps, ToastActionElement };

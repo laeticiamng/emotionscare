@@ -57,3 +57,80 @@ export const createEmotionEntry = async (data: Partial<EmotionResult>): Promise<
   
   return completedData;
 };
+
+// Add missing analyzeEmotion function
+export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
+  console.log('Analyzing emotion from text:', text);
+  
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  // Mock emotions based on text content
+  const emotions: Record<string, number> = {};
+  const emotionKeywords: Record<string, string[]> = {
+    joy: ['happy', 'glad', 'excited', 'joyful', 'content', 'pleased'],
+    sadness: ['sad', 'upset', 'depressed', 'unhappy', 'down', 'disappointed'],
+    anger: ['angry', 'mad', 'furious', 'irritated', 'annoyed', 'frustrated'],
+    fear: ['afraid', 'scared', 'terrified', 'worried', 'nervous', 'anxious'],
+    disgust: ['disgusted', 'revolted', 'repulsed', 'sickened'],
+    surprise: ['surprised', 'shocked', 'amazed', 'astonished'],
+    neutral: ['fine', 'okay', 'alright', 'neutral']
+  };
+  
+  // Simple algorithm to detect emotions
+  const lowerText = text.toLowerCase();
+  let primaryEmotion = 'neutral';
+  let highestScore = 0.2; // Default neutral score
+  
+  // Calculate scores for each emotion
+  Object.entries(emotionKeywords).forEach(([emotion, keywords]) => {
+    const matchCount = keywords.filter(word => lowerText.includes(word)).length;
+    const emotionScore = matchCount > 0 ? 0.3 + (matchCount * 0.15) : 0.1;
+    emotions[emotion] = Math.min(emotionScore, 0.95); // Cap at 0.95
+    
+    if (emotionScore > highestScore) {
+      highestScore = emotionScore;
+      primaryEmotion = emotion;
+    }
+  });
+  
+  // Generate feedback based on detected emotion
+  const feedbackMap: Record<string, string> = {
+    joy: "Vous semblez être de bonne humeur aujourd'hui!",
+    sadness: "Vous semblez un peu mélancolique. Comment puis-je vous aider?",
+    anger: "Je détecte de la frustration. Prenez quelques respirations profondes.",
+    fear: "Vous semblez inquiet. Parlons de ce qui vous préoccupe.",
+    disgust: "Quelque chose semble vous déranger.",
+    surprise: "Vous semblez surpris ou étonné.",
+    neutral: "Votre humeur semble plutôt neutre actuellement."
+  };
+  
+  return {
+    id: uuid(),
+    user_id: 'user-1',
+    date: new Date().toISOString(),
+    timestamp: new Date().toISOString(),
+    score: Math.round(highestScore * 100),
+    confidence: highestScore,
+    emotion: primaryEmotion,
+    primary_emotion: primaryEmotion,
+    text: text,
+    transcript: text,
+    feedback: feedbackMap[primaryEmotion] || "Merci de partager vos émotions.",
+    emotions: emotions
+  };
+};
+
+// Add missing saveEmotion function
+export const saveEmotion = async (emotion: EmotionResult): Promise<EmotionResult> => {
+  console.log('Saving emotion:', emotion);
+  
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // In a real application, this would save to a database
+  return {
+    ...emotion,
+    id: emotion.id || uuid()
+  };
+};
