@@ -1,11 +1,24 @@
 
-import { toast } from "sonner";
-import type { ToastProps, ToastActionElement } from "@/types/toast";
+import { toast as sonnerToast } from "sonner";
+import type { ToastProps, ToastActionElement, ToastOptions } from "@/types/toast";
 
-export { toast };
-export const useToast = () => ({ toast });
+// Create a wrapper around sonner toast to support our app's toast options
+export const toast = (options: ToastOptions) => {
+  return sonnerToast(options.title || "", {
+    description: options.description,
+    action: options.action,
+    duration: options.duration,
+    className: options.variant ? `toast-${options.variant}` : undefined,
+  });
+};
 
-export type { ToastProps, ToastActionElement };
-export type { Toast, ToastOptions } from "@/types/toast";
+export const useToast = () => {
+  return { 
+    toast 
+  };
+};
+
+export type { ToastProps, ToastActionElement, ToastOptions };
+export { Toast } from "@/types/toast";
 
 export default useToast;

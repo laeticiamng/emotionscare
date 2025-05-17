@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Mic, Square, Save, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 const AudioRecorderSection: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);

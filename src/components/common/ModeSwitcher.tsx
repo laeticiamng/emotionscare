@@ -13,7 +13,7 @@ import { User, Building, Shield, Check, SwitchCamera } from 'lucide-react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useUserModeHelpers } from '@/hooks/useUserModeHelpers';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface ModeSwitcherProps {
   variant?: "default" | "outline" | "secondary" | "ghost" | "link";
@@ -28,6 +28,7 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
   const { userMode, setUserMode } = useUserMode();
   const { isB2C, isB2BUser, isB2BAdmin } = useUserModeHelpers();
   const [isOpen, setIsOpen] = useState(false);
+  const { toast } = useToast();
   
   const handleSwitchMode = (mode: string) => {
     const normalizedMode = normalizeUserMode(mode);

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useEffect, useState, ReactNode } from 'react';
 import { AudioTrack } from '@/types/audio';
 
@@ -183,6 +182,34 @@ export const useAudioPlayer = () => {
     throw new Error('useAudioPlayer must be used within an AudioProvider');
   }
   return context;
+};
+
+// Adding a useAudio export to fix the import error
+export const useAudio = () => {
+  const { state, playTrack, pauseTrack, resumeTrack, nextTrack, prevTrack, setVolume, toggleMute, seekTo } = useAudioPlayer();
+  
+  return {
+    currentTrack: state.currentTrack,
+    isPlaying: state.isPlaying,
+    volume: state.volume,
+    muted: state.muted,
+    currentTime: state.currentTime,
+    duration: state.duration,
+    progress: state.currentTime,
+    isMuted: state.muted,
+    loading: false,
+    togglePlay: state.isPlaying ? pauseTrack : resumeTrack,
+    playTrack,
+    pauseTrack,
+    seekTo,
+    setVolume,
+    toggleMute,
+    formatTime: (seconds: number) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+  };
 };
 
 interface AudioProviderProps {
