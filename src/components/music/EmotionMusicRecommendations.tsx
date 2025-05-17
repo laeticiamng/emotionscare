@@ -1,134 +1,102 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { useMusic } from '@/contexts/MusicContext';
-import { Music, Play, Loader2 } from 'lucide-react';
-import { EmotionMusicParams, MusicPlaylist } from '@/types/music';
+import { Play, Pause, Music } from 'lucide-react';
+import { useMusic } from '@/contexts/music';
 
 interface EmotionMusicRecommendationsProps {
-  emotion: string;
-  description?: string;
+  emotion?: string;
+  className?: string;
 }
 
 const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = ({
-  emotion,
-  description
+  emotion = "calm",
+  className = ""
 }) => {
   const { 
     currentTrack, 
     playTrack, 
     isPlaying, 
-    pauseTrack,
-    loadPlaylistForEmotion
+    pauseTrack, 
+    loadPlaylistForEmotion 
   } = useMusic();
   
-  const [recommendation, setRecommendation] = useState<MusicPlaylist | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [recommendedEmotion, setRecommendedEmotion] = useState(emotion);
   
-  // Get a description of the emotion-based music
-  const getEmotionMusicDescription = (emotion: string): string => {
-    const descriptions: Record<string, string> = {
-      'calm': 'Une musique apaisante pour vous aider à vous détendre et retrouver votre sérénité.',
-      'happy': 'Des mélodies joyeuses et entraînantes pour amplifier votre bonne humeur.',
-      'sad': 'Des compositions mélancoliques pour accompagner vos moments de réflexion.',
-      'angry': 'Une musique énergique pour canaliser et transformer votre colère.',
-      'anxious': 'Des sons doux et réguliers pour vous aider à retrouver votre calme intérieur.',
-      'focus': 'Une ambiance sonore équilibrée pour améliorer votre concentration.',
-      'energetic': 'Des rythmes dynamiques pour stimuler votre énergie et votre motivation.',
-      'melancholy': 'Des mélodies douces et introspectives pour accompagner vos moments de nostalgie.'
-    };
-    
-    return descriptions[emotion.toLowerCase()] || 'Musique adaptée à votre état émotionnel actuel.';
-  };
-  
-  useEffect(() => {
-    const loadRecommendation = async () => {
-      if (!emotion) return;
-      
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-        // Call the loadPlaylistForEmotion function from MusicContext
-        const params: EmotionMusicParams = { emotion };
-        const playlist = await loadPlaylistForEmotion(params);
-        if (playlist) {
-          setRecommendation(playlist);
-        }
-      } catch (err) {
-        console.error('Failed to load music recommendation:', err);
-        setError('Impossible de charger les recommandations musicales.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadRecommendation();
-  }, [emotion, loadPlaylistForEmotion]);
-  
-  const handlePlayRecommendation = () => {
-    if (recommendation && recommendation.tracks && recommendation.tracks.length > 0) {
-      playTrack(recommendation.tracks[0]);
+  // Textes par émotion
+  const emotionTexts: Record<string, { title: string; description: string }> = {
+    calm: {
+      title: "Musique apaisante",
+      description: "Des sons pour vous aider à vous détendre et à vous recentrer."
+    },
+    focused: {
+      title: "Concentration optimale",
+      description: "Mélodies idéales pour améliorer votre concentration et productivité."
+    },
+    energetic: {
+      title: "Boost d'énergie",
+      description: "Rythmes dynamiques pour vous motiver et stimuler votre énergie."
+    },
+    sad: {
+      title: "Réconfort émotionnel",
+      description: "Des mélodies douces pour accompagner vos moments de mélancolie."
+    },
+    stressed: {
+      title: "Anti-stress",
+      description: "Sons relaxants pour diminuer votre anxiété et retrouver la sérénité."
     }
   };
   
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-        <p className="text-muted-foreground">Chargement des recommandations musicales...</p>
-      </div>
-    );
-  }
+  const currentEmotionData = emotionTexts[recommendedEmotion] || emotionTexts.calm;
   
-  if (error) {
-    return (
-      <div className="text-center py-6">
-        <p className="text-muted-foreground">{error}</p>
-        <Button 
-          variant="outline" 
-          className="mt-4"
-          onClick={() => window.location.reload()}
-        >
-          Réessayer
-        </Button>
-      </div>
-    );
-  }
-  
+  useEffect(() => {
+    // Mettre à jour la recommandation si l'émotion change
+    if (emotion) {
+      setRecommendedEmotion(emotion);
+    }
+  }, [emotion]);
+
+  const handlePlayMusic = () => {
+    loadPlaylistForEmotion(recommendedEmotion);
+  };
+
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <Music className="h-8 w-8 text-primary" />
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Music className="h-5 w-5" />
+          {currentEmotionData.title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground mb-4">
+          {currentEmotionData.description}
+        </p>
+        
+        <Button 
+          onClick={isPlaying ? pauseTrack : handlePlayMusic}
+          className="w-full flex items-center justify-center gap-2"
+          variant="outline"
+        >
+          {isPlaying ? (
+            <>
+              <Pause className="h-4 w-4" />
+              Pause
+            </>
+          ) : (
+            <>
+              <Play className="h-4 w-4" />
+              Écouter
+            </>
+          )}
+        </Button>
+        
+        {currentTrack && isPlaying && (
+          <div className="mt-4 text-xs text-center text-muted-foreground">
+            Lecture en cours: {currentTrack.title} - {currentTrack.artist}
           </div>
-          
-          <div className="flex-1">
-            <h3 className="text-lg font-medium mb-1">
-              Musique pour {emotion.charAt(0).toUpperCase() + emotion.slice(1)}
-            </h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              {description || getEmotionMusicDescription(emotion)}
-            </p>
-            
-            {recommendation ? (
-              <div className="space-y-4">
-                <h4 className="font-medium">Recommandation: {recommendation.name || recommendation.title}</h4>
-                {recommendation.tracks && recommendation.tracks.length > 0 && (
-                  <Button onClick={handlePlayRecommendation}>
-                    <Play className="mr-2 h-4 w-4" />
-                    Écouter maintenant
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <p className="text-sm italic">Aucune recommandation disponible pour le moment.</p>
-            )}
-          </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   );

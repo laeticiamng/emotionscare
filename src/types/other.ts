@@ -14,7 +14,7 @@ export interface MoodData {
 export interface AudioPlaylist {
   id: string;
   name: string;
-  title?: string; // Ajout de ce champ pour compatibilité
+  title?: string;
   tracks: any[];
   description?: string;
 }

@@ -3,31 +3,27 @@ export interface ChatMessage {
   id: string;
   content: string;
   text?: string;
-  sender: string;
-  role: string;
+  sender: 'user' | 'assistant' | 'system';
+  role: 'user' | 'assistant' | 'system';
   timestamp: string;
   conversation_id: string;
   isError?: boolean;
-  isTyping?: boolean;
-  attachments?: string[];
 }
 
 export interface ChatConversation {
   id: string;
-  user_id: string;
   title: string;
+  user_id?: string;
   created_at: string;
   updated_at: string;
   last_message?: string;
-  lastMessage?: string; // Keeping both variants for backward compatibility
-  messages?: ChatMessage[];
-  status?: string; // Adding status property needed by multiple components
+  status?: string;
 }
 
 export interface ChatResponse {
-  content?: string;
   message?: string;
-  emotion?: string;
-  id?: string;
-  timestamp?: string;
+  response?: string;
+  conversation_id?: string;
+  error?: string;
+  success?: boolean;
 }

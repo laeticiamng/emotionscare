@@ -5,16 +5,15 @@ export interface Badge {
   description: string;
   imageUrl?: string;
   image_url?: string;
-  unlocked: boolean;
-  level: number;
-  category: string;
+  category?: string;
   tier?: string;
-  icon?: string;
   earned?: boolean;
-  progress?: number;
   threshold?: number;
+  progress?: number;
   completed?: boolean;
-  rarity?: string;
+  icon?: string;
+  level?: number;
+  unlocked?: boolean;
 }
 
 export interface Challenge {
@@ -22,13 +21,12 @@ export interface Challenge {
   title: string;
   description: string;
   points?: number;
-  progress: number;
-  goal: number | string;
-  category: string;
-  completed: boolean;
-  status: string;
-  name?: string;
+  progress?: number;
+  completed?: boolean;
   totalSteps?: number;
   difficulty?: string;
   deadline?: string;
+  goal?: string;
+  status?: string;
+  category?: string;
 }

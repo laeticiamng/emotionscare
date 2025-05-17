@@ -2,14 +2,17 @@
 export interface LeaderboardEntry {
   id: string;
   userId: string;
-  points: number;
-  rank: number;
+  displayName?: string;
+  name?: string;
   avatar?: string;
-  name?: string; // This field is used in multiple components
-  score?: number;    // Adding missing properties
-  username?: string; // needed by various components
-  avatarUrl?: string;
-  trend?: string;
+  score: number;
+  rank: number;
+  team?: string;
+  department?: string;
+  level?: number;
+  badges?: number | string[];
+  position?: number;
+  points?: number;
 }
 
 export interface KpiCardProps {

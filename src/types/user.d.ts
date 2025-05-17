@@ -27,6 +27,7 @@ export interface User {
   avatarUrl?: string;
   avatar_url?: string;
   job_title?: string;
+  isActive?: boolean;
 }
 
 export interface UserWithStatus {
@@ -55,7 +56,7 @@ export interface UserPreferences {
   notifications_enabled?: boolean;
   email_notifications?: boolean;
   
-  // Add properties that are used in the application
+  // Propriétés utilisées dans l'application
   notifications?: {
     enabled?: boolean;
     emailEnabled?: boolean;
