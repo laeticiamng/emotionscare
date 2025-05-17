@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { getRoleHomePath } from '@/hooks/use-role-redirect';
 
 interface LoginProps {
   role?: 'b2c' | 'b2b_user' | 'b2b_admin';
@@ -31,14 +32,6 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
   };
   
   const currentMode = role || getCurrentMode();
-
-  const getRedirectPath = (userRole: string) => {
-    switch(userRole) {
-      case 'b2b_admin': return '/b2b/admin';
-      case 'b2b_user': return '/b2b/user';
-      case 'b2c': default: return '/b2c';
-    }
-  };
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +46,7 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
       });
       
       // Redirect to the appropriate dashboard based on user role or current mode
-      const redirectPath = getRedirectPath(user?.role || currentMode);
+      const redirectPath = getRoleHomePath(user?.role || currentMode);
       navigate(redirectPath);
     } catch (error: any) {
       toast({
@@ -123,7 +116,12 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
           </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button variant="outline" className="w-full" type="button">
+          <Button 
+            variant="outline" 
+            className="w-full" 
+            type="button"
+            onClick={() => navigate(currentMode === 'b2c' ? '/b2c/register' : '/')}
+          >
             Créer un compte
           </Button>
           <Button variant="ghost" className="w-full" type="button" onClick={() => navigate('/')}>

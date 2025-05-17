@@ -3,9 +3,33 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  
+  // Déterminer la redirection appropriée en fonction du statut d'authentification et du rôle
+  const handleGoToDashboard = () => {
+    if (!isAuthenticated) {
+      navigate('/');
+      return;
+    }
+    
+    // Rediriger vers le tableau de bord approprié selon le rôle
+    switch (user?.role) {
+      case 'b2b_admin':
+        navigate('/b2b/admin');
+        break;
+      case 'b2b_user':
+        navigate('/b2b/user');
+        break;
+      case 'b2c':
+      default:
+        navigate('/b2c');
+        break;
+    }
+  };
   
   return (
     <div className="min-h-screen flex flex-col items-center justify-center text-center p-4">
@@ -22,13 +46,15 @@ const NotFoundPage: React.FC = () => {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Retourner à l'accueil
         </Button>
+        
         <Button 
           variant="outline"
-          onClick={() => navigate('/b2c')}
+          onClick={handleGoToDashboard}
           className="flex items-center justify-center"
         >
-          Espace Personnel
+          Accéder à mon tableau de bord
         </Button>
+        
         <Button 
           variant="outline"
           onClick={() => navigate('/b2b/selection')}

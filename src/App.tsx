@@ -1,27 +1,31 @@
 
-import React from 'react';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-import { AuthProvider } from '@/hooks/useAuth';
-import { UserModeProvider } from '@/contexts/UserModeContext';
-import { LayoutProvider } from '@/contexts/LayoutContext';
-import { MusicProvider } from '@/contexts/MusicContext';
-import AppRoutes from '@/router/AppRoutes';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { ThemeProvider } from '@/providers/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { UserModeProvider } from '@/contexts/UserModeContext';
+import { MusicProvider } from '@/contexts/music';
+import { PreferencesProvider } from '@/contexts/PreferencesContext';
+import AppRouter from '@/AppRouter';
+import RouteDebugger from '@/components/ui/RouteDebugger';
 
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <UserModeProvider>
-          <LayoutProvider>
-            <MusicProvider>
-              <AppRoutes />
-              <Toaster />
-            </MusicProvider>
-          </LayoutProvider>
-        </UserModeProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <Router>
+      <ThemeProvider defaultTheme="system" storageKey="ui-theme">
+        <AuthProvider>
+          <UserModeProvider>
+            <PreferencesProvider>
+              <MusicProvider>
+                <AppRouter />
+                <Toaster />
+                {process.env.NODE_ENV === 'development' && <RouteDebugger />}
+              </MusicProvider>
+            </PreferencesProvider>
+          </UserModeProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </Router>
   );
 }
 

@@ -25,12 +25,28 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // If not authenticated and trying to access a protected route, redirect to login
   if (!isAuthenticated) {
-    return <Navigate to={redirectTo || '/b2c/login'} state={{ from: location }} />;
+    // Déterminer quelle page de login utiliser en fonction du chemin actuel
+    let loginPath = '/b2c/login';
+    
+    if (location.pathname.includes('/b2b/admin')) {
+      loginPath = '/b2b/admin/login';
+    } else if (location.pathname.includes('/b2b/user')) {
+      loginPath = '/b2b/user/login';
+    }
+    
+    return <Navigate to={loginPath} state={{ from: location }} />;
   }
 
-  // If role is required and user doesn't have it, redirect to unauthorized
+  // Si un rôle spécifique est requis et que l'utilisateur ne l'a pas, rediriger
   if (requiredRole && user?.role !== requiredRole) {
-    return <Navigate to="/unauthorized" />;
+    // Si l'utilisateur est connecté mais n'a pas le bon rôle, rediriger vers son tableau de bord par défaut
+    const userDashboardPath = user?.role === 'b2b_admin' 
+      ? '/b2b/admin' 
+      : user?.role === 'b2b_user' 
+        ? '/b2b/user' 
+        : '/b2c';
+    
+    return <Navigate to={userDashboardPath} />;
   }
 
   // User is authenticated and has required role (or no specific role required)
