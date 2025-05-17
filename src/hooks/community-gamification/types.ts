@@ -13,4 +13,6 @@ export interface GamificationStats {
   recentAchievements?: Badge[];
 }
 
-export { Badge, Challenge, LeaderboardEntry };
+// Export types avec "export type" pour corriger l'erreur isolatedModules
+export type { Badge };
+export type { Challenge, LeaderboardEntry };

@@ -13,6 +13,7 @@ import B2BSelectionPage from '@/pages/B2BSelectionPage';
 import B2CLayout from '@/layouts/B2CLayout';
 import B2CDashboard from '@/pages/b2c/Dashboard';
 import B2CGamificationPage from '@/pages/b2c/Gamification';
+import B2CMusicPage from '@/pages/b2c/Music';
 
 // B2B User pages
 import B2BUserLayout from '@/layouts/B2BUserLayout';
@@ -40,6 +41,7 @@ export const AppRoutes: React.FC = () => {
       <Route path="/b2c" element={<B2CLayout />}>
         <Route path="dashboard" element={<B2CDashboard />} />
         <Route path="gamification" element={<B2CGamificationPage />} />
+        <Route path="music" element={<B2CMusicPage />} />
       </Route>
 
       {/* B2B User Routes */}

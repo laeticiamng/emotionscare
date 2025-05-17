@@ -1,4 +1,3 @@
-
 export interface MusicTrack {
   id: string;
   title: string;
@@ -23,6 +22,7 @@ export interface MusicPlaylist {
   tracks: MusicTrack[];
   description?: string;
   coverUrl?: string;
+  coverImage?: string;  // Ajout pour compatibilité
 }
 
 export interface EmotionMusicParams {
@@ -68,6 +68,9 @@ export interface ProgressBarProps {
   className?: string;
   formatTime?: (seconds: number) => string;
   showTimestamps?: boolean;
+  position?: number;  // Ajout pour compatibilité
+  max?: number;       // Ajout pour compatibilité
+  onChange?: (time: number) => void;  // Ajout pour compatibilité
 }
 
 export interface MusicDrawerProps {

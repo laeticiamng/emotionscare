@@ -1,86 +1,103 @@
+export type {
+  User,
+  UserPreferences,
+  FontFamily,
+  FontSize,
+  ThemeName,
+  InvitationVerificationResult,
+  UserRole,
+  NotificationPreferences,
+  Period,
+  UserModeType,
+  Story
+} from './types/types';
 
-import { UserRole } from "./user";
-import { ThemeName, FontSize, FontFamily, NotificationPreferences as NotificationPrefs } from "./preferences";
+export type {
+  VRSessionTemplate,
+  VRSession,
+  VRHistoryListProps,
+  VRSessionHistoryProps,
+  VRSessionWithMusicProps,
+  VRTemplateGridProps
+} from './types/vr';
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-  avatar_url?: string;
-  avatarUrl?: string;
-  role?: UserRole;
-  preferences?: UserPreferences;
-  onboarded?: boolean;
-  department?: string;
-  position?: string;
-  created_at?: string;
-  joined_at?: string;
-  emotional_score?: number;
-}
+// Export types from music
+export type {
+  MusicTrack,
+  MusicPlaylist,
+  MusicContextType,
+  MusicDrawerProps,
+  ProgressBarProps,
+  VolumeControlProps,
+  MusicControlsProps,
+  MusicLibraryProps,
+  EmotionMusicParams,
+  TrackInfoProps
+} from './types/music';
 
-export interface UserPreferences {
-  theme?: ThemeName;
-  fontSize?: FontSize;
-  fontFamily?: FontFamily;
-  reduceMotion?: boolean;
-  colorBlindMode?: boolean;
-  autoplayMedia?: boolean;
-  language?: string;
-  notifications?: NotificationPrefs;
-  emailEnabled?: boolean;
-  pushEnabled?: boolean;
-  soundEnabled?: boolean;
-  onboardingCompleted?: boolean;
-  dashboardLayout?: string;
-  privacyLevel?: string;
-  notifications_enabled?: boolean;
-  notificationPreferences?: NotificationPrefs;
-  ambientSound?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  displayName?: string;
-  pronouns?: string;
-  biography?: string;
-  avatarUrl?: string;
-  fullAnonymity?: boolean;
-  privacy?: {
-    shareData: boolean;
-    anonymizeReports?: boolean;
-    profileVisibility: string;
-    showProfile?: boolean;
-    shareActivity?: boolean;
-    allowMessages?: boolean;
-    allowNotifications?: boolean;
-    anonymousMode?: boolean;
-  };
-}
+// Export from emotions
+export type {
+  Emotion,
+  EmotionResult,
+  LiveVoiceScannerProps,
+  TeamOverviewProps,
+  EmotionalTeamViewProps
+} from './types/emotions';
 
-export type NotificationPreferences = NotificationPrefs;
+// Export from badge
+export type {
+  Badge
+} from './types/badge';
 
-export interface Story {
-  id: string;
-  title: string;
-  content: string;
-  date: Date;
-  seen: boolean;
-  type?: string;
-  emotion?: string;
-  image?: string;
-  cta?: {
-    label: string;
-    route: string;
-  };
-}
+// Export from theme
+export type {
+  Theme,
+  ThemeContextType,
+  FontFamily,
+  FontSize
+} from './types/theme';
 
-export type Period = 'day' | 'week' | 'month' | 'year';
-export type UserModeType = 'b2c' | 'b2b-collaborator' | 'b2b-admin';
-export { UserRole } from './user';
+// Export from notification
+export type {
+  NotificationFrequency,
+  NotificationTone,
+  NotificationPreference
+} from './types/notification';
 
-// Type for invitation verification
-export interface InvitationVerificationResult {
-  valid: boolean;
-  message?: string;
-  email?: string;
-  role?: UserRole;
+// Export type from sidebar
+export type { 
+  SidebarContextType 
+} from './types/sidebar';
+
+// Export from dashboard
+export type { 
+  KpiCardProps, 
+  DraggableKpiCardsGridProps, 
+  GlobalOverviewTabProps,
+  DashboardWidgetConfig,
+  GamificationData
+} from './types/dashboard';
+
+export type {
+  ChatMessage,
+  MoodData,
+  JournalEntry,
+  Story as OtherStory,
+  EmotionPrediction,
+  Recommendation,
+  InvitationStats,
+  InvitationData,
+  InvitationFormData,
+  UserPreference
+} from './types/other';
+
+// Ajouté pour résoudre les erreurs d'import
+export interface EmotionResult {
+  emotion: string;
+  confidence: number;
+  timestamp?: string;
+  source?: string;
+  audioUrl?: string;
+  textInput?: string;
+  facialExpression?: string;
 }

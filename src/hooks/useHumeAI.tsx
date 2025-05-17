@@ -1,205 +1,169 @@
 
-import { useState, useCallback } from 'react';
-import { EmotionResult } from '@/types/types';
+import { useState } from 'react';
+import { useToast } from './use-toast';
+import { EmotionResult } from '@/types/emotions';
+
+// Mock API response for Hume AI analysis
+interface MockHumeAIResponse {
+  emotions: {
+    name: string;
+    score: number;
+  }[];
+  sentiment: {
+    positive: number;
+    negative: number;
+    neutral: number;
+  };
+  language: {
+    detected: string;
+    confidence: number;
+  };
+}
 
 export const useHumeAI = () => {
-  const [analyzing, setAnalyzing] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<EmotionResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  // Analyze text to detect emotion
-  const analyzeText = useCallback(async (text: string): Promise<EmotionResult> => {
-    if (!text) {
-      throw new Error('Text is required');
+  // Simulated analysis function for text
+  const analyzeText = async (text: string): Promise<EmotionResult> => {
+    if (!text || text.trim() === '') {
+      throw new Error('Text input is required for analysis');
     }
 
-    setAnalyzing(true);
-    setError(null);
-
+    setIsAnalyzing(true);
+    
     try {
-      // In a real application, this would be an API call to Hume AI
-      // Simulating API call with a timeout
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          // Mock result
-          const mockResult: EmotionResult = {
-            id: `text-${Date.now()}`,
-            emotion: 'joy',
-            dominantEmotion: 'joy',
-            score: 75, 
-            confidence: 0.85,
-            source: 'text',
-            text: text,
-            timestamp: new Date().toISOString(),
-            date: new Date().toISOString(),
-            anxiety: 25,
-            recommendations: [
-              'Continue practices that bring you joy',
-              'Share your positive experiences with others'
-            ],
-            feedback: 'Your writing shows a positive emotional state.'
-          };
-
-          setResult(mockResult);
-          setAnalyzing(false);
-          resolve(mockResult);
-        }, 1500);
+      // Simulate API call delay
+      await new Promise(resolver => setTimeout(resolver, 1500));
+      
+      // Mock response based on text content
+      const lowerText = text.toLowerCase();
+      let primaryEmotion = 'neutral';
+      let confidence = 0.7;
+      
+      if (lowerText.includes('happy') || lowerText.includes('joy') || lowerText.includes('excited')) {
+        primaryEmotion = 'joy';
+        confidence = 0.85;
+      } else if (lowerText.includes('sad') || lowerText.includes('depressed') || lowerText.includes('unhappy')) {
+        primaryEmotion = 'sadness';
+        confidence = 0.8;
+      } else if (lowerText.includes('angry') || lowerText.includes('frustrated') || lowerText.includes('mad')) {
+        primaryEmotion = 'anger';
+        confidence = 0.75;
+      } else if (lowerText.includes('scared') || lowerText.includes('afraid') || lowerText.includes('anxious')) {
+        primaryEmotion = 'fear';
+        confidence = 0.7;
+      } else if (lowerText.includes('calm') || lowerText.includes('peaceful') || lowerText.includes('relaxed')) {
+        primaryEmotion = 'calm';
+        confidence = 0.9;
+      }
+      
+      const emotionResult: EmotionResult = {
+        emotion: primaryEmotion,
+        confidence: confidence,
+        timestamp: new Date().toISOString(),
+        source: 'text',
+        textInput: text
+      };
+      
+      setResult(emotionResult);
+      return emotionResult;
+    } catch (error) {
+      console.error('Error analyzing text with Hume AI:', error);
+      toast({
+        title: 'Analyse échouée',
+        description: 'Impossible d\'analyser le texte. Veuillez réessayer.',
+        variant: 'destructive',
       });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error during text analysis';
-      setError(errorMessage);
-      setAnalyzing(false);
-      throw new Error(errorMessage);
+      throw error;
+    } finally {
+      setIsAnalyzing(false);
     }
-  }, []);
-
-  // Analyze audio to detect emotion
-  const analyzeAudio = useCallback(async (audioBlob: Blob): Promise<EmotionResult> => {
-    if (!audioBlob) {
-      throw new Error('Audio data is required');
-    }
-
-    setAnalyzing(true);
-    setError(null);
-
+  };
+  
+  // Simulated analysis function for audio
+  const analyzeAudio = async (audioBlob: Blob): Promise<EmotionResult> => {
+    setIsAnalyzing(true);
+    
     try {
-      // In a real application, this would be an API call to Hume AI
-      // Simulating API call with a timeout
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          // Mock result
-          const mockResult: EmotionResult = {
-            id: `audio-${Date.now()}`,
-            emotion: 'calm',
-            dominantEmotion: 'calm',
-            score: 82,
-            confidence: 0.92,
-            source: 'audio',
-            timestamp: new Date().toISOString(),
-            date: new Date().toISOString(),
-            anxiety: 15,
-            recommendations: [
-              'Practice mindfulness to maintain your calm state',
-              'Use breathing techniques when facing stressful situations'
-            ],
-            feedback: 'Your voice indicates a calm and balanced emotional state.'
-          };
-
-          setResult(mockResult);
-          setAnalyzing(false);
-          resolve(mockResult);
-        }, 2000);
+      // Simulate API call delay
+      await new Promise(resolver => setTimeout(resolver, 2000));
+      
+      // Create a mock audio URL
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      // Mock emotions with random values for demo
+      const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'calm'];
+      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const randomConfidence = 0.5 + Math.random() * 0.4; // Between 0.5 and 0.9
+      
+      const emotionResult: EmotionResult = {
+        emotion: randomEmotion,
+        confidence: randomConfidence,
+        timestamp: new Date().toISOString(),
+        source: 'audio',
+        audioUrl
+      };
+      
+      setResult(emotionResult);
+      return emotionResult;
+    } catch (error) {
+      console.error('Error analyzing audio with Hume AI:', error);
+      toast({
+        title: 'Analyse échouée',
+        description: 'Impossible d\'analyser l\'audio. Veuillez réessayer.',
+        variant: 'destructive',
       });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error during audio analysis';
-      setError(errorMessage);
-      setAnalyzing(false);
-      throw new Error(errorMessage);
+      throw error;
+    } finally {
+      setIsAnalyzing(false);
     }
-  }, []);
-
-  // Analyze facial expression to detect emotion
-  const analyzeFacial = useCallback(async (imageBlob: Blob): Promise<EmotionResult> => {
-    if (!imageBlob) {
-      throw new Error('Image data is required');
-    }
-
-    setAnalyzing(true);
-    setError(null);
-
+  };
+  
+  // Simulated analysis function for facial expression
+  const analyzeFacial = async (imageBlob: Blob): Promise<EmotionResult> => {
+    setIsAnalyzing(true);
+    
     try {
-      // In a real application, this would be an API call to Hume AI
-      // Simulating API call with a timeout
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          // Mock result
-          const mockResult: EmotionResult = {
-            id: `facial-${Date.now()}`,
-            emotion: 'neutral',
-            dominantEmotion: 'neutral',
-            score: 60,
-            confidence: 0.78,
-            source: 'facial',
-            timestamp: new Date().toISOString(),
-            date: new Date().toISOString(),
-            anxiety: 30,
-            recommendations: [
-              'Consider activities that energize you',
-              'Take short breaks to reset your emotional state'
-            ],
-            feedback: 'Your facial expression shows a neutral emotional state.'
-          };
-
-          setResult(mockResult);
-          setAnalyzing(false);
-          resolve(mockResult);
-        }, 1800);
+      // Simulate API call delay
+      await new Promise(resolver => setTimeout(resolver, 1800));
+      
+      // Mock emotions with random values for demo
+      const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'neutral'];
+      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const randomConfidence = 0.6 + Math.random() * 0.3; // Between 0.6 and 0.9
+      
+      const emotionResult: EmotionResult = {
+        emotion: randomEmotion,
+        confidence: randomConfidence,
+        timestamp: new Date().toISOString(),
+        source: 'facial',
+        facialExpression: randomEmotion
+      };
+      
+      setResult(emotionResult);
+      return emotionResult;
+    } catch (error) {
+      console.error('Error analyzing facial expression with Hume AI:', error);
+      toast({
+        title: 'Analyse échouée',
+        description: 'Impossible d\'analyser l\'expression faciale. Veuillez réessayer.',
+        variant: 'destructive',
       });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error during facial analysis';
-      setError(errorMessage);
-      setAnalyzing(false);
-      throw new Error(errorMessage);
+      throw error;
+    } finally {
+      setIsAnalyzing(false);
     }
-  }, []);
-
-  // Combined analysis (multiple modalities)
-  const analyzeCombined = useCallback(async ({
-    text,
-    audio,
-    facial
-  }: {
-    text?: string;
-    audio?: Blob;
-    facial?: Blob;
-  }): Promise<EmotionResult> => {
-    setAnalyzing(true);
-    setError(null);
-
-    try {
-      // In a real application, this would send all data to Hume AI for multimodal analysis
-      // Simulating API call with a timeout
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          // Mock result
-          const mockResult: EmotionResult = {
-            id: `combined-${Date.now()}`,
-            emotion: 'content',
-            dominantEmotion: 'content',
-            score: 70,
-            confidence: 0.89,
-            source: 'multimodal',
-            timestamp: new Date().toISOString(),
-            date: new Date().toISOString(),
-            recommendations: [
-              'Continue your current positive activities',
-              'Consider journaling about what makes you content'
-            ]
-          };
-
-          setResult(mockResult);
-          setAnalyzing(false);
-          resolve(mockResult);
-        }, 2500);
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error during combined analysis';
-      setError(errorMessage);
-      setAnalyzing(false);
-      throw new Error(errorMessage);
-    }
-  }, []);
+  };
 
   return {
     analyzeText,
     analyzeAudio,
     analyzeFacial,
-    analyzeCombined,
-    analyzing,
+    isAnalyzing,
     result,
-    error,
-    clearResult: () => setResult(null),
-    clearError: () => setError(null)
+    resetResult: () => setResult(null)
   };
 };
 

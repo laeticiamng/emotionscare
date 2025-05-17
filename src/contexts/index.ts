@@ -7,6 +7,6 @@ export { UserModeProvider, useUserMode } from './UserModeContext';
 export { LayoutProvider, useLayout } from './LayoutContext';
 export { SidebarProvider, useSidebar } from './SidebarContext';
 export { AuthProvider, useAuth } from './AuthContext';
-export { MusicContext, MusicProvider, useMusic } from './music/MusicProvider';
+export { MusicContext, MusicProvider, useMusic } from './music';
 
 // Autres contexts si besoin

@@ -1,9 +1,40 @@
 
 import React from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/contexts';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume, VolumeX, Music } from 'lucide-react';
-import MusicProgressBar from './MusicProgressBar';
+
+interface MusicProgressBarProps {
+  position?: number;
+  max?: number;
+  onChange?: (position: number) => void;
+  currentTime?: number;
+  duration?: number;
+  formatTime?: (seconds: number) => string;
+  onSeek?: (time: number) => void;
+}
+
+const MusicProgressBar: React.FC<MusicProgressBarProps> = ({
+  currentTime = 0,
+  duration = 0,
+  formatTime = (sec) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`,
+  onSeek
+}) => {
+  return (
+    <div className="w-full">
+      <div className="relative h-1 bg-gray-300 rounded-full overflow-hidden">
+        <div 
+          className="absolute h-full bg-primary"
+          style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
+        />
+      </div>
+      <div className="flex justify-between text-xs mt-1">
+        <span>{formatTime(currentTime)}</span>
+        <span>{formatTime(duration)}</span>
+      </div>
+    </div>
+  );
+};
 
 const MusicPlayer: React.FC = () => {
   const { 
@@ -90,13 +121,10 @@ const MusicPlayer: React.FC = () => {
           </div>
 
           <MusicProgressBar
-            position={currentTime || 0}
-            max={duration || 100}
-            onChange={seekTo}
             currentTime={currentTime || 0}
-            duration={duration || 0}
-            formatTime={formatTime}
+            duration={duration || 100}
             onSeek={seekTo}
+            formatTime={formatTime}
           />
         </div>
 

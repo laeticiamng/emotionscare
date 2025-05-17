@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { MusicTrack, MusicPlaylist, EmotionMusicParams, MusicContextType } from '@/types/music';
 
 // Créer le context
@@ -19,12 +19,16 @@ export const MusicContext = createContext<MusicContextType>({
   openDrawer: false,
   playTrack: () => {},
   pauseTrack: () => {},
+  resumeTrack: () => {},
   togglePlay: () => {},
   nextTrack: () => {},
   previousTrack: () => {},
   setVolume: () => {},
   toggleMute: () => {},
+  seekTo: () => {},
   loadPlaylistForEmotion: async () => null,
+  setEmotion: () => {},
+  setOpenDrawer: () => {},
 });
 
 // Hook pour utiliser le context
@@ -143,6 +147,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
         name: `${emotion} Playlist`,
         title: `${emotion} Music`,
         emotion: emotion,
+        coverUrl: `/images/covers/${emotion}.jpg`,
         tracks: mockTracks.filter(track => 
           track.emotion === emotion || !track.emotion
         )

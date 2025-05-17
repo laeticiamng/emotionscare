@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/contexts';
 import { toast } from '@/hooks/use-toast';
 
 interface MoodBasedRecommendationsProps {
@@ -14,7 +14,7 @@ interface MoodBasedRecommendationsProps {
 }
 
 const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ mood, intensity = 0.5, standalone = true }) => {
-  const { loadPlaylistForEmotion, recommendations, isLoading, error } = useMusic();
+  const { loadPlaylistForEmotion, playlist, isLoading, error } = useMusic();
 
   React.useEffect(() => {
     if (mood) {
@@ -38,7 +38,6 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ moo
       <CardContent className="space-y-4">
         {isLoading && <p>Chargement des recommandations...</p>}
         {error && <p className="text-red-500">Erreur: {error.message}</p>}
-        {/* Pour éviter l'erreur, utilisons les données du contexte correctement */}
         <div className="grid gap-4">
           <div className="border rounded-md p-4">
             <h3 className="text-lg font-semibold">Titre de la musique</h3>

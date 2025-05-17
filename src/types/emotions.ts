@@ -1,62 +1,34 @@
 
 export interface Emotion {
   id: string;
-  date: string;
-  emotion: string;
-  score: number;
-  user_id?: string;
+  name: string;  // Ajout du champ name manquant
+  label: string;
+  color: string;
+  intensity: number;
+  icon?: string;
+  emoji?: string;
 }
 
 export interface EmotionResult {
-  id: string;
-  userId?: string;
-  user_id?: string;
-  timestamp?: string;
-  date?: string;
   emotion: string;
-  primaryEmotion?: string;
-  score?: number;
-  confidence?: number;
-  intensity?: number;
-  emojis?: string | string[];
-  text?: string;
-  transcript?: string;
-  audio_url?: string;
-  audioUrl?: string;
-  feedback?: string;
-  ai_feedback?: string;
-  recommendations?: string[];
+  confidence: number;
+  timestamp?: string;
   source?: string;
-  emotions?: Record<string, number>;
+  audioUrl?: string;
+  textInput?: string;
+  facialExpression?: string;
 }
 
 export interface LiveVoiceScannerProps {
-  onEmotionDetected?: (emotion: EmotionResult) => void;
-  language?: string;
+  onEmotionDetected?: (result: EmotionResult) => void;
   autoStart?: boolean;
-  duration?: number;
-  className?: string;
-  withAI?: boolean;
 }
 
 export interface TeamOverviewProps {
-  teamId?: string;
-  period?: 'day' | 'week' | 'month';
-  userId?: string;
-  anonymized?: boolean;
-  className?: string;
-  dateRange?: any;
-  users?: any[];
-  showNames?: boolean;
-  compact?: boolean;
+  teamId: string;
 }
 
 export interface EmotionalTeamViewProps {
   teamId: string;
   period?: 'day' | 'week' | 'month';
-  anonymized?: boolean;
-  dateRange?: [Date, Date];
-  showGraph?: boolean;
-  showMembers?: boolean;
-  className?: string;
 }

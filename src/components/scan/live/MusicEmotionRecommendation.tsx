@@ -1,93 +1,66 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Music, Heart } from 'lucide-react';
-import { useMusic } from '@/contexts/music/MusicProvider';
-import { MusicPlaylist } from '@/types/music';
+import { Music, Play } from 'lucide-react';
+import { useMusic } from '@/contexts';
+import { useToast } from '@/hooks/use-toast';
+import { EmotionResult } from '@/types';
 
 interface MusicEmotionRecommendationProps {
-  emotion: string;
-  onSelect: (playlist: MusicPlaylist) => void;
+  emotionResult: EmotionResult;
 }
 
-const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({ emotion, onSelect }) => {
-  const { loadPlaylistForEmotion } = useMusic();
+const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({ emotionResult }) => {
+  const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
+  const { toast } = useToast();
   
-  // Mock playlists based on emotions
-  const playlists: Record<string, { id: string, name: string, tracks: number }> = {
-    happy: { id: 'happy-1', name: 'Énergie positive', tracks: 12 },
-    sad: { id: 'sad-1', name: 'Réconfort et douceur', tracks: 8 },
-    angry: { id: 'angry-1', name: 'Libération et calme', tracks: 10 },
-    anxious: { id: 'anxious-1', name: 'Apaisement et sérénité', tracks: 9 },
-    calm: { id: 'calm-1', name: 'Pleine conscience', tracks: 7 },
-    neutral: { id: 'neutral-1', name: 'Equilibre émotionnel', tracks: 11 }
-  };
-  
-  // Get playlist based on emotion or fallback to neutral
-  const playlist = playlists[emotion as keyof typeof playlists] || playlists.neutral;
-  
-  const handleSelectPlaylist = async () => {
+  const handleActivateMusic = async () => {
     try {
-      const musicPlaylist = await loadPlaylistForEmotion(emotion);
-      if (musicPlaylist) {
-        onSelect(musicPlaylist);
-      } else {
-        // Create a minimal fallback playlist
-        const fallbackPlaylist: MusicPlaylist = {
-          id: playlist.id,
-          title: playlist.name,
-          name: playlist.name,
-          tracks: []
-        };
-        onSelect(fallbackPlaylist);
+      const playlist = await loadPlaylistForEmotion({
+        emotion: emotionResult.emotion.toLowerCase(),
+        intensity: emotionResult.confidence
+      });
+      
+      if (playlist) {
+        setOpenDrawer(true);
+        toast({
+          title: 'Musique activée',
+          description: `Une playlist adaptée à votre humeur ${emotionResult.emotion} est maintenant active.`,
+        });
       }
     } catch (error) {
-      console.error("Error loading emotion-based playlist:", error);
-      // Create a minimal fallback playlist
-      const fallbackPlaylist: MusicPlaylist = {
-        id: playlist.id,
-        title: playlist.name,
-        name: playlist.name,
-        tracks: []
-      };
-      onSelect(fallbackPlaylist);
+      console.error('Error activating music for emotion:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'activer la musique adaptée à votre humeur.',
+        variant: 'destructive',
+      });
     }
   };
   
   return (
-    <Card className="mt-4">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Music className="h-5 w-5" />
-          Musique recommandée pour votre état émotionnel
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Music className="h-5 w-5 text-primary" />
+          Recommandation musicale
         </CardTitle>
+        <CardDescription>
+          Musique adaptée à votre état émotionnel actuel
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-medium">{playlist.name}</h3>
-              <p className="text-sm text-muted-foreground">
-                {playlist.tracks} morceaux • Adaptés à l'émotion <span className="font-medium">{emotion}</span>
-              </p>
-            </div>
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Heart className="h-5 w-5 text-primary" />
-            </div>
-          </div>
-          
-          <p className="text-sm">
-            Cette sélection musicale est spécialement conçue pour harmoniser votre état émotionnel 
-            actuel et favoriser votre bien-être.
-          </p>
-        </div>
-      </CardContent>
-      <CardFooter className="pt-0">
-        <Button className="w-full" onClick={handleSelectPlaylist}>
-          Écouter cette playlist
+        <p className="mb-4">
+          Nous avons sélectionné une playlist qui correspond à votre émotion dominante :
+          <span className="font-semibold text-primary ml-1">
+            {emotionResult.emotion}
+          </span>
+        </p>
+        <Button onClick={handleActivateMusic} className="w-full">
+          <Play className="mr-2 h-4 w-4" /> Écouter la playlist recommandée
         </Button>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 };

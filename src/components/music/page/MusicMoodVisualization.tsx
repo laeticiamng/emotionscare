@@ -1,96 +1,115 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useMusic } from '@/contexts';
 import { Card, CardContent } from '@/components/ui/card';
-import { Slider } from '@/components/ui/slider';
-import { useMusic } from '@/contexts/music';
-import EnhancedMusicVisualizer from '@/components/music/EnhancedMusicVisualizer';
-import { Volume2 } from 'lucide-react';
 
-interface MusicMoodVisualizationProps {
-  mood?: string;
-  intensity?: number;
-  showControls?: boolean;
+interface MoodColor {
+  light: string;
+  medium: string;
+  dark: string;
 }
 
-const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({
-  mood = 'calm',
-  intensity = 0.5,
-  showControls = true
-}) => {
-  const { volume, setVolume, isPlaying, currentEmotion } = useMusic();
-  const [visualizerHeight, setVisualizerHeight] = useState(200);
-  const [activeMood, setActiveMood] = useState(mood);
-  const [activeIntensity, setActiveIntensity] = useState(intensity);
+const moodColors: Record<string, MoodColor> = {
+  happy: { light: '#FFE9A8', medium: '#FFC837', dark: '#FF8008' },
+  calm: { light: '#C9F5F5', medium: '#81D8D0', dark: '#46B3B3' },
+  sad: { light: '#BBDEFB', medium: '#64B5F6', dark: '#1976D2' },
+  energetic: { light: '#FFCDD2', medium: '#EF5350', dark: '#B71C1C' },
+  focused: { light: '#D1C4E9', medium: '#9575CD', dark: '#512DA8' },
+  neutral: { light: '#E0E0E0', medium: '#9E9E9E', dark: '#616161' }
+};
+
+const MusicMoodVisualization: React.FC = () => {
+  const { emotion, currentTrack } = useMusic();
   
-  // Use the current emotion from context if available
-  useEffect(() => {
-    if (currentEmotion) {
-      setActiveMood(currentEmotion);
+  const currentMood = emotion || 'neutral';
+  const colors = moodColors[currentMood] || moodColors.neutral;
+  
+  const progress = 0.35; // For animation
+  const randomness = 0.2; // For how "chaotic" the visualization is
+  
+  // Generate visualization points
+  const generatePoints = () => {
+    const points = [];
+    const numberOfPoints = 8;
+    
+    for (let i = 0; i < numberOfPoints; i++) {
+      // Base position around a circle
+      const angle = (i / numberOfPoints) * Math.PI * 2;
+      const radius = 50 + Math.sin(Date.now() / 1000 + i) * randomness * 20;
+      
+      const x = 50 + Math.cos(angle) * radius * progress;
+      const y = 50 + Math.sin(angle) * radius * progress;
+      
+      points.push(`${x},${y}`);
     }
-  }, [currentEmotion]);
-  
-  // Adjust visualizer height based on screen size
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 640) {
-        setVisualizerHeight(140);
-      } else {
-        setVisualizerHeight(200);
-      }
-    };
     
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  
-  // If there's music playing, visualize it
-  const isActive = isPlaying;
-  
-  // Get mood color based on mood
-  const getMoodColor = (mood: string): string => {
-    const colors: Record<string, string> = {
-      calm: 'bg-blue-500/20',
-      happy: 'bg-yellow-500/20',
-      sad: 'bg-purple-500/20',
-      angry: 'bg-red-500/20',
-      focus: 'bg-green-500/20'
-    };
-    
-    return colors[mood.toLowerCase()] || 'bg-blue-500/20';
+    return points.join(' ');
   };
   
   return (
-    <Card className={`w-full overflow-hidden ${getMoodColor(activeMood)}`}>
-      <CardContent className="p-0">
-        <div className="relative">
-          <EnhancedMusicVisualizer 
-            mood={activeMood}
-            height={visualizerHeight}
-            showControls={false}
-            intensity={activeIntensity}
-            volume={volume}
-          />
-          
-          {showControls && (
-            <div className="absolute bottom-4 left-4 right-4">
-              <div className="bg-background/80 backdrop-blur-sm p-3 rounded-lg flex items-center gap-3">
-                <Volume2 className="h-4 w-4 text-muted-foreground" />
-                <Slider
-                  value={[volume * 100]}
-                  max={100}
-                  step={1}
-                  onValueChange={(values) => setVolume(values[0] / 100)}
-                  className="flex-1"
-                />
-                <span className="text-xs text-muted-foreground w-8 text-right">
-                  {Math.round(volume * 100)}%
-                </span>
-              </div>
-            </div>
+    <Card className="overflow-hidden">
+      <CardContent className="p-6">
+        <div className="text-center mb-4">
+          <h3 className="text-lg font-semibold">Ambiance Musicale: {currentMood}</h3>
+          {currentTrack && (
+            <p className="text-sm text-muted-foreground">
+              En cours: {currentTrack.title} - {currentTrack.artist}
+            </p>
           )}
         </div>
+        
+        <div className="aspect-square w-full max-w-xs mx-auto relative">
+          {/* Background gradient */}
+          <div 
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: `radial-gradient(circle, ${colors.light} 0%, ${colors.medium} 50%, ${colors.dark} 100%)`,
+              opacity: 0.7
+            }}
+          />
+          
+          {/* SVG visualization */}
+          <svg 
+            viewBox="0 0 100 100" 
+            className="absolute inset-0 w-full h-full"
+          >
+            {/* Animated polygon shape */}
+            <polygon 
+              points={generatePoints()}
+              fill={colors.medium}
+              opacity="0.5"
+              style={{
+                animation: 'pulse 3s infinite alternate'
+              }}
+            />
+            
+            {/* Center circle */}
+            <circle 
+              cx="50" 
+              cy="50" 
+              r="15" 
+              fill={colors.dark}
+              opacity="0.8"
+              style={{
+                animation: 'pulse 2s infinite'
+              }}
+            />
+          </svg>
+        </div>
       </CardContent>
+      
+      <style jsx>{`
+        @keyframes pulse {
+          0% {
+            transform: scale(0.95);
+            opacity: 0.7;
+          }
+          100% {
+            transform: scale(1.05);
+            opacity: 0.9;
+          }
+        }
+      `}</style>
     </Card>
   );
 };

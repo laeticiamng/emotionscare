@@ -28,6 +28,11 @@ export interface NotificationPreference {
   inApp?: boolean;
 }
 
+export interface NotificationPreferences {
+  preferences: NotificationPreference[];
+  email?: boolean; // Pour compatibilité
+}
+
 export interface Notification {
   id: string;
   title: string;
