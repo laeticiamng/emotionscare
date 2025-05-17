@@ -45,6 +45,7 @@ const VREmotionRecommendation: React.FC<VREmotionRecommendationProps> = ({
     return recommendations[emotionName.toLowerCase() as keyof typeof recommendations] || recommendations.default;
   };
   
+  // Get the recommendation object
   const recommendation = getRecommendation(emotion.emotion);
   
   return (

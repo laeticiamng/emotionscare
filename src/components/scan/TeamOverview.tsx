@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export interface TeamOverviewProps {
@@ -25,12 +24,23 @@ const TeamOverview: React.FC<TeamOverviewProps> = ({
 }) => {
   // Convertir les valeurs numériques ou objets en ReactNode sécurisé
   const safeValue = (value: any): React.ReactNode => {
+    if (value === null || value === undefined) {
+      return 'N/A';
+    }
+    
     if (typeof value === 'string' || typeof value === 'number') {
       return value.toString();
     }
-    if (typeof value === 'object' && value !== null) {
+    
+    if (typeof value === 'object') {
+      // For objects that have title and description, display the title
+      if (value.title) {
+        return value.title.toString();
+      }
+      // Otherwise return a stringified version
       return JSON.stringify(value);
     }
+    
     return String(value);
   };
 
