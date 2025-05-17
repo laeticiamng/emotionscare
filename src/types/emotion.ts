@@ -39,3 +39,20 @@ export interface EmotionTimelineEntry {
 }
 
 export type EmotionIntensity = 'low' | 'medium' | 'high';
+
+// Ajout du type Emotion manquant
+export interface Emotion {
+  id: string;
+  name: string;
+  color: string;
+  emoji?: string;
+  intensity?: EmotionIntensity;
+  description?: string;
+}
+
+// Ajout du type EmotionalTeamViewProps manquant
+export interface EmotionalTeamViewProps {
+  teamId?: string;
+  period?: 'day' | 'week' | 'month';
+  view?: 'chart' | 'grid' | 'list';
+}

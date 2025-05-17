@@ -2,23 +2,33 @@
 import { useState, useEffect } from 'react';
 
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
-  
+  const [matches, setMatches] = useState<boolean>(false);
+
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     const media = window.matchMedia(query);
     
-    // Update the state immediately
+    // Mettre à jour l'état initialement
     setMatches(media.matches);
-    
-    // Define a callback function to handle changes
+
+    // Créer un gestionnaire de callback pour mettre à jour l'état
     const listener = () => setMatches(media.matches);
     
-    // Add the listener to handle changes
-    media.addEventListener('change', listener);
-    
-    // Clean up
-    return () => media.removeEventListener('change', listener);
+    // Écouter les changements de media query
+    // Utiliser la nouvelle API addEventListener si disponible, sinon utiliser addListener
+    if (media.addEventListener) {
+      media.addEventListener('change', listener);
+      return () => media.removeEventListener('change', listener);
+    } else {
+      // Pour la compatibilité avec les anciens navigateurs
+      media.addListener(listener);
+      return () => media.removeListener(listener);
+    }
   }, [query]);
-  
+
   return matches;
 }
+
+// Export pour compatibilité
+export default useMediaQuery;

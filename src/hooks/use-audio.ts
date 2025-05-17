@@ -186,5 +186,5 @@ export const useAudioHandlers = ({ toast = true }: UseAudioProps = {}) => {
   };
 };
 
-// Alias pour faciliter l'import
+// Export default alias for convenience
 export default useAudioHandlers;

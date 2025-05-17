@@ -1,82 +1,71 @@
 
 import { useState, useEffect } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 import { UserPreferences } from '@/types/user';
-import { DEFAULT_PREFERENCES } from '@/types/preferences';
 
-interface UsePreferencesOptions {
-  defaultPreferences?: UserPreferences;
-  saveToStorage?: boolean;
-  storageKey?: string;
-  onPreferenceChange?: (preferences: UserPreferences) => void;
-}
+// Préférences par défaut
+const defaultPreferences: UserPreferences = {
+  theme: 'system',
+  fontSize: 'normal',
+  fontFamily: 'Inter',
+  useSystemTheme: true,
+  highContrast: false,
+  reducedMotion: false,
+  soundEffects: true,
+  language: 'fr',
+  timeZone: 'Europe/Paris',
+  dateFormat: 'DD/MM/YYYY',
+  notifications_enabled: true,
+  email_notifications: true,
+  notifications: [],
+  dashboardLayout: {},
+  onboardingCompleted: false
+};
 
-export const usePreferences = (options: UsePreferencesOptions = {}) => {
-  const {
-    defaultPreferences = DEFAULT_PREFERENCES,
-    saveToStorage = true,
-    storageKey = 'user_preferences',
-    onPreferenceChange
-  } = options;
-
-  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  // Load preferences from storage (if enabled)
+export const usePreferences = (initialPreferences?: Partial<UserPreferences>) => {
+  const mergedDefaults = { ...defaultPreferences, ...initialPreferences };
+  
+  // Utiliser localStorage pour persister les préférences
+  const [preferences, setStoredPreferences] = useLocalStorage<UserPreferences>('user-preferences', mergedDefaults);
+  
+  // État local pour les préférences (facilite les mises à jour)
+  const [localPrefs, setLocalPrefs] = useState<UserPreferences>(preferences);
+  
+  // Synchroniser l'état local avec localStorage
   useEffect(() => {
-    if (saveToStorage) {
-      try {
-        const savedPrefs = localStorage.getItem(storageKey);
-        if (savedPrefs) {
-          const parsed = JSON.parse(savedPrefs);
-          setPreferences({ ...defaultPreferences, ...parsed });
-        }
-      } catch (error) {
-        console.error('Error loading preferences from storage:', error);
-      }
-    }
-    setIsLoading(false);
-  }, [saveToStorage, storageKey, defaultPreferences]);
-
-  // Update preferences
-  const updatePreferences = (newPrefs: Partial<UserPreferences>) => {
-    const updated = { ...preferences, ...newPrefs };
-    setPreferences(updated);
-    
-    if (saveToStorage) {
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(updated));
-      } catch (error) {
-        console.error('Error saving preferences to storage:', error);
-      }
-    }
-    
-    if (onPreferenceChange) {
-      onPreferenceChange(updated);
-    }
+    setLocalPrefs(preferences);
+  }, [preferences]);
+  
+  // Mettre à jour une ou plusieurs préférences
+  const updatePreferences = (updates: Partial<UserPreferences>) => {
+    const updatedPrefs = { ...localPrefs, ...updates };
+    setStoredPreferences(updatedPrefs);
+    setLocalPrefs(updatedPrefs);
   };
-
-  // Reset preferences to default
+  
+  // Réinitialiser les préférences aux valeurs par défaut
   const resetPreferences = () => {
-    setPreferences(defaultPreferences);
-    
-    if (saveToStorage) {
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(defaultPreferences));
-      } catch (error) {
-        console.error('Error resetting preferences in storage:', error);
-      }
-    }
-    
-    if (onPreferenceChange) {
-      onPreferenceChange(defaultPreferences);
+    setStoredPreferences(mergedDefaults);
+    setLocalPrefs(mergedDefaults);
+  };
+  
+  // Toggle pour les préférences booléennes
+  const togglePreference = (key: keyof UserPreferences) => {
+    if (typeof localPrefs[key] === 'boolean') {
+      const updatedPrefs = {
+        ...localPrefs,
+        [key]: !localPrefs[key]
+      };
+      setStoredPreferences(updatedPrefs);
+      setLocalPrefs(updatedPrefs);
     }
   };
-
+  
   return {
-    preferences,
+    preferences: localPrefs,
     updatePreferences,
     resetPreferences,
-    isLoading
+    togglePreference
   };
 };
 

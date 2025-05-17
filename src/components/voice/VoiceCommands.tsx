@@ -1,145 +1,75 @@
-import React, { useState, useEffect, useCallback, useRef, useContext } from 'react';
-import { useSpeechRecognition } from 'react-speech-kit';
-import { Button } from '@/components/ui/button';
-import { Mic, MicOff } from 'lucide-react';
-import { useMusic } from '@/contexts/music';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from 'react';
+import { useSpeechRecognition, useSpeechSynthesis } from '@/utils/voice-recognition';
+import { Button } from "@/components/ui/button";
+import { Mic, Square } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface VoiceCommandsProps {
-  className?: string;
+  onCommandRecognized?: (command: string) => void;
 }
 
-const VoiceCommands: React.FC<VoiceCommandsProps> = ({ className }) => {
+const VoiceCommands: React.FC<VoiceCommandsProps> = ({ onCommandRecognized }) => {
   const [listening, setListening] = useState(false);
-  const musicContext = useMusic();
+  const { transcript, isListening, startListening, stopListening, browserSupported } = useSpeechRecognition();
+  const { supported, speak, speaking, cancel, voices } = useSpeechSynthesis();
   const { toast } = useToast();
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
-  
-  const {
-    transcript,
-    resetTranscript,
-    browserSupportsSpeechRecognition,
-    start,
-    stop
-  } = useSpeechRecognition({
-    onResult: (result) => {
-      const command = result;
-      console.log('Voice command:', command);
-      
-      // Check for music commands
-      if (command.includes('music')) {
-        const musicCommand = command.replace('music', '').trim();
-        handleMusicCommand(musicCommand);
-      }
-      
-      // Add more command handling logic here
-    },
-    onError: (error) => {
-      console.error("Speech recognition error:", error);
-      toast({
-        title: "Erreur de reconnaissance vocale",
-        description: "La reconnaissance vocale n'a pas pu démarrer. Veuillez réessayer.",
-        variant: "destructive"
-      });
+
+  useEffect(() => {
+    if (transcript && onCommandRecognized) {
+      onCommandRecognized(transcript);
     }
-  });
-  
-  const toggleListening = useCallback(() => {
+  }, [transcript, onCommandRecognized]);
+
+  const toggleListening = () => {
+    if (!browserSupported) {
+      toast({
+        title: "La reconnaissance vocale n'est pas supportée",
+        description: "Votre navigateur ne supporte pas la reconnaissance vocale.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (listening) {
       stopListening();
+      setListening(false);
     } else {
       startListening();
-    }
-  }, [listening, start, stop]);
-  
-  const startListening = () => {
-    if (browserSupportsSpeechRecognition) {
-      start();
       setListening(true);
-      toast({
-        title: "Reconnaissance vocale activée",
-        description: "Vous pouvez maintenant utiliser les commandes vocales."
-      });
-    } else {
-      toast({
-        title: "Non supporté",
-        description: "La reconnaissance vocale n'est pas supportée par votre navigateur.",
-        variant: "destructive"
-      });
     }
-  };
-  
-  const stopListening = () => {
-    stop();
-    setListening(false);
-    toast({
-      title: "Reconnaissance vocale désactivée",
-      description: "La reconnaissance vocale est maintenant désactivée."
-    });
   };
 
-  // Handle music commands
-  const handleMusicCommand = (command: string) => {
-    if (!musicContext) return;
-    
-    switch (command.toLowerCase()) {
-      case 'play':
-      case 'resume':
-        musicContext.resumeTrack();
-        break;
-      case 'pause':
-        musicContext.pauseTrack();
-        break;
-      case 'next':
-      case 'skip':
-        musicContext.nextTrack();
-        break;
-      case 'previous':
-      case 'back':
-        musicContext.prevTrack(); // Changed from previousTrack to prevTrack
-        break;
-      default:
-        console.log('Unknown music command:', command);
-    }
-  };
-  
-  useEffect(() => {
-    if (!browserSupportsSpeechRecognition) {
+  const handleSpeak = (text: string) => {
+    if (!supported) {
       toast({
-        title: "Navigateur non supporté",
-        description: "La reconnaissance vocale n'est pas supportée par votre navigateur.",
-        variant: "destructive"
+        title: "La synthèse vocale n'est pas supportée",
+        description: "Votre navigateur ne supporte pas la synthèse vocale.",
+        variant: "destructive",
       });
+      return;
     }
-  }, [browserSupportsSpeechRecognition, toast]);
-  
+    speak({ text });
+  };
+
   return (
-    <div className={`flex items-center space-x-4 ${className}`}>
+    <div>
       <Button
         variant="outline"
         onClick={toggleListening}
-        disabled={!browserSupportsSpeechRecognition}
+        disabled={speaking}
       >
         {listening ? (
           <>
-            <MicOff className="mr-2 h-4 w-4" />
-            Arrêter
+            <Square className="mr-2 h-4 w-4" /> Arrêter
           </>
         ) : (
           <>
-            <Mic className="mr-2 h-4 w-4" />
-            Écouter
+            <Mic className="mr-2 h-4 w-4" /> Démarrer
           </>
         )}
       </Button>
-      
-      {transcript && (
-        <div className="flex-1 overflow-x-auto">
-          <p className="text-sm text-muted-foreground">
-            {transcript}
-          </p>
-        </div>
-      )}
+      {/*<Button onClick={() => handleSpeak("Bonjour, comment ça va ?")}>Dire Bonjour</Button>*/}
+      {/*<p>Transcription: {transcript}</p>*/}
     </div>
   );
 };
