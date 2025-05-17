@@ -1,19 +1,14 @@
 
-// Centralisation des exports de types pour simplifier les imports
+// Re-export types for easy imports
+export * from './user';
+export * from './emotion';
+export * from './music';
+export * from './toast';
+export * from './notification';
+export * from './preferences';
+export * from './badge';
+export * from './challenges';
+export * from './other';
 
-// Types de base
-export type { User, UserPreferences } from './user';
-export type { Theme, ThemeName, FontFamily, FontSize, ThemeContextType } from './theme';
-export type { NotificationFrequency, NotificationType, NotificationPreference, NotificationTone } from './notification';
-export type { SidebarContextType } from './sidebar';
-
-// Types liés aux fonctionnalités
-export type { Badge } from './badge';
-export type { Challenge, ChallengeCollection } from './challenges';
-export type { AudioTrack, AudioPlayerState, AudioContextValue } from './audio';
-
-// Types liés aux interfaces utilisateur
-export type { Toast, ToastProps, ToastActionElement } from './toast';
-
-// Types de contextes
-export type { CoachContextType, ChatMessage, Conversation } from './coach';
+// Export specific types that need aliases
+export { EmotionalTeamViewProps } from './emotion';

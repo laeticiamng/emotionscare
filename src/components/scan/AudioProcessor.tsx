@@ -1,156 +1,136 @@
 
-import React, { useEffect, useState } from 'react';
-import { v4 as uuid } from 'uuid';
+import React, { useState, useEffect } from 'react';
 import { EmotionResult } from '@/types/emotion';
-import { useToast } from '@/hooks/use-toast';
 
 interface AudioProcessorProps {
   isRecording: boolean;
   onResult?: (result: EmotionResult) => void;
   onProcessingChange?: (isProcessing: boolean) => void;
-  maxRecordingTime?: number; // in milliseconds
 }
 
-const AudioProcessor: React.FC<AudioProcessorProps> = ({
-  isRecording,
+const AudioProcessor: React.FC<AudioProcessorProps> = ({ 
+  isRecording, 
   onResult,
-  onProcessingChange,
-  maxRecordingTime = 30000 // 30 seconds default
+  onProcessingChange
 }) => {
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
-  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
-  const [transcript, setTranscript] = useState<string>('');
-  const { toast } = useToast();
+  const [audioData, setAudioData] = useState<Blob | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   
-  // Initialize media recorder
+  // Reset audio data when recording starts
   useEffect(() => {
-    let recordingTimeout: NodeJS.Timeout;
-    
-    const setupRecorder = async () => {
-      try {
-        if (isRecording) {
-          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          const recorder = new MediaRecorder(stream);
-          
-          recorder.addEventListener('dataavailable', (event) => {
-            if (event.data.size > 0) {
-              setAudioChunks(prev => [...prev, event.data]);
-            }
-          });
-          
-          recorder.addEventListener('stop', () => {
-            processAudio();
-            
-            // Close audio stream tracks
-            stream.getTracks().forEach(track => track.stop());
-          });
-          
-          setMediaRecorder(recorder);
-          recorder.start();
-          
-          if (onProcessingChange) {
-            onProcessingChange(false);
-          }
-          
-          // Set timeout to automatically stop recording
-          recordingTimeout = setTimeout(() => {
-            if (recorder.state === 'recording') {
-              recorder.stop();
-              toast({
-                title: "Enregistrement terminé",
-                description: "La durée maximale d'enregistrement a été atteinte"
-              });
-            }
-          }, maxRecordingTime);
-        } else if (mediaRecorder && mediaRecorder.state === 'recording') {
-          mediaRecorder.stop();
-        }
-      } catch (error) {
-        console.error('Error accessing microphone:', error);
-        toast({
-          title: "Erreur d'accès au microphone",
-          description: "Veuillez autoriser l'accès au microphone",
-          variant: "destructive"
-        });
-      }
-    };
-    
-    setupRecorder();
-    
-    return () => {
-      clearTimeout(recordingTimeout);
-      if (mediaRecorder && mediaRecorder.state === 'recording') {
-        mediaRecorder.stop();
-      }
-    };
-  }, [isRecording, maxRecordingTime, toast]);
+    if (isRecording) {
+      setAudioData(null);
+    }
+  }, [isRecording]);
   
-  // Process recorded audio
-  const processAudio = async () => {
-    if (audioChunks.length === 0) return;
+  // Simulate recording completion
+  useEffect(() => {
+    let timeout: number | null = null;
     
-    if (onProcessingChange) {
-      onProcessingChange(true);
+    if (!isRecording && audioData === null) {
+      // Create a mock audio blob
+      const mockAudioBlob = new Blob([], { type: 'audio/wav' });
+      setAudioData(mockAudioBlob);
+      
+      // Start processing
+      setIsProcessing(true);
+      if (onProcessingChange) {
+        onProcessingChange(true);
+      }
+      
+      // Simulate processing delay
+      timeout = window.setTimeout(() => {
+        processAudio(mockAudioBlob);
+      }, 1500);
     }
     
-    try {
-      // Create audio blob
-      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
+  }, [isRecording, audioData]);
+  
+  // Process the audio data
+  const processAudio = (audioBlob: Blob) => {
+    // Mock processing of audio data
+    console.log('Processing audio data...');
+    
+    // Simulate API call delay
+    setTimeout(() => {
+      // Generate mock emotion result
+      const emotions = [
+        'joy', 'calm', 'focused', 'anxious', 'sad',
+        'neutral', 'happy', 'excited', 'tired', 'confused'
+      ];
       
-      // Simulate processing with Whisper API
-      // In a real implementation, send the audioBlob to a backend service
+      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock transcription result
-      const mockTranscript = "Je me sens plutôt bien aujourd'hui, même si j'ai eu une matinée un peu stressante.";
-      setTranscript(mockTranscript);
-      
-      // Mock emotion analysis result
-      const mockEmotionResult: EmotionResult = {
-        id: uuid(),
-        user_id: 'current-user',
-        date: new Date().toISOString(),
-        emotion: 'mixed',
-        score: 65,
-        confidence: 0.75,
-        intensity: 0.65,
-        text: mockTranscript,
-        transcript: mockTranscript
+      const emotionResult: EmotionResult = {
+        id: `audio-${Date.now()}`,
+        emotion: randomEmotion,
+        score: Math.random() * 0.5 + 0.5,
+        confidence: Math.random() * 0.3 + 0.7,
+        intensity: Math.random(),
+        timestamp: new Date().toISOString(),
+        emojis: getEmojisForEmotion(randomEmotion),
+        feedback: "Your voice analysis reveals aspects of your emotional state. Consider how this aligns with your self-perception.",
+        recommendations: getRecommendationsForEmotion(randomEmotion),
+        source: 'audio' // Ajout de la propriété source
       };
       
+      console.log('Emotion result:', emotionResult);
+      
+      // Send result to parent
       if (onResult) {
-        onResult(mockEmotionResult);
+        onResult(emotionResult);
       }
       
-      // Reset for next recording
-      setAudioChunks([]);
-      
-    } catch (error) {
-      console.error('Error processing audio:', error);
-      toast({
-        title: "Erreur de traitement",
-        description: "Une erreur est survenue lors du traitement de l'audio",
-        variant: "destructive"
-      });
-    } finally {
+      // Update processing state
+      setIsProcessing(false);
       if (onProcessingChange) {
         onProcessingChange(false);
       }
-    }
+    }, 2000);
   };
   
-  return (
-    <div className="space-y-2">
-      {transcript && (
-        <div className="p-3 bg-muted rounded-md">
-          <p className="text-sm font-medium mb-1">Transcription:</p>
-          <p className="italic">{transcript}</p>
-        </div>
-      )}
-    </div>
-  );
+  // Helper function to get emojis for an emotion
+  const getEmojisForEmotion = (emotion: string): string[] => {
+    const emojiMap: Record<string, string[]> = {
+      joy: ['😊', '😄', '😁'],
+      calm: ['😌', '🧘', '☺️'],
+      focused: ['🧐', '🤔', '💭'],
+      anxious: ['😟', '😰', '😨'],
+      sad: ['😢', '😔', '😞'],
+      neutral: ['😐', '🙂', '😶'],
+      happy: ['😀', '😄', '🥰'],
+      excited: ['🤩', '😃', '🎉'],
+      tired: ['😴', '🥱', '😮‍💨'],
+      confused: ['😕', '🤨', '🤔']
+    };
+    
+    return emojiMap[emotion] || ['😐'];
+  };
+  
+  // Helper function to get recommendations for an emotion
+  const getRecommendationsForEmotion = (emotion: string): string[] => {
+    const recommendationMap: Record<string, string[]> = {
+      joy: ['Share your joy with others', 'Document this moment for future reflection'],
+      calm: ['Practice deep breathing to maintain this state', 'Consider a short meditation'],
+      focused: ['Set clear goals for your focused time', 'Take regular breaks to maintain focus'],
+      anxious: ['Try the 4-7-8 breathing technique', 'Ground yourself by naming 5 things you can see'],
+      sad: ['Allow yourself to feel without judgment', 'Consider talking to someone you trust'],
+      neutral: ['Check in with yourself about what you need', 'Try a mood-boosting activity'],
+      happy: ['Journal about what's making you happy', 'Spread positivity to others'],
+      excited: ['Channel this energy into a creative activity', 'Share your excitement with others'],
+      tired: ['Consider a short power nap', 'Hydrate and take a short break from screens'],
+      confused: ['Break problems into smaller parts', 'Ask for clarity where needed']
+    };
+    
+    return recommendationMap[emotion] || ['Take a moment for self-reflection'];
+  };
+  
+  return null; // No UI needed for this component
 };
 
 export default AudioProcessor;

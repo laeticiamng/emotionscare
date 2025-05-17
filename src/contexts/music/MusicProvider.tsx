@@ -44,7 +44,6 @@ interface MusicProviderProps {
 export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [emotion, setEmotion] = useState<string | null>(null);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -52,18 +51,21 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   
   const { toast } = useToast();
-  const {
-    audioRef,
-    volume,
-    muted,
-    currentTime,
-    duration,
-    playTrack: handlePlayTrack,
-    pauseTrack: handlePauseTrack,
+  const audioHandlers = useAudioHandlers({ toast: true });
+  const { 
+    isPlaying, 
+    volume, 
+    muted, 
+    currentTime, 
+    duration, 
+    play, 
+    pause, 
+    togglePlay: handleTogglePlay, 
+    setVolume, 
     seekTo,
-    setVolume,
-    toggleMute
-  } = useAudioHandlers({ toast: true });
+    toggleMute,
+    audioRef
+  } = audioHandlers;
 
   useEffect(() => {
     // Initialize music system
@@ -72,32 +74,32 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
 
   const playTrack = (track: MusicTrack) => {
     setCurrentTrack(track);
-    handlePlayTrack(track);
-    setIsPlaying(true);
+    if (audioRef && audioRef.current) {
+      audioRef.current.src = track.url;
+      audioRef.current.play()
+        .then(() => {
+          setIsInitialized(true);
+        })
+        .catch(error => {
+          console.error('Error playing track:', error);
+        });
+    }
+    play();
   };
 
   const pauseTrack = () => {
-    handlePauseTrack();
-    setIsPlaying(false);
+    pause();
   };
 
   const resumeTrack = () => {
-    if (currentTrack && audioRef.current) {
+    if (currentTrack && audioRef && audioRef.current) {
       audioRef.current.play()
         .then(() => {
-          setIsPlaying(true);
+          play();
         })
         .catch(error => {
           console.error('Error resuming track:', error);
         });
-    }
-  };
-
-  const togglePlay = () => {
-    if (isPlaying) {
-      pauseTrack();
-    } else {
-      resumeTrack();
     }
   };
 
@@ -131,10 +133,10 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     setError(null);
     
     try {
-      const emotion = typeof params === 'string' ? params : params.emotion;
+      const emotionName = typeof params === 'string' ? params : params.emotion;
       const intensity = typeof params === 'object' ? params.intensity : 0.5;
       
-      console.log(`Loading playlist for emotion: ${emotion} with intensity: ${intensity}`);
+      console.log(`Loading playlist for emotion: ${emotionName} with intensity: ${intensity}`);
       
       // Simuler le chargement d'une playlist
       const mockTracks: MusicTrack[] = [
@@ -159,13 +161,13 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
       ];
       
       const mockPlaylist: MusicPlaylist = {
-        id: `playlist-${emotion}`,
-        name: `${emotion} Playlist`,
-        title: `${emotion} Music`,
-        emotion: emotion,
-        coverUrl: `/images/covers/${emotion}.jpg`,
+        id: `playlist-${emotionName}`,
+        name: `${emotionName} Playlist`,
+        title: `${emotionName} Music`,
+        emotion: emotionName,
+        coverUrl: `/images/covers/${emotionName}.jpg`,
         tracks: mockTracks.filter(track => 
-          track.emotion === emotion || !track.emotion
+          track.emotion === emotionName || !track.emotion
         )
       };
       
@@ -206,7 +208,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
         playTrack,
         pauseTrack,
         resumeTrack,
-        togglePlay,
+        togglePlay: handleTogglePlay,
         nextTrack,
         prevTrack,
         previousTrack,

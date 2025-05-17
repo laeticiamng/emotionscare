@@ -16,6 +16,7 @@ export interface EmotionResult {
   user_id?: string;
   transcript?: string;
   ai_feedback?: string;
+  source?: string; // Ajouté pour résoudre les erreurs
 }
 
 export interface EmotionStats {
@@ -60,4 +61,27 @@ export interface EmotionalTeamViewProps {
   showGraph?: boolean;
   showMembers?: boolean;
   className?: string;
+}
+
+// Ajout pour une interface EmotionalData manquante dans certains imports
+export interface EmotionalData {
+  id: string;
+  emotion: string;
+  intensity: number;
+  timestamp: string;
+  user_id?: string;
+  notes?: string;
+}
+
+// Interfaces pour les fonctionnalités du scanner
+export interface LiveVoiceScannerProps {
+  onScanComplete?: (result: EmotionResult) => void;
+  autoStart?: boolean;
+  scanDuration?: number;
+}
+
+export interface TeamOverviewProps {
+  teamId: string;
+  period?: string;
+  showMembers?: boolean;
 }

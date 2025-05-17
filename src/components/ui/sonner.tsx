@@ -1,9 +1,17 @@
 
+"use client";
+
+import { useTheme } from "@/hooks/use-theme";
 import { Toaster as SonnerToaster } from "sonner";
 
-export function Toaster() {
+type ToasterProps = React.ComponentProps<typeof SonnerToaster>;
+
+const Toaster = ({ ...props }: ToasterProps) => {
+  const { theme = "system" } = useTheme();
+
   return (
     <SonnerToaster
+      theme={theme as "light" | "dark" | "system"}
       className="toaster group"
       toastOptions={{
         classNames: {
@@ -16,8 +24,9 @@ export function Toaster() {
             "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
         },
       }}
+      {...props}
     />
   );
-}
+};
 
-export { useToast, toast } from "@/hooks/use-toast";
+export { Toaster };

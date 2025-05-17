@@ -18,6 +18,7 @@ export interface Challenge {
   tags?: string[];
   completions?: number;
   total?: number;
+  totalSteps?: number; // Ajouté pour résoudre les erreurs
 }
 
 export type ChallengeType = 'daily' | 'weekly' | 'monthly' | 'special' | 'onetime';
@@ -39,4 +40,11 @@ export interface ChallengeCompletion {
     name: string;
     points: number;
   }[];
+}
+
+export interface ChallengeCollection {
+  daily: Challenge[];
+  weekly: Challenge[];
+  monthly: Challenge[];
+  special: Challenge[];
 }

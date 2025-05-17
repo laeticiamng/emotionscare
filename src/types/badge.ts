@@ -25,6 +25,9 @@ export interface Badge {
   earned?: boolean;
   earnedAt?: string;
   tier?: string;
+  completed?: boolean;
+  rarity?: string; // Ajouté pour résoudre les erreurs
+  title?: string; // Ajouté pour résoudre les erreurs
 }
 
 export interface BadgeCollection {
@@ -32,4 +35,19 @@ export interface BadgeCollection {
   badges: Badge[];
   totalUnlocked: number;
   recentlyUnlocked: Badge[];
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  score: number;
+  rank: number;
+  name?: string; // Ajouté pour résoudre les erreurs
+  avatar?: string;
+  level?: number;
+  badges?: number;
+  username?: string;
+  avatarUrl?: string;
+  points?: number;
+  streak?: number;
 }

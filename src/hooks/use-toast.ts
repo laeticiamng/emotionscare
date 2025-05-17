@@ -135,15 +135,36 @@ function dispatch(action: Action) {
   });
 }
 
-// FIX: Make sure toast doesn't return toast options object directly
+// Fixed: Properly type the toast function to return an object with dismiss method
 export function toast(props: ToastOptions) {
-  // Properly forward to sonner toast without returning the toast options directly
-  return sonnerToast(props.title || "", {
+  // Call sonner toast with appropriate arguments and return its result
+  const title = props.title || "";
+  const options = {
     description: props.description,
     action: props.action,
     duration: props.duration,
     ...(props.variant && { variant: props.variant })
-  });
+  };
+  
+  // Return the result from sonner toast
+  return sonnerToast(title, options);
+}
+
+// Add missing helper toast methods for common variants
+export function error(props: Omit<ToastOptions, 'variant'>) {
+  return toast({ ...props, variant: 'destructive' });
+}
+
+export function success(props: Omit<ToastOptions, 'variant'>) {
+  return toast({ ...props, variant: 'success' });
+}
+
+export function warning(props: Omit<ToastOptions, 'variant'>) {
+  return toast({ ...props, variant: 'warning' });
+}
+
+export function info(props: Omit<ToastOptions, 'variant'>) {
+  return toast({ ...props, variant: 'info' });
 }
 
 export function useToast() {
@@ -161,6 +182,10 @@ export function useToast() {
 
   return {
     toast,
+    error,
+    success,
+    warning,
+    info,
     toasts: state.toasts,
     dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId })
   };

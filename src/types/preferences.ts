@@ -6,17 +6,19 @@ export type FontFamily = 'system' | 'serif' | 'mono' | 'sans' | 'inter';
 
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'system' | 'pastel';
-  fontSize: FontSize;
-  fontFamily: FontFamily;
-  reduceMotion: boolean;
-  colorBlindMode: boolean;
-  autoplayMedia: boolean;
-  soundEnabled: boolean;
+  fontSize?: FontSize;
+  fontFamily?: FontFamily;
+  reduceMotion?: boolean;
+  colorBlindMode?: boolean;
+  autoplayMedia?: boolean;
+  soundEnabled?: boolean;
   language?: string;
-  dashboardLayout?: string;
+  dashboardLayout?: string | Record<string, any>;
   onboardingCompleted?: boolean;
-  notifications: NotificationPreference;
-  privacy: {
+  notifications?: NotificationPreference;
+  notifications_enabled?: boolean;
+  email_notifications?: boolean;
+  privacy?: {
     shareData: boolean;
     anonymizeReports: boolean;
     profileVisibility: 'public' | 'team' | 'private';
@@ -30,6 +32,11 @@ export interface UserPreferences {
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   ambientSound?: boolean;
+  useSystemTheme?: boolean;
+  highContrast?: boolean;
+  timeZone?: string;
+  dateFormat?: string;
+  showTips?: boolean;
 }
 
 export interface UserPreferencesContextType {
@@ -47,6 +54,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   soundEnabled: true,
   language: 'fr',
   onboardingCompleted: false,
+  dashboardLayout: 'default',
   notifications: {
     enabled: true,
     emailEnabled: true,

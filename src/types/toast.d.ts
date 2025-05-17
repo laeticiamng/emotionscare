@@ -1,6 +1,5 @@
 
 import * as React from "react";
-import { type VariantProps } from "class-variance-authority";
 
 export interface ToastProps {
   id: string;
