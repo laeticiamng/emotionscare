@@ -73,6 +73,8 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
   
   const handlePlayMusic = (emotion: string) => {
     const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
+    const params: EmotionMusicParams = { emotion: musicType };
+    // Use playFirstRecommendation or directly call loadPlaylistForEmotion
     return playFirstRecommendation();
   };
   
@@ -85,3 +87,5 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
     EMOTION_TO_MUSIC
   };
 }
+
+export default useMusicRecommendation;

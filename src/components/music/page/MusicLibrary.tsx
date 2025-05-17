@@ -12,16 +12,16 @@ export interface MusicLibraryProps {
   tracks: MusicTrack[];
   playlists: MusicPlaylist[];
   onTrackSelect?: (track: MusicTrack) => void;
-  currentTrack: MusicTrack | null;
   onPlaylistSelect?: (playlist: MusicPlaylist) => void;
+  currentTrack: MusicTrack | null;
 }
 
 const MusicLibrary: React.FC<MusicLibraryProps> = ({ 
   tracks,
   playlists,
   onTrackSelect,
-  currentTrack,
-  onPlaylistSelect
+  onPlaylistSelect,
+  currentTrack
 }) => {
   const [activeTab, setActiveTab] = useState('all');
   
@@ -64,7 +64,7 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({
                 className="bg-card border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors"
                 onClick={() => handlePlaylistClick(playlist)}
               >
-                <h3 className="font-medium">{playlist.title}</h3>
+                <h3 className="font-medium">{playlist.title || playlist.name}</h3>
                 <p className="text-muted-foreground text-sm">
                   {playlist.tracks.length} titres
                 </p>

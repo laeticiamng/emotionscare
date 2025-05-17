@@ -4,7 +4,7 @@ export type FontSize = 'small' | 'medium' | 'large' | 'xlarge' | 'xs' | 'sm' | '
 export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'sans-serif';
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
 export type NotificationTone = 'formal' | 'friendly' | 'minimal';
-export type PrivacyLevel = 'public' | 'private' | 'friends' | 'organization' | 'balanced';
+export type PrivacyLevel = 'public' | 'private' | 'friends' | 'organization' | 'balanced' | 'strict' | 'relaxed';
 
 export interface NotificationPreferences {
   enabled: boolean;
@@ -53,6 +53,16 @@ export interface UserPreferences {
   biography?: string;
   avatarUrl?: string;
   fullAnonymity?: boolean;
+  haptics?: boolean;
+  dataCollection?: boolean;
+  animations?: boolean;
+  soundEffects?: boolean;
+  sound?: boolean | {
+    volume: number;
+    effects: boolean;
+    music: boolean;
+  };
+  onboarded?: boolean;
   privacy?: {
     shareData: boolean;
     anonymizeReports?: boolean;

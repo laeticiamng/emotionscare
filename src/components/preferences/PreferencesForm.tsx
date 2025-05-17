@@ -82,6 +82,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
         await auth.updateUser({
           ...user,
           preferences,
+          role: user.role || 'b2c', // Ensure role is always defined
         });
       }
 

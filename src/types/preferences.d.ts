@@ -1,9 +1,8 @@
 
-
-export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large';
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel' | 'blue-pastel';
+export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large' | 'xlarge';
 export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'inter' | 'sans-serif' | 'monospace';
-export type PrivacyLevel = 'strict' | 'balanced' | 'relaxed';
+export type PrivacyLevel = 'strict' | 'balanced' | 'relaxed' | 'public' | 'private' | 'friends' | 'organization';
 export type Theme = ThemeName;
 
 export interface NotificationPreference {
@@ -23,7 +22,7 @@ export interface NotificationPreferences {
   emailEnabled?: boolean;
   pushEnabled?: boolean;
   inAppEnabled?: boolean;
-  email?: boolean; // Added this for compatibility
+  email?: boolean;
   types?: Record<string, boolean>;
   frequency?: string;
   tone?: string;
@@ -50,7 +49,7 @@ export interface UserPreferences {
   autoplayMedia?: boolean;
   sound?: SoundPreference | boolean;
   
-  // Ajout des champs manquants qui sont utilisés dans l'application
+  // Additional fields used in the application
   ambientSound?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
@@ -61,6 +60,12 @@ export interface UserPreferences {
   avatarUrl?: string;
   onboarded?: boolean;
   soundEnabled?: boolean;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  notificationsEnabled?: boolean;
+  onboardingCompleted?: boolean;
+  dashboardLayout?: string;
+  notifications_enabled?: boolean;
   
   privacy?: {
     shareData: boolean;
@@ -72,5 +77,6 @@ export interface UserPreferences {
     allowNotifications?: boolean;
     anonymousMode?: boolean;
   };
+  
+  [key: string]: any; // To allow for future extensions
 }
-

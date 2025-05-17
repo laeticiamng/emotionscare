@@ -4,18 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Music, Heart } from 'lucide-react';
 import { useMusic } from '@/contexts/music';
-import { EmotionMusicParams } from '@/types/music';
+import { EmotionMusicParams, MusicPlaylist } from '@/types/music';
 
 interface MusicEmotionRecommendationProps {
   emotion: string;
-  onSelect: (playlist: any) => void;
+  onSelect: (playlist: MusicPlaylist) => void;
 }
 
 const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({ emotion, onSelect }) => {
   const { loadPlaylistForEmotion } = useMusic();
   
   // Mock playlists based on emotions
-  const playlists = {
+  const playlists: Record<string, { id: string, name: string, tracks: number }> = {
     happy: { id: 'happy-1', name: 'Énergie positive', tracks: 12 },
     sad: { id: 'sad-1', name: 'Réconfort et douceur', tracks: 8 },
     angry: { id: 'angry-1', name: 'Libération et calme', tracks: 10 },
@@ -31,10 +31,28 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
     try {
       const params: EmotionMusicParams = { emotion };
       const musicPlaylist = await loadPlaylistForEmotion(params);
-      onSelect(musicPlaylist || playlist);
+      if (musicPlaylist) {
+        onSelect(musicPlaylist);
+      } else {
+        // Create a minimal fallback playlist
+        const fallbackPlaylist: MusicPlaylist = {
+          id: playlist.id,
+          title: playlist.name,
+          name: playlist.name,
+          tracks: []
+        };
+        onSelect(fallbackPlaylist);
+      }
     } catch (error) {
       console.error("Error loading emotion-based playlist:", error);
-      onSelect(playlist);
+      // Create a minimal fallback playlist
+      const fallbackPlaylist: MusicPlaylist = {
+        id: playlist.id,
+        title: playlist.name,
+        name: playlist.name,
+        tracks: []
+      };
+      onSelect(fallbackPlaylist);
     }
   };
   

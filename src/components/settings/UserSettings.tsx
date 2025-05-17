@@ -9,8 +9,9 @@ const UserSettings = () => {
   const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('theme');
 
-  const handleThemeChange = (newTheme: Theme) => {
-    setTheme(newTheme);
+  // Ensure theme type compatibility
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme as Theme);
   };
 
   return (

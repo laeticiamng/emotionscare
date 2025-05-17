@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import MusicContext from './MusicContext';
-import { MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { MusicTrack, MusicPlaylist, EmotionMusicParams, MusicContextType } from '@/types/music';
 import { toast } from '@/hooks/use-toast';
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -17,6 +17,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [emotion, setEmotionState] = useState<string | null>(null);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
   const [openDrawer, setOpenDrawerState] = useState(false);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [isRepeating, setIsRepeating] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -165,6 +167,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setCurrentTime(position);
     }
   };
+
+  const toggleShuffle = () => {
+    setIsShuffled(!isShuffled);
+  };
+
+  const toggleRepeat = () => {
+    setIsRepeating(!isRepeating);
+  };
   
   const loadPlaylistForEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
     setIsLoading(true);
@@ -179,6 +189,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // Mock data for demonstration
       const mockPlaylist: MusicPlaylist = {
         id: `playlist-${emotionName}`,
+        title: `${emotionName} Music`,
         name: `${emotionName} Music`,
         description: `Music tailored for ${emotionName} mood`,
         tracks: [
@@ -226,12 +237,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setOpenDrawerState(open);
   };
   
-  const value = {
+  const value: MusicContextType = {
     currentTrack,
     playlist,
     isPlaying,
     volume,
     isMuted,
+    muted: isMuted, // Add muted property for compatibility
     currentTime,
     duration,
     progress: duration ? (currentTime / duration) * 100 : 0,
@@ -252,6 +264,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     loadPlaylistForEmotion,
     setEmotion,
     setOpenDrawer,
+    isShuffled,
+    isRepeating,
+    toggleShuffle,
+    toggleRepeat
   };
   
   return (
@@ -260,3 +276,5 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     </MusicContext.Provider>
   );
 };
+
+export default MusicProvider;
