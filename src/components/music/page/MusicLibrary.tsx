@@ -1,154 +1,121 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Music } from 'lucide-react';
-import { MusicTrack, MusicLibraryProps } from '@/types/music';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MusicTrack, MusicPlaylist, MusicLibraryProps } from '@/types/music';
+import TrackList from '../TrackList';
+import PlaylistGrid from '../PlaylistGrid';
+import { Search } from 'lucide-react';
 
-const MusicLibrary: React.FC<MusicLibraryProps> = ({
+// Updated interface to include className
+interface ExtendedMusicLibraryProps extends MusicLibraryProps {
+  className?: string;
+}
+
+const MusicLibrary: React.FC<ExtendedMusicLibraryProps> = ({
   tracks = [],
+  playlists = [],
   onTrackSelect,
+  onPlaylistSelect,
+  currentTrack,
+  searchTerm = '',
+  onSearchChange,
   className = '',
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeCategory, setActiveCategory] = useState<string>('all');
-  
-  const categories = [
-    { id: 'all', name: 'Tous' },
-    { id: 'calm', name: 'Calme' },
-    { id: 'focus', name: 'Concentration' },
-    { id: 'energy', name: 'Énergie' },
-    { id: 'sleep', name: 'Sommeil' }
-  ];
-  
-  // Sample tracks if none provided
-  const defaultTracks: MusicTrack[] = [
-    {
-      id: '1',
-      title: 'Méditation matinale',
-      artist: 'Zen Dreams',
-      duration: 180,
-      url: '/path/to/audio1.mp3',
-      coverUrl: '/images/cover1.jpg',
-    },
-    {
-      id: '2',
-      title: 'Concentration profonde',
-      artist: 'Focus Mind',
-      duration: 240,
-      url: '/path/to/audio2.mp3',
-      coverUrl: '/images/cover2.jpg',
-    },
-    {
-      id: '3',
-      title: 'Énergie positive',
-      artist: 'Good Vibes',
-      duration: 200,
-      url: '/path/to/audio3.mp3',
-      coverUrl: '/images/cover3.jpg',
-    },
-    {
-      id: '4',
-      title: 'Sommeil réparateur',
-      artist: 'Dream State',
-      duration: 300,
-      url: '/path/to/audio4.mp3',
-      coverUrl: '/images/cover4.jpg',
-    },
-  ];
-  
-  const displayTracks: MusicTrack[] = tracks.length > 0 ? tracks : defaultTracks;
-  
-  // Filter tracks by search and category
-  const filteredTracks = displayTracks.filter(track => {
-    const matchesSearch = 
-      track.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      track.artist.toLowerCase().includes(searchTerm.toLowerCase());
-      
-    const matchesCategory = activeCategory === 'all' ? true : 
-      (track.emotion === activeCategory);
-      
-    return matchesSearch && matchesCategory;
-  });
-  
-  const handleTrackSelect = (track: MusicTrack) => {
-    if (onTrackSelect) {
-      onTrackSelect(track);
+  const [activeTab, setActiveTab] = useState('all');
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const term = e.target.value;
+    setLocalSearchTerm(term);
+    if (onSearchChange) {
+      onSearchChange(term);
     }
   };
-  
+
+  const filteredTracks = tracks.filter(track => {
+    const searchLower = localSearchTerm.toLowerCase();
+    return (
+      track.title.toLowerCase().includes(searchLower) ||
+      (track.artist && track.artist.toLowerCase().includes(searchLower))
+    );
+  });
+
+  const filteredPlaylists = playlists.filter(playlist => {
+    const searchLower = localSearchTerm.toLowerCase();
+    return (
+      playlist.title.toLowerCase().includes(searchLower) ||
+      (playlist.name && playlist.name.toLowerCase().includes(searchLower))
+    );
+  });
+
+  // Group tracks by emotion/mood for the "Ambiance" tab
+  const emotionGroups: Record<string, MusicTrack[]> = {};
+  filteredTracks.forEach(track => {
+    if (track.mood || track.emotion) {
+      const emotionKey = (track.mood || track.emotion || 'unknown').toLowerCase();
+      if (!emotionGroups[emotionKey]) {
+        emotionGroups[emotionKey] = [];
+      }
+      emotionGroups[emotionKey].push(track);
+    }
+  });
+
   return (
     <div className={`space-y-6 ${className}`}>
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-grow">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Rechercher par titre ou artiste..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+      <div className="relative">
+        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Rechercher par titre, artiste ou playlist"
+          className="pl-8"
+          value={localSearchTerm}
+          onChange={handleSearchChange}
+        />
       </div>
-      
-      <div className="flex overflow-auto pb-2 gap-2">
-        {categories.map(category => (
-          <Button
-            key={category.id}
-            variant={activeCategory === category.id ? "default" : "outline"}
-            size="sm"
-            onClick={() => setActiveCategory(category.id)}
-            className="whitespace-nowrap"
-          >
-            {category.name}
-          </Button>
-        ))}
-      </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredTracks.length === 0 ? (
-          <div className="col-span-full text-center py-10">
-            <Music className="mx-auto h-10 w-10 text-muted-foreground opacity-50" />
-            <p className="mt-2 text-muted-foreground">Aucune musique ne correspond à votre recherche</p>
-          </div>
-        ) : (
-          filteredTracks.map(track => (
-            <div 
-              key={track.id}
-              className="flex items-center gap-3 p-3 border rounded-md hover:bg-accent/50 cursor-pointer transition-colors"
-              onClick={() => handleTrackSelect(track)}
-            >
-              <div className="w-12 h-12 bg-muted rounded-md flex items-center justify-center overflow-hidden">
-                {track.coverUrl ? (
-                  <img 
-                    src={track.coverUrl} 
-                    alt={track.title} 
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <Music className="h-6 w-6 text-muted-foreground" />
-                )}
+
+      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-3 mb-4">
+          <TabsTrigger value="all">Tout</TabsTrigger>
+          <TabsTrigger value="playlists">Playlists</TabsTrigger>
+          <TabsTrigger value="ambiance">Ambiance</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="all" className="space-y-6">
+          {filteredTracks.length > 0 ? (
+            <TrackList tracks={filteredTracks} onTrackSelect={onTrackSelect} currentTrack={currentTrack} />
+          ) : (
+            <p className="text-center text-muted-foreground py-8">Aucun titre trouvé</p>
+          )}
+        </TabsContent>
+
+        <TabsContent value="playlists" className="space-y-6">
+          {filteredPlaylists.length > 0 ? (
+            <PlaylistGrid playlists={filteredPlaylists} onSelectPlaylist={onPlaylistSelect} />
+          ) : (
+            <p className="text-center text-muted-foreground py-8">Aucune playlist trouvée</p>
+          )}
+        </TabsContent>
+
+        <TabsContent value="ambiance" className="space-y-8">
+          {Object.keys(emotionGroups).length > 0 ? (
+            Object.entries(emotionGroups).map(([emotion, tracks]) => (
+              <div key={emotion} className="space-y-3">
+                <h3 className="font-medium capitalize">{emotion}</h3>
+                <TrackList
+                  tracks={tracks}
+                  onTrackSelect={onTrackSelect}
+                  currentTrack={currentTrack}
+                  compact
+                />
               </div>
-              
-              <div className="flex-grow min-w-0">
-                <p className="font-medium truncate">{track.title}</p>
-                <p className="text-sm text-muted-foreground truncate">{track.artist}</p>
-              </div>
-              
-              <div className="text-xs text-muted-foreground">
-                {Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-      
-      {filteredTracks.length > 0 && (
-        <p className="text-center text-sm text-muted-foreground py-2">
-          Affichage de {filteredTracks.length} morceaux
-        </p>
-      )}
+            ))
+          ) : (
+            <p className="text-center text-muted-foreground py-8">
+              Aucune musique par ambiance trouvée
+            </p>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

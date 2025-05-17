@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { MusicTrack } from '@/types/music';
 import MusicControls from './MusicControls';
@@ -25,7 +24,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.8);
-  const [isMuted, setIsMuted] = useState(false);
+  const [muted, setIsMuted] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -81,19 +80,29 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
     if (!audioRef.current) return;
     
     const audio = audioRef.current;
-    audio.volume = isMuted ? 0 : volume;
-  }, [volume, isMuted]);
+    audio.volume = muted ? 0 : volume;
+  }, [volume, muted]);
   
   const getCurrentTrackUrl = () => {
     if (!currentTrack) return '';
     return currentTrack.url;
   };
   
-  const handleTogglePlay = () => {
+  const togglePlay = () => {
     setIsPlaying(prev => !prev);
   };
   
-  const handlePrevious = () => {
+  const playTrack = () => {
+    if (!audioRef.current) return;
+    audioRef.current.play().catch(err => console.error('Error playing audio:', err));
+  };
+  
+  const pauseTrack = () => {
+    if (!audioRef.current) return;
+    audioRef.current.pause();
+  };
+  
+  const previousTrack = () => {
     if (!currentTrack || tracks.length <= 1) return;
     
     const currentIndex = tracks.findIndex(track => track.id === currentTrack.id);
@@ -104,7 +113,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
     onTrackChange && onTrackChange(prevTrack);
   };
   
-  const handleNext = () => {
+  const nextTrack = () => {
     if (!currentTrack || tracks.length <= 1) return;
     
     const currentIndex = tracks.findIndex(track => track.id === currentTrack.id);
@@ -115,19 +124,19 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
     onTrackChange && onTrackChange(nextTrack);
   };
   
-  const handleSeek = (value: number) => {
+  const seekTo = (value: number) => {
     if (!audioRef.current) return;
     
     audioRef.current.currentTime = value;
     setCurrentTime(value);
   };
   
-  const handleVolumeChange = (value: number) => {
+  const setVolume = (value: number) => {
     setVolume(value);
     setIsMuted(value === 0);
   };
   
-  const handleToggleMute = () => {
+  const toggleMute = () => {
     setIsMuted(prev => !prev);
   };
   
@@ -146,18 +155,19 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
       
       <MusicControls
         isPlaying={isPlaying}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onTogglePlay={handleTogglePlay}
-        onPrevious={tracks.length > 1 ? handlePrevious : undefined}
-        onNext={tracks.length > 1 ? handleNext : undefined}
+        onPlayPause={togglePlay}
+        onPlay={playTrack}
+        onPause={pauseTrack}
+        onTogglePlay={togglePlay}
+        onPrevious={previousTrack}
+        onNext={nextTrack}
         currentTime={currentTime}
-        duration={duration || (currentTrack?.duration || 0)}
-        onSeek={handleSeek}
+        duration={duration}
+        onSeek={seekTo}
         volume={volume}
-        isMuted={isMuted}
-        onToggleMute={handleToggleMute}
-        onVolumeChange={handleVolumeChange}
+        isMuted={muted}
+        onToggleMute={toggleMute}
+        onVolumeChange={setVolume}
         track={currentTrack}
       />
     </>

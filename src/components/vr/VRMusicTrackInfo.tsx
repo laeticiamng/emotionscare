@@ -1,61 +1,44 @@
-
 import React from 'react';
-import { ExternalLink } from 'lucide-react';
 import { MusicTrack } from '@/types/music';
+import { Button } from '@/components/ui/button';
+import { Play, Pause } from 'lucide-react';
 
 interface VRMusicTrackInfoProps {
-  currentTrack: MusicTrack;
+  track: MusicTrack;
+  isPlaying: boolean;
+  onTogglePlay: () => void;
+  className?: string;
 }
 
-const VRMusicTrackInfo: React.FC<VRMusicTrackInfoProps> = ({ currentTrack }) => {
-  // Format duration from seconds to MM:SS
-  const formatDuration = (seconds?: number): string => {
-    if (!seconds) return '0:00';
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = Math.floor(seconds % 60);
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
-  // Get cover URL with fallback
-  const getCoverUrl = () => {
-    return currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover || '';
-  };
-
+const VRMusicTrackInfo: React.FC<VRMusicTrackInfoProps> = ({
+  track,
+  isPlaying,
+  onTogglePlay,
+  className = '',
+}) => {
   return (
-    <div className="flex items-center space-x-3 p-3 rounded-lg bg-muted/30">
-      <div className="w-12 h-12 rounded overflow-hidden bg-primary/10">
-        {getCoverUrl() ? (
-          <img 
-            src={getCoverUrl()} 
-            alt={currentTrack.title} 
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-xl">♪</span>
-          </div>
-        )}
+    <div className={`flex items-center gap-4 p-4 bg-black/30 backdrop-blur-md rounded-xl ${className}`}>
+      <div className="h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
+        <img 
+          src={track?.coverUrl || track?.cover_url || track?.cover || '/images/default-album-cover.jpg'} 
+          alt={track.title} 
+          className="w-full h-full object-cover" 
+        />
       </div>
       
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center">
-          <h4 className="font-medium text-sm truncate">{currentTrack.title}</h4>
-          {currentTrack.url && (
-            <a 
-              href={currentTrack.url} 
-              className="ml-2 text-muted-foreground" 
-              target="_blank" 
-              rel="noopener noreferrer"
-            >
-              <ExternalLink className="h-3 w-3" />
-            </a>
-          )}
-        </div>
-        <p className="text-xs text-muted-foreground flex items-center justify-between">
-          <span>{currentTrack.artist || 'Unknown Artist'}</span>
-          {currentTrack.duration && <span>{formatDuration(currentTrack.duration)}</span>}
-        </p>
+      <div className="flex-grow">
+        <h3 className="text-lg font-medium text-white">{track.title}</h3>
+        <p className="text-sm text-white/70">{track.artist}</p>
       </div>
+      
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        className="h-10 w-10 rounded-full bg-white/20 hover:bg-white/30 text-white"
+        onClick={onTogglePlay}
+      >
+        {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+      </Button>
     </div>
   );
 };

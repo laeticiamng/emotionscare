@@ -8,6 +8,8 @@ export interface MusicTrack {
   audioUrl?: string;
   coverUrl?: string;
   cover_url?: string;
+  cover?: string;
+  coverImage?: string;
   emotionalTone?: string;
   genreId?: string;
   albumId?: string;
@@ -18,6 +20,9 @@ export interface MusicTrack {
   energyLevel?: number;
   visualizerType?: string;
   mood?: string;
+  emotion?: string;
+  intensity?: number;
+  category?: string;
 }
 
 export interface MusicPlaylist {
@@ -33,6 +38,7 @@ export interface MusicPlaylist {
   updatedAt?: string;
   isPublic?: boolean;
   mood?: string;
+  emotion?: string;
   category?: string;
 }
 
@@ -100,9 +106,12 @@ export interface MusicLibraryProps {
   onTrackSelect?: (track: MusicTrack) => void;
   onPlaylistSelect?: (playlist: MusicPlaylist) => void;
   onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+  onSelectTrack?: (track: MusicTrack) => void;
   currentTrack?: MusicTrack | null;
+  isPlaying?: boolean;
   searchTerm?: string;
   onSearchChange?: (term: string) => void;
+  className?: string;
 }
 
 export interface MusicContextType {
@@ -122,6 +131,7 @@ export interface MusicContextType {
   togglePlay: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
+  prevTrack?: () => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
   seekTo: (time: number) => void;
@@ -134,4 +144,5 @@ export interface MusicContextType {
   error?: Error | null;
   recommendations?: MusicTrack[];
   isLoading?: boolean;
+  playlists?: MusicPlaylist[];
 }

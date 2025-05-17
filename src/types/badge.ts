@@ -14,4 +14,5 @@ export interface Badge {
   threshold?: number;
   level?: number;
   unlocked?: boolean;
+  progress?: number;
 }

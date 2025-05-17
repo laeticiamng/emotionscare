@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Drawer,
@@ -58,11 +57,11 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
           {currentTrack ? (
             <div className="flex flex-col items-center">
               <div className="w-32 h-32 bg-muted rounded-lg overflow-hidden mb-4">
-                {(currentTrack.coverUrl || currentTrack.cover) ? (
+                {(currentTrack.coverUrl || currentTrack.cover_url || currentTrack.cover || '/images/default-album-cover.jpg') ? (
                   <img 
-                    src={currentTrack.coverUrl || currentTrack.cover} 
-                    alt={currentTrack.title} 
-                    className="w-full h-full object-cover"
+                    src={currentTrack?.coverUrl || currentTrack?.cover_url || currentTrack?.cover || '/images/default-album-cover.jpg'} 
+                    alt={`Cover for ${currentTrack?.title}`}
+                    className="object-cover w-full h-full"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground">

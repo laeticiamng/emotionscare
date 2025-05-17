@@ -1,7 +1,7 @@
 
 export type ThemeName = 'light' | 'dark' | 'system' | 'blue-pastel' | 'pastel';
 export type FontSize = 'small' | 'medium' | 'large' | 'xlarge' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded';
+export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'sans-serif';
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
 export type NotificationTone = 'formal' | 'friendly' | 'minimal';
 export type PrivacyLevel = 'public' | 'private' | 'friends' | 'organization' | 'balanced';
@@ -11,7 +11,7 @@ export interface NotificationPreferences {
   emailEnabled?: boolean;
   pushEnabled?: boolean;
   inAppEnabled?: boolean;
-  types?: {
+  types: {
     system: boolean;
     emotion: boolean;
     coach: boolean;

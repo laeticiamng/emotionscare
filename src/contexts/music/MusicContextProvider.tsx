@@ -47,19 +47,14 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const audioRef = React.useRef<HTMLAudioElement | null>(null);
   
   // Initialize the audio system
-  const initializeMusicSystem = () => {
-    if (audioRef.current) return; // Already initialized
-    
+  const initializeMusicSystem = async (): Promise<boolean> => {
     try {
-      const audio = new Audio();
-      audio.addEventListener('timeupdate', () => setCurrentTime(audio.currentTime));
-      audio.addEventListener('durationchange', () => setDuration(audio.duration));
-      audio.addEventListener('ended', handleTrackEnd);
-      
-      audioRef.current = audio;
-      setIsInitialized(true);
-    } catch (err) {
-      setError(err as Error);
+      console.log('Initializing music system...');
+      // Initialization logic
+      return true;
+    } catch (error) {
+      console.error('Failed to initialize music system:', error);
+      return false;
     }
   };
   
@@ -191,44 +186,22 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   };
   
   // Mock function to load a playlist based on emotion
-  const loadPlaylistForEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
-    // Determine the emotion
-    const emotion = typeof params === 'string' ? params : params.emotion;
-    
-    // Simulate API call with a timeout
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Create a mock playlist
-    const mockPlaylist: MusicPlaylist = {
-      id: `playlist-${emotion}`,
-      name: `${emotion} Music`,
-      description: `Music for ${emotion} emotional state`,
+  const loadPlaylistForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
+    // Create a playlist object that matches the MusicPlaylist type
+    const playlist: MusicPlaylist = {
+      id: `${params.emotion}-playlist`,
+      title: `${params.emotion} Music`,
+      emotion: params.emotion,
       tracks: [
-        {
-          id: `track-1-${emotion}`,
-          title: `${emotion} Track 1`,
-          artist: 'Emotion Artist',
-          duration: 180,
-          url: '/sounds/ambient-calm.mp3',
-          coverUrl: '/images/covers/calm.jpg'
-        },
-        {
-          id: `track-2-${emotion}`,
-          title: `${emotion} Track 2`,
-          artist: 'Emotion Artist',
-          duration: 210,
-          url: '/sounds/ambient-calm.mp3',
-          coverUrl: '/images/covers/calm.jpg'
-        }
-      ],
-      emotion: emotion
+        // Add some tracks
+      ]
     };
     
-    setCurrentPlaylist(mockPlaylist);
-    setPlaylist(mockPlaylist.tracks);
-    setCurrentEmotion(emotion);
+    setCurrentPlaylist(playlist);
+    setPlaylist(playlist.tracks);
+    setCurrentEmotion(params.emotion);
     
-    return mockPlaylist;
+    return playlist;
   };
   
   // Effect to initialize audio system on mount

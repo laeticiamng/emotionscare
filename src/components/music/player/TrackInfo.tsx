@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { MusicTrack } from '@/types/music';
-import { Music } from 'lucide-react';
+import Image from 'next/image';
 
 interface TrackInfoProps {
   track: MusicTrack;
@@ -12,34 +12,27 @@ interface TrackInfoProps {
 const TrackInfo: React.FC<TrackInfoProps> = ({
   track,
   className = '',
-  showCover = true
+  showCover = true,
 }) => {
-  // Determine cover URL from various possible properties
-  const coverUrl = track.coverUrl || track.cover || track.coverImage || track.cover_url || '';
-  
+  // Get the cover URL from any of the possible fields
+  const getCoverUrl = () => {
+    return track.coverUrl || track.cover_url || track.cover || track.coverImage || '/images/default-album-cover.jpg';
+  };
+
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       {showCover && (
-        <div className="w-10 h-10 bg-secondary/50 rounded-md overflow-hidden flex-shrink-0">
-          {coverUrl ? (
-            <img 
-              src={coverUrl} 
-              alt={track.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-secondary/30">
-              <Music className="h-5 w-5 text-foreground/60" />
-            </div>
-          )}
+        <div className="relative h-12 w-12 rounded-md overflow-hidden flex-shrink-0">
+          <img
+            src={getCoverUrl()}
+            alt={`Cover for ${track.title}`}
+            className="object-cover w-full h-full"
+          />
         </div>
       )}
-      
-      <div className="min-w-0 flex-1">
-        <h4 className="font-medium text-sm truncate">{track.title}</h4>
-        {track.artist && (
-          <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
-        )}
+      <div className="min-w-0">
+        <h3 className="font-medium text-sm truncate">{track.title}</h3>
+        <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
       </div>
     </div>
   );

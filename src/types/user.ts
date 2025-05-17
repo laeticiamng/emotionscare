@@ -8,8 +8,8 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  firstName?: string;  // Added
-  lastName?: string;   // Added
+  firstName?: string;
+  lastName?: string;
   role: UserRole;
   created_at?: string;
   updated_at?: string;
@@ -34,4 +34,4 @@ export interface UserPreferencesContextType {
 }
 
 // Export UserPreferences to make it accessible
-export { UserPreferences } from './preferences';
+export { UserPreferences, NotificationPreferences } from './preferences';
