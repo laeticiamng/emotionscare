@@ -26,25 +26,25 @@ const B2BAdminLogin = () => {
       
       if (user.role !== 'b2b_admin') {
         toast({
-          title: "Accès refusé",
-          description: "Ce compte n'a pas les permissions nécessaires pour accéder à l'espace d'administration.",
           variant: "destructive",
+          title: "Accès refusé",
+          description: "Ce compte n'a pas les permissions nécessaires pour accéder à l'espace d'administration."
         });
         return;
       }
       
       toast({
-        title: "Connexion réussie",
-        description: "Vous êtes maintenant connecté à l'espace d'administration.",
         variant: "success",
+        title: "Connexion réussie",
+        description: "Vous êtes maintenant connecté à l'espace d'administration."
       });
       navigate('/b2b/admin/dashboard');
     } catch (error: any) {
       console.error('Erreur de connexion:', error);
       toast({
-        title: "Échec de la connexion",
-        description: error.message || "Veuillez vérifier vos identifiants et réessayer.",
         variant: "destructive",
+        title: "Échec de la connexion",
+        description: error.message || "Veuillez vérifier vos identifiants et réessayer."
       });
     } finally {
       setIsLoading(false);

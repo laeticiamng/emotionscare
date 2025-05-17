@@ -27,14 +27,15 @@ const B2CLogin = () => {
       
       if (user.role !== 'b2c') {
         toast({
-          title: "Accès refusé",
-          description: "Ce compte n'a pas les permissions nécessaires pour accéder à l'espace particulier.",
           variant: "destructive",
+          title: "Accès refusé",
+          description: "Ce compte n'a pas les permissions nécessaires pour accéder à l'espace particulier."
         });
         return;
       }
       
       toast({
+        variant: "success",
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté à votre espace personnel."
       });
@@ -42,9 +43,9 @@ const B2CLogin = () => {
     } catch (error: any) {
       console.error('Erreur de connexion:', error);
       toast({
+        variant: "destructive",
         title: "Échec de la connexion",
-        description: error.message || "Veuillez vérifier vos identifiants et réessayer.",
-        variant: "destructive"
+        description: error.message || "Veuillez vérifier vos identifiants et réessayer."
       });
     } finally {
       setIsLoading(false);
