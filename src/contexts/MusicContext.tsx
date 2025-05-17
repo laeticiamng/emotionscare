@@ -1,30 +1,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
-
-export interface MusicContextType {
-  currentTrack: MusicTrack | null;
-  currentPlaylist: MusicPlaylist | null;
-  isPlaying: boolean;
-  volume: number;
-  muted: boolean;
-  currentTime: number;
-  duration: number;
-  isInitialized: boolean;
-  openDrawer: boolean;
-  emotion: string | null;
-  togglePlay: () => void;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-  setVolume: (volume: number) => void;
-  toggleMute: () => void;
-  seekTo: (time: number) => void;
-  setOpenDrawer: (isOpen: boolean) => void;
-  setEmotion: (emotion: string) => void;
-  loadPlaylistForEmotion: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
-}
+import { MusicTrack, MusicPlaylist, EmotionMusicParams, MusicContextType } from '@/types/music';
 
 export const MusicContext = createContext<MusicContextType>({
   currentTrack: null,
@@ -48,6 +24,10 @@ export const MusicContext = createContext<MusicContextType>({
   setOpenDrawer: () => {},
   setEmotion: () => {},
   loadPlaylistForEmotion: async () => null,
+  playlist: null,
+  recommendations: [],
+  isLoading: false,
+  error: null,
 });
 
 export const useMusicContext = () => useContext(MusicContext);
@@ -68,6 +48,12 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [emotion, setEmotion] = useState<string | null>(null);
+  const [recommendations, setRecommendations] = useState<MusicTrack[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [queue, setQueue] = useState<MusicTrack[]>([]);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [isRepeating, setIsRepeating] = useState(false);
 
   useEffect(() => {
     // Initialize music system
@@ -85,6 +71,10 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
 
   const pauseTrack = () => {
     setIsPlaying(false);
+  };
+
+  const resumeTrack = () => {
+    setIsPlaying(true);
   };
 
   const nextTrack = () => {
@@ -105,8 +95,32 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     setCurrentTime(time);
   };
 
+  const toggleShuffle = () => {
+    setIsShuffled(prev => !prev);
+  };
+
+  const toggleRepeat = () => {
+    setIsRepeating(prev => !prev);
+  };
+
+  const addToQueue = (track: MusicTrack) => {
+    setQueue(prevQueue => [...prevQueue, track]);
+  };
+
+  const clearQueue = () => {
+    setQueue([]);
+  };
+
+  const loadPlaylist = (playlist: MusicPlaylist) => {
+    setCurrentPlaylist(playlist);
+    if (playlist.tracks && playlist.tracks.length > 0) {
+      setCurrentTrack(playlist.tracks[0]);
+    }
+  };
+
   const loadPlaylistForEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
     try {
+      setIsLoading(true);
       console.log(`Loading playlist for emotion: ${typeof params === 'string' ? params : params.emotion}`);
       
       // Simulate loading a playlist
@@ -137,6 +151,8 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
       };
       
       setCurrentPlaylist(mockPlaylist);
+      setRecommendations(mockPlaylist.tracks);
+      
       if (mockPlaylist.tracks.length > 0) {
         setCurrentTrack(mockPlaylist.tracks[0]);
       }
@@ -144,7 +160,45 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
       return mockPlaylist;
     } catch (error) {
       console.error('Error loading playlist:', error);
+      setError(error instanceof Error ? error : new Error('Failed to load playlist'));
       return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const recommendByEmotion = (emotion: string, intensity?: number): MusicPlaylist => {
+    const mockPlaylist: MusicPlaylist = {
+      id: `rec-${emotion}`,
+      name: `${emotion} Recommendations`,
+      emotion: emotion,
+      tracks: [
+        {
+          id: `${emotion}-1`,
+          title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Track 1`,
+          artist: 'AI Music',
+          duration: 180,
+          url: '/sounds/sample.mp3'
+        },
+        {
+          id: `${emotion}-2`,
+          title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Track 2`,
+          artist: 'AI Music',
+          duration: 210,
+          url: '/sounds/sample2.mp3'
+        }
+      ]
+    };
+    
+    return mockPlaylist;
+  };
+
+  const playSimilar = (mood?: string) => {
+    const targetMood = mood || (currentTrack?.emotion || 'calm');
+    const playlist = recommendByEmotion(targetMood);
+    loadPlaylist(playlist);
+    if (playlist.tracks.length > 0) {
+      playTrack(playlist.tracks[0]);
     }
   };
 
@@ -164,6 +218,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
         togglePlay,
         playTrack,
         pauseTrack,
+        resumeTrack,
         nextTrack,
         previousTrack,
         setVolume,
@@ -171,7 +226,21 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
         seekTo,
         setOpenDrawer,
         setEmotion,
-        loadPlaylistForEmotion
+        loadPlaylistForEmotion,
+        playlist: currentPlaylist,
+        recommendations,
+        isLoading,
+        error,
+        queue,
+        isShuffled,
+        isRepeating,
+        toggleShuffle,
+        toggleRepeat,
+        addToQueue,
+        clearQueue,
+        loadPlaylist,
+        recommendByEmotion,
+        playSimilar
       }}
     >
       {children}

@@ -1,202 +1,105 @@
 
-import { v4 as uuid } from 'uuid';
 import { EmotionResult } from '@/types/emotion';
+import { supabase } from '@/integrations/supabase/client';
+import { mockEmotions } from '@/data/mockEmotions';
 
-// Mock emotion analysis function
-export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Generate a random emotion result
-  const emotions = ['joy', 'calm', 'anxiety', 'sadness', 'anger', 'fear', 'neutral'];
-  const selectedEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-  const score = Math.floor(Math.random() * 50) + 50; // 50-100
-  const confidence = (Math.random() * 0.3) + 0.7; // 0.7-1.0
-  
-  // Emoji mapping
-  const emojiMap: Record<string, string> = {
-    joy: '😊',
-    calm: '😌',
-    anxiety: '😰',
-    sadness: '😢',
-    anger: '😡',
-    fear: '😨',
-    neutral: '😐'
-  };
-  
-  // Generate feedback based on emotion
-  let feedback = '';
-  let recommendations: string[] = [];
-  
-  switch (selectedEmotion) {
-    case 'joy':
-      feedback = "Vous semblez être dans un état émotionnel positif. C'est une excellente occasion de vous engager dans des activités créatives.";
-      recommendations = [
-        "Partagez votre joie avec quelqu'un d'autre",
-        "Notez ce qui vous rend heureux dans votre journal",
-        "Planifiez une activité agréable pour prolonger ce sentiment"
-      ];
-      break;
-    case 'calm':
-      feedback = "Vous semblez être dans un état calme et équilibré. C'est un bon moment pour la réflexion et la planification.";
-      recommendations = [
-        "Pratiquez la méditation pour maintenir ce calme",
-        "Prenez des décisions importantes dans cet état d'esprit",
-        "Faites une promenade dans la nature"
-      ];
-      break;
-    case 'anxiety':
-      feedback = "Je détecte des signes d'anxiété. C'est une réaction normale à des situations stressantes.";
-      recommendations = [
-        "Pratiquez la respiration profonde pendant 5 minutes",
-        "Faites une courte marche à l'extérieur",
-        "Écrivez vos préoccupations sur papier"
-      ];
-      break;
-    case 'sadness':
-      feedback = "Il semble que vous ressentiez de la tristesse. Prenez soin de vous et n'hésitez pas à chercher du soutien.";
-      recommendations = [
-        "Parlez à un ami ou un proche de confiance",
-        "Écoutez de la musique qui vous réconforte",
-        "Accordez-vous un moment pour ressentir vos émotions sans jugement"
-      ];
-      break;
-    default:
-      feedback = "Merci de partager votre état émotionnel. Continuer à suivre vos émotions est une excellente pratique pour votre bien-être.";
-      recommendations = [
-        "Prenez un moment pour réfléchir à votre journée",
-        "Hydratez-vous et mangez équilibré",
-        "Prenez soin de votre sommeil"
-      ];
-  }
-  
-  return {
-    id: uuid(),
-    emotion: selectedEmotion,
-    score,
-    confidence,
-    emojis: emojiMap[selectedEmotion],
-    text,
-    feedback,
-    recommendations,
-    timestamp: new Date().toISOString(),
-    intensity: score / 100
-  };
-};
-
-// Get latest emotion for a user
-export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  // Generate a mock result
-  return {
-    id: uuid(),
-    emotion: ['joy', 'calm', 'anxiety', 'sadness'][Math.floor(Math.random() * 4)],
-    score: Math.floor(Math.random() * 100),
-    confidence: Math.random(),
-    timestamp: new Date().toISOString(),
-    user_id: userId
-  };
-};
-
-// Save emotion
-export const saveEmotion = async (emotionData: Partial<EmotionResult>): Promise<EmotionResult> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  const completeEmotion: EmotionResult = {
-    id: emotionData.id || uuid(),
-    emotion: emotionData.emotion || 'neutral',
-    score: emotionData.score || 50,
-    timestamp: emotionData.timestamp || new Date().toISOString(),
-    confidence: emotionData.confidence || 0.8,
-    user_id: emotionData.user_id,
-    ...emotionData
-  };
-  
-  console.log('Emotion saved:', completeEmotion);
-  
-  return completeEmotion;
-};
-
-// Get emotions for a user within a date range
-export const getEmotionsByDateRange = async (
-  userId: string,
-  startDate: Date,
-  endDate: Date
-): Promise<EmotionResult[]> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1200));
-  
-  // Generate mock results
-  const results: EmotionResult[] = [];
-  const emotions = ['joy', 'calm', 'anxiety', 'sadness', 'anger', 'fear', 'neutral'];
-  
-  // One entry per day in the range
-  const daysInRange = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24));
-  const numEntries = Math.min(daysInRange, 30); // Max 30 entries
-  
-  for (let i = 0; i < numEntries; i++) {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + i);
-    
-    results.push({
-      id: uuid(),
-      emotion: emotions[Math.floor(Math.random() * emotions.length)],
-      score: Math.floor(Math.random() * 100),
-      confidence: Math.random(),
-      timestamp: date.toISOString(),
-      user_id: userId
-    });
-  }
-  
-  return results;
-};
-
-// Get entry by ID
-export const getEmotionById = async (id: string): Promise<EmotionResult | null> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // 20% chance of not finding the result
-  if (Math.random() < 0.2) {
+export const saveEmotion = async (emotionData: Partial<EmotionResult>): Promise<EmotionResult | null> => {
+  try {
+    // Try to save to Supabase if available
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('emotions')
+        .insert({
+          ...emotionData,
+          date: new Date().toISOString()
+        })
+        .select('*')
+        .single();
+        
+      if (error) throw error;
+      return data as EmotionResult;
+    } else {
+      // Mock saving for development
+      const newEmotion: EmotionResult = {
+        id: `emo-${Date.now()}`,
+        date: new Date().toISOString(),
+        emotion: emotionData.emotion || 'neutral',
+        user_id: emotionData.user_id || 'user-123',
+        text: emotionData.text,
+        emojis: emotionData.emojis,
+        audio_url: emotionData.audio_url,
+        score: emotionData.score || 50
+      };
+      
+      mockEmotions.unshift(newEmotion);
+      return newEmotion;
+    }
+  } catch (error) {
+    console.error('Error saving emotion:', error);
     return null;
   }
-  
-  return {
-    id,
-    emotion: ['joy', 'calm', 'anxiety', 'sadness'][Math.floor(Math.random() * 4)],
-    score: Math.floor(Math.random() * 100),
-    confidence: Math.random(),
-    timestamp: new Date().toISOString(),
-    user_id: 'user-123'
-  };
 };
 
-// Create an emotion entry
-export const createEmotionEntry = async (data: Partial<EmotionResult>): Promise<EmotionResult> => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  const newEmotion: EmotionResult = {
-    id: data.id || uuid(),
-    emotion: data.emotion || 'neutral',
-    score: data.score || 50,
-    timestamp: data.timestamp || new Date().toISOString(),
-    confidence: data.confidence || 0.8,
-    user_id: data.user_id || 'user-123',
-    ...data
-  };
-  
-  return newEmotion;
+export const getEmotions = async (userId: string): Promise<EmotionResult[]> => {
+  try {
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('emotions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('date', { ascending: false });
+        
+      if (error) throw error;
+      return data as EmotionResult[];
+    } else {
+      return mockEmotions.filter(e => e.user_id === userId);
+    }
+  } catch (error) {
+    console.error('Error fetching emotions:', error);
+    return [];
+  }
 };
 
-export default {
-  analyzeEmotion,
-  fetchLatestEmotion,
-  getEmotionsByDateRange,
-  getEmotionById,
-  saveEmotion,
-  createEmotionEntry
+export const getEmotionById = async (id: string): Promise<EmotionResult | null> => {
+  try {
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('emotions')
+        .select('*')
+        .eq('id', id)
+        .single();
+        
+      if (error) throw error;
+      return data as EmotionResult;
+    } else {
+      return mockEmotions.find(e => e.id === id) || null;
+    }
+  } catch (error) {
+    console.error('Error fetching emotion by id:', error);
+    return null;
+  }
+};
+
+export const deleteEmotion = async (id: string): Promise<boolean> => {
+  try {
+    if (supabase) {
+      const { error } = await supabase
+        .from('emotions')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      return true;
+    } else {
+      const index = mockEmotions.findIndex(e => e.id === id);
+      if (index !== -1) {
+        mockEmotions.splice(index, 1);
+        return true;
+      }
+      return false;
+    }
+  } catch (error) {
+    console.error('Error deleting emotion:', error);
+    return false;
+  }
 };

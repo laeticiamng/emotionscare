@@ -15,6 +15,7 @@ export interface EmotionValues {
 export interface EmotionResult {
   id: string;
   user_id?: string;
+  userId?: string;
   date?: string;
   score?: number;
   emojis?: string | string[];
@@ -31,7 +32,6 @@ export interface EmotionResult {
   transcript?: string;
   recommendations?: string[];
   timestamp?: string;
-  userId?: string;
 }
 
 export interface LiveVoiceScannerProps {

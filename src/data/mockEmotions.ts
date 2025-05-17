@@ -1,8 +1,8 @@
 
-import { Emotion } from '@/types/emotions';
+import { EmotionResult } from '@/types/emotion';
 
 // Mock emotions data
-export const mockEmotions: Emotion[] = [
+export const mockEmotions: EmotionResult[] = [
   {
     id: "emo-1",
     date: new Date(2025, 4, 15).toISOString(),
@@ -45,7 +45,7 @@ export const getEmotionsByDateRange = (
   userId: string = "user-123"
 ) => {
   return mockEmotions.filter(emotion => {
-    const emotionDate = new Date(emotion.date);
+    const emotionDate = new Date(emotion.date as string);
     return (
       emotion.user_id === userId &&
       emotionDate >= startDate &&
@@ -58,6 +58,6 @@ export const getEmotionsByDateRange = (
 export const getLatestEmotion = (userId: string = "user-123") => {
   const userEmotions = getUserEmotions(userId);
   return userEmotions.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) => new Date(b.date as string).getTime() - new Date(a.date as string).getTime()
   )[0];
 };

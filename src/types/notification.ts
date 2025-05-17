@@ -1,43 +1,24 @@
 
-import { ReactNode } from 'react';
+export type NotificationFrequency = 'daily' | 'weekly' | 'monthly' | 'never' | 'immediate';
+export type NotificationTone = 'friendly' | 'neutral' | 'formal' | 'casual' | 'direct' | 'professional' | 'motivational';
+export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'achievement' | 'reminder' | 'badge' | 'streak';
 
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: NotificationType;
-  read: boolean;
-  timestamp?: string;
-  created_at?: string;
-  priority?: 'normal' | 'high' | 'urgent';
-  action?: {
-    label: string;
-    url: string;
-  };
-  actions?: {
-    label: string;
-    url: string;
-  }[];
+export interface NotificationPreference {
+  type: string;
+  enabled: boolean;
+  frequency?: NotificationFrequency;
+  tone?: NotificationTone;
+  time?: string;
 }
 
-export type NotificationType = 'system' | 'emotion' | 'coach' | 'journal' | 'community' | 'user' | 'message';
-export type NotificationFilter = 'all' | 'unread' | 'read' | NotificationType | 'urgent';
-
-export interface NotificationPreferences {
+export interface NotificationSettings {
   enabled: boolean;
-  emailEnabled?: boolean;
-  pushEnabled?: boolean;
-  inAppEnabled?: boolean;
-  email?: boolean;
-  push?: boolean;
-  sms?: boolean;
-  types?: {
-    system?: boolean;
-    emotion?: boolean;
-    coach?: boolean;
-    journal?: boolean;
-    community?: boolean;
-    achievement?: boolean;
-  },
-  frequency?: string;
+  sound: boolean;
+  vibration?: boolean;
+  dailySummary?: boolean;
+  weeklyReport?: boolean;
+  achievementAlerts?: boolean;
+  reminderAlerts?: boolean;
+  newContentAlerts?: boolean;
+  emailNotifications?: boolean;
 }

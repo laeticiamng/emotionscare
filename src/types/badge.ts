@@ -13,11 +13,13 @@ export interface Badge {
   progress?: number;
   color?: string;
   type?: 'achievement' | 'milestone' | 'special';
+  threshold?: number;
 }
 
 export interface Challenge {
   id: string;
   title: string;
+  name?: string;
   description: string;
   points: number;
   status: 'completed' | 'failed' | 'locked' | 'ongoing' | 'active' | 'available';
@@ -26,7 +28,6 @@ export interface Challenge {
   goal?: number;
   icon?: string;
   level?: string | number;
-  name?: string;
   completions?: number;
   deadline?: string;
   totalSteps?: number;

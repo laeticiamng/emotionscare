@@ -1,113 +1,93 @@
 
-import { v4 as uuid } from 'uuid';
+import { Post, Comment, Group } from '@/types/community';
+import { supabase } from '@/integrations/supabase/client';
 
-// Mock data for posts
-const mockPosts = [
-  {
-    id: uuid(),
-    user_id: 'user1',
-    date: new Date().toISOString(),
-    content: 'Just had a great mindfulness session today!',
-    reactions: 5,
-    image_url: null,
-  },
-  {
-    id: uuid(),
-    user_id: 'user2',
-    date: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-    content: 'Seeking recommendations for meditation apps. What are you all using?',
-    reactions: 3,
-    image_url: '/images/meditation.jpg',
-  },
-];
-
-// Mock data for comments
-const mockComments = [
-  {
-    id: uuid(),
-    post_id: mockPosts[0].id,
-    user_id: 'user2',
-    date: new Date().toISOString(),
-    content: 'That sounds wonderful! What techniques did you practice?',
-  },
-  {
-    id: uuid(),
-    post_id: mockPosts[1].id,
-    user_id: 'user1',
-    date: new Date().toISOString(),
-    content: 'I recommend Calm or Headspace, both are great!',
-  },
-];
-
-// Mock tags
-const mockTags = [
-  'mindfulness', 'meditation', 'wellness', 'self-care', 'motivation',
-  'journaling', 'gratitude', 'emotional-intelligence', 'mental-health'
-];
-
-// Function to get all posts
-export const getPosts = async () => {
-  return mockPosts;
-};
-
-// Function to get a post by ID
-export const getPostById = async (id) => {
-  return mockPosts.find(post => post.id === id);
-};
-
-// Function to create a new post
-export const createPost = async (postData) => {
-  const newPost = {
-    id: uuid(),
-    date: new Date().toISOString(),
-    reactions: 0,
-    ...postData,
-  };
-  mockPosts.unshift(newPost);
-  return newPost;
-};
-
-// Function to react to a post
-export const reactToPost = async (postId, userId, reactionType = 'like') => {
-  const post = mockPosts.find(p => p.id === postId);
-  if (post) {
-    post.reactions = (post.reactions || 0) + 1;
-    return post;
+export const createPost = async (post: Partial<Post>): Promise<Post | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .insert(post)
+      .select('*')
+      .single();
+      
+    if (error) throw error;
+    return data as Post;
+  } catch (error) {
+    console.error('Error creating post:', error);
+    return null;
   }
-  throw new Error('Post not found');
 };
 
-// Function to get comments for a post
-export const getCommentsForPost = async (postId) => {
-  return mockComments.filter(comment => comment.post_id === postId);
-};
-
-// Function to create a comment
-export const createComment = async (commentData) => {
-  const newComment = {
-    id: uuid(),
-    date: new Date().toISOString(),
-    ...commentData
-  };
-  mockComments.push(newComment);
-  return newComment;
-};
-
-// Function to get recommended tags
-export const getRecommendedTags = async (query = '') => {
-  if (!query) {
-    return mockTags;
+export const createComment = async (comment: Partial<Comment>): Promise<Comment | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .insert(comment)
+      .select('*')
+      .single();
+      
+    if (error) throw error;
+    return data as Comment;
+  } catch (error) {
+    console.error('Error creating comment:', error);
+    return null;
   }
-  return mockTags.filter(tag => tag.includes(query.toLowerCase()));
 };
 
-// Function to create a group
-export const createGroup = async (groupData) => {
-  const newGroup = {
-    id: uuid(),
-    created_at: new Date().toISOString(),
-    members: [groupData.user_id],
-    ...groupData,
-  };
-  return newGroup;
+export const reactToPost = async (postId: string, userId: string): Promise<boolean> => {
+  try {
+    const { data: post, error: fetchError } = await supabase
+      .from('posts')
+      .select('reactions')
+      .eq('id', postId)
+      .single();
+      
+    if (fetchError) throw fetchError;
+    
+    const newReactionsCount = (post?.reactions || 0) + 1;
+    
+    const { error: updateError } = await supabase
+      .from('posts')
+      .update({ reactions: newReactionsCount })
+      .eq('id', postId);
+      
+    if (updateError) throw updateError;
+    
+    return true;
+  } catch (error) {
+    console.error('Error reacting to post:', error);
+    return false;
+  }
+};
+
+export const createGroup = async (group: Partial<Group>): Promise<Group | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('groups')
+      .insert(group)
+      .select('*')
+      .single();
+      
+    if (error) throw error;
+    return data as Group;
+  } catch (error) {
+    console.error('Error creating group:', error);
+    return null;
+  }
+};
+
+export const getRecommendedTags = async (): Promise<string[]> => {
+  // Mock function for now
+  return [
+    'anxiété',
+    'dépression',
+    'bien-être',
+    'méditation',
+    'stress',
+    'sommeil',
+    'motivation',
+    'santé mentale',
+    'thérapie',
+    'pleine conscience'
+  ];
 };

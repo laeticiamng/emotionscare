@@ -1,39 +1,25 @@
 
-// Coach types file
-export interface CoachEvent {
-  id: string;
-  type: string;
-  data: any;
-  timestamp: Date;
+export interface AI_MODEL_CONFIG_Type {
+  model: string;
+  temperature: number;
+  max_tokens: number;
+  top_p: number;
+  stream: boolean;
+  cacheEnabled?: boolean;
+  cacheTTL?: number;
 }
 
-export interface EmotionalData {
-  emotion: string;
-  intensity: number;
-  timestamp: Date | string;
-  context?: string;
+export interface AI_MODEL_CONFIG_Map {
+  chat: AI_MODEL_CONFIG_Type;
+  journal: AI_MODEL_CONFIG_Type;
+  coach: AI_MODEL_CONFIG_Type;
+  scan: AI_MODEL_CONFIG_Type;
+  [key: string]: AI_MODEL_CONFIG_Type;
 }
 
-export interface EmotionalTrend {
-  emotion: string;
-  count: number;
-  average_intensity: number;
-  timeframe: 'day' | 'week' | 'month';
-}
-
-export interface CoachNotification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'warning' | 'success' | 'error';
-  timestamp: Date | string;
-  read?: boolean;
-  action?: any;
-}
-
-export const AI_MODEL_CONFIG = {
+export const AI_MODEL_CONFIG: AI_MODEL_CONFIG_Map = {
   chat: {
-    model: 'gpt-4o-mini',
+    model: 'gpt-4o',
     temperature: 0.7,
     max_tokens: 500,
     top_p: 1,
@@ -42,7 +28,7 @@ export const AI_MODEL_CONFIG = {
     cacheTTL: 3600
   },
   journal: {
-    model: 'gpt-4o-mini',
+    model: 'gpt-4o',
     temperature: 0.5,
     max_tokens: 1000,
     top_p: 1,
@@ -51,7 +37,7 @@ export const AI_MODEL_CONFIG = {
     cacheTTL: 7200
   },
   coach: {
-    model: 'gpt-4o-mini',
+    model: 'gpt-4o',
     temperature: 0.3,
     max_tokens: 500,
     top_p: 1,
@@ -60,7 +46,7 @@ export const AI_MODEL_CONFIG = {
     cacheTTL: 3600
   },
   scan: {
-    model: 'gpt-4o-mini',
+    model: 'gpt-4o',
     temperature: 0.2,
     max_tokens: 300,
     top_p: 1,
@@ -69,3 +55,5 @@ export const AI_MODEL_CONFIG = {
     cacheTTL: 1800
   }
 };
+
+export default AI_MODEL_CONFIG;

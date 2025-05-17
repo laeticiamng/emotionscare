@@ -2,32 +2,44 @@
 export interface Post {
   id: string;
   user_id: string;
+  userId?: string;
   date: string | Date;
   content: string;
-  reactions: number;
   image_url?: string;
-  user?: {
-    name: string;
-    avatar_url?: string;
-  };
-  comments?: Comment[];
+  imageUrl?: string;
+  reactions: number;
+  tags?: string[];
 }
 
 export interface Comment {
   id: string;
   post_id: string;
+  postId?: string;
   user_id: string;
+  userId?: string;
   date: string | Date;
   content: string;
-  user?: {
-    name: string;
-    avatar_url?: string;
-  };
 }
 
-export interface CommunityStats {
-  total_users: number;
-  active_users: number;
-  total_posts: number;
-  posts_today: number;
+export interface Group {
+  id: string;
+  name: string;
+  description?: string;
+  topic?: string;
+  members?: string[];
+  owner_id?: string;
+  ownerId?: string;
+  created_at?: string | Date;
+  createdAt?: string | Date;
+  image_url?: string;
+  imageUrl?: string;
+  tags?: string[];
+}
+
+export interface TagSelectorProps {
+  selectedTags: string[];
+  maxTags?: number;
+  onTagsChange?: (tags: string[]) => void;
+  placeholder?: string;
+  recommendedTags?: string[];
 }

@@ -1,119 +1,155 @@
 
-import React, { useEffect, useState } from 'react';
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { X, Plus } from 'lucide-react';
 import { getRecommendedTags } from '@/lib/communityService';
 
-interface TagSelectorProps {
+export interface TagSelectorProps {
   selectedTags: string[];
-  setSelectedTags: React.Dispatch<React.SetStateAction<string[]>>;
   maxTags?: number;
+  onTagsChange?: (tags: string[]) => void;
+  placeholder?: string;
+  recommendedTags?: string[];
 }
 
-const TagSelector: React.FC<TagSelectorProps> = ({ 
-  selectedTags, 
-  setSelectedTags, 
-  maxTags = 5 
+const TagSelector: React.FC<TagSelectorProps> = ({
+  selectedTags,
+  onTagsChange,
+  maxTags = 5,
+  placeholder = "Ajouter un tag...",
+  recommendedTags = []
 }) => {
   const [inputValue, setInputValue] = useState('');
-  const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  // Load suggested tags when input changes
+  const [showRecommended, setShowRecommended] = useState(false);
+  const [recommendations, setRecommendations] = useState<string[]>([]);
+
   useEffect(() => {
-    const fetchTags = async () => {
-      setIsLoading(true);
-      try {
-        const tags = await getRecommendedTags(inputValue);
-        setSuggestedTags(
-          tags.filter(tag => !selectedTags.includes(tag))
-        );
-      } catch (error) {
-        console.error('Error fetching tags:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    if (inputValue.length >= 2) {
-      fetchTags();
+    if (recommendedTags && recommendedTags.length > 0) {
+      setRecommendations(recommendedTags);
     } else {
-      setSuggestedTags([]);
+      // Load recommended tags if none provided
+      const loadRecommendations = async () => {
+        try {
+          const tags = await getRecommendedTags();
+          setRecommendations(tags || []);
+        } catch (error) {
+          console.error('Failed to load tag recommendations', error);
+          setRecommendations([]);
+        }
+      };
+      
+      loadRecommendations();
     }
-  }, [inputValue, selectedTags]);
-  
-  const addTag = (tag: string) => {
+  }, [recommendedTags]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+    if (e.target.value) {
+      setShowRecommended(true);
+    } else {
+      setShowRecommended(false);
+    }
+  };
+
+  const handleAddTag = (tag: string) => {
+    if (!tag.trim()) return;
+    
+    const formattedTag = tag.trim().toLowerCase();
+    
     if (
-      tag &&
-      !selectedTags.includes(tag) &&
-      selectedTags.length < maxTags
+      selectedTags.includes(formattedTag) ||
+      selectedTags.length >= maxTags
     ) {
-      setSelectedTags([...selectedTags, tag]);
-      setInputValue('');
+      return;
+    }
+    
+    const newTags = [...selectedTags, formattedTag];
+    onTagsChange?.(newTags);
+    setInputValue('');
+    setShowRecommended(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddTag(inputValue);
     }
   };
-  
-  const removeTag = (tag: string) => {
-    setSelectedTags(selectedTags.filter(t => t !== tag));
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    const newTags = selectedTags.filter(tag => tag !== tagToRemove);
+    onTagsChange?.(newTags);
   };
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    addTag(inputValue.trim().toLowerCase());
-  };
-  
+
+  const filteredRecommendations = inputValue
+    ? recommendations.filter(tag => 
+        tag.toLowerCase().includes(inputValue.toLowerCase()) && 
+        !selectedTags.includes(tag.toLowerCase())
+      )
+    : [];
+
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
+    <div className="w-full">
+      <div className="flex flex-wrap gap-2 mb-2">
         {selectedTags.map(tag => (
-          <Badge key={tag} variant="secondary" className="px-2 py-1 text-sm">
+          <Badge key={tag} variant="secondary" className="py-1 px-3">
             {tag}
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              size="sm"
-              className="h-4 w-4 p-0 ml-1"
-              onClick={() => removeTag(tag)}
+              onClick={() => handleRemoveTag(tag)}
+              className="ml-1 text-muted-foreground hover:text-foreground focus:outline-none"
             >
               <X className="h-3 w-3" />
-            </Button>
+            </button>
           </Badge>
         ))}
+        
+        {selectedTags.length < maxTags && (
+          <div className="relative w-full">
+            <div className="flex items-center">
+              <Input
+                value={inputValue}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                placeholder={placeholder}
+                className="w-full"
+              />
+              {inputValue && (
+                <button
+                  type="button"
+                  onClick={() => handleAddTag(inputValue)}
+                  className="absolute right-2 text-primary"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            
+            {showRecommended && filteredRecommendations.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 p-2 bg-background border rounded-md shadow-md">
+                <div className="text-xs text-muted-foreground mb-2">Suggestions :</div>
+                <div className="flex flex-wrap gap-1">
+                  {filteredRecommendations.slice(0, 5).map(tag => (
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-primary hover:text-primary-foreground"
+                      onClick={() => handleAddTag(tag)}
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
       
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <div className="relative flex-1">
-          <Input
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder={`Ajouter un tag${selectedTags.length >= maxTags ? ' (max atteint)' : ''}`}
-            disabled={selectedTags.length >= maxTags}
-          />
-          
-          {suggestedTags.length > 0 && (
-            <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-background border rounded-md shadow-lg p-2">
-              {suggestedTags.slice(0, 5).map(tag => (
-                <div
-                  key={tag}
-                  className="p-1 cursor-pointer hover:bg-accent rounded"
-                  onClick={() => addTag(tag)}
-                >
-                  {tag}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        
-        <Button 
-          type="submit" 
-          disabled={!inputValue.trim() || selectedTags.length >= maxTags}
-        >
-          Ajouter
-        </Button>
-      </form>
+      <div className="text-xs text-muted-foreground">
+        {selectedTags.length} / {maxTags} tags utilisés
+      </div>
     </div>
   );
 };
