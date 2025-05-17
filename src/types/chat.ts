@@ -1,4 +1,3 @@
-
 export interface ChatMessage {
   id: string;
   conversation_id: string;
@@ -19,6 +18,7 @@ export interface ChatConversation {
   created_at: string;
   updated_at: string;
   last_message?: string;
+  messages?: ChatMessage[];
 }
 
 export interface ChatMessageRequest {

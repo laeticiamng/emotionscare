@@ -7,6 +7,11 @@ export interface AudioTrack {
   coverUrl?: string;
   duration?: number;
   description?: string;
+  // Ajout des propriétés manquantes utilisées dans le code
+  audioUrl?: string;
+  emotion?: string;
+  genre?: string;
+  album?: string;
 }
 
 export interface AudioPlaylist {
@@ -17,4 +22,6 @@ export interface AudioPlaylist {
   coverUrl?: string;
   createdAt: string;
   userId?: string;
+  // Ajout des propriétés manquantes utilisées dans le code
+  emotion?: string;
 }

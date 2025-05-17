@@ -1,4 +1,3 @@
-
 export interface Challenge {
   id: string;
   title: string;
@@ -13,6 +12,9 @@ export interface Challenge {
   category: string;
   difficulty?: string;
   tags?: string[];
+  deadline?: string;
+  completions?: number;
+  total?: number;
 }
 
 export interface ChallengeProgress {

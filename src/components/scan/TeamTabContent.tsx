@@ -1,182 +1,183 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DateRangePicker } from '@/components/ui/date-range-picker';
-import { Radio, RadioGroup, RadioIndicator, RadioItem } from '@/components/ui/radio';
-import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TabsContent } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Period } from '@/types';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio';
+import { addDays, endOfDay, endOfMonth, endOfWeek, startOfDay, startOfMonth, startOfWeek, subDays, subMonths, subWeeks } from 'date-fns';
 import TeamOverview from './TeamOverview';
 
-type Period = 'day' | 'week' | 'month';
+// Données fictives pour démonstration
+const mockUsers = [
+  {
+    id: 'user-1',
+    name: 'Jean Dupont',
+    teamId: 'team-1',
+    emotionalScore: 0.82,
+    lastActive: new Date().toISOString()
+  },
+  {
+    id: 'user-2',
+    name: 'Marie Martin',
+    teamId: 'team-1',
+    emotionalScore: 0.65,
+    lastActive: subDays(new Date(), 1).toISOString()
+  },
+  {
+    id: 'user-3',
+    name: 'Paul Bernard',
+    teamId: 'team-1',
+    emotionalScore: 0.91,
+    lastActive: subDays(new Date(), 3).toISOString()
+  }
+];
 
-const TeamTabContent: React.FC = () => {
-  const [selectedTeamId, setSelectedTeamId] = useState<string>('all');
+interface TeamTabContentProps {
+  teamId: string;
+  value: string;
+}
+
+const TeamTabContent: React.FC<TeamTabContentProps> = ({ teamId, value }) => {
   const [period, setPeriod] = useState<Period>('week');
   const [dateRange, setDateRange] = useState<[Date, Date]>([
-    new Date(new Date().setDate(new Date().getDate() - 7)),
-    new Date()
+    startOfWeek(new Date()),
+    endOfWeek(new Date())
   ]);
-  const [anonymized, setAnonymized] = useState(false);
-  const [showNames, setShowNames] = useState(true);
   
-  // Données de démonstration
-  const teams = [
-    { id: 'team1', name: 'Équipe Marketing' },
-    { id: 'team2', name: 'Équipe Développement' },
-    { id: 'team3', name: 'Équipe RH' }
-  ];
-  
-  const mockUsers = [
-    {
-      id: 'user1',
-      name: 'Jean Dupont',
-      teamId: 'team1',
-      emotionalScore: 85,
-      lastActive: '2023-05-15'
-    },
-    {
-      id: 'user2',
-      name: 'Marie Martin',
-      teamId: 'team1',
-      emotionalScore: 72,
-      lastActive: '2023-05-16'
-    },
-    {
-      id: 'user3',
-      name: 'Pierre Bernard',
-      teamId: 'team2',
-      emotionalScore: 90,
-      lastActive: '2023-05-14'
-    },
-    {
-      id: 'user4',
-      name: 'Sophie Petit',
-      teamId: 'team2',
-      emotionalScore: 68,
-      lastActive: '2023-05-17'
-    },
-    {
-      id: 'user5',
-      name: 'Thomas Robert',
-      teamId: 'team3',
-      emotionalScore: 79,
-      lastActive: '2023-05-15'
+  // Gestion du changement de période
+  const handlePeriodChange = (newPeriod: Period) => {
+    setPeriod(newPeriod);
+    
+    const now = new Date();
+    let start: Date;
+    let end: Date;
+    
+    switch (newPeriod) {
+      case 'day':
+        start = startOfDay(now);
+        end = endOfDay(now);
+        break;
+      case 'week':
+        start = startOfWeek(now);
+        end = endOfWeek(now);
+        break;
+      case 'month':
+        start = startOfMonth(now);
+        end = endOfMonth(now);
+        break;
+      default:
+        start = startOfWeek(now);
+        end = endOfWeek(now);
     }
-  ];
+    
+    setDateRange([start, end]);
+  };
   
-  // Filtrer les utilisateurs par équipe sélectionnée
-  const filteredUsers = selectedTeamId === 'all'
-    ? mockUsers
-    : mockUsers.filter(user => user.teamId === selectedTeamId);
-
+  // Navigation dans les périodes
+  const navigatePeriod = (direction: 'next' | 'prev') => {
+    const [start, end] = dateRange;
+    
+    let newStart: Date;
+    let newEnd: Date;
+    
+    if (direction === 'prev') {
+      switch (period) {
+        case 'day':
+          newStart = subDays(start, 1);
+          newEnd = subDays(end, 1);
+          break;
+        case 'week':
+          newStart = subWeeks(start, 1);
+          newEnd = subWeeks(end, 1);
+          break;
+        case 'month':
+          newStart = subMonths(start, 1);
+          newEnd = subMonths(end, 1);
+          break;
+        default:
+          newStart = subWeeks(start, 1);
+          newEnd = subWeeks(end, 1);
+      }
+    } else {
+      switch (period) {
+        case 'day':
+          newStart = addDays(start, 1);
+          newEnd = addDays(end, 1);
+          break;
+        case 'week':
+          newStart = addDays(start, 7);
+          newEnd = addDays(end, 7);
+          break;
+        case 'month':
+          newStart = addDays(start, 30);
+          newEnd = addDays(end, 30);
+          break;
+        default:
+          newStart = addDays(start, 7);
+          newEnd = addDays(end, 7);
+      }
+    }
+    
+    setDateRange([newStart, newEnd]);
+  };
+  
   return (
-    <div className="space-y-6">
+    <TabsContent value={value} className="space-y-6">
       <Card>
-        <CardContent className="pt-6">
-          <Tabs defaultValue="overview">
-            <TabsList className="mb-4">
-              <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-              <TabsTrigger value="analytics">Analytique</TabsTrigger>
-              <TabsTrigger value="charts">Graphiques</TabsTrigger>
-            </TabsList>
-            
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="team-select">Équipe</Label>
-                  <Select value={selectedTeamId} onValueChange={setSelectedTeamId}>
-                    <SelectTrigger id="team-select">
-                      <SelectValue placeholder="Sélectionner une équipe" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Toutes les équipes</SelectItem>
-                      {teams.map(team => (
-                        <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+        <CardHeader>
+          <CardTitle>Vue d'équipe</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Sélection de période */}
+            <div>
+              <RadioGroup
+                value={period}
+                onValueChange={(value) => handlePeriodChange(value as Period)}
+                className="flex space-x-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="day" id="day" />
+                  <Label htmlFor="day">Jour</Label>
                 </div>
-                
-                <div>
-                  <Label>Période</Label>
-                  <RadioGroup value={period} onValueChange={(value) => setPeriod(value as Period)} className="flex flex-col space-y-1 mt-2">
-                    <div className="flex items-center space-x-2">
-                      <RadioItem value="day" id="period-day" />
-                      <Label htmlFor="period-day">Jour</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioItem value="week" id="period-week" />
-                      <Label htmlFor="period-week">Semaine</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioItem value="month" id="period-month" />
-                      <Label htmlFor="period-month">Mois</Label>
-                    </div>
-                  </RadioGroup>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="week" id="week" />
+                  <Label htmlFor="week">Semaine</Label>
                 </div>
-                
-                <div>
-                  <Label>Plage de dates</Label>
-                  <DateRangePicker 
-                    value={dateRange} 
-                    onChange={setDateRange} 
-                    className="w-full mt-1"
-                  />
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="month" id="month" />
+                  <Label htmlFor="month">Mois</Label>
                 </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      id="anonymize" 
-                      checked={anonymized}
-                      onCheckedChange={setAnonymized}
-                    />
-                    <Label htmlFor="anonymize">Anonymiser les données</Label>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      id="showNames" 
-                      checked={showNames}
-                      onCheckedChange={setShowNames}
-                      disabled={anonymized}
-                    />
-                    <Label htmlFor="showNames">Afficher les noms</Label>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="md:col-span-3">
-                <TabsContent value="overview">
-                  <TeamOverview 
-                    teamId={selectedTeamId !== 'all' ? selectedTeamId : undefined}
-                    dateRange={dateRange}
-                    users={filteredUsers}
-                    period={period}
-                    anonymized={false}
-                    showNames={true}
-                  />
-                </TabsContent>
-                
-                <TabsContent value="analytics">
-                  <div className="text-muted-foreground text-center py-12">
-                    Module d'analytique en développement
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="charts">
-                  <div className="text-muted-foreground text-center py-12">
-                    Module de graphiques en développement
-                  </div>
-                </TabsContent>
-              </div>
+              </RadioGroup>
             </div>
-          </Tabs>
+            
+            {/* Navigation */}
+            <div className="flex justify-between items-center">
+              <Button variant="outline" onClick={() => navigatePeriod('prev')}>
+                Précédent
+              </Button>
+              <span>
+                {dateRange[0].toLocaleDateString()} - {dateRange[1].toLocaleDateString()}
+              </span>
+              <Button variant="outline" onClick={() => navigatePeriod('next')}>
+                Suivant
+              </Button>
+            </div>
+            
+            {/* Vue d'équipe */}
+            <TeamOverview
+              teamId={teamId}
+              dateRange={dateRange}
+              users={mockUsers}
+              anonymized={false}
+              showNames={true}
+            />
+          </div>
         </CardContent>
       </Card>
-    </div>
+    </TabsContent>
   );
 };
 

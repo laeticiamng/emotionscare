@@ -2,7 +2,7 @@
 import React from 'react';
 
 export interface TeamOverviewProps {
-  teamId?: string;
+  teamId: string;
   userId?: string;
   anonymized?: boolean;
   className?: string;
@@ -10,6 +10,7 @@ export interface TeamOverviewProps {
   users?: any[];
   showNames?: boolean;
   compact?: boolean;
+  period?: string;
 }
 
 const TeamOverview: React.FC<TeamOverviewProps> = ({
