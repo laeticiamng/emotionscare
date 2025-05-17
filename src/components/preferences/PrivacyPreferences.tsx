@@ -1,83 +1,102 @@
 
 import React from 'react';
-import { UserPreferences } from '@/types/user';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
-interface PrivacyPreferencesProps {
-  preferences: UserPreferences;
-  onChange: (preferences: Partial<UserPreferences>) => void;
-}
-
-const PrivacyPreferences: React.FC<PrivacyPreferencesProps> = ({ preferences, onChange }) => {
-  // Ensure we have the privacy object
-  const privacy = preferences.privacy || {
-    shareData: false,
+const PrivacyPreferences: React.FC = () => {
+  const { preferences, updatePreferences } = useUserPreferences();
+  
+  const privacySettings = preferences?.privacy || {
+    shareData: true,
     anonymizeReports: false,
-    profileVisibility: 'private'
+    profileVisibility: 'public',
   };
-
-  // Helper to update nested privacy preferences
-  const handlePrivacyChange = (key: string, value: any) => {
-    onChange({
+  
+  const handleShareDataChange = (checked: boolean) => {
+    updatePreferences({
       privacy: {
-        ...privacy,
-        [key]: value
-      }
+        ...privacySettings,
+        shareData: checked,
+      },
+    });
+  };
+  
+  const handleAnonymizeReportsChange = (checked: boolean) => {
+    updatePreferences({
+      privacy: {
+        ...privacySettings,
+        anonymizeReports: checked,
+      },
+    });
+  };
+  
+  const handleProfileVisibilityChange = (value: string) => {
+    updatePreferences({
+      privacy: {
+        ...privacySettings,
+        profileVisibility: value,
+      },
     });
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <Label htmlFor="shareData">Partage des données anonymisées</Label>
-          <p className="text-sm text-muted-foreground">
-            Autoriser le partage anonyme de vos données pour améliorer nos services
+    <Card>
+      <CardHeader>
+        <CardTitle>Préférences de confidentialité</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="share-data">Partage de données</Label>
+            <p className="text-sm text-muted-foreground">
+              Autoriser le partage anonymisé de données pour améliorer le service
+            </p>
+          </div>
+          <Switch
+            id="share-data"
+            checked={privacySettings.shareData}
+            onCheckedChange={handleShareDataChange}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="anonymize-reports">Anonymiser les rapports</Label>
+            <p className="text-sm text-muted-foreground">
+              Masquer votre identité dans les rapports d'équipe
+            </p>
+          </div>
+          <Switch
+            id="anonymize-reports"
+            checked={privacySettings.anonymizeReports}
+            onCheckedChange={handleAnonymizeReportsChange}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="profile-visibility">Visibilité du profil</Label>
+          <Select
+            value={privacySettings.profileVisibility}
+            onValueChange={handleProfileVisibilityChange}
+          >
+            <SelectTrigger id="profile-visibility">
+              <SelectValue placeholder="Choisir la visibilité" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="public">Public</SelectItem>
+              <SelectItem value="team">Équipe seulement</SelectItem>
+              <SelectItem value="private">Privé</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-sm text-muted-foreground mt-1">
+            Détermine qui peut voir votre profil et vos statistiques
           </p>
         </div>
-        <Switch
-          id="shareData"
-          checked={privacy.shareData}
-          onCheckedChange={(checked) => handlePrivacyChange('shareData', checked)}
-        />
-      </div>
-
-      <div className="flex items-center justify-between">
-        <div>
-          <Label htmlFor="anonymizeReports">Anonymiser les rapports</Label>
-          <p className="text-sm text-muted-foreground">
-            Masquer votre identité dans les rapports d'analyse
-          </p>
-        </div>
-        <Switch
-          id="anonymizeReports"
-          checked={privacy.anonymizeReports}
-          onCheckedChange={(checked) => handlePrivacyChange('anonymizeReports', checked)}
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="profileVisibility">Visibilité du profil</Label>
-        <Select
-          value={privacy.profileVisibility}
-          onValueChange={(value) => handlePrivacyChange('profileVisibility', value)}
-        >
-          <SelectTrigger className="w-full mt-1">
-            <SelectValue placeholder="Sélectionner la visibilité" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="public">Public</SelectItem>
-            <SelectItem value="friends">Amis uniquement</SelectItem>
-            <SelectItem value="private">Privé</SelectItem>
-          </SelectContent>
-        </Select>
-        <p className="text-sm text-muted-foreground mt-1">
-          Définit qui peut voir votre profil et vos activités
-        </p>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

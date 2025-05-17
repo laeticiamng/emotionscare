@@ -1,8 +1,8 @@
 
 import { NotificationPreference } from './notification';
 
-export type FontSize = 'small' | 'medium' | 'large';
-export type FontFamily = 'system' | 'serif' | 'mono' | 'sans' | 'inter';
+export type FontSize = 'small' | 'medium' | 'large' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type FontFamily = 'system' | 'serif' | 'mono' | 'sans' | 'inter' | 'rounded' | 'monospace' | 'sans-serif';
 
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'system' | 'pastel';
@@ -12,6 +12,8 @@ export interface UserPreferences {
   colorBlindMode?: boolean;
   autoplayMedia?: boolean;
   soundEnabled?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
   language?: string;
   dashboardLayout?: string | Record<string, any>;
   onboardingCompleted?: boolean;
@@ -29,8 +31,6 @@ export interface UserPreferences {
   displayName?: string;
   pronouns?: string;
   biography?: string;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
   ambientSound?: boolean;
   useSystemTheme?: boolean;
   highContrast?: boolean;

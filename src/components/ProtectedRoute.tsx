@@ -3,6 +3,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/types/user';
+import { normalizeUserMode } from '@/utils/userModeHelpers';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -38,15 +39,20 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // If a specific role is required and the user doesn't have it, redirect
-  if (requiredRole && user?.role !== requiredRole) {
-    // If user is authenticated but doesn't have the right role, redirect to their default dashboard
-    const userDashboardPath = user?.role === 'b2b_admin' 
-      ? '/b2b/admin' 
-      : user?.role === 'b2b_user' 
-        ? '/b2b/user' 
-        : '/b2c';
+  if (requiredRole && user?.role) {
+    const normalizedUserRole = normalizeUserMode(user.role);
+    const normalizedRequiredRole = normalizeUserMode(requiredRole);
     
-    return <Navigate to={redirectTo || userDashboardPath} />;
+    if (normalizedUserRole !== normalizedRequiredRole) {
+      // If user is authenticated but doesn't have the right role, redirect to their default dashboard
+      const userDashboardPath = normalizedUserRole === 'b2b_admin' 
+        ? '/b2b/admin' 
+        : normalizedUserRole === 'b2b_user' 
+          ? '/b2b/user' 
+          : '/b2c';
+      
+      return <Navigate to={redirectTo || userDashboardPath} />;
+    }
   }
 
   // User is authenticated and has required role (or no specific role required)

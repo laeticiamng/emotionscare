@@ -4,7 +4,7 @@ export interface MusicTrack {
   title: string;
   artist: string;
   duration: number;
-  src?: string; // Adding src property that was missing but used
+  src?: string;
   audioUrl?: string;
   track_url?: string;
   coverUrl?: string;
@@ -36,7 +36,7 @@ export interface MusicContextType {
   isPlaying: boolean;
   currentTrack: MusicTrack | null;
   volume: number;
-  playlist: MusicTrack[];
+  playlist: MusicPlaylist | MusicTrack[] | null;
   allTracks: MusicTrack[];
   playlists: MusicPlaylist[];
   play: () => void;
@@ -46,7 +46,7 @@ export interface MusicContextType {
   previous: () => void;
   setTrack: (track: MusicTrack) => void;
   setVolume: (volume: number) => void;
-  setPlaylist: (playlist: MusicTrack[]) => void;
+  setPlaylist: (playlist: MusicTrack[] | MusicPlaylist) => void;
   togglePlay: () => void;
   addToPlaylist: (track: MusicTrack) => void;
   createPlaylist: (name: string, tracks?: MusicTrack[]) => MusicPlaylist;

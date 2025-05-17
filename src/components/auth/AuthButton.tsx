@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { LogIn, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getRoleName } from '@/utils/roleUtils';
+import { UserRole } from '@/types/user';
 
 interface AuthButtonProps {
   variant?: 'default' | 'outline' | 'ghost';
@@ -44,7 +45,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({
           <LogIn className="mr-2 h-4 w-4" />
       )}
       {isAuthenticated ? 
-        `Déconnexion ${user && user.role ? `(${getRoleName(user.role)})` : ''}` : 
+        `Déconnexion ${user && user.role ? `(${getRoleName(user.role as UserRole)})` : ''}` : 
         'Se connecter'
       }
     </Button>

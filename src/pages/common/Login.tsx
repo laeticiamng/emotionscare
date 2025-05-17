@@ -8,9 +8,11 @@ import { User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { getRoleHomePath } from '@/hooks/use-role-redirect';
+import { UserRole } from '@/types/user';
+import { UserModeType } from '@/types/userMode';
 
 interface LoginProps {
-  role?: 'b2c' | 'b2b_user' | 'b2b_admin';
+  role?: UserRole | UserModeType;
 }
 
 const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
@@ -24,7 +26,7 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
   const { toast } = useToast();
   
   // Determine the current mode based on URL
-  const getCurrentMode = () => {
+  const getCurrentMode = (): UserRole => {
     if (location.pathname.includes('/b2b/admin')) {
       return 'b2b_admin';
     } else if (location.pathname.includes('/b2b/user')) {

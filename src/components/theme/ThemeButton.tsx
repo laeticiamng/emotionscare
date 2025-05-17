@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/hooks/use-theme';
-import { Theme } from '@/types';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Theme } from '@/types/theme';
 import { Moon, Sun } from 'lucide-react';
 
 interface ThemeButtonProps {

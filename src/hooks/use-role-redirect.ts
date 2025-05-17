@@ -2,10 +2,16 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { UserRole } from '@/types/user';
+import { normalizeUserMode } from '@/utils/userModeHelpers';
 
 // Function to determine the home path based on user role
-export const getRoleHomePath = (role?: string): string => {
-  switch(role) {
+export const getRoleHomePath = (role?: string | UserRole): string => {
+  if (!role) return '/b2c';
+  
+  const normalizedRole = normalizeUserMode(role);
+  
+  switch(normalizedRole) {
     case 'b2b_admin':
       return '/b2b/admin';
     case 'b2b_user':

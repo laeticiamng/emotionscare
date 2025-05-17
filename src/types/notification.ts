@@ -1,89 +1,34 @@
 
-export type NotificationFrequency = 
-  | "immediate"
-  | "daily"
-  | "weekly"
-  | "never";
-
-export type NotificationType = 
-  | "system"
-  | "emotion"
-  | "coach"
-  | "journal"
-  | "community"
-  | "achievement"
-  | "badge"
-  | "challenge"
-  | "reminder"
-  | "info"
-  | "warning"
-  | "error"
-  | "success"
-  | "streak"
-  | "urgent"; 
-
-export type NotificationTone = 
-  | "friendly"
-  | "professional" 
-  | "direct"
-  | "motivational"
-  | "neutral"
-  | "casual"
-  | "formal"
-  | "minimal"; 
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
+export type NotificationTone = 'formal' | 'friendly' | 'casual' | 'professional';
 
 export interface NotificationPreference {
   enabled: boolean;
-  frequency: NotificationFrequency;
-  types: Record<NotificationType, boolean>;
   emailEnabled?: boolean;
   pushEnabled?: boolean;
   inAppEnabled?: boolean;
-  tone?: NotificationTone;
-  quietHours?: {
-    enabled: boolean;
-    start: string;
-    end: string;
+  frequency?: NotificationFrequency;
+  types?: {
+    system?: boolean;
+    emotion?: boolean;
+    coach?: boolean;
+    journal?: boolean;
+    community?: boolean;
+    achievement?: boolean;
+    badge?: boolean;
+    challenge?: boolean;
+    reminder?: boolean;
+    info?: boolean;
+    warning?: boolean;
+    error?: boolean;
+    success?: boolean;
+    streak?: boolean;
+    urgent?: boolean;
+    [key: string]: boolean | undefined;
   };
   email?: boolean;
   push?: boolean;
   sms?: boolean;
-}
-
-export interface Notification {
-  id: string;
-  user_id: string;
-  title: string;
-  message: string;
-  type: NotificationType;
-  read: boolean;
-  timestamp: string;
-  createdAt?: string;
-  created_at?: string;
-  actionUrl?: string;
-  source?: string;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
-}
-
-export type NotificationFilter = 'all' | 'unread' | 'read' | 'urgent' | 'system' | 'journal' | 'emotion' | 'user' | 'achievement' | 'badge' | 'reminder' | 'streak' | 'info' | 'success' | 'warning' | 'error';
-
-export interface NotificationSettings {
-  enabled: boolean;
-  email: boolean;
-  push: boolean;
-  sms?: boolean;
-  frequency: NotificationFrequency;
-  doNotDisturb: boolean;
-  doNotDisturbStart?: string;
-  doNotDisturbEnd?: string;
-  tone?: NotificationTone;
-  types?: Record<NotificationType, boolean>;
-}
-
-// Assurons-nous que les types se ressemblent pour éviter des problèmes de compatibilité
-export type NotificationChannels = {
-  email?: boolean;
-  push?: boolean;
-  sms?: boolean;
   inApp?: boolean;
-};
+  tone?: NotificationTone;
+}

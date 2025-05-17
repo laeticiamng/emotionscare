@@ -1,13 +1,27 @@
 
-import { useContext } from 'react';
-import { ThemeContext } from '@/contexts/ThemeContext';
+import { useTheme as useThemeOriginal } from '@/contexts/ThemeContext';
+import { Theme } from '@/types/theme';
 
-export function useTheme() {
-  const context = useContext(ThemeContext);
+/**
+ * A hook that provides type-safe access to the theme context
+ * Ensures consistent typing across the application
+ */
+export const useTheme = () => {
+  const themeContext = useThemeOriginal();
   
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  
-  return context;
-}
+  // Ensure the theme is one of the valid values
+  const validateTheme = (theme: string): Theme => {
+    if (['light', 'dark', 'system', 'pastel'].includes(theme)) {
+      return theme as Theme;
+    }
+    return 'system';
+  };
+
+  return {
+    ...themeContext,
+    theme: validateTheme(themeContext.theme),
+    setTheme: (theme: Theme) => themeContext.setTheme(theme),
+  };
+};
+
+export default useTheme;

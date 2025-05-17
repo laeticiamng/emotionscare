@@ -8,7 +8,7 @@ import { getStorage } from 'firebase/storage';
 // Using placeholder config since we're using the mock authentication in AuthContext
 // In production, this would be replaced with actual Firebase credentials
 export const firebaseConfig = {
-  apiKey: "AIzaSyD_8dx4meyAFo7K_vAV6HUoQn215hzHtkE",
+  apiKey: "AIzaSyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
   authDomain: "emotions-care.firebaseapp.com",
   projectId: "emotions-care",
   storageBucket: "emotions-care.appspot.com",

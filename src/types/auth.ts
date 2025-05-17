@@ -29,6 +29,14 @@ export interface UserPreferences {
   soundEnabled?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
+  language?: string;
+  dashboardLayout?: Record<string, any> | string;
+  onboardingCompleted?: boolean;
+  privacy?: {
+    shareData: boolean;
+    anonymizeReports: boolean;
+    profileVisibility: string;
+  };
   notifications?: {
     enabled: boolean;
     emailEnabled: boolean;
@@ -47,13 +55,5 @@ export interface UserPreferences {
     push: boolean;
     sms: boolean;
   };
-  privacy?: {
-    shareData: boolean;
-    anonymizeReports: boolean;
-    profileVisibility: string;
-  };
-  dashboardLayout?: Record<string, any> | string;
-  onboardingCompleted?: boolean;
-  language?: string;
   [key: string]: any;
 }

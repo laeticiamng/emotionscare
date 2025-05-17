@@ -24,10 +24,41 @@ export interface User {
 }
 
 export interface UserPreferences {
-  theme: 'light' | 'dark' | 'system';
+  theme: 'light' | 'dark' | 'system' | 'pastel';
   language: string;
-  notifications_enabled: boolean;
-  email_notifications: boolean;
+  notifications_enabled?: boolean;
+  email_notifications?: boolean;
+  fontSize?: string;
+  fontFamily?: string;
+  reduceMotion?: boolean;
+  colorBlindMode?: boolean;
+  autoplayMedia?: boolean;
+  soundEnabled?: boolean;
+  dashboardLayout?: Record<string, any> | string;
+  onboardingCompleted?: boolean;
+  privacy?: {
+    shareData: boolean;
+    anonymizeReports: boolean;
+    profileVisibility: string;
+  };
+  notifications?: {
+    enabled: boolean;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+    inAppEnabled: boolean;
+    types: {
+      system: boolean;
+      emotion: boolean;
+      coach: boolean;
+      journal: boolean;
+      community: boolean;
+      achievement: boolean;
+    };
+    frequency: string;
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
 }
 
 export interface UserWithStatus {

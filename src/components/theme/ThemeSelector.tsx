@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/contexts/ThemeContext';
+import { Theme } from '@/types/theme';
 
 interface ThemeSelectorProps {
   minimal?: boolean;

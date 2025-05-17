@@ -1,5 +1,5 @@
 
-export type Theme = 'light' | 'dark' | 'system' | 'blue' | 'green' | 'violet' | 'yellow' | 'rose' | 'blue-pastel' | 'pastel';
+export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type ThemeName = Theme;
 export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'sans-serif';
 export type FontSize = 'small' | 'medium' | 'large' | 'xlarge' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -14,6 +14,11 @@ export interface ThemeContextType {
   setFontFamily?: (family: FontFamily) => void;
   toggleTheme?: () => void;
   getContrastText?: (color: string) => 'black' | 'white';
+  soundEnabled?: boolean;
+  reduceMotion?: boolean;
+  systemTheme?: 'dark' | 'light';
+  preferences?: any;
+  updatePreferences?: (preferences: any) => void;
 }
 
 export interface ThemeSettingsTabProps {

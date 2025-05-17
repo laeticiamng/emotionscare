@@ -44,8 +44,8 @@ export interface UserWithStatus {
 
 export interface UserPreferences {
   theme?: 'light' | 'dark' | 'system' | 'pastel';
-  fontSize?: 'small' | 'medium' | 'large';
-  fontFamily?: 'system' | 'serif' | 'mono' | 'sans';
+  fontSize?: 'small' | 'medium' | 'large' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  fontFamily?: 'system' | 'serif' | 'mono' | 'sans' | 'rounded' | 'monospace' | 'sans-serif';
   useSystemTheme?: boolean;
   highContrast?: boolean;
   reduceMotion?: boolean;
@@ -61,6 +61,8 @@ export interface UserPreferences {
   dashboardLayout?: Record<string, any> | string;
   onboardingCompleted?: boolean;
   showTips?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
   
   // Properties used in the application
   notifications?: {

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
 import { AuthContextType, UserPreferences } from '@/types/auth';
-import { User } from '@/types/user';
+import { User, UserRole } from '@/types/user';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Normalize the user role to ensure consistency
         if (parsedUser.role) {
-          parsedUser.role = normalizeUserMode(parsedUser.role);
+          parsedUser.role = normalizeUserMode(parsedUser.role) as UserRole;
         }
         
         setUser(parsedUser);
@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Determine role based on email for demo purposes
-      let role = 'b2c';
+      let role: UserRole = 'b2c';
       if (email.includes('admin')) {
         role = 'b2b_admin';
       } else if (email.includes('b2b') || email.includes('collaborateur')) {

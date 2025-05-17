@@ -21,7 +21,7 @@ const Shell: React.FC<ShellProps> = ({
   className = "",
   immersive = false
 }) => {
-  const { theme, soundEnabled, reduceMotion } = useTheme();
+  const { theme, soundEnabled = false, reduceMotion = false } = useTheme();
   
   return (
     <div className={`flex flex-col min-h-screen ${className} ${theme}`}>
