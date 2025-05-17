@@ -135,7 +135,7 @@ function dispatch(action: Action) {
   });
 }
 
-// Fixed: Correctly type the toast function
+// Correctly typed toast function
 export function toast(props: ToastOptions) {
   const { title = "", description, action, duration, variant } = props;
   
