@@ -20,6 +20,7 @@ export interface Challenge {
   goal?: number;
   icon?: string;
   total?: number;
+  type?: string;
 }
 
 export interface LeaderboardEntry {
@@ -30,6 +31,12 @@ export interface LeaderboardEntry {
   avatar?: string;
   trend?: 'up' | 'down' | 'stable';
   previousRank?: number;
+  score?: number;
+  level?: number;
+  progress?: number;
+  avatarUrl?: string;
+  lastActive?: string;
+  userId?: string;
 }
 
 export interface GamificationStats {

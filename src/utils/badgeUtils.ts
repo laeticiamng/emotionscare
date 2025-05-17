@@ -16,7 +16,12 @@ export const normalizeBadge = (badge: any): Badge => {
     isNew: badge.isNew || false,
     category: badge.category || '',
     tier: badge.tier || 'bronze',
-    threshold: badge.threshold || badge.total || 100
+    threshold: badge.threshold || badge.total || 100,
+    // Propriétés additionnelles pour compatibilité
+    image_url: badge.imageUrl || badge.image_url || badge.image || badge.icon_url || '',
+    image: badge.imageUrl || badge.image_url || badge.image || badge.icon_url || '',
+    unlocked: badge.earned || badge.unlocked || badge.achieved || !!badge.earnedAt || !!badge.unlockedAt || !!badge.unlocked_at || false,
+    achieved: badge.earned || badge.unlocked || badge.achieved || !!badge.earnedAt || !!badge.unlockedAt || !!badge.unlocked_at || false
   };
 };
 

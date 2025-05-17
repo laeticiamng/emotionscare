@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Notification } from '@/types/notification';
+import { Notification, NotificationType } from '@/types/notification';
 import { Button } from '@/components/ui/button';
 import { Bell, Check } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -26,7 +26,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   
   // Fonction pour obtenir l'icône et la couleur en fonction du type
   const getTypeStyles = () => {
-    switch (notification.type) {
+    const type = notification.type as NotificationType;
+    
+    switch (type) {
       case 'success':
         return { color: 'text-green-500', bgColor: 'bg-green-100 dark:bg-green-900' };
       case 'warning':

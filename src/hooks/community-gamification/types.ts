@@ -1,23 +1,6 @@
 
-import { Badge } from '@/types';
-
-export interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  points: number;
-  status: 'completed' | 'failed' | 'locked' | 'ongoing' | 'active' | 'available';
-  category: string;
-  progress?: number;
-  goal?: number;
-  icon?: string;
-  level?: string | number;
-  name?: string;
-  completions?: number;
-  deadline?: string;
-  totalSteps?: number;
-  completed?: boolean;
-}
+import { Badge } from '@/types/badge';
+import { Challenge, LeaderboardEntry } from '@/types/gamification';
 
 export interface GamificationStats {
   points: number;
@@ -29,3 +12,5 @@ export interface GamificationStats {
   progress: number;
   recentAchievements?: Badge[];
 }
+
+export { Badge, Challenge, LeaderboardEntry };

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge as BadgeType } from '@/types/gamification';
+import { Badge as BadgeType } from '@/types/badge';
 import { GamificationStats } from '@/types/gamification';
 
 const UserDashboard = () => {
@@ -12,9 +12,11 @@ const UserDashboard = () => {
       name: 'Explorateur Émotionnel',
       description: 'Vous avez exploré vos émotions pendant 7 jours consécutifs',
       image: '/images/badges/explorer.svg',
+      imageUrl: '/images/badges/explorer.svg',
       unlocked: true,
       achieved: true,
-      dateAchieved: '2023-05-10',
+      earnedAt: '2023-05-10',
+      earned: true,
       category: 'engagement'
     },
     {
@@ -22,10 +24,13 @@ const UserDashboard = () => {
       name: 'Maître de la Pleine Conscience',
       description: 'Vous avez complété 10 sessions de pleine conscience',
       image: '/images/badges/mindfulness.svg',
+      imageUrl: '/images/badges/mindfulness.svg',
       unlocked: true,
       achieved: true,
+      earned: true,
       progress: 10,
       maxProgress: 10,
+      threshold: 10,
       category: 'mindfulness'
     },
     {
@@ -33,10 +38,13 @@ const UserDashboard = () => {
       name: 'Ami des Émotions',
       description: 'Vous avez aidé 5 autres utilisateurs dans leur parcours émotionnel',
       image: '/images/badges/friend.svg',
+      imageUrl: '/images/badges/friend.svg',
       unlocked: false,
       achieved: false,
+      earned: false,
       progress: 3,
       maxProgress: 5,
+      threshold: 5,
       category: 'social'
     }
   ];
@@ -45,14 +53,20 @@ const UserDashboard = () => {
     level: 4,
     xp: 356,
     xpToNextLevel: 500,
-    rank: 'Explorateur',
+    rank: 4,
     points: 780,
     streakDays: 7,
     longestStreak: 14,
     completedChallenges: 12,
     totalChallenges: 25,
     unlockedBadges: 8,
-    totalBadges: 20
+    totalBadges: 20,
+    nextLevelPoints: 500,
+    totalPoints: 780,
+    challengesCompleted: 12,
+    challenges: [],
+    streak: 7,
+    badges: []
   };
 
   return (

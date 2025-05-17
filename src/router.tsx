@@ -13,6 +13,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import B2CDashboardPage from './pages/b2c/DashboardPage';
 import B2BUserDashboardPage from './pages/b2b/user/Dashboard';
 import B2BAdminDashboardPage from './pages/b2b/admin/Dashboard';
+import B2CGamificationPage from './pages/b2c/Gamification';
+import B2BUserGamificationPage from './pages/b2b/user/Gamification';
 
 // Create and export the router
 export const router = createBrowserRouter([
@@ -59,6 +61,10 @@ export const router = createBrowserRouter([
           {
             path: 'dashboard',
             element: <B2CDashboardPage />
+          },
+          {
+            path: 'gamification',
+            element: <B2CGamificationPage />
           }
         ]
       },
@@ -74,6 +80,10 @@ export const router = createBrowserRouter([
           {
             path: 'dashboard',
             element: <B2BUserDashboardPage />
+          },
+          {
+            path: 'gamification',
+            element: <B2BUserGamificationPage />
           }
         ]
       },

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge, Progress } from '@/components/ui/progress';
+import { Progress } from '@/components/ui/progress';
 import { Challenge, Badge as BadgeType } from '@/types/gamification';
 
 const GamificationTab: React.FC = () => {
@@ -18,7 +18,6 @@ const GamificationTab: React.FC = () => {
       points: 50,
       difficulty: 'easy',
       category: 'journal',
-      completedAt: '2023-05-12T10:30:00Z',
       tags: ['journal', 'quotidien']
     },
     {
@@ -45,10 +44,10 @@ const GamificationTab: React.FC = () => {
       imageUrl: '/images/badges/mindfulness-master.svg',
       achieved: true,
       unlocked: true,
-      achievedAt: '2023-05-10T14:30:00Z',
+      earnedAt: '2023-05-10T14:30:00Z',
+      earned: true,
       tier: 'gold',
-      category: 'méditation',
-      rarity: 'rare'
+      category: 'méditation'
     },
     {
       id: '2',
@@ -58,12 +57,12 @@ const GamificationTab: React.FC = () => {
       imageUrl: '/images/badges/emotion-explorer.svg',
       achieved: false,
       unlocked: false,
+      earned: false,
       progress: 12,
       maxProgress: 20,
       total: 20,
       tier: 'silver',
-      category: 'émotions',
-      rarity: 'uncommon'
+      category: 'émotions'
     }
   ];
 

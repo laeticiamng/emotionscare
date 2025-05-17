@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
-import { useUserPreferences } from '@/contexts/UserPreferencesContext';
-import { useMusic } from '@/contexts/music/MusicProvider';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useMusic } from '@/contexts';
 
 export const useAmbientSound = () => {
   const [isPlaying, setIsPlaying] = useState(false);

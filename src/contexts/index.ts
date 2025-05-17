@@ -1,10 +1,12 @@
 
-// Export all contexts from this barrel file
-export { useMusic, MusicContext, MusicProvider } from './music/MusicProvider';
-export * from './coach';
-export * from './UserModeContext';
-export * from './UserPreferencesContext';
-export * from './ThemeContext';
-export * from './AuthContext';
-export * from './SidebarContext';
-export * from './LayoutContext';
+// Centralisation des exports de contextes pour simplifier les imports
+
+export { ThemeProvider, useTheme } from './ThemeContext';
+export { UserPreferencesProvider, useUserPreferences } from './UserPreferencesContext';
+export { UserModeProvider, useUserMode } from './UserModeContext';
+export { LayoutProvider, useLayout } from './LayoutContext';
+export { SidebarProvider, useSidebar } from './SidebarContext';
+export { AuthProvider, useAuth } from './AuthContext';
+export { MusicContext, MusicProvider, useMusic } from './music/MusicProvider';
+
+// Autres contexts si besoin

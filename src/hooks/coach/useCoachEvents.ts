@@ -1,66 +1,92 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { CoachEvent } from '@/lib/coach/types';
+import { useState, useCallback, useEffect } from 'react';
+import { CoachEvent } from '@/types/coach/CoachEvent';
 
-export function useCoachEvents(userId: string) {
+export const useCoachEvents = (userId: string) => {
   const [events, setEvents] = useState<CoachEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchEvents = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      // In a real implementation, this would fetch events from an API
-      // Simulate API call with mock data
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const mockEvents: CoachEvent[] = [
-        {
-          id: '1',
-          type: 'session_started',
-          data: { sessionId: 'session-1' },
-          timestamp: new Date()
-        },
-        {
-          id: '2',
-          type: 'insight_generated',
-          data: { 
-            text: "Vous semblez plus productif le matin. Essayez de planifier vos tâches importantes pour cette période." 
+  useEffect(() => {
+    const fetchInitialEvents = async () => {
+      setIsLoading(true);
+      try {
+        // Simulation d'appel API
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        const initialEvents: CoachEvent[] = [
+          {
+            id: '1',
+            type: 'message',
+            content: 'Bienvenue dans votre espace coaching ! Je suis Emma, votre coach personnel.',
+            timestamp: new Date().toISOString(),
+            userId
           },
-          timestamp: new Date()
-        }
-      ];
-      
-      setEvents(mockEvents);
-    } catch (error) {
-      console.error('Error fetching coach events:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId]); // Add userId as dependency
-  
-  const addEvent = useCallback((eventType: string, eventData: any) => {
-    const newEvent: CoachEvent = {
-      id: Date.now().toString(),
-      type: eventType,
-      data: eventData,
-      timestamp: new Date()
+          {
+            id: '2',
+            type: 'suggestion',
+            content: 'Essayez notre nouvelle fonctionnalité de méditation guidée pour réduire votre stress.',
+            timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 jour avant
+            userId
+          }
+        ];
+        
+        setEvents(initialEvents);
+      } catch (error) {
+        console.error('Failed to fetch coach events', error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     
-    setEvents(prev => [...prev, newEvent]);
+    fetchInitialEvents();
+  }, [userId]);
+
+  const addEvent = useCallback((newEvent: Omit<CoachEvent, 'id' | 'timestamp' | 'userId'>) => {
+    const completeEvent: CoachEvent = {
+      id: `event-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      userId,
+      ...newEvent
+    };
     
-    // In a real implementation, this would also send the event to an API
-    console.log(`New coach event: ${eventType}`, eventData);
+    setEvents(prev => [completeEvent, ...prev]);
+    return completeEvent;
+  }, [userId]);
+
+  const deleteEvent = useCallback((eventId: string) => {
+    setEvents(prev => prev.filter(event => event.id !== eventId));
   }, []);
 
-  // Load events on mount
-  useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
+  const clearAllEvents = useCallback(() => {
+    setEvents([]);
+  }, []);
+
+  const markEventAsRead = useCallback((eventId: string) => {
+    setEvents(prev => 
+      prev.map(event => 
+        event.id === eventId 
+          ? { ...event, read: true }
+          : event
+      )
+    );
+  }, []);
+
+  const markAllAsRead = useCallback(() => {
+    setEvents(prev => 
+      prev.map(event => ({ ...event, read: true }))
+    );
+  }, []);
 
   return {
     events,
     isLoading,
     addEvent,
-    fetchEvents
+    deleteEvent,
+    clearAllEvents,
+    markEventAsRead,
+    markAllAsRead,
+    unreadCount: events.filter(e => e.read !== true).length
   };
-}
+};
+
+export default useCoachEvents;

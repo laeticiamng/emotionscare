@@ -1,7 +1,7 @@
 
+import { useCallback } from 'react';
 import { useMusic } from '@/contexts';
 import { useToast } from '@/hooks/use-toast';
-import { useCallback } from 'react';
 import { EmotionMusicParams } from '@/types/music';
 
 interface EmotionMusicOptions {
@@ -10,7 +10,7 @@ interface EmotionMusicOptions {
 }
 
 export function useMusicEmotionIntegration() {
-  const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
+  const { loadPlaylistForEmotion, setOpenDrawer, setEmotion } = useMusic();
   const { toast } = useToast();
 
   const activateMusicForEmotion = useCallback(async (options: EmotionMusicOptions) => {
@@ -18,9 +18,10 @@ export function useMusicEmotionIntegration() {
     
     try {
       const params: EmotionMusicParams = { emotion, intensity };
+      setEmotion(emotion);
       const playlist = await loadPlaylistForEmotion(params);
       
-      if (playlist && setOpenDrawer) {
+      if (playlist) {
         setOpenDrawer(true);
         
         toast({
@@ -37,7 +38,7 @@ export function useMusicEmotionIntegration() {
       console.error("Error activating music for emotion:", error);
       return false;
     }
-  }, [loadPlaylistForEmotion, setOpenDrawer, toast]);
+  }, [loadPlaylistForEmotion, setOpenDrawer, setEmotion, toast]);
   
   const getEmotionMusicDescription = useCallback((emotion: string): string => {
     const descriptions: Record<string, string> = {

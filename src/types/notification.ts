@@ -3,7 +3,20 @@ export type NotificationFrequency = 'daily' | 'weekly' | 'never' | 'real-time';
 
 export type NotificationTone = 'professional' | 'friendly' | 'supportive';
 
-export type NotificationType = 'system' | 'emotion' | 'badge' | 'journal' | 'community' | 'coach' | 'reminder';
+export type NotificationType = 
+  | 'system' 
+  | 'emotion' 
+  | 'badge' 
+  | 'achievement'
+  | 'journal' 
+  | 'community' 
+  | 'coach' 
+  | 'reminder'
+  | 'streak'
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'error';
 
 export interface NotificationPreference {
   type: NotificationType;
@@ -26,13 +39,27 @@ export interface Notification {
   user_id: string;
   metadata?: Record<string, any>;
   link?: string;
+  // Compatibilité avec l'existant
+  createdAt?: string;
 }
 
-export interface NotificationFilter {
-  type?: NotificationType | 'all' | 'unread';
-  startDate?: string;
-  endDate?: string;
-}
+export type NotificationFilter = 
+  | 'all' 
+  | 'unread' 
+  | 'read'
+  | 'achievement'
+  | 'badge'
+  | 'reminder'
+  | 'streak'
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'system'
+  | 'journal'
+  | 'emotion'
+  | 'user'
+  | 'urgent';
 
 export interface NotificationContextType {
   notifications: Notification[];

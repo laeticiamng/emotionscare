@@ -25,7 +25,7 @@ export const useGamificationStats = (userId?: string) => {
       points: 500,
       rewards: ['New Badge', 'Feature Unlock']
     },
-    lastActivityDate: '2023-05-01'
+    lastActivityDate: new Date().toISOString()
   });
   
   const [loading, setLoading] = useState(true);
