@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { getRoleRoute } from '@/utils/roleUtils';
 
 interface LoginProps {
@@ -19,14 +19,16 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, error, clearError, isAuthenticated, user } = useAuth();
+  const { login, clearError, isAuthenticated, user } = useAuth();
   
-  // If user is already authenticated, redirect them to appropriate dashboard
-  // But only do this when the component mounts, not on every re-render
+  // Check if user is already authenticated when the component mounts
   useEffect(() => {
+    // Only redirect if authenticated AND on first mount (not after login attempts)
     if (isAuthenticated && user) {
       const from = location.state?.from?.pathname || getRoleRoute(user.role);
-      navigate(from);
+      // Add a small delay to prevent immediate redirect issues
+      const timer = setTimeout(() => navigate(from), 100);
+      return () => clearTimeout(timer);
     }
   }, []);
   
@@ -45,7 +47,6 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
           toast({
             title: "Accès refusé",
             description: `Ce compte n'a pas les permissions nécessaires pour accéder à cet espace.`,
-            variant: "destructive"
           });
           setIsLoading(false);
           return;
@@ -65,7 +66,6 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
       toast({
         title: "Erreur de connexion",
         description: error.message || "Une erreur s'est produite lors de la connexion",
-        variant: "destructive"
       });
     } finally {
       setIsLoading(false);

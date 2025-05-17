@@ -23,7 +23,7 @@ const ProtectedLayout = () => {
   const isProtectedPath = !location.pathname.includes('/login') && 
                          !location.pathname.includes('/register') && 
                          !location.pathname.includes('/choose-mode') &&
-                         !location.pathname === '/';
+                         location.pathname !== '/'; // Fix: Changed comparison from boolean to string
 
   if (!isAuthenticated && isProtectedPath) {
     // Determine which login page to redirect to based on the path

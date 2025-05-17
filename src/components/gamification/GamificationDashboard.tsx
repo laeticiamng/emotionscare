@@ -1,100 +1,51 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/types';
+import BadgeCard from './BadgeCard';
+import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import BadgesWidget from '@/components/dashboard/widgets/BadgesWidget';
-import { Badge } from '@/types/badge';
 
-// Mock data
-const badges: Badge[] = [
-  {
-    id: '1',
-    name: 'Premier Pas',
-    description: 'Compléter votre première entrée de journal',
-    image_url: '/icons/badges/first-step.svg',
-    icon: '/icons/badges/first-step.svg',
-    rarity: 'common',
-    unlocked: true,
-  },
-  {
-    id: '2',
-    name: 'Zen Master',
-    description: '10 méditations complétées',
-    image_url: '/icons/badges/zen-master.svg',
-    icon: '/icons/badges/zen-master.svg',
-    rarity: 'uncommon',
-    unlocked: true,
-  },
-  {
-    id: '3',
-    name: 'Explorateur Musical',
-    description: 'Écouter 5 types de musiques thérapeutiques',
-    image_url: '/icons/badges/music-explorer.svg',
-    icon: '/icons/badges/music-explorer.svg',
-    rarity: 'rare',
-    unlocked: false,
-    progress: 3,
-    maxProgress: 5,
-  }
-];
+interface GamificationDashboardProps {
+  badges: Badge[];
+  level: number;
+  xp: number;
+  nextLevelXp: number;
+}
 
-const GamificationDashboard: React.FC = () => {
+const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
+  badges,
+  level,
+  xp,
+  nextLevelXp
+}) => {
+  const progressPercentage = (xp / nextLevelXp) * 100;
+
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold mb-6">Gamification</h1>
-      
-      <Tabs defaultValue="badges">
-        <TabsList className="mb-4">
-          <TabsTrigger value="badges">Badges</TabsTrigger>
-          <TabsTrigger value="challenges">Challenges</TabsTrigger>
-          <TabsTrigger value="rewards">Récompenses</TabsTrigger>
-          <TabsTrigger value="leaderboard">Classement</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="badges">
-          <Card>
-            <CardHeader>
-              <CardTitle>Vos badges</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <BadgesWidget badges={badges} showSeeAll={false} />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="challenges">
-          <Card>
-            <CardHeader>
-              <CardTitle>Challenges en cours</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Contenu des challenges à venir</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="rewards">
-          <Card>
-            <CardHeader>
-              <CardTitle>Récompenses disponibles</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Contenu des récompenses à venir</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="leaderboard">
-          <Card>
-            <CardHeader>
-              <CardTitle>Classement</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Contenu du classement à venir</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Level {level}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>{xp} XP</span>
+              <span>{nextLevelXp} XP</span>
+            </div>
+            <Progress value={progressPercentage} className="h-2" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {badges.map((badge) => (
+          <BadgeCard
+            key={badge.id}
+            badge={badge}
+            progress={badge.progress || 0} // Use property that exists in the Badge type
+          />
+        ))}
+      </div>
     </div>
   );
 };

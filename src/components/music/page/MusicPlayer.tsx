@@ -1,176 +1,184 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { MusicTrack } from '@/types/music';
-import MusicControls from './MusicControls';
+
+import React, { useState, useEffect } from 'react';
+import { MusicTrack } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 
 interface MusicPlayerProps {
-  tracks: MusicTrack[];
-  autoPlay?: boolean;
-  initialTrack?: MusicTrack;
-  onTrackChange?: (track: MusicTrack) => void;
-  onPlay?: () => void;
-  onPause?: () => void;
+  track: MusicTrack | null;
+  onNext: () => void;
+  onPrevious: () => void;
+  onPlay: () => void;
+  onPause: () => void;
+  isPlaying: boolean;
+  volume: number;
+  onVolumeChange: (value: number) => void;
 }
 
 const MusicPlayer: React.FC<MusicPlayerProps> = ({
-  tracks = [],
-  autoPlay = false,
-  initialTrack,
-  onTrackChange,
+  track,
+  onNext,
+  onPrevious,
   onPlay,
-  onPause
+  onPause,
+  isPlaying,
+  volume,
+  onVolumeChange
 }) => {
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(initialTrack || (tracks.length > 0 ? tracks[0] : null));
-  const [isPlaying, setIsPlaying] = useState(autoPlay);
+  // Define setVolume only once
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.8);
-  const [muted, setIsMuted] = useState(false);
-  
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  
+  const [isMuted, setIsMuted] = useState(false);
+  const audioRef = React.useRef<HTMLAudioElement>(null);
+
   useEffect(() => {
-    if (initialTrack) {
-      setCurrentTrack(initialTrack);
+    if (track && audioRef.current) {
+      audioRef.current.src = track.audioUrl;
+      audioRef.current.load();
+      if (isPlaying) {
+        audioRef.current.play();
+      }
     }
-  }, [initialTrack]);
-  
-  useEffect(() => {
-    if (!audioRef.current) return;
-    
-    const audio = audioRef.current;
-    
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-    };
-    
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-    };
-    
-    const handleEnded = () => {
-      handleNext();
-    };
-    
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('ended', handleEnded);
-    
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, [currentTrack]);
-  
-  useEffect(() => {
-    if (!audioRef.current || !currentTrack) return;
-    
-    const audio = audioRef.current;
-    
+  }, [track, isPlaying]);
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  // Define the missing handleNext function
+  const handleNext = () => {
+    if (onNext) onNext();
+  };
+
+  const handlePrevious = () => {
+    if (onPrevious) onPrevious();
+  };
+
+  const handleTogglePlay = () => {
     if (isPlaying) {
-      audio.play().catch(err => console.error('Error playing audio:', err));
-      onPlay && onPlay();
+      onPause();
     } else {
-      audio.pause();
-      onPause && onPause();
+      onPlay();
     }
-  }, [isPlaying, currentTrack, onPlay, onPause]);
-  
-  useEffect(() => {
-    if (!audioRef.current) return;
-    
-    const audio = audioRef.current;
-    audio.volume = muted ? 0 : volume;
-  }, [volume, muted]);
-  
-  const getCurrentTrackUrl = () => {
-    if (!currentTrack) return '';
-    return currentTrack.url;
   };
-  
-  const togglePlay = () => {
-    setIsPlaying(prev => !prev);
+
+  const handleSeek = (value: number[]) => {
+    if (audioRef.current) {
+      const seekTime = value[0];
+      audioRef.current.currentTime = seekTime;
+      setCurrentTime(seekTime);
+    }
   };
-  
-  const playTrack = () => {
-    if (!audioRef.current) return;
-    audioRef.current.play().catch(err => console.error('Error playing audio:', err));
+
+  const handleToggleMute = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
   };
-  
-  const pauseTrack = () => {
-    if (!audioRef.current) return;
-    audioRef.current.pause();
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
-  
-  const previousTrack = () => {
-    if (!currentTrack || tracks.length <= 1) return;
-    
-    const currentIndex = tracks.findIndex(track => track.id === currentTrack.id);
-    const prevIndex = currentIndex <= 0 ? tracks.length - 1 : currentIndex - 1;
-    const prevTrack = tracks[prevIndex];
-    
-    setCurrentTrack(prevTrack);
-    onTrackChange && onTrackChange(prevTrack);
-  };
-  
-  const nextTrack = () => {
-    if (!currentTrack || tracks.length <= 1) return;
-    
-    const currentIndex = tracks.findIndex(track => track.id === currentTrack.id);
-    const nextIndex = currentIndex >= tracks.length - 1 ? 0 : currentIndex + 1;
-    const nextTrack = tracks[nextIndex];
-    
-    setCurrentTrack(nextTrack);
-    onTrackChange && onTrackChange(nextTrack);
-  };
-  
-  const seekTo = (value: number) => {
-    if (!audioRef.current) return;
-    
-    audioRef.current.currentTime = value;
-    setCurrentTime(value);
-  };
-  
-  const setVolume = (value: number) => {
-    setVolume(value);
-    setIsMuted(value === 0);
-  };
-  
-  const toggleMute = () => {
-    setIsMuted(prev => !prev);
-  };
-  
-  if (tracks.length === 0 || !currentTrack) {
-    return <div className="text-center text-muted-foreground p-4">No tracks available</div>;
-  }
-  
+
   return (
-    <>
-      <audio
-        ref={audioRef}
-        src={getCurrentTrackUrl()}
-        preload="metadata"
-        style={{ display: 'none' }}
-      />
-      
-      <MusicControls
-        isPlaying={isPlaying}
-        onPlayPause={togglePlay}
-        onPlay={playTrack}
-        onPause={pauseTrack}
-        onTogglePlay={togglePlay}
-        onPrevious={previousTrack}
-        onNext={nextTrack}
-        currentTime={currentTime}
-        duration={duration}
-        onSeek={seekTo}
-        volume={volume}
-        isMuted={muted}
-        onToggleMute={toggleMute}
-        onVolumeChange={setVolume}
-        track={currentTrack}
-      />
-    </>
+    <Card className="w-full">
+      <CardContent className="p-6">
+        {track && (
+          <>
+            <div className="flex flex-col items-center mb-4">
+              <h3 className="text-lg font-medium">{track.title}</h3>
+              <p className="text-sm text-muted-foreground">{track.artist}</p>
+            </div>
+
+            <audio
+              ref={audioRef}
+              onTimeUpdate={handleTimeUpdate}
+              onEnded={handleNext}
+              className="hidden"
+            />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between text-sm">
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
+              </div>
+
+              <Slider
+                value={[currentTime]}
+                min={0}
+                max={duration || 0.1}
+                step={0.1}
+                onValueChange={handleSeek}
+                className="w-full"
+              />
+
+              <div className="flex items-center justify-center space-x-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handlePrevious}
+                  disabled={!track}
+                >
+                  <SkipBack size={20} />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleTogglePlay}
+                  disabled={!track}
+                  className="h-12 w-12 rounded-full"
+                >
+                  {isPlaying ? <Pause size={24} /> : <Play size={24} />}
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleNext}
+                  disabled={!track}
+                >
+                  <SkipForward size={20} />
+                </Button>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleToggleMute}
+                  className="h-8 w-8"
+                >
+                  {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                </Button>
+                <Slider
+                  value={[isMuted ? 0 : volume]}
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  onValueChange={(value) => onVolumeChange(value[0])}
+                  className="w-24"
+                />
+              </div>
+            </div>
+          </>
+        )}
+
+        {!track && (
+          <div className="flex items-center justify-center h-40">
+            <p className="text-muted-foreground">Select a track to play</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

@@ -17,13 +17,13 @@ export function useRoleRedirect() {
     // This prevents redirecting users who are already browsing the app
     const isLoginOrRegisterPage = 
       location.pathname === '/' || 
-      location.pathname.includes('/login') || 
-      location.pathname.includes('/register');
+      location.pathname === '/login' ||
+      location.pathname === '/register';
     
     if (isAuthenticated && user && isLoginOrRegisterPage) {
       navigate(getRoleHomePath(user.role));
     }
-  }, [isAuthenticated, user, isLoading, navigate, location]);
+  }, [isAuthenticated, user, isLoading, navigate, location.pathname]);
   
   return { user, isAuthenticated, isLoading };
 }

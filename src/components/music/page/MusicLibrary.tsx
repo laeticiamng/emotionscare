@@ -1,118 +1,121 @@
-
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
+import React from 'react';
+import { MusicTrack, MusicPlaylist } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MusicTrack, MusicPlaylist, MusicLibraryProps } from '@/types/music';
-import TrackList from '../TrackList';
-import PlaylistGrid from '../PlaylistGrid';
+import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
+import TrackList from '../TrackList'; // Fix import path
 
-// Updated interface to include className
-interface ExtendedMusicLibraryProps extends MusicLibraryProps {
-  className?: string;
+interface MusicLibraryProps {
+  tracks: MusicTrack[];
+  playlists: MusicPlaylist[];
+  onTrackSelect: (track: MusicTrack) => void;
+  currentTrack: MusicTrack | null;
+  className?: string; // Add missing property
 }
 
-const MusicLibrary: React.FC<ExtendedMusicLibraryProps> = ({
-  tracks = [],
-  playlists = [],
+const MusicLibrary: React.FC<MusicLibraryProps> = ({
+  tracks,
+  playlists,
   onTrackSelect,
-  onPlaylistSelect,
   currentTrack,
-  searchTerm = '',
-  onSearchChange,
-  className = '',
+  className = '' // Provide default value
 }) => {
-  const [activeTab, setActiveTab] = useState('all');
-  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [activeTab, setActiveTab] = React.useState('all');
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value;
-    setLocalSearchTerm(term);
-    if (onSearchChange) {
-      onSearchChange(term);
-    }
-  };
-
-  const filteredTracks = tracks.filter(track => {
-    const searchLower = localSearchTerm.toLowerCase();
-    return (
-      track.title.toLowerCase().includes(searchLower) ||
-      (track.artist && track.artist.toLowerCase().includes(searchLower))
+  const filteredTracks = React.useMemo(() => {
+    return tracks.filter(track => 
+      track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      track.artist.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  });
+  }, [tracks, searchQuery]);
 
-  const filteredPlaylists = playlists.filter(playlist => {
-    const searchLower = localSearchTerm.toLowerCase();
-    return (
-      playlist.title.toLowerCase().includes(searchLower) ||
-      (playlist.name && playlist.name.toLowerCase().includes(searchLower))
-    );
-  });
-
-  // Group tracks by emotion/mood for the "Ambiance" tab
-  const emotionGroups: Record<string, MusicTrack[]> = {};
-  filteredTracks.forEach(track => {
-    if (track.mood || track.emotion) {
-      const emotionKey = (track.mood || track.emotion || 'unknown').toLowerCase();
-      if (!emotionGroups[emotionKey]) {
-        emotionGroups[emotionKey] = [];
+  const filteredTracksByCategory = React.useMemo(() => {
+    if (activeTab === 'all') return filteredTracks;
+    
+    return filteredTracks.filter(track => {
+      // If track has emotion property, use it for filtering
+      if ('emotion' in track) {
+        return track.emotion === activeTab;
       }
-      emotionGroups[emotionKey].push(track);
-    }
-  });
+      return true;
+    });
+  }, [filteredTracks, activeTab]);
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={`space-y-4 ${className}`}>
       <div className="relative">
-        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Rechercher par titre, artiste ou playlist"
-          className="pl-8"
-          value={localSearchTerm}
-          onChange={handleSearchChange}
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+        <Input 
+          placeholder="Search tracks or artists..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
         />
       </div>
-
-      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-3 mb-4">
-          <TabsTrigger value="all">Tout</TabsTrigger>
-          <TabsTrigger value="playlists">Playlists</TabsTrigger>
-          <TabsTrigger value="ambiance">Ambiance</TabsTrigger>
+      
+      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="mb-4">
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="calm">Calm</TabsTrigger>
+          <TabsTrigger value="focus">Focus</TabsTrigger>
+          <TabsTrigger value="energy">Energy</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all" className="space-y-6">
-          {filteredTracks.length > 0 ? (
-            <TrackList tracks={filteredTracks} onTrackSelect={onTrackSelect} currentTrack={currentTrack} />
+        <TabsContent value="all" className="space-y-4">
+          {filteredTracksByCategory.length > 0 ? (
+            <TrackList 
+              tracks={filteredTracksByCategory} 
+              onTrackSelect={onTrackSelect} 
+              currentTrack={currentTrack || undefined} 
+              // Remove the compact property since it's not in TrackListProps
+            />
           ) : (
-            <p className="text-center text-muted-foreground py-8">Aucun titre trouvé</p>
+            <div className="text-center py-8 text-muted-foreground">
+              No tracks found matching your search.
+            </div>
           )}
         </TabsContent>
 
-        <TabsContent value="playlists" className="space-y-6">
-          {filteredPlaylists.length > 0 ? (
-            <PlaylistGrid playlists={filteredPlaylists} onSelectPlaylist={onPlaylistSelect} />
+        <TabsContent value="calm" className="space-y-4">
+          {filteredTracksByCategory.length > 0 ? (
+            <TrackList 
+              tracks={filteredTracksByCategory} 
+              onTrackSelect={onTrackSelect} 
+              currentTrack={currentTrack || undefined}
+            />
           ) : (
-            <p className="text-center text-muted-foreground py-8">Aucune playlist trouvée</p>
+            <div className="text-center py-8 text-muted-foreground">
+              No calm tracks found.
+            </div>
           )}
         </TabsContent>
-
-        <TabsContent value="ambiance" className="space-y-8">
-          {Object.keys(emotionGroups).length > 0 ? (
-            Object.entries(emotionGroups).map(([emotion, tracks]) => (
-              <div key={emotion} className="space-y-3">
-                <h3 className="font-medium capitalize">{emotion}</h3>
-                <TrackList
-                  tracks={tracks}
-                  onTrackSelect={onTrackSelect}
-                  currentTrack={currentTrack}
-                  compact
-                />
-              </div>
-            ))
+        
+        <TabsContent value="focus">
+          {filteredTracksByCategory.length > 0 ? (
+            <TrackList 
+              tracks={filteredTracksByCategory} 
+              onTrackSelect={onTrackSelect} 
+              currentTrack={currentTrack || undefined}
+            />
           ) : (
-            <p className="text-center text-muted-foreground py-8">
-              Aucune musique par ambiance trouvée
-            </p>
+            <div className="text-center py-8 text-muted-foreground">
+              No focus tracks found.
+            </div>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="energy">
+          {filteredTracksByCategory.length > 0 ? (
+            <TrackList 
+              tracks={filteredTracksByCategory} 
+              onTrackSelect={onTrackSelect} 
+              currentTrack={currentTrack || undefined}
+            />
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No energy tracks found.
+            </div>
           )}
         </TabsContent>
       </Tabs>
