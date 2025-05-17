@@ -1,47 +1,94 @@
 
-/* Glass effects for UI components */
-@import 'tailwindcss/components';
+/* Effets de verre et gradients pour différents thèmes */
 
-@layer components {
-  .glass-dark {
-    @apply bg-black/40 backdrop-blur-md border border-gray-800;
+/* Style de base pour l'effet de verre */
+.glass {
+  @apply backdrop-blur-md border;
+  transition: all 0.3s ease;
+}
+
+/* Variantes selon le thème */
+.light .glass {
+  @apply bg-white/70 border-white/20;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass {
+  @apply bg-gray-900/40 border-gray-800/40;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.pastel .glass {
+  @apply bg-blue-50/70 border-blue-100/50;
+  box-shadow: 0 8px 32px rgba(96, 165, 250, 0.1);
+}
+
+/* Fallback pour les navigateurs qui ne supportent pas backdrop-filter */
+@supports not (backdrop-filter: blur(8px)) {
+  .glass {
+    backdrop-filter: none;
   }
   
-  .glass-light {
-    @apply bg-white/80 backdrop-blur-md border border-gray-200;
+  .light .glass {
+    @apply bg-white/90;
   }
   
-  .glass-pastel {
-    @apply bg-blue-50/70 backdrop-blur-md border border-blue-200;
+  .dark .glass {
+    @apply bg-gray-900/90;
   }
   
-  .glass-card {
-    @apply bg-white/20 backdrop-blur-md border border-white/20;
+  .pastel .glass {
+    @apply bg-blue-50/90;
   }
-  
-  /* Glass effects for each theme */
-  .theme-light .glass-effect {
-    @apply glass-light;
+}
+
+/* Gradients de fond pour différents thèmes */
+.gradient-bg {
+  transition: background 0.5s ease;
+}
+
+.light .gradient-bg {
+  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+}
+
+.dark .gradient-bg {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.pastel .gradient-bg {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+/* Variantes d'intensité pour les effets de verre */
+.glass-light {
+  @apply backdrop-blur-sm bg-white/40 border border-white/10;
+}
+
+.glass-medium {
+  @apply backdrop-blur-md bg-white/30 border border-white/20;
+}
+
+.glass-strong {
+  @apply backdrop-blur-lg bg-white/20 border border-white/30;
+}
+
+/* Support pour les utilisateurs qui préfèrent réduire les animations */
+@media (prefers-reduced-motion: reduce) {
+  .glass, .gradient-bg {
+    transition: none;
   }
-  
-  .theme-dark .glass-effect {
-    @apply glass-dark;
+}
+
+/* Styles spécifiques pour les appareils à faible performance */
+@media (max-width: 640px) {
+  .glass {
+    backdrop-filter: blur(4px);
   }
-  
-  .theme-pastel .glass-effect {
-    @apply glass-pastel;
-  }
-  
-  /* Glass shadow effects */
-  .shadow-premium-light {
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-  }
-  
-  .shadow-premium-dark {
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-  }
-  
-  .shadow-premium-pastel {
-    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.15);
-  }
+}
+
+/* Fallback pour les appareils très limités */
+.no-effects .glass {
+  backdrop-filter: none;
+  @apply bg-background border;
+  box-shadow: none;
 }

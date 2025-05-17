@@ -25,6 +25,12 @@ export interface GamificationStats {
   activeChallenges?: number;
   totalBadges?: number;
   unlockedBadges?: number;
+  // Propriétés additionnelles pour la compatibilité
+  totalChallenges?: number;
+  streakDays?: number;
+  longestStreak?: number;
+  xp?: number;
+  xpToNextLevel?: number;
 }
 
 export * from './badge';

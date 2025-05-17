@@ -21,6 +21,10 @@ export interface Badge {
   }[];
   achieved?: boolean;
   threshold?: number;
+  // Propriétés additionnelles pour la compatibilité
+  earned?: boolean;
+  earnedAt?: string;
+  tier?: string;
 }
 
 export interface BadgeCollection {

@@ -6,18 +6,26 @@ import MainFooter from './navigation/MainFooter';
 
 interface ShellProps {
   children?: React.ReactNode;
+  hideNav?: boolean;
+  hideFooter?: boolean;
+  className?: string;
 }
 
-const Shell: React.FC<ShellProps> = ({ children }) => {
+const Shell: React.FC<ShellProps> = ({ 
+  children, 
+  hideNav = false, 
+  hideFooter = false,
+  className = "" 
+}) => {
   return (
-    <div className="flex flex-col min-h-screen">
-      <MainNavbar />
+    <div className={`flex flex-col min-h-screen ${className}`}>
+      {!hideNav && <MainNavbar />}
 
       <main className="flex-1 bg-gradient-to-b from-background to-muted/20">
         {children || <Outlet />}
       </main>
 
-      <MainFooter />
+      {!hideFooter && <MainFooter />}
     </div>
   );
 };
