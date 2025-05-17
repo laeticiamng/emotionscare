@@ -61,7 +61,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     seekTo,
     setVolume,
     toggleMute
-  } = useAudioHandlers({ toast });
+  } = useAudioHandlers({ toast: true });
 
   useEffect(() => {
     // Initialize music system
