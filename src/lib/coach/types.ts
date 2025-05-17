@@ -39,4 +39,13 @@ export const AI_MODEL_CONFIG = {
   }
 };
 
+export interface CoachEvent {
+  id: string;
+  type: 'message' | 'suggestion' | 'notification' | 'recommendation';
+  content: string;
+  timestamp: string;
+  source?: string;
+  metadata?: Record<string, any>;
+}
+
 export default AI_MODEL_CONFIG;

@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult } from '@/types/emotion';
+import { v4 as uuid } from 'uuid';
 
 export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult | null> => {
   try {
@@ -72,5 +73,61 @@ export const createEmotionEntry = async (emotion: Partial<EmotionResult>): Promi
   } catch (error) {
     console.error('Error creating emotion entry:', error);
     throw error;
+  }
+};
+
+export const analyzeEmotion = async (text: string): Promise<EmotionResult | null> => {
+  try {
+    // This would typically call an AI service or API endpoint
+    // For now, we'll create a mock implementation
+    const mockResult: EmotionResult = {
+      id: uuid(),
+      timestamp: new Date().toISOString(),
+      emotion: text.toLowerCase().includes('happy') ? 'joy' : 
+               text.toLowerCase().includes('sad') ? 'sadness' : 
+               text.toLowerCase().includes('angry') ? 'anger' : 'neutral',
+      intensity: 0.7,
+      confidence: 0.8,
+      source: 'text',
+    };
+    
+    return mockResult;
+  } catch (error) {
+    console.error('Error analyzing emotion:', error);
+    return null;
+  }
+};
+
+export const fetchEmotionHistory = async (userId: string, limit = 10): Promise<EmotionResult[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('emotions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('date', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    
+    if (data) {
+      return data.map(entry => ({
+        id: entry.id,
+        user_id: entry.user_id,
+        date: entry.date,
+        timestamp: entry.date,
+        score: entry.score,
+        emojis: entry.emojis,
+        text: entry.text,
+        audio_url: entry.audio_url,
+        ai_feedback: entry.ai_feedback,
+        emotion: entry.primary_emotion || 'neutral',
+        source: entry.source || 'manual',
+      }));
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Error fetching emotion history:', error);
+    return [];
   }
 };

@@ -1,60 +1,49 @@
 
-export interface GamificationStats {
-  level: number;
-  xp: number;
-  xpToNextLevel: number;
-  rank: string;
-  points: number;
-  streakDays: number;
-  longestStreak?: number;
-  completedChallenges: number;
-  unlockedBadges: number;
-  totalChallenges: number;
-  totalBadges: number;
-}
+import { Badge } from './badge';
 
 export interface Challenge {
   id: string;
   title: string;
-  name?: string;
   description: string;
+  points: number;
   progress: number;
   completed: boolean;
-  status?: 'active' | 'completed' | 'locked';
-  points?: number;
-  goal?: number;
-  total?: number;
-  difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
-  deadline?: string;
-  completions?: number;
-  tags?: string[];
-  category?: string;
-  completedAt?: string;
-}
-
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  imageUrl?: string;
-  unlocked?: boolean;
-  achieved?: boolean;
-  achievedAt?: string;
-  dateAchieved?: string;
-  progress?: number;
-  maxProgress?: number;
-  tier?: string;
-  total?: number;
-  category?: string;
-  icon?: React.ReactNode;
-  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  totalSteps?: number;
+  completedSteps?: number;
 }
 
 export interface LeaderboardEntry {
   id: string;
   name: string;
-  avatar: string;
   points: number;
   rank: number;
+  avatar?: string;
+  trend?: 'up' | 'down' | 'stable';
+  previousRank?: number;
+}
+
+export interface GamificationStats {
+  level: number;
+  points: number;
+  nextLevelPoints: number;
+  totalPoints: number;
+  rank: number;
+  challengesCompleted: number;
+  challenges: Challenge[];
+  streak: number;
+  badges: Badge[];
+  activeChallenges?: Challenge[];
+}
+
+export interface GamificationContextType {
+  stats: GamificationStats;
+  leaderboard: LeaderboardEntry[];
+  challenges: Challenge[];
+  badges: Badge[];
+  earnPoints: (points: number, reason?: string) => void;
+  completeChallenge: (challengeId: string) => void;
+  earnBadge: (badgeId: string) => void;
+  refreshStats: () => void;
+  isLoading: boolean;
+  error: Error | null;
 }

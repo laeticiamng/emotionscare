@@ -20,5 +20,16 @@ export interface ScanHistoryItem {
   source: ScanType;
 }
 
+export interface EmotionGamificationStats {
+  totalScans: number;
+  streakDays: number;
+  emotionDiversity: number;
+  topEmotion: string;
+  positiveRatio: number;
+  achievements: string[];
+  progress: number;
+  level: number;
+}
+
 export { EmotionResult };
 export type { TeamOverviewProps } from './emotion';

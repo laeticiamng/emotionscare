@@ -8,7 +8,7 @@ import {
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [filter, setFilter] = useState<NotificationFilter>('all');
+  const [filter, setFilter] = useState<NotificationFilter | 'all'>('all');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,6 +24,8 @@ export function useNotifications() {
           type: 'system',
           read: false,
           created_at: new Date().toISOString(),
+          timestamp: new Date().toISOString(),
+          user_id: 'current-user'
         },
         {
           id: '2',
@@ -32,6 +34,8 @@ export function useNotifications() {
           type: 'emotion',
           read: true,
           created_at: new Date(Date.now() - 86400000).toISOString(),
+          timestamp: new Date(Date.now() - 86400000).toISOString(),
+          user_id: 'current-user'
         },
         {
           id: '3',
@@ -40,6 +44,8 @@ export function useNotifications() {
           type: 'badge', 
           read: false,
           created_at: new Date(Date.now() - 172800000).toISOString(),
+          timestamp: new Date(Date.now() - 172800000).toISOString(),
+          user_id: 'current-user'
         }
       ];
       
@@ -81,7 +87,10 @@ export function useNotifications() {
   const filteredNotifications = notifications.filter(notification => {
     if (filter === 'all') return true;
     if (filter === 'unread') return !notification.read;
-    return notification.type === filter;
+    if (typeof filter === 'object' && filter.type) {
+      return filter.type === 'all' ? true : notification.type === filter.type;
+    }
+    return true;
   });
 
   const unreadCount = notifications.filter(n => !n.read).length;

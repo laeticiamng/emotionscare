@@ -7,19 +7,19 @@ export const useAmbientSound = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.3);
   const [soundType, setSoundType] = useState<'nature' | 'ambient' | 'space'>('ambient');
-  const { userPreferences } = useUserPreferences();
+  const { preferences } = useUserPreferences();
   const music = useMusic();
 
-  // Charger les préférences utilisateur
+  // Load user preferences
   useEffect(() => {
-    if (userPreferences) {
-      setVolume(userPreferences.soundVolume || 0.3);
-      setSoundType(userPreferences.ambientSoundType || 'ambient');
-      setIsPlaying(userPreferences.ambientSoundEnabled || false);
+    if (preferences) {
+      setVolume(preferences.soundVolume || 0.3);
+      setSoundType(preferences.ambientSoundType || 'ambient');
+      setIsPlaying(preferences.ambientSoundEnabled || false);
     }
-  }, [userPreferences]);
+  }, [preferences]);
 
-  // Contrôler la lecture
+  // Control playback
   const togglePlaying = () => {
     setIsPlaying(!isPlaying);
   };
