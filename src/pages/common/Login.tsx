@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,17 +20,6 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, clearError, isAuthenticated, user } = useAuth();
-  
-  // Check if user is already authenticated when the component mounts
-  useEffect(() => {
-    // Only redirect if authenticated AND on first mount (not after login attempts)
-    if (isAuthenticated && user) {
-      const from = location.state?.from?.pathname || getRoleRoute(user.role);
-      // Add a small delay to prevent immediate redirect issues
-      const timer = setTimeout(() => navigate(from), 100);
-      return () => clearTimeout(timer);
-    }
-  }, []);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

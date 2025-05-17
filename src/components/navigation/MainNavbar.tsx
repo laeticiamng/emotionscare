@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 
 const MainNavbar: React.FC = () => {
   const navigate = useNavigate();
@@ -30,11 +29,11 @@ const MainNavbar: React.FC = () => {
         </nav>
         
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
+          <Button variant="outline" size="sm" onClick={() => navigate('/b2c/login')}>
             Connexion
           </Button>
-          <Button size="sm" onClick={() => navigate('/dashboard')}>
-            Démarrer
+          <Button size="sm" onClick={() => navigate('/b2c/register')}>
+            Inscription
           </Button>
         </div>
       </div>

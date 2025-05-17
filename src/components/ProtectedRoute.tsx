@@ -25,7 +25,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // If not authenticated and trying to access a protected route, redirect to login
   if (!isAuthenticated) {
-    return <Navigate to={redirectTo || '/login'} state={{ from: location }} />;
+    return <Navigate to={redirectTo || '/b2c/login'} state={{ from: location }} />;
   }
 
   // If role is required and user doesn't have it, redirect to unauthorized

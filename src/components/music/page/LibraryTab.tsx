@@ -23,6 +23,7 @@ const LibraryTab: React.FC<LibraryTabProps> = ({
         playlists={playlists} 
         onTrackSelect={onSelectTrack}
         currentTrack={null}
+        onPlaylistSelect={onSelectPlaylist}
       />
     </div>
   );
