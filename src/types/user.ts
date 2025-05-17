@@ -1,51 +1,74 @@
 
-import { NotificationPreference } from './notification';
+export type UserRole = 'user' | 'admin' | 'b2b_user' | 'b2b_admin' | 'b2c';
 
 export interface User {
   id: string;
-  name?: string;
   email: string;
-  avatar?: string;
-  avatarUrl?: string;
-  avatar_url?: string;
+  name: string;
   role: UserRole;
-  preferences?: UserPreferences;
-  teams?: string[];
+  created_at: string;
+  isActive?: boolean;
+  job_title?: string;
   department?: string;
-  position?: string;
-  location?: string;
-  status?: 'active' | 'inactive' | 'pending' | 'blocked';
-  emotional_score?: number;
-  emotionalScore?: number;
-  joined_at?: string;
-  created_at?: string;
+  notifications_enabled?: boolean;
 }
-
-export type UserRole = 'admin' | 'user' | 'manager' | 'viewer' | 'coach' | 'b2c' | 'b2b_admin' | 'b2b_user';
 
 export interface UserPreferences {
-  theme: 'light' | 'dark' | 'system' | 'pastel';
-  fontSize: FontSize;
-  fontFamily: FontFamily;
-  reduceMotion: boolean;
-  colorBlindMode: boolean;
-  autoplayMedia: boolean;
-  soundEnabled: boolean;
-  language?: string;
-  dashboardLayout?: string;
-  onboardingCompleted?: boolean;
-  notifications: NotificationPreference;
-  privacy: {
-    shareData: boolean;
-    anonymizeReports: boolean;
-    profileVisibility: 'public' | 'team' | 'private';
-  };
+  theme: 'light' | 'dark' | 'system';
+  language: string;
+  notifications_enabled: boolean;
+  email_notifications: boolean;
 }
 
-export type FontFamily = 'system' | 'serif' | 'mono' | 'sans' | 'inter';
-export type FontSize = 'small' | 'medium' | 'large';
+export interface UserWithStatus {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  status: 'active' | 'inactive' | 'pending';
+  last_active?: string;
+  department?: string;
+  firstName?: string;
+  lastName?: string;
+}
 
-export interface UserPreferencesContextType {
-  preferences: UserPreferences;
-  updatePreferences: (preferences: Partial<UserPreferences>) => void;
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl?: string;
+  image_url?: string;
+  unlocked: boolean;
+  level: number;
+  category: string;
+  tier?: string;
+  icon?: string;
+  earned?: boolean;
+  progress?: number;
+  threshold?: number;
+  completed?: boolean;
+  rarity?: string;
+}
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  points: number;
+  progress: number;
+  goal: number;
+  category: string;
+  completed: boolean;
+  status: string;
+  name?: string;
+  totalSteps?: number;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  points: number;
+  rank: number;
+  avatar?: string;
+  name?: string;
 }

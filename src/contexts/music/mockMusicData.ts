@@ -11,6 +11,8 @@ export const mockMusicTracks: MusicTrack[] = [
     duration: 180,
     url: 'https://example.com/sounds/calm-waters.mp3',
     coverUrl: 'https://example.com/images/calm-waters.jpg',
+    coverImage: 'https://example.com/images/calm-waters.jpg',
+    cover: 'https://example.com/images/calm-waters.jpg',
     genre: 'ambient',
     emotion: 'calm',
     description: 'Relaxing sounds of gentle waves on a peaceful shore'
@@ -23,6 +25,8 @@ export const mockMusicTracks: MusicTrack[] = [
     duration: 210,
     url: 'https://example.com/sounds/morning-energy.mp3',
     coverUrl: 'https://example.com/images/sunrise.jpg',
+    coverImage: 'https://example.com/images/sunrise.jpg',
+    cover: 'https://example.com/images/sunrise.jpg',
     genre: 'uplifting',
     emotion: 'energized',
     description: 'Start your day with this energetic composition'
@@ -35,6 +39,8 @@ export const mockMusicTracks: MusicTrack[] = [
     duration: 240,
     url: 'https://example.com/sounds/deep-focus.mp3',
     coverUrl: 'https://example.com/images/focus.jpg',
+    coverImage: 'https://example.com/images/focus.jpg',
+    cover: 'https://example.com/images/focus.jpg',
     genre: 'electronic',
     emotion: 'focused',
     description: 'Enhanced concentration with deep electronic beats'
@@ -80,3 +86,11 @@ export const mockPlaylists: MusicPlaylist[] = [
     emotion: 'mixed'
   }
 ];
+
+// Helper function to get mock music data
+export const getMockMusicData = () => {
+  return {
+    mockMusicTracks,
+    mockPlaylists
+  };
+};

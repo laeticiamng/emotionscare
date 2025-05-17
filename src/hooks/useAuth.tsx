@@ -16,7 +16,8 @@ const mockUser: User = {
   name: "John Doe",
   role: "user",
   created_at: new Date().toISOString(),
-  isActive: true
+  isActive: true,
+  job_title: "Software Developer" // Adding job_title for B2B layouts
 };
 
 // Création du contexte

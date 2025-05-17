@@ -4,13 +4,17 @@ import { AudioTrack, AudioPlaylist, EmotionMusicParams } from './audio';
 
 // Extended music track with additional properties
 export interface MusicTrack extends AudioTrack {
+  coverImage?: string;
+  cover?: string;
   description?: string;
+  category?: string;
 }
 
 // Extended music playlist with additional properties
 export interface MusicPlaylist extends AudioPlaylist {
   name?: string;
   title?: string;
+  category?: string;
 }
 
 export type { EmotionMusicParams };
@@ -53,6 +57,8 @@ export interface MusicDrawerProps {
   isOpen?: boolean;
   playlist?: MusicPlaylist | null;
   currentTrack?: MusicTrack | null;
+  children?: React.ReactNode;
+  side?: "left" | "right" | "top" | "bottom";
 }
 
 export interface MusicLibraryProps {

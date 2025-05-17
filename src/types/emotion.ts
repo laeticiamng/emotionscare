@@ -1,129 +1,42 @@
 
-export interface EmotionValues {
-  joy?: number;
-  calm?: number;
-  sadness?: number;
-  anxiety?: number;
-  anger?: number;
-  fear?: number;
-  surprise?: number;
-  disgust?: number;
-  neutral?: number;
-  [key: string]: number | undefined;
-}
-
 export interface EmotionResult {
   id: string;
-  user_id?: string;
-  userId?: string;
-  date?: string;
-  timestamp?: string;
-  score?: number;
-  emojis?: string | string[];
-  text?: string;
-  audio_url?: string;
-  audioUrl?: string;
-  ai_feedback?: string;
-  feedback?: string;
-  primary_emotion?: string;
   emotion: string;
-  emotions?: EmotionValues;
+  score: number;
   confidence: number;
-  intensity?: number;
-  transcript?: string;
-  recommendations?: string[];
-  source?: 'text' | 'facial' | 'audio' | 'manual' | 'emoji' | 'voice';
-  details?: Record<string, number>;
-  duration?: number;
-  facialExpression?: string;
-  textInput?: string;
-  category?: string; 
+  text: string;
+  emojis: string[];
+  recommendations: string[];
+  secondary_emotion?: string;
+  secondary_score?: number;
 }
 
-export interface EnhancedEmotionResult extends EmotionResult {
-  dominantEmotion: {
-    name: string;
-    score: number;
-  }
-}
-
-export interface LiveVoiceScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  onFinish?: () => void;
-  automaticMode?: boolean;
-  instruction?: string;
-  buttonText?: string;
-  onEmotionDetected?: (emotion: EmotionResult) => void;
-  language?: string;
-  autoStart?: boolean;
-  duration?: number;
-  className?: string;
-  withAI?: boolean;
-  onError?: (error: string) => void;
-  continuous?: boolean;
-}
-
-export interface TeamOverviewProps {
-  teamId?: string;
-  period?: 'day' | 'week' | 'month';
-  userId?: string;
-  anonymized?: boolean;
-  className?: string;
-  dateRange?: any;
-  users?: any[];
-  showNames?: boolean;
-  compact?: boolean;
-}
-
-export interface EmotionalTeamViewProps {
-  teamId: string;
-  dateRange?: [Date, Date];
-  departments?: string[];
-  showIndividuals?: boolean;
-  compact?: boolean;
-  period?: 'day' | 'week' | 'month';
-  anonymized?: boolean;
-  showGraph?: boolean;
-  showMembers?: boolean;
-  className?: string;
-}
-
-export type Emotion = 
-  'joy' | 
-  'sadness' | 
-  'anger' | 
-  'fear' | 
-  'disgust' | 
-  'surprise' | 
-  'trust' | 
-  'anticipation' |
-  'calm' |
-  'anxiety' |
-  'neutral';
-
-export interface EmotionInterface {
+export interface EmotionHistory {
   id: string;
-  name: string;  
-  label: string;
-  color: string;
-  intensity: number;
-  icon?: string;
-  emoji?: string;
-  emotion?: string;
-  user_id?: string;
-  date?: string;
-  score?: number;
-  confidence: number;
-  text?: string;
-  feedback?: string;
-  transcript?: string;
-  timestamp?: string;
-  source?: string;
-  audioUrl?: string;
-  textInput?: string;
-  facialExpression?: string;
-  category?: string;
+  date: string;
+  emotion: string;
+  score: number;
+  note?: string;
 }
 
-// Exporter EmotionalData
-export * from './emotional-data';
+export interface EmotionAnalytics {
+  dominant: string;
+  frequency: Record<string, number>;
+  trends: {
+    emotion: string;
+    values: number[];
+    dates: string[];
+  }[];
+  recent: EmotionHistory[];
+}
+
+export interface EmotionScan {
+  id: string;
+  timestamp: string;
+  primary_emotion: string;
+  secondary_emotion?: string;
+  confidence: number;
+  source: 'facial' | 'voice' | 'text';
+  notes?: string;
+  emoji?: string;
+}

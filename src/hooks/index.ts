@@ -1,44 +1,47 @@
 
-// Export des hooks personnalisés centralisé
-// Ce fichier sert de point d'entrée unique pour tous les hooks de l'application
+// Auth hooks
+export { useAuth } from './useAuth';
+export { default as usePasswordReset } from './usePasswordReset';
+export { default as useLoginForm } from './useLoginForm';
 
-// Hooks d'authentification
-export { default as useAuth } from './useAuth';
-// Les hooks suivants seront implémentés plus tard au besoin
-// export { default as useSession } from './useSession';
-// export { default as useAuthForm } from './useAuthForm';
+// UI state hooks
+export { default as useLocalStorage } from './useLocalStorage';
+export { default as useMediaQuery } from './useMediaQuery';
+export { default as useModal } from './useModal';
+export { default as useOnboardingState } from './useOnboardingState';
+export { default as useTheme } from './useTheme';
+export { default as useToast } from './use-toast';
 
-// Hooks d'interface utilisateur
-export { useToast, toast } from './use-toast';
-// Les hooks suivants seront implémentés plus tard au besoin
-// export { default as useMediaQuery } from './useMediaQuery';
-// export { default as useLocalStorage } from './useLocalStorage';
-// export { default as useCopyToClipboard } from './useCopyToClipboard';
-// export { default as useDebounce } from './useDebounce';
-// export { default as useThrottle } from './useThrottle';
-// export { default as useClickOutside } from './useClickOutside';
-// export { default as useKeyPress } from './useKeyPress';
-// export { default as useAudioRecorder } from './useAudioRecorder';
+// Feature-specific hooks
+export { default as useActivityData } from './useActivityData';
+export { default as useAIAssistant } from './useAIAssistant';
+export { default as useEmotion } from './useEmotion';
+export { default as useEmotionAnalytics } from './useEmotionAnalytics';
+export { default as useGamification } from './useGamification';
+export { default as useJournal } from './useJournal';
+export { default as useMeditation } from './useMeditation';
+export { default as useMusicPlaylist } from './useMusicPlaylist';
+export { default as useMusicService } from './useMusicService';
+export { default as usePlaylistManager } from './usePlaylistManager';
+export { default as useScanHistory } from './useScanHistory';
+export { default as useScanResults } from './useScanResults';
+export { default as useSubscription } from './useSubscription';
+export { default as useUserSettings } from './useUserSettings';
+export { default as useVoiceInput } from './useVoiceInput';
+export { default as useVoiceRecognition } from './useVoiceRecognition';
 
-// Hooks d'API et de données
-export * from './api';
-// Les hooks suivants seront implémentés plus tard au besoin
-// export { default as useUserData } from './useUserData';
-// export { default as useInvitations } from './useInvitations';
-// export { default as useFetchData } from './useFetchData';
-// export { default as useQueryParams } from './useQueryParams';
-// export { default as useSocket } from './useSocket';
-// export { default as useInfiniteScroll } from './useInfiniteScroll';
+// API hooks
+export * from './api/useCoachChat';
+export * from './api/useEmotionAPI';
+export * from './api/useFacialExpression';
+export * from './api/useMusicGen';
+export * from './api/useVoiceAnalysis';
 
-// Hooks spécifiques aux fonctionnalités
-// export * from './chat';
-// export * from './emotion';
-// export * from './journal';
-export * from './community-gamification';
-// export * from './vr';
+// Remove incorrect import
+// export * from './community-gamification';
 
-// Hooks d'interface pour l'application
-// export { default as useAppSettings } from './useAppSettings';
-// export { default as useOnboarding } from './useOnboarding';
-// export { default as useNotificationPermission } from './useNotificationPermission';
-// export { default as useTemporaryState } from './useTemporaryState';
+// User mode hooks
+export { default as useUserModeHelpers } from './useUserModeHelpers';
+
+// Typescript types
+export * from './types';

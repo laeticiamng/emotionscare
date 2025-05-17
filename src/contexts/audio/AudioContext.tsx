@@ -7,6 +7,7 @@ interface AudioContextType {
   toggleMute: () => void;
   setVolume: (value: number) => void;
   playSound: (soundUrl: string, options?: { volume?: number }) => void;
+  playTrack?: (track: any) => void;
 }
 
 const AudioContext = createContext<AudioContextType>({
@@ -55,6 +56,13 @@ export const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       console.error("Error creating audio element:", error);
     }
   };
+
+  // Simple playTrack method for compatibility
+  const playTrack = (track: any) => {
+    if (track && track.url) {
+      playSound(track.url);
+    }
+  };
   
   return (
     <AudioContext.Provider value={{
@@ -63,6 +71,7 @@ export const AudioProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       toggleMute,
       setVolume: handleVolumeChange,
       playSound,
+      playTrack
     }}>
       {children}
     </AudioContext.Provider>

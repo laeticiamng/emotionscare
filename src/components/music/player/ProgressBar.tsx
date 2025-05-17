@@ -1,7 +1,15 @@
 
 import React, { useCallback } from 'react';
 import { Slider } from '@/components/ui/slider';
-import { ProgressBarProps } from '@/types/music';
+
+export interface ProgressBarProps {
+  currentTime: number;
+  duration: number;
+  onSeek: (time: number) => void;
+  formatTime?: (seconds: number) => string;
+  className?: string;
+  showTimestamps?: boolean;
+}
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
   currentTime,

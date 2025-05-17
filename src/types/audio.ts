@@ -11,6 +11,8 @@ export interface AudioTrack {
   genre?: string;
   emotion?: string;
   description?: string;
+  coverImage?: string;
+  cover?: string;
 }
 
 export interface AudioPlaylist {

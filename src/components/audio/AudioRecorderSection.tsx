@@ -1,11 +1,9 @@
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Mic, Square, Save, Trash2 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import React, { useState, useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Mic, Square, Save, Trash } from "lucide-react";
 import { useToast } from '@/hooks/use-toast';
+import { AudioTrack } from '@/types/audio';
 
 const AudioRecorderSection: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -76,6 +74,9 @@ const AudioRecorderSection: React.FC = () => {
   return (
     <div className="space-y-6">
       <Card className="bg-card">
+        <CardHeader>
+          <CardTitle>Enregistrement audio</CardTitle>
+        </CardHeader>
         <CardContent className="pt-6 text-center">
           <div className="mb-4">
             <div className={`inline-flex items-center justify-center h-24 w-24 rounded-full ${isRecording ? 'bg-red-100 dark:bg-red-900/30' : 'bg-secondary'}`}>
@@ -128,7 +129,7 @@ const AudioRecorderSection: React.FC = () => {
           </CardContent>
           <CardFooter className="justify-between">
             <Button variant="outline" onClick={handleCancel}>
-              <Trash2 className="h-4 w-4 mr-2" />
+              <Trash className="h-4 w-4 mr-2" />
               Annuler
             </Button>
             <Button onClick={handleSave}>

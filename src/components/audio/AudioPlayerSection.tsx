@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Play, SkipBack, SkipForward, Pause, Volume2, VolumeX } from 'lucide-react';
-import { Slider } from '@/components/ui/slider';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAudio } from '@/contexts/AudioContext';
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { AudioTrack } from '@/types/audio';
+import { useAudio } from '@/contexts/audio/AudioContext';
 import { useToast } from '@/hooks/use-toast';
 
 const AudioPlayerSection: React.FC = () => {

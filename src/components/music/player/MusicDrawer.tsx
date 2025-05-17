@@ -1,125 +1,127 @@
 
 import React from 'react';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerClose,
-} from "@/components/ui/drawer";
-import { Button } from '@/components/ui/button';
-import { MusicDrawerProps } from '@/types/music';
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { MusicTrack, MusicPlaylist, MusicDrawerProps } from '@/types/music';
+import { useMusic } from '@/contexts/music';
+import { Card } from '@/components/ui/card';
+import TrackInfo from './TrackInfo';
+import PlayerControls from './MusicControls';
+import ProgressBar from './ProgressBar';
+import VolumeControl from './VolumeControl';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({
-  open,
+  children,
+  isOpen,
+  onOpenChange,
   onClose,
-  isOpen, // Compatible property
-  onOpenChange, // Compatible property
   playlist,
-  currentTrack
+  currentTrack,
+  side = "right"
 }) => {
-  // Use either isOpen or open prop
-  const isDrawerOpen = isOpen !== undefined ? isOpen : open;
+  const {
+    currentTrack: contextTrack,
+    playlist: contextPlaylist,
+    isPlaying,
+    togglePlay,
+    prevTrack,
+    nextTrack,
+    volume,
+    setVolume,
+    currentTime,
+    duration,
+    seekTo,
+    muted,
+    toggleMute,
+    openDrawer,
+    setOpenDrawer
+  } = useMusic();
+
+  // Use props or context values
+  const activeTrack = currentTrack || contextTrack;
+  const activePlaylist = playlist || contextPlaylist;
+  const isOpened = isOpen !== undefined ? isOpen : openDrawer;
   
-  // Helper function to get playlist name/title safely
-  const getPlaylistTitle = () => {
-    if (!playlist) return '';
-    if (typeof playlist === 'object' && 'tracks' in playlist) {
-      return playlist.title || playlist.name || '';
+  const handleOpenChange = (open: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(open);
+    } else {
+      setOpenDrawer(open);
     }
-    return '';
+    
+    if (!open && onClose) {
+      onClose();
+    }
   };
-  
-  // Helper function to get tracks safely
-  const getTracks = () => {
-    if (!playlist) return [];
-    if (Array.isArray(playlist)) {
-      return playlist;
-    }
-    if (typeof playlist === 'object' && 'tracks' in playlist) {
-      return playlist.tracks;
-    }
-    return [];
-  };
-  
+
   return (
-    <Drawer open={isDrawerOpen} onOpenChange={onOpenChange || onClose}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Music Player</DrawerTitle>
-          <DrawerDescription>
-            {playlist ? `Playing from ${getPlaylistTitle()}` : 'Current track'}
-          </DrawerDescription>
-        </DrawerHeader>
-        
-        <div className="p-4">
-          {currentTrack ? (
-            <div className="flex flex-col items-center">
-              <div className="w-32 h-32 bg-muted rounded-lg overflow-hidden mb-4">
-                {(currentTrack.coverUrl || currentTrack.coverImage) ? (
-                  <img 
-                    src={currentTrack.coverUrl || currentTrack.coverImage} 
-                    alt={`Cover for ${currentTrack?.title}`}
-                    className="object-cover w-full h-full"
+    <Dialog open={isOpened} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <div className="flex flex-col gap-4 p-2">
+          {/* Track info */}
+          {activeTrack && (
+            <Card className="p-4">
+              <div className="flex flex-col space-y-4">
+                <div className="text-center">
+                  {activeTrack.coverUrl || activeTrack.coverImage || activeTrack.cover ? (
+                    <img 
+                      src={activeTrack.coverUrl || activeTrack.coverImage || activeTrack.cover} 
+                      alt={activeTrack.title}
+                      className="mx-auto h-40 w-40 object-cover rounded-md"
+                    />
+                  ) : (
+                    <div className="mx-auto h-40 w-40 bg-muted flex items-center justify-center rounded-md">
+                      <span className="text-4xl">♪</span>
+                    </div>
+                  )}
+                </div>
+                
+                <TrackInfo track={activeTrack} />
+                
+                {/* Playback controls */}
+                <div className="space-y-4">
+                  <ProgressBar 
+                    currentTime={currentTime} 
+                    duration={duration} 
+                    onSeek={seekTo} 
+                    showTimestamps={true}
                   />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                    ♪
+                  
+                  <div className="flex flex-col space-y-2">
+                    <PlayerControls 
+                      isPlaying={isPlaying}
+                      onPlay={togglePlay}
+                      onPause={togglePlay}
+                      onPrevious={prevTrack}
+                      onNext={nextTrack}
+                    />
+                    
+                    <VolumeControl 
+                      volume={volume}
+                      isMuted={muted}
+                      onVolumeChange={setVolume}
+                      onMuteToggle={toggleMute}
+                      className="w-full justify-end"
+                      showLabel={true}
+                    />
                   </div>
-                )}
+                </div>
               </div>
-              
-              <div className="text-center mb-6">
-                <h3 className="font-medium">{currentTrack.title}</h3>
-                <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No track currently playing
-            </div>
+            </Card>
           )}
           
-          {playlist && getTracks().length > 0 && (
-            <div className="mt-4">
-              <h4 className="font-medium mb-2">Playlist: {getPlaylistTitle()}</h4>
-              <div className="max-h-[200px] overflow-y-auto">
-                {getTracks().map((track) => (
-                  <div 
-                    key={track.id}
-                    className={`flex items-center p-2 rounded ${
-                      currentTrack?.id === track.id ? 'bg-secondary/50' : 'hover:bg-muted/50'
-                    } cursor-pointer mb-1`}
-                  >
-                    <div className="w-8 h-8 bg-muted/50 rounded overflow-hidden mr-3">
-                      {(track.coverUrl || track.coverImage) && (
-                        <img 
-                          src={track.coverUrl || track.coverImage} 
-                          alt={track.title} 
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm truncate">{track.title}</div>
-                      <div className="text-xs text-muted-foreground truncate">{track.artist}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* Playlist tracks list */}
+          {activePlaylist && activePlaylist.tracks && activePlaylist.tracks.length > 0 && (
+            <div className="max-h-80 overflow-y-auto">
+              <h3 className="font-medium mb-2">
+                {activePlaylist.title || activePlaylist.name || "Current Playlist"}
+              </h3>
+              {/* Render playlist tracks here */}
+              {children}
             </div>
           )}
         </div>
-        
-        <DrawerFooter>
-          <DrawerClose asChild>
-            <Button variant="outline" onClick={onClose}>Close</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   );
 };
 
