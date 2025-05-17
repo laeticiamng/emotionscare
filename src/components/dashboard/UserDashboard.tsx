@@ -17,7 +17,9 @@ const UserDashboard = () => {
       achieved: true,
       earnedAt: '2023-05-10',
       earned: true,
-      category: 'engagement'
+      category: 'engagement',
+      icon: '🧭',
+      level: 1
     },
     {
       id: '2',
@@ -29,9 +31,10 @@ const UserDashboard = () => {
       achieved: true,
       earned: true,
       progress: 10,
-      maxProgress: 10,
       threshold: 10,
-      category: 'mindfulness'
+      category: 'mindfulness',
+      icon: '🧘‍♂️',
+      level: 2
     },
     {
       id: '3',
@@ -43,9 +46,10 @@ const UserDashboard = () => {
       achieved: false,
       earned: false,
       progress: 3,
-      maxProgress: 5,
       threshold: 5,
-      category: 'social'
+      category: 'social',
+      icon: '🤝',
+      level: 1
     }
   ];
   

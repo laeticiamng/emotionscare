@@ -3,8 +3,8 @@
 
 export { ThemeProvider, useTheme, ThemeContext, type ThemeContextType } from './ThemeContext';
 export { UserPreferencesProvider, useUserPreferences, UserPreferencesContext } from './UserPreferencesContext';
-export { UserModeProvider, useUserMode, default as UserModeContext } from './UserModeContext';
-export { LayoutProvider, useLayout, default as LayoutContext } from './LayoutContext';
+export { UserModeProvider, useUserMode, UserModeContext } from './UserModeContext';
+export { LayoutProvider, useLayout, LayoutContext } from './LayoutContext';
 export { SidebarProvider, useSidebar } from './SidebarContext';
 export { AuthProvider, useAuth } from './AuthContext';
 export { AudioProvider, useAudio, AudioContext } from './AudioContext';

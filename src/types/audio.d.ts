@@ -33,9 +33,9 @@ export interface AudioPlayerState {
   isMuted: boolean;
   progress: number;
   duration: number;
-  playlist: AudioTrack[]; // Ajouté pour corriger les erreurs
-  repeatMode: 'off' | 'one' | 'all'; // Ajouté pour corriger les erreurs
-  shuffleMode: boolean; // Ajouté pour corriger les erreurs
+  playlist: AudioTrack[];
+  repeatMode: 'off' | 'one' | 'all';
+  shuffleMode: boolean;
 }
 
 export interface AudioContextValue {

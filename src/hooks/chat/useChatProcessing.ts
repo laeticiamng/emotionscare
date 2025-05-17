@@ -18,7 +18,9 @@ export function useChatProcessing() {
       const userMessage: ChatMessage = {
         id: uuidv4(),
         content: message,
+        text: message,
         sender: 'user',
+        role: 'user',
         timestamp: new Date().toISOString()
       };
       
@@ -29,7 +31,9 @@ export function useChatProcessing() {
       const aiMessage: ChatMessage = {
         id: uuidv4(),
         content: aiResponse.content || aiResponse.message || '',
+        text: aiResponse.content || aiResponse.message || '',
         sender: 'assistant',
+        role: 'assistant',
         timestamp: new Date().toISOString()
       };
       
@@ -41,7 +45,9 @@ export function useChatProcessing() {
       const errorMessage: ChatMessage = {
         id: uuidv4(),
         content: 'Sorry, an error occurred. Please try again.',
+        text: 'Sorry, an error occurred. Please try again.',
         sender: 'assistant',
+        role: 'assistant',
         timestamp: new Date().toISOString()
       };
       
@@ -49,7 +55,9 @@ export function useChatProcessing() {
         {
           id: uuidv4(),
           content: message,
+          text: message,
           sender: 'user',
+          role: 'user',
           timestamp: new Date().toISOString()
         }, 
         errorMessage

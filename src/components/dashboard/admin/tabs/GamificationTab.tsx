@@ -1,73 +1,77 @@
-
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Challenge, Badge as BadgeType } from '@/types/gamification';
+import { Challenge } from '@/types/challenge';
+import { Badge } from '@/types/badge';
 
 const GamificationTab: React.FC = () => {
-  // Mock data - in a real app, this would come from an API
+  // Sample challenges - in a real app, these would be fetched
   const challenges: Challenge[] = [
     {
       id: '1',
-      title: 'Journal quotidien',
-      name: 'Journal quotidien',
-      description: 'Remplissez votre journal émotionnel chaque jour pendant une semaine',
+      title: 'Goal Crusher',
+      name: 'Goal Crusher',
+      description: 'Complete your weekly well-being objective',
       progress: 100,
       completed: true,
       status: 'completed',
       points: 50,
-      difficulty: 'easy',
-      category: 'journal',
-      tags: ['journal', 'quotidien']
+      difficulty: 'medium',
+      category: 'wellness',
+      tags: ['weekly', 'wellbeing'],
+      goal: '7 days streak'
     },
     {
       id: '2',
-      title: 'Méditation matinale',
-      name: 'Méditation matinale',
-      description: 'Effectuez une méditation de 5 minutes chaque matin pendant 5 jours',
+      title: 'Social Butterfly',
+      name: 'Social Butterfly',
+      description: 'Connect with 5 team members in the community',
       progress: 60,
       completed: false,
-      status: 'active',
-      points: 100,
-      difficulty: 'medium',
-      category: 'meditation',
-      tags: ['méditation', 'matin']
+      status: 'in-progress',
+      points: 75,
+      difficulty: 'hard',
+      category: 'social',
+      tags: ['community', 'connection'],
+      goal: 'Connect with 5 members'
     }
   ];
 
-  const badges: BadgeType[] = [
+  // Sample badges - in a real app, these would be fetched
+  const badges: Badge[] = [
     {
       id: '1',
-      name: 'Maître de la pleine conscience',
-      description: 'Vous avez pratiqué 30 jours de méditation',
-      image: '/images/badges/mindfulness-master.svg',
-      imageUrl: '/images/badges/mindfulness-master.svg',
+      name: 'Emotional Guardian',
+      description: 'Maintained positive emotional balance for 30 days',
+      image: '/badges/emotional-guardian.png',
+      imageUrl: '/badges/emotional-guardian.png',
       achieved: true,
       unlocked: true,
-      earnedAt: '2023-05-10T14:30:00Z',
+      earnedAt: '2023-07-15',
       earned: true,
       tier: 'gold',
-      category: 'méditation'
+      category: 'emotional',
+      icon: '👑',
+      level: 3
     },
     {
       id: '2',
-      name: 'Explorateur émotionnel',
-      description: 'Vous avez identifié 20 émotions différentes',
-      image: '/images/badges/emotion-explorer.svg',
-      imageUrl: '/images/badges/emotion-explorer.svg',
+      name: 'Team Supporter',
+      description: 'Helped improve team emotional score by 15%',
+      image: '/badges/team-supporter.png',
+      imageUrl: '/badges/team-supporter.png',
       achieved: false,
       unlocked: false,
-      earned: false,
-      progress: 12,
-      maxProgress: 20,
-      total: 20,
       tier: 'silver',
-      category: 'émotions'
+      category: 'team',
+      progress: 70,
+      threshold: 100,
+      icon: '🤝',
+      level: 2
     }
   ];
 
   return (
     <div className="space-y-6">
+      <h2 className="text-2xl font-semibold">Gamification</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardContent className="p-6">

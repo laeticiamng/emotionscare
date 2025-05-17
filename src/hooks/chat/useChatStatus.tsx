@@ -1,135 +1,76 @@
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
 
-/**
- * Hook pour gérer le statut du chat (chargement, erreur, etc.)
- */
-export function useChatStatus() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export const useChatStatus = () => {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   
-  // Process sending a message
-  const sendMessage = useCallback(
-    (
-      text: string,
-      addUserMessage: (message: ChatMessage) => void,
-      addBotMessage: (message: ChatMessage) => void,
-      processMessage: (text: string) => Promise<string>,
-      onComplete?: () => void
-    ) => {
-      // Add user message
-      const userMessage: ChatMessage = {
-        id: Date.now().toString(),
-        text,
-        content: text,
-        sender: 'user',
-        conversation_id: 'default',
-        timestamp: new Date().toISOString()
-      };
-      addUserMessage(userMessage);
-      
-      // Process the message
-      setIsLoading(true);
-      setError(null);
-      
-      processMessage(text)
-        .then((response) => {
-          // Add bot response
-          const botMessage: ChatMessage = {
-            id: (Date.now() + 1).toString(),
-            text: response,
-            content: response,
-            sender: 'bot',
-            conversation_id: 'default',
-            timestamp: new Date().toISOString()
-          };
-          addBotMessage(botMessage);
-        })
-        .catch((err) => {
-          console.error('Error processing message:', err);
-          setError('Failed to process message');
-          
-          // Add error message
-          const errorMessage: ChatMessage = {
-            id: (Date.now() + 1).toString(),
-            text: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
-            content: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
-            sender: 'bot',
-            conversation_id: 'default',
-            timestamp: new Date().toISOString()
-          };
-          addBotMessage(errorMessage);
-        })
-        .finally(() => {
-          setIsLoading(false);
-          if (onComplete) onComplete();
-        });
-    },
-    []
-  );
+  const toggleChat = () => {
+    setIsChatOpen(!isChatOpen);
+    if (!isChatOpen) {
+      // Reset unread count when opening chat
+      setUnreadMessages(0);
+    }
+  };
   
-  // Process regenerating a response
-  const regenerateResponse = useCallback(
-    (
-      messages: ChatMessage[],
-      addBotMessage: (message: ChatMessage) => void,
-      processMessage: (text: string) => Promise<string>
-    ) => {
-      // Find the last user message
-      const lastUserMessage = [...messages]
-        .reverse()
-        .find((msg) => msg.sender === 'user');
-      
-      if (!lastUserMessage) {
-        setError('No message to regenerate');
-        return;
-      }
-      
-      // Process the message
-      setIsLoading(true);
-      setError(null);
-      
-      processMessage(lastUserMessage.text || lastUserMessage.content || '')
-        .then((response) => {
-          // Add bot response
-          const botMessage: ChatMessage = {
-            id: Date.now().toString(),
-            text: response,
-            content: response,
-            sender: 'bot',
-            conversation_id: 'default',
-            timestamp: new Date().toISOString()
-          };
-          addBotMessage(botMessage);
-        })
-        .catch((err) => {
-          console.error('Error regenerating response:', err);
-          setError('Failed to regenerate response');
-          
-          // Add error message
-          const errorMessage: ChatMessage = {
-            id: Date.now().toString(),
-            text: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
-            content: "Je suis désolé, une erreur s'est produite. Veuillez réessayer plus tard.",
-            sender: 'bot',
-            conversation_id: 'default',
-            timestamp: new Date().toISOString()
-          };
-          addBotMessage(errorMessage);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    },
-    []
-  );
+  const startTyping = () => setIsTyping(true);
+  const stopTyping = () => setIsTyping(false);
+  
+  const createSystemMessage = (text: string, conversationId: string): ChatMessage => {
+    return {
+      id: uuidv4(),
+      text,
+      content: text,
+      sender: 'system',
+      role: 'system',
+      conversation_id: conversationId,
+      timestamp: new Date().toISOString()
+    };
+  };
+
+  const createUserMessage = (text: string, conversationId: string): ChatMessage => {
+    return {
+      id: uuidv4(),
+      text,
+      content: text,
+      sender: 'user',
+      role: 'user',
+      conversation_id: conversationId,
+      timestamp: new Date().toISOString()
+    };
+  };
+
+  const createAssistantMessage = (text: string, conversationId: string): ChatMessage => {
+    return {
+      id: uuidv4(),
+      text,
+      content: text,
+      sender: 'assistant',
+      role: 'assistant',
+      conversation_id: conversationId,
+      timestamp: new Date().toISOString()
+    };
+  };
+  
+  const incrementUnreadCount = () => {
+    if (!isChatOpen) {
+      setUnreadMessages(prev => prev + 1);
+    }
+  };
   
   return {
-    isLoading,
-    error,
-    setError,
-    sendMessage,
-    regenerateResponse
+    isChatOpen,
+    isTyping,
+    unreadMessages,
+    toggleChat,
+    startTyping,
+    stopTyping,
+    createSystemMessage,
+    createUserMessage,
+    createAssistantMessage,
+    incrementUnreadCount,
   };
-}
+};

@@ -1,34 +1,31 @@
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
-interface LayoutContextType {
-  sidebarOpen: boolean;
+type LayoutContextType = {
+  sidebarCollapsed: boolean;
   toggleSidebar: () => void;
-  setSidebarOpen: (isOpen: boolean) => void;
-}
+  setSidebarCollapsed: (collapsed: boolean) => void;
+};
 
-const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
+const LayoutContext = createContext<LayoutContextType>({
+  sidebarCollapsed: false,
+  toggleSidebar: () => {},
+  setSidebarCollapsed: () => {},
+});
 
 export const LayoutProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const toggleSidebar = useCallback(() => {
-    setSidebarOpen(prev => !prev);
-  }, []);
+  const toggleSidebar = () => {
+    setSidebarCollapsed(prev => !prev);
+  };
 
   return (
-    <LayoutContext.Provider value={{ sidebarOpen, toggleSidebar, setSidebarOpen }}>
+    <LayoutContext.Provider value={{ sidebarCollapsed, toggleSidebar, setSidebarCollapsed }}>
       {children}
     </LayoutContext.Provider>
   );
 };
 
-export const useLayout = (): LayoutContextType => {
-  const context = useContext(LayoutContext);
-  
-  if (context === undefined) {
-    throw new Error('useLayout must be used within a LayoutProvider');
-  }
-  
-  return context;
-};
+export const useLayout = () => useContext(LayoutContext);
+export default LayoutContext;

@@ -20,18 +20,27 @@ export const mockUsers: User[] = [
     preferences: {
       theme: "light",
       fontSize: "medium",
-      fontFamily: "inter",
+      fontFamily: "system",
       notifications: {
         email: true,
         push: true,
         inApp: true,
+        enabled: true,
+        emailEnabled: true,
+        pushEnabled: true,
+        inAppEnabled: true,
         frequency: "daily"
       },
       soundEnabled: true,
       reduceMotion: false,
       language: "fr",
       dashboardLayout: "default",
-      onboardingCompleted: true
+      onboardingCompleted: true,
+      privacy: {
+        shareData: true,
+        anonymizeReports: false,
+        profileVisibility: "public"
+      }
     },
     emotional_score: 78,
     emotionalScore: 78
@@ -54,18 +63,27 @@ export const mockUsers: User[] = [
     preferences: {
       theme: "dark",
       fontSize: "large",
-      fontFamily: "sans",
+      fontFamily: "system",
       notifications: {
         email: true,
         push: false,
         inApp: true,
+        enabled: true,
+        emailEnabled: true,
+        pushEnabled: false,
+        inAppEnabled: true,
         frequency: "weekly"
       },
       soundEnabled: false,
       reduceMotion: true,
       language: "fr",
       dashboardLayout: "compact",
-      onboardingCompleted: true
+      onboardingCompleted: true,
+      privacy: {
+        shareData: true,
+        anonymizeReports: false,
+        profileVisibility: "public"
+      }
     },
     emotional_score: 85,
     emotionalScore: 85
@@ -86,20 +104,29 @@ export const mockUsers: User[] = [
     company: "TechSolutions",
     department: "Marketing",
     preferences: {
-      theme: "pastel",
+      theme: "system",
       fontSize: "small",
-      fontFamily: "inter",
+      fontFamily: "system",
       notifications: {
         email: false,
         push: true,
         inApp: true,
+        enabled: true,
+        emailEnabled: false,
+        pushEnabled: true,
+        inAppEnabled: true,
         frequency: "daily"
       },
       soundEnabled: true,
       reduceMotion: false,
       language: "fr",
       dashboardLayout: "expanded",
-      onboardingCompleted: false
+      onboardingCompleted: false,
+      privacy: {
+        shareData: true,
+        anonymizeReports: false,
+        profileVisibility: "public"
+      }
     },
     emotional_score: 62,
     emotionalScore: 62

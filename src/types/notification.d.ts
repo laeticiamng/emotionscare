@@ -1,29 +1,34 @@
 
-export type NotificationFrequency = 'immediate' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'never';
-export type NotificationTone = 'default' | 'success' | 'warning' | 'error' | 'info';
-
-export type NotificationType = 
-  | 'system' 
-  | 'emotion' 
-  | 'coach' 
-  | 'journal' 
-  | 'community' 
-  | 'achievement' 
-  | 'badge' 
-  | 'challenge' 
-  | 'reminder' 
-  | 'info' 
-  | 'warning' 
-  | 'error' 
-  | 'success'
-  | 'streak'
-  | 'urgent';
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
+export type NotificationTone = 'formal' | 'friendly' | 'minimal' | 'direct' | 'professional' | 'motivational' | 'neutral' | 'casual';
 
 export interface NotificationPreference {
   enabled: boolean;
   emailEnabled: boolean;
   pushEnabled: boolean;
   inAppEnabled: boolean;
-  types: Record<NotificationType, boolean>;
+  email: boolean;
+  push: boolean;
+  sms?: boolean;
+  inApp?: boolean;
+  types?: {
+    system?: boolean;
+    emotion?: boolean;
+    coach?: boolean;
+    journal?: boolean;
+    community?: boolean;
+    achievement?: boolean;
+    badge?: boolean;
+    challenge?: boolean;
+    reminder?: boolean;
+    info?: boolean;
+    warning?: boolean;
+    error?: boolean;
+    success?: boolean;
+    streak?: boolean;
+    urgent?: boolean;
+    [key: string]: boolean | undefined;
+  };
   frequency: NotificationFrequency;
+  tone?: NotificationTone;
 }
