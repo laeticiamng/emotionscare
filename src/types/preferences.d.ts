@@ -3,6 +3,8 @@ export type ThemeName = 'light' | 'dark' | 'system' | 'pastel' | 'blue-pastel';
 export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large' | 'xlarge';
 export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'inter' | 'sans-serif' | 'monospace';
 export type PrivacyLevel = 'strict' | 'balanced' | 'relaxed' | 'public' | 'private' | 'friends' | 'organization';
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
+export type NotificationTone = 'formal' | 'friendly' | 'minimal' | 'direct' | 'professional' | 'motivational';
 export type Theme = ThemeName;
 
 export interface NotificationPreference {
@@ -24,8 +26,8 @@ export interface NotificationPreferences {
   inAppEnabled?: boolean;
   email?: boolean;
   types?: Record<string, boolean>;
-  frequency?: string;
-  tone?: string;
+  frequency?: NotificationFrequency;
+  tone?: NotificationTone;
   quietHours?: {
     enabled: boolean;
     start: string;

@@ -5,14 +5,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { User } from '@/types/types';
-import { UserPreferences } from '@/types/preferences';
+import { UserPreferences, NotificationPreferences, PrivacyLevel } from '@/types/preferences';
 import DisplayPreferences from './DisplayPreferences';
 import NotificationPreferences from './NotificationPreferences';
 import PrivacyPreferences from './PrivacyPreferences';
 import { useAuth } from '@/contexts/AuthContext';
-
-// Define allowed font size values in TypeScript
-export type FontSize = 'small' | 'medium' | 'large' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 interface PreferencesFormProps {
   user: User;
@@ -56,11 +53,12 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
       shareData: true,
       anonymizeReports: false,
       profileVisibility: 'public',
-    }
+    },
+    privacyLevel: 'balanced' as PrivacyLevel,
   };
   
   const [preferences, setPreferences] = useState<UserPreferences>(
-    user.preferences || defaultPreferences
+    () => user.preferences || defaultPreferences
   );
 
   const handlePreferencesChange = (newPartialPreferences: Partial<UserPreferences>) => {
@@ -121,8 +119,14 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
             </TabsContent>
             <TabsContent value="notifications">
               <NotificationPreferences
-                preferences={preferences}
-                onChange={handlePreferencesChange}
+                preferences={preferences.notifications || {
+                  enabled: false,
+                  types: {},
+                  frequency: 'daily'
+                } as NotificationPreferences}
+                onChange={(notifPrefs) => 
+                  handlePreferencesChange({ notifications: notifPrefs })
+                }
               />
             </TabsContent>
             <TabsContent value="privacy">

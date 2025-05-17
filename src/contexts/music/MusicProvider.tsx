@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import MusicContext from './MusicContext';
 import { MusicTrack, MusicPlaylist, EmotionMusicParams, MusicContextType } from '@/types/music';
@@ -237,6 +236,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setOpenDrawerState(open);
   };
   
+  // Calculate progress value
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  
   const value: MusicContextType = {
     currentTrack,
     playlist,
@@ -246,7 +248,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     muted: isMuted, // Add muted property for compatibility
     currentTime,
     duration,
-    progress: duration ? (currentTime / duration) * 100 : 0,
+    progress, // Include calculated progress
     isLoading,
     error,
     emotion,

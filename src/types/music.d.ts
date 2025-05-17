@@ -5,7 +5,7 @@ export interface MusicTrack {
   artist?: string;
   url?: string;
   audioUrl?: string;
-  track_url?: string;
+  track_url?: string; // Added this property
   coverUrl?: string;
   coverImage?: string;
   cover?: string;
@@ -18,7 +18,7 @@ export interface MusicTrack {
 export interface MusicPlaylist {
   id: string;
   name?: string;
-  title?: string;
+  title: string; // Make this required
   description?: string;
   emotion?: string;
   tracks: MusicTrack[];
@@ -35,10 +35,10 @@ export interface MusicContextType {
   isPlaying: boolean;
   volume: number;
   isMuted: boolean;
-  muted?: boolean;
+  muted?: boolean; // Added this property
   currentTime: number;
   duration: number;
-  progress: number;
+  progress: number; // Added this property
   isLoading: boolean;
   error: Error | null;
   emotion: string | null;

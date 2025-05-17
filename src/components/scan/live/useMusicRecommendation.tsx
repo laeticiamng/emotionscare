@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/contexts/MusicContext';
 import { EmotionResult, MusicTrack, EmotionMusicParams } from '@/types';
 
 export const EMOTION_TO_MUSIC: Record<string, string> = {
@@ -38,7 +38,7 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
         // Make sure all tracks have required properties
         const tracksWithRequiredProps = playlist.tracks.map(track => ({
           ...track,
-          url: track.url || '',
+          url: track.url || track.audioUrl || '',
           duration: track.duration || 0
         }));
         setRecommendedTracks(tracksWithRequiredProps);
@@ -57,7 +57,7 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
     if (track) {
       playTrack({
         ...track,
-        url: track.url || '',
+        url: track.url || track.audioUrl || '',
         duration: track.duration || 0
       });
     }
@@ -74,7 +74,8 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
   const handlePlayMusic = (emotion: string) => {
     const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
     const params: EmotionMusicParams = { emotion: musicType };
-    // Use playFirstRecommendation or directly call loadPlaylistForEmotion
+    // Use loadPlaylistForEmotion directly with the params
+    loadPlaylistForEmotion?.(params);
     return playFirstRecommendation();
   };
   
