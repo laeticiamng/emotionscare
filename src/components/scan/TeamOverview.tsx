@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export interface TeamOverviewProps {
@@ -22,7 +23,7 @@ const TeamOverview: React.FC<TeamOverviewProps> = ({
   showNames = false,
   compact = false
 }) => {
-  // Convertir les valeurs numériques ou objets en ReactNode sécurisé
+  // Properly handle any value type and convert to safe React node
   const safeValue = (value: any): React.ReactNode => {
     if (value === null || value === undefined) {
       return 'N/A';
@@ -32,23 +33,24 @@ const TeamOverview: React.FC<TeamOverviewProps> = ({
       return value.toString();
     }
     
+    // Handle objects properly
     if (typeof value === 'object') {
-      // For objects that have title and description, display the title
-      if (value.title) {
-        return value.title.toString();
+      // For objects with title and description properties
+      if ('title' in value && typeof value.title === 'string') {
+        return value.title;
       }
       
-      // For objects with emotionName, use that property
-      if (value.emotionName) {
-        return value.emotionName.toString();
+      // For objects with emotionName property
+      if ('emotionName' in value && typeof value.emotionName === 'string') {
+        return value.emotionName;
       }
       
-      // For objects with name, use that property
-      if (value.name) {
-        return value.name.toString();
+      // For objects with name property
+      if ('name' in value && typeof value.name === 'string') {
+        return value.name;
       }
       
-      // Otherwise return a stringified version, but make sure we're not directly rendering objects
+      // Convert object to string representation safely
       try {
         return JSON.stringify(value);
       } catch (e) {

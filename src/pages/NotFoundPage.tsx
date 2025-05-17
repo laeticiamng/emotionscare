@@ -9,14 +9,14 @@ const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   
-  // Déterminer la redirection appropriée en fonction du statut d'authentification et du rôle
+  // Determine the appropriate redirect based on authentication status and role
   const handleGoToDashboard = () => {
     if (!isAuthenticated) {
       navigate('/');
       return;
     }
     
-    // Rediriger vers le tableau de bord approprié selon le rôle
+    // Redirect to the appropriate dashboard based on role
     switch (user?.role) {
       case 'b2b_admin':
         navigate('/b2b/admin');
