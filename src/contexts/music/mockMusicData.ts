@@ -5,70 +5,82 @@ export const getMockMusicData = () => {
   const mockTracks: MusicTrack[] = [
     {
       id: 'track-1',
-      title: 'Calm Waves',
-      artist: 'Ocean Sounds',
+      title: 'Relaxation profonde',
+      artist: 'Nature Sounds',
       duration: 180,
-      url: 'https://example.com/audio/calm-waves.mp3',
-      coverUrl: 'https://example.com/images/calm-waves.jpg',
-      emotion: 'calm'
+      url: 'https://example.com/audio/relaxation.mp3',
+      coverUrl: 'https://example.com/images/covers/relaxation.jpg',
+      emotion: 'calm',
+      genre: 'ambient'
     },
     {
       id: 'track-2',
-      title: 'Morning Energy',
-      artist: 'Sunrise Beats',
+      title: 'Énergie positive',
+      artist: 'Happy Vibes',
       duration: 210,
-      url: 'https://example.com/audio/morning-energy.mp3',
-      coverUrl: 'https://example.com/images/morning-energy.jpg',
-      emotion: 'joy'
+      url: 'https://example.com/audio/energy.mp3',
+      coverUrl: 'https://example.com/images/covers/energy.jpg',
+      emotion: 'joy',
+      genre: 'upbeat'
     },
     {
       id: 'track-3',
-      title: 'Rainy Day',
-      artist: 'Ambient Sounds',
-      duration: 240,
-      url: 'https://example.com/audio/rainy-day.mp3',
-      coverUrl: 'https://example.com/images/rainy-day.jpg',
-      emotion: 'sadness'
+      title: 'Méditation guidée',
+      artist: 'Mindfulness',
+      duration: 300,
+      url: 'https://example.com/audio/meditation.mp3',
+      coverUrl: 'https://example.com/images/covers/meditation.jpg',
+      emotion: 'focus',
+      genre: 'ambient'
     },
     {
       id: 'track-4',
-      title: 'Focus Zone',
-      artist: 'Mind Clarity',
-      duration: 300,
-      url: 'https://example.com/audio/focus-zone.mp3',
-      coverUrl: 'https://example.com/images/focus-zone.jpg',
-      emotion: 'neutral'
+      title: 'Douceur mélancolique',
+      artist: 'Gentle Mood',
+      duration: 240,
+      url: 'https://example.com/audio/melancholy.mp3',
+      coverUrl: 'https://example.com/images/covers/melancholy.jpg',
+      emotion: 'sadness',
+      genre: 'classical'
     }
   ];
 
   const mockPlaylists: MusicPlaylist[] = [
     {
       id: 'playlist-calm',
-      name: 'Calm Moments',
+      name: 'Calme et sérénité',
       emotion: 'calm',
-      tracks: mockTracks.filter(track => track.emotion === 'calm'),
-      description: 'Perfect for relaxation and stress reduction'
+      mood: 'calm',
+      tracks: [mockTracks[0], mockTracks[2]],
+      description: 'Une playlist pour retrouver le calme intérieur',
+      coverUrl: 'https://example.com/images/playlists/calm.jpg'
     },
     {
       id: 'playlist-joy',
-      name: 'Joy & Energy',
+      name: 'Énergie positive',
       emotion: 'joy',
-      tracks: mockTracks.filter(track => track.emotion === 'joy'),
-      description: 'Uplifting tracks to boost your mood'
+      mood: 'happy',
+      tracks: [mockTracks[1]],
+      description: 'Des mélodies pour stimuler votre joie de vivre',
+      coverUrl: 'https://example.com/images/playlists/joy.jpg'
     },
     {
       id: 'playlist-focus',
-      name: 'Deep Focus',
-      emotion: 'neutral',
-      tracks: mockTracks.filter(track => track.emotion === 'neutral'),
-      description: 'Enhance your concentration and productivity'
+      name: 'Concentration',
+      emotion: 'focus',
+      mood: 'focused',
+      tracks: [mockTracks[2]],
+      description: 'Aide à la concentration et au travail',
+      coverUrl: 'https://example.com/images/playlists/focus.jpg'
     },
     {
-      id: 'playlist-sadness',
-      name: 'Melancholy Moods',
+      id: 'playlist-sad',
+      name: 'Mélancolie',
       emotion: 'sadness',
-      tracks: mockTracks.filter(track => track.emotion === 'sadness'),
-      description: 'Soothing tracks for emotional processing'
+      mood: 'sad',
+      tracks: [mockTracks[3]],
+      description: 'Pour accompagner les moments de mélancolie',
+      coverUrl: 'https://example.com/images/playlists/sadness.jpg'
     }
   ];
 

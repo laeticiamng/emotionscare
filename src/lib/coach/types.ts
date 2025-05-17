@@ -1,6 +1,6 @@
 
 // Coach hook shared types
-import { EmotionalData, EmotionalTrend } from '@/types/emotional-data';
+import { type EmotionalData, type EmotionalTrend } from '@/types/emotional-data';
 
 export type CoachEmotionData = {
   emotion: string;
@@ -28,7 +28,7 @@ export type CoachEvent = {
   title?: string;
 };
 
-export { EmotionalData, EmotionalTrend };
+export type { EmotionalData, EmotionalTrend };
 
 export type CoachNotification = {
   id: string;

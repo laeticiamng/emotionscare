@@ -71,11 +71,19 @@ export interface NotificationSettings {
   enabled: boolean;
   email: boolean;
   push: boolean;
+  sms?: boolean;
   frequency: NotificationFrequency;
   doNotDisturb: boolean;
   doNotDisturbStart?: string;
   doNotDisturbEnd?: string;
   tone?: NotificationTone;
   types?: Record<NotificationType, boolean>;
-  sms?: boolean;
 }
+
+// Assurons-nous que les types se ressemblent pour éviter des problèmes de compatibilité
+export type NotificationChannels = {
+  email?: boolean;
+  push?: boolean;
+  sms?: boolean;
+  inApp?: boolean;
+};

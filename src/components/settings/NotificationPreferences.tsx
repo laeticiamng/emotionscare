@@ -4,11 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NotificationFrequency, NotificationPreferences } from '@/types/preferences';
+import { NotificationFrequency, NotificationPreference, NotificationType } from '@/types/notification';
 
 interface NotificationPreferencesProps {
-  preferences: NotificationPreferences;
-  onUpdate: (preferences: NotificationPreferences) => void;
+  preferences: NotificationPreference;
+  onUpdate: (preferences: NotificationPreference) => void;
 }
 
 const NotificationPreferencesComponent: React.FC<NotificationPreferencesProps> = ({
@@ -33,13 +33,23 @@ const NotificationPreferencesComponent: React.FC<NotificationPreferencesProps> =
           coach: false,
           journal: false,
           community: false,
+          achievement: false,
+          badge: false,
+          challenge: false,
+          reminder: false,
+          info: false,
+          warning: false,
+          error: false,
+          success: false,
+          streak: false,
+          urgent: false
         },
         frequency: 'immediate',
       });
     }
   };
 
-  const handleTypeToggle = (type: keyof NotificationPreferences['types'], checked: boolean) => {
+  const handleTypeToggle = (type: keyof NotificationPreference['types'], checked: boolean) => {
     const updatedTypes = {
       ...preferences.types,
       [type]: checked,
@@ -59,7 +69,7 @@ const NotificationPreferencesComponent: React.FC<NotificationPreferencesProps> =
       <CardContent className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <Label htmlFor="notifications-toggle" className="font-medium">
+            <Label htmlFor="notifications-toggle" className="block text-gray-700">
               Activer les notifications
             </Label>
             <p className="text-sm text-muted-foreground">

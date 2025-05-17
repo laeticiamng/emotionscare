@@ -36,30 +36,33 @@ export interface EmotionMusicParams {
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   playlist: MusicPlaylist | null;
+  playlists?: MusicPlaylist[];
   isPlaying: boolean;
   volume: number;
-  isMuted: boolean;
+  isMuted?: boolean;
   muted: boolean;
   currentTime: number;
   duration: number;
-  recommendations: MusicTrack[];
-  isLoading: boolean;
-  error: Error | null;
-  isInitialized: boolean;
+  recommendations?: MusicTrack[];
+  isLoading?: boolean;
+  error?: Error | null;
+  isInitialized?: boolean;
   openDrawer: boolean;
   emotion: string | null;
   playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  resumeTrack: () => void;
+  pauseTrack?: () => void;
+  resumeTrack?: () => void;
   togglePlay: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
+  nextTrack?: () => void;
+  previousTrack?: () => void;
   setVolume: (volume: number) => void;
-  toggleMute: () => void;
+  toggleMute?: () => void;
   seekTo: (time: number) => void;
-  loadPlaylistForEmotion: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
-  setEmotion: (emotion: string) => void;
-  setOpenDrawer: (open: boolean) => void;
+  loadPlaylistForEmotion?: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null> | MusicPlaylist | null;
+  setEmotion?: (emotion: string) => void;
+  setOpenDrawer?: (open: boolean) => void;
+  loadPlaylist?: (playlist: MusicPlaylist) => void;
+  recommendByEmotion?: (emotion: string, intensity?: number) => MusicPlaylist | null;
 }
 
 export interface ProgressBarProps {

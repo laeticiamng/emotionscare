@@ -7,7 +7,7 @@ export interface Emotion {
   intensity: number;
   icon?: string;
   emoji?: string;
-  emotion?: string; // For compatibility with certain hooks
+  emotion?: string; // Pour la compatibilité avec certains hooks
   user_id?: string;
   date?: string;
   score?: number;

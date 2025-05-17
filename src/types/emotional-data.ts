@@ -4,6 +4,8 @@ export interface EmotionalData {
   intensity: number;
   timestamp: Date | string;
   context?: string;
+  userId?: string;
+  id?: string;
 }
 
 export interface EmotionalTrend {
@@ -18,3 +20,8 @@ export interface EmotionalTrend {
   endDate?: string;
   data?: EmotionalData[];
 }
+
+export type EmotionalFilter = 'all' | 'positive' | 'negative' | 'neutral' | string;
+
+// Pour compatibilité avec d'autres modules
+export type EmotionCategory = 'positive' | 'negative' | 'neutral' | 'mixed';

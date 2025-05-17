@@ -1,5 +1,43 @@
 
 import { User, UserPreferences } from '@/types/user';
+import { NotificationType } from '@/types/notification';
+
+// Définition complète des types de notifications pour éviter les erreurs
+const allNotificationTypes: Record<NotificationType, boolean> = {
+  system: true,
+  emotion: true,
+  coach: true,
+  journal: true,
+  community: true,
+  achievement: true,
+  badge: true,
+  challenge: true,
+  reminder: true,
+  info: true,
+  warning: true,
+  error: true,
+  success: true,
+  streak: true,
+  urgent: true
+};
+
+const disabledNotificationTypes: Record<NotificationType, boolean> = {
+  system: false,
+  emotion: false,
+  coach: false,
+  journal: false,
+  community: false,
+  achievement: false,
+  badge: false,
+  challenge: false,
+  reminder: false,
+  info: false,
+  warning: false,
+  error: false,
+  success: false,
+  streak: false,
+  urgent: false
+};
 
 // Mock user data for development
 export const mockUsers: User[] = [
@@ -22,21 +60,7 @@ export const mockUsers: User[] = [
         emailEnabled: true,
         pushEnabled: true,
         inAppEnabled: true,
-        types: {
-          system: true,
-          emotion: true,
-          coach: true,
-          journal: true,
-          community: true,
-          achievement: true,
-          badge: true,
-          challenge: true,
-          reminder: true,
-          info: true,
-          warning: true,
-          error: true,
-          success: true,
-        },
+        types: allNotificationTypes,
         frequency: 'daily',
         email: true,
         push: true,
@@ -69,21 +93,7 @@ export const mockUsers: User[] = [
         emailEnabled: false,
         pushEnabled: false,
         inAppEnabled: false,
-        types: {
-          system: false,
-          emotion: false,
-          coach: false,
-          journal: false,
-          community: false,
-          achievement: false,
-          badge: false,
-          challenge: false,
-          reminder: false,
-          info: false,
-          warning: false,
-          error: false,
-          success: false,
-        },
+        types: disabledNotificationTypes,
         frequency: 'weekly',
         email: false,
         push: false,
@@ -116,21 +126,7 @@ export const mockUsers: User[] = [
         emailEnabled: true,
         pushEnabled: true,
         inAppEnabled: true,
-        types: {
-          system: true,
-          emotion: true,
-          coach: true,
-          journal: true,
-          community: true,
-          achievement: true,
-          badge: true,
-          challenge: true,
-          reminder: true,
-          info: true,
-          warning: true,
-          error: true,
-          success: true,
-        },
+        types: allNotificationTypes,
         frequency: 'immediate',
         email: true,
         push: true,
