@@ -4,7 +4,8 @@
 import { useTheme, ThemeProvider } from './ThemeContext';
 import { useLayout, LayoutProvider } from './LayoutContext';
 import { useUserPreferences, UserPreferencesProvider } from './UserPreferencesContext';
-import { useAudio, AudioProvider } from './AudioContext';
+import { useAudio, AudioProvider } from './audio/AudioContext';
+import { useMusic, MusicProvider } from './MusicContext';
 
 export {
   useTheme,
@@ -14,5 +15,7 @@ export {
   useUserPreferences,
   UserPreferencesProvider,
   useAudio,
-  AudioProvider
+  AudioProvider,
+  useMusic,
+  MusicProvider
 };

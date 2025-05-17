@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { humeAI } from '@/services';
 import { useToast } from '@/hooks/use-toast';
+import { EmotionResult } from '@/types/emotion';
 
 export function useHumeAI() {
   const { toast } = useToast();
@@ -11,7 +12,7 @@ export function useHumeAI() {
   /**
    * Analyse les émotions dans un fichier vocal
    */
-  const analyzeVoiceEmotion = async (audioFile: File | Blob) => {
+  const analyzeVoiceEmotion = async (audioFile: File | Blob): Promise<EmotionResult | null> => {
     setIsAnalyzing(true);
     setError(null);
     
@@ -35,7 +36,7 @@ export function useHumeAI() {
   /**
    * Analyse les émotions dans un texte
    */
-  const analyzeTextEmotion = async (text: string) => {
+  const analyzeTextEmotion = async (text: string): Promise<EmotionResult | null> => {
     setIsAnalyzing(true);
     setError(null);
     
@@ -59,7 +60,7 @@ export function useHumeAI() {
   /**
    * Analyse les émotions faciales dans une image
    */
-  const analyzeFacialEmotion = async (imageFile: File | Blob) => {
+  const analyzeFacialEmotion = async (imageFile: File | Blob): Promise<EmotionResult | null> => {
     setIsAnalyzing(true);
     setError(null);
     

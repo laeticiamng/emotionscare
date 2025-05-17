@@ -3,9 +3,9 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, Play } from 'lucide-react';
-import { useMusic } from '@/contexts';
+import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/emotion';
 
 interface MusicEmotionRecommendationProps {
   emotionResult: EmotionResult;

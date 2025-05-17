@@ -1,11 +1,5 @@
 
-/**
- * Types d'API et d'activités API
- */
-
-/**
- * Structure des activités d'utilisation des API
- */
+// Types pour les activités d'utilisation d'API
 export interface ApiUseActivity {
   date: string;
   openai?: number;
@@ -13,15 +7,18 @@ export interface ApiUseActivity {
   musicgen?: number;
   humeai?: number;
   dalle?: number;
-  [key: string]: number | string | undefined;
 }
 
-/**
- * Structure des statistiques d'utilisation des API
- */
+// Types pour les statistiques d'utilisation d'API
 export interface ApiUsageStats {
   totalCalls: number;
-  callsByApi: Record<string, number>;
+  callsByApi: {
+    openai: number;
+    whisper: number;
+    musicgen: number;
+    humeai: number;
+    dalle: number;
+  };
   errorRate: number;
   avgResponseTime: number;
   costEstimate: number;
@@ -31,44 +28,20 @@ export interface ApiUsageStats {
   };
 }
 
-/**
- * Structure des données de latence d'API
- */
-export interface ApiLatencyData {
+// Types pour les événements d'API
+export interface ApiEvent {
+  id: string;
+  timestamp: string;
   api: string;
   endpoint: string;
-  timestamp: string;
-  latency: number; // en ms
-  status: number;
+  success: boolean;
+  responseTime: number;
+  errorMessage?: string;
+  userId?: string;
+  cost?: number;
 }
 
-/**
- * Structure des erreurs d'API
- */
-export interface ApiError {
-  api: string;
-  endpoint: string;
-  timestamp: string;
-  errorCode: string;
-  errorMessage: string;
-  requestId?: string;
-}
-
-/**
- * Structure des quotas d'API
- */
-export interface ApiQuota {
-  api: string;
-  limit: number;
-  used: number;
-  reset: string; // Date ISO
-  unit: 'requests' | 'tokens' | 'calls';
-  period: 'minute' | 'hour' | 'day' | 'month';
-}
-
-/**
- * Statut des API
- */
+// Types pour l'état de l'API
 export interface ApiStatus {
   name: string;
   isAvailable: boolean;

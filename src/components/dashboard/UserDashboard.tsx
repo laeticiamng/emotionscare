@@ -1,70 +1,49 @@
 
-import React, { useState } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { User } from '@/types/user';
-
-// Import des onglets du tableau de bord
-import EmotionalOverviewTab from './tabs/EmotionalOverviewTab';
-import JournalTab from './tabs/JournalTab';
-import GamificationTab from './tabs/GamificationTab';
+import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import GlobalOverviewTab from './tabs/GlobalOverviewTab';
 import AnalyticsTab from './tabs/AnalyticsTab';
+import JournalTab from './tabs/JournalTab';
 import TeamTab from './tabs/TeamTab';
-import SettingsTab from './tabs/SettingsTab';
+import { User, UserRole } from '@/types/user';
 
 interface UserDashboardProps {
   user: User;
 }
 
 const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
-  const [activeTab, setActiveTab] = useState('overview');
-  
-  // Déterminer si l'utilisateur est B2B ou B2C
-  const isB2B = user.role === 'b2b';
+  // Vérifier si l'utilisateur a un rôle d'entreprise (B2B)
+  const isB2BUser = user.role === 'b2b';
   
   return (
-    <div className="container mx-auto py-6">
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Tableau de bord de {user.name}</CardTitle>
-        </CardHeader>
-      </Card>
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-2xl font-bold mb-6">Tableau de bord</h1>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="overview">Aperçu émotionnel</TabsTrigger>
-          <TabsTrigger value="journal">Journal</TabsTrigger>
-          <TabsTrigger value="gamification">Gamification</TabsTrigger>
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList className="grid grid-cols-4 gap-2">
+          <TabsTrigger value="overview">Vue globale</TabsTrigger>
           <TabsTrigger value="analytics">Analytiques</TabsTrigger>
-          {isB2B && <TabsTrigger value="team">Équipe</TabsTrigger>}
-          <TabsTrigger value="settings">Paramètres</TabsTrigger>
+          <TabsTrigger value="journal">Journal</TabsTrigger>
+          {isB2BUser && <TabsTrigger value="team">Équipe</TabsTrigger>}
         </TabsList>
         
         <TabsContent value="overview">
-          <EmotionalOverviewTab />
-        </TabsContent>
-        
-        <TabsContent value="journal">
-          <JournalTab />
-        </TabsContent>
-        
-        <TabsContent value="gamification">
-          <GamificationTab />
+          <GlobalOverviewTab className="w-full" />
         </TabsContent>
         
         <TabsContent value="analytics">
-          <AnalyticsTab />
+          <AnalyticsTab className="w-full" />
         </TabsContent>
         
-        {isB2B && (
+        <TabsContent value="journal">
+          <JournalTab className="w-full" />
+        </TabsContent>
+        
+        {isB2BUser && (
           <TabsContent value="team">
-            <TeamTab />
+            <TeamTab className="w-full" />
           </TabsContent>
         )}
-        
-        <TabsContent value="settings">
-          <SettingsTab />
-        </TabsContent>
       </Tabs>
     </div>
   );

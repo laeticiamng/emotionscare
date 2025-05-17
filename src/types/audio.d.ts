@@ -14,29 +14,58 @@ export interface AudioTrack {
   source?: string;
 }
 
+export interface AudioPlaylist {
+  id: string;
+  name: string;
+  tracks: AudioTrack[];
+  description?: string;
+  coverUrl?: string;
+  emotion?: string;
+}
+
 export interface AudioPlayerState {
-  currentTrack: AudioTrack | null;
   isPlaying: boolean;
+  currentTrack: AudioTrack | null;
+  playlist: AudioPlaylist | null;
   volume: number;
-  isMuted: boolean;
-  progress: number;
+  muted: boolean;
+  currentTime: number;
   duration: number;
-  playlist: AudioTrack[];
-  repeatMode: 'off' | 'one' | 'all';
+  loading: boolean;
   shuffleMode: boolean;
+  repeatMode: 'off' | 'one' | 'all';
 }
 
 export interface AudioContextValue {
-  audioState: AudioPlayerState;
-  play: () => void;
-  pause: () => void;
-  stop: () => void;
-  next: () => void;
-  previous: () => void;
+  // État du lecteur
+  isPlaying: boolean;
+  currentTrack: AudioTrack | null;
+  playlist: AudioPlaylist | null;
+  volume: number;
+  muted: boolean;
+  currentTime: number;
+  duration: number;
+  loading: boolean;
+  shuffleMode: boolean;
+  repeatMode: 'off' | 'one' | 'all';
+  
+  // Méthodes
+  playTrack: (track: AudioTrack) => void;
+  pauseTrack: () => void;
+  togglePlay: () => void;
+  nextTrack: () => void;
+  prevTrack: () => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
-  seekTo: (position: number) => void;
-  playTrack: (track: AudioTrack) => void;
-  toggleShuffle: () => void;
-  changeRepeatMode: () => void;
+  seekTo: (time: number) => void;
+  loadPlaylist: (playlist: AudioPlaylist) => void;
+  loadPlaylistForEmotion: (params: EmotionMusicParams) => Promise<AudioPlaylist | null>;
+  setOpenDrawer: (open: boolean) => void;
+  openDrawer: boolean;
+  setEmotion: (emotion: string) => void;
+}
+
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
 }
