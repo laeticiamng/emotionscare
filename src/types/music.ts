@@ -1,3 +1,4 @@
+
 export interface MusicTrack {
   id: string;
   title: string;
@@ -11,6 +12,7 @@ export interface MusicTrack {
   emotion?: string;
   genre?: string;
   album?: string;
+  category?: string;
 }
 
 export interface MusicPlaylist {
@@ -22,7 +24,8 @@ export interface MusicPlaylist {
   tracks: MusicTrack[];
   description?: string;
   coverUrl?: string;
-  coverImage?: string;  // Ajout pour compatibilité
+  coverImage?: string;
+  category?: string;
 }
 
 export interface EmotionMusicParams {
@@ -35,17 +38,16 @@ export interface MusicContextType {
   playlist: MusicPlaylist | null;
   isPlaying: boolean;
   volume: number;
-  isMuted?: boolean;
+  isMuted: boolean;
   muted: boolean;
   currentTime: number;
   duration: number;
-  currentEmotion?: string | null;
+  recommendations: MusicTrack[];
+  isLoading: boolean;
+  error: Error | null;
+  isInitialized: boolean;
+  openDrawer: boolean;
   emotion: string | null;
-  recommendations?: MusicTrack[] | MusicPlaylist[];
-  isLoading?: boolean;
-  error?: Error | null;
-  isInitialized?: boolean;
-  openDrawer?: boolean;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
@@ -58,7 +60,6 @@ export interface MusicContextType {
   loadPlaylistForEmotion: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
   setEmotion: (emotion: string) => void;
   setOpenDrawer: (open: boolean) => void;
-  initializeMusicSystem?: () => void;
 }
 
 export interface ProgressBarProps {
@@ -68,9 +69,9 @@ export interface ProgressBarProps {
   className?: string;
   formatTime?: (seconds: number) => string;
   showTimestamps?: boolean;
-  position?: number;  // Ajout pour compatibilité
-  max?: number;       // Ajout pour compatibilité
-  onChange?: (time: number) => void;  // Ajout pour compatibilité
+  position?: number;
+  max?: number;
+  onChange?: (time: number) => void;
 }
 
 export interface MusicDrawerProps {

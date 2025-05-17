@@ -33,7 +33,8 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
     setIsLoading(true);
     try {
       const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-      const playlist = await loadPlaylistForEmotion(musicType);
+      const params: EmotionMusicParams = { emotion: musicType };
+      const playlist = await loadPlaylistForEmotion(params);
       
       if (playlist && playlist.tracks) {
         // Make sure all tracks have required properties
@@ -74,7 +75,8 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
   
   const handlePlayMusic = (emotion: string) => {
     const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-    loadPlaylistForEmotion(musicType);
+    const params: EmotionMusicParams = { emotion: musicType };
+    loadPlaylistForEmotion(params);
     return playFirstRecommendation();
   };
   

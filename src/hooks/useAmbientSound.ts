@@ -1,23 +1,20 @@
 
 import { useEffect, useState } from 'react';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useMusic } from '@/contexts';
 
 export const useAmbientSound = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.3);
   const [soundType, setSoundType] = useState<'nature' | 'ambient' | 'space'>('ambient');
-  const { preferences } = useUserPreferences();
   const music = useMusic();
 
-  // Load user preferences
+  // Load user preferences - à adapter avec des vraies préférences utilisateur
   useEffect(() => {
-    if (preferences) {
-      setVolume(preferences.soundVolume || 0.3);
-      setSoundType(preferences.ambientSoundType || 'ambient');
-      setIsPlaying(preferences.ambientSoundEnabled || false);
-    }
-  }, [preferences]);
+    // Exemple de chargement de préférences
+    setVolume(0.3);
+    setSoundType('ambient');
+    setIsPlaying(false);
+  }, []);
 
   // Control playback
   const togglePlaying = () => {

@@ -5,13 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume, VolumeX, Music } from 'lucide-react';
 
 interface MusicProgressBarProps {
-  position?: number;
-  max?: number;
-  onChange?: (position: number) => void;
   currentTime?: number;
   duration?: number;
-  formatTime?: (seconds: number) => string;
   onSeek?: (time: number) => void;
+  formatTime?: (seconds: number) => string;
 }
 
 const MusicProgressBar: React.FC<MusicProgressBarProps> = ({

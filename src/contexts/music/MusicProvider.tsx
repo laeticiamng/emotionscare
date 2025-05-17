@@ -7,19 +7,27 @@ interface MusicContextType {
   playlist: MusicPlaylist | null;
   isPlaying: boolean;
   volume: number;
-  progress: number;
+  muted: boolean;
+  isMuted: boolean;
+  currentTime: number;
   duration: number;
-  emotion: string | null;
+  recommendations: MusicTrack[];
+  isLoading: boolean;
+  error: Error | null;
+  isInitialized: boolean;
   openDrawer: boolean;
+  emotion: string | null;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
+  togglePlay: () => void;
   nextTrack: () => void;
   previousTrack: () => void;
   setVolume: (volume: number) => void;
-  setProgress: (progress: number) => void;
+  toggleMute: () => void;
+  seekTo: (time: number) => void;
+  loadPlaylistForEmotion: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
   setEmotion: (emotion: string) => void;
-  loadPlaylistForEmotion: (params: EmotionMusicParams) => Promise<MusicPlaylist | null>;
   setOpenDrawer: (open: boolean) => void;
 }
 
@@ -29,19 +37,27 @@ const defaultContext: MusicContextType = {
   playlist: null,
   isPlaying: false,
   volume: 0.5,
-  progress: 0,
+  muted: false,
+  isMuted: false,
+  currentTime: 0,
   duration: 0,
-  emotion: null,
+  recommendations: [],
+  isLoading: false,
+  error: null,
+  isInitialized: false,
   openDrawer: false,
+  emotion: null,
   playTrack: () => {},
   pauseTrack: () => {},
   resumeTrack: () => {},
+  togglePlay: () => {},
   nextTrack: () => {},
   previousTrack: () => {},
   setVolume: () => {},
-  setProgress: () => {},
-  setEmotion: () => {},
+  toggleMute: () => {},
+  seekTo: () => {},
   loadPlaylistForEmotion: async () => null,
+  setEmotion: () => {},
   setOpenDrawer: () => {}
 };
 
@@ -61,17 +77,23 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
-  const [progress, setProgress] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [emotion, setEmotion] = useState<string | null>(null);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [recommendations, setRecommendations] = useState<MusicTrack[]>([]);
 
   // Initialisation de l'élément audio
   useEffect(() => {
     const audio = new Audio();
     audio.volume = volume;
     setAudioElement(audio);
+    setIsInitialized(true);
 
     return () => {
       audio.pause();
@@ -89,7 +111,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   // Mise à jour de la source audio lorsque la piste courante change
   useEffect(() => {
     if (audioElement && currentTrack) {
-      audioElement.src = currentTrack.url;
+      audioElement.src = currentTrack.url || '';
       audioElement.load();
       if (isPlaying) {
         audioElement.play();
@@ -102,7 +124,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
 
       // Mettre à jour la progression pendant la lecture
       audioElement.ontimeupdate = () => {
-        setProgress(audioElement.currentTime);
+        setCurrentTime(audioElement.currentTime);
       };
 
       // Passer à la piste suivante lorsque la piste est terminée
@@ -142,6 +164,15 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     setIsPlaying(true);
   };
 
+  // Changer l'état de lecture
+  const togglePlay = () => {
+    if (isPlaying) {
+      pauseTrack();
+    } else {
+      resumeTrack();
+    }
+  };
+
   // Passer à la piste suivante dans la playlist
   const nextTrack = () => {
     if (!playlist || !currentTrack) return;
@@ -169,29 +200,49 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   };
 
   // Définir la position dans la piste
-  const setProgressTime = (time: number) => {
+  const seekTo = (time: number) => {
     if (audioElement) {
       audioElement.currentTime = time;
     }
-    setProgress(time);
+    setCurrentTime(time);
+  };
+  
+  // Changer le volume
+  const changeVolume = (newVolume: number) => {
+    setVolume(newVolume);
+    if (audioElement) {
+      audioElement.volume = newVolume;
+    }
+  };
+  
+  // Activer/désactiver le mode muet
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (audioElement) {
+      audioElement.muted = !isMuted;
+    }
   };
 
   // Charger une playlist pour une émotion spécifique
-  const loadPlaylistForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
+  const loadPlaylistForEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      // Ici, on simulerait un appel API pour obtenir une playlist basée sur l'émotion
-      console.log(`Loading playlist for emotion: ${params.emotion} with intensity ${params.intensity}`);
+      const emotionParam = typeof params === 'string' ? params : params.emotion;
+      const intensityParam = typeof params === 'object' ? params.intensity || 0.5 : 0.5;
+      
+      console.log(`Loading playlist for emotion: ${emotionParam} with intensity ${intensityParam}`);
       
       // Pour l'exemple, on crée une playlist factice
       const mockPlaylist: MusicPlaylist = {
-        id: `playlist-${params.emotion}`,
-        name: `${params.emotion.charAt(0).toUpperCase() + params.emotion.slice(1)} Playlist`,
-        description: `Music to match your ${params.emotion} mood`,
-        coverImage: `/images/playlists/${params.emotion}.jpg`,
+        id: `playlist-${emotionParam}`,
+        name: `${emotionParam.charAt(0).toUpperCase() + emotionParam.slice(1)} Playlist`,
+        description: `Music to match your ${emotionParam} mood`,
         tracks: [
           {
-            id: `track-${params.emotion}-1`,
-            title: `${params.emotion} Track 1`,
+            id: `track-${emotionParam}-1`,
+            title: `${emotionParam} Track 1`,
             artist: 'Emotion Artist',
             album: 'Mood Album',
             duration: 180,
@@ -199,8 +250,8 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
             coverImage: '/images/covers/track1.jpg'
           },
           {
-            id: `track-${params.emotion}-2`,
-            title: `${params.emotion} Track 2`,
+            id: `track-${emotionParam}-2`,
+            title: `${emotionParam} Track 2`,
             artist: 'Mood Musician',
             album: 'Feeling Album',
             duration: 210,
@@ -211,43 +262,56 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
       };
       
       setPlaylist(mockPlaylist);
-      setEmotion(params.emotion);
+      setEmotion(emotionParam);
+      setRecommendations(mockPlaylist.tracks);
       
       // Jouer automatiquement la première piste
       if (mockPlaylist.tracks.length > 0) {
         playTrack(mockPlaylist.tracks[0]);
       }
       
+      setIsLoading(false);
       return mockPlaylist;
     } catch (error) {
-      console.error('Error loading playlist for emotion:', error);
+      const err = error instanceof Error ? error : new Error('Unknown error loading playlist');
+      console.error('Error loading playlist for emotion:', err);
+      setError(err);
+      setIsLoading(false);
       return null;
     }
   };
 
   // Valeur du contexte
-  const value: MusicContextType = {
+  const contextValue: MusicContextType = {
     currentTrack,
     playlist,
     isPlaying,
     volume,
-    progress,
+    muted: isMuted,
+    isMuted,
+    currentTime,
     duration,
-    emotion,
+    recommendations,
+    isLoading,
+    error,
+    isInitialized,
     openDrawer,
+    emotion,
     playTrack,
     pauseTrack,
     resumeTrack,
+    togglePlay,
     nextTrack,
     previousTrack,
-    setVolume,
-    setProgress: setProgressTime,
-    setEmotion,
+    setVolume: changeVolume,
+    toggleMute,
+    seekTo,
     loadPlaylistForEmotion,
+    setEmotion,
     setOpenDrawer
   };
 
-  return <MusicContext.Provider value={value}>{children}</MusicContext.Provider>;
+  return <MusicContext.Provider value={contextValue}>{children}</MusicContext.Provider>;
 };
 
 export default MusicProvider;

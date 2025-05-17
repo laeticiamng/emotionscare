@@ -1,12 +1,13 @@
 
 export interface Emotion {
   id: string;
-  name: string;  // Ajout du champ name manquant
+  name: string;  
   label: string;
   color: string;
   intensity: number;
   icon?: string;
   emoji?: string;
+  emotion?: string; // Pour compatibilité avec certains hooks
 }
 
 export interface EmotionResult {
@@ -17,6 +18,9 @@ export interface EmotionResult {
   audioUrl?: string;
   textInput?: string;
   facialExpression?: string;
+  score?: number; // Pour compatibilité
+  text?: string; // Pour compatibilité
+  emojis?: string[]; // Pour compatibilité
 }
 
 export interface LiveVoiceScannerProps {
