@@ -20,16 +20,43 @@ export interface RouteConfig {
     login: string;
     register: string;
     dashboard: string;
+    journal?: string;
+    scan?: string;
+    music?: string;
+    coach?: string;
+    vr?: string;
+    teams?: string;
+    reports?: string;
+    events?: string;
+    settings?: string;
   };
   b2bUser: {
     home: string;
     login: string;
     dashboard: string;
+    journal?: string;
+    scan?: string;
+    music?: string;
+    coach?: string;
+    vr?: string;
+    teams?: string;
+    reports?: string;
+    events?: string;
+    settings?: string;
   };
   b2bAdmin: {
     home: string;
     login: string;
     dashboard: string;
+    journal?: string;
+    scan?: string;
+    music?: string;
+    coach?: string;
+    vr?: string;
+    teams?: string;
+    reports?: string;
+    events?: string;
+    settings?: string;
   };
   common: {
     home: string;
@@ -44,17 +71,39 @@ export const ROUTES: RouteConfig = {
     home: '/b2c',
     login: '/b2c/login',
     register: '/b2c/register',
-    dashboard: '/b2c/dashboard'
+    dashboard: '/b2c/dashboard',
+    journal: '/b2c/journal',
+    scan: '/b2c/scan',
+    music: '/b2c/music',
+    coach: '/b2c/coach',
+    vr: '/b2c/vr',
+    settings: '/b2c/settings'
   },
   b2bUser: {
     home: '/b2b/user',
     login: '/b2b/user/login',
-    dashboard: '/b2b/user/dashboard'
+    dashboard: '/b2b/user/dashboard',
+    journal: '/b2b/user/journal',
+    scan: '/b2b/user/scan',
+    music: '/b2b/user/music',
+    coach: '/b2b/user/coach',
+    vr: '/b2b/user/vr',
+    teams: '/b2b/user/teams',
+    settings: '/b2b/user/settings'
   },
   b2bAdmin: {
     home: '/b2b/admin',
     login: '/b2b/admin/login',
-    dashboard: '/b2b/admin/dashboard'
+    dashboard: '/b2b/admin/dashboard',
+    journal: '/b2b/admin/journal',
+    scan: '/b2b/admin/scan',
+    music: '/b2b/admin/music',
+    coach: '/b2b/admin/coach',
+    vr: '/b2b/admin/vr',
+    teams: '/b2b/admin/teams',
+    reports: '/b2b/admin/reports',
+    events: '/b2b/admin/events',
+    settings: '/b2b/admin/settings'
   },
   common: {
     home: '/',

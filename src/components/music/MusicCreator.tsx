@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { MusicTrack, EmotionMusicParams } from '@/types/music';
+import { MusicTrack } from '@/types/music';
 
 const MusicCreator = () => {
   const [generatedTracks, setGeneratedTracks] = useState<MusicTrack[]>([]);
   
   const generateMusicForEmotion = async (emotion: string) => {
-    // Example of generating a track with mood property
+    // Example of generating a track with emotion property
     const newTrack: MusicTrack = {
       id: `track-${Date.now()}`,
       title: `${emotion} Melody`,
@@ -14,7 +14,7 @@ const MusicCreator = () => {
       duration: 180,
       url: '/sample/music.mp3',
       coverUrl: '/images/covers/generated.jpg',
-      mood: emotion
+      emotion: emotion
     };
     
     setGeneratedTracks(prev => [...prev, newTrack]);

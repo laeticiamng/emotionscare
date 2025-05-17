@@ -1,7 +1,37 @@
 
-export type NotificationFrequency = 'daily' | 'weekly' | 'monthly' | 'never' | 'immediate';
-export type NotificationTone = 'friendly' | 'neutral' | 'formal' | 'casual' | 'direct' | 'professional' | 'motivational';
-export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'achievement' | 'reminder' | 'badge' | 'streak' | 'system' | 'emotion';
+export type NotificationFrequency = 
+  | 'daily'
+  | 'weekly'
+  | 'monthly'
+  | 'never'
+  | 'immediate';
+
+export type NotificationTone = 
+  | 'friendly'
+  | 'neutral'
+  | 'formal'
+  | 'casual'
+  | 'direct'
+  | 'professional'
+  | 'motivational';
+
+export type NotificationType = 
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'achievement'
+  | 'reminder'
+  | 'badge'
+  | 'streak'
+  | 'system'
+  | 'emotion'
+  | 'challenge'
+  | 'journal'
+  | 'coach'
+  | 'community'
+  | 'urgent'
+  | 'user';
 
 export interface NotificationPreference {
   type: string;
@@ -9,6 +39,15 @@ export interface NotificationPreference {
   frequency?: NotificationFrequency;
   tone?: NotificationTone;
   time?: string;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  inAppEnabled?: boolean;
+  quietHours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
+  types?: Record<NotificationType, boolean>;
 }
 
 export interface NotificationSettings {
@@ -21,6 +60,12 @@ export interface NotificationSettings {
   reminderAlerts?: boolean;
   newContentAlerts?: boolean;
   emailNotifications?: boolean;
+  email?: boolean;
+  push?: boolean;
+  frequency?: 'immediate' | 'daily' | 'weekly';
+  doNotDisturb?: boolean;
+  doNotDisturbStart?: string;
+  doNotDisturbEnd?: string;
 }
 
 export interface Notification {
@@ -35,4 +80,4 @@ export interface Notification {
   created_at?: string;
 }
 
-export type NotificationFilter = 'all' | 'unread' | NotificationType;
+export type NotificationFilter = 'all' | 'unread' | 'read' | 'urgent' | 'system' | 'journal' | 'emotion' | 'user' | NotificationType;

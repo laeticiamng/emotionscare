@@ -58,9 +58,9 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
           {currentTrack ? (
             <div className="flex flex-col items-center">
               <div className="w-32 h-32 bg-muted rounded-lg overflow-hidden mb-4">
-                {(currentTrack.coverUrl || currentTrack.cover) ? (
+                {(currentTrack.coverUrl || currentTrack.coverImage) ? (
                   <img 
-                    src={currentTrack?.coverUrl || currentTrack?.cover} 
+                    src={currentTrack.coverUrl || currentTrack.coverImage} 
                     alt={`Cover for ${currentTrack?.title}`}
                     className="object-cover w-full h-full"
                   />
@@ -94,9 +94,9 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
                     } cursor-pointer mb-1`}
                   >
                     <div className="w-8 h-8 bg-muted/50 rounded overflow-hidden mr-3">
-                      {(track.coverUrl || track.cover) && (
+                      {(track.coverUrl || track.coverImage) && (
                         <img 
-                          src={track.coverUrl || track.cover} 
+                          src={track.coverUrl || track.coverImage} 
                           alt={track.title} 
                           className="w-full h-full object-cover"
                         />

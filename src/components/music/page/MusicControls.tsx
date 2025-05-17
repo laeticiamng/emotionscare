@@ -1,4 +1,7 @@
+
 import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import { MusicTrack } from '@/types/music';
 
 export interface MusicControlsProps {
@@ -24,6 +27,7 @@ export interface MusicControlsProps {
   size?: 'sm' | 'md' | 'lg';
   vertical?: boolean;
   className?: string;
+  progress?: number;
 }
 
 const MusicControls: React.FC<MusicControlsProps> = ({

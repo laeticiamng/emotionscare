@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MusicTrack } from '@/types';
+import { MusicTrack } from '@/types/music';
 import { Avatar } from '@/components/ui/avatar';
 
 interface TrackInfoProps {
@@ -13,7 +13,7 @@ const TrackInfo: React.FC<TrackInfoProps> = ({ track }) => {
   }
 
   // Determine the correct cover image property
-  const coverImage = track.coverImage || track.cover || '/images/default-album.jpg';
+  const coverImage = track.coverImage || track.coverUrl || track.cover || '/images/default-album.jpg';
 
   return (
     <div className="flex items-center space-x-3 p-2">

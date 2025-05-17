@@ -4,8 +4,8 @@ import { Slider } from '@/components/ui/slider';
 import { ProgressBarProps } from '@/types/music';
 
 export const MusicProgressBar: React.FC<ProgressBarProps> = ({
-  currentTime,
-  duration,
+  currentTime = 0,
+  duration = 0,
   onSeek,
   className = '',
   formatTime = (seconds: number) => {
@@ -16,20 +16,22 @@ export const MusicProgressBar: React.FC<ProgressBarProps> = ({
   showTimestamps = true,
 }) => {
   const handleChange = (value: number[]) => {
-    onSeek(value[0]);
+    if (onSeek) {
+      onSeek(value[0]);
+    }
   };
 
   return (
     <div className={`space-y-2 ${className}`}>
       {showTimestamps && (
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
+          <span>{formatTime(currentTime || 0)}</span>
+          <span>{formatTime(duration || 0)}</span>
         </div>
       )}
       <Slider
-        defaultValue={[currentTime]}
-        value={[currentTime]}
+        defaultValue={[currentTime || 0]}
+        value={[currentTime || 0]}
         max={duration || 100}
         step={0.1}
         onValueChange={handleChange}

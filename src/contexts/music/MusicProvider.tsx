@@ -1,8 +1,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MusicContext, MusicContextType } from '@/contexts/MusicContext';
+import MusicContext from '@/contexts/MusicContext';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { mockTracks, mockPlaylists } from '@/data/mockMusic';
+
+// Placeholder mock data if needed
+const mockPlaylists: MusicPlaylist[] = [];
 
 const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -13,6 +15,11 @@ const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
+  const [recommendations, setRecommendations] = useState<MusicPlaylist[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
+  const [openDrawer, setOpenDrawer] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
@@ -26,6 +33,8 @@ const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   };
   
   useEffect(() => {
+    initializeMusicSystem();
+    
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -50,12 +59,13 @@ const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     }
     
     if (audioRef.current) {
-      audioRef.current.src = track.url;
+      audioRef.current.src = track.url || track.audioUrl || '';
       audioRef.current.play().then(() => {
         setCurrentTrack(track);
         setIsPlaying(true);
       }).catch(error => {
         console.error('Error playing track:', error);
+        setError(error as Error);
       });
     }
   };
@@ -71,7 +81,10 @@ const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     if (audioRef.current && !isPlaying && currentTrack) {
       audioRef.current.play()
         .then(() => setIsPlaying(true))
-        .catch(error => console.error('Error resuming track:', error));
+        .catch(error => {
+          console.error('Error resuming track:', error);
+          setError(error as Error);
+        });
     }
   };
   
@@ -120,16 +133,50 @@ const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     }
   };
   
-  const loadPlaylistForEmotion = (emotion: string) => {
-    const emotionPlaylist = mockPlaylists.find(p => p.emotion === emotion) || mockPlaylists[0];
-    setPlaylist(emotionPlaylist);
+  const loadPlaylistForEmotion = async (emotion: string) => {
+    setIsLoading(true);
+    setError(null);
+    setCurrentEmotion(emotion);
     
-    if (emotionPlaylist.tracks.length > 0 && !currentTrack) {
-      playTrack(emotionPlaylist.tracks[0]);
+    try {
+      // In a real application, this would be an API call
+      // For now we'll use a placeholder
+      const emotionPlaylist = mockPlaylists.find(p => p.emotion === emotion || p.mood === emotion);
+      
+      if (emotionPlaylist) {
+        setPlaylist(emotionPlaylist);
+        if (emotionPlaylist.tracks.length > 0 && !isPlaying) {
+          playTrack(emotionPlaylist.tracks[0]);
+        }
+        return emotionPlaylist;
+      } else {
+        // Create a placeholder playlist
+        const newPlaylist: MusicPlaylist = {
+          id: `playlist-${emotion}-${Date.now()}`,
+          name: `${emotion} Music`,
+          emotion: emotion,
+          tracks: [],
+          description: `Music to match your ${emotion} mood`
+        };
+        setPlaylist(newPlaylist);
+        return newPlaylist;
+      }
+    } catch (err) {
+      setError(err as Error);
+      console.error('Error loading playlist for emotion:', err);
+      return null;
+    } finally {
+      setIsLoading(false);
     }
   };
   
-  const musicContextValue: MusicContextType = {
+  const setEmotion = (emotion: string) => {
+    setCurrentEmotion(emotion);
+    loadPlaylistForEmotion(emotion);
+  };
+  
+  // Provide the context value
+  const musicContextValue = {
     isInitialized,
     currentTrack,
     isPlaying,
@@ -139,6 +186,13 @@ const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     currentTime,
     duration,
     playlist,
+    recommendations,
+    isLoading,
+    error,
+    currentEmotion,
+    emotion: currentEmotion,
+    openDrawer,
+    setOpenDrawer,
     togglePlay,
     playTrack,
     pauseTrack,
@@ -149,6 +203,7 @@ const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     setVolume: handleVolumeChange,
     toggleMute,
     loadPlaylistForEmotion,
+    setEmotion,
     initializeMusicSystem
   };
   

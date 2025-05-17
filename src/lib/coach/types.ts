@@ -1,49 +1,66 @@
 
-export type CoachEventType = 'achievement' | 'reminder' | 'feedback' | 'suggestion' | 'session_start' | 'session_started' | 'insight_generated' | string;
+import { EmotionResult } from '@/types/emotion';
 
 export interface CoachEvent {
   id: string;
-  type: CoachEventType;
-  title: string;
-  message: string;
+  type: string;
   timestamp: string;
-  userId?: string;
-  metadata?: Record<string, any>;
+  data: any;
+}
+
+export interface CoachResponse {
+  id: string;
+  message: string;
+  suggestions?: string[];
+  actions?: CoachAction[];
+  followupQuestions?: string[];
+  emotionDetected?: string;
+  timestamp: string;
+}
+
+export interface CoachAction {
+  id: string;
+  type: 'music' | 'exercise' | 'journal' | 'scan' | 'vr' | 'reminder';
+  label: string;
+  description?: string;
+  payload?: any;
+}
+
+export interface CoachState {
+  conversations: CoachConversation[];
+  activeConversationId: string | null;
+  isTyping: boolean;
+  lastDetectedEmotion: string | null;
+  emotionHistory: EmotionResult[];
+  lastInteractionTimestamp: string | null;
+  suggestionHistory: string[];
+}
+
+export interface CoachConversation {
+  id: string;
+  title: string;
+  messages: CoachMessage[];
+  createdAt: string;
+  updatedAt: string;
+  primaryEmotion?: string;
+  summary?: string;
+}
+
+export interface CoachMessage {
+  id: string;
+  content: string;
+  sender: 'user' | 'coach' | 'system';
+  timestamp: string;
+  emotion?: string;
+  attachments?: any[];
+  actions?: CoachAction[];
   read?: boolean;
 }
 
-export interface CoachInsight {
-  id: string;
-  userId: string;
-  date: string;
-  emotionTrend: string;
-  mainEmotion: string;
-  secondaryEmotion?: string;
-  intensity: number;
-  recommendations: string[];
-  activities?: string[];
-  journalPrompts?: string[];
-}
-
-export interface CoachSuggestion {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  emotion: string;
-  duration?: string;
-  difficulty?: 'easy' | 'medium' | 'hard';
-  benefits?: string[];
-  steps?: string[];
-}
-
-export interface CoachAchievement {
-  id: string;
-  title: string;
-  description: string;
-  unlockCondition: string;
-  icon?: string;
-  category?: string;
-  points?: number;
-  unlockedAt?: string;
-}
+export const AI_MODEL_CONFIG = {
+  defaultModel: 'gpt-4-turbo',
+  fallbackModel: 'gpt-3.5-turbo',
+  maxTokens: 2000,
+  temperature: 0.7,
+  systemPrompt: 'You are an empathetic emotional well-being coach.'
+};

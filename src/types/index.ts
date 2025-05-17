@@ -3,7 +3,7 @@ export * from './user';
 export * from './theme';
 export * from './music';
 export * from './badge';
-export * from './emotions';
+export * from './emotion';
 export * from './notification';
 export * from './vr';
 export * from './types';

@@ -1,6 +1,6 @@
 
 // Export all contexts from this barrel file
-export * from './music';
+export { MusicProvider, useMusic, MusicContext } from './music';
 export * from './coach';
 export * from './UserModeContext';
 export * from './UserPreferencesContext';

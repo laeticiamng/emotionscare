@@ -1,33 +1,44 @@
 
 import { createContext, useContext } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicContextType } from '@/types/music';
 
-export interface MusicContextType {
-  isInitialized: boolean;
-  currentTrack: MusicTrack | null;
-  isPlaying: boolean;
-  volume: number;
-  muted: boolean;
-  isMuted: boolean;
-  currentTime: number;
-  duration: number;
-  playlist: MusicPlaylist | null;
-  togglePlay: () => void;
-  playTrack: (track: MusicTrack) => void;
-  pauseTrack: () => void;
-  resumeTrack: () => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-  seekTo: (time: number) => void;
-  setVolume: (volume: number) => void;
-  toggleMute: () => void;
-  loadPlaylistForEmotion: (emotion: string) => void;
-  initializeMusicSystem?: () => void;
-}
+// Create a default context value
+const defaultContextValue: MusicContextType = {
+  currentTrack: null,
+  playlist: null,
+  isPlaying: false,
+  volume: 1,
+  isMuted: false,
+  muted: false,
+  currentTime: 0,
+  duration: 0,
+  currentEmotion: null,
+  emotion: null,
+  recommendations: [],
+  isLoading: false,
+  error: null,
+  isInitialized: false,
+  openDrawer: false,
+  playTrack: () => {},
+  pauseTrack: () => {},
+  resumeTrack: () => {},
+  togglePlay: () => {},
+  nextTrack: () => {},
+  previousTrack: () => {},
+  setVolume: () => {},
+  toggleMute: () => {},
+  seekTo: () => {},
+  loadPlaylistForEmotion: async () => null,
+  setEmotion: () => {},
+  setOpenDrawer: () => {},
+  initializeMusicSystem: () => {},
+};
 
-export const MusicContext = createContext<MusicContextType | null>(null);
+// Create the context
+const MusicContext = createContext<MusicContextType>(defaultContextValue);
 
-export const useMusic = (): MusicContextType => {
+// Create a hook for using the context
+export const useMusic = () => {
   const context = useContext(MusicContext);
   
   if (!context) {
