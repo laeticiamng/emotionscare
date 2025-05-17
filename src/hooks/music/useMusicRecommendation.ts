@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/contexts';
 import { MusicTrack, EmotionMusicParams, MusicPlaylist } from '@/types/music';
-import { EmotionResult } from '@/types/scan';
+import { EmotionResult } from '@/types';
 
 export const EMOTION_TO_MUSIC: Record<string, string> = {
   joy: 'upbeat',
@@ -33,25 +33,17 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
     setIsLoading(true);
     try {
       const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-      const params: EmotionMusicParams = { emotion: musicType };
+      const playlist = await loadPlaylistForEmotion(musicType);
       
-      // Vérifier si loadPlaylistForEmotion existe
-      if (loadPlaylistForEmotion) {
-        const playlist = await loadPlaylistForEmotion(params);
-        
-        if (playlist?.tracks) {
-          // Make sure all tracks have required properties
-          const tracksWithRequiredProps = playlist.tracks.map(track => ({
-            ...track,
-            url: track.url || track.audioUrl || '',
-            duration: track.duration || 0
-          }));
-          setRecommendedTracks(tracksWithRequiredProps);
-        } else {
-          setRecommendedTracks([]);
-        }
+      if (playlist && playlist.tracks) {
+        // Make sure all tracks have required properties
+        const tracksWithRequiredProps = playlist.tracks.map(track => ({
+          ...track,
+          url: track.url || track.audioUrl || '',
+          duration: track.duration || 0
+        }));
+        setRecommendedTracks(tracksWithRequiredProps);
       } else {
-        console.log("loadPlaylistForEmotion n'est pas disponible");
         setRecommendedTracks([]);
       }
     } catch (error) {
@@ -82,12 +74,7 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
   
   const handlePlayMusic = (emotion: string) => {
     const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-    const params: EmotionMusicParams = { emotion: musicType };
-    
-    // Vérifier si loadPlaylistForEmotion existe avant de l'appeler
-    if (loadPlaylistForEmotion) {
-      loadPlaylistForEmotion(params);
-    }
+    loadPlaylistForEmotion(musicType);
     return playFirstRecommendation();
   };
   

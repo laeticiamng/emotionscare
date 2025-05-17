@@ -29,6 +29,9 @@ export interface RouteConfig {
     reports?: string;
     events?: string;
     settings?: string;
+    gamification?: string;
+    cocon?: string;
+    preferences?: string;
   };
   b2bUser: {
     home: string;
@@ -43,6 +46,9 @@ export interface RouteConfig {
     reports?: string;
     events?: string;
     settings?: string;
+    gamification?: string;
+    cocon?: string;
+    preferences?: string;
   };
   b2bAdmin: {
     home: string;
@@ -77,7 +83,10 @@ export const ROUTES: RouteConfig = {
     music: '/b2c/music',
     coach: '/b2c/coach',
     vr: '/b2c/vr',
-    settings: '/b2c/settings'
+    settings: '/b2c/settings',
+    gamification: '/b2c/gamification',
+    cocon: '/b2c/cocon',
+    preferences: '/b2c/preferences'
   },
   b2bUser: {
     home: '/b2b/user',
@@ -89,7 +98,10 @@ export const ROUTES: RouteConfig = {
     coach: '/b2b/user/coach',
     vr: '/b2b/user/vr',
     teams: '/b2b/user/teams',
-    settings: '/b2b/user/settings'
+    settings: '/b2b/user/settings',
+    gamification: '/b2b/user/gamification',
+    cocon: '/b2b/user/cocon',
+    preferences: '/b2b/user/preferences'
   },
   b2bAdmin: {
     home: '/b2b/admin',

@@ -1,12 +1,26 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import MusicContext from '@/contexts/MusicContext';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicContextType, MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
 
-// Placeholder mock data if needed
-const mockPlaylists: MusicPlaylist[] = [];
+// Create a context
+export const MusicContext = React.createContext<MusicContextType | null>(null);
 
-const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Create a hook for using the context
+export const useMusic = () => {
+  const context = React.useContext(MusicContext);
+  
+  if (!context) {
+    throw new Error('useMusic must be used within a MusicProvider');
+  }
+  
+  return context;
+};
+
+export interface MusicProviderProps {
+  children: React.ReactNode;
+}
+
+const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -15,7 +29,7 @@ const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
-  const [recommendations, setRecommendations] = useState<MusicPlaylist[] | null>(null);
+  const [recommendations, setRecommendations] = useState<MusicTrack[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
@@ -133,37 +147,51 @@ const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     }
   };
   
-  const loadPlaylistForEmotion = async (emotion: string) => {
+  const loadPlaylistForEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
     setIsLoading(true);
     setError(null);
+    
+    // Parse parameters
+    const emotion = typeof params === 'string' ? params : params.emotion;
     setCurrentEmotion(emotion);
     
     try {
       // In a real application, this would be an API call
-      // For now we'll use a placeholder
-      const emotionPlaylist = mockPlaylists.find(p => p.emotion === emotion || p.mood === emotion);
+      // For now we'll create a mock playlist
+      const newPlaylist: MusicPlaylist = {
+        id: `playlist-${emotion}-${Date.now()}`,
+        name: `${emotion} Music`,
+        title: `${emotion} Music`,
+        emotion: emotion,
+        tracks: [
+          {
+            id: `track-${emotion}-1`,
+            title: `${emotion} Track 1`,
+            artist: 'AI Composer',
+            duration: 180,
+            url: '/sounds/ambient-calm.mp3',
+            coverUrl: '/images/covers/generated.jpg',
+            emotion: emotion
+          },
+          {
+            id: `track-${emotion}-2`,
+            title: `${emotion} Track 2`,
+            artist: 'AI Composer',
+            duration: 210,
+            url: '/sounds/welcome.mp3',
+            coverUrl: '/images/covers/generated.jpg',
+            emotion: emotion
+          }
+        ],
+        description: `Music to match your ${emotion} mood`
+      };
       
-      if (emotionPlaylist) {
-        setPlaylist(emotionPlaylist);
-        if (emotionPlaylist.tracks.length > 0 && !isPlaying) {
-          playTrack(emotionPlaylist.tracks[0]);
-        }
-        return emotionPlaylist;
-      } else {
-        // Create a placeholder playlist
-        const newPlaylist: MusicPlaylist = {
-          id: `playlist-${emotion}-${Date.now()}`,
-          name: `${emotion} Music`,
-          emotion: emotion,
-          tracks: [],
-          description: `Music to match your ${emotion} mood`
-        };
-        setPlaylist(newPlaylist);
-        return newPlaylist;
-      }
+      setPlaylist(newPlaylist);
+      return newPlaylist;
     } catch (err) {
-      setError(err as Error);
-      console.error('Error loading playlist for emotion:', err);
+      const error = err as Error;
+      setError(error);
+      console.error('Error loading playlist for emotion:', error);
       return null;
     } finally {
       setIsLoading(false);
@@ -176,7 +204,7 @@ const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   };
   
   // Provide the context value
-  const musicContextValue = {
+  const musicContextValue: MusicContextType = {
     isInitialized,
     currentTrack,
     isPlaying,

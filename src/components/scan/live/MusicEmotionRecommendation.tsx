@@ -3,8 +3,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, Heart } from 'lucide-react';
-import { useMusic } from '@/contexts/music';
-import { EmotionMusicParams, MusicPlaylist } from '@/types/music';
+import { useMusic } from '@/contexts/music/MusicProvider';
+import { MusicPlaylist } from '@/types/music';
 
 interface MusicEmotionRecommendationProps {
   emotion: string;
@@ -29,8 +29,7 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
   
   const handleSelectPlaylist = async () => {
     try {
-      const params: EmotionMusicParams = { emotion };
-      const musicPlaylist = await loadPlaylistForEmotion(params);
+      const musicPlaylist = await loadPlaylistForEmotion(emotion);
       if (musicPlaylist) {
         onSelect(musicPlaylist);
       } else {

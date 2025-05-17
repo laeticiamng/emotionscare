@@ -62,5 +62,10 @@ export const AI_MODEL_CONFIG = {
   fallbackModel: 'gpt-3.5-turbo',
   maxTokens: 2000,
   temperature: 0.7,
-  systemPrompt: 'You are an empathetic emotional well-being coach.'
+  systemPrompt: 'You are an empathetic emotional well-being coach.',
+  scan: {
+    model: 'gpt-4-turbo',
+    maxTokens: 1000,
+    temperature: 0.5
+  }
 };
