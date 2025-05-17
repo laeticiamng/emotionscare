@@ -1,27 +1,28 @@
 
-export type Theme = 'light' | 'dark' | 'system' | 'blue-pastel' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large' | 'xlarge' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'sans-serif';
+export type Theme = 
+  | "light"
+  | "dark"
+  | "system"
+  | "blue"
+  | "green"
+  | "violet"
+  | "yellow"
+  | "rose"
+  | "blue-pastel"; // Ajout de cette valeur
 
 export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  isDarkMode?: boolean;
-  fontSize?: FontSize;
-  setFontSize?: (size: FontSize) => void;
-  fontFamily?: FontFamily;
-  setFontFamily?: (family: FontFamily) => void;
-  toggleTheme?: () => void;
-  getContrastText?: (color: string) => 'black' | 'white';
 }
 
-export interface ThemeSettingsTabProps {
-  currentTheme: Theme;
-  onThemeChange: (theme: Theme) => void;
-}
+export type FontFamily = 
+  | "system"
+  | "inter"
+  | "manrope"
+  | "mono";
 
-export interface ThemeOption {
-  name: string;
-  value: Theme;
-  preview: string;
-}
+export type FontSize = 
+  | "sm"
+  | "md"
+  | "lg"
+  | "xl";

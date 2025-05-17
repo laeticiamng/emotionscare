@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TeamOverviewProps } from '@/types/scan';
 
 const TeamOverview: React.FC<TeamOverviewProps> = ({
+  teamId,
+  period = 'week',
   userId,
-  period,
   anonymized,
   className,
   dateRange,

@@ -1,21 +1,28 @@
 
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
-export type NotificationTone = 'formal' | 'friendly' | 'minimal' | 'direct' | 'professional' | 'motivational';
+export type NotificationFrequency =
+  | "immediately"
+  | "daily"
+  | "weekly"
+  | "never";
 
-export type NotificationFilter = 'all' | 'unread' | string;
+export type NotificationTone =
+  | "friendly" 
+  | "professional"
+  | "direct"
+  | "motivational";
 
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: string;
-  read: boolean;
-  created_at: string;
-  createdAt?: string; // Pour la rétrocompatibilité
-  priority?: 'low' | 'medium' | 'high';
-  actionUrl?: string;
-  image?: string;
+export type NotificationType =
+  | "alert"
+  | "reminder"
+  | "update"
+  | "message"
+  | "badge"
+  | "achievement"
+  | "health";
+
+export interface NotificationPreference {
+  type: NotificationType;
+  frequency: NotificationFrequency;
+  tone: NotificationTone;
+  enabled: boolean;
 }
-
-// Définir NotificationType pour inclure tous les types possibles
-export type NotificationType = string | 'system' | 'emotion' | 'badge';

@@ -11,22 +11,25 @@ export interface Emotion {
 }
 
 export interface EmotionResult {
-  id: string; // Required prop
+  id: string; 
   emotion: string;
   score: number;
   confidence: number;
   text?: string;
   feedback?: string;
-  ai_feedback?: string; // Added for backward compatibility
+  ai_feedback?: string; // Pour compatibilité
   timestamp?: string;
   emojis?: string | string[];
   recommendations?: string[];
   triggers?: string[];
   user_id?: string;
-  date?: string | Date;
+  userId?: string;
+  date?: string | Date; // Accepter string et Date pour compatibilité
   intensity?: number;
   transcript?: string;
-  audioUrl?: string; // Added for AudioProcessor component
+  audioUrl?: string;
+  audio_url?: string;
+  source?: string; // Ajout pour AudioProcessor
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {

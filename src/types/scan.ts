@@ -45,7 +45,6 @@ export interface EmotionTrend {
   [key: string]: string | number | undefined;
 }
 
-// Add the missing EmotionResult type that's imported by various scan components
 export interface EmotionResult {
   id: string;
   user_id?: string;
@@ -63,12 +62,20 @@ export interface EmotionResult {
   audio_url?: string;
   audioUrl?: string;
   feedback?: string;
+  ai_feedback?: string; // Ajout pour compatibilité
   recommendations?: string[];
+  source?: string;
 }
 
-// Add TeamOverviewProps type
 export interface TeamOverviewProps {
   teamId: string;
   period?: 'day' | 'week' | 'month';
   filter?: string;
+  userId?: string;
+  anonymized?: boolean;
+  className?: string;
+  dateRange?: any;
+  users?: any[];
+  showNames?: boolean;
+  compact?: boolean;
 }
