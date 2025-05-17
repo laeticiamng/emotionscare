@@ -57,6 +57,12 @@ const TeamTabContent: React.FC<TeamTabContentProps> = ({ companyId }) => {
     fetchTeamUsers();
   }, [companyId]);
   
+  // Formater la période pour le composant TeamOverview
+  const formatPeriodString = (): "day" | "week" | "month" => {
+    // On utilise une valeur par défaut week qui est valide
+    return "week";
+  };
+  
   return (
     <Card className="p-6">
       <div className="mb-6 grid gap-4 md:grid-cols-3">
@@ -103,7 +109,7 @@ const TeamTabContent: React.FC<TeamTabContentProps> = ({ companyId }) => {
           <TeamOverview 
             dateRange={dateRange}
             users={teamUsers}
-            period={`${dateRange[0].toLocaleDateString()} - ${dateRange[1].toLocaleDateString()}`}
+            period={formatPeriodString()}
             anonymized={false}
             showNames={true}
           />

@@ -1,28 +1,35 @@
 
-export type NotificationFrequency =
-  | "immediately"
+export type NotificationFrequency = 
+  | "immediate"
   | "daily"
-  | "weekly"
-  | "never";
+  | "weekly";
 
-export type NotificationTone =
-  | "friendly" 
-  | "professional"
-  | "direct"
-  | "motivational";
-
-export type NotificationType =
-  | "alert"
-  | "reminder"
-  | "update"
-  | "message"
-  | "badge"
+export type NotificationType = 
+  | "system"
+  | "emotion"
+  | "coach"
+  | "journal"
+  | "community"
   | "achievement"
-  | "health";
+  | "badge"; // Ajout du type "badge"
+
+export type NotificationTone = 
+  | "friendly"
+  | "professional" 
+  | "direct"
+  | "motivational"; // Ajout des valeurs manquantes
 
 export interface NotificationPreference {
-  type: NotificationType;
-  frequency: NotificationFrequency;
-  tone: NotificationTone;
   enabled: boolean;
+  frequency: NotificationFrequency;
+  types: Record<NotificationType, boolean>;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  inAppEnabled?: boolean;
+  tone?: NotificationTone;
+  quietHours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
 }

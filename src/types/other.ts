@@ -5,6 +5,7 @@ export interface ChatMessage {
   content: string;
   timestamp?: string;
   text?: string;
+  sender?: string;
 }
 
 export interface MoodData {
@@ -14,6 +15,9 @@ export interface MoodData {
   date?: string;
   timestamp?: string;
   value?: number;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
 }
 
 export interface JournalEntry {
@@ -23,6 +27,9 @@ export interface JournalEntry {
   content: string;
   mood?: string;
   tags?: string[];
+  text?: string;
+  ai_feedback?: string;
+  mood_score?: number;
 }
 
 export interface Story {
@@ -54,6 +61,13 @@ export interface InvitationStats {
   accepted: number;
   pending: number;
   expired: number;
+  rejected?: number;
+  total?: number;
+  completed?: number;
+  conversionRate?: number;
+  averageTimeToAccept?: number;
+  teams?: Record<string, number>;
+  recent_invites?: InvitationData[];
 }
 
 export interface InvitationData {
@@ -62,6 +76,10 @@ export interface InvitationData {
   status: "pending" | "accepted" | "expired";
   sentAt: string;
   acceptedAt?: string;
+  role?: string;
+  created_at?: string;
+  expires_at?: string;
+  accepted_at?: string;
 }
 
 export interface InvitationFormData {

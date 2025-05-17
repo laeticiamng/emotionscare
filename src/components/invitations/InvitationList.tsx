@@ -65,23 +65,23 @@ const InvitationList: React.FC<InvitationListProps> = ({
               <p className="font-medium">{invitation.email}</p>
               <div className="flex items-center gap-2">
                 {getStatusBadge(invitation.status)}
-                <Badge variant="outline">{invitation.role}</Badge>
+                {invitation.role && <Badge variant="outline">{invitation.role}</Badge>}
               </div>
             </div>
             
             <div className="mt-2 text-sm text-muted-foreground">
               <span>
-                Envoyée {formatDistanceToNow(new Date(invitation.created_at), { addSuffix: true, locale: fr })}
+                Envoyée {formatDistanceToNow(new Date(invitation.sentAt || invitation.created_at || ''), { addSuffix: true, locale: fr })}
               </span>
               <span className="mx-2">•</span>
               <span>
-                Expire {formatDistanceToNow(new Date(invitation.expires_at), { addSuffix: true, locale: fr })}
+                Expire {formatDistanceToNow(new Date(invitation.expires_at || ''), { addSuffix: true, locale: fr })}
               </span>
-              {invitation.accepted_at && (
+              {(invitation.acceptedAt || invitation.accepted_at) && (
                 <>
                   <span className="mx-2">•</span>
                   <span>
-                    Acceptée {formatDistanceToNow(new Date(invitation.accepted_at), { addSuffix: true, locale: fr })}
+                    Acceptée {formatDistanceToNow(new Date(invitation.acceptedAt || invitation.accepted_at || ''), { addSuffix: true, locale: fr })}
                   </span>
                 </>
               )}

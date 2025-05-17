@@ -68,7 +68,7 @@ export interface EmotionResult {
 }
 
 export interface TeamOverviewProps {
-  teamId: string;
+  teamId?: string;
   period?: 'day' | 'week' | 'month';
   userId?: string;
   anonymized?: boolean;

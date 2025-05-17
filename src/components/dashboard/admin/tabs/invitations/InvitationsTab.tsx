@@ -6,23 +6,7 @@ import InvitationForm from '@/components/invitations/InvitationForm';
 import InvitationStatsDisplay from './InvitationStats';
 import { InvitationStats, InvitationData } from '@/types';
 import InvitationModal from './InvitationModal';
-
-// Mock implementation for InvitationList component
-const InvitationList = ({ invitations, isLoading }: { invitations: InvitationData[], isLoading: boolean }) => (
-  <div>
-    {isLoading ? (
-      <div>Loading...</div>
-    ) : invitations.length === 0 ? (
-      <div>Aucune invitation trouvée</div>
-    ) : (
-      <ul>
-        {invitations.map(invitation => (
-          <li key={invitation.id}>{invitation.email} - {invitation.status}</li>
-        ))}
-      </ul>
-    )}
-  </div>
-);
+import InvitationList from '@/components/invitations/InvitationList';
 
 const InvitationsTab = () => {
   const [invitationStats, setInvitationStats] = useState<InvitationStats>({
@@ -32,11 +16,7 @@ const InvitationsTab = () => {
     rejected: 0,
     expired: 0,
     sent: 0,
-    completed: 0,
-    conversionRate: 0,
-    averageTimeToAccept: 0,
-    teams: {},
-    recent_invites: []
+    completed: 0
   });
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -54,6 +34,38 @@ const InvitationsTab = () => {
     await new Promise(resolve => setTimeout(resolve, 800));
     
     // Mock data
+    const mockInvites: InvitationData[] = [
+      {
+        id: 'inv1',
+        email: 'johndoe@example.com',
+        status: 'accepted',
+        sentAt: '2023-10-15T14:30:00Z',
+        acceptedAt: '2023-10-16T09:12:00Z',
+        role: 'user',
+        created_at: '2023-10-15T14:30:00Z',
+        expires_at: '2023-10-22T14:30:00Z',
+        accepted_at: '2023-10-16T09:12:00Z'
+      },
+      {
+        id: 'inv2',
+        email: 'janedoe@example.com',
+        status: 'pending',
+        sentAt: '2023-10-16T11:20:00Z',
+        role: 'user',
+        created_at: '2023-10-16T11:20:00Z',
+        expires_at: '2023-10-23T11:20:00Z'
+      },
+      {
+        id: 'inv3',
+        email: 'robert@example.com',
+        status: 'expired',
+        sentAt: '2023-09-29T08:45:00Z',
+        role: 'manager',
+        created_at: '2023-09-29T08:45:00Z',
+        expires_at: '2023-10-06T08:45:00Z'
+      }
+    ];
+    
     setInvitationStats({
       total: 120,
       pending: 45,
@@ -71,33 +83,7 @@ const InvitationsTab = () => {
         'HR': 15,
         'Management': 20
       },
-      recent_invites: [
-        {
-          id: 'inv1',
-          email: 'johndoe@example.com',
-          status: 'accepted',
-          created_at: '2023-10-15T14:30:00Z',
-          expires_at: '2023-10-22T14:30:00Z',
-          accepted_at: '2023-10-16T09:12:00Z',
-          role: 'user'
-        },
-        {
-          id: 'inv2',
-          email: 'janedoe@example.com',
-          status: 'pending',
-          created_at: '2023-10-16T11:20:00Z',
-          expires_at: '2023-10-23T11:20:00Z',
-          role: 'user'
-        },
-        {
-          id: 'inv3',
-          email: 'robert@example.com',
-          status: 'expired',
-          created_at: '2023-09-29T08:45:00Z',
-          expires_at: '2023-10-06T08:45:00Z',
-          role: 'manager'
-        }
-      ] as InvitationData[]
+      recent_invites: mockInvites
     });
     
     setLoading(false);
@@ -131,10 +117,10 @@ const InvitationsTab = () => {
         <CardContent>
           <Tabs defaultValue="pending">
             <TabsList className="grid grid-cols-4 mb-4">
-              <TabsTrigger value="all">Toutes ({invitationStats.total})</TabsTrigger>
+              <TabsTrigger value="all">Toutes ({invitationStats.total || 0})</TabsTrigger>
               <TabsTrigger value="pending">En attente ({invitationStats.pending})</TabsTrigger>
               <TabsTrigger value="accepted">Acceptées ({invitationStats.accepted})</TabsTrigger>
-              <TabsTrigger value="expired">Expirées ({(invitationStats.expired || 0) + invitationStats.rejected})</TabsTrigger>
+              <TabsTrigger value="expired">Expirées ({(invitationStats.expired || 0) + (invitationStats.rejected || 0)})</TabsTrigger>
             </TabsList>
             
             <TabsContent value="all">
@@ -161,7 +147,7 @@ const InvitationsTab = () => {
             <TabsContent value="expired">
               <InvitationList 
                 invitations={(invitationStats.recent_invites || []).filter(inv => 
-                  inv.status === 'expired' || inv.status === 'rejected'
+                  inv.status === 'expired'
                 )}
                 isLoading={loading} 
               />

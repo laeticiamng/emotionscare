@@ -1,226 +1,135 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Send, RefreshCw, ChevronLeft } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useChat } from '@/hooks/useChat';
 import { ChatMessage } from '@/types';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Send, User, Bot } from 'lucide-react';
 
 interface ChatInterfaceProps {
-  title?: string;
   initialMessages?: ChatMessage[];
-  onSendMessage: (message: string) => Promise<any>;
-  onRegenerate?: () => Promise<any>;
-  onBackClick?: () => void;
-  placeholder?: string;
+  onSendMessage?: (message: string) => void;
+  readOnly?: boolean;
   className?: string;
-  autoFocus?: boolean;
-  systemMessageContent?: string;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({
-  title = "Assistant IA",
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
   initialMessages = [],
   onSendMessage,
-  onRegenerate,
-  onBackClick,
-  placeholder = "Écrivez votre message ici...",
-  className = "",
-  autoFocus = true,
-  systemMessageContent
+  readOnly = false,
+  className = ''
 }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  const [inputValue, setInputValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
-
+  const { messages, sendMessage } = useChat({ initialMessages });
+  const [newMessage, setNewMessage] = useState('');
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  
   // Scroll to bottom when messages change
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (scrollAreaRef.current) {
+      const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
     }
   }, [messages]);
-
-  // Focus input on mount if autoFocus is true
-  useEffect(() => {
-    if (autoFocus && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [autoFocus]);
-
-  // Add system message if provided
-  useEffect(() => {
-    if (systemMessageContent && messages.length === 0) {
-      setMessages([
-        {
-          id: "system-message",
-          content: systemMessageContent,
-          sender: "system",
+  
+  const handleSend = () => {
+    if (!newMessage.trim()) return;
+    
+    // Either use the custom handler or the internal chat state
+    if (onSendMessage) {
+      onSendMessage(newMessage);
+    } else {
+      sendMessage({
+        id: Date.now().toString(),
+        content: newMessage,
+        role: 'user',
+        timestamp: new Date().toISOString(),
+      });
+      
+      // Mock AI response after a delay
+      setTimeout(() => {
+        sendMessage({
+          id: (Date.now() + 1).toString(),
+          content: `This is a demo response to: "${newMessage}"`,
+          role: 'ai',
           timestamp: new Date().toISOString(),
-        }
-      ]);
+        });
+      }, 1000);
     }
-  }, [systemMessageContent, messages.length]);
-
-  const handleSendMessage = async () => {
-    if (inputValue.trim() === "" || isLoading) return;
-
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      content: inputValue,
-      sender: "user",
-      timestamp: new Date().toISOString(),
-    };
-
-    setMessages(prevMessages => [...prevMessages, userMessage]);
-    setInputValue("");
-    setIsLoading(true);
-
-    try {
-      const response = await onSendMessage(inputValue);
-      
-      if (response) {
-        // If response is already a ChatMessage, add it directly
-        if (response.id && response.content && response.sender) {
-          setMessages(prevMessages => [...prevMessages, response]);
-        } 
-        // Otherwise, create a new assistant message
-        else {
-          const assistantMessage: ChatMessage = {
-            id: `assistant-${Date.now()}`,
-            content: typeof response === 'string' ? response : JSON.stringify(response),
-            sender: "ai", // Change from "assistant" to "ai" to match the type
-            timestamp: new Date().toISOString(),
-          };
-          setMessages(prevMessages => [...prevMessages, assistantMessage]);
-        }
-      }
-    } catch (error) {
-      console.error("Error sending message:", error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors de l'envoi du message",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    
+    setNewMessage('');
   };
-
+  
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSend();
     }
   };
-
-  const handleRegenerate = async () => {
-    if (!onRegenerate || isLoading) return;
-    
-    setIsLoading(true);
-    
-    try {
-      await onRegenerate();
-    } catch (error) {
-      console.error("Error regenerating response:", error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur s'est produite lors de la régénération de la réponse",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Helper to determine message style based on sender
-  const getMessageStyle = (message: ChatMessage) => {
-    switch (message.sender) {
-      case 'user':
-        return "bg-primary/10 ml-auto max-w-[80%] md:max-w-[70%] rounded-lg p-3";
-      case 'ai':
-        return "bg-muted max-w-[80%] md:max-w-[70%] rounded-lg p-3";
-      case 'system':
-        return "bg-accent/20 max-w-full rounded-lg p-3 text-center";
-      default:
-        return "bg-muted max-w-[80%] md:max-w-[70%] rounded-lg p-3";
-    }
-  };
-
+  
   return (
-    <Card className={`flex flex-col h-full max-h-[600px] ${className}`}>
-      <CardHeader className="px-4 py-3 border-b flex flex-row items-center gap-2">
-        {onBackClick && (
-          <Button variant="ghost" size="icon" onClick={onBackClick}>
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-        )}
-        <CardTitle className="text-lg">{title}</CardTitle>
-      </CardHeader>
-      
-      <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
-          <div 
-            key={message.id}
-            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div className={getMessageStyle(message)}>
-              <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap text-sm">
-                {message.content}
+    <Card className={`flex flex-col h-[600px] ${className}`}>
+      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
+        <div className="space-y-4">
+          {messages.map((message) => (
+            <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`flex items-start gap-2 max-w-[80%] ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                <Avatar className="mt-1">
+                  {message.role === 'user' ? (
+                    <>
+                      <AvatarFallback>U</AvatarFallback>
+                      <AvatarImage src="/images/avatar.png" />
+                    </>
+                  ) : (
+                    <>
+                      <AvatarFallback>AI</AvatarFallback>
+                      <AvatarImage src="/images/ai-avatar.png" />
+                    </>
+                  )}
+                </Avatar>
+                <div className={`rounded-lg p-3 ${
+                  message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                }`}>
+                  <p className="text-sm">{message.content}</p>
+                  {message.timestamp && (
+                    <span className={`text-xs block mt-1 ${
+                      message.role === 'user' ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                    }`}>
+                      {new Date(message.timestamp).toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-        
-        {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-muted max-w-[80%] md:max-w-[70%] rounded-lg p-3">
-              <Skeleton className="h-4 w-40 mb-2" />
-              <Skeleton className="h-4 w-60 mb-2" />
-              <Skeleton className="h-4 w-32" />
+          ))}
+          {messages.length === 0 && (
+            <div className="flex items-center justify-center h-64 text-muted-foreground">
+              <p>Aucun message. Commencez la conversation!</p>
             </div>
-          </div>
-        )}
-        
-        <div ref={messagesEndRef} />
-      </CardContent>
-      
-      <div className="p-4 border-t">
-        <div className="flex items-center gap-2">
-          <Input
-            ref={inputRef}
-            placeholder={placeholder}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading}
-            className="flex-1"
-          />
-          <Button 
-            onClick={handleSendMessage}
-            disabled={!inputValue.trim() || isLoading}
-            size="icon"
-          >
-            <Send className="h-4 w-4" />
-          </Button>
-          
-          {onRegenerate && messages.length > 1 && (
-            <Button
-              onClick={handleRegenerate}
-              disabled={isLoading}
-              variant="outline"
-              size="icon"
-              title="Régénérer la dernière réponse"
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
           )}
         </div>
-      </div>
+      </ScrollArea>
+      
+      {!readOnly && (
+        <div className="p-4 border-t">
+          <div className="flex gap-2">
+            <Textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Écrivez votre message..."
+              className="min-h-[60px]"
+            />
+            <Button size="icon" onClick={handleSend} disabled={!newMessage.trim()}>
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </Card>
   );
 };

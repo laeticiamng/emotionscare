@@ -8,8 +8,9 @@ export const mockTracks: MusicTrack[] = [
     title: 'Calm Waters',
     artist: 'Nature Sounds',
     duration: 180,
-    trackUrl: 'https://example.com/tracks/calm-waters.mp3',
     audioUrl: 'https://example.com/tracks/calm-waters.mp3',
+    trackUrl: 'https://example.com/tracks/calm-waters.mp3',
+    url: 'https://example.com/tracks/calm-waters.mp3',
     mood: 'calm'
   },
   {
@@ -17,8 +18,9 @@ export const mockTracks: MusicTrack[] = [
     title: 'Happy Days',
     artist: 'Positive Vibes',
     duration: 210,
-    trackUrl: 'https://example.com/tracks/happy-days.mp3',
     audioUrl: 'https://example.com/tracks/happy-days.mp3',
+    trackUrl: 'https://example.com/tracks/happy-days.mp3',
+    url: 'https://example.com/tracks/happy-days.mp3',
     mood: 'happy'
   },
   {
@@ -26,8 +28,9 @@ export const mockTracks: MusicTrack[] = [
     title: 'Focus Energy',
     artist: 'Mind Control',
     duration: 240,
-    trackUrl: 'https://example.com/tracks/focus-energy.mp3',
     audioUrl: 'https://example.com/tracks/focus-energy.mp3',
+    trackUrl: 'https://example.com/tracks/focus-energy.mp3',
+    url: 'https://example.com/tracks/focus-energy.mp3',
     mood: 'focus'
   }
 ];

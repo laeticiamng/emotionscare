@@ -23,26 +23,26 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <StatCard 
                 title="Total" 
-                value={stats.total} 
+                value={stats.total || stats.sent || 0} 
                 icon="📧"
               />
               <StatCard 
                 title="En attente" 
                 value={stats.pending} 
                 icon="⏳"
-                percentage={stats.total > 0 ? (stats.pending / stats.total) * 100 : 0}
+                percentage={(stats.total || stats.sent) > 0 ? (stats.pending / (stats.total || stats.sent)) * 100 : 0}
               />
               <StatCard 
                 title="Acceptées" 
                 value={stats.accepted} 
                 icon="✅"
-                percentage={stats.total > 0 ? (stats.accepted / stats.total) * 100 : 0}
+                percentage={(stats.total || stats.sent) > 0 ? (stats.accepted / (stats.total || stats.sent)) * 100 : 0}
               />
               <StatCard 
                 title="Expirées" 
-                value={(stats.expired || 0) + stats.rejected} 
+                value={(stats.expired || 0) + (stats.rejected || 0)} 
                 icon="⛔"
-                percentage={stats.total > 0 ? (((stats.expired || 0) + stats.rejected) / stats.total) * 100 : 0}
+                percentage={(stats.total || stats.sent) > 0 ? (((stats.expired || 0) + (stats.rejected || 0)) / (stats.total || stats.sent)) * 100 : 0}
               />
             </div>
             
@@ -94,7 +94,7 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
                       </div>
                       <CircularProgress 
                         value={count} 
-                        max={stats.total} 
+                        max={stats.total || stats.sent || 100} 
                         size={60}
                         thickness={6}
                       />
