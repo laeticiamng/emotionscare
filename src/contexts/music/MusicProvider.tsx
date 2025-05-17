@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { MusicTrack, MusicPlaylist, EmotionMusicParams, MusicContextType } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
-import { useAudioHandlers } from './useAudioHandlers';
+import useAudioHandlers from '@/hooks/use-audio';
 
 // Créer le context
 export const MusicContext = createContext<MusicContextType>({
@@ -11,7 +11,6 @@ export const MusicContext = createContext<MusicContextType>({
   isPlaying: false,
   volume: 0.5,
   muted: false,
-  isMuted: false,
   currentTime: 0,
   duration: 0,
   emotion: null,
@@ -25,11 +24,11 @@ export const MusicContext = createContext<MusicContextType>({
   prevTrack: () => {},
   previousTrack: () => {},
   setVolume: () => {},
+  toggleMute: () => {},
   seekTo: () => {},
   loadPlaylistForEmotion: async () => null,
   setEmotion: () => {},
-  setOpenDrawer: () => {},
-  toggleMute: () => {}
+  setOpenDrawer: () => {}
 });
 
 // Hook pour utiliser le context
@@ -54,7 +53,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const {
     audioRef,
     volume,
-    isMuted,
+    muted,
     currentTime,
     duration,
     playTrack: handlePlayTrack,
@@ -194,8 +193,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
         playlist,
         isPlaying,
         volume,
-        isMuted,
-        muted: isMuted,
+        muted,
         currentTime,
         duration,
         emotion,

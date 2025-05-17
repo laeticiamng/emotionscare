@@ -172,6 +172,7 @@ export const useAudioHandlers = ({ toast = true }: UseAudioProps = {}) => {
     audioRef,
     volume,
     isMuted,
+    muted: isMuted, // Alias pour compatibilité avec MusicContext
     currentTime,
     duration,
     isLoading,
@@ -185,4 +186,5 @@ export const useAudioHandlers = ({ toast = true }: UseAudioProps = {}) => {
   };
 };
 
+// Alias pour faciliter l'import
 export default useAudioHandlers;
