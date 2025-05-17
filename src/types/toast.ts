@@ -1,6 +1,8 @@
 
 import { ReactNode } from 'react';
 
+export type NotificationType = 'default' | 'error' | 'success' | 'warning' | 'info' | 'badge';
+
 export interface Toast {
   id: string;
   title?: string;

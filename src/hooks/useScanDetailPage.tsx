@@ -1,11 +1,25 @@
 
 import { useState, useEffect } from 'react';
 import { useEmotionScan } from './useEmotionScan';
-import { fetchUserById } from '@/lib/communityService';
-import type { Emotion, User } from '@/types';
+import { User } from '@/types/other';
+import { EmotionResult } from '@/types/emotions';
+
+// Fonction simulée pour récupérer les détails d'un utilisateur
+const fetchUserById = async (userId: string): Promise<User> => {
+  // Simuler un délai d'API
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  return {
+    id: userId,
+    name: `User ${userId}`,
+    email: `user${userId}@example.com`,
+  };
+};
 
 export function useScanDetailPage(userId?: string) {
-  const { scanEmotion, getLatestEmotion, lastEmotion, isLoading: emotionLoading, error } = useEmotionScan();
+  const { scanEmotion, latestEmotion, isLoading: emotionLoading, error, fetchLatest } = useEmotionScan({
+    userId
+  });
   
   const [emojis, setEmojis] = useState<string>('');
   const [text, setText] = useState<string>('');
@@ -25,7 +39,7 @@ export function useScanDetailPage(userId?: string) {
       setUserDetail(userData);
       
       // Fetch latest emotion for this user
-      await getLatestEmotion();
+      await fetchLatest();
     } catch (err) {
       console.error('Error fetching user or emotion data:', err);
     } finally {
@@ -62,7 +76,7 @@ export function useScanDetailPage(userId?: string) {
     text,
     audioUrl,
     userDetail,
-    latestEmotion: lastEmotion,
+    latestEmotion,
     loading: loading || emotionLoading,
     analyzing,
     error,

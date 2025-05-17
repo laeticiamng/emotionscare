@@ -3,43 +3,55 @@ export interface Emotion {
   id: string;
   date: string;
   emotion: string;
-  name: string;
   score: number;
-  confidence: number;
-  intensity: number;
-  color: string;
-  text: string;
-  userId?: string;
-  user_id?: string;
 }
 
 export interface EmotionResult {
-  emotion: string;
-  score: number;
+  id: string;
+  userId?: string;
+  user_id?: string;
+  timestamp?: string;
+  date?: string;
+  emotion?: string;
+  primaryEmotion?: string;
+  score?: number;
   confidence?: number;
   intensity?: number;
-  color?: string;
-  suggestions?: string[];
+  emojis?: string | string[];
+  text?: string;
+  transcript?: string;
+  audio_url?: string;
+  audioUrl?: string;
+  feedback?: string;
+  ai_feedback?: string;
+  recommendations?: string[];
+  source?: string;
+  emotions?: Record<string, number>;
 }
 
 export interface LiveVoiceScannerProps {
   onEmotionDetected?: (emotion: EmotionResult) => void;
+  language?: string;
   autoStart?: boolean;
   duration?: number;
+  className?: string;
+  withAI?: boolean;
 }
 
 export interface TeamOverviewProps {
-  departmentId?: string;
-  period?: 'day' | 'week' | 'month' | 'year';
+  teamId?: string;
+  period?: 'day' | 'week' | 'month';
+  userId?: string;
+  anonymized?: boolean;
+  className?: string;
+  dateRange?: any;
+  users?: any[];
+  showNames?: boolean;
+  compact?: boolean;
 }
 
 export interface EmotionalTeamViewProps {
-  teamId?: string;
-  displayMode?: 'chart' | 'grid' | 'list';
-  period?: 'day' | 'week' | 'month' | 'year';
+  teamId: string;
+  period: 'day' | 'week' | 'month';
   anonymized?: boolean;
-  dateRange?: [Date, Date];
-  showGraph?: boolean;
-  showMembers?: boolean;
-  className?: string;
 }

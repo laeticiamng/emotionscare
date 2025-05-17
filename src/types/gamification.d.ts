@@ -4,7 +4,7 @@ export interface GamificationStats {
   level: number;
   streak: number;
   streakDays: number;
-  badges: Badge[];
+  badges?: Badge[];
   challenges: Challenge[];
   achievements: Achievement[];
   leaderboard: LeaderboardEntry[];
@@ -21,7 +21,7 @@ export interface GamificationStats {
     rewards: string[];
   };
   lastActivityDate: string;
-  badges?: Badge[];
+  nextLevelPoints?: number;
 }
 
 export interface Badge {
@@ -52,6 +52,10 @@ export interface Challenge {
   deadline?: string;
   completions?: number;
   totalSteps?: number;
+  status?: 'completed' | 'failed' | 'locked' | 'ongoing' | 'active' | 'available';
+  category?: string;
+  goal?: number;
+  icon?: string;
 }
 
 export interface Achievement {

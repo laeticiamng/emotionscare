@@ -44,7 +44,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const playPlaylist = (newPlaylist: MusicPlaylist) => {
+  const loadPlaylistAndPlay = (newPlaylist: MusicPlaylist) => {
     if (newPlaylist.tracks.length === 0) {
       setError(new Error('This playlist is empty'));
       return;
@@ -187,7 +187,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     openDrawer,
     setOpenDrawer,
     playTrack,
-    playPlaylist,
     playSimilar,
     playNext: nextTrack,
     playPrevious: previousTrack,

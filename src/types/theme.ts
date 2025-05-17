@@ -1,5 +1,5 @@
 
-export type Theme = 'light' | 'dark' | 'system' | 'blue-pastel' | 'pastel';
+export type Theme = 'light' | 'dark' | 'system' | 'blue' | 'green' | 'violet' | 'yellow' | 'rose' | 'blue-pastel' | 'pastel';
 export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'sans-serif';
 export type FontSize = 'small' | 'medium' | 'large' | 'xlarge' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 

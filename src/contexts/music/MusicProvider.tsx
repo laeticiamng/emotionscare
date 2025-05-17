@@ -26,7 +26,7 @@ const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [volume, setVolume] = useState<number>(0.5);
   const [duration, setDuration] = useState<number>(0);
   const [currentTime, setCurrentTime] = useState<number>(0);
-  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
+  const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
   const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
   const [openDrawer, setOpenDrawer] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -42,14 +42,14 @@ const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     localStorage.setItem('musicPlaylists', JSON.stringify(playlists));
   }, [playlists]);
 
-  const setPlaylist = (newPlaylist: MusicPlaylist | ((prev: MusicPlaylist) => MusicPlaylist)) => {
+  const setPlaylistState = (newPlaylist: MusicPlaylist | ((prev: MusicPlaylist) => MusicPlaylist)) => {
     if (typeof newPlaylist === 'function') {
-      setCurrentPlaylist(newPlaylist);
+      setPlaylist(newPlaylist);
     } else {
       if (!newPlaylist.title) {
         newPlaylist.title = "Generated Playlist";
       }
-      setCurrentPlaylist(newPlaylist);
+      setPlaylist(newPlaylist);
     }
   };
 
@@ -58,8 +58,8 @@ const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     setIsPlaying(true);
   };
 
-  const playPlaylist = (playlist: MusicPlaylist) => {
-    setPlaylist(playlist);
+  const loadPlaylistAndPlay = (playlist: MusicPlaylist) => {
+    setPlaylistState(playlist);
     setCurrentTrack(playlist.tracks[0] || null);
     setIsPlaying(true);
   };
@@ -76,18 +76,18 @@ const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   };
 
   const playNext = () => {
-    if (!currentPlaylist || !currentTrack) return;
-    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
-    const nextIndex = (currentIndex + 1) % currentPlaylist.tracks.length;
-    setCurrentTrack(currentPlaylist.tracks[nextIndex]);
+    if (!playlist || !currentTrack) return;
+    const currentIndex = playlist.tracks.findIndex(track => track.id === currentTrack.id);
+    const nextIndex = (currentIndex + 1) % playlist.tracks.length;
+    setCurrentTrack(playlist.tracks[nextIndex]);
     setIsPlaying(true);
   };
 
   const playPrevious = () => {
-    if (!currentPlaylist || !currentTrack) return;
-    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
-    const previousIndex = (currentIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
-    setCurrentTrack(currentPlaylist.tracks[previousIndex]);
+    if (!playlist || !currentTrack) return;
+    const currentIndex = playlist.tracks.findIndex(track => track.id === currentTrack.id);
+    const previousIndex = (currentIndex - 1 + playlist.tracks.length) % playlist.tracks.length;
+    setCurrentTrack(playlist.tracks[previousIndex]);
     setIsPlaying(true);
   };
 
@@ -132,7 +132,7 @@ const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
         tracks: similarTracks,
         mood: mood
       };
-      setPlaylist(newPlaylist);
+      setPlaylistState(newPlaylist);
       setCurrentTrack(similarTracks[0]);
       setIsPlaying(true);
     }
@@ -149,7 +149,7 @@ const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
         }
       }
     }
-  }, [currentTrack]);
+  }, [currentTrack, isPlaying]);
 
   const recommendByEmotion = (emotion: string, intensity: number = 0.5): MusicPlaylist => {
     const allTracks = playlists.reduce((acc: MusicTrack[], playlist) => {
@@ -183,12 +183,11 @@ const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     volume,
     duration,
     currentTime,
-    playlist: currentPlaylist,
+    playlist,
     playlists,
     openDrawer,
     setOpenDrawer,
     playTrack,
-    playPlaylist,
     playSimilar,
     playNext,
     playPrevious,

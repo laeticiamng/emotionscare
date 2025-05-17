@@ -1,85 +1,87 @@
 
-import { GamificationStats, Challenge, Badge } from '@/types/gamification';
+import { Challenge } from '@/hooks/community-gamification/types';
 
-// Mock data and services for gamification
-export async function fetchGamificationStats(userId: string): Promise<GamificationStats> {
-  return {
-    points: 450,
-    level: 3,
-    rank: 'Explorer',
-    badges: [],
-    challenges: [],
-    streak: 5,
-    nextLevel: {
-      points: 600,
-      rewards: ['Badge exclusif', 'Nouveau thème']
-    },
-    achievements: [],
-    currentLevel: 3,
-    pointsToNextLevel: 150,
-    progressToNextLevel: 75,
-    totalPoints: 450,
-    badgesCount: 7,
-    streakDays: 5,
-    activeChallenges: 2,
-    completedChallenges: 8,
-    totalChallenges: 10, // Ajout de la propriété manquante
-    lastActivityDate: new Date().toISOString(),
-    recentAchievements: [],
-    progress: 75
-  };
-}
-
-export async function fetchChallenges(userId: string): Promise<Challenge[]> {
+export async function fetchUserChallenges(userId: string): Promise<Challenge[]> {
+  // Simuler un délai d'API
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Retourner des défis simulés
   return [
     {
-      id: '1',
+      id: 'challenge-1',
       title: 'Scan quotidien',
-      description: 'Effectuez un scan émotionnel chaque jour pendant 7 jours',
+      description: 'Effectuez un scan émotionnel chaque jour pendant une semaine',
       points: 100,
-      status: 'active',
+      status: 'ongoing',
       category: 'scan',
       progress: 5,
-      goal: 7,
-      name: 'Scan quotidien', // Ajout de la propriété manquante
-      type: 'daily' // Ajout de la propriété manquante
+      goal: 7
     },
     {
-      id: '2',
-      title: 'Journal introspectif',
-      description: 'Écrivez dans votre journal 3 fois cette semaine',
-      points: 75,
-      status: 'ongoing',
-      category: 'journal',
+      id: 'challenge-2',
+      title: 'Explorer la méditation',
+      description: 'Participez à 3 sessions de méditation guidée',
+      points: 150,
+      status: 'active',
+      category: 'meditation',
       progress: 1,
-      goal: 3,
-      name: 'Journal introspectif', // Ajout de la propriété manquante
-      type: 'weekly' // Ajout de la propriété manquante
-    }
+      goal: 3
+    },
+    {
+      id: 'challenge-3',
+      title: 'Journal émotionnel',
+      description: 'Rédigez 5 entrées dans votre journal émotionnel',
+      points: 200,
+      status: 'completed',
+      category: 'journal',
+      progress: 5,
+      goal: 5
+    },
   ];
 }
 
-export async function completeChallenge(challengeId: string): Promise<void> {
-  console.log(`Challenge ${challengeId} completed`);
+export async function completeChallenge(challengeId: string): Promise<boolean> {
+  console.log(`Compléter le défi: ${challengeId}`);
+  
+  // Simuler un délai d'API
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Simuler une réussite
+  return true;
 }
 
-export async function fetchUserBadges(userId: string): Promise<Badge[]> {
+export async function fetchUserBadges(userId: string): Promise<any[]> {
+  // Simuler un délai d'API
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Retourner des badges simulés
   return [
     {
-      id: '1',
-      name: 'Premier Pas',
-      description: 'A effectué son premier scan émotionnel',
-      image_url: '/badges/first-scan.png',
-      type: 'achievement',
-      level: 'Bronze'
+      id: 'badge-1',
+      name: 'Première semaine',
+      description: 'A utilisé l\'application pendant une semaine complète',
+      icon: 'star',
+      unlocked: true,
+      progress: 100,
+      total: 100
     },
     {
-      id: '2',
-      name: 'Régulier',
-      description: '7 jours consécutifs d\'utilisation',
-      image_url: '/badges/streak-7.png',
-      type: 'streak',
-      level: 'Silver'
+      id: 'badge-2',
+      name: 'Maître de la pleine conscience',
+      description: 'A complété 10 sessions de méditation',
+      icon: 'zap',
+      unlocked: false,
+      progress: 7,
+      total: 10
+    },
+    {
+      id: 'badge-3',
+      name: 'Expert en émotions',
+      description: 'A identifié 20 émotions différentes',
+      icon: 'smile',
+      unlocked: false,
+      progress: 12,
+      total: 20
     }
   ];
 }

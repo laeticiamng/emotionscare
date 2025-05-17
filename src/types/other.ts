@@ -101,3 +101,17 @@ export interface ChatResponse {
   message: string;
   timestamp: string;
 }
+
+export interface User {
+  id: string;
+  name?: string;
+  email?: string;
+  role?: string;
+  created_at?: string;
+  avatar_url?: string;
+  preferences?: any;
+}
+
+export type NotificationType = 'default' | 'info' | 'success' | 'warning' | 'error' | 'badge';
+
+export type NotificationTone = 'friendly' | 'neutral' | 'formal' | 'casual' | 'direct' | 'professional' | 'motivational';
