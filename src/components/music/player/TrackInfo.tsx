@@ -2,7 +2,6 @@
 import React from 'react';
 import { MusicTrack } from '@/types';
 import { Avatar } from '@/components/ui/avatar';
-// Remove next/image import and use standard img tag instead
 
 interface TrackInfoProps {
   track: MusicTrack | null;
@@ -13,12 +12,14 @@ const TrackInfo: React.FC<TrackInfoProps> = ({ track }) => {
     return <div className="flex items-center space-x-3 p-2">No track selected</div>;
   }
 
+  // Determine the correct cover image property
+  const coverImage = track.coverImage || track.cover || '/images/default-album.jpg';
+
   return (
     <div className="flex items-center space-x-3 p-2">
       <Avatar className="h-12 w-12 rounded-md">
-        {/* Use standard img instead of next/image */}
         <img 
-          src={track.coverImage || '/images/default-album.jpg'} 
+          src={coverImage} 
           alt={track.title}
           className="object-cover"
         />

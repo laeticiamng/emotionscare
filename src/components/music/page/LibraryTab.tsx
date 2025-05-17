@@ -22,7 +22,7 @@ const LibraryTab: React.FC<LibraryTabProps> = ({
         tracks={playlists.flatMap(playlist => playlist.tracks)}
         playlists={playlists} 
         onTrackSelect={onSelectTrack}
-        onSelectPlaylist={onSelectPlaylist}
+        currentTrack={null}
       />
     </div>
   );

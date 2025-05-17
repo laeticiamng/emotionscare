@@ -3,9 +3,11 @@ export interface Track {
   id: string;
   title: string;
   artist?: string;
-  url: string;
+  url?: string;
   audioUrl?: string;
+  track_url?: string;
   coverUrl?: string;
+  coverImage?: string;
   cover?: string;
   duration?: number;
   emotion?: string;
@@ -16,9 +18,10 @@ export interface Track {
 export interface Playlist {
   id: string;
   name: string;
+  title?: string;
+  description?: string;
   emotion?: string;
   tracks: Track[];
-  title?: string;
 }
 
 export interface EmotionMusicParams {

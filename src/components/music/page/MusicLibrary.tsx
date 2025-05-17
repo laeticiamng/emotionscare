@@ -1,16 +1,17 @@
+
 import React from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
-import TrackList from '../TrackList'; // Fix import path
+import TrackList from '../TrackList';
 
 interface MusicLibraryProps {
   tracks: MusicTrack[];
   playlists: MusicPlaylist[];
   onTrackSelect: (track: MusicTrack) => void;
   currentTrack: MusicTrack | null;
-  className?: string; // Add missing property
+  className?: string;
 }
 
 const MusicLibrary: React.FC<MusicLibraryProps> = ({
@@ -18,7 +19,7 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({
   playlists,
   onTrackSelect,
   currentTrack,
-  className = '' // Provide default value
+  className = ''
 }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [activeTab, setActiveTab] = React.useState('all');
@@ -34,8 +35,11 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({
     if (activeTab === 'all') return filteredTracks;
     
     return filteredTracks.filter(track => {
-      // If track has emotion property, use it for filtering
-      if ('emotion' in track) {
+      // Check if track has category or emotion property to use for filtering
+      if (track.category) {
+        return track.category === activeTab;
+      }
+      if ('emotion' in track && track.emotion) {
         return track.emotion === activeTab;
       }
       return true;
@@ -68,7 +72,6 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({
               tracks={filteredTracksByCategory} 
               onTrackSelect={onTrackSelect} 
               currentTrack={currentTrack || undefined} 
-              // Remove the compact property since it's not in TrackListProps
             />
           ) : (
             <div className="text-center py-8 text-muted-foreground">

@@ -41,8 +41,12 @@ const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
         {badges.map((badge) => (
           <BadgeCard
             key={badge.id}
-            badge={badge}
-            progress={badge.progress || 0} // Use property that exists in the Badge type
+            name={badge.name}
+            description={badge.description}
+            iconUrl={badge.imageUrl || badge.image_url}
+            isEarned={badge.unlocked || false}
+            progress={badge.progress || 0}
+            threshold={badge.threshold || 100}
           />
         ))}
       </div>

@@ -27,7 +27,6 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
   volume,
   onVolumeChange
 }) => {
-  // Define setVolume only once
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
@@ -48,15 +47,6 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
       setCurrentTime(audioRef.current.currentTime);
       setDuration(audioRef.current.duration);
     }
-  };
-
-  // Define the missing handleNext function
-  const handleNext = () => {
-    if (onNext) onNext();
-  };
-
-  const handlePrevious = () => {
-    if (onPrevious) onPrevious();
   };
 
   const handleTogglePlay = () => {
@@ -101,7 +91,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
             <audio
               ref={audioRef}
               onTimeUpdate={handleTimeUpdate}
-              onEnded={handleNext}
+              onEnded={onNext}
               className="hidden"
             />
 
@@ -124,7 +114,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={handlePrevious}
+                  onClick={onPrevious}
                   disabled={!track}
                 >
                   <SkipBack size={20} />
@@ -143,7 +133,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={handleNext}
+                  onClick={onNext}
                   disabled={!track}
                 >
                   <SkipForward size={20} />
