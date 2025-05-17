@@ -5,7 +5,7 @@ export type NotificationType = 'default' | 'error' | 'success' | 'warning' | 'in
 
 export interface Toast {
   id: string;
-  title?: string;
+  title?: string | ReactNode;
   description?: string | ReactNode;
   action?: ReactNode;
   variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
@@ -18,7 +18,7 @@ export interface ToastProps {
 }
 
 export interface ToastOptions {
-  title?: string;
+  title?: string | ReactNode;
   description?: string | ReactNode;
   action?: ReactNode;
   variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';

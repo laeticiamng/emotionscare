@@ -20,6 +20,11 @@ export interface User {
   status?: 'active' | 'inactive' | 'pending' | 'blocked';
   lastLoginDate?: string;
   totalSessions?: number;
+  name?: string;
+  department?: string;
+  emotional_score?: number;
+  joined_at?: string;
+  avatarUrl?: string;
 }
 
 export type UserRole = 'admin' | 'user' | 'coach' | 'therapist' | 'b2b' | 'b2c';
@@ -38,7 +43,7 @@ export interface UserPreferences {
   notifications_enabled?: boolean;
   email_notifications?: boolean;
   
-  // Ajout des propriétés manquantes
+  // Add the properties being used in the application
   notifications?: NotificationPreference[];
   dashboardLayout?: Record<string, any>;
   onboardingCompleted?: boolean;

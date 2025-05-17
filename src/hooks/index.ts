@@ -21,7 +21,5 @@ export * from './api/useMusicGen';
 export { default as useUserModeHelpers } from './useUserModeHelpers';
 
 // Reexport other valid hooks only
-export { default as usePlaylistManager } from './usePlaylistManager';
-export { default as useMusicService } from './useMusicService';
-
-// Remove exports that don't exist
+export { usePlaylistManager } from './usePlaylistManager';
+export { useMusicService } from './useMusicService';

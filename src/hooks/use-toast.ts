@@ -2,13 +2,13 @@
 // This file is the main implementation of the toast functionality
 import { toast as sonnerToast } from "sonner";
 import * as React from "react";
-import { ToastActionElement, Toast, ToastProps, ToastOptions } from "@/types/toast";
+import { Toast, ToastOptions } from "@/types/toast";
 
 type ToasterToast = Toast & {
   id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
-  action?: ToastActionElement;
+  action?: React.ReactNode;
 };
 
 const TOAST_LIMIT = 5;
@@ -135,9 +135,15 @@ function dispatch(action: Action) {
   });
 }
 
+// FIX: Make sure toast doesn't return toast options object directly
 export function toast(props: ToastOptions) {
-  // Forward to sonner toast as default implementation
-  return sonnerToast(props as any);
+  // Properly forward to sonner toast without returning the toast options directly
+  return sonnerToast(props.title || "", {
+    description: props.description,
+    action: props.action,
+    duration: props.duration,
+    ...(props.variant && { variant: props.variant })
+  });
 }
 
 export function useToast() {
@@ -161,4 +167,4 @@ export function useToast() {
 }
 
 export { Toaster } from "@/components/ui/sonner";
-export type { Toast, ToastProps, ToastActionElement, ToastOptions };
+export type { Toast, ToastProps, ToastActionElement, ToastOptions } from "@/types/toast";

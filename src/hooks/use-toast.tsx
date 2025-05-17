@@ -1,5 +1,3 @@
 
-// This file is a placeholder to prevent circular dependencies
-// The actual implementation is in src/hooks/use-toast.ts
-export { useToast, toast } from "./use-toast.ts";
-export type { Toast, ToastProps, ToastActionElement, ToastOptions } from "@/types/toast";
+// Re-export from the main implementation
+export * from './use-toast';

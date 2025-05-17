@@ -2,31 +2,31 @@
 import * as React from "react";
 import { type VariantProps } from "class-variance-authority";
 
-interface ToastProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof toastVariants> {
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-}
-
-type ToastActionElement = React.ReactElement<any, string | React.JSXElementConstructor<any>>;
-
-interface Toast {
+export interface ToastProps {
   id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
-  action?: ToastActionElement;
-  variant?: 'default' | 'destructive';
+  action?: React.ReactNode;
+  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
+  duration?: number;
+  open?: boolean;
 }
 
-interface ToastOptions {
+export type ToastActionElement = React.ReactElement<any, string | React.JSXElementConstructor<any>>;
+
+export interface Toast {
+  id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
-  action?: ToastActionElement;
-  variant?: 'default' | 'destructive';
+  action?: React.ReactNode;
+  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
+  duration?: number;
 }
 
-export type {
-  Toast,
-  ToastProps,
-  ToastActionElement,
-  ToastOptions,
-};
+export interface ToastOptions {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: React.ReactNode;
+  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
+  duration?: number;
+}

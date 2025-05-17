@@ -50,9 +50,14 @@ export interface Emotion {
   description?: string;
 }
 
-// Ajout du type EmotionalTeamViewProps manquant
+// Update EmotionalTeamViewProps with all the properties used in the component
 export interface EmotionalTeamViewProps {
   teamId?: string;
   period?: 'day' | 'week' | 'month';
   view?: 'chart' | 'grid' | 'list';
+  anonymized?: boolean;
+  dateRange?: Date[];
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
 }
