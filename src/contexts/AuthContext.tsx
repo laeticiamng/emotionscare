@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   logout: () => void;
   register: (userData: Partial<User>) => Promise<void>;
   updateUser: (userData: User) => Promise<void>;
@@ -18,7 +18,9 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
   isLoading: true,
-  login: async () => {},
+  login: async () => {
+    throw new Error('AuthContext not initialized');
+  },
   logout: () => {},
   register: async () => {},
   updateUser: async () => {},
@@ -51,15 +53,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkSession();
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string): Promise<User> => {
     setIsLoading(true);
     try {
       // In a real app, this would make an API call to authenticate
+      // Simulate different user roles based on email for testing purposes
+      let role = 'b2c';
+      if (email.includes('admin')) {
+        role = 'admin';
+      } else if (email.includes('b2b-admin')) {
+        role = 'b2b_admin';
+      } else if (email.includes('b2b-user') || email.includes('collaborateur')) {
+        role = 'b2b_user';
+      }
+      
       const mockUser: User = {
         id: '1',
-        name: 'Test User',
+        name: email.split('@')[0],
         email,
-        role: 'user',
+        role: role as any,
         preferences: {
           theme: 'system',
           fontSize: 'medium',
@@ -93,6 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setUser(mockUser);
       localStorage.setItem('user', JSON.stringify(mockUser));
+      return mockUser;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -114,7 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: '1',
         name: userData.name || '',
         email: userData.email || '',
-        role: 'user',
+        role: userData.role || 'b2c',
         preferences: {
           theme: 'system',
           fontSize: 'medium',

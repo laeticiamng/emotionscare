@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,7 +18,17 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, error, clearError } = useAuth();
+  const location = useLocation();
+  const { login, error, clearError, isAuthenticated, user } = useAuth();
+  
+  // If user is already authenticated, redirect them to appropriate dashboard
+  // But only do this when the component mounts, not on every re-render
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const from = location.state?.from?.pathname || getRoleRoute(user.role);
+      navigate(from);
+    }
+  }, []);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +57,9 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
         });
         
         // Redirection vers la dashboard appropriée en fonction du rôle
-        navigate(getRoleRoute(user.role));
+        // or back to where they were trying to go
+        const from = location.state?.from?.pathname || getRoleRoute(user.role);
+        navigate(from);
       }
     } catch (error: any) {
       toast({

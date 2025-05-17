@@ -18,8 +18,14 @@ const ProtectedLayout = () => {
     );
   }
 
-  // If user is not authenticated, redirect to appropriate login page
-  if (!isAuthenticated) {
+  // Only redirect if user is not authenticated AND trying to access a protected route
+  // Check if the current path indicates a protected route (not login/register/public pages)
+  const isProtectedPath = !location.pathname.includes('/login') && 
+                         !location.pathname.includes('/register') && 
+                         !location.pathname.includes('/choose-mode') &&
+                         !location.pathname === '/';
+
+  if (!isAuthenticated && isProtectedPath) {
     // Determine which login page to redirect to based on the path
     let loginPath = '/b2c/login'; // default to B2C login
     
@@ -33,11 +39,12 @@ const ProtectedLayout = () => {
   }
 
   // If user is authenticated but hasn't selected a mode yet (except when on the mode selection page)
-  if (isAuthenticated && !userMode && !location.pathname.includes('/choose-mode')) {
+  // Only redirect if actually needed - don't force redirect if they're already on a valid path
+  if (isAuthenticated && !userMode && !location.pathname.includes('/choose-mode') && isProtectedPath) {
     return <Navigate to="/choose-mode" replace />;
   }
 
-  // User is authenticated and has completed necessary steps, show protected content
+  // User is authenticated or accessing public routes, proceed normally
   return <Outlet />;
 };
 

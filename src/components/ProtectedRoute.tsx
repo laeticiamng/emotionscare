@@ -12,7 +12,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
-  requiredRole = 'b2c',
+  requiredRole,
   redirectTo
 }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -23,18 +23,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <div className="p-8 text-center">Chargement...</div>;
   }
 
-  // If not authenticated, redirect to login
+  // If not authenticated and trying to access a protected route, redirect to login
   if (!isAuthenticated) {
     return <Navigate to={redirectTo || '/login'} state={{ from: location }} />;
   }
 
-  // If role is required and user doesn't have it, redirect
+  // If role is required and user doesn't have it, redirect to unauthorized
   if (requiredRole && user?.role !== requiredRole) {
-    // Safely compare as strings
     return <Navigate to="/unauthorized" />;
   }
 
-  // User is authenticated and has required role
+  // User is authenticated and has required role (or no specific role required)
   return <>{children}</>;
 };
 
