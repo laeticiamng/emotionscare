@@ -22,3 +22,19 @@ export interface NotificationSettings {
   newContentAlerts?: boolean;
   emailNotifications?: boolean;
 }
+
+// Add missing Notification interface
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  read: boolean;
+  timestamp: string;
+  createdAt?: string;
+  created_at?: string;
+}
+
+// Add missing NotificationFilter type
+export type NotificationFilter = 'all' | 'unread' | NotificationType;

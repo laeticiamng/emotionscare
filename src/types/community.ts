@@ -9,6 +9,7 @@ export interface Post {
   imageUrl?: string;
   reactions: number;
   tags?: string[];
+  title?: string;
 }
 
 export interface Comment {

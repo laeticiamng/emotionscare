@@ -56,4 +56,15 @@ export const AI_MODEL_CONFIG: AI_MODEL_CONFIG_Map = {
   }
 };
 
+export interface CoachEvent {
+  id: string;
+  type: 'suggestion' | 'reminder' | 'feedback' | 'achievement';
+  message: string;
+  timestamp: Date;
+  priority: 'low' | 'medium' | 'high';
+  read: boolean;
+  category?: string;
+  relatedEntityId?: string;
+}
+
 export default AI_MODEL_CONFIG;

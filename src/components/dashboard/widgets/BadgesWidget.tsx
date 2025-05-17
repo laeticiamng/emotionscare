@@ -1,81 +1,54 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
 import { Badge } from '@/types/badge';
 
-export interface BadgesWidgetProps {
+interface BadgesWidgetProps {
   badges: Badge[];
-  onSeeAll?: () => void;
-  showSeeAll?: boolean;
   className?: string;
 }
 
-const BadgesWidget: React.FC<BadgesWidgetProps> = ({ 
-  badges,
-  onSeeAll,
-  showSeeAll = true,
-  className
-}) => {
-  // Get only unlocked badges
-  const unlockedBadges = badges.filter(badge => badge.unlocked);
-  
-  // Display only first 3 unlocked badges
-  const displayBadges = unlockedBadges.slice(0, 3);
-  
-  // Show the "and X more" text if there are more than 3 unlocked badges
-  const hasMoreBadges = unlockedBadges.length > 3;
-  const moreBadgesCount = unlockedBadges.length - 3;
-  
+const BadgesWidget: React.FC<BadgesWidgetProps> = ({ badges, className }) => {
+  const recentBadges = badges
+    .filter(badge => badge.unlockedAt || badge.unlocked_at)
+    .sort((a, b) => {
+      const dateA = new Date(a.unlockedAt || a.unlocked_at || '').getTime();
+      const dateB = new Date(b.unlockedAt || b.unlocked_at || '').getTime();
+      return dateB - dateA;
+    })
+    .slice(0, 3);
+
   return (
     <Card className={className}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-md font-medium">Vos badges récents</CardTitle>
-        {showSeeAll && onSeeAll && (
-          <Button variant="ghost" size="sm" className="text-sm" onClick={onSeeAll}>
-            Voir tout
-            <ChevronRight className="ml-1 h-4 w-4" />
-          </Button>
-        )}
+      <CardHeader>
+        <CardTitle>Recent Badges</CardTitle>
       </CardHeader>
       <CardContent>
-        {unlockedBadges.length === 0 ? (
-          <div className="text-center py-6 text-muted-foreground">
-            <p>Vous n'avez pas encore débloqué de badges.</p>
-          </div>
-        ) : (
+        {recentBadges.length > 0 ? (
           <div className="grid grid-cols-3 gap-4">
-            {displayBadges.map((badge) => (
-              <div 
-                key={badge.id} 
-                className="flex flex-col items-center text-center"
-              >
-                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-2">
-                  <img 
-                    src={badge.icon} 
-                    alt={badge.name} 
-                    className="w-8 h-8" 
-                    onError={(e) => {
-                      e.currentTarget.src = '/placeholders/badge-placeholder.svg';
-                    }}
-                  />
+            {recentBadges.map(badge => (
+              <div key={badge.id} className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                  {badge.imageUrl || badge.image_url ? (
+                    <img 
+                      src={badge.imageUrl || badge.image_url} 
+                      alt={badge.name} 
+                      className="w-12 h-12" 
+                    />
+                  ) : (
+                    <div className="text-2xl">🏆</div>
+                  )}
                 </div>
-                <div className="text-xs font-medium">{badge.name}</div>
+                <span className="text-sm font-medium">{badge.name}</span>
+                <span className="text-xs text-muted-foreground">{badge.description}</span>
               </div>
             ))}
           </div>
-        )}
-        
-        {hasMoreBadges && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="w-full mt-2 text-muted-foreground" 
-            onClick={onSeeAll}
-          >
-            Et {moreBadgesCount} de plus...
-          </Button>
+        ) : (
+          <div className="text-center py-8 text-muted-foreground">
+            <p>You have not earned any badges yet.</p>
+            <p className="text-sm">Complete challenges to earn badges!</p>
+          </div>
         )}
       </CardContent>
     </Card>

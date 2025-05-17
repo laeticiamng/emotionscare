@@ -1,105 +1,58 @@
 
 import { EmotionResult } from '@/types/emotion';
-import { supabase } from '@/integrations/supabase/client';
-import { mockEmotions } from '@/data/mockEmotions';
 
-export const saveEmotion = async (emotionData: Partial<EmotionResult>): Promise<EmotionResult | null> => {
-  try {
-    // Try to save to Supabase if available
-    if (supabase) {
-      const { data, error } = await supabase
-        .from('emotions')
-        .insert({
-          ...emotionData,
-          date: new Date().toISOString()
-        })
-        .select('*')
-        .single();
-        
-      if (error) throw error;
-      return data as EmotionResult;
-    } else {
-      // Mock saving for development
-      const newEmotion: EmotionResult = {
-        id: `emo-${Date.now()}`,
-        date: new Date().toISOString(),
-        emotion: emotionData.emotion || 'neutral',
-        user_id: emotionData.user_id || 'user-123',
-        text: emotionData.text,
-        emojis: emotionData.emojis,
-        audio_url: emotionData.audio_url,
-        score: emotionData.score || 50
-      };
-      
-      mockEmotions.unshift(newEmotion);
-      return newEmotion;
-    }
-  } catch (error) {
-    console.error('Error saving emotion:', error);
-    return null;
-  }
+// Mock scan service implementation
+export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  // Create a mock emotion result
+  const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust', 'neutral'];
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  
+  const result: EmotionResult = {
+    id: `scan-${Date.now()}`,
+    emotion: randomEmotion,
+    score: Math.floor(Math.random() * 100),
+    confidence: Math.random() * 0.5 + 0.5,
+    date: new Date().toISOString(),
+    emojis: getEmojisForEmotion(randomEmotion),
+    feedback: `Your text indicates ${randomEmotion}. This is a simulated analysis.`,
+    recommendations: [
+      'Take a few deep breaths',
+      'Consider a short meditation session',
+      'Listen to music that matches your mood'
+    ]
+  };
+
+  return result;
 };
 
-export const getEmotions = async (userId: string): Promise<EmotionResult[]> => {
-  try {
-    if (supabase) {
-      const { data, error } = await supabase
-        .from('emotions')
-        .select('*')
-        .eq('user_id', userId)
-        .order('date', { ascending: false });
-        
-      if (error) throw error;
-      return data as EmotionResult[];
-    } else {
-      return mockEmotions.filter(e => e.user_id === userId);
-    }
-  } catch (error) {
-    console.error('Error fetching emotions:', error);
-    return [];
-  }
+export const saveEmotion = async (emotion: EmotionResult): Promise<EmotionResult> => {
+  // Simulate API call delay
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // In a real implementation, this would save to a database
+  console.log('Saving emotion:', emotion);
+  
+  // Return the same emotion with a confirmation
+  return {
+    ...emotion,
+    id: emotion.id || `emotion-${Date.now()}`
+  };
 };
 
-export const getEmotionById = async (id: string): Promise<EmotionResult | null> => {
-  try {
-    if (supabase) {
-      const { data, error } = await supabase
-        .from('emotions')
-        .select('*')
-        .eq('id', id)
-        .single();
-        
-      if (error) throw error;
-      return data as EmotionResult;
-    } else {
-      return mockEmotions.find(e => e.id === id) || null;
-    }
-  } catch (error) {
-    console.error('Error fetching emotion by id:', error);
-    return null;
-  }
-};
-
-export const deleteEmotion = async (id: string): Promise<boolean> => {
-  try {
-    if (supabase) {
-      const { error } = await supabase
-        .from('emotions')
-        .delete()
-        .eq('id', id);
-        
-      if (error) throw error;
-      return true;
-    } else {
-      const index = mockEmotions.findIndex(e => e.id === id);
-      if (index !== -1) {
-        mockEmotions.splice(index, 1);
-        return true;
-      }
-      return false;
-    }
-  } catch (error) {
-    console.error('Error deleting emotion:', error);
-    return false;
-  }
+// Helper function to get emojis for each emotion
+const getEmojisForEmotion = (emotion: string): string[] => {
+  const emojiMap: Record<string, string[]> = {
+    joy: ['😊', '😄', '🥰'],
+    sadness: ['😢', '😥', '😞'],
+    anger: ['😡', '😠', '🤬'],
+    fear: ['😨', '😰', '😱'],
+    surprise: ['😮', '😲', '🤯'],
+    disgust: ['🤢', '😖', '🙄'],
+    neutral: ['😐', '😑', '😶']
+  };
+  
+  return emojiMap[emotion] || ['😶'];
 };

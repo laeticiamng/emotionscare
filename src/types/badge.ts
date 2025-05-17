@@ -14,6 +14,7 @@ export interface Badge {
   color?: string;
   type?: 'achievement' | 'milestone' | 'special';
   threshold?: number;
+  userId?: string;
 }
 
 export interface Challenge {

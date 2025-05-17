@@ -19,6 +19,8 @@ export interface MusicTrack {
   energy?: number;
   audioUrl?: string;
   track_url?: string;
+  mood?: string;
+  category?: string;
 }
 
 export interface MusicPlaylist {
@@ -33,6 +35,7 @@ export interface MusicPlaylist {
   createdAt?: string;
   duration?: number;
   author?: string;
+  mood?: string;
 }
 
 export interface MusicContextType {
@@ -79,6 +82,7 @@ export interface MusicContextType {
   addToQueue?: (track: MusicTrack) => void;
   clearQueue?: () => void;
   playSimilar?: (mood?: string) => void;
+  initializeMusicSystem?: () => void;
   
   recommendByEmotion?: (emotion: string, intensity?: number) => MusicPlaylist;
   getRecommendedPlaylists?: (limit?: number) => MusicPlaylist[];
@@ -135,6 +139,8 @@ export interface MusicControlsProps {
   track?: MusicTrack | null;
   showVolume?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  vertical?: boolean;
+  className?: string;
 }
 
 export interface MusicLibraryProps {

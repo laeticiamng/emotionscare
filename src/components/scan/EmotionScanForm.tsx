@@ -1,199 +1,173 @@
 
-import React, { useState, useCallback } from 'react';
-import { v4 as uuid } from 'uuid';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2 } from 'lucide-react';
+import { EmotionResult } from '@/types/emotion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { analyzeEmotion, saveEmotion } from '@/lib/scanService';
-import { EmotionResult } from '@/types/emotion';
-import EmojiPicker from './EmojiPicker';
+import LiveVoiceScanner from './live/LiveVoiceScanner';
+import TextEmotionScanner from './TextEmotionScanner';
 
-interface EmotionScanFormProps {
-  onEmotionDetected?: (emotion: EmotionResult) => void;
-  onScanComplete?: () => void;
-  onClose?: () => void;
-  userId?: string;
-  onScanSaved?: () => void;
-  onComplete?: (result: EmotionResult) => void;
-}
-
-// Mock gamification service function
-const processEmotionForBadges = async (emotion: string, userId: string) => {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Randomly decide if a new badge is earned (20% chance)
-  const earnedNewBadge = Math.random() < 0.2;
-  
-  if (earnedNewBadge) {
-    return {
-      points: Math.floor(Math.random() * 50) + 10,
-      newBadges: [
-        {
-          id: uuid(),
-          name: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Explorer`,
-          description: `Vous avez exploré l'émotion ${emotion} de manière consciente.`,
-          image_url: '',
-          icon: 'award'
-        }
-      ]
-    };
-  }
-  
-  return {
-    points: Math.floor(Math.random() * 20) + 5,
-    newBadges: []
-  };
-};
-
-const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ 
-  onEmotionDetected, 
-  onScanComplete,
-  onClose,
-  userId,
-  onScanSaved,
-  onComplete
-}) => {
+const EmotionScanForm: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('text');
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanResult, setScanResult] = useState<EmotionResult | null>(null);
+  const [textInput, setTextInput] = useState('');
   const { user } = useAuth();
   const { toast } = useToast();
-  const [text, setText] = useState('');
-  const [emojis, setEmojis] = useState('');
-  const [mostRecentEmotion, setMostRecentEmotion] = useState<EmotionResult | null>(null);
-  
-  const handleEmojiSelect = useCallback((emoji: string) => {
-    setEmojis(prevEmojis => prevEmojis + emoji);
-  }, []);
-  
-  const handleAnalysisComplete = async (result: EmotionResult) => {
-    if (!result || (!user && !userId)) return;
 
+  const handleTextScan = async () => {
+    if (!textInput.trim()) {
+      toast({
+        title: "Texte requis",
+        description: "Veuillez entrer du texte pour analyser vos émotions",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsScanning(true);
     try {
-      // Get the correct user ID
-      const currentUserId = userId || user?.id || '';
+      const result = await analyzeEmotion(textInput);
       
-      // Ensure result has the required properties
-      const emotion: EmotionResult = {
-        ...result,
-        id: result.id || uuid(),
-        user_id: currentUserId,
-        date: result.date || new Date().toISOString(),
-        emotion: result.emotion || 'neutral',
-        score: result.score || Math.round((result.confidence || 0.5) * 100),
-        confidence: result.confidence || 0.5,
-        intensity: result.intensity || result.score || 50,
-        text: result.text || '',
-        feedback: result.feedback || '',
-        transcript: result.transcript || '',
-      };
-
-      // Process for badges and points
-      const gamificationResult = await processEmotionForBadges(result.emotion, currentUserId);
-      
-      if (gamificationResult && gamificationResult.newBadges.length > 0) {
+      if (result) {
+        setScanResult(result);
+        
+        // Save the emotion if user is logged in
+        if (user) {
+          await saveEmotion({
+            ...result,
+            user_id: user.id,
+          });
+        }
+        
         toast({
-          title: "Nouveau badge obtenu !",
-          description: `Vous avez obtenu le badge "${gamificationResult.newBadges[0].name}"`,
-          variant: "default"
+          title: "Analyse terminée",
+          description: `Émotion principale détectée : ${result.emotion}`,
         });
       }
-
-      // Save in database
-      const savedEmotion = await saveEmotion(emotion);
-      
-      // Update state and call callback
-      setMostRecentEmotion(savedEmotion);
-      if (onEmotionDetected) {
-        onEmotionDetected(savedEmotion);
-      }
-      
-      // Call completion handler if provided
-      if (onScanComplete) {
-        onScanComplete();
-      }
-      
-      if (onComplete) {
-        onComplete(savedEmotion);
-      }
-      
-      if (onScanSaved) {
-        onScanSaved();
-      }
-      
     } catch (error) {
-      console.error('Error saving emotion:', error);
+      console.error("Error analyzing text:", error);
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder votre analyse émotionnelle.",
-        variant: "destructive"
+        title: "Erreur d'analyse",
+        description: "Impossible d'analyser vos émotions. Veuillez réessayer.",
+        variant: "destructive",
       });
+    } finally {
+      setIsScanning(false);
     }
   };
 
-  const handleAnalyze = async () => {
-    try {
-      // Analyze the text directly
-      const result = await analyzeEmotion(text);
-      
-      // Process the analysis result
-      await handleAnalysisComplete(result);
-    } catch (error) {
-      console.error('Error during analysis:', error);
-      toast({
-        title: "Erreur d'analyse",
-        description: "Une erreur s'est produite lors de l'analyse de votre émotion.",
-        variant: "destructive"
-      });
+  const handleVoiceScanComplete = async (result: EmotionResult) => {
+    setScanResult(result);
+    
+    if (user) {
+      try {
+        await saveEmotion({
+          ...result,
+          user_id: user.id,
+        });
+        
+        toast({
+          title: "Analyse vocale terminée",
+          description: `Émotion principale détectée : ${result.emotion}`,
+        });
+      } catch (error) {
+        console.error("Error saving voice scan result:", error);
+        toast({
+          title: "Erreur de sauvegarde",
+          description: "Le résultat de l'analyse a été généré mais n'a pas pu être sauvegardé",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   return (
-    <Card className="overflow-hidden shadow-md">
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>Comment vous sentez-vous ?</CardTitle>
-        <CardDescription>
-          Partagez vos émotions pour un suivi personnalisé
-        </CardDescription>
+        <CardTitle>Scanner d'Émotions</CardTitle>
       </CardHeader>
-      <CardContent className="p-6">
-        <div className="grid gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Décrivez votre état émotionnel..."
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
+      <CardContent>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="text">Analyse de texte</TabsTrigger>
+            <TabsTrigger value="voice">Analyse vocale</TabsTrigger>
+          </TabsList>
+          <div className="mt-6">
+            <TabsContent value="text">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Textarea
+                    placeholder="Décrivez comment vous vous sentez actuellement..."
+                    value={textInput}
+                    onChange={(e) => setTextInput(e.target.value)}
+                    rows={5}
+                  />
+                </div>
+                <Button 
+                  onClick={handleTextScan} 
+                  disabled={isScanning || !textInput.trim()}
+                  className="w-full"
+                >
+                  {isScanning ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Analyse en cours...
+                    </>
+                  ) : (
+                    "Analyser mes émotions"
+                  )}
+                </Button>
+              </div>
+            </TabsContent>
+            <TabsContent value="voice">
+              <LiveVoiceScanner onScanComplete={handleVoiceScanComplete} />
+            </TabsContent>
           </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="emojis">Emojis</Label>
-            <Input
-              id="emojis"
-              placeholder="Ajoutez des emojis..."
-              value={emojis}
-              onChange={(e) => setEmojis(e.target.value)}
-            />
-            <EmojiPicker onEmojiSelect={handleEmojiSelect} />
-          </div>
-          
-          <Button className="w-full" onClick={handleAnalyze}>
-            Analyser mes émotions
-          </Button>
-        </div>
-        
-        {mostRecentEmotion && (
-          <div className="mt-6 pt-6 border-t">
-            <h3 className="text-lg font-semibold mb-2">Dernière émotion détectée</h3>
-            <p>Émotion: {mostRecentEmotion.emotion}</p>
-            <p>Score: {mostRecentEmotion.score}</p>
+        </Tabs>
+
+        {scanResult && (
+          <div className="mt-6 p-4 border rounded-lg">
+            <h3 className="font-semibold text-lg mb-2">Résultat de l'analyse</h3>
+            <div className="grid gap-3">
+              <div>
+                <p className="text-sm font-medium">Émotion principale:</p>
+                <p className="text-xl">{scanResult.emotion}</p>
+              </div>
+              
+              {scanResult.confidence && (
+                <div>
+                  <p className="text-sm font-medium">Niveau de confiance:</p>
+                  <div className="w-full bg-muted h-2.5 rounded-full">
+                    <div 
+                      className="bg-primary h-2.5 rounded-full" 
+                      style={{ width: `${Math.round(scanResult.confidence * 100)}%` }}
+                    />
+                  </div>
+                  <p className="text-xs text-right mt-1">{Math.round(scanResult.confidence * 100)}%</p>
+                </div>
+              )}
+              
+              {scanResult.feedback && (
+                <div>
+                  <p className="text-sm font-medium">Feedback:</p>
+                  <p className="text-sm">{scanResult.feedback}</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </CardContent>
+      <CardFooter className="text-xs text-muted-foreground">
+        <p>
+          Le scanner d'émotions utilise l'intelligence artificielle pour vous aider à identifier et comprendre vos états émotionnels.
+        </p>
+      </CardFooter>
     </Card>
   );
 };

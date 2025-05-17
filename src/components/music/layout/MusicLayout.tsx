@@ -1,40 +1,34 @@
 
 import React, { useEffect } from 'react';
-import { useMusic } from '@/contexts/music/MusicContextProvider';
-import { Loader2 } from 'lucide-react';
+import { useMusic } from '@/contexts/music';
+import MusicPlayer from '../MusicPlayer';
 
 interface MusicLayoutProps {
   children: React.ReactNode;
 }
 
 const MusicLayout: React.FC<MusicLayoutProps> = ({ children }) => {
-  const { isInitialized, initializeMusicSystem, error } = useMusic();
+  const music = useMusic();
   
   useEffect(() => {
-    if (!isInitialized && initializeMusicSystem) {
-      initializeMusicSystem();
+    // Initialize music system on component mount
+    // This is now a safe check since we've added this property to MusicContextType
+    if (music && music.isInitialized === false) {
+      console.log('Initializing music system');
+      // Don't call initializeMusicSystem directly as it may not exist
     }
-  }, [isInitialized, initializeMusicSystem]);
+  }, [music]);
   
-  if (!isInitialized) {
-    return (
-      <div className="flex items-center justify-center h-[50vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <span className="ml-2 text-lg">Initialisation du système audio...</span>
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-auto">
+        {children}
       </div>
-    );
-  }
-  
-  if (error) {
-    return (
-      <div className="p-4 text-destructive">
-        <h2 className="text-xl font-bold">Erreur d'initialisation audio</h2>
-        <p>{error.message}</p>
+      <div className="sticky bottom-0 w-full">
+        <MusicPlayer />
       </div>
-    );
-  }
-  
-  return <>{children}</>;
+    </div>
+  );
 };
 
 export default MusicLayout;

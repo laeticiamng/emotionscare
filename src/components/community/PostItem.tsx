@@ -42,7 +42,7 @@ const PostItem: React.FC<PostItemProps> = ({
     }
     
     try {
-      await reactToPost(post.id, user.id, 'like');
+      await reactToPost(post.id, user.id);
       if (onReactionAdded) {
         onReactionAdded();
       }

@@ -1,132 +1,151 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerClose,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { MusicDrawerProps, MusicTrack, MusicPlaylist } from '@/types/music';
+import { useMusic } from '@/contexts/music';
+import { MusicDrawerProps, MusicTrack } from '@/types/music';
+import { X, Play, Pause, Music } from 'lucide-react';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({
   open,
+  onClose,
   onOpenChange,
-  isOpen, 
-  onClose, 
+  isOpen = open,
   playlist,
   currentTrack,
   children,
-  side
+  side = 'right'
 }) => {
-  // Use either isOpen or open prop
-  const isDrawerOpen = isOpen !== undefined ? isOpen : open;
-  
-  // Handle close function
-  const handleClose = () => {
-    if (onClose) onClose();
-    if (onOpenChange) onOpenChange(false);
+  const { playTrack, isPlaying, togglePlay, currentTrack: activeTrack } = useMusic();
+  const [filter, setFilter] = useState('');
+
+  const handlePlayTrack = (track: MusicTrack) => {
+    playTrack(track);
   };
-  
-  // Helper function to get playlist name/title safely
-  const getPlaylistTitle = () => {
-    if (!playlist) return '';
-    if (typeof playlist === 'object' && 'tracks' in playlist) {
-      return playlist.title || playlist.name || '';
-    }
-    return '';
-  };
-  
-  // Helper function to get tracks safely
-  const getTracks = () => {
-    if (!playlist) return [];
-    if (Array.isArray(playlist)) {
-      return playlist;
-    }
-    if (typeof playlist === 'object' && 'tracks' in playlist) {
-      return playlist.tracks;
-    }
-    return [];
-  };
-  
+
+  const filteredTracks = playlist?.tracks.filter(track => 
+    track.title.toLowerCase().includes(filter.toLowerCase()) || 
+    (track.artist && track.artist.toLowerCase().includes(filter.toLowerCase()))
+  ) || [];
+
   return (
-    <Drawer open={isDrawerOpen} onOpenChange={onOpenChange || handleClose}>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>Music Player</DrawerTitle>
-          <DrawerDescription>
-            {playlist ? `Playing from ${getPlaylistTitle()}` : 'Current track'}
-          </DrawerDescription>
-        </DrawerHeader>
+    <Sheet open={isOpen} onOpenChange={onOpenChange || onClose} side={side}>
+      <SheetContent className="flex flex-col">
+        <SheetHeader className="mb-4">
+          <div className="flex justify-between items-center">
+            <SheetTitle>
+              {playlist?.name || 'Music Library'}
+            </SheetTitle>
+            <SheetClose asChild>
+              <Button variant="ghost" size="icon">
+                <X className="h-4 w-4" />
+              </Button>
+            </SheetClose>
+          </div>
+        </SheetHeader>
         
-        <div className="p-4">
-          {currentTrack ? (
-            <div className="flex flex-col items-center">
-              <div className="w-32 h-32 bg-muted rounded-lg overflow-hidden mb-4">
-                {(currentTrack?.coverUrl || currentTrack?.cover_url || currentTrack?.cover || '/images/default-album-cover.jpg') ? (
-                  <img 
-                    src={currentTrack?.coverUrl || currentTrack?.cover_url || currentTrack?.cover || '/images/default-album-cover.jpg'} 
-                    alt={`Cover for ${currentTrack?.title}`}
-                    className="object-cover w-full h-full"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                    ♪
+        {children || (
+          <>
+            {playlist && (
+              <div className="mb-6">
+                <div className="flex gap-4 items-center">
+                  <div className="w-24 h-24 bg-muted-foreground/10 rounded-md overflow-hidden">
+                    {playlist.coverUrl ? (
+                      <img 
+                        src={playlist.coverUrl} 
+                        alt={playlist.name}
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Music className="h-10 w-10 text-muted-foreground" />
+                      </div>
+                    )}
                   </div>
-                )}
+                  <div>
+                    <h3 className="font-medium text-lg">{playlist.name}</h3>
+                    <p className="text-sm text-muted-foreground">{playlist.tracks.length} tracks</p>
+                    {playlist.description && (
+                      <p className="text-sm text-muted-foreground">{playlist.description}</p>
+                    )}
+                  </div>
+                </div>
               </div>
-              
-              <div className="text-center mb-6">
-                <h3 className="font-medium">{currentTrack.title}</h3>
-                <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No track currently playing
-            </div>
-          )}
-          
-          {playlist && getTracks().length > 0 && (
-            <div className="mt-4">
-              <h4 className="font-medium mb-2">Playlist: {getPlaylistTitle()}</h4>
-              <div className="max-h-[200px] overflow-y-auto">
-                {getTracks().map((track) => (
-                  <div 
+            )}
+            
+            <input 
+              type="text"
+              placeholder="Filter tracks..."
+              className="w-full p-2 mb-4 border rounded-md"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            
+            <div className="flex-1 overflow-y-auto">
+              <ul className="space-y-2">
+                {filteredTracks.map(track => (
+                  <li 
                     key={track.id}
-                    className={`flex items-center p-2 rounded ${
-                      currentTrack?.id === track.id ? 'bg-secondary/50' : 'hover:bg-muted/50'
-                    } cursor-pointer mb-1`}
+                    className={`p-2 rounded-md flex items-center gap-3 cursor-pointer hover:bg-accent ${
+                      activeTrack?.id === track.id ? 'bg-accent' : ''
+                    }`}
+                    onClick={() => handlePlayTrack(track)}
                   >
-                    <div className="w-8 h-8 bg-muted/50 rounded overflow-hidden mr-3">
-                      {(track.coverUrl || track.cover) && (
+                    <div className="w-10 h-10 bg-muted-foreground/10 rounded overflow-hidden">
+                      {track.coverUrl ? (
                         <img 
-                          src={track.coverUrl || track.cover} 
-                          alt={track.title} 
-                          className="w-full h-full object-cover"
+                          src={track.coverUrl} 
+                          alt={track.title}
+                          className="w-full h-full object-cover" 
                         />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Music className="h-5 w-5 text-muted-foreground" />
+                        </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm truncate">{track.title}</div>
-                      <div className="text-xs text-muted-foreground truncate">{track.artist}</div>
+                      <p className="font-medium truncate">{track.title}</p>
+                      <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
                     </div>
-                  </div>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (activeTrack?.id === track.id) {
+                          togglePlay();
+                        } else {
+                          handlePlayTrack(track);
+                        }
+                      }}
+                    >
+                      {activeTrack?.id === track.id && isPlaying ? (
+                        <Pause className="h-4 w-4" />
+                      ) : (
+                        <Play className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </li>
                 ))}
-              </div>
+                {filteredTracks.length === 0 && (
+                  <li className="text-center py-4 text-muted-foreground">
+                    No tracks found
+                  </li>
+                )}
+              </ul>
             </div>
-          )}
-        </div>
-        
-        <DrawerFooter>
-          <DrawerClose asChild>
-            <Button variant="outline" onClick={onClose}>Close</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
   );
 };
 
