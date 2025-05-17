@@ -49,7 +49,7 @@ const CoachRecommendations: React.FC = () => {
           },
           model: modelConfig.model,
           temperature: modelConfig.temperature,
-          max_tokens: modelConfig.max_tokens,
+          maxTokens: modelConfig.maxTokens,
           top_p: modelConfig.top_p,
           stream: modelConfig.stream
         }

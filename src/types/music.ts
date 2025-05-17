@@ -22,6 +22,7 @@ export interface MusicPlaylist {
   mood?: string;
   tracks: MusicTrack[];
   description?: string;
+  coverUrl?: string;
 }
 
 export interface EmotionMusicParams {
@@ -71,11 +72,15 @@ export interface ProgressBarProps {
 
 export interface MusicDrawerProps {
   open?: boolean;
+  isOpen?: boolean;
   onClose?: () => void;
   onOpen?: () => void;
+  onOpenChange?: (open: boolean) => void;
   children?: React.ReactNode;
   position?: 'left' | 'right' | 'top' | 'bottom';
   className?: string;
+  playlist?: MusicPlaylist;
+  currentTrack?: MusicTrack | null;
 }
 
 export interface VolumeControlProps {

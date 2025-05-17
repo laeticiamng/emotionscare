@@ -7,6 +7,7 @@ export * from './emotion';
 export * from './notification';
 export * from './vr';
 export * from './scan';
+export * from './emotions';
 
 // Types that already exist in the codebase
 export * from './auth';
@@ -15,4 +16,3 @@ export * from './dashboard';
 export * from './sidebar';
 export * from './navigation';
 export * from './gamification';
-

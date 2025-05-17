@@ -13,7 +13,7 @@ export interface EmotionValues {
 }
 
 export interface EmotionResult {
-  id?: string;
+  id: string;
   user_id?: string;
   userId?: string;
   date?: string;
@@ -32,7 +32,7 @@ export interface EmotionResult {
   intensity?: number;
   transcript?: string;
   recommendations?: string[];
-  source?: 'text' | 'facial' | 'audio' | 'manual' | 'emoji';
+  source?: 'text' | 'facial' | 'audio' | 'manual' | 'emoji' | 'voice';
   details?: Record<string, number>;
   duration?: number;
 }

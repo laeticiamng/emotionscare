@@ -1,7 +1,7 @@
 
 import { EmotionResult } from './emotion';
 
-export type ScanType = 'text' | 'facial' | 'audio' | 'manual';
+export type ScanType = 'text' | 'facial' | 'audio' | 'manual' | 'voice' | 'emoji';
 
 export interface ScanResult {
   id: string;
