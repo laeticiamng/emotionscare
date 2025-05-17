@@ -11,6 +11,7 @@ export interface MusicTrack {
   cover_url?: string;
   mood?: string;
   emotionalTone?: string;
+  track_url?: string;
 }
 
 export interface MusicPlaylist {

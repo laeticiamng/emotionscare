@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { ChatMessage } from '@/types';
+import { ChatMessage } from '@/types/other';
 import { CoachEvent } from '@/lib/coach/types';
 
 export const useCoach = () => {

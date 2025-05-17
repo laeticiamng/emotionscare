@@ -21,6 +21,7 @@ export interface GamificationStats {
     rewards: string[];
   };
   lastActivityDate: string;
+  badges?: Badge[];
 }
 
 export interface Badge {
@@ -37,6 +38,7 @@ export interface Badge {
   level?: number;
   imageUrl?: string;
   image_url?: string;
+  achieved?: boolean;
 }
 
 export interface Challenge {

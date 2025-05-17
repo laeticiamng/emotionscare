@@ -140,7 +140,7 @@ const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
 
   useEffect(() => {
     if (currentTrack && audioRef.current) {
-      const trackUrl = currentTrack.audioUrl || currentTrack.trackUrl;
+      const trackUrl = currentTrack.audioUrl || currentTrack.url;
       if (trackUrl) {
         audioRef.current.src = trackUrl;
         audioRef.current.load();

@@ -1,96 +1,77 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { MusicPlaylist, MusicTrack } from '@/types/music';
-import { useMusic } from '@/contexts/MusicContext';
+import { useState } from 'react';
+import { useMusic } from '@/contexts/music/MusicContextProvider';
+import { useToast } from './use-toast';
 
-interface UseMusicRecommendationProps {
-  emotion?: string;
-}
-
-const useMusicRecommendation = ({ emotion }: UseMusicRecommendationProps = {}) => {
+export function useMusicRecommendation() {
   const { 
-    currentPlaylist,
-    currentTrack,
-    isPlaying,
-    loadPlaylistForEmotion,
-    playTrack,
-    pauseTrack,
+    recommendByEmotion, 
+    playPlaylist, 
+    playlist,
     setOpenDrawer
   } = useMusic();
-  
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const fetchPlaylist = useCallback(async (musicType: string) => {
+  const getRecommendationForEmotion = (emotion: string, intensity?: number) => {
     setLoading(true);
-    setError(null);
-    
     try {
-      // Use the existing context function to load playlist
-      const playlist = loadPlaylistForEmotion(musicType);
-      
-      if (!playlist) {
-        setError(`No playlist found for emotion: ${musicType}`);
-      }
-    } catch (err) {
-      setError(`Failed to fetch playlist for emotion: ${musicType}`);
-    } finally {
+      const playlist = recommendByEmotion(emotion, intensity);
       setLoading(false);
-    }
-  }, [loadPlaylistForEmotion]);
-
-  const togglePlay = () => {
-    if (isPlaying) {
-      pauseTrack();
-    } else if (currentTrack) {
-      playTrack(currentTrack);
+      return playlist;
+    } catch (error) {
+      console.error('Error getting music recommendation:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de récupérer les recommandations musicales',
+        variant: 'destructive',
+      });
+      setLoading(false);
+      return null;
     }
   };
 
-  const goToNextTrack = () => {
-    if (!currentPlaylist || !currentTrack) return;
-
-    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
-    const nextIndex = (currentIndex + 1) % currentPlaylist.tracks.length;
-    const nextTrack = {
-      ...currentPlaylist.tracks[nextIndex],
-      duration: currentPlaylist.tracks[nextIndex].duration || 0,
-      url: currentPlaylist.tracks[nextIndex].url || ''
-    };
-    playTrack(nextTrack);
-  };
-
-  const goToPreviousTrack = () => {
-    if (!currentPlaylist || !currentTrack) return;
-
-    const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
-    const previousIndex = (currentIndex - 1 + currentPlaylist.tracks.length) % currentPlaylist.tracks.length;
-    const prevTrack = {
-      ...currentPlaylist.tracks[previousIndex],
-      duration: currentPlaylist.tracks[previousIndex].duration || 0,
-      url: currentPlaylist.tracks[previousIndex].url || ''
-    };
-    playTrack(prevTrack);
-  };
-
-  useEffect(() => {
-    if (emotion) {
-      fetchPlaylist(emotion);
+  const playEmotionMusic = (emotion: string, intensity?: number) => {
+    setLoading(true);
+    try {
+      const recommendedPlaylist = recommendByEmotion(emotion, intensity);
+      if (recommendedPlaylist && recommendedPlaylist.tracks.length > 0) {
+        playPlaylist(recommendedPlaylist);
+        setOpenDrawer(true);
+        toast({
+          title: 'Musique activée',
+          description: `Lecture d'une playlist adaptée à votre émotion: ${emotion}`,
+          variant: 'success',
+        });
+        setLoading(false);
+        return true;
+      } else {
+        toast({
+          title: 'Aucune musique disponible',
+          description: `Aucune piste disponible pour l'émotion: ${emotion}`,
+          variant: 'warning',
+        });
+        setLoading(false);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error playing emotion music:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de jouer la musique',
+        variant: 'destructive',
+      });
+      setLoading(false);
+      return false;
     }
-  }, [emotion, fetchPlaylist]);
+  };
 
   return {
-    currentPlaylist,
-    currentTrack,
-    isPlaying,
-    loading,
-    error,
-    fetchPlaylist,
-    playTrack,
-    togglePlay,
-    goToNextTrack,
-    goToPreviousTrack,
+    getRecommendationForEmotion,
+    playEmotionMusic,
+    currentPlaylist: playlist,
+    isLoading: loading
   };
-};
+}
 
 export default useMusicRecommendation;

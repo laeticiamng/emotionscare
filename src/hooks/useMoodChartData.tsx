@@ -1,59 +1,73 @@
 
-import { useMemo } from 'react';
-import { JournalEntry, MoodData } from '@/types';
-import { format, subDays } from 'date-fns';
+import { useState, useEffect } from 'react';
+import { MoodData } from '@/types/other';
+import { format, subDays, startOfDay } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
-interface UseMoodChartDataResult {
-  moodData: MoodData[];
-}
+export function useMoodChartData(period: 'day' | 'week' | 'month' = 'week') {
+  const [moodData, setMoodData] = useState<MoodData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export const useMoodChartData = (
-  entries: JournalEntry[],
-  timeRange: '7' | '30' | '90'
-): UseMoodChartDataResult => {
-  const moodData = useMemo(() => {
-    // Convert time range to number of days
-    const days = parseInt(timeRange, 10);
-    const today = new Date();
-    const startDate = subDays(today, days);
-    
-    // Filter entries by date range
-    const filteredEntries = entries.filter(entry => {
-      const entryDate = new Date(entry.date);
-      return entryDate >= startDate;
-    });
-    
-    // Initialize an array for all days in the range
-    const allDays: MoodData[] = [];
-    for (let i = days; i >= 0; i--) {
-      const date = subDays(today, i);
-      allDays.push({
-        date: format(date, 'dd/MM'),
-        originalDate: date.toISOString(),
-        value: 0,
-        sentiment: Math.random() * 100, // Mock data
-        anxiety: Math.random() * 100, // Mock data
-        energy: Math.random() * 100 // Mock data
-      });
-    }
-    
-    // Merge entry data with the days array
-    filteredEntries.forEach(entry => {
-      const entryDate = new Date(entry.date);
-      const formattedDate = format(entryDate, 'dd/MM');
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
       
-      const dayIndex = allDays.findIndex(day => day.date === formattedDate);
-      if (dayIndex !== -1) {
-        allDays[dayIndex].value = entry.mood_score;
+      try {
+        // Dans un vrai cas, nous récupérerions des données depuis une API
+        // Pour l'instant, nous générons des données de test
+        
+        let numberOfDays = 7; // Par défaut pour 'week'
+        
+        if (period === 'day') {
+          numberOfDays = 1;
+        } else if (period === 'month') {
+          numberOfDays = 30;
+        }
+        
+        // Générer des données factices pour chaque jour
+        const mockData: MoodData[] = [];
+        
+        for (let i = 0; i < numberOfDays; i++) {
+          const date = subDays(new Date(), i);
+          const formattedDate = format(date, 'yyyy-MM-dd');
+          const originalDate = format(date, 'dd MMMM', { locale: fr });
+          
+          mockData.push({
+            id: `mood-${i}`,
+            mood: ['happy', 'calm', 'sad', 'anxious', 'motivated'][Math.floor(Math.random() * 5)],
+            intensity: Math.floor(Math.random() * 10) + 1,
+            date: formattedDate,
+            value: Math.floor(Math.random() * 10) + 1,
+            sentiment: (Math.random() * 2) - 1, // Entre -1 et 1
+            anxiety: Math.random() * 10, // Entre 0 et 10
+            energy: Math.random() * 10, // Entre 0 et 10
+            originalDate
+          });
+        }
+        
+        setMoodData(mockData.sort((a, b) => a.date && b.date ? a.date.localeCompare(b.date) : 0));
+      } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+      } finally {
+        setLoading(false);
       }
-    });
-    
-    return allDays;
-  }, [entries, timeRange]);
+    };
+
+    loadData();
+  }, [period]);
+
+  // Transforme les données pour un format compatible avec les graphiques
+  const chartData = moodData.map(item => ({
+    date: item.date,
+    value: item.intensity,
+    mood: item.mood
+  }));
   
   return {
-    moodData
+    moodData,
+    chartData,
+    loading
   };
-};
+}
 
 export default useMoodChartData;

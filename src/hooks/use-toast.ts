@@ -1,5 +1,5 @@
 
-// Importing and re-exporting from components/ui/toast
+// Importing from types/toast
 import { Toast, ToastProps, ToastActionElement } from '@/types/toast';
 
 // Mock implementation

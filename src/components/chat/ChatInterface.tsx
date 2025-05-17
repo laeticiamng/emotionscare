@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useChat } from '@/hooks/useChat';
-import { ChatMessage } from '@/types';
+import { ChatMessage } from '@/types/other';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Send, User, Bot } from 'lucide-react';
+import { Send } from 'lucide-react';
 
 interface ChatInterfaceProps {
   initialMessages?: ChatMessage[];

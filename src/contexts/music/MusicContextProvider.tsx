@@ -38,7 +38,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentTime(0);
 
     // In a real app, we would play the audio from track.url or track.audioUrl
-    const audioUrl = track.url || track.audioUrl || track.trackUrl;
+    const audioUrl = track.url || track.audioUrl;
     if (!audioUrl) {
       setError(new Error('No audio URL provided for this track'));
     }
@@ -172,6 +172,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsRepeating(prev => !prev);
   };
 
+  const setEmotion = (emotion: string) => {
+    setCurrentEmotion(emotion);
+  };
+
   const value: MusicContextType = {
     currentTrack,
     isPlaying,
@@ -210,7 +214,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     toggleShuffle: shufflePlaylist,
     toggleRepeat,
     error,
-    isInitialized
+    isInitialized,
+    setEmotion
   };
 
   return <MusicContext.Provider value={value}>{children}</MusicContext.Provider>;

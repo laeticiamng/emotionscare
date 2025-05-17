@@ -11,6 +11,10 @@ export interface Toast {
   open?: boolean;
 }
 
+export interface ToastProps {
+  toast: Toast;
+}
+
 export interface ToastAction {
   altText: string;
   onClick: () => void;

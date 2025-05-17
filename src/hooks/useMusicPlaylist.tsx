@@ -1,80 +1,93 @@
 
-import { useCallback } from 'react';
-import { MusicPlaylist } from '@/types/types';
-import { usePlaylistNotifications } from '@/hooks/music/usePlaylistNotifications';
-
-// Updating to use proper types
-interface PlaylistManager {
-  playlists: MusicPlaylist[];
-  getPlaylistById: (id: string) => MusicPlaylist;
-  getPlaylistByEmotion: (emotion: string) => MusicPlaylist;
-}
+import { useState } from 'react';
+import { MusicPlaylist } from '@/types/music';
 
 export function useMusicPlaylist() {
-  const { notifyPlaylistError } = usePlaylistNotifications();
-  
-  // Mock data for playlists
-  const playlists: MusicPlaylist[] = [
-    {
-      id: 'calm-1',
-      name: 'Calm Meditation',
-      title: 'Calm Meditation',
-      description: 'Relaxing music to help you meditate',
-      tracks: [],
-      emotion: 'calm'
-    },
-    {
-      id: 'joy-1',
-      name: 'Happy Vibes',
-      title: 'Happy Vibes',
-      description: 'Music to boost your mood',
-      tracks: [],
-      emotion: 'joy'
-    }
-  ];
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
 
-  // Function to load a playlist based on emotion
-  const loadPlaylistForEmotion = useCallback(async (emotion: string): Promise<MusicPlaylist | null> => {
+  const fetchPlaylists = async () => {
+    setLoading(true);
     try {
-      // Find a playlist matching the emotion
-      const playlist = playlists.find(p => p.emotion?.toLowerCase() === emotion.toLowerCase());
+      // Dans une vraie application, nous ferions un appel API ici
+      // Pour l'instant, on utilise des données simulées
+      const mockPlaylists: MusicPlaylist[] = [
+        {
+          id: 'playlist-1',
+          title: 'Relaxation Profonde',
+          tracks: [
+            { id: 'track-1', title: 'Ocean Waves', artist: 'Nature Sounds', duration: 180 },
+            { id: 'track-2', title: 'Forest Ambiance', artist: 'Nature Sounds', duration: 210 },
+            { id: 'track-3', title: 'Gentle Rain', artist: 'Nature Sounds', duration: 195 },
+          ],
+          mood: 'calm'
+        },
+        {
+          id: 'playlist-2',
+          title: 'Énergie Positive',
+          tracks: [
+            { id: 'track-4', title: 'Morning Boost', artist: 'Happy Vibes', duration: 150 },
+            { id: 'track-5', title: 'Ready for Success', artist: 'Motivation', duration: 180 },
+            { id: 'track-6', title: 'Rise and Shine', artist: 'Happy Vibes', duration: 165 },
+          ],
+          mood: 'happy'
+        }
+      ];
       
-      if (!playlist) {
-        console.log(`No playlist found for emotion: ${emotion}`);
-        return null;
+      setPlaylists(mockPlaylists);
+      
+      if (!currentPlaylist && mockPlaylists.length > 0) {
+        setCurrentPlaylist(mockPlaylists[0]);
       }
       
-      return playlist;
+      return mockPlaylists;
     } catch (error) {
-      console.error(`Error loading playlist for emotion ${emotion}:`, error);
-      notifyPlaylistError(error instanceof Error ? error.message : 'Unknown error loading playlist');
-      return null;
+      console.error('Error fetching playlists:', error);
+      return [];
+    } finally {
+      setLoading(false);
     }
-  }, [notifyPlaylistError]);
+  };
 
-  // Function to load a playlist by ID
-  const loadPlaylistById = useCallback(async (id: string): Promise<MusicPlaylist | null> => {
-    try {
-      const playlist = playlists.find(p => p.id === id);
-      
-      if (!playlist) {
-        console.log(`No playlist found with ID: ${id}`);
-        return null;
-      }
-      
-      return playlist;
-    } catch (error) {
-      console.error(`Error loading playlist with ID ${id}:`, error);
-      notifyPlaylistError(error instanceof Error ? error.message : 'Unknown error loading playlist');
-      return null;
+  const createPlaylist = (playlist: MusicPlaylist) => {
+    setPlaylists(prevPlaylists => [...prevPlaylists, playlist]);
+    return playlist;
+  };
+
+  const updatePlaylist = (playlistId: string, updates: Partial<MusicPlaylist>) => {
+    setPlaylists(prevPlaylists => 
+      prevPlaylists.map(playlist => 
+        playlist.id === playlistId ? { ...playlist, ...updates } : playlist
+      )
+    );
+  };
+
+  const deletePlaylist = (playlistId: string) => {
+    setPlaylists(prevPlaylists => 
+      prevPlaylists.filter(playlist => playlist.id !== playlistId)
+    );
+    
+    if (currentPlaylist?.id === playlistId) {
+      setCurrentPlaylist(null);
     }
-  }, [notifyPlaylistError]);
+  };
+
+  const selectPlaylist = (playlistId: string) => {
+    const playlist = playlists.find(p => p.id === playlistId) || null;
+    setCurrentPlaylist(playlist);
+    return playlist;
+  };
 
   return {
-    currentPlaylist: null, // This will need to be managed elsewhere
     playlists,
-    loadPlaylistForEmotion,
-    loadPlaylistById
+    loading,
+    currentPlaylist,
+    fetchPlaylists,
+    createPlaylist,
+    updatePlaylist,
+    deletePlaylist,
+    selectPlaylist
   };
 }
 
