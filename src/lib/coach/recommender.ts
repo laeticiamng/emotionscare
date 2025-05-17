@@ -1,46 +1,49 @@
 
-import { Recommendation, EmotionResult } from '@/types';
+import { Recommendation } from '@/types/recommendation';
+import { v4 as uuidv4 } from 'uuid';
 
-export const generateRecommendation = async (emotionData: EmotionResult): Promise<Recommendation[]> => {
-  // Mock implementation
-  console.log('Generating recommendations based on emotion:', emotionData.emotion);
-  
+export const getRecommendationsForMood = async (mood: string, intensity: number): Promise<Recommendation[]> => {
+  // Mock implementation that would be replaced with real API calls
   const recommendations: Recommendation[] = [
     {
-      id: crypto.randomUUID(),
-      title: 'Pratiquez la pleine conscience',
-      description: 'Une séance de 10 minutes pour vous recentrer et observer vos émotions.',
-      category: 'mindfulness',
-      priority: 1,
-      confidence: 0.9,
-      actionUrl: '/mindfulness/session',
-      actionLabel: 'Commencer'
+      id: uuidv4(),
+      title: 'Méditation guidée de 5 minutes',
+      description: 'Une courte méditation pour calmer votre esprit et vous recentrer.',
+      type: 'mindfulness',
+      source: 'mood-api',
+      category: 'well-being',
+      urgency: 'low'
     },
     {
-      id: crypto.randomUUID(),
-      title: 'Écoutez de la musique adaptative',
-      description: 'Des morceaux sélectionnés pour votre état émotionnel actuel.',
-      category: 'music',
-      priority: 2,
-      confidence: 0.85,
-      actionUrl: '/music',
-      actionLabel: 'Écouter'
+      id: uuidv4(),
+      title: 'Playlist relaxante',
+      description: 'Musique apaisante pour vous aider à vous détendre.',
+      type: 'music',
+      source: 'mood-api',
+      category: 'entertainment',
+      urgency: 'medium'
     },
     {
-      id: crypto.randomUUID(),
-      title: 'Exprimez-vous dans votre journal',
-      description: 'Notez vos pensées et émotions pour mieux les comprendre.',
-      category: 'journal',
-      priority: 3,
-      confidence: 0.8,
-      actionUrl: '/journal/new',
-      actionLabel: 'Noter'
+      id: uuidv4(),
+      title: 'Exercice de respiration profonde',
+      description: 'Technique de respiration pour réduire le stress immédiatement.',
+      type: 'exercise',
+      source: 'mood-api',
+      category: 'health',
+      urgency: 'high'
     }
   ];
-  
+
   return recommendations;
 };
 
+export const getRecommendationsForEmotionalState = async (userId: string, emotionalState: any): Promise<Recommendation[]> => {
+  // Mock implementation
+  console.log(`Getting recommendations for user ${userId} with emotional state:`, emotionalState);
+  return getRecommendationsForMood(emotionalState.dominantEmotion, emotionalState.intensity);
+};
+
 export default {
-  generateRecommendation
+  getRecommendationsForMood,
+  getRecommendationsForEmotionalState
 };

@@ -22,7 +22,16 @@ export const useEmotionScan = (props?: UseEmotionScanProps) => {
     
     try {
       const data = await fetchLatestEmotion(userId);
-      setLatestEmotion(data);
+      if (data) {
+        // Ensure data conforms to EmotionResult type
+        const result: EmotionResult = {
+          ...data,
+          id: data.id || `emotion-${Date.now()}`,
+          emotion: data.emotion || 'neutral',
+          confidence: data.confidence ?? 0
+        };
+        setLatestEmotion(result);
+      }
       return data;
     } catch (err) {
       console.error('Error fetching latest emotion:', err);
@@ -45,17 +54,26 @@ export const useEmotionScan = (props?: UseEmotionScanProps) => {
     try {
       // Convert the object to a string for the analyzeEmotion function
       const textToAnalyze = data.text || '';
-      const result = await analyzeEmotion(textToAnalyze);
+      const rawResult = await analyzeEmotion(textToAnalyze);
       
-      if (result) {
+      if (rawResult) {
+        const result: EmotionResult = {
+          ...rawResult,
+          id: rawResult.id || `emotion-${Date.now()}`,
+          emotion: rawResult.emotion || 'neutral',
+          confidence: rawResult.confidence ?? 0
+        };
+        
         setLatestEmotion(result);
         
         if (props?.onEmotionDetected) {
           props.onEmotionDetected(result);
         }
+        
+        return result;
       }
       
-      return result;
+      return null;
     } catch (err) {
       console.error('Error scanning emotion:', err);
       setError('Impossible d\'analyser votre émotion');
@@ -71,20 +89,19 @@ export const useEmotionScan = (props?: UseEmotionScanProps) => {
     setError('');
     
     try {
-      const result = {
-        id: `emo-${Date.now()}`,
-        userId,
-        timestamp: new Date().toISOString(),
-        emotion: data.emotion || 'neutral', // Ensure we always have an emotion
+      const result: EmotionResult = {
+        id: data.id || `emo-${Date.now()}`,
+        userId: userId,
+        timestamp: data.timestamp || new Date().toISOString(),
+        emotion: data.emotion || 'neutral',
+        confidence: data.confidence ?? 0,
         ...data
       };
       
-      if (result) {
-        setLatestEmotion(result as EmotionResult);
-        
-        if (props?.onEmotionDetected) {
-          props.onEmotionDetected(result as EmotionResult);
-        }
+      setLatestEmotion(result);
+      
+      if (props?.onEmotionDetected) {
+        props.onEmotionDetected(result);
       }
       
       return result;
@@ -105,7 +122,7 @@ export const useEmotionScan = (props?: UseEmotionScanProps) => {
     createEmotion,
     scanEmotion,
     getLatestEmotion: fetchLatest,
-    setLatestEmotion
+    setLatestEmotion: (emotion: EmotionResult | null) => setLatestEmotion(emotion)
   };
 };
 

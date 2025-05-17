@@ -28,13 +28,15 @@ export interface EmotionResult {
   primary_emotion?: string;
   emotion: string;
   emotions?: EmotionValues;
-  confidence?: number;
+  confidence: number;
   intensity?: number;
   transcript?: string;
   recommendations?: string[];
   source?: 'text' | 'facial' | 'audio' | 'manual' | 'emoji' | 'voice';
   details?: Record<string, number>;
   duration?: number;
+  facialExpression?: string;
+  textInput?: string;
 }
 
 export interface LiveVoiceScannerProps {

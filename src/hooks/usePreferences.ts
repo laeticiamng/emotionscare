@@ -1,86 +1,82 @@
 
 import { useState, useEffect } from 'react';
-import { UserPreferences, ThemeName, FontSize, FontFamily } from '@/types/preferences';
-import { useAuth } from '@/contexts/AuthContext';
-import { DEFAULT_USER_PREFERENCES } from '@/constants/defaults';
+import { UserPreferences } from '@/types/user';
+import { DEFAULT_PREFERENCES } from '@/types/preferences';
 
-export const usePreferences = () => {
-  const { user, updateUser } = useAuth();
-  const [preferences, setPreferences] = useState<UserPreferences>(user?.preferences || {
-    ...DEFAULT_USER_PREFERENCES,
-    notifications: { 
-      enabled: false, 
-      emailEnabled: false, 
-      pushEnabled: false, 
-      frequency: 'daily' 
-    },
-    theme: 'system' as ThemeName,
-    fontSize: 'medium' as FontSize,
-    fontFamily: 'system' as FontFamily,
-    language: 'fr',
-    autoplayVideos: false,
-    dataCollection: true,
-    accessibilityFeatures: {
-      highContrast: false,
-      reducedMotion: false,
-      screenReader: false
-    },
-    dashboardLayout: 'standard',
-    onboardingCompleted: false,
-    privacyLevel: 'balanced'
-  });
-  
-  // Sync preferences when user changes
+interface UsePreferencesOptions {
+  defaultPreferences?: UserPreferences;
+  saveToStorage?: boolean;
+  storageKey?: string;
+  onPreferenceChange?: (preferences: UserPreferences) => void;
+}
+
+export const usePreferences = (options: UsePreferencesOptions = {}) => {
+  const {
+    defaultPreferences = DEFAULT_PREFERENCES,
+    saveToStorage = true,
+    storageKey = 'user_preferences',
+    onPreferenceChange
+  } = options;
+
+  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Load preferences from storage (if enabled)
   useEffect(() => {
-    if (user?.preferences) {
-      setPreferences(user.preferences);
+    if (saveToStorage) {
+      try {
+        const savedPrefs = localStorage.getItem(storageKey);
+        if (savedPrefs) {
+          const parsed = JSON.parse(savedPrefs);
+          setPreferences({ ...defaultPreferences, ...parsed });
+        }
+      } catch (error) {
+        console.error('Error loading preferences from storage:', error);
+      }
     }
-  }, [user]);
-  
-  const updatePreference = async <K extends keyof UserPreferences>(
-    key: K, 
-    value: UserPreferences[K]
-  ): Promise<void> => {
-    if (!user) return;
+    setIsLoading(false);
+  }, [saveToStorage, storageKey, defaultPreferences]);
+
+  // Update preferences
+  const updatePreferences = (newPrefs: Partial<UserPreferences>) => {
+    const updated = { ...preferences, ...newPrefs };
+    setPreferences(updated);
     
-    const updatedPreferences = {
-      ...preferences,
-      [key]: value
-    };
+    if (saveToStorage) {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(updated));
+      } catch (error) {
+        console.error('Error saving preferences to storage:', error);
+      }
+    }
     
-    setPreferences(updatedPreferences);
-    
-    await updateUser({
-      ...user,
-      preferences: updatedPreferences
-    });
+    if (onPreferenceChange) {
+      onPreferenceChange(updated);
+    }
   };
-  
-  const updatePreferences = async (newPreferences: Partial<UserPreferences>): Promise<void> => {
-    if (!user) return;
+
+  // Reset preferences to default
+  const resetPreferences = () => {
+    setPreferences(defaultPreferences);
     
-    const updatedPreferences: UserPreferences = {
-      ...preferences,
-      ...newPreferences,
-      theme: (newPreferences.theme as ThemeName) || preferences.theme,
-      fontSize: (newPreferences.fontSize as FontSize) || preferences.fontSize,
-      fontFamily: (newPreferences.fontFamily as FontFamily) || preferences.fontFamily,
-      language: newPreferences.language || preferences.language
-    };
+    if (saveToStorage) {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(defaultPreferences));
+      } catch (error) {
+        console.error('Error resetting preferences in storage:', error);
+      }
+    }
     
-    setPreferences(updatedPreferences);
-    
-    await updateUser({
-      ...user,
-      preferences: updatedPreferences
-    });
+    if (onPreferenceChange) {
+      onPreferenceChange(defaultPreferences);
+    }
   };
-  
+
   return {
     preferences,
-    updatePreference,
     updatePreferences,
-    isLoading: !user
+    resetPreferences,
+    isLoading
   };
 };
 

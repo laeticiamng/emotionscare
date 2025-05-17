@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useMusic } from '@/contexts';
 import { MusicTrack, EmotionMusicParams, MusicPlaylist } from '@/types/music';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/emotions';
 
 export const EMOTION_TO_MUSIC: Record<string, string> = {
   joy: 'upbeat',

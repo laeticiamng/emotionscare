@@ -1,7 +1,11 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMusic } from '@/contexts';
 import { Card, CardContent } from '@/components/ui/card';
+
+interface MusicMoodVisualizationProps {
+  mood?: string;
+}
 
 interface MoodColor {
   light: string;
@@ -18,33 +22,44 @@ const moodColors: Record<string, MoodColor> = {
   neutral: { light: '#E0E0E0', medium: '#9E9E9E', dark: '#616161' }
 };
 
-const MusicMoodVisualization: React.FC = () => {
+const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({ mood }) => {
   const { emotion, currentTrack } = useMusic();
+  const [points, setPoints] = useState<string>('');
   
-  const currentMood = emotion || 'neutral';
+  const currentMood = mood || emotion || 'neutral';
   const colors = moodColors[currentMood] || moodColors.neutral;
   
-  const progress = 0.35; // For animation
   const randomness = 0.2; // For how "chaotic" the visualization is
   
   // Generate visualization points
-  const generatePoints = () => {
-    const points = [];
-    const numberOfPoints = 8;
-    
-    for (let i = 0; i < numberOfPoints; i++) {
-      // Base position around a circle
-      const angle = (i / numberOfPoints) * Math.PI * 2;
-      const radius = 50 + Math.sin(Date.now() / 1000 + i) * randomness * 20;
+  useEffect(() => {
+    const generatePoints = () => {
+      const pointsArray = [];
+      const numberOfPoints = 8;
       
-      const x = 50 + Math.cos(angle) * radius * progress;
-      const y = 50 + Math.sin(angle) * radius * progress;
+      for (let i = 0; i < numberOfPoints; i++) {
+        // Base position around a circle
+        const angle = (i / numberOfPoints) * Math.PI * 2;
+        const radius = 50 + Math.sin(Date.now() / 1000 + i) * randomness * 20;
+        
+        const x = 50 + Math.cos(angle) * radius * 0.35;
+        const y = 50 + Math.sin(angle) * radius * 0.35;
+        
+        pointsArray.push(`${x},${y}`);
+      }
       
-      points.push(`${x},${y}`);
-    }
+      return pointsArray.join(' ');
+    };
     
-    return points.join(' ');
-  };
+    const intervalId = setInterval(() => {
+      setPoints(generatePoints());
+    }, 1000);
+    
+    // Initial points
+    setPoints(generatePoints());
+    
+    return () => clearInterval(intervalId);
+  }, [randomness]);
   
   return (
     <Card className="overflow-hidden">
@@ -75,7 +90,7 @@ const MusicMoodVisualization: React.FC = () => {
           >
             {/* Animated polygon shape */}
             <polygon 
-              points={generatePoints()}
+              points={points}
               fill={colors.medium}
               opacity="0.5"
               style={{
@@ -98,7 +113,7 @@ const MusicMoodVisualization: React.FC = () => {
         </div>
       </CardContent>
       
-      <style jsx>{`
+      <style>{`
         @keyframes pulse {
           0% {
             transform: scale(0.95);

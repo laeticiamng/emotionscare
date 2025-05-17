@@ -1,77 +1,77 @@
 
-export type NotificationFrequency = 'daily' | 'weekly' | 'never' | 'real-time';
-
-export type NotificationTone = 'professional' | 'friendly' | 'supportive';
+export type NotificationFrequency = 
+  | "immediate"
+  | "daily"
+  | "weekly";
 
 export type NotificationType = 
-  | 'system' 
-  | 'emotion' 
-  | 'badge' 
-  | 'achievement'
-  | 'journal' 
-  | 'community' 
-  | 'coach' 
-  | 'reminder'
-  | 'streak'
-  | 'info'
-  | 'success'
-  | 'warning'
-  | 'error';
+  | "system"
+  | "emotion"
+  | "coach"
+  | "journal"
+  | "community"
+  | "achievement"
+  | "badge"
+  | "challenge"
+  | "reminder"
+  | "info"
+  | "warning"
+  | "error"
+  | "success"; 
+
+export type NotificationTone = 
+  | "friendly"
+  | "professional" 
+  | "direct"
+  | "motivational"
+  | "neutral"
+  | "casual"
+  | "formal"; 
 
 export interface NotificationPreference {
-  type: NotificationType;
   enabled: boolean;
-  frequency?: NotificationFrequency;
+  frequency: NotificationFrequency;
+  types: Record<NotificationType, boolean>;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  inAppEnabled?: boolean;
   tone?: NotificationTone;
+  quietHours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
   email?: boolean;
   push?: boolean;
-  inApp?: boolean;
-}
-
-export interface NotificationPreferences {
-  preferences: NotificationPreference[];
-  email?: boolean; // Pour compatibilité
+  sms?: boolean;
 }
 
 export interface Notification {
   id: string;
+  user_id: string;
   title: string;
   message: string;
   type: NotificationType;
   read: boolean;
-  created_at: string;
   timestamp: string;
-  user_id: string;
-  metadata?: Record<string, any>;
-  link?: string;
-  // Compatibilité avec l'existant
   createdAt?: string;
+  created_at?: string;
+  actionUrl?: string;
+  source?: string;
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
 }
 
-export type NotificationFilter = 
-  | 'all' 
-  | 'unread' 
-  | 'read'
-  | 'achievement'
-  | 'badge'
-  | 'reminder'
-  | 'streak'
-  | 'info'
-  | 'success'
-  | 'warning'
-  | 'error'
-  | 'system'
-  | 'journal'
-  | 'emotion'
-  | 'user'
-  | 'urgent';
+export type NotificationFilter = 'all' | 'unread' | 'read' | 'urgent' | 'system' | 'journal' | 'emotion' | 'user';
 
-export interface NotificationContextType {
-  notifications: Notification[];
-  unreadCount: number;
-  fetchNotifications: () => Promise<void>;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
-  deleteNotification: (id: string) => void;
-  clearAllNotifications: () => void;
+export interface NotificationSettings {
+  enabled: boolean;
+  email: boolean;
+  push: boolean;
+  frequency: NotificationFrequency;
+  doNotDisturb: boolean;
+  doNotDisturbStart?: string;
+  doNotDisturbEnd?: string;
+  tone?: NotificationTone;
+  types?: Record<NotificationType, boolean>;
+  sms?: boolean;
 }

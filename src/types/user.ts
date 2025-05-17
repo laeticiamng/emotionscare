@@ -1,6 +1,5 @@
 
 import { UserPreferences } from './preferences';
-import { NotificationPreferences } from './preferences';
 
 export type UserRole = 'user' | 'admin' | 'b2b_user' | 'b2b_admin' | 'b2b-user' | 'b2b-admin' | 'collaborator' | 'b2c';
 
@@ -20,10 +19,12 @@ export interface User {
   company_id?: string;
   department?: string;
   position?: string;
+  job_title?: string;
   settings?: Record<string, any>;
   preferences?: UserPreferences;
   emotional_score?: number;
   onboarded?: boolean;
+  createdAt?: string;
 }
 
 export interface UserPreferencesContextType {
@@ -34,4 +35,4 @@ export interface UserPreferencesContextType {
 }
 
 // Export UserPreferences to make it accessible
-export { UserPreferences, NotificationPreferences } from './preferences';
+export { UserPreferences } from './preferences';

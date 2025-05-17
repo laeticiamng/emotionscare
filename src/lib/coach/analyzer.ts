@@ -1,12 +1,12 @@
 
-import { EmotionResult } from '@/types/types';
+import { EmotionResult } from '@/types/emotions';
 
 export const analyzeEmotionalState = async (userId: string, emotionalData: EmotionResult[]): Promise<any> => {
   // Mock implementation
   console.log(`Analyzing emotional state for user ${userId}`);
   return {
     dominantEmotion: emotionalData[0]?.emotion || 'neutral',
-    intensity: emotionalData[0]?.score || 50,
+    intensity: emotionalData[0]?.intensity || 50,
     trend: 'stable',
     insights: ['User appears to be in a stable emotional state']
   };

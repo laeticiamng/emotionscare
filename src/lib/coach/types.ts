@@ -1,51 +1,82 @@
 
-// AI model configurations for different features
+// Coach hook shared types
+import { EmotionalData, EmotionalTrend } from '@/types/emotional-data';
+
+export type CoachEmotionData = {
+  emotion: string;
+  score: number;
+};
+
+export type CoachAction = {
+  id: string;
+  type: string;
+  payload: any;
+  created_at?: string;
+};
+
+export type CoachEvent = {
+  id: string;
+  type: string;
+  data: any;
+  timestamp: Date | string;
+  content?: string;
+  message?: string;
+  source?: string;
+  metadata?: Record<string, any>;
+  read?: boolean;
+  actionUrl?: string;
+  title?: string;
+};
+
+export { EmotionalData, EmotionalTrend };
+
+export type CoachNotification = {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  timestamp: Date | string;
+  read?: boolean;
+  action?: CoachAction;
+};
+
 export const AI_MODEL_CONFIG = {
   chat: {
-    model: 'gpt-4o',
+    model: 'gpt-4o-mini',
     temperature: 0.7,
-    maxTokens: 500,
+    max_tokens: 500,
     top_p: 1,
     stream: false,
     cacheEnabled: true,
     cacheTTL: 3600
   },
   journal: {
-    model: 'gpt-4o',
+    model: 'gpt-4o-mini',
     temperature: 0.5,
-    maxTokens: 1000,
+    max_tokens: 1000,
     top_p: 1,
     stream: false,
     cacheEnabled: true,
     cacheTTL: 7200
   },
   coach: {
-    model: 'gpt-4o',
+    model: 'gpt-4o-mini',
     temperature: 0.3,
-    maxTokens: 500,
+    max_tokens: 500,
     top_p: 1,
     stream: false,
     cacheEnabled: true,
     cacheTTL: 3600
   },
   scan: {
-    model: 'gpt-4o',
+    model: 'gpt-4o-mini',
     temperature: 0.2,
-    maxTokens: 300,
+    max_tokens: 300,
     top_p: 1,
     stream: false,
     cacheEnabled: true,
     cacheTTL: 1800
   }
 };
-
-export interface CoachEvent {
-  id: string;
-  type: 'message' | 'suggestion' | 'notification' | 'recommendation';
-  content: string;
-  timestamp: string;
-  source?: string;
-  metadata?: Record<string, any>;
-}
 
 export default AI_MODEL_CONFIG;

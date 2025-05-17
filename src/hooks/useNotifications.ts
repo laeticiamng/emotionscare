@@ -1,119 +1,127 @@
 
-import { useState, useEffect } from 'react';
-import { Notification, NotificationType } from '@/types';
+import { useState, useEffect, useCallback } from 'react';
+import { Notification } from '@/types/notification';
+import { NotificationService } from '@/lib/notifications';
 
-export type NotificationFilter = 'all' | 'unread' | NotificationType;
+interface UseNotificationsOptions {
+  userId?: string;
+  fetchOnMount?: boolean;
+  limit?: number;
+}
 
-// Mock notifications for development
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    title: 'Bienvenue sur notre plateforme',
-    message: 'Découvrez toutes les fonctionnalités disponibles',
-    type: 'system',
-    timestamp: new Date().toISOString(),
-    read: false,
-  },
-  {
-    id: '2',
-    title: 'Rappel : Scan émotionnel',
-    message: 'N\'oubliez pas votre scan émotionnel quotidien',
-    type: 'reminder',
-    timestamp: new Date(Date.now() - 3600000).toISOString(),
-    read: true,
-    actionUrl: '/scan'
-  },
-  {
-    id: '3',
-    title: 'Nouvelle session VR disponible',
-    message: 'Découvrez notre nouveau programme de méditation en réalité virtuelle',
-    type: 'success',
-    timestamp: new Date(Date.now() - 86400000).toISOString(),
-    read: false,
-    actionUrl: '/vr'
-  },
-  {
-    id: '4',
-    title: 'Attention : Niveau de stress élevé',
-    message: 'Nous avons détecté un niveau de stress élevé. Prenez un moment pour vous détendre.',
-    type: 'warning',
-    timestamp: new Date(Date.now() - 172800000).toISOString(),
-    read: false
-  }
-];
-
-export const useNotifications = () => {
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+export const useNotifications = (options: UseNotificationsOptions = {}) => {
+  const { userId, fetchOnMount = true, limit = 20 } = options;
+  
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [filter, setFilter] = useState<NotificationFilter>('all');
+  const [error, setError] = useState<string | null>(null);
   
-  // Calculate unread count when notifications change
-  useEffect(() => {
-    setUnreadCount(notifications.filter(n => !n.read).length);
-  }, [notifications]);
-  
-  // Fetch notifications based on filter
-  const fetchNotifications = async (selectedFilter: NotificationFilter = filter) => {
+  const fetchNotifications = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     
     try {
-      // In a real app, this would be an API call
-      // We're using mock data for now
-      let filteredNotifications = [...mockNotifications];
-      
-      if (selectedFilter === 'unread') {
-        filteredNotifications = filteredNotifications.filter(n => !n.read);
-      } else if (selectedFilter !== 'all') {
-        filteredNotifications = filteredNotifications.filter(n => n.type === selectedFilter);
-      }
-      
-      setNotifications(filteredNotifications);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
+      const result = await NotificationService.getNotifications(userId);
+      setNotifications(result.slice(0, limit));
+      return result;
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+      setError('Failed to load notifications');
+      return [];
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userId, limit]);
   
-  // Mark a notification as read
-  const markAsRead = async (id: string) => {
+  const fetchUnreadCount = useCallback(async () => {
     try {
-      // In a real app, this would be an API call
-      setNotifications(prev =>
-        prev.map(notification =>
-          notification.id === id ? { ...notification, read: true } : notification
-        )
-      );
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
+      const count = await NotificationService.getUnreadCount(userId);
+      setUnreadCount(count);
+      return count;
+    } catch (err) {
+      console.error('Error fetching unread count:', err);
+      return 0;
     }
-  };
+  }, [userId]);
   
-  // Mark all notifications as read
-  const markAllAsRead = async () => {
+  const markAsRead = useCallback(async (notificationId: string) => {
     try {
-      // In a real app, this would be an API call
-      setNotifications(prev =>
-        prev.map(notification => ({ ...notification, read: true }))
-      );
-    } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+      await NotificationService.markAsRead(notificationId);
+      
+      // Update local state
+      setNotifications(prev => prev.map(notification => 
+        notification.id === notificationId 
+          ? { ...notification, read: true } 
+          : notification
+      ));
+      
+      // Update unread count
+      fetchUnreadCount();
+      
+      return true;
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+      return false;
     }
-  };
+  }, [fetchUnreadCount]);
   
-  useEffect(() => {
-    fetchNotifications();
+  const markAllAsRead = useCallback(async () => {
+    try {
+      await NotificationService.markAllAsRead(userId);
+      
+      // Update local state
+      setNotifications(prev => prev.map(notification => ({ ...notification, read: true })));
+      setUnreadCount(0);
+      
+      return true;
+    } catch (err) {
+      console.error('Error marking all notifications as read:', err);
+      return false;
+    }
+  }, [userId]);
+  
+  const addNotification = useCallback(async (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
+    try {
+      const id = await NotificationService.addNotification(notification);
+      
+      // Update local state
+      const newNotification: Notification = {
+        id,
+        ...notification,
+        timestamp: new Date().toISOString(),
+        read: false
+      };
+      
+      setNotifications(prev => [newNotification, ...prev]);
+      setUnreadCount(prev => prev + 1);
+      
+      return id;
+    } catch (err) {
+      console.error('Error adding notification:', err);
+      throw err;
+    }
   }, []);
+  
+  // Initial fetch
+  useEffect(() => {
+    if (fetchOnMount) {
+      fetchNotifications();
+      fetchUnreadCount();
+    }
+  }, [fetchOnMount, fetchNotifications, fetchUnreadCount]);
   
   return {
     notifications,
     unreadCount,
     isLoading,
-    filter,
-    setFilter,
+    error,
     fetchNotifications,
+    fetchUnreadCount,
     markAsRead,
     markAllAsRead,
+    addNotification
   };
 };
+
+export default useNotifications;

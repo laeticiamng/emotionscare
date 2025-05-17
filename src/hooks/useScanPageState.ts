@@ -1,87 +1,88 @@
 
-import { useState, useEffect } from 'react';
-import { Emotion } from '@/types';
-import { fetchEmotionHistory } from '@/lib/scanService';
+import { useState, useEffect, useCallback } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { EmotionResult } from '@/types/emotions';
+import { useMusicRecommendation } from '@/hooks/music/useMusicRecommendation';
+import { useRouter } from 'react-router-dom';
 
-export function useScanPageState(userId?: string) {
-  // État du composant
-  const [activeTab, setActiveTab] = useState<string>('scan');
-  const [showScanForm, setShowScanForm] = useState(false);
-  const [emotions, setEmotions] = useState<Emotion[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [periodFilter, setPeriodFilter] = useState<'7' | '30' | '90'>('7');
-  const [serviceFilter, setServiceFilter] = useState<string>('all');
-  
-  // Filtres pour les utilisateurs (fonctionnalité admin)
-  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
-  const [selectedFilter, setSelectedFilter] = useState<string>('all');
+export const useScanPageState = () => {
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanCompleted, setScanCompleted] = useState(false);
+  const [scanResults, setScanResults] = useState<EmotionResult[]>([]);
+  const [lastScannedEmotion, setLastScannedEmotion] = useState<EmotionResult | null>(null);
+  const { toast } = useToast();
+  const router = useRouter();
+  const { handlePlayMusic, isLoading: musicLoading } = useMusicRecommendation();
 
   useEffect(() => {
-    const loadEmotionHistory = async () => {
-      try {
-        setLoading(true);
-        console.log("Fetching emotion history for user:", userId);
-        const history = await fetchEmotionHistory(userId || '');
-        setEmotions(history);
-        console.log("Emotion history loaded:", history.length, "entries");
-      } catch (error) {
-        console.error("Error loading emotion history:", error);
-      } finally {
-        // Add a small delay to ensure loading state is visible
-        setTimeout(() => setLoading(false), 600); 
+    // Fetch last emotion if needed
+    // This would normally come from a real API
+  }, []);
+
+  const handleScanStart = useCallback(() => {
+    setIsScanning(true);
+    setScanCompleted(false);
+  }, []);
+
+  const handleScanComplete = useCallback((result: EmotionResult) => {
+    setIsScanning(false);
+    setScanCompleted(true);
+    setLastScannedEmotion(result);
+    
+    // Add to scan history
+    setScanResults(prev => {
+      if (prev.find(item => item.id === result.id)) {
+        return prev;
       }
-    };
+      return [result, ...prev];
+    });
 
-    if (userId) {
-      loadEmotionHistory();
-    }
-  }, [userId, periodFilter, serviceFilter]); // Add filter dependencies to reload data when they change
+    toast({
+      title: "Scan completed",
+      description: `Detected primary emotion: ${result.emotion}`,
+      duration: 3000,
+    });
+  }, [toast]);
 
-  const handleScanSaved = () => {
-    setShowScanForm(false);
-    // Refresh data after saving
-    if (userId) {
-      fetchEmotionHistory(userId).then(setEmotions);
-    }
-  };
+  const handleViewHistory = useCallback(() => {
+    router.navigate('/scan-history');
+  }, [router]);
 
-  const refreshEmotionHistory = async (): Promise<void> => {
-    setLoading(true);
-    try {
-      if (userId) {
-        const data = await fetchEmotionHistory(userId);
-        setEmotions(data);
-      }
-    } catch (error) {
-      console.error("Error refreshing emotion history:", error);
-    } finally {
-      setTimeout(() => setLoading(false), 600);
-    }
-  };
-  
-  // Fonction pour filtrer les utilisateurs (pour fonctionnalité admin)
-  const filterUsers = (filter: string) => {
-    setSelectedFilter(filter);
-    // Implémentation du filtrage ici si nécessaire
-  };
+  const handlePlayRecommendedMusic = useCallback((emotion: string) => {
+    handlePlayMusic(emotion);
+    toast({
+      title: "Music started",
+      description: `Playing music for ${emotion} mood`,
+      duration: 3000,
+    });
+  }, [handlePlayMusic, toast]);
+
+  const handleSaveEmotion = useCallback((result: EmotionResult) => {
+    // This would normally save to a database
+    console.log('Saving emotion result:', result);
+    setScanResults(prev => [result, ...prev]);
+    
+    toast({
+      title: "Emotion saved",
+      description: "Your emotional data has been recorded",
+      duration: 3000,
+    });
+    
+    return result;
+  }, [toast]);
 
   return {
-    activeTab,
-    setActiveTab,
-    showScanForm,
-    setShowScanForm,
-    emotions,
-    loading,
-    periodFilter,
-    setPeriodFilter,
-    serviceFilter,
-    setServiceFilter,
-    filteredUsers,
-    selectedFilter,
-    filterUsers,
-    handleScanSaved,
-    refreshEmotionHistory
+    isScanning,
+    scanCompleted,
+    scanResults,
+    lastScannedEmotion,
+    musicLoading,
+    handleScanStart,
+    handleScanComplete,
+    handleViewHistory,
+    handlePlayRecommendedMusic,
+    handleSaveEmotion,
   };
-}
+};
 
 export default useScanPageState;

@@ -7,10 +7,23 @@ export interface Emotion {
   intensity: number;
   icon?: string;
   emoji?: string;
-  emotion?: string; // Pour compatibilité avec certains hooks
+  emotion?: string; // For compatibility with certain hooks
+  user_id?: string;
+  date?: string;
+  score?: number;
+  confidence: number;
+  text?: string;
+  feedback?: string;
+  transcript?: string;
+  timestamp?: string;
+  source?: string;
+  audioUrl?: string;
+  textInput?: string;
+  facialExpression?: string;
 }
 
 export interface EmotionResult {
+  id: string;
   emotion: string;
   confidence: number;
   timestamp?: string;
@@ -18,21 +31,61 @@ export interface EmotionResult {
   audioUrl?: string;
   textInput?: string;
   facialExpression?: string;
-  score?: number; // Pour compatibilité
-  text?: string; // Pour compatibilité
-  emojis?: string[]; // Pour compatibilité
+  score?: number;
+  text?: string;
+  emojis?: string[];
+  user_id?: string;
+  userId?: string;
+  date?: string;
+  audio_url?: string;
+  ai_feedback?: string;
+  feedback?: string;
+  primary_emotion?: string;
+  emotions?: Record<string, number | undefined>;
+  intensity?: number;
+  transcript?: string;
+  recommendations?: string[];
+  details?: Record<string, number>;
+  duration?: number;
 }
 
 export interface LiveVoiceScannerProps {
   onEmotionDetected?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
+  onFinish?: () => void;
+  automaticMode?: boolean;
+  instruction?: string;
+  buttonText?: string;
   autoStart?: boolean;
+  language?: string;
+  duration?: number;
+  className?: string;
+  withAI?: boolean;
+  onError?: (error: string) => void;
+  continuous?: boolean;
 }
 
 export interface TeamOverviewProps {
-  teamId: string;
+  teamId?: string;
+  period?: 'day' | 'week' | 'month';
+  userId?: string;
+  anonymized?: boolean;
+  className?: string;
+  dateRange?: any;
+  users?: any[];
+  showNames?: boolean;
+  compact?: boolean;
 }
 
 export interface EmotionalTeamViewProps {
   teamId: string;
   period?: 'day' | 'week' | 'month';
+  dateRange?: [Date, Date];
+  departments?: string[];
+  showIndividuals?: boolean;
+  compact?: boolean;
+  anonymized?: boolean;
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
 }
