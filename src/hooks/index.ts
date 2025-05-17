@@ -10,7 +10,7 @@ export { useToast, toast, error, success, warning, info } from './use-toast';
 // Feature-specific hooks
 export { default as useAudioHandlers } from './use-audio';
 // Export useAudio for components that rely on it
-export { useAudio } from './use-audio';
+export { default as useAudio } from './use-audio';
 export { useAudioPlayer } from './useAudioPlayer';
 
 // API hooks

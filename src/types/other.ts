@@ -9,6 +9,9 @@ export interface MoodData {
   timestamp: string;
   value: number;
   label?: string;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
 }
 
 export interface JournalEntry {
@@ -21,6 +24,7 @@ export interface JournalEntry {
   ai_feedback?: string;
   tags?: string[];
   emotions?: string[];
+  mood_score?: number;
 }
 
 export interface Story {

@@ -23,26 +23,27 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <StatCard 
                 title="Total" 
-                value={stats.total || stats.sent || 0} 
+                value={stats.total || (stats.sent || 0)} 
                 icon="📧"
               />
               <StatCard 
                 title="En attente" 
                 value={stats.pending} 
                 icon="⏳"
-                percentage={(stats.total || stats.sent) > 0 ? (stats.pending / (stats.total || stats.sent)) * 100 : 0}
+                percentage={(stats.total || (stats.sent || 0)) > 0 ? (stats.pending / (stats.total || (stats.sent || 0))) * 100 : 0}
               />
               <StatCard 
                 title="Acceptées" 
                 value={stats.accepted} 
                 icon="✅"
-                percentage={(stats.total || stats.sent) > 0 ? (stats.accepted / (stats.total || stats.sent)) * 100 : 0}
+                percentage={(stats.total || (stats.sent || 0)) > 0 ? (stats.accepted / (stats.total || (stats.sent || 0))) * 100 : 0}
               />
               <StatCard 
                 title="Expirées" 
                 value={(stats.expired || 0) + (stats.rejected || 0)} 
                 icon="⛔"
-                percentage={(stats.total || stats.sent) > 0 ? (((stats.expired || 0) + (stats.rejected || 0)) / (stats.total || stats.sent)) * 100 : 0}
+                percentage={(stats.total || (stats.sent || 0)) > 0 ? 
+                  (((stats.expired || 0) + (stats.rejected || 0)) / (stats.total || (stats.sent || 0))) * 100 : 0}
               />
             </div>
             
@@ -53,7 +54,7 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium">Taux de conversion</h3>
-                        <p className="text-2xl font-bold">{stats.conversionRate || stats.conversion_rate || 0}%</p>
+                        <p className="text-2xl font-bold">{(stats.conversionRate || stats.conversion_rate || 0) as number}%</p>
                       </div>
                       <CircularProgress 
                         value={(stats.conversionRate || stats.conversion_rate || 0) as number} 
@@ -84,7 +85,7 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
           
           <TabsContent value="teams">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {stats.teams && Object.entries(stats.teams).map(([team, count]) => (
+              {stats.teams && Object.entries(stats.teams || {}).map(([team, count]) => (
                 <Card key={team}>
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between">
@@ -93,8 +94,8 @@ const InvitationStatsDisplay: React.FC<InvitationStatsDisplayProps> = ({ stats }
                         <p className="text-2xl font-bold">{count}</p>
                       </div>
                       <CircularProgress 
-                        value={count as number} 
-                        max={(stats.total || stats.sent || 100) as number} 
+                        value={(count as number)} 
+                        max={((stats.total || (stats.sent || 100)) as number)} 
                         size={60}
                         thickness={6}
                       />

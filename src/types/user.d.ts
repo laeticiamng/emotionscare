@@ -44,7 +44,7 @@ export interface UserPreferences {
   email_notifications?: boolean;
   
   // Add the properties being used in the application
-  notifications?: NotificationPreference[] | {
+  notifications?: {
     enabled?: boolean;
     emailEnabled?: boolean;
     pushEnabled?: boolean;

@@ -1,126 +1,74 @@
-
 import React from 'react';
-import { InvitationData } from '@/types';
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Send, Eye, Trash } from 'lucide-react';
+import { InvitationData } from '@/types/invitation';
+import { formatDate } from '@/utils';
 
 interface InvitationListProps {
   invitations: InvitationData[];
   isLoading?: boolean;
-  onResend?: (id: string) => void;
-  onDelete?: (id: string) => void;
-  onView?: (id: string) => void;
 }
 
-const InvitationList: React.FC<InvitationListProps> = ({
+const InvitationList: React.FC<InvitationListProps> = ({ 
   invitations,
-  isLoading = false,
-  onResend,
-  onDelete,
-  onView
+  isLoading = false
 }) => {
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-
-  if (invitations.length === 0) {
-    return (
-      <div className="text-center py-8 text-muted-foreground">
-        Aucune invitation trouvée
-      </div>
-    );
-  }
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
+  const renderStatusBadge = (status: string) => {
+    switch (status.toLowerCase()) {
       case 'pending':
-        return <Badge variant="warning">En attente</Badge>;
+        return <span className="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">En attente</span>;
       case 'accepted':
-        return <Badge variant="success">Acceptée</Badge>;
+        return <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Acceptée</span>;
       case 'expired':
-        return <Badge variant="secondary">Expirée</Badge>;
-      case 'rejected':
-        return <Badge variant="destructive">Refusée</Badge>;
+        return <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">Expirée</span>;
+      case 'revoked':
+        return <span className="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800">Révoquée</span>;
       default:
-        return <Badge>{status}</Badge>;
+        return <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">{status}</span>;
     }
   };
 
-  return (
-    <div className="space-y-4">
-      {invitations.map((invitation) => (
-        <div
-          key={invitation.id}
-          className="p-4 border rounded-lg bg-background shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"
-        >
-          <div className="flex-1">
-            <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-              <p className="font-medium">{invitation.email}</p>
-              <div className="flex items-center gap-2">
-                {getStatusBadge(invitation.status)}
-                {invitation.role && <Badge variant="outline">{invitation.role}</Badge>}
-              </div>
-            </div>
-            
-            <div className="mt-2 text-sm text-muted-foreground">
-              <span>
-                Envoyée {formatDistanceToNow(new Date(invitation.sent_at || invitation.created_at || ''), { addSuffix: true, locale: fr })}
-              </span>
-              <span className="mx-2">•</span>
-              <span>
-                Expire {formatDistanceToNow(new Date(invitation.expired_at || invitation.expires_at || ''), { addSuffix: true, locale: fr })}
-              </span>
-              {(invitation.accepted_at) && (
-                <>
-                  <span className="mx-2">•</span>
-                  <span>
-                    Acceptée {formatDistanceToNow(new Date(invitation.accepted_at || ''), { addSuffix: true, locale: fr })}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
+  const formatDateField = (date: string | undefined) => {
+    if (!date) return 'N/A';
+    return formatDate(date);
+  };
 
-          <div className="flex items-center gap-2">
-            {invitation.status === 'pending' && onResend && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => onResend(invitation.id)}
-              >
-                <Send className="h-4 w-4 mr-1" /> Renvoyer
-              </Button>
-            )}
-            
-            {onView && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => onView(invitation.id)}
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-            )}
-            
-            {onDelete && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => onDelete(invitation.id)}
-              >
-                <Trash className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </div>
-      ))}
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full">
+        <thead>
+          <tr className="border-b">
+            <th className="px-4 py-2 text-left">Email</th>
+            <th className="px-4 py-2 text-left">Rôle</th>
+            <th className="px-4 py-2 text-left">Statut</th>
+            <th className="px-4 py-2 text-left">Envoyée le</th>
+            <th className="px-4 py-2 text-left">Expire le</th>
+            <th className="px-4 py-2 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {isLoading ? (
+            <tr>
+              <td colSpan={6} className="text-center py-4">Chargement...</td>
+            </tr>
+          ) : invitations.length === 0 ? (
+            <tr>
+              <td colSpan={6} className="text-center py-4">Aucune invitation trouvée</td>
+            </tr>
+          ) : (
+            invitations.map((invitation) => (
+              <tr key={invitation.id} className="border-b hover:bg-muted/50">
+                <td className="px-4 py-2">{invitation.email}</td>
+                <td className="px-4 py-2">{invitation.role}</td>
+                <td className="px-4 py-2">{renderStatusBadge(invitation.status)}</td>
+                <td className="px-4 py-2">{formatDateField(invitation.sent_at)}</td>
+                <td className="px-4 py-2">{formatDateField(invitation.expires_at)}</td>
+                <td className="px-4 py-2">
+                  {/* Action buttons would go here */}
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };

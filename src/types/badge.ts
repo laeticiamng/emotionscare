@@ -51,4 +51,5 @@ export interface LeaderboardEntry {
   avatarUrl?: string;
   points?: number;
   streak?: number;
+  trend?: string;
 }

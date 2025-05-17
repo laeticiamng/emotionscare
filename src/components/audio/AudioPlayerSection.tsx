@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { AudioTrack } from '@/types/audio';
-import { useAudio } from '@/hooks/use-audio';
+import { useAudio } from '@/hooks'; // Fixed import
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 

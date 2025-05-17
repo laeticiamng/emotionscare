@@ -16,8 +16,8 @@ const InvitationsTab = () => {
     expired: 0,
     rejected: 0,
     sent: 0,
-    completed: 0,
     conversion_rate: 0,
+    recent_invites: [],
     last_sent: []
   });
   const [loading, setLoading] = useState(true);
@@ -80,7 +80,6 @@ const InvitationsTab = () => {
       expired: 8,
       rejected: 5,
       sent: 120,
-      completed: 67,
       conversion_rate: 51.7,
       conversionRate: 51.7,
       averageTimeToAccept: 32, // hours
@@ -91,8 +90,7 @@ const InvitationsTab = () => {
         'HR': 15,
         'Management': 20
       },
-      recent_invites: mockInvites,
-      last_sent: []
+      recent_invites: mockInvites
     });
     
     setLoading(false);

@@ -1,4 +1,3 @@
-
 import { Challenge, LeaderboardEntry } from '@/types/challenge';
 import { Badge } from '@/types/badge';
 
@@ -83,30 +82,36 @@ export const mockChallenges: Challenge[] = [
 export const mockBadges: Badge[] = [
   {
     id: "1",
-    name: "Novice émotionnel",
-    description: "Premier scan émotionnel complété",
-    icon: "brain",
-    rarity: "common",
-    dateEarned: "2023-09-15",
-    category: "débutant"
+    name: "Early Adopter",
+    description: "One of the first users",
+    icon: "star",
+    rarity: "rare",
+    dateEarned: "2023-01-15",
+    category: "achievement",
+    level: 1,
+    unlocked: true
   },
   {
     id: "2",
-    name: "Explorateur en herbe",
-    description: "A exploré 5 fonctionnalités différentes",
-    icon: "compass",
-    rarity: "common",
-    dateEarned: "2023-09-18",
-    category: "exploration"
+    name: "Frequent Visitor",
+    description: "Logged in 10 days in a row",
+    icon: "calendar",
+    rarity: "uncommon",
+    dateEarned: "2023-02-20",
+    category: "engagement",
+    level: 2,
+    unlocked: true
   },
   {
     id: "3",
-    name: "Journaliste",
-    description: "A maintenu un journal émotionnel pendant 7 jours",
-    icon: "book",
-    rarity: "rare",
-    dateEarned: "2023-09-25",
-    category: "journal"
+    name: "Emotion Master",
+    description: "Recorded 100 emotions",
+    icon: "heart",
+    rarity: "epic",
+    dateEarned: "2023-03-05",
+    category: "emotions",
+    level: 3, 
+    unlocked: true
   }
 ];
 

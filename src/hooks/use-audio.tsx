@@ -1,8 +1,6 @@
 
+// Rename the file to make the imports work properly
 import useAudioHandlers from './use-audio';
 
-// Re-export with both named and default export
+// Default export for useAudio
 export default useAudioHandlers;
-
-// Named export for compatability
-export const useAudio = useAudioHandlers;

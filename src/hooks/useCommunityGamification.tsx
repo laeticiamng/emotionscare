@@ -16,7 +16,10 @@ export const useCommunityGamification = () => {
       icon: 'message-circle',
       earned: true,
       progress: 100,
-      threshold: 5
+      threshold: 5,
+      level: 1,
+      category: 'community',
+      unlocked: true
     },
     {
       id: '2',
@@ -28,7 +31,10 @@ export const useCommunityGamification = () => {
       icon: 'heart-handshake',
       earned: false,
       progress: 67,
-      threshold: 3
+      threshold: 3,
+      level: 2,
+      category: 'community',
+      unlocked: false
     },
   ]);
 
@@ -42,7 +48,9 @@ export const useCommunityGamification = () => {
       points: 10,
       progress: 0,
       completed: false,
-      status: 'active'
+      status: 'active',
+      category: 'community',
+      goal: 1
     },
     {
       id: '2',
@@ -52,7 +60,9 @@ export const useCommunityGamification = () => {
       points: 25,
       progress: 0,
       completed: false,
-      status: 'active'
+      status: 'active',
+      category: 'community',
+      goal: 1
     }
   ]);
 
@@ -60,27 +70,33 @@ export const useCommunityGamification = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([
     {
       id: '1',
-      name: 'Sophie M.',
+      userId: 'user1',
       rank: 1,
+      score: 730,
       points: 730,
       avatar: '/avatars/user1.png',
-      trend: 'stable'
+      username: 'Sophie M.',
+      badges: 5
     },
     {
       id: '2',
-      name: 'Thomas L.',
+      userId: 'user2',
       rank: 2,
+      score: 685,
       points: 685,
       avatar: '/avatars/user2.png',
-      trend: 'up'
+      username: 'Thomas L.',
+      badges: 4
     },
     {
       id: '3',
-      name: 'Vous',
+      userId: 'user3',
       rank: 3,
+      score: 520,
       points: 520,
       avatar: '/avatars/user3.png',
-      trend: 'down'
+      username: 'Vous',
+      badges: 3
     }
   ]);
 
@@ -118,7 +134,7 @@ export const useCommunityGamification = () => {
     setBadges(prevBadges => 
       prevBadges.map(badge => 
         badge.id === badgeId
-          ? { ...badge, earned: true, progress: 100 }
+          ? { ...badge, earned: true, progress: 100, unlocked: true }
           : badge
       )
     );
