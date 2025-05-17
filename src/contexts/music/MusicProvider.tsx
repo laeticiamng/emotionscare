@@ -16,6 +16,8 @@ export const MusicContext = createContext<MusicContextType>({
   emotion: null,
   openDrawer: false,
   isInitialized: false,
+  isLoading: false,
+  error: null,
   playTrack: () => {},
   pauseTrack: () => {},
   resumeTrack: () => {},

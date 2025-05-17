@@ -4,8 +4,8 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/hooks/useAuth';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { LayoutProvider } from '@/contexts/LayoutContext';
+import { MusicProvider } from '@/contexts/MusicContext';
 import AppRoutes from '@/router/AppRoutes';
-import { AudioProvider } from '@/contexts/AudioContext';
 import { Toaster } from '@/components/ui/toaster';
 
 function App() {
@@ -14,10 +14,10 @@ function App() {
       <AuthProvider>
         <UserModeProvider>
           <LayoutProvider>
-            <AudioProvider>
+            <MusicProvider>
               <AppRoutes />
               <Toaster />
-            </AudioProvider>
+            </MusicProvider>
           </LayoutProvider>
         </UserModeProvider>
       </AuthProvider>
