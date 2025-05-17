@@ -7,9 +7,10 @@ import { useTheme } from '@/contexts/ThemeContext';
 
 interface AudioControlsProps {
   minimal?: boolean;
+  className?: string;
 }
 
-const AudioControls: React.FC<AudioControlsProps> = ({ minimal = false }) => {
+const AudioControls: React.FC<AudioControlsProps> = ({ minimal = false, className = '' }) => {
   const { soundEnabled, setSoundEnabled } = useTheme();
   const [volume, setVolume] = React.useState(0.5);
 
@@ -28,7 +29,7 @@ const AudioControls: React.FC<AudioControlsProps> = ({ minimal = false }) => {
       <Button
         variant="ghost"
         size="icon"
-        className="rounded-full bg-background/80 backdrop-blur-sm"
+        className={`rounded-full bg-background/80 backdrop-blur-sm ${className}`}
         onClick={toggleMute}
       >
         {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
@@ -37,7 +38,7 @@ const AudioControls: React.FC<AudioControlsProps> = ({ minimal = false }) => {
   }
 
   return (
-    <div className="flex items-center space-x-2 bg-background/80 backdrop-blur-sm p-2 rounded-full">
+    <div className={`flex items-center space-x-2 bg-background/80 backdrop-blur-sm p-2 rounded-full ${className}`}>
       <Button
         variant="ghost"
         size="icon"

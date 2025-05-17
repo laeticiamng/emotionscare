@@ -1,19 +1,42 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { MusicTrack, MusicPlaylist, MusicContextType, EmotionMusicParams } from '@/types/music';
-import defaultPlaylists from '@/data/musicPlaylists';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { MusicTrack, MusicPlaylist, MusicContextType } from '@/types/music';
+import { sampleTracks, defaultPlaylists } from '@/data/musicPlaylists';
 
-const MusicContext = createContext<MusicContextType | undefined>(undefined);
+// Create the context
+export const MusicContext = createContext<MusicContextType>({
+  isPlaying: false,
+  currentTrack: null,
+  volume: 0.5,
+  playlist: [],
+  allTracks: [],
+  playlists: [],
+  play: () => {},
+  pause: () => {},
+  stop: () => {},
+  next: () => {},
+  previous: () => {},
+  setTrack: () => {},
+  setVolume: () => {},
+  setPlaylist: () => {},
+  togglePlay: () => {},
+  addToPlaylist: () => {},
+  createPlaylist: () => ({ id: '', name: '', tracks: [] }),
+  removeFromPlaylist: () => {},
+  getTracksByEmotion: () => [],
+  progress: 0
+});
 
+// Create a provider component
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.7);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
+  const [volume, setVolume] = useState(0.5);
+  const [playlist, setPlaylist] = useState<MusicTrack[]>([]);
+  const [allTracks, setAllTracks] = useState<MusicTrack[]>(sampleTracks);
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>(defaultPlaylists);
+  const [progress, setProgress] = useState(0);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Initialize audio element
   useEffect(() => {
@@ -27,199 +50,169 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
   }, []);
 
-  // Function to get music recommendations based on emotion
-  const getMusicByEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist> => {
-    try {
-      // This is a placeholder for actual API call to get music recommendations
-      console.log("Getting music recommendations for:", params);
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Return mock data based on emotion
-      const emotion = params.emotion || 'neutral';
-      
-      // Find matching playlist or return default
-      const matchingPlaylist = defaultPlaylists.find(p => 
-        p.emotion.toLowerCase() === emotion.toLowerCase()
-      ) || defaultPlaylists[0];
-      
-      return { ...matchingPlaylist };
-    } catch (error) {
-      console.error("Error getting music recommendations:", error);
-      return defaultPlaylists[0]; // Return default playlist on error
+  // Update audio source when current track changes
+  useEffect(() => {
+    if (audioElement && currentTrack && currentTrack.src) {
+      audioElement.src = currentTrack.src;
+      if (isPlaying) {
+        audioElement.play().catch(err => console.error("Error playing audio:", err));
+      }
     }
-  };
+  }, [currentTrack, audioElement]);
 
-  // Play a specific track
-  const playTrack = (track: MusicTrack) => {
-    if (!audioElement) return;
-
-    // Set the current track
-    setCurrentTrack(track);
-    
-    // Update the audio source
-    audioElement.src = track.audioUrl;
-    audioElement.load();
-    
-    // Play the track
-    audioElement.play().catch(error => {
-      console.error("Error playing track:", error);
-    });
-    
-    setIsPlaying(true);
-  };
-
-  // Toggle play/pause
-  const togglePlay = () => {
-    if (!audioElement || !currentTrack) return;
-
-    if (isPlaying) {
-      audioElement.pause();
-    } else {
-      audioElement.play().catch(error => {
-        console.error("Error playing track:", error);
-      });
+  // Handle play/pause state changes
+  useEffect(() => {
+    if (audioElement) {
+      if (isPlaying) {
+        audioElement.play().catch(err => console.error("Error playing audio:", err));
+      } else {
+        audioElement.pause();
+      }
     }
-    
-    setIsPlaying(!isPlaying);
-  };
+  }, [isPlaying, audioElement]);
 
-  // Skip to the next track in playlist
-  const nextTrack = () => {
-    if (!playlist || !currentTrack) return;
-
-    const currentIndex = playlist.tracks.findIndex(track => track.id === currentTrack.id);
-    if (currentIndex < playlist.tracks.length - 1) {
-      playTrack(playlist.tracks[currentIndex + 1]);
-    } else {
-      // Loop back to the first track
-      playTrack(playlist.tracks[0]);
+  // Update volume when it changes
+  useEffect(() => {
+    if (audioElement) {
+      audioElement.volume = volume;
     }
-  };
+  }, [volume, audioElement]);
 
-  // Skip to the previous track in playlist
-  const previousTrack = () => {
-    if (!playlist || !currentTrack) return;
-
-    const currentIndex = playlist.tracks.findIndex(track => track.id === currentTrack.id);
-    if (currentIndex > 0) {
-      playTrack(playlist.tracks[currentIndex - 1]);
-    } else {
-      // Loop to the last track
-      playTrack(playlist.tracks[playlist.tracks.length - 1]);
-    }
-  };
-
-  // Set the volume
-  const setVolumeLevel = (level: number) => {
-    if (!audioElement) return;
-    
-    // Ensure volume is between 0 and 1
-    const newVolume = Math.max(0, Math.min(1, level));
-    audioElement.volume = newVolume;
-    setVolume(newVolume);
-  };
-
-  // Set specific time in the track
-  const seekTo = (time: number) => {
-    if (!audioElement) return;
-    
-    audioElement.currentTime = time;
-    setCurrentTime(time);
-  };
-
-  // Set up event listeners for the audio element
+  // Track progress
   useEffect(() => {
     if (!audioElement) return;
 
-    const handleTimeUpdate = () => {
-      setCurrentTime(audioElement.currentTime);
-    };
-
-    const handleDurationChange = () => {
-      setDuration(audioElement.duration);
+    const updateProgress = () => {
+      if (audioElement.duration > 0) {
+        setProgress(audioElement.currentTime / audioElement.duration);
+      }
     };
 
     const handleEnded = () => {
-      nextTrack();
+      next();
     };
 
-    audioElement.addEventListener('timeupdate', handleTimeUpdate);
-    audioElement.addEventListener('durationchange', handleDurationChange);
+    audioElement.addEventListener('timeupdate', updateProgress);
     audioElement.addEventListener('ended', handleEnded);
 
     return () => {
-      audioElement.removeEventListener('timeupdate', handleTimeUpdate);
-      audioElement.removeEventListener('durationchange', handleDurationChange);
+      audioElement.removeEventListener('timeupdate', updateProgress);
       audioElement.removeEventListener('ended', handleEnded);
     };
-  }, [audioElement, nextTrack]);
+  }, [audioElement, playlist]);
 
-  // Load and play a playlist
-  const loadPlaylist = (newPlaylist: MusicPlaylist, autoplay = true) => {
-    setPlaylist(newPlaylist);
-    
-    if (newPlaylist.tracks.length > 0 && autoplay) {
-      playTrack(newPlaylist.tracks[0]);
-    }
+  // Play function
+  const play = () => {
+    setIsPlaying(true);
   };
 
-  // Get a specific playlist by ID
-  const getPlaylistById = (id: string): MusicPlaylist | undefined => {
-    return defaultPlaylists.find(playlist => playlist.id === id);
-  };
-
-  // Open/close music drawer
-  const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen);
-  };
-
-  // Stop the current track
-  const stopTrack = () => {
-    if (!audioElement) return;
-    
-    audioElement.pause();
-    audioElement.currentTime = 0;
+  // Pause function
+  const pause = () => {
     setIsPlaying(false);
   };
 
-  const playEmotionBasedMusic = async (params: EmotionMusicParams): Promise<MusicPlaylist> => {
-    const playlist = await getMusicByEmotion(params);
-    loadPlaylist(playlist);
-    return playlist;
+  // Stop function
+  const stop = () => {
+    setIsPlaying(false);
+    if (audioElement) {
+      audioElement.currentTime = 0;
+    }
   };
 
-  // Context value
-  const contextValue: MusicContextType = {
-    currentTrack,
-    playlist,
-    isPlaying,
-    volume,
-    duration,
-    currentTime,
-    playTrack,
-    togglePlay,
-    nextTrack,
-    previousTrack,
-    setVolume: setVolumeLevel,
-    seekTo,
-    loadPlaylist,
-    getPlaylistById,
-    isDrawerOpen,
-    toggleDrawer,
-    stopTrack,
-    getMusicByEmotion,
-    playEmotionBasedMusic
+  // Set track function
+  const setTrack = (track: MusicTrack) => {
+    setCurrentTrack(track);
+    setIsPlaying(true);
+  };
+
+  // Toggle play/pause function
+  const togglePlay = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  // Next track function
+  const next = () => {
+    if (playlist.length === 0 || !currentTrack) return;
+
+    const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex < playlist.length - 1) {
+      setCurrentTrack(playlist[currentIndex + 1]);
+    } else {
+      setCurrentTrack(playlist[0]); // Loop back to the first track
+    }
+  };
+
+  // Previous track function
+  const previous = () => {
+    if (playlist.length === 0 || !currentTrack) return;
+
+    const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex > 0) {
+      setCurrentTrack(playlist[currentIndex - 1]);
+    } else {
+      setCurrentTrack(playlist[playlist.length - 1]); // Loop to the last track
+    }
+  };
+
+  // Add to playlist function
+  const addToPlaylist = (track: MusicTrack) => {
+    setPlaylist([...playlist, track]);
+  };
+
+  // Create playlist function
+  const createPlaylist = (name: string, tracks: MusicTrack[] = []): MusicPlaylist => {
+    const newPlaylist: MusicPlaylist = {
+      id: `playlist-${Date.now()}`,
+      name,
+      tracks,
+    };
+    setPlaylists([...playlists, newPlaylist]);
+    return newPlaylist;
+  };
+
+  // Remove from playlist function
+  const removeFromPlaylist = (trackId: string) => {
+    setPlaylist(playlist.filter(track => track.id !== trackId));
+  };
+
+  // Get tracks by emotion
+  const getTracksByEmotion = (emotion: string): MusicTrack[] => {
+    return allTracks.filter(track => 
+      track.emotion && track.emotion.toLowerCase() === emotion.toLowerCase()
+    );
   };
 
   return (
-    <MusicContext.Provider value={contextValue}>
+    <MusicContext.Provider
+      value={{
+        isPlaying,
+        currentTrack,
+        volume,
+        playlist,
+        allTracks,
+        playlists,
+        play,
+        pause,
+        stop,
+        next,
+        previous,
+        setTrack,
+        setVolume,
+        setPlaylist,
+        togglePlay,
+        addToPlaylist,
+        createPlaylist,
+        removeFromPlaylist,
+        getTracksByEmotion,
+        progress
+      }}
+    >
       {children}
     </MusicContext.Provider>
   );
 };
 
+// Export the useMusic hook
 export const useMusic = () => {
   const context = useContext(MusicContext);
   if (!context) {

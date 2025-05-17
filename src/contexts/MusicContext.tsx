@@ -1,3 +1,6 @@
 
-// Re-export from the main MusicProvider file
-export { MusicProvider, MusicContext, useMusic } from './music/MusicProvider';
+import { MusicProvider, useMusic } from './music/index';
+import MusicContext from './music/index';
+
+export { MusicProvider, useMusic };
+export default MusicContext;

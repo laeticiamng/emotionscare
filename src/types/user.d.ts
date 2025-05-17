@@ -48,7 +48,6 @@ export interface UserPreferences {
   fontFamily?: 'system' | 'serif' | 'mono' | 'sans';
   useSystemTheme?: boolean;
   highContrast?: boolean;
-  reducedMotion?: boolean;
   reduceMotion?: boolean;
   colorBlindMode?: boolean;
   soundEffects?: boolean;
