@@ -40,6 +40,9 @@ export interface LiveVoiceScannerProps {
   automaticMode?: boolean;
   instruction?: string;
   buttonText?: string;
+  autoStart?: boolean;
+  duration?: number;
+  className?: string;
 }
 
 export interface TeamOverviewProps {

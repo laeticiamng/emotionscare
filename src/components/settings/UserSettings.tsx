@@ -11,7 +11,7 @@ const UserSettings = () => {
 
   // Properly typed theme handler
   const handleThemeChange = (newTheme: Theme) => {
-    setTheme(newTheme);
+    setTheme(newTheme as any);
   };
 
   return (
@@ -28,7 +28,7 @@ const UserSettings = () => {
         
         <TabsContent value="theme">
           <ThemeSettingsTab 
-            currentTheme={theme}
+            currentTheme={theme as Theme}
             onThemeChange={handleThemeChange} 
           />
         </TabsContent>

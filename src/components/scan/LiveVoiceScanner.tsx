@@ -3,15 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Mic, MicOff, Loader2 } from "lucide-react";
-import { LiveVoiceScannerProps, EmotionResult } from "@/types/emotion";
+import { LiveVoiceScannerProps } from "@/types/emotion";
 import { scanService } from '@/services/scanService';
 import { Progress } from '@/components/ui/progress';
 
 const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
   onResult,
   autoStart = false,
-  stopAfterSeconds = 30,
-  duration = 30, // Default duration
+  duration = 30,
   className = ""
 }) => {
   const [isRecording, setIsRecording] = useState(autoStart);
@@ -101,7 +100,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
     if (isRecording) {
       interval = setInterval(() => {
         setRecordingTime((prev) => {
-          if (prev >= stopAfterSeconds) {
+          if (prev >= duration) {
             stopRecording();
             return prev;
           }
@@ -113,7 +112,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
     return () => {
       clearInterval(interval);
     };
-  }, [isRecording, stopAfterSeconds]);
+  }, [isRecording, duration]);
 
   return (
     <Card className={`w-full max-w-md ${className}`}>
@@ -142,14 +141,14 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
         <div className="space-y-2">
           <div className="flex justify-between text-xs">
             <span>{recordingTime} s</span>
-            <span>{stopAfterSeconds} s</span>
+            <span>{duration} s</span>
           </div>
-          <Progress value={(recordingTime / stopAfterSeconds) * 100} />
+          <Progress value={(recordingTime / duration) * 100} />
         </div>
         
         <div className="text-center text-sm">
           {isRecording ? (
-            <p>Enregistrement en cours... {stopAfterSeconds - recordingTime}s restantes</p>
+            <p>Enregistrement en cours... {duration - recordingTime}s restantes</p>
           ) : isProcessing ? (
             <p>Traitement de l'audio...</p>
           ) : (

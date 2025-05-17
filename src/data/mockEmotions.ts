@@ -1,56 +1,63 @@
 
-import { Emotion } from '@/types';
+import { Emotion } from '@/types/emotions';
 
-// Données fictives d'émotions pour les tests et le développement
+// Mock emotions data
 export const mockEmotions: Emotion[] = [
   {
-    id: '1',
-    user_id: 'user-1',
-    date: new Date(Date.now() - 86400000).toISOString(),
-    emotion: 'joy',
-    name: 'Joy', 
-    score: 0.85,
-    confidence: 0.92,
-    intensity: 0.8,
-    color: '#FFD700',
-    text: 'I feel really happy today after completing my project!',
+    id: "emo-1",
+    date: new Date(2025, 4, 15).toISOString(),
+    emotion: "joy",
+    score: 85,
+    user_id: "user-123",
   },
   {
-    id: '2',
-    user_id: 'user-1',
-    date: new Date(Date.now() - 172800000).toISOString(),
-    emotion: 'sadness',
-    name: 'Sadness', 
-    score: 0.65,
-    confidence: 0.78,
-    intensity: 0.6,
-    color: '#6495ED',
-    text: 'I miss my family back home.',
+    id: "emo-2",
+    date: new Date(2025, 4, 14).toISOString(),
+    emotion: "calm",
+    score: 72,
+    user_id: "user-123",
   },
   {
-    id: '3',
-    user_id: 'user-1',
-    date: new Date(Date.now() - 259200000).toISOString(),
-    emotion: 'anxiety',
-    name: 'Anxiety', 
-    score: 0.75,
-    confidence: 0.82,
-    intensity: 0.7,
-    color: '#FF6347',
-    text: 'Feeling nervous about tomorrow\'s presentation.',
+    id: "emo-3",
+    date: new Date(2025, 4, 13).toISOString(),
+    emotion: "anxiety",
+    score: 45,
+    user_id: "user-123",
   },
   {
-    id: '4',
-    user_id: 'user-2',
-    date: new Date(Date.now() - 86400000).toISOString(),
-    emotion: 'calm',
-    name: 'Calm', 
-    score: 0.9,
-    confidence: 0.95,
-    intensity: 0.85,
-    color: '#20B2AA',
-    text: 'Meditation this morning really helped me focus.',
-  },
+    id: "emo-4",
+    date: new Date(2025, 4, 12).toISOString(),
+    emotion: "sadness",
+    score: 30,
+    user_id: "user-123",
+  }
 ];
 
-export default mockEmotions;
+// Function to get mock emotions for a specific user
+export const getUserEmotions = (userId: string = "user-123") => {
+  return mockEmotions.filter(emotion => emotion.user_id === userId);
+};
+
+// Get emotions by date range
+export const getEmotionsByDateRange = (
+  startDate: Date, 
+  endDate: Date, 
+  userId: string = "user-123"
+) => {
+  return mockEmotions.filter(emotion => {
+    const emotionDate = new Date(emotion.date);
+    return (
+      emotion.user_id === userId &&
+      emotionDate >= startDate &&
+      emotionDate <= endDate
+    );
+  });
+};
+
+// Get the latest emotion
+export const getLatestEmotion = (userId: string = "user-123") => {
+  const userEmotions = getUserEmotions(userId);
+  return userEmotions.sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )[0];
+};

@@ -2,8 +2,18 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { VoiceEmotionScannerProps } from '@/types/emotion';
+import { EmotionResult } from '@/types/emotion';
 import { MicIcon } from 'lucide-react';
+
+interface VoiceEmotionScannerProps {
+  onComplete?: (result: EmotionResult) => void;
+  audioOnly?: boolean;
+  onResult?: (result: EmotionResult) => void;
+  duration?: number;
+  autoStart?: boolean;
+  showVisualizer?: boolean;
+  className?: string;
+}
 
 const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({
   onComplete,

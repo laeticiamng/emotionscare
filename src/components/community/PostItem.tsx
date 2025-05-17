@@ -42,7 +42,7 @@ const PostItem: React.FC<PostItemProps> = ({
     }
     
     try {
-      await reactToPost(post.id, user.id); // Fixed: Added second argument user.id
+      await reactToPost(post.id, user.id, 'like');
       if (onReactionAdded) {
         onReactionAdded();
       }

@@ -11,7 +11,7 @@ export interface UserPreferences {
   notificationsEnabled?: boolean;
   preferredTheme?: string;
   emotionTrackingFrequency?: 'daily' | 'weekly' | 'onDemand';
-  notificationTone?: 'friendly' | 'neutral' | 'formal' | 'casual' | 'direct' | 'professional' | 'motivational';
+  notificationTone?: 'friendly' | 'neutral' | 'formal' | 'casual' | 'direct' | 'professional' | 'motivational' | 'direct' | 'professional' | 'motivational';
 }
 
 export interface UserContext {

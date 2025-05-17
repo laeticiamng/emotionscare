@@ -1,141 +1,113 @@
 
-import { User } from '@/types/other';
 import { v4 as uuid } from 'uuid';
 
-// Fonction simulée pour récupérer les détails d'un utilisateur
-export async function fetchUserById(userId: string): Promise<User> {
-  console.log(`Fetching user details for ID: ${userId}`);
-  
-  // Simuler un délai d'API
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  // Retourner des données simulées
-  return {
-    id: userId,
-    name: `Utilisateur ${userId}`,
-    email: `user${userId}@example.com`,
-    role: 'b2c',
-    created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 jours avant
-    avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`,
-    preferences: {
-      theme: 'system',
-      language: 'fr',
-      notifications: true,
-      emailUpdates: false
-    }
-  };
-}
-
-// Fonction simulée pour récupérer une liste d'utilisateurs
-export async function fetchUsers(limit: number = 10): Promise<User[]> {
-  console.log(`Fetching ${limit} users`);
-  
-  // Simuler un délai d'API
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Retourner une liste d'utilisateurs simulés
-  return Array.from({ length: limit }, (_, i) => ({
-    id: `user-${i + 1}`,
-    name: `Utilisateur ${i + 1}`,
-    email: `user${i + 1}@example.com`,
-    role: i % 3 === 0 ? 'b2b_admin' : 'b2c',
-    created_at: new Date(Date.now() - (i + 1) * 7 * 24 * 60 * 60 * 1000).toISOString(), // Chaque utilisateur s'est inscrit il y a un nombre différent de semaines
-    avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${i}`,
-  }));
-}
-
-// Fonction simulée pour mettre à jour un utilisateur
-export async function updateUser(userId: string, data: Partial<User>): Promise<User> {
-  console.log(`Updating user ${userId} with data:`, data);
-  
-  // Simuler un délai d'API
-  await new Promise(resolve => setTimeout(resolve, 400));
-  
-  // Retourner l'utilisateur mis à jour
-  return {
-    id: userId,
-    name: data.name || `Utilisateur ${userId}`,
-    email: data.email || `user${userId}@example.com`,
-    role: data.role || 'b2c',
-    created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
-    avatar_url: data.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`,
-    preferences: {
-      ...(data.preferences || {})
-    }
-  };
-}
-
-// Add missing functions for community features
-export async function createComment(data: any) {
-  console.log(`Creating comment:`, data);
-  await new Promise(resolve => setTimeout(resolve, 300));
-  return {
+// Mock data for posts
+const mockPosts = [
+  {
     id: uuid(),
-    content: data.content,
-    postId: data.postId,
-    userId: data.userId,
-    createdAt: new Date().toISOString()
-  };
-}
-
-export async function createGroup(data: any) {
-  console.log(`Creating group:`, data);
-  await new Promise(resolve => setTimeout(resolve, 400));
-  return {
+    user_id: 'user1',
+    date: new Date().toISOString(),
+    content: 'Just had a great mindfulness session today!',
+    reactions: 5,
+    image_url: null,
+  },
+  {
     id: uuid(),
-    name: data.name,
-    description: data.description,
-    createdBy: data.userId,
-    createdAt: new Date().toISOString(),
-    members: [data.userId],
-    tags: data.tags || []
-  };
-}
+    user_id: 'user2',
+    date: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+    content: 'Seeking recommendations for meditation apps. What are you all using?',
+    reactions: 3,
+    image_url: '/images/meditation.jpg',
+  },
+];
 
-export async function createPost(data: any) {
-  console.log(`Creating post:`, data);
-  await new Promise(resolve => setTimeout(resolve, 350));
-  return {
+// Mock data for comments
+const mockComments = [
+  {
     id: uuid(),
-    title: data.title,
-    content: data.content,
-    userId: data.userId,
-    groupId: data.groupId,
-    createdAt: new Date().toISOString(),
-    likes: 0,
-    comments: 0,
-    tags: data.tags || []
-  };
-}
+    post_id: mockPosts[0].id,
+    user_id: 'user2',
+    date: new Date().toISOString(),
+    content: 'That sounds wonderful! What techniques did you practice?',
+  },
+  {
+    id: uuid(),
+    post_id: mockPosts[1].id,
+    user_id: 'user1',
+    date: new Date().toISOString(),
+    content: 'I recommend Calm or Headspace, both are great!',
+  },
+];
 
-export async function reactToPost(postId: string, userId: string, reaction: 'like' | 'dislike') {
-  console.log(`${reaction === 'like' ? 'Liking' : 'Disliking'} post ${postId} by user ${userId}`);
-  await new Promise(resolve => setTimeout(resolve, 200));
-  return {
-    success: true,
-    postId,
-    userId,
-    reaction
-  };
-}
+// Mock tags
+const mockTags = [
+  'mindfulness', 'meditation', 'wellness', 'self-care', 'motivation',
+  'journaling', 'gratitude', 'emotional-intelligence', 'mental-health'
+];
 
-export async function getRecommendedTags(input: string): Promise<string[]> {
-  console.log(`Getting recommended tags for input: ${input}`);
-  await new Promise(resolve => setTimeout(resolve, 250));
-  
-  const allTags = [
-    'bien-être', 'méditation', 'sport', 'nutrition', 'sommeil', 
-    'stress', 'équilibre', 'santé mentale', 'pleine conscience', 
-    'exercice', 'relaxation', 'productivité', 'développement personnel'
-  ];
-  
-  if (!input) {
-    return allTags.slice(0, 5);
+// Function to get all posts
+export const getPosts = async () => {
+  return mockPosts;
+};
+
+// Function to get a post by ID
+export const getPostById = async (id) => {
+  return mockPosts.find(post => post.id === id);
+};
+
+// Function to create a new post
+export const createPost = async (postData) => {
+  const newPost = {
+    id: uuid(),
+    date: new Date().toISOString(),
+    reactions: 0,
+    ...postData,
+  };
+  mockPosts.unshift(newPost);
+  return newPost;
+};
+
+// Function to react to a post
+export const reactToPost = async (postId, userId, reactionType = 'like') => {
+  const post = mockPosts.find(p => p.id === postId);
+  if (post) {
+    post.reactions = (post.reactions || 0) + 1;
+    return post;
   }
-  
-  const filteredTags = allTags.filter(tag => 
-    tag.toLowerCase().includes(input.toLowerCase())
-  );
-  
-  return filteredTags.length > 0 ? filteredTags : allTags.slice(0, 3);
-}
+  throw new Error('Post not found');
+};
+
+// Function to get comments for a post
+export const getCommentsForPost = async (postId) => {
+  return mockComments.filter(comment => comment.post_id === postId);
+};
+
+// Function to create a comment
+export const createComment = async (commentData) => {
+  const newComment = {
+    id: uuid(),
+    date: new Date().toISOString(),
+    ...commentData
+  };
+  mockComments.push(newComment);
+  return newComment;
+};
+
+// Function to get recommended tags
+export const getRecommendedTags = async (query = '') => {
+  if (!query) {
+    return mockTags;
+  }
+  return mockTags.filter(tag => tag.includes(query.toLowerCase()));
+};
+
+// Function to create a group
+export const createGroup = async (groupData) => {
+  const newGroup = {
+    id: uuid(),
+    created_at: new Date().toISOString(),
+    members: [groupData.user_id],
+    ...groupData,
+  };
+  return newGroup;
+};

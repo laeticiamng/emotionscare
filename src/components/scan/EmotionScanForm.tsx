@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { saveEmotion, analyzeEmotion } from '@/lib/scanService';
+import { analyzeEmotion, saveEmotion } from '@/lib/scanService';
 import { EmotionResult } from '@/types/emotion';
 import EmojiPicker from './EmojiPicker';
 
@@ -102,12 +102,12 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
       }
 
       // Save in database
-      await saveEmotion(emotion);
+      const savedEmotion = await saveEmotion(emotion);
       
       // Update state and call callback
-      setMostRecentEmotion(emotion);
+      setMostRecentEmotion(savedEmotion);
       if (onEmotionDetected) {
-        onEmotionDetected(emotion);
+        onEmotionDetected(savedEmotion);
       }
       
       // Call completion handler if provided
@@ -116,7 +116,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
       }
       
       if (onComplete) {
-        onComplete(emotion);
+        onComplete(savedEmotion);
       }
       
       if (onScanSaved) {
@@ -135,10 +135,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
 
   const handleAnalyze = async () => {
     try {
-      // Convert emojis string to array
-      const emojiArray = emojis.split('');
-      
-      // Analyze the text
+      // Analyze the text directly
       const result = await analyzeEmotion(text);
       
       // Process the analysis result

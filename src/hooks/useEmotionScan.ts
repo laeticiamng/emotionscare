@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { EmotionResult } from '@/types/emotions';
-import { analyzeEmotion, getLatestEmotion as fetchLatestEmotion } from '@/lib/scanService';
+import { analyzeEmotion, fetchLatestEmotion } from '@/lib/scanService';
 
 interface UseEmotionScanProps {
   userId?: string;
@@ -43,11 +43,16 @@ export const useEmotionScan = (props?: UseEmotionScanProps) => {
     setError('');
     
     try {
-      const result = await analyzeEmotion(data);
-      setLatestEmotion(result);
+      // Convert the object to a string for the analyzeEmotion function
+      const textToAnalyze = data.text || '';
+      const result = await analyzeEmotion(textToAnalyze);
       
-      if (props?.onEmotionDetected) {
-        props.onEmotionDetected(result);
+      if (result) {
+        setLatestEmotion(result);
+        
+        if (props?.onEmotionDetected) {
+          props.onEmotionDetected(result);
+        }
       }
       
       return result;
@@ -70,13 +75,16 @@ export const useEmotionScan = (props?: UseEmotionScanProps) => {
         id: `emo-${Date.now()}`,
         userId,
         timestamp: new Date().toISOString(),
+        emotion: data.emotion || 'neutral', // Ensure we always have an emotion
         ...data
       };
       
-      setLatestEmotion(result);
-      
-      if (props?.onEmotionDetected) {
-        props.onEmotionDetected(result);
+      if (result) {
+        setLatestEmotion(result as EmotionResult);
+        
+        if (props?.onEmotionDetected) {
+          props.onEmotionDetected(result as EmotionResult);
+        }
       }
       
       return result;

@@ -6,6 +6,7 @@ import { EmotionalTeamViewProps } from '@/types/emotions';
 const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ 
   teamId, 
   period = 'week',
+  anonymized,
   dateRange,
   showGraph = true, 
   showMembers = true,
