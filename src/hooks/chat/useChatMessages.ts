@@ -1,77 +1,57 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChatMessage } from '@/types/chat';
-import { v4 as uuidv4 } from 'uuid';
 
 export const useChatMessages = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  const addUserMessage = (text: string): ChatMessage => {
-    const message: ChatMessage = {
-      id: uuidv4(),
-      text,
-      sender: 'user',
-      timestamp: new Date().toISOString()
-    };
+  useEffect(() => {
+    // Exemple de messages pour la démo
+    const demoMessages = [
+      {
+        id: '1',
+        text: 'Bonjour, comment puis-je vous aider aujourd\'hui ?',
+        sender: 'assistant',
+        timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+        role: 'assistant' as const
+      },
+      {
+        id: '2',
+        text: 'Je me sens un peu anxieux. Pourriez-vous me suggérer des techniques de respiration ?',
+        sender: 'user',
+        timestamp: new Date(Date.now() - 1000 * 60 * 4).toISOString(),
+        role: 'user' as const
+      },
+      {
+        id: '3',
+        text: 'Bien sûr ! La technique 4-7-8 est très efficace. Inspirez pendant 4 secondes, retenez votre souffle pendant 7 secondes, puis expirez lentement pendant 8 secondes. Essayez cela 3-4 fois.',
+        sender: 'assistant',
+        timestamp: new Date(Date.now() - 1000 * 60 * 3).toISOString(),
+        role: 'assistant' as const
+      },
+      {
+        id: '4',
+        text: 'Merci, ça aide beaucoup !',
+        sender: 'user',
+        timestamp: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
+        role: 'user' as const
+      }
+    ];
 
+    setMessages(demoMessages);
+  }, []);
+
+  const addMessage = (message: ChatMessage) => {
     setMessages(prev => [...prev, message]);
-    return message;
   };
 
-  const addBotMessage = (text: string): ChatMessage => {
-    const message: ChatMessage = {
-      id: uuidv4(),
-      text,
-      sender: 'bot',
-      timestamp: new Date().toISOString()
-    };
-
-    setMessages(prev => [...prev, message]);
-    return message;
-  };
-
-  const addSystemMessage = (text: string): ChatMessage => {
-    const message: ChatMessage = {
-      id: uuidv4(),
-      text,
-      sender: 'system',
-      timestamp: new Date().toISOString()
-    };
-
-    setMessages(prev => [...prev, message]);
-    return message;
-  };
-
-  const addCoachMessage = (text: string): ChatMessage => {
-    const message: ChatMessage = {
-      id: uuidv4(),
-      text,
-      sender: 'coach',
-      timestamp: new Date().toISOString()
-    };
-
-    setMessages(prev => [...prev, message]);
-    return message;
-  };
-
-  const removeMessage = (id: string) => {
-    setMessages(prev => prev.filter(message => message.id !== id));
-  };
-
-  const clearMessages = () => {
+  const resetMessages = () => {
     setMessages([]);
   };
 
   return {
     messages,
-    setMessages,
-    addUserMessage,
-    addBotMessage,
-    addSystemMessage,
-    addCoachMessage,
-    removeMessage,
-    clearMessages,
+    addMessage,
+    resetMessages
   };
 };
-
-export default useChatMessages;

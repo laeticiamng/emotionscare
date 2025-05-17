@@ -1,42 +1,58 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '@/contexts/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, User, Building, Mic, Volume2, VolumeX } from 'lucide-react';
 import Shell from '@/Shell';
-import * as THREE from 'three';
+import ParticlesBackground from '@/components/three/ParticlesBackground';
 import { motion } from 'framer-motion';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 const ImmersiveHome: React.FC = () => {
   const navigate = useNavigate();
-  const { theme, isDarkMode } = useTheme();
+  const { theme, isDarkMode, soundEnabled, setSoundEnabled } = useTheme();
   const { toast } = useToast();
   const [greeting, setGreeting] = useState<string>('Bienvenue dans votre espace de bien-être émotionnel');
   const [isListening, setIsListening] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const sceneRef = useRef<THREE.Scene | null>(null);
-  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const animationFrameRef = useRef<number>(0);
 
-  // Generate greeting based on time of day
-  const generateGreeting = () => {
+  // Générer un accueil selon l'heure du jour
+  useEffect(() => {
     const hour = new Date().getHours();
     
     if (hour >= 5 && hour < 12) {
-      return "Bienvenue dans votre espace de reconnexion émotionnelle matinale";
+      setGreeting("Bienvenue dans votre espace de reconnexion émotionnelle matinale");
     } else if (hour >= 12 && hour < 18) {
-      return "Votre espace premium pour le bien-être émotionnel quotidien";
+      setGreeting("Votre espace premium pour le bien-être émotionnel quotidien");
     } else if (hour >= 18 && hour < 22) {
-      return "Votre refuge émotionnel pour une soirée apaisante";
+      setGreeting("Votre refuge émotionnel pour une soirée apaisante");
     } else {
-      return "Votre havre de paix émotionnel nocturne";
+      setGreeting("Votre havre de paix émotionnel nocturne");
     }
-  };
+    
+    // Charger et lire la musique d'ambiance si activée
+    if (soundEnabled) {
+      audioRef.current = new Audio('/sounds/ambient.mp3');
+      audioRef.current.volume = 0.2;
+      audioRef.current.loop = true;
+      
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          // Auto-play a été bloqué - normal sur de nombreux navigateurs
+          console.info("Lecture audio automatique bloquée", error);
+        });
+      }
+    }
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, [soundEnabled]);
 
   const handlePersonalClick = () => {
     // Vibration tactile pour mobile
@@ -58,7 +74,7 @@ const ImmersiveHome: React.FC = () => {
   };
 
   const handleVoiceCommand = () => {
-    // Check if browser supports speech recognition
+    // Vérifier si le navigateur supporte la reconnaissance vocale
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       setIsListening(true);
       
@@ -99,7 +115,7 @@ const ImmersiveHome: React.FC = () => {
         setIsListening(false);
         toast({
           title: "Erreur",
-          description: "Impossible de reconnaître la commande vocale",
+          description: "Impossible d'activer la reconnaissance vocale",
           variant: "destructive"
         });
       };
@@ -110,429 +126,134 @@ const ImmersiveHome: React.FC = () => {
       
       recognition.start();
     } else {
-      console.log('Speech recognition not supported');
       toast({
         title: "Non supporté",
-        description: "Commande vocale non supportée sur votre navigateur",
+        description: "La reconnaissance vocale n'est pas supportée par votre navigateur",
         variant: "destructive"
       });
     }
   };
 
-  const toggleAudio = () => {
-    if (audioRef.current) {
-      if (audioEnabled) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play().catch(e => {
-          console.log('Autoplay prevented by browser');
-          toast({
-            title: "Interaction requise",
-            description: "Cliquez à nouveau pour activer l'audio"
-          });
-        });
-      }
-      setAudioEnabled(!audioEnabled);
-    }
-  };
-
-  // Initialize three.js scene
-  useEffect(() => {
-    if (!canvasRef.current) return;
-
-    // Create scene
-    const scene = new THREE.Scene();
-    sceneRef.current = scene;
-
-    // Create camera
-    const camera = new THREE.PerspectiveCamera(
-      75, 
-      window.innerWidth / window.innerHeight, 
-      0.1, 
-      1000
-    );
-    camera.position.z = 30;
-    cameraRef.current = camera;
-
-    // Create renderer with transparent background
-    const renderer = new THREE.WebGLRenderer({
-      canvas: canvasRef.current,
-      alpha: true,
-      antialias: true
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    rendererRef.current = renderer;
-
-    // Get theme-specific colors
-    const getThemeColors = () => {
-      switch (theme) {
-        case 'dark':
-          return {
-            primary: 0x0891B2,  // cyan
-            secondary: 0x1E40AF, // deep blue
-            accent: 0x6366F1     // indigo
-          };
-        case 'blue-pastel':
-          return {
-            primary: 0x93C5FD,   // blue-300
-            secondary: 0xBFDBFE,  // blue-200
-            accent: 0xC7D2FE     // indigo-200
-          };
-        case 'pastel':
-          return {
-            primary: 0xFDE68A,   // yellow-200
-            secondary: 0xA7F3D0,  // green-200
-            accent: 0xC7D2FE     // indigo-200
-          };
-        default: // light
-          return {
-            primary: 0x3B82F6,   // blue-500
-            secondary: 0x60A5FA,  // blue-400
-            accent: 0x818CF8     // indigo-400
-          };
-      }
-    };
-
-    const colors = getThemeColors();
-
-    // Create particles for cosmos effect
-    const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 1500;
-    const posArray = new Float32Array(particlesCount * 3);
+  const toggleSound = () => {
+    setSoundEnabled(!soundEnabled);
     
-    for (let i = 0; i < particlesCount * 3; i++) {
-      posArray[i] = (Math.random() - 0.5) * 100;
-    }
-    
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.2,
-      color: colors.primary,
-      transparent: true,
-      opacity: 0.8,
-      blending: THREE.AdditiveBlending
-    });
-    
-    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particlesMesh);
-
-    // Create floating sphere
-    const sphereGeometry = new THREE.SphereGeometry(5, 64, 64);
-    const sphereMaterial = new THREE.MeshPhongMaterial({
-      color: colors.secondary,
-      transparent: true,
-      opacity: 0.7,
-      wireframe: false,
-    });
-    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    sphere.position.set(-10, 0, 0);
-    scene.add(sphere);
-
-    // Create second floating sphere
-    const sphere2Geometry = new THREE.SphereGeometry(3, 32, 32);
-    const sphere2Material = new THREE.MeshPhongMaterial({
-      color: colors.accent,
-      transparent: true,
-      opacity: 0.6,
-      wireframe: false,
-    });
-    const sphere2 = new THREE.Mesh(sphere2Geometry, sphere2Material);
-    sphere2.position.set(15, 5, -10);
-    scene.add(sphere2);
-
-    // Add lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-
-    const pointLight = new THREE.PointLight(0xffffff, 1);
-    pointLight.position.set(25, 5, 15);
-    scene.add(pointLight);
-
-    // Animation
-    const animate = () => {
-      particlesMesh.rotation.x += 0.0005;
-      particlesMesh.rotation.y += 0.0003;
-      
-      sphere.rotation.y += 0.005;
-      sphere.position.y = Math.sin(Date.now() * 0.001) * 1.5;
-      
-      sphere2.rotation.y -= 0.007;
-      sphere2.position.y = Math.sin(Date.now() * 0.0015 + 1) * 2;
-      
-      renderer.render(scene, camera);
-      animationFrameRef.current = requestAnimationFrame(animate);
-    };
-    
-    animate();
-
-    // Handle resize
-    const handleResize = () => {
-      if (!canvasRef.current) return;
-      
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    // Clean up on unmount
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameRef.current);
-      
-      scene.clear();
-      particlesGeometry.dispose();
-      particlesMaterial.dispose();
-      sphereGeometry.dispose();
-      sphereMaterial.dispose();
-      
-      if (rendererRef.current) {
-        rendererRef.current.dispose();
-      }
-    };
-  }, [theme]);
-
-  // Update greeting and other time-based items
-  useEffect(() => {
-    setGreeting(generateGreeting());
-    
-    // Set up background audio
-    if (audioRef.current) {
-      audioRef.current.volume = 0.2;
-    }
-    
-    // Check for stored user preference
-    const checkUserMode = () => {
-      const storedUserMode = localStorage.getItem('userMode');
-      if (storedUserMode === 'b2c') {
-        navigate('/b2c/login');
-      } else if (storedUserMode === 'b2b_user') {
-        navigate('/b2b/user/login');
-      } else if (storedUserMode === 'b2b_admin') {
-        navigate('/b2b/admin/login');
-      }
-    };
-    
-    // Check after a short delay to allow the animation to show first
-    const timerId = setTimeout(checkUserMode, 1000);
-    
-    // Use interval to update greeting based on time of day
-    const greetingInterval = setInterval(() => {
-      setGreeting(generateGreeting());
-    }, 60000);
-    
-    // Clean up on unmount
-    return () => {
-      clearTimeout(timerId);
-      clearInterval(greetingInterval);
+    if (soundEnabled) {
+      // Arrêter le son
       if (audioRef.current) {
         audioRef.current.pause();
       }
-    };
-  }, [navigate]);
-
-  // Button variants based on theme
-  const primaryButtonClass = 
-    theme === 'dark' 
-      ? 'bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900'
-      : theme === 'blue-pastel' || theme === 'pastel'
-        ? 'bg-gradient-to-r from-blue-300 to-blue-400 hover:from-blue-400 hover:to-blue-500'
-        : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600';
-  
-  const secondaryButtonClass = 
-    theme === 'dark' 
-      ? 'bg-gray-800 border border-gray-700 hover:bg-gray-700 text-gray-100'
-      : theme === 'blue-pastel' || theme === 'pastel'
-        ? 'bg-white/70 backdrop-blur-sm border border-blue-200 hover:bg-blue-50 text-blue-600'
-        : 'bg-white/90 backdrop-blur-sm border border-gray-200 hover:bg-gray-50 text-gray-800';
-
-  const getBgClass = () => {
-    switch (theme) {
-      case 'dark':
-        return 'bg-gradient-to-br from-gray-900 to-blue-900/30';
-      case 'blue-pastel':
-        return 'bg-gradient-to-br from-blue-100 to-indigo-100';
-      case 'pastel':
-        return 'bg-gradient-to-br from-yellow-50 to-green-50';
-      default: // light
-        return 'bg-gradient-to-br from-white to-blue-50';
+    } else {
+      // Activer le son
+      if (audioRef.current) {
+        audioRef.current.play().catch(console.error);
+      } else {
+        audioRef.current = new Audio('/sounds/ambient.mp3');
+        audioRef.current.volume = 0.2;
+        audioRef.current.loop = true;
+        audioRef.current.play().catch(console.error);
+      }
     }
   };
-
-  const getTextColorClass = () => {
-    switch (theme) {
-      case 'dark':
-        return 'text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300';
-      case 'blue-pastel':
-        return 'text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-indigo-400';
-      case 'pastel':
-        return 'text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-400';
-      default: // light
-        return 'text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-600';
-    }
-  };
-  
-  const getDescriptionClass = () => {
-    switch (theme) {
-      case 'dark':
-        return 'text-blue-300';
-      case 'blue-pastel':
-        return 'text-blue-600';
-      case 'pastel':
-        return 'text-emerald-600';
-      default: // light
-        return 'text-blue-900';
-    }
-  };
-
-  const audioPath = theme === 'pastel' 
-    ? '/sounds/ambient-gentle.mp3' 
-    : theme === 'dark' 
-      ? '/sounds/ambient-dark.mp3' 
-      : '/sounds/ambient-calm.mp3';
 
   return (
     <Shell hideNav>
-      {/* Main background based on theme */}
-      <div className={`min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden ${getBgClass()}`}>
-        {/* Background Canvas for 3D animation */}
-        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full -z-10" />
+      <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+        {/* Fond animé 3D */}
+        <ParticlesBackground />
         
-        {/* Audio element for background music */}
-        <audio 
-          ref={audioRef}
-          src={audioPath}
-          loop 
+        {/* Gradient de fond adapté au thème */}
+        <div 
+          className={`absolute inset-0 -z-20 
+            ${theme === 'light' 
+              ? 'bg-gradient-to-br from-blue-50 to-white' 
+              : theme === 'dark' 
+                ? 'bg-gradient-to-br from-gray-900 to-blue-950' 
+                : 'bg-gradient-to-br from-blue-50 to-blue-100'
+            }`}
         />
-
-        {/* Main Content */}
-        <div className="z-10 px-4 max-w-6xl mx-auto text-center relative" role="main">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+        
+        <div className="z-10 px-4 max-w-6xl mx-auto text-center relative">
+          {/* Contrôle du volume */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute top-4 right-4 text-primary hover:bg-primary/10 rounded-full"
+            onClick={toggleSound}
+            title={soundEnabled ? "Désactiver le son" : "Activer le son"}
           >
-            {/* Title with dynamic styling based on theme */}
-            <h1 className={`text-5xl md:text-7xl font-bold mb-4 ${getTextColorClass()}`}
-                aria-label="EmotionsCare">
-              EmotionsCare
-            </h1>
-            
-            {/* Dynamic greeting that changes based on time of day */}
-            <motion.p 
-              className={`text-xl md:text-2xl max-w-3xl mx-auto font-light mb-12 ${getDescriptionClass()}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 0.4 }}
-              aria-live="polite"
-            >
-              {greeting}
-            </motion.p>
-          </motion.div>
+            {soundEnabled ? <Volume2 /> : <VolumeX />}
+          </Button>
           
-          {/* Call-to-action buttons with animations */}
           <motion.div 
-            className="flex flex-col sm:flex-row justify-center mt-12 space-y-4 sm:space-y-0 sm:space-x-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+            transition={{ duration: 0.6 }}
+            className="mb-12 text-center"
           >
-            {/* B2C Button */}
+            <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 tracking-tight">
+              EmotionsCare
+            </h1>
+            <p className="text-xl md:text-2xl text-blue-700 dark:text-blue-300 max-w-3xl mx-auto font-light">
+              {greeting}
+            </p>
+          </motion.div>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-col sm:flex-row justify-center mt-12 space-y-4 sm:space-y-0 sm:space-x-6 relative"
+          >
             <Button 
+              size="lg" 
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white px-8 py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl transform transition-all duration-300 hover:-translate-y-1"
               onClick={handlePersonalClick}
-              className={`px-8 py-7 text-lg rounded-3xl shadow-lg flex items-center justify-center transform transition-all duration-300 hover:scale-105 hover:shadow-xl ${primaryButtonClass}`}
-              aria-label="Je suis un particulier"
             >
               <User className="mr-2 h-5 w-5" />
-              Je suis un particulier
-              <ArrowRight className="ml-2 h-5 w-5" />
+              Espace Personnel
+              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
             
-            {/* B2B Button */}
             <Button 
-              onClick={handleBusinessClick} 
               variant="outline" 
-              className={`px-8 py-7 text-lg rounded-3xl shadow-md flex items-center justify-center transform transition-all duration-300 hover:scale-105 hover:shadow-lg ${secondaryButtonClass}`}
-              aria-label="Je suis une entreprise"
+              size="lg"
+              className="border-blue-400 dark:border-blue-700 bg-white/80 dark:bg-blue-950/50 backdrop-blur-sm hover:bg-blue-50 dark:hover:bg-blue-900/80 text-blue-700 dark:text-blue-300 px-8 py-6 text-lg rounded-2xl shadow-md hover:shadow-lg transform transition-all duration-300 hover:-translate-y-1"
+              onClick={handleBusinessClick}
             >
               <Building className="mr-2 h-5 w-5" />
-              Je suis une entreprise
-              <ArrowRight className="ml-2 h-5 w-5" />
+              Espace Entreprise
+              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
           </motion.div>
           
-          {/* Utility controls: voice commands and sound */}
           <motion.div 
-            className="mt-12 flex justify-center space-x-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.7 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="mt-16"
           >
-            {/* Voice Command Button */}
-            <Button
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className={`text-blue-600 dark:text-blue-400 
+                hover:bg-blue-100/50 dark:hover:bg-blue-900/50 rounded-full p-3
+                ${isListening ? 'animate-pulse ring-2 ring-blue-400 dark:ring-blue-600' : ''}`}
               onClick={handleVoiceCommand}
-              variant="ghost"
-              size="icon"
-              className={`rounded-full w-12 h-12 ${
-                isListening 
-                  ? 'bg-red-500/20 text-red-500 animate-pulse' 
-                  : theme === 'dark'
-                    ? 'bg-gray-800/50 text-gray-300 hover:bg-gray-700'
-                    : theme === 'blue-pastel' || theme === 'pastel'
-                      ? 'bg-blue-100/70 text-blue-600 hover:bg-blue-200/70'
-                      : 'bg-gray-100/70 text-gray-700 hover:bg-gray-200/70'
-              }`}
-              aria-label="Activer la commande vocale"
+              title="Commande vocale"
+              disabled={isListening}
             >
               <Mic className="h-5 w-5" />
               <span className="sr-only">Commande vocale</span>
             </Button>
-            
-            {/* Sound Toggle Button */}
-            <Button
-              onClick={toggleAudio}
-              variant="ghost"
-              size="icon"
-              className={`rounded-full w-12 h-12 ${
-                theme === 'dark'
-                  ? 'bg-gray-800/50 text-gray-300 hover:bg-gray-700'
-                  : theme === 'blue-pastel' || theme === 'pastel'
-                    ? 'bg-blue-100/70 text-blue-600 hover:bg-blue-200/70'
-                    : 'bg-gray-100/70 text-gray-700 hover:bg-gray-200/70'
-              }`}
-              aria-label={audioEnabled ? "Désactiver la musique" : "Activer la musique"}
-            >
-              {audioEnabled ? (
-                <Volume2 className="h-5 w-5" />
-              ) : (
-                <VolumeX className="h-5 w-5" />
-              )}
-              <span className="sr-only">{audioEnabled ? "Désactiver la musique" : "Activer la musique"}</span>
-            </Button>
           </motion.div>
           
-          {/* Subtle footer message */}
           <motion.div 
-            className="absolute bottom-4 left-0 right-0 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.5 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
+            className="mt-24 text-blue-600/60 dark:text-blue-400/60 text-sm"
           >
-            <p className={`text-sm ${
-              theme === 'dark' 
-                ? 'text-blue-400/50' 
-                : theme === 'blue-pastel'
-                  ? 'text-blue-500/50'
-                  : theme === 'pastel'
-                    ? 'text-emerald-500/50'
-                    : 'text-blue-700/50'
-            }`}>
-              Découvrez la technologie qui comprend vos émotions
-            </p>
+            <p>Découvrez <span className="text-blue-600 dark:text-blue-400 font-medium">SocialCocon</span> - Votre communauté dédiée au bien-être</p>
           </motion.div>
         </div>
       </div>

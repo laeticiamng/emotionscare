@@ -2,7 +2,7 @@
 import { NotificationPreference } from './notification';
 
 export type ThemeName = "system" | "dark" | "light" | "pastel";
-export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "mono" | "sans" | "rounded"; 
+export type FontFamily = "system" | "serif" | "sans-serif" | "sans" | "rounded" | "monospace" | "mono"; 
 export type FontSize = "small" | "medium" | "large" | "x-large" | "xs" | "sm" | "md" | "lg" | "xl";
 export type Period = "day" | "week" | "month" | "year";
 export type UserModeType = "personal" | "work" | "relax" | "focus";

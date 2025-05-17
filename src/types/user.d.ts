@@ -10,7 +10,7 @@ export interface User {
   role: UserRole;
   avatar?: string;
   avatarUrl?: string; // Pour compatibilité
-  avatar_url?: string; // Pour compatibilité
+  avatar_url?: string; // Pour compatibilité  
   created_at?: string;
   updated_at?: string;
   joined_at?: string;
@@ -24,6 +24,7 @@ export interface User {
   preferences?: UserPreferences;
   emotional_score?: number;
   onboarded?: boolean;
+  language?: string;
 }
 
 export interface UserPreferencesContextType {

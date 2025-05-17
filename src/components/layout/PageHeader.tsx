@@ -1,37 +1,35 @@
 
-import React from 'react';
+import React from "react";
+import { cn } from "@/lib/utils";
+import { ThemeSelector } from '@/components/theme/ThemeSelector';
+import AudioControls from '@/components/audio/AudioControls';
 
 interface PageHeaderProps {
-  title: string;
-  description?: string;
-  icon?: React.ReactNode;
-  actions?: React.ReactNode;
+  heading: string;
+  text?: string;
+  children?: React.ReactNode;
+  className?: string;
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({
-  title,
-  description,
-  icon,
-  actions
-}) => {
+export function PageHeader({
+  heading,
+  text,
+  children,
+  className,
+}: PageHeaderProps) {
   return (
-    <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:justify-between md:items-center mb-6">
-      <div className="flex flex-col space-y-1">
-        <div className="flex items-center gap-2">
-          {icon && <div className="text-primary/80">{icon}</div>}
-          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-        </div>
-        {description && (
-          <p className="text-muted-foreground">{description}</p>
-        )}
+    <div className={cn("flex items-center justify-between px-2", className)}>
+      <div className="grid gap-1">
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+          {heading}
+        </h1>
+        {text && <p className="text-muted-foreground">{text}</p>}
       </div>
-      {actions && (
-        <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
-          {actions}
-        </div>
-      )}
+      <div className="flex items-center gap-2">
+        <AudioControls minimal />
+        <ThemeSelector minimal />
+        {children}
+      </div>
     </div>
   );
-};
-
-export default PageHeader;
+}

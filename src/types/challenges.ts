@@ -10,8 +10,14 @@ export interface Challenge {
   goal: number;
   completed: boolean;
   dueDate?: string;
+  deadline?: string;
   reward?: string;
   icon?: string;
+  name?: string; // Pour compatibilité
+  difficulty?: string;
+  tags?: string[];
+  completions?: number;
+  total?: number;
 }
 
 export type ChallengeType = 'daily' | 'weekly' | 'monthly' | 'special' | 'onetime';

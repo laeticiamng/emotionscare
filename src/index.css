@@ -1,146 +1,53 @@
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import './styles/premium.css';
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 1rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
-  }
-  
-  /* Thème pastel bleu - revised to be more blue and premium */
-  .pastel {
-    --background: 210 100% 98%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 210 100% 99%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 210 100% 99%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 215 94% 68%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 213.5 100% 95.7%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 213.5 100% 95.7%;
-    --muted-foreground: 215.4 16.3% 56.9%;
-    --accent: 213 96% 87%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214 100% 91%;
-    --input: 214 100% 91%;
-    --ring: 215 94% 68%;
-  }
-}
+/* Importing Inter font for premium typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 @layer base {
   * {
     @apply border-border font-inter;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Premium typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight font-medium;
+    letter-spacing: -0.015em;
+  }
+  
+  h1 {
+    @apply text-4xl lg:text-5xl;
+    letter-spacing: -0.03em;
+  }
+  
+  h2 {
+    @apply text-3xl lg:text-4xl;
+    letter-spacing: -0.02em;
+  }
+  
+  h3 {
+    @apply text-2xl lg:text-3xl;
+    letter-spacing: -0.015em;
+  }
+  
+  /* Font for all site */
+  .font-inter {
+    font-family: 'Inter', sans-serif;
   }
 }
 
-/* Adding Inter font throughout the application */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
-.font-inter {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+/* Premium UI animations */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
-/* Classes spécifiques pour le thème pastel bleu - Premium blue styling */
-.bg-pastel-gradient {
-  @apply bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-900 dark:to-blue-900/20;
-}
-
-.bg-pastel-card {
-  @apply bg-white/90 dark:bg-slate-900/70 border-blue-200 dark:border-blue-900/30 backdrop-blur-md shadow-md;
-}
-
-/* Nouvelles classes pour les différentes sections pastel blue */
-.pastel-blue-section {
-  @apply bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20;
-}
-
-.pastel-blue-card {
-  @apply bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 shadow-sm hover:shadow-md transition-all duration-300;
-}
-
-.pastel-blue-button {
-  @apply bg-blue-500 hover:bg-blue-600 text-white transition-colors duration-200;
-}
-
-.pastel-blue-input {
-  @apply border-blue-200 dark:border-blue-700 focus:border-blue-400 focus:ring-blue-300 bg-white dark:bg-slate-800;
-}
-
-/* Animation de transition douce */
-.theme-transition {
-  @apply transition-all duration-300 ease-in-out;
-}
-
-/* Premium UI Effects */
-.premium-card {
-  @apply rounded-2xl border border-white/40 bg-white/80 dark:bg-slate-900/80 dark:border-slate-800/40 shadow-lg backdrop-blur-sm;
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
-}
-
-.premium-button {
-  @apply rounded-2xl font-medium shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1;
-  background: linear-gradient(45deg, var(--primary), color-mix(in srgb, var(--primary) 80%, white));
-}
-
-.premium-glass {
-  @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl;
-}
-
-.text-gradient {
-  @apply bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent;
-}
-
-/* Animation Effects */
 @keyframes float {
   0%, 100% {
     transform: translateY(0);
@@ -150,67 +57,59 @@
   }
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+/* Transition for theme changes */
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-@keyframes pulse-subtle {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
+/* Premium shadows for components */
+.shadow-premium {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
 }
 
-.animate-pulse-subtle {
-  animation: pulse-subtle 3s ease-in-out infinite;
+.dark .shadow-premium {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
 }
 
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.bg-gradient-animate {
-  background-size: 200% 200%;
-  animation: gradient-shift 15s ease infinite;
-}
-
-/* Apple-style design utilities */
-.apple-card {
-  @apply rounded-2xl shadow-md bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700;
-  box-shadow: 0 4px 24px rgba(149, 157, 165, 0.1);
-}
-
-.apple-button {
-  @apply rounded-full px-6 py-3 font-medium transition-all duration-300;
-  background: linear-gradient(90deg, #0066ff, #5e9dff);
-  color: white;
-}
-
-.apple-button:hover {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
-}
-
-/* Hover effects */
+/* Hover lift effect for clickable elements */
 .hover-lift {
-  @apply transition-transform hover:-translate-y-1;
+  @apply transition-transform duration-300;
 }
 
-.hover-glow {
-  @apply transition-shadow hover:shadow-lg;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+.hover-lift:hover {
+  transform: translateY(-2px);
 }
 
-.hover-glow:hover {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+/* Premium gradients for backgrounds */
+.premium-gradient {
+  @apply bg-gradient-to-br;
+}
+
+.light .premium-gradient {
+  @apply from-white to-blue-50;
+}
+
+.dark .premium-gradient {
+  @apply from-gray-900 to-blue-950;
+}
+
+.pastel .premium-gradient {
+  @apply from-blue-50 to-blue-100;
+}
+
+/* Glass morphism effect */
+.glass-effect {
+  @apply backdrop-blur-md border;
+}
+
+.light .glass-effect {
+  @apply bg-white/80 border-white/20;
+}
+
+.dark .glass-effect {
+  @apply bg-black/20 border-white/10;
+}
+
+.pastel .glass-effect {
+  @apply bg-blue-50/80 border-blue-100/30;
 }
