@@ -1,64 +1,129 @@
 
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { RouteObject } from 'react-router-dom';
 import NotFoundPage from '@/pages/NotFoundPage';
 import LandingPage from '@/pages/LandingPage';
-
-// Login pages
+import B2BSelectionPage from '@/pages/B2BSelectionPage';
+import B2CLayout from '@/layouts/B2CLayout';
+import B2BUserLayout from '@/layouts/B2BUserLayout';
+import B2BAdminLayout from '@/layouts/B2BAdminLayout';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import B2CDashboardPage from '@/pages/b2c/DashboardPage';
+import B2BUserDashboardPage from '@/pages/b2b/user/Dashboard';
+import B2BAdminDashboardPage from '@/pages/b2b/admin/Dashboard';
+import B2CGamificationPage from '@/pages/b2c/Gamification';
+import B2BUserGamificationPage from '@/pages/b2b/user/Gamification';
+import ImmersiveHome from '@/pages/ImmersiveHome';
+import Home from '@/pages/Home';
 import LoginPage from '@/pages/common/Login';
 import RegisterPage from '@/pages/common/Register';
-import B2BSelectionPage from '@/pages/B2BSelectionPage';
 
-// B2C pages
-import B2CLayout from '@/layouts/B2CLayout';
-import B2CDashboard from '@/pages/b2c/Dashboard';
-import B2CGamificationPage from '@/pages/b2c/Gamification';
-import B2CMusicPage from '@/pages/b2c/Music';
+// Define the application routes without creating a router instance
+export const routes: RouteObject[] = [
+  {
+    path: '/',
+    element: <ImmersiveHome />
+  },
+  {
+    path: '/home',
+    element: <Home />
+  },
+  // B2C Auth Routes
+  {
+    path: 'b2c/login',
+    element: <LoginPage />
+  },
+  {
+    path: 'b2c/register',
+    element: <RegisterPage />
+  },
+  // B2B Selection Route
+  {
+    path: 'b2b/selection',
+    element: <B2BSelectionPage />
+  },
+  // Make sure the route with special character is also supported
+  {
+    path: 'b2b/sélection',
+    element: <B2BSelectionPage />
+  },
+  // B2B Auth Routes
+  {
+    path: 'b2b/user/login',
+    element: <LoginPage />
+  },
+  {
+    path: 'b2b/admin/login',
+    element: <LoginPage />
+  },
+  // B2C Protected Routes
+  {
+    path: 'b2c',
+    element: (
+      <ProtectedRoute>
+        <B2CLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: '',
+        element: <B2CDashboardPage /> // Default route when accessing /b2c
+      },
+      {
+        path: 'dashboard',
+        element: <B2CDashboardPage />
+      },
+      {
+        path: 'gamification',
+        element: <B2CGamificationPage />
+      }
+    ]
+  },
+  // B2B User Protected Routes
+  {
+    path: 'b2b/user',
+    element: (
+      <ProtectedRoute>
+        <B2BUserLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: '',
+        element: <B2BUserDashboardPage /> // Default route when accessing /b2b/user
+      },
+      {
+        path: 'dashboard',
+        element: <B2BUserDashboardPage />
+      },
+      {
+        path: 'gamification',
+        element: <B2BUserGamificationPage />
+      }
+    ]
+  },
+  // B2B Admin Protected Routes
+  {
+    path: 'b2b/admin',
+    element: (
+      <ProtectedRoute>
+        <B2BAdminLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: '',
+        element: <B2BAdminDashboardPage /> // Default route when accessing /b2b/admin
+      },
+      {
+        path: 'dashboard',
+        element: <B2BAdminDashboardPage />
+      }
+    ]
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />
+  }
+];
 
-// B2B User pages
-import B2BUserLayout from '@/layouts/B2BUserLayout';
-import B2BUserDashboard from '@/pages/b2b/user/Dashboard';
-import B2BUserGamificationPage from '@/pages/b2b/user/Gamification';
-
-// B2B Admin pages
-import B2BAdminLayout from '@/layouts/B2BAdminLayout';
-import B2BAdminDashboard from '@/pages/b2b/admin/Dashboard';
-
-export const AppRoutes: React.FC = () => {
-  return (
-    <Routes>
-      {/* Root route - Landing page */}
-      <Route path="/" element={<LandingPage />} />
-      
-      {/* Auth routes */}
-      <Route path="/b2c/login" element={<LoginPage />} />
-      <Route path="/b2b/user/login" element={<LoginPage />} />
-      <Route path="/b2b/admin/login" element={<LoginPage />} />
-      <Route path="/b2c/register" element={<RegisterPage />} />
-      <Route path="/b2b/selection" element={<B2BSelectionPage />} />
-
-      {/* B2C Routes */}
-      <Route path="/b2c" element={<B2CLayout />}>
-        <Route path="dashboard" element={<B2CDashboard />} />
-        <Route path="gamification" element={<B2CGamificationPage />} />
-        <Route path="music" element={<B2CMusicPage />} />
-      </Route>
-
-      {/* B2B User Routes */}
-      <Route path="/b2b/user" element={<B2BUserLayout />}>
-        <Route path="dashboard" element={<B2BUserDashboard />} />
-        <Route path="gamification" element={<B2BUserGamificationPage />} />
-      </Route>
-
-      {/* B2B Admin Routes */}
-      <Route path="/b2b/admin" element={<B2BAdminLayout />}>
-        <Route path="dashboard" element={<B2BAdminDashboard />} />
-      </Route>
-      
-      {/* Catch all - 404 */}
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
-  );
-};
-
-export default AppRoutes;
+export default routes;
