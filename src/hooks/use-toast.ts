@@ -19,6 +19,7 @@ export const useToast = () => {
 };
 
 export type { ToastProps, ToastActionElement, ToastOptions };
-export { Toast } from "@/types/toast";
+// Use export type for re-exporting types when isolatedModules is enabled
+export type { Toast } from "@/types/toast";
 
 export default useToast;

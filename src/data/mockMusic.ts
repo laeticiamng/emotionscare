@@ -12,6 +12,7 @@ export const mockTracks: MusicTrack[] = [
     coverUrl: '/images/covers/calm-waters.jpg',
     emotion: 'calm',
     genre: 'ambient',
+    description: 'Gentle sounds of ocean waves'
   },
   {
     id: '2',
@@ -22,6 +23,7 @@ export const mockTracks: MusicTrack[] = [
     coverUrl: '/images/covers/morning-energy.jpg',
     emotion: 'joy',
     genre: 'upbeat',
+    description: 'Start your day with positive energy'
   },
   {
     id: '3',
@@ -32,6 +34,7 @@ export const mockTracks: MusicTrack[] = [
     coverUrl: '/images/covers/deep-focus.jpg',
     emotion: 'neutral',
     genre: 'concentration',
+    description: 'Focus and productivity enhancement'
   },
   {
     id: '4',
@@ -42,6 +45,7 @@ export const mockTracks: MusicTrack[] = [
     coverUrl: '/images/covers/evening-relax.jpg',
     emotion: 'calm',
     genre: 'relaxation',
+    description: 'Wind down after a long day'
   }
 ];
 
@@ -49,19 +53,21 @@ export const mockTracks: MusicTrack[] = [
 export const mockPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-1',
+    title: 'Calm Emotions',
     name: 'Calm Emotions',
     description: 'Perfect for relaxation and unwinding',
     emotion: 'calm',
     tracks: mockTracks.filter(track => track.emotion === 'calm'),
-    coverUrl: '/images/covers/calm-playlist.jpg',
+    coverUrl: '/images/covers/calm-playlist.jpg'
   },
   {
     id: 'playlist-2',
+    title: 'Positive Energy',
     name: 'Positive Energy',
     description: 'Boost your mood with these tracks',
     emotion: 'joy',
     tracks: mockTracks.filter(track => track.emotion === 'joy'),
-    coverUrl: '/images/covers/joy-playlist.jpg',
+    coverUrl: '/images/covers/joy-playlist.jpg'
   }
 ];
 

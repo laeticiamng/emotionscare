@@ -117,7 +117,7 @@ const AudioPlayerSection: React.FC = () => {
                 {currentTrack?.title || "Sons relaxants de la nature"}
               </h3>
               <p className="text-muted-foreground">
-                {currentTrack?.description || "Écoutez les sons apaisants de la forêt tropicale pour réduire votre stress."}
+                {currentTrack?.description || "No description available"}
               </p>
             </div>
             

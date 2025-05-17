@@ -1,9 +1,18 @@
 
+// Re-export audio types with additional music-specific properties
 import { AudioTrack, AudioPlaylist, EmotionMusicParams } from './audio';
 
-// Re-export these types for backward compatibility
-export type MusicTrack = AudioTrack;
-export type MusicPlaylist = AudioPlaylist;
+// Extended music track with additional properties
+export interface MusicTrack extends AudioTrack {
+  description?: string;
+}
+
+// Extended music playlist with additional properties
+export interface MusicPlaylist extends AudioPlaylist {
+  name?: string;
+  title?: string;
+}
+
 export type { EmotionMusicParams };
 
 export interface TrackInfoProps {
@@ -16,6 +25,8 @@ export interface ProgressBarProps {
   duration: number;
   onSeek: (time: number) => void;
   className?: string;
+  formatTime?: (seconds: number) => string;
+  showTimestamps?: boolean;
 }
 
 export interface VolumeControlProps {
@@ -38,6 +49,10 @@ export interface MusicControlsProps {
 export interface MusicDrawerProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
+  isOpen?: boolean;
+  playlist?: MusicPlaylist | null;
+  currentTrack?: MusicTrack | null;
 }
 
 export interface MusicLibraryProps {
@@ -56,8 +71,8 @@ export interface MusicContextType {
   emotion: string | null;
   openDrawer: boolean;
   isInitialized: boolean;
-  isLoading: boolean;
-  error: Error | null;
+  isLoading?: boolean;
+  error?: Error | null;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;

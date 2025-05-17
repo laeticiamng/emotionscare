@@ -1,3 +1,3 @@
 
-export * from './MusicContext';
-export { useMusicPlayer } from './useMusicPlayer';
+export { MusicProvider, useMusic, MusicContext } from './MusicProvider';
+export type { MusicContextType } from './MusicProvider';

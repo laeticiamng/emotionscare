@@ -13,6 +13,7 @@ export const musicTracks: MusicTrack[] = [
     coverUrl: '/images/calm-waters.jpg',
     genre: 'ambient',
     emotion: 'calm',
+    description: 'Relaxing water sounds'
   },
   {
     id: 'track-002',
@@ -24,6 +25,7 @@ export const musicTracks: MusicTrack[] = [
     coverUrl: '/images/sunrise.jpg',
     genre: 'uplifting',
     emotion: 'energized',
+    description: 'Start your day with energy'
   },
   {
     id: 'track-003',
@@ -35,6 +37,7 @@ export const musicTracks: MusicTrack[] = [
     coverUrl: '/images/focus.jpg',
     genre: 'electronic',
     emotion: 'focused',
+    description: 'Improve your concentration'
   },
 ];
 
@@ -46,29 +49,29 @@ const focusedTracks = musicTracks.filter(track => track.emotion === 'focused');
 export const musicPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-001',
-    name: 'Relaxation',
     title: 'Détente profonde',
+    name: 'Relaxation',
     description: 'Une sélection pour vous aider à vous détendre',
     coverUrl: '/images/calm-waters.jpg',
     tracks: calmTracks,
-    emotion: 'calm',
+    emotion: 'calm'
   },
   {
     id: 'playlist-002',
-    name: 'Energie du matin',
     title: 'Boost d\'énergie',
+    name: 'Energie du matin',
     description: 'Pour bien commencer la journée',
     coverUrl: '/images/sunrise.jpg',
     tracks: energizedTracks,
-    emotion: 'energized',
+    emotion: 'energized'
   },
   {
     id: 'playlist-003',
-    name: 'Concentration',
     title: 'Focus intense',
+    name: 'Concentration',
     description: 'Pour rester concentré dans votre travail',
     coverUrl: '/images/focus.jpg',
     tracks: focusedTracks,
-    emotion: 'focused',
+    emotion: 'focused'
   },
 ];

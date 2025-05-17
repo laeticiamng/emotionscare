@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@/types/user';
 
@@ -16,7 +15,7 @@ const mockUser: User = {
   email: "user@example.com",
   name: "John Doe",
   role: "user",
-  createdAt: new Date().toISOString(),
+  created_at: new Date().toISOString(),
   isActive: true
 };
 
