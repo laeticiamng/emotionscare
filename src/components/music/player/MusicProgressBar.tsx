@@ -1,53 +1,74 @@
-
 import React from 'react';
-import { Slider } from '@/components/ui/slider';
-import { ProgressBarProps } from '@/types/music';
-import { cn } from '@/lib/utils';
+
+export interface ProgressBarProps {
+  value?: number;
+  max?: number;
+  onChange?: (value: number) => void;
+  position?: number;
+  currentTime?: number;
+  duration?: number;
+  className?: string;
+  formatTime?: (seconds: number) => string;
+  onSeek?: (value: number) => void;
+  showTimestamps?: boolean;
+}
 
 const MusicProgressBar: React.FC<ProgressBarProps> = ({
-  position,
-  max,
+  value,
+  max = 100,
   onChange,
+  position,
   currentTime = 0,
   duration = 0,
-  formatTime,
-  showTimestamps = false,
-  className,
-  onSeek
+  className = "",
+  formatTime = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`,
+  onSeek,
+  showTimestamps = true
 }) => {
-  // Default formatter if none provided
-  const defaultFormatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = parseFloat(e.target.value);
+    onChange?.(newValue);
+    onSeek?.(newValue);
   };
 
-  const timeFormatter = formatTime || defaultFormatTime;
-  
-  const handleChange = (value: number[]) => {
-    const newPosition = value[0];
-    if (onSeek) {
-      onSeek(newPosition);
-    } else {
-      onChange(newPosition);
-    }
-  };
+  const thumbPosition = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className={cn("w-full space-y-1", className)}>
-      <Slider
-        value={[position]}
-        max={max}
-        step={1}
-        onValueChange={handleChange}
-        aria-label="Music progress"
-      />
-      
+    <div className={`flex items-center ${className}`}>
       {showTimestamps && (
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{timeFormatter(currentTime)}</span>
-          <span>{timeFormatter(duration)}</span>
-        </div>
+        <span className="text-xs text-muted-foreground mr-2">{formatTime(currentTime)}</span>
+      )}
+      <div className="relative flex-1">
+        <input
+          type="range"
+          min={0}
+          max={max}
+          value={value}
+          onChange={handleInputChange}
+          className="
+            w-full h-1 bg-input rounded-full appearance-none
+            cursor-pointer
+            focus:outline-none focus:ring-2 focus:ring-primary
+            [&::-webkit-slider-thumb]:(
+              appearance-none w-4 h-4 bg-primary rounded-full border-none
+              cursor-pointer
+              transition-transform duration-200
+              transform translate-y-[-1.5px]
+            )
+            [&::-moz-range-thumb]:(
+              appearance-none w-4 h-4 bg-primary rounded-full border-none
+              cursor-pointer
+              transition-transform duration-200
+            )
+          "
+        />
+        <div
+          className="absolute top-0 left-0 h-1 bg-primary rounded-full pointer-events-none"
+          style={{ width: `${thumbPosition}%` }}
+        />
+      </div>
+      {showTimestamps && (
+        <span className="text-xs text-muted-foreground ml-2">{formatTime(duration)}</span>
       )}
     </div>
   );

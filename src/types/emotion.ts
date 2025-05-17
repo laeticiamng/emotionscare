@@ -24,6 +24,7 @@ export interface EmotionResult {
   recommendations?: string[];
   ai_feedback?: string;
   emojis?: string | string[];
+  date?: string; // Ajout du champ date manquant
 }
 
 export interface LiveVoiceScannerProps {
@@ -45,4 +46,10 @@ export interface EmotionalTeamViewProps {
   data?: any[];
   isLoading?: boolean;
   error?: Error | null;
+  period?: string;
+  anonymized?: boolean;
+  dateRange?: [Date, Date];
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
 }

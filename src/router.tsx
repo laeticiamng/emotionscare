@@ -1,6 +1,6 @@
+
 import { createBrowserRouter } from 'react-router-dom';
 import App from './App';
-import ImmersiveHome from './pages/ImmersiveHome';
 import LandingPage from './pages/LandingPage';
 import NotFoundPage from './pages/NotFoundPage';
 import LoginPage from './pages/common/Login';
@@ -11,7 +11,8 @@ import B2BUserLayout from './layouts/B2BUserLayout';
 import B2BAdminLayout from './layouts/B2BAdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import B2CDashboardPage from './pages/b2c/DashboardPage';
-import Dashboard from './pages/Dashboard';
+import B2BUserDashboardPage from './pages/b2b/user/Dashboard';
+import B2BAdminDashboardPage from './pages/b2b/admin/Dashboard';
 
 // Create and export the router
 export const router = createBrowserRouter([
@@ -21,7 +22,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <ImmersiveHome />
+        element: <LandingPage />
       },
       // B2C Auth Routes
       {
@@ -59,7 +60,6 @@ export const router = createBrowserRouter([
             path: 'dashboard',
             element: <B2CDashboardPage />
           }
-          // Other B2C routes will be rendered by the router/index.tsx
         ]
       },
       // B2B User Protected Routes
@@ -73,9 +73,8 @@ export const router = createBrowserRouter([
         children: [
           {
             path: 'dashboard',
-            element: <Dashboard />
+            element: <B2BUserDashboardPage />
           }
-          // Other B2B user routes will be rendered by the router/index.tsx
         ]
       },
       // B2B Admin Protected Routes
@@ -89,9 +88,8 @@ export const router = createBrowserRouter([
         children: [
           {
             path: 'dashboard',
-            element: <Dashboard />
+            element: <B2BAdminDashboardPage />
           }
-          // Other B2B admin routes will be rendered by the router/index.tsx
         ]
       },
       {

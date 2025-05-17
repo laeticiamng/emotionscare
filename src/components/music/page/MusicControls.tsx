@@ -1,11 +1,35 @@
-
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { MusicControlsProps } from '@/types/music';
-import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
+import { MusicTrack } from '@/types/music';
+
+export interface MusicControlsProps {
+  isPlaying?: boolean;
+  onPlay?: () => void;
+  onPause?: () => void;
+  onTogglePlay?: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
+  shuffleMode?: boolean;
+  repeatMode?: boolean;
+  onToggleShuffle?: () => void;
+  onToggleRepeat?: () => void;
+  currentTime?: number;
+  duration?: number;
+  onSeek?: (time: number) => void;
+  volume?: number;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
+  onVolumeChange?: (volume: number) => void;
+  track?: MusicTrack;
+  showVolume?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  vertical?: boolean;
+  className?: string;
+}
 
 const MusicControls: React.FC<MusicControlsProps> = ({
-  isPlaying,
+  isPlaying = false,
+  onPlay,
+  onPause,
   onTogglePlay,
   onNext,
   onPrevious,
@@ -13,8 +37,6 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   repeatMode,
   onToggleShuffle,
   onToggleRepeat,
-  onPlay,
-  onPause,
   currentTime,
   duration,
   onSeek,
@@ -25,6 +47,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   track,
   showVolume,
   size = 'md',
+  vertical = false,
   className = '',
 }) => {
   const handleTogglePlay = () => {
