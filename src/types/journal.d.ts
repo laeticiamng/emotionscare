@@ -2,7 +2,7 @@
 export interface JournalEntry {
   id: string;
   date: string;
-  title?: string; // Make this optional to match the other definition
+  title?: string; // Making title optional
   content: string;
   mood?: string | number;
   text?: string;

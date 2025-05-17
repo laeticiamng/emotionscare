@@ -24,7 +24,6 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ moo
 
   const handlePlay = (trackId: string) => {
     toast({
-      title: "Lecture de la musique",
       description: `Lecture de la musique avec l'ID: ${trackId}`
     });
   };

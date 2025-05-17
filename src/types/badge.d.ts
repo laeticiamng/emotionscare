@@ -21,9 +21,9 @@ export interface Challenge {
   id: string;
   title: string;
   description: string;
-  points: number;
+  points?: number;
   progress: number;
-  goal: number;
+  goal: number | string;
   category: string;
   completed: boolean;
   status: string;

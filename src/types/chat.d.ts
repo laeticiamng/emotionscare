@@ -6,7 +6,7 @@ export interface ChatMessage {
   sender: string;
   role: string;
   timestamp: string;
-  conversation_id?: string;
+  conversation_id: string;
   isError?: boolean;
   isTyping?: boolean;
   attachments?: string[];
@@ -19,9 +19,9 @@ export interface ChatConversation {
   created_at: string;
   updated_at: string;
   last_message?: string;
-  lastMessage?: string; // Add this to support both property names
+  lastMessage?: string; // Keeping both variants for backward compatibility
   messages?: ChatMessage[];
-  status?: string; // Add this to support the status property
+  status?: string; // Adding status property needed by multiple components
 }
 
 export interface ChatResponse {

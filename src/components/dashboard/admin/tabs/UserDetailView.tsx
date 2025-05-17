@@ -87,13 +87,19 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user }) => {
               <div>
                 <h4 className="text-sm font-medium text-muted-foreground">Notifications</h4>
                 <p className="text-sm">
-                  {user.preferences?.notifications?.enabled ? 'Activées' : 'Désactivées'}
+                  {user.preferences?.notifications?.enabled !== undefined ? 
+                    (user.preferences.notifications.enabled ? 'Activées' : 'Désactivées') : 
+                    (user.preferences?.notifications_enabled ? 'Activées' : 'Désactivées')}
                 </p>
               </div>
               <div>
                 <h4 className="text-sm font-medium text-muted-foreground">Layout dashboard</h4>
-                <p className="text-sm">{typeof user.preferences?.dashboardLayout === 'string' ? 
-                  user.preferences.dashboardLayout : 'Défaut'}</p>
+                <p className="text-sm">{
+                  user.preferences?.dashboardLayout ? 
+                    (typeof user.preferences.dashboardLayout === 'string' ? 
+                      user.preferences.dashboardLayout : 'Personnalisé') : 
+                    'Défaut'
+                }</p>
               </div>
               <div>
                 <h4 className="text-sm font-medium text-muted-foreground">Onboarding complété</h4>

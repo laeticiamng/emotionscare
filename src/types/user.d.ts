@@ -40,7 +40,7 @@ export interface UserPreferences {
   notifications_enabled?: boolean;
   email_notifications?: boolean;
   
-  // Add properties used in the application
+  // Add properties that are used in the application
   notifications?: {
     enabled?: boolean;
     emailEnabled?: boolean;
@@ -48,8 +48,16 @@ export interface UserPreferences {
     inAppEnabled?: boolean;
     types?: Record<string, boolean>;
     frequency?: string;
+    email?: boolean;
+    push?: boolean;
+    sms?: boolean;
   };
   dashboardLayout?: Record<string, any> | string;
   onboardingCompleted?: boolean;
   showTips?: boolean;
+  privacy?: {
+    shareData?: boolean;
+    anonymizeReports?: boolean;
+    profileVisibility?: string;
+  };
 }
