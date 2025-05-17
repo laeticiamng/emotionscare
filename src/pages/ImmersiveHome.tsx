@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, User, Building, Mic, Volume2, VolumeX } from 'lucide-react';
-import Shell from '@/Shell';
+import Shell from '@/components/Shell';
 import ParticlesBackground from '@/components/three/ParticlesBackground';
 import { motion } from 'framer-motion';
 import { useToast } from '@/components/ui/use-toast';
@@ -156,23 +156,10 @@ const ImmersiveHome: React.FC = () => {
   };
 
   return (
-    <Shell hideNav>
-      <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
-        {/* Fond animé 3D */}
-        <ParticlesBackground />
-        
-        {/* Gradient de fond adapté au thème */}
-        <div 
-          className={`absolute inset-0 -z-20 
-            ${theme === 'light' 
-              ? 'bg-gradient-to-br from-blue-50 to-white' 
-              : theme === 'dark' 
-                ? 'bg-gradient-to-br from-gray-900 to-blue-950' 
-                : 'bg-gradient-to-br from-blue-50 to-blue-100'
-            }`}
-        />
-        
-        <div className="z-10 px-4 max-w-6xl mx-auto text-center relative">
+    <Shell hideNav immersive>
+      <div className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4 md:px-8">
+        {/* Conteneur principal avec l'animation de fade-in */}
+        <div className="z-10 max-w-6xl mx-auto text-center relative">
           {/* Contrôle du volume */}
           <Button 
             variant="ghost" 

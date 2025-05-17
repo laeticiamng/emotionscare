@@ -3,7 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AudioProvider } from '@/contexts/AudioContext';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from '@/components/ui/use-toast';
 import ImmersiveHome from '@/pages/ImmersiveHome';
 
 // Chargement paresseux pour optimiser le bundle

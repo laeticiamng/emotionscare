@@ -1,33 +1,43 @@
 
-import { UserPreferences } from './preferences';
-
-export type UserRole = 'user' | 'admin' | 'b2b_user' | 'b2b_admin' | 'b2b-user' | 'b2b-admin' | 'collaborator' | 'b2c' | 'viewer' | 'manager' | 'coach';
+import { Theme, FontFamily, FontSize } from './theme';
 
 export interface User {
   id: string;
-  name: string;
   email: string;
-  role: UserRole;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  displayName?: string;
   avatar?: string;
-  avatarUrl?: string; // Pour compatibilité
-  avatar_url?: string; // Pour compatibilité  
+  avatar_url?: string;
+  avatarUrl?: string;
+  role?: 'user' | 'admin' | 'coach' | 'hr' | string;
+  createdAt?: string;
   created_at?: string;
-  updated_at?: string;
+  joinedAt?: string;
   joined_at?: string;
-  company_id?: string;
+  company?: string;
   department?: string;
-  position?: string;
-  location?: string;
-  teams?: string[];
-  status?: 'active' | 'inactive' | 'pending' | 'blocked';
-  settings?: Record<string, any>;
+  language?: string;
   preferences?: UserPreferences;
   emotional_score?: number;
-  onboarded?: boolean;
-  language?: string;
+  emotionalScore?: number;
 }
 
-export interface UserPreferencesContextType {
-  preferences: UserPreferences;
-  updatePreferences: (newPreferences: Partial<UserPreferences>) => void;
+export interface UserPreferences {
+  theme: Theme;
+  fontSize?: FontSize;
+  fontFamily?: FontFamily;
+  notifications?: {
+    email: boolean;
+    push: boolean;
+    inApp: boolean;
+    frequency?: 'daily' | 'weekly' | 'monthly' | 'never';
+  };
+  soundEnabled?: boolean;
+  reduceMotion?: boolean;
+  language?: string;
+  dashboardLayout?: string;
+  onboardingCompleted?: boolean;
+  // Ajoutez d'autres préférences utilisateur selon les besoins
 }
