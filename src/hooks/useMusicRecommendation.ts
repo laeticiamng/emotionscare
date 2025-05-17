@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useMusic } from '@/contexts/music/MusicContextProvider';
+import { useMusic } from '@/contexts/music/MusicContext';
 import { useToast } from './use-toast';
 
 export function useMusicRecommendation() {

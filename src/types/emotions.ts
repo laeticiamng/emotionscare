@@ -33,7 +33,7 @@ export interface EmotionResult {
   facialExpression?: string;
   score?: number;
   text?: string;
-  emojis?: string[];
+  emojis?: string[] | string;
   user_id?: string;
   userId?: string;
   date?: string;

@@ -1,5 +1,5 @@
 
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult } from '@/types/emotions';
 
 // Mock emotions data
 export const mockEmotions: EmotionResult[] = [
@@ -9,6 +9,7 @@ export const mockEmotions: EmotionResult[] = [
     emotion: "joy",
     score: 85,
     user_id: "user-123",
+    confidence: 0.95
   },
   {
     id: "emo-2",
@@ -16,6 +17,7 @@ export const mockEmotions: EmotionResult[] = [
     emotion: "calm",
     score: 72,
     user_id: "user-123",
+    confidence: 0.87
   },
   {
     id: "emo-3",
@@ -23,6 +25,7 @@ export const mockEmotions: EmotionResult[] = [
     emotion: "anxiety",
     score: 45,
     user_id: "user-123",
+    confidence: 0.76
   },
   {
     id: "emo-4",
@@ -30,6 +33,7 @@ export const mockEmotions: EmotionResult[] = [
     emotion: "sadness",
     score: 30,
     user_id: "user-123",
+    confidence: 0.82
   }
 ];
 

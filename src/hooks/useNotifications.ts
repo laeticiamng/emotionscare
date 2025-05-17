@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { Notification } from '@/types/notification';
-import { NotificationService } from '@/lib/notifications';
+import { Notification, NotificationFilter } from '@/types/notification';
+import { v4 as uuid } from 'uuid';
 
 interface UseNotificationsOptions {
   userId?: string;
@@ -22,9 +22,30 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
     setError(null);
     
     try {
-      const result = await NotificationService.getNotifications(userId);
-      setNotifications(result.slice(0, limit));
-      return result;
+      // Mock implementation, would be replaced with real API call
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      const mockNotifications: Notification[] = Array.from({ length: limit }, (_, i) => ({
+        id: `notif-${i}`,
+        user_id: userId || 'current-user',
+        title: `Notification ${i}`,
+        message: `This is notification message ${i}`,
+        type: i % 5 === 0 ? 'system' : 
+              i % 4 === 0 ? 'emotion' :
+              i % 3 === 0 ? 'journal' :
+              i % 2 === 0 ? 'achievement' : 'info',
+        read: i % 3 === 0,
+        timestamp: new Date(Date.now() - i * 3600000).toISOString(),
+        created_at: new Date(Date.now() - i * 3600000).toISOString()
+      }));
+      
+      setNotifications(mockNotifications);
+      
+      // Count unread notifications
+      const unread = mockNotifications.filter(n => !n.read).length;
+      setUnreadCount(unread);
+      
+      return mockNotifications;
     } catch (err) {
       console.error('Error fetching notifications:', err);
       setError('Failed to load notifications');
@@ -36,19 +57,18 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
   
   const fetchUnreadCount = useCallback(async () => {
     try {
-      const count = await NotificationService.getUnreadCount(userId);
+      // Mock implementation
+      const count = notifications.filter(n => !n.read).length;
       setUnreadCount(count);
       return count;
     } catch (err) {
       console.error('Error fetching unread count:', err);
       return 0;
     }
-  }, [userId]);
+  }, [notifications]);
   
   const markAsRead = useCallback(async (notificationId: string) => {
     try {
-      await NotificationService.markAsRead(notificationId);
-      
       // Update local state
       setNotifications(prev => prev.map(notification => 
         notification.id === notificationId 
@@ -68,8 +88,6 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
   
   const markAllAsRead = useCallback(async () => {
     try {
-      await NotificationService.markAllAsRead(userId);
-      
       // Update local state
       setNotifications(prev => prev.map(notification => ({ ...notification, read: true })));
       setUnreadCount(0);
@@ -79,24 +97,24 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
       console.error('Error marking all notifications as read:', err);
       return false;
     }
-  }, [userId]);
+  }, []);
   
   const addNotification = useCallback(async (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
     try {
-      const id = await NotificationService.addNotification(notification);
-      
-      // Update local state
+      // Generate a new notification with required fields
       const newNotification: Notification = {
-        id,
+        id: uuid(),
         ...notification,
         timestamp: new Date().toISOString(),
+        created_at: new Date().toISOString(),
         read: false
       };
       
+      // Update local state
       setNotifications(prev => [newNotification, ...prev]);
       setUnreadCount(prev => prev + 1);
       
-      return id;
+      return newNotification.id;
     } catch (err) {
       console.error('Error adding notification:', err);
       throw err;
@@ -107,9 +125,8 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
   useEffect(() => {
     if (fetchOnMount) {
       fetchNotifications();
-      fetchUnreadCount();
     }
-  }, [fetchOnMount, fetchNotifications, fetchUnreadCount]);
+  }, [fetchOnMount, fetchNotifications]);
   
   return {
     notifications,

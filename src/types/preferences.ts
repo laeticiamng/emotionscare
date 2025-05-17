@@ -2,10 +2,13 @@
 import { NotificationPreference } from './notification';
 
 export type ThemeName = "system" | "dark" | "light" | "pastel";
-export type FontFamily = "system" | "serif" | "sans-serif" | "monospace"; 
-export type FontSize = "small" | "medium" | "large" | "x-large";
+export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "rounded"; 
+export type FontSize = "small" | "medium" | "large" | "x-large" | "xs" | "sm" | "md" | "lg" | "xl";
 export type Period = "day" | "week" | "month" | "year";
 export type UserModeType = "personal" | "work" | "relax" | "focus";
+export type PrivacyLevel = 'strict' | 'balanced' | 'relaxed' | 'public' | 'private' | 'friends' | 'organization';
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
+export type NotificationTone = 'formal' | 'friendly' | 'minimal' | 'direct' | 'professional' | 'motivational' | 'neutral' | 'casual';
 
 export interface UserPreferences {
   theme: ThemeName;
@@ -20,9 +23,20 @@ export interface UserPreferences {
   notifications: NotificationPreference;
   privacy?: {
     shareData: boolean;
-    anonymizeReports: boolean;
+    anonymizeReports?: boolean;
     profileVisibility: string;
+    showProfile?: boolean;
+    shareActivity?: boolean;
+    allowMessages?: boolean;
+    allowNotifications?: boolean;
+    anonymousMode?: boolean;
   };
+  language?: string;
+  haptics?: boolean;
+  dataCollection?: boolean;
+  privacyLevel?: PrivacyLevel;
+  animations?: boolean;
+  soundEffects?: boolean;
   [key: string]: any;
 }
 
@@ -58,6 +72,8 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
       warning: true,
       error: true,
       success: true,
+      streak: true,
+      urgent: true
     },
     frequency: "daily",
     tone: "friendly"
@@ -65,6 +81,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   privacy: {
     shareData: true,
     anonymizeReports: false,
-    profileVisibility: "public"
+    profileVisibility: "public",
+    anonymousMode: false
   }
 };

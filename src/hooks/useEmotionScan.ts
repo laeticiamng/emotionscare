@@ -28,7 +28,8 @@ export const useEmotionScan = (props?: UseEmotionScanProps) => {
           ...data,
           id: data.id || `emotion-${Date.now()}`,
           emotion: data.emotion || 'neutral',
-          confidence: data.confidence ?? 0
+          confidence: data.confidence ?? 0,
+          emojis: Array.isArray(data.emojis) ? data.emojis : data.emojis ? [data.emojis] : []
         };
         setLatestEmotion(result);
       }
@@ -61,7 +62,8 @@ export const useEmotionScan = (props?: UseEmotionScanProps) => {
           ...rawResult,
           id: rawResult.id || `emotion-${Date.now()}`,
           emotion: rawResult.emotion || 'neutral',
-          confidence: rawResult.confidence ?? 0
+          confidence: rawResult.confidence ?? 0,
+          emojis: Array.isArray(rawResult.emojis) ? rawResult.emojis : rawResult.emojis ? [rawResult.emojis] : []
         };
         
         setLatestEmotion(result);
@@ -95,6 +97,7 @@ export const useEmotionScan = (props?: UseEmotionScanProps) => {
         timestamp: data.timestamp || new Date().toISOString(),
         emotion: data.emotion || 'neutral',
         confidence: data.confidence ?? 0,
+        emojis: Array.isArray(data.emojis) ? data.emojis : data.emojis ? [data.emojis] : [],
         ...data
       };
       

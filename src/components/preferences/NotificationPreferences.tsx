@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NotificationFrequency } from '@/types/preferences';
+import { NotificationFrequency, NotificationType } from '@/types/notification';
 
 interface NotificationPreferencesProps {
   preferences: {
@@ -19,6 +19,14 @@ interface NotificationPreferencesProps {
       journal: boolean;
       community: boolean;
       achievement?: boolean;
+      badge?: boolean;
+      challenge?: boolean;
+      reminder?: boolean;
+      info?: boolean;
+      warning?: boolean;
+      error?: boolean;
+      success?: boolean;
+      streak?: boolean;
     };
     frequency: NotificationFrequency;
     tone?: string;

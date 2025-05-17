@@ -1,169 +1,170 @@
 
-import { useState } from 'react';
-import { useToast } from './use-toast';
+import { useState, useCallback } from 'react';
+import { v4 as uuid } from 'uuid';
 import { EmotionResult } from '@/types/emotions';
 
-// Mock API response for Hume AI analysis
-interface MockHumeAIResponse {
+interface HumeAIResponse {
+  // Type de réponse d'API Hume (simplifié)
   emotions: {
     name: string;
     score: number;
   }[];
-  sentiment: {
-    positive: number;
-    negative: number;
-    neutral: number;
-  };
-  language: {
-    detected: string;
-    confidence: number;
-  };
+  success: boolean;
+  error?: string;
 }
 
-export const useHumeAI = () => {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [result, setResult] = useState<EmotionResult | null>(null);
-  const { toast } = useToast();
+interface UseHumeAIProps {
+  apiKey?: string;
+  onResult?: (result: EmotionResult) => void;
+}
 
-  // Simulated analysis function for text
-  const analyzeText = async (text: string): Promise<EmotionResult> => {
-    if (!text || text.trim() === '') {
-      throw new Error('Text input is required for analysis');
+export const useHumeAI = ({ apiKey, onResult }: UseHumeAIProps = {}) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastResult, setLastResult] = useState<EmotionResult | null>(null);
+
+  // Fonction pour traiter les résultats bruts de l'API Hume
+  const processEmotionResults = (humeResponse: HumeAIResponse): EmotionResult | null => {
+    if (!humeResponse.success || !humeResponse.emotions || humeResponse.emotions.length === 0) {
+      return null;
     }
 
-    setIsAnalyzing(true);
-    
+    // Trier les émotions par score et prendre la plus forte
+    const sortedEmotions = [...humeResponse.emotions].sort((a, b) => b.score - a.score);
+    const primaryEmotion = sortedEmotions[0];
+
+    return {
+      id: uuid(), // Générer un ID unique
+      emotion: primaryEmotion.name.toLowerCase(),
+      confidence: primaryEmotion.score,
+      timestamp: new Date().toISOString(),
+      emotions: sortedEmotions.reduce((acc, emotion) => {
+        acc[emotion.name.toLowerCase()] = emotion.score;
+        return acc;
+      }, {} as Record<string, number>)
+    };
+  };
+
+  // Analyse de texte
+  const analyzeText = useCallback(async (text: string) => {
+    if (!text.trim()) {
+      setError('Texte vide, impossible d\'analyser');
+      return null;
+    }
+
+    setLoading(true);
+    setError(null);
+
     try {
-      // Simulate API call delay
-      await new Promise(resolver => setTimeout(resolver, 1500));
+      // Simulation d'appel API (à remplacer par un vrai appel à Hume API)
+      await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Mock response based on text content
-      const lowerText = text.toLowerCase();
-      let primaryEmotion = 'neutral';
-      let confidence = 0.7;
-      
-      if (lowerText.includes('happy') || lowerText.includes('joy') || lowerText.includes('excited')) {
-        primaryEmotion = 'joy';
-        confidence = 0.85;
-      } else if (lowerText.includes('sad') || lowerText.includes('depressed') || lowerText.includes('unhappy')) {
-        primaryEmotion = 'sadness';
-        confidence = 0.8;
-      } else if (lowerText.includes('angry') || lowerText.includes('frustrated') || lowerText.includes('mad')) {
-        primaryEmotion = 'anger';
-        confidence = 0.75;
-      } else if (lowerText.includes('scared') || lowerText.includes('afraid') || lowerText.includes('anxious')) {
-        primaryEmotion = 'fear';
-        confidence = 0.7;
-      } else if (lowerText.includes('calm') || lowerText.includes('peaceful') || lowerText.includes('relaxed')) {
-        primaryEmotion = 'calm';
-        confidence = 0.9;
-      }
-      
-      const emotionResult: EmotionResult = {
-        emotion: primaryEmotion,
-        confidence: confidence,
+      // Résultat simulé
+      const mockResult: EmotionResult = {
+        id: uuid(), // Ajout d'un ID unique
+        emotion: text.includes('heureux') ? 'joy' : 
+                 text.includes('triste') ? 'sadness' : 
+                 text.includes('énervé') ? 'anger' : 'neutral',
+        confidence: 0.85,
         timestamp: new Date().toISOString(),
         source: 'text',
         textInput: text
       };
       
-      setResult(emotionResult);
-      return emotionResult;
-    } catch (error) {
-      console.error('Error analyzing text with Hume AI:', error);
-      toast({
-        title: 'Analyse échouée',
-        description: 'Impossible d\'analyser le texte. Veuillez réessayer.',
-        variant: 'destructive',
-      });
-      throw error;
+      setLastResult(mockResult);
+      
+      if (onResult) {
+        onResult(mockResult);
+      }
+      
+      return mockResult;
+    } catch (err) {
+      console.error('Error analyzing text with HumeAI:', err);
+      setError(err instanceof Error ? err.message : 'Erreur lors de l\'analyse du texte');
+      return null;
     } finally {
-      setIsAnalyzing(false);
+      setLoading(false);
     }
-  };
-  
-  // Simulated analysis function for audio
-  const analyzeAudio = async (audioBlob: Blob): Promise<EmotionResult> => {
-    setIsAnalyzing(true);
-    
+  }, [onResult]);
+
+  // Analyse audio
+  const analyzeAudio = useCallback(async (audioBlob: Blob) => {
+    setLoading(true);
+    setError(null);
+
     try {
-      // Simulate API call delay
-      await new Promise(resolver => setTimeout(resolver, 2000));
+      // Simulation d'appel API (à remplacer par un vrai appel à Hume API)
+      await new Promise(resolve => setTimeout(resolve, 1200));
       
-      // Create a mock audio URL
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      // Mock emotions with random values for demo
-      const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'calm'];
-      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      const randomConfidence = 0.5 + Math.random() * 0.4; // Between 0.5 and 0.9
-      
-      const emotionResult: EmotionResult = {
-        emotion: randomEmotion,
-        confidence: randomConfidence,
+      // Résultat simulé
+      const mockResult: EmotionResult = {
+        id: uuid(), // Ajout d'un ID unique
+        emotion: Math.random() > 0.5 ? 'calm' : 'joy',
+        confidence: 0.78,
         timestamp: new Date().toISOString(),
         source: 'audio',
-        audioUrl
+        audioUrl: URL.createObjectURL(audioBlob)
       };
       
-      setResult(emotionResult);
-      return emotionResult;
-    } catch (error) {
-      console.error('Error analyzing audio with Hume AI:', error);
-      toast({
-        title: 'Analyse échouée',
-        description: 'Impossible d\'analyser l\'audio. Veuillez réessayer.',
-        variant: 'destructive',
-      });
-      throw error;
+      setLastResult(mockResult);
+      
+      if (onResult) {
+        onResult(mockResult);
+      }
+      
+      return mockResult;
+    } catch (err) {
+      console.error('Error analyzing audio with HumeAI:', err);
+      setError(err instanceof Error ? err.message : 'Erreur lors de l\'analyse audio');
+      return null;
     } finally {
-      setIsAnalyzing(false);
+      setLoading(false);
     }
-  };
-  
-  // Simulated analysis function for facial expression
-  const analyzeFacial = async (imageBlob: Blob): Promise<EmotionResult> => {
-    setIsAnalyzing(true);
-    
+  }, [onResult]);
+
+  // Analyse d'expression faciale
+  const analyzeFacial = useCallback(async (imageBlob: Blob) => {
+    setLoading(true);
+    setError(null);
+
     try {
-      // Simulate API call delay
-      await new Promise(resolver => setTimeout(resolver, 1800));
+      // Simulation d'appel API (à remplacer par un vrai appel à Hume API)
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Mock emotions with random values for demo
-      const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'neutral'];
-      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      const randomConfidence = 0.6 + Math.random() * 0.3; // Between 0.6 and 0.9
-      
-      const emotionResult: EmotionResult = {
-        emotion: randomEmotion,
-        confidence: randomConfidence,
+      // Résultat simulé
+      const mockResult: EmotionResult = {
+        id: uuid(), // Ajout d'un ID unique
+        emotion: Math.random() > 0.6 ? 'joy' : 
+                 Math.random() > 0.3 ? 'neutral' : 'surprise',
+        confidence: 0.82,
         timestamp: new Date().toISOString(),
         source: 'facial',
-        facialExpression: randomEmotion
+        facialExpression: 'smile'
       };
       
-      setResult(emotionResult);
-      return emotionResult;
-    } catch (error) {
-      console.error('Error analyzing facial expression with Hume AI:', error);
-      toast({
-        title: 'Analyse échouée',
-        description: 'Impossible d\'analyser l\'expression faciale. Veuillez réessayer.',
-        variant: 'destructive',
-      });
-      throw error;
+      setLastResult(mockResult);
+      
+      if (onResult) {
+        onResult(mockResult);
+      }
+      
+      return mockResult;
+    } catch (err) {
+      console.error('Error analyzing facial expression with HumeAI:', err);
+      setError(err instanceof Error ? err.message : 'Erreur lors de l\'analyse de l\'expression faciale');
+      return null;
     } finally {
-      setIsAnalyzing(false);
+      setLoading(false);
     }
-  };
+  }, [onResult]);
 
   return {
     analyzeText,
     analyzeAudio,
     analyzeFacial,
-    isAnalyzing,
-    result,
-    resetResult: () => setResult(null)
+    loading,
+    error,
+    lastResult
   };
 };
 

@@ -2,7 +2,8 @@
 export type NotificationFrequency = 
   | "immediate"
   | "daily"
-  | "weekly";
+  | "weekly"
+  | "never";
 
 export type NotificationType = 
   | "system"
@@ -17,7 +18,9 @@ export type NotificationType =
   | "info"
   | "warning"
   | "error"
-  | "success"; 
+  | "success"
+  | "streak"
+  | "urgent"; 
 
 export type NotificationTone = 
   | "friendly"
@@ -26,7 +29,8 @@ export type NotificationTone =
   | "motivational"
   | "neutral"
   | "casual"
-  | "formal"; 
+  | "formal"
+  | "minimal"; 
 
 export interface NotificationPreference {
   enabled: boolean;
@@ -61,7 +65,7 @@ export interface Notification {
   priority?: 'low' | 'medium' | 'high' | 'urgent';
 }
 
-export type NotificationFilter = 'all' | 'unread' | 'read' | 'urgent' | 'system' | 'journal' | 'emotion' | 'user';
+export type NotificationFilter = 'all' | 'unread' | 'read' | 'urgent' | 'system' | 'journal' | 'emotion' | 'user' | 'achievement' | 'badge' | 'reminder' | 'streak' | 'info' | 'success' | 'warning' | 'error';
 
 export interface NotificationSettings {
   enabled: boolean;

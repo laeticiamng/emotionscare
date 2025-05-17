@@ -26,7 +26,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
   
   // Fonction pour obtenir l'icône et la couleur en fonction du type
   const getTypeStyles = () => {
-    const type = notification.type as NotificationType;
+    const type = notification.type;
     
     switch (type) {
       case 'success':

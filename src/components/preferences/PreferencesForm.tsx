@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { User } from '@/types/types';
-import { UserPreferences, PrivacyLevel } from '@/types/preferences';
+import { User } from '@/types/user';
+import { UserPreferences } from '@/types/preferences';
+import { NotificationType } from '@/types/notification';
 import DisplayPreferences from './DisplayPreferences';
 import NotificationPreferencesComponent from './NotificationPreferences';
 import PrivacyPreferences from './PrivacyPreferences';
@@ -46,6 +47,15 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
         journal: true,
         community: true,
         achievement: true,
+        badge: true,
+        challenge: true,
+        reminder: true,
+        info: true,
+        warning: true,
+        error: true,
+        success: true,
+        streak: true,
+        urgent: true
       },
       frequency: 'immediate',
     },
@@ -53,8 +63,9 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
       shareData: true,
       anonymizeReports: false,
       profileVisibility: 'public',
+      anonymousMode: false
     },
-    privacyLevel: 'balanced' as PrivacyLevel,
+    privacyLevel: 'balanced',
   };
   
   const [preferences, setPreferences] = useState<UserPreferences>(
