@@ -1,6 +1,5 @@
 
-import { createBrowserRouter } from 'react-router-dom';
-import App from './App';
+import { RouteObject } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import NotFoundPage from './pages/NotFoundPage';
 import LoginPage from './pages/common/Login';
@@ -15,99 +14,99 @@ import B2BUserDashboardPage from './pages/b2b/user/Dashboard';
 import B2BAdminDashboardPage from './pages/b2b/admin/Dashboard';
 import B2CGamificationPage from './pages/b2c/Gamification';
 import B2BUserGamificationPage from './pages/b2b/user/Gamification';
+import ImmersiveHome from './pages/ImmersiveHome';
+import Home from './pages/Home';
 
-// Create and export the router
-export const router = createBrowserRouter([
+// Define the application routes without creating a router instance
+export const routes: RouteObject[] = [
   {
     path: '/',
-    element: <App />,
+    element: <ImmersiveHome />
+  },
+  {
+    path: '/home',
+    element: <Home />
+  },
+  // B2C Auth Routes
+  {
+    path: 'b2c/login',
+    element: <LoginPage />
+  },
+  {
+    path: 'b2c/register',
+    element: <RegisterPage />
+  },
+  // B2B Selection Route
+  {
+    path: 'b2b/selection',
+    element: <B2BSelectionPage />
+  },
+  // B2B Auth Routes
+  {
+    path: 'b2b/user/login',
+    element: <LoginPage />
+  },
+  {
+    path: 'b2b/admin/login',
+    element: <LoginPage />
+  },
+  // B2C Protected Routes
+  {
+    path: 'b2c',
+    element: (
+      <ProtectedRoute>
+        <B2CLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
-        index: true,
-        element: <LandingPage />
-      },
-      // B2C Auth Routes
-      {
-        path: 'b2c/login',
-        element: <LoginPage />
+        path: 'dashboard',
+        element: <B2CDashboardPage />
       },
       {
-        path: 'b2c/register',
-        element: <RegisterPage />
-      },
-      // B2B Selection Route
-      {
-        path: 'b2b/selection',
-        element: <B2BSelectionPage />
-      },
-      // B2B Auth Routes
-      {
-        path: 'b2b/user/login',
-        element: <LoginPage />
-      },
-      {
-        path: 'b2b/admin/login',
-        element: <LoginPage />
-      },
-      // B2C Protected Routes
-      {
-        path: 'b2c',
-        element: (
-          <ProtectedRoute>
-            <B2CLayout />
-          </ProtectedRoute>
-        ),
-        children: [
-          {
-            path: 'dashboard',
-            element: <B2CDashboardPage />
-          },
-          {
-            path: 'gamification',
-            element: <B2CGamificationPage />
-          }
-        ]
-      },
-      // B2B User Protected Routes
-      {
-        path: 'b2b/user',
-        element: (
-          <ProtectedRoute>
-            <B2BUserLayout />
-          </ProtectedRoute>
-        ),
-        children: [
-          {
-            path: 'dashboard',
-            element: <B2BUserDashboardPage />
-          },
-          {
-            path: 'gamification',
-            element: <B2BUserGamificationPage />
-          }
-        ]
-      },
-      // B2B Admin Protected Routes
-      {
-        path: 'b2b/admin',
-        element: (
-          <ProtectedRoute>
-            <B2BAdminLayout />
-          </ProtectedRoute>
-        ),
-        children: [
-          {
-            path: 'dashboard',
-            element: <B2BAdminDashboardPage />
-          }
-        ]
-      },
-      {
-        path: '*',
-        element: <NotFoundPage />
+        path: 'gamification',
+        element: <B2CGamificationPage />
       }
     ]
+  },
+  // B2B User Protected Routes
+  {
+    path: 'b2b/user',
+    element: (
+      <ProtectedRoute>
+        <B2BUserLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: 'dashboard',
+        element: <B2BUserDashboardPage />
+      },
+      {
+        path: 'gamification',
+        element: <B2BUserGamificationPage />
+      }
+    ]
+  },
+  // B2B Admin Protected Routes
+  {
+    path: 'b2b/admin',
+    element: (
+      <ProtectedRoute>
+        <B2BAdminLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: 'dashboard',
+        element: <B2BAdminDashboardPage />
+      }
+    ]
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />
   }
-]);
+];
 
-export default router;
+export default routes;

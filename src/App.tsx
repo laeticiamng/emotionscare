@@ -1,24 +1,19 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { useRoutes } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AudioProvider } from '@/contexts/AudioContext';
 import { Toaster } from '@/components/ui/sonner';
-import ImmersiveHome from '@/pages/ImmersiveHome';
-
-// Chargement paresseux pour optimiser le bundle
-const Home = React.lazy(() => import('@/pages/Home'));
+import { routes } from './router';
 
 function App() {
+  const routeElement = useRoutes(routes);
+
   return (
     <ThemeProvider>
       <AudioProvider>
         <React.Suspense fallback={<div>Chargement...</div>}>
-          <Routes>
-            <Route path="/" element={<ImmersiveHome />} />
-            <Route path="/home" element={<Home />} />
-            {/* Autres routes à ajouter ici */}
-          </Routes>
+          {routeElement}
         </React.Suspense>
         <Toaster />
       </AudioProvider>
