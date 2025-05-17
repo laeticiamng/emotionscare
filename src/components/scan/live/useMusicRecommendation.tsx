@@ -1,8 +1,10 @@
 
-import { useState, useEffect } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
-import { EmotionResult, MusicTrack, EmotionMusicParams } from '@/types';
+import { useState, useCallback } from 'react';
+import { useMusic } from '@/contexts';
+import { MusicTrack } from '@/types';
+import { EmotionResult } from '@/types';
 
+// Mapping of emotions to music types
 export const EMOTION_TO_MUSIC: Record<string, string> = {
   joy: 'upbeat',
   happy: 'upbeat',
@@ -17,31 +19,22 @@ export const EMOTION_TO_MUSIC: Record<string, string> = {
   neutral: 'focus',
 };
 
-export function useMusicRecommendation(emotionResult?: EmotionResult) {
+export function useMusicRecommendation() {
   const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { loadPlaylistForEmotion, playTrack } = useMusic();
   
-  useEffect(() => {
-    if (emotionResult?.emotion) {
-      loadRecommendations(emotionResult.emotion);
-    }
-  }, [emotionResult]);
-  
-  const loadRecommendations = async (emotion: string) => {
+  const loadRecommendations = useCallback(async (emotion: string) => {
     setIsLoading(true);
     try {
       const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-      const params: EmotionMusicParams = { emotion: musicType };
-      const playlist = await loadPlaylistForEmotion?.(params);
-      if (playlist?.tracks) {
+      const playlist = await loadPlaylistForEmotion({
+        emotion: musicType
+      });
+      
+      if (playlist && playlist.tracks) {
         // Make sure all tracks have required properties
-        const tracksWithRequiredProps = playlist.tracks.map(track => ({
-          ...track,
-          url: track.url || track.audioUrl || '',
-          duration: track.duration || 0
-        }));
-        setRecommendedTracks(tracksWithRequiredProps);
+        setRecommendedTracks(playlist.tracks);
       } else {
         setRecommendedTracks([]);
       }
@@ -51,15 +44,11 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [loadPlaylistForEmotion]);
   
   const playRecommendedTrack = (track: MusicTrack) => {
     if (track) {
-      playTrack({
-        ...track,
-        url: track.url || track.audioUrl || '',
-        duration: track.duration || 0
-      });
+      playTrack(track);
     }
   };
   
@@ -73,9 +62,9 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
   
   const handlePlayMusic = (emotion: string) => {
     const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-    const params: EmotionMusicParams = { emotion: musicType };
-    // Use loadPlaylistForEmotion directly with the params
-    loadPlaylistForEmotion?.(params);
+    loadPlaylistForEmotion({
+      emotion: musicType
+    });
     return playFirstRecommendation();
   };
   
@@ -85,6 +74,7 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
     playRecommendedTrack,
     playFirstRecommendation,
     handlePlayMusic,
+    loadRecommendations,
     EMOTION_TO_MUSIC
   };
 }

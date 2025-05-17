@@ -1,182 +1,117 @@
 
-/**
- * Hook useDalle
- * 
- * Ce hook fournit une interface React pour utiliser les services de génération d'images DALL-E
- * avec gestion d'état, chargement, et affichage.
- */
 import { useState, useCallback } from 'react';
-import { dalle } from '@/services';
-import { DalleOptions } from '@/services/dalle';
-import { useToast } from '@/hooks/use-toast';
+import dalleService, { DALLEOptions } from '@/services/dalle';
 
-interface UseDalleOptions {
-  onImageGenerated?: (imageUrl: string) => void;
-  onError?: (error: Error) => void;
+interface DALLEResult {
+  imageUrl: string | null;
+  loading: boolean;
+  error: string | null;
 }
 
-export function useDalle(options: UseDalleOptions = {}) {
-  const [isGenerating, setIsGenerating] = useState(false);
+interface UseDalleReturn extends DALLEResult {
+  generateImage: (prompt: string, options?: DALLEOptions) => Promise<string | null>;
+  generateEmotionImage: (emotion: string, options?: DALLEOptions) => Promise<string | null>;
+  generatePersonalizedImage: (userContext: string, emotion: string, options?: DALLEOptions) => Promise<string | null>;
+  generateVariations: (imageUrl: string, options?: DALLEOptions) => Promise<string[] | null>;
+  checkApiConnection: () => Promise<{ status: boolean; message: string }>;
+  reset: () => void;
+}
+
+export const useDalle = (): UseDalleReturn => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  
-  const { toast } = useToast();
-  
-  const { 
-    onImageGenerated,
-    onError 
-  } = options;
-  
-  /**
-   * Génère une image avec les options spécifiées
-   */
-  const generateImage = useCallback(async (prompt: string, options?: DalleOptions) => {
-    setIsGenerating(true);
-    setError(null);
-    
-    try {
-      // Génère l'image
-      const result = await dalle.generateImage(prompt, options);
-      
-      if (!result.url) {
-        throw new Error('No image URL returned from DALL-E');
-      }
-      
-      // Stocke l'URL de l'image
-      setImageUrl(result.url);
-      
-      // Notification
-      toast({
-        title: "Image générée",
-        description: "Votre image a été générée avec succès.",
-      });
-      
-      // Callback utilisateur
-      if (onImageGenerated) {
-        onImageGenerated(result.url);
-      }
-      
-      return result.url;
-    } catch (err) {
-      console.error('Error generating image:', err);
-      setError(err as Error);
-      
-      toast({
-        title: "Erreur de génération",
-        description: "Impossible de générer l'image. Veuillez réessayer.",
-        variant: "destructive",
-      });
-      
-      if (onError) onError(err as Error);
-      return null;
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [onImageGenerated, onError, toast]);
-  
-  /**
-   * Génère une image représentant une émotion
-   */
-  const generateEmotionImage = useCallback(async (emotion: string, options?: Partial<DalleOptions>) => {
-    setIsGenerating(true);
-    setError(null);
-    
-    try {
-      // Génère l'image basée sur l'émotion
-      const url = await dalle.generateEmotionImage(emotion, options);
-      setImageUrl(url);
-      
-      // Notification
-      toast({
-        title: "Image générée",
-        description: `Image représentant l'émotion "${emotion}" générée avec succès.`,
-      });
-      
-      // Callback utilisateur
-      if (onImageGenerated) {
-        onImageGenerated(url);
-      }
-      
-      return url;
-    } catch (err) {
-      console.error('Error generating emotion image:', err);
-      setError(err as Error);
-      
-      toast({
-        title: "Erreur de génération",
-        description: "Impossible de générer l'image émotionnelle. Veuillez réessayer.",
-        variant: "destructive",
-      });
-      
-      if (onError) onError(err as Error);
-      return null;
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [onImageGenerated, onError, toast]);
-  
-  /**
-   * Génère une image personnalisée pour un utilisateur
-   */
-  const generatePersonalizedImage = useCallback(async (
-    interests: string[],
-    mood: string,
-    options?: Partial<DalleOptions>
-  ) => {
-    setIsGenerating(true);
-    setError(null);
-    
-    try {
-      // Génère l'image personnalisée
-      const url = await dalle.generatePersonalizedImage(interests, mood, options);
-      setImageUrl(url);
-      
-      // Notification
-      toast({
-        title: "Image personnalisée",
-        description: "Votre image personnalisée a été générée avec succès.",
-      });
-      
-      // Callback utilisateur
-      if (onImageGenerated) {
-        onImageGenerated(url);
-      }
-      
-      return url;
-    } catch (err) {
-      console.error('Error generating personalized image:', err);
-      setError(err as Error);
-      
-      toast({
-        title: "Erreur de génération",
-        description: "Impossible de générer l'image personnalisée. Veuillez réessayer.",
-        variant: "destructive",
-      });
-      
-      if (onError) onError(err as Error);
-      return null;
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [onImageGenerated, onError, toast]);
-  
-  /**
-   * Réinitialise l'état du hook
-   */
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
   const reset = useCallback(() => {
     setImageUrl(null);
     setError(null);
   }, []);
-  
+
+  const generateImage = useCallback(async (prompt: string, options?: DALLEOptions): Promise<string | null> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const url = await dalleService.generateImage(prompt, options);
+      setImageUrl(url);
+      setLoading(false);
+      return url;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(`Failed to generate image: ${errorMessage}`);
+      setLoading(false);
+      return null;
+    }
+  }, []);
+
+  const generateVariations = useCallback(async (imgUrl: string, options?: DALLEOptions): Promise<string[] | null> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const urls = await dalleService.generateVariations(imgUrl, options);
+      if (urls && urls.length > 0) {
+        setImageUrl(urls[0]);
+      }
+      setLoading(false);
+      return urls;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(`Failed to generate variations: ${errorMessage}`);
+      setLoading(false);
+      return null;
+    }
+  }, []);
+
+  const generateEmotionImage = useCallback(async (emotion: string, options?: DALLEOptions): Promise<string | null> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const url = await dalleService.generateEmotionImage(emotion, options);
+      setImageUrl(url);
+      setLoading(false);
+      return url;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(`Failed to generate emotion image: ${errorMessage}`);
+      setLoading(false);
+      return null;
+    }
+  }, []);
+
+  const generatePersonalizedImage = useCallback(async (
+    userContext: string, 
+    emotion: string, 
+    options?: DALLEOptions
+  ): Promise<string | null> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const url = await dalleService.generatePersonalizedImage(userContext, emotion, options);
+      setImageUrl(url);
+      setLoading(false);
+      return url;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError(`Failed to generate personalized image: ${errorMessage}`);
+      setLoading(false);
+      return null;
+    }
+  }, []);
+
+  const checkApiConnection = useCallback(async () => {
+    return dalleService.checkApiConnection();
+  }, []);
+
   return {
-    isGenerating,
     imageUrl,
+    loading,
     error,
     generateImage,
     generateEmotionImage,
     generatePersonalizedImage,
+    generateVariations,
+    checkApiConnection,
     reset
   };
-}
+};
 
 export default useDalle;

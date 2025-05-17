@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
@@ -120,5 +121,5 @@ export {
 
 export type { ToastProps, ToastActionElement };
 
-// Re-export sonner's useToast and toast instead of creating circular dependencies
-export { useToast, toast } from "sonner";
+// Export directly from sonner
+export { toast } from "sonner";

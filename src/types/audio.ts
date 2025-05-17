@@ -1,62 +1,72 @@
 
+// Define AudioTrack type
 export interface AudioTrack {
   id: string;
   title: string;
   artist: string;
-  duration: number;
   url: string;
-  type?: string;
+  duration: number;
+  audioUrl?: string;
   coverUrl?: string;
+  coverImage?: string;
   cover?: string;
-  description?: string;
+  album?: string;
+  genre?: string;
+  emotion?: string;
+  intensity?: number;
+  category?: string;
 }
 
+// Define AudioPlaylist type
+export interface AudioPlaylist {
+  id: string;
+  title: string;
+  tracks: AudioTrack[];
+  description?: string;
+  coverImage?: string;
+  emotion?: string;
+  mood?: string;
+}
+
+// Audio Player State
 export interface AudioPlayerState {
   currentTrack: AudioTrack | null;
   isPlaying: boolean;
   volume: number;
-  isMuted: boolean;
-  progress: number;
+  muted: boolean;
+  currentTime: number;
   duration: number;
-  loading: boolean;
-  error: string | Error | null;
+  playlist: AudioTrack[];
+  repeatMode: 'off' | 'all' | 'one';
+  shuffleMode: boolean;
 }
 
-export interface AudioPlayerContextType {
+// Audio Context Value
+export interface AudioContextValue {
   currentTrack: AudioTrack | null;
   isPlaying: boolean;
   volume: number;
-  isMuted: boolean;
-  progress: number;
+  muted: boolean;
+  currentTime: number;
   duration: number;
-  loading: boolean;
-  error: string | Error | null;
+  playlist: AudioTrack[];
+  repeatMode: 'off' | 'all' | 'one';
+  shuffleMode: boolean;
   playTrack: (track: AudioTrack) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
   togglePlay: () => void;
   setVolume: (volume: number) => void;
-  toggleMute: () => void;
   seekTo: (time: number) => void;
-  formatTime: (seconds: number) => string;
+  nextTrack: () => void;
+  prevTrack: () => void;
+  toggleMute: () => void;
+  toggleRepeatMode: () => void;
+  toggleShuffleMode: () => void;
 }
 
-export interface UseAudioPlayerStateReturn {
-  currentTrack: AudioTrack | null;
-  isPlaying: boolean;
-  volume: number;
-  isMuted: boolean;
-  progress: number;
-  duration: number;
-  loading: boolean;
-  error: string | Error | null;
-  setCurrentTrack: (track: AudioTrack | null) => void;
-  setIsPlaying: (isPlaying: boolean) => void;
-  setVolume: (volume: number) => void;
-  setIsMuted: (isMuted: boolean) => void;
-  setProgress: (progress: number) => void;
-  setDuration: (duration: number) => void;
-  setLoading: (loading: boolean) => void;
-  setLoadingTrack: (loading: boolean) => void;
-  setError: (error: string | Error | null) => void;
+// Parameters for emotion-based music
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
 }

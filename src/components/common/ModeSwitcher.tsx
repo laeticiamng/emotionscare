@@ -33,7 +33,7 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
     const normalizedMode = normalizeUserMode(mode);
     
     if (normalizedMode === normalizeUserMode(userMode)) {
-      return; // Ne rien faire si on sélectionne le même mode
+      return; // Do nothing if selecting the same mode
     }
     
     setUserMode(normalizedMode);
@@ -48,7 +48,7 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
       }.`
     });
     
-    // Rediriger vers la page appropriée
+    // Redirect to the appropriate page
     switch (normalizedMode) {
       case 'b2c':
         navigate('/b2c/dashboard');

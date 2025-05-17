@@ -10,7 +10,7 @@ interface ModeAwareContentProps {
 }
 
 /**
- * Composant qui affiche différents contenus selon le mode utilisateur actuel
+ * Component that displays different content based on the current user mode
  */
 const ModeAwareContent: React.FC<ModeAwareContentProps> = ({
   b2cContent,
@@ -32,7 +32,7 @@ const ModeAwareContent: React.FC<ModeAwareContentProps> = ({
     return <>{b2bAdminContent}</>;
   }
   
-  // Fallback si aucun contenu spécifique au mode n'est trouvé
+  // Fallback if no specific content for the mode is found
   return <>{fallbackContent}</>;
 };
 

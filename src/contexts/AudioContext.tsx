@@ -1,300 +1,335 @@
 
-import React, { createContext, useState, useContext, useRef, useCallback, useEffect } from 'react';
-import { AudioTrack, AudioPlayerState, AudioContextValue } from '@/types/audio';
+import React, { createContext, useContext, useReducer, useEffect, useState, ReactNode } from 'react';
+import { AudioTrack } from '@/types/audio';
 
-const defaultState: AudioPlayerState = {
+interface AudioPlayerState {
+  currentTrack: AudioTrack | null;
+  isPlaying: boolean;
+  volume: number;
+  muted: boolean;
+  currentTime: number;
+  duration: number;
+  playlist: AudioTrack[];
+  repeatMode: 'off' | 'all' | 'one';
+  shuffleMode: boolean;
+}
+
+type AudioAction =
+  | { type: 'PLAY_TRACK'; payload: AudioTrack }
+  | { type: 'PAUSE' }
+  | { type: 'RESUME' }
+  | { type: 'SET_VOLUME'; payload: number }
+  | { type: 'TOGGLE_MUTE' }
+  | { type: 'SET_CURRENT_TIME'; payload: number }
+  | { type: 'SET_DURATION'; payload: number }
+  | { type: 'NEXT_TRACK' }
+  | { type: 'PREV_TRACK' }
+  | { type: 'SET_PLAYLIST'; payload: AudioTrack[] }
+  | { type: 'TOGGLE_REPEAT' }
+  | { type: 'TOGGLE_SHUFFLE' };
+
+const initialState: AudioPlayerState = {
   currentTrack: null,
   isPlaying: false,
   volume: 0.7,
-  isMuted: false,
-  progress: 0,
+  muted: false,
+  currentTime: 0,
   duration: 0,
   playlist: [],
   repeatMode: 'off',
-  shuffleMode: false
+  shuffleMode: false,
 };
 
-const AudioContext = createContext<AudioContextValue>({
-  audioState: defaultState,
-  play: () => {},
-  pause: () => {},
-  stop: () => {},
-  next: () => {},
-  previous: () => {},
-  setVolume: () => {},
-  toggleMute: () => {},
-  seekTo: () => {},
-  playTrack: () => {},
-  toggleShuffle: () => {},
-  changeRepeatMode: () => {},
-});
-
-export const useAudio = () => useContext(AudioContext);
-
-export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [audioState, setAudioState] = useState<AudioPlayerState>(defaultState);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const intervalRef = useRef<number | null>(null);
-
-  // Initialise l'élément audio
-  useEffect(() => {
-    audioRef.current = new Audio();
-    audioRef.current.volume = audioState.volume;
-
-    // Nettoyage
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      if (intervalRef.current) {
-        window.clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
-
-  // Met à jour la progression de la lecture
-  const startProgressTimer = useCallback(() => {
-    if (intervalRef.current) {
-      window.clearInterval(intervalRef.current);
-    }
-
-    intervalRef.current = window.setInterval(() => {
-      if (audioRef.current && audioRef.current.currentTime && audioRef.current.duration) {
-        setAudioState(prev => ({
-          ...prev,
-          progress: audioRef.current?.currentTime || 0,
-          duration: audioRef.current?.duration || 0,
-        }));
-      }
-    }, 1000);
-  }, []);
-
-  // Fonctions de contrôle audio
-  const play = useCallback(() => {
-    if (!audioRef.current || !audioState.currentTrack) return;
-    
-    audioRef.current.play()
-      .then(() => {
-        setAudioState(prev => ({ ...prev, isPlaying: true }));
-        startProgressTimer();
-      })
-      .catch(error => {
-        console.error('Error playing audio:', error);
-      });
-  }, [audioState.currentTrack, startProgressTimer]);
-
-  const pause = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setAudioState(prev => ({ ...prev, isPlaying: false }));
-      if (intervalRef.current) {
-        window.clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    }
-  }, []);
-
-  const stop = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setAudioState(prev => ({
-        ...prev,
-        isPlaying: false,
-        progress: 0
-      }));
-      if (intervalRef.current) {
-        window.clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    }
-  }, []);
-
-  // Fonction pour obtenir le prochain morceau
-  const getNextTrackIndex = useCallback(() => {
-    if (!audioState.currentTrack || audioState.playlist.length === 0) return null;
-    
-    const currentIndex = audioState.playlist.findIndex(t => t.id === audioState.currentTrack?.id);
-    if (currentIndex === -1) return null;
-    
-    if (audioState.shuffleMode) {
-      // Mode aléatoire
-      const randomIndex = Math.floor(Math.random() * audioState.playlist.length);
-      return randomIndex !== currentIndex ? randomIndex : (randomIndex + 1) % audioState.playlist.length;
-    } else {
-      // Mode normal
-      return (currentIndex + 1) % audioState.playlist.length;
-    }
-  }, [audioState.currentTrack, audioState.playlist, audioState.shuffleMode]);
-
-  // Fonction pour obtenir le morceau précédent
-  const getPreviousTrackIndex = useCallback(() => {
-    if (!audioState.currentTrack || audioState.playlist.length === 0) return null;
-    
-    const currentIndex = audioState.playlist.findIndex(t => t.id === audioState.currentTrack?.id);
-    if (currentIndex === -1) return null;
-    
-    if (audioState.shuffleMode) {
-      // Mode aléatoire
-      const randomIndex = Math.floor(Math.random() * audioState.playlist.length);
-      return randomIndex !== currentIndex ? randomIndex : (randomIndex - 1 + audioState.playlist.length) % audioState.playlist.length;
-    } else {
-      // Mode normal
-      return (currentIndex - 1 + audioState.playlist.length) % audioState.playlist.length;
-    }
-  }, [audioState.currentTrack, audioState.playlist, audioState.shuffleMode]);
-
-  // Gestionnaire de fin de morceau
-  useEffect(() => {
-    const handleTrackEnd = () => {
-      if (audioState.repeatMode === 'one') {
-        // Répéter le morceau actuel
-        if (audioRef.current) {
-          audioRef.current.currentTime = 0;
-          audioRef.current.play()
-            .catch(err => console.error('Error replaying track:', err));
-        }
+const audioReducer = (state: AudioPlayerState, action: AudioAction): AudioPlayerState => {
+  switch (action.type) {
+    case 'PLAY_TRACK':
+      return { ...state, currentTrack: action.payload, isPlaying: true, currentTime: 0 };
+    case 'PAUSE':
+      return { ...state, isPlaying: false };
+    case 'RESUME':
+      return { ...state, isPlaying: true };
+    case 'SET_VOLUME':
+      return { ...state, volume: action.payload };
+    case 'TOGGLE_MUTE':
+      return { ...state, muted: !state.muted };
+    case 'SET_CURRENT_TIME':
+      return { ...state, currentTime: action.payload };
+    case 'SET_DURATION':
+      return { ...state, duration: action.payload };
+    case 'SET_PLAYLIST':
+      return { ...state, playlist: action.payload };
+    case 'TOGGLE_REPEAT':
+      return { 
+        ...state, 
+        repeatMode: state.repeatMode === 'off' 
+          ? 'all' 
+          : state.repeatMode === 'all' 
+            ? 'one' 
+            : 'off' 
+      };
+    case 'TOGGLE_SHUFFLE':
+      return { ...state, shuffleMode: !state.shuffleMode };
+    case 'NEXT_TRACK':
+      if (!state.currentTrack || state.playlist.length === 0) return state;
+      
+      const currentIndex = state.playlist.findIndex(
+        track => track.id === state.currentTrack?.id
+      );
+      
+      if (currentIndex === -1) return state;
+      
+      if (state.shuffleMode) {
+        // Random track excluding current
+        const availableTracks = state.playlist.filter((_, index) => index !== currentIndex);
+        if (availableTracks.length === 0) return state;
+        
+        const randomIndex = Math.floor(Math.random() * availableTracks.length);
+        return { ...state, currentTrack: availableTracks[randomIndex], isPlaying: true, currentTime: 0 };
       } else {
-        // Passer au morceau suivant
-        const nextIndex = getNextTrackIndex();
-        if (nextIndex !== null) {
-          playTrack(audioState.playlist[nextIndex]);
-        } else if (audioState.repeatMode === 'all') {
-          // Recommencer la playlist
-          playTrack(audioState.playlist[0]);
+        // Next track in order
+        if (currentIndex === state.playlist.length - 1) {
+          // Last track
+          if (state.repeatMode === 'all') {
+            // Loop to first track
+            return { ...state, currentTrack: state.playlist[0], isPlaying: true, currentTime: 0 };
+          } else if (state.repeatMode === 'one') {
+            // Repeat current track
+            return { ...state, currentTime: 0, isPlaying: true };
+          } else {
+            // End of playlist
+            return { ...state, isPlaying: false };
+          }
         } else {
-          // Arrêter la lecture
-          stop();
+          // Not last track, go to next
+          return { 
+            ...state, 
+            currentTrack: state.playlist[currentIndex + 1], 
+            isPlaying: true, 
+            currentTime: 0 
+          };
         }
       }
-    };
+    case 'PREV_TRACK':
+      if (!state.currentTrack || state.playlist.length === 0) return state;
+      
+      const currentIdx = state.playlist.findIndex(
+        track => track.id === state.currentTrack?.id
+      );
+      
+      if (currentIdx === -1) return state;
+      
+      if (state.shuffleMode) {
+        // Random track excluding current
+        const availableTracks = state.playlist.filter((_, index) => index !== currentIdx);
+        if (availableTracks.length === 0) return state;
+        
+        const randomIndex = Math.floor(Math.random() * availableTracks.length);
+        return { ...state, currentTrack: availableTracks[randomIndex], isPlaying: true, currentTime: 0 };
+      } else {
+        // Previous track in order
+        if (currentIdx === 0) {
+          // First track
+          if (state.repeatMode === 'all') {
+            // Loop to last track
+            return { 
+              ...state, 
+              currentTrack: state.playlist[state.playlist.length - 1], 
+              isPlaying: true, 
+              currentTime: 0 
+            };
+          } else if (state.repeatMode === 'one') {
+            // Repeat current track
+            return { ...state, currentTime: 0, isPlaying: true };
+          } else {
+            // Stay on first track but restart
+            return { ...state, currentTime: 0, isPlaying: true };
+          }
+        } else {
+          // Not first track, go to previous
+          return { 
+            ...state, 
+            currentTrack: state.playlist[currentIdx - 1], 
+            isPlaying: true, 
+            currentTime: 0 
+          };
+        }
+      }
+    default:
+      return state;
+  }
+};
 
-    if (audioRef.current) {
-      audioRef.current.addEventListener('ended', handleTrackEnd);
-    }
+// Context definition
+interface AudioContextValue {
+  state: AudioPlayerState;
+  playTrack: (track: AudioTrack) => void;
+  pauseTrack: () => void;
+  resumeTrack: () => void;
+  nextTrack: () => void;
+  prevTrack: () => void;
+  setVolume: (volume: number) => void;
+  toggleMute: () => void;
+  seekTo: (time: number) => void;
+  setPlaylist: (tracks: AudioTrack[]) => void;
+  toggleRepeatMode: () => void;
+  toggleShuffleMode: () => void;
+}
+
+const AudioContext = createContext<AudioContextValue | undefined>(undefined);
+
+export const useAudioPlayer = () => {
+  const context = useContext(AudioContext);
+  if (context === undefined) {
+    throw new Error('useAudioPlayer must be used within an AudioProvider');
+  }
+  return context;
+};
+
+interface AudioProviderProps {
+  children: ReactNode;
+}
+
+export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
+  const [state, dispatch] = useReducer(audioReducer, initialState);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+
+  // Initialize audio element
+  useEffect(() => {
+    const audio = new Audio();
+    setAudioElement(audio);
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current.removeEventListener('ended', handleTrackEnd);
-      }
+      audio.pause();
+      audio.src = '';
     };
-  }, [audioState.playlist, audioState.repeatMode, stop, getNextTrackIndex]);
+  }, []);
 
-  // Navigation dans la playlist
-  const next = useCallback(() => {
-    const nextIndex = getNextTrackIndex();
-    if (nextIndex !== null) {
-      playTrack(audioState.playlist[nextIndex]);
-    } else if (audioState.repeatMode === 'all' && audioState.playlist.length > 0) {
-      playTrack(audioState.playlist[0]);
-    }
-  }, [audioState.playlist, audioState.repeatMode, getNextTrackIndex]);
+  // Handle audio events
+  useEffect(() => {
+    if (!audioElement) return;
 
-  const previous = useCallback(() => {
-    const prevIndex = getPreviousTrackIndex();
-    if (prevIndex !== null) {
-      playTrack(audioState.playlist[prevIndex]);
-    }
-  }, [audioState.playlist, getPreviousTrackIndex]);
+    const handleTimeUpdate = () => {
+      dispatch({ type: 'SET_CURRENT_TIME', payload: audioElement.currentTime });
+    };
 
-  // Jouer un morceau spécifique
-  const playTrack = useCallback((track: AudioTrack) => {
-    if (!track || !track.url) {
-      console.error('Invalid track or missing URL');
-      return;
-    }
-    
-    if (audioRef.current) {
-      const newUrl = track.audioUrl || track.url;
-      
-      // Si c'est un nouveau morceau
-      if (audioRef.current.src !== newUrl) {
-        audioRef.current.src = newUrl;
-        audioRef.current.load();
-      }
-      
-      setAudioState(prev => ({
-        ...prev,
-        currentTrack: track,
-        isPlaying: true,
-        progress: 0,
-        duration: prev.duration
-      }));
-      
-      audioRef.current.play()
-        .then(() => {
-          startProgressTimer();
-        })
-        .catch(err => {
-          console.error('Error playing track:', err);
-          setAudioState(prev => ({ ...prev, isPlaying: false }));
+    const handleLoadedMetadata = () => {
+      dispatch({ type: 'SET_DURATION', payload: audioElement.duration });
+    };
+
+    const handleEnded = () => {
+      dispatch({ type: 'NEXT_TRACK' });
+    };
+
+    audioElement.addEventListener('timeupdate', handleTimeUpdate);
+    audioElement.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audioElement.addEventListener('ended', handleEnded);
+
+    return () => {
+      audioElement.removeEventListener('timeupdate', handleTimeUpdate);
+      audioElement.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audioElement.removeEventListener('ended', handleEnded);
+    };
+  }, [audioElement]);
+
+  // Update audio element when track changes
+  useEffect(() => {
+    if (audioElement && state.currentTrack) {
+      const source = state.currentTrack.url;
+      audioElement.src = source;
+      audioElement.load();
+      if (state.isPlaying) {
+        audioElement.play().catch(error => {
+          console.error('Audio playback error:', error);
         });
-    }
-  }, [startProgressTimer]);
-
-  // Contrôles de volume et de recherche
-  const setVolume = useCallback((volume: number) => {
-    const newVolume = Math.max(0, Math.min(1, volume));
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-    }
-    setAudioState(prev => ({ ...prev, volume: newVolume }));
-  }, []);
-
-  const toggleMute = useCallback(() => {
-    setAudioState(prev => {
-      const newMuted = !prev.isMuted;
-      if (audioRef.current) {
-        audioRef.current.muted = newMuted;
       }
-      return { ...prev, isMuted: newMuted };
-    });
-  }, []);
-
-  const seekTo = useCallback((position: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = position;
-      setAudioState(prev => ({ ...prev, progress: position }));
     }
-  }, []);
+  }, [state.currentTrack, audioElement]);
 
-  // Contrôles de mode de lecture
-  const toggleShuffle = useCallback(() => {
-    setAudioState(prev => ({ 
-      ...prev, 
-      shuffleMode: !prev.shuffleMode 
-    }));
-  }, []);
+  // Update playing state
+  useEffect(() => {
+    if (!audioElement) return;
 
-  const changeRepeatMode = useCallback(() => {
-    setAudioState(prev => {
-      const modes: ('off' | 'one' | 'all')[] = ['off', 'one', 'all'];
-      const currentIndex = modes.indexOf(prev.repeatMode);
-      const nextMode = modes[(currentIndex + 1) % modes.length];
-      return { ...prev, repeatMode: nextMode };
-    });
-  }, []);
+    if (state.isPlaying) {
+      audioElement.play().catch(error => {
+        console.error('Audio playback error:', error);
+        dispatch({ type: 'PAUSE' });
+      });
+    } else {
+      audioElement.pause();
+    }
+  }, [state.isPlaying, audioElement]);
 
-  const contextValue: AudioContextValue = {
-    audioState,
-    play,
-    pause,
-    stop,
-    next,
-    previous,
+  // Update volume and mute state
+  useEffect(() => {
+    if (!audioElement) return;
+
+    audioElement.volume = state.muted ? 0 : state.volume;
+  }, [state.volume, state.muted, audioElement]);
+
+  // Audio control functions
+  const playTrack = (track: AudioTrack) => {
+    dispatch({ type: 'PLAY_TRACK', payload: track });
+  };
+
+  const pauseTrack = () => {
+    dispatch({ type: 'PAUSE' });
+  };
+
+  const resumeTrack = () => {
+    dispatch({ type: 'RESUME' });
+  };
+
+  const nextTrack = () => {
+    dispatch({ type: 'NEXT_TRACK' });
+  };
+
+  const prevTrack = () => {
+    dispatch({ type: 'PREV_TRACK' });
+  };
+
+  const setVolume = (volume: number) => {
+    dispatch({ type: 'SET_VOLUME', payload: Math.min(1, Math.max(0, volume)) });
+  };
+
+  const toggleMute = () => {
+    dispatch({ type: 'TOGGLE_MUTE' });
+  };
+
+  const seekTo = (time: number) => {
+    if (audioElement) {
+      audioElement.currentTime = time;
+      dispatch({ type: 'SET_CURRENT_TIME', payload: time });
+    }
+  };
+
+  const setPlaylist = (tracks: AudioTrack[]) => {
+    dispatch({ type: 'SET_PLAYLIST', payload: tracks });
+  };
+
+  const toggleRepeatMode = () => {
+    dispatch({ type: 'TOGGLE_REPEAT' });
+  };
+
+  const toggleShuffleMode = () => {
+    dispatch({ type: 'TOGGLE_SHUFFLE' });
+  };
+
+  const value = {
+    state,
+    playTrack,
+    pauseTrack,
+    resumeTrack,
+    nextTrack,
+    prevTrack,
     setVolume,
     toggleMute,
     seekTo,
-    playTrack,
-    toggleShuffle,
-    changeRepeatMode
+    setPlaylist,
+    toggleRepeatMode,
+    toggleShuffleMode
   };
 
-  return (
-    <AudioContext.Provider value={contextValue}>
-      {children}
-    </AudioContext.Provider>
-  );
+  return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
 };
 
-export default AudioContext;
+export default AudioProvider;
