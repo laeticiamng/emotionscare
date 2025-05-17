@@ -13,12 +13,12 @@ export interface Challenge {
   deadline?: string;
   reward?: string;
   icon?: string;
-  name?: string; // Pour compatibilité
+  name?: string; // For compatibility
   difficulty?: string;
   tags?: string[];
   completions?: number;
   total?: number;
-  totalSteps?: number; // Ajouté pour résoudre les erreurs
+  totalSteps?: number;
 }
 
 export type ChallengeType = 'daily' | 'weekly' | 'monthly' | 'special' | 'onetime';

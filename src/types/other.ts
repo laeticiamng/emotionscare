@@ -1,68 +1,39 @@
 
-import { User } from './user';
+// Import the ChatMessage type from chat.ts to maintain consistency
+import { ChatMessage as BaseChatMessage } from './chat';
 
-export interface ChatMessage {
-  id: string;
-  conversation_id: string;
-  role: 'user' | 'assistant' | 'system';
-  sender?: string;
-  content: string;
-  text?: string;
-  timestamp: string;
-}
+// Extend the ChatMessage type to ensure compatibility
+export type ChatMessage = BaseChatMessage;
 
 export interface MoodData {
-  id: string;
-  mood: string;
-  intensity: number;
-  date: string;
-  value?: number;
-  sentiment?: number;
-  anxiety?: number;
-  energy?: number;
+  timestamp: string;
+  value: number;
+  label?: string;
 }
 
 export interface JournalEntry {
   id: string;
-  user_id?: string;
-  title: string;
-  content: string;
-  emotion?: string;
-  intensity?: number;
   date: string;
+  title?: string;
+  content: string;
+  mood?: string | number;
+  text?: string;
+  ai_feedback?: string;
   tags?: string[];
-  is_private?: boolean;
-  mood_score?: number;
+  emotions?: string[];
 }
 
 export interface Story {
   id: string;
   title: string;
-  description: string;
-  author_id: string;
-  author_name?: string;
-  date: string;
-  emotion?: string;
-  likes: number;
-  comments: number;
-  is_anonymous: boolean;
-  content?: string;
+  content: string;
+  imageUrl?: string;
   tags?: string[];
-  image_url?: string;
 }
 
 export interface EmotionPrediction {
-  id: string;
-  user_id: string;
-  predicted_emotion: string;
-  confidence: number;
-  factors: {
-    recent_activity: string;
-    weather?: string;
-    sleep?: string;
-    work_pressure?: string;
-  };
-  timestamp: string;
+  emotion: string;
+  probability: number;
 }
 
 export interface Recommendation {
@@ -70,20 +41,16 @@ export interface Recommendation {
   title: string;
   description: string;
   type: string;
-  emotion_target: string;
-  source: string;
-  duration?: number;
-  link?: string;
-  is_premium?: boolean;
-  thumbnail?: string;
-  category?: string;
+  url?: string;
 }
 
 export interface InvitationStats {
+  total: number;
   pending: number;
   accepted: number;
   expired: number;
-  total: number;
+  rejected?: number;
+  sent?: number;
 }
 
 export interface InvitationData {
@@ -95,21 +62,19 @@ export interface InvitationData {
   created_at: string;
   expires_at: string;
   accepted_at?: string;
+  sent_at?: string;
+  sent_by?: string;
 }
 
 export interface InvitationFormData {
   email: string;
   role: string;
-  expiration_days: number;
+  expiresInDays: number;
 }
 
 export interface UserPreference {
   id: string;
-  user_id: string;
+  userId: string;
   key: string;
   value: string;
-  created_at: string;
-  updated_at: string;
 }
-
-export type { User };

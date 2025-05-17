@@ -44,4 +44,18 @@ export interface InvitationStats {
   averageTimeToAccept?: number;
   teams?: Record<string, number>;
   recent_invites?: any[];
+  last_sent?: any[];
+}
+
+export interface InvitationData {
+  id: string;
+  email: string;
+  name?: string;
+  status: string;
+  sent_at?: string;
+  accepted_at?: string;
+  role: string;
+  sent_by?: string;
+  created_at: string;
+  expires_at: string;
 }

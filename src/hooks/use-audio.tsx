@@ -1,5 +1,8 @@
 
-// Re-export from the main implementation
 import useAudioHandlers from './use-audio';
+
+// Re-export with both named and default export
 export default useAudioHandlers;
-export { useAudioHandlers };
+
+// Named export for compatability
+export const useAudio = useAudioHandlers;

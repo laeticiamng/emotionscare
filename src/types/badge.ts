@@ -4,16 +4,16 @@ export interface Badge {
   name: string;
   description: string;
   icon: string;
-  level: 'bronze' | 'silver' | 'gold' | 'platinum' | string;
+  level: 'bronze' | 'silver' | 'gold' | 'platinum' | string | number;
   category: string;
   unlocked: boolean;
   unlockedAt?: string;
-  unlocked_at?: string; // Pour compatibilité
+  unlocked_at?: string; // For compatibility
   progress?: number;
   total?: number;
   image?: string;
   imageUrl?: string;
-  image_url?: string; // Pour compatibilité
+  image_url?: string; // For compatibility
   requirements?: {
     description: string;
     progress: number;
@@ -21,13 +21,14 @@ export interface Badge {
   }[];
   achieved?: boolean;
   threshold?: number;
-  // Propriétés additionnelles pour la compatibilité
+  // Properties added for compatibility
   earned?: boolean;
   earnedAt?: string;
+  dateEarned?: string;
   tier?: string;
   completed?: boolean;
-  rarity?: string; // Ajouté pour résoudre les erreurs
-  title?: string; // Ajouté pour résoudre les erreurs
+  rarity?: string;
+  title?: string;
 }
 
 export interface BadgeCollection {
@@ -42,7 +43,7 @@ export interface LeaderboardEntry {
   userId: string;
   score: number;
   rank: number;
-  name?: string; // Ajouté pour résoudre les erreurs
+  name?: string;
   avatar?: string;
   level?: number;
   badges?: number;

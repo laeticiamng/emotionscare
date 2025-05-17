@@ -38,5 +38,21 @@ export interface EmotionGamificationStats {
   highest_emotion?: string;
 }
 
+export interface TeamOverviewProps {
+  teamId: string;
+  period?: 'day' | 'week' | 'month' | string;
+  userId?: string;
+  anonymized?: boolean;
+  className?: string;
+  dateRange?: [Date, Date];
+  users?: Array<{
+    id: string;
+    name: string;
+    emotionalScore?: number | Record<string, number>;
+    [key: string]: any;
+  }>;
+  showNames?: boolean;
+  compact?: boolean;
+}
+
 export { EmotionResult };
-export type { TeamOverviewProps } from './emotion';
