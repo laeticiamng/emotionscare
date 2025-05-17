@@ -3,47 +3,34 @@ export interface Challenge {
   id: string;
   title: string;
   description: string;
-  type: ChallengeType;
-  difficulty: 'easy' | 'medium' | 'hard';
-  duration: number;
   points: number;
-  completed?: boolean;
-  progress?: number;
-  assigned_date?: string;
-  due_date?: string;
-  completion_date?: string;
-  emotion_target?: string;
+  status: 'active' | 'completed' | 'failed' | 'ongoing' | string;
   category: string;
-  goal?: number;
-  status?: string;
+  progress: number;
+  goal: number;
+  completed: boolean;
+  dueDate?: string;
+  reward?: string;
+  icon?: string;
 }
 
-export type ChallengeType = 
-  | 'mindfulness' 
-  | 'physical' 
-  | 'emotional' 
-  | 'social' 
-  | 'learning' 
-  | 'productivity' 
-  | 'gratitude';
+export type ChallengeType = 'daily' | 'weekly' | 'monthly' | 'special' | 'onetime';
 
 export interface UserChallenge {
-  id: string;
-  challenge_id: string;
-  user_id: string;
-  status: 'assigned' | 'in_progress' | 'completed' | 'failed';
-  assigned_date: string;
-  completed_date?: string;
+  userId: string;
+  challengeId: string;
   progress: number;
-  notes?: string;
+  completed: boolean;
+  startedAt: string;
+  completedAt?: string;
 }
 
 export interface ChallengeCompletion {
-  challenge_id: string;
-  user_id: string;
-  date: string;
-  points_earned: number;
-  feedback?: string;
-  mood_before?: number;
-  mood_after?: number;
+  challenge: Challenge;
+  completedAt: string;
+  reward: number;
+  bonuses?: {
+    name: string;
+    points: number;
+  }[];
 }

@@ -12,29 +12,13 @@ interface UserDetailViewProps {
 }
 
 const UserDetailView: React.FC<UserDetailViewProps> = ({ user }) => {
-  const getInitials = (name: string) => {
+  const getInitials = (name: string = '') => {
     return name
       .split(' ')
       .map(part => part[0])
       .join('')
       .toUpperCase()
       .slice(0, 2);
-  };
-
-  const getDefaultNotificationPreferences = () => {
-    return {
-      enabled: true,
-      emailEnabled: true,
-      pushEnabled: true,
-      frequency: 'daily', // Adding required frequency
-      types: {
-        system: true,
-        emotion: true,
-        coach: true,
-        journal: true,
-        community: true
-      }
-    };
   };
 
   return (
@@ -46,7 +30,7 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user }) => {
         <div className="flex items-center space-x-4">
           <Avatar className="h-16 w-16">
             <AvatarImage src={user.avatar || user.avatarUrl || user.avatar_url} />
-            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+            <AvatarFallback>{getInitials(user.name || '')}</AvatarFallback>
           </Avatar>
           <div>
             <h3 className="text-xl font-bold">{user.name}</h3>

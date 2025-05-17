@@ -14,6 +14,9 @@ export type {
   FontSize,
   Period,
   UserModeType,
+  PrivacyLevel,
+  NotificationFrequency,
+  NotificationTone,
 } from './preferences';
 
 // VR-related types
@@ -42,11 +45,11 @@ export type {
 
 // Emotion and scan types
 export type {
-  Emotion,
   EmotionResult,
   LiveVoiceScannerProps,
   TeamOverviewProps,
-  EmotionalTeamViewProps
+  EmotionalTeamViewProps,
+  Emotion
 } from './emotions';
 
 // Badge and gamification types
@@ -110,7 +113,11 @@ export type {
   MoodData,
   JournalEntry,
   EmotionPrediction,
-  Recommendation
+  Recommendation,
+  Story,
+  InvitationStats,
+  InvitationData,
+  InvitationFormData
 } from './other';
 
 // Activity and usage types
@@ -148,3 +155,18 @@ export type {
   RecurrenceRule,
   CalendarSettings
 } from './calendar';
+
+// Emotional data types
+export type {
+  EmotionalData,
+  EmotionalTrend,
+  EmotionalFilter
+} from './emotional-data';
+
+// Invitation types
+export type {
+  Invitation,
+  InvitationVerificationResult,
+  NewInvitationData,
+  InvitationResponse
+} from './invitation';

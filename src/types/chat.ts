@@ -1,15 +1,16 @@
 
 export interface ChatMessage {
   id: string;
-  text?: string;
+  text: string;
   content?: string;
   sender: string;
+  timestamp: string;
+  role: 'user' | 'assistant' | 'system';
   sender_id?: string;
-  timestamp?: string;
   conversation_id?: string;
-  role?: string;
-  is_read?: boolean;
   sender_type?: string;
+  is_read?: boolean;
+  isLoading?: boolean;
 }
 
 export interface ChatResponse {
@@ -24,7 +25,6 @@ export interface ChatResponse {
   recommendations?: string[];
 }
 
-// Ajout de ce type pour résoudre les erreurs ChatResponseType
 export type ChatResponseType = ChatResponse;
 
 export interface ChatConversation {

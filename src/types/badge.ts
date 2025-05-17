@@ -3,33 +3,25 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  imageUrl: string;
-  earned: boolean;
-  earnedAt?: string;
-  criteria?: string;
-  progress?: number;
-  threshold?: number;
-  isNew?: boolean;
-  category?: string;
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
-  total?: number;
-  completed?: boolean;
-  maxProgress?: number;
-  // Compatibilité avec les autres composants
-  image_url?: string;
-  icon?: string;
-  unlocked?: boolean;
-  achieved?: boolean;
+  icon: string;
+  level: 'bronze' | 'silver' | 'gold' | 'platinum' | string;
+  category: string;
+  unlocked: boolean;
   unlockedAt?: string;
-  unlocked_at?: string;
-  dateEarned?: string;
+  progress?: number;
+  total?: number;
   image?: string;
-  icon_url?: string;
-  level?: string | number;
-  rarity?: string;
+  imageUrl?: string;
+  requirements?: {
+    description: string;
+    progress: number;
+    goal: number;
+  }[];
 }
 
 export interface BadgeCollection {
-  earned: Badge[];
-  available: Badge[];
+  userId: string;
+  badges: Badge[];
+  totalUnlocked: number;
+  recentlyUnlocked: Badge[];
 }

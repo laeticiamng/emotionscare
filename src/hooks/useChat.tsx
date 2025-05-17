@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { ChatMessage } from '@/types/other';
+import { ChatMessage } from '@/types/chat';
 
 interface UseChatOptions {
   initialMessages?: ChatMessage[];
@@ -17,9 +17,11 @@ export const useChat = ({ initialMessages = [] }: UseChatOptions = {}) => {
     // Create user message
     const userMessage: ChatMessage = {
       id: `msg-${Date.now()}-user`,
-      role: 'user',
-      content,
-      timestamp: new Date().toISOString()
+      text: content,
+      content: content,
+      sender: 'user',
+      timestamp: new Date().toISOString(),
+      role: 'user'
     };
     
     // Add user message
@@ -29,9 +31,11 @@ export const useChat = ({ initialMessages = [] }: UseChatOptions = {}) => {
     setTimeout(() => {
       const aiMessage: ChatMessage = {
         id: `msg-${Date.now()}-ai`,
-        role: 'assistant',
+        text: `This is an automated response to "${content}"`,
         content: `This is an automated response to "${content}"`,
-        timestamp: new Date().toISOString()
+        sender: 'assistant',
+        timestamp: new Date().toISOString(),
+        role: 'assistant'
       };
       
       addMessage(aiMessage);

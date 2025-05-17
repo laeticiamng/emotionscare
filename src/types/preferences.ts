@@ -2,7 +2,7 @@
 import { NotificationPreference } from './notification';
 
 export type ThemeName = "system" | "dark" | "light" | "pastel";
-export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "sans" | "rounded"; 
+export type FontFamily = "system" | "serif" | "sans-serif" | "monospace" | "mono" | "sans" | "rounded"; 
 export type FontSize = "small" | "medium" | "large" | "x-large" | "xs" | "sm" | "md" | "lg" | "xl";
 export type Period = "day" | "week" | "month" | "year";
 export type UserModeType = "personal" | "work" | "relax" | "focus";
@@ -37,6 +37,9 @@ export interface UserPreferences {
   privacyLevel?: PrivacyLevel;
   animations?: boolean;
   soundEffects?: boolean;
+  dashboardLayout?: string;
+  onboardingCompleted?: boolean;
+  notifications_enabled?: boolean;
   [key: string]: any;
 }
 
@@ -83,5 +86,8 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
     anonymizeReports: false,
     profileVisibility: "public",
     anonymousMode: false
-  }
+  },
+  privacyLevel: 'balanced',
+  dashboardLayout: 'default',
+  onboardingCompleted: false,
 };

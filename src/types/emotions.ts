@@ -20,6 +20,7 @@ export interface Emotion {
   audioUrl?: string;
   textInput?: string;
   facialExpression?: string;
+  category?: string;
 }
 
 export interface EmotionResult {
@@ -47,6 +48,15 @@ export interface EmotionResult {
   recommendations?: string[];
   details?: Record<string, number>;
   duration?: number;
+  category?: string;
+  predictedEmotion?: string;
+}
+
+export interface EnhancedEmotionResult extends EmotionResult {
+  dominantEmotion: {
+    name: string;
+    score: number;
+  }
 }
 
 export interface LiveVoiceScannerProps {
@@ -89,3 +99,6 @@ export interface EmotionalTeamViewProps {
   showMembers?: boolean;
   className?: string;
 }
+
+// Exporter EmotionalData
+export * from './emotional-data';

@@ -8,10 +8,12 @@ export interface MusicTrack {
   audioUrl?: string;
   coverUrl?: string;
   coverImage?: string;
+  cover?: string;
   album?: string;
   genre?: string;
   emotion?: string;
   intensity?: number;
+  category?: string; // Ajouté pour compatibilité
 }
 
 export interface MusicPlaylist {
@@ -23,6 +25,7 @@ export interface MusicPlaylist {
   mood?: string;
   tracks: MusicTrack[];
   coverUrl?: string;
+  category?: string; // Ajouté pour compatibilité
 }
 
 export interface MusicContextType {
@@ -61,12 +64,19 @@ export interface MusicContextType {
 export interface MusicDrawerProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  isOpen?: boolean; // Pour compatibilité
+  onClose?: () => void; // Pour compatibilité
+  playlist?: MusicPlaylist; // Pour compatibilité
+  currentTrack?: MusicTrack; // Pour compatibilité
 }
 
 export interface ProgressBarProps {
   currentTime: number;
   duration: number;
   onSeek: (time: number) => void;
+  className?: string; // Pour compatibilité
+  formatTime?: (seconds: number) => string; // Pour compatibilité
+  showTimestamps?: boolean; // Pour compatibilité
 }
 
 export interface VolumeControlProps {
