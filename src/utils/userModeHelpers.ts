@@ -22,3 +22,16 @@ export const normalizeUserMode = (mode?: string): UserModeType | string => {
   // Retourner le mode tel quel si aucune correspondance n'est trouvée
   return mode;
 };
+
+export const getUserModeDisplayName = (mode: UserModeType | string): string => {
+  switch (mode) {
+    case 'b2b_admin':
+      return 'Administrateur Entreprise';
+    case 'b2b_user':
+      return 'Utilisateur Entreprise';
+    case 'b2c':
+      return 'Utilisateur Personnel';
+    default:
+      return 'Utilisateur';
+  }
+};

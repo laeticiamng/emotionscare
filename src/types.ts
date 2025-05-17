@@ -2,27 +2,39 @@
 export type {
   User,
   UserPreferences,
+  UserRole,
+} from './types/user';
+
+export type {
+  UserPreferencesContextType,
+} from './types/preferences';
+
+export type {
   FontFamily,
   FontSize,
   ThemeName,
-  InvitationVerificationResult,
-  UserRole,
-  NotificationPreferences,
-  Period,
-  UserModeType,
-  Story
-} from './types/types';
+  Theme,
+  ThemeContextType,
+} from './types/theme';
 
 export type {
-  VRSessionTemplate,
-  VRSession,
-  VRHistoryListProps,
-  VRSessionHistoryProps,
-  VRSessionWithMusicProps,
-  VRTemplateGridProps
-} from './types/vr';
+  NotificationFrequency,
+  NotificationTone,
+  NotificationPreference,
+} from './types/notification';
 
-// Export types from music
+export type { UserModeType } from './types/userMode';
+
+export type { 
+  KpiCardProps, 
+  DraggableKpiCardsGridProps, 
+  GlobalOverviewTabProps,
+  DashboardWidgetConfig,
+  GamificationData
+} from './types/dashboard';
+
+export type { SidebarContextType } from './types/sidebar';
+
 export type {
   MusicTrack,
   MusicPlaylist,
@@ -36,7 +48,27 @@ export type {
   TrackInfoProps
 } from './types/music';
 
-// Export from emotions
+export type {
+  Badge,
+  Challenge
+} from './types/badge';
+
+export type {
+  ChatMessage,
+  ChatConversation,
+  ChatResponse
+} from './types/chat';
+
+export type {
+  MoodData,
+  AudioPlaylist,
+  EmotionalData
+} from './types/other';
+
+export type {
+  Story
+} from './types/Story';
+
 export type {
   Emotion,
   EmotionResult,
@@ -44,50 +76,3 @@ export type {
   TeamOverviewProps,
   EmotionalTeamViewProps
 } from './types/emotions';
-
-// Export from badge
-export type {
-  Badge
-} from './types/badge';
-
-// Export from theme
-export type {
-  Theme,
-  ThemeContextType,
-  FontFamily,
-  FontSize
-} from './types/theme';
-
-// Export from notification
-export type {
-  NotificationFrequency,
-  NotificationTone,
-  NotificationPreference
-} from './types/notification';
-
-// Export type from sidebar
-export type { 
-  SidebarContextType 
-} from './types/sidebar';
-
-// Export from dashboard
-export type { 
-  KpiCardProps, 
-  DraggableKpiCardsGridProps, 
-  GlobalOverviewTabProps,
-  DashboardWidgetConfig,
-  GamificationData
-} from './types/dashboard';
-
-export type {
-  ChatMessage,
-  MoodData,
-  JournalEntry,
-  Story as OtherStory,
-  EmotionPrediction,
-  Recommendation,
-  InvitationStats,
-  InvitationData,
-  InvitationFormData,
-  UserPreference
-} from './types/other';

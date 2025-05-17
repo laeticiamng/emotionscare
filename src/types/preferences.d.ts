@@ -28,5 +28,8 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
     shareData: true,
     anonymizeReports: false,
     profileVisibility: 'public'
-  }
+  },
+  colorBlindMode: false,
+  autoplayMedia: true,
+  soundEnabled: true
 };

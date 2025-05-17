@@ -56,7 +56,7 @@ export interface UserPreferences {
   notifications_enabled?: boolean;
   email_notifications?: boolean;
   
-  // Propriétés utilisées dans l'application
+  // Properties used in the application
   notifications?: {
     enabled?: boolean;
     emailEnabled?: boolean;
@@ -67,6 +67,7 @@ export interface UserPreferences {
     email?: boolean;
     push?: boolean;
     sms?: boolean;
+    inApp?: boolean;
   };
   dashboardLayout?: Record<string, any> | string;
   onboardingCompleted?: boolean;
@@ -76,4 +77,10 @@ export interface UserPreferences {
     anonymizeReports?: boolean;
     profileVisibility?: string;
   };
+  
+  // Additional properties needed by preferences components
+  reduceMotion?: boolean;
+  colorBlindMode?: boolean;
+  autoplayMedia?: boolean;
+  soundEnabled?: boolean;
 }

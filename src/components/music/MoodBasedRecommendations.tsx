@@ -7,14 +7,18 @@ import { Play } from 'lucide-react';
 interface MoodBasedRecommendationsProps {
   mood?: string;
   className?: string;
+  intensity?: number;
+  standalone?: boolean;
 }
 
 const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ 
   mood = 'calm',
-  className = ''
+  className = '',
+  intensity = 0.5,
+  standalone = false
 }) => {
-  // Cette fonction renvoie correctement un JSX Element et non un objet
-  const renderRecommendation = () => {
+  // This function now explicitly returns a JSX.Element
+  const renderRecommendation = (): JSX.Element => {
     switch (mood) {
       case 'calm':
         return (

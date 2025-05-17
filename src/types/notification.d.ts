@@ -1,28 +1,19 @@
 
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'custom';
-export type NotificationTone = 'professional' | 'friendly' | 'minimal';
+
+export type NotificationTone = 'formal' | 'casual' | 'friendly' | 'professional';
 
 export interface NotificationPreference {
   enabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled: boolean;
-  inAppEnabled: boolean;
+  email: boolean;
+  push: boolean;
+  inApp: boolean;
   frequency: NotificationFrequency;
-  types: {
-    system: boolean;
-    emotion: boolean;
-    coach: boolean;
-    journal: boolean;
-    community: boolean;
-    achievement: boolean;
-    badge: boolean;
-    challenge: boolean;
-    reminder: boolean;
-    info: boolean;
-    warning: boolean;
-    error: boolean;
-    success: boolean;
-    streak: boolean;
-    urgent: boolean;
+  types?: Record<string, boolean>;
+  tone?: NotificationTone;
+  quietHours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
   };
 }
