@@ -8,7 +8,8 @@ export type Theme =
   | "violet"
   | "yellow"
   | "rose"
-  | "blue-pastel"; // Ajout de cette valeur
+  | "blue-pastel"
+  | "pastel";
 
 export interface ThemeContextType {
   theme: Theme;

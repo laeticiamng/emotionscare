@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useState,
@@ -27,7 +28,7 @@ const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
-  const [isOpenDrawer, setOpenDrawer] = useState<boolean>(false);
+  const [openDrawer, setOpenDrawer] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -139,7 +140,7 @@ const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
 
   useEffect(() => {
     if (currentTrack && audioRef.current) {
-      const trackUrl = currentTrack.trackUrl || currentTrack.track_url;
+      const trackUrl = currentTrack.audioUrl || currentTrack.trackUrl;
       if (trackUrl) {
         audioRef.current.src = trackUrl;
         audioRef.current.load();
@@ -184,7 +185,7 @@ const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     currentTime,
     playlist: currentPlaylist,
     playlists,
-    isOpenDrawer,
+    openDrawer,
     setOpenDrawer,
     playTrack,
     playPlaylist,
@@ -192,7 +193,7 @@ const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     playNext,
     playPrevious,
     togglePlay,
-    setVolume,
+    setVolume: handleVolumeChange,
     seekTo,
     recommendByEmotion,
     getRecommendedPlaylists,

@@ -47,10 +47,10 @@ export interface EmotionTrend {
 
 export interface EmotionResult {
   id: string;
-  user_id?: string;
   userId?: string;
-  date?: string;
+  user_id?: string;
   timestamp?: string;
+  date?: string;
   emotion?: string;
   primary_emotion?: string;
   score?: number;
@@ -62,7 +62,7 @@ export interface EmotionResult {
   audio_url?: string;
   audioUrl?: string;
   feedback?: string;
-  ai_feedback?: string; // Ajout pour compatibilité
+  ai_feedback?: string;
   recommendations?: string[];
   source?: string;
 }
@@ -70,7 +70,6 @@ export interface EmotionResult {
 export interface TeamOverviewProps {
   teamId: string;
   period?: 'day' | 'week' | 'month';
-  filter?: string;
   userId?: string;
   anonymized?: boolean;
   className?: string;

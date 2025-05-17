@@ -7,7 +7,8 @@ export interface MusicTrack {
   duration: number;
   imageUrl?: string;
   trackUrl?: string;
-  track_url?: string; // Ajout pour compatibilité
+  audioUrl?: string;
+  track_url?: string;
   genre?: string;
   year?: number;
   mood?: string;
@@ -41,8 +42,9 @@ export interface MusicContextType {
   currentTime: number;
   playlist: MusicPlaylist | null;
   playlists: MusicPlaylist[];
-  isOpenDrawer: boolean;
+  openDrawer: boolean;
   setOpenDrawer: (open: boolean) => void;
+  isOpenDrawer?: boolean;
   playTrack: (track: MusicTrack) => void;
   playPlaylist: (playlist: MusicPlaylist) => void;
   playSimilar: (mood?: string) => void;
@@ -53,6 +55,18 @@ export interface MusicContextType {
   seekTo: (time: number) => void;
   recommendByEmotion: (emotion: string, intensity?: number) => MusicPlaylist;
   getRecommendedPlaylists: (limit?: number) => MusicPlaylist[];
+  pauseTrack?: () => void;
+  resumeTrack?: () => void;
+  nextTrack?: () => void;
+  previousTrack?: () => void;
+  toggleMute?: () => void;
+  loadPlaylistForEmotion?: (params: EmotionMusicParams) => Promise<MusicPlaylist | null>;
+  setEmotion?: (emotion: string) => void;
+  currentPlaylist?: MusicPlaylist | null;
+  emotion?: string | null;
+  currentEmotion?: string | null;
+  isMuted?: boolean;
+  muted?: boolean;
 }
 
 export interface MusicDrawerProps {

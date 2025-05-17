@@ -1,54 +1,44 @@
 
 export interface ChatMessage {
   id: string;
+  role: "system" | "user" | "ai" | "assistant" | "coach";
   content: string;
-  sender: 'user' | 'ai' | 'system' | 'assistant';
-  timestamp: string | Date;
-  seen?: boolean;
-  role?: 'user' | 'ai' | 'system' | 'assistant';
+  timestamp?: string;
+  text?: string;
 }
 
 export interface MoodData {
   id: string;
   mood: string;
-  score: number;
-  timestamp: string | Date;
-  notes?: string;
-  sentiment?: number;
-  anxiety?: number;
-  energy?: number;
+  intensity: number;
+  date?: string;
+  timestamp?: string;
+  value?: number;
 }
 
 export interface JournalEntry {
   id: string;
+  date: string;
   title: string;
   content: string;
   mood?: string;
-  created_at: string | Date;
-  updated_at?: string | Date;
   tags?: string[];
-  user_id?: string;
-  date?: string | Date;
-  text?: string;
-  mood_score?: number;
-  ai_feedback?: string;
 }
 
 export interface Story {
   id: string;
   title: string;
+  excerpt: string;
   content: string;
-  created_at: string;
-  author_id: string;
-  seen?: boolean;
-  type?: string;
+  category: string;
+  imageUrl?: string;
+  author?: string;
+  published?: string;
 }
 
 export interface EmotionPrediction {
-  id: string;
   emotion: string;
-  confidence: number;
-  timestamp: string | Date;
+  probability: number;
 }
 
 export interface Recommendation {
@@ -56,56 +46,33 @@ export interface Recommendation {
   title: string;
   description: string;
   type: string;
-  priority: number;
-  completed?: boolean;
+  source?: string;
 }
 
 export interface InvitationStats {
-  total: number;
-  pending: number;
+  sent: number;
   accepted: number;
-  rejected: number;
-  expired?: number;
-  sent?: number;
-  completed?: number;
-  conversionRate?: number;
-  averageTimeToAccept?: number;
-  teams?: Record<string, number>;
-  recent_invites?: InvitationData[];
+  pending: number;
+  expired: number;
 }
 
 export interface InvitationData {
   id: string;
   email: string;
-  role: string;
-  status: 'pending' | 'accepted' | 'rejected' | 'expired';
-  created_at: string | Date;
-  expires_at?: string | Date;
-  accepted_at?: string | Date;
+  status: "pending" | "accepted" | "expired";
+  sentAt: string;
+  acceptedAt?: string;
 }
 
 export interface InvitationFormData {
   email: string;
-  role: string;
+  role?: string;
   message?: string;
-  expires_in?: number;
 }
 
 export interface UserPreference {
-  key: string;
-  value: any;
-  label?: string;
-  description?: string;
+  theme: string;
+  notifications: boolean;
+  emailUpdates: boolean;
+  language: string;
 }
-
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'success' | 'info' | 'warning' | 'error';
-  read: boolean;
-  created_at: string | Date;
-  link?: string;
-}
-
-export type NotificationType = 'success' | 'info' | 'warning' | 'error';

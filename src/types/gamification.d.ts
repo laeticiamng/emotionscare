@@ -18,6 +18,7 @@ export interface Challenge {
   completed?: boolean;
   points?: number;
   totalSteps?: number; // Pour compatibilité
+  name?: string; // Pour compatibilité
 }
 
 export interface GamificationStats {

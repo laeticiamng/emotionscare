@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
 import { MusicContextType, MusicPlaylist, MusicTrack } from '@/types/music';
 import { mockPlaylists, mockTracks } from '@/data/music';
@@ -25,7 +26,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [duration, setDuration] = useState(0);
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [playlists, setPlaylists] = useState<MusicPlaylist[]>(initialPlaylists);
-  const [isOpenDrawer, setOpenDrawer] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const allTracks = mockTracks;
 
@@ -37,7 +38,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
 
   useEffect(() => {
     if (currentTrack && audioRef.current) {
-      audioRef.current.src = currentTrack.trackUrl || '';
+      audioRef.current.src = currentTrack.audioUrl || currentTrack.trackUrl || '';
       audioRef.current.load();
       if (isPlaying) {
         audioRef.current.play();
@@ -177,7 +178,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     currentTime,
     playlist: currentPlaylist,
     playlists,
-    isOpenDrawer,
+    openDrawer,
     setOpenDrawer,
     playTrack,
     playPlaylist,

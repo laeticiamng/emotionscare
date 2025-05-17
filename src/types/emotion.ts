@@ -24,7 +24,7 @@ export interface EmotionResult {
   triggers?: string[];
   user_id?: string;
   userId?: string;
-  date?: string | Date; // Accepter string et Date pour compatibilité
+  date?: string; // Change to only accept string
   intensity?: number;
   transcript?: string;
   audioUrl?: string;
