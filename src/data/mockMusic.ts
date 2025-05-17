@@ -58,7 +58,8 @@ export const mockPlaylists: MusicPlaylist[] = [
     description: 'Perfect for relaxation and unwinding',
     emotion: 'calm',
     tracks: mockTracks.filter(track => track.emotion === 'calm'),
-    coverUrl: '/images/covers/calm-playlist.jpg'
+    coverUrl: '/images/covers/calm-playlist.jpg',
+    createdAt: new Date().toISOString()
   },
   {
     id: 'playlist-2',
@@ -67,7 +68,8 @@ export const mockPlaylists: MusicPlaylist[] = [
     description: 'Boost your mood with these tracks',
     emotion: 'joy',
     tracks: mockTracks.filter(track => track.emotion === 'joy'),
-    coverUrl: '/images/covers/joy-playlist.jpg'
+    coverUrl: '/images/covers/joy-playlist.jpg',
+    createdAt: new Date().toISOString()
   }
 ];
 

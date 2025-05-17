@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { JournalEntry } from '@/types';
+import { JournalEntry } from '@/types/journal';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import JournalMoodChart from './JournalMoodChart';
 

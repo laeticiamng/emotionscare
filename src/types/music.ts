@@ -15,6 +15,7 @@ export interface MusicPlaylist extends AudioPlaylist {
   name?: string;
   title?: string;
   category?: string;
+  createdAt?: string;
 }
 
 export type { EmotionMusicParams };

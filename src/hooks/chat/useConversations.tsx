@@ -12,7 +12,6 @@ const initialConversations: ChatConversation[] = [
     created_at: '2023-03-15T12:00:00Z',
     updated_at: '2023-03-15T12:05:00Z',
     last_message: 'Hello! How can I help you today?',
-    status: 'active',
     messages: []
   },
   {
@@ -22,7 +21,6 @@ const initialConversations: ChatConversation[] = [
     created_at: '2023-03-14T09:30:00Z',
     updated_at: '2023-03-14T09:35:00Z',
     last_message: 'Remember to take breaks during your workday.',
-    status: 'active',
     messages: []
   }
 ];
@@ -56,7 +54,7 @@ export const useConversations = (userId = 'user-1') => {
     };
 
     loadConversations();
-  }, [userId]);
+  }, [userId, selectedConversation]);
 
   // Create a new conversation
   const createConversation = useCallback(async (title: string) => {
@@ -68,7 +66,6 @@ export const useConversations = (userId = 'user-1') => {
       created_at: timestamp,
       updated_at: timestamp,
       last_message: '',
-      status: 'active',
       messages: []
     };
 
@@ -89,14 +86,14 @@ export const useConversations = (userId = 'user-1') => {
   // Add a message to a conversation
   const addMessageToConversation = useCallback(async (
     conversationId: string, 
-    message: Omit<ChatMessage, 'id' | 'timestamp' | 'conversation_id'>
+    message: Omit<ChatMessage, 'id' | 'timestamp'>
   ) => {
     const timestamp = new Date().toISOString();
     const newMessage: ChatMessage = {
       id: uuidv4(),
       timestamp,
-      conversation_id: conversationId,
-      ...message
+      ...message,
+      conversation_id: conversationId
     };
 
     // Find and update the conversation

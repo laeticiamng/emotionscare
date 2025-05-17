@@ -29,8 +29,7 @@ export const useConversationState = ({
         messages: [],
         created_at: timestamp,
         updated_at: timestamp,
-        last_message: '',
-        status: 'active'
+        last_message: ''
       };
       
       setConversations((prev) => [conversation, ...prev]);

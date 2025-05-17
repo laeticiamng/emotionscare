@@ -21,7 +21,8 @@ export const useChat = ({ initialMessages = [] }: UseChatOptions = {}) => {
       content: content,
       sender: 'user',
       timestamp: new Date().toISOString(),
-      role: 'user'
+      role: 'user',
+      conversation_id: 'default'
     };
     
     // Add user message
@@ -35,7 +36,8 @@ export const useChat = ({ initialMessages = [] }: UseChatOptions = {}) => {
         content: `This is an automated response to "${content}"`,
         sender: 'assistant',
         timestamp: new Date().toISOString(),
-        role: 'assistant'
+        role: 'assistant',
+        conversation_id: 'default'
       };
       
       addMessage(aiMessage);

@@ -21,7 +21,8 @@ export function useChatProcessing() {
         text: message,
         sender: 'user',
         role: 'user',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        conversation_id: 'default'
       };
       
       // Get AI response
@@ -34,7 +35,8 @@ export function useChatProcessing() {
         text: aiResponse.content || aiResponse.message || '',
         sender: 'assistant',
         role: 'assistant',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        conversation_id: 'default'
       };
       
       return [userMessage, aiMessage];
@@ -48,7 +50,9 @@ export function useChatProcessing() {
         text: 'Sorry, an error occurred. Please try again.',
         sender: 'assistant',
         role: 'assistant',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        conversation_id: 'default',
+        isError: true
       };
       
       return [
@@ -58,7 +62,8 @@ export function useChatProcessing() {
           text: message,
           sender: 'user',
           role: 'user',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          conversation_id: 'default'
         }, 
         errorMessage
       ];

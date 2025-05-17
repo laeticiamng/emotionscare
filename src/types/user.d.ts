@@ -1,7 +1,4 @@
 
-import { ThemeName, FontSize } from './theme';
-import { NotificationPreference } from './notification';
-
 export interface User {
   id: string;
   email: string;
@@ -27,11 +24,11 @@ export interface User {
   avatarUrl?: string;
 }
 
-export type UserRole = 'admin' | 'user' | 'coach' | 'therapist' | 'b2b' | 'b2c';
+export type UserRole = 'admin' | 'user' | 'coach' | 'therapist' | 'b2b' | 'b2c' | 'b2b_user' | 'b2b_admin';
 
 export interface UserPreferences {
-  theme: ThemeName;
-  fontSize?: FontSize;
+  theme: string;
+  fontSize?: string;
   fontFamily?: string;
   useSystemTheme?: boolean;
   highContrast?: boolean;
@@ -43,7 +40,7 @@ export interface UserPreferences {
   notifications_enabled?: boolean;
   email_notifications?: boolean;
   
-  // Ajout des propriétés utilisées dans l'application
+  // Add properties used in the application
   notifications?: {
     enabled?: boolean;
     emailEnabled?: boolean;

@@ -92,7 +92,8 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user }) => {
               </div>
               <div>
                 <h4 className="text-sm font-medium text-muted-foreground">Layout dashboard</h4>
-                <p className="text-sm">{user.preferences?.dashboardLayout || 'Défaut'}</p>
+                <p className="text-sm">{typeof user.preferences?.dashboardLayout === 'string' ? 
+                  user.preferences.dashboardLayout : 'Défaut'}</p>
               </div>
               <div>
                 <h4 className="text-sm font-medium text-muted-foreground">Onboarding complété</h4>

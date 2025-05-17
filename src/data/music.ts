@@ -54,7 +54,8 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: 'Une sélection pour vous aider à vous détendre',
     coverUrl: '/images/calm-waters.jpg',
     tracks: calmTracks,
-    emotion: 'calm'
+    emotion: 'calm',
+    createdAt: new Date().toISOString()
   },
   {
     id: 'playlist-002',
@@ -63,7 +64,8 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: 'Pour bien commencer la journée',
     coverUrl: '/images/sunrise.jpg',
     tracks: energizedTracks,
-    emotion: 'energized'
+    emotion: 'energized',
+    createdAt: new Date().toISOString()
   },
   {
     id: 'playlist-003',
@@ -72,6 +74,7 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: 'Pour rester concentré dans votre travail',
     coverUrl: '/images/focus.jpg',
     tracks: focusedTracks,
-    emotion: 'focused'
+    emotion: 'focused',
+    createdAt: new Date().toISOString()
   },
 ];
