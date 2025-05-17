@@ -8,15 +8,14 @@ export const useCoachChat = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   
-  // Add loading state since it was referenced but not defined
-  const [loading, setLoading] = useState<boolean>(false);
+  // Use loading state from coach context
+  const loading = coach.loading || false;
   
-  const sendMessage = useCallback(async (message: string, history: any[] = []) => {
+  const sendMessage = useCallback(async (message: string) => {
     try {
       setIsProcessing(true);
-      setLoading(true);
-      // Add the second parameter that was missing
-      const response = await coach.sendMessage(message, history);
+      // Use the existing messages as history
+      const response = await coach.sendMessage(message, messages);
       
       setMessages(prevMessages => {
         const updatedMessages = [...prevMessages, { text: message, sender: 'user' }];
@@ -28,9 +27,8 @@ export const useCoachChat = () => {
       return null;
     } finally {
       setIsProcessing(false);
-      setLoading(false);
     }
-  }, [coach]);
+  }, [coach, messages]);
   
   const addMessage = useCallback((text: string, sender: 'system' | 'user' | 'ai' | 'assistant') => {
     setMessages(prevMessages => [...prevMessages, { text, sender }]);

@@ -9,6 +9,9 @@ export interface MusicTrack {
   emotion?: string;
   // Add track_url for compatibility
   track_url?: string;
+  coverUrl?: string;
+  coverImage?: string;
+  cover?: string;
 }
 
 export interface MusicPlaylist {

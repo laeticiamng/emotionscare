@@ -10,11 +10,11 @@ export interface Notification {
   message: string;
   type: string;
   read: boolean;
-  createdAt: string; // Keep as createdAt to match usage in code
+  created_at: string;
+  createdAt?: string; // For backward compatibility
   priority?: 'low' | 'medium' | 'high';
   actionUrl?: string;
   image?: string;
 }
 
 export type NotificationType = string;
-

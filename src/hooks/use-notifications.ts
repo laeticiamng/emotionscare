@@ -23,7 +23,7 @@ export function useNotifications() {
           message: 'Le système a été mis à jour avec succès',
           type: 'system',
           read: false,
-          createdAt: new Date().toISOString(),
+          created_at: new Date().toISOString(),
         },
         {
           id: '2',
@@ -31,15 +31,15 @@ export function useNotifications() {
           message: 'Votre analyse émotionnelle hebdomadaire est prête',
           type: 'emotion',
           read: true,
-          createdAt: new Date(Date.now() - 86400000).toISOString(),
+          created_at: new Date(Date.now() - 86400000).toISOString(),
         },
         {
           id: '3',
           title: 'Badge débloqué',
           message: 'Félicitations ! Vous avez débloqué le badge "Régularité"',
-          type: 'badge', // Changed from "achievement" to a valid type
+          type: 'badge',
           read: false,
-          createdAt: new Date(Date.now() - 172800000).toISOString(),
+          created_at: new Date(Date.now() - 172800000).toISOString(),
         }
       ];
       

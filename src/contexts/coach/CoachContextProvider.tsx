@@ -13,6 +13,7 @@ interface CoachContextProps {
   sendMessage: (message: string, conversationHistory: any[]) => Promise<string>;
   analyzeEmotion: (text: string) => Promise<{ emotion: string; score: number }>;
   getRecommendations: (category: string) => string[];
+  loading?: boolean; // Add loading property for useCoachChat
 }
 
 const CoachContext = createContext<CoachContextProps | undefined>(undefined);
@@ -24,12 +25,18 @@ interface CoachContextProviderProps {
 
 export const CoachContextProvider: React.FC<CoachContextProviderProps> = ({ children, handlers }) => {
   const { sendMessageHandler, analyzeEmotionHandler, getRecommendationsHandler, processUserMessage, setIsProcessing } = handlers;
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const sendMessage = useCallback(async (message: string, conversationHistory: any[]) => {
     if (!sendMessageHandler) {
       throw new Error('sendMessageHandler is required in handlers');
     }
-    return sendMessageHandler(message, conversationHistory);
+    setLoading(true);
+    try {
+      return await sendMessageHandler(message, conversationHistory);
+    } finally {
+      setLoading(false);
+    }
   }, [sendMessageHandler]);
 
   const analyzeEmotion = useCallback(async (text: string) => {
@@ -47,7 +54,7 @@ export const CoachContextProvider: React.FC<CoachContextProviderProps> = ({ chil
   }, [getRecommendationsHandler]);
 
   return (
-    <CoachContext.Provider value={{ sendMessage, analyzeEmotion, getRecommendations }}>
+    <CoachContext.Provider value={{ sendMessage, analyzeEmotion, getRecommendations, loading }}>
       {children}
     </CoachContext.Provider>
   );

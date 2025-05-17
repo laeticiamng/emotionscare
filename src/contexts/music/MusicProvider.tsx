@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import MusicContext from './MusicContext';
 import { MusicTrack, MusicPlaylist, EmotionMusicParams, MusicContextType } from '@/types/music';
