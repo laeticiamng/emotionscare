@@ -37,8 +37,12 @@ const TeamOverview: React.FC<TeamOverviewProps> = ({
       if (value.title) {
         return value.title.toString();
       }
-      // Otherwise return a stringified version
-      return JSON.stringify(value);
+      // Otherwise return a stringified version, but make sure we're not directly rendering objects
+      try {
+        return JSON.stringify(value);
+      } catch (e) {
+        return 'Complex object';
+      }
     }
     
     return String(value);

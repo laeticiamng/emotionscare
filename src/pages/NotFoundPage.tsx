@@ -1,27 +1,27 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-import Shell from '@/Shell';
 
 const NotFoundPage: React.FC = () => {
+  const navigate = useNavigate();
+  
   return (
-    <Shell>
-      <div className="flex flex-col items-center justify-center min-h-[70vh] text-center p-4">
-        <h1 className="text-4xl md:text-7xl font-bold mb-4">404</h1>
-        <p className="text-2xl mb-6 text-muted-foreground">Page non trouvée</p>
-        <p className="mb-8 max-w-md text-muted-foreground">
-          Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
-        </p>
-        <Button asChild>
-          <Link to="/">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Retourner à l'accueil
-          </Link>
-        </Button>
-      </div>
-    </Shell>
+    <div className="min-h-screen flex flex-col items-center justify-center text-center p-4">
+      <h1 className="text-8xl font-bold mb-6">404</h1>
+      <h2 className="text-3xl font-semibold mb-4">Page non trouvée</h2>
+      <p className="text-muted-foreground max-w-md mx-auto mb-8">
+        Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
+      </p>
+      <Button 
+        onClick={() => navigate('/')}
+        className="flex items-center"
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Retourner à l'accueil
+      </Button>
+    </div>
   );
 };
 

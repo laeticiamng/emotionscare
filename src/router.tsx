@@ -41,6 +41,11 @@ export const routes: RouteObject[] = [
     path: 'b2b/selection',
     element: <B2BSelectionPage />
   },
+  // Make sure the route with special character is also supported
+  {
+    path: 'b2b/sélection',
+    element: <B2BSelectionPage />
+  },
   // B2B Auth Routes
   {
     path: 'b2b/user/login',
@@ -59,6 +64,10 @@ export const routes: RouteObject[] = [
       </ProtectedRoute>
     ),
     children: [
+      {
+        path: '',
+        element: <B2CDashboardPage /> // Default route when accessing /b2c
+      },
       {
         path: 'dashboard',
         element: <B2CDashboardPage />
@@ -79,6 +88,10 @@ export const routes: RouteObject[] = [
     ),
     children: [
       {
+        path: '',
+        element: <B2BUserDashboardPage /> // Default route when accessing /b2b/user
+      },
+      {
         path: 'dashboard',
         element: <B2BUserDashboardPage />
       },
@@ -97,6 +110,10 @@ export const routes: RouteObject[] = [
       </ProtectedRoute>
     ),
     children: [
+      {
+        path: '',
+        element: <B2BAdminDashboardPage /> // Default route when accessing /b2b/admin
+      },
       {
         path: 'dashboard',
         element: <B2BAdminDashboardPage />

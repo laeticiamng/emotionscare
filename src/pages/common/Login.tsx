@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { getRoleRoute } from '@/utils/roleUtils';
 
 interface LoginProps {
   role?: 'b2c' | 'b2b_user' | 'b2b_admin';
@@ -19,38 +18,43 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, clearError, isAuthenticated, user } = useAuth();
+  const { login } = useAuth();
+  
+  // Determine the current mode based on URL
+  const getCurrentMode = () => {
+    if (location.pathname.includes('/b2b/admin')) {
+      return 'b2b_admin';
+    } else if (location.pathname.includes('/b2b/user')) {
+      return 'b2b_user';
+    }
+    return 'b2c';
+  };
+  
+  const currentMode = role || getCurrentMode();
+
+  const getRedirectPath = (userRole: string) => {
+    switch(userRole) {
+      case 'b2b_admin': return '/b2b/admin';
+      case 'b2b_user': return '/b2b/user';
+      case 'b2c': default: return '/b2c';
+    }
+  };
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (clearError) clearError();
     setIsLoading(true);
     
     try {
       const user = await login(email, password);
       
-      if (user) {
-        // Vérifier que l'utilisateur a le rôle correct
-        if (role && role !== user.role) {
-          toast({
-            title: "Accès refusé",
-            description: `Ce compte n'a pas les permissions nécessaires pour accéder à cet espace.`,
-          });
-          setIsLoading(false);
-          return;
-        }
-        
-        toast({
-          title: "Connexion réussie",
-          description: "Vous êtes maintenant connecté."
-        });
-        
-        // Redirection vers la dashboard appropriée en fonction du rôle
-        // or back to where they were trying to go
-        const from = location.state?.from?.pathname || getRoleRoute(user.role);
-        navigate(from);
-      }
+      toast({
+        title: "Connexion réussie",
+        description: "Vous êtes maintenant connecté."
+      });
+      
+      // Redirect to the appropriate dashboard based on user role or current mode
+      const redirectPath = getRedirectPath(user?.role || currentMode);
+      navigate(redirectPath);
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",
@@ -58,6 +62,14 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+  
+  const getPageTitle = () => {
+    switch(currentMode) {
+      case 'b2b_admin': return 'Espace Administration';
+      case 'b2b_user': return 'Espace Collaborateur';
+      case 'b2c': default: return 'Espace Personnel';
     }
   };
   
@@ -69,7 +81,7 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
             <User className="h-10 w-10 text-blue-600" />
           </div>
           <CardTitle className="text-2xl font-bold">Connexion</CardTitle>
-          <CardDescription>Connectez-vous pour accéder à votre espace</CardDescription>
+          <CardDescription>Connectez-vous à votre {getPageTitle()}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -102,6 +114,12 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Connexion en cours..." : "Se connecter"}
             </Button>
+            
+            {/* Debug information for development */}
+            <div className="text-xs text-muted-foreground mt-4">
+              <p>Pour les tests: utilisateur@exemple.fr / admin</p>
+              <p className="mt-1">Mode actuel: {currentMode}</p>
+            </div>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
