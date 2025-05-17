@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/hooks/useAuth';
 import { UserModeProvider } from '@/contexts/UserModeContext';
@@ -16,9 +15,7 @@ function App() {
         <UserModeProvider>
           <LayoutProvider>
             <AudioProvider>
-              <Router>
-                <AppRoutes />
-              </Router>
+              <AppRoutes />
               <Toaster />
             </AudioProvider>
           </LayoutProvider>
