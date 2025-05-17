@@ -1,5 +1,6 @@
 
 import { User } from '@/types/other';
+import { v4 as uuid } from 'uuid';
 
 // Fonction simulée pour récupérer les détails d'un utilisateur
 export async function fetchUserById(userId: string): Promise<User> {
@@ -62,4 +63,79 @@ export async function updateUser(userId: string, data: Partial<User>): Promise<U
       ...(data.preferences || {})
     }
   };
+}
+
+// Add missing functions for community features
+export async function createComment(data: any) {
+  console.log(`Creating comment:`, data);
+  await new Promise(resolve => setTimeout(resolve, 300));
+  return {
+    id: uuid(),
+    content: data.content,
+    postId: data.postId,
+    userId: data.userId,
+    createdAt: new Date().toISOString()
+  };
+}
+
+export async function createGroup(data: any) {
+  console.log(`Creating group:`, data);
+  await new Promise(resolve => setTimeout(resolve, 400));
+  return {
+    id: uuid(),
+    name: data.name,
+    description: data.description,
+    createdBy: data.userId,
+    createdAt: new Date().toISOString(),
+    members: [data.userId],
+    tags: data.tags || []
+  };
+}
+
+export async function createPost(data: any) {
+  console.log(`Creating post:`, data);
+  await new Promise(resolve => setTimeout(resolve, 350));
+  return {
+    id: uuid(),
+    title: data.title,
+    content: data.content,
+    userId: data.userId,
+    groupId: data.groupId,
+    createdAt: new Date().toISOString(),
+    likes: 0,
+    comments: 0,
+    tags: data.tags || []
+  };
+}
+
+export async function reactToPost(postId: string, userId: string, reaction: 'like' | 'dislike') {
+  console.log(`${reaction === 'like' ? 'Liking' : 'Disliking'} post ${postId} by user ${userId}`);
+  await new Promise(resolve => setTimeout(resolve, 200));
+  return {
+    success: true,
+    postId,
+    userId,
+    reaction
+  };
+}
+
+export async function getRecommendedTags(input: string): Promise<string[]> {
+  console.log(`Getting recommended tags for input: ${input}`);
+  await new Promise(resolve => setTimeout(resolve, 250));
+  
+  const allTags = [
+    'bien-être', 'méditation', 'sport', 'nutrition', 'sommeil', 
+    'stress', 'équilibre', 'santé mentale', 'pleine conscience', 
+    'exercice', 'relaxation', 'productivité', 'développement personnel'
+  ];
+  
+  if (!input) {
+    return allTags.slice(0, 5);
+  }
+  
+  const filteredTags = allTags.filter(tag => 
+    tag.toLowerCase().includes(input.toLowerCase())
+  );
+  
+  return filteredTags.length > 0 ? filteredTags : allTags.slice(0, 3);
 }

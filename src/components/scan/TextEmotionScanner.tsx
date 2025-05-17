@@ -35,8 +35,9 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
     try {
       const result = await analyzeEmotion(text);
       
-      if (onResult) {
-        onResult(result);
+      if (onResult && result) {
+        // Use typecasting to ensure compatibility between emotion types
+        onResult(result as EmotionResult);
       }
     } catch (error) {
       console.error("Erreur lors de l'analyse:", error);

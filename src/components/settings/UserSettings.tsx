@@ -11,10 +11,7 @@ const UserSettings = () => {
 
   // Properly typed theme handler
   const handleThemeChange = (newTheme: Theme) => {
-    // Ensure newTheme is a valid Theme type
-    if (['light', 'dark', 'system', 'blue', 'green', 'violet', 'yellow', 'rose', 'blue-pastel', 'pastel'].includes(newTheme)) {
-      setTheme(newTheme);
-    }
+    setTheme(newTheme);
   };
 
   return (

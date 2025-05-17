@@ -81,17 +81,17 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
         id: result.id || uuid(),
         user_id: currentUserId,
         date: result.date || new Date().toISOString(),
-        emotion: result.emotion,
+        emotion: result.emotion || 'neutral',
         score: result.score || Math.round((result.confidence || 0.5) * 100),
-        confidence: result.confidence,
-        intensity: result.intensity || result.score,
-        text: result.text || result.transcript || '',
+        confidence: result.confidence || 0.5,
+        intensity: result.intensity || result.score || 50,
+        text: result.text || '',
         feedback: result.feedback || '',
         transcript: result.transcript || '',
       };
 
       // Process for badges and points
-      const gamificationResult = await processEmotionForBadges(result.emotion || 'neutral', currentUserId);
+      const gamificationResult = await processEmotionForBadges(result.emotion, currentUserId);
       
       if (gamificationResult && gamificationResult.newBadges.length > 0) {
         toast({

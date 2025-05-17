@@ -12,6 +12,11 @@ export interface Challenge {
   goal?: number;
   icon?: string;
   level?: string | number;
+  name?: string;
+  completions?: number;
+  deadline?: string;
+  totalSteps?: number;
+  completed?: boolean;
 }
 
 export interface GamificationStats {

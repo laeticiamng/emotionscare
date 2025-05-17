@@ -4,6 +4,7 @@ export interface Emotion {
   date: string;
   emotion: string;
   score: number;
+  user_id?: string;
 }
 
 export interface EmotionResult {
@@ -12,7 +13,7 @@ export interface EmotionResult {
   user_id?: string;
   timestamp?: string;
   date?: string;
-  emotion?: string;
+  emotion: string;
   primaryEmotion?: string;
   score?: number;
   confidence?: number;
@@ -52,6 +53,10 @@ export interface TeamOverviewProps {
 
 export interface EmotionalTeamViewProps {
   teamId: string;
-  period: 'day' | 'week' | 'month';
+  period?: 'day' | 'week' | 'month';
   anonymized?: boolean;
+  dateRange?: [Date, Date];
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
 }

@@ -1,152 +1,79 @@
 
-import { EmotionResult } from '@/types/scan';
-import { Emotion } from '@/types/emotions';
+import { v4 as uuid } from 'uuid';
+import { EmotionResult } from '@/types/emotion';
 
-// Fonction simulée pour récupérer l'historique des émotions d'un utilisateur
-export async function fetchEmotionHistory(userId: string): Promise<Emotion[]> {
-  console.log(`Fetching emotion history for user: ${userId}`);
+// Mock function for analyzing emotion from text
+export async function analyzeEmotion(text: string): Promise<EmotionResult> {
+  console.log('Analyzing emotion from text:', text);
   
-  // Simuler un délai d'API
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Retourner des données simulées
-  return [
-    {
-      id: 'emo-1',
-      date: new Date(Date.now() - 86400000 * 7).toISOString(),
-      emotion: 'joy', 
-      score: 0.85
-    },
-    {
-      id: 'emo-2',
-      date: new Date(Date.now() - 86400000 * 5).toISOString(),
-      emotion: 'calm',
-      score: 0.72
-    },
-    {
-      id: 'emo-3',
-      date: new Date(Date.now() - 86400000 * 3).toISOString(),
-      emotion: 'anxious',
-      score: 0.45
-    },
-    {
-      id: 'emo-4',
-      date: new Date(Date.now() - 86400000 * 1).toISOString(),
-      emotion: 'joy',
-      score: 0.92
-    }
-  ];
-}
-
-// Fonction simulée pour créer une nouvelle émotion
-export async function createEmotion(data: Partial<EmotionResult>): Promise<EmotionResult> {
-  console.log('Creating emotion record:', data);
-  
-  // Simuler un délai d'API
+  // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 800));
   
-  // Créer un nouvel enregistrement d'émotion
-  const newEmotion: EmotionResult = {
-    id: `emo-${Date.now()}`,
-    userId: data.userId || 'default-user',
-    timestamp: new Date().toISOString(),
-    primaryEmotion: data.primaryEmotion || data.emotion || 'neutral',
-    score: data.score || Math.random(),
-    emotions: data.emotions || { neutral: 0.5 },
-    ...data
-  };
+  // Random emotion generator for mock implementation
+  const emotions = ['joy', 'sadness', 'anger', 'fear', 'disgust', 'surprise', 'neutral'];
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  const randomScore = Math.floor(Math.random() * 100);
+  const randomConfidence = (Math.random() * 0.5) + 0.5; // 0.5 to 1.0
   
-  return newEmotion;
-}
-
-// Fonction simulée pour récupérer la dernière émotion d'un utilisateur
-export async function getLatestEmotion(userId: string): Promise<EmotionResult | null> {
-  console.log(`Fetching latest emotion for user: ${userId}`);
-  
-  // Simuler un délai d'API
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  // Retourner un enregistrement simulé
   return {
-    id: `emo-latest-${userId}`,
-    userId,
-    timestamp: new Date().toISOString(),
-    primaryEmotion: 'joy',
-    score: 0.87,
-    emotions: {
-      joy: 0.87,
-      calm: 0.65,
-      anxious: 0.12
-    }
+    id: uuid(),
+    emotion: randomEmotion,
+    score: randomScore,
+    confidence: randomConfidence,
+    date: new Date().toISOString(),
+    text: text,
+    feedback: `Il semble que vous ressentiez de ${randomEmotion} à un niveau ${randomScore > 70 ? 'élevé' : randomScore > 40 ? 'modéré' : 'bas'}.`,
+    recommendations: [
+      'Prenez quelques minutes pour respirer profondément',
+      'Notez vos pensées dans un journal',
+      'Parlez à un ami de confiance'
+    ]
   };
 }
 
-// Fonction simulée pour analyser les émotions à partir de plusieurs sources
-export async function analyzeEmotion(data: {
-  text?: string;
-  emojis?: string;
-  audio_url?: string;
-}): Promise<EmotionResult> {
-  console.log('Analyzing emotion from inputs:', data);
+// Function to save an emotion entry
+export async function saveEmotion(emotion: Partial<EmotionResult>): Promise<EmotionResult> {
+  console.log('Saving emotion:', emotion);
   
-  // Simuler un délai d'analyse
-  await new Promise(resolve => setTimeout(resolve, 1500));
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
   
-  // Déterminer l'émotion dominante (simulée)
-  let primaryEmotion = 'neutral';
-  let score = 0.5;
+  // Complete any missing fields
+  const completeEmotion: EmotionResult = {
+    id: emotion.id || uuid(),
+    emotion: emotion.emotion || 'neutral',
+    score: emotion.score || Math.floor(Math.random() * 100),
+    confidence: emotion.confidence || 0.7,
+    date: emotion.date || new Date().toISOString(),
+    user_id: emotion.user_id || 'current-user',
+    text: emotion.text || '',
+    feedback: emotion.feedback || ''
+  };
   
-  if (data.text?.toLowerCase().includes('heureux') || data.text?.toLowerCase().includes('content') || 
-      data.emojis?.includes('😊') || data.emojis?.includes('😃')) {
-    primaryEmotion = 'joy';
-    score = 0.85;
-  } else if (data.text?.toLowerCase().includes('triste') || data.text?.toLowerCase().includes('déprimé') || 
-      data.emojis?.includes('😢') || data.emojis?.includes('😭')) {
-    primaryEmotion = 'sadness';
-    score = 0.75;
-  } else if (data.text?.toLowerCase().includes('calme') || data.text?.toLowerCase().includes('serein') || 
-      data.emojis?.includes('😌') || data.emojis?.includes('🧘')) {
-    primaryEmotion = 'calm';
-    score = 0.8;
-  } else if (data.text?.toLowerCase().includes('anxieux') || data.text?.toLowerCase().includes('stress') || 
-      data.emojis?.includes('😰') || data.emojis?.includes('😓')) {
-    primaryEmotion = 'anxious';
-    score = 0.7;
-  }
+  return completeEmotion;
+}
+
+// Function to fetch the latest emotion entry
+export async function fetchLatestEmotion(userId: string): Promise<EmotionResult | null> {
+  console.log('Fetching latest emotion for user:', userId);
   
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 600));
+  
+  // Generate a mock latest emotion
   return {
-    id: `emo-analyze-${Date.now()}`,
-    userId: 'current-user',
-    timestamp: new Date().toISOString(),
-    primaryEmotion,
-    score,
-    emotions: {
-      [primaryEmotion]: score,
-      neutral: 1 - score
-    },
-    text: data.text,
-    transcript: data.text,
-    audioUrl: data.audio_url
+    id: uuid(),
+    emotion: 'calm',
+    score: 85,
+    confidence: 0.9,
+    date: new Date().toISOString(),
+    user_id: userId,
+    text: "Today I'm feeling relaxed after finishing my tasks.",
+    feedback: "Il semble que vous vous sentiez calme et satisfait(e)."
   };
 }
 
-export async function fetchEmotionById(emotionId: string): Promise<EmotionResult | null> {
-  console.log(`Fetching emotion with ID: ${emotionId}`);
-  
-  // Simuler un délai d'API
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  // Retourner un enregistrement simulé
-  return {
-    id: emotionId,
-    userId: 'user-1',
-    timestamp: new Date().toISOString(),
-    primaryEmotion: 'joy',
-    score: 0.87,
-    emotions: {
-      joy: 0.87,
-      calm: 0.65,
-      anxious: 0.12
-    }
-  };
+// Function to create a new emotion entry
+export async function createEmotionEntry(data: Partial<EmotionResult>): Promise<EmotionResult> {
+  return saveEmotion(data);
 }

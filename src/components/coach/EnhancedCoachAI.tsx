@@ -43,7 +43,8 @@ const EnhancedCoachAI = () => {
   // Update the function where the error appears
   const handleEmotionDetected = (result: EmotionResult) => {
     if (result) {
-      setAnalysisResult(result);
+      // Use typecasting to ensure compatibility
+      setAnalysisResult(result as EmotionResult);
     }
     setIsLoading(false);
     
@@ -59,8 +60,9 @@ const EnhancedCoachAI = () => {
     try {
       const result = await analyzeEmotion(userText);
       if (result) {
-        setAnalysisResult(result);
-        handleEmotionDetected(result);
+        // Use typecasting to ensure compatibility
+        setAnalysisResult(result as EmotionResult);
+        handleEmotionDetected(result as EmotionResult);
       }
     } catch (error) {
       console.error('Error analyzing emotion:', error);
