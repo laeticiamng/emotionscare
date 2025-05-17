@@ -1,128 +1,86 @@
 
-import React from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
 import TrackList from '../TrackList';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
+import EmptyState from '@/components/shared/EmptyState';
+import { Music2 } from 'lucide-react';
 
-interface MusicLibraryProps {
+export interface MusicLibraryProps {
   tracks: MusicTrack[];
   playlists: MusicPlaylist[];
-  onTrackSelect: (track: MusicTrack) => void;
+  onTrackSelect?: (track: MusicTrack) => void;
   currentTrack: MusicTrack | null;
-  className?: string;
+  onPlaylistSelect?: (playlist: MusicPlaylist) => void;
 }
 
-const MusicLibrary: React.FC<MusicLibraryProps> = ({
+const MusicLibrary: React.FC<MusicLibraryProps> = ({ 
   tracks,
   playlists,
   onTrackSelect,
   currentTrack,
-  className = ''
+  onPlaylistSelect
 }) => {
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [activeTab, setActiveTab] = React.useState('all');
-
-  const filteredTracks = React.useMemo(() => {
-    return tracks.filter(track => 
-      track.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      track.artist.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [tracks, searchQuery]);
-
-  const filteredTracksByCategory = React.useMemo(() => {
-    if (activeTab === 'all') return filteredTracks;
-    
-    return filteredTracks.filter(track => {
-      // Check if track has category or emotion property to use for filtering
-      if (track.category) {
-        return track.category === activeTab;
-      }
-      if ('emotion' in track && track.emotion) {
-        return track.emotion === activeTab;
-      }
-      return true;
-    });
-  }, [filteredTracks, activeTab]);
+  const [activeTab, setActiveTab] = useState('all');
+  
+  const handlePlaylistClick = (playlist: MusicPlaylist) => {
+    if (onPlaylistSelect) {
+      onPlaylistSelect(playlist);
+    }
+  };
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-        <Input 
-          placeholder="Search tracks or artists..." 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
-      </div>
+    <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
+      <TabsList className="mb-4">
+        <TabsTrigger value="all">Tous les titres</TabsTrigger>
+        <TabsTrigger value="playlists">Playlists</TabsTrigger>
+      </TabsList>
       
-      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-4">
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="calm">Calm</TabsTrigger>
-          <TabsTrigger value="focus">Focus</TabsTrigger>
-          <TabsTrigger value="energy">Energy</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all" className="space-y-4">
-          {filteredTracksByCategory.length > 0 ? (
-            <TrackList 
-              tracks={filteredTracksByCategory} 
-              onTrackSelect={onTrackSelect} 
-              currentTrack={currentTrack || undefined} 
-            />
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No tracks found matching your search.
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="calm" className="space-y-4">
-          {filteredTracksByCategory.length > 0 ? (
-            <TrackList 
-              tracks={filteredTracksByCategory} 
-              onTrackSelect={onTrackSelect} 
-              currentTrack={currentTrack || undefined}
-            />
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No calm tracks found.
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="focus">
-          {filteredTracksByCategory.length > 0 ? (
-            <TrackList 
-              tracks={filteredTracksByCategory} 
-              onTrackSelect={onTrackSelect} 
-              currentTrack={currentTrack || undefined}
-            />
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No focus tracks found.
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="energy">
-          {filteredTracksByCategory.length > 0 ? (
-            <TrackList 
-              tracks={filteredTracksByCategory} 
-              onTrackSelect={onTrackSelect} 
-              currentTrack={currentTrack || undefined}
-            />
-          ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              No energy tracks found.
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-    </div>
+      <TabsContent value="all">
+        {tracks.length > 0 ? (
+          <TrackList 
+            tracks={tracks} 
+            onTrackSelect={onTrackSelect} 
+            currentTrack={currentTrack} 
+          />
+        ) : (
+          <EmptyState 
+            title="Aucun titre"
+            description="Votre bibliothèque musicale est vide."
+            icon={<Music2 className="h-10 w-10 text-muted-foreground" />}
+            actionLabel="Ajouter de la musique"
+          />
+        )}
+      </TabsContent>
+      
+      <TabsContent value="playlists">
+        {playlists.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {playlists.map(playlist => (
+              <div 
+                key={playlist.id} 
+                className="bg-card border rounded-lg p-4 cursor-pointer hover:bg-accent transition-colors"
+                onClick={() => handlePlaylistClick(playlist)}
+              >
+                <h3 className="font-medium">{playlist.title}</h3>
+                <p className="text-muted-foreground text-sm">
+                  {playlist.tracks.length} titres
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <EmptyState 
+            title="Aucune playlist"
+            description="Créez des playlists pour organiser votre musique."
+            icon={<Music2 className="h-10 w-10 text-muted-foreground" />}
+            actionLabel="Créer une playlist"
+          />
+        )}
+      </TabsContent>
+    </Tabs>
   );
 };
 

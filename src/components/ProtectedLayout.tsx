@@ -19,16 +19,16 @@ const ProtectedLayout = () => {
   }
 
   // Define explicit protected paths that require authentication
-  // Only redirect if user is not authenticated AND trying to access a protected route
-  const isProtectedPath = location.pathname.includes('/b2c/') && 
-                         !location.pathname.includes('/login') && 
-                         !location.pathname.includes('/register') ||
-                         location.pathname.includes('/b2b/user/') && 
-                         !location.pathname.includes('/login') && 
-                         !location.pathname.includes('/register') ||
-                         location.pathname.includes('/b2b/admin/') && 
-                         !location.pathname.includes('/login') && 
-                         !location.pathname.includes('/register');
+  const isProtectedPath = 
+    (location.pathname.startsWith('/b2c/') && 
+     !location.pathname.includes('/login') && 
+     !location.pathname.includes('/register')) ||
+    (location.pathname.startsWith('/b2b/user/') && 
+     !location.pathname.includes('/login') && 
+     !location.pathname.includes('/register')) ||
+    (location.pathname.startsWith('/b2b/admin/') && 
+     !location.pathname.includes('/login') && 
+     !location.pathname.includes('/register'));
 
   if (!isAuthenticated && isProtectedPath) {
     // Determine which login page to redirect to based on the path

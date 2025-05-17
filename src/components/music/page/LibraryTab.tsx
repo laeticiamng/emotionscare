@@ -18,12 +18,12 @@ const LibraryTab: React.FC<LibraryTabProps> = ({
     <div className="space-y-6">
       <h2 className="text-xl font-bold">Bibliothèque musicale</h2>
       
+      {/* Pass the props based on the MusicLibrary component's expected interface */}
       <MusicLibrary 
         tracks={playlists.flatMap(playlist => playlist.tracks)}
         playlists={playlists} 
         onTrackSelect={onSelectTrack}
         currentTrack={null}
-        onPlaylistSelect={onSelectPlaylist}
       />
     </div>
   );

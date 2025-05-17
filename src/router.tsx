@@ -10,9 +10,8 @@ import B2CLayout from './layouts/B2CLayout';
 import B2BUserLayout from './layouts/B2BUserLayout';
 import B2BAdminLayout from './layouts/B2BAdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
-
-// B2C pages (needed for proper routing)
-import B2CDashboard from './pages/b2c/Dashboard'; 
+import B2CDashboardPage from './pages/b2c/DashboardPage';
+import Dashboard from './pages/Dashboard';
 
 // Create and export the router
 export const router = createBrowserRouter([
@@ -58,7 +57,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: 'dashboard',
-            element: <B2CDashboard />
+            element: <B2CDashboardPage />
           }
           // Other B2C routes will be rendered by the router/index.tsx
         ]
@@ -74,7 +73,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: 'dashboard',
-            element: <B2CDashboard />
+            element: <Dashboard />
           }
           // Other B2B user routes will be rendered by the router/index.tsx
         ]
@@ -90,7 +89,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: 'dashboard',
-            element: <B2CDashboard />
+            element: <Dashboard />
           }
           // Other B2B admin routes will be rendered by the router/index.tsx
         ]
