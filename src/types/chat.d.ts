@@ -2,28 +2,26 @@
 export interface ChatMessage {
   id: string;
   content: string;
-  text?: string;
-  sender: 'user' | 'assistant' | 'system';
-  role: 'user' | 'assistant' | 'system';
+  sender: string;
+  role: string;
   timestamp: string;
   conversation_id: string;
-  isError?: boolean;
 }
 
 export interface ChatConversation {
   id: string;
   title: string;
-  user_id?: string;
   created_at: string;
   updated_at: string;
+  user_id: string;
   last_message?: string;
-  status?: string;
+  messages?: ChatMessage[];
 }
 
 export interface ChatResponse {
-  message?: string;
-  response?: string;
-  conversation_id?: string;
-  error?: string;
-  success?: boolean;
+  text: string;
+  id: string;
+  timestamp: string;
+  sentiment?: string;
+  suggested_actions?: string[];
 }

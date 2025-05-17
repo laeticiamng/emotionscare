@@ -27,3 +27,10 @@ export interface VRSession {
     after: string;
   };
 }
+
+export interface VRSessionWithMusicProps {
+  sessionId?: string;
+  moodFilter?: string;
+  onComplete?: () => void;
+  className?: string;
+}

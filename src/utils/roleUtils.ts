@@ -42,3 +42,8 @@ export const getRoleDescription = (role?: UserRole): string => {
       return 'Accès standard à l\'application';
   }
 };
+
+// Add the missing isAdminRole function
+export const isAdminRole = (role?: UserRole): boolean => {
+  return role === 'admin' || role === 'b2b_admin';
+};

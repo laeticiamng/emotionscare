@@ -3,6 +3,7 @@ export type {
   User,
   UserPreferences,
   UserRole,
+  UserWithStatus
 } from './types/user';
 
 export type {
@@ -83,5 +84,6 @@ export type {
 
 export type {
   VRSessionTemplate,
-  VRSession
+  VRSession,
+  VRSessionWithMusicProps
 } from './types/vr';

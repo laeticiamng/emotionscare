@@ -17,7 +17,7 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({
   intensity = 0.5,
   standalone = false
 }) => {
-  // Cette fonction retourne explicitement un JSX.Element
+  // We'll ensure this function always returns a JSX.Element
   const renderRecommendation = (): JSX.Element => {
     switch (mood) {
       case 'calm':
@@ -56,6 +56,7 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({
     }
   };
 
+  // Return proper JSX here to avoid "objects are not valid as React child" error
   return (
     <Card className={className}>
       <CardHeader>

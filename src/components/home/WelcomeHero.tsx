@@ -1,117 +1,88 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
-import { Story } from '@/types/Story';
+import { Link } from 'react-router-dom';
 
 interface WelcomeHeroProps {
-  className?: string;
   title?: string;
   subtitle?: string;
-  actionLabel?: string;
-  actionLink?: string;
-  showStories?: boolean;
+  ctaButtons?: Array<{
+    label: string;
+    link: string;
+    text?: string; // Add the text property
+  }>;
+  imageSrc?: string;
+  imageAlt?: string;
+  className?: string;
 }
 
 const WelcomeHero: React.FC<WelcomeHeroProps> = ({
-  className = '',
-  title = "Bienvenue sur votre Assistant émotionnel",
-  subtitle = "Suivez votre bien-être et améliorez votre quotidien",
-  actionLabel = "Commencer",
-  actionLink = "/dashboard",
-  showStories = true
-}) => {
-  // Exemples d'histoires de réussite
-  const successStories: Story[] = [
+  title = "Bienvenue sur votre application de bien-être",
+  subtitle = "Découvrez nos outils pour améliorer votre santé émotionnelle et mentale.",
+  ctaButtons = [
     {
-      id: '1',
-      title: 'Amélioration du sommeil',
-      content: 'J\'ai utilisé les conseils personnalisés pendant 2 semaines et mon sommeil s\'est nettement amélioré. Je me réveille plus reposé et énergique.',
-      author: 'Thomas D.',
-      created_at: '2025-04-10',
-      date: '2025-04-10',
-      tags: ['sommeil', 'bien-être']
+      label: "Commencer",
+      link: "/explore",
     },
     {
-      id: '2',
-      title: 'Moins de stress au travail',
-      content: 'Les techniques de respiration et méditation m\'ont aidé à mieux gérer mon stress professionnel. Je me sens plus équilibré.',
-      author: 'Sophie M.',
-      created_at: '2025-03-22',
-      date: '2025-03-22',
-      tags: ['travail', 'stress']
+      label: "En savoir plus",
+      link: "/about",
     }
-  ];
-  
-  // Histoire mise en avant
-  const featuredStory: Story = {
-    id: '3',
-    title: 'Mon parcours de transformation',
-    content: 'En suivant les recommandations personnalisées, j\'ai pu améliorer considérablement ma santé mentale en seulement un mois. La plateforme m\'a aidé à identifier mes déclencheurs émotionnels et à développer des stratégies efficaces.',
-    author: 'Marie L.',
-    created_at: '2025-05-01',
-    date: '2025-05-01',
-    tags: ['santé mentale', 'transformation'],
-    cta: {
-      text: 'Lire le témoignage complet',
-      link: '/stories/3'
-    }
-  };
-
+  ],
+  imageSrc,
+  imageAlt = "Illustration bien-être",
+  className = "",
+}) => {
   return (
-    <section className={`py-12 md:py-24 lg:py-32 ${className}`}>
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center space-y-4 text-center">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">{title}</h1>
-            <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">{subtitle}</p>
-          </div>
-          <div className="space-y-2 w-full max-w-sm">
-            <Button asChild className="w-full" size="lg">
-              <Link to={actionLink}>
-                {actionLabel}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
+    <div className={`py-12 md:py-20 px-6 md:px-10 flex flex-col md:flex-row items-center gap-8 md:gap-12 ${className}`}>
+      <div className="flex-1 space-y-6">
+        <div className="space-y-4">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">{title}</h1>
+          <p className="text-lg md:text-xl text-muted-foreground">{subtitle}</p>
         </div>
 
-        {showStories && (
-          <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {successStories.map(story => (
-              <div key={story.id} className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-                <div className="flex flex-col space-y-2">
-                  <h3 className="font-bold">{story.title}</h3>
-                  <p className="text-sm text-muted-foreground">{story.content}</p>
-                  <div className="flex items-center pt-2">
-                    <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium">
-                      {story.author?.charAt(0)}
-                    </div>
-                    <div className="ml-2">
-                      <p className="text-sm font-medium">{story.author}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+          {ctaButtons.map((button, index) => (
+            <Button
+              key={index}
+              variant={index === 0 ? "default" : "outline"}
+              asChild
+              size="lg"
+              className="px-8"
+            >
+              <Link to={button.link}>
+                {button.text || button.label}
+              </Link>
+            </Button>
+          ))}
+        </div>
 
-            <div className="rounded-lg border bg-accent p-6 text-accent-foreground">
-              <div className="flex flex-col space-y-2">
-                <span className="text-xs uppercase font-bold tracking-wider">Témoignage</span>
-                <h3 className="font-bold">{featuredStory.title}</h3>
-                <p className="text-sm">{featuredStory.content}</p>
-                <Button variant="outline" size="sm" className="mt-2" asChild>
-                  <Link to={featuredStory.cta?.link || '#'}>
-                    {featuredStory.cta?.text || "Lire plus"}
-                  </Link>
-                </Button>
-              </div>
+        <div className="pt-4">
+          <div className="flex items-center space-x-4">
+            <div className="flex -space-x-2">
+              {/* User avatars could go here */}
             </div>
+            <p className="text-sm text-muted-foreground">
+              Rejoignez notre communauté d'utilisateurs en croissance
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 w-full max-w-md">
+        {imageSrc ? (
+          <img
+            src={imageSrc}
+            alt={imageAlt}
+            className="w-full h-auto object-cover rounded-lg shadow-lg"
+          />
+        ) : (
+          <div className="w-full aspect-video bg-gradient-to-tr from-primary/30 to-secondary/30 rounded-lg flex items-center justify-center">
+            <p className="text-muted-foreground italic">Image illustration</p>
           </div>
         )}
       </div>
-    </section>
+    </div>
   );
 };
 
