@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AudioProvider } from '@/contexts/AudioContext';
 import { Toaster } from '@/components/ui/sonner';
@@ -13,15 +13,13 @@ function App() {
   return (
     <ThemeProvider>
       <AudioProvider>
-        <Router>
-          <React.Suspense fallback={<div>Chargement...</div>}>
-            <Routes>
-              <Route path="/" element={<ImmersiveHome />} />
-              <Route path="/home" element={<Home />} />
-              {/* Autres routes à ajouter ici */}
-            </Routes>
-          </React.Suspense>
-        </Router>
+        <React.Suspense fallback={<div>Chargement...</div>}>
+          <Routes>
+            <Route path="/" element={<ImmersiveHome />} />
+            <Route path="/home" element={<Home />} />
+            {/* Autres routes à ajouter ici */}
+          </Routes>
+        </React.Suspense>
         <Toaster />
       </AudioProvider>
     </ThemeProvider>
