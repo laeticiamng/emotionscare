@@ -16,7 +16,6 @@ const SessionTimeoutAlert: React.FC = () => {
   useEffect(() => {
     if (auth.isAuthenticated && showWarning) {
       toast({
-        variant: "warning",
         title: "Session expiration",
         description: (
           <div className="flex flex-col space-y-2">

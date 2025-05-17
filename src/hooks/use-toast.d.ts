@@ -1,24 +1,24 @@
 
 import * as React from "react";
-import { ToastProps, Toast } from "@/types/toast";
+import { ToastProps, Toast, ToastOptions } from "@/types/toast";
 
 // The function signatures for the toast API
-export declare function toast(props: ToastProps): {
+export declare function toast(props: ToastOptions): {
   id: string;
   dismiss: () => void;
-  update: (props: Partial<ToastProps>) => void;
+  update: (props: Partial<ToastOptions>) => void;
 };
 
 export interface UseToastReturn {
   toast: typeof toast;
   toasts: Toast[];
   dismiss: (toastId?: string) => void;
-  error: (props: ToastProps) => typeof toast;
-  success: (props: ToastProps) => typeof toast;
-  warning: (props: ToastProps) => typeof toast;
-  info: (props: ToastProps) => typeof toast;
+  error: (props: ToastOptions) => typeof toast;
+  success: (props: ToastOptions) => typeof toast;
+  warning: (props: ToastOptions) => typeof toast;
+  info: (props: ToastOptions) => typeof toast;
 }
 
 export declare function useToast(): UseToastReturn;
 
-export type { Toast, ToastProps, ToastActionElement } from "@/types/toast";
+export type { Toast, ToastProps, ToastActionElement, ToastOptions } from "@/types/toast";

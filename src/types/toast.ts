@@ -17,6 +17,15 @@ export interface ToastProps {
   toast: Toast;
 }
 
+export interface ToastOptions {
+  title?: string;
+  description?: string | ReactNode;
+  action?: ReactNode;
+  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
+  duration?: number;
+  open?: boolean;
+}
+
 export interface ToastAction {
   altText: string;
   onClick: () => void;

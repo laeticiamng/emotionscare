@@ -17,7 +17,6 @@ const EmotionalCheckIn: React.FC = () => {
     
     if (!emotion) {
       toast({
-        variant: "destructive",
         title: "Erreur",
         description: "Veuillez sélectionner une émotion."
       });
@@ -32,7 +31,6 @@ const EmotionalCheckIn: React.FC = () => {
       
       // Successful submission
       toast({
-        variant: "success",
         title: "Émotion enregistrée",
         description: "Votre check-in émotionnel a été sauvegardé avec succès."
       });
@@ -42,7 +40,6 @@ const EmotionalCheckIn: React.FC = () => {
     } catch (error) {
       console.error('Error submitting emotion:', error);
       toast({
-        variant: "destructive",
         title: "Erreur",
         description: "Impossible d'enregistrer votre émotion. Veuillez réessayer."
       });

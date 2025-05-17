@@ -1,9 +1,7 @@
 
 import * as React from "react";
-import { Toast, ToastProps } from "@/types/toast";
+import { Toast, ToastProps, ToastOptions } from "@/types/toast";
 import { Toaster as SonnerToaster, toast as sonnerToast } from "sonner";
-
-type ToastOptions = Omit<ToastProps, "id">;
 
 // Create a type-safe wrapper for the toast function
 const useToast = () => {
@@ -49,4 +47,4 @@ const toast = (options: ToastOptions) => {
 };
 
 export { useToast, toast };
-export type { Toast, ToastProps, ToastActionElement } from "@/types/toast";
+export type { Toast, ToastProps, ToastActionElement, ToastOptions } from "@/types/toast";
