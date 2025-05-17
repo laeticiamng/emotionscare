@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { MusicTrack, MusicPlaylist, MusicContextType, EmotionMusicParams } from '@/types/music';
 
@@ -199,7 +198,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     const emotionParam = typeof params === 'string' ? params : params.emotion;
     
     const playlistData: MusicPlaylist = {
-      id: `${emotionParam}-playlist`,
+      id: `playlist-${emotionParam}`,
       title: `${emotionParam} Music`,
       tracks: [
         {

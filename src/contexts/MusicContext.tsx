@@ -23,7 +23,7 @@ export interface MusicContextType {
   seekTo: (time: number) => void;
   setOpenDrawer: (isOpen: boolean) => void;
   setEmotion: (emotion: string) => void;
-  loadPlaylistForEmotion: (params: EmotionMusicParams) => Promise<MusicPlaylist | null>;
+  loadPlaylistForEmotion: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
 }
 
 export const MusicContext = createContext<MusicContextType>({
@@ -105,15 +105,17 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     setCurrentTime(time);
   };
 
-  const loadPlaylistForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
+  const loadPlaylistForEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
     try {
-      console.log(`Loading playlist for emotion: ${params.emotion}`);
+      console.log(`Loading playlist for emotion: ${typeof params === 'string' ? params : params.emotion}`);
       
       // Simulate loading a playlist
+      const emotion = typeof params === 'string' ? params : params.emotion;
       const mockPlaylist: MusicPlaylist = {
-        id: `playlist-${params.emotion}`,
-        name: `${params.emotion} Playlist`,
-        emotion: params.emotion,
+        id: `playlist-${emotion}`,
+        title: `${emotion} Playlist`,
+        name: `${emotion} Playlist`,
+        emotion: emotion,
         tracks: [
           {
             id: '1',

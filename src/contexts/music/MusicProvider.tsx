@@ -82,7 +82,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentTrack(track);
     
     if (audioRef.current) {
-      // Use the appropriate URL property
+      // Utiliser la propriété URL appropriée
       const trackUrl = track.audioUrl || track.url || track.track_url || '';
       audioRef.current.src = trackUrl;
       audioRef.current.volume = volume;
@@ -175,6 +175,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsRepeating(!isRepeating);
   };
   
+  // Mock function to load a playlist based on emotion
   const loadPlaylistForEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
     setIsLoading(true);
     setError(null);

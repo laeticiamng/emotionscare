@@ -11,10 +11,11 @@ export interface Notification {
   type: string;
   read: boolean;
   created_at: string;
-  createdAt?: string; // For backward compatibility
+  createdAt?: string; // Pour la rétrocompatibilité
   priority?: 'low' | 'medium' | 'high';
   actionUrl?: string;
   image?: string;
 }
 
-export type NotificationType = string;
+// Définir NotificationType pour inclure tous les types possibles
+export type NotificationType = string | 'system' | 'emotion' | 'badge';

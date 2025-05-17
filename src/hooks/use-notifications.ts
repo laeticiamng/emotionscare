@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { 
   Notification,
@@ -36,7 +37,7 @@ export function useNotifications() {
           id: '3',
           title: 'Badge débloqué',
           message: 'Félicitations ! Vous avez débloqué le badge "Régularité"',
-          type: 'badge', // Using string as per updated NotificationType
+          type: 'badge', 
           read: false,
           created_at: new Date(Date.now() - 172800000).toISOString(),
         }

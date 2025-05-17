@@ -9,7 +9,7 @@ const UserSettings = () => {
   const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('theme');
 
-  // Properly cast the theme to ensure type compatibility
+  // Utiliser un cast pour s'assurer de la compatibilité des types
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme);
   };
@@ -28,7 +28,7 @@ const UserSettings = () => {
         
         <TabsContent value="theme">
           <ThemeSettingsTab 
-            currentTheme={theme} 
+            currentTheme={theme as Theme}
             onThemeChange={handleThemeChange} 
           />
         </TabsContent>

@@ -1,31 +1,46 @@
 
-// Update TeamOverviewProps to include all required properties
-export interface TeamOverviewProps {
-  userId?: string;
-  period?: string;
-  anonymized?: boolean;
-  className?: string;
-  dateRange?: [Date, Date];
-  users?: any[];
-  showNames?: boolean;
-  compact?: boolean;
+export interface EmotionScan {
+  id: string;
+  userId: string;
+  timestamp: string;
+  primaryEmotion: string;
+  score: number;
+  emotions: Record<string, number>;
+  audioUrl?: string;
+  transcription?: string;
 }
 
-export interface EmotionResult {
-  id?: string;
-  userId?: string;
-  user_id?: string; // Added for compatibility
-  emotion?: string;
-  intensity?: number;
-  timestamp?: string | Date;
-  source?: string;
-  context?: string;
-  tags?: string[];
-  notes?: string;
-  category?: string;
-  score?: number;
-  feedback?: string;
-  ai_feedback?: string;
-  confidence?: number;
-  recommendations?: string[];
+export interface EmotionGamificationStats {
+  total_scans: number;
+  streak_days: number;
+  points: number;
+  level: number;
+  next_milestone: number;
+  badges_earned: string[];
+  highest_emotion: string;
+  emotional_balance: number;
+}
+
+export interface ScanHistoryEntry {
+  id: string;
+  date: string;
+  emotion: string;
+  score: number;
+}
+
+export interface EmotionSnapshot {
+  emotion: string;
+  percentage: number;
+  color: string;
+}
+
+export interface EmotionTrend {
+  date: string;
+  joy?: number;
+  sadness?: number;
+  anger?: number;
+  fear?: number;
+  disgust?: number;
+  surprise?: number;
+  [key: string]: string | number | undefined;
 }

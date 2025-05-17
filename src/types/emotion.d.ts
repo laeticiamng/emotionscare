@@ -1,33 +1,56 @@
 
+export interface EmotionValues {
+  joy?: number;
+  calm?: number;
+  sadness?: number;
+  anxiety?: number;
+  anger?: number;
+  fear?: number;
+  surprise?: number;
+  disgust?: number;
+  neutral?: number;
+  [key: string]: number | undefined;
+}
+
 export interface EmotionResult {
   id: string;
   user_id: string;
   date: string;
-  emotion: string;
-  score: number;
-  confidence: number;
-  intensity?: number;
+  score?: number;
+  emojis?: string;
   text?: string;
-  feedback?: string;
-  transcript?: string;
-  timestamp?: string | Date;
+  audio_url?: string;
+  ai_feedback?: string;
+  primary_emotion?: string;
+  emotions?: EmotionValues;
 }
 
-export interface EmotionScanResult {
-  emotion: string;
-  score: number;
-  confidence?: number;
-  intensity?: number;
-  feedback?: string;
+export interface LiveVoiceScannerProps {
+  onResult?: (result: EmotionResult) => void;
+  onFinish?: () => void;
+  automaticMode?: boolean;
+  instruction?: string;
+  buttonText?: string;
 }
 
-export interface EmotionFeedbackProps {
-  result: EmotionResult;
-  onSaveFeedback?: (feedback: string) => void;
+export interface TeamOverviewProps {
+  teamId: string;
 }
 
-export interface EmotionHistoryProps {
-  userId?: string;
-  limit?: number;
-  showDetails?: boolean;
+export interface EmotionalTeamViewProps {
+  teamId: string;
+  period?: 'day' | 'week' | 'month';
 }
+
+export type Emotion = 
+  'joy' | 
+  'sadness' | 
+  'anger' | 
+  'fear' | 
+  'disgust' | 
+  'surprise' | 
+  'trust' | 
+  'anticipation' |
+  'calm' |
+  'anxiety' |
+  'neutral';
