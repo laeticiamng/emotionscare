@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { EmotionResult } from '@/types/emotion';
 
 interface AudioProcessorProps {
@@ -76,7 +76,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
         emojis: getEmojisForEmotion(randomEmotion),
         feedback: "Your voice analysis reveals aspects of your emotional state. Consider how this aligns with your self-perception.",
         recommendations: getRecommendationsForEmotion(randomEmotion),
-        source: 'audio' // Ajout de la propriété source
+        source: 'audio'
       };
       
       console.log('Emotion result:', emotionResult);

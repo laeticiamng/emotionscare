@@ -135,22 +135,19 @@ function dispatch(action: Action) {
   });
 }
 
-// Fixed: Properly type the toast function to return an object with dismiss method
+// Fixed: Correctly type the toast function
 export function toast(props: ToastOptions) {
-  // Call sonner toast with appropriate arguments and return its result
-  const title = props.title || "";
-  const options = {
-    description: props.description,
-    action: props.action,
-    duration: props.duration,
-    ...(props.variant && { variant: props.variant })
-  };
+  const { title = "", description, action, duration, variant } = props;
   
-  // Return the result from sonner toast
-  return sonnerToast(title, options);
+  return sonnerToast(title, {
+    description,
+    action,
+    duration,
+    ...(variant ? { variant } : {})
+  });
 }
 
-// Add missing helper toast methods for common variants
+// Helper toast methods for common variants
 export function error(props: Omit<ToastOptions, 'variant'>) {
   return toast({ ...props, variant: 'destructive' });
 }
@@ -192,4 +189,6 @@ export function useToast() {
 }
 
 export { Toaster } from "@/components/ui/sonner";
+
+// Re-export toast types
 export type { Toast, ToastProps, ToastActionElement, ToastOptions } from "@/types/toast";
