@@ -3,16 +3,9 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  image?: string;
-  imageUrl?: string;
-  unlocked: boolean;
-  achieved?: boolean;
-  earnedAt?: string;
-  earned?: boolean;
+  icon: string;
   category: string;
-  icon?: string | React.ReactNode;
-  level?: number;
-  progress?: number;
-  threshold?: number;
-  tier?: string;
+  dateEarned?: string;
+  type?: string;
+  rarity?: string;
 }

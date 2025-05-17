@@ -13,8 +13,7 @@ import {
   ArcElement,
   Title, 
   Tooltip, 
-  Legend,
-  ChartOptions
+  Legend
 } from 'chart.js';
 import { Button } from '@/components/ui/button';
 import { Download, RefreshCw } from 'lucide-react';
@@ -117,7 +116,6 @@ const ApiUsageMonitor: React.FC<ApiUsageMonitorProps> = ({ onRefresh }) => {
     if (onRefresh) {
       onRefresh();
     } else {
-      // Recharger les données
       setUsageData([]);
       setStats(null);
       setPeriod(period); // Déclenche le useEffect
@@ -191,7 +189,7 @@ const ApiUsageMonitor: React.FC<ApiUsageMonitorProps> = ({ onRefresh }) => {
   };
   
   // Options communes aux graphiques
-  const chartOptions: ChartOptions<'line' | 'bar' | 'pie'> = {
+  const chartOptions = {
     responsive: true,
     plugins: {
       legend: {
@@ -201,7 +199,7 @@ const ApiUsageMonitor: React.FC<ApiUsageMonitorProps> = ({ onRefresh }) => {
         display: false
       },
       tooltip: {
-        mode: 'index',
+        mode: 'index' as const,
         intersect: false,
       }
     },
@@ -278,56 +276,13 @@ const ApiUsageMonitor: React.FC<ApiUsageMonitorProps> = ({ onRefresh }) => {
               </TabsList>
               <TabsContent value="timeline">
                 <div className="h-[400px] mt-4">
-                  <Line 
-                    data={lineChartData} 
-                    options={{
-                      ...chartOptions,
-                      scales: {
-                        y: {
-                          beginAtZero: true,
-                          title: {
-                            display: true,
-                            text: 'Nombre d\'appels'
-                          }
-                        },
-                        x: {
-                          title: {
-                            display: true,
-                            text: 'Date'
-                          }
-                        }
-                      }
-                    }}
-                  />
+                  <Line data={lineChartData} options={chartOptions} />
                 </div>
               </TabsContent>
               <TabsContent value="distribution">
-                <div className="h-[400px] mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-sm font-medium text-center mb-4">Répartition des appels API</h3>
+                <div className="h-[400px] flex justify-center items-center mt-4">
+                  <div className="w-1/2 h-full">
                     <Pie data={pieChartData} options={chartOptions} />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-center mb-4">Appels par API</h3>
-                    <Bar 
-                      data={{
-                        labels: pieChartData.labels,
-                        datasets: [{
-                          label: 'Nombre d\'appels',
-                          data: pieChartData.datasets[0].data,
-                          backgroundColor: pieChartData.datasets[0].backgroundColor
-                        }]
-                      }} 
-                      options={{
-                        ...chartOptions,
-                        indexAxis: 'y' as const,
-                        scales: {
-                          x: {
-                            beginAtZero: true,
-                          }
-                        }
-                      }} 
-                    />
                   </div>
                 </div>
               </TabsContent>

@@ -1,170 +1,250 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { User } from '@/types/user';
-import { UserPreferences } from '@/types/preferences';
-import { NotificationType } from '@/types/notification';
-import DisplayPreferences from './DisplayPreferences';
-import NotificationPreferencesComponent from './NotificationPreferences';
-import PrivacyPreferences from './PrivacyPreferences';
-import { useAuth } from '@/contexts/AuthContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useUserPreferences } from '@/contexts/UserPreferencesContext';
+import { FontSize, FontFamily, UserPreferences } from '@/types/preferences';
 
 interface PreferencesFormProps {
-  user: User;
-  onPreferencesSave?: (preferences: UserPreferences) => void;
   className?: string;
 }
 
-const PreferencesForm: React.FC<PreferencesFormProps> = ({
-  user,
-  onPreferencesSave,
-  className = ''
-}) => {
-  const { toast } = useToast();
-  const auth = useAuth();
-  const [activeTab, setActiveTab] = useState('display');
-  
-  const defaultPreferences: UserPreferences = {
-    theme: 'system',
-    fontSize: 'medium',
-    fontFamily: 'system',
-    reduceMotion: false,
-    colorBlindMode: false,
-    autoplayMedia: true,
-    soundEnabled: true,
-    notifications: {
-      enabled: true,
-      emailEnabled: true,
-      pushEnabled: true,
-      inAppEnabled: true,
-      types: {
-        system: true,
-        emotion: true,
-        coach: true,
-        journal: true,
-        community: true,
-        achievement: true,
-        badge: true,
-        challenge: true,
-        reminder: true,
-        info: true,
-        warning: true,
-        error: true,
-        success: true,
-        streak: true,
-        urgent: true
-      },
-      frequency: 'immediate',
-    },
-    privacy: {
-      shareData: true,
-      anonymizeReports: false,
-      profileVisibility: 'public',
-      anonymousMode: false
-    },
-    privacyLevel: 'balanced',
-  };
-  
-  const [preferences, setPreferences] = useState<UserPreferences>(
-    () => user.preferences || defaultPreferences
-  );
+const PreferencesForm: React.FC<PreferencesFormProps> = ({ className }) => {
+  const { preferences, updatePreferences } = useUserPreferences();
+  const [formValues, setFormValues] = useState<UserPreferences>(preferences);
 
-  const handlePreferencesChange = (newPartialPreferences: Partial<UserPreferences>) => {
-    setPreferences(prev => ({
+  const handleThemeChange = (theme: 'light' | 'dark' | 'system' | 'pastel') => {
+    setFormValues(prev => ({ ...prev, theme }));
+  };
+
+  const handleFontSizeChange = (fontSize: FontSize) => {
+    setFormValues(prev => ({ ...prev, fontSize }));
+  };
+
+  const handleFontFamilyChange = (fontFamily: FontFamily) => {
+    setFormValues(prev => ({ ...prev, fontFamily }));
+  };
+
+  const handleToggleChange = (key: keyof UserPreferences, value: boolean) => {
+    setFormValues(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handlePrivacyChange = (key: string, value: boolean) => {
+    setFormValues(prev => ({
       ...prev,
-      ...newPartialPreferences,
+      privacy: {
+        ...prev.privacy,
+        [key]: value
+      }
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      // Call the save function if provided
-      if (onPreferencesSave) {
-        onPreferencesSave(preferences);
-      } 
-      // Or use the context update function if available
-      else if (auth.updateUser) {
-        await auth.updateUser({
-          ...user,
-          preferences,
-          role: user.role || 'b2c', // Ensure role is always defined
-        });
-      }
-
-      toast({
-        title: 'Préférences mises à jour',
-        description: 'Vos préférences ont été enregistrées avec succès.',
-        variant: 'success',
-      });
-    } catch (error) {
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de mettre à jour vos préférences.',
-        variant: 'destructive',
-      });
+  const handleNotificationChange = (key: string, value: boolean) => {
+    if (key === 'enabled' || key === 'emailEnabled' || key === 'pushEnabled' || key === 'inAppEnabled') {
+      setFormValues(prev => ({
+        ...prev,
+        notifications: {
+          ...prev.notifications,
+          [key]: value
+        }
+      }));
+    } else {
+      setFormValues(prev => ({
+        ...prev,
+        notifications: {
+          ...prev.notifications,
+          types: {
+            ...prev.notifications.types,
+            [key]: value
+          }
+        }
+      }));
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className={className}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Préférences utilisateur</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-6">
-              <TabsTrigger value="display">Affichage</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
-            </TabsList>
-            <TabsContent value="display">
-              <DisplayPreferences
-                preferences={preferences}
-                onChange={handlePreferencesChange}
-              />
-            </TabsContent>
-            <TabsContent value="notifications">
-              <NotificationPreferencesComponent
-                preferences={preferences.notifications || {
-                  enabled: false,
-                  types: {
-                    system: false,
-                    emotion: false,
-                    coach: false,
-                    journal: false,
-                    community: false
-                  },
-                  frequency: 'daily'
-                }}
-                onUpdate={(notifPrefs) => 
-                  handlePreferencesChange({ notifications: notifPrefs })
-                }
-              />
-            </TabsContent>
-            <TabsContent value="privacy">
-              <PrivacyPreferences
-                preferences={preferences}
-                onChange={handlePreferencesChange}
-              />
-            </TabsContent>
-          </Tabs>
+  const handleSave = () => {
+    updatePreferences(formValues);
+    // Afficher une notification de succès
+  };
 
-          <div className="mt-6 flex justify-end gap-2">
-            <Button variant="outline" type="button">
-              Annuler
-            </Button>
-            <Button type="submit">
-              Enregistrer les préférences
-            </Button>
+  return (
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle>Préférences</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Préférences d'affichage */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Affichage</h3>
+          
+          <div className="space-y-2">
+            <Label htmlFor="theme">Thème</Label>
+            <Select value={formValues.theme} onValueChange={(value: any) => handleThemeChange(value)}>
+              <SelectTrigger id="theme">
+                <SelectValue placeholder="Sélectionner un thème" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">Clair</SelectItem>
+                <SelectItem value="dark">Sombre</SelectItem>
+                <SelectItem value="system">Système</SelectItem>
+                <SelectItem value="pastel">Pastel</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </CardContent>
-      </Card>
-    </form>
+          
+          <div className="space-y-2">
+            <Label htmlFor="fontSize">Taille de police</Label>
+            <Select value={formValues.fontSize} onValueChange={(value: any) => handleFontSizeChange(value)}>
+              <SelectTrigger id="fontSize">
+                <SelectValue placeholder="Sélectionner une taille" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="small">Petite</SelectItem>
+                <SelectItem value="medium">Moyenne</SelectItem>
+                <SelectItem value="large">Grande</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="fontFamily">Police</Label>
+            <Select value={formValues.fontFamily} onValueChange={(value: any) => handleFontFamilyChange(value)}>
+              <SelectTrigger id="fontFamily">
+                <SelectValue placeholder="Sélectionner une police" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="system">Système</SelectItem>
+                <SelectItem value="serif">Serif</SelectItem>
+                <SelectItem value="mono">Monospace</SelectItem>
+                <SelectItem value="sans">Sans-serif</SelectItem>
+                <SelectItem value="inter">Inter</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="reduceMotion">Réduire les animations</Label>
+            <Switch 
+              id="reduceMotion" 
+              checked={formValues.reduceMotion}
+              onCheckedChange={(checked) => handleToggleChange('reduceMotion', checked)} 
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="colorBlindMode">Mode daltonien</Label>
+            <Switch 
+              id="colorBlindMode" 
+              checked={formValues.colorBlindMode}
+              onCheckedChange={(checked) => handleToggleChange('colorBlindMode', checked)} 
+            />
+          </div>
+        </div>
+        
+        {/* Préférences de confidentialité */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Confidentialité</h3>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="shareData">Partager les données anonymisées</Label>
+            <Switch 
+              id="shareData" 
+              checked={formValues.privacy.shareData}
+              onCheckedChange={(checked) => handlePrivacyChange('shareData', checked)} 
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="anonymizeReports">Anonymiser les rapports</Label>
+            <Switch 
+              id="anonymizeReports" 
+              checked={formValues.privacy.anonymizeReports}
+              onCheckedChange={(checked) => handlePrivacyChange('anonymizeReports', checked)} 
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="profileVisibility">Visibilité du profil</Label>
+            <Select 
+              value={formValues.privacy.profileVisibility} 
+              onValueChange={(value: any) => {
+                setFormValues(prev => ({
+                  ...prev,
+                  privacy: {
+                    ...prev.privacy,
+                    profileVisibility: value
+                  }
+                }));
+              }}
+            >
+              <SelectTrigger id="profileVisibility">
+                <SelectValue placeholder="Sélectionner la visibilité" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="public">Public</SelectItem>
+                <SelectItem value="team">Équipe uniquement</SelectItem>
+                <SelectItem value="private">Privé</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="anonymousMode">Mode anonyme</Label>
+            <Switch 
+              id="anonymousMode" 
+              checked={formValues.privacy.anonymousMode || false}
+              onCheckedChange={(checked) => handlePrivacyChange('anonymousMode', checked)} 
+            />
+          </div>
+        </div>
+        
+        {/* Préférences de notification */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Notifications</h3>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="notificationsEnabled">Activer les notifications</Label>
+            <Switch 
+              id="notificationsEnabled" 
+              checked={formValues.notifications.enabled}
+              onCheckedChange={(checked) => handleNotificationChange('enabled', checked)} 
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="emailEnabled">Notifications par email</Label>
+            <Switch 
+              id="emailEnabled" 
+              checked={formValues.notifications.emailEnabled}
+              onCheckedChange={(checked) => handleNotificationChange('emailEnabled', checked)} 
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="pushEnabled">Notifications push</Label>
+            <Switch 
+              id="pushEnabled" 
+              checked={formValues.notifications.pushEnabled}
+              onCheckedChange={(checked) => handleNotificationChange('pushEnabled', checked)} 
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <Label htmlFor="inAppEnabled">Notifications dans l'application</Label>
+            <Switch 
+              id="inAppEnabled" 
+              checked={formValues.notifications.inAppEnabled}
+              onCheckedChange={(checked) => handleNotificationChange('inAppEnabled', checked)} 
+            />
+          </div>
+        </div>
+        
+        <Button onClick={handleSave} className="w-full">Enregistrer les préférences</Button>
+      </CardContent>
+    </Card>
   );
 };
 

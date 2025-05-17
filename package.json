@@ -50,6 +50,7 @@
     "@types/file-saver": "^2.0.5",
     "@types/uuid": "^10.0.0",
     "canvas-confetti": "^1.9.2",
+    "chart.js": "^4.4.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",

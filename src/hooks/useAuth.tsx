@@ -1,168 +1,131 @@
 
-import { useState, useEffect, createContext, useContext } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { User } from '@/types/user';
 
-// Mock user data for development
-const mockUserData = {
-  id: '123',
-  name: 'Demo User',
-  email: 'demo@emotionscare.app',
-  role: 'user' as const,
-  created_at: new Date().toISOString(),
-  preferences: {
-    theme: 'system',
-    fontSize: 'medium',
-    fontFamily: 'system',
-    reduceMotion: false,
-    colorBlindMode: false,
-    autoplayMedia: true,
-    soundEnabled: true,
-    notifications: {
-      email: true,
-      push: true,
-      sms: false,
-      frequency: 'daily'
-    }
-  }
-};
-
-// Auth context
-const AuthContext = createContext<{
-  user: typeof mockUserData | null;
+interface AuthContextType {
+  user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  error: Error | null;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  register: (name: string, email: string, password: string) => Promise<void>;
-}>({
-  user: null,
-  isAuthenticated: false,
-  isLoading: false,
-  error: null,
-  login: async () => {},
-  logout: () => {},
-  register: async () => {},
-});
+  logout: () => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
+}
 
-// Auth provider component
+const mockUser: User = {
+  id: "user-001",
+  email: "user@example.com",
+  name: "John Doe",
+  role: "user",
+  createdAt: new Date().toISOString(),
+  isActive: true
+};
+
+// Création du contexte
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Hook personnalisé pour utiliser le contexte
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
+
+// Provider component
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<typeof mockUserData | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  
-  // Simulate loading user data on initial load
+
   useEffect(() => {
-    const checkAuth = async () => {
-      setIsLoading(true);
+    // Simulation de chargement initial des données utilisateur
+    const checkAuthStatus = async () => {
       try {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // For development, always load the mock user
-        // In production, this would check session/token validity
-        const hasSession = localStorage.getItem('auth_session');
-        
-        if (hasSession) {
-          setUser(mockUserData);
-        } else {
-          setUser(null);
+        // Dans une vraie application, vérifier le token JWT
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
         }
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Authentication failed'));
+      } catch (error) {
+        console.error('Error checking auth status:', error);
         setUser(null);
       } finally {
         setIsLoading(false);
       }
     };
     
-    checkAuth();
+    checkAuthStatus();
   }, []);
-  
-  // Mock login function
+
+  // Fonction de connexion
   const login = async (email: string, password: string) => {
     setIsLoading(true);
-    setError(null);
-    
     try {
-      // Simulate API call
+      // Simule une requête API
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Set mock data and session
-      setUser(mockUserData);
-      localStorage.setItem('auth_session', 'mock_token');
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Login failed'));
-      throw err;
+      // Dans une vraie application, appeler l'API d'authentification
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
-  
-  // Mock logout function
-  const logout = () => {
-    localStorage.removeItem('auth_session');
-    setUser(null);
-  };
-  
-  // Mock register function
-  const register = async (name: string, email: string, password: string) => {
+
+  // Fonction de déconnexion
+  const logout = async () => {
     setIsLoading(true);
-    setError(null);
-    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Simule une requête API
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Create new user (would come from API in production)
+      // Dans une vraie application, appeler l'API de déconnexion
+      setUser(null);
+      localStorage.removeItem('user');
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fonction d'inscription
+  const register = async (email: string, password: string, name: string) => {
+    setIsLoading(true);
+    try {
+      // Simule une requête API
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Dans une vraie application, appeler l'API d'inscription
       const newUser = {
-        ...mockUserData,
-        id: `user-${Date.now()}`,
-        name,
+        ...mockUser,
         email,
-        created_at: new Date().toISOString(),
-        preferences: {
-          theme: 'system',
-          fontSize: 'medium',
-          fontFamily: 'system',
-          reduceMotion: false,
-          colorBlindMode: false,
-          autoplayMedia: true,
-          soundEnabled: true,
-          notifications: {
-            email: true,
-            push: true,
-            sms: false,
-            frequency: 'daily'
-          }
-        }
+        name
       };
       
       setUser(newUser);
-      localStorage.setItem('auth_session', 'mock_token');
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Registration failed'));
-      throw err;
+      localStorage.setItem('user', JSON.stringify(newUser));
+    } catch (error) {
+      console.error('Register error:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
   };
-  
-  return (
-    <AuthContext.Provider value={{
-      user,
-      isAuthenticated: !!user,
-      isLoading,
-      error,
-      login,
-      logout,
-      register
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
 
-// Hook for using the auth context
-export const useAuth = () => useContext(AuthContext);
+  const value = {
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    login,
+    logout,
+    register
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
 
 export default useAuth;

@@ -1,29 +1,32 @@
 
-import * as React from "react"
+import * as React from "react";
+import { type VariantProps } from "class-variance-authority";
 
-export type ToastProps = {
-  id?: string
-  className?: string
-  title?: React.ReactNode
-  description?: React.ReactNode
-  action?: React.ReactElement
-  variant?: "default" | "destructive" | "success" | "warning" | "info"
-  duration?: number
-  onOpenChange?: (open: boolean) => void
+interface ToastProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof toastVariants> {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export type Toast = {
-  id: string
-  title?: React.ReactNode
-  description?: React.ReactNode
-  action?: React.ReactElement
-  variant?: "default" | "destructive" | "success" | "warning" | "info"
-  duration?: number
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
+type ToastActionElement = React.ReactElement<any, string | React.JSXElementConstructor<any>>;
+
+interface Toast {
+  id: string;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: ToastActionElement;
+  variant?: 'default' | 'destructive';
 }
 
-export interface ToastActionElement extends React.ReactElement {
-  altText?: string
-  onClick?: () => void
+interface ToastOptions {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: ToastActionElement;
+  variant?: 'default' | 'destructive';
 }
+
+export type {
+  Toast,
+  ToastProps,
+  ToastActionElement,
+  ToastOptions,
+};

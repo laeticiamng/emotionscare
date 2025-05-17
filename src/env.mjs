@@ -1,10 +1,38 @@
 
+/**
+ * Environnement centralisé
+ * 
+ * Ce fichier gère les variables d'environnement avec validation
+ */
+
 export const env = {
+  // URL API
+  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://api.example.com',
+  
+  // Clés d'API
   NEXT_PUBLIC_OPENAI_API_KEY: process.env.NEXT_PUBLIC_OPENAI_API_KEY || '',
-  NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV || 'development',
-  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
-  NEXT_PUBLIC_WEB_URL: process.env.NEXT_PUBLIC_WEB_URL || 'http://localhost:3000',
-  // Add any other environment variables you need here
+  NEXT_PUBLIC_HUME_API_KEY: process.env.NEXT_PUBLIC_HUME_API_KEY || '',
+  
+  // Configuration du serveur
+  NODE_ENV: process.env.NODE_ENV || 'development'
 };
 
-export default env;
+// Validation simple en mode développement
+if (env.NODE_ENV === 'development') {
+  checkEnvVars();
+}
+
+function checkEnvVars() {
+  const requiredVars = [
+    'NEXT_PUBLIC_API_URL'
+  ];
+  
+  const missingVars = requiredVars.filter(key => !env[key]);
+  
+  if (missingVars.length > 0) {
+    console.warn(
+      `⚠️  Missing environment variables: ${missingVars.join(', ')}\n` +
+      `Create a .env.local file with the required variables.`
+    );
+  }
+}

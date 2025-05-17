@@ -9,7 +9,7 @@
 import useOpenAI from './useOpenAI';
 import useWhisper from './useWhisper';
 import useMusicGen from './useMusicGen';
-import useDalle from './useDalle';
+import useDalle from './useOpenAI';
 import useHumeAI from './useHumeAI';
 
 // Export individuel pour import sélectif

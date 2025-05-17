@@ -2,29 +2,16 @@
 export interface AudioTrack {
   id: string;
   title: string;
-  description?: string;
   artist?: string;
-  album?: string;
+  description?: string;
   duration: number;
   url: string;
-  coverImage?: string;
-  category?: string;
-  mood?: string | string[];
-  bpm?: number;
-  tags?: string[];
-  year?: number;
-  isDefaultTrack?: boolean;
-  isFavorite?: boolean;
-  source?: 'library' | 'spotify' | 'apple_music' | 'generated' | string;
-  lastPlayed?: string;
-  playCount?: number;
-  trackAnalysis?: {
-    emotion?: string;
-    energy?: number;
-    danceability?: number;
-    acousticness?: number;
-  };
   audioUrl?: string;
+  coverUrl?: string;
+  category?: string;
+  mood?: string;
+  tags?: string[];
+  source?: string;
 }
 
 export interface AudioPlayerState {
