@@ -7,7 +7,6 @@ export interface MusicTrack {
   url?: string;
   audioUrl?: string;
   emotion?: string;
-  // Add track_url for compatibility
   track_url?: string;
   coverUrl?: string;
   coverImage?: string;
@@ -16,7 +15,7 @@ export interface MusicTrack {
 
 export interface MusicPlaylist {
   id: string;
-  title?: string;
+  title: string;
   name?: string;
   description?: string;
   emotion?: string;

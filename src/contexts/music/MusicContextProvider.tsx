@@ -13,6 +13,7 @@ const MusicContext = createContext<MusicContextType>({
   playlist: [],
   currentPlaylist: {
     id: 'empty',
+    title: 'Empty Playlist',
     tracks: []
   },
   togglePlay: () => {},
@@ -45,6 +46,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [currentEmotion, setCurrentEmotion] = useState<string | undefined>(undefined);
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist>({
     id: 'default',
+    title: 'Default Playlist',
     tracks: []
   });
   
