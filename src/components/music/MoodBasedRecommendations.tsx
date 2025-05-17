@@ -17,7 +17,7 @@ const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({
   intensity = 0.5,
   standalone = false
 }) => {
-  // This function now explicitly returns a JSX.Element
+  // Cette fonction retourne explicitement un JSX.Element
   const renderRecommendation = (): JSX.Element => {
     switch (mood) {
       case 'calm':

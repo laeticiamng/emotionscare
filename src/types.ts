@@ -76,3 +76,12 @@ export type {
   TeamOverviewProps,
   EmotionalTeamViewProps
 } from './types/emotions';
+
+export type {
+  JournalEntry
+} from './types/journal';
+
+export type {
+  VRSessionTemplate,
+  VRSession
+} from './types/vr';

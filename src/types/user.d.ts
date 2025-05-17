@@ -43,18 +43,22 @@ export interface UserWithStatus {
 }
 
 export interface UserPreferences {
-  theme?: string;
-  fontSize?: string;
-  fontFamily?: string;
+  theme?: 'light' | 'dark' | 'system' | 'pastel';
+  fontSize?: 'small' | 'medium' | 'large';
+  fontFamily?: 'system' | 'serif' | 'mono' | 'sans';
   useSystemTheme?: boolean;
   highContrast?: boolean;
   reducedMotion?: boolean;
+  reduceMotion?: boolean;
+  colorBlindMode?: boolean;
   soundEffects?: boolean;
+  soundEnabled?: boolean;
   language?: string;
   timeZone?: string;
   dateFormat?: string;
   notifications_enabled?: boolean;
   email_notifications?: boolean;
+  autoplayMedia?: boolean;
   
   // Properties used in the application
   notifications?: {
@@ -77,10 +81,4 @@ export interface UserPreferences {
     anonymizeReports?: boolean;
     profileVisibility?: string;
   };
-  
-  // Additional properties needed by preferences components
-  reduceMotion?: boolean;
-  colorBlindMode?: boolean;
-  autoplayMedia?: boolean;
-  soundEnabled?: boolean;
 }

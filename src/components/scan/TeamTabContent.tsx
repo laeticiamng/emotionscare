@@ -1,177 +1,205 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
-import { CalendarIcon } from "lucide-react"
-import { format } from 'date-fns';
-import { enUS, fr } from 'date-fns/locale';
-import { DateRange } from "react-day-picker";
-import { cn } from "@/lib/utils";
-import TeamOverview from './TeamOverview';
-import { User } from '@/types';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { MoreVertical, ArrowDown, ArrowUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { useAuth } from '@/contexts/AuthContext';
 
 interface TeamTabContentProps {
-  users: User[];
+  teamId: string;
 }
 
-const TeamTabContent: React.FC<TeamTabContentProps> = ({ users }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [emotionalThreshold, setEmotionalThreshold] = useState<number[]>([0, 100]);
-  const [periodFilter, setPeriodFilter] = useState<string>('7');
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: new Date(new Date().setDate(new Date().getDate() - 7)),
-    to: new Date(),
-  });
-  const [filteredUsers, setFilteredUsers] = useState<User[]>(users);
+interface Member {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  emotional_score?: number;
+  department?: string;
+  position?: string;
+}
 
+const TeamTabContent: React.FC<TeamTabContentProps> = ({ teamId }) => {
+  const [members, setMembers] = useState<Member[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const { user } = useAuth();
+  
   useEffect(() => {
-    applyFilters();
-  }, [searchQuery, emotionalThreshold, periodFilter, dateRange, users]);
-
-  const applyFilters = () => {
-    let filtered = users.filter(user => {
-      const searchMatch = user.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const emotionalScore = user.emotionalScore || 0;
-      const thresholdMatch = emotionalScore >= emotionalThreshold[0] && emotionalScore <= emotionalThreshold[1];
-
-      return searchMatch && thresholdMatch;
-    });
-
-    setFilteredUsers(filtered);
+    // Simuler le chargement des membres de l'équipe
+    const loadTeamMembers = async () => {
+      setIsLoading(true);
+      try {
+        // Simuler une requête API
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Données simulées
+        const mockMembers: Member[] = [
+          {
+            id: '1',
+            name: 'Alice Dubois',
+            email: 'alice.dubois@example.com',
+            avatarUrl: 'https://i.pravatar.cc/150?img=1',
+            emotional_score: 75,
+            department: 'Marketing',
+            position: 'Chef de projet'
+          },
+          {
+            id: '2',
+            name: 'Bob Martin',
+            email: 'bob.martin@example.com',
+            avatarUrl: 'https://i.pravatar.cc/150?img=2',
+            emotional_score: 62,
+            department: 'Ventes',
+            position: 'Commercial'
+          },
+          {
+            id: '3',
+            name: 'Charlie Dupont',
+            email: 'charlie.dupont@example.com',
+            avatarUrl: 'https://i.pravatar.cc/150?img=3',
+            emotional_score: 88,
+            department: 'IT',
+            position: 'Développeur'
+          },
+          {
+            id: '4',
+            name: 'Diana Leclerc',
+            email: 'diana.leclerc@example.com',
+            avatarUrl: 'https://i.pravatar.cc/150?img=4',
+            emotional_score: 92,
+            department: 'RH',
+            position: 'Responsable RH'
+          },
+          {
+            id: '5',
+            name: 'Eva Garcia',
+            email: 'eva.garcia@example.com',
+            avatarUrl: 'https://i.pravatar.cc/150?img=5',
+            emotional_score: 55,
+            department: 'Finance',
+            position: 'Analyste financier'
+          },
+        ];
+        
+        setMembers(mockMembers);
+      } catch (error) {
+        console.error('Error loading team members:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadTeamMembers();
+  }, [teamId]);
+  
+  const toggleSortDirection = () => {
+    setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
   };
-
-  const handlePeriodChange = (period: string) => {
-    setPeriodFilter(period);
-    let fromDate;
-    switch (period) {
-      case '7':
-        fromDate = new Date(new Date().setDate(new Date().getDate() - 7));
-        break;
-      case '30':
-        fromDate = new Date(new Date().setDate(new Date().getDate() - 30));
-        break;
-      case '90':
-        fromDate = new Date(new Date().setDate(new Date().getDate() - 90));
-        break;
-      default:
-        fromDate = new Date(new Date().setDate(new Date().getDate() - 7));
-        break;
-    }
-    setDateRange({ from: fromDate, to: new Date() });
+  
+  const sortedMembers = [...members].sort((a, b) => {
+    // Utilisez emotional_score au lieu de emotionalScore
+    const scoreA = a.emotional_score || 0;
+    const scoreB = b.emotional_score || 0;
+    return sortDirection === 'asc' ? scoreA - scoreB : scoreB - scoreA;
+  });
+  
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
-
-  // Convert dateRange to [Date, Date] format for TeamOverview
-  const getDateRangeArray = (): [Date, Date] | undefined => {
-    if (dateRange?.from && dateRange?.to) {
-      return [dateRange.from, dateRange.to];
-    }
-    return undefined;
-  };
-
+  
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Filtrer les membres de l'équipe</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="search">Rechercher par nom</Label>
-              <Input
-                type="search"
-                id="search"
-                placeholder="Rechercher un membre..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label>Score émotionnel</Label>
-              <div className="flex items-center space-x-2">
-                <span>{emotionalThreshold[0]}</span>
-                <Slider
-                  value={emotionalThreshold}
-                  onValueChange={setEmotionalThreshold}
-                  max={100}
-                  step={1}
-                />
-                <span>{emotionalThreshold[1]}</span>
+    <Card>
+      <CardHeader>
+        <CardTitle>Membres de l'équipe</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="grid gap-4">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center space-x-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
               </div>
-            </div>
+            ))}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label>Période</Label>
-              <Select value={periodFilter} onValueChange={handlePeriodChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sélectionner une période" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7">7 jours</SelectItem>
-                  <SelectItem value="30">30 jours</SelectItem>
-                  <SelectItem value="90">90 jours</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Date Range</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !dateRange?.from && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dateRange?.from ? (
-                      dateRange.to ? (
-                        <>
-                          {format(dateRange.from, "dd MMM yyyy", { locale: fr })} -{" "}
-                          {format(dateRange.to, "dd MMM yyyy", { locale: fr })}
-                        </>
-                      ) : (
-                        format(dateRange.from, "dd MMM yyyy", { locale: fr })
-                      )
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="center" side="bottom">
-                  <Calendar
-                    mode="range"
-                    defaultMonth={dateRange?.from}
-                    selected={dateRange}
-                    onSelect={setDateRange}
-                    numberOfMonths={2}
-                    locale={fr}
-                    pagedNavigation
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+        ) : (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[100px]">Nom</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>
+                    <Button variant="ghost" size="sm" onClick={toggleSortDirection}>
+                      Score Emotionnel
+                      {sortDirection === 'asc' ? <ArrowUp className="ml-2 h-4 w-4" /> : <ArrowDown className="ml-2 h-4 w-4" />}
+                    </Button>
+                  </TableHead>
+                  <TableHead>Département</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedMembers.map((member) => (
+                  <TableRow key={member.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center space-x-2">
+                        <Avatar>
+                          <AvatarImage src={member.avatarUrl} alt={member.name} />
+                          <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
+                        </Avatar>
+                        <span>{member.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{member.email}</TableCell>
+                    <TableCell>{member.emotional_score}</TableCell>
+                    <TableCell>{member.department}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Ouvrir le menu</span>
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>Voir le profil</DropdownMenuItem>
+                          <DropdownMenuItem>Envoyer un message</DropdownMenuItem>
+                          {user?.role === 'admin' && (
+                            <DropdownMenuItem>Supprimer de l'équipe</DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
-        </CardContent>
-      </Card>
-
-      <TeamOverview 
-        teamId="team-1" // Default team ID if none available
-        dateRange={getDateRangeArray()} 
-        users={filteredUsers} 
-        period={periodFilter} 
-        anonymized={false} 
-        showNames={true} 
-      />
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

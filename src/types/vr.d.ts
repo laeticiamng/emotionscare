@@ -4,52 +4,26 @@ export interface VRSessionTemplate {
   title: string;
   description: string;
   duration: number;
+  category: string;
   tags: string[];
-  emotionTarget?: string;
-  emotion_target?: string;
-  difficulty?: string;
-  benefits?: string[];
-  thumbnailUrl?: string;
   imageUrl?: string;
-  coverUrl?: string;
-  cover_url?: string;
-  category?: string;
-  theme?: string;
-  completionRate?: number;
-  completion_rate?: number;
-  recommendedMood?: string;
-  recommended_mood?: string;
-  emotion?: string;
-  is_audio_only?: boolean;
-  preview_url?: string;
-  audio_url?: string;
+  previewUrl?: string;
 }
 
 export interface VRSession {
   id: string;
-  template_id: string;
-  user_id: string;
-  date: string;
-  duration: number;
+  templateId: string;
+  userId: string;
+  startedAt: string;
+  endedAt?: string;
+  duration?: number;
   completed: boolean;
-  feedback?: string;
-  score?: number;
-  mood_before?: string;
-  mood_after?: string;
-}
-
-export interface VRHistoryListProps {
-  sessions: VRSession[];
-  onSelect: (session: VRSession) => void;
-}
-
-export interface VRSessionHistoryProps {
-  session: VRSession;
-  template: VRSessionTemplate;
-}
-
-export interface VRSessionWithMusicProps {
-  template: VRSessionTemplate;
-  onComplete: (feedback: string, score: number) => void;
-  onExit: () => void;
+  feedback?: {
+    rating: number;
+    comments?: string;
+  };
+  emotionalState?: {
+    before: string;
+    after: string;
+  };
 }

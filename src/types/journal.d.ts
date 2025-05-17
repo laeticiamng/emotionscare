@@ -1,13 +1,15 @@
 
 export interface JournalEntry {
   id: string;
-  date: string;
-  title?: string; // Making title optional
+  user_id?: string;
+  date: string | Date;
   content: string;
-  mood?: string | number;
-  text?: string;
-  ai_feedback?: string;
+  title?: string;
+  mood?: string;
   tags?: string[];
-  emotions?: string[];
-  mood_score?: number;
+  ai_feedback?: string;
+  emotion?: string;
+  intensity?: number;
+  sentiment_score?: number;
+  private?: boolean;
 }

@@ -7,9 +7,10 @@ export interface Story {
   emotion?: string;
   created_at: string;
   tags?: string[];
+  image?: string;
   date?: string;
   cta?: {
-    text: string;
+    label: string;
     link: string;
   };
 }

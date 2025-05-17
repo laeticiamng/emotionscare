@@ -1,68 +1,44 @@
 
-import { UserRole } from "@/types/user";
+import { UserRole } from '@/types/user';
 
-export function getRoleName(role: UserRole): string {
+export const getRoleName = (role?: UserRole): string => {
   switch (role) {
     case 'admin':
       return 'Administrateur';
+    case 'b2b_admin':
+      return 'Administrateur B2B';
+    case 'b2b_user':
+      return 'Utilisateur B2B';
+    case 'b2c':
+      return 'Utilisateur B2C';
+    case 'coach':
+      return 'Coach';
+    case 'therapist':
+      return 'Thérapeute';
     case 'user':
       return 'Utilisateur';
-    case 'b2b_user':
-    case 'b2b-user':
-      return 'Collaborateur';
-    case 'b2b_admin':
-    case 'b2b-admin':
-      return 'Admin Entreprise';
-    case 'b2c':
-      return 'Particulier';
-    case 'collaborator':
-      return 'Collaborateur';
     default:
-      return role;
+      return 'Utilisateur';
   }
-}
+};
 
-export function getRoleHomePath(role: UserRole): string {
+export const getRoleDescription = (role?: UserRole): string => {
   switch (role) {
     case 'admin':
-      return '/admin/dashboard';
-    case 'user':
-      return '/dashboard';
-    case 'b2b_user':
-    case 'b2b-user':
-      return '/b2b/user/dashboard';
+      return 'Accès complet à toutes les fonctionnalités';
     case 'b2b_admin':
-    case 'b2b-admin':
-      return '/b2b/admin/dashboard';
+      return 'Gestion des utilisateurs et des données de l\'entreprise';
+    case 'b2b_user':
+      return 'Accès aux fonctionnalités B2B standard';
     case 'b2c':
-      return '/b2c/dashboard';
-    case 'collaborator':
-      return '/collaborator/dashboard';
+      return 'Accès aux fonctionnalités personnelles';
+    case 'coach':
+      return 'Accompagnement et coaching des utilisateurs';
+    case 'therapist':
+      return 'Suivi thérapeutique des utilisateurs';
+    case 'user':
+      return 'Accès standard à l\'application';
     default:
-      return '/dashboard';
+      return 'Accès standard à l\'application';
   }
-}
-
-export function getRoleRoute(role: UserRole): string {
-  return getRoleHomePath(role);
-}
-
-export function isB2BUser(role?: UserRole): boolean {
-  return role === 'b2b_user' || role === 'b2b-user';
-}
-
-export function isB2BAdmin(role?: UserRole): boolean {
-  return role === 'b2b_admin' || role === 'b2b-admin';
-}
-
-export function isB2C(role?: UserRole): boolean {
-  return role === 'b2c';
-}
-
-export function isAdmin(role?: UserRole): boolean {
-  return role === 'admin';
-}
-
-export function isAdminRole(role?: UserRole): boolean {
-  return role === 'admin' || role === 'b2b_admin' || role === 'b2b-admin';
-}
+};
