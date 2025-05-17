@@ -1,9 +1,8 @@
 
-import React, { createContext, useState, useContext, useCallback } from 'react';
+import React, { createContext, useState, useContext, useRef, useCallback, useEffect } from 'react';
 import { AudioTrack, AudioPlayerState, AudioContextValue } from '@/types/audio';
 
-// Initial state
-const initialState: AudioPlayerState = {
+const defaultState: AudioPlayerState = {
   currentTrack: null,
   isPlaying: false,
   volume: 0.7,
@@ -12,12 +11,11 @@ const initialState: AudioPlayerState = {
   duration: 0,
   playlist: [],
   repeatMode: 'off',
-  shuffleMode: false,
+  shuffleMode: false
 };
 
-// Create context
-export const AudioContext = createContext<AudioContextValue>({
-  audioState: initialState,
+const AudioContext = createContext<AudioContextValue>({
+  audioState: defaultState,
   play: () => {},
   pause: () => {},
   stop: () => {},
@@ -31,32 +29,68 @@ export const AudioContext = createContext<AudioContextValue>({
   changeRepeatMode: () => {},
 });
 
-export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [audioState, setAudioState] = useState<AudioPlayerState>(initialState);
-  const audioRef = React.useRef<HTMLAudioElement | null>(null);
+export const useAudio = () => useContext(AudioContext);
 
-  React.useEffect(() => {
+export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [audioState, setAudioState] = useState<AudioPlayerState>(defaultState);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const intervalRef = useRef<number | null>(null);
+
+  // Initialise l'élément audio
+  useEffect(() => {
     audioRef.current = new Audio();
-    
+    audioRef.current.volume = audioState.volume;
+
+    // Nettoyage
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
-        audioRef.current = null;
+      }
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
       }
     };
   }, []);
 
-  const play = useCallback(() => {
-    if (audioRef.current && audioState.currentTrack) {
-      audioRef.current.play().catch(error => console.error("Error playing audio:", error));
-      setAudioState(prev => ({ ...prev, isPlaying: true }));
+  // Met à jour la progression de la lecture
+  const startProgressTimer = useCallback(() => {
+    if (intervalRef.current) {
+      window.clearInterval(intervalRef.current);
     }
-  }, [audioState.currentTrack]);
+
+    intervalRef.current = window.setInterval(() => {
+      if (audioRef.current && audioRef.current.currentTime && audioRef.current.duration) {
+        setAudioState(prev => ({
+          ...prev,
+          progress: audioRef.current?.currentTime || 0,
+          duration: audioRef.current?.duration || 0,
+        }));
+      }
+    }, 1000);
+  }, []);
+
+  // Fonctions de contrôle audio
+  const play = useCallback(() => {
+    if (!audioRef.current || !audioState.currentTrack) return;
+    
+    audioRef.current.play()
+      .then(() => {
+        setAudioState(prev => ({ ...prev, isPlaying: true }));
+        startProgressTimer();
+      })
+      .catch(error => {
+        console.error('Error playing audio:', error);
+      });
+  }, [audioState.currentTrack, startProgressTimer]);
 
   const pause = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
       setAudioState(prev => ({ ...prev, isPlaying: false }));
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     }
   }, []);
 
@@ -64,24 +98,158 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
-      setAudioState(prev => ({ ...prev, isPlaying: false, progress: 0 }));
+      setAudioState(prev => ({
+        ...prev,
+        isPlaying: false,
+        progress: 0
+      }));
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     }
   }, []);
 
-  const setVolume = useCallback((volume: number) => {
-    if (audioRef.current) {
-      audioRef.current.volume = Math.min(1, Math.max(0, volume));
-      setAudioState(prev => ({ ...prev, volume, isMuted: volume === 0 }));
+  // Fonction pour obtenir le prochain morceau
+  const getNextTrackIndex = useCallback(() => {
+    if (!audioState.currentTrack || audioState.playlist.length === 0) return null;
+    
+    const currentIndex = audioState.playlist.findIndex(t => t.id === audioState.currentTrack?.id);
+    if (currentIndex === -1) return null;
+    
+    if (audioState.shuffleMode) {
+      // Mode aléatoire
+      const randomIndex = Math.floor(Math.random() * audioState.playlist.length);
+      return randomIndex !== currentIndex ? randomIndex : (randomIndex + 1) % audioState.playlist.length;
+    } else {
+      // Mode normal
+      return (currentIndex + 1) % audioState.playlist.length;
     }
+  }, [audioState.currentTrack, audioState.playlist, audioState.shuffleMode]);
+
+  // Fonction pour obtenir le morceau précédent
+  const getPreviousTrackIndex = useCallback(() => {
+    if (!audioState.currentTrack || audioState.playlist.length === 0) return null;
+    
+    const currentIndex = audioState.playlist.findIndex(t => t.id === audioState.currentTrack?.id);
+    if (currentIndex === -1) return null;
+    
+    if (audioState.shuffleMode) {
+      // Mode aléatoire
+      const randomIndex = Math.floor(Math.random() * audioState.playlist.length);
+      return randomIndex !== currentIndex ? randomIndex : (randomIndex - 1 + audioState.playlist.length) % audioState.playlist.length;
+    } else {
+      // Mode normal
+      return (currentIndex - 1 + audioState.playlist.length) % audioState.playlist.length;
+    }
+  }, [audioState.currentTrack, audioState.playlist, audioState.shuffleMode]);
+
+  // Gestionnaire de fin de morceau
+  useEffect(() => {
+    const handleTrackEnd = () => {
+      if (audioState.repeatMode === 'one') {
+        // Répéter le morceau actuel
+        if (audioRef.current) {
+          audioRef.current.currentTime = 0;
+          audioRef.current.play()
+            .catch(err => console.error('Error replaying track:', err));
+        }
+      } else {
+        // Passer au morceau suivant
+        const nextIndex = getNextTrackIndex();
+        if (nextIndex !== null) {
+          playTrack(audioState.playlist[nextIndex]);
+        } else if (audioState.repeatMode === 'all') {
+          // Recommencer la playlist
+          playTrack(audioState.playlist[0]);
+        } else {
+          // Arrêter la lecture
+          stop();
+        }
+      }
+    };
+
+    if (audioRef.current) {
+      audioRef.current.addEventListener('ended', handleTrackEnd);
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('ended', handleTrackEnd);
+      }
+    };
+  }, [audioState.playlist, audioState.repeatMode, stop, getNextTrackIndex]);
+
+  // Navigation dans la playlist
+  const next = useCallback(() => {
+    const nextIndex = getNextTrackIndex();
+    if (nextIndex !== null) {
+      playTrack(audioState.playlist[nextIndex]);
+    } else if (audioState.repeatMode === 'all' && audioState.playlist.length > 0) {
+      playTrack(audioState.playlist[0]);
+    }
+  }, [audioState.playlist, audioState.repeatMode, getNextTrackIndex]);
+
+  const previous = useCallback(() => {
+    const prevIndex = getPreviousTrackIndex();
+    if (prevIndex !== null) {
+      playTrack(audioState.playlist[prevIndex]);
+    }
+  }, [audioState.playlist, getPreviousTrackIndex]);
+
+  // Jouer un morceau spécifique
+  const playTrack = useCallback((track: AudioTrack) => {
+    if (!track || !track.url) {
+      console.error('Invalid track or missing URL');
+      return;
+    }
+    
+    if (audioRef.current) {
+      const newUrl = track.audioUrl || track.url;
+      
+      // Si c'est un nouveau morceau
+      if (audioRef.current.src !== newUrl) {
+        audioRef.current.src = newUrl;
+        audioRef.current.load();
+      }
+      
+      setAudioState(prev => ({
+        ...prev,
+        currentTrack: track,
+        isPlaying: true,
+        progress: 0,
+        duration: prev.duration
+      }));
+      
+      audioRef.current.play()
+        .then(() => {
+          startProgressTimer();
+        })
+        .catch(err => {
+          console.error('Error playing track:', err);
+          setAudioState(prev => ({ ...prev, isPlaying: false }));
+        });
+    }
+  }, [startProgressTimer]);
+
+  // Contrôles de volume et de recherche
+  const setVolume = useCallback((volume: number) => {
+    const newVolume = Math.max(0, Math.min(1, volume));
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+    setAudioState(prev => ({ ...prev, volume: newVolume }));
   }, []);
 
   const toggleMute = useCallback(() => {
-    if (audioRef.current) {
-      const newMuted = !audioState.isMuted;
-      audioRef.current.muted = newMuted;
-      setAudioState(prev => ({ ...prev, isMuted: newMuted }));
-    }
-  }, [audioState.isMuted]);
+    setAudioState(prev => {
+      const newMuted = !prev.isMuted;
+      if (audioRef.current) {
+        audioRef.current.muted = newMuted;
+      }
+      return { ...prev, isMuted: newMuted };
+    });
+  }, []);
 
   const seekTo = useCallback((position: number) => {
     if (audioRef.current) {
@@ -90,98 +258,11 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
-  const findTrackIndex = useCallback((track: AudioTrack | null) => {
-    if (!track || !audioState.playlist.length) return -1;
-    return audioState.playlist.findIndex(t => t.id === track.id);
-  }, [audioState.playlist]);
-
-  const next = useCallback(() => {
-    if (!audioState.playlist.length) return;
-    
-    const currentIndex = findTrackIndex(audioState.currentTrack);
-    
-    if (currentIndex >= 0) {
-      let nextIndex: number;
-      
-      if (audioState.shuffleMode) {
-        // Random but not the same as current
-        nextIndex = Math.floor(Math.random() * (audioState.playlist.length - 1));
-        if (nextIndex >= currentIndex) nextIndex++;
-      } else if (currentIndex < audioState.playlist.length - 1) {
-        // Next track
-        nextIndex = currentIndex + 1;
-      } else if (audioState.repeatMode === 'all') {
-        // Loop back to beginning
-        nextIndex = 0;
-      } else {
-        // End of playlist and no repeat
-        return;
-      }
-      
-      const nextTrack = audioState.playlist[nextIndex];
-      playTrack(nextTrack);
-    }
-  }, [audioState.playlist, audioState.currentTrack, audioState.repeatMode, audioState.shuffleMode]);
-
-  const previous = useCallback(() => {
-    if (!audioState.playlist.length) return;
-    
-    const currentIndex = findTrackIndex(audioState.currentTrack);
-    
-    if (currentIndex > 0) {
-      // Previous track
-      const previousTrack = audioState.playlist[currentIndex - 1];
-      playTrack(previousTrack);
-    } else if (currentIndex === 0 && audioState.repeatMode === 'all') {
-      // Loop to end
-      const lastTrack = audioState.playlist[audioState.playlist.length - 1];
-      playTrack(lastTrack);
-    } else {
-      // Start current track from beginning
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        setAudioState(prev => ({ ...prev, progress: 0 }));
-      }
-    }
-  }, [audioState.playlist, audioState.currentTrack, audioState.repeatMode]);
-
-  const playTrack = useCallback((track: AudioTrack) => {
-    if (!track || !track.url) {
-      console.error("Cannot play track: Invalid track or missing URL");
-      return;
-    }
-    
-    const newUrl = track.url || track.audioUrl;
-    
-    if (audioRef.current) {
-      // Stop current audio
-      audioRef.current.pause();
-      
-      // Set up new audio
-      audioRef.current.src = newUrl as string;
-      audioRef.current.load();
-      
-      // Update state with new track
-      setAudioState(prev => ({
-        ...prev,
-        currentTrack: track,
-        progress: 0,
-        duration: track.duration || 0,
-        isPlaying: true
-      }));
-      
-      // Play new track
-      audioRef.current.play().catch(error => {
-        console.error("Error playing track:", error);
-        setAudioState(prev => ({ ...prev, isPlaying: false }));
-      });
-    }
-  }, []);
-
+  // Contrôles de mode de lecture
   const toggleShuffle = useCallback(() => {
-    setAudioState(prev => ({
-      ...prev,
-      shuffleMode: !prev.shuffleMode
+    setAudioState(prev => ({ 
+      ...prev, 
+      shuffleMode: !prev.shuffleMode 
     }));
   }, []);
 
@@ -189,34 +270,31 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setAudioState(prev => {
       const modes: ('off' | 'one' | 'all')[] = ['off', 'one', 'all'];
       const currentIndex = modes.indexOf(prev.repeatMode);
-      const nextIndex = (currentIndex + 1) % modes.length;
-      return {
-        ...prev,
-        repeatMode: modes[nextIndex]
-      };
+      const nextMode = modes[(currentIndex + 1) % modes.length];
+      return { ...prev, repeatMode: nextMode };
     });
   }, []);
 
+  const contextValue: AudioContextValue = {
+    audioState,
+    play,
+    pause,
+    stop,
+    next,
+    previous,
+    setVolume,
+    toggleMute,
+    seekTo,
+    playTrack,
+    toggleShuffle,
+    changeRepeatMode
+  };
+
   return (
-    <AudioContext.Provider
-      value={{
-        audioState,
-        play,
-        pause,
-        stop,
-        next,
-        previous,
-        setVolume,
-        toggleMute,
-        seekTo,
-        playTrack,
-        toggleShuffle,
-        changeRepeatMode
-      }}
-    >
+    <AudioContext.Provider value={contextValue}>
       {children}
     </AudioContext.Provider>
   );
 };
 
-export const useAudio = () => useContext(AudioContext);
+export default AudioContext;

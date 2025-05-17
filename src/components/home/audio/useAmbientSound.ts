@@ -1,194 +1,156 @@
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { useToast } from '@/hooks/use-toast';
-import { UserPreferences } from '@/types/preferences';
 
-type SoundType = 'rain' | 'forest' | 'ocean' | 'cafe' | 'night' | 'city' | 'fire';
+type AmbientSoundType = 'rain' | 'forest' | 'waves' | 'white-noise' | 'cafe' | 'none';
 
 interface AmbientSoundOptions {
   defaultEnabled?: boolean;
   defaultVolume?: number;
-  defaultType?: SoundType;
-  autoplay?: boolean;
-  fadeInDuration?: number; // milliseconds
+  defaultType?: AmbientSoundType;
 }
 
-interface AmbientSoundHook {
-  isPlaying: boolean;
-  volume: number;
-  soundType: SoundType;
-  toggle: () => void;
-  setVolume: (volume: number) => void;
-  setSoundType: (type: SoundType) => void;
-  play: () => void;
-  pause: () => void;
-}
-
-export const useAmbientSound = (
-  preferences?: UserPreferences,
-  options: AmbientSoundOptions = {}
-): AmbientSoundHook => {
-  const {
+export const useAmbientSound = (options: AmbientSoundOptions = {}) => {
+  const { 
     defaultEnabled = false,
-    defaultVolume = 0.3,
-    defaultType = 'rain',
-    autoplay = false,
-    fadeInDuration = 1000
+    defaultVolume = 0.5,
+    defaultType = 'rain'
   } = options;
-
-  const [isPlaying, setIsPlaying] = useState(autoplay);
-  const [volume, setVolumeState] = useState(defaultVolume);
-  const [soundType, setSoundTypeState] = useState<SoundType>(defaultType);
+  
+  const { preferences, updatePreferences } = useUserPreferences();
+  const { toast } = useToast();
+  
+  const [isEnabled, setIsEnabled] = useState(defaultEnabled);
+  const [volume, setVolume] = useState(defaultVolume);
+  const [soundType, setSoundType] = useState<AmbientSoundType>(defaultType);
+  const [isLoading, setIsLoading] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const { toast } = useToast();
-
-  // Initialize audio based on preferences
+  
+  // Mapping des types de sons aux URLs
+  const soundUrls: Record<AmbientSoundType, string> = {
+    'rain': '/sounds/ambient/rain.mp3',
+    'forest': '/sounds/ambient/forest.mp3',
+    'waves': '/sounds/ambient/waves.mp3',
+    'white-noise': '/sounds/ambient/white-noise.mp3',
+    'cafe': '/sounds/ambient/cafe-ambience.mp3',
+    'none': ''
+  };
+  
+  // Initialisation de l'élément audio
   useEffect(() => {
-    if (preferences) {
-      const preferenceEnabled = preferences.ambientSound ?? defaultEnabled;
-      if (preferenceEnabled && autoplay) {
-        setIsPlaying(true);
-      }
-    }
-  }, [preferences, defaultEnabled, autoplay]);
-
-  // Audio source management
-  const getSoundUrl = useCallback((type: SoundType) => {
-    const baseUrl = '/sounds/ambient';
-    
-    switch (type) {
-      case 'rain': return `${baseUrl}/rain.mp3`;
-      case 'forest': return `${baseUrl}/forest.mp3`;
-      case 'ocean': return `${baseUrl}/ocean.mp3`;
-      case 'cafe': return `${baseUrl}/cafe.mp3`;
-      case 'night': return `${baseUrl}/night.mp3`;
-      case 'city': return `${baseUrl}/city.mp3`;
-      case 'fire': return `${baseUrl}/fire.mp3`;
-      default: return `${baseUrl}/rain.mp3`;
-    }
-  }, []);
-
-  // Load and configure audio
-  useEffect(() => {
-    if (!audioRef.current) {
+    if (typeof window !== 'undefined') {
       audioRef.current = new Audio();
       audioRef.current.loop = true;
+      
+      // Appliquer les préférences utilisateur si existantes
+      const userEnabled = preferences.ambientSound;
+      if (userEnabled !== undefined) {
+        setIsEnabled(userEnabled);
+      }
     }
     
-    const audioElement = audioRef.current;
-    audioElement.src = getSoundUrl(soundType);
-    audioElement.volume = volume;
-    
-    const handleError = () => {
-      toast({
-        title: "Erreur audio",
-        description: "Impossible de charger le fichier audio",
-        variant: "destructive"
-      });
-      setIsPlaying(false);
-    };
-    
-    audioElement.addEventListener('error', handleError);
-    
+    // Nettoyage
     return () => {
-      audioElement.pause();
-      audioElement.removeEventListener('error', handleError);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
     };
-  }, [soundType, toast, getSoundUrl]);
+  }, [preferences.ambientSound]);
   
-  // Play/Pause control
+  // Gestion du changement de son
   useEffect(() => {
-    const audioElement = audioRef.current;
-    if (!audioElement) return;
+    if (!audioRef.current) return;
     
-    if (isPlaying) {
-      // Fade in effect
-      let startVolume = 0;
-      const targetVolume = volume;
-      const fadeSteps = 20;
-      const stepDuration = fadeInDuration / fadeSteps;
-      const volumeIncrement = targetVolume / fadeSteps;
+    const wasPlaying = !audioRef.current.paused;
+    const newUrl = soundUrls[soundType];
+    
+    if (!newUrl) {
+      audioRef.current.pause();
+      return;
+    }
+    
+    if (audioRef.current.src !== newUrl) {
+      setIsLoading(true);
+      audioRef.current.src = newUrl;
+      audioRef.current.load();
       
-      audioElement.volume = startVolume;
-      const playPromise = audioElement.play();
-      
-      // Handle play promise (required for Chrome)
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            // Successfully playing
-            let step = 0;
-            const fadeInterval = setInterval(() => {
-              if (step < fadeSteps) {
-                startVolume += volumeIncrement;
-                audioElement.volume = startVolume;
-                step++;
-              } else {
-                clearInterval(fadeInterval);
-              }
-            }, stepDuration);
-          })
-          .catch(error => {
-            // Auto-play prevented
-            setIsPlaying(false);
-            console.log("Auto-play prevented:", error);
+      audioRef.current.onloadeddata = () => {
+        setIsLoading(false);
+        if (wasPlaying && isEnabled) {
+          audioRef.current?.play().catch(err => {
+            console.error('Failed to play ambient sound:', err);
           });
-      }
-    } else {
-      audioElement.pause();
-    }
-  }, [isPlaying, volume, fadeInDuration]);
-  
-  // Volume control
-  const setVolume = useCallback((newVolume: number) => {
-    const clampedVolume = Math.max(0, Math.min(1, newVolume));
-    setVolumeState(clampedVolume);
-    
-    if (audioRef.current) {
-      audioRef.current.volume = clampedVolume;
-    }
-  }, []);
-  
-  // Sound type control
-  const setSoundType = useCallback((type: SoundType) => {
-    setSoundTypeState(type);
-    
-    // Restart playing if already playing
-    if (isPlaying && audioRef.current) {
-      const wasPlaying = !audioRef.current.paused;
-      audioRef.current.src = getSoundUrl(type);
+        }
+      };
       
-      if (wasPlaying) {
-        audioRef.current.play().catch(console.error);
-      }
+      audioRef.current.onerror = () => {
+        setIsLoading(false);
+        toast({
+          title: "Erreur de chargement",
+          description: `Impossible de charger le son d'ambiance "${soundType}"`,
+          variant: "destructive",
+        });
+      };
     }
-  }, [isPlaying, getSoundUrl]);
+  }, [soundType, soundUrls, isEnabled, toast]);
   
-  // Toggle play/pause
-  const toggle = useCallback(() => {
-    setIsPlaying(prev => !prev);
+  // Gestion du volume
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
+  
+  // Gestion de l'état activé/désactivé
+  useEffect(() => {
+    if (!audioRef.current) return;
+    
+    if (isEnabled && soundType !== 'none') {
+      audioRef.current.play().catch(err => {
+        console.error('Failed to play ambient sound:', err);
+        toast({
+          title: "Erreur de lecture",
+          description: "Impossible de lire le son d'ambiance. Vérifiez les permissions audio.",
+          variant: "destructive",
+        });
+        setIsEnabled(false);
+      });
+    } else {
+      audioRef.current.pause();
+    }
+    
+    // Mettre à jour les préférences utilisateur
+    updatePreferences({
+      ambientSound: isEnabled
+    });
+  }, [isEnabled, soundType, updatePreferences, toast]);
+  
+  // Fonctions de contrôle
+  const toggleSound = useCallback(() => {
+    setIsEnabled(prev => !prev);
   }, []);
   
-  // Play control
-  const play = useCallback(() => {
-    setIsPlaying(true);
+  const changeSound = useCallback((type: AmbientSoundType) => {
+    setSoundType(type);
   }, []);
   
-  // Pause control
-  const pause = useCallback(() => {
-    setIsPlaying(false);
+  const adjustVolume = useCallback((value: number) => {
+    const newVolume = Math.max(0, Math.min(1, value));
+    setVolume(newVolume);
   }, []);
   
   return {
-    isPlaying,
-    volume,
+    isEnabled,
     soundType,
-    toggle,
-    setVolume,
-    setSoundType,
-    play,
-    pause
+    volume,
+    isLoading,
+    toggleSound,
+    changeSound,
+    adjustVolume,
+    availableSounds: Object.keys(soundUrls).filter(s => s !== 'none') as AmbientSoundType[]
   };
 };
 

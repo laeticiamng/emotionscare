@@ -5,7 +5,7 @@
  * Ce hook fournit une interface React pour utiliser les services d'analyse émotionnelle Hume AI
  * avec gestion d'état, chargement, et résultats.
  */
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { humeAI } from '@/services';
 import { HumeAIOptions, EmotionAnalysisResult } from '@/services/humeai';
 import { useToast } from '@/hooks/use-toast';
@@ -203,7 +203,7 @@ export function useHumeAI(options: UseHumeAIOptions = {}) {
   }, []);
   
   // Vérifie l'accès à la webcam au premier rendu si nécessaire
-  React.useEffect(() => {
+  useEffect(() => {
     if (autoDetectWebcam && hasWebcamPermission === null) {
       requestWebcamPermission();
     }

@@ -1,33 +1,41 @@
 
-// Centralisation des exports de hooks pour simplifier les imports
+// Export des hooks personnalisés centralisé
+// Ce fichier sert de point d'entrée unique pour tous les hooks de l'application
 
-// Réexporter les hooks de base
-export { useToast, toast } from './use-toast';
-
-// Réexporter hooks audio
-export { useAudioPlayer } from './useAudioPlayer';
-export { useAudioRecorder } from './useAudioRecorder';
-
-// Hooks pour le chat et conversations
-export { useChatStatus } from './chat/useChatStatus';
-export { useChatProcessing } from './chat/useChatProcessing';
-export { useConversations } from './chat/useConversations';
-
-// Hooks d'authentification et utilisateur
-export { useUser } from './useUser';
-export { useUserProfile } from './useUserProfile';
-export { useAuthentication } from './useAuthentication';
-
-// Hooks de dashboard et données
-export { useDashboardData } from './useDashboardData';
+// Hooks d'authentification
+export { default as useAuth } from './useAuth';
+export { default as useSession } from './useSession';
+export { default as useAuthForm } from './useAuthForm';
 
 // Hooks d'interface utilisateur
-export { useMediaQuery } from './useMediaQuery';
-export { useLocalStorage } from './useLocalStorage';
-export { useWindowSize } from './useWindowSize';
-export { useOnClickOutside } from './useOnClickOutside';
+export { default as useToast } from './use-toast';
+export { default as useMediaQuery } from './useMediaQuery';
+export { default as useLocalStorage } from './useLocalStorage';
+export { default as useCopyToClipboard } from './useCopyToClipboard';
+export { default as useDebounce } from './useDebounce';
+export { default as useThrottle } from './useThrottle';
+export { default as useClickOutside } from './useClickOutside';
+export { default as useKeyPress } from './useKeyPress';
+export { default as useAudioRecorder } from './useAudioRecorder';
 
-// Hooks pour les fonctionnalités
-export { useEmotion } from './useEmotion';
-export { useGamification } from './useGamification';
-export { useJournal } from './useJournal';
+// Hooks d'API et de données
+export * from './api';
+export { default as useUserData } from './useUserData';
+export { default as useInvitations } from './useInvitations';
+export { default as useFetchData } from './useFetchData';
+export { default as useQueryParams } from './useQueryParams';
+export { default as useSocket } from './useSocket';
+export { default as useInfiniteScroll } from './useInfiniteScroll';
+
+// Hooks spécifiques aux fonctionnalités
+export * from './chat';
+export * from './emotion';
+export * from './journal';
+export * from './community-gamification';
+export * from './vr';
+
+// Hooks d'interface pour l'application
+export { default as useAppSettings } from './useAppSettings';
+export { default as useOnboarding } from './useOnboarding';
+export { default as useNotificationPermission } from './useNotificationPermission';
+export { default as useTemporaryState } from './useTemporaryState';

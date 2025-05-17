@@ -1,283 +1,339 @@
 
-/**
- * Composant ApiUsageMonitor
- * 
- * Tableau de bord pour surveiller l'utilisation des différentes API.
- * Fonctionnalité premium pour les administrateurs.
- */
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import React, { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Progress } from '@/components/ui/progress';
+import { Line, Bar, Pie } from 'react-chartjs-2';
 import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
+  Chart as ChartJS, 
+  CategoryScale, 
+  LinearScale, 
+  PointElement, 
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title, 
   Tooltip, 
-  ResponsiveContainer,
   Legend,
-  BarChart,
-  Bar
-} from 'recharts';
-import { ApiUseActivity } from '@/types';
+  ChartOptions
+} from 'chart.js';
+import { Button } from '@/components/ui/button';
+import { Download, RefreshCw } from 'lucide-react';
+import { ApiUseActivity, ApiUsageStats } from '@/types/api';
 
-// Données simulées pour démonstration
-const mockApiUsage: ApiUseActivity[] = [
-  { date: '2023-01-01', openai: 120, whisper: 45, musicgen: 22, humeai: 15, dalle: 30 },
-  { date: '2023-01-02', openai: 145, whisper: 50, musicgen: 28, humeai: 18, dalle: 35 },
-  { date: '2023-01-03', openai: 130, whisper: 42, musicgen: 25, humeai: 20, dalle: 28 },
-  { date: '2023-01-04', openai: 150, whisper: 48, musicgen: 30, humeai: 22, dalle: 32 },
-  { date: '2023-01-05', openai: 160, whisper: 52, musicgen: 35, humeai: 25, dalle: 40 },
-  { date: '2023-01-06', openai: 175, whisper: 58, musicgen: 38, humeai: 30, dalle: 45 },
-  { date: '2023-01-07', openai: 190, whisper: 62, musicgen: 42, humeai: 32, dalle: 48 },
-];
-
-interface ApiQuota {
-  api: string;
-  used: number;
-  limit: number;
-  percentage: number;
-  status: 'good' | 'warning' | 'critical';
-}
-
-// Quotas simulés pour démonstration
-const quotas: ApiQuota[] = [
-  { api: 'OpenAI', used: 8500, limit: 10000, percentage: 85, status: 'warning' },
-  { api: 'Whisper', used: 2200, limit: 5000, percentage: 44, status: 'good' },
-  { api: 'MusicGen', used: 950, limit: 1000, percentage: 95, status: 'critical' },
-  { api: 'Hume AI', used: 1800, limit: 3000, percentage: 60, status: 'good' },
-  { api: 'DALL-E', used: 2800, limit: 5000, percentage: 56, status: 'good' },
-];
-
-const errorRates = [
-  { api: 'OpenAI', success: 97.5, error: 2.5 },
-  { api: 'Whisper', success: 96.2, error: 3.8 },
-  { api: 'MusicGen', success: 94.8, error: 5.2 },
-  { api: 'Hume AI', success: 98.1, error: 1.9 },
-  { api: 'DALL-E', success: 95.5, error: 4.5 },
-];
+// Enregistrement des composants Chart.js
+ChartJS.register(
+  CategoryScale, 
+  LinearScale, 
+  PointElement, 
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title, 
+  Tooltip, 
+  Legend
+);
 
 interface ApiUsageMonitorProps {
-  className?: string;
+  onRefresh?: () => void;
 }
 
-const ApiUsageMonitor: React.FC<ApiUsageMonitorProps> = ({ className = '' }) => {
-  const [timeRange, setTimeRange] = useState('7d');
+const ApiUsageMonitor: React.FC<ApiUsageMonitorProps> = ({ onRefresh }) => {
+  const [usageData, setUsageData] = useState<ApiUseActivity[]>([]);
+  const [stats, setStats] = useState<ApiUsageStats | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [period, setPeriod] = useState<'day' | 'week' | 'month'>('week');
   
-  // Obtenir la couleur en fonction du statut de quota
-  const getQuotaColor = (status: string) => {
-    switch (status) {
-      case 'good': return 'bg-green-500';
-      case 'warning': return 'bg-amber-500';
-      case 'critical': return 'bg-red-500';
-      default: return 'bg-gray-500';
+  // Chargement des données (simulées ici)
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        // Simulation de chargement - à remplacer par un vrai appel API
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Données simulées
+        const currentDate = new Date();
+        const mockData: ApiUseActivity[] = [];
+        
+        // Nombre de jours selon la période
+        const days = period === 'day' ? 1 : period === 'week' ? 7 : 30;
+        
+        // Génération de données fictives
+        for (let i = 0; i < days; i++) {
+          const date = new Date();
+          date.setDate(currentDate.getDate() - i);
+          
+          mockData.push({
+            date: date.toISOString().split('T')[0],
+            openai: Math.floor(Math.random() * 50) + 20,
+            whisper: Math.floor(Math.random() * 15) + 5,
+            musicgen: Math.floor(Math.random() * 10) + 1,
+            humeai: Math.floor(Math.random() * 8) + 2,
+            dalle: Math.floor(Math.random() * 12) + 3
+          });
+        }
+        
+        // Tri par date
+        mockData.sort((a, b) => a.date.localeCompare(b.date));
+        
+        setUsageData(mockData);
+        
+        // Statistiques globales
+        const totalOpenAI = mockData.reduce((sum, item) => sum + (item.openai || 0), 0);
+        const totalWhisper = mockData.reduce((sum, item) => sum + (item.whisper || 0), 0);
+        const totalMusicGen = mockData.reduce((sum, item) => sum + (item.musicgen || 0), 0);
+        const totalHumeAI = mockData.reduce((sum, item) => sum + (item.humeai || 0), 0);
+        const totalDalle = mockData.reduce((sum, item) => sum + (item.dalle || 0), 0);
+        const totalCalls = totalOpenAI + totalWhisper + totalMusicGen + totalHumeAI + totalDalle;
+        
+        setStats({
+          totalCalls,
+          callsByApi: {
+            openai: totalOpenAI,
+            whisper: totalWhisper,
+            musicgen: totalMusicGen,
+            humeai: totalHumeAI,
+            dalle: totalDalle
+          },
+          errorRate: Math.random() * 0.05, // 0-5% d'erreurs
+          avgResponseTime: Math.random() * 500 + 200, // 200-700ms
+          costEstimate: (totalOpenAI * 0.02 + totalWhisper * 0.006 + totalMusicGen * 0.03 + totalHumeAI * 0.01 + totalDalle * 0.04),
+          period: {
+            start: mockData[0]?.date || '',
+            end: mockData[mockData.length - 1]?.date || ''
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching API usage data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [period]);
+  
+  const handleRefresh = () => {
+    if (onRefresh) {
+      onRefresh();
+    } else {
+      // Recharger les données
+      setUsageData([]);
+      setStats(null);
+      setPeriod(period); // Déclenche le useEffect
     }
   };
   
+  // Configuration pour le graphique d'utilisation quotidienne
+  const lineChartData = {
+    labels: usageData.map(item => item.date),
+    datasets: [
+      {
+        label: 'OpenAI',
+        data: usageData.map(item => item.openai || 0),
+        borderColor: 'rgba(53, 162, 235, 1)',
+        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+        tension: 0.3
+      },
+      {
+        label: 'Whisper',
+        data: usageData.map(item => item.whisper || 0),
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+        tension: 0.3
+      },
+      {
+        label: 'MusicGen',
+        data: usageData.map(item => item.musicgen || 0),
+        borderColor: 'rgba(255, 159, 64, 1)',
+        backgroundColor: 'rgba(255, 159, 64, 0.5)',
+        tension: 0.3
+      },
+      {
+        label: 'Hume AI',
+        data: usageData.map(item => item.humeai || 0),
+        borderColor: 'rgba(153, 102, 255, 1)',
+        backgroundColor: 'rgba(153, 102, 255, 0.5)',
+        tension: 0.3
+      },
+      {
+        label: 'DALL-E',
+        data: usageData.map(item => item.dalle || 0),
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        tension: 0.3
+      }
+    ]
+  };
+  
+  // Configuration pour le graphique de répartition par API
+  const pieChartData = {
+    labels: stats ? Object.keys(stats.callsByApi).map(key => 
+      key === 'openai' ? 'OpenAI' :
+      key === 'whisper' ? 'Whisper' :
+      key === 'musicgen' ? 'MusicGen' :
+      key === 'humeai' ? 'Hume AI' :
+      key === 'dalle' ? 'DALL-E' : key
+    ) : [],
+    datasets: [
+      {
+        data: stats ? Object.values(stats.callsByApi) : [],
+        backgroundColor: [
+          'rgba(53, 162, 235, 0.8)',
+          'rgba(75, 192, 192, 0.8)',
+          'rgba(255, 159, 64, 0.8)',
+          'rgba(153, 102, 255, 0.8)',
+          'rgba(255, 99, 132, 0.8)',
+        ],
+        borderWidth: 1
+      }
+    ]
+  };
+  
+  // Options communes aux graphiques
+  const chartOptions: ChartOptions<'line' | 'bar' | 'pie'> = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: false
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false,
+      }
+    },
+    maintainAspectRatio: false
+  };
+  
   return (
-    <Card className={`${className} overflow-hidden`}>
-      <CardHeader>
-        <div className="flex justify-between items-center flex-wrap gap-4">
-          <div>
-            <CardTitle className="text-xl">Surveillance des API</CardTitle>
-            <CardDescription>
-              Moniteur d'utilisation, quotas et performances des API
-            </CardDescription>
-          </div>
-          <Select defaultValue={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-36">
-              <SelectValue placeholder="Période" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="24h">Dernières 24h</SelectItem>
-              <SelectItem value="7d">7 derniers jours</SelectItem>
-              <SelectItem value="30d">30 derniers jours</SelectItem>
-              <SelectItem value="90d">90 derniers jours</SelectItem>
-            </SelectContent>
-          </Select>
+    <Card className="w-full">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Monitoring des API</CardTitle>
+        <div className="flex items-center gap-2">
+          <Tabs 
+            value={period} 
+            onValueChange={(val) => setPeriod(val as 'day' | 'week' | 'month')}
+            className="mr-4"
+          >
+            <TabsList>
+              <TabsTrigger value="day">Jour</TabsTrigger>
+              <TabsTrigger value="week">Semaine</TabsTrigger>
+              <TabsTrigger value="month">Mois</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={handleRefresh}
+            disabled={isLoading}
+          >
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          </Button>
+          <Button variant="outline" size="icon">
+            <Download className="h-4 w-4" />
+          </Button>
         </div>
       </CardHeader>
-      
-      <CardContent className="px-2 sm:px-6">
-        <Tabs defaultValue="usage">
-          <TabsList className="mb-6">
-            <TabsTrigger value="usage">Utilisation</TabsTrigger>
-            <TabsTrigger value="quotas">Quotas</TabsTrigger>
-            <TabsTrigger value="errors">Erreurs</TabsTrigger>
-            <TabsTrigger value="costs">Coûts</TabsTrigger>
-          </TabsList>
-          
-          {/* Onglet d'utilisation */}
-          <TabsContent value="usage" className="space-y-4">
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={mockApiUsage}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="openai" stroke="#3b82f6" name="OpenAI" />
-                  <Line type="monotone" dataKey="whisper" stroke="#10b981" name="Whisper" />
-                  <Line type="monotone" dataKey="musicgen" stroke="#8b5cf6" name="MusicGen" />
-                  <Line type="monotone" dataKey="humeai" stroke="#f59e0b" name="Hume AI" />
-                  <Line type="monotone" dataKey="dalle" stroke="#ef4444" name="DALL-E" />
-                </LineChart>
-              </ResponsiveContainer>
+      <CardContent>
+        {isLoading ? (
+          <div className="flex justify-center items-center h-[400px]">
+            <div className="text-muted-foreground">Chargement des données...</div>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-sm font-medium text-muted-foreground">Appels totaux</div>
+                  <div className="text-2xl font-bold">{stats?.totalCalls || 0}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-sm font-medium text-muted-foreground">Taux d'erreurs</div>
+                  <div className="text-2xl font-bold">{(stats?.errorRate || 0) * 100}%</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-sm font-medium text-muted-foreground">Temps de réponse moyen</div>
+                  <div className="text-2xl font-bold">{Math.round(stats?.avgResponseTime || 0)} ms</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-4">
+                  <div className="text-sm font-medium text-muted-foreground">Coût estimé</div>
+                  <div className="text-2xl font-bold">{stats?.costEstimate?.toFixed(2) || 0} €</div>
+                </CardContent>
+              </Card>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-              {mockApiUsage.reduce((acc, curr) => {
-                const total = Object.entries(curr)
-                  .filter(([key]) => key !== 'date')
-                  .reduce((sum, [, value]) => sum + (value as number), 0);
-                
-                return acc + total;
-              }, 0)}
-            </div>
-          </TabsContent>
-          
-          {/* Onglet des quotas */}
-          <TabsContent value="quotas" className="space-y-6">
-            {quotas.map((quota) => (
-              <div key={quota.api} className="space-y-1">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">{quota.api}</span>
-                  <span className="text-sm">
-                    {quota.used.toLocaleString()} / {quota.limit.toLocaleString()}
-                  </span>
-                </div>
-                <Progress 
-                  value={quota.percentage} 
-                  className={`h-2 ${getQuotaColor(quota.status)}`} 
-                />
-              </div>
-            ))}
-            
-            <div className="bg-muted p-4 rounded-md mt-6">
-              <h3 className="font-medium mb-2">Informations sur les quotas</h3>
-              <ul className="text-sm space-y-1">
-                <li className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-green-500"></span>
-                  <span>Bon (moins de 75% utilisé)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-amber-500"></span>
-                  <span>Attention (75-90% utilisé)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-red-500"></span>
-                  <span>Critique (plus de 90% utilisé)</span>
-                </li>
-              </ul>
-            </div>
-          </TabsContent>
-          
-          {/* Onglet des erreurs */}
-          <TabsContent value="errors">
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={errorRates}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                  layout="vertical"
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" domain={[0, 100]} />
-                  <YAxis dataKey="api" type="category" />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="success" name="Succès (%)" stackId="a" fill="#10b981" />
-                  <Bar dataKey="error" name="Erreur (%)" stackId="a" fill="#ef4444" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            
-            <div className="mt-6 space-y-4">
-              <h3 className="font-medium">Erreurs les plus courantes</h3>
-              <div className="space-y-2">
-                <div className="p-3 rounded-md bg-muted">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">Timeout</span>
-                    <span className="text-sm">38%</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Délai d'attente dépassé lors de l'appel API
-                  </p>
-                </div>
-                <div className="p-3 rounded-md bg-muted">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">Rate Limit</span>
-                    <span className="text-sm">27%</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Limite de requêtes par minute dépassée
-                  </p>
-                </div>
-                <div className="p-3 rounded-md bg-muted">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">Auth Error</span>
-                    <span className="text-sm">18%</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Problème d'authentification avec la clé API
-                  </p>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-          
-          {/* Onglet des coûts */}
-          <TabsContent value="costs">
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={[
-                    { name: 'OpenAI', cost: 256.78 },
-                    { name: 'Whisper', cost: 87.25 },
-                    { name: 'MusicGen', cost: 120.50 },
-                    { name: 'Hume AI', cost: 75.30 },
-                    { name: 'DALL-E', cost: 102.45 }
-                  ]}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip 
-                    formatter={(value) => [`$${value}`, 'Coût']}
+            <Tabs defaultValue="timeline">
+              <TabsList className="w-full">
+                <TabsTrigger value="timeline" className="flex-1">Utilisation journalière</TabsTrigger>
+                <TabsTrigger value="distribution" className="flex-1">Répartition par API</TabsTrigger>
+              </TabsList>
+              <TabsContent value="timeline">
+                <div className="h-[400px] mt-4">
+                  <Line 
+                    data={lineChartData} 
+                    options={{
+                      ...chartOptions,
+                      scales: {
+                        y: {
+                          beginAtZero: true,
+                          title: {
+                            display: true,
+                            text: 'Nombre d\'appels'
+                          }
+                        },
+                        x: {
+                          title: {
+                            display: true,
+                            text: 'Date'
+                          }
+                        }
+                      }
+                    }}
                   />
-                  <Bar dataKey="cost" name="Coût ($)" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            
-            <div className="mt-6">
-              <div className="flex justify-between py-2 border-b">
-                <span className="font-medium">Total du mois</span>
-                <span className="font-bold">$642.28</span>
-              </div>
-              <div className="flex justify-between py-2 border-b">
-                <span className="font-medium">Projection annuelle</span>
-                <span>$7,707.36</span>
-              </div>
-              <div className="flex justify-between py-2 border-b">
-                <span className="font-medium">Budget alloué</span>
-                <span>$10,000.00</span>
-              </div>
-              <div className="flex justify-between py-2">
-                <span className="font-medium">Reste disponible</span>
-                <span className="text-green-600 font-medium">$2,292.64</span>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+                </div>
+              </TabsContent>
+              <TabsContent value="distribution">
+                <div className="h-[400px] mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-sm font-medium text-center mb-4">Répartition des appels API</h3>
+                    <Pie data={pieChartData} options={chartOptions} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-center mb-4">Appels par API</h3>
+                    <Bar 
+                      data={{
+                        labels: pieChartData.labels,
+                        datasets: [{
+                          label: 'Nombre d\'appels',
+                          data: pieChartData.datasets[0].data,
+                          backgroundColor: pieChartData.datasets[0].backgroundColor
+                        }]
+                      }} 
+                      options={{
+                        ...chartOptions,
+                        indexAxis: 'y' as const,
+                        scales: {
+                          x: {
+                            beginAtZero: true,
+                          }
+                        }
+                      }} 
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

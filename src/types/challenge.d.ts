@@ -11,6 +11,17 @@ export interface Challenge {
   difficulty: string;
   category: string;
   tags: string[];
-  goal: number | string;
+  goal: string;
   totalSteps?: number;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  username: string;
+  avatarUrl?: string;
+  points: number;
+  rank: number;
+  badges: number;
+  streak: number;
 }

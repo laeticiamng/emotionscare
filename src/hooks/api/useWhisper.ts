@@ -5,7 +5,7 @@
  * Ce hook fournit une interface React pour utiliser les services de transcription audio Whisper
  * avec gestion d'état, enregistrement, et transcription.
  */
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { whisper } from '@/services';
 import { useToast } from '@/hooks/use-toast';
 
@@ -36,6 +36,30 @@ export function useWhisper(options: UseWhisperOptions = {}) {
     onTranscription,
     onError
   } = options;
+  
+  // Clean up function for recording resources
+  const cleanup = useCallback(() => {
+    if (mediaRecorderRef.current) {
+      if (mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+      mediaRecorderRef.current = null;
+    }
+    
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    
+    audioChunksRef.current = [];
+  }, []);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      cleanup();
+    };
+  }, [cleanup]);
   
   /**
    * Demande la permission d'accès au microphone
@@ -69,40 +93,61 @@ export function useWhisper(options: UseWhisperOptions = {}) {
     
     try {
       // Vérifie ou demande la permission
-      if (hasPermission !== true) {
-        const permission = await requestPermission();
-        if (!permission) return;
+      if (hasPermission === null) {
+        const granted = await requestPermission();
+        if (!granted) return;
+      } else if (hasPermission === false) {
+        toast({
+          title: "Accès refusé",
+          description: "L'accès au microphone est nécessaire pour enregistrer.",
+          variant: "destructive",
+        });
+        return;
       }
       
-      // Réinitialise les états
-      setError(null);
-      audioChunksRef.current = [];
-      
-      // Accède au microphone
+      // Demande l'accès au microphone
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
       
       // Crée l'enregistreur
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
       
-      // Configure les gestionnaires d'événements
-      mediaRecorder.addEventListener('dataavailable', (event) => {
+      // Configure les événements
+      mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
-      });
+      };
+      
+      mediaRecorder.onstop = async () => {
+        // Combine les chunks en un blob
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        
+        // Transcrit l'audio
+        await transcribeAudio(audioBlob);
+        
+        // Nettoyage
+        cleanup();
+        setIsRecording(false);
+      };
       
       // Lance l'enregistrement
       mediaRecorder.start();
       setIsRecording(true);
       
-      // Configure l'arrêt automatique après la durée maximale
+      // Timer pour arrêter automatiquement
       setTimeout(() => {
-        if (isRecording && mediaRecorderRef.current?.state === 'recording') {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
           stopRecording();
         }
       }, maxDuration);
+      
+      toast({
+        title: "Enregistrement démarré",
+        description: `Enregistrement en cours... (max ${maxDuration / 1000}s)`,
+      });
       
       return true;
     } catch (err) {
@@ -118,73 +163,58 @@ export function useWhisper(options: UseWhisperOptions = {}) {
       if (onError) onError(err as Error);
       return false;
     }
-  }, [isRecording, hasPermission, maxDuration, onError, requestPermission, toast]);
+  }, [isRecording, hasPermission, requestPermission, maxDuration, cleanup, toast, onError]);
   
   /**
-   * Arrête l'enregistrement et lance la transcription
+   * Arrête l'enregistrement audio
    */
   const stopRecording = useCallback(() => {
-    if (!isRecording || !mediaRecorderRef.current) return;
-    
-    try {
-      // Arrête l'enregistrement
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
       
-      // Libère le flux audio
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-        streamRef.current = null;
-      }
-      
-      setIsRecording(false);
-      
-      // Déclenche la transcription après un petit délai
-      // pour s'assurer que tous les chunks sont disponibles
-      setTimeout(() => {
-        if (audioChunksRef.current.length > 0) {
-          transcribeAudioChunks();
-        }
-      }, 100);
-    } catch (err) {
-      console.error('Error stopping recording:', err);
-      setError(err as Error);
-      setIsRecording(false);
-      
-      if (onError) onError(err as Error);
+      toast({
+        title: "Enregistrement terminé",
+        description: "Transcription en cours...",
+      });
     }
-  }, [isRecording, onError]);
+  }, [toast]);
   
   /**
-   * Transcrit les chunks audio enregistrés
+   * Transcrit un fichier audio avec Whisper
    */
-  const transcribeAudioChunks = useCallback(async () => {
-    if (audioChunksRef.current.length === 0) return;
-    
+  const transcribeAudio = useCallback(async (audioBlob: Blob) => {
     setIsTranscribing(true);
     setError(null);
     
     try {
-      // Combine les chunks en un seul blob
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-      
       // Transcrit l'audio
-      const transcription = await whisper.transcribeAudio(audioBlob, { language });
+      const result = await whisper.transcribeAudio(audioBlob, {
+        language,
+        responseFormat: 'json'
+      });
       
-      // Met à jour l'état et notifie
-      setTranscript(transcription.text);
+      // Met à jour la transcription
+      setTranscript(result.text);
       
+      // Callback utilisateur
       if (onTranscription) {
-        onTranscription(transcription.text);
+        onTranscription(result.text);
       }
       
-      return transcription.text;
+      // Notification
+      toast({
+        title: "Transcription terminée",
+        description: "Audio transcrit avec succès.",
+      });
+      
+      return result.text;
     } catch (err) {
       console.error('Error transcribing audio:', err);
       setError(err as Error);
       
       toast({
         title: "Erreur de transcription",
-        description: "Impossible de transcrire l'enregistrement audio.",
+        description: "Impossible de transcrire l'audio. Veuillez réessayer.",
         variant: "destructive",
       });
       
@@ -192,12 +222,11 @@ export function useWhisper(options: UseWhisperOptions = {}) {
       return '';
     } finally {
       setIsTranscribing(false);
-      audioChunksRef.current = [];
     }
-  }, [language, onError, onTranscription, toast]);
+  }, [language, toast, onTranscription, onError]);
   
   /**
-   * Transcrit un fichier audio directement
+   * Transcrit un fichier audio existant
    */
   const transcribeFile = useCallback(async (file: File) => {
     if (!file || !file.type.includes('audio')) {
@@ -213,21 +242,34 @@ export function useWhisper(options: UseWhisperOptions = {}) {
     setError(null);
     
     try {
-      const transcription = await whisper.transcribeAudio(file, { language });
-      setTranscript(transcription.text);
+      // Transcrit l'audio
+      const result = await whisper.transcribeAudio(file, {
+        language,
+        responseFormat: 'json'
+      });
       
+      // Met à jour la transcription
+      setTranscript(result.text);
+      
+      // Callback utilisateur
       if (onTranscription) {
-        onTranscription(transcription.text);
+        onTranscription(result.text);
       }
       
-      return transcription.text;
+      // Notification
+      toast({
+        title: "Transcription terminée",
+        description: "Audio transcrit avec succès.",
+      });
+      
+      return result.text;
     } catch (err) {
       console.error('Error transcribing file:', err);
       setError(err as Error);
       
       toast({
         title: "Erreur de transcription",
-        description: "Impossible de transcrire le fichier audio.",
+        description: "Impossible de transcrire le fichier audio. Veuillez réessayer.",
         variant: "destructive",
       });
       
@@ -236,7 +278,7 @@ export function useWhisper(options: UseWhisperOptions = {}) {
     } finally {
       setIsTranscribing(false);
     }
-  }, [language, onError, onTranscription, toast]);
+  }, [language, toast, onTranscription, onError]);
   
   /**
    * Réinitialise l'état du hook
@@ -244,15 +286,11 @@ export function useWhisper(options: UseWhisperOptions = {}) {
   const reset = useCallback(() => {
     setTranscript('');
     setError(null);
-    audioChunksRef.current = [];
-  }, []);
-  
-  // Vérifie l'accès au microphone au premier rendu
-  React.useEffect(() => {
-    if (hasPermission === null) {
-      requestPermission();
+    
+    if (isRecording) {
+      stopRecording();
     }
-  }, [hasPermission, requestPermission]);
+  }, [isRecording, stopRecording]);
   
   return {
     isRecording,
@@ -263,6 +301,7 @@ export function useWhisper(options: UseWhisperOptions = {}) {
     startRecording,
     stopRecording,
     transcribeFile,
+    requestPermission,
     reset
   };
 }

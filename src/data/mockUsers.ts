@@ -1,74 +1,77 @@
-import { User, UserRole } from '@/types/user';
-import { v4 as uuidv4 } from 'uuid';
 
-export const mockUsers: User[] = [
+import { User, UserPreferences } from '@/types/types';
+
+export const MOCK_USERS: User[] = [
   {
-    id: '1',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    avatar: '/images/avatars/avatar-1.png',
-    avatarUrl: '/images/avatars/avatar-1.png',
-    role: 'b2b_admin',
-    teams: ['dev', 'product'],
-    department: 'Engineering',
-    position: 'Senior Developer',
-    location: 'Paris',
+    id: 'user-1',
+    email: 'sarah.martin@example.com',
+    name: 'Sarah Martin',
+    language: 'fr',
+    role: 'b2c',
+    createdAt: '2023-09-01T10:00:00Z',
+    lastLoginAt: '2023-09-15T14:30:00Z',
+    subscriptionTier: 'premium',
     status: 'active',
-    emotional_score: 85,
-    emotionalScore: 85,
-    joined_at: '2023-01-15T12:00:00Z',
-    created_at: '2023-01-15T12:00:00Z',
     preferences: {
-      theme: 'system',
+      theme: 'light',
       fontSize: 'medium',
       fontFamily: 'system',
       reduceMotion: false,
       colorBlindMode: false,
       autoplayMedia: true,
       soundEnabled: true,
-      language: 'fr',
-      dashboardLayout: 'default',
       onboardingCompleted: true,
       notifications: {
         enabled: true,
         emailEnabled: true,
         pushEnabled: true,
         inAppEnabled: true,
-        email: true,
-        push: true,
-        inApp: true,
         types: {
           system: true,
           emotion: true,
           coach: true,
-          journal: true
+          journal: true,
+          community: true,
+          achievement: true,
+          badge: true,
+          challenge: true,
+          reminder: true,
+          info: true,
+          warning: true,
+          error: true,
+          success: true,
+          streak: true,
+          urgent: true
         },
-        frequency: 'daily',
-        tone: 'friendly'
+        frequency: 'immediate'
       },
       privacy: {
         shareData: true,
         anonymizeReports: false,
-        profileVisibility: 'team'
+        profileVisibility: 'public'
       }
+    },
+    stats: {
+      emotionalScansCompleted: 47,
+      journalEntriesCount: 32,
+      sessionsCount: 28,
+      consecutiveDays: 14,
+      totalPointsEarned: 1250,
+      challengesCompleted: 8,
+      badgesEarned: 6,
+      accountAgeInDays: 130
     }
   },
   {
-    id: '2',
-    name: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    avatar: '/images/avatars/avatar-2.png',
-    avatarUrl: '/images/avatars/avatar-2.png',
-    role: 'b2b_user',
-    teams: ['marketing'],
-    department: 'Marketing',
-    position: 'Marketing Manager',
-    location: 'Lyon',
+    id: 'user-2',
+    email: 'thomas.dubois@example.com',
+    name: 'Thomas Dubois',
+    language: 'fr',
+    role: 'b2c',
+    createdAt: '2023-08-15T10:00:00Z',
+    lastLoginAt: '2023-09-14T18:20:00Z',
+    subscriptionTier: 'free',
     status: 'active',
-    emotional_score: 78,
-    emotionalScore: 78,
-    joined_at: '2023-02-20T12:00:00Z',
-    created_at: '2023-02-20T12:00:00Z',
     preferences: {
       theme: 'dark',
       fontSize: 'large',
@@ -77,82 +80,116 @@ export const mockUsers: User[] = [
       colorBlindMode: false,
       autoplayMedia: false,
       soundEnabled: true,
-      language: 'en',
-      dashboardLayout: 'focused',
       onboardingCompleted: true,
       notifications: {
         enabled: true,
-        emailEnabled: false,
-        pushEnabled: true,
+        emailEnabled: true,
+        pushEnabled: false,
         inAppEnabled: true,
-        email: false,
-        push: true,
-        inApp: true,
         types: {
           system: true,
           emotion: true,
           coach: false,
-          journal: true
+          journal: true,
+          community: true,
+          achievement: true,
+          badge: true,
+          challenge: true,
+          reminder: true,
+          info: true,
+          warning: true,
+          error: true,
+          success: true,
+          streak: true,
+          urgent: true
         },
-        frequency: 'weekly',
-        tone: 'formal'
+        frequency: 'daily'
       },
       privacy: {
         shareData: false,
         anonymizeReports: true,
         profileVisibility: 'private'
       }
+    },
+    stats: {
+      emotionalScansCompleted: 28,
+      journalEntriesCount: 14,
+      sessionsCount: 23,
+      consecutiveDays: 5,
+      totalPointsEarned: 720,
+      challengesCompleted: 4,
+      badgesEarned: 3,
+      accountAgeInDays: 147
     }
   },
   {
-    id: '3',
-    name: 'Robert Johnson',
-    email: 'robert.johnson@example.com',
-    avatar: '/images/avatars/avatar-3.png',
-    avatarUrl: '/images/avatars/avatar-3.png',
-    role: 'b2c',
-    teams: [],
-    department: '',
-    position: '',
-    location: 'Marseille',
+    id: 'user-3',
+    email: 'emma.lefebvre@company.com',
+    name: 'Emma Lefebvre',
+    language: 'fr',
+    role: 'b2b',
+    createdAt: '2023-07-20T10:00:00Z',
+    lastLoginAt: '2023-09-15T09:45:00Z',
+    companyId: 'company-1',
+    department: 'Marketing',
+    position: 'Chef de projet',
+    subscriptionTier: 'enterprise',
     status: 'active',
-    emotional_score: 92,
-    emotionalScore: 92,
-    joined_at: '2023-03-10T12:00:00Z',
-    created_at: '2023-03-10T12:00:00Z',
     preferences: {
-      theme: 'light',
+      theme: 'system',
       fontSize: 'medium',
       fontFamily: 'serif',
       reduceMotion: false,
-      colorBlindMode: true,
+      colorBlindMode: false,
       autoplayMedia: true,
-      soundEnabled: false,
-      language: 'fr',
-      dashboardLayout: 'expanded',
+      soundEnabled: true,
       onboardingCompleted: true,
       notifications: {
         enabled: true,
         emailEnabled: true,
         pushEnabled: true,
         inAppEnabled: true,
-        email: true,
-        push: true,
-        inApp: true,
         types: {
           system: true,
           emotion: true,
           coach: true,
-          journal: true
+          journal: true,
+          community: true,
+          achievement: true,
+          badge: true,
+          challenge: true,
+          reminder: true,
+          info: true,
+          warning: true,
+          error: true,
+          success: true,
+          streak: true,
+          urgent: true
         },
-        frequency: 'immediate',
-        tone: 'casual'
+        frequency: 'immediate'
       },
       privacy: {
         shareData: true,
-        anonymizeReports: false,
-        profileVisibility: 'public'
+        anonymizeReports: true,
+        profileVisibility: 'team'
       }
+    },
+    stats: {
+      emotionalScansCompleted: 65,
+      journalEntriesCount: 42,
+      sessionsCount: 38,
+      consecutiveDays: 21,
+      totalPointsEarned: 1780,
+      challengesCompleted: 12,
+      badgesEarned: 9,
+      accountAgeInDays: 173
+    },
+    teamData: {
+      teamId: 'team-1',
+      teamName: 'Équipe Marketing',
+      role: 'member',
+      teamSize: 8,
+      teamHealthScore: 78
     }
   }
 ];

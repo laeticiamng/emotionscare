@@ -1,146 +1,164 @@
-import { Badge, Challenge } from '@/types';
 
-// Mock data for community gamification
+import { Challenge, LeaderboardEntry } from '@/types/challenge';
+import { Badge } from '@/types/badge';
 
 export const mockChallenges: Challenge[] = [
   {
-    id: "challenge-1",
-    title: "Première connexion",
-    name: "Première connexion",
-    description: "Connectez-vous pour la première fois à l'application",
+    id: "1",
+    title: "Premier pas",
+    name: "first-steps",
+    description: "Complétez votre premier scan émotionnel",
     progress: 100,
     completed: true,
     status: "completed",
     points: 10,
     difficulty: "easy",
-    category: "onboarding",
-    tags: ["débutant", "connexion"],
+    category: "débutant",
+    tags: ["émotion", "débutant"],
     goal: "1",
     totalSteps: 1
   },
   {
-    id: "challenge-2",
-    title: "Remplir son profil",
-    name: "Remplir son profil",
-    description: "Complétez votre profil à 100%",
-    progress: 75,
-    completed: false,
-    status: "in-progress",
-    points: 15,
-    difficulty: "medium",
-    category: "profile",
-    tags: ["profile", "données"],
-    goal: "100%",
-    totalSteps: 4
-  },
-  {
-    id: "challenge-3",
-    title: "Méditation quotidienne",
-    name: "Méditation quotidienne",
-    description: "Faites 7 jours consécutifs de méditation",
-    progress: 40,
+    id: "2",
+    title: "Explorateur émotionnel",
+    name: "emotion-explorer",
+    description: "Réalisez 5 scans émotionnels différents",
+    progress: 60,
     completed: false,
     status: "in-progress",
     points: 25,
+    difficulty: "medium",
+    category: "émotion",
+    tags: ["émotion", "exploration"],
+    goal: "5",
+    totalSteps: 5
+  },
+  {
+    id: "3",
+    title: "Journal assidu",
+    name: "journal-keeper",
+    description: "Complétez des entrées de journal pendant 7 jours consécutifs",
+    progress: 42,
+    completed: false,
+    status: "in-progress",
+    points: 50,
     difficulty: "hard",
-    category: "wellbeing",
-    tags: ["méditation", "régularité", "bien-être"],
+    category: "journal",
+    tags: ["journal", "constance"],
     goal: "7",
     totalSteps: 7
-  }
+  },
+  {
+    id: "4",
+    title: "Maître du calme",
+    name: "calm-master",
+    description: "Atteignez un niveau de sérénité de 80% ou plus 3 fois",
+    progress: 33,
+    completed: false,
+    status: "in-progress",
+    points: 30,
+    difficulty: "medium",
+    category: "bien-être",
+    tags: ["calme", "méditation"],
+    goal: "3",
+    totalSteps: 3
+  },
+  {
+    id: "5",
+    title: "Musicien de l'âme",
+    name: "soul-musician",
+    description: "Générez 10 compositions musicales personnalisées",
+    progress: 20,
+    completed: false,
+    status: "in-progress",
+    points: 40,
+    difficulty: "medium",
+    category: "musique",
+    tags: ["musique", "création"],
+    goal: "10",
+    totalSteps: 10
+  },
 ];
 
 export const mockBadges: Badge[] = [
   {
-    id: "badge-1",
-    name: "Explorateur Novice",
-    description: "A complété sa première session sur la plateforme",
-    unlocked: true,
-    earned: true,
-    earnedAt: "2023-04-15",
-    category: "engagement",
-    level: 1,
-    progress: 100,
-    threshold: 1,
-    tier: "bronze"
+    id: "1",
+    name: "Novice émotionnel",
+    description: "Premier scan émotionnel complété",
+    icon: "brain",
+    rarity: "common",
+    dateEarned: "2023-09-15",
+    category: "débutant"
   },
   {
-    id: "badge-2",
-    name: "Apprenti Méditant",
-    description: "A complété 10 minutes de méditation",
-    unlocked: true,
-    earned: true,
-    earnedAt: "2023-04-18",
-    category: "méditation",
-    level: 1,
-    progress: 100,
-    threshold: 10,
-    tier: "bronze"
+    id: "2",
+    name: "Explorateur en herbe",
+    description: "A exploré 5 fonctionnalités différentes",
+    icon: "compass",
+    rarity: "common",
+    dateEarned: "2023-09-18",
+    category: "exploration"
   },
   {
-    id: "badge-3",
-    name: "Journal Intime",
-    description: "A écrit 3 entrées dans son journal émotionnel",
-    unlocked: false,
-    earned: false,
-    category: "journal",
-    level: 2,
-    progress: 30,
-    threshold: 3,
-    tier: "silver"
+    id: "3",
+    name: "Journaliste",
+    description: "A maintenu un journal émotionnel pendant 7 jours",
+    icon: "book",
+    rarity: "rare",
+    dateEarned: "2023-09-25",
+    category: "journal"
   }
 ];
 
 export const mockLeaderboard: LeaderboardEntry[] = [
   {
-    id: 'user1',
-    name: 'Sophie Martin',
+    id: "1",
+    userId: "user123",
+    username: "EmotionMaster",
+    avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=Emma",
+    points: 1250,
     rank: 1,
-    points: 780,
-    avatarUrl: '/avatars/user1.jpg',
-    trend: 'up'
+    badges: 8,
+    streak: 14
   },
   {
-    id: 'user2',
-    name: 'Thomas Bernard',
+    id: "2",
+    userId: "user456",
+    username: "MindfulSoul",
+    avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=John",
+    points: 980,
     rank: 2,
-    points: 650,
-    avatarUrl: '/avatars/user2.jpg',
-    trend: 'stable'
+    badges: 6,
+    streak: 7
   },
   {
-    id: 'user3',
-    name: 'Emma Dubois',
+    id: "3",
+    userId: "user789",
+    username: "SereneSpirit",
+    avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=Sophia",
+    points: 870,
     rank: 3,
-    points: 620,
-    avatarUrl: '/avatars/user3.jpg',
-    trend: 'up'
+    badges: 5,
+    streak: 12
   },
   {
-    id: 'user4',
-    name: 'Lucas Petit',
+    id: "4",
+    userId: "user101",
+    username: "CalmExplorer",
+    avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=Lucas",
+    points: 720,
     rank: 4,
-    points: 590,
-    avatarUrl: '/avatars/user4.jpg',
-    trend: 'down'
+    badges: 4,
+    streak: 5
   },
   {
-    id: 'current-user',
-    name: 'Vous',
-    rank: 15,
-    points: 320,
-    avatarUrl: '/avatars/current-user.jpg',
-    trend: 'up'
+    id: "5",
+    userId: "user202",
+    username: "HarmonySeeker",
+    avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=Olivia",
+    points: 650,
+    rank: 5,
+    badges: 3,
+    streak: 3
   }
 ];
-
-export const mockGamificationStats = {
-  points: 320,
-  level: 3,
-  rank: '15',
-  badges: mockBadges,
-  streak: 4,
-  nextLevelPoints: 500,
-  progress: 0.64,
-  recentAchievements: [mockBadges[1]]
-};
