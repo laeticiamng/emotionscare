@@ -1,33 +1,28 @@
 
-import { Badge } from '@/types/gamification';
+import { Badge } from '@/types/badge';
 
 /**
- * Normalizes a single badge
+ * Normalize badge properties to handle different property names across components
  */
-export const normalizeBadge = (badge: Partial<Badge>): Badge => {
+export const normalizeBadge = (badge: any): Badge => {
   return {
-    id: badge.id || '',
-    name: badge.name || '',
-    description: badge.description || '',
-    category: badge.category || 'general',
-    tier: badge.tier || 'bronze',
+    id: badge.id,
+    name: badge.name,
+    description: badge.description,
     imageUrl: badge.imageUrl || badge.image_url || badge.image || badge.icon_url || '',
-    unlockedAt: badge.unlockedAt || '',
-    unlocked: badge.unlocked || badge.completed || false,
+    earned: badge.earned || badge.unlocked || badge.achieved || !!badge.earnedAt || !!badge.unlockedAt || !!badge.unlocked_at || false,
     progress: badge.progress || 0,
+    earnedAt: badge.earnedAt || badge.unlockedAt || badge.unlocked_at || badge.dateEarned,
+    isNew: badge.isNew || false,
+    category: badge.category || '',
+    tier: badge.tier || 'bronze',
+    threshold: badge.threshold || badge.total || 100
   };
 };
 
 /**
- * Normalizes an array of badges
+ * Normalize an array of badges
  */
-export const normalizeBadges = (badges: Partial<Badge>[]): Badge[] => {
+export const normalizeBadges = (badges: any[]): Badge[] => {
   return badges.map(normalizeBadge);
-};
-
-/**
- * Filter badges by visibility (unlocked or in progress)
- */
-export const visibleBadges = (badges: Badge[]): Badge[] => {
-  return badges.filter(badge => badge.unlocked || badge.progress > 0);
 };

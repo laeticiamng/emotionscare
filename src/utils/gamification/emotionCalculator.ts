@@ -1,41 +1,67 @@
 
 /**
  * Calculate streak days from emotion entries
+ * @param entries Array of emotion entries with date field
  */
-export function calculateStreakDays(emotionsData: any[]): number {
-  if (!emotionsData.length) return 0;
+export const calculateStreakDays = (entries: any[]): number => {
+  if (!entries || entries.length === 0) return 0;
+  
+  // Sort entries by date (most recent first)
+  const sortedEntries = [...entries].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
   
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
+  let currentDate = today;
   let streakDays = 0;
-  let currentDate = new Date(today);
   
-  // Check for consecutive days with entries
-  while (true) {
-    // Format the date as yyyy-MM-dd to match with dates in the database
-    const dateString = currentDate.toISOString().split('T')[0];
+  // Check if there's an entry for today
+  const todayEntry = sortedEntries.find(entry => {
+    const entryDate = new Date(entry.date);
+    entryDate.setHours(0, 0, 0, 0);
+    return entryDate.getTime() === today.getTime();
+  });
+  
+  if (todayEntry) {
+    streakDays = 1;
     
-    // Find if there's an entry for this date
-    const hasEntryForDate = emotionsData.some(entry => {
-      const entryDate = new Date(entry.date);
-      return entryDate.toISOString().split('T')[0] === dateString;
-    });
-    
-    if (hasEntryForDate) {
-      streakDays++;
-      currentDate.setDate(currentDate.getDate() - 1);
-    } else {
-      break;
+    // Check previous days
+    for (let i = 1; i <= 30; i++) { // Check up to 30 days back
+      currentDate = new Date(today);
+      currentDate.setDate(today.getDate() - i);
+      currentDate.setHours(0, 0, 0, 0);
+      
+      const dayEntry = sortedEntries.find(entry => {
+        const entryDate = new Date(entry.date);
+        entryDate.setHours(0, 0, 0, 0);
+        return entryDate.getTime() === currentDate.getTime();
+      });
+      
+      if (dayEntry) {
+        streakDays++;
+      } else {
+        break; // Streak is broken
+      }
     }
   }
   
   return streakDays;
-}
+};
 
 /**
- * Calculate the progress percentage for the level bar
+ * Calculate progress percentage to next level
+ * @param points Current points
  */
 export const calculateProgressToNextLevel = (points: number): number => {
-  return Math.min(100, Math.round(((points % 100) / 100) * 100));
+  // Each level is 100 points
+  const currentLevelPoints = Math.floor(points / 100) * 100;
+  const nextLevelPoints = currentLevelPoints + 100;
+  
+  // Calculate progress as percentage
+  const pointsToNextLevel = nextLevelPoints - points;
+  const progressPercentage = 100 - (pointsToNextLevel);
+  
+  return Math.max(0, Math.min(100, progressPercentage));
 };

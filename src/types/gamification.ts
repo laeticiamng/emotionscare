@@ -10,6 +10,16 @@ export interface Challenge {
   completed: boolean;
   totalSteps?: number;
   completedSteps?: number;
+  status?: 'completed' | 'failed' | 'locked' | 'ongoing' | 'active' | 'available';
+  category?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  deadline?: string;
+  completions?: number;
+  name?: string;
+  tags?: string[];
+  goal?: number;
+  icon?: string;
+  total?: number;
 }
 
 export interface LeaderboardEntry {
@@ -33,6 +43,15 @@ export interface GamificationStats {
   streak: number;
   badges: Badge[];
   activeChallenges?: Challenge[];
+  // Additional properties from UserDashboard/UserSidePanel
+  xp?: number;
+  xpToNextLevel?: number;
+  streakDays?: number;
+  longestStreak?: number;
+  completedChallenges?: number;
+  totalChallenges?: number;
+  unlockedBadges?: number;
+  totalBadges?: number;
 }
 
 export interface GamificationContextType {
@@ -47,3 +66,6 @@ export interface GamificationContextType {
   isLoading: boolean;
   error: Error | null;
 }
+
+// Export Badge type explicitly to resolve module declaration errors
+export { Badge } from './badge';

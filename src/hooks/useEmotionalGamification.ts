@@ -10,14 +10,21 @@ export const useEmotionalGamification = (userId?: string) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [stats, setStats] = useState<EmotionGamificationStats>({
-    total_scans: 0,
-    streak_days: 0,
+    totalScans: 0,
+    streakDays: 0,
     points: 0,
     level: 1,
     next_milestone: 100,
     badges_earned: [],
     highest_emotion: 'neutral',
-    emotional_balance: 50
+    emotional_balance: 50,
+    emotionDiversity: 0,
+    topEmotion: 'neutral',
+    positiveRatio: 0,
+    achievements: [],
+    progress: 0,
+    total_scans: 0,
+    streak_days: 0
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -91,6 +98,8 @@ export const useEmotionalGamification = (userId?: string) => {
           const badges_earned = badgesData?.map(b => b.name) || [];
             
           setStats({
+            totalScans: emotionsData.length,
+            streakDays: streakDays,
             total_scans: emotionsData.length,
             streak_days: streakDays,
             points,
@@ -98,7 +107,12 @@ export const useEmotionalGamification = (userId?: string) => {
             next_milestone,
             badges_earned,
             highest_emotion: highestEmotion,
-            emotional_balance: emotionalBalance
+            emotional_balance: emotionalBalance,
+            emotionDiversity: Object.keys(emotionCounts).length,
+            topEmotion: highestEmotion,
+            positiveRatio: total > 0 ? (positiveCount / total) * 100 : 50,
+            achievements: badges_earned,
+            progress: (points % 100) / 100 * 100 // Progress to next level as percentage
           });
         }
       } catch (error) {
