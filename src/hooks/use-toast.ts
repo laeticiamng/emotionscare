@@ -1,29 +1,52 @@
 
-import { Toast, ToastActionElement, ToastProps } from '@/types/toast';
-import { useToast as useShadcnToast } from '@/components/ui/toast';
+import * as React from "react";
+import { Toast, ToastProps } from "@/types/toast";
+import { Toaster as SonnerToaster, toast as sonnerToast } from "sonner";
 
-export const useToast = () => {
-  const shadcnToast = useShadcnToast();
+type ToastOptions = Omit<ToastProps, "id">;
 
-  return {
-    ...shadcnToast,
-    toast: (props: ToastProps) => {
-      return shadcnToast.toast(props);
-    }
+// Create a type-safe wrapper for the toast function
+const useToast = () => {
+  const toast = (options: ToastOptions) => {
+    return sonnerToast(options);
   };
+
+  // Add convenience methods for different variants
+  const api = {
+    toast,
+    // Helper methods for different toast types
+    success: (options: ToastOptions) => 
+      toast({ ...options, variant: "success" }),
+    error: (options: ToastOptions) => 
+      toast({ ...options, variant: "destructive" }),
+    warning: (options: ToastOptions) => 
+      toast({ ...options, variant: "warning" }),
+    info: (options: ToastOptions) => 
+      toast({ ...options, variant: "info" }),
+    // Method to dismiss a toast
+    dismiss: (toastId?: string) => sonnerToast.dismiss(toastId),
+    // List of active toasts (empty since sonner handles this internally)
+    toasts: [] as Toast[]
+  };
+
+  // If in the browser, store a reference globally for non-hook usage
+  if (typeof window !== 'undefined') {
+    (window as any).__toast = api.toast;
+  }
+
+  return api;
 };
 
-// Exporter aussi directement l'objet toast pour faciliter l'utilisation
-// sans hook dans les composants de classe ou les utility functions
-export const toast = (props: ToastProps) => {
-  // Créer une fonction toast temporaire si on est en dehors d'un composant
-  // qui utilise useToast
-  const toastFn = typeof window !== 'undefined' ? 
-    (window as any).__toast || 
-    ((props: ToastProps) => console.log('Toast (fallback):', props.title, props.description)) : 
-    () => {};
+// Export a singleton instance for direct imports outside of React components
+const toast = (options: ToastOptions) => {
+  // Use the global toast function if available
+  if (typeof window !== 'undefined' && (window as any).__toast) {
+    return (window as any).__toast(options);
+  }
   
-  return toastFn(props);
+  // Fallback to sonner toast directly
+  return sonnerToast(options);
 };
 
-export type { Toast, ToastActionElement, ToastProps };
+export { useToast, toast };
+export type { Toast, ToastProps, ToastActionElement } from "@/types/toast";
