@@ -27,3 +27,9 @@ export type FontSize =
   | "md"
   | "lg"
   | "xl";
+
+export interface ThemeOption {
+  name: string;
+  value: string;
+  preview: string;
+}

@@ -11,13 +11,13 @@ export type NotificationType =
   | "journal"
   | "community"
   | "achievement"
-  | "badge"; // Ajout du type "badge"
+  | "badge"; 
 
 export type NotificationTone = 
   | "friendly"
   | "professional" 
   | "direct"
-  | "motivational"; // Ajout des valeurs manquantes
+  | "motivational"; 
 
 export interface NotificationPreference {
   enabled: boolean;

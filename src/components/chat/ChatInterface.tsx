@@ -22,7 +22,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   readOnly = false,
   className = ''
 }) => {
-  const { messages, sendMessage } = useChat({ initialMessages });
+  const { messages, addMessage, handleSend } = useChat({ initialMessages });
   const [newMessage, setNewMessage] = useState('');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
@@ -36,29 +36,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, [messages]);
   
-  const handleSend = () => {
+  const handleSendMessage = () => {
     if (!newMessage.trim()) return;
     
     // Either use the custom handler or the internal chat state
     if (onSendMessage) {
       onSendMessage(newMessage);
     } else {
-      sendMessage({
-        id: Date.now().toString(),
-        content: newMessage,
-        role: 'user',
-        timestamp: new Date().toISOString(),
-      });
-      
-      // Mock AI response after a delay
-      setTimeout(() => {
-        sendMessage({
-          id: (Date.now() + 1).toString(),
-          content: `This is a demo response to: "${newMessage}"`,
-          role: 'ai',
-          timestamp: new Date().toISOString(),
-        });
-      }, 1000);
+      handleSend(newMessage);
     }
     
     setNewMessage('');
@@ -67,7 +52,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      handleSendMessage();
     }
   };
   
@@ -124,7 +109,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               placeholder="Écrivez votre message..."
               className="min-h-[60px]"
             />
-            <Button size="icon" onClick={handleSend} disabled={!newMessage.trim()}>
+            <Button size="icon" onClick={handleSendMessage} disabled={!newMessage.trim()}>
               <Send className="h-4 w-4" />
             </Button>
           </div>

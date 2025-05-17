@@ -62,7 +62,7 @@ export interface EmotionResult {
   audio_url?: string;
   audioUrl?: string;
   feedback?: string;
-  ai_feedback?: string;
+  ai_feedback?: string; 
   recommendations?: string[];
   source?: string;
 }

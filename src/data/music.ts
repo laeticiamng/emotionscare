@@ -11,6 +11,7 @@ export const mockTracks: MusicTrack[] = [
     audioUrl: 'https://example.com/tracks/calm-waters.mp3',
     trackUrl: 'https://example.com/tracks/calm-waters.mp3',
     url: 'https://example.com/tracks/calm-waters.mp3',
+    coverUrl: 'https://example.com/images/calm-waters.jpg',
     mood: 'calm'
   },
   {
@@ -21,6 +22,7 @@ export const mockTracks: MusicTrack[] = [
     audioUrl: 'https://example.com/tracks/happy-days.mp3',
     trackUrl: 'https://example.com/tracks/happy-days.mp3',
     url: 'https://example.com/tracks/happy-days.mp3',
+    coverUrl: 'https://example.com/images/happy-days.jpg',
     mood: 'happy'
   },
   {
@@ -31,6 +33,7 @@ export const mockTracks: MusicTrack[] = [
     audioUrl: 'https://example.com/tracks/focus-energy.mp3',
     trackUrl: 'https://example.com/tracks/focus-energy.mp3',
     url: 'https://example.com/tracks/focus-energy.mp3',
+    coverUrl: 'https://example.com/images/focus-energy.jpg',
     mood: 'focus'
   }
 ];
@@ -41,18 +44,21 @@ export const mockPlaylists: MusicPlaylist[] = [
     id: 'playlist-1',
     title: 'Calm Collection',
     tracks: mockTracks.filter(track => track.mood === 'calm'),
+    coverUrl: 'https://example.com/playlists/calm-collection.jpg',
     mood: 'calm'
   },
   {
     id: 'playlist-2',
     title: 'Happy Vibes',
     tracks: mockTracks.filter(track => track.mood === 'happy'),
+    coverUrl: 'https://example.com/playlists/happy-vibes.jpg',
     mood: 'happy'
   },
   {
     id: 'playlist-3',
     title: 'Focus Mode',
     tracks: mockTracks.filter(track => track.mood === 'focus'),
+    coverUrl: 'https://example.com/playlists/focus-mode.jpg',
     mood: 'focus'
   }
 ];

@@ -1,4 +1,32 @@
 
+export interface MusicTrack {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;
+  url?: string;
+  audioUrl?: string;
+  trackUrl?: string;
+  coverUrl?: string;
+  cover_url?: string;
+  mood?: string;
+  emotionalTone?: string;
+}
+
+export interface MusicPlaylist {
+  id: string;
+  title: string;
+  tracks: MusicTrack[];
+  coverUrl?: string;
+  mood?: string;
+  category?: string;
+}
+
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
+}
+
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   isPlaying: boolean;
@@ -32,4 +60,15 @@ export interface MusicContextType {
   currentEmotion?: string | null;
   isMuted?: boolean;
   muted?: boolean;
+  queue?: MusicTrack[];
+  clearQueue?: () => void;
+  addToQueue?: (track: MusicTrack) => void;
+  shufflePlaylist?: () => void;
+  loadPlaylist?: (playlist: MusicPlaylist) => void;
+  isShuffled?: boolean;
+  isRepeating?: boolean;
+  toggleShuffle?: () => void;
+  toggleRepeat?: () => void;
+  error?: Error | null;
+  isInitialized?: boolean;
 }

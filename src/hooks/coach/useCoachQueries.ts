@@ -2,8 +2,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCoach } from '@/contexts/CoachContext';
 
+interface CoachService {
+  askQuestion: (question: string) => Promise<string>;
+}
+
+interface ExtendedCoachContext {
+  coachService: CoachService | null;
+}
+
 export function useCoachQueries() {
-  const { coachService } = useCoach() || { coachService: null };
+  const context = useCoach() as ExtendedCoachContext;
+  const { coachService } = context || { coachService: null };
 
   const askQuestion = (question: string) => {
     return useQuery({

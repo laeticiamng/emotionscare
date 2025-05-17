@@ -18,6 +18,7 @@ export interface MoodData {
   sentiment?: number;
   anxiety?: number;
   energy?: number;
+  originalDate?: string;
 }
 
 export interface JournalEntry {
@@ -73,7 +74,7 @@ export interface InvitationStats {
 export interface InvitationData {
   id: string;
   email: string;
-  status: "pending" | "accepted" | "expired";
+  status: "pending" | "accepted" | "expired" | "rejected";
   sentAt: string;
   acceptedAt?: string;
   role?: string;
@@ -93,4 +94,10 @@ export interface UserPreference {
   notifications: boolean;
   emailUpdates: boolean;
   language: string;
+}
+
+export interface ChatResponse {
+  id: string;
+  message: string;
+  timestamp: string;
 }

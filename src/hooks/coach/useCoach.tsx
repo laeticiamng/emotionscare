@@ -16,8 +16,8 @@ export const useCoach = () => {
       // Create a new user message
       const userMessage: ChatMessage = {
         id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        text: text,
-        sender: 'user',
+        content: text,
+        role: 'user',
         timestamp: new Date().toISOString()
       };
       
@@ -30,8 +30,8 @@ export const useCoach = () => {
       // Create a mock response
       const coachResponse: ChatMessage = {
         id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        text: `Merci pour votre message. En tant que coach IA, je suis là pour vous aider.`,
-        sender: 'coach',
+        content: `Merci pour votre message. En tant que coach IA, je suis là pour vous aider.`,
+        role: 'assistant',
         timestamp: new Date().toISOString()
       };
       
@@ -60,8 +60,8 @@ export const useCoach = () => {
       setMessages([
         {
           id: 'msg-1',
-          text: 'Bonjour, comment puis-je vous aider aujourd\'hui?',
-          sender: 'coach',
+          content: 'Bonjour, comment puis-je vous aider aujourd\'hui?',
+          role: 'assistant',
           timestamp: new Date(Date.now() - 86400000).toISOString()
         }
       ]);
