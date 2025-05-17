@@ -121,7 +121,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       anxious: ['Try the 4-7-8 breathing technique', 'Ground yourself by naming 5 things you can see'],
       sad: ['Allow yourself to feel without judgment', 'Consider talking to someone you trust'],
       neutral: ['Check in with yourself about what you need', 'Try a mood-boosting activity'],
-      happy: ['Journal about what's making you happy', 'Spread positivity to others'],
+      happy: ['Journal about what\'s making you happy', 'Spread positivity to others'],
       excited: ['Channel this energy into a creative activity', 'Share your excitement with others'],
       tired: ['Consider a short power nap', 'Hydrate and take a short break from screens'],
       confused: ['Break problems into smaller parts', 'Ask for clarity where needed']
