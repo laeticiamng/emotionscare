@@ -1,73 +1,77 @@
-# Welcome to your Lovable project
 
-## Project info
+# Structure des Contexts et Hooks
 
-**URL**: https://lovable.dev/projects/9e5840a2-4948-4a34-a85a-d7f1e9f4027e
+Ce document décrit l'organisation des Contexts React et des Hooks personnalisés dans le projet.
 
-## How can I edit this code?
+## Architecture des Contexts
 
-There are several ways of editing your application.
+Tous les contexts React sont centralisés dans le dossier `/src/contexts/`. 
+Pour les importer, utilisez:
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/9e5840a2-4948-4a34-a85a-d7f1e9f4027e) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```typescript
+import { ThemeContext, useTheme } from '@/contexts';
 ```
 
-**Edit a file directly in GitHub**
+### Liste des Contexts disponibles
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+| Context | Provider | Hook | Description |
+|---------|----------|------|-------------|
+| ThemeContext | ThemeProvider | useTheme | Gestion du thème de l'application |
+| UserPreferencesContext | UserPreferencesProvider | useUserPreferences | Préférences utilisateur |
+| UserModeContext | UserModeProvider | useUserMode | Mode utilisateur (B2C, B2B user, B2B admin) |
+| AuthContext | AuthProvider | useAuth | Authentification |
+| AudioContext | AudioProvider | useAudio | Gestion audio |
+| MusicContext | MusicProvider | useMusic | Lecteur de musique |
+| LayoutContext | LayoutProvider | useLayout | Mise en page |
+| SidebarContext | SidebarProvider | useSidebar | Sidebar |
+| CoachContext | CoachProvider | useCoach | Coach IA |
+| StorytellingContext | StorytellingProvider | useStorytelling | Récits narratifs |
+| SoundscapeContext | SoundscapeProvider | useSoundscape | Ambiances sonores |
+| BrandingContext | BrandingProvider | - | Personnalisation marque |
+| SegmentContext | SegmentProvider | useSegment | Segmentation utilisateurs |
+| SessionContext | SessionProvider | useSession | Gestion de session |
+| OnboardingContext | OnboardingProvider | useOnboarding | Processus d'intégration |
+| PredictiveAnalyticsContext | PredictiveAnalyticsProvider | usePredictiveAnalytics | Analyses prédictives |
 
-**Use GitHub Codespaces**
+## Architecture des Hooks
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Tous les hooks personnalisés sont centralisés dans le dossier `/src/hooks/`. 
+Pour les importer, utilisez:
 
-## What technologies are used for this project?
+```typescript
+import { useToast, useMediaQuery } from '@/hooks';
+```
 
-This project is built with:
+### Liste des Hooks disponibles
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+| Hook | Description |
+|------|-------------|
+| useToast | Affichage de notifications toast |
+| useAudioPlayer | Lecteur audio |
+| useAudioRecorder | Enregistreur audio |
+| useChatStatus | État des conversations |
+| useChatProcessing | Traitement des messages |
+| useConversations | Gestion des conversations |
+| useUser | Informations utilisateur |
+| useUserProfile | Profil utilisateur |
+| useAuthentication | Authentification |
+| useDashboardData | Données du tableau de bord |
+| useMediaQuery | Requêtes média responsive |
+| useLocalStorage | Stockage local |
+| useWindowSize | Taille de fenêtre |
+| useOnClickOutside | Détection de clic extérieur |
+| useEmotion | Gestion des émotions |
+| useGamification | Fonctionnalités de gamification |
+| useJournal | Journal émotionnel |
 
-## How can I deploy this project?
+## Bonnes pratiques
 
-Simply open [Lovable](https://lovable.dev/projects/9e5840a2-4948-4a34-a85a-d7f1e9f4027e) and click on Share -> Publish.
+1. Toujours importer depuis les fichiers d'index centralisés:
+   - `import { useTheme } from '@/contexts'` au lieu de `import { useTheme } from '@/contexts/ThemeContext'`
 
-## Can I connect a custom domain to my Lovable project?
+2. Utiliser les hooks au lieu d'accéder directement au contexte:
+   - `const { theme } = useTheme()` au lieu de `const theme = useContext(ThemeContext)`
 
-Yes, you can!
+3. Tous les exports sont nommés, pas de default exports
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+4. Les types associés sont également disponibles dans les fichiers centralisés

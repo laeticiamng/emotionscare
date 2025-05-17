@@ -2,7 +2,7 @@
 export interface AudioTrack {
   id: string;
   title: string;
-  description?: string; // Ajout de la propriété manquante
+  description?: string;
   artist?: string;
   album?: string;
   duration: number;
@@ -33,9 +33,9 @@ export interface AudioPlayerState {
   isMuted: boolean;
   progress: number;
   duration: number;
-  playlist: AudioTrack[];
-  repeatMode: 'off' | 'one' | 'all';
-  shuffleMode: boolean;
+  playlist: AudioTrack[]; // Ajouté pour corriger les erreurs
+  repeatMode: 'off' | 'one' | 'all'; // Ajouté pour corriger les erreurs
+  shuffleMode: boolean; // Ajouté pour corriger les erreurs
 }
 
 export interface AudioContextValue {
