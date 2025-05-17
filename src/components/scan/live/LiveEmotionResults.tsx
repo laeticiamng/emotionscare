@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmotionResult } from '@/types/scan';
+import { EmotionResult } from '@/types/emotion';
 
 interface LiveEmotionResultsProps {
   result: EmotionResult | null;
@@ -34,6 +35,9 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result, isLoadi
     );
   }
 
+  // Calculer une valeur d'intensité par défaut si elle n'existe pas
+  const displayIntensity = result.intensity !== undefined ? result.intensity : (result.score / 100);
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -64,11 +68,11 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result, isLoadi
               <div className="w-full bg-secondary rounded-full h-2.5">
                 <div
                   className="bg-primary h-2.5 rounded-full"
-                  style={{ width: `${(result.intensity || 0) * 100}%` }}
+                  style={{ width: `${displayIntensity * 100}%` }}
                 ></div>
               </div>
               <p className="text-right text-sm text-muted-foreground mt-1">
-                {Math.round((result.intensity || 0) * 100)}%
+                {Math.round(displayIntensity * 100)}%
               </p>
             </div>
             

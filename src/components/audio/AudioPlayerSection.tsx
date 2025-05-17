@@ -1,12 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { AudioTrack } from '@/types/audio';
-import { useAudio } from '@/contexts/audio/AudioContext';
+import { useAudio } from '@/hooks/use-audio';
 import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const AudioPlayerSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState('relaxation');

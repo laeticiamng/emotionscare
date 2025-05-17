@@ -1,7 +1,8 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff, Loader2 } from 'lucide-react';
-import { EmotionResult } from '@/types/scan';
+import { EmotionResult } from '@/types/emotion';
 
 interface AudioProcessorProps {
   onResult?: (result: EmotionResult) => void;
@@ -97,14 +98,19 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
     if (onResult && mockResult) {
       onResult({
         id: 'mock-id-' + Date.now(),
-        userId: 'current-user-id',
         emotion: mockResult.emotion,
-        intensity: mockResult.intensity,
         score: mockResult.score,
+        confidence: 0.85,
+        text: "Sample text",
+        emojis: ["😊"],
+        recommendations: [
+          "Take a moment to appreciate your positive mood",
+          "Share your happiness with someone"
+        ],
+        intensity: mockResult.intensity,
         feedback: mockResult.feedback,
         timestamp: new Date().toISOString(),
-        source: 'voice',
-        confidence: 0.85
+        source: 'voice'
       });
     }
 

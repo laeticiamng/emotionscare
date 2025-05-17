@@ -40,4 +40,22 @@ export interface AudioContextType {
   resumeTrack: () => void;
   prevTrack: () => void;
   nextTrack: () => void;
+  togglePlay: () => void;
+  volume: number;
+  setVolume: (volume: number) => void;
+  isMuted: boolean;
+  toggleMute: () => void;
+  progress: number;
+  duration: number;
+  seekTo: (time: number) => void;
+  formatTime: (seconds: number) => string;
+  loading: boolean;
+  openDrawer?: boolean;
+  setOpenDrawer?: (open: boolean) => void;
+  loadPlaylist?: (playlist: AudioPlaylist) => void;
+  loadPlaylistForEmotion?: (params: EmotionMusicParams) => Promise<AudioPlaylist | null>;
+  setEmotion?: (emotion: string) => void;
+  emotion?: string;
+  error?: Error | null;
+  isInitialized?: boolean;
 }

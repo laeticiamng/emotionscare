@@ -1,5 +1,5 @@
 
-export type UserRole = 'user' | 'admin' | 'b2b_user' | 'b2b_admin' | 'b2c';
+export type UserRole = 'user' | 'admin' | 'b2b_user' | 'b2b_admin' | 'b2c' | 'coach' | 'therapist';
 
 export interface User {
   id: string;
@@ -11,6 +11,16 @@ export interface User {
   job_title?: string;
   department?: string;
   notifications_enabled?: boolean;
+  avatar?: string;
+  avatarUrl?: string;
+  avatar_url?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  lastLogin?: string;
+  joined_at?: string;
+  position?: string;
+  emotional_score?: number;
+  preferences?: UserPreferences;
 }
 
 export interface UserPreferences {

@@ -37,14 +37,14 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
         
         const emotionResult: EmotionResult = {
           id: `scan-${Date.now()}`,
-          user_id: 'user-123',
           emotion: emotion,
-          emojis: '😊',
+          emojis: ["😊"],
           score: Math.random() * 0.5 + 0.5,
           confidence: Math.random() * 0.3 + 0.7,
           intensity: Math.random(),
           timestamp: new Date().toISOString(),
-          feedback: "Your voice analysis reveals a balanced emotional state with slight tendencies toward the positive spectrum."
+          feedback: "Your voice analysis reveals a balanced emotional state with slight tendencies toward the positive spectrum.",
+          recommendations: ["Take a walk", "Practice deep breathing"]
         };
         
         // Mettre à jour le contexte Coach avec l'émotion détectée
