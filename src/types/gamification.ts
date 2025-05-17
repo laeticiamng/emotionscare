@@ -37,6 +37,7 @@ export interface LeaderboardEntry {
   avatarUrl?: string;
   lastActive?: string;
   userId?: string;
+  position?: number; // Add missing property
 }
 
 export interface GamificationStats {

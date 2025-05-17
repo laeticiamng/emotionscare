@@ -37,6 +37,14 @@ export interface EmotionResult {
   duration?: number;
   facialExpression?: string;
   textInput?: string;
+  category?: string; // Add missing property
+}
+
+export interface EnhancedEmotionResult extends EmotionResult {
+  dominantEmotion: {
+    name: string;
+    score: number;
+  }
 }
 
 export interface LiveVoiceScannerProps {
@@ -92,3 +100,30 @@ export type Emotion =
   'calm' |
   'anxiety' |
   'neutral';
+
+export interface EmotionInterface {
+  id: string;
+  name: string;  
+  label: string;
+  color: string;
+  intensity: number;
+  icon?: string;
+  emoji?: string;
+  emotion?: string;
+  user_id?: string;
+  date?: string;
+  score?: number;
+  confidence: number;
+  text?: string;
+  feedback?: string;
+  transcript?: string;
+  timestamp?: string;
+  source?: string;
+  audioUrl?: string;
+  textInput?: string;
+  facialExpression?: string;
+  category?: string;
+}
+
+// Export type for backward compatibility
+export type { EmotionalData } from './emotional-data';

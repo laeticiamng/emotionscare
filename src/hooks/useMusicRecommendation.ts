@@ -39,15 +39,16 @@ export function useMusicRecommendation() {
     }
   };
 
-  const playEmotionMusic = (emotion: string, intensity?: number) => {
+  const playEmotionMusic = async (emotion: string, intensity?: number) => {
     setLoading(true);
     try {
       // Vérifions si loadPlaylistForEmotion existe et l'utilisons
       if (typeof loadPlaylistForEmotion === 'function') {
         const params = { emotion, intensity: intensity || 0.5 };
-        const recommendedPlaylist = loadPlaylistForEmotion(params);
+        const recommendedPlaylist = await loadPlaylistForEmotion(params);
         
-        if (recommendedPlaylist && recommendedPlaylist.tracks && recommendedPlaylist.tracks.length > 0) {
+        // Check if recommendedPlaylist is available and has tracks
+        if (recommendedPlaylist && Array.isArray(recommendedPlaylist.tracks) && recommendedPlaylist.tracks.length > 0) {
           // Si playTrack est disponible, jouons la première piste
           if (typeof playTrack === 'function') {
             playTrack(recommendedPlaylist.tracks[0]);

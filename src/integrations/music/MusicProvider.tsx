@@ -1,6 +1,7 @@
+
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
-import { mockMusicTracks, mockPlaylists } from './mockMusicData';
+import { mockMusicTracks, mockPlaylists } from '../../contexts/music/mockMusicData';
 
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
@@ -79,7 +80,7 @@ export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const loadPlaylistForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
     // Placeholder logic to load a playlist based on emotion
-    return null;
+    return mockPlaylists.find(p => p.emotion?.toLowerCase() === params.emotion.toLowerCase()) || null;
   };
 
   return (

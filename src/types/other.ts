@@ -1,19 +1,19 @@
 
 export interface ChatMessage {
   id: string;
-  role: "system" | "user" | "ai" | "assistant" | "coach";
-  content: string;
-  timestamp?: string;
-  text?: string;
-  sender?: string;
+  text: string;
+  content?: string;
+  sender: string;
+  timestamp: string;
+  role: 'user' | 'assistant' | 'system';
+  isLoading?: boolean;
 }
 
 export interface MoodData {
   id: string;
+  date: string;
   mood: string;
   intensity: number;
-  date?: string;
-  timestamp?: string;
   value?: number;
   sentiment?: number;
   anxiety?: number;
@@ -23,30 +23,36 @@ export interface MoodData {
 
 export interface JournalEntry {
   id: string;
-  date: string;
   title: string;
   content: string;
-  mood?: string;
+  mood: string;
+  date: string;
+  user_id: string;
   tags?: string[];
-  text?: string;
-  ai_feedback?: string;
+  emotion?: string;
   mood_score?: number;
+  ai_feedback?: string;
 }
 
 export interface Story {
   id: string;
   title: string;
-  excerpt: string;
+  description: string;
   content: string;
-  category: string;
+  mood: string;
   imageUrl?: string;
-  author?: string;
-  published?: string;
+  audioUrl?: string;
+  type: 'short' | 'long' | 'guided';
+  tags: string[];
 }
 
 export interface EmotionPrediction {
   emotion: string;
   probability: number;
+  confidence: number;
+  predictedEmotion?: string;
+  triggers?: string[];
+  recommendations?: string[];
 }
 
 export interface Recommendation {
@@ -54,64 +60,46 @@ export interface Recommendation {
   title: string;
   description: string;
   type: string;
-  source?: string;
+  priority: number;
+  completed: boolean;
+  emotion?: string;
 }
 
 export interface InvitationStats {
   sent: number;
   accepted: number;
   pending: number;
-  expired: number;
-  rejected?: number;
-  total?: number;
-  completed?: number;
-  conversionRate?: number;
-  averageTimeToAccept?: number;
-  teams?: Record<string, number>;
-  recent_invites?: InvitationData[];
+  conversion_rate: number;
+  last_sent: string[];
 }
 
 export interface InvitationData {
   id: string;
   email: string;
-  status: "pending" | "accepted" | "expired" | "rejected";
-  sentAt: string;
-  acceptedAt?: string;
-  role?: string;
-  created_at?: string;
-  expires_at?: string;
+  name: string;
+  status: 'sent' | 'accepted' | 'expired';
+  sent_at: string;
   accepted_at?: string;
+  expired_at?: string;
+  sent_by: string;
+  role: string;
 }
 
 export interface InvitationFormData {
   email: string;
-  role?: string;
+  name: string;
+  role: string;
   message?: string;
 }
 
 export interface UserPreference {
-  theme: string;
-  notifications: boolean;
-  emailUpdates: boolean;
+  id: string;
+  user_id: string;
+  theme: 'light' | 'dark' | 'system';
+  notifications_enabled: boolean;
+  email_notifications: boolean;
+  sound_enabled: boolean;
   language: string;
+  created_at: string;
+  updated_at: string;
 }
-
-export interface ChatResponse {
-  id: string;
-  message: string;
-  timestamp: string;
-}
-
-export interface User {
-  id: string;
-  name?: string;
-  email?: string;
-  role?: string;
-  created_at?: string;
-  avatar_url?: string;
-  preferences?: any;
-}
-
-export type NotificationType = 'default' | 'info' | 'success' | 'warning' | 'error' | 'badge';
-
-export type NotificationTone = 'friendly' | 'neutral' | 'formal' | 'casual' | 'direct' | 'professional' | 'motivational';

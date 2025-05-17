@@ -6,6 +6,8 @@ export interface EmotionalData {
   context?: string;
   userId?: string;
   id?: string;
+  source?: string;  // Add missing property
+  feedback?: string; // Add missing property
 }
 
 export interface EmotionalTrend {

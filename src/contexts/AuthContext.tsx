@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { User, UserPreferences } from '@/types/user';
+import { NotificationType } from '@/types/notification';
 
 interface AuthContextType {
   user: User | null;
@@ -67,6 +68,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role = 'b2b_user';
       }
       
+      // Set up notification types with all required properties
+      const notificationTypes: Record<NotificationType, boolean> = {
+        system: true,
+        emotion: true,
+        coach: true,
+        journal: true,
+        community: true,
+        achievement: true,
+        badge: true,
+        challenge: true,
+        reminder: true,
+        info: true,
+        warning: true,
+        error: true,
+        success: true,
+        streak: true,
+        urgent: true
+      };
+      
       const mockUser: User = {
         id: '1',
         name: email.split('@')[0],
@@ -85,14 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             emailEnabled: true,
             pushEnabled: false,
             inAppEnabled: true,
-            types: {
-              system: true,
-              emotion: true,
-              coach: true,
-              journal: true,
-              community: true,
-              achievement: true,
-            },
+            types: notificationTypes,
             frequency: 'immediate',
           },
           privacy: {
@@ -122,6 +135,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = useCallback(async (userData: Partial<User>) => {
     setIsLoading(true);
     try {
+      // Set up notification types with all required properties
+      const notificationTypes: Record<NotificationType, boolean> = {
+        system: true,
+        emotion: true,
+        coach: true,
+        journal: true,
+        community: true,
+        achievement: true,
+        badge: true,
+        challenge: true,
+        reminder: true,
+        info: true,
+        warning: true,
+        error: true,
+        success: true,
+        streak: true,
+        urgent: true
+      };
+      
       // In a real app, this would make an API call to register
       const mockUser: User = {
         id: '1',
@@ -141,14 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             emailEnabled: true,
             pushEnabled: false,
             inAppEnabled: true,
-            types: {
-              system: true,
-              emotion: true,
-              coach: true,
-              journal: true,
-              community: true,
-              achievement: true,
-            },
+            types: notificationTypes,
             frequency: 'immediate',
           },
           privacy: {
