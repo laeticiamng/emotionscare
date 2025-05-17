@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from "@/components/ui/input"
@@ -63,6 +64,14 @@ const TeamTabContent: React.FC<TeamTabContentProps> = ({ users }) => {
         break;
     }
     setDateRange({ from: fromDate, to: new Date() });
+  };
+
+  // Convert dateRange to [Date, Date] format for TeamOverview
+  const getDateRangeArray = (): [Date, Date] | undefined => {
+    if (dateRange?.from && dateRange?.to) {
+      return [dateRange.from, dateRange.to];
+    }
+    return undefined;
   };
 
   return (
@@ -156,7 +165,7 @@ const TeamTabContent: React.FC<TeamTabContentProps> = ({ users }) => {
 
       <TeamOverview 
         teamId="team-1" // Default team ID if none available
-        dateRange={dateRange} 
+        dateRange={getDateRangeArray()} 
         users={filteredUsers} 
         period={periodFilter} 
         anonymized={false} 

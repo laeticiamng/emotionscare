@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { useMusic } from '@/contexts';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface MoodBasedRecommendationsProps {
   mood: string;
@@ -15,6 +15,7 @@ interface MoodBasedRecommendationsProps {
 
 const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ mood, intensity = 0.5, standalone = true }) => {
   const { loadPlaylistForEmotion, playlist, isLoading, error } = useMusic();
+  const { toast } = useToast();
 
   React.useEffect(() => {
     if (mood) {
