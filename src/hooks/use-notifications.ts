@@ -37,7 +37,7 @@ export function useNotifications() {
           id: '3',
           title: 'Badge débloqué',
           message: 'Félicitations ! Vous avez débloqué le badge "Régularité"',
-          type: 'achievement',
+          type: 'badge', // Changed from "achievement" to a valid type
           read: false,
           createdAt: new Date(Date.now() - 172800000).toISOString(),
         }

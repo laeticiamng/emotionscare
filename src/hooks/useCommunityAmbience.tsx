@@ -83,7 +83,7 @@ export const useCommunityAmbience = (options: UseCommunityAmbienceOptions = {}) 
       pauseMusic();
     }
     
-    // Create valid EmotionMusicParams object
+    // Create valid EmotionMusicParams object for the API
     const params: EmotionMusicParams = {
       emotion
     };

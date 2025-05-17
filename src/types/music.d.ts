@@ -7,6 +7,8 @@ export interface MusicTrack {
   url?: string;
   audioUrl?: string;
   emotion?: string;
+  // Add track_url for compatibility
+  track_url?: string;
 }
 
 export interface MusicPlaylist {

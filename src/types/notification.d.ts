@@ -10,15 +10,11 @@ export interface Notification {
   message: string;
   type: string;
   read: boolean;
-  createdAt: string;
+  createdAt: string; // Keep as createdAt to match usage in code
   priority?: 'low' | 'medium' | 'high';
   actionUrl?: string;
   image?: string;
 }
 
-export interface NotificationType {
-  id: string;
-  name: string;
-  description: string;
-  icon?: string;
-}
+export type NotificationType = string;
+

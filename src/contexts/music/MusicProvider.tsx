@@ -75,7 +75,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   
   // Music playback controls
   const playTrack = (track: MusicTrack) => {
-    if (!track.audioUrl && !track.url) {
+    if (!track.audioUrl && !track.url && !track.track_url) {
       setError(new Error('No audio URL provided for this track'));
       return;
     }
@@ -84,8 +84,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     if (audioRef.current) {
       // Use the appropriate URL property
-      const trackUrl = track.audioUrl || track.url;
-      audioRef.current.src = trackUrl || '';
+      const trackUrl = track.audioUrl || track.url || track.track_url || '';
+      audioRef.current.src = trackUrl;
       audioRef.current.volume = volume;
       audioRef.current.play()
         .then(() => setIsPlaying(true))
@@ -240,9 +240,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Calculate progress value
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   
-  const value = {
+  // Make sure all properties match the MusicContextType interface
+  const value: MusicContextType = {
     currentTrack,
-    playlist,
+    playlist: playlist?.tracks || [],
+    currentPlaylist: playlist,
     isPlaying,
     volume,
     isMuted,

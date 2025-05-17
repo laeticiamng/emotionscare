@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { MusicTrack, MusicPlaylist, MusicContextType, EmotionMusicParams } from '@/types/music';
 
@@ -10,6 +11,7 @@ const MusicContext = createContext<MusicContextType>({
   currentTime: 0,
   muted: false,
   playlist: [],
+  currentPlaylist: null, // Initialize with null instead of undefined[]
   togglePlay: () => {},
   nextTrack: () => {},
   previousTrack: () => {},
@@ -191,7 +193,6 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     const playlistData: MusicPlaylist = {
       id: `${emotionParam}-playlist`,
       title: `${emotionParam} Music`,
-      emotion: emotionParam,
       tracks: [
         {
           id: 'track1',
