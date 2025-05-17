@@ -2,11 +2,11 @@
 export interface AudioTrack {
   id: string;
   title: string;
-  artist?: string;
+  artist: string;
   description?: string;
   duration: number;
   url: string;
-  audioUrl?: string;
+  audioUrl: string;
   coverUrl?: string;
   category?: string;
   mood?: string;
@@ -63,6 +63,8 @@ export interface AudioContextValue {
   setOpenDrawer: (open: boolean) => void;
   openDrawer: boolean;
   setEmotion: (emotion: string) => void;
+  isInitialized?: boolean;
+  error?: Error | null;
 }
 
 export interface EmotionMusicParams {

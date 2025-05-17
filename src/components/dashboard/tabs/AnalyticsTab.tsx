@@ -1,22 +1,20 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export interface AnalyticsTabProps {
+interface AnalyticsTabProps {
   className?: string;
 }
 
 const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ className }) => {
   return (
     <div className={className}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Analytiques</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Contenu des analytiques à venir.</p>
-        </CardContent>
-      </Card>
+      <h2 className="text-xl font-semibold mb-4">Analytiques</h2>
+      <p className="text-muted-foreground">Visualisez et analysez vos données émotionnelles.</p>
+      
+      {/* Contenu des analytiques à implémenter */}
+      <div className="mt-4 p-4 border rounded-md">
+        <p>Graphiques et statistiques à venir...</p>
+      </div>
     </div>
   );
 };

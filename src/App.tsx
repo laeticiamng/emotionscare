@@ -1,22 +1,29 @@
 
 import React from 'react';
-import { useRoutes } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { AuthProvider } from '@/hooks/useAuth';
+import { UserModeProvider } from '@/contexts/UserModeContext';
+import { LayoutProvider } from '@/contexts/LayoutContext';
+import AppRoutes from '@/router/AppRoutes';
 import { AudioProvider } from '@/contexts/AudioContext';
-import { Toaster } from '@/components/ui/sonner';
-import { routes } from './router';
+import { Toaster } from '@/components/ui/toaster';
 
 function App() {
-  const routeElement = useRoutes(routes);
-
   return (
     <ThemeProvider>
-      <AudioProvider>
-        <React.Suspense fallback={<div>Chargement...</div>}>
-          {routeElement}
-        </React.Suspense>
-        <Toaster />
-      </AudioProvider>
+      <AuthProvider>
+        <UserModeProvider>
+          <LayoutProvider>
+            <AudioProvider>
+              <Router>
+                <AppRoutes />
+              </Router>
+              <Toaster />
+            </AudioProvider>
+          </LayoutProvider>
+        </UserModeProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

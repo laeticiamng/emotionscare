@@ -5,7 +5,7 @@ import GlobalOverviewTab from './tabs/GlobalOverviewTab';
 import AnalyticsTab from './tabs/AnalyticsTab';
 import JournalTab from './tabs/JournalTab';
 import TeamTab from './tabs/TeamTab';
-import { User, UserRole } from '@/types/user';
+import { User } from '@/types/user';
 
 interface UserDashboardProps {
   user: User;
@@ -13,7 +13,7 @@ interface UserDashboardProps {
 
 const UserDashboard: React.FC<UserDashboardProps> = ({ user }) => {
   // Vérifier si l'utilisateur a un rôle d'entreprise (B2B)
-  const isB2BUser = user.role === 'b2b';
+  const isB2BUser = user.role === 'b2b_user' || user.role === 'b2b_admin';
   
   return (
     <div className="container mx-auto px-4 py-6">

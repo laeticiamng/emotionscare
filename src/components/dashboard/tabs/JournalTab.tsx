@@ -1,22 +1,20 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export interface JournalTabProps {
+interface JournalTabProps {
   className?: string;
 }
 
 const JournalTab: React.FC<JournalTabProps> = ({ className }) => {
   return (
     <div className={className}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Journal</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Contenu du journal à venir.</p>
-        </CardContent>
-      </Card>
+      <h2 className="text-xl font-semibold mb-4">Journal</h2>
+      <p className="text-muted-foreground">Consultez et modifiez votre journal émotionnel.</p>
+      
+      {/* Contenu du journal à implémenter */}
+      <div className="mt-4 p-4 border rounded-md">
+        <p>Entrées de journal à venir...</p>
+      </div>
     </div>
   );
 };

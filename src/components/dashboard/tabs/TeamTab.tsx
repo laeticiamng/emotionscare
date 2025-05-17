@@ -1,22 +1,20 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export interface TeamTabProps {
+interface TeamTabProps {
   className?: string;
 }
 
 const TeamTab: React.FC<TeamTabProps> = ({ className }) => {
   return (
     <div className={className}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Équipe</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Contenu de l'équipe à venir.</p>
-        </CardContent>
-      </Card>
+      <h2 className="text-xl font-semibold mb-4">Équipe</h2>
+      <p className="text-muted-foreground">Visualisez et gérez les données de votre équipe.</p>
+      
+      {/* Contenu de l'équipe à implémenter */}
+      <div className="mt-4 p-4 border rounded-md">
+        <p>Tableau de bord d'équipe à venir...</p>
+      </div>
     </div>
   );
 };
