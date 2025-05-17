@@ -5,9 +5,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { User } from '@/types/types';
-import { UserPreferences, NotificationPreferences, PrivacyLevel } from '@/types/preferences';
+import { UserPreferences, PrivacyLevel } from '@/types/preferences';
 import DisplayPreferences from './DisplayPreferences';
-import NotificationPreferences from './NotificationPreferences';
+import NotificationPreferencesComponent from './NotificationPreferences';
 import PrivacyPreferences from './PrivacyPreferences';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -118,13 +118,19 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({
               />
             </TabsContent>
             <TabsContent value="notifications">
-              <NotificationPreferences
+              <NotificationPreferencesComponent
                 preferences={preferences.notifications || {
                   enabled: false,
-                  types: {},
+                  types: {
+                    system: false,
+                    emotion: false,
+                    coach: false,
+                    journal: false,
+                    community: false
+                  },
                   frequency: 'daily'
-                } as NotificationPreferences}
-                onChange={(notifPrefs) => 
+                }}
+                onUpdate={(notifPrefs) => 
                   handlePreferencesChange({ notifications: notifPrefs })
                 }
               />

@@ -4,7 +4,12 @@ import { Card, CardContent } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Sun, Moon, Laptop, Palette } from 'lucide-react';
-import { ThemeSettingsTabProps } from '@/types/theme';
+import { Theme } from '@/types/theme';
+
+export interface ThemeSettingsTabProps {
+  currentTheme: string;
+  onThemeChange: (theme: string) => void;
+}
 
 export const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   currentTheme,
@@ -22,7 +27,7 @@ export const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
           <CardContent className="pt-6">
             <RadioGroup 
               value={currentTheme} 
-              onValueChange={(value) => onThemeChange(value as any)}
+              onValueChange={onThemeChange}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
             >
               <div>

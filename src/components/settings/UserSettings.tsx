@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ThemeSettingsTab from './ThemeSettingsTab';
-import { ThemeName } from '@/types/preferences';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const UserSettings = () => {
@@ -11,7 +10,7 @@ const UserSettings = () => {
 
   // Ensure theme type compatibility
   const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme as ThemeName);
+    setTheme(newTheme);
   };
 
   return (
@@ -28,7 +27,7 @@ const UserSettings = () => {
         
         <TabsContent value="theme">
           <ThemeSettingsTab 
-            currentTheme={theme as ThemeName} 
+            currentTheme={theme} 
             onThemeChange={handleThemeChange} 
           />
         </TabsContent>

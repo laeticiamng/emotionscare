@@ -4,11 +4,31 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NotificationFrequency, NotificationPreferences } from '@/types/preferences';
+import { NotificationFrequency } from '@/types/preferences';
 
 interface NotificationPreferencesProps {
-  preferences: NotificationPreferences;
-  onUpdate: (preferences: NotificationPreferences) => void;
+  preferences: {
+    enabled: boolean;
+    emailEnabled?: boolean;
+    pushEnabled?: boolean;
+    inAppEnabled?: boolean;
+    types: {
+      system: boolean;
+      emotion: boolean;
+      coach: boolean;
+      journal: boolean;
+      community: boolean;
+      achievement?: boolean;
+    };
+    frequency: NotificationFrequency;
+    tone?: string;
+    quietHours?: {
+      enabled: boolean;
+      start: string;
+      end: string;
+    }
+  };
+  onUpdate: (preferences: any) => void;
 }
 
 const NotificationPreferencesComponent: React.FC<NotificationPreferencesProps> = ({
@@ -39,7 +59,7 @@ const NotificationPreferencesComponent: React.FC<NotificationPreferencesProps> =
     }
   };
 
-  const handleTypeToggle = (type: keyof NotificationPreferences['types'], checked: boolean) => {
+  const handleTypeToggle = (type: string, checked: boolean) => {
     const updatedTypes = {
       ...preferences.types,
       [type]: checked,

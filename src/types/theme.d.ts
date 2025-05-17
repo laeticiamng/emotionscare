@@ -15,3 +15,14 @@ export interface ThemeContextType {
 }
 
 export { ThemeName, FontSize, FontFamily };
+
+export interface ThemeSettingsTabProps {
+  currentTheme: string;
+  onThemeChange: (theme: string) => void;
+}
+
+export interface ThemeOption {
+  name: string;
+  value: Theme;
+  preview: string;
+}
