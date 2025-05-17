@@ -1,7 +1,6 @@
 
-// Re-export from the correct location
-import { toast } from "sonner";
-import { useToast } from "@/hooks/use-toast";
+// Re-export from the hooks file
+import { toast, useToast } from "@/hooks/use-toast";
 
 export { toast, useToast };
 export type { Toast, ToastProps, ToastActionElement, ToastOptions } from "@/types/toast";
