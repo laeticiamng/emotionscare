@@ -14,13 +14,29 @@ const NotFoundPage: React.FC = () => {
       <p className="text-muted-foreground max-w-md mx-auto mb-8">
         Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
       </p>
-      <Button 
-        onClick={() => navigate('/')}
-        className="flex items-center"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Retourner à l'accueil
-      </Button>
+      <div className="flex flex-col gap-4 w-full max-w-xs">
+        <Button 
+          onClick={() => navigate('/')}
+          className="flex items-center justify-center"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Retourner à l'accueil
+        </Button>
+        <Button 
+          variant="outline"
+          onClick={() => navigate('/b2c')}
+          className="flex items-center justify-center"
+        >
+          Espace Personnel
+        </Button>
+        <Button 
+          variant="outline"
+          onClick={() => navigate('/b2b/selection')}
+          className="flex items-center justify-center"
+        >
+          Espace Entreprise
+        </Button>
+      </div>
     </div>
   );
 };

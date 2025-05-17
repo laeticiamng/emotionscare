@@ -37,6 +37,17 @@ const TeamOverview: React.FC<TeamOverviewProps> = ({
       if (value.title) {
         return value.title.toString();
       }
+      
+      // For objects with emotionName, use that property
+      if (value.emotionName) {
+        return value.emotionName.toString();
+      }
+      
+      // For objects with name, use that property
+      if (value.name) {
+        return value.name.toString();
+      }
+      
       // Otherwise return a stringified version, but make sure we're not directly rendering objects
       try {
         return JSON.stringify(value);
@@ -57,7 +68,7 @@ const TeamOverview: React.FC<TeamOverviewProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           {users.map((user, index) => (
             <div key={user.id || index} className="p-4 border rounded">
-              <h3 className="font-medium">{showNames ? user.name : `Membre #${index + 1}`}</h3>
+              <h3 className="font-medium">{showNames ? safeValue(user.name) : `Membre #${index + 1}`}</h3>
               <div className="mt-2">
                 <div className="text-sm">
                   <span>Score émotionnel: </span>

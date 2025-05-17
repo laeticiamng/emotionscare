@@ -2,7 +2,19 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getRoleHomePath } from '@/utils/roleUtils';
+
+// Function to determine the home path based on user role
+export const getRoleHomePath = (role?: string): string => {
+  switch(role) {
+    case 'b2b_admin':
+      return '/b2b/admin';
+    case 'b2b_user':
+      return '/b2b/user';
+    case 'b2c':
+    default:
+      return '/b2c';
+  }
+};
 
 export function useRoleRedirect() {
   const { user, isAuthenticated, isLoading } = useAuth();
