@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+import { useState, useCallback } from 'react';
 import { 
   Notification,
   NotificationFilter,
@@ -20,25 +21,25 @@ export function useNotifications() {
           id: '1',
           title: 'Système mis à jour',
           message: 'Le système a été mis à jour avec succès',
-          type: 'system' as NotificationType,
+          type: 'system',
           read: false,
-          timestamp: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
         },
         {
           id: '2',
           title: 'Nouvelle analyse émotionnelle',
           message: 'Votre analyse émotionnelle hebdomadaire est prête',
-          type: 'emotion' as NotificationType,
+          type: 'emotion',
           read: true,
-          timestamp: new Date(Date.now() - 86400000).toISOString(),
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
         },
         {
           id: '3',
           title: 'Badge débloqué',
           message: 'Félicitations ! Vous avez débloqué le badge "Régularité"',
-          type: 'achievement' as NotificationType,
+          type: 'achievement',
           read: false,
-          timestamp: new Date(Date.now() - 172800000).toISOString(),
+          createdAt: new Date(Date.now() - 172800000).toISOString(),
         }
       ];
       
@@ -60,19 +61,19 @@ export function useNotifications() {
       )
     );
   }, []);
-
+  
   const markAllAsRead = useCallback(() => {
     setNotifications(prev => 
       prev.map(notification => ({ ...notification, read: true }))
     );
   }, []);
-
+  
   const deleteNotification = useCallback((id: string) => {
     setNotifications(prev => 
       prev.filter(notification => notification.id !== id)
     );
   }, []);
-
+  
   const clearAllNotifications = useCallback(() => {
     setNotifications([]);
   }, []);

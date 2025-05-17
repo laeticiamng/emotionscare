@@ -1,3 +1,4 @@
+
 // Fix missing parameters in useCoachChat.tsx
 import { useState, useCallback } from 'react';
 import { useCoach } from '@/contexts/coach/CoachContextProvider';
@@ -7,12 +8,13 @@ export const useCoachChat = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   
-  // Add this loading state since it was referenced but not defined
+  // Add loading state since it was referenced but not defined
   const [loading, setLoading] = useState<boolean>(false);
   
   const sendMessage = useCallback(async (message: string, history: any[] = []) => {
     try {
       setIsProcessing(true);
+      setLoading(true);
       // Add the second parameter that was missing
       const response = await coach.sendMessage(message, history);
       
@@ -26,6 +28,7 @@ export const useCoachChat = () => {
       return null;
     } finally {
       setIsProcessing(false);
+      setLoading(false);
     }
   }, [coach]);
   
@@ -41,7 +44,7 @@ export const useCoachChat = () => {
     messages,
     sendMessage,
     isProcessing,
-    loading, // Make sure to return this property
+    loading,
     addMessage,
     clearMessages,
   };

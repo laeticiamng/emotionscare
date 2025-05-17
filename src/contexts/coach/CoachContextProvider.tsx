@@ -4,7 +4,7 @@ import React, { createContext, useState, useCallback, useContext } from 'react';
 interface CoachHandlersOptions {
   sendMessageHandler: (message: string, conversationHistory: any[]) => Promise<string>;
   analyzeEmotionHandler: (text: string) => Promise<{ emotion: string; score: number }>;
-  getRecommendationsHandler: (category: string) => string[]; // Changed return type from Promise<string[]> to string[]
+  getRecommendationsHandler: (category: string) => string[]; // Changed return type to match implementation
   processUserMessage?: (message: string) => Promise<void>;
   setIsProcessing?: (isProcessing: boolean) => void;
 }

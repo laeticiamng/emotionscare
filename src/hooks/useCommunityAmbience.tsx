@@ -1,89 +1,118 @@
-import { useCallback } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
-import { useToast } from '@/hooks/use-toast';
+
+import { useEffect, useState } from 'react';
+import { useMusic } from '@/contexts/music';
 import { EmotionMusicParams } from '@/types/music';
 
-export const useMusicEmotionIntegration = () => {
-  const { setEmotion, openDrawer, setOpenDrawer, loadPlaylistForEmotion } = useMusic();
-  const { toast } = useToast();
+interface UseCommunityAmbienceOptions {
+  autoPlay?: boolean;
+  defaultEmotion?: string;
+}
 
-  const getEmotionMusicDescription = useCallback((emotion: string): string => {
-    const descriptions: Record<string, string> = {
-      'happy': 'Des mélodies joyeuses pour amplifier votre bonne humeur',
-      'calm': 'Des sonorités apaisantes pour retrouver la sérénité',
-      'focus': 'Des compositions pour améliorer votre concentration',
-      'energetic': 'Des rythmes dynamiques pour booster votre énergie',
-      'sad': 'Des mélodies mélancoliques pour accompagner vos émotions',
-      'anxiety': 'Des sons apaisants pour réduire votre anxiété',
-      'confidence': 'Des compositions inspirantes pour renforcer votre confiance',
-      'sleep': 'Des berceuses douces pour faciliter l\'endormissement'
-    };
-    
-    return descriptions[emotion.toLowerCase()] || 'Musique adaptée à votre humeur';
-  }, []);
-
-  const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams): Promise<boolean> => {
+export const useCommunityAmbience = (options: UseCommunityAmbienceOptions = {}) => {
+  const { autoPlay = false, defaultEmotion = 'calm' } = options;
+  const music = useMusic();
+  const [currentEmotion, setCurrentEmotion] = useState(defaultEmotion);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  useEffect(() => {
+    // Load default emotion playlist on mount if autoPlay is true
+    if (autoPlay && !isLoaded) {
+      loadEmotionMusic(defaultEmotion);
+    }
+  }, [autoPlay, defaultEmotion, isLoaded]);
+  
+  const loadEmotionMusic = async (emotion: string, intensity?: number) => {
     try {
-      // Set the emotion in the music context
-      setEmotion(params.emotion);
+      setIsLoaded(false);
       
-      // Load playlist for this emotion
-      const playlist = await loadPlaylistForEmotion(params);
+      // Create valid EmotionMusicParams object
+      const params: EmotionMusicParams = {
+        emotion,
+        intensity: intensity || 0.5
+      };
       
-      // Open the music drawer
-      if (!openDrawer) {
-        setOpenDrawer(true);
-        
-        // Show toast notification
-        toast({
-          title: 'Musique émotionnelle activée',
-          description: getEmotionMusicDescription(params.emotion)
-        });
+      const playlist = await music.loadPlaylistForEmotion(params);
+      
+      if (playlist) {
+        setCurrentEmotion(emotion);
+        setIsLoaded(true);
+        return true;
       }
-      
-      return true;
+      return false;
     } catch (error) {
-      console.error('Error activating music for emotion:', error);
-      
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de charger la musique. Veuillez réessayer.',
-        variant: 'destructive',
-      });
-      
+      console.error("Error loading emotion music:", error);
       return false;
     }
-  }, [openDrawer, setOpenDrawer, setEmotion, loadPlaylistForEmotion, toast, getEmotionMusicDescription]);
-
+  };
+  
+  const playEmotionMusic = async (emotion: string, intensity?: number) => {
+    const success = await loadEmotionMusic(emotion, intensity);
+    if (success && music.currentTrack) {
+      music.playTrack(music.currentTrack);
+      setIsPlaying(true);
+    }
+    return success;
+  };
+  
+  const pauseMusic = () => {
+    music.pauseTrack();
+    setIsPlaying(false);
+  };
+  
+  const resumeMusic = () => {
+    if (music.resumeTrack) {
+      music.resumeTrack();
+    } else {
+      music.togglePlay();
+    }
+    setIsPlaying(true);
+  };
+  
+  const togglePlayback = () => {
+    if (isPlaying) {
+      pauseMusic();
+    } else {
+      resumeMusic();
+    }
+  };
+  
+  const matchMusicToEmotion = async (emotion: string) => {
+    // Stop current music if playing
+    if (isPlaying) {
+      pauseMusic();
+    }
+    
+    // Create valid EmotionMusicParams object
+    const params: EmotionMusicParams = {
+      emotion
+    };
+    
+    await music.loadPlaylistForEmotion(params);
+    
+    if (music.currentTrack) {
+      music.playTrack(music.currentTrack);
+      setIsPlaying(true);
+      setCurrentEmotion(emotion);
+      return true;
+    }
+    return false;
+  };
+  
   return {
-    activateMusicForEmotion,
-    getEmotionMusicDescription
+    currentEmotion,
+    isPlaying,
+    isLoaded,
+    loadEmotionMusic,
+    playEmotionMusic,
+    pauseMusic,
+    resumeMusic,
+    togglePlayback,
+    matchMusicToEmotion,
+    setVolume: music.setVolume,
+    currentTrack: music.currentTrack,
+    progress: music.currentTime / (music.duration || 1),
   };
 };
 
-export default useMusicEmotionIntegration;
-
-// Fix the specific type error by ensuring we create a properly formatted EmotionMusicParams object
-export const activateMusicForCommunityMood = async (emotion: string) => {
-  try {
-    // Create a properly formatted EmotionMusicParams object
-    const params: EmotionMusicParams = {
-      emotion: emotion,
-      intensity: 0.5
-    };
-    
-    // Now use the params object when calling loadPlaylistForEmotion
-    const musicContext = useMusic();
-    const playlist = await musicContext.loadPlaylistForEmotion(params);
-    
-    if (playlist) {
-      musicContext.setOpenDrawer(true);
-      return true;
-    }
-    
-    return false;
-  } catch (error) {
-    console.error('Failed to activate music for community mood:', error);
-    return false;
-  }
-};
+export default useCommunityAmbience;

@@ -2,11 +2,7 @@
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
 export type NotificationTone = 'formal' | 'friendly' | 'minimal' | 'direct' | 'professional' | 'motivational';
 
-export interface NotificationFilter {
-  type?: string;
-  read?: boolean;
-  priority?: string;
-}
+export type NotificationFilter = 'all' | 'unread' | string;
 
 export interface Notification {
   id: string;

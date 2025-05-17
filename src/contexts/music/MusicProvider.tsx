@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import MusicContext from './MusicContext';
 import { MusicTrack, MusicPlaylist, EmotionMusicParams, MusicContextType } from '@/types/music';
@@ -74,7 +75,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   
   // Music playback controls
   const playTrack = (track: MusicTrack) => {
-    if (!track.audioUrl && !track.url && !track.track_url) {
+    if (!track.audioUrl && !track.url) {
       setError(new Error('No audio URL provided for this track'));
       return;
     }
@@ -83,7 +84,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     
     if (audioRef.current) {
       // Use the appropriate URL property
-      const trackUrl = track.audioUrl || track.url || track.track_url;
+      const trackUrl = track.audioUrl || track.url;
       audioRef.current.src = trackUrl || '';
       audioRef.current.volume = volume;
       audioRef.current.play()
@@ -183,7 +184,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // For now, just a mock implementation - in a real app, this would call an API
       const emotionName = typeof params === 'string' ? params : params.emotion;
       setEmotionState(emotionName);
-      setCurrentEmotion(emotionName); // Mettre à jour currentEmotion
+      setCurrentEmotion(emotionName);
       
       // Mock data for demonstration
       const mockPlaylist: MusicPlaylist = {
@@ -196,14 +197,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             id: `track-1-${emotionName}`,
             title: `${emotionName} Track 1`,
             artist: 'Artist 1',
-            audioUrl: '/sounds/ambient-calm.mp3', // Using the included sound file
+            audioUrl: '/sounds/ambient-calm.mp3',
             duration: 180
           },
           {
             id: `track-2-${emotionName}`,
             title: `${emotionName} Track 2`,
             artist: 'Artist 2',
-            audioUrl: '/sounds/welcome.mp3', // Using the included sound file
+            audioUrl: '/sounds/welcome.mp3',
             duration: 210
           }
         ],
@@ -239,7 +240,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Calculate progress value
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   
-  const value: MusicContextType = {
+  const value = {
     currentTrack,
     playlist,
     isPlaying,
@@ -248,7 +249,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     muted: isMuted, // Add muted property for compatibility
     currentTime,
     duration,
-    progress, // Include calculated progress
     isLoading,
     error,
     emotion,
@@ -269,7 +269,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     isShuffled,
     isRepeating,
     toggleShuffle,
-    toggleRepeat
+    toggleRepeat,
+    progress, // Make sure progress is included in the interface
   };
   
   return (

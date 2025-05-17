@@ -18,10 +18,7 @@ const MusicContext = createContext<MusicContextType>({
   toggleMute: () => {},
   pauseTrack: () => {},
   playTrack: () => {},
-  isInitialized: false,
-  initializeMusicSystem: () => {},
   loadPlaylistForEmotion: async () => null,
-  setOpenDrawer: () => {},
 });
 
 interface MusicProviderProps {
@@ -51,6 +48,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     try {
       console.log('Initializing music system...');
       // Initialization logic
+      setIsInitialized(true);
       return true;
     } catch (error) {
       console.error('Failed to initialize music system:', error);
@@ -100,7 +98,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     if (!audioRef.current) return;
     
     setCurrentTrack(track);
-    audioRef.current.src = track.url;
+    audioRef.current.src = track.url || '';
     audioRef.current.load();
     
     audioRef.current.play().catch((err) => {
@@ -144,7 +142,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     if (!audioRef.current) return;
     
     setCurrentTrack(track);
-    audioRef.current.src = track.url;
+    audioRef.current.src = track.url || '';
     audioRef.current.load();
     
     if (isPlaying) {
@@ -186,22 +184,42 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   };
   
   // Mock function to load a playlist based on emotion
-  const loadPlaylistForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
+  const loadPlaylistForEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
     // Create a playlist object that matches the MusicPlaylist type
-    const playlist: MusicPlaylist = {
-      id: `${params.emotion}-playlist`,
-      title: `${params.emotion} Music`,
-      emotion: params.emotion,
+    const emotionParam = typeof params === 'string' ? params : params.emotion;
+    
+    const playlistData: MusicPlaylist = {
+      id: `${emotionParam}-playlist`,
+      title: `${emotionParam} Music`,
+      emotion: emotionParam,
       tracks: [
-        // Add some tracks
+        {
+          id: 'track1',
+          title: 'Sample Track 1',
+          artist: 'Artist 1',
+          duration: 180,
+          url: '/sounds/ambient-calm.mp3',
+        },
+        {
+          id: 'track2',
+          title: 'Sample Track 2',
+          artist: 'Artist 2',
+          duration: 220,
+          url: '/sounds/welcome.mp3',
+        }
       ]
     };
     
-    setCurrentPlaylist(playlist);
-    setPlaylist(playlist.tracks);
-    setCurrentEmotion(params.emotion);
+    setPlaylist(playlistData.tracks);
+    setCurrentPlaylist(playlistData);
     
-    return playlist;
+    if (typeof params === 'string') {
+      setCurrentEmotion(params);
+    } else {
+      setCurrentEmotion(params.emotion);
+    }
+    
+    return playlistData;
   };
   
   // Effect to initialize audio system on mount
@@ -226,6 +244,9 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     }
   }, [volume, muted]);
   
+  // Calculate progress
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  
   const value: MusicContextType = {
     currentTrack,
     isPlaying,
@@ -234,6 +255,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     currentTime,
     muted,
     playlist,
+    progress,
     togglePlay,
     nextTrack,
     previousTrack,
