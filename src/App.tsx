@@ -5,6 +5,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { MusicProvider } from '@/contexts/music';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { UserPreferencesProvider } from '@/contexts/UserPreferencesContext';
 import AppRouter from '@/AppRouter';
 import RouteDebugger from '@/components/ui/RouteDebugger';
 
@@ -13,13 +14,15 @@ function App() {
     <Router>
       <ThemeProvider>
         <AuthProvider>
-          <UserModeProvider>
-            <MusicProvider>
-              <AppRouter />
-              <Toaster />
-              {process.env.NODE_ENV === 'development' && <RouteDebugger />}
-            </MusicProvider>
-          </UserModeProvider>
+          <UserPreferencesProvider>
+            <UserModeProvider>
+              <MusicProvider>
+                <AppRouter />
+                <Toaster />
+                {process.env.NODE_ENV === 'development' && <RouteDebugger />}
+              </MusicProvider>
+            </UserModeProvider>
+          </UserPreferencesProvider>
         </AuthProvider>
       </ThemeProvider>
     </Router>

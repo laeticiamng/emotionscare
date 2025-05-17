@@ -59,6 +59,9 @@ export interface UserPreferences {
   notifications_enabled?: boolean;
   email_notifications?: boolean;
   autoplayMedia?: boolean;
+  dashboardLayout?: Record<string, any> | string;
+  onboardingCompleted?: boolean;
+  showTips?: boolean;
   
   // Properties used in the application
   notifications?: {
@@ -73,9 +76,7 @@ export interface UserPreferences {
     sms?: boolean;
     inApp?: boolean;
   };
-  dashboardLayout?: Record<string, any> | string;
-  onboardingCompleted?: boolean;
-  showTips?: boolean;
+  
   privacy?: {
     shareData?: boolean;
     anonymizeReports?: boolean;

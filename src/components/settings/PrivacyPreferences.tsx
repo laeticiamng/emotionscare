@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UserPreferences } from '@/types/types';
+import { UserPreferences } from '@/types/user';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';

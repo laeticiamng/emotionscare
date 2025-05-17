@@ -8,9 +8,10 @@ export interface Story {
   created_at: string;
   tags?: string[];
   image?: string;
-  date?: string;
+  date?: Date | string;
   cta?: {
     label: string;
-    link: string;
+    route?: string;
+    action?: () => void;
   };
 }

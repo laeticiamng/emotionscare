@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Story } from '@/types/types';
+import { Story } from '@/types/Story';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -46,9 +46,11 @@ const StoryCard: React.FC<StoryCardProps> = ({
     }
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: string | Date) => {
+    if (!date) return 'Date inconnue';
+    
     try {
-      return formatDistanceToNow(date, { addSuffix: true, locale: fr });
+      return formatDistanceToNow(new Date(date), { addSuffix: true, locale: fr });
     } catch (error) {
       return 'Date inconnue';
     }
@@ -74,7 +76,7 @@ const StoryCard: React.FC<StoryCardProps> = ({
           {story.content}
         </p>
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{formatDate(story.date)}</span>
+          <span>{story.created_at ? formatDate(story.created_at) : 'Date inconnue'}</span>
           {story.emotion && <span className="capitalize">{story.emotion}</span>}
         </div>
       </CardContent>

@@ -1,6 +1,9 @@
 
-// This is a stub file for firebase configuration
-// Replace with actual firebase config when needed
+// Firebase configuration
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 export const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
@@ -12,4 +15,10 @@ export const firebaseConfig = {
   measurementId: "YOUR_MEASUREMENT_ID"
 };
 
-export default firebaseConfig;
+// Initialize Firebase
+export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
+
+export default app;

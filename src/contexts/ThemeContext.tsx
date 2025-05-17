@@ -1,162 +1,133 @@
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { Theme, FontFamily, FontSize } from '@/types/theme';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { ThemeName, Theme } from '@/types';
 
-export interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  isDarkMode: boolean;
-  fontSize: FontSize;
-  setFontSize: (size: FontSize) => void;
-  fontFamily: FontFamily;
-  setFontFamily: (family: FontFamily) => void;
+interface ThemeContextType {
+  theme: ThemeName;
+  setTheme: (theme: ThemeName) => void;
   toggleTheme: () => void;
-  getContrastText: (color: string) => 'black' | 'white';
-  reduceMotion: boolean;
-  setReduceMotion: (reduce: boolean) => void;
-  soundEnabled: boolean;
-  setSoundEnabled: (enabled: boolean) => void;
+  themes: Record<ThemeName, Theme>;
 }
 
-const initialState: ThemeContextType = {
-  theme: 'system',
-  setTheme: () => null,
-  isDarkMode: false,
-  fontSize: 'medium',
-  setFontSize: () => null,
-  fontFamily: 'system',
-  setFontFamily: () => null,
-  toggleTheme: () => null,
-  getContrastText: () => 'black',
-  reduceMotion: false,
-  setReduceMotion: () => null,
-  soundEnabled: true,
-  setSoundEnabled: () => null
+const defaultTheme: ThemeName = 'system';
+
+const defaultThemes: Record<ThemeName, Theme> = {
+  light: {
+    name: 'light',
+    value: 'light',
+    colors: {
+      primary: '#0070f3',
+      secondary: '#ff0080',
+      accent: '#1fb2a6',
+      background: '#ffffff',
+      text: '#1a1a1a'
+    }
+  },
+  dark: {
+    name: 'dark',
+    value: 'dark',
+    colors: {
+      primary: '#0070f3',
+      secondary: '#ff0080',
+      accent: '#1fb2a6',
+      background: '#000000',
+      text: '#ffffff'
+    }
+  },
+  system: {
+    name: 'system',
+    value: 'system',
+    colors: {
+      primary: '#0070f3',
+      secondary: '#ff0080',
+      accent: '#1fb2a6',
+      background: 'system-defined',
+      text: 'system-defined'
+    }
+  },
+  pastel: {
+    name: 'pastel',
+    value: 'pastel',
+    colors: {
+      primary: '#a0d2eb',
+      secondary: '#e5eaf5',
+      accent: '#d0bdf4',
+      background: '#fcf4ff',
+      text: '#494949'
+    }
+  }
 };
 
-export const ThemeContext = createContext<ThemeContextType>(initialState);
+const ThemeContext = createContext<ThemeContextType>({
+  theme: defaultTheme,
+  setTheme: () => null,
+  toggleTheme: () => null,
+  themes: defaultThemes
+});
 
-export const ThemeProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const storedTheme = localStorage.getItem('theme') as Theme;
-    return storedTheme || 'system';
-  });
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
-  const [fontSize, setFontSize] = useState<FontSize>(() => {
-    return (localStorage.getItem('fontSize') as FontSize) || 'medium';
-  });
-  const [fontFamily, setFontFamily] = useState<FontFamily>(() => {
-    return (localStorage.getItem('fontFamily') as FontFamily) || 'system';
-  });
-  const [reduceMotion, setReduceMotion] = useState<boolean>(() => {
-    return localStorage.getItem('reduceMotion') === 'true' || false;
-  });
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(() => {
-    return localStorage.getItem('soundEnabled') !== 'false';
-  });
+export const useTheme = () => useContext(ThemeContext);
 
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<ThemeName>(defaultTheme);
+  
   useEffect(() => {
-    const root = window.document.documentElement;
+    const savedTheme = localStorage.getItem('theme') as ThemeName;
     
-    // Nettoyer les classes de thème existantes
-    root.classList.remove('light', 'dark', 'pastel');
+    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'system' || savedTheme === 'pastel')) {
+      setTheme(savedTheme);
+    }
     
-    // Appliquer le thème actuel
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const currentTheme = theme === 'system' ? systemTheme : theme;
-    
-    root.classList.add(currentTheme);
-    setIsDarkMode(currentTheme === 'dark');
+    // Apply the theme class to the document
+    applyTheme(savedTheme || theme);
+  }, []);
+  
+  useEffect(() => {
+    // Apply theme when it changes
+    applyTheme(theme);
     localStorage.setItem('theme', theme);
+  }, [theme]);
+  
+  const applyTheme = (currentTheme: ThemeName) => {
+    const root = window.document.documentElement;
+    const isDark = 
+      currentTheme === 'dark' ||
+      (currentTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
     
-    // Ajouter class pour le mode de mouvement réduit
-    if (reduceMotion) {
-      root.classList.add('reduce-motion');
+    if (isDark) {
+      root.classList.add('dark');
     } else {
-      root.classList.remove('reduce-motion');
+      root.classList.remove('dark');
     }
-
-    // Observer les changements de préférence système
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => {
-      if (theme === 'system') {
-        const newSystemTheme = mediaQuery.matches ? 'dark' : 'light';
-        root.classList.remove('light', 'dark', 'pastel');
-        root.classList.add(newSystemTheme);
-        setIsDarkMode(newSystemTheme === 'dark');
-      }
-    };
     
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme, reduceMotion]);
-
-  useEffect(() => {
-    localStorage.setItem('fontSize', fontSize);
-    document.documentElement.dataset.fontSize = fontSize;
-  }, [fontSize]);
-
-  useEffect(() => {
-    localStorage.setItem('fontFamily', fontFamily);
-    document.documentElement.dataset.fontFamily = fontFamily;
-  }, [fontFamily]);
-
-  useEffect(() => {
-    localStorage.setItem('reduceMotion', String(reduceMotion));
-  }, [reduceMotion]);
-
-  useEffect(() => {
-    localStorage.setItem('soundEnabled', String(soundEnabled));
-  }, [soundEnabled]);
-
+    // Apply special pastel theme if selected
+    if (currentTheme === 'pastel') {
+      root.classList.add('theme-pastel');
+    } else {
+      root.classList.remove('theme-pastel');
+    }
+  };
+  
   const toggleTheme = () => {
-    if (theme === 'light') {
-      setTheme('dark');
-    } else if (theme === 'dark') {
-      setTheme('pastel');
-    } else {
-      setTheme('light');
-    }
+    setTheme(prevTheme => {
+      if (prevTheme === 'light') return 'dark';
+      if (prevTheme === 'dark') return 'system';
+      if (prevTheme === 'system') return 'pastel';
+      return 'light';
+    });
   };
-
-  // Fonction pour déterminer si le texte doit être noir ou blanc selon la couleur de fond
-  const getContrastText = (color: string): 'black' | 'white' => {
-    // Convertir hex en RGB
-    const hex = color.replace('#', '');
-    const r = parseInt(hex.length === 3 ? hex[0] + hex[0] : hex.substring(0, 2), 16);
-    const g = parseInt(hex.length === 3 ? hex[1] + hex[1] : hex.substring(2, 4), 16);
-    const b = parseInt(hex.length === 3 ? hex[2] + hex[2] : hex.substring(4, 6), 16);
-    
-    // Calculer la luminosité relative
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    
-    // Retourner noir ou blanc selon la luminosité
-    return luminance > 0.5 ? 'black' : 'white';
+  
+  const value = {
+    theme,
+    setTheme,
+    toggleTheme,
+    themes: defaultThemes,
   };
-
+  
   return (
-    <ThemeContext.Provider value={{ 
-      theme, 
-      setTheme, 
-      isDarkMode,
-      fontSize,
-      setFontSize,
-      fontFamily,
-      setFontFamily,
-      toggleTheme,
-      getContrastText,
-      reduceMotion,
-      setReduceMotion,
-      soundEnabled,
-      setSoundEnabled
-    }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
-};
+}
 
-export const useTheme = () => useContext(ThemeContext);
+export default ThemeContext;

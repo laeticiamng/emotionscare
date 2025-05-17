@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '@/config/firebase';
@@ -6,7 +7,8 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  updateProfile
+  updateProfile,
+  User as FirebaseUser
 } from 'firebase/auth';
 import { User, UserPreferences } from '@/types/user';
 import { useToast } from '@/hooks/use-toast';
@@ -18,7 +20,7 @@ interface AuthContextProps {
   login: (email: string, password: string) => Promise<User>;
   register: (email: string, password: string, name: string) => Promise<User>;
   logout: () => Promise<void>;
-  updateUser: (name: string, avatarUrl: string) => Promise<void>;
+  updateUser: (userData: Partial<User>) => Promise<void>;
   error: string | null;
   clearError: () => void;
 }
@@ -48,7 +50,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const defaultPreferences: UserPreferences = {
           theme: 'light',
           language: 'fr',
-          fontSize: 'medium',
           notifications_enabled: true,
           email_notifications: true
         };
@@ -87,7 +88,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const defaultPreferences: UserPreferences = {
         theme: 'light',
         language: 'fr',
-        fontSize: 'medium',
         notifications_enabled: true,
         email_notifications: true
       };
@@ -124,7 +124,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const defaultPreferences: UserPreferences = {
         theme: 'light',
         language: 'fr',
-        fontSize: 'medium',
         notifications_enabled: true,
         email_notifications: true
       };
@@ -170,21 +169,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
   
-  const updateUser = async (name: string, avatarUrl: string): Promise<void> => {
+  const updateUser = async (userData: Partial<User>): Promise<void> => {
     try {
       if (auth.currentUser) {
-        await updateProfile(auth.currentUser, {
-          displayName: name,
-          photoURL: avatarUrl
-        });
+        if (userData.name) {
+          await updateProfile(auth.currentUser, {
+            displayName: userData.name,
+            photoURL: userData.avatar_url || userData.avatarUrl || auth.currentUser.photoURL
+          });
+        }
         
         setUser(prevUser => {
           if (prevUser) {
             return {
               ...prevUser,
-              name: name,
-              avatarUrl: avatarUrl,
-              avatar_url: avatarUrl
+              ...userData
             };
           }
           return prevUser;

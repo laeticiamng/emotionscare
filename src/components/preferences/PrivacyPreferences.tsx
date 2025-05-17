@@ -1,93 +1,81 @@
 
 import React from 'react';
+import { UserPreferences } from '@/types/user';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { UserPreferences } from '@/types/types';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface PrivacyPreferencesProps {
   preferences: UserPreferences;
-  onChange: (value: Partial<UserPreferences>) => void;
+  onChange: (preferences: Partial<UserPreferences>) => void;
 }
 
 const PrivacyPreferences: React.FC<PrivacyPreferencesProps> = ({ preferences, onChange }) => {
+  // Ensure we have the privacy object
   const privacy = preferences.privacy || {
-    shareData: true,
+    shareData: false,
     anonymizeReports: false,
-    profileVisibility: 'public',
+    profileVisibility: 'private'
   };
-  
-  // Helper to update privacy settings
-  const updatePrivacy = (updates: Partial<typeof privacy>) => {
+
+  // Helper to update nested privacy preferences
+  const handlePrivacyChange = (key: string, value: any) => {
     onChange({
       privacy: {
         ...privacy,
-        ...updates,
-      },
+        [key]: value
+      }
     });
   };
-  
+
   return (
     <div className="space-y-6">
-      <div className="space-y-3">
-        <Label className="text-base">Partage des données</Label>
-        
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="share-data"
-              checked={privacy.shareData}
-              onCheckedChange={(checked) => updatePrivacy({ shareData: checked === true })}
-            />
-            <Label htmlFor="share-data" className="font-normal">
-              Autoriser l'utilisation anonyme des données pour améliorer le service
-            </Label>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="anonymize-reports"
-              checked={privacy.anonymizeReports}
-              onCheckedChange={(checked) => updatePrivacy({ anonymizeReports: checked === true })}
-            />
-            <Label htmlFor="anonymize-reports" className="font-normal">
-              Anonymiser mes données dans les rapports
-            </Label>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <Label htmlFor="shareData">Partage des données anonymisées</Label>
+          <p className="text-sm text-muted-foreground">
+            Autoriser le partage anonyme de vos données pour améliorer nos services
+          </p>
         </div>
+        <Switch
+          id="shareData"
+          checked={privacy.shareData}
+          onCheckedChange={(checked) => handlePrivacyChange('shareData', checked)}
+        />
       </div>
-      
-      <div className="space-y-3">
-        <Label className="text-base">Visibilité du profil</Label>
-        
-        <RadioGroup
+
+      <div className="flex items-center justify-between">
+        <div>
+          <Label htmlFor="anonymizeReports">Anonymiser les rapports</Label>
+          <p className="text-sm text-muted-foreground">
+            Masquer votre identité dans les rapports d'analyse
+          </p>
+        </div>
+        <Switch
+          id="anonymizeReports"
+          checked={privacy.anonymizeReports}
+          onCheckedChange={(checked) => handlePrivacyChange('anonymizeReports', checked)}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="profileVisibility">Visibilité du profil</Label>
+        <Select
           value={privacy.profileVisibility}
-          onValueChange={(value: "public" | "private" | "friends") => 
-            updatePrivacy({ profileVisibility: value })
-          }
-          className="space-y-2"
+          onValueChange={(value) => handlePrivacyChange('profileVisibility', value)}
         >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="public" id="public" />
-            <Label htmlFor="public" className="font-normal">
-              Public - Tout le monde peut voir mon profil
-            </Label>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="friends" id="friends" />
-            <Label htmlFor="friends" className="font-normal">
-              Amis - Seuls mes contacts peuvent voir mon profil
-            </Label>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="private" id="private" />
-            <Label htmlFor="private" className="font-normal">
-              Privé - Personne ne peut voir mon profil
-            </Label>
-          </div>
-        </RadioGroup>
+          <SelectTrigger className="w-full mt-1">
+            <SelectValue placeholder="Sélectionner la visibilité" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="public">Public</SelectItem>
+            <SelectItem value="friends">Amis uniquement</SelectItem>
+            <SelectItem value="private">Privé</SelectItem>
+          </SelectContent>
+        </Select>
+        <p className="text-sm text-muted-foreground mt-1">
+          Définit qui peut voir votre profil et vos activités
+        </p>
       </div>
     </div>
   );
