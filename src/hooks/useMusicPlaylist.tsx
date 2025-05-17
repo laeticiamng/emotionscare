@@ -1,98 +1,72 @@
 
-import { useState } from 'react';
-import { AudioTrack, AudioPlaylist } from '@/types/audio';
+import { useState, useEffect } from 'react';
 
-export const useMusicPlaylist = () => {
-  const [playlists, setPlaylists] = useState<AudioPlaylist[]>([
-    {
-      id: "relax",
-      title: "Relaxation",
-      description: "Calming tracks for relaxation",
-      tracks: [
-        {
-          id: "track1",
-          title: "Ocean Waves",
-          artist: "Nature Sounds",
-          duration: 180,
-          url: "/audio/ocean-waves.mp3",
-          coverUrl: "/images/ocean.jpg"
-        },
-        {
-          id: "track2",
-          title: "Gentle Rain",
-          artist: "Nature Sounds",
-          duration: 240,
-          url: "/audio/gentle-rain.mp3",
-          coverUrl: "/images/rain.jpg"
-        },
-        {
-          id: "track3",
-          title: "Forest Ambience",
-          artist: "Nature Sounds",
-          duration: 300,
-          url: "/audio/forest-ambience.mp3",
-          coverUrl: "/images/forest.jpg"
-        }
-      ]
-    },
-    {
-      id: "focus",
-      title: "Focus",
-      description: "Tracks to help with concentration",
-      tracks: [
-        {
-          id: "track4",
-          title: "Deep Focus",
-          artist: "Concentration Music",
-          duration: 360,
-          url: "/audio/deep-focus.mp3",
-          coverUrl: "/images/focus.jpg"
-        },
-        {
-          id: "track5",
-          title: "Study Session",
-          artist: "Concentration Music",
-          duration: 420,
-          url: "/audio/study-session.mp3",
-          coverUrl: "/images/study.jpg"
-        },
-        {
-          id: "track6",
-          title: "Ambient Work",
-          artist: "Concentration Music",
-          duration: 480,
-          url: "/audio/ambient-work.mp3",
-          coverUrl: "/images/work.jpg"
-        }
-      ]
-    }
-  ]);
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  url: string;
+  duration: number;
+  coverUrl?: string;
+}
 
-  // Function to add a new playlist
-  const addPlaylist = (newPlaylist: AudioPlaylist) => {
-    setPlaylists([...playlists, newPlaylist]);
-  };
+export interface AudioPlaylist {
+  id: string;
+  name: string;
+  title?: string;
+  description?: string;
+  tracks: Track[];
+}
 
-  // Function to remove a playlist by ID
-  const removePlaylist = (playlistId: string) => {
-    setPlaylists(playlists.filter(playlist => playlist.id !== playlistId));
-  };
+export function useMusicPlaylist() {
+  const [playlists, setPlaylists] = useState<AudioPlaylist[]>([]);
+  const [currentPlaylist, setCurrentPlaylist] = useState<AudioPlaylist | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Function to update a playlist
-  const updatePlaylist = (updatedPlaylist: AudioPlaylist) => {
-    setPlaylists(
-      playlists.map(playlist =>
-        playlist.id === updatedPlaylist.id ? updatedPlaylist : playlist
-      )
-    );
-  };
-
-  return {
-    playlists,
-    addPlaylist,
-    removePlaylist,
-    updatePlaylist
-  };
-};
+  useEffect(() => {
+    // Simuler le chargement de playlists depuis une API
+    const loadPlaylists = async () => {
+      try {
+        setLoading(true);
+        
+        // Données fictives
+        const mockPlaylists: AudioPlaylist[] = [
+          {
+            id: '1',
+            name: 'Méditation du matin',
+            title: 'Méditation du matin',
+            description: 'Sons apaisants pour bien commencer la journée',
+            tracks: [
+              { id: '101', title: 'Lever de soleil', artist: 'Nature Sounds', url: '/audio/sunrise.mp3', duration: 180 },
+              { id: '102', title: 'Ruisseau tranquille', artist: 'Nature Sounds', url: '/audio/stream.mp3', duration: 240 },
+              { id: '103', title: 'Respiration guidée', artist: 'Mindfulness Coach', url: '/audio/breathing.mp3', duration: 300 }
+            ]
+          },
+          {
+            id: '2',
+            name: 'Focus au travail',
+            title: 'Focus au travail',
+            description: 'Musique pour rester concentré pendant votre journée',
+            tracks: [
+              { id: '201', title: 'Productivité', artist: 'Deep Focus', url: '/audio/productivity.mp3', duration: 360 },
+              { id: '202', title: 'Flux créatif', artist: 'Brain Waves', url: '/audio/creative-flow.mp3', duration: 420 },
+              { id: '203', title: 'Concentration intense', artist: 'Deep Focus', url: '/audio/deep-focus.mp3', duration: 390 }
+            ]
+          }
+        ];
+        
+        setPlaylists(mockPlaylists);
+        setLoading(false);
+      } catch (error) {
+        console.error('Erreur lors du chargement des playlists:', error);
+        setLoading(false);
+      }
+    };
+    
+    loadPlaylists();
+  }, []);
+  
+  return { playlists, currentPlaylist, setCurrentPlaylist, loading };
+}
 
 export default useMusicPlaylist;

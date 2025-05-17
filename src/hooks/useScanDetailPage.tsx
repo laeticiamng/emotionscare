@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useEmotionScan } from './useEmotionScan';
-import { User } from '@/types/other';
+import { User } from '@/types/user';
 import { EmotionResult } from '@/types/emotions';
 
 // Fonction simulée pour récupérer les détails d'un utilisateur

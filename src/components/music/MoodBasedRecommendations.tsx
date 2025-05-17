@@ -1,49 +1,64 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { useMusic } from '@/contexts';
-import { toast } from 'sonner';
+import { Play } from 'lucide-react';
 
 interface MoodBasedRecommendationsProps {
-  mood: string;
-  intensity?: number;
-  standalone?: boolean;
+  mood?: string;
+  className?: string;
 }
 
-const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ mood, intensity = 0.5, standalone = true }) => {
-  const { loadPlaylistForEmotion, playlist, isLoading, error } = useMusic();
-
-  React.useEffect(() => {
-    if (mood) {
-      loadPlaylistForEmotion({ emotion: mood, intensity });
+const MoodBasedRecommendations: React.FC<MoodBasedRecommendationsProps> = ({ 
+  mood = 'calm',
+  className = ''
+}) => {
+  // Cette fonction renvoie correctement un JSX Element et non un objet
+  const renderRecommendation = () => {
+    switch (mood) {
+      case 'calm':
+        return (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Musique apaisante pour favoriser la concentration et la sérénité.
+            </p>
+            <Button size="sm" className="gap-2">
+              <Play className="h-4 w-4" /> Écouter la playlist
+            </Button>
+          </div>
+        );
+      case 'stressed':
+        return (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Sons relaxants pour réduire l'anxiété et retrouver le calme.
+            </p>
+            <Button size="sm" className="gap-2">
+              <Play className="h-4 w-4" /> Écouter la playlist
+            </Button>
+          </div>
+        );
+      default:
+        return (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Musique personnalisée pour accompagner votre humeur.
+            </p>
+            <Button size="sm" className="gap-2">
+              <Play className="h-4 w-4" /> Explorer les playlists
+            </Button>
+          </div>
+        );
     }
-  }, [mood, loadPlaylistForEmotion, intensity]);
-
-  const handlePlay = (trackId: string) => {
-    toast({
-      description: `Lecture de la musique avec l'ID: ${trackId}`
-    });
   };
 
   return (
-    <Card>
+    <Card className={className}>
       <CardHeader>
-        <CardTitle>Recommandations musicales basées sur l'humeur</CardTitle>
-        <CardDescription>Découvrez de nouvelles musiques en fonction de votre humeur actuelle.</CardDescription>
+        <CardTitle>Recommandations musicales</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {isLoading && <p>Chargement des recommandations...</p>}
-        {error && <p className="text-red-500">Erreur: {error.message}</p>}
-        <div className="grid gap-4">
-          <div className="border rounded-md p-4">
-            <h3 className="text-lg font-semibold">Titre de la musique</h3>
-            <p className="text-sm text-muted-foreground">Artiste: Nom de l'artiste</p>
-            <Button onClick={() => handlePlay("sample-id")}>Écouter</Button>
-          </div>
-        </div>
+      <CardContent>
+        {renderRecommendation()}
       </CardContent>
     </Card>
   );

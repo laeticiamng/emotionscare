@@ -1,10 +1,12 @@
 
+export type UserRole = 'user' | 'admin' | 'b2b_user' | 'b2b_admin' | 'b2c' | 'coach' | 'therapist';
+
 export interface User {
   id: string;
   email: string;
+  name?: string;
   firstName?: string;
   lastName?: string;
-  avatar_url?: string;
   role?: UserRole;
   created_at?: string;
   updated_at?: string;
@@ -17,17 +19,30 @@ export interface User {
   status?: 'active' | 'inactive' | 'pending' | 'blocked';
   lastLoginDate?: string;
   totalSessions?: number;
-  name?: string;
   department?: string;
   emotional_score?: number;
   joined_at?: string;
+  createdAt?: string;
+  avatar?: string;
   avatarUrl?: string;
+  avatar_url?: string;
+  job_title?: string;
 }
 
-export type UserRole = 'admin' | 'user' | 'coach' | 'therapist' | 'b2b' | 'b2c' | 'b2b_user' | 'b2b_admin';
+export interface UserWithStatus {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  status: 'active' | 'inactive' | 'pending';
+  last_active?: string;
+  department?: string;
+  firstName?: string;
+  lastName?: string;
+}
 
 export interface UserPreferences {
-  theme: string;
+  theme?: string;
   fontSize?: string;
   fontFamily?: string;
   useSystemTheme?: boolean;

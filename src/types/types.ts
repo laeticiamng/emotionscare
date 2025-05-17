@@ -1,103 +1,67 @@
-export type {
-  User,
-  UserPreferences,
-  FontFamily,
-  FontSize,
-  ThemeName,
-  InvitationVerificationResult,
-  UserRole,
-  NotificationPreferences,
-  Period,
-  UserModeType,
-  Story
-} from './types/types';
 
-export type {
-  VRSessionTemplate,
-  VRSession,
-  VRHistoryListProps,
-  VRSessionHistoryProps,
-  VRSessionWithMusicProps,
-  VRTemplateGridProps
-} from './types/vr';
+export type { User, UserPreferences, UserRole } from './user';
+export type { Badge, Challenge } from './badge';
+export type { ChatMessage, ChatConversation, ChatResponse } from './chat';
+export type { MoodData } from './other';
+export type { LeaderboardEntry, KpiCardProps, DashboardWidgetConfig, GamificationData } from './dashboard';
+export type { JournalEntry } from './journal';
 
-// Export types from music
-export type {
-  MusicTrack,
-  MusicPlaylist,
-  MusicContextType,
-  MusicDrawerProps,
-  ProgressBarProps,
-  VolumeControlProps,
-  MusicControlsProps,
-  MusicLibraryProps,
-  EmotionMusicParams,
-  TrackInfoProps
-} from './types/music';
-
-// Export from emotions
-export type {
-  Emotion,
-  EmotionResult,
-  LiveVoiceScannerProps,
-  TeamOverviewProps,
-  EmotionalTeamViewProps
-} from './types/emotions';
-
-// Export from badge
-export type {
-  Badge
-} from './types/badge';
-
-// Export from theme
-export type {
-  Theme,
-  ThemeContextType,
-  FontFamily,
-  FontSize
-} from './types/theme';
-
-// Export from notification
-export type {
-  NotificationFrequency,
-  NotificationTone,
-  NotificationPreference
-} from './types/notification';
-
-// Export type from sidebar
-export type { 
-  SidebarContextType 
-} from './types/sidebar';
-
-// Export from dashboard
-export type { 
-  KpiCardProps, 
-  DraggableKpiCardsGridProps, 
-  GlobalOverviewTabProps,
-  DashboardWidgetConfig,
-  GamificationData
-} from './types/dashboard';
-
-export type {
-  ChatMessage,
-  MoodData,
-  JournalEntry,
-  Story as OtherStory,
-  EmotionPrediction,
-  Recommendation,
-  InvitationStats,
-  InvitationData,
-  InvitationFormData,
-  UserPreference
-} from './types/other';
-
-// Ajouté pour résoudre les erreurs d'import
-export interface EmotionResult {
-  emotion: string;
-  confidence: number;
+export interface EmotionalData {
+  id?: string;
+  user_id?: string;
   timestamp?: string;
+  emotion?: string;
+  intensity?: number;
+  created_at?: string;
+  updated_at?: string;
+  context?: string;
   source?: string;
-  audioUrl?: string;
-  textInput?: string;
-  facialExpression?: string;
+}
+
+export interface FontFamily {
+  name: string;
+  value: string;
+}
+
+export interface FontSize {
+  name: string;
+  value: string;
+}
+
+export interface ThemeName {
+  name: string;
+  value: string;
+}
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  message?: string;
+  email?: string;
+  role?: string;
+}
+
+export interface NotificationPreferences {
+  enabled: boolean;
+  email: boolean;
+  push: boolean;
+  inApp: boolean;
+  types?: Record<string, boolean>;
+}
+
+export interface Period {
+  label: string;
+  value: string;
+  days: number;
+}
+
+export type UserModeType = 'b2c' | 'b2b_user' | 'b2b_admin';
+
+export interface Story {
+  id: string;
+  title: string;
+  content: string;
+  author?: string;
+  emotion?: string;
+  created_at: string;
+  tags?: string[];
 }

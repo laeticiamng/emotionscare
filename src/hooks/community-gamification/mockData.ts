@@ -1,180 +1,147 @@
 
-import { Challenge, LeaderboardEntry } from '@/types/challenge';
-import { Badge } from '@/types/badge';
+import { Badge, Challenge } from '@/types/badge';
+import { LeaderboardEntry } from '@/types/dashboard';
 
-export const mockChallenges: Challenge[] = [
-  {
-    id: "1",
-    title: "Premier pas",
-    name: "first-steps",
-    description: "Complétez votre premier scan émotionnel",
-    progress: 100,
-    completed: true,
-    status: "completed",
-    points: 10,
-    difficulty: "easy",
-    category: "débutant",
-    tags: ["émotion", "débutant"],
-    goal: "1",
-    totalSteps: 1
-  },
-  {
-    id: "2",
-    title: "Explorateur émotionnel",
-    name: "emotion-explorer",
-    description: "Réalisez 5 scans émotionnels différents",
-    progress: 60,
-    completed: false,
-    status: "in-progress",
-    points: 25,
-    difficulty: "medium",
-    category: "émotion",
-    tags: ["émotion", "exploration"],
-    goal: "5",
-    totalSteps: 5
-  },
-  {
-    id: "3",
-    title: "Journal assidu",
-    name: "journal-keeper",
-    description: "Complétez des entrées de journal pendant 7 jours consécutifs",
-    progress: 42,
-    completed: false,
-    status: "in-progress",
-    points: 50,
-    difficulty: "hard",
-    category: "journal",
-    tags: ["journal", "constance"],
-    goal: "7",
-    totalSteps: 7
-  },
-  {
-    id: "4",
-    title: "Maître du calme",
-    name: "calm-master",
-    description: "Atteignez un niveau de sérénité de 80% ou plus 3 fois",
-    progress: 33,
-    completed: false,
-    status: "in-progress",
-    points: 30,
-    difficulty: "medium",
-    category: "bien-être",
-    tags: ["calme", "méditation"],
-    goal: "3",
-    totalSteps: 3
-  },
-  {
-    id: "5",
-    title: "Musicien de l'âme",
-    name: "soul-musician",
-    description: "Générez 10 compositions musicales personnalisées",
-    progress: 20,
-    completed: false,
-    status: "in-progress",
-    points: 40,
-    difficulty: "medium",
-    category: "musique",
-    tags: ["musique", "création"],
-    goal: "10",
-    totalSteps: 10
-  },
-];
-
+// Badges factices pour la démonstration
 export const mockBadges: Badge[] = [
   {
-    id: "1",
-    name: "Early Adopter",
-    description: "One of the first users",
-    icon: "star",
-    rarity: "rare",
-    category: "achievement",
-    level: "bronze",
+    id: '1',
+    name: 'Méditation Zen',
+    description: 'Effectué 5 sessions de méditation',
+    imageUrl: '/badges/meditation.png',
     unlocked: true,
-    dateEarned: "2023-01-15"
+    level: 1,
+    category: 'méditation',
+    tier: 'bronze'
   },
   {
-    id: "2",
-    name: "Frequent Visitor",
-    description: "Logged in 10 days in a row",
-    icon: "calendar",
-    rarity: "uncommon",
-    category: "engagement",
-    level: "silver",
-    unlocked: true,
-    dateEarned: "2023-02-20"
+    id: '2',
+    name: 'Expert en Bien-être',
+    description: 'Maintenu un score émotionnel de 80+ pendant une semaine',
+    imageUrl: '/badges/wellbeing.png',
+    unlocked: false,
+    level: 2,
+    category: 'bien-être',
+    tier: 'silver'
   },
   {
-    id: "3",
-    name: "Emotion Master",
-    description: "Recorded 100 emotions",
-    icon: "heart",
-    rarity: "epic",
-    category: "emotions",
-    level: "gold", 
+    id: '3',
+    name: 'Maître du Journal',
+    description: 'Écrit dans votre journal pendant 14 jours consécutifs',
+    imageUrl: '/badges/journal.png',
     unlocked: true,
-    dateEarned: "2023-03-05"
+    level: 2,
+    category: 'journal',
+    tier: 'gold'
   }
 ];
 
+// Défis factices pour la démonstration
+export const mockChallenges: Challenge[] = [
+  {
+    id: '1',
+    title: 'Explorateur de Bien-être',
+    description: 'Essayez toutes les fonctionnalités disponibles sur EmotionsCare',
+    points: 150,
+    progress: 4,
+    goal: 5,
+    category: 'exploration',
+    completed: false,
+    status: 'en cours'
+  },
+  {
+    id: '2',
+    title: 'Série Journalière',
+    description: 'Écrivez dans votre journal 7 jours consécutifs',
+    points: 100,
+    progress: 7,
+    goal: 7,
+    category: 'journal',
+    completed: true,
+    status: 'terminé'
+  },
+  {
+    id: '3',
+    title: 'Scientifique Émotionnel',
+    description: 'Faites 10 analyses émotionnelles en une semaine',
+    points: 120,
+    progress: 6,
+    goal: 10,
+    category: 'analyse',
+    completed: false,
+    status: 'en cours'
+  }
+];
+
+// Données factices pour le tableau de classement
 export const mockLeaderboard: LeaderboardEntry[] = [
   {
-    id: "1",
-    userId: "user123",
-    name: "EmotionMaster",
-    username: "EmotionMaster",
-    avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=Emma",
+    id: '1',
+    userId: 'user1',
+    name: 'Alexandra M.',
+    avatar: '/avatars/avatar-1.png',
     points: 1250,
-    score: 1250,
     rank: 1,
-    badges: 8,
-    streak: 14
+    trend: 'up'
   },
   {
-    id: "2",
-    userId: "user456",
-    name: "MindfulSoul",
-    username: "MindfulSoul",
-    avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=John",
-    points: 980,
-    score: 980,
+    id: '2',
+    userId: 'user2',
+    name: 'Thomas R.',
+    avatar: '/avatars/avatar-2.png',
+    points: 1120,
     rank: 2,
-    badges: 6,
-    streak: 7
+    trend: 'neutral'
   },
   {
-    id: "3",
-    userId: "user789",
-    name: "SereneSpirit",
-    username: "SereneSpirit",
-    avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=Sophia",
-    points: 870,
-    score: 870,
+    id: '3',
+    userId: 'user3',
+    name: 'Sophie L.',
+    avatar: '/avatars/avatar-3.png',
+    points: 980,
     rank: 3,
-    badges: 5,
-    streak: 12
+    trend: 'up'
   },
   {
-    id: "4",
-    userId: "user101",
-    name: "CalmExplorer",
-    username: "CalmExplorer",
-    avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=Lucas",
-    points: 720,
-    score: 720,
+    id: '4',
+    userId: 'user4',
+    name: 'Marc D.',
+    avatar: '/avatars/avatar-4.png',
+    points: 920,
     rank: 4,
-    badges: 4,
-    streak: 5
+    trend: 'down'
   },
   {
-    id: "5",
-    userId: "user202",
-    name: "HarmonySeeker",
-    username: "HarmonySeeker",
-    avatarUrl: "https://api.dicebear.com/7.x/personas/svg?seed=Olivia",
-    points: 650,
-    score: 650,
+    id: '5',
+    userId: 'user5',
+    name: 'Émilie P.',
+    avatar: '/avatars/avatar-5.png',
+    points: 850,
     rank: 5,
-    badges: 3,
-    streak: 3
+    trend: 'neutral'
+  }
+];
+
+export const mockWeeklyGoals = [
+  {
+    id: '1',
+    title: 'Méditer 10 minutes par jour',
+    progress: 4,
+    total: 7,
+    category: 'méditation'
+  },
+  {
+    id: '2',
+    title: 'Écrire dans le journal 5 jours',
+    progress: 3,
+    total: 5,
+    category: 'journal'
+  },
+  {
+    id: '3',
+    title: 'Compléter 3 sessions de VR',
+    progress: 1,
+    total: 3,
+    category: 'vr'
   }
 ];

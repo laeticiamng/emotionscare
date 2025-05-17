@@ -1,81 +1,74 @@
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage, ChatResponse } from '@/types/chat';
 
-export function useChatProcessing() {
+export const useChatProcessing = () => {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Process a user message and get AI response
-  const processMessage = useCallback(async (
-    message: string, 
-    aiResponseFn: (msg: string) => Promise<ChatResponse>
-  ): Promise<[ChatMessage, ChatMessage]> => {
-    setIsProcessing(true);
+  const createUserMessage = (content: string): ChatMessage => {
+    return {
+      id: uuidv4(),
+      content: content,
+      text: content,
+      sender: "user",
+      role: "user",
+      timestamp: new Date().toISOString(),
+      conversation_id: "default" // Utilisez une valeur appropriée ou passez-la en paramètre
+    };
+  };
+
+  const createAssistantMessage = (content: any): ChatMessage => {
+    return {
+      id: uuidv4(),
+      content: content,
+      text: content,
+      sender: "assistant",
+      role: "assistant",
+      timestamp: new Date().toISOString(),
+      conversation_id: "default" // Utilisez une valeur appropriée ou passez-la en paramètre
+    };
+  };
+
+  const createErrorMessage = (errorMessage: string): ChatMessage => {
+    return {
+      id: uuidv4(),
+      content: errorMessage,
+      text: errorMessage,
+      sender: "assistant",
+      role: "assistant",
+      timestamp: new Date().toISOString(),
+      conversation_id: "default", // Utilisez une valeur appropriée
+      isError: true
+    };
+  };
+
+  const appendUserMessage = (userMessage: string, setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>) => {
+    const message = {
+      id: uuidv4(),
+      content: userMessage,
+      text: userMessage,
+      sender: "user", 
+      role: "user",
+      timestamp: new Date().toISOString(),
+      conversation_id: "default" // Utilisez une valeur appropriée
+    };
     
-    try {
-      // Create user message
-      const userMessage: ChatMessage = {
-        id: uuidv4(),
-        content: message,
-        text: message,
-        sender: 'user',
-        role: 'user',
-        timestamp: new Date().toISOString(),
-        conversation_id: 'default'
-      };
-      
-      // Get AI response
-      const aiResponse = await aiResponseFn(message);
-      
-      // Create AI message
-      const aiMessage: ChatMessage = {
-        id: uuidv4(),
-        content: aiResponse.content || aiResponse.message || '',
-        text: aiResponse.content || aiResponse.message || '',
-        sender: 'assistant',
-        role: 'assistant',
-        timestamp: new Date().toISOString(),
-        conversation_id: 'default'
-      };
-      
-      return [userMessage, aiMessage];
-    } catch (error) {
-      console.error('Error processing message:', error);
-      
-      // Return error message
-      const errorMessage: ChatMessage = {
-        id: uuidv4(),
-        content: 'Sorry, an error occurred. Please try again.',
-        text: 'Sorry, an error occurred. Please try again.',
-        sender: 'assistant',
-        role: 'assistant',
-        timestamp: new Date().toISOString(),
-        conversation_id: 'default',
-        isError: true
-      };
-      
-      return [
-        {
-          id: uuidv4(),
-          content: message,
-          text: message,
-          sender: 'user',
-          role: 'user',
-          timestamp: new Date().toISOString(),
-          conversation_id: 'default'
-        }, 
-        errorMessage
-      ];
-    } finally {
-      setIsProcessing(false);
-    }
-  }, []);
+    setMessages(prevMessages => [...prevMessages, message]);
+    return message;
+  };
 
   return {
     isProcessing,
-    processMessage
+    error,
+    setIsProcessing,
+    setError,
+    createUserMessage,
+    createAssistantMessage,
+    createErrorMessage,
+    appendUserMessage
   };
-}
+};
 
 export default useChatProcessing;
