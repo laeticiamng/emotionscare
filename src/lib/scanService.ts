@@ -1,74 +1,96 @@
 
+import { v4 as uuid } from 'uuid';
 import { EmotionResult } from '@/types/emotion';
 
-// Simple mock analysis function - in production this would call an API
-export const analyzeEmotion = async (
-  text: string,
-  userId?: string,
-): Promise<EmotionResult> => {
-  console.log('Analyzing emotion for text:', text);
+// Simulated API call for emotion analysis from text
+export async function analyzeEmotion(text: string): Promise<EmotionResult> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1200));
   
-  // Simple emotion detection algorithm based on keywords
-  const emotions = [
-    { name: 'happy', keywords: ['happy', 'joy', 'great', 'excellent', 'good', 'love', 'smile'] },
-    { name: 'sad', keywords: ['sad', 'unhappy', 'depressed', 'bad', 'terrible', 'crying'] },
-    { name: 'angry', keywords: ['angry', 'mad', 'upset', 'annoyed', 'furious', 'hate'] },
-    { name: 'anxious', keywords: ['anxious', 'worried', 'nervous', 'stress', 'tense', 'afraid'] },
-    { name: 'calm', keywords: ['calm', 'peaceful', 'relaxed', 'chill', 'quiet', 'serene'] }
-  ];
+  // Mock emotion detection logic
+  const emotions = ['happy', 'sad', 'calm', 'anxious', 'angry', 'neutral'];
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  const randomScore = Math.random();
+  const randomConfidence = 0.7 + Math.random() * 0.3; // Between 0.7 and 1.0
   
-  const lowercaseText = text.toLowerCase();
-  let detectedEmotion = 'neutral';
-  let highestScore = 0;
-  
-  // Find emotion with highest keyword matches
-  emotions.forEach(emotion => {
-    const score = emotion.keywords.reduce((count, keyword) => {
-      return count + (lowercaseText.includes(keyword) ? 1 : 0);
-    }, 0);
-    
-    if (score > highestScore) {
-      highestScore = score;
-      detectedEmotion = emotion.name;
-    }
-  });
-  
-  // If no keywords matched, default is neutral
-  const confidence = highestScore > 0 ? Math.min(0.5 + (highestScore * 0.1), 0.95) : 0.5;
-  
-  // Wait to simulate API call
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  const result: EmotionResult = {
-    id: `emotion-${Date.now()}`,
-    user_id: userId || 'anonymous',
-    emotion: detectedEmotion,
-    score: confidence,
-    confidence: confidence,
-    intensity: confidence * 10,
-    timestamp: new Date().toISOString(),
-    text: text,
-    emojis: getEmojiForEmotion(detectedEmotion),
-    date: new Date().toISOString()
-  };
-  
-  return result;
-};
-
-// Helper function to get emoji for emotion
-function getEmojiForEmotion(emotion: string): string {
-  switch (emotion.toLowerCase()) {
+  // Generate a mock feedback based on the emotion
+  let feedback = '';
+  switch (randomEmotion) {
     case 'happy':
-      return '😊';
+      feedback = "You're expressing joy and positivity. This is great for your wellbeing!";
+      break;
     case 'sad':
-      return '😢';
-    case 'angry':
-      return '😠';
-    case 'anxious':
-      return '😰';
+      feedback = "I'm noticing signs of sadness in your expression. Remember that it's okay to feel this way.";
+      break;
     case 'calm':
-      return '😌';
+      feedback = "You appear to be in a calm and balanced emotional state.";
+      break;
+    case 'anxious':
+      feedback = "I detect some anxiety in your message. Taking a few deep breaths might help.";
+      break;
+    case 'angry':
+      feedback = "There seems to be some frustration in your words. Consider addressing what's bothering you.";
+      break;
     default:
-      return '😐';
+      feedback = "Your emotional state appears to be neutral at the moment.";
   }
+  
+  // Return a structured emotion result
+  return {
+    id: uuid(),
+    emotion: randomEmotion,
+    score: randomScore,
+    confidence: randomConfidence,
+    intensity: randomScore * 0.8 + 0.2, // Between 0.2 and 1.0
+    feedback,
+    text: text,
+    timestamp: new Date().toISOString(),
+    recommendations: [
+      "Try taking a short walk outside",
+      "Listen to some calming music",
+      "Practice deep breathing for 5 minutes"
+    ],
+    source: 'text'
+  };
+}
+
+// Fetch the latest emotion for a user
+export async function fetchLatestEmotion(userId: string): Promise<EmotionResult | null> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  // In a real app, this would fetch from an API or database
+  // For now, return a mock result
+  return {
+    id: uuid(),
+    user_id: userId,
+    emotion: 'calm',
+    score: 0.85,
+    confidence: 0.92,
+    intensity: 0.7,
+    feedback: "You've been quite calm today. Keep it up!",
+    timestamp: new Date().toISOString(),
+    source: 'manual'
+  };
+}
+
+// Save a new emotion entry
+export async function createEmotionEntry(data: Partial<EmotionResult>): Promise<EmotionResult> {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // In a real app, this would save to an API or database
+  // For now, just return the data with a few added fields
+  return {
+    id: data.id || uuid(),
+    user_id: data.user_id || 'unknown',
+    emotion: data.emotion || 'neutral',
+    score: data.score || 0.5,
+    confidence: data.confidence || 0.8,
+    intensity: data.intensity || 0.5,
+    feedback: data.feedback || "Thank you for logging your emotion.",
+    text: data.text || "",
+    timestamp: data.timestamp || new Date().toISOString(),
+    source: data.source || 'manual'
+  };
 }

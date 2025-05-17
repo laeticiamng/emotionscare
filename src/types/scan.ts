@@ -21,3 +21,4 @@ export interface ScanHistoryItem {
 }
 
 export { EmotionResult };
+export type { TeamOverviewProps } from './emotion';

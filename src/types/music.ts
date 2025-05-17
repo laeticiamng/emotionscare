@@ -68,3 +68,43 @@ export interface ProgressBarProps {
   formatTime?: (seconds: number) => string;
   showTimestamps?: boolean;
 }
+
+export interface MusicDrawerProps {
+  open?: boolean;
+  onClose?: () => void;
+  onOpen?: () => void;
+  children?: React.ReactNode;
+  position?: 'left' | 'right' | 'top' | 'bottom';
+  className?: string;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  onVolumeChange: (volume: number) => void;
+  muted: boolean;
+  onMuteToggle: () => void;
+  className?: string;
+}
+
+export interface MusicControlsProps {
+  isPlaying: boolean;
+  onPlayPause: () => void;
+  onNext: () => void;
+  onPrevious: () => void;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+}
+
+export interface MusicLibraryProps {
+  playlists?: MusicPlaylist[];
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+  className?: string;
+}
+
+export interface TrackInfoProps {
+  track: MusicTrack | null;
+  className?: string;
+  showCover?: boolean;
+  showArtist?: boolean;
+  showTitle?: boolean;
+}
