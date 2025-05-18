@@ -9,27 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      abonnement_biovida: {
-        Row: {
-          created_at: string
-          email: string
-          id: string
-          prenom: string
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          prenom: string
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-          prenom?: string
-        }
-        Relationships: []
-      }
       abonnement_fiches: {
         Row: {
           created_at: string
@@ -105,36 +84,6 @@ export type Database = {
           image_url?: string | null
           name?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      biovida_analyses: {
-        Row: {
-          analysis_result: string | null
-          created_at: string
-          email: string
-          form_data: Json
-          id: string
-          payment_status: string | null
-          person_name: string
-        }
-        Insert: {
-          analysis_result?: string | null
-          created_at?: string
-          email: string
-          form_data: Json
-          id?: string
-          payment_status?: string | null
-          person_name: string
-        }
-        Update: {
-          analysis_result?: string | null
-          created_at?: string
-          email?: string
-          form_data?: Json
-          id?: string
-          payment_status?: string | null
-          person_name?: string
         }
         Relationships: []
       }

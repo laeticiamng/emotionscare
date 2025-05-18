@@ -1,11 +1,10 @@
 
-import { UserPreferences as AuthUserPreferences } from './auth';
-import { UserPreferences as AppUserPreferences } from './preferences';
+import type { UserPreferences } from './preferences';
 
 /**
  * Adapter pour convertir entre les types de préférences utilisateur
  */
-export function adaptAuthPreferences(authPrefs: AuthUserPreferences): AppUserPreferences {
+export function adaptAuthPreferences(authPrefs: UserPreferences): UserPreferences {
   return {
     theme: authPrefs.theme || 'system',
     fontSize: authPrefs.fontSize,
