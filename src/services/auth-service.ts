@@ -1,5 +1,5 @@
 
-import { supabase } from '@/lib/supabase-client';
+import { supabase } from '@/integrations/supabase/client';
 import { User, UserRole } from '@/types/user';
 import { UserPreferences } from '@/types/preferences';
 import { normalizeUserMode } from '@/utils/userModeHelpers';

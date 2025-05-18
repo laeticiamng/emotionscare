@@ -2,6 +2,7 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
 import { useEffect } from 'react';
+import { UserRole } from '@/types/user';
 
 export function useUserModeHelpers() {
   const { userMode, setUserMode } = useUserMode();
@@ -32,17 +33,34 @@ export function useUserModeHelpers() {
   
   const normalizedMode = normalizeUserMode(userMode);
   
-  const isB2C = normalizedMode === 'b2c';
-  const isB2BUser = normalizedMode === 'b2b_user';
-  const isB2BAdmin = normalizedMode === 'b2b_admin';
-  const isB2B = isB2BUser || isB2BAdmin;
-  
   return {
-    isB2C,
-    isB2B,
-    isB2BUser,
-    isB2BAdmin,
-    currentMode: normalizedMode
+    isB2C: normalizedMode === 'b2c',
+    isB2BUser: normalizedMode === 'b2b_user',
+    isB2BAdmin: normalizedMode === 'b2b_admin',
+    normalizedMode,
+    
+    // Helper method to get a human-readable name for the current mode
+    getModeName: () => {
+      switch (normalizedMode) {
+        case 'b2b_admin': return 'Administrateur';
+        case 'b2b_user': return 'Collaborateur';
+        case 'b2c': default: return 'Particulier';
+      }
+    },
+    
+    // Helper to get the home path for the current mode
+    getHomePathForCurrentMode: () => {
+      switch (normalizedMode) {
+        case 'b2b_admin': return '/b2b/admin/dashboard';
+        case 'b2b_user': return '/b2b/user/dashboard';
+        case 'b2c': default: return '/b2c/dashboard';
+      }
+    },
+    
+    // Helper to check if the current mode matches a given role
+    matchesRole: (role: UserRole | string) => {
+      return normalizeUserMode(role) === normalizedMode;
+    }
   };
 }
 

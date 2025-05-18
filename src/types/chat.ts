@@ -7,6 +7,9 @@ export interface ChatMessage {
   conversation_id: string;
   read?: boolean;
   metadata?: Record<string, any>;
+  // Add these properties to fix ChatInterface errors
+  role?: "system" | "user" | "assistant";
+  content?: string;
 }
 
 export interface ChatConversation {

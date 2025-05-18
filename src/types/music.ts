@@ -7,6 +7,8 @@ export interface MusicTrack {
   track_url?: string;    // URL audio pour le nouveau format
   duration?: number;
   cover_url?: string;
+  coverUrl?: string;     // Added for compatibility
+  coverImage?: string;   // Added for compatibility
   genre?: string;
   emotion?: string;
   tempo?: number;
@@ -60,6 +62,11 @@ export interface MusicContextType {
   setCurrentTrack: (track: MusicTrack | null) => void;
   findTrack: (id: string) => MusicTrack | undefined;
   findPlaylist: (id: string) => MusicPlaylist | undefined;
+  // Add missing methods
+  playTrack?: (track: MusicTrack) => void;
+  pauseTrack?: () => void;
+  loadPlaylistForEmotion?: (emotion: string, intensity?: number) => Promise<MusicPlaylist | null>;
+  isInitialized?: boolean;
 }
 
 export interface MusicDrawerProps {

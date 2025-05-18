@@ -1,26 +1,13 @@
 
-import { supabase } from '@/lib/supabase-client';
+import { supabase } from '@/integrations/supabase/client';
 import { Notification, NotificationType } from '@/types/notification';
 
-export interface CreateNotificationParams {
-  userId: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  actionLink?: string;
-  actionText?: string;
-  metadata?: Record<string, any>;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
-  icon?: string;
-  image?: string;
-}
-
 /**
- * Service de gestion des notifications utilisant Supabase
+ * Service for managing notifications using Supabase
  */
 export const notificationService = {
   /**
-   * Récupérer les notifications d'un utilisateur
+   * Get all notifications for the current user
    */
   async getUserNotifications(userId: string): Promise<{ notifications: Notification[]; error: Error | null }> {
     try {
@@ -29,10 +16,10 @@ export const notificationService = {
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
-      
+        
       if (error) throw error;
       
-      return { notifications: data as Notification[], error: null };
+      return { notifications: data || [], error: null };
     } catch (error: any) {
       console.error('Error fetching notifications:', error);
       return { notifications: [], error };
@@ -40,34 +27,19 @@ export const notificationService = {
   },
   
   /**
-   * Créer une notification pour un utilisateur
+   * Create a new notification
    */
-  async createNotification(params: CreateNotificationParams): Promise<{ notification: Notification | null; error: Error | null }> {
+  async createNotification(notification: Omit<Notification, 'id' | 'created_at'>): Promise<{ notification: Notification | null; error: Error | null }> {
     try {
-      const { userId, type, title, message, actionLink, actionText, metadata, priority, icon, image } = params;
-      
       const { data, error } = await supabase
         .from('notifications')
-        .insert({
-          user_id: userId,
-          type,
-          title,
-          message,
-          action_link: actionLink,
-          action_text: actionText,
-          metadata,
-          priority: priority || 'medium',
-          icon,
-          image,
-          read: false,
-          created_at: new Date().toISOString()
-        })
+        .insert([notification])
         .select()
         .single();
-      
+        
       if (error) throw error;
       
-      return { notification: data as Notification, error: null };
+      return { notification: data, error: null };
     } catch (error: any) {
       console.error('Error creating notification:', error);
       return { notification: null, error };
@@ -75,7 +47,7 @@ export const notificationService = {
   },
   
   /**
-   * Marquer une notification comme lue
+   * Mark a notification as read
    */
   async markAsRead(notificationId: string): Promise<{ success: boolean; error: Error | null }> {
     try {
@@ -83,7 +55,7 @@ export const notificationService = {
         .from('notifications')
         .update({ read: true })
         .eq('id', notificationId);
-      
+        
       if (error) throw error;
       
       return { success: true, error: null };
@@ -94,7 +66,7 @@ export const notificationService = {
   },
   
   /**
-   * Marquer toutes les notifications d'un utilisateur comme lues
+   * Mark all notifications as read for a user
    */
   async markAllAsRead(userId: string): Promise<{ success: boolean; error: Error | null }> {
     try {
@@ -103,7 +75,7 @@ export const notificationService = {
         .update({ read: true })
         .eq('user_id', userId)
         .eq('read', false);
-      
+        
       if (error) throw error;
       
       return { success: true, error: null };
@@ -114,7 +86,7 @@ export const notificationService = {
   },
   
   /**
-   * Supprimer une notification
+   * Delete a notification
    */
   async deleteNotification(notificationId: string): Promise<{ success: boolean; error: Error | null }> {
     try {
@@ -122,7 +94,7 @@ export const notificationService = {
         .from('notifications')
         .delete()
         .eq('id', notificationId);
-      
+        
       if (error) throw error;
       
       return { success: true, error: null };
@@ -133,22 +105,72 @@ export const notificationService = {
   },
   
   /**
-   * Supprimer toutes les notifications lues d'un utilisateur
+   * Get unread notifications count
    */
-  async deleteReadNotifications(userId: string): Promise<{ success: boolean; error: Error | null }> {
+  async getUnreadCount(userId: string): Promise<{ count: number; error: Error | null }> {
     try {
-      const { error } = await supabase
+      const { count, error } = await supabase
         .from('notifications')
-        .delete()
+        .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
-        .eq('read', true);
-      
+        .eq('read', false);
+        
       if (error) throw error;
       
-      return { success: true, error: null };
+      return { count: count || 0, error: null };
     } catch (error: any) {
-      console.error('Error deleting read notifications:', error);
-      return { success: false, error };
+      console.error('Error getting unread count:', error);
+      return { count: 0, error };
+    }
+  },
+  
+  /**
+   * Get filtered notifications
+   */
+  async getFilteredNotifications(
+    userId: string,
+    filter: string = 'all',
+    page: number = 1,
+    pageSize: number = 10
+  ): Promise<{ notifications: Notification[]; error: Error | null; total: number }> {
+    try {
+      let query = supabase
+        .from('notifications')
+        .select('*', { count: 'exact' })
+        .eq('user_id', userId);
+        
+      // Apply filters
+      if (filter === 'unread') {
+        query = query.eq('read', false);
+      } else if (filter === 'read') {
+        query = query.eq('read', true);
+      } else if (filter !== 'all') {
+        // Filter by notification type
+        query = query.eq('type', filter);
+      }
+      
+      // Apply pagination
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+      
+      const { data, error, count } = await query
+        .order('created_at', { ascending: false })
+        .range(from, to);
+        
+      if (error) throw error;
+      
+      return { 
+        notifications: data || [], 
+        error: null,
+        total: count || 0
+      };
+    } catch (error: any) {
+      console.error('Error fetching filtered notifications:', error);
+      return { 
+        notifications: [], 
+        error,
+        total: 0
+      };
     }
   }
 };

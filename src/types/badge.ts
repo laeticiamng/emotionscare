@@ -13,6 +13,12 @@ export interface Badge {
   total?: number;
   user_id?: string;
   awarded_at?: string;
+  // Add missing properties
+  achieved?: boolean;
+  earned?: boolean;
+  image_url?: string;
+  unlockedAt?: string;
+  unlocked_at?: string;
 }
 
 export interface Challenge {
@@ -29,4 +35,9 @@ export interface Challenge {
   difficulty?: 'easy' | 'medium' | 'hard';
   badge_id?: string;
   user_id?: string;
+  // Add missing properties
+  title?: string;
+  goal?: number;
+  status?: string;
+  totalSteps?: number;
 }

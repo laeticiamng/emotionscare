@@ -12,12 +12,30 @@ export interface KpiCardProps {
   footer?: React.ReactNode;
   className?: string;
   onClick?: () => void;
+  // Add missing properties
+  id?: string;
+  delta?: number | {
+    value: number;
+    label?: string;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  subtitle?: string | React.ReactNode;
+  ariaLabel?: string;
+  isLoading?: boolean;
+  loading?: boolean;
+  status?: 'success' | 'warning' | 'danger' | 'info';
+  trendText?: string;
 }
 
 export interface DraggableKpiCardsGridProps {
-  cards: KpiCardProps[];
+  cards?: KpiCardProps[];
   onSave?: (newLayout: any) => void;
   savedLayout?: any;
+  // Add missing properties
+  kpiCards?: KpiCardProps[];
+  onLayoutChange?: (layout: any) => void;
+  className?: string;
+  isEditable?: boolean;
 }
 
 export interface GlobalOverviewTabProps {
@@ -35,6 +53,8 @@ export interface DashboardWidgetConfig {
   y: number;
   visible: boolean;
   data?: any;
+  // Add missing properties
+  settings?: Record<string, any>;
 }
 
 export interface GamificationData {
@@ -56,4 +76,7 @@ export interface LeaderboardEntry {
   department?: string;
   level?: number;
   trend?: number;
+  // Add missing properties
+  username?: string;
+  userId?: string;
 }
