@@ -86,6 +86,7 @@ export const ROUTES: RouteConfig = {
     vr: '/b2c/vr',
     settings: '/b2c/settings',
     gamification: '/b2c/gamification',
+    marketplace: '/b2c/marketplace',
     cocon: '/b2c/cocon',
     preferences: '/b2c/preferences',
     extensions: '/extensions'
