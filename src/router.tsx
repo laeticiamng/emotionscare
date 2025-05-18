@@ -1,21 +1,21 @@
-
+import React, { lazy } from 'react';
 import { RouteObject } from 'react-router-dom';
-import LandingPage from './pages/LandingPage';
-import NotFoundPage from './pages/NotFoundPage';
-import LoginPage from './pages/common/Login';
-import RegisterPage from './pages/common/Register';
-import B2BSelectionPage from './pages/B2BSelectionPage';
-import B2CLayout from './layouts/B2CLayout';
-import B2BUserLayout from './layouts/B2BUserLayout';
-import B2BAdminLayout from './layouts/B2BAdminLayout';
-import ProtectedRoute from './components/ProtectedRoute';
-import B2CDashboardPage from './pages/b2c/DashboardPage';
-import B2BUserDashboardPage from './pages/b2b/user/Dashboard';
-import B2BAdminDashboardPage from './pages/b2b/admin/Dashboard';
-import B2CGamificationPage from './pages/b2c/Gamification';
-import B2BUserGamificationPage from './pages/b2b/user/Gamification';
-import ImmersiveHome from './pages/ImmersiveHome';
-import Home from './pages/Home';
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const LoginPage = lazy(() => import('./pages/common/Login'));
+const RegisterPage = lazy(() => import('./pages/common/Register'));
+const B2BSelectionPage = lazy(() => import('./pages/B2BSelectionPage'));
+const B2CLayout = lazy(() => import('./layouts/B2CLayout'));
+const B2BUserLayout = lazy(() => import('./layouts/B2BUserLayout'));
+const B2BAdminLayout = lazy(() => import('./layouts/B2BAdminLayout'));
+const ProtectedRoute = lazy(() => import('./components/ProtectedRoute'));
+const B2CDashboardPage = lazy(() => import('./pages/b2c/DashboardPage'));
+const B2BUserDashboardPage = lazy(() => import('./pages/b2b/user/Dashboard'));
+const B2BAdminDashboardPage = lazy(() => import('./pages/b2b/admin/Dashboard'));
+const B2CGamificationPage = lazy(() => import('./pages/b2c/Gamification'));
+const B2BUserGamificationPage = lazy(() => import('./pages/b2b/user/Gamification'));
+const ImmersiveHome = lazy(() => import('./pages/ImmersiveHome'));
+const Home = lazy(() => import('./pages/Home'));
 
 // Define the application routes without creating a router instance
 export const routes: RouteObject[] = [

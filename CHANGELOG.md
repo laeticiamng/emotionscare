@@ -3,6 +3,13 @@
 
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.0] - 2025-06-01
+
+### Optimisé
+- Lazy loading des pages via `React.lazy`
+- Cache court pour les appels OpenAI
+- Compression Brotli lors du build
+
 ## [1.0.0] - 2025-05-17
 
 ### Ajouté
