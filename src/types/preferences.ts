@@ -19,21 +19,18 @@ export interface UserPreferences {
   highContrastMode: boolean;
   fontSize: 'small' | 'medium' | 'large' | 'xlarge';
   animationsEnabled: boolean;
-  // Propriétés nécessaires pour les composants audio et préférences
   ambientSound?: string;
   soundEnabled?: boolean;
   reduceMotion?: boolean;
   autoplayMedia?: boolean;
   colorBlindMode?: boolean;
   fontFamily?: 'system' | 'sans' | 'serif' | 'mono' | 'rounded';
-  // Propriétés déjà existantes
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   privacy?: {
     dataSharing: boolean;
     analytics: boolean;
     thirdParty: boolean;
-    // Propriétés additionnelles pour compatibilité
     shareData?: boolean;
     anonymizeReports?: boolean;
     profileVisibility?: string;
@@ -118,7 +115,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
 
 export interface UserPreferencesContextType {
   preferences: UserPreferences;
-  updatePreferences: (preferences: Partial<UserPreferences>) => void;
+  updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
   resetPreferences: () => void;
   isLoading: boolean;
   error?: Error | null;

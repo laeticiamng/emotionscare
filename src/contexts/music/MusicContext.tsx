@@ -16,6 +16,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [playlist, setPlaylistState] = useState<MusicPlaylist | null>(null);
   const [emotion, setEmotionState] = useState<string | null>(null);
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const { tracks, playlists } = getMockMusicData();
 
@@ -39,7 +40,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentTrack(track);
     setIsPlaying(true);
     setCurrentTime(0);
-    setDuration(track.duration);
+    setDuration(track.duration || 0);
   };
 
   const pauseTrack = () => {
@@ -89,26 +90,32 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const closeDrawer = () => setOpenDrawer(false);
 
   // Mock implementation of AI music generation
-  const generateMusic = async (prompt: string): Promise<MusicTrack> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Create a mock generated track
-    const generatedTrack: MusicTrack = {
-      id: `generated-${Date.now()}`,
-      title: `Generated from: ${prompt.slice(0, 20)}...`,
-      artist: "AI Composer",
-      duration: 180,
-      audioUrl: "/audio/generated-track.mp3",
-      coverUrl: "/images/ai-generated.jpg",
-      album: "AI Generated Music",
-      year: new Date().getFullYear(),
-      tags: ["ai", "generated", prompt.split(" ")[0]],
-      genre: "Electronic",
-      category: "ai-generated"
-    };
-    
-    return generatedTrack;
+  const generateMusic = async (prompt: string): Promise<MusicTrack | null> => {
+    try {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Create a mock generated track
+      const generatedTrack: MusicTrack = {
+        id: `generated-${Date.now()}`,
+        title: `Generated from: ${prompt.slice(0, 20)}...`,
+        artist: "AI Composer",
+        duration: 180,
+        audioUrl: "/audio/generated-track.mp3",
+        coverUrl: "/images/ai-generated.jpg",
+        album: "AI Generated Music",
+        year: new Date().getFullYear(),
+        tags: ["ai", "generated", prompt.split(" ")[0]],
+        genre: "Electronic",
+        category: "ai-generated"
+      };
+      
+      return generatedTrack;
+    } catch (error) {
+      console.error('Error generating music:', error);
+      setError(error instanceof Error ? error : new Error('Failed to generate music'));
+      return null;
+    }
   };
 
   const loadPlaylistForEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
@@ -121,7 +128,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       );
       
       if (emotionPlaylist) {
-        setPlaylist(emotionPlaylist);
+        setPlaylistState(emotionPlaylist);
         
         // If no current track, set the first track
         if (!currentTrack && emotionPlaylist.tracks.length > 0) {
@@ -167,7 +174,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     loadPlaylistForEmotion,
     setPlaylist,
     generateMusic,
-    togglePlay: togglePlayPause // Alias for compatibility
+    togglePlay: togglePlayPause,
+    setCurrentTrack,
+    error
   };
 
   return <MusicContext.Provider value={value}>{children}</MusicContext.Provider>;

@@ -4,18 +4,20 @@ export interface MusicTrack {
   title: string;
   artist: string;
   duration: number;
-  src?: string;
-  audioUrl?: string;
+  url?: string;
+  audioUrl: string;
   track_url?: string;
   coverUrl?: string;
   coverImage?: string;
   cover?: string;
+  src?: string;
   emotion?: string;
   intensity?: number;
   category?: string;
   album?: string;
   year?: number;
   genre?: string;
+  name?: string;
 }
 
 export interface MusicPlaylist {
@@ -36,27 +38,38 @@ export interface MusicContextType {
   isPlaying: boolean;
   currentTrack: MusicTrack | null;
   volume: number;
-  playlist: MusicPlaylist | MusicTrack[] | null;
-  allTracks: MusicTrack[];
-  playlists: MusicPlaylist[];
-  play: () => void;
-  pause: () => void;
-  stop: () => void;
-  next: () => void;
-  previous: () => void;
-  setTrack: (track: MusicTrack) => void;
+  muted: boolean;
+  currentTime: number;
+  duration: number;
+  playlist: MusicPlaylist | null;
+  emotion: string | null;
+  openDrawer: boolean;
+  isInitialized: boolean;
+  error?: Error | null;
+  
+  // Actions
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  resumeTrack: () => void;
+  togglePlay?: () => void;
+  togglePlayPause: () => void;
+  nextTrack: () => void;
+  prevTrack: () => void;
+  previousTrack: () => void;
   setVolume: (volume: number) => void;
-  setPlaylist: (playlist: MusicTrack[] | MusicPlaylist) => void;
-  togglePlay: () => void;
-  addToPlaylist: (track: MusicTrack) => void;
-  createPlaylist: (name: string, tracks?: MusicTrack[]) => MusicPlaylist;
-  removeFromPlaylist: (trackId: string) => void;
-  getTracksByEmotion: (emotion: string) => MusicTrack[];
-  progress: number;
-  loadPlaylist?: (playlistId: string) => void;
+  setMute: (muted: boolean) => void;
+  toggleMute: () => void;
+  seekTo: (time: number) => void;
+  setEmotion: (emotion: string) => void;
+  loadPlaylistForEmotion: (emotion: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
+  setOpenDrawer: (open: boolean) => void;
+  toggleDrawer?: () => void;
+  closeDrawer?: () => void;
+  setPlaylist?: (playlist: MusicPlaylist | MusicTrack[]) => void;
+  setCurrentTrack?: (track: MusicTrack) => void;
+  generateMusic?: (prompt: string) => Promise<MusicTrack | null>;
 }
 
-// Additional interfaces kept the same
 export interface MusicDrawerProps {
   open: boolean;
   onClose: () => void;

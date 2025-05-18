@@ -6,15 +6,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { useTheme } from '@/hooks/use-theme';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { Theme } from '@/types/theme';
 
 const DisplayPreferences: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const { preferences, updatePreferences } = useUserPreferences();
 
   const handleThemeChange = (value: string) => {
-    // La valeur peut être system, light, dark ou pastel
-    setTheme(value);
-    updatePreferences({ theme: value as 'system' | 'light' | 'dark' | 'pastel' });
+    // Convertir la valeur en type Theme avant de la passer à setTheme
+    const themeValue = value as Theme;
+    setTheme(themeValue);
+    updatePreferences({ theme: themeValue });
   };
 
   const handleFontFamilyChange = (value: string) => {

@@ -1,29 +1,10 @@
 
 import { useState, useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage';
-import { UserPreferences } from '@/types/user';
-
-// Préférences par défaut
-const defaultPreferences: UserPreferences = {
-  theme: 'system',
-  fontSize: 'normal',
-  fontFamily: 'Inter',
-  useSystemTheme: true,
-  highContrast: false,
-  reducedMotion: false,
-  soundEffects: true,
-  language: 'fr',
-  timeZone: 'Europe/Paris',
-  dateFormat: 'DD/MM/YYYY',
-  notifications_enabled: true,
-  email_notifications: true,
-  notifications: [],
-  dashboardLayout: {},
-  onboardingCompleted: false
-};
+import { UserPreferences, DEFAULT_PREFERENCES } from '@/types/preferences';
 
 export const usePreferences = (initialPreferences?: Partial<UserPreferences>) => {
-  const mergedDefaults = { ...defaultPreferences, ...initialPreferences };
+  const mergedDefaults = { ...DEFAULT_PREFERENCES, ...initialPreferences };
   
   // Utiliser localStorage pour persister les préférences
   const [preferences, setStoredPreferences] = useLocalStorage<UserPreferences>('user-preferences', mergedDefaults);
