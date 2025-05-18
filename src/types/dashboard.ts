@@ -35,3 +35,11 @@ export interface DraggableKpiCardsGridProps {
   className?: string;
 }
 
+export interface GamificationData {
+  activeChallenges: number;
+  badges: number;
+  completedChallenges: number;
+  level: number;
+  points: number;
+  streak: number;
+}
