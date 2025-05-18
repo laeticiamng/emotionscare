@@ -8,7 +8,14 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
+
+      - name: Pre-check merge conflicts
+        run: |
+          if grep -r "<<<<<<<" -n .; then
+            echo "Unresolved merge conflict markers detected";
+            exit 1;
+          fi
       - name: Install deps
         run: |
           npm install
