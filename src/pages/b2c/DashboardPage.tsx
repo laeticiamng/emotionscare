@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useMusic } from '@/contexts/music';
 import { motion } from 'framer-motion';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import { TrendingUp } from 'lucide-react';
 
 // Composant pour le widget de journal rapide
 const QuickJournalWidget = () => {
@@ -174,6 +175,29 @@ const AICoachWidget = () => {
   );
 };
 
+const OptimizationWidget = () => {
+  const navigate = useNavigate();
+
+  return (
+    <Card className="premium-card interactive-card">
+      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+        <CardTitle className="text-lg flex items-center">
+          <TrendingUp className="h-5 w-5 mr-2 text-blue-500" />
+          Amélioration continue
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-4">
+        <p className="text-sm text-muted-foreground mb-4">
+          Consultez vos statistiques d'usage et recevez des suggestions personnalisées.
+        </p>
+        <Button onClick={() => navigate('/optimisation')} className="w-full" variant="outline">
+          Voir mon reporting
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
 // Composant pour le widget timeline
 const TimelineWidget = () => {
   const navigate = useNavigate();
@@ -258,6 +282,7 @@ const B2CDashboardPage: React.FC = () => {
             <SocialCoconWidget />
             <AICoachWidget />
             <TimelineWidget />
+            <OptimizationWidget />
           </motion.div>
         </TabsContent>
         
@@ -294,10 +319,11 @@ const B2CDashboardPage: React.FC = () => {
             transition={{ duration: 0.4 }}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
-            <QuickJournalWidget />
-            <AICoachWidget />
-            <SocialCoconWidget />
-            <div>
+           <QuickJournalWidget />
+           <AICoachWidget />
+           <SocialCoconWidget />
+            <OptimizationWidget />
+           <div>
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">

@@ -117,7 +117,8 @@ export const ROUTES: RouteConfig = {
     teams: '/b2b/admin/teams',
     reports: '/b2b/admin/reports',
     events: '/b2b/admin/events',
-    settings: '/b2b/admin/settings'
+    settings: '/b2b/admin/settings',
+    optimisation: '/b2b/admin/optimisation'
   },
   common: {
     home: '/',

@@ -31,6 +31,7 @@ const B2BAdminNavBar: React.FC = () => {
       <NavItem to={ROUTES.b2bAdmin.teams} isActive={isActive(ROUTES.b2bAdmin.teams)} icon={<Users className="h-5 w-5" />} label="Équipes" />
       <NavItem to={ROUTES.b2bAdmin.reports} isActive={isActive(ROUTES.b2bAdmin.reports)} icon={<FileBarChart className="h-5 w-5" />} label="Rapports" />
       <NavItem to={ROUTES.b2bAdmin.events} isActive={isActive(ROUTES.b2bAdmin.events)} icon={<Calendar className="h-5 w-5" />} label="Événements" />
+      <NavItem to={ROUTES.b2bAdmin.optimisation} isActive={isActive(ROUTES.b2bAdmin.optimisation)} icon={<FileBarChart className="h-5 w-5" />} label="Optimisation" />
       <NavItem to={ROUTES.b2bAdmin.settings} isActive={isActive(ROUTES.b2bAdmin.settings)} icon={<Settings className="h-5 w-5" />} label="Paramètres" />
       
       <button 
