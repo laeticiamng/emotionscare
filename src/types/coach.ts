@@ -1,31 +1,18 @@
 
-import { ReactNode } from 'react';
-
-/**
- * Message échangé entre l'utilisateur et le coach IA.
- */
 export interface ChatMessage {
   id: string;
-  /** Contenu textuel du message */
-  content: string;
-  /** Expéditeur du message */
-  sender: 'user' | 'coach' | 'system' | string;
-  /** Date d'envoi */
-  timestamp: string | Date;
-  /** Indique si le message est en cours de génération */
+  text?: string;  // For backward compatibility
+  content?: string; // New field that will replace text
+  sender: 'user' | 'assistant' | 'system' | 'coach';
+  timestamp: Date | string;
+  conversationId?: string;
+  role?: string; // For backward compatibility
   isLoading?: boolean;
-  /** Métadonnées libres */
-  metadata?: Record<string, any>;
 }
 
-export interface CoachCharacterProps {
-  name?: string;
-  avatar?: string;
-  mood?: string;
-  size?: 'sm' | 'md' | 'lg';
-  animate?: boolean;
-  className?: string;
-  onClick?: () => void;
+export interface CoachMessageProps {
+  message: ChatMessage;
+  isLast?: boolean;
 }
 
 export interface CoachChatProps {
@@ -39,35 +26,32 @@ export interface CoachChatProps {
   embedded?: boolean;
 }
 
-/**
- * Conversation complète regroupant une liste de messages.
- */
 export interface Conversation {
   id: string;
   title: string;
   messages: ChatMessage[];
-  createdAt: Date | string;
-  lastUpdated: Date | string;
+  createdAt: Date;
+  lastUpdated: Date;
 }
 
-/**
- * Session de coaching contenant plusieurs conversations d'un utilisateur.
- */
+export interface ChatResponse {
+  id: string;
+  text: string;
+  suggestions?: string[];
+}
+
+export interface Suggestion {
+  id: string;
+  text: string;
+  category?: string;
+}
+
 export interface CoachSession {
   id: string;
   userId: string;
-  conversations: Conversation[];
-  startedAt: Date | string;
-  endedAt?: Date | string;
+  startTime: Date;
+  endTime?: Date;
+  messageCount: number;
+  emotionalState?: string;
+  feedbackScore?: number;
 }
-
-/**
- * Suggestion de ressource ou d'action proposée par le coach.
- */
-export interface Suggestion {
-  id: string;
-  content: string;
-  category: string;
-  createdAt: Date | string;
-}
-

@@ -5,6 +5,8 @@ export interface SegmentOption {
   key: string;
   label: string;
   value?: any;
+  dimensionKey?: string;
+  optionKey?: string;
 }
 
 export interface SegmentDimension {

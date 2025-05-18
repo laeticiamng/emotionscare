@@ -62,7 +62,7 @@ const KpiCard = ({
   if (deltaObj) {
     const trendValue = 'trend' in deltaObj ? deltaObj.trend : 
                       'direction' in deltaObj ? deltaObj.direction : 'neutral';
-                      
+                     
     if (trendValue === 'up') {
       statusColor = status === 'neutral' || status === 'info' ? 'text-emerald-600 dark:text-emerald-400' : `text-${status}`;
     } else if (trendValue === 'down') {
@@ -93,13 +93,13 @@ const KpiCard = ({
         <div className="text-2xl font-bold">{value}</div>
         {deltaObj && (
           <p className={cn("text-xs flex items-center gap-1 mt-1", statusColor)}>
-            {deltaObj.trend === 'up' && <ArrowUp className="h-3 w-3" />}
-            {deltaObj.trend === 'down' && <ArrowDown className="h-3 w-3" />}
-            {deltaObj.trend === 'neutral' && <Minus className="h-3 w-3" />}
+            {deltaObj.trend === 'up' || deltaObj.direction === 'up' && <ArrowUp className="h-3 w-3" />}
+            {deltaObj.trend === 'down' || deltaObj.direction === 'down' && <ArrowDown className="h-3 w-3" />}
+            {(deltaObj.trend === 'neutral' || deltaObj.direction === 'stable' || (!deltaObj.trend && !deltaObj.direction)) && <Minus className="h-3 w-3" />}
             {deltaObj.value !== undefined && (
               <span>{Math.abs(Number(deltaObj.value)).toFixed(1)}%</span>
             )}
-            {deltaObj.label && <span>{deltaObj.label}</span>}
+            {'label' in deltaObj && deltaObj.label && <span>{deltaObj.label}</span>}
           </p>
         )}
         {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}

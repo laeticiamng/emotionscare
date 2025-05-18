@@ -3,15 +3,12 @@ export interface AudioTrack {
   id: string;
   title: string;
   artist?: string;
+  duration: number;
   url: string;
   coverUrl?: string;
-  duration?: number;
-  description?: string;
-  // Ajout des propriétés manquantes utilisées dans le code
-  audioUrl?: string;
-  emotion?: string;
+  mood?: string;
+  bpm?: number;
   genre?: string;
-  album?: string;
 }
 
 export interface AudioPlaylist {
@@ -20,8 +17,12 @@ export interface AudioPlaylist {
   description?: string;
   tracks: AudioTrack[];
   coverUrl?: string;
-  createdAt: string;
-  userId?: string;
-  // Ajout des propriétés manquantes utilisées dans le code
-  emotion?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface AudioProcessorProps {
+  isRecording: boolean;
+  onResult?: (result: any) => void;
+  onProcessingChange?: (isProcessing: boolean) => void;
 }

@@ -6,6 +6,7 @@ export interface DashboardWidget {
   size: 'small' | 'medium' | 'large' | 'full';
   data?: any;
   position?: { x: number; y: number; w: number; h: number };
+  settings?: Record<string, any>;
 }
 
 export interface AdminAccessLog {
@@ -32,6 +33,8 @@ export interface TeamSummary {
   activeUsers?: number;
   trendDirection?: 'up' | 'down' | 'stable';
   trendValue?: number;
+  alertCount?: number;
+  averageMood?: string | number;
 }
 
 export interface GlobalOverviewTabProps {
@@ -39,10 +42,11 @@ export interface GlobalOverviewTabProps {
   segment?: string;
   filterBy?: string;
   className?: string;
+  onPeriodChange?: (period: string) => void;
 }
 
 export interface KpiCardProps {
-  id?: string; // Made optional but present for backwards compatibility
+  id?: string;
   title: string;
   value: string | number;
   status?: KpiCardStatus;
@@ -66,16 +70,24 @@ export type KpiCardStatus = 'positive' | 'negative' | 'neutral' | 'success' | 'w
 export type KpiDelta = {
   value: number;
   direction: 'up' | 'down' | 'stable';
-  label?: string; // Added for backward compatibility
-  trend?: 'up' | 'down' | 'neutral'; // Added for backward compatibility
+  label?: string;
+  trend?: 'up' | 'down' | 'neutral';
 };
 
 export interface DashboardWidgetConfig extends DashboardWidget {
   component: React.ComponentType<any>;
   defaultProps?: Record<string, any>;
+  settings?: Record<string, any>;
 }
 
 export interface DraggableKpiCardsGridProps {
   cards: KpiCardProps[];
   onReorder?: (newOrder: KpiCardProps[]) => void;
+  onCardsReorder?: (cards: KpiCardProps[]) => void;
+  onOrderChange?: (cards: KpiCardProps[]) => void;
+  onSave?: (layouts: any) => void;
+  savedLayout?: any;
+  className?: string;
+  isEditable?: boolean;
+  kpiCards?: KpiCardProps[];
 }

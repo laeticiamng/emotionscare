@@ -17,7 +17,8 @@ const UserDashboardSections: React.FC = () => {
       thumbnailUrl: '/images/meditation-morning.jpg',
       intensity: 1,
       objective: 'Apaiser l\'esprit',
-      type: 'meditation'
+      type: 'meditation',
+      tags: ['morning', 'calm', 'focus']
     },
     {
       id: '2',
@@ -31,7 +32,8 @@ const UserDashboardSections: React.FC = () => {
       thumbnailUrl: '/images/deep-relaxation.jpg',
       intensity: 2,
       objective: 'Réduire le stress',
-      type: 'relaxation'
+      type: 'relaxation',
+      tags: ['stress-relief', 'evening', 'sleep']
     }
   ];
 

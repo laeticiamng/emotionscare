@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { VRSessionTemplate } from '@/types';
+import { VRSessionTemplate } from '@/types/vr';
 import { useToast } from '@/hooks/use-toast';
 
 interface VRAudioSessionProps {

@@ -6,15 +6,22 @@ export interface VRSessionTemplate {
   description: string;
   duration: number;
   imageUrl: string;
-  thumbnailUrl?: string; // Added missing property
+  thumbnailUrl?: string;
   environmentId: string;
   goalType?: 'relaxation' | 'focus' | 'creativity' | 'energy';
   guideType?: 'voice' | 'text' | 'none';
-  intensity?: 'light' | 'medium' | 'intense' | number; // Support for legacy number values
-  category?: string; // Added missing property
-  tags?: string[]; // Added missing property
-  objective?: string; // Added missing property
-  type?: string; // Added missing property
+  intensity?: 'light' | 'medium' | 'intense' | number;
+  category?: string;
+  tags?: string[];
+  objective?: string;
+  type?: string;
+  audio_url?: string;
+  audioTrack?: string;
+  preview_url?: string;
+  is_audio_only?: boolean;
+  benefits?: string[];
+  difficulty?: string;
+  lastUsed?: Date | string;
 }
 
 export interface VRSession {
@@ -25,6 +32,14 @@ export interface VRSession {
   endTime: Date | null;
   duration: number | null;
   metrics: VRSessionMetrics;
+  completed?: boolean;
+  completedAt?: Date | string;
+  heartRateBefore?: number;
+  heartRateAfter?: number;
+  feedback?: string;
+  rating?: number;
+  startedAt?: Date | string;
+  date?: Date | string;
 }
 
 export interface VRSessionMetrics {
@@ -41,4 +56,9 @@ export interface VRTemplateDetailProps {
   heartRate: number;
   onBack: () => void;
   onStartSession?: () => void;
+}
+
+export interface VRSessionHistoryProps {
+  sessions: VRSession[];
+  onSelect?: (session: VRSession) => void;
 }
