@@ -1,26 +1,19 @@
 
 import { UserPreferences } from './user';
 
-export type FontFamily = 'inter' | 'roboto' | 'system' | 'open-sans' | 'poppins' | string;
+export type FontFamily = 'inter' | 'roboto' | 'system' | 'open-sans' | 'poppins' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'sans-serif' | string;
 
-export type FontSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | string;
+export type FontSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | 'medium' | string;
 
-export type ThemeName = 'light' | 'dark' | 'system' | 'custom' | string;
+export type ThemeName = 'light' | 'dark' | 'system' | 'custom' | 'pastel' | string;
 
-export interface Theme {
-  name: ThemeName;
-  colors: {
-    primary: string;
-    secondary: string;
-    accent: string;
-    background: string;
-    text: string;
-    [key: string]: string;
-  };
-  font: {
-    family: FontFamily;
-    size: FontSize;
-  };
+export type Theme = ThemeName | 'light' | 'dark' | 'system' | 'pastel';
+
+export interface ThemeOption {
+  name: string;
+  value: Theme;
+  icon?: string;
+  description?: string;
 }
 
 export interface ThemeContextType {
@@ -30,7 +23,26 @@ export interface ThemeContextType {
   setFontFamily: (fontFamily: FontFamily) => void;
   fontSize: FontSize;
   setFontSize: (fontSize: FontSize) => void;
-  colorAccent: string;
-  setColorAccent: (colorAccent: string) => void;
-  savePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
+  colorAccent?: string;
+  setColorAccent?: (colorAccent: string) => void;
+  savePreferences?: (preferences: Partial<UserPreferences>) => Promise<void>;
+  toggleTheme?: () => void;
+  isDark?: boolean;
+  isDarkMode?: boolean;
+  systemTheme?: 'dark' | 'light';
+  preferences?: {
+    soundEnabled: boolean;
+    reduceMotion: boolean;
+  };
+  soundEnabled?: boolean;
+  reduceMotion?: boolean;
+  updatePreferences?: (prefs: { soundEnabled?: boolean; reduceMotion?: boolean }) => void;
+  getContrastText?: (color: string) => 'black' | 'white';
+}
+
+export interface UserThemePreferences {
+  theme: Theme;
+  fontFamily: FontFamily;
+  fontSize: FontSize;
+  colorAccent?: string;
 }

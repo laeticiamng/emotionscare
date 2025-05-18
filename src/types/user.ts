@@ -1,101 +1,81 @@
 
-export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin';
+export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin' | string;
 
 export interface UserPreferences {
-  theme: string;
-  language: string;
-  notificationsEnabled: boolean;
-  emailNotifications: boolean;
+  theme?: string;
   fontSize?: string;
   fontFamily?: string;
   colorAccent?: string;
+  language?: string;
+  notificationsEnabled?: boolean;
+  emailNotifications?: boolean;
   soundEffects?: boolean;
-  privacySettings?: string | PrivacyPreferences;
+  privacySettings?: PrivacyPreferences;
   accessibilitySettings?: AccessibilitySettings;
+  dashboardLayout?: Record<string, any>;
+  onboardingCompleted?: boolean;
+  notifications?: {
+    email?: boolean;
+    push?: boolean;
+    sms?: boolean;
+    weekly?: boolean;
+    insights?: boolean;
+  };
+  [key: string]: any;
 }
 
 export interface PrivacyPreferences {
-  dataSharing: boolean;
-  analytics: boolean;
-  thirdParty: boolean;
   shareData?: boolean;
-  anonymizeReports?: boolean;
-  profileVisibility?: string;
+  anonymizedData?: boolean;
+  analytics?: boolean;
+  marketing?: boolean;
+  [key: string]: boolean | undefined;
 }
 
 export interface AccessibilitySettings {
-  highContrast: boolean;
-  reducedMotion: boolean;
-  largeText: boolean;
-  screenReader: boolean;
+  reduceMotion?: boolean;
+  highContrast?: boolean;
+  largeText?: boolean;
+  screenReader?: boolean;
+  [key: string]: boolean | undefined;
 }
 
 export interface User {
   id: string;
-  name?: string;
+  name: string;
   email: string;
-  role?: UserRole | string;
+  role: UserRole;
   avatar_url?: string;
   avatarUrl?: string;
-  created_at?: string;
-  createdAt?: string;
-  updated_at?: string;
-  updatedAt?: string;
+  avatar?: string;
   department?: string;
   jobTitle?: string;
+  job_title?: string;
   preferences?: UserPreferences;
   emotionalScore?: number;
+  emotional_score?: number;
+  position?: string;
+  joined_at?: string | Date;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  [key: string]: any;
 }
 
 export interface UserWithStatus extends User {
-  status?: 'active' | 'inactive' | 'pending' | 'blocked';
-  lastSeen?: string;
-  onlineStatus?: 'online' | 'offline' | 'away' | 'busy';
+  status?: 'online' | 'offline' | 'away' | 'busy';
+  lastActive?: string | Date;
 }
 
-export interface Profile {
-  id: string;
-  name?: string;
-  email?: string;
-  role?: UserRole | string;
-  department?: string;
-  job_title?: string;
-  jobTitle?: string;
-  avatar_url?: string;
-  avatarUrl?: string;
-  created_at?: string;
-  createdAt?: string;
-  updated_at?: string;
-  updatedAt?: string;
-  emotional_score?: number;
-  emotionalScore?: number;
-  preferences?: UserPreferences;
-}
+// Helper types for API operations
+export type CreateUserDto = Omit<User, 'id'> & {
+  password?: string;
+};
 
-export function isUserAdmin(user?: User | null): boolean {
-  return user?.role === 'admin' || user?.role === 'b2b_admin';
-}
+export type UpdateUserDto = Partial<User>;
 
-export function getUserDisplayName(user?: User | null): string {
-  if (!user) return 'Guest';
-  return user.name || user.email || 'Unknown User';
-}
-
-export function mapProfileToUser(profile: Profile): User {
-  return {
-    id: profile.id,
-    name: profile.name,
-    email: profile.email || '',
-    role: profile.role,
-    department: profile.department,
-    jobTitle: profile.job_title || profile.jobTitle,
-    avatar_url: profile.avatar_url,
-    avatarUrl: profile.avatar_url,
-    created_at: profile.created_at,
-    createdAt: profile.created_at,
-    updated_at: profile.updated_at,
-    updatedAt: profile.updated_at,
-    emotionalScore: profile.emotional_score || profile.emotionalScore,
-    preferences: profile.preferences
-  };
-}
+export type UserAuthResponse = {
+  user: User;
+  token?: string;
+  refreshToken?: string;
+  expiresIn?: number;
+};

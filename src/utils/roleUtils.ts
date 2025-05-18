@@ -61,3 +61,8 @@ export function canUserAccessFeature(role: UserRole, feature: string): boolean {
       return permissions.includes('use_tools');
   }
 }
+
+export function isAdminRole(role: UserRole | string | undefined | null): boolean {
+  if (!role) return false;
+  return role === 'admin' || role === 'b2b_admin';
+}
