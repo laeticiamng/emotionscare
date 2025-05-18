@@ -17,6 +17,7 @@ EmotionsCare est structuré autour d'une architecture orientée composants, avec
 
 ```
 src/
+├── assets/              # Images et fichiers statiques
 ├── components/          # Composants React
 │   ├── ui/              # Composants UI de base (shadcn/ui)
 │   ├── layout/          # Composants de mise en page
@@ -26,13 +27,22 @@ src/
 │   ├── journal/         # Composants du journal émotionnel
 │   ├── vr/              # Composants de réalité virtuelle
 │   └── ...
+├── config/              # Fichiers de configuration
+├── constants/           # Valeurs et énumérations globales
 ├── contexts/            # Contextes React pour l'état global
+├── providers/           # Providers globaux (auth, thème…)
 ├── hooks/               # Hooks personnalisés
+├── integrations/        # Clients et adaptateurs d'APIs externes
+├── layouts/             # Layouts applicatifs
 ├── pages/               # Composants de page
+├── themes/              # Définition des thèmes
 ├── types/               # Définitions TypeScript
 ├── utils/               # Fonctions utilitaires
-├── services/            # Services d'API et intégrations
-└── lib/                 # Bibliothèques et fonctions partagées
+├── services/            # Services d'API et logique métier
+├── lib/                 # Bibliothèques et helpers partagés
+├── scripts/             # Scripts de maintenance
+├── tests/               # Tests unitaires et d'intégration
+└── docs/                # Documentation technique
 ```
 
 ## Flux de données
