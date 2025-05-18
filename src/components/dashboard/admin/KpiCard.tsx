@@ -11,7 +11,7 @@ export const KpiCard = ({
   delta,
   icon,
   subtitle,
-  status = 'info',  // Changed from 'default' to 'info' which is allowed by the type
+  status = 'info',
   className,
   isLoading,
   ariaLabel,

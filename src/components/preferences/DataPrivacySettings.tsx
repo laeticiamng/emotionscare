@@ -2,8 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { FormControl, FormDescription, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { FormControl, FormDescription, FormItem, FormLabel } from '@/components/ui/form';
 import { UserPreferences } from '@/types';
 
 interface DataPrivacySettingsProps {
@@ -17,11 +16,14 @@ const DataPrivacySettings: React.FC<DataPrivacySettingsProps> = ({
   onPreferenceChange,
   disabled = false
 }) => {
-  // Initialize privacy object if it doesn't exist
+  // Initialize privacy object if it doesn't exist with all possible properties
   const privacy = preferences.privacy || {
     shareActivity: false,
     shareJournal: false,
-    publicProfile: false
+    publicProfile: false,
+    shareData: false,
+    anonymizeReports: false,
+    profileVisibility: 'private'
   };
   
   const handlePrivacyChange = (key: string, value: boolean) => {
@@ -85,6 +87,40 @@ const DataPrivacySettings: React.FC<DataPrivacySettingsProps> = ({
               onCheckedChange={(checked) => handlePrivacyChange('publicProfile', checked)}
               disabled={disabled}
               aria-label="Profil public"
+            />
+          </FormControl>
+        </FormItem>
+
+        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+          <div className="space-y-0.5">
+            <FormLabel className="text-base">Partage de données</FormLabel>
+            <FormDescription>
+              Partagez vos données pour aider à améliorer nos services.
+            </FormDescription>
+          </div>
+          <FormControl>
+            <Switch
+              checked={privacy.shareData || false}
+              onCheckedChange={(checked) => handlePrivacyChange('shareData', checked)}
+              disabled={disabled}
+              aria-label="Partage de données"
+            />
+          </FormControl>
+        </FormItem>
+
+        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+          <div className="space-y-0.5">
+            <FormLabel className="text-base">Rapports anonymisés</FormLabel>
+            <FormDescription>
+              Anonymiser vos données dans les rapports et analyses.
+            </FormDescription>
+          </div>
+          <FormControl>
+            <Switch
+              checked={privacy.anonymizeReports || false}
+              onCheckedChange={(checked) => handlePrivacyChange('anonymizeReports', checked)}
+              disabled={disabled}
+              aria-label="Rapports anonymisés"
             />
           </FormControl>
         </FormItem>

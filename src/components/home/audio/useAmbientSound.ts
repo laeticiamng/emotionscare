@@ -1,153 +1,99 @@
 
-import { useEffect, useState, useRef } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useUserPreferences } from '@/contexts/PreferencesContext';
-
-interface Sound {
-  name: string;
-  src: string;
-  volume: number;
-}
-
-export const AMBIENT_SOUNDS: Record<string, Sound> = {
-  'nature': { 
-    name: 'Nature', 
-    src: '/sounds/ambient/nature.mp3',
-    volume: 0.4 
-  },
-  'rain': { 
-    name: 'Rain', 
-    src: '/sounds/ambient/rain.mp3', 
-    volume: 0.5 
-  },
-  'cafe': { 
-    name: 'Café', 
-    src: '/sounds/ambient/cafe.mp3', 
-    volume: 0.3 
-  },
-  'waves': { 
-    name: 'Ocean Waves', 
-    src: '/sounds/ambient/waves.mp3', 
-    volume: 0.4 
-  },
-  'fireplace': { 
-    name: 'Fireplace', 
-    src: '/sounds/ambient/fireplace.mp3', 
-    volume: 0.35 
-  },
-  'none': { 
-    name: 'No Sound', 
-    src: '', 
-    volume: 0 
-  },
-};
+import { useState, useEffect } from 'react';
+import { usePreferences } from '@/contexts/PreferencesContext';
 
 export const useAmbientSound = () => {
-  const { isAuthenticated } = useAuth();
-  const { theme } = useTheme();
-  const { preferences, updatePreferences } = useUserPreferences();
+  const { preferences } = usePreferences();
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   
-  const [currentSound, setCurrentSound] = useState<string>('none');
-  const [volume, setVolume] = useState<number>(0.3);
-  const [playing, setPlaying] = useState<boolean>(false);
+  // Les sons d'ambiance disponibles
+  const ambientSounds = {
+    nature: '/audio/ambient/nature.mp3',
+    rain: '/audio/ambient/rain.mp3',
+    forest: '/audio/ambient/forest.mp3',
+    ocean: '/audio/ambient/ocean.mp3',
+    night: '/audio/ambient/night.mp3',
+    cafe: '/audio/ambient/cafe.mp3',
+    white_noise: '/audio/ambient/white-noise.mp3'
+  };
   
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  
-  // Initialize ambient sound from user preferences if available
+  // Initialisation du son
   useEffect(() => {
-    if (isAuthenticated && preferences) {
-      // Add a fallback if ambientSound is not in preferences
-      const savedSound = preferences.ambientSound || 'none';
-      if (savedSound !== 'none') {
-        setCurrentSound(savedSound);
-        setPlaying(true);
-      }
+    // Création de l'élément audio seulement côté client
+    if (typeof window !== 'undefined') {
+      const ambientSound = preferences.ambientSound || 'nature';
+      const soundUrl = ambientSounds[ambientSound as keyof typeof ambientSounds] || ambientSounds.nature;
+      
+      const audioElement = new Audio(soundUrl);
+      audioElement.loop = true;
+      audioElement.volume = 0.3;
+      setAudio(audioElement);
+      
+      return () => {
+        audioElement.pause();
+        audioElement.src = '';
+      };
     }
-  }, [isAuthenticated, preferences]);
+  }, [preferences.ambientSound]);
   
-  // Set up audio element
+  // Gestion de l'activation/désactivation du son selon les préférences
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.loop = true;
-    }
-    
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
-  
-  // Handle sound changes
-  useEffect(() => {
-    const audio = audioRef.current;
     if (!audio) return;
     
-    if (currentSound === 'none') {
+    if (preferences.soundEnabled && !isPlaying) {
+      audio.play().catch(err => console.error('Error playing ambient sound:', err));
+      setIsPlaying(true);
+    } else if (!preferences.soundEnabled && isPlaying) {
       audio.pause();
-      setPlaying(false);
-      return;
+      setIsPlaying(false);
     }
-    
-    const sound = AMBIENT_SOUNDS[currentSound];
-    if (!sound) return;
-    
-    audio.src = sound.src;
-    audio.volume = volume * sound.volume;
-    
-    if (playing) {
-      audio.play().catch(err => {
-        console.error('Failed to play ambient sound:', err);
-        setPlaying(false);
-      });
-    } else {
-      audio.pause();
-    }
-  }, [currentSound, volume, playing]);
+  }, [preferences.soundEnabled, audio, isPlaying]);
   
-  const changeSound = async (soundKey: string) => {
-    setCurrentSound(soundKey);
-    if (soundKey !== 'none') {
-      setPlaying(true);
-      
-      // Save to user preferences if authenticated
-      if (isAuthenticated) {
-        await updatePreferences({
-          ambientSound: soundKey,
-        });
-      }
-    } else {
-      setPlaying(false);
-    }
+  // Méthodes pour contrôler le son
+  const play = () => {
+    if (!audio) return;
+    audio.play().catch(err => console.error('Error playing ambient sound:', err));
+    setIsPlaying(true);
   };
   
-  const togglePlay = () => {
-    setPlaying(!playing);
+  const pause = () => {
+    if (!audio) return;
+    audio.pause();
+    setIsPlaying(false);
   };
   
-  const changeVolume = (newVolume: number) => {
-    if (audioRef.current) {
-      const sound = AMBIENT_SOUNDS[currentSound];
-      if (sound) {
-        audioRef.current.volume = newVolume * sound.volume;
-      }
+  const toggle = () => {
+    isPlaying ? pause() : play();
+  };
+  
+  const setVolume = (value: number) => {
+    if (!audio) return;
+    audio.volume = Math.max(0, Math.min(1, value));
+  };
+  
+  const changeSound = (soundKey: keyof typeof ambientSounds) => {
+    if (!audio) return;
+    
+    const wasPlaying = !audio.paused;
+    audio.pause();
+    
+    audio.src = ambientSounds[soundKey] || ambientSounds.nature;
+    audio.load();
+    
+    if (wasPlaying) {
+      audio.play().catch(err => console.error('Error playing ambient sound:', err));
     }
-    setVolume(newVolume);
   };
   
   return {
-    playing,
-    currentSound,
-    volume,
-    availableSounds: AMBIENT_SOUNDS,
+    isPlaying,
+    play,
+    pause,
+    toggle,
+    setVolume,
     changeSound,
-    togglePlay,
-    changeVolume,
+    currentSound: preferences.ambientSound || 'nature'
   };
 };
 

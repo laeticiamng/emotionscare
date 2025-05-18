@@ -19,11 +19,16 @@ const MusicPlayerCard: React.FC<MusicPlayerCardProps> = ({
   // Basic player controls
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   
   // Handle play/pause
   const handleTogglePlay = () => {
     setIsPlaying(prev => !prev);
   };
+
+  const handlePlay = () => setIsPlaying(true);
+  const handlePause = () => setIsPlaying(false);
   
   // Handle track change
   const handleNextTrack = () => {
@@ -41,6 +46,10 @@ const MusicPlayerCard: React.FC<MusicPlayerCardProps> = ({
     const prevIndex = (currentIndex - 1 + tracks.length) % tracks.length;
     setCurrentTrack(tracks[prevIndex]);
   };
+
+  const handleSeek = (time: number) => {
+    setCurrentTime(time);
+  };
   
   return (
     <Card>
@@ -48,12 +57,15 @@ const MusicPlayerCard: React.FC<MusicPlayerCardProps> = ({
         <MusicPlayer 
           track={currentTrack}
           isPlaying={isPlaying}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
+          onPlay={handlePlay}
+          onPause={handlePause}
           onNext={handleNextTrack}
           onPrevious={handlePreviousTrack}
           volume={volume}
           onVolumeChange={setVolume}
+          currentTime={currentTime}
+          duration={duration}
+          onSeek={handleSeek}
         />
       </CardContent>
     </Card>

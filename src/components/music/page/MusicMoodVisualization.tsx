@@ -1,144 +1,112 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { useMusic } from '@/contexts/music';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface MusicMoodVisualizationProps {
-  className?: string;
+export interface MusicMoodVisualizationProps {
+  mood: string;
+  intensity?: number;
 }
 
-const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({ className }) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const { isPlaying, currentTrack, emotion } = useMusic();
-  const [, forceUpdate] = useState({});
-  
-  // Map emotion to colors
-  const getEmotionColors = (emotionType?: string | null) => {
-    switch (emotionType?.toLowerCase()) {
+const MusicMoodVisualization: React.FC<MusicMoodVisualizationProps> = ({ mood, intensity = 0.5 }) => {
+  // Définir différents styles selon l'humeur
+  const getMoodColor = () => {
+    switch (mood.toLowerCase()) {
       case 'calm':
-      case 'peaceful':
-      case 'relaxed':
-        return ['#5B9BD5', '#8CC7DC', '#68BBE3'];
-      case 'happy':
-      case 'joy':
-        return ['#FFC000', '#ED7D31', '#FFD966'];
-      case 'sad':
-      case 'melancholy':
-        return ['#5B6D8E', '#7D8CA3', '#4A5568'];
-      case 'focus':
-      case 'concentrate':
-        return ['#9062C0', '#763FA3', '#BD8DDA'];
+        return 'bg-blue-50 dark:bg-blue-950';
       case 'energetic':
-      case 'energy':
-        return ['#F25022', '#FF8C00', '#FFCB05'];
+        return 'bg-orange-50 dark:bg-orange-950';
+      case 'focused':
+        return 'bg-purple-50 dark:bg-purple-950';
+      case 'happy':
+        return 'bg-yellow-50 dark:bg-yellow-950';
+      case 'relaxed':
+        return 'bg-green-50 dark:bg-green-950';
+      case 'sad':
+        return 'bg-indigo-50 dark:bg-indigo-950';
       default:
-        return ['#5B9BD5', '#9062C0', '#68BBE3'];
+        return 'bg-gray-50 dark:bg-gray-900';
     }
   };
-  
-  // Draw the visualization
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+
+  const getWaveColor = () => {
+    switch (mood.toLowerCase()) {
+      case 'calm':
+        return '#3b82f6';
+      case 'energetic':
+        return '#f97316';
+      case 'focused':
+        return '#8b5cf6';
+      case 'happy':
+        return '#eab308';
+      case 'relaxed':
+        return '#10b981';
+      case 'sad':
+        return '#6366f1';
+      default:
+        return '#64748b';
+    }
+  };
+
+  // Générer un pattern de visualisation simple pour l'humeur
+  const generateVisualizationBars = () => {
+    const numBars = 20;
+    const waveColor = getWaveColor();
     
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    // Set canvas dimensions
-    const resizeCanvas = () => {
-      const container = canvas.parentElement;
-      if (container) {
-        canvas.width = container.clientWidth;
-        canvas.height = container.clientHeight;
-      }
-    };
-    
-    // Handle resize
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-    
-    // Animation state
-    let animationId: number;
-    const particles: any[] = [];
-    const colors = getEmotionColors(emotion);
-    
-    // Create particles
-    const createParticles = () => {
-      particles.length = 0;
-      const numParticles = isPlaying ? 50 : 20;
-      
-      for (let i = 0; i < numParticles; i++) {
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          size: Math.random() * 5 + 1,
-          speedX: Math.random() * 1 - 0.5,
-          speedY: Math.random() * 1 - 0.5,
-          color: colors[Math.floor(Math.random() * colors.length)]
-        });
-      }
-    };
-    
-    // Animate particles
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw particles
-      particles.forEach(particle => {
-        ctx.fillStyle = particle.color;
-        ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Update position
-        particle.x += particle.speedX * (isPlaying ? 2 : 0.5);
-        particle.y += particle.speedY * (isPlaying ? 2 : 0.5);
-        
-        // Wrap around edges
-        if (particle.x > canvas.width) particle.x = 0;
-        if (particle.x < 0) particle.x = canvas.width;
-        if (particle.y > canvas.height) particle.y = 0;
-        if (particle.y < 0) particle.y = canvas.height;
-      });
-      
-      animationId = requestAnimationFrame(animate);
-    };
-    
-    // Start animation
-    createParticles();
-    animate();
-    
-    // Clean up
-    return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener('resize', resizeCanvas);
-    };
-  }, [isPlaying, emotion, currentTrack]);
-  
-  // Force update when track changes
-  useEffect(() => {
-    forceUpdate({});
-  }, [currentTrack, emotion]);
-  
+    return (
+      <div className="flex items-end justify-center h-24 space-x-1">
+        {Array.from({ length: numBars }).map((_, i) => {
+          // Créer une forme d'onde qui ressemble à l'humeur
+          // Par exemple, une onde calme aurait des hauteurs plus régulières
+          let height;
+          
+          if (mood.toLowerCase() === 'calm') {
+            // Onde plus régulière pour calme
+            height = 30 + Math.sin(i * 0.5) * 20 * intensity;
+          } else if (mood.toLowerCase() === 'energetic') {
+            // Onde plus chaotique pour énergique
+            height = 20 + Math.random() * 60 * intensity;
+          } else if (mood.toLowerCase() === 'focused') {
+            // Onde avec des pics réguliers pour concentré
+            height = 30 + Math.cos(i * 0.8) * 30 * intensity;
+          } else {
+            // Onde par défaut
+            height = 10 + Math.sin(i * 0.7) * 40 * intensity;
+          }
+          
+          return (
+            <div 
+              key={i}
+              style={{ 
+                height: `${height}px`,
+                backgroundColor: waveColor,
+                opacity: 0.7 + Math.random() * 0.3
+              }}
+              className="w-2 rounded-md"
+            />
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
-    <Card className={`overflow-hidden relative ${className}`}>
-      <div className="absolute inset-0">
-        <canvas 
-          ref={canvasRef} 
-          className="w-full h-full"
-          style={{ background: 'transparent' }}
-        />
-      </div>
-      <div className="relative z-10 p-6 text-center">
-        <h3 className="font-bold text-lg mb-1">
-          {emotion ? `${emotion} Mood` : 'Mood Visualization'}
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          {isPlaying 
-            ? 'Visualizing your current music mood' 
-            : 'Start playing music to see visualization'}
-        </p>
-      </div>
+    <Card className={`${getMoodColor()} transition-all duration-500`}>
+      <CardHeader>
+        <CardTitle className="capitalize">{mood}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {generateVisualizationBars()}
+        <div className="mt-4 text-sm text-center text-muted-foreground">
+          {mood === 'calm' && "Ondes cérébrales détendues, fréquence entre 8-12 Hz"}
+          {mood === 'energetic' && "Rythme cardiaque élevé, activité neuronale rapide"}
+          {mood === 'focused' && "Attention concentrée, ondes beta modérées"}
+          {mood === 'happy' && "Dopamine et sérotonine élevées"}
+          {mood === 'relaxed' && "Respiration ralentie, pression artérielle réduite"}
+          {mood === 'sad' && "Activité préfrontale asymétrique"}
+          {!['calm', 'energetic', 'focused', 'happy', 'relaxed', 'sad'].includes(mood.toLowerCase()) && 
+            "Visualisation personnalisée de l'état émotionnel"}
+        </div>
+      </CardContent>
     </Card>
   );
 };

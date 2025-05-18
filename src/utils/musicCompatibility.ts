@@ -1,58 +1,75 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicTrack } from '@/types/music';
 
 /**
- * Gets the cover URL from a track using any of the available property names
+ * Obtient l'URL de la couverture d'une piste en gérant les différentes propriétés possibles
+ * @param track La piste musicale
+ * @returns L'URL de la couverture ou null si non disponible
  */
-export function getTrackCover(track: MusicTrack | null | undefined): string | undefined {
-  if (!track) return undefined;
-  return track.coverUrl || track.cover || track.coverImage || track.cover_url;
-}
+export const getTrackCover = (track: MusicTrack): string | null => {
+  if (!track) return null;
+  
+  // Vérifier les différentes propriétés possibles
+  return track.cover || track.coverUrl || track.coverImage || null;
+};
 
 /**
- * Gets the audio URL from a track using any of the available property names
+ * Obtient l'URL audio d'une piste en gérant les différentes propriétés possibles
+ * @param track La piste musicale
+ * @returns L'URL audio ou null si non disponible
  */
-export function getTrackAudioUrl(track: MusicTrack | null | undefined): string | undefined {
-  if (!track) return undefined;
-  return track.audioUrl || track.src || track.url || track.track_url;
-}
+export const getTrackAudioUrl = (track: MusicTrack): string | null => {
+  if (!track) return null;
+  
+  // Vérifier les différentes propriétés possibles
+  return track.url || track.audioUrl || track.src || track.track_url || null;
+};
 
 /**
- * Gets the title or name from a track
+ * Obtient le titre d'une piste en gérant les différentes propriétés possibles
+ * @param track La piste musicale
+ * @returns Le titre ou "Titre inconnu" si non disponible
  */
-export function getTrackTitle(track: MusicTrack | null | undefined): string {
-  if (!track) return 'Unknown Track';
-  return track.title || track.name || 'Unknown Track';
-}
+export const getTrackTitle = (track: MusicTrack): string => {
+  if (!track) return "Titre inconnu";
+  
+  // Vérifier les différentes propriétés possibles
+  return track.title || track.name || "Titre inconnu";
+};
 
 /**
- * Gets the artist from a track
+ * Obtient l'artiste d'une piste en gérant les différentes propriétés possibles
+ * @param track La piste musicale
+ * @returns L'artiste ou "Artiste inconnu" si non disponible
  */
-export function getTrackArtist(track: MusicTrack | null | undefined): string {
-  if (!track) return 'Unknown Artist';
-  return track.artist || 'Unknown Artist';
-}
+export const getTrackArtist = (track: MusicTrack): string => {
+  if (!track) return "Artiste inconnu";
+  
+  return track.artist || "Artiste inconnu";
+};
 
 /**
- * Gets the cover URL from a playlist using any of the available property names
+ * Normalise une piste musicale en assurant que toutes les propriétés nécessaires sont présentes
+ * @param track La piste musicale à normaliser
+ * @returns Une piste normalisée avec toutes les propriétés nécessaires
  */
-export function getPlaylistCover(playlist: MusicPlaylist | null | undefined): string | undefined {
-  if (!playlist) return undefined;
-  return playlist.coverUrl || playlist.cover || playlist.coverImage;
-}
-
-/**
- * Gets the title or name from a playlist
- */
-export function getPlaylistTitle(playlist: MusicPlaylist | null | undefined): string {
-  if (!playlist) return 'Unknown Playlist';
-  return playlist.title || playlist.name || 'Unknown Playlist';
-}
-
-/**
- * Safely gets the emotion from a track
- */
-export function getTrackEmotion(track: MusicTrack | null | undefined): string {
-  if (!track) return '';
-  return track.emotion || track.mood || '';
-}
+export const normalizeTrack = (track: Partial<MusicTrack>): MusicTrack => {
+  return {
+    id: track.id || `track-${Date.now()}`,
+    title: getTrackTitle(track as MusicTrack),
+    name: track.name || track.title || "Titre inconnu",
+    artist: getTrackArtist(track as MusicTrack),
+    url: getTrackAudioUrl(track as MusicTrack) || '',
+    audioUrl: track.audioUrl || track.url || track.src || track.track_url || '',
+    src: track.src || track.url || track.audioUrl || track.track_url || '',
+    track_url: track.track_url || track.url || track.audioUrl || track.src || '',
+    cover: getTrackCover(track as MusicTrack) || '',
+    coverUrl: track.coverUrl || track.cover || track.coverImage || '',
+    coverImage: track.coverImage || track.cover || track.coverUrl || '',
+    duration: track.duration || 0,
+    emotion: track.emotion || '',
+    intensity: track.intensity || 0.5,
+    category: track.category || '',
+    tags: track.tags || []
+  };
+};

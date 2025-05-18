@@ -11,39 +11,34 @@ export const VolumeControl: React.FC<VolumeControlProps> = ({
   onVolumeChange,
   onMuteToggle
 }) => {
-  const handleVolumeChange = (values: number[]) => {
-    onVolumeChange(values[0]);
-  };
-  
-  // Determine which icon to display based on volume level and mute state
+  // Déterminer quelle icône de volume afficher
   const VolumeIcon = () => {
-    if (muted) return <VolumeX className="h-4 w-4" />;
-    if (volume > 0.7) return <Volume2 className="h-4 w-4" />;
-    if (volume > 0.2) return <Volume1 className="h-4 w-4" />;
-    return <Volume className="h-4 w-4" />;
+    if (muted || volume === 0) return <VolumeX size={18} />;
+    if (volume < 0.3) return <Volume size={18} />;
+    if (volume < 0.7) return <Volume1 size={18} />;
+    return <Volume2 size={18} />;
   };
-  
+
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex items-center gap-2">
       <Button 
         variant="ghost" 
-        size="icon" 
-        className="h-8 w-8"
+        size="sm" 
+        className="p-1"
         onClick={onMuteToggle}
       >
         <VolumeIcon />
       </Button>
-      
       <Slider
         value={[muted ? 0 : volume * 100]}
         min={0}
         max={100}
-        step={1}
-        onValueChange={(values) => handleVolumeChange([values[0] / 100])}
-        className="w-full"
+        onValueChange={(value) => onVolumeChange(value[0] / 100)}
+        className="w-full max-w-40"
       />
+      <span className="text-xs text-muted-foreground w-9">
+        {Math.round((muted ? 0 : volume) * 100)}%
+      </span>
     </div>
   );
 };
-
-export default VolumeControl;

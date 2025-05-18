@@ -35,9 +35,11 @@ const IdentitySettings: React.FC<IdentitySettingsProps> = ({
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target && event.target.result) {
-          onChange({
+          const updatedPreferences = {
+            ...preferences,
             avatarUrl: event.target.result as string
-          });
+          };
+          onChange(updatedPreferences);
         }
       };
       reader.readAsDataURL(file);
@@ -48,12 +50,15 @@ const IdentitySettings: React.FC<IdentitySettingsProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    onChange({
+    const updatedPreferences = {
+      ...preferences,
       avatarUrl,
       displayName,
       pronouns,
       biography
-    });
+    };
+    
+    onChange(updatedPreferences);
   };
   
   return (

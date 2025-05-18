@@ -11,7 +11,6 @@ import { VolumeControl } from './VolumeControl';
 const MusicDrawer: React.FC<MusicDrawerProps> = ({
   open,
   onOpenChange,
-  side = "right",
   playlist,
   currentTrack,
   children
@@ -36,7 +35,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
   
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side={side} className="w-[320px] sm:w-[400px]">
+      <SheetContent className="w-[320px] sm:w-[400px]">
         <SheetHeader className="text-left mb-6">
           <SheetTitle>Music Player</SheetTitle>
         </SheetHeader>

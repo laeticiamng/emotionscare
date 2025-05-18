@@ -1,119 +1,94 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { useUserPreferences } from '@/contexts/PreferencesContext';
+import { useTheme } from '@/hooks/use-theme';
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 import { useMusic } from '@/contexts/music';
-import { normalizeUserMode } from '@/utils/userModeHelpers';
 
-/**
- * Component for testing context access and values
- * Useful for debugging context-related issues
- */
 const TestContextAccess: React.FC = () => {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-  const { userMode, isLoading: userModeLoading } = useUserMode();
-  const { preferences, isLoading: preferencesLoading } = useUserPreferences();
-  const { isInitialized: musicInitialized } = useMusic();
+  // Accès au contexte de thème
+  const themeContext = useTheme();
   
+  // Accès au contexte de préférences (version standard)
+  const preferencesContext = usePreferences();
+  
+  // Accès au contexte de préférences utilisateur (version étendue)
+  const userPrefContext = useUserPreferences();
+  
+  // Accès au contexte de musique
+  const musicContext = useMusic();
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">Context Access Test</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Auth Context */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Auth Context</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p><strong>Loading:</strong> {authLoading ? 'Yes' : 'No'}</p>
-              <p><strong>Authenticated:</strong> {isAuthenticated ? 'Yes' : 'No'}</p>
-              {user ? (
-                <div className="space-y-2">
-                  <p><strong>User ID:</strong> {user.id}</p>
-                  <p><strong>Email:</strong> {user.email}</p>
-                  <p><strong>Name:</strong> {user.name}</p>
-                  <p><strong>Role:</strong> {user.role}</p>
-                  <p><strong>Created:</strong> {new Date(user.created_at).toLocaleString()}</p>
-                </div>
-              ) : (
-                <p className="italic text-muted-foreground">No user data</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+    <div className="p-4 border rounded-md">
+      <h2 className="text-xl font-bold mb-4">Test d'accès aux contextes</h2>
+
+      <div className="space-y-4">
+        <div>
+          <h3 className="font-medium">ThemeContext:</h3>
+          <pre className="bg-muted p-2 rounded text-xs overflow-auto">
+            {JSON.stringify({ 
+              theme: themeContext.theme, 
+              setTheme: typeof themeContext.setTheme 
+            }, null, 2)}
+          </pre>
+        </div>
+
+        <div>
+          <h3 className="font-medium">PreferencesContext:</h3>
+          <pre className="bg-muted p-2 rounded text-xs overflow-auto">
+            {JSON.stringify({ 
+              theme: preferencesContext.preferences.theme,
+              language: preferencesContext.preferences.language,
+              isLoading: preferencesContext.isLoading,
+              updatePreferences: typeof preferencesContext.updatePreferences
+            }, null, 2)}
+          </pre>
+        </div>
+
+        <div>
+          <h3 className="font-medium">UserPreferencesContext:</h3>
+          <pre className="bg-muted p-2 rounded text-xs overflow-auto">
+            {JSON.stringify({ 
+              theme: userPrefContext.preferences.theme,
+              language: userPrefContext.preferences.language,
+              updatePreferences: typeof userPrefContext.updatePreferences
+            }, null, 2)}
+          </pre>
+        </div>
+
+        <div>
+          <h3 className="font-medium">MusicContext:</h3>
+          <pre className="bg-muted p-2 rounded text-xs overflow-auto">
+            {JSON.stringify({ 
+              currentTrack: musicContext.currentTrack ? {
+                id: musicContext.currentTrack.id,
+                title: musicContext.currentTrack.title || musicContext.currentTrack.name
+              } : null,
+              isPlaying: musicContext.isPlaying,
+              volume: musicContext.volume,
+              isInitialized: musicContext.isInitialized,
+              togglePlay: typeof musicContext.togglePlay,
+              nextTrack: typeof musicContext.nextTrack
+            }, null, 2)}
+          </pre>
+        </div>
+      </div>
+
+      <div className="mt-6 space-x-2">
+        <button 
+          onClick={() => themeContext.setTheme(themeContext.theme === 'dark' ? 'light' : 'dark')}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
+        >
+          Toggle Theme
+        </button>
         
-        {/* UserMode Context */}
-        <Card>
-          <CardHeader>
-            <CardTitle>UserMode Context</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p><strong>Loading:</strong> {userModeLoading ? 'Yes' : 'No'}</p>
-              <p><strong>Current Mode:</strong> {userMode || 'None'}</p>
-              <p><strong>Normalized Mode:</strong> {normalizeUserMode(userMode)}</p>
-              
-              {user?.role && userMode && (
-                <div className="mt-4 p-3 rounded-md bg-muted">
-                  <p><strong>Role/Mode Match Check:</strong></p>
-                  <p>User Role: {user.role}</p>
-                  <p>User Mode: {userMode}</p>
-                  <p>Normalized Role: {normalizeUserMode(user.role)}</p>
-                  <p>Normalized Mode: {normalizeUserMode(userMode)}</p>
-                  <p className={normalizeUserMode(user.role) === normalizeUserMode(userMode) ? 'text-green-500' : 'text-red-500'}>
-                    <strong>
-                      {normalizeUserMode(user.role) === normalizeUserMode(userMode) ? '✓ MATCH' : '✗ MISMATCH'}
-                    </strong>
-                  </p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Preferences Context */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Preferences Context</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p><strong>Loading:</strong> {preferencesLoading ? 'Yes' : 'No'}</p>
-              
-              {preferences ? (
-                <div>
-                  <p><strong>Theme:</strong> {preferences.theme}</p>
-                  <p><strong>Language:</strong> {preferences.language}</p>
-                  <p><strong>Notifications:</strong> {preferences.notifications_enabled ? 'Enabled' : 'Disabled'}</p>
-                  <p><strong>Email Notifications:</strong> {preferences.email_notifications ? 'Enabled' : 'Disabled'}</p>
-                  <p><strong>Font Family:</strong> {preferences.fontFamily || 'Default'}</p>
-                  <p><strong>Font Size:</strong> {preferences.fontSize || 'Default'}</p>
-                  <p><strong>Reduce Motion:</strong> {preferences.reduceMotion ? 'Yes' : 'No'}</p>
-                  <p><strong>Sound Enabled:</strong> {preferences.soundEnabled ? 'Yes' : 'No'}</p>
-                  <p><strong>Ambient Sound:</strong> {preferences.ambientSound || 'None'}</p>
-                </div>
-              ) : (
-                <p className="italic text-muted-foreground">No preferences data</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Music Context */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Music Context</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p><strong>Initialized:</strong> {musicInitialized ? 'Yes' : 'No'}</p>
-            </div>
-          </CardContent>
-        </Card>
+        <button 
+          onClick={() => musicContext.togglePlay()}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
+          disabled={!musicContext.currentTrack}
+        >
+          {musicContext.isPlaying ? 'Pause' : 'Play'} Music
+        </button>
       </div>
     </div>
   );

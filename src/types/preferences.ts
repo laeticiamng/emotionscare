@@ -1,6 +1,38 @@
 
 import { ThemeName, FontFamily, FontSize } from './theme';
 
+// Valeur par défaut pour les préférences utilisateur
+export const DEFAULT_PREFERENCES: UserPreferences = {
+  theme: 'system',
+  language: 'fr',
+  notifications_enabled: true,
+  email_notifications: false,
+  fontFamily: 'system',
+  fontSize: 'medium',
+  reduceMotion: false,
+  soundEnabled: true,
+  ambientSound: 'nature',
+  colorBlindMode: false,
+  autoplayMedia: false,
+  privacy: {
+    shareActivity: false,
+    shareJournal: false,
+    publicProfile: false,
+    shareData: false,
+    anonymizeReports: false,
+    profileVisibility: 'private'
+  },
+  onboardingCompleted: false,
+  // Propriétés supplémentaires pour les fonctionnalités premium
+  emotionalCamouflage: false,
+  aiSuggestions: false,
+  // Propriétés pour l'identité
+  avatarUrl: '',
+  displayName: '',
+  pronouns: '',
+  biography: '',
+};
+
 export interface UserPreferences {
   theme: ThemeName;
   language: string;
@@ -35,6 +67,14 @@ export interface UserPreferences {
     sms?: boolean;
     inApp?: boolean;
   };
+  // Propriétés supplémentaires pour les fonctionnalités premium
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  // Propriétés pour l'identité de l'utilisateur
+  avatarUrl?: string;
+  displayName?: string;
+  pronouns?: string;
+  biography?: string;
 }
 
 export interface UserPreferencesContextType {
@@ -43,3 +83,6 @@ export interface UserPreferencesContextType {
   isLoading: boolean;
   error: Error | null;
 }
+
+// Exporter FontFamily et FontSize pour les composants qui les importent directement
+export { FontFamily, FontSize } from './theme';
