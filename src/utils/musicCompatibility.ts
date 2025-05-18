@@ -6,6 +6,38 @@
 import { MusicTrack, MusicPlaylist } from "@/types/music";
 
 /**
+ * Get the cover image URL from a track, handling different property names
+ */
+export const getTrackCover = (track: MusicTrack | null | undefined): string => {
+  if (!track) return '';
+  return track.coverUrl || track.cover || track.coverImage || '';
+};
+
+/**
+ * Get the title from a track, handling different property names
+ */
+export const getTrackTitle = (track: MusicTrack | null | undefined): string => {
+  if (!track) return '';
+  return track.title || track.name || 'Unknown Track';
+};
+
+/**
+ * Get the artist from a track, handling different property names
+ */
+export const getTrackArtist = (track: MusicTrack | null | undefined): string => {
+  if (!track) return '';
+  return track.artist || 'Unknown Artist';
+};
+
+/**
+ * Get the audio URL from a track, handling different property names
+ */
+export const getTrackAudioUrl = (track: MusicTrack | null | undefined): string => {
+  if (!track) return '';
+  return track.audioUrl || track.url || track.src || track.track_url || '';
+};
+
+/**
  * Ensures that a value is a complete MusicTrack, filling in defaults for required fields
  */
 export const ensureTrack = (track: Partial<MusicTrack>): MusicTrack => {
@@ -65,6 +97,10 @@ export const normalizeTrackProperties = (track: any): MusicTrack => {
 };
 
 export default {
+  getTrackCover,
+  getTrackTitle,
+  getTrackArtist,
+  getTrackAudioUrl,
   ensureTrack,
   ensurePlaylist,
   normalizeTrackProperties

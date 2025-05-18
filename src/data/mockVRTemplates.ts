@@ -1,4 +1,10 @@
 
+/**
+ * Mock VR Templates
+ * --------------------------------------
+ * This file provides test data that strictly follows the official types defined in /src/types/vr.ts
+ */
+
 import { VRSessionTemplate } from '@/types/vr';
 
 // Données fictives pour les templates de sessions VR
@@ -12,11 +18,11 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     intensity: 1,
     category: "meditation",
     tags: ["pleine conscience", "débutant", "nature"],
-    thumbnail: "/images/vr/forest-meditation.jpg",
-    created_at: "2023-01-15T08:30:00Z",
-    author_name: "Dr. Marie Durand",
-    average_rating: 4.8,
-    completion_count: 1245
+    thumbnailUrl: "/images/vr/forest-meditation.jpg", // Renamed from thumbnail to thumbnailUrl
+    createdAt: "2023-01-15T08:30:00Z", // Using modern naming
+    authorName: "Dr. Marie Durand", // Using modern naming
+    averageRating: 4.8, // Using modern naming
+    completionCount: 1245 // Using modern naming
   },
   {
     id: "vr-template-2",
@@ -27,11 +33,11 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     intensity: 2,
     category: "relaxation",
     tags: ["plage", "océan", "détente"],
-    thumbnail: "/images/vr/tropical-beach.jpg",
-    created_at: "2023-02-22T14:15:00Z",
-    author_name: "Sophia Martinez",
-    average_rating: 4.9,
-    completion_count: 2187
+    thumbnailUrl: "/images/vr/tropical-beach.jpg", // Renamed from thumbnail to thumbnailUrl
+    createdAt: "2023-02-22T14:15:00Z", // Using modern naming
+    authorName: "Sophia Martinez", // Using modern naming
+    averageRating: 4.9, // Using modern naming
+    completionCount: 2187 // Using modern naming
   },
   {
     id: "vr-template-3",
@@ -42,11 +48,11 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     intensity: 3,
     category: "anxiety",
     tags: ["respiration", "anti-stress", "thérapeutique"],
-    thumbnail: "/images/vr/breathing-exercise.jpg",
-    created_at: "2023-03-10T09:45:00Z",
-    author_name: "Dr. Thomas Laurent",
-    average_rating: 4.7,
-    completion_count: 1876
+    thumbnailUrl: "/images/vr/breathing-exercise.jpg", // Renamed from thumbnail to thumbnailUrl
+    createdAt: "2023-03-10T09:45:00Z", // Using modern naming
+    authorName: "Dr. Thomas Laurent", // Using modern naming
+    averageRating: 4.7, // Using modern naming
+    completionCount: 1876 // Using modern naming
   },
   {
     id: "vr-template-4",
@@ -57,11 +63,11 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     intensity: 1,
     category: "sleep",
     tags: ["sommeil", "nuit", "visualisation"],
-    thumbnail: "/images/vr/deep-sleep.jpg",
-    created_at: "2023-04-05T22:00:00Z",
-    author_name: "Claire Dubois",
-    average_rating: 4.9,
-    completion_count: 3214
+    thumbnailUrl: "/images/vr/deep-sleep.jpg", // Renamed from thumbnail to thumbnailUrl
+    createdAt: "2023-04-05T22:00:00Z", // Using modern naming
+    authorName: "Claire Dubois", // Using modern naming
+    averageRating: 4.9, // Using modern naming
+    completionCount: 3214 // Using modern naming
   },
   {
     id: "vr-template-5",
@@ -72,11 +78,11 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     intensity: 4,
     category: "focus",
     tags: ["concentration", "productivité", "mental"],
-    thumbnail: "/images/vr/focus-training.jpg",
-    created_at: "2023-05-18T10:30:00Z",
-    author_name: "Dr. Nicolas Bernard",
-    average_rating: 4.6,
-    completion_count: 1523
+    thumbnailUrl: "/images/vr/focus-training.jpg", // Renamed from thumbnail to thumbnailUrl
+    createdAt: "2023-05-18T10:30:00Z", // Using modern naming
+    authorName: "Dr. Nicolas Bernard", // Using modern naming
+    averageRating: 4.6, // Using modern naming
+    completionCount: 1523 // Using modern naming
   },
   {
     id: "vr-template-6",
@@ -87,11 +93,11 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     intensity: 3,
     category: "anger",
     tags: ["gestion émotionnelle", "thérapie", "océan"],
-    thumbnail: "/images/vr/calm-ocean.jpg",
-    created_at: "2023-06-20T16:45:00Z",
-    author_name: "Prof. Élodie Martin",
-    average_rating: 4.7,
-    completion_count: 1287
+    thumbnailUrl: "/images/vr/calm-ocean.jpg", // Renamed from thumbnail to thumbnailUrl
+    createdAt: "2023-06-20T16:45:00Z", // Using modern naming
+    authorName: "Prof. Élodie Martin", // Using modern naming
+    averageRating: 4.7, // Using modern naming
+    completionCount: 1287 // Using modern naming
   }
 ];
 

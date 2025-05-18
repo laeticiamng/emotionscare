@@ -1,4 +1,10 @@
 
+/**
+ * Mock Emotion Data
+ * --------------------------------------
+ * This file provides test data that strictly follows the official types defined in /src/types/emotion.ts
+ */
+
 import { Emotion } from '@/types/emotion';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -7,7 +13,7 @@ const mockEmotions: Emotion[] = [
     id: uuidv4(),
     name: 'Joyeux',
     label: 'happy',
-    intensity: 0.85,
+    intensity: 'high', // Changed from number to string enum value
     timestamp: new Date().toISOString(),
     description: "Un état d'esprit positif, caractérisé par la satisfaction et le plaisir.",
     tips: [
@@ -22,7 +28,7 @@ const mockEmotions: Emotion[] = [
     id: uuidv4(),
     name: 'Calme',
     label: 'calm',
-    intensity: 0.7,
+    intensity: 'medium', // Changed from number to string enum value
     timestamp: new Date(Date.now() - 86400000).toISOString(), // Hier
     description: "État de tranquillité et de paix intérieure, d'absence d'agitation.",
     tips: [
@@ -37,7 +43,7 @@ const mockEmotions: Emotion[] = [
     id: uuidv4(),
     name: 'Concentré',
     label: 'focused',
-    intensity: 0.9,
+    intensity: 'high', // Changed from number to string enum value
     timestamp: new Date(Date.now() - 172800000).toISOString(), // Avant-hier
     description: "Capacité à diriger son attention de manière soutenue sur une tâche ou une activité.",
     tips: [
@@ -52,7 +58,7 @@ const mockEmotions: Emotion[] = [
     id: uuidv4(),
     name: 'Anxieux',
     label: 'anxious',
-    intensity: 0.65,
+    intensity: 'medium', // Changed from number to string enum value
     timestamp: new Date(Date.now() - 259200000).toISOString(), // Il y a 3 jours
     description: "Sentiment d'inquiétude et d'appréhension face à des situations perçues comme menaçantes.",
     tips: [
@@ -67,7 +73,7 @@ const mockEmotions: Emotion[] = [
     id: uuidv4(),
     name: 'Triste',
     label: 'sad',
-    intensity: 0.5,
+    intensity: 'low', // Changed from number to string enum value
     timestamp: new Date(Date.now() - 345600000).toISOString(), // Il y a 4 jours
     description: "État émotionnel lié à la perte, la déception ou la mélancolie.",
     tips: [
@@ -90,6 +96,6 @@ export const getEmotionByLabel = (label: EmotionLabel | string): Emotion | undef
 
 export const getRecentEmotions = (limit: number = 5): Emotion[] => {
   return [...mockEmotions].sort((a, b) => 
-    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    new Date(b.timestamp || '').getTime() - new Date(a.timestamp || '').getTime()
   ).slice(0, limit);
 };

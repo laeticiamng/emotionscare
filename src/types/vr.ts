@@ -1,82 +1,61 @@
 
+/**
+ * VR Types
+ * --------------------------------------
+ * This file defines the official types for VR functionality.
+ * Any new property or correction must be documented here and synchronized across all mockData and components.
+ */
+
 export interface VRSessionTemplate {
   id: string;
-  name: string;
-  title?: string; // Pour compatibilité
-  description?: string;
-  duration: number;
-  environment: string;
-  intensity: number;
+  title: string;
+  description: string;
+  thumbnailUrl: string; // Official property name
+  thumbnail?: string; // For backward compatibility, to be deprecated
+  duration: number; // Duration in seconds
+  difficulty: string;
+  category: string;
   tags: string[];
-  objective: string;
-  coverImage?: string;
-  audioTrack?: string;
-  audio_url?: string; // Pour compatibilité
-  preview_url?: string; // Pour compatibilité
-  thumbnailUrl?: string; // Pour compatibilité
-  lastUsed?: string; // Pour compatibilité
-  category?: string; // Pour compatibilité
-  difficulty?: string; // Pour compatibilité
-  benefits?: string[]; // Pour compatibilité
-  is_audio_only?: boolean; // Pour compatibilité
-  emotion?: string; // Ajouté pour compatibilité avec VRTemplateDetail
-  theme?: string; // Ajouté pour compatibilité avec VRTemplateDetail
-  completionRate?: number; // Ajouté pour compatibilité avec VRTemplateDetail
-  completion_rate?: number; // Ajouté pour compatibilité avec VRTemplateDetail
-  recommendedMood?: string; // Ajouté pour compatibilité avec VRTemplateDetail
-  recommended_mood?: string; // Ajouté pour compatibilité avec VRTemplateDetail
-  imageUrl?: string; // Ajouté pour compatibilité avec VRTemplateDetail
-  coverUrl?: string; // Ajouté pour compatibilité avec VRTemplateDetail
-  cover_url?: string; // Ajouté pour compatibilité avec VRTemplateDetail
+  completion_count?: number; // Number of times the session was completed
+  completionCount?: number; // Modern naming, prefer this
+  average_rating?: number;
+  averageRating?: number; // Modern naming, prefer this
+  author_name?: string;
+  authorName?: string; // Modern naming, prefer this
+  created_at?: string;
+  createdAt?: string; // Modern naming, prefer this
+  intensity?: number;
+  emotion_target?: string; // Target emotion to achieve with this session
+  emotionTarget?: string; // Modern naming, prefer this
+  recommended_mood?: string; // Mood this session is recommended for
+  recommendedMood?: string; // Modern naming, prefer this
+  preview_url?: string;
+  previewUrl?: string; // Modern naming, prefer this
+  is_audio_only?: boolean;
+  isAudioOnly?: boolean; // Modern naming, prefer this
+  audio_url?: string;
+  audioUrl?: string; // Modern naming, prefer this
+  benefits?: string[];
+  theme?: string;
 }
 
-export interface VRSession {
-  id: string;
+export interface VRSessionStats {
+  sessionId: string;
+  completions: number;
+  averageRating: number;
+  averageDuration: number;
+  mostCommonEmotion?: string;
+  userCount: number;
+}
+
+export interface VRSessionProgress {
   userId: string;
-  templateId: string;
-  startTime: Date;
-  endTime?: Date;
+  sessionId: string;
+  progress: number; // 0-100
   completed: boolean;
-  feedback?: string | { rating?: number; comments?: string };
-  rating?: number;
-  metrics?: {
-    focusLevel?: number;
-    relaxationLevel?: number;
-    heartRate?: number[];
-    breathingRate?: number[];
-  };
-  startedAt?: Date | string; // Pour compatibilité
-  endedAt?: Date | string; // Pour compatibilité
-  completedAt?: Date | string; // Pour compatibilité
-  end_time?: Date | string; // Pour compatibilité
-  date?: string; // Pour compatibilité
-  template?: VRSessionTemplate; // Pour compatibilité
-  duration?: number; // Pour compatibilité
-  heartRateBefore?: number; // Pour compatibilité
-  heartRateAfter?: number; // Pour compatibilité
-  emotionBefore?: string; // Pour compatibilité
-  emotionAfter?: string; // Pour compatibilité
-}
-
-export interface VRSessionWithMusicProps {
-  session: VRSession;
-  template: VRSessionTemplate;
-  useMusic?: boolean;
-  onComplete?: (feedback: string, rating: number) => void;
-  // Ajout des propriétés manquantes utilisées dans VRSessionWithMusic.tsx
-  sessionId?: string;
-  title?: string;
-  description?: string;
+  startedAt: string;
+  completedAt?: string;
   duration?: number;
-  environment?: string;
-  musicTrackId?: string;
-}
-
-// Ajout du type manquant VRSessionHistoryProps
-export interface VRSessionHistoryProps {
-  sessions?: VRSession[];
-  userId?: string;
-  limit?: number;
-  showHeader?: boolean;
-  className?: string;
+  feedback?: string;
+  rating?: number;
 }
