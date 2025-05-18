@@ -19,6 +19,7 @@ import B2BUserDashboardPage from './pages/b2b/user/Dashboard';
 import B2BAdminDashboardPage from './pages/b2b/admin/Dashboard';
 import B2CGamificationPage from './pages/b2c/Gamification';
 import B2BUserGamificationPage from './pages/b2b/user/Gamification';
+import RetentionDashboardPage from './pages/RetentionDashboardPage';
 import B2CJournalPage from './pages/b2c/Journal';
 import B2CScanPage from './pages/b2c/Scan';
 import B2CMusicPage from './pages/b2c/Music';
@@ -172,6 +173,10 @@ export const routes: RouteObject[] = [
         element: <SanctuaryPage />
       },
       {
+        path: 'retention',
+        element: <RetentionDashboardPage />
+      },
+      {
         path: 'gamification',
         element: <B2CGamificationPage />
       }
@@ -239,6 +244,10 @@ export const routes: RouteObject[] = [
         element: <SanctuaryPage />
       },
       {
+        path: 'retention',
+        element: <RetentionDashboardPage />
+      },
+      {
         path: 'gamification',
         element: <B2BUserGamificationPage />
       }
@@ -288,6 +297,10 @@ export const routes: RouteObject[] = [
       {
         path: 'innovation',
         element: <B2BAdminInnovationPage />
+      },
+      {
+        path: 'retention',
+        element: <RetentionDashboardPage />
       },
       {
         path: 'settings',
