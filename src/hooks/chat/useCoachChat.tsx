@@ -1,123 +1,82 @@
 
+// Fix missing parameters in useCoachChat.tsx
 import { useState, useCallback } from 'react';
+import { useCoach } from '@/contexts/coach/CoachContextProvider';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
-import { useOpenAI } from '@/hooks/api';
-import { useToast } from '@/hooks/use-toast';
 
-// Hook pour gérer les conversations avec le coach
-export function useCoachChat() {
+export const useCoachChat = () => {
+  const coach = useCoach();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { generateText, chatCompletion } = useOpenAI();
-  const { toast } = useToast();
-
-  // Ajouter un message utilisateur
-  const addUserMessage = useCallback((text: string, conversationId: string) => {
-    const newMessage: ChatMessage = {
-      id: uuidv4(),
-      text,
-      content: text,
-      sender: 'user',
-      role: 'user',
-      conversation_id: conversationId,
-      timestamp: new Date().toISOString()
-    };
-    
-    setMessages((prev) => [...prev, newMessage]);
-    return newMessage;
-  }, []);
-
-  // Ajouter un message assistant
-  const addAssistantMessage = useCallback((text: string, conversationId: string) => {
-    const newMessage: ChatMessage = {
-      id: uuidv4(),
-      text,
-      content: text,
-      sender: 'assistant',
-      role: 'assistant',
-      conversation_id: conversationId,
-      timestamp: new Date().toISOString()
-    };
-    
-    setMessages((prev) => [...prev, newMessage]);
-    return newMessage;
-  }, []);
-
-  // Ajouter un message système
-  const addSystemMessage = useCallback((text: string, conversationId: string) => {
-    const newMessage: ChatMessage = {
-      id: uuidv4(),
-      text,
-      content: text,
-      sender: 'system',
-      role: 'system',
-      conversation_id: conversationId,
-      timestamp: new Date().toISOString()
-    };
-    
-    setMessages((prev) => [...prev, newMessage]);
-    return newMessage;
-  }, []);
-
-  // Envoyer un message et obtenir une réponse du coach
-  const sendMessage = useCallback(async (text: string, conversationId: string) => {
-    if (!text.trim()) return null;
-    
-    const userMessage = addUserMessage(text, conversationId);
-    setIsLoading(true);
-    
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  
+  // Use loading state from coach context
+  const loading = coach.loading || false;
+  
+  const sendMessage = useCallback(async (message: string) => {
     try {
-      // Ajouter un délai de "frappe" pour plus de naturel
-      const response = await chatCompletion(
-        [...messages, userMessage]
-      );
+      setIsProcessing(true);
+      // Create a new message object for the user message
+      const userMessage: ChatMessage = {
+        id: uuidv4(),
+        conversationId: 'coach-conversation',
+        sender: 'user',
+        text: message,
+        timestamp: new Date().toISOString()
+      };
       
-      if (response) {
-        const assistantMessage = addAssistantMessage(response, conversationId);
-        return assistantMessage;
-      } else {
-        toast({
-          title: "Erreur de communication",
-          description: "Le coach n'a pas pu répondre. Veuillez réessayer.",
-          variant: "destructive"
-        });
-        return null;
-      }
+      // Add user message to the state
+      setMessages(prevMessages => [...prevMessages, userMessage]);
+      
+      // Use the existing messages as history
+      const response = await coach.sendMessage(message, messages);
+      
+      // Create a message object for the response
+      const assistantMessage: ChatMessage = {
+        id: uuidv4(),
+        conversationId: 'coach-conversation',
+        sender: 'assistant',
+        text: response,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Add assistant message to the state
+      setMessages(prevMessages => [...prevMessages, assistantMessage]);
+      
+      return response;
     } catch (error) {
-      console.error("Error getting coach response:", error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la communication avec le coach.",
-        variant: "destructive"
-      });
+      console.error('Error sending message:', error);
       return null;
     } finally {
-      setIsLoading(false);
+      setIsProcessing(false);
     }
-  }, [messages, addUserMessage, addAssistantMessage, chatCompletion, toast]);
-
-  // Effacer tous les messages
+  }, [coach, messages]);
+  
+  const addMessage = useCallback((text: string, sender: 'system' | 'user' | 'ai' | 'assistant') => {
+    const newMessage: ChatMessage = {
+      id: uuidv4(),
+      conversationId: 'coach-conversation',
+      sender: sender === 'ai' ? 'assistant' : sender,
+      text,
+      timestamp: new Date().toISOString()
+    };
+    
+    setMessages(prevMessages => [...prevMessages, newMessage]);
+    return newMessage;
+  }, []);
+  
   const clearMessages = useCallback(() => {
     setMessages([]);
   }, []);
   
-  // Supprimer un message spécifique
-  const removeMessage = useCallback((messageId: string) => {
-    setMessages(prev => prev.filter(msg => msg.id !== messageId));
-  }, []);
-
   return {
     messages,
-    isLoading,
-    setIsLoading,
-    addUserMessage,
-    addAssistantMessage,
-    addSystemMessage,
     sendMessage,
+    isProcessing,
+    loading,
+    addMessage,
     clearMessages,
-    removeMessage
   };
-}
+};
 
 export default useCoachChat;

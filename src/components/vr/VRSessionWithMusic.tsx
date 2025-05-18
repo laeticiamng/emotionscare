@@ -5,6 +5,7 @@ import { VRSessionWithMusicProps } from '@/types';
 
 const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   session,
+  template,
   onComplete,
   sessionId,
   title = "Session VR immersive",

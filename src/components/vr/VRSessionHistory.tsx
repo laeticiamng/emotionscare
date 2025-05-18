@@ -57,14 +57,17 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
   };
 
   const getSessionRating = (session: VRSession) => {
-    const hasRating = typeof session.rating !== "undefined" || (typeof session.feedback === "object" && session.feedback?.rating);
-    if (!hasRating) return null;
+    let rating: number | undefined;
     
-    const rating = typeof session.feedback === "object" 
-      ? session.feedback?.rating 
-      : session.rating;
-      
-    if (typeof rating !== "number") return null;
+    if (typeof session.feedback === "object" && session.feedback) {
+      if (session.feedback.rating !== undefined) {
+        rating = session.feedback.rating;
+      }
+    } else if (typeof session.rating === "number") {
+      rating = session.rating;
+    }
+    
+    if (rating === undefined) return null;
     
     return (
       <div className="flex items-center">

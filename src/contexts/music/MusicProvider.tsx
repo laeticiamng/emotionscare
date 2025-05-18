@@ -33,7 +33,13 @@ const defaultContext: MusicContextType = {
   closeDrawer: () => {},
   setPlaylist: () => {},
   setCurrentTrack: () => {},
-  generateMusic: async () => null
+  generateMusic: async () => ({ 
+    id: "", 
+    title: "", 
+    artist: "", 
+    duration: 0, 
+    audioUrl: ""
+  })
 };
 
 const MusicContext = createContext<MusicContextType>(defaultContext);
@@ -247,7 +253,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   };
 
   // Generate AI music (mock implementation)
-  const generateMusic = async (prompt: string): Promise<MusicTrack | null> => {
+  const generateMusic = async (prompt: string): Promise<MusicTrack> => {
     try {
       // In a real app, this would call an AI music generation API
       const generatedTrack: MusicTrack = {
@@ -265,7 +271,13 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     } catch (error) {
       console.error('Error generating music:', error);
       setError(error instanceof Error ? error : new Error('Failed to generate music'));
-      return null;
+      return {
+        id: 'error',
+        title: 'Error generating music',
+        artist: 'System',
+        duration: 0,
+        audioUrl: ''
+      };
     }
   };
 
@@ -275,7 +287,8 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
       setPlaylist({
         id: `playlist-${Date.now()}`,
         name: 'Custom Playlist',
-        tracks: newPlaylist
+        tracks: newPlaylist,
+        created_at: new Date().toISOString()
       });
     } else {
       setPlaylist(newPlaylist);
@@ -305,7 +318,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
         prevTrack,
         previousTrack,
         setVolume,
-        setMute,
+        setMute: setMuted,
         toggleMute,
         seekTo,
         setEmotion,

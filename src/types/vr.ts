@@ -19,6 +19,15 @@ export interface VRSessionTemplate {
   difficulty?: string; // Pour compatibilité
   benefits?: string[]; // Pour compatibilité
   is_audio_only?: boolean; // Pour compatibilité
+  emotion?: string; // Ajouté pour compatibilité avec VRTemplateDetail
+  theme?: string; // Ajouté pour compatibilité avec VRTemplateDetail
+  completionRate?: number; // Ajouté pour compatibilité avec VRTemplateDetail
+  completion_rate?: number; // Ajouté pour compatibilité avec VRTemplateDetail
+  recommendedMood?: string; // Ajouté pour compatibilité avec VRTemplateDetail
+  recommended_mood?: string; // Ajouté pour compatibilité avec VRTemplateDetail
+  imageUrl?: string; // Ajouté pour compatibilité avec VRTemplateDetail
+  coverUrl?: string; // Ajouté pour compatibilité avec VRTemplateDetail
+  cover_url?: string; // Ajouté pour compatibilité avec VRTemplateDetail
 }
 
 export interface VRSession {
@@ -28,7 +37,7 @@ export interface VRSession {
   startTime: Date;
   endTime?: Date;
   completed: boolean;
-  feedback?: string;
+  feedback?: string | { rating?: number; comments?: string };
   rating?: number;
   metrics?: {
     focusLevel?: number;
@@ -54,6 +63,13 @@ export interface VRSessionWithMusicProps {
   template: VRSessionTemplate;
   useMusic?: boolean;
   onComplete?: (feedback: string, rating: number) => void;
+  // Ajout des propriétés manquantes utilisées dans VRSessionWithMusic.tsx
+  sessionId?: string;
+  title?: string;
+  description?: string;
+  duration?: number;
+  environment?: string;
+  musicTrackId?: string;
 }
 
 // Ajout du type manquant VRSessionHistoryProps

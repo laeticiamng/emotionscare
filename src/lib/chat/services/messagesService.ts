@@ -23,9 +23,10 @@ const addMessageToConversation = async (conversationId: string, messageData: Omi
   // Create a new message object with an ID
   const message: ChatMessage = {
     id: uuidv4(), // Generate a new UUID if not provided
-    conversation_id: messageData.conversation_id,
+    conversationId: conversationId,
+    conversation_id: conversationId, // Pour compatibilité
     sender: messageData.sender,
-    text: messageData.text || messageData.content,
+    text: messageData.text || messageData.content || "",
     timestamp: messageData.timestamp?.toString() || new Date().toISOString(),
     role: messageData.role || (messageData.sender === 'user' ? 'user' : 'assistant'),
   };

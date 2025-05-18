@@ -80,10 +80,19 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
   const heartRateBefore = session.heartRateBefore || (session.metrics?.heartRate?.[0]);
   const heartRateAfter = session.heartRateAfter || (session.metrics?.heartRate?.[session.metrics.heartRate.length - 1]);
 
-  // Get rating depending on data format (rating number or feedback object)
-  const rating = typeof session.feedback === 'object' 
-    ? session.feedback?.rating 
-    : session.rating;
+  // Get rating based on the shape of the feedback property
+  let rating: number | undefined;
+  let feedbackText: string | undefined;
+  
+  if (typeof session.feedback === 'object' && session.feedback) {
+    rating = session.feedback.rating;
+    feedbackText = session.feedback.comments;
+  } else if (typeof session.feedback === 'string') {
+    feedbackText = session.feedback;
+    rating = session.rating;
+  } else {
+    rating = session.rating;
+  }
 
   return (
     <Card className={className}>
@@ -147,14 +156,12 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
             </div>
           )}
           
-          {session.feedback && (
+          {feedbackText && (
             <div className="flex items-start space-x-2">
               <FileText className="h-5 w-5 text-muted-foreground mt-1" />
               <div>
                 <p className="text-sm font-medium">Feedback</p>
-                <p className="text-sm text-muted-foreground">
-                  {typeof session.feedback === 'string' ? session.feedback : JSON.stringify(session.feedback)}
-                </p>
+                <p className="text-sm text-muted-foreground">{feedbackText}</p>
               </div>
             </div>
           )}

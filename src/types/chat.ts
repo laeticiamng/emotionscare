@@ -7,6 +7,7 @@ export interface ChatMessage {
   content?: string; // Pour compatibilité
   role?: 'user' | 'assistant' | 'system'; // Pour compatibilité
   timestamp: string;
+  conversation_id?: string; // Pour compatibilité
 }
 
 export interface ChatConversation {
@@ -19,6 +20,8 @@ export interface ChatConversation {
   created_at?: string; // Pour compatibilité
   updated_at?: string; // Pour compatibilité
   last_message?: string; // Pour compatibilité
+  user_id?: string; // Pour compatibilité
+  status?: string; // Pour compatibilité
 }
 
 export interface ChatResponse {

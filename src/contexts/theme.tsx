@@ -5,7 +5,9 @@ import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types/theme';
 export const ThemeContext = createContext<ThemeContextType>({
   theme: 'system',
   setTheme: () => {},
-  isDarkMode: false,
+  toggleTheme: () => {},
+  isDark: false,
+  isDarkMode: false
 });
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -97,6 +99,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   const setFontSize = (newSize: FontSize) => {
     setFontSizeState(newSize);
   };
+  
+  // Helper pour basculer entre les thèmes
+  const toggleTheme = () => {
+    const currentIsDark = theme === 'dark' || (theme === 'system' && isDarkMode);
+    setTheme(currentIsDark ? 'light' : 'dark');
+  };
 
   const getContrastText = (color: string): 'black' | 'white' => {
     // Simple contrast calculation - can be improved
@@ -121,15 +129,20 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     return luminance > 0.5 ? 'black' : 'white';
   };
 
+  // Alias for isDarkMode
+  const isDark = isDarkMode;
+
   return (
     <ThemeContext.Provider value={{ 
       theme, 
       setTheme, 
       isDarkMode,
+      isDark,
       fontFamily, 
       setFontFamily, 
       fontSize, 
       setFontSize,
+      toggleTheme,
       getContrastText
     }}>
       {children}
