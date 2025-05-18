@@ -109,14 +109,15 @@ NEXT_PUBLIC_WEB_URL=http://localhost:3000
 > **Note**
 > L'ancienne variable `SKIP_AUTH_CHECK` utilisée pour désactiver l'authentification en développement a été supprimée. Les tableaux de bord sont désormais toujours protégés.
 
-### Utilisateur de test
+### Utilisateurs de test
 
-Un compte de test est mis à disposition pour les démonstrations :
+Trois comptes sont mis à disposition pour vérifier le routage selon les rôles :
 
-- **Email** : `utilisateur@exemple.fr`
-- **Mot de passe** : `admin`
+- **B2C** : `b2c@exemple.fr` / `b2c`
+- **B2B Utilisateur** : `user@exemple.fr` / `user`
+- **B2B Admin** : `admin@exemple.fr` / `admin`
 
-Si ce compte n'existe pas dans votre base Supabase, vous pouvez le créer
+Si ces comptes n'existent pas dans votre base Supabase, vous pouvez les créer
 automatiquement avec la commande suivante&nbsp;:
 
 ```bash
