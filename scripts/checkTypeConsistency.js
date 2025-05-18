@@ -84,14 +84,14 @@ function findDuplicateTypes() {
   }
   
   if (duplicates.length === 0) {
-    console.log('✅ No duplicate type definitions found!');
+    console.log("✅ No duplicate type definitions found!");
   } else {
-    console.log('⚠️ Found duplicate type definitions:');
+    console.log("⚠ Duplicate type definitions found!");
     for (const dup of duplicates) {
       console.log(`  - ${dup.typeName} in ${dup.file}`);
     }
   }
-  
+
   return duplicates.length === 0;
 }
 
@@ -121,11 +121,11 @@ function findPropertyVariations() {
   }
   
   if (issues.length === 0) {
-    console.log('✅ No property name inconsistencies found!');
+    console.log("✅ No property name inconsistencies found!");
   } else {
-    console.log('⚠️ Found property name inconsistencies:');
+    console.log("⚠ Inconsistent property names found!");
     const grouped = {};
-    
+
     for (const issue of issues) {
       const key = `${issue.variation} → should be ${issue.standard}`;
       if (!grouped[key]) {
@@ -133,7 +133,7 @@ function findPropertyVariations() {
       }
       grouped[key].push(issue.file);
     }
-    
+
     for (const [issue, files] of Object.entries(grouped)) {
       console.log(`  - ${issue} in ${files.length} files:`);
       for (const file of files.slice(0, 3)) {
@@ -144,7 +144,7 @@ function findPropertyVariations() {
       }
     }
   }
-  
+
   return issues.length === 0;
 }
 
@@ -156,12 +156,12 @@ function main() {
   const noDuplicates = findDuplicateTypes();
   const noVariations = findPropertyVariations();
   
-  console.log('\n======================');
+  console.log("\n======================");
   if (noDuplicates && noVariations) {
-    console.log('✅ All checks passed! The project has consistent types.');
+    console.log("✅ All checks passed! The project has consistent types.");
   } else {
-    console.log('⚠️ Found inconsistencies that should be fixed.');
-    console.log('   See the details above for what needs to be fixed.');
+    console.log("⚠ Issues detected during type checks!");
+    console.log("   See the details above for what needs to be fixed.");
   }
 }
 
