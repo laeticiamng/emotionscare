@@ -1,10 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatDistance } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import { VRSession } from '@/types/vr';
-import { Heart, Clock, Calendar, Star, FileText } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { HeartPulse, Activity, Brain } from 'lucide-react';
 
 interface VRSessionStatsProps {
   session: VRSession;
@@ -12,177 +10,132 @@ interface VRSessionStatsProps {
 }
 
 const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = '' }) => {
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}min ${remainingSeconds}s`;
-  };
-
-  const formatDate = (date: Date | string | undefined) => {
-    if (!date) return 'N/A';
-    
-    try {
-      const dateObj = typeof date === 'string' ? new Date(date) : date;
-      return dateObj.toLocaleString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return 'Invalid date';
+  // Calcul des statistiques
+  const calculateHeartRateChange = () => {
+    if (session.heartRateBefore && session.heartRateAfter) {
+      return session.heartRateAfter - session.heartRateBefore;
     }
+    return 0;
   };
   
-  const calculateSessionDuration = () => {
-    // Use startTime or startedAt for the start date
-    const startTimeField = session.startTime || session.startedAt;
-    if (!startTimeField) {
-      return 'N/A';
-    }
-    
-    const startDate = typeof startTimeField === 'string' 
-      ? new Date(startTimeField) 
-      : startTimeField;
-      
-    // Use endTime, completedAt or endedAt for the end date
-    if (session.completed) {
-      const endTimeField = session.endTime || session.completedAt || session.endedAt || session.end_time;
-      
-      if (endTimeField) {
-        const endDate = typeof endTimeField === 'string' ? new Date(endTimeField) : endTimeField;
-        const durationMs = endDate.getTime() - startDate.getTime();
-        return formatDistance(0, durationMs, { includeSeconds: true, locale: fr });
+  const calculateAverageHeartRate = () => {
+    if (session.metrics?.heartRate) {
+      if (Array.isArray(session.metrics.heartRate)) {
+        return session.metrics.heartRate.length > 0 
+          ? Math.round(session.metrics.heartRate.reduce((sum, rate) => sum + rate, 0) / session.metrics.heartRate.length) 
+          : 0;
+      } else {
+        return session.metrics.heartRate;
       }
     }
-    
-    // Use provided duration if available
-    if (typeof session.duration === 'number') {
-      return `${session.duration} min`;
-    }
-    
-    return 'N/A';
+    return 0;
   };
-
-  // Safety check for empty session object
-  if (!session || !session.id) {
-    return (
-      <Card className={className}>
-        <CardContent className="pt-6">
-          <p className="text-center text-muted-foreground">Aucune donnée de session disponible</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const heartRateBefore = session.heartRateBefore || (session.metrics?.heartRate?.[0]);
-  const heartRateAfter = session.heartRateAfter || (session.metrics?.heartRate?.[session.metrics.heartRate.length - 1]);
-
-  // Get rating based on the shape of the feedback property
-  let rating: number | undefined;
-  let feedbackText: string | undefined;
   
-  if (typeof session.feedback === 'object' && session.feedback) {
-    rating = session.feedback.rating;
-    feedbackText = session.feedback.comments;
-  } else if (typeof session.feedback === 'string') {
-    feedbackText = session.feedback;
-    rating = session.rating;
-  } else {
-    rating = session.rating;
-  }
-
+  const getHeartRateArray = () => {
+    if (session.metrics?.heartRate && Array.isArray(session.metrics.heartRate)) {
+      return session.metrics.heartRate;
+    }
+    return [];
+  };
+  
+  const heartRateChange = calculateHeartRateChange();
+  const averageHeartRate = calculateAverageHeartRate();
+  const heartRateArray = getHeartRateArray();
+  
   return (
-    <Card className={className}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl">Détails de la session</CardTitle>
+    <Card className={`w-full ${className}`}>
+      <CardHeader>
+        <CardTitle className="text-lg">Statistiques de session</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center space-x-2">
-              <Clock className="h-5 w-5 text-muted-foreground" />
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Fréquence cardiaque */}
+          <div className="p-4 bg-muted rounded-lg">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">Durée</p>
-                <p className="text-sm text-muted-foreground">{calculateSessionDuration()}</p>
+                <p className="text-sm font-medium text-muted-foreground">Fréquence cardiaque</p>
+                <div className="flex items-end gap-2">
+                  <p className="text-2xl font-bold">{averageHeartRate}</p>
+                  <p className="text-sm text-muted-foreground mb-1">bpm moy.</p>
+                </div>
               </div>
+              <HeartPulse className="text-rose-500 h-8 w-8" />
             </div>
             
-            <div className="flex items-center space-x-2">
-              <Calendar className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">Date</p>
-                <p className="text-sm text-muted-foreground">{formatDate(session.startTime || session.startedAt)}</p>
+            {session.heartRateBefore && session.heartRateAfter && (
+              <div className="mt-3 text-xs">
+                <span className="inline-flex items-center">
+                  Avant: {session.heartRateBefore} bpm 
+                  <span className="mx-2">→</span> 
+                  Après: {session.heartRateAfter} bpm
+                  {heartRateChange !== 0 && (
+                    <span className={`ml-2 ${heartRateChange < 0 ? 'text-emerald-500' : heartRateChange > 0 ? 'text-rose-500' : ''}`}>
+                      ({heartRateChange > 0 ? '+' : ''}{heartRateChange})
+                    </span>
+                  )}
+                </span>
               </div>
-            </div>
-          </div>
-          
-          {(heartRateBefore !== undefined) && (
-            <div className="flex items-center space-x-2">
-              <Heart className="h-5 w-5 text-red-500" />
-              <div>
-                <p className="text-sm font-medium">Rythme cardiaque avant</p>
-                <p className="text-sm text-muted-foreground">{heartRateBefore} BPM</p>
-              </div>
-            </div>
-          )}
-          
-          {(heartRateAfter !== undefined) && (
-            <div className="flex items-center space-x-2">
-              <Heart className="h-5 w-5 text-green-500" />
-              <div>
-                <p className="text-sm font-medium">Rythme cardiaque après</p>
-                <p className="text-sm text-muted-foreground">{heartRateAfter} BPM</p>
-              </div>
-            </div>
-          )}
-          
-          {(rating !== undefined && typeof rating === 'number') && (
-            <div className="flex items-center space-x-2">
-              <Star className="h-5 w-5 text-yellow-500" />
-              <div>
-                <p className="text-sm font-medium">Évaluation</p>
-                <div className="flex">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className={`h-4 w-4 ${i < rating ? 'fill-yellow-500 text-yellow-500' : 'text-muted'}`} 
+            )}
+            
+            {heartRateArray && Array.isArray(heartRateArray) && heartRateArray.length > 0 && (
+              <div className="mt-3 h-12">
+                <div className="flex items-end h-full space-x-1">
+                  {heartRateArray.slice(0, 20).map((value, index) => (
+                    <div 
+                      key={index}
+                      style={{ 
+                        height: `${Math.min(100, value / 2)}%`,
+                        width: `${100 / Math.min(20, heartRateArray.length)}%` 
+                      }}
+                      className="bg-rose-500/60 rounded-t-sm"
                     />
                   ))}
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
           
-          {feedbackText && (
-            <div className="flex items-start space-x-2">
-              <FileText className="h-5 w-5 text-muted-foreground mt-1" />
+          {/* Niveau de stress */}
+          <div className="p-4 bg-muted rounded-lg">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">Feedback</p>
-                <p className="text-sm text-muted-foreground">{feedbackText}</p>
+                <p className="text-sm font-medium text-muted-foreground">Niveau de stress</p>
+                <div className="flex items-end gap-2">
+                  <p className="text-2xl font-bold">{session.metrics?.stressLevel || 'N/A'}</p>
+                  <p className="text-sm text-muted-foreground mb-1">/100</p>
+                </div>
               </div>
+              <Activity className="text-amber-500 h-8 w-8" />
             </div>
-          )}
+            
+            <div className="mt-3 h-3 bg-muted-foreground/20 rounded-full">
+              <div 
+                className="h-3 bg-gradient-to-r from-green-500 to-amber-500 rounded-full"
+                style={{ width: `${session.metrics?.stressLevel || 0}%` }}
+              ></div>
+            </div>
+          </div>
           
-          {(session.emotionBefore || session.emotionAfter) && (
-            <div className="border-t pt-4 mt-4">
-              <p className="text-sm font-medium mb-3">Évolution émotionnelle</p>
-              
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div className="p-2 rounded-md bg-muted/50">
-                  <p className="text-xs text-muted-foreground">Avant</p>
-                  <p className="font-medium capitalize">{session.emotionBefore || "N/A"}</p>
-                </div>
-                
-                <div className="p-2 rounded-md bg-muted/50">
-                  <p className="text-xs text-muted-foreground">Après</p>
-                  <p className="font-medium capitalize">{session.emotionAfter || "N/A"}</p>
+          {/* Niveau de concentration */}
+          <div className="p-4 bg-muted rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Concentration</p>
+                <div className="flex items-end gap-2">
+                  <p className="text-2xl font-bold">{session.metrics?.focusLevel || 'N/A'}</p>
+                  <p className="text-sm text-muted-foreground mb-1">/100</p>
                 </div>
               </div>
+              <Brain className="text-blue-500 h-8 w-8" />
             </div>
-          )}
+            
+            <div className="mt-3 h-3 bg-muted-foreground/20 rounded-full">
+              <div 
+                className="h-3 bg-gradient-to-r from-blue-300 to-blue-600 rounded-full"
+                style={{ width: `${session.metrics?.focusLevel || 0}%` }}
+              ></div>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

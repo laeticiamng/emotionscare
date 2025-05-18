@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { KpiCardProps, KpiCardStatus } from "@/types/dashboard";
+import { KpiCardProps, KpiCardStatus, KpiDelta } from "@/types/dashboard";
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 
 export const KpiCard = ({
@@ -53,8 +53,8 @@ export const KpiCard = ({
 
   // Convert number delta to object format for consistency in rendering
   const deltaObj = typeof delta === 'number' 
-    ? { value: delta, trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral' } 
-    : delta;
+    ? { value: delta, trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral' } as KpiDelta
+    : delta as KpiDelta;
 
   // Handle status color based on card status
   let statusColor = "";

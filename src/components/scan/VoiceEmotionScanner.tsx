@@ -8,9 +8,10 @@ import { EmotionResult } from '@/types/emotion';
 
 interface VoiceEmotionScannerProps {
   onResult?: (result: EmotionResult) => void;
+  onComplete?: (result: EmotionResult) => void;
 }
 
-const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onResult }) => {
+const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onResult, onComplete }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -60,20 +61,24 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onResult }) =
     const mockResult: EmotionResult = {
       id: uuidv4(),
       emotion: "calm",
-      score: 0.78,
       confidence: 0.82,
       intensity: 0.65,
       emojis: ["😌"],
       text: "Je me sens plutôt bien aujourd'hui, même si j'ai eu quelques moments de stress ce matin.",
       feedback: "Votre voix indique un état de calme relatif avec une légère tension sous-jacente.",
       timestamp: new Date().toISOString(),
-      source: "voice"
+      source: "voice",
+      score: 0.78
     };
     
     setIsAnalyzing(false);
     
     if (onResult) {
       onResult(mockResult);
+    }
+    
+    if (onComplete) {
+      onComplete(mockResult);
     }
     
     toast({

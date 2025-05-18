@@ -76,7 +76,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
         </TabsContent>
         
         <TabsContent value="voice">
-          <VoiceEmotionScanner onComplete={handleScanResult} />
+          <VoiceEmotionScanner onResult={handleScanResult} />
         </TabsContent>
       </Tabs>
       

@@ -30,6 +30,13 @@ export interface VRSessionTemplate {
   intensity?: number;
   objective?: string;
   benefits?: string[];
+  
+  // Pour compatibilité avec les anciens composants
+  coverUrl?: string;
+  cover_url?: string;
+  recommendedMood?: string;
+  recommended_mood?: string;
+  completion_rate?: number;
 }
 
 export interface VRSession {
@@ -81,6 +88,12 @@ export interface VRSessionWithMusicProps {
   onComplete?: (result: { emotionBefore: string; emotionAfter: string }) => void;
   className?: string;
   session?: VRSession;
+  template?: VRSessionTemplate;
+  title?: string;
+  description?: string;
+  duration?: number;
+  environment?: string;
+  musicTrackId?: string;
 }
 
 export interface VRSessionHistoryProps {

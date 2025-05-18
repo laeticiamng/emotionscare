@@ -6,13 +6,13 @@
  */
 
 export interface UserPreferencesContextType {
+  preferences: UserPreferences;
   theme: string;
   fontSize: string;
   language: string;
   notifications: NotificationsPreferences;
   privacy: string | PrivacyPreferences;
-  preferences?: UserPreferences; // Ajout pour la compatibilité
-  updatePreferences: (preferences: Partial<UserPreferences>) => void;
+  updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
   resetPreferences?: () => void;
   isLoading?: boolean;
   error?: Error | null;

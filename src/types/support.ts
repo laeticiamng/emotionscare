@@ -2,18 +2,21 @@
 export interface Message {
   id: string;
   content: string;
-  sender: "user" | "assistant";
-  timestamp: Date;
+  sender: 'user' | 'assistant' | 'system';
+  timestamp: Date | string;
   emotion?: string;
 }
 
-export interface SupportTicket {
+export interface ChatResponse {
+  content: string;
+  emotion?: string;
+}
+
+export interface SupportHistory {
   id: string;
-  title: string;
-  description: string;
-  status: "open" | "in-progress" | "resolved" | "closed";
-  priority: "low" | "medium" | "high" | "urgent";
+  userId: string;
+  messages: Message[];
   createdAt: Date;
   updatedAt: Date;
-  userId: string;
+  resolved: boolean;
 }
