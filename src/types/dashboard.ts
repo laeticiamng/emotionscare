@@ -18,6 +18,17 @@ export interface KpiCardProps {
   status?: KpiCardStatus;
   trend?: number;
   className?: string;
+  id?: string;
+  delta?: number | {
+    value: number;
+    label?: string;
+    trend: 'up' | 'down' | 'neutral';
+  };
+  subtitle?: ReactNode | string;
+  ariaLabel?: string;
+  isLoading?: boolean;
+  onClick?: () => void;
+  footer?: ReactNode;
 }
 
 export interface DashboardWidgetConfig {
@@ -28,11 +39,14 @@ export interface DashboardWidgetConfig {
   position?: number;
 }
 
-export type KpiCardStatus = 'positive' | 'negative' | 'neutral' | 'warning';
+export type KpiCardStatus = 'positive' | 'negative' | 'neutral' | 'warning' | 'default' | 'info';
 
 export interface DraggableKpiCardsGridProps {
   cards: KpiCardProps[];
   className?: string;
+  onOrderChange?: (cards: KpiCardProps[]) => void;
+  onLayoutChange?: (layout: any) => void;
+  isEditable?: boolean;
 }
 
 export interface GamificationData {
