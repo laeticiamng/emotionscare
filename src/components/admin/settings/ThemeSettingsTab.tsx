@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -23,9 +24,9 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
 }) => {
   // Theme options
   const themes: ThemeOption[] = [
-    { name: 'Light', value: 'light', preview: '#ffffff' },
-    { name: 'Dark', value: 'dark', preview: '#1f2937' },
-    { name: 'System', value: 'system', preview: 'linear-gradient(to right, #ffffff 50%, #1f2937 50%)' }
+    { value: 'light', label: 'Light', preview: '#ffffff' },
+    { value: 'dark', label: 'Dark', preview: '#1f2937' },
+    { value: 'system', label: 'System', preview: 'linear-gradient(to right, #ffffff 50%, #1f2937 50%)' }
   ];
   
   const handleThemeChange = (value: string) => {
@@ -100,7 +101,7 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
                       theme.value === 'dark' ? "text-white" : null
                     )}
                   >
-                    {theme.name}
+                    {theme.label}
                   </span>
                 </div>
               </Label>

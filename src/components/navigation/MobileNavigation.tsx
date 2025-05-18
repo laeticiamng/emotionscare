@@ -49,6 +49,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ className = "" }) =
       </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
+        {/* Remove the side prop which is causing the error */}
         <SheetContent className="w-[80%] max-w-sm p-0 bg-background">
           <div className="flex flex-col h-full">
             <SheetHeader className="p-4 border-b">

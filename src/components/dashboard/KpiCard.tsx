@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import { KpiCardStatus, KpiCardProps } from '@/types/dashboard';
+import { KpiCardProps } from '@/types/dashboard';
 
 /**
  * KPI Card component for displaying key performance indicators
@@ -39,20 +39,23 @@ const KpiCard: React.FC<KpiCardProps> = ({
   const renderDelta = () => {
     if (!delta) return null;
     
-    // If delta is a number, convert to simple object
+    // Support both legacy and new delta formats
     const deltaObj = typeof delta === 'number' 
       ? { value: delta, trend: delta >= 0 ? 'up' : 'down' } 
       : delta;
     
+    const trendValue = 'trend' in deltaObj ? deltaObj.trend : 
+                      'direction' in deltaObj ? deltaObj.direction : 'neutral';
+                      
     const label = 'label' in deltaObj && deltaObj.label ? deltaObj.label : '';
     
     return (
       <Badge 
-        variant={getBadgeVariant(deltaObj.trend)}
+        variant={getBadgeVariant(trendValue)}
         className="mt-2 font-normal"
       >
-        {deltaObj.trend === 'up' ? '↑' : deltaObj.trend === 'down' ? '↓' : '○'} 
-        {deltaObj.value}% {label}
+        {trendValue === 'up' ? '↑' : trendValue === 'down' ? '↓' : '○'} 
+        {deltaObj.value !== undefined && Math.abs(Number(deltaObj.value)).toFixed(1)}% {label}
       </Badge>
     );
   };

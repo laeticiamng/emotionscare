@@ -11,7 +11,8 @@ const UserDashboardSections: React.FC = () => {
       title: 'Méditation matinale', // Pour compatibilité
       description: 'Commencez votre journée avec une méditation guidée pour un esprit clair',
       duration: 15,
-      tags: ['méditation', 'matin', 'débutant'],
+      imageUrl: '/images/meditation-morning.jpg',
+      environmentId: 'env-1', // Add required field
       category: 'méditation',
       thumbnailUrl: '/images/meditation-morning.jpg',
       intensity: 1,
@@ -24,7 +25,8 @@ const UserDashboardSections: React.FC = () => {
       title: 'Relaxation profonde', // Pour compatibilité
       description: 'Une session immersive pour libérer le stress et retrouver l\'équilibre',
       duration: 25,
-      tags: ['relaxation', 'stress', 'soir'],
+      imageUrl: '/images/deep-relaxation.jpg', 
+      environmentId: 'env-2', // Add required field
       category: 'relaxation',
       thumbnailUrl: '/images/deep-relaxation.jpg',
       intensity: 2,

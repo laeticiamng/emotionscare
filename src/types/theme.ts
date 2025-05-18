@@ -26,5 +26,7 @@ export interface ThemeContextType {
 export interface ThemeOption {
   value: Theme;
   label: string;
+  name?: string; // Added for backward compatibility
+  preview?: string; // Added for backward compatibility
   icon?: React.ReactNode;
 }

@@ -11,7 +11,7 @@ export const KpiCard = ({
   delta,
   icon,
   subtitle,
-  status = 'default',
+  status = 'neutral', // Changed from 'default' to valid KpiCardStatus
   className,
   isLoading,
   ariaLabel,
@@ -53,16 +53,19 @@ export const KpiCard = ({
 
   // Convert number delta to object format for consistency in rendering
   const deltaObj = typeof delta === 'number' 
-    ? { value: delta, trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral' } as KpiDelta
-    : delta as KpiDelta;
+    ? { value: delta, trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral' } 
+    : delta;
 
   // Handle status color based on card status
   let statusColor = "";
   if (deltaObj) {
-    if (deltaObj.trend === 'up') {
-      statusColor = status === 'default' || status === 'info' ? 'text-emerald-600 dark:text-emerald-400' : `text-${status}`;
-    } else if (deltaObj.trend === 'down') {
-      statusColor = status === 'default' || status === 'info' ? 'text-rose-600 dark:text-rose-400' : `text-${status}`;
+    const trendValue = 'trend' in deltaObj ? deltaObj.trend : 
+                     'direction' in deltaObj ? deltaObj.direction : 'neutral';
+                     
+    if (trendValue === 'up') {
+      statusColor = status === 'neutral' || status === 'info' ? 'text-emerald-600 dark:text-emerald-400' : `text-${status}`;
+    } else if (trendValue === 'down') {
+      statusColor = status === 'neutral' || status === 'info' ? 'text-rose-600 dark:text-rose-400' : `text-${status}`;
     } else {
       statusColor = 'text-gray-600 dark:text-gray-400';
     }
@@ -92,7 +95,7 @@ export const KpiCard = ({
             {deltaObj.trend === 'down' && <ArrowDown className="h-3 w-3" />}
             {deltaObj.trend === 'neutral' && <Minus className="h-3 w-3" />}
             {deltaObj.value !== undefined && (
-              <span>{Math.abs(deltaObj.value).toFixed(1)}%</span>
+              <span>{Math.abs(Number(deltaObj.value)).toFixed(1)}%</span>
             )}
             {deltaObj.label && <span>{deltaObj.label}</span>}
           </p>

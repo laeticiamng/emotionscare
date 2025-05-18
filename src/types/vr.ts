@@ -12,6 +12,9 @@ export interface VRSessionTemplate {
   guideType?: 'voice' | 'text' | 'none';
   intensity?: 'light' | 'medium' | 'intense' | number; // Support for legacy number values
   category?: string; // Added missing property
+  tags?: string[]; // Added missing property
+  objective?: string; // Added missing property
+  type?: string; // Added missing property
 }
 
 export interface VRSession {
