@@ -1,18 +1,40 @@
 
+/**
+ * useMusicPlayer.tsx
+ * Enhanced hook that extends the base useMusic functionality
+ */
+
 import { useState, useEffect } from 'react';
 import { useMusic } from '@/contexts/MusicContext';
 
-export function useMusicPlayer() {
+export interface MusicPlayerOptions {
+  autoPlay?: boolean;
+  initialVolume?: number;
+  enableLogs?: boolean;
+}
+
+export function useMusicPlayer(options?: MusicPlayerOptions) {
   const music = useMusic();
   const [isInitialized, setIsInitialized] = useState(false);
   
-  // Initialize on first render
+  // Initialize with options
   useEffect(() => {
     if (music.isInitialized) {
       setIsInitialized(true);
+      
+      // Set initial volume if provided
+      if (options?.initialVolume !== undefined) {
+        music.setVolume(options.initialVolume);
+      }
+      
+      // Enable debug logs
+      if (options?.enableLogs) {
+        console.log('[MusicPlayer] Initialized');
+      }
     }
-  }, [music.isInitialized]);
+  }, [music.isInitialized, options]);
   
+  // Return the music context with our enhanced state
   return {
     ...music,
     isInitialized,

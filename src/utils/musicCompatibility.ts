@@ -1,55 +1,71 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+/**
+ * Utilities to help with music type compatibility across different parts of the application
+ */
 
-// Récupérer l'URL de la couverture d'une piste (gère les différentes propriétés possibles)
-export const getTrackCover = (track: MusicTrack): string | undefined => {
-  return track.coverUrl || track.cover || track.coverImage;
+import { MusicTrack, MusicPlaylist } from "@/types/music";
+
+/**
+ * Ensures that a value is a complete MusicTrack, filling in defaults for required fields
+ */
+export const ensureTrack = (track: Partial<MusicTrack>): MusicTrack => {
+  return {
+    id: track.id || `generated-${Date.now()}`,
+    title: track.title || "Unknown Title",
+    artist: track.artist || "Unknown Artist",
+    duration: track.duration || 0,
+    audioUrl: track.audioUrl || track.url || track.src || "",
+    coverUrl: track.coverUrl || track.cover || track.coverImage || "",
+    ...track
+  };
 };
 
-// Récupérer le titre d'une piste (gère les différentes propriétés possibles)
-export const getTrackTitle = (track: MusicTrack): string => {
-  return track.title || track.name || "Titre inconnu";
-};
-
-// Récupérer l'artiste d'une piste
-export const getTrackArtist = (track: MusicTrack): string => {
-  return track.artist || "Artiste inconnu";
-};
-
-// Récupérer l'URL audio d'une piste (gère les différentes propriétés possibles)
-export const getTrackAudioUrl = (track: MusicTrack): string => {
-  return track.audioUrl || track.url || track.track_url || track.src || "";
-};
-
-// S'assure qu'un tableau de pistes ou une playlist est formaté comme une playlist
-export const ensurePlaylist = (input: MusicPlaylist | MusicTrack[]): MusicPlaylist => {
+/**
+ * Ensures that an array of tracks or a partial playlist is converted to a complete MusicPlaylist
+ */
+export const ensurePlaylist = (input: MusicPlaylist | MusicTrack[] | any): MusicPlaylist => {
   if (Array.isArray(input)) {
     return {
-      id: `dynamic-${Date.now()}`,
-      name: 'Playlist dynamique',
-      tracks: input
+      id: `playlist-${Date.now()}`,
+      name: "Custom Playlist",
+      tracks: input.map(ensureTrack),
+    };
+  } else if (input && typeof input === 'object') {
+    return {
+      id: input.id || `playlist-${Date.now()}`,
+      name: input.name || input.title || "Untitled Playlist",
+      tracks: Array.isArray(input.tracks) ? input.tracks.map(ensureTrack) : [],
+      ...input
     };
   }
-  return input;
-};
-
-// Filtre les pistes par humeur/émotion
-export const filterTracksByMood = (tracks: MusicTrack[], mood: string): MusicTrack[] => {
-  const lowerMood = mood.toLowerCase();
-  return tracks.filter(track => 
-    (track.mood?.toLowerCase() === lowerMood) || 
-    (track.emotion?.toLowerCase() === lowerMood)
-  );
-};
-
-// Crée une playlist à partir d'une émotion
-export const createPlaylistForEmotion = (tracks: MusicTrack[], emotion: string): MusicPlaylist => {
-  const filteredTracks = filterTracksByMood(tracks, emotion);
   
+  // Default empty playlist
   return {
-    id: `emotion-${emotion}-${Date.now()}`,
-    name: `Playlist ${emotion}`,
-    emotion: emotion,
-    tracks: filteredTracks.length > 0 ? filteredTracks : tracks.slice(0, 5) // Fallback si pas de correspondance
+    id: `empty-${Date.now()}`,
+    name: "Empty Playlist",
+    tracks: []
   };
+};
+
+/**
+ * Normalizes property names for compatibility with different API sources
+ */
+export const normalizeTrackProperties = (track: any): MusicTrack => {
+  if (!track) return ensureTrack({});
+  
+  return ensureTrack({
+    ...track,
+    // Normalize URL fields
+    audioUrl: track.audioUrl || track.url || track.src || track.track_url,
+    // Normalize cover image fields
+    coverUrl: track.coverUrl || track.cover || track.coverImage,
+    // Normalize title
+    title: track.title || track.name
+  });
+};
+
+export default {
+  ensureTrack,
+  ensurePlaylist,
+  normalizeTrackProperties
 };

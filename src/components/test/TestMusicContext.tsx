@@ -4,10 +4,13 @@ import { useMusic } from '@/contexts/MusicContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+/**
+ * Test component for validating MusicContext functionality
+ */
 const TestMusicContext: React.FC = () => {
   const music = useMusic();
   
-  // Test the context
+  // Test the context's playback controls
   const handleTestPlay = () => {
     if (music.currentTrack) {
       music.togglePlay();
@@ -18,6 +21,7 @@ const TestMusicContext: React.FC = () => {
     }
   };
   
+  // Test the emotion-based playlist loading
   const handleTestEmotion = async () => {
     const emotions = ['calm', 'happy', 'focused', 'energetic', 'relaxed'];
     const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];

@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/contexts/MusicContext';
 import { MusicTrack, EmotionMusicParams } from '@/types/music';
 import { EmotionResult } from '@/types/emotion';
 
@@ -22,31 +22,23 @@ export const EMOTION_TO_MUSIC: Record<string, string> = {
 export function useMusicRecommendation() {
   const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { loadPlaylistForEmotion, playTrack, playlists } = useMusic();
+  const music = useMusic();
   
   const loadRecommendations = useCallback(async (emotion: string) => {
     setIsLoading(true);
     try {
       const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-      await loadPlaylistForEmotion({
+      const result = await music.loadPlaylistForEmotion({
         emotion: musicType
       });
       
-      // Since we can't access the return value directly, let's check current playlists
-      // or use a default playlist if available
-      if (playlists && playlists.length > 0) {
-        const matchingPlaylist = playlists.find(p => 
-          p.emotion?.toLowerCase() === musicType.toLowerCase() ||
-          p.mood?.toLowerCase() === musicType.toLowerCase()
-        );
-        
-        if (matchingPlaylist?.tracks?.length) {
-          setRecommendedTracks(matchingPlaylist.tracks);
-        } else {
-          setRecommendedTracks(playlists[0].tracks || []);
-        }
+      if (result && result.tracks && result.tracks.length > 0) {
+        // Set recommended tracks from the playlist
+        setRecommendedTracks(result.tracks);
       } else {
-        setRecommendedTracks([]);
+        // Try to get tracks by mood directly if available
+        const moodTracks = music.findTracksByMood ? music.findTracksByMood(musicType) : [];
+        setRecommendedTracks(moodTracks);
       }
     } catch (error) {
       console.error('Error loading music recommendations:', error);
@@ -54,11 +46,11 @@ export function useMusicRecommendation() {
     } finally {
       setIsLoading(false);
     }
-  }, [loadPlaylistForEmotion, playlists]);
+  }, [music]);
   
   const playRecommendedTrack = (track: MusicTrack) => {
     if (track) {
-      playTrack(track);
+      music.playTrack(track);
     }
   };
   
@@ -72,7 +64,7 @@ export function useMusicRecommendation() {
   
   const handlePlayMusic = (emotion: string) => {
     const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-    loadPlaylistForEmotion({
+    music.loadPlaylistForEmotion({
       emotion: musicType
     });
     return playFirstRecommendation();

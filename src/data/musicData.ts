@@ -1,6 +1,7 @@
 
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
+// Music tracks data
 export const musicTracks: MusicTrack[] = [
   {
     id: '1',
@@ -74,8 +75,10 @@ export const musicTracks: MusicTrack[] = [
   }
 ];
 
-export const allTracks = musicTracks; // Export allTracks explicitly
+// Explicitly export allTracks to fix the import error
+export const allTracks = musicTracks;
 
+// Music presets
 export const musicPresets = [
   { id: 'calm', name: 'Calme', color: '#c4e0f3', trackIds: ['1', '5'] },
   { id: 'focus', name: 'Concentration', color: '#d4c4f3', trackIds: ['2'] },
@@ -84,6 +87,7 @@ export const musicPresets = [
   { id: 'relaxed', name: 'Relaxant', color: '#f9d8d3', trackIds: ['4'] }
 ];
 
+// Mock playlists
 export const mockPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-calm',
