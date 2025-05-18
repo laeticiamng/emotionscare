@@ -290,6 +290,7 @@ Vous trouverez dans le dossier `src/docs` plusieurs guides détaillés :
 - `home-routing-audit.md` : audit et conventions d'accès public
 - `RoutingFlow.md` : schéma du flux d'accès (accueil → login → dashboard)
 
+
 ## Équipe et contribution
 
 EmotionsCare est un produit développé par [Votre Entreprise], avec une équipe dédiée au développement, au design et à l'expérience utilisateur.

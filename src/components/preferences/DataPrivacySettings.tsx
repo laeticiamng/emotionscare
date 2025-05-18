@@ -3,7 +3,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Control, Controller } from 'react-hook-form'; // Import for form control
-import { UserPreferences } from '@/types/user'; // Assuming this type exists for preferences
+import { UserPreferences } from '@/types/preferences';
 
 export interface DataPrivacyProps {
   className?: string;

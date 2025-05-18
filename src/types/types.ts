@@ -1,5 +1,6 @@
 
-export type { User, UserPreferences, UserRole } from './user';
+export type { User, UserRole } from './user';
+export type { UserPreferences } from './preferences';
 export type { Badge, Challenge } from './badge';
 export type { ChatMessage, ChatConversation, ChatResponse } from './chat';
 export type { MoodData } from './other';

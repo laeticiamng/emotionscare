@@ -9,14 +9,7 @@ import MusicDrawer from './components/music/player/MusicDrawer';
 import { useMusic } from './contexts/music';
 import { useTheme } from './contexts/ThemeContext';
 import ScrollProgress from './components/ui/ScrollProgress';
-
-interface ShellProps {
-  children?: React.ReactNode;
-  hideNav?: boolean;
-  hideFooter?: boolean;
-  immersive?: boolean;
-  className?: string;
-}
+import { ShellProps } from '@/types/layout';
 
 const Shell: React.FC<ShellProps> = ({ 
   children, 

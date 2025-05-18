@@ -55,6 +55,14 @@ export interface PrivacyPreferences {
   profileVisibility?: string;
 }
 
+export interface AccessibilityPreferences {
+  reduceMotion?: boolean;
+  highContrast?: boolean;
+  largeText?: boolean;
+  screenReader?: boolean;
+  [key: string]: boolean | undefined;
+}
+
 export interface UserPreferences {
   theme?: 'light' | 'dark' | 'pastel' | 'system';
   fontSize?: 'small' | 'medium' | 'large' | 'xlarge';
@@ -68,6 +76,7 @@ export interface UserPreferences {
   autoplayMedia?: boolean;
   soundEnabled?: boolean;
   dashboardLayout?: string | object;
+  accessibility?: AccessibilityPreferences;
   onboardingCompleted?: boolean;
   shareData?: boolean;
   anonymizedData?: boolean;
@@ -131,5 +140,6 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   },
   soundEnabled: false,
   autoplayMedia: true,
-  dashboardLayout: 'default'
+  dashboardLayout: 'default',
+  accessibility: {}
 };

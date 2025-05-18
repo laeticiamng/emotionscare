@@ -1,12 +1,6 @@
 
 import React, { createContext, useState, useContext } from 'react';
-
-export type LayoutContextType = {
-  sidebarCollapsed: boolean;
-  toggleSidebar: () => void;
-  setSidebarCollapsed: (collapsed: boolean) => void;
-  sidebarOpen?: boolean; // Added for compatibility
-};
+import { LayoutContextType, LayoutProviderProps } from '@/types/layout';
 
 export const LayoutContext = createContext<LayoutContextType>({
   sidebarCollapsed: false,
@@ -15,7 +9,7 @@ export const LayoutContext = createContext<LayoutContextType>({
   sidebarOpen: true,
 });
 
-export const LayoutProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const toggleSidebar = () => {
