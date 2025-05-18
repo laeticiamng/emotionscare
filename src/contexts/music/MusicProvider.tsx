@@ -18,15 +18,22 @@ const defaultContext: MusicContextType = {
   pauseTrack: () => {},
   resumeTrack: () => {},
   togglePlay: () => {},
+  togglePlayPause: () => {},
   nextTrack: () => {},
   prevTrack: () => {},
   previousTrack: () => {},
   setVolume: () => {},
+  setMute: () => {},
+  toggleMute: () => {},
   seekTo: () => {},
   setEmotion: () => {},
   loadPlaylistForEmotion: async () => null,
   setOpenDrawer: () => {},
-  toggleMute: () => {}
+  toggleDrawer: () => {},
+  closeDrawer: () => {},
+  setPlaylist: () => {},
+  setCurrentTrack: () => {},
+  generateMusic: async () => null
 };
 
 const MusicContext = createContext<MusicContextType>(defaultContext);
@@ -156,6 +163,9 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     }
   };
 
+  // Alias for togglePlay
+  const togglePlayPause = togglePlay;
+
   // Play next track
   const nextTrack = () => {
     if (!playlist || !currentTrack) return;
@@ -170,7 +180,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   };
 
   // Play previous track
-  const previousTrack = () => {
+  const prevTrack = () => {
     if (!playlist || !currentTrack) return;
     
     const currentIndex = playlist.tracks.findIndex(track => track.id === currentTrack.id);
@@ -181,6 +191,9 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
       playTrack(playlist.tracks[currentIndex - 1]);
     }
   };
+
+  // Alias for prevTrack
+  const previousTrack = prevTrack;
 
   // Seek to a specific time
   const seekTo = (time: number) => {
@@ -193,6 +206,16 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   // Toggle mute
   const toggleMute = () => {
     setMuted(!muted);
+  };
+
+  // Toggle drawer
+  const toggleDrawer = () => {
+    setOpenDrawer(!openDrawer);
+  };
+
+  // Close drawer
+  const closeDrawer = () => {
+    setOpenDrawer(false);
   };
 
   // Load a playlist based on emotion
@@ -277,17 +300,21 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
         pauseTrack,
         resumeTrack,
         togglePlay,
+        togglePlayPause,
         nextTrack,
         prevTrack,
         previousTrack,
         setVolume,
+        setMute,
+        toggleMute,
         seekTo,
         setEmotion,
         loadPlaylistForEmotion,
         setOpenDrawer,
-        toggleMute,
-        setCurrentTrack,
+        toggleDrawer,
+        closeDrawer,
         setPlaylist: setPlaylistHandler,
+        setCurrentTrack,
         generateMusic
       }}
     >

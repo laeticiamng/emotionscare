@@ -6,6 +6,8 @@ import { ThemeContextType, Theme, FontFamily, FontSize } from '@/types/theme';
 export const ThemeContext = createContext<ThemeContextType>({
   theme: 'system',
   setTheme: () => {},
+  toggleTheme: () => {},
+  isDark: false
 });
 
 export const useTheme = () => useContext(ThemeContext);
@@ -142,6 +144,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   
   // Détecter si le mode actuel est sombre
   const isDarkMode = theme === 'dark' || (theme === 'system' && systemTheme === 'dark');
+  const isDark = isDarkMode; // Alias pour compatibilité
   
   // Fonction d'aide pour obtenir la véritable famille de police CSS
   function getActualFontFamily(family: FontFamily): string {
@@ -215,6 +218,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
       value={{
         theme,
         setTheme,
+        isDark,
         isDarkMode,
         fontSize,
         setFontSize: setFontSizeValue,

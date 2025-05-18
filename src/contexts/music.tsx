@@ -20,6 +20,7 @@ const MusicContext = createContext<MusicContextType>({
   toggleMute: () => {},
   seekTo: () => {},
   togglePlayPause: () => {},
+  togglePlay: () => {},
   toggleDrawer: () => {},
   closeDrawer: () => {},
   setOpenDrawer: () => {},
@@ -30,7 +31,7 @@ const MusicContext = createContext<MusicContextType>({
   prevTrack: () => {},
   previousTrack: () => {},
   setEmotion: () => {},
-  loadPlaylistForEmotion: async () => {},
+  loadPlaylistForEmotion: async () => null,
   setPlaylist: () => {},
   generateMusic: async () => {
     return {
@@ -40,8 +41,7 @@ const MusicContext = createContext<MusicContextType>({
       duration: 0,
       audioUrl: ''
     };
-  },
-  togglePlay: () => {},
+  }
 });
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -202,7 +202,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     loadPlaylistForEmotion(newEmotion);
   };
   
-  const loadPlaylistForEmotion = async (emotionParam: string | EmotionMusicParams): Promise<void> => {
+  const loadPlaylistForEmotion = async (emotionParam: string | EmotionMusicParams): Promise<MusicPlaylist | null> => {
     // Parse emotion parameter
     const emotion = typeof emotionParam === 'string' ? emotionParam : emotionParam.emotion;
     
@@ -210,7 +210,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // Find a matching playlist or create one
       const matchingPlaylist = playlists.find(p => p.emotion === emotion);
       if (matchingPlaylist) {
-        setPlaylist(matchingPlaylist);
+        setPlaylistState(matchingPlaylist);
+        return matchingPlaylist;
       } else {
         // Create a new playlist with matching tracks
         const matchingTracks = tracks.filter(t => t.emotion === emotion || t.mood === emotion);
@@ -221,15 +222,18 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             description: `Music for ${emotion} mood`,
             tracks: matchingTracks,
             emotion,
-            created_at: new Date().toISOString()
+            createdAt: new Date().toISOString()
           };
-          setPlaylist(newPlaylist);
+          setPlaylistState(newPlaylist);
+          return newPlaylist;
         } else {
           console.warn(`No tracks found for emotion: ${emotion}`);
+          return null;
         }
       }
     } catch (error) {
       console.error(`Error loading playlist for emotion ${emotion}:`, error);
+      return null;
     }
   };
   
@@ -240,7 +244,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         id: `playlist-${Date.now()}`,
         name: 'Custom Playlist',
         tracks: newPlaylist,
-        created_at: new Date().toISOString()
+        createdAt: new Date().toISOString()
       };
       setPlaylistState(playlistFromTracks);
     } else {
@@ -262,7 +266,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       coverUrl: '/images/waves.jpg',
       genre: 'ambient',
       emotion: 'calm',
-      tags: ['ai', 'generated']
     };
     
     return Promise.resolve(mockTrack);

@@ -2,142 +2,100 @@
 import { useState, useEffect } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
-interface UseMusicServiceProps {
-  defaultEmotion?: string;
+interface UseMusicServiceReturn {
+  tracks: MusicTrack[];
+  playlists: MusicPlaylist[];
+  loading: boolean;
+  error: Error | null;
 }
 
-export const useMusicService = ({ defaultEmotion = 'calm' }: UseMusicServiceProps = {}) => {
+export function useMusicService(): UseMusicServiceReturn {
   const [tracks, setTracks] = useState<MusicTrack[]>([]);
   const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentEmotion, setCurrentEmotion] = useState(defaultEmotion);
+  const [error, setError] = useState<Error | null>(null);
 
-  // Function to get tracks by emotion
-  const getTracksByEmotion = (emotion: string | string[]) => {
-    setLoading(true);
-    
-    // Handle array of emotions
-    const normalizedEmotion = Array.isArray(emotion) 
-      ? emotion[0].toLowerCase() 
-      : emotion.toLowerCase();
-    
-    try {
-      // This would be an API call in a real app
-      setTimeout(() => {
-        // Mock fetch response
-        const filteredTracks = tracks.filter(track => 
-          track.category?.toLowerCase().includes(normalizedEmotion)
-        );
-        setTracks(filteredTracks.length ? filteredTracks : tracks);
-        setLoading(false);
-      }, 800);
-    } catch (err) {
-      setError('Failed to fetch tracks by emotion');
-      setLoading(false);
-    }
-  };
-
-  // Function to get playlists by emotion
-  const getPlaylistsByEmotion = (emotion: string | string[]) => {
-    setLoading(true);
-    
-    // Handle array of emotions
-    const normalizedEmotion = Array.isArray(emotion) 
-      ? emotion[0].toLowerCase() 
-      : emotion.toLowerCase();
-    
-    try {
-      // This would be an API call in a real app
-      setTimeout(() => {
-        // Mock fetch response
-        const filteredPlaylists = playlists.filter(playlist => 
-          playlist.category?.toLowerCase().includes(normalizedEmotion)
-        );
-        setPlaylists(filteredPlaylists.length ? filteredPlaylists : playlists);
-        setLoading(false);
-      }, 800);
-    } catch (err) {
-      setError('Failed to fetch playlists by emotion');
-      setLoading(false);
-    }
-  };
-
-  // Initial load
   useEffect(() => {
     const fetchMusicData = async () => {
-      setLoading(true);
       try {
-        // This would be an API call in a real app
-        setTimeout(() => {
-          // Mock data - would come from the API
-          setTracks([
-            {
-              id: '001',
-              title: 'Calm Waters',
-              artist: 'Ambient Sounds',
-              duration: 180,
-              url: '/audio/calm-waters.mp3',
-              coverUrl: '/images/covers/calm-waters.jpg',
-              category: 'calm'
-            },
-            {
-              id: '002',
-              title: 'Energy Flow',
-              artist: 'Upbeat Tracks',
-              duration: 210,
-              url: '/audio/energy-flow.mp3',
-              coverUrl: '/images/covers/energy-flow.jpg',
-              category: 'energetic'
-            }
-          ]);
-          
-          setPlaylists([
-            {
-              id: 'playlist001',
-              title: 'Meditation Collection',
-              name: 'Meditation Collection',
-              category: 'calm',
-              description: 'Perfect for meditation sessions',
-              tracks: []
-            },
-            {
-              id: 'playlist002',
-              title: 'Workout Mix',
-              name: 'Workout Mix',
-              category: 'energetic',
-              description: 'Boost your workout performance',
-              tracks: []
-            }
-          ]);
-          
-          setLoading(false);
-        }, 1000);
+        setLoading(true);
+        // Simuler un appel API - dans une vraie application, ceci serait un fetch()
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Données fictives
+        const mockTracks: MusicTrack[] = [
+          {
+            id: '1',
+            title: 'Calm Water',
+            artist: 'Nature Sounds',
+            duration: 184,
+            audioUrl: '/audio/calm-water.mp3',
+            url: '/audio/calm-water.mp3',
+            coverUrl: '/images/covers/calm-water.jpg',
+            category: 'relaxation',
+            emotion: 'calm'
+          },
+          {
+            id: '2',
+            title: 'Deep Focus',
+            artist: 'Brain Waves',
+            duration: 240,
+            audioUrl: '/audio/deep-focus.mp3',
+            url: '/audio/deep-focus.mp3',
+            coverUrl: '/images/covers/deep-focus.jpg',
+            category: 'concentration',
+            emotion: 'focus'
+          },
+          {
+            id: '3',
+            title: 'Morning Energy',
+            artist: 'Positive Vibes',
+            duration: 198,
+            audioUrl: '/audio/morning-energy.mp3',
+            url: '/audio/morning-energy.mp3',
+            coverUrl: '/images/covers/morning-energy.jpg',
+            category: 'energizing',
+            emotion: 'energetic'
+          }
+        ];
+
+        const mockPlaylists: MusicPlaylist[] = [
+          {
+            id: 'pl-1',
+            name: 'Relaxation',
+            tracks: [mockTracks[0]],
+            emotion: 'calm',
+            description: 'Playlist pour se détendre'
+          },
+          {
+            id: 'pl-2',
+            name: 'Concentration',
+            tracks: [mockTracks[1]],
+            emotion: 'focus',
+            description: 'Pour rester concentré'
+          },
+          {
+            id: 'pl-3',
+            name: 'Énergie',
+            tracks: [mockTracks[2]],
+            emotion: 'energetic',
+            description: 'Pour démarrer la journée'
+          }
+        ];
+
+        setTracks(mockTracks);
+        setPlaylists(mockPlaylists);
+        setLoading(false);
       } catch (err) {
-        setError('Failed to fetch music data');
+        setError(err instanceof Error ? err : new Error('An error occurred while fetching music data'));
         setLoading(false);
       }
     };
-    
+
     fetchMusicData();
   }, []);
 
-  // Update data when emotion changes
-  useEffect(() => {
-    if (currentEmotion) {
-      getTracksByEmotion(currentEmotion);
-      getPlaylistsByEmotion(currentEmotion);
-    }
-  }, [currentEmotion]);
+  return { tracks, playlists, loading, error };
+}
 
-  return {
-    tracks,
-    playlists,
-    loading,
-    error,
-    currentEmotion,
-    setCurrentEmotion,
-    getTracksByEmotion,
-    getPlaylistsByEmotion
-  };
-};
+export default useMusicService;

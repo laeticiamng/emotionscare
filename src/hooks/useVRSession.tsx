@@ -1,140 +1,142 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { VRSession, VRSessionTemplate } from '@/types/types';
-import { mockVRTemplates } from '@/data/mockVRTemplates';
+import { useState, useEffect } from 'react';
+import { VRSession, VRSessionTemplate } from '@/types/vr';
 
-export const useVRSession = (userId: string) => {
-  const [isLoading, setIsLoading] = useState(true);
+interface UseVRSessionReturn {
+  sessions: VRSession[];
+  templates: VRSessionTemplate[];
+  activeSession: VRSession | null;
+  startSession: (templateId: string) => Promise<VRSession>;
+  endSession: (sessionId: string, feedback?: string, rating?: number) => Promise<void>;
+  loading: boolean;
+  error: Error | null;
+}
+
+export function useVRSession(userId: string): UseVRSessionReturn {
   const [sessions, setSessions] = useState<VRSession[]>([]);
-  const [currentSession, setCurrentSession] = useState<VRSession | null>(null);
   const [templates, setTemplates] = useState<VRSessionTemplate[]>([]);
+  const [activeSession, setActiveSession] = useState<VRSession | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  // Load VR templates
   useEffect(() => {
-    const loadTemplates = async () => {
+    const fetchData = async () => {
       try {
-        // In a real application, this would fetch from an API
-        // Set default title to name if needed
-        const processedTemplates = mockVRTemplates.map(template => ({
-          ...template,
-          title: template.title || template.name || '',
-        }));
-        setTemplates(processedTemplates);
-      } catch (error) {
-        console.error("Error loading VR templates:", error);
-      }
-    };
-
-    const loadUserSessions = async () => {
-      try {
-        // Mock data - in a real app, this would fetch from an API
-        const mockSessions: VRSession[] = [
+        setLoading(true);
+        
+        // Simuler un chargement des données depuis une API
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Templates fictifs
+        const mockTemplates: VRSessionTemplate[] = [
           {
-            id: 'session-1',
-            userId: userId,
-            templateId: '1',
-            startTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-            startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-            endTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 5 * 60 * 1000).toISOString(),
-            duration: 300,
-            durationSeconds: 300,
-            completed: true,
-            heartRateBefore: 75,
-            heartRateAfter: 68
+            id: 'vrt-1',
+            name: 'Méditation en forêt',
+            description: 'Une séance de méditation dans une forêt calme',
+            duration: 600, // 10 minutes
+            environment: 'forest',
+            intensity: 2,
+            tags: ['meditation', 'nature', 'calm'],
+            objective: 'Détente et relaxation'
           },
           {
-            id: 'session-2',
-            userId: userId,
-            templateId: '3',
-            startTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-            startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-            endTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 + 15 * 60 * 1000).toISOString(),
-            duration: 900,
-            durationSeconds: 900,
-            completed: true,
-            heartRateBefore: 82,
-            heartRateAfter: 70
+            id: 'vrt-2',
+            name: 'Plage paradisiaque',
+            description: 'Relaxation sur une plage tropicale',
+            duration: 900, // 15 minutes
+            environment: 'beach',
+            intensity: 1,
+            tags: ['relaxation', 'beach', 'water'],
+            objective: 'Réduire l\'anxiété'
           }
         ];
-
+        
+        // Sessions fictives
+        const mockSessions: VRSession[] = [
+          {
+            id: 'vrs-1',
+            userId,
+            templateId: 'vrt-1',
+            startTime: new Date(Date.now() - 86400000), // Hier
+            endTime: new Date(Date.now() - 86400000 + 600000),
+            completed: true,
+            feedback: 'Très relaxant',
+            rating: 5
+          }
+        ];
+        
+        setTemplates(mockTemplates);
         setSessions(mockSessions);
-      } catch (error) {
-        console.error("Error loading user sessions:", error);
-      } finally {
-        setIsLoading(false);
+        setLoading(false);
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Erreur lors du chargement des données VR'));
+        setLoading(false);
       }
     };
-
-    loadTemplates();
-    loadUserSessions();
-  }, [userId]);
-
-  // Start a new VR session
-  const startSession = useCallback((templateId: string): VRSession => {
-    const template = templates.find(t => t.id === templateId);
-    if (!template) {
-      throw new Error("Template not found");
-    }
-
-    const newSession: VRSession = {
-      id: `session-${Date.now()}`,
-      userId: userId,
-      templateId: templateId,
-      startTime: new Date().toISOString(),
-      startDate: new Date().toISOString(),
-      duration: template.duration,
-      durationSeconds: template.duration * 60,
-      completed: false
-    };
-
-    setCurrentSession(newSession);
-    return newSession;
-  }, [templates, userId]);
-
-  // Complete a VR session
-  const completeSession = useCallback((sessionId: string, emotionAfter?: string) => {
-    setSessions(prevSessions => {
-      const updatedSessions = prevSessions.map(session => {
-        if (session.id === sessionId) {
-          return {
-            ...session,
-            endTime: new Date().toISOString(),
-            completed: true,
-            emotionAfter: emotionAfter || session.emotionAfter
-          };
-        }
-        return session;
-      });
-      return updatedSessions;
-    });
-
-    setCurrentSession(null);
-  }, []);
-
-  // Get stats for a user
-  const getUserStats = useCallback(() => {
-    const completedCount = sessions.filter(s => s.completed).length;
-    const totalDuration = sessions.reduce((acc, session) => {
-      return acc + (session.durationSeconds || 0);
-    }, 0);
     
-    return {
-      sessionsCount: sessions.length,
-      completedCount,
-      totalDurationMinutes: Math.floor(totalDuration / 60),
-      lastSessionDate: sessions.length > 0 ? new Date(sessions[0].startDate) : null
-    };
-  }, [sessions]);
-
+    fetchData();
+  }, [userId]);
+  
+  const startSession = async (templateId: string): Promise<VRSession> => {
+    try {
+      const template = templates.find(t => t.id === templateId);
+      
+      if (!template) {
+        throw new Error('Template non trouvé');
+      }
+      
+      const newSession: VRSession = {
+        id: `vrs-${Date.now()}`,
+        userId,
+        templateId,
+        startTime: new Date(),
+        completed: false
+      };
+      
+      setActiveSession(newSession);
+      setSessions(prev => [...prev, newSession]);
+      
+      return newSession;
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Erreur lors du démarrage de la session');
+      setError(error);
+      throw error;
+    }
+  };
+  
+  const endSession = async (sessionId: string, feedback?: string, rating?: number): Promise<void> => {
+    try {
+      setSessions(prev => 
+        prev.map(session => 
+          session.id === sessionId 
+            ? {
+                ...session,
+                endTime: new Date(),
+                completed: true,
+                feedback,
+                rating
+              }
+            : session
+        )
+      );
+      
+      setActiveSession(null);
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Erreur lors de la fin de la session');
+      setError(error);
+      throw error;
+    }
+  };
+  
   return {
-    isLoading,
     sessions,
     templates,
-    currentSession,
+    activeSession,
     startSession,
-    completeSession,
-    getUserStats
+    endSession,
+    loading,
+    error
   };
-};
+}
 
 export default useVRSession;
