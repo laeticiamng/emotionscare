@@ -17,6 +17,12 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 
 ### Modifié
 - Normalisation du `CoachContext` pour utiliser les nouveaux types.
+## [1.1.3] - 2025-05-21
+
+### Ajouté
+- Documentation d'audit du module B2B (`docs/b2b-module-audit.md`).
+- Réexport des types utilisateurs et dashboard dans `types/`.
+
 
 ## [1.1.0] - 2025-05-18
 
