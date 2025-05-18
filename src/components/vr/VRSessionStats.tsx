@@ -37,28 +37,33 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
   };
   
   const calculateSessionDuration = () => {
-    if (!session.startedAt) {
+    // Use startTime or startedAt for the start date
+    const startTimeField = session.startTime || session.startedAt;
+    if (!startTimeField) {
       return 'N/A';
     }
     
-    const startDate = typeof session.startedAt === 'string' 
-      ? new Date(session.startedAt) 
-      : session.startedAt;
+    const startDate = typeof startTimeField === 'string' 
+      ? new Date(startTimeField) 
+      : startTimeField;
       
-    if (session.completed && (session.completedAt || session.endedAt || session.end_time)) {
-      const endDate = session.completedAt 
-        ? (typeof session.completedAt === 'string' ? new Date(session.completedAt) : session.completedAt)
-        : session.endedAt 
-          ? (typeof session.endedAt === 'string' ? new Date(session.endedAt) : session.endedAt)
-          : (typeof session.end_time === 'string' ? new Date(session.end_time) : session.end_time);
+    // Use endTime, completedAt or endedAt for the end date
+    if (session.completed) {
+      const endTimeField = session.endTime || session.completedAt || session.endedAt || session.end_time;
       
-      if (endDate) {
+      if (endTimeField) {
+        const endDate = typeof endTimeField === 'string' ? new Date(endTimeField) : endTimeField;
         const durationMs = endDate.getTime() - startDate.getTime();
         return formatDistance(0, durationMs, { includeSeconds: true, locale: fr });
       }
     }
     
-    return formatDuration(session.duration);
+    // Use provided duration if available
+    if (typeof session.duration === 'number') {
+      return `${session.duration} min`;
+    }
+    
+    return 'N/A';
   };
 
   // Safety check for empty session object
@@ -72,8 +77,13 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
     );
   }
 
-  const heartRateBefore = session.heartRateBefore || session.heart_rate_before;
-  const heartRateAfter = session.heartRateAfter || session.heart_rate_after;
+  const heartRateBefore = session.heartRateBefore || (session.metrics?.heartRate?.[0]);
+  const heartRateAfter = session.heartRateAfter || (session.metrics?.heartRate?.[session.metrics.heartRate.length - 1]);
+
+  // Get rating depending on data format (rating number or feedback object)
+  const rating = typeof session.feedback === 'object' 
+    ? session.feedback?.rating 
+    : session.rating;
 
   return (
     <Card className={className}>
@@ -95,7 +105,7 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
               <Calendar className="h-5 w-5 text-muted-foreground" />
               <div>
                 <p className="text-sm font-medium">Date</p>
-                <p className="text-sm text-muted-foreground">{formatDate(session.startedAt)}</p>
+                <p className="text-sm text-muted-foreground">{formatDate(session.startTime || session.startedAt)}</p>
               </div>
             </div>
           </div>
@@ -120,7 +130,7 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
             </div>
           )}
           
-          {(session.rating !== undefined) && (
+          {(rating !== undefined && typeof rating === 'number') && (
             <div className="flex items-center space-x-2">
               <Star className="h-5 w-5 text-yellow-500" />
               <div>
@@ -129,7 +139,7 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star 
                       key={i} 
-                      className={`h-4 w-4 ${i < (session.rating || 0) ? 'fill-yellow-500 text-yellow-500' : 'text-muted'}`} 
+                      className={`h-4 w-4 ${i < rating ? 'fill-yellow-500 text-yellow-500' : 'text-muted'}`} 
                     />
                   ))}
                 </div>

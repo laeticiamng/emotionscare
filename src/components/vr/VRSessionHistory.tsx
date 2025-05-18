@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { VRSessionHistoryProps, VRSession } from '@/types/vr';
+import { VRSession, VRSessionHistoryProps } from '@/types/vr';
 
 const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({ 
   sessions = [],
@@ -27,13 +27,25 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
   }
 
   const formatSessionDate = (session: VRSession) => {
-    const date = session.startedAt || 
-                new Date(session.start_time || session.startTime || session.date || Date.now());
-    return formatDistanceToNow(date, { addSuffix: true });
+    try {
+      const date = session.startedAt 
+                  ? (typeof session.startedAt === 'string' ? new Date(session.startedAt) : session.startedAt)
+                  : session.startTime 
+                  ? (typeof session.startTime === 'string' ? new Date(session.startTime) : session.startTime)
+                  : session.date 
+                  ? new Date(session.date) 
+                  : new Date();
+      
+      return formatDistanceToNow(date, { addSuffix: true });
+    } catch (err) {
+      console.error("Error formatting date:", err);
+      return "Date inconnue";
+    }
   };
 
   const getStatusIndicator = (session: VRSession) => {
-    return session.completed || session.completedAt ? (
+    const isCompleted = session.completed || session.completedAt;
+    return isCompleted ? (
       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400">
         Terminé
       </span>
@@ -45,9 +57,15 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
   };
 
   const getSessionRating = (session: VRSession) => {
-    if (!session.feedback?.rating && !session.rating) return null;
+    const hasRating = typeof session.rating !== "undefined" || (typeof session.feedback === "object" && session.feedback?.rating);
+    if (!hasRating) return null;
     
-    const rating = session.feedback?.rating || session.rating;
+    const rating = typeof session.feedback === "object" 
+      ? session.feedback?.rating 
+      : session.rating;
+      
+    if (typeof rating !== "number") return null;
+    
     return (
       <div className="flex items-center">
         <span className="text-yellow-500">★</span>
@@ -68,7 +86,7 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
         {limitedSessions.map((session) => (
           <div key={session.id} className="p-3 border rounded-lg bg-card">
             <div className="flex justify-between items-start mb-1">
-              <h4 className="font-medium">{session.template?.title || "Session VR"}</h4>
+              <h4 className="font-medium">{session.template?.title || session.template?.name || "Session VR"}</h4>
               {getSessionRating(session)}
             </div>
             

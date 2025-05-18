@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useChat } from '@/hooks/useChat';
 import { ChatMessage } from '@/types/chat';
@@ -60,10 +61,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="space-y-4">
           {messages.map((message) => (
-            <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`flex items-start gap-2 max-w-[80%] ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
+            <div key={message.id} className={`flex ${message.sender || message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`flex items-start gap-2 max-w-[80%] ${message.sender || message.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <Avatar className="mt-1">
-                  {message.role === 'user' ? (
+                  {message.sender === 'user' || message.role === 'user' ? (
                     <>
                       <AvatarFallback>U</AvatarFallback>
                       <AvatarImage src="/images/avatar.png" />
@@ -76,12 +77,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   )}
                 </Avatar>
                 <div className={`rounded-lg p-3 ${
-                  message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                  message.sender === 'user' || message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
                 }`}>
-                  <p className="text-sm">{message.content}</p>
+                  <p className="text-sm">{message.text || message.content}</p>
                   {message.timestamp && (
                     <span className={`text-xs block mt-1 ${
-                      message.role === 'user' ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                      message.sender === 'user' || message.role === 'user' ? 'text-primary-foreground/80' : 'text-muted-foreground'
                     }`}>
                       {new Date(message.timestamp).toLocaleTimeString()}
                     </span>

@@ -14,16 +14,16 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({ messages, isLoading, 
       {messages.map((message) => (
         <div 
           key={message.id} 
-          className={`mb-4 ${message.sender === 'user' ? 'text-right' : ''}`}
+          className={`mb-4 ${message.sender === 'user' || message.role === 'user' ? 'text-right' : ''}`}
         >
           <div 
             className={`inline-block p-3 rounded-lg max-w-[80%] ${
-              message.sender === 'user' 
+              message.sender === 'user' || message.role === 'user'
                 ? 'bg-primary text-primary-foreground' 
                 : 'bg-muted'
             }`}
           >
-            {message.text || message.content}
+            {message.text || message.content || ""}
           </div>
         </div>
       ))}

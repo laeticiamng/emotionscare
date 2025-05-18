@@ -7,25 +7,29 @@ const UserDashboardSections: React.FC = () => {
   const recommendedSessions: VRSessionTemplate[] = [
     {
       id: '1',
-      title: 'Méditation matinale',
+      name: 'Méditation matinale',
+      title: 'Méditation matinale', // Pour compatibilité
       description: 'Commencez votre journée avec une méditation guidée pour un esprit clair',
       duration: 15,
       tags: ['méditation', 'matin', 'débutant'],
       category: 'méditation',
       environment: 'plage',
       thumbnailUrl: '/images/meditation-morning.jpg',
-      emotionTarget: 'calme'
+      intensity: 1,
+      objective: 'Apaiser l\'esprit'
     },
     {
       id: '2',
-      title: 'Relaxation profonde',
+      name: 'Relaxation profonde',
+      title: 'Relaxation profonde', // Pour compatibilité
       description: 'Une session immersive pour libérer le stress et retrouver l\'équilibre',
       duration: 25,
       tags: ['relaxation', 'stress', 'soir'],
       category: 'relaxation',
       environment: 'forêt',
       thumbnailUrl: '/images/deep-relaxation.jpg',
-      emotionTarget: 'sérénité'
+      intensity: 2,
+      objective: 'Réduire le stress'
     }
   ];
 
@@ -43,12 +47,12 @@ const UserDashboardSections: React.FC = () => {
                 {session.thumbnailUrl && (
                   <img 
                     src={session.thumbnailUrl} 
-                    alt={session.title}
+                    alt={session.title || session.name}
                     className="w-full h-full object-cover rounded"
                   />
                 )}
               </div>
-              <h4 className="font-medium">{session.title}</h4>
+              <h4 className="font-medium">{session.title || session.name}</h4>
               <p className="text-sm text-muted-foreground">{session.description}</p>
               <div className="flex items-center gap-2 mt-2">
                 <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,7 +38,7 @@ const VRActiveSession: React.FC<VRActiveSessionProps> = ({ template, onComplete,
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Session en cours: {template.title}</CardTitle>
+        <CardTitle>Session en cours: {template.title || template.name}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center space-y-4">
         <p className="text-muted-foreground text-center">

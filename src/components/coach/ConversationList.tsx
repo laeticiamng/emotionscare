@@ -31,7 +31,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
     }
     
     // Or use the last_message field if available
-    return conversation.last_message || "Aucun message";
+    return conversation.lastMessage || conversation.last_message || "Aucun message";
   };
   
   // Format date helper function
@@ -78,7 +78,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                     {getLastMessageText(conversation)}
                   </p>
                   <p className="text-xs mt-1">
-                    {formatDate(conversation.updated_at || conversation.created_at)}
+                    {formatDate(conversation.updatedAt || conversation.updated_at || conversation.createdAt || conversation.created_at)}
                   </p>
                 </div>
                 <Button 

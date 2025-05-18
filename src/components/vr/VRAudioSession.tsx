@@ -24,8 +24,9 @@ const VRAudioSession: React.FC<VRAudioSessionProps> = ({
   
   useEffect(() => {
     // Initialize audio element
-    if (template.audio_url && !audioRef.current) {
-      const audio = new Audio(template.audio_url);
+    const audioUrl = template.audio_url || template.audioTrack;
+    if (audioUrl && !audioRef.current) {
+      const audio = new Audio(audioUrl);
       
       // Add event listeners
       audio.addEventListener('ended', onComplete);
@@ -48,7 +49,7 @@ const VRAudioSession: React.FC<VRAudioSessionProps> = ({
         audioRef.current.pause();
       }
     };
-  }, [template.audio_url, onComplete, toast]);
+  }, [template.audio_url, template.audioTrack, onComplete, toast]);
   
   // Handle play/pause
   useEffect(() => {
