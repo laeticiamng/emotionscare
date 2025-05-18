@@ -38,6 +38,10 @@ import B2BAdminEventsPage from '@/pages/b2b/admin/Events';
 import B2BAdminSettingsPage from '@/pages/b2b/admin/Settings';
 import ImmersiveHome from '@/pages/ImmersiveHome';
 import Home from '@/pages/Home';
+import LoginPage from '@/pages/common/Login';
+import RegisterPage from '@/pages/common/Register';
+import B2CLogin from '@/pages/b2c/Login';
+import B2CRegister from '@/pages/b2c/Register';
 
 
 // Define the application routes without creating a router instance
@@ -53,11 +57,11 @@ export const routes: RouteObject[] = [
   // B2C Auth Routes
   {
     path: 'b2c/login',
-    element: <LoginPage />
+    element: <B2CLogin />
   },
   {
     path: 'b2c/register',
-    element: <RegisterPage />
+    element: <B2CRegister />
   },
   // B2B Selection Route
   {
