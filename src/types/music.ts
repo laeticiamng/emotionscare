@@ -63,6 +63,27 @@ export interface MusicPreset {
   trackIds: string[];
 }
 
+export interface MusicPreferences {
+  favoriteGenres?: string[];
+  dislikedGenres?: string[];
+  preferredTempo?: 'slow' | 'medium' | 'fast';
+  volume?: number;
+}
+
+export interface MusicSession {
+  id: string;
+  playlist: MusicPlaylist;
+  startedAt: string;
+  endedAt?: string;
+  mood?: string;
+}
+
+export interface MusicMood {
+  name: string;
+  description?: string;
+  intensity?: number;
+}
+
 export interface EmotionMusicParams {
   emotion: string;
   intensity?: number;
@@ -91,6 +112,8 @@ export interface MusicContextType {
   isRepeating?: boolean;
   isShuffled?: boolean;
   queue?: MusicTrack[];
+  preferences?: MusicPreferences;
+  sessions?: MusicSession[];
   progress?: number;
   recommendations?: MusicTrack[]; // For recommended tracks
   isLoading?: boolean; // Loading state for async operations
@@ -130,6 +153,9 @@ export interface MusicContextType {
   addToQueue?: (track: MusicTrack) => void;
   clearQueue?: () => void;
   findTracksByMood?: (mood: string) => MusicTrack[];
+  updatePreferences?: (prefs: Partial<MusicPreferences>) => void;
+  startSession?: (playlist: MusicPlaylist) => MusicSession;
+  endSession?: (id: string) => void;
 }
 
 // UI component props types
