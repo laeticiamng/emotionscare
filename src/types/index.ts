@@ -28,6 +28,5 @@ export * from './preferences';
 // Export gamification types
 export * from './gamification';
 
-// Export navigation and layout types
+// Export navigation types
 export * from './navigation';
-export * from './layout';

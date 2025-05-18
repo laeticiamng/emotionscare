@@ -52,7 +52,7 @@ src/
 
 ## Routes principales
 
-- `/` - Page d'accueil
+- `/` - Page d'accueil (publique, aucune authentification requise)
 - `/auth/login` - Connexion
 - `/auth/register` - Inscription
 - `/dashboard` - Tableau de bord utilisateur
@@ -287,7 +287,9 @@ Vous trouverez dans le dossier `src/docs` plusieurs guides détaillés :
 - `ARCHITECTURE.md` : présentation de la structure du projet
 - `API_INTEGRATION.md` : intégration des services tiers
 - `BUILD_CHECKLIST.md` : étapes à vérifier avant un déploiement
-- `../docs/b2c_auth_flow.md` : description du flux d'authentification B2C
+- `home-routing-audit.md` : audit et conventions d'accès public
+- `RoutingFlow.md` : schéma du flux d'accès (accueil → login → dashboard)
+
 
 ## Équipe et contribution
 

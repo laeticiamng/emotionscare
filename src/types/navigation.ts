@@ -71,9 +71,15 @@ export interface RouteConfig {
     extensions?: string;
   };
   common: {
+    /** Landing page accessible without authentication */
+    landing: string;
+    /** Optional secondary home route */
     home: string;
+    /** Route for B2B mode selection */
     b2bSelection: string;
+    /** Unauthorized access page */
     unauthorized: string;
+    /** Not found page */
     notFound: string;
   };
 }
@@ -130,7 +136,8 @@ export const ROUTES: RouteConfig = {
     extensions: '/extensions'
   },
   common: {
-    home: '/',
+    landing: '/',
+    home: '/home',
     b2bSelection: '/b2b/selection',
     unauthorized: '/unauthorized',
     notFound: '/not-found'
