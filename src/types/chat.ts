@@ -87,3 +87,10 @@ export interface UseChatOptions {
   initialMessages?: ChatMessage[];
   initialConversationId?: string;
 }
+
+export interface ChatResponse {
+  id: string;
+  message: string;
+  sender: string;
+  timestamp: string;
+}

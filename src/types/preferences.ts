@@ -1,122 +1,74 @@
 
-export interface UserPreferences {
-  theme: 'system' | 'light' | 'dark' | 'pastel';
-  language: string;
-  notificationsEnabled: boolean;
-  emailNotifications: boolean;
-  pushNotifications: boolean;
-  newsletterEnabled: boolean;
-  activityTracking: boolean;
-  dataSharing: boolean;
-  audioEnabled: boolean;
-  musicEnabled: boolean;
-  autoScanEnabled: boolean;
-  timezone: string;
-  dateFormat: 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
-  timeFormat: '12h' | '24h';
-  defaultDashboard: 'overview' | 'analytics' | 'emotions' | 'coaching';
-  accessibilityMode: boolean;
-  highContrastMode: boolean;
-  fontSize: 'small' | 'medium' | 'large' | 'xlarge';
-  animationsEnabled: boolean;
-  ambientSound?: string;
-  soundEnabled?: boolean;
-  reduceMotion?: boolean;
-  autoplayMedia?: boolean;
-  colorBlindMode?: boolean;
-  fontFamily?: 'system' | 'sans' | 'serif' | 'mono' | 'rounded';
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  privacy?: {
-    dataSharing: boolean;
-    analytics: boolean;
-    thirdParty: boolean;
-    shareData?: boolean;
-    anonymizeReports?: boolean;
-    profileVisibility?: string;
-  };
-  notifications?: {
-    enabled: boolean;
-    emailEnabled: boolean;
-    pushEnabled: boolean;
-    inAppEnabled: boolean;
-    types: {
-      system: boolean;
-      emotion: boolean;
-      coach: boolean;
-      journal: boolean;
-      community: boolean;
-      achievement: boolean;
-      badge?: boolean;
-    };
-    frequency: string;
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-}
-
-export const DEFAULT_PREFERENCES: UserPreferences = {
-  theme: 'system',
-  language: 'fr',
-  notificationsEnabled: true,
-  emailNotifications: true,
-  pushNotifications: true,
-  newsletterEnabled: true,
-  activityTracking: true,
-  dataSharing: false,
-  audioEnabled: true,
-  musicEnabled: true,
-  autoScanEnabled: false,
-  timezone: 'Europe/Paris',
-  dateFormat: 'DD/MM/YYYY',
-  timeFormat: '24h',
-  defaultDashboard: 'overview',
-  accessibilityMode: false,
-  highContrastMode: false,
-  fontSize: 'medium',
-  animationsEnabled: true,
-  soundEnabled: true,
-  ambientSound: 'nature',
-  reduceMotion: false,
-  colorBlindMode: false,
-  autoplayMedia: false,
-  fontFamily: 'system',
-  emotionalCamouflage: false,
-  aiSuggestions: false,
-  privacy: {
-    dataSharing: false,
-    analytics: true,
-    thirdParty: false,
-    shareData: false,
-    anonymizeReports: false,
-    profileVisibility: 'public'
-  },
-  notifications: {
-    enabled: true,
-    emailEnabled: true,
-    pushEnabled: true,
-    inAppEnabled: true,
-    types: {
-      system: true,
-      emotion: true,
-      coach: true,
-      journal: true,
-      community: true,
-      achievement: true,
-      badge: true
-    },
-    frequency: 'daily',
-    email: true,
-    push: true,
-    sms: false
-  }
-};
+/**
+ * Types officiels pour les préférences utilisateur.
+ * Toute modification doit être synchronisée dans tous les mocks et composants.
+ * Ne jamais dupliquer ce type en local.
+ */
 
 export interface UserPreferencesContextType {
-  preferences: UserPreferences;
-  updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
-  resetPreferences: () => void;
-  isLoading: boolean;
-  error?: Error | null;
+  theme: string;
+  fontSize: string;
+  language: string;
+  notifications: NotificationsPreferences;
+  privacy: string;
+  updatePreferences: (preferences: Partial<UserPreferences>) => void;
+}
+
+export interface NotificationsPreferences {
+  enabled: boolean;
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  inAppEnabled?: boolean;
+  types?: {
+    system?: boolean;
+    emotion?: boolean;
+    coach?: boolean;
+    journal?: boolean;
+    community?: boolean;
+    achievement?: boolean;
+    badge?: boolean;
+  };
+  frequency?: string;
+  email?: boolean;
+  push?: boolean;
+  sms?: boolean;
+  quietHours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
+  tone?: string;
+}
+
+export interface UserPreferences {
+  theme?: 'light' | 'dark' | 'pastel' | 'system';
+  fontSize?: 'small' | 'medium' | 'large';
+  language?: string;
+  privacy?: 'public' | 'private' | 'friends';
+  notifications?: NotificationsPreferences | boolean;
+}
+
+// Utilitaire pour normaliser les préférences
+export function normalizePreferences(prefs: any): UserPreferences {
+  if (!prefs) return {
+    theme: 'system',
+    fontSize: 'medium',
+    language: 'fr',
+    privacy: 'private',
+    notifications: {
+      enabled: true,
+      emailEnabled: true,
+      pushEnabled: false
+    }
+  };
+
+  return {
+    theme: prefs.theme || 'system',
+    fontSize: prefs.fontSize || 'medium',
+    language: prefs.language || 'fr',
+    privacy: prefs.privacy || 'private',
+    notifications: typeof prefs.notifications === 'boolean' ? 
+      { enabled: prefs.notifications, emailEnabled: false, pushEnabled: false } : 
+      prefs.notifications || { enabled: true, emailEnabled: true, pushEnabled: false }
+  };
 }

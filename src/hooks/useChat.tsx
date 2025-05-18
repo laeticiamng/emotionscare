@@ -82,7 +82,7 @@ export const useChat = (
     sendMessage,
     conversationId,
     clearMessages,
-    setConversation: setConversation,
+    setConversation,
     input,
     setInput,
     handleInputChange,

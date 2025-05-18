@@ -63,3 +63,17 @@ export interface EmotionalTeamViewProps {
   showMembers?: boolean;
   className?: string;
 }
+
+// Interfaces pour les composants de scan des émotions
+export interface LiveVoiceScannerProps {
+  onResult?: (result: EmotionResult) => void;
+  onError?: (error: Error) => void;
+  autoStart?: boolean;
+  className?: string;
+}
+
+export interface TeamOverviewProps {
+  teamId: string;
+  period?: string;
+  showGraph?: boolean;
+}
