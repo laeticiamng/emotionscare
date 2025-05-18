@@ -29,6 +29,7 @@ import B2CVRPage from './pages/b2c/VR';
 import B2CPreferencesPage from './pages/b2c/Preferences';
 import B2CSettingsPage from './pages/b2c/Settings';
 import B2CCoconPage from './pages/b2c/Cocon';
+import B2CMarketplacePage from './pages/b2c/Marketplace';
 import B2BUserJournalPage from './pages/b2b/user/Journal';
 import B2BUserScanPage from './pages/b2b/user/Scan';
 import B2BUserMusicPage from './pages/b2b/user/Music';
@@ -161,6 +162,10 @@ export const routes: RouteObject[] = [
       {
         path: 'cocon',
         element: <B2CCoconPage />
+      },
+      {
+        path: 'marketplace',
+        element: <B2CMarketplacePage />
       },
       {
         path: 'timeline',
