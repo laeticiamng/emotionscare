@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, Shield, ArrowLeft } from 'lucide-react';
@@ -9,6 +10,21 @@ import Shell from '@/Shell';
 
 const B2BSelectionPage = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+
+  // Redirect authenticated users directly to their dashboard
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+
+    const role = user.role?.toLowerCase();
+    if (role === 'b2b_admin') {
+      navigate('/b2b/admin/dashboard', { replace: true });
+    } else if (role === 'b2b_user') {
+      navigate('/b2b/user/dashboard', { replace: true });
+    } else {
+      navigate('/b2c/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleUserAccess = () => {
     // Feedback tactile
