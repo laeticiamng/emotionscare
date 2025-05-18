@@ -1,14 +1,6 @@
 
 import { useState, useEffect } from 'react';
-
-// Définition du type User manquant
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  created_at: string;
-}
+import type { User } from '@/types/user';
 
 export interface ScanDetail {
   id: string;

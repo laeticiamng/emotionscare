@@ -1,21 +1,7 @@
 
 import { useState } from 'react';
 import { useToast } from './use-toast';
-
-export interface UserPreferences {
-  notifications_enabled?: boolean;
-  email_notifications?: boolean;
-  push_notifications?: boolean;
-  theme?: 'light' | 'dark' | 'system';
-  fontSize?: 'small' | 'medium' | 'large';
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  fullAnonymity?: boolean;
-  language?: string;
-  autoPlay?: boolean;
-  journalReminders?: boolean;
-  audioQuality?: 'low' | 'medium' | 'high';
-}
+import type { UserPreferences } from '@/types/preferences';
 
 export function usePreferences() {
   // Dans une app réelle, ceci viendrait de l'API ou du stockage local
