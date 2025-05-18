@@ -17,25 +17,17 @@ export const env = {
   NEXT_PUBLIC_APP_ENV: import.meta.env.NEXT_PUBLIC_APP_ENV || import.meta.env.MODE || 'development',
 
   // Clés d'API
-  NEXT_PUBLIC_OPENAI_API_KEY: import.meta.env.NEXT_PUBLIC_OPENAI_API_KEY || import.meta.env.VITE_OPENAI_API_KEY || '',
-  NEXT_PUBLIC_HUME_API_KEY: import.meta.env.NEXT_PUBLIC_HUME_API_KEY || '',
-  // DSN Sentry pour la surveillance des erreurs
-  NEXT_PUBLIC_SENTRY_DSN: import.meta.env.NEXT_PUBLIC_SENTRY_DSN || '',
-
-  // Configuration Supabase
-  VITE_SUPABASE_URL:
-    import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  VITE_SUPABASE_ANON_KEY:
-    import.meta.env.VITE_SUPABASE_ANON_KEY ||
-    import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-  SUPABASE_SERVICE_ROLE_KEY: import.meta.env.SUPABASE_SERVICE_ROLE_KEY || '',
-
-  // Configuration uploads
-  NEXT_PUBLIC_UPLOAD_MAX_SIZE: Number(import.meta.env.NEXT_PUBLIC_UPLOAD_MAX_SIZE || '10485760'),
-  NEXT_PUBLIC_ALLOWED_IMAGE_TYPES:
-    import.meta.env.NEXT_PUBLIC_ALLOWED_IMAGE_TYPES || 'image/jpeg,image/png,image/webp',
-  NEXT_PUBLIC_ALLOWED_AUDIO_TYPES:
-    import.meta.env.NEXT_PUBLIC_ALLOWED_AUDIO_TYPES || 'audio/mpeg,audio/wav,audio/ogg',
+  NEXT_PUBLIC_OPENAI_API_KEY: process.env.NEXT_PUBLIC_OPENAI_API_KEY || '',
+  NEXT_PUBLIC_HUME_API_KEY: process.env.NEXT_PUBLIC_HUME_API_KEY || '',
+  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+  VITE_FIREBASE_API_KEY: process.env.VITE_FIREBASE_API_KEY || '',
+  VITE_FIREBASE_AUTH_DOMAIN: process.env.VITE_FIREBASE_AUTH_DOMAIN || '',
+  VITE_FIREBASE_PROJECT_ID: process.env.VITE_FIREBASE_PROJECT_ID || '',
+  VITE_FIREBASE_STORAGE_BUCKET: process.env.VITE_FIREBASE_STORAGE_BUCKET || '',
+  VITE_FIREBASE_MESSAGING_SENDER_ID: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
+  VITE_FIREBASE_APP_ID: process.env.VITE_FIREBASE_APP_ID || '',
+  VITE_FIREBASE_MEASUREMENT_ID: process.env.VITE_FIREBASE_MEASUREMENT_ID || '',
 
   // Configuration du serveur
   NODE_ENV: import.meta.env.MODE || 'development',
@@ -44,13 +36,16 @@ export const env = {
 };
 
 // Validation simple en mode développement
-if (env.NODE_ENV === 'development') {
-  checkEnvVars();
-}
+  if (env.NODE_ENV === 'development') {
+    checkEnvVars();
+  }
 
 function checkEnvVars() {
   const requiredVars = [
-    'NEXT_PUBLIC_API_URL'
+    'NEXT_PUBLIC_API_URL',
+    'NEXT_PUBLIC_OPENAI_API_KEY',
+    'NEXT_PUBLIC_SUPABASE_URL',
+    'NEXT_PUBLIC_SUPABASE_ANON_KEY'
   ];
 
   const missingVars = requiredVars.filter(key => !env[key]);
