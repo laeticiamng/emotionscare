@@ -77,10 +77,10 @@ const ImmersiveHome: React.FC = () => {
     // Vérifier si le navigateur supporte la reconnaissance vocale
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       setIsListening(true);
-      
-      // @ts-ignore - WebkitSpeechRecognition might not be in the types
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
+
+      const SpeechRecognitionClass =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognitionClass();
       
       recognition.lang = 'fr-FR';
       recognition.continuous = false;

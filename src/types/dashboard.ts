@@ -13,6 +13,7 @@ export interface EmotionalTeamViewProps {
 export interface KpiCardProps {
   title: string;
   value: string | number;
+  label?: string;
   description?: string;
   icon?: ReactNode;
   status?: KpiCardStatus;

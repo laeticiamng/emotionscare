@@ -30,6 +30,7 @@ export interface RouteConfig {
     events?: string;
     settings?: string;
     gamification?: string;
+    marketplace?: string;
     cocon?: string;
     preferences?: string;
   };
@@ -64,6 +65,7 @@ export interface RouteConfig {
     reports?: string;
     events?: string;
     settings?: string;
+    optimisation?: string;
   };
   common: {
     home: string;

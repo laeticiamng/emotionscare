@@ -75,8 +75,15 @@ export interface ChatHookResult {
   conversationId: string;
   clearMessages: () => void;
   setConversation: (id: string) => void;
-  input?: string;
-  setInput?: (text: string) => void;
-  handleInputChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  handleSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
+  input: string;
+  setInput: (text: string) => void;
+  handleInputChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+}
+
+export interface UseChatOptions {
+  initialMessages?: ChatMessage[];
+  initialConversationId?: string;
 }

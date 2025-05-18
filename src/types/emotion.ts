@@ -27,13 +27,9 @@ export interface EmotionResult {
 }
 
 export interface EmotionRecommendation {
-  id: string;
-  type: 'music' | 'activity' | 'exercise' | 'content';
-  title: string;
-  description?: string;
-  emoji?: string;
-  actionText?: string;
-  actionUrl?: string;
+  emotion: string;
+  category: 'music' | 'vr' | 'exercise' | 'mindfulness' | 'general';
+  content: string;
 }
 
 export interface Emotion {
