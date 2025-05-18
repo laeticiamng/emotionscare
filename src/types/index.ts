@@ -19,4 +19,7 @@ export * from './chat';
 export * from './vr';
 
 // Export user types
-export type { UserPreferences } from './user';
+export * from './user';
+
+// Export gamification types
+export * from './gamification';

@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { normalizeChatMessage } from '@/types/chat'; // Import our normalization utility
@@ -56,3 +57,6 @@ export const useChat = (initialConversationId = '') => {
     setConversation: setConversation
   };
 };
+
+// Add default export to fix import errors
+export default useChat;

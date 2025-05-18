@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useMusic } from '@/contexts';
+import { useMusic } from '@/hooks/useMusic';
 import { MusicTrack, EmotionMusicParams, MusicPlaylist } from '@/types/music';
 import { EmotionResult } from '@/types/emotion';
 

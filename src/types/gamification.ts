@@ -21,6 +21,7 @@ export interface Badge {
   requirements?: string[];
   points?: number;
   dateEarned?: string; // Deprecated - use earnedAt instead
+  achieved?: boolean; // Used by some components
 }
 
 export interface Achievement {
@@ -54,4 +55,27 @@ export interface GamificationProfile {
     completed: number;
     total: number;
   };
+}
+
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  points: number;
+  progress: number; // 0-100
+  isCompleted: boolean;
+  startDate: string;
+  endDate?: string;
+  requirements: string[];
+}
+
+export interface GamificationStats {
+  points: number;
+  level: number;
+  badges: number;
+  achievements: number;
+  currentStreak: number;
+  activeChallenges: number;
 }

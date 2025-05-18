@@ -1,6 +1,6 @@
 
 import { useCallback, useState, ChangeEvent } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { MusicTrack } from '@/types/music';
 
 export const useMusicControls = () => {

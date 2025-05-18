@@ -1,11 +1,12 @@
 
 /**
  * useMusicPlayer.tsx
- * Enhanced hook that extends the base useMusic functionality
+ * ⚠️ DEPRECATED: This is an alias for useMusic for backwards compatibility.
+ * Please use useMusic directly from '@/hooks/useMusic' instead.
  */
 
-import { useState, useEffect } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useEffect, useState } from 'react';
+import { useMusic } from '@/hooks/useMusic';
 
 export interface MusicPlayerOptions {
   autoPlay?: boolean;

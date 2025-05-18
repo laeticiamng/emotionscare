@@ -1,74 +1,35 @@
-# Music Context Documentation
 
-## Overview
+# Music Context
 
-This is the official music context for the application. All components requiring music functionality should use this context via the `useMusic` hook.
+This directory contains the official Music Context and related utilities for the application.
 
-## Usage
+## Important Guidelines
 
-```tsx
-import { useMusic } from '@/contexts/MusicContext';
+- For accessing the MusicContext, use **EXCLUSIVELY** the `useMusic` hook defined in `@/hooks/useMusic`.
+- Any variation or duplication is prohibited and will be removed in the next code cleanup.
+- All music-related functionality must go through this context.
+- The `MusicContextType` in `@/types/music.ts` defines all available properties and methods.
 
-function MusicComponent() {
-  const { 
-    currentTrack, 
-    isPlaying, 
-    togglePlay, 
-    playTrack,
-    // ...other methods and properties
-  } = useMusic();
-  
-  // Use the music context
-}
-```
+## Structure
 
-## Available Methods and Properties
+- `MusicContext.tsx` - The main context definition
+- `index.ts` - Exports for the context and hooks
+- `mockMusicData.ts` - Mock data for testing/development
+- `types.ts` - (Deprecated) Types for backward compatibility
 
-The music context provides a comprehensive set of methods and properties for music playback, playlist management, and emotion-based recommendations:
+## Adding New Functionality
 
-### State Properties:
-- `isInitialized`: Boolean indicating if the music system is ready
-- `isPlaying`: Boolean indicating if music is currently playing
-- `currentTrack`: The currently selected track (or null)
-- `volume`: Current volume level (0-1)
-- `duration`: Duration of the current track in seconds
-- `currentTime`: Current playback position in seconds
-- `muted`: Boolean indicating if audio is muted
-- `playlist`: Current playlist object
-- `emotion`: Current selected emotion for music recommendations
-- `openDrawer`: Boolean controlling the music drawer UI component
+When adding new music-related features:
 
-### Playback Methods:
-- `playTrack(track)`: Start playing a specific track
-- `pauseTrack()`: Pause the current track
-- `resumeTrack()`: Resume playing the current track
-- `togglePlay()`: Toggle between play and pause
-- `nextTrack()`: Skip to the next track in playlist
-- `previousTrack()` or `prevTrack()`: Go to the previous track in playlist
-- `seekTo(time)`: Jump to specific time in the track
+1. First update the `MusicContextType` in `@/types/music.ts`
+2. Implement the feature in the provider in `MusicContext.tsx`
+3. Use the `useMusic` hook to access it from components
 
-### Playlist Methods:
-- `setPlaylist(playlist)`: Set the current playlist
-- `loadPlaylistForEmotion(emotion)`: Load a playlist based on an emotion
-- `getRecommendationByEmotion(emotion)`: Get track recommendations for an emotion
-- `findTracksByMood(mood)`: Find tracks matching a specific mood
+## Legacy Hooks
 
-### UI Control:
-- `setOpenDrawer(isOpen)`: Control the visibility of the music drawer
-- `toggleDrawer()`: Toggle the music drawer visibility
+The following hooks are deprecated and will be removed in future versions:
 
-### Other Methods:
-- `setVolume(volume)`: Set the audio volume
-- `setMute(isMuted)`: Set muted state
-- `toggleMute()`: Toggle audio mute
-- `generateMusic(prompt)`: Generate AI music based on a text prompt
+- `useMusicPlayer` - use `useMusic` instead
+- `usePlayerContext` - use `useMusic` instead
 
-## Demo/Test
-
-To test if the music context is working correctly, you can use the `TestMusicContext` component located in `src/components/test/TestMusicContext.tsx`.
-
-## Important Notes
-
-- DO NOT create multiple instances of MusicProvider in your application
-- Always use this context through the `useMusic` hook
-- When implementing new music-related features, extend this context instead of creating new ones
+Do not create new hooks that duplicate functionality already in the music context.

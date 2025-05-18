@@ -6,6 +6,11 @@
  * Import from this file instead of directly referencing the implementation.
  */
 
-export { useMusic, MusicProvider } from '@/contexts/MusicContext';
+// Export the hook for accessing music functionality
+export { useMusic } from '@/hooks/useMusic';
+
+// Export the default context
 export { default } from '@/contexts/MusicContext';
 
+// For backward compatibility (to be removed in future versions)
+export { MusicProvider } from '@/contexts/MusicContext';

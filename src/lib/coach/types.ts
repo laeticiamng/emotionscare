@@ -16,3 +16,13 @@ export interface CoachState {
 }
 
 export type CoachReducer = (state: CoachState, action: CoachAction) => CoachState;
+
+// AI model configuration
+export const AI_MODEL_CONFIG = {
+  defaultModel: 'gpt-3.5-turbo',
+  advancedModel: 'gpt-4',
+  temperature: 0.7,
+  maxTokens: 1024,
+  frequencyPenalty: 0.5,
+  presencePenalty: 0.5
+};

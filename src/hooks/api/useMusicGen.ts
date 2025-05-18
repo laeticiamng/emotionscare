@@ -1,12 +1,12 @@
 
 import { useState } from 'react';
 import { MusicTrack } from '@/types/music';
-import useMusicPlayer from '@/hooks/useMusicPlayer';
+import { useMusic } from '@/hooks/useMusic';
 
 export function useMusicGen() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedTrack, setGeneratedTrack] = useState<MusicTrack | null>(null);
-  const { playTrack } = useMusicPlayer();
+  const { playTrack } = useMusic();
 
   const generateMusic = async (prompt: string): Promise<MusicTrack | null> => {
     setIsGenerating(true);

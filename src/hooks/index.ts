@@ -11,8 +11,13 @@ export { useToast, toast, error, success, warning, info } from './use-toast';
 export { default as useAudio } from './use-audio';
 export { useAudioPlayer } from './useAudioPlayer';
 
-// API hooks
-export * from './api/useMusicGen';
+// Music hooks - centralized 
+export { useMusic } from './useMusic';
+export { useMusicControls } from './useMusicControls';
+export { useMusicGen } from './api/useMusicGen';
+
+// For backward compatibility (to be removed in future versions)
+export { useMusicPlayer } from './useMusicPlayer';
 
 // User mode hooks
 export { default as useUserModeHelpers } from './useUserModeHelpers';
@@ -28,3 +33,6 @@ export { default as useEmotionScan } from './useEmotionScan';
 
 // Theme hook
 export { useTheme } from './use-theme';
+
+// Chat hooks
+export { useChat } from './useChat';

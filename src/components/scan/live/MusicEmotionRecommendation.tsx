@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, Play } from 'lucide-react';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/hooks/useMusic';
 import { useToast } from '@/hooks/use-toast';
 import { EmotionResult } from '@/types/emotion';
 
