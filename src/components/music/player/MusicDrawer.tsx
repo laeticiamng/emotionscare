@@ -30,118 +30,116 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
     toggleMute,
   } = useMusic();
 
-  // Use the most available method
-  const handlePrevious = prevTrack || previousTrack || (() => {});
-  
+  // Use the appropriate previous track function
+  const handlePreviousTrack = () => {
+    if (typeof prevTrack === 'function') {
+      prevTrack();
+    } else if (typeof previousTrack === 'function') {
+      previousTrack();
+    }
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[320px] sm:w-[400px]">
-        <SheetHeader className="text-left mb-6">
+      <SheetContent className="sm:max-w-md">
+        <SheetHeader>
           <SheetTitle>Music Player</SheetTitle>
         </SheetHeader>
         
-        {/* Album art and track info */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-48 h-48 bg-muted rounded-lg overflow-hidden mb-4">
-            {currentTrack?.cover ? (
-              <img 
-                src={currentTrack.cover} 
-                alt={currentTrack.name || currentTrack.title || "Album art"} 
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Volume2 className="h-12 w-12 text-muted-foreground opacity-50" />
-              </div>
-            )}
-          </div>
-          
-          <h3 className="font-semibold text-lg">
-            {currentTrack?.name || currentTrack?.title || "No track selected"}
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {currentTrack?.artist || "Unknown artist"}
-          </p>
-        </div>
-        
-        {/* Progress bar */}
-        <ProgressBar 
-          currentTime={currentTime} 
-          duration={duration} 
-          onSeek={seekTo} 
-        />
-        
-        {/* Controls */}
-        <div className="flex items-center justify-center space-x-4 my-6">
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={handlePrevious}
-          >
-            <SkipBack className="h-5 w-5" />
-          </Button>
-          
-          <Button 
-            size="icon" 
-            className="h-12 w-12 rounded-full"
-            onClick={togglePlay}
-          >
-            {isPlaying ? (
-              <Pause className="h-6 w-6" />
-            ) : (
-              <Play className="h-6 w-6 ml-0.5" />
-            )}
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            size="icon"
-            onClick={nextTrack}
-          >
-            <SkipForward className="h-5 w-5" />
-          </Button>
-        </div>
-        
-        {/* Volume control */}
-        <VolumeControl 
-          volume={volume} 
-          muted={muted}
-          onVolumeChange={setVolume}
-          onMuteToggle={toggleMute}
-        />
-        
-        {/* Playlist */}
-        {playlist && playlist.tracks && playlist.tracks.length > 0 && (
-          <div className="mt-8">
-            <h3 className="font-medium text-sm mb-3">Playlist</h3>
-            <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
-              {playlist.tracks.map((track, index) => (
-                <div 
-                  key={track.id || index} 
-                  className={`flex items-center p-2 rounded-md ${
-                    currentTrack?.id === track.id 
-                      ? 'bg-primary/10 text-primary' 
-                      : 'hover:bg-muted'
-                  }`}
-                >
-                  <div className="text-xs font-medium w-5 text-right mr-3">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm truncate">
-                      {track.name || track.title || `Track ${index + 1}`}
-                    </h4>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {track.artist || "Unknown"}
+        <div className="py-6">
+          {children ? (
+            children
+          ) : (
+            <div className="space-y-6">
+              {currentTrack && (
+                <div className="flex flex-col items-center space-y-4">
+                  {currentTrack.coverUrl && (
+                    <div className="rounded-lg overflow-hidden w-48 h-48">
+                      <img 
+                        src={currentTrack.coverUrl} 
+                        alt={currentTrack.title || 'Album cover'} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="text-center">
+                    <h3 className="font-medium text-lg">
+                      {currentTrack.title || currentTrack.name || 'Unknown Track'}
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {currentTrack.artist || 'Unknown Artist'}
                     </p>
                   </div>
+                  
+                  <ProgressBar 
+                    currentTime={currentTime} 
+                    duration={duration} 
+                    onSeek={seekTo} 
+                  />
+                  
+                  <div className="flex items-center justify-center space-x-4">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={handlePreviousTrack}
+                    >
+                      <SkipBack />
+                    </Button>
+                    
+                    <Button 
+                      size="icon" 
+                      className="h-12 w-12 rounded-full" 
+                      onClick={togglePlay}
+                    >
+                      {isPlaying ? <Pause size={24} /> : <Play size={24} className="ml-1" />}
+                    </Button>
+                    
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={nextTrack}
+                    >
+                      <SkipForward />
+                    </Button>
+                  </div>
+                  
+                  <VolumeControl 
+                    volume={volume} 
+                    muted={muted} 
+                    onVolumeChange={setVolume} 
+                    onMuteToggle={toggleMute} 
+                  />
                 </div>
-              ))}
+              )}
+              
+              {playlist && playlist.tracks.length > 0 && (
+                <div className="mt-6 space-y-2">
+                  <h4 className="font-medium">Playlist: {playlist.name || 'Current Playlist'}</h4>
+                  <div className="space-y-1">
+                    {playlist.tracks.map(track => (
+                      <div 
+                        key={track.id} 
+                        className={`flex items-center p-2 rounded-md ${
+                          currentTrack?.id === track.id ? 'bg-secondary' : 'hover:bg-accent'
+                        }`}
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">
+                            {track.title || track.name || 'Unknown Track'}
+                          </p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {track.artist || 'Unknown Artist'}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        )}
-        
-        {children}
+          )}
+        </div>
       </SheetContent>
     </Sheet>
   );

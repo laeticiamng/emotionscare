@@ -1,147 +1,103 @@
 
 import { Badge, Challenge } from '@/types/badge';
-import { LeaderboardEntry } from '@/types/dashboard';
+import { LeaderboardEntry } from '@/types/badge';
 
-// Badges factices pour la démonstration
 export const mockBadges: Badge[] = [
   {
-    id: '1',
-    name: 'Méditation Zen',
-    description: 'Effectué 5 sessions de méditation',
-    imageUrl: '/badges/meditation.png',
+    id: "1",
+    name: "Early Bird",
+    description: "Connect 5 days in a row before 8am",
+    imageUrl: "/badges/early-bird.png",
     unlocked: true,
     level: 1,
-    category: 'méditation',
-    tier: 'bronze'
+    category: "habit",
+    tier: "bronze"
   },
   {
-    id: '2',
-    name: 'Expert en Bien-être',
-    description: 'Maintenu un score émotionnel de 80+ pendant une semaine',
-    imageUrl: '/badges/wellbeing.png',
-    unlocked: false,
-    level: 2,
-    category: 'bien-être',
-    tier: 'silver'
-  },
-  {
-    id: '3',
-    name: 'Maître du Journal',
-    description: 'Écrit dans votre journal pendant 14 jours consécutifs',
-    imageUrl: '/badges/journal.png',
+    id: "2",
+    name: "Emotion Master",
+    description: "Record your emotions 30 days in a row",
+    imageUrl: "/badges/emotion-master.png",
     unlocked: true,
     level: 2,
-    category: 'journal',
-    tier: 'gold'
+    category: "emotion"
+  },
+  {
+    id: "3",
+    name: "Journaling Pro",
+    description: "Write in your journal 20 times",
+    imageUrl: "/badges/journal-pro.png",
+    unlocked: false,
+    level: 1,
+    category: "journal"
   }
 ];
 
-// Défis factices pour la démonstration
 export const mockChallenges: Challenge[] = [
   {
-    id: '1',
-    title: 'Explorateur de Bien-être',
-    description: 'Essayez toutes les fonctionnalités disponibles sur EmotionsCare',
-    points: 150,
-    progress: 4,
-    goal: 5,
-    category: 'exploration',
-    completed: false,
-    status: 'en cours'
-  },
-  {
-    id: '2',
-    title: 'Série Journalière',
-    description: 'Écrivez dans votre journal 7 jours consécutifs',
+    id: "ch1",
+    name: "Daily Check-in",
+    title: "Daily Check-in",
+    description: "Connect to the app every day for a week",
     points: 100,
-    progress: 7,
+    progress: 5,
     goal: 7,
-    category: 'journal',
-    completed: true,
-    status: 'terminé'
+    category: "habit",
+    completed: false,
+    status: "in-progress",
+    tags: []
   },
   {
-    id: '3',
-    title: 'Scientifique Émotionnel',
-    description: 'Faites 10 analyses émotionnelles en une semaine',
+    id: "ch2",
+    name: "Emotion Tracking",
+    title: "Emotion Tracking",
+    description: "Track your emotions every day for 5 days",
+    points: 150,
+    progress: 5,
+    goal: 5,
+    category: "emotion",
+    completed: true,
+    status: "completed",
+    tags: []
+  },
+  {
+    id: "ch3",
+    name: "Journaling Challenge",
+    title: "Journaling Challenge",
+    description: "Write in your journal 3 times this week",
     points: 120,
-    progress: 6,
-    goal: 10,
-    category: 'analyse',
+    progress: 1,
+    goal: 3,
+    category: "journal",
     completed: false,
-    status: 'en cours'
+    status: "in-progress",
+    tags: []
   }
 ];
 
-// Données factices pour le tableau de classement
 export const mockLeaderboard: LeaderboardEntry[] = [
   {
-    id: '1',
-    userId: 'user1',
-    name: 'Alexandra M.',
-    avatar: '/avatars/avatar-1.png',
+    id: "l1",
+    userId: "u1",
+    name: "Emma Johnson",
     points: 1250,
     rank: 1,
-    trend: 'up'
+    avatar: "/avatars/avatar-1.png"
   },
   {
-    id: '2',
-    userId: 'user2',
-    name: 'Thomas R.',
-    avatar: '/avatars/avatar-2.png',
-    points: 1120,
-    rank: 2,
-    trend: 'neutral'
-  },
-  {
-    id: '3',
-    userId: 'user3',
-    name: 'Sophie L.',
-    avatar: '/avatars/avatar-3.png',
+    id: "l2",
+    userId: "u2",
+    name: "Thomas Wright",
     points: 980,
+    rank: 2,
+    avatar: "/avatars/avatar-2.png"
+  },
+  {
+    id: "l3",
+    userId: "u3",
+    name: "Sarah Miller",
+    points: 820,
     rank: 3,
-    trend: 'up'
-  },
-  {
-    id: '4',
-    userId: 'user4',
-    name: 'Marc D.',
-    avatar: '/avatars/avatar-4.png',
-    points: 920,
-    rank: 4,
-    trend: 'down'
-  },
-  {
-    id: '5',
-    userId: 'user5',
-    name: 'Émilie P.',
-    avatar: '/avatars/avatar-5.png',
-    points: 850,
-    rank: 5,
-    trend: 'neutral'
-  }
-];
-
-export const mockWeeklyGoals = [
-  {
-    id: '1',
-    title: 'Méditer 10 minutes par jour',
-    progress: 4,
-    total: 7,
-    category: 'méditation'
-  },
-  {
-    id: '2',
-    title: 'Écrire dans le journal 5 jours',
-    progress: 3,
-    total: 5,
-    category: 'journal'
-  },
-  {
-    id: '3',
-    title: 'Compléter 3 sessions de VR',
-    progress: 1,
-    total: 3,
-    category: 'vr'
+    avatar: "/avatars/avatar-3.png"
   }
 ];

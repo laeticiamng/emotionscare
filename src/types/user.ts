@@ -1,5 +1,5 @@
 
-export type UserRole = 'user' | 'admin' | 'b2b_user' | 'b2b_admin' | 'b2c' | 'coach' | 'therapist';
+export type UserRole = 'user' | 'admin' | 'b2b_user' | 'b2b_admin' | 'b2c' | 'coach' | 'therapist' | 'b2b';
 
 export interface User {
   id: string;
@@ -40,6 +40,7 @@ export interface UserPreferences {
     shareData: boolean;
     anonymizeReports: boolean;
     profileVisibility: string;
+    anonymousMode?: boolean;
   };
   notifications?: {
     enabled: boolean;
@@ -53,6 +54,7 @@ export interface UserPreferences {
       journal: boolean;
       community: boolean;
       achievement: boolean;
+      badge?: boolean;
     };
     frequency: string;
     email: boolean;
@@ -71,45 +73,4 @@ export interface UserWithStatus {
   department?: string;
   firstName?: string;
   lastName?: string;
-}
-
-export interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl?: string;
-  image_url?: string;
-  unlocked: boolean;
-  level: number;
-  category: string;
-  tier?: string;
-  icon?: string;
-  earned?: boolean;
-  progress?: number;
-  threshold?: number;
-  completed?: boolean;
-  rarity?: string;
-}
-
-export interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  points: number;
-  progress: number;
-  goal: number;
-  category: string;
-  completed: boolean;
-  status: string;
-  name?: string;
-  totalSteps?: number;
-}
-
-export interface LeaderboardEntry {
-  id: string;
-  userId: string;
-  points: number;
-  rank: number;
-  avatar?: string;
-  name?: string;
 }

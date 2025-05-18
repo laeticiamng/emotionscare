@@ -1,80 +1,113 @@
 
 import { useState, useEffect } from 'react';
-import { Challenge } from '@/types/challenge';
-import { Badge } from '@/types/badge';
-import { mockChallenges, mockBadges, mockLeaderboard } from './mockData';
+import { Badge, Challenge } from '@/types/badge';
+import { mockBadges, mockChallenges } from './mockData';
 
 export interface GamificationStats {
   totalPoints: number;
+  level: number;
+  streakDays: number;
+  nextLevelPoints: number;
   completedChallenges: number;
   totalChallenges: number;
-  earnedBadges: number;
-  rank?: number;
-  level?: number;
-  streakDays?: number;
+  unlockedBadges: number;
+  totalBadges: number;
+  percentageToNextLevel: number;
 }
 
-export function useGamificationStats(userId?: string) {
+export const useGamificationStats = (userId?: string) => {
+  const [badges, setBadges] = useState<Badge[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [stats, setStats] = useState<GamificationStats>({
     totalPoints: 0,
+    level: 1,
+    streakDays: 0,
+    nextLevelPoints: 100,
     completedChallenges: 0,
     totalChallenges: 0,
-    earnedBadges: 0,
-    rank: 0,
-    level: 1,
-    streakDays: 0
+    unlockedBadges: 0,
+    totalBadges: 0,
+    percentageToNextLevel: 0,
   });
-  
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [badges, setBadges] = useState<Badge[]>([]);
-  const [leaderboard, setLeaderboard] = useState(mockLeaderboard);
-  const [isLoading, setIsLoading] = useState(true);
-  
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
-      
       try {
-        // Dans une vraie application, ces données viendraient d'une API
-        // Pour l'instant, on utilise des données mockées
-        setChallenges(mockChallenges);
-        setBadges(mockBadges);
+        setLoading(true);
         
-        // Calcul des statistiques
-        const completedCount = mockChallenges.filter(c => c.completed).length;
-        const totalPoints = mockChallenges.reduce((sum, c) => {
-          return sum + (c.completed ? c.points : 0);
+        // In a real app, this would be API calls
+        // For now, we'll use the mock data
+        const fetchedBadges = [...mockBadges];
+        const fetchedChallenges = [...mockChallenges];
+        
+        setBadges(fetchedBadges);
+        setChallenges(fetchedChallenges);
+        
+        // Calculate stats
+        const totalPoints = fetchedChallenges.reduce((sum, challenge) => {
+          return sum + (challenge.completed ? challenge.points : 0);
         }, 0);
         
-        // Recherche du rang de l'utilisateur
-        const userEntry = mockLeaderboard.find(entry => entry.userId === userId);
+        const level = Math.floor(totalPoints / 100) + 1;
+        const nextLevelPoints = level * 100;
+        const percentageToNextLevel = ((totalPoints % 100) / 100) * 100;
+        
+        const completedChallenges = fetchedChallenges.filter(c => c.completed).length;
+        const unlockedBadges = fetchedBadges.filter(b => b.unlocked).length;
         
         setStats({
           totalPoints,
-          completedChallenges: completedCount,
-          totalChallenges: mockChallenges.length,
-          earnedBadges: mockBadges.length,
-          rank: userEntry?.rank || 0,
-          level: Math.floor(totalPoints / 100) + 1,
-          streakDays: userEntry?.streak || 0
+          level,
+          streakDays: 7, // Mock streak data
+          nextLevelPoints,
+          completedChallenges,
+          totalChallenges: fetchedChallenges.length,
+          unlockedBadges,
+          totalBadges: fetchedBadges.length,
+          percentageToNextLevel,
         });
+        
       } catch (error) {
         console.error('Error fetching gamification data:', error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
     
     fetchData();
   }, [userId]);
-  
-  return {
-    stats,
-    challenges,
-    badges,
-    leaderboard,
-    isLoading
+
+  // Function to complete a challenge
+  const completeChallenge = (challengeId: string) => {
+    setChallenges(prev => 
+      prev.map(challenge => 
+        challenge.id === challengeId 
+          ? { ...challenge, completed: true, status: 'completed' } 
+          : challenge
+      )
+    );
   };
-}
+
+  // Function to unlock a badge
+  const unlockBadge = (badgeId: string) => {
+    setBadges(prev => 
+      prev.map(badge => 
+        badge.id === badgeId 
+          ? { ...badge, unlocked: true } 
+          : badge
+      )
+    );
+  };
+
+  return {
+    badges,
+    challenges,
+    stats,
+    loading,
+    completeChallenge,
+    unlockBadge
+  };
+};
 
 export default useGamificationStats;

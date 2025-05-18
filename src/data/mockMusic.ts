@@ -1,87 +1,96 @@
 
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
-// Mock tracks for development
+// Sample tracks
 export const mockTracks: MusicTrack[] = [
   {
-    id: '1',
-    title: 'Calm Waters',
-    artist: 'Ocean Sounds',
-    duration: 180,
-    url: '/sounds/ambient-calm.mp3',
-    coverUrl: '/images/covers/calm-waters.jpg',
+    id: 'track-1',
+    title: 'Ocean Waves',
+    artist: 'Nature Sounds',
+    duration: 300,
+    url: '/audio/ocean-waves.mp3',
+    audioUrl: '/audio/ocean-waves.mp3',
+    coverUrl: '/images/waves.jpg',
     emotion: 'calm',
     genre: 'ambient',
-    description: 'Gentle sounds of ocean waves'
+    album: 'Relaxation Collection',
+    year: 2023,
+    tags: ['relaxation', 'meditation', 'nature']
   },
   {
-    id: '2',
+    id: 'track-2',
     title: 'Morning Energy',
-    artist: 'Rise Up',
-    duration: 210,
-    url: '/sounds/welcome.mp3',
-    coverUrl: '/images/covers/morning-energy.jpg',
-    emotion: 'joy',
-    genre: 'upbeat',
-    description: 'Start your day with positive energy'
+    artist: 'Positive Vibes',
+    duration: 240,
+    url: '/audio/morning-energy.mp3',
+    audioUrl: '/audio/morning-energy.mp3',
+    coverUrl: '/images/sunrise.jpg',
+    emotion: 'happy',
+    genre: 'electronic',
+    album: 'Daily Boost',
+    year: 2023,
+    tags: ['energetic', 'morning', 'motivation']
   },
   {
-    id: '3',
+    id: 'track-3',
     title: 'Deep Focus',
-    artist: 'Mind Flow',
-    duration: 245,
-    url: '/sounds/ambient-calm.mp3',
-    coverUrl: '/images/covers/deep-focus.jpg',
-    emotion: 'neutral',
-    genre: 'concentration',
-    description: 'Focus and productivity enhancement'
+    artist: 'Concentration',
+    duration: 360,
+    url: '/audio/deep-focus.mp3',
+    audioUrl: '/audio/deep-focus.mp3',
+    coverUrl: '/images/focus.jpg',
+    emotion: 'focus',
+    genre: 'minimal',
+    album: 'Productivity Series',
+    year: 2022,
+    tags: ['focus', 'work', 'study']
   },
   {
-    id: '4',
-    title: 'Evening Relaxation',
-    artist: 'Twilight Dreams',
-    duration: 320,
-    url: '/sounds/ambient-calm.mp3',
-    coverUrl: '/images/covers/evening-relax.jpg',
+    id: 'track-4',
+    title: 'Tranquil Rain',
+    artist: 'Nature Sounds',
+    duration: 420,
+    url: '/audio/rain.mp3',
+    audioUrl: '/audio/rain.mp3',
+    coverUrl: '/images/rain.jpg',
     emotion: 'calm',
-    genre: 'relaxation',
-    description: 'Wind down after a long day'
+    genre: 'ambient',
+    album: 'Sleep Sounds',
+    year: 2023,
+    tags: ['sleep', 'relaxation', 'nature']
   }
 ];
 
-// Mock playlists for development
+// Sample playlists
 export const mockPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-1',
-    title: 'Calm Emotions',
-    name: 'Calm Emotions',
-    description: 'Perfect for relaxation and unwinding',
+    name: 'Relaxation Collection',
+    description: 'Calm your mind and body with these soothing tracks',
+    tracks: [mockTracks[0], mockTracks[3]],
     emotion: 'calm',
-    tracks: mockTracks.filter(track => track.emotion === 'calm'),
-    coverUrl: '/images/covers/calm-playlist.jpg',
-    createdAt: new Date().toISOString()
+    coverUrl: '/images/relaxation.jpg',
+    tags: ['relaxation', 'calm', 'meditation'],
+    created_at: '2023-10-05T14:48:00.000Z'
   },
   {
     id: 'playlist-2',
-    title: 'Positive Energy',
-    name: 'Positive Energy',
-    description: 'Boost your mood with these tracks',
-    emotion: 'joy',
-    tracks: mockTracks.filter(track => track.emotion === 'joy'),
-    coverUrl: '/images/covers/joy-playlist.jpg',
-    createdAt: new Date().toISOString()
+    name: 'Productivity Boost',
+    description: 'Music to help you focus and get things done',
+    tracks: [mockTracks[2]],
+    emotion: 'focus',
+    coverUrl: '/images/productivity.jpg',
+    tags: ['focus', 'work', 'productivity'],
+    created_at: '2023-09-15T09:30:00.000Z'
+  },
+  {
+    id: 'playlist-3',
+    name: 'Morning Motivation',
+    description: 'Start your day with positive energy',
+    tracks: [mockTracks[1]],
+    emotion: 'happy',
+    coverUrl: '/images/morning.jpg',
+    tags: ['morning', 'motivation', 'positive'],
+    created_at: '2023-10-01T07:15:00.000Z'
   }
 ];
-
-// Helper functions
-export const getTrackById = (id: string): MusicTrack | undefined => {
-  return mockTracks.find(track => track.id === id);
-};
-
-export const getPlaylistById = (id: string): MusicPlaylist | undefined => {
-  return mockPlaylists.find(playlist => playlist.id === id);
-};
-
-export const getPlaylistsByEmotion = (emotion: string): MusicPlaylist[] => {
-  return mockPlaylists.filter(playlist => playlist.emotion === emotion);
-};

@@ -6,40 +6,37 @@ export interface Badge {
   imageUrl?: string;
   image_url?: string;
   unlocked: boolean;
-  unlocked_at?: string;
-  unlockedAt?: string;
-  level?: number;
-  category?: string;
+  level: number;
+  category: string;
   tier?: string;
   icon?: string;
-  progress?: number;
-  total?: number;
-  user_id?: string;
-  awarded_at?: string;
-  achieved?: boolean;
   earned?: boolean;
+  progress?: number;
   threshold?: number;
-  rarity?: string;
   completed?: boolean;
+  rarity?: string;
 }
 
 export interface Challenge {
   id: string;
-  name: string;
-  title?: string;
+  title: string;
+  name?: string; // Added to satisfy type requirements
   description: string;
   points: number;
-  progress?: number;
-  goal?: number;
-  total?: number;
+  progress: number;
+  goal: number;
+  category: string;
+  completed: boolean;
+  status: string;
   totalSteps?: number;
-  completed?: boolean;
-  deadline?: string;
-  imageUrl?: string;
-  category?: string;
-  difficulty?: 'easy' | 'medium' | 'hard';
-  badge_id?: string;
-  user_id?: string;
-  status?: string;
-  completions?: number;
+  tags?: string[]; // Added to satisfy import requirements
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  points: number;
+  rank: number;
+  avatar?: string;
+  name?: string;
 }

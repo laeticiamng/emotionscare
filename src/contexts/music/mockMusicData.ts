@@ -1,96 +1,83 @@
 
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
-// Mock tracks for testing purposes
 export const mockMusicTracks: MusicTrack[] = [
   {
-    id: 'track-001',
-    title: 'Calm Waters',
-    artist: 'Ambient Sounds',
-    album: 'Nature Sounds',
+    id: "1",
+    title: "Calming Waves",
+    artist: "Ocean Sounds",
     duration: 180,
-    url: 'https://example.com/sounds/calm-waters.mp3',
-    coverUrl: 'https://example.com/images/calm-waters.jpg',
-    coverImage: 'https://example.com/images/calm-waters.jpg',
-    cover: 'https://example.com/images/calm-waters.jpg',
-    genre: 'ambient',
-    emotion: 'calm',
-    description: 'Relaxing sounds of gentle waves on a peaceful shore'
+    audioUrl: "/audio/calming-waves.mp3",
+    coverUrl: "/images/ocean.jpg",
+    emotion: "calm",
+    category: "nature",
+    tags: ["relaxation", "sleep", "meditation"],
+    genre: "ambient",
+    album: "Nature Sounds Vol.1",
+    year: 2023
   },
   {
-    id: 'track-002',
-    title: 'Morning Energy',
-    artist: 'Dawn Breakers',
-    album: 'Sunrise',
+    id: "2",
+    title: "Happy Morning",
+    artist: "Sunrise Vibes",
     duration: 210,
-    url: 'https://example.com/sounds/morning-energy.mp3',
-    coverUrl: 'https://example.com/images/sunrise.jpg',
-    coverImage: 'https://example.com/images/sunrise.jpg',
-    cover: 'https://example.com/images/sunrise.jpg',
-    genre: 'uplifting',
-    emotion: 'energized',
-    description: 'Start your day with this energetic composition'
+    audioUrl: "/audio/happy-morning.mp3",
+    coverUrl: "/images/sunrise.jpg",
+    emotion: "happy",
+    category: "upbeat",
+    tags: ["morning", "motivation", "positive"],
+    genre: "acoustic",
+    album: "Morning Playlist",
+    year: 2023
   },
   {
-    id: 'track-003',
-    title: 'Deep Focus',
-    artist: 'Concentration Sounds',
-    album: 'Focus',
+    id: "3",
+    title: "Focus Flow",
+    artist: "Mind Clarity",
     duration: 240,
-    url: 'https://example.com/sounds/deep-focus.mp3',
-    coverUrl: 'https://example.com/images/focus.jpg',
-    coverImage: 'https://example.com/images/focus.jpg',
-    cover: 'https://example.com/images/focus.jpg',
-    genre: 'electronic',
-    emotion: 'focused',
-    description: 'Enhanced concentration with deep electronic beats'
+    audioUrl: "/audio/focus-flow.mp3",
+    coverUrl: "/images/focus.jpg",
+    emotion: "focus",
+    category: "productivity",
+    tags: ["concentration", "work", "study"],
+    genre: "electronic",
+    album: "Deep Focus",
+    year: 2023
   }
 ];
 
-// Mock playlists for testing purposes
 export const mockPlaylists: MusicPlaylist[] = [
   {
-    id: 'playlist-001',
-    title: 'Relaxation',
-    name: 'Relaxation Playlist',
-    description: 'A collection of relaxing sounds to help you unwind',
-    coverUrl: 'https://example.com/images/relaxation.jpg',
-    tracks: mockMusicTracks.filter(track => track.emotion === 'calm'),
-    emotion: 'calm'
+    id: "playlist-calm",
+    name: "Calming Collection",
+    description: "Peaceful sounds to help you relax and unwind",
+    tracks: mockMusicTracks.filter(track => track.emotion === "calm" || track.category === "nature"),
+    emotion: "calm",
+    category: "relaxation",
+    coverUrl: "/images/playlist-calm.jpg",
+    coverImage: "/images/playlist-calm.jpg",
+    tags: ["relax", "peace", "meditation"]
   },
   {
-    id: 'playlist-002',
-    title: 'Energy Boost',
-    name: 'Energy Boost Playlist',
-    description: 'Uplifting tracks to boost your energy levels',
-    coverUrl: 'https://example.com/images/energy.jpg',
-    tracks: mockMusicTracks.filter(track => track.emotion === 'energized'),
-    emotion: 'energized'
+    id: "playlist-happy",
+    name: "Happiness Boost",
+    description: "Upbeat tracks to brighten your mood",
+    tracks: mockMusicTracks.filter(track => track.emotion === "happy" || track.category === "upbeat"),
+    emotion: "happy",
+    category: "mood",
+    coverUrl: "/images/playlist-happy.jpg",
+    coverImage: "/images/playlist-happy.jpg",
+    tags: ["happy", "energy", "positive"]
   },
   {
-    id: 'playlist-003',
-    title: 'Focus Zone',
-    name: 'Focus Zone Playlist',
-    description: 'Enhance your concentration and productivity',
-    coverUrl: 'https://example.com/images/focus.jpg',
-    tracks: mockMusicTracks.filter(track => track.emotion === 'focused'),
-    emotion: 'focused'
-  },
-  {
-    id: 'playlist-004',
-    title: 'Mixed Emotions',
-    name: 'Mixed Emotions Playlist',
-    description: 'A varied collection for all moods',
-    coverUrl: 'https://example.com/images/mixed.jpg',
-    tracks: mockMusicTracks,
-    emotion: 'mixed'
+    id: "playlist-focus",
+    name: "Deep Concentration",
+    description: "Music designed to help you focus and be productive",
+    tracks: mockMusicTracks.filter(track => track.emotion === "focus" || track.category === "productivity"),
+    emotion: "focus",
+    category: "productivity",
+    coverUrl: "/images/playlist-focus.jpg",
+    coverImage: "/images/playlist-focus.jpg",
+    tags: ["focus", "work", "concentration"]
   }
 ];
-
-// Helper function to get mock music data
-export const getMockMusicData = () => {
-  return {
-    mockMusicTracks,
-    mockPlaylists
-  };
-};

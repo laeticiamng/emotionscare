@@ -1,88 +1,109 @@
 
-import { ThemeName, FontFamily, FontSize } from './theme';
+import { FontFamily, FontSize, ThemeName } from './theme';
 
-// Valeur par défaut pour les préférences utilisateur
+export interface NotificationPreference {
+  enabled: boolean;
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  inAppEnabled: boolean;
+  types: {
+    system: boolean;
+    emotion: boolean;
+    coach: boolean;
+    journal: boolean;
+    community: boolean;
+    achievement: boolean;
+    badge?: boolean; // Added for backward compatibility
+  };
+  frequency: string;
+  email: boolean;
+  push: boolean;
+  sms?: boolean;
+  inApp?: boolean;
+}
+
+export interface PrivacyPreference {
+  shareData?: boolean;
+  anonymizeReports?: boolean;
+  profileVisibility?: string;
+  shareActivity?: boolean;
+  shareJournal?: boolean;
+  publicProfile?: boolean;
+  anonymousMode?: boolean; // Added missing field
+}
+
 export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'system',
   language: 'fr',
   notifications_enabled: true,
   email_notifications: false,
-  fontFamily: 'system',
   fontSize: 'medium',
-  reduceMotion: false,
-  soundEnabled: true,
-  ambientSound: 'nature',
-  colorBlindMode: false,
-  autoplayMedia: false,
-  privacy: {
-    shareActivity: false,
-    shareJournal: false,
-    publicProfile: false,
-    shareData: false,
-    anonymizeReports: false,
-    profileVisibility: 'private'
+  fontFamily: 'system',
+  notifications: {
+    enabled: true,
+    emailEnabled: false,
+    pushEnabled: true,
+    inAppEnabled: true,
+    types: {
+      system: true,
+      emotion: true,
+      coach: true,
+      journal: true,
+      community: true,
+      achievement: true,
+    },
+    frequency: 'normal',
+    email: false,
+    push: true,
+    sms: false,
+    inApp: true,
   },
+  privacy: {
+    shareData: true,
+    anonymizeReports: false,
+    profileVisibility: 'public',
+    anonymousMode: false
+  },
+  soundEnabled: true,
+  reduceMotion: false,
+  colorBlindMode: false,
+  useSystemTheme: true,
+  highContrast: false,
   onboardingCompleted: false,
-  // Propriétés supplémentaires pour les fonctionnalités premium
-  emotionalCamouflage: false,
-  aiSuggestions: false,
-  // Propriétés pour l'identité
-  avatarUrl: '',
-  displayName: '',
-  pronouns: '',
-  biography: '',
+  dashboardLayout: {},
+  ambientSound: 'nature'
 };
 
 export interface UserPreferences {
-  theme: ThemeName;
-  language: string;
-  notifications_enabled: boolean;
-  email_notifications: boolean;
-  fontFamily?: FontFamily;
+  theme?: ThemeName;
   fontSize?: FontSize;
+  fontFamily?: FontFamily;
+  useSystemTheme?: boolean;
+  highContrast?: boolean;
   reduceMotion?: boolean;
-  soundEnabled?: boolean;
-  dashboardLayout?: Record<string, any>;
-  privacy?: {
-    shareActivity?: boolean;
-    shareJournal?: boolean;
-    publicProfile?: boolean;
-    shareData?: boolean;
-    anonymizeReports?: boolean;
-    profileVisibility?: string;
-  };
-  onboardingCompleted?: boolean;
-  ambientSound?: string;
   colorBlindMode?: boolean;
+  soundEnabled?: boolean;
+  language?: string;
+  timeZone?: string;
+  dateFormat?: string;
+  notifications_enabled?: boolean;
+  email_notifications?: boolean;
   autoplayMedia?: boolean;
-  notifications?: {
-    enabled?: boolean;
-    emailEnabled?: boolean;
-    pushEnabled?: boolean;
-    inAppEnabled?: boolean;
-    types?: Record<string, boolean>;
-    frequency?: string;
-    email?: boolean;
-    push?: boolean;
-    sms?: boolean;
-    inApp?: boolean;
-  };
-  // Propriétés supplémentaires pour les fonctionnalités premium
+  dashboardLayout?: Record<string, any> | string;
+  onboardingCompleted?: boolean;
+  showTips?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
-  // Propriétés pour l'identité de l'utilisateur
-  avatarUrl?: string;
-  displayName?: string;
-  pronouns?: string;
-  biography?: string;
+  ambientSound?: string;
+  
+  // Structured preferences
+  notifications?: NotificationPreference;
+  privacy?: PrivacyPreference;
 }
 
 export interface UserPreferencesContextType {
   preferences: UserPreferences;
-  updatePreferences: (newPreferences: Partial<UserPreferences>) => Promise<void>;
+  updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
   isLoading: boolean;
   error: Error | null;
 }
-
-// Exporter FontFamily et FontSize pour les composants qui les importent directement
-export { FontFamily, FontSize } from './theme';

@@ -21,6 +21,7 @@ export interface MusicTrack {
   year?: number;
   created_at?: string;
   mood?: string;
+  description?: string; // Added description field
 }
 
 export interface MusicPlaylist {
@@ -33,9 +34,12 @@ export interface MusicPlaylist {
   category?: string;
   coverUrl?: string;
   cover?: string;
+  coverImage?: string; // Added coverImage field
   tags?: string[];
   mood?: string;
   created_at?: string;
+  createdAt?: string; // Added for backward compatibility
+  createdBy?: string;
 }
 
 export interface EmotionMusicParams {
@@ -69,14 +73,12 @@ export interface MusicContextType {
   loadPlaylistForEmotion: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
   setOpenDrawer: (open: boolean) => void;
   toggleMute: () => void;
-  // Méthodes additionnelles nécessaires
   setCurrentTrack?: (track: MusicTrack) => void;
   setPlaylist?: (playlist: MusicPlaylist | MusicTrack[]) => void;
   getRecommendationByEmotion?: (params: EmotionMusicParams | string) => Promise<MusicPlaylist>;
   generateMusic?: (prompt: string) => Promise<MusicTrack | null>;
 }
 
-// Exportons le reste des interfaces telles quelles
 export interface MusicDrawerProps {
   children?: React.ReactNode;
   isOpen?: boolean;

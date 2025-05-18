@@ -1,80 +1,82 @@
 
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
-// Exemples de pistes musicales
-export const musicTracks: MusicTrack[] = [
+// Sample tracks
+export const tracks: MusicTrack[] = [
   {
-    id: 'track-001',
-    title: 'Calm Waters',
-    artist: 'Ambient Sounds',
-    album: 'Nature Sounds',
-    duration: 180,
-    url: '/sounds/calm-waters.mp3',
-    coverUrl: '/images/calm-waters.jpg',
-    genre: 'ambient',
+    id: 'track-1',
+    title: 'Ocean Waves',
+    artist: 'Nature Sounds',
+    duration: 300,
+    url: '/audio/ocean-waves.mp3',
+    audioUrl: '/audio/ocean-waves.mp3',
+    coverUrl: '/images/waves.jpg',
     emotion: 'calm',
-    description: 'Relaxing water sounds'
+    genre: 'ambient',
+    album: 'Relaxation Collection',
+    year: 2023,
+    tags: ['relaxation', 'meditation', 'nature']
   },
   {
-    id: 'track-002',
+    id: 'track-2',
     title: 'Morning Energy',
-    artist: 'Dawn Breakers',
-    album: 'Sunrise',
-    duration: 210,
-    url: '/sounds/morning-energy.mp3',
+    artist: 'Positive Vibes',
+    duration: 240,
+    url: '/audio/morning-energy.mp3',
+    audioUrl: '/audio/morning-energy.mp3',
     coverUrl: '/images/sunrise.jpg',
-    genre: 'uplifting',
-    emotion: 'energized',
-    description: 'Start your day with energy'
+    emotion: 'happy',
+    genre: 'electronic',
+    album: 'Daily Boost',
+    year: 2023,
+    tags: ['energetic', 'morning', 'motivation']
   },
   {
-    id: 'track-003',
+    id: 'track-3',
     title: 'Deep Focus',
-    artist: 'Concentration Sounds',
-    album: 'Focus',
-    duration: 240,
-    url: '/sounds/deep-focus.mp3',
+    artist: 'Concentration',
+    duration: 360,
+    url: '/audio/deep-focus.mp3',
+    audioUrl: '/audio/deep-focus.mp3',
     coverUrl: '/images/focus.jpg',
-    genre: 'electronic',
-    emotion: 'focused',
-    description: 'Improve your concentration'
-  },
+    emotion: 'focus',
+    genre: 'minimal',
+    album: 'Productivity Series',
+    year: 2022,
+    tags: ['focus', 'work', 'study']
+  }
 ];
 
-// Exemples de playlists
-const calmTracks = musicTracks.filter(track => track.emotion === 'calm');
-const energizedTracks = musicTracks.filter(track => track.emotion === 'energized');
-const focusedTracks = musicTracks.filter(track => track.emotion === 'focused');
-
-export const musicPlaylists: MusicPlaylist[] = [
+// Sample playlists
+export const playlists: MusicPlaylist[] = [
   {
-    id: 'playlist-001',
-    title: 'Détente profonde',
-    name: 'Relaxation',
-    description: 'Une sélection pour vous aider à vous détendre',
-    coverUrl: '/images/calm-waters.jpg',
-    tracks: calmTracks,
+    id: 'playlist-1',
+    name: 'Relaxation Collection',
+    description: 'Calm your mind and body with these soothing tracks',
+    tracks: [tracks[0]],
     emotion: 'calm',
-    createdAt: new Date().toISOString()
+    coverUrl: '/images/relaxation.jpg',
+    tags: ['relaxation', 'calm', 'meditation'],
+    created_at: '2023-10-05T14:48:00.000Z'
   },
   {
-    id: 'playlist-002',
-    title: 'Boost d\'énergie',
-    name: 'Energie du matin',
-    description: 'Pour bien commencer la journée',
-    coverUrl: '/images/sunrise.jpg',
-    tracks: energizedTracks,
-    emotion: 'energized',
-    createdAt: new Date().toISOString()
+    id: 'playlist-2',
+    name: 'Productivity Boost',
+    description: 'Music to help you focus and get things done',
+    tracks: [tracks[2]],
+    emotion: 'focus',
+    coverUrl: '/images/productivity.jpg',
+    tags: ['focus', 'work', 'productivity'],
+    created_at: '2023-09-15T09:30:00.000Z'
   },
   {
-    id: 'playlist-003',
-    title: 'Focus intense',
-    name: 'Concentration',
-    description: 'Pour rester concentré dans votre travail',
-    coverUrl: '/images/focus.jpg',
-    tracks: focusedTracks,
-    emotion: 'focused',
-    createdAt: new Date().toISOString()
-  },
+    id: 'playlist-3',
+    name: 'Morning Motivation',
+    description: 'Start your day with positive energy',
+    tracks: [tracks[1]],
+    emotion: 'happy',
+    coverUrl: '/images/morning.jpg',
+    tags: ['morning', 'motivation', 'positive'],
+    created_at: '2023-09-01T07:15:00.000Z'
+  }
 ];

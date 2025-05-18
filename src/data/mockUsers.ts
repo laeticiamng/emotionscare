@@ -1,26 +1,78 @@
 
-import { User, UserPreferences } from '@/types/types';
+import { User, UserRole } from '@/types/user';
 
-export const MOCK_USERS: User[] = [
+export const mockUsers: User[] = [
   {
-    id: 'user-1',
-    email: 'sarah.martin@example.com',
-    name: 'Sarah Martin',
-    language: 'fr',
+    id: '1',
+    email: 'johndoe@example.com',
+    name: 'John Doe',
     role: 'b2c',
-    createdAt: '2023-09-01T10:00:00Z',
-    lastLoginAt: '2023-09-15T14:30:00Z',
-    subscriptionTier: 'premium',
-    status: 'active',
+    created_at: '2023-09-01T10:00:00Z',
+    emotional_score: 75,
+    avatar_url: '/avatars/avatar-01.png',
     preferences: {
-      theme: 'light',
+      theme: 'system',
+      language: 'fr',
+      notifications_enabled: true,
+      email_notifications: false,
       fontSize: 'medium',
       fontFamily: 'system',
       reduceMotion: false,
       colorBlindMode: false,
-      autoplayMedia: true,
       soundEnabled: true,
-      onboardingCompleted: true,
+      dashboardLayout: {
+        kpis: ['emotions', 'activities', 'streak'],
+        widgets: ['journal', 'music', 'social']
+      },
+      notifications: {
+        enabled: true,
+        emailEnabled: false,
+        pushEnabled: true,
+        inAppEnabled: true,
+        types: {
+          system: true,
+          emotion: true,
+          coach: true,
+          journal: true,
+          community: true,
+          achievement: true
+        },
+        frequency: 'daily',
+        email: false,
+        push: true,
+        sms: false
+      },
+      privacy: {
+        shareData: true,
+        anonymizeReports: false,
+        profileVisibility: 'public'
+      }
+    }
+  },
+  {
+    id: '2',
+    email: 'alice@example.com',
+    name: 'Alice Smith',
+    role: 'b2b_user',
+    created_at: '2023-08-15T14:30:00Z',
+    emotional_score: 82,
+    department: 'Marketing',
+    job_title: 'Content Manager',
+    avatar_url: '/avatars/avatar-02.png',
+    preferences: {
+      theme: 'light',
+      language: 'en',
+      notifications_enabled: true,
+      email_notifications: true,
+      fontSize: 'large',
+      fontFamily: 'sans',
+      reduceMotion: true,
+      colorBlindMode: false,
+      soundEnabled: false,
+      dashboardLayout: {
+        kpis: ['emotions', 'team', 'activities'],
+        widgets: ['journal', 'goals', 'music']
+      },
       notifications: {
         enabled: true,
         emailEnabled: true,
@@ -32,55 +84,44 @@ export const MOCK_USERS: User[] = [
           coach: true,
           journal: true,
           community: true,
-          achievement: true,
-          badge: true,
-          challenge: true,
-          reminder: true,
-          info: true,
-          warning: true,
-          error: true,
-          success: true,
-          streak: true,
-          urgent: true
+          achievement: true
         },
-        frequency: 'immediate'
+        frequency: 'weekly',
+        email: true,
+        push: true,
+        sms: false
       },
       privacy: {
-        shareData: true,
-        anonymizeReports: false,
-        profileVisibility: 'public'
+        shareData: false,
+        anonymizeReports: true,
+        profileVisibility: 'connections'
       }
-    },
-    stats: {
-      emotionalScansCompleted: 47,
-      journalEntriesCount: 32,
-      sessionsCount: 28,
-      consecutiveDays: 14,
-      totalPointsEarned: 1250,
-      challengesCompleted: 8,
-      badgesEarned: 6,
-      accountAgeInDays: 130
     }
   },
   {
-    id: 'user-2',
-    email: 'thomas.dubois@example.com',
-    name: 'Thomas Dubois',
-    language: 'fr',
-    role: 'b2c',
-    createdAt: '2023-08-15T10:00:00Z',
-    lastLoginAt: '2023-09-14T18:20:00Z',
-    subscriptionTier: 'free',
-    status: 'active',
+    id: '3',
+    email: 'robert@example.com',
+    name: 'Robert Johnson',
+    role: 'b2b_admin',
+    created_at: '2023-07-20T09:15:00Z',
+    emotional_score: 68,
+    department: 'Human Resources',
+    job_title: 'HR Director',
+    avatar_url: '/avatars/avatar-03.png',
     preferences: {
       theme: 'dark',
-      fontSize: 'large',
-      fontFamily: 'sans',
-      reduceMotion: true,
+      language: 'fr',
+      notifications_enabled: true,
+      email_notifications: true,
+      fontSize: 'medium',
+      fontFamily: 'serif',
+      reduceMotion: false,
       colorBlindMode: false,
-      autoplayMedia: false,
       soundEnabled: true,
-      onboardingCompleted: true,
+      dashboardLayout: {
+        kpis: ['team_health', 'alerts', 'productivity'],
+        widgets: ['reports', 'team_overview', 'schedule']
+      },
       notifications: {
         enabled: true,
         emailEnabled: true,
@@ -90,60 +131,44 @@ export const MOCK_USERS: User[] = [
           system: true,
           emotion: true,
           coach: false,
-          journal: true,
+          journal: false,
           community: true,
-          achievement: true,
-          badge: true,
-          challenge: true,
-          reminder: true,
-          info: true,
-          warning: true,
-          error: true,
-          success: true,
-          streak: true,
-          urgent: true
+          achievement: true
         },
-        frequency: 'daily'
+        frequency: 'daily',
+        email: true,
+        push: false,
+        sms: false
       },
       privacy: {
-        shareData: false,
-        anonymizeReports: true,
-        profileVisibility: 'private'
+        shareData: true,
+        anonymizeReports: false,
+        profileVisibility: 'team'
       }
-    },
-    stats: {
-      emotionalScansCompleted: 28,
-      journalEntriesCount: 14,
-      sessionsCount: 23,
-      consecutiveDays: 5,
-      totalPointsEarned: 720,
-      challengesCompleted: 4,
-      badgesEarned: 3,
-      accountAgeInDays: 147
     }
   },
   {
-    id: 'user-3',
-    email: 'emma.lefebvre@company.com',
-    name: 'Emma Lefebvre',
-    language: 'fr',
-    role: 'b2b',
-    createdAt: '2023-07-20T10:00:00Z',
-    lastLoginAt: '2023-09-15T09:45:00Z',
-    companyId: 'company-1',
-    department: 'Marketing',
-    position: 'Chef de projet',
-    subscriptionTier: 'enterprise',
-    status: 'active',
+    id: '4',
+    email: 'emma@example.com',
+    name: 'Emma Wilson',
+    role: 'admin',
+    created_at: '2023-06-05T11:45:00Z',
+    emotional_score: 90,
+    avatar_url: '/avatars/avatar-04.png',
     preferences: {
       theme: 'system',
-      fontSize: 'medium',
-      fontFamily: 'serif',
+      language: 'fr',
+      notifications_enabled: true,
+      email_notifications: true,
+      fontSize: 'small',
+      fontFamily: 'system',
       reduceMotion: false,
-      colorBlindMode: false,
-      autoplayMedia: true,
+      colorBlindMode: true,
       soundEnabled: true,
-      onboardingCompleted: true,
+      dashboardLayout: {
+        kpis: ['users', 'activity', 'content'],
+        widgets: ['admin_tools', 'analytics', 'logs']
+      },
       notifications: {
         enabled: true,
         emailEnabled: true,
@@ -155,41 +180,20 @@ export const MOCK_USERS: User[] = [
           coach: true,
           journal: true,
           community: true,
-          achievement: true,
-          badge: true,
-          challenge: true,
-          reminder: true,
-          info: true,
-          warning: true,
-          error: true,
-          success: true,
-          streak: true,
-          urgent: true
+          achievement: true
         },
-        frequency: 'immediate'
+        frequency: 'immediate',
+        email: true,
+        push: true,
+        sms: true
       },
       privacy: {
         shareData: true,
-        anonymizeReports: true,
-        profileVisibility: 'team'
+        anonymizeReports: false,
+        profileVisibility: 'private'
       }
-    },
-    stats: {
-      emotionalScansCompleted: 65,
-      journalEntriesCount: 42,
-      sessionsCount: 38,
-      consecutiveDays: 21,
-      totalPointsEarned: 1780,
-      challengesCompleted: 12,
-      badgesEarned: 9,
-      accountAgeInDays: 173
-    },
-    teamData: {
-      teamId: 'team-1',
-      teamName: 'Équipe Marketing',
-      role: 'member',
-      teamSize: 8,
-      teamHealthScore: 78
     }
   }
 ];
+
+export default mockUsers;

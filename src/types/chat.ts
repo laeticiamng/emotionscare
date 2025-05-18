@@ -1,32 +1,27 @@
 
 export interface ChatMessage {
   id: string;
-  text: string;
-  sender: "system" | "user" | "assistant";
-  timestamp: string;
   conversation_id: string;
-  read?: boolean;
-  metadata?: Record<string, any>;
-  // Add these properties to fix ChatInterface errors
-  role?: "system" | "user" | "assistant";
-  content?: string;
+  content: string;
+  text: string; // Alternative property name for content
+  sender: "user" | "system" | "assistant";
+  role: string; // For OpenAI compatibility
+  timestamp: string;
+  isError?: boolean; // Optional property for error messages
 }
 
 export interface ChatConversation {
   id: string;
   title: string;
-  last_message?: string;
+  user_id: string;
   created_at: string;
   updated_at: string;
-  user_id: string;
+  last_message?: string;
   messages?: ChatMessage[];
-  metadata?: Record<string, any>;
 }
 
 export interface ChatResponse {
   id: string;
   content: string;
-  role: string;
-  timestamp: string;
-  metadata?: Record<string, any>;
+  created_at: string;
 }

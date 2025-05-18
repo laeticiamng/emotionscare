@@ -1,250 +1,192 @@
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
-import { FontSize, FontFamily, UserPreferences } from '@/types/preferences';
+import { UserPreferences } from '@/types';
+import DisplayPreferences from './DisplayPreferences';
+import NotificationsPreferences from './NotificationsPreferences';
+import DataPrivacySettings from './DataPrivacySettings';
 
 interface PreferencesFormProps {
-  className?: string;
+  onClose?: () => void;
 }
 
-const PreferencesForm: React.FC<PreferencesFormProps> = ({ className }) => {
-  const { preferences, updatePreferences } = useUserPreferences();
-  const [formValues, setFormValues] = useState<UserPreferences>(preferences);
-
-  const handleThemeChange = (theme: 'light' | 'dark' | 'system' | 'pastel') => {
-    setFormValues(prev => ({ ...prev, theme }));
+const PreferencesForm: React.FC<PreferencesFormProps> = ({ onClose }) => {
+  const { preferences, updatePreferences, isLoading } = useUserPreferences();
+  
+  // Make sure we have default values for all properties
+  const defaultValues: UserPreferences = {
+    ...preferences,
+    notifications: {
+      enabled: true,
+      emailEnabled: false,
+      pushEnabled: true,
+      inAppEnabled: true,
+      types: {
+        system: true,
+        emotion: true,
+        coach: true,
+        journal: true,
+        community: true,
+        achievement: true,
+      },
+      frequency: 'normal',
+      email: false,
+      push: true,
+      sms: false,
+    },
+    privacy: {
+      shareData: true,
+      anonymizeReports: false,
+      profileVisibility: 'public',
+      shareActivity: true,
+      shareJournal: false,
+      publicProfile: true,
+      anonymousMode: false,
+    },
+    theme: preferences.theme || 'system',
+    fontSize: preferences.fontSize || 'medium',
+    fontFamily: preferences.fontFamily || 'system',
+    language: preferences.language || 'fr',
+    soundEnabled: preferences.soundEnabled !== undefined ? preferences.soundEnabled : true,
+    reduceMotion: preferences.reduceMotion || false,
+    colorBlindMode: preferences.colorBlindMode || false,
   };
+  
+  const form = useForm<UserPreferences>({
+    defaultValues,
+  });
 
-  const handleFontSizeChange = (fontSize: FontSize) => {
-    setFormValues(prev => ({ ...prev, fontSize }));
-  };
-
-  const handleFontFamilyChange = (fontFamily: FontFamily) => {
-    setFormValues(prev => ({ ...prev, fontFamily }));
-  };
-
-  const handleToggleChange = (key: keyof UserPreferences, value: boolean) => {
-    setFormValues(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handlePrivacyChange = (key: string, value: boolean) => {
-    setFormValues(prev => ({
-      ...prev,
-      privacy: {
-        ...prev.privacy,
-        [key]: value
-      }
-    }));
-  };
-
-  const handleNotificationChange = (key: string, value: boolean) => {
-    if (key === 'enabled' || key === 'emailEnabled' || key === 'pushEnabled' || key === 'inAppEnabled') {
-      setFormValues(prev => ({
-        ...prev,
-        notifications: {
-          ...prev.notifications,
-          [key]: value
-        }
-      }));
-    } else {
-      setFormValues(prev => ({
-        ...prev,
-        notifications: {
-          ...prev.notifications,
-          types: {
-            ...prev.notifications.types,
-            [key]: value
-          }
-        }
-      }));
+  const onSubmit = async (data: UserPreferences) => {
+    try {
+      await updatePreferences(data);
+      if (onClose) onClose();
+    } catch (error) {
+      console.error("Failed to update preferences:", error);
     }
   };
 
-  const handleSave = () => {
-    updatePreferences(formValues);
-    // Afficher une notification de succès
-  };
+  // Form sections
+  const renderGeneralSection = () => (
+    <div className="space-y-4">
+      <FormField
+        control={form.control}
+        name="soundEnabled"
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+            <div className="space-y-0.5">
+              <FormLabel>Sons de l'application</FormLabel>
+              <FormDescription>
+                Activer les sons et effets sonores
+              </FormDescription>
+            </div>
+            <FormControl>
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={isLoading}
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      
+      <FormField
+        control={form.control}
+        name="reduceMotion"
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+            <div className="space-y-0.5">
+              <FormLabel>Réduire les animations</FormLabel>
+              <FormDescription>
+                Désactiver ou réduire les animations de l'interface
+              </FormDescription>
+            </div>
+            <FormControl>
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={isLoading}
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      
+      <FormField
+        control={form.control}
+        name="colorBlindMode"
+        render={({ field }) => (
+          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+            <div className="space-y-0.5">
+              <FormLabel>Mode daltonien</FormLabel>
+              <FormDescription>
+                Optimiser les couleurs pour différents types de daltonisme
+              </FormDescription>
+            </div>
+            <FormControl>
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={isLoading}
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+    </div>
+  );
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle>Préférences</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Préférences d'affichage */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Affichage</h3>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pb-10">
+        <Tabs defaultValue="display" className="w-full">
+          <TabsList className="grid grid-cols-4 mb-4">
+            <TabsTrigger value="display">Affichage</TabsTrigger>
+            <TabsTrigger value="general">Général</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
+          </TabsList>
           
-          <div className="space-y-2">
-            <Label htmlFor="theme">Thème</Label>
-            <Select value={formValues.theme} onValueChange={(value: any) => handleThemeChange(value)}>
-              <SelectTrigger id="theme">
-                <SelectValue placeholder="Sélectionner un thème" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">Clair</SelectItem>
-                <SelectItem value="dark">Sombre</SelectItem>
-                <SelectItem value="system">Système</SelectItem>
-                <SelectItem value="pastel">Pastel</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <TabsContent value="display" className="space-y-4">
+            <DisplayPreferences control={form.control} isLoading={isLoading} />
+          </TabsContent>
           
-          <div className="space-y-2">
-            <Label htmlFor="fontSize">Taille de police</Label>
-            <Select value={formValues.fontSize} onValueChange={(value: any) => handleFontSizeChange(value)}>
-              <SelectTrigger id="fontSize">
-                <SelectValue placeholder="Sélectionner une taille" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="small">Petite</SelectItem>
-                <SelectItem value="medium">Moyenne</SelectItem>
-                <SelectItem value="large">Grande</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <TabsContent value="general" className="space-y-4">
+            {renderGeneralSection()}
+          </TabsContent>
           
-          <div className="space-y-2">
-            <Label htmlFor="fontFamily">Police</Label>
-            <Select value={formValues.fontFamily} onValueChange={(value: any) => handleFontFamilyChange(value)}>
-              <SelectTrigger id="fontFamily">
-                <SelectValue placeholder="Sélectionner une police" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="system">Système</SelectItem>
-                <SelectItem value="serif">Serif</SelectItem>
-                <SelectItem value="mono">Monospace</SelectItem>
-                <SelectItem value="sans">Sans-serif</SelectItem>
-                <SelectItem value="inter">Inter</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <TabsContent value="notifications" className="space-y-4">
+            <NotificationsPreferences control={form.control} isLoading={isLoading} />
+          </TabsContent>
           
-          <div className="flex items-center justify-between">
-            <Label htmlFor="reduceMotion">Réduire les animations</Label>
-            <Switch 
-              id="reduceMotion" 
-              checked={formValues.reduceMotion}
-              onCheckedChange={(checked) => handleToggleChange('reduceMotion', checked)} 
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="colorBlindMode">Mode daltonien</Label>
-            <Switch 
-              id="colorBlindMode" 
-              checked={formValues.colorBlindMode}
-              onCheckedChange={(checked) => handleToggleChange('colorBlindMode', checked)} 
-            />
-          </div>
+          <TabsContent value="privacy" className="space-y-4">
+            <DataPrivacySettings control={form.control} isLoading={isLoading} />
+          </TabsContent>
+        </Tabs>
+
+        <div className="flex justify-end gap-2 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            disabled={isLoading}
+          >
+            Annuler
+          </Button>
+          <Button 
+            type="submit" 
+            disabled={isLoading}
+          >
+            {isLoading ? 'Enregistrement...' : 'Enregistrer les préférences'}
+          </Button>
         </div>
-        
-        {/* Préférences de confidentialité */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Confidentialité</h3>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="shareData">Partager les données anonymisées</Label>
-            <Switch 
-              id="shareData" 
-              checked={formValues.privacy.shareData}
-              onCheckedChange={(checked) => handlePrivacyChange('shareData', checked)} 
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="anonymizeReports">Anonymiser les rapports</Label>
-            <Switch 
-              id="anonymizeReports" 
-              checked={formValues.privacy.anonymizeReports}
-              onCheckedChange={(checked) => handlePrivacyChange('anonymizeReports', checked)} 
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="profileVisibility">Visibilité du profil</Label>
-            <Select 
-              value={formValues.privacy.profileVisibility} 
-              onValueChange={(value: any) => {
-                setFormValues(prev => ({
-                  ...prev,
-                  privacy: {
-                    ...prev.privacy,
-                    profileVisibility: value
-                  }
-                }));
-              }}
-            >
-              <SelectTrigger id="profileVisibility">
-                <SelectValue placeholder="Sélectionner la visibilité" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="public">Public</SelectItem>
-                <SelectItem value="team">Équipe uniquement</SelectItem>
-                <SelectItem value="private">Privé</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="anonymousMode">Mode anonyme</Label>
-            <Switch 
-              id="anonymousMode" 
-              checked={formValues.privacy.anonymousMode || false}
-              onCheckedChange={(checked) => handlePrivacyChange('anonymousMode', checked)} 
-            />
-          </div>
-        </div>
-        
-        {/* Préférences de notification */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Notifications</h3>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="notificationsEnabled">Activer les notifications</Label>
-            <Switch 
-              id="notificationsEnabled" 
-              checked={formValues.notifications.enabled}
-              onCheckedChange={(checked) => handleNotificationChange('enabled', checked)} 
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="emailEnabled">Notifications par email</Label>
-            <Switch 
-              id="emailEnabled" 
-              checked={formValues.notifications.emailEnabled}
-              onCheckedChange={(checked) => handleNotificationChange('emailEnabled', checked)} 
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="pushEnabled">Notifications push</Label>
-            <Switch 
-              id="pushEnabled" 
-              checked={formValues.notifications.pushEnabled}
-              onCheckedChange={(checked) => handleNotificationChange('pushEnabled', checked)} 
-            />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <Label htmlFor="inAppEnabled">Notifications dans l'application</Label>
-            <Switch 
-              id="inAppEnabled" 
-              checked={formValues.notifications.inAppEnabled}
-              onCheckedChange={(checked) => handleNotificationChange('inAppEnabled', checked)} 
-            />
-          </div>
-        </div>
-        
-        <Button onClick={handleSave} className="w-full">Enregistrer les préférences</Button>
-      </CardContent>
-    </Card>
+      </form>
+    </Form>
   );
 };
 

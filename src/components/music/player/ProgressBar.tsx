@@ -1,29 +1,30 @@
 
 import React from 'react';
-import { Slider } from '@/components/ui/slider';
+import { Slider } from "@/components/ui/slider";
 import { ProgressBarProps } from '@/types/music';
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({
-  currentTime,
-  duration,
-  onSeek
+export const ProgressBar: React.FC<ProgressBarProps> = ({ 
+  currentTime, 
+  duration, 
+  onSeek 
 }) => {
-  // Formater le temps en minutes:secondes
-  const formatTime = (seconds: number): string => {
-    if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' + sec : sec}`;
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  const handleSeek = (value: number[]) => {
+    onSeek(value[0]);
   };
 
   return (
     <div className="space-y-1">
-      <Slider
-        value={[currentTime]}
-        max={duration || 100}
-        step={0.1}
-        onValueChange={(value) => onSeek(value[0])}
-        className="w-full"
+      <Slider 
+        value={[currentTime]} 
+        max={Math.max(duration, 1)} 
+        step={0.1} 
+        onValueChange={handleSeek}
       />
       <div className="flex justify-between text-xs text-muted-foreground">
         <span>{formatTime(currentTime)}</span>
