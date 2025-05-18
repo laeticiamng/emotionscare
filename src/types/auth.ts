@@ -7,6 +7,10 @@ export interface AuthContextType {
     name?: string;
     email: string;
     role?: string;
+    /** JWT d'accès retourné par l'API */
+    accessToken?: string;
+    /** Jeton de rafraîchissement pour prolonger la session */
+    refreshToken?: string;
     preferences?: UserPreferences;
     [key: string]: any;
   } | null;

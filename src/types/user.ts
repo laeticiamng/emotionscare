@@ -12,6 +12,10 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
+  /** Jeton d'authentification courant */
+  accessToken?: string;
+  /** Jeton de rafraîchissement de session */
+  refreshToken?: string;
   avatar_url?: string;
   avatarUrl?: string;
   avatar?: string;
@@ -23,8 +27,14 @@ export interface User {
   emotional_score?: number;
   position?: string;
   joined_at?: string | Date;
+  created_at?: string | Date;
   createdAt?: string | Date;
+  updated_at?: string | Date;
   updatedAt?: string | Date;
+  /** Date de dernière connexion */
+  lastLogin?: string | Date;
+  /** Indique si le compte est actif */
+  isActive?: boolean;
   [key: string]: any;
 }
 
