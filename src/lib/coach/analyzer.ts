@@ -1,5 +1,5 @@
 
-import { EmotionResult } from '@/types/emotions';
+import { EmotionResult } from '@/types/emotion';
 
 export const analyzeEmotionalState = async (userId: string, emotionalData: EmotionResult[]): Promise<any> => {
   // Mock implementation

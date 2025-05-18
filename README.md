@@ -89,6 +89,23 @@ VITE_API_URL=http://localhost:3001
 VITE_WEB_URL=http://localhost:3000
 ```
 
+### Utilisateur de test
+
+Un compte de test est mis à disposition pour les démonstrations :
+
+- **Email** : `utilisateur@exemple.fr`
+- **Mot de passe** : `admin`
+
+Si ce compte n'existe pas dans votre base Supabase, vous pouvez le créer
+automatiquement avec la commande suivante&nbsp;:
+
+```bash
+npx ts-node scripts/ensureTestUser.ts
+```
+
+Cette commande nécessite la variable `SUPABASE_SERVICE_ROLE_KEY` dans votre
+`.env.local` afin d'utiliser l'API d'administration Supabase.
+
 ## Installation et démarrage
 
 ```bash
@@ -122,7 +139,7 @@ EmotionsCare utilise un système de design basé sur Tailwind CSS et Shadcn UI, 
 - **AuthContext** - Authentification et informations utilisateur
 - **UserModeContext** - Mode utilisateur (B2B/B2C)
 - **LayoutContext** - Mise en page et navigation
-- **MusicContext** - Lecture et gestion de la musique
+- **MusicContext** - Lecture et gestion de la musique (source unique via `useMusic`)
 
 ## Gestion du responsive
 
@@ -138,6 +155,23 @@ L'application est entièrement responsive et optimisée pour les appareils mobil
 - Vérification de type TypeScript (`npm run type-check`)
 - Tests unitaires (placeholder) (`npm run test`)
 - Nettoyage du build (`npm run clean`)
+
+## Monitoring & Alerting
+
+L'application intègre **Sentry** pour la surveillance des erreurs et des incidents.
+Le fichier `src/monitoring.ts` initialise Sentry si la variable d'environnement
+`NEXT_PUBLIC_SENTRY_DSN` est présente. Les erreurs non gérées et les variables
+d'environnement manquantes sont automatiquement reportées sur le tableau de bord
+Sentry.
+
+Pour activer la surveillance, ajoutez dans votre `.env.local` la clé :
+
+```bash
+NEXT_PUBLIC_SENTRY_DSN=<votre_DSN_Sentry>
+```
+
+Le tableau de bord et la gestion des alertes sont configurables directement sur
+Sentry.
 
 ## Équipe et contribution
 

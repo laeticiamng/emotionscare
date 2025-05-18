@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { EmotionResult } from '@/types/emotions';
-import { Emotion } from '@/types/emotions';
+import { EmotionResult } from '@/types/emotion';
+import { Emotion } from '@/types/emotion';
 
 export function useScanPage() {
   const [currentTab, setCurrentTab] = useState('voice');

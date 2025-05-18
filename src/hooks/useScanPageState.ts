@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { EmotionResult } from '@/types/emotions';
+import { EmotionResult } from '@/types/emotion';
 
 const useScanPageState = () => {
   const [currentStep, setCurrentStep] = useState<number>(1);

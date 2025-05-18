@@ -9,6 +9,8 @@ import { musicPresets, musicTracks } from '@/data/musicData';
  * Ceci est l'unique source de vérité pour la gestion de la musique/audio dans l'application.
  * Tout nouveau composant doit utiliser le hook `useMusic` de ce fichier.
  * NE PAS créer d'autres contexts music ailleurs !
+ *
+ * UNIQUE source de vérité pour la musique
  */
 export const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
