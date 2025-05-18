@@ -1,6 +1,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import './setupLogging';
 import App from './App';
 import './index.css';
 import './monitoring';

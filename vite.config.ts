@@ -9,13 +9,17 @@ const debugPlugin = () => {
   return {
     name: 'debug-plugin',
     configResolved(config: any) {
-      console.log('🔧 Configuration Vite résolue:');
-      console.log('  - Mode:', config.mode);
-      console.log('  - Base URL:', config.base);
-      console.log('  - Env prefix:', config.envPrefix);
+      if (process.env.DEBUG) {
+        console.log('🔧 Configuration Vite résolue:');
+        console.log('  - Mode:', config.mode);
+        console.log('  - Base URL:', config.base);
+        console.log('  - Env prefix:', config.envPrefix);
+      }
     },
     transformIndexHtml(html: any) {
-      console.log('📄 Transformation de index.html');
+      if (process.env.DEBUG) {
+        console.log('📄 Transformation de index.html');
+      }
       return html;
     }
   };
