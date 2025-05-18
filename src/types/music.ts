@@ -48,6 +48,13 @@ export interface MusicPlaylist {
   category?: string; // Added for compatibility
 }
 
+export interface MusicPreset {
+  id: string;
+  name: string;
+  color: string;
+  trackIds: string[];
+}
+
 export interface ProgressBarProps {
   currentTime: number;
   duration: number;
@@ -75,6 +82,10 @@ export interface MusicContextType {
   openDrawer: boolean;
   error?: Error | null;
   playlists?: MusicPlaylist[];
+  isRepeating?: boolean; // Added based on error
+  isShuffled?: boolean;
+  queue?: MusicTrack[];
+  progress?: number;
   
   // Methods
   setVolume: (volume: number) => void;
@@ -97,6 +108,13 @@ export interface MusicContextType {
   setPlaylist: (playlist: MusicPlaylist | MusicTrack[]) => void;
   setCurrentTrack: (track: MusicTrack) => void;
   getRecommendationByEmotion?: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | MusicTrack[]>;
+  generateMusic?: (prompt: string) => Promise<MusicTrack | null>;
+  setProgress?: (progress: number) => void;
+  toggleRepeat?: () => void;
+  toggleShuffle?: () => void;
+  addToQueue?: (track: MusicTrack) => void;
+  clearQueue?: () => void;
+  findTracksByMood?: (mood: string) => MusicTrack[];
 }
 
 export interface MusicPlayerProps {

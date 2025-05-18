@@ -2,11 +2,11 @@
 export interface ChatMessage {
   id: string;
   text?: string;
-  content?: string; // Ajout pour compatibilité 
+  content?: string; // Added for compatibility 
   sender: 'user' | 'assistant' | 'system';
-  role?: 'user' | 'assistant' | 'system'; // Pour la compatibilité avec différentes implémentations
+  role?: 'user' | 'assistant' | 'system'; // For compatibility with different implementations
   timestamp: string;
-  conversation_id?: string; // Pour la compatibilité 
+  conversation_id?: string; // For compatibility 
   conversationId?: string;
   emotions?: Record<string, number>;
   feedback?: string;
@@ -19,10 +19,10 @@ export interface ChatConversation {
   title: string;
   updated_at: string;
   created_at: string;
-  updatedAt?: string; // Pour la compatibilité
-  createdAt?: string; // Pour la compatibilité
+  updatedAt?: string; // For compatibility
+  createdAt?: string; // For compatibility
   last_message?: string;
-  lastMessage?: string; // Pour la compatibilité
+  lastMessage?: string; // For compatibility
   last_message_time?: string;
   messages?: ChatMessage[];
   user_id?: string;

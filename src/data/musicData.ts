@@ -74,12 +74,14 @@ export const musicTracks: MusicTrack[] = [
   }
 ];
 
+export const allTracks = musicTracks; // Export this directly to resolve the import error
+
 export const musicPresets = [
-  { id: 'calm', name: 'Calme', color: '#c4e0f3' },
-  { id: 'focus', name: 'Concentration', color: '#d4c4f3' },
-  { id: 'happy', name: 'Joyeux', color: '#f8e9c1' },
-  { id: 'energetic', name: 'Énergique', color: '#c8f4d5' },
-  { id: 'relaxed', name: 'Relaxant', color: '#f9d8d3' }
+  { id: 'calm', name: 'Calme', color: '#c4e0f3', trackIds: ['1', '5'] },
+  { id: 'focus', name: 'Concentration', color: '#d4c4f3', trackIds: ['2'] },
+  { id: 'happy', name: 'Joyeux', color: '#f8e9c1', trackIds: ['3'] },
+  { id: 'energetic', name: 'Énergique', color: '#c8f4d5', trackIds: ['3'] },
+  { id: 'relaxed', name: 'Relaxant', color: '#f9d8d3', trackIds: ['4'] }
 ];
 
 export const mockPlaylists: MusicPlaylist[] = [

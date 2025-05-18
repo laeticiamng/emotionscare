@@ -6,6 +6,7 @@ export interface VRSessionTemplate {
   duration: number;
   sessionType: VRSessionType;
   thumbnailUrl?: string;
+  thumbnail?: string; // For compatibility
   intensity: string;
   effects?: VREffect[];
   categories?: string[];
@@ -18,7 +19,6 @@ export interface VRSessionTemplate {
   userCount?: number;
   isFeatured?: boolean;
   isPublic?: boolean;
-  thumbnail?: string; // Pour compatibilité (alias de thumbnailUrl)
 }
 
 export type VRSessionType = 

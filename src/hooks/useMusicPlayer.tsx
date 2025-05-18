@@ -1,12 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 
 export function useMusicPlayer() {
   const music = useMusic();
   const [isInitialized, setIsInitialized] = useState(false);
   
-  // Initialiser au premier rendu
+  // Initialize on first render
   useEffect(() => {
     if (music.isInitialized) {
       setIsInitialized(true);
