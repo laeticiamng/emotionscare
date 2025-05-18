@@ -1,30 +1,31 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-
+import { requireAuth } from "../_shared/auth.ts";
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-
 // Cache implementation for frequent requests (24h TTL)
 const cache = new Map();
 const CACHE_TTL = 86400 * 1000; // 24 hours in milliseconds
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
-
+  const user = await requireAuth(req);
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   try {
     if (!openAIApiKey) {
       console.error("OpenAI API key not configured");
       throw new Error("OpenAI API key is not configured");
     }
-
     // Parse request body
     const { 
       message, 
@@ -41,7 +42,6 @@ serve(async (req) => {
     
     console.log(`Request to OpenAI API - Module: ${module}, Model: ${model}`);
     console.log("User context:", userContext);
-
     // Check cache for FAQ-type questions (only for non-streaming responses)
     if (!stream && cacheEnabled && !userContext) {
       const cacheKey = `${model}:${message || ''}`;
@@ -53,11 +53,8 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-    }
-
     // Build system prompt based on module and context
     let systemPrompt = '';
-    
     if (module === 'premium-support') {
       systemPrompt = `Tu es un assistant de support premium ultra-avancé pour EmotionsCare, une plateforme de bien-être mental
       pour les professionnels de santé. Tu dois fournir une assistance exceptionnelle, empathique et proactive.
@@ -78,15 +75,10 @@ serve(async (req) => {
        Adapte tes réponses à son contexte émotionnel, reste bienveillant et factuel. 
        Réponds toujours en français de manière précise et directe.`;
     } else {
-      systemPrompt = `Tu es un assistant de bien-être professionnel pour les travailleurs de la santé. 
-       Réponds toujours en français de manière précise et directe.`;
-    }
-
     const messages = [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: message }
     ];
-    
     // Build OpenAI request body with the specified parameters
     const requestBody = {
       model: model,
@@ -96,14 +88,12 @@ serve(async (req) => {
       top_p: top_p,
       stream: stream
     };
-
     console.log("Request to OpenAI:", JSON.stringify({
       model: requestBody.model,
       messageCount: requestBody.messages.length,
       temperature: requestBody.temperature,
       stream: requestBody.stream
     }));
-
     // If stream is activated, handle streaming
     if (stream) {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -114,7 +104,6 @@ serve(async (req) => {
         },
         body: JSON.stringify(requestBody),
       });
-
       // Return the stream directly
       return new Response(response.body, {
         headers: { 
@@ -122,26 +111,12 @@ serve(async (req) => {
           'Content-Type': 'text/event-stream',
           'Cache-Control': 'no-cache',
           'Connection': 'keep-alive'
-        },
-      });
     } 
-    
     // Regular non-streaming request
     else {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openAIApiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error?.message || 'OpenAI API error');
-      }
-
       const data = await response.json();
       const result = {
         response: data.choices[0].message.content,
@@ -149,7 +124,6 @@ serve(async (req) => {
         usage: data.usage,
         session_id: sessionId
       };
-
       // Cache the response if caching is enabled
       if (cacheEnabled && !userContext) {
         const cacheKey = `${model}:${message || ''}`;
@@ -159,21 +133,12 @@ serve(async (req) => {
         setTimeout(() => {
           cache.delete(cacheKey);
         }, CACHE_TTL);
-      }
-
       return new Response(JSON.stringify(result), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
   } catch (error) {
     console.error("Error in chat-with-ai function:", error);
-    
     return new Response(JSON.stringify({
       error: error.message || "An error occurred processing your request",
     }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
 });
