@@ -7,6 +7,7 @@
  */
 import { env } from '@/env.mjs';
 import { ChatMessage } from '@/types/chat';
+import { getCache, setCache } from '@/utils/cache';
 
 // Types
 export interface OpenAITextGenerationOptions {
@@ -31,6 +32,8 @@ export interface OpenAIImageGenerationOptions {
 const API_BASE_URL = 'https://api.openai.com/v1';
 const DEFAULT_MODEL = 'gpt-4o-mini';
 const DEFAULT_IMAGE_MODEL = 'dall-e-3';
+const TEXT_CACHE_TTL = 1000 * 60 * 5; // 5 minutes
+const MODERATION_CACHE_TTL = 1000 * 60; // 1 minute
 
 /**
  * Récupère la clé API OpenAI depuis les variables d'environnement
@@ -96,6 +99,12 @@ export async function generateText(prompt: string, options: OpenAITextGeneration
     { role: 'user', content: prompt }
   ];
 
+  const cacheKey = `text:${model}:${temperature}:${maxTokens}:${prompt}`;
+  const cached = getCache<string>(cacheKey, TEXT_CACHE_TTL);
+  if (cached) {
+    return cached;
+  }
+
   const response = await callOpenAI<{
     choices: Array<{
       message: {
@@ -112,8 +121,9 @@ export async function generateText(prompt: string, options: OpenAITextGeneration
     frequency_penalty: frequencyPenalty,
     presence_penalty: presencePenalty
   });
-
-  return response.choices[0]?.message.content || '';
+  const result = response.choices[0]?.message.content || '';
+  setCache(cacheKey, result);
+  return result;
 }
 
 /**
@@ -212,6 +222,13 @@ export async function moderateContent(content: string): Promise<{
   categories: Record<string, boolean>;
   categoryScores: Record<string, number>;
 }> {
+  const cacheKey = `moderation:${content}`;
+  const cached = getCache<{
+    flagged: boolean;
+    categories: Record<string, boolean>;
+    categoryScores: Record<string, number>;
+  }>(cacheKey, MODERATION_CACHE_TTL);
+  if (cached) return cached;
   const response = await callOpenAI<{
     results: Array<{
       flagged: boolean;
@@ -223,12 +240,13 @@ export async function moderateContent(content: string): Promise<{
   });
 
   const result = response.results[0];
-  
-  return {
+  const formatted = {
     flagged: result.flagged,
     categories: result.categories,
     categoryScores: result.category_scores
   };
+  setCache(cacheKey, formatted);
+  return formatted;
 }
 
 /**

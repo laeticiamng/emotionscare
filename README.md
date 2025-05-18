@@ -132,6 +132,12 @@ L'application est entièrement responsive et optimisée pour les appareils mobil
 - Hook `useMediaQuery` pour la logique conditionnelle
 - Layouts adaptifs pour chaque taille d'écran
 
+## Optimisations de performance
+
+- Chargement paresseux des pages via `React.lazy` pour réduire le bundle initial
+- Mise en cache courte des appels OpenAI pour limiter les requêtes réseau
+- Compression Brotli activée lors du build de production
+
 ## Tests et qualité
 
 - ESLint pour la qualité du code

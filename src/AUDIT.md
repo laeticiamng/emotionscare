@@ -37,6 +37,11 @@
 - ✅ Gestion des erreurs, des clés API et du monitoring
 - ✅ Architecture modulaire et extensible
 
+### Ticket 24 - Optimisation technique et performance
+- ✅ Lazy loading des pages et composants clés
+- ✅ Mise en cache courte des requêtes OpenAI
+- ✅ Compression Brotli activée pour le build
+
 ## Points forts
 
 1. **Architecture modulaire**: Services API centralisés et hooks React pour une utilisation facile.

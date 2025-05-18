@@ -3,6 +3,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import compression from "vite-plugin-compression";
 
 // Plugin de débogage pour Vite
 const debugPlugin = () => {
@@ -31,6 +32,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'development' && componentTagger(),
     mode === 'development' && debugPlugin(),
+    mode === 'production' && compression({ algorithm: 'brotliCompress' })
   ].filter(Boolean),
   resolve: {
     alias: {
