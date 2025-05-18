@@ -49,6 +49,9 @@ import SanctuaryPage from './pages/SanctuaryPage';
 import ImmersiveHome from './pages/ImmersiveHome';
 import Home from './pages/Home';
 import UnifiedSettingsPage from './pages/UnifiedSettingsPage';
+import OnboardingPage from './pages/OnboardingPage';
+import OnboardingModePage from './pages/OnboardingModePage';
+import OnboardingExperiencePage from './pages/OnboardingExperiencePage';
 
 // Define the application routes without creating a router instance
 export const routes: RouteObject[] = [
@@ -59,6 +62,18 @@ export const routes: RouteObject[] = [
   {
     path: '/home',
     element: <Home />
+  },
+  {
+    path: 'onboarding-mode',
+    element: <OnboardingModePage />
+  },
+  {
+    path: 'onboarding',
+    element: <OnboardingPage />
+  },
+  {
+    path: 'onboarding-experience',
+    element: <OnboardingExperiencePage />
   },
   {
     path: 'settings',
@@ -116,6 +131,10 @@ export const routes: RouteObject[] = [
       {
         path: 'dashboard',
         element: <B2CDashboardPage />
+      },
+      {
+        path: 'onboarding',
+        element: <OnboardingExperiencePage />
       },
       {
         path: 'journal',
@@ -189,6 +208,10 @@ export const routes: RouteObject[] = [
         element: <B2BUserDashboardPage />
       },
       {
+        path: 'onboarding',
+        element: <OnboardingExperiencePage />
+      },
+      {
         path: 'journal',
         element: <B2BUserJournalPage />
       },
@@ -254,6 +277,10 @@ export const routes: RouteObject[] = [
       {
         path: 'dashboard',
         element: <B2BAdminDashboardPage />
+      },
+      {
+        path: 'onboarding',
+        element: <OnboardingExperiencePage />
       },
       {
         path: 'journal',

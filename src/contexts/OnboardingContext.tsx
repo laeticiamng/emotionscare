@@ -5,7 +5,12 @@ import React, { createContext, useContext, useState } from 'react';
 export interface OnboardingStep {
   id: string;
   title: string;
-  content: React.ReactNode;
+  /**
+   * Optional React content for this step. The immersive onboarding
+   * components supply their own UI based on the current step so this
+   * field is not always required.
+   */
+  content?: React.ReactNode;
   required?: boolean;
 }
 
