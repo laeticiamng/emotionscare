@@ -122,7 +122,7 @@ EmotionsCare utilise un système de design basé sur Tailwind CSS et Shadcn UI, 
 - **AuthContext** - Authentification et informations utilisateur
 - **UserModeContext** - Mode utilisateur (B2B/B2C)
 - **LayoutContext** - Mise en page et navigation
-- **MusicContext** - Lecture et gestion de la musique
+- **MusicContext** - Lecture et gestion de la musique (source unique via `useMusic`)
 
 ## Gestion du responsive
 
