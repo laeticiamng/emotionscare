@@ -43,6 +43,7 @@ import B2BAdminTeamsPage from './pages/b2b/admin/Teams';
 import B2BAdminReportsPage from './pages/b2b/admin/Reports';
 import B2BAdminEventsPage from './pages/b2b/admin/Events';
 import B2BAdminSettingsPage from './pages/b2b/admin/Settings';
+import B2BAdminInnovationPage from './pages/b2b/admin/Innovation';
 import TimelinePage from './pages/TimelinePage';
 import WorldPage from './pages/WorldPage';
 import SanctuaryPage from './pages/SanctuaryPage';
@@ -283,6 +284,10 @@ export const routes: RouteObject[] = [
       {
         path: 'events',
         element: <B2BAdminEventsPage />
+      },
+      {
+        path: 'innovation',
+        element: <B2BAdminInnovationPage />
       },
       {
         path: 'settings',
