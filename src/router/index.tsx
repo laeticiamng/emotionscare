@@ -41,6 +41,7 @@ import B2BAdminTeamsPage from '@/pages/b2b/admin/Teams';
 import B2BAdminReportsPage from '@/pages/b2b/admin/Reports';
 import B2BAdminEventsPage from '@/pages/b2b/admin/Events';
 import B2BAdminSettingsPage from '@/pages/b2b/admin/Settings';
+import SecurityDashboardPage from '@/pages/b2b/admin/SecurityDashboard';
 import ImmersiveHome from '@/pages/ImmersiveHome';
 import Home from '@/pages/Home';
 import LoginPage from '@/pages/common/Login';
@@ -254,6 +255,10 @@ export const routes: RouteObject[] = [
       {
         path: 'events',
         element: <B2BAdminEventsPage />
+      },
+      {
+        path: 'security',
+        element: <SecurityDashboardPage />
       },
       {
         path: 'settings',

@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import NotificationSettings from '@/components/settings/NotificationSettings';
 import NotificationPreferences from '@/components/settings/NotificationPreferences';
+import SecuritySettings from '@/components/settings/SecuritySettings';
+import PrivacySettings from '@/components/settings/PrivacySettings';
 import { useTheme } from '@/hooks/use-theme';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -25,23 +27,11 @@ const Settings = () => {
     colorBlindMode: false
   });
   
-  // État pour les paramètres de sécurité
-  const [securitySettings, setSecuritySettings] = useState({
-    enableTwoFactor: false,
-    privateMode: false,
-    dataSharing: true,
-    rememberMe: true
-  });
-  
   // Fonction pour mettre à jour les paramètres d'apparence
   const handleAppearanceChange = (key: string, value: any) => {
     setAppearanceSettings(prev => ({ ...prev, [key]: value }));
   };
   
-  // Fonction pour mettre à jour les paramètres de sécurité
-  const handleSecurityChange = (key: string, value: boolean) => {
-    setSecuritySettings(prev => ({ ...prev, [key]: value }));
-  };
   
   // Fonction pour sauvegarder les changements
   const handleSave = () => {
@@ -61,10 +51,11 @@ const Settings = () => {
       </div>
       
       <Tabs defaultValue="appearance" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-4 mb-8">
+        <TabsList className="grid grid-cols-5 mb-8">
           <TabsTrigger value="appearance">Apparence</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="security">Sécurité</TabsTrigger>
+          <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
           <TabsTrigger value="accessibility">Accessibilité</TabsTrigger>
         </TabsList>
         
@@ -145,99 +136,13 @@ const Settings = () => {
         </TabsContent>
         
         <TabsContent value="security" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Sécurité et confidentialité</CardTitle>
-              <CardDescription>
-                Gérez les paramètres de sécurité et de confidentialité de votre compte
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="two-factor">Authentification à deux facteurs</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Renforce la sécurité de votre compte
-                    </p>
-                  </div>
-                  <Switch 
-                    id="two-factor" 
-                    checked={securitySettings.enableTwoFactor}
-                    onCheckedChange={(checked) => handleSecurityChange('enableTwoFactor', checked)}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="private-mode">Mode privé</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Masque votre journal et vos analyses émotionnelles
-                    </p>
-                  </div>
-                  <Switch 
-                    id="private-mode" 
-                    checked={securitySettings.privateMode}
-                    onCheckedChange={(checked) => handleSecurityChange('privateMode', checked)}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="data-sharing">Partage de données anonymes</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Contribue à l'amélioration de nos services
-                    </p>
-                  </div>
-                  <Switch 
-                    id="data-sharing" 
-                    checked={securitySettings.dataSharing}
-                    onCheckedChange={(checked) => handleSecurityChange('dataSharing', checked)}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label htmlFor="remember-me">Rester connecté</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Mémoriser votre session après fermeture du navigateur
-                    </p>
-                  </div>
-                  <Switch 
-                    id="remember-me" 
-                    checked={securitySettings.rememberMe}
-                    onCheckedChange={(checked) => handleSecurityChange('rememberMe', checked)}
-                  />
-                </div>
-                
-                <Button onClick={handleSave}>Enregistrer les changements</Button>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Actions sensibles</CardTitle>
-              <CardDescription>
-                Actions qui affecteront votre compte et vos données
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
-                <Button variant="outline" className="w-full">
-                  Changer le mot de passe
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Exporter mes données
-                </Button>
-                <Button variant="destructive" className="w-full">
-                  Supprimer mon compte
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <SecuritySettings />
         </TabsContent>
-        
+
+        <TabsContent value="privacy" className="space-y-6">
+          <PrivacySettings />
+        </TabsContent>
+
         <TabsContent value="accessibility" className="space-y-6">
           <Card>
             <CardHeader>

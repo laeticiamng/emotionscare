@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import SecuritySettings from '@/components/settings/SecuritySettings';
 
 const B2BAdminSettings = () => {
   const { toast } = useToast();
@@ -289,6 +290,8 @@ const B2BAdminSettings = () => {
               </div>
             </CardContent>
           </Card>
+
+          <SecuritySettings />
         </TabsContent>
         
         <TabsContent value="data" className="space-y-6">

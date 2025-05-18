@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import NotificationSettings from '@/components/settings/NotificationSettings';
+import SecuritySettings from '@/components/settings/SecuritySettings';
 import { useTheme } from '@/hooks/use-theme';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -31,10 +32,11 @@ const B2BUserSettings = () => {
       </div>
       
       <Tabs defaultValue="appearance">
-        <TabsList className="grid grid-cols-3 mb-8">
+        <TabsList className="grid grid-cols-4 mb-8">
           <TabsTrigger value="appearance">Apparence</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
+          <TabsTrigger value="security">Sécurité</TabsTrigger>
         </TabsList>
         
         <TabsContent value="appearance" className="space-y-6">
@@ -95,7 +97,7 @@ const B2BUserSettings = () => {
         
         <TabsContent value="notifications" className="space-y-6">
           <NotificationSettings />
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Notifications professionnelles</CardTitle>
@@ -134,11 +136,15 @@ const B2BUserSettings = () => {
                 <Switch defaultChecked={true} />
               </div>
               
-              <Button onClick={handleSave}>Enregistrer les préférences</Button>
-            </CardContent>
+          <Button onClick={handleSave}>Enregistrer les préférences</Button>
+        </CardContent>
           </Card>
         </TabsContent>
-        
+
+        <TabsContent value="security" className="space-y-6">
+          <SecuritySettings />
+        </TabsContent>
+
         <TabsContent value="privacy" className="space-y-6">
           <Card>
             <CardHeader>
