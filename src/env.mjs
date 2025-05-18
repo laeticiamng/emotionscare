@@ -3,6 +3,9 @@
  * Environnement centralisé
  *
  * Ce fichier gère les variables d'environnement avec validation
+ *
+ * Les variables exposées au client doivent être lues via `import.meta.env`.
+ * Les scripts Node utilisent toujours les variables de leur propre environnement.
  */
 
 import * as Sentry from '@sentry/react';
