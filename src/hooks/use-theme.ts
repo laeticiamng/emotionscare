@@ -1,5 +1,6 @@
 
-import { useTheme as useThemeOriginal } from '@/contexts/ThemeContext';
+import { useContext } from 'react';
+import { ThemeContext } from '@/contexts/ThemeContext';
 import { Theme } from '@/types/theme';
 
 /**
@@ -7,7 +8,11 @@ import { Theme } from '@/types/theme';
  * Ensures consistent typing across the application
  */
 export const useTheme = () => {
-  const themeContext = useThemeOriginal();
+  const themeContext = useContext(ThemeContext);
+  
+  if (!themeContext) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
   
   // Ensure the theme is one of the valid values
   const validateTheme = (theme: string): Theme => {

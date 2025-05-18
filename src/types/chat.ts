@@ -1,41 +1,29 @@
+
 export interface ChatMessage {
   id: string;
-  conversation_id: string;
-  timestamp: string;
-  sender: 'user' | 'assistant' | 'system';
   text: string;
-  content: string;
-  role: 'user' | 'assistant' | 'system';
-  attachments?: string[];
-  isError?: boolean;
-  isTyping?: boolean;
+  sender: "system" | "user" | "assistant";
+  timestamp: string;
+  conversation_id: string;
+  read?: boolean;
+  metadata?: Record<string, any>;
 }
 
 export interface ChatConversation {
   id: string;
-  user_id: string;
   title: string;
+  last_message?: string;
   created_at: string;
   updated_at: string;
-  last_message?: string;
-  messages?: ChatMessage[];
-}
-
-export interface ChatMessageRequest {
-  message: string;
-  conversation_id: string;
   user_id: string;
+  messages?: ChatMessage[];
+  metadata?: Record<string, any>;
 }
 
-export interface ChatMessageResponse {
+export interface ChatResponse {
   id: string;
-  message: string;
-  created_at: string;
-}
-
-export interface ChatHistoryItem {
-  id: string;
-  title: string;
+  content: string;
+  role: string;
   timestamp: string;
-  preview: string;
+  metadata?: Record<string, any>;
 }

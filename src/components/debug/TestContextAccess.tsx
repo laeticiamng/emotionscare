@@ -1,74 +1,104 @@
 
 import React from 'react';
-import { useTheme } from '@/hooks/use-theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { useMusic } from '@/contexts/MusicContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 /**
- * A debug component that tests access to all application contexts
- * Can be imported and rendered on any page to verify contexts are working
+ * Composant de test pour vérifier l'accès aux contextes
+ * Ce composant peut être utilisé pour déboguer les problèmes d'accès aux contextes
  */
 const TestContextAccess: React.FC = () => {
-  const { theme, setTheme, isDarkMode } = useTheme();
-  const { user, isAuthenticated } = useAuth();
-  const { preferences, updatePreferences } = useUserPreferences();
-  const { currentTrack, isPlaying } = useMusic();
-
+  // Accès aux contextes
+  const theme = useTheme();
+  const auth = useAuth();
+  
   return (
-    <Card className="max-w-lg mx-auto my-8">
-      <CardHeader>
-        <CardTitle>Context Access Test</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div>
-          <h3 className="font-medium mb-2">Theme Context:</h3>
-          <ul className="list-disc pl-5">
-            <li>Current theme: {theme}</li>
-            <li>Dark mode: {isDarkMode ? 'Yes' : 'No'}</li>
-          </ul>
-          <button 
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="text-xs text-blue-500 hover:underline mt-1"
+    <div className="container mx-auto p-6 space-y-6">
+      <h1 className="text-2xl font-bold">Test d'accès aux contextes</h1>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex justify-between items-center">
+            ThemeContext
+            <Badge variant={theme.isDarkMode ? "destructive" : "default"}>
+              {theme.theme}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <div><strong>Theme:</strong> {theme.theme}</div>
+            <div><strong>Is Dark Mode:</strong> {theme.isDarkMode ? 'Oui' : 'Non'}</div>
+            <div><strong>Font Size:</strong> {theme.fontSize || 'Non défini'}</div>
+            <div><strong>Font Family:</strong> {theme.fontFamily || 'Non défini'}</div>
+            <div><strong>Sound Enabled:</strong> {theme.soundEnabled ? 'Oui' : 'Non'}</div>
+            <div><strong>Reduce Motion:</strong> {theme.reduceMotion ? 'Oui' : 'Non'}</div>
+            <div><strong>System Theme:</strong> {theme.systemTheme || 'Non détecté'}</div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex justify-between items-center">
+            AuthContext
+            <Badge variant={auth.isAuthenticated ? "success" : "outline"}>
+              {auth.isAuthenticated ? 'Connecté' : 'Déconnecté'}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <div><strong>Authenticated:</strong> {auth.isAuthenticated ? 'Oui' : 'Non'}</div>
+            <div><strong>Loading:</strong> {auth.isLoading ? 'Oui' : 'Non'}</div>
+            <div><strong>Error:</strong> {auth.error ? auth.error.message : 'Aucune erreur'}</div>
+            
+            {auth.user && (
+              <div className="mt-4 space-y-2 border p-4 rounded-md">
+                <div><strong>User ID:</strong> {auth.user.id}</div>
+                <div><strong>Name:</strong> {auth.user.name || 'Non défini'}</div>
+                <div><strong>Email:</strong> {auth.user.email}</div>
+                <div><strong>Role:</strong> {auth.user.role || 'Non défini'}</div>
+                <div>
+                  <strong>Preferences:</strong>
+                  <pre className="mt-2 p-2 bg-muted rounded-md overflow-auto text-xs">
+                    {JSON.stringify(auth.user.preferences, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Boutons pour tester les fonctions du contexte */}
+      <div className="flex flex-wrap gap-4">
+        <button
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
+          onClick={() => theme.setTheme(theme.theme === 'dark' ? 'light' : 'dark')}
+        >
+          Changer le thème
+        </button>
+        
+        {auth.isAuthenticated ? (
+          <button
+            className="px-4 py-2 bg-destructive text-destructive-foreground rounded-md"
+            onClick={() => auth.logout()}
           >
-            Toggle theme
+            Déconnexion
           </button>
-        </div>
-
-        <div>
-          <h3 className="font-medium mb-2">Auth Context:</h3>
-          <ul className="list-disc pl-5">
-            <li>Authenticated: {isAuthenticated ? 'Yes' : 'No'}</li>
-            <li>User role: {user?.role || 'Not logged in'}</li>
-          </ul>
-        </div>
-
-        <div>
-          <h3 className="font-medium mb-2">User Preferences:</h3>
-          <ul className="list-disc pl-5">
-            <li>Theme preference: {preferences?.theme || 'Not set'}</li>
-            <li>Language: {preferences?.language || 'Not set'}</li>
-            <li>Sound enabled: {preferences?.soundEnabled ? 'Yes' : 'No'}</li>
-            <li>Reduce motion: {preferences?.reduceMotion ? 'Yes' : 'No'}</li>
-          </ul>
-          <button 
-            onClick={() => updatePreferences({ soundEnabled: !preferences?.soundEnabled })}
-            className="text-xs text-blue-500 hover:underline mt-1"
+        ) : (
+          <button
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
+            onClick={() => auth.login('test@example.com', 'password')}
           >
-            Toggle sound
+            Connexion (test)
           </button>
-        </div>
-
-        <div>
-          <h3 className="font-medium mb-2">Music Context:</h3>
-          <ul className="list-disc pl-5">
-            <li>Current track: {currentTrack?.title || 'None'}</li>
-            <li>Playing: {isPlaying ? 'Yes' : 'No'}</li>
-          </ul>
-        </div>
-      </CardContent>
-    </Card>
+        )}
+      </div>
+    </div>
   );
 };
 

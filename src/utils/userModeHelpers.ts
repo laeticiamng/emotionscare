@@ -90,3 +90,13 @@ export const getRoleDisplayName = (role?: string | UserRole | UserModeType): str
       return 'Utilisateur';
   }
 };
+
+/**
+ * Gets a user-friendly display name for a user mode
+ * Alias for getRoleDisplayName for compatibility
+ * @param mode The user mode
+ * @returns The display name for the mode
+ */
+export const getUserModeDisplayName = (mode: string | UserRole | UserModeType): string => {
+  return getRoleDisplayName(mode);
+};

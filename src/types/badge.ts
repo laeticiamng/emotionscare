@@ -3,53 +3,30 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  icon: string;
-  level: 'bronze' | 'silver' | 'gold' | 'platinum' | string | number;
-  category: string;
+  imageUrl?: string;
   unlocked: boolean;
-  unlockedAt?: string;
-  unlocked_at?: string; // Pour compatibilité
+  level?: number;
+  category?: string;
+  tier?: string;
+  icon?: string;
   progress?: number;
   total?: number;
-  image?: string;
-  imageUrl?: string;
-  image_url?: string; // Pour compatibilité
-  requirements?: {
-    description: string;
-    progress: number;
-    goal: number;
-  }[];
-  achieved?: boolean;
-  threshold?: number;
-  // Properties added for compatibility
-  earned?: boolean;
-  earnedAt?: string;
-  dateEarned?: string;
-  tier?: string;
-  completed?: boolean;
-  rarity?: string;
-  title?: string;
+  user_id?: string;
+  awarded_at?: string;
 }
 
-export interface BadgeCollection {
-  userId: string;
-  badges: Badge[];
-  totalUnlocked: number;
-  recentlyUnlocked: Badge[];
-}
-
-export interface LeaderboardEntry {
+export interface Challenge {
   id: string;
-  userId: string;
-  score: number;
-  rank: number;
-  name?: string;
-  avatar?: string;
-  level?: number;
-  badges?: number;
-  username?: string;
-  avatarUrl?: string;
-  points?: number;
-  streak?: number;
-  trend?: string;
+  name: string;
+  description: string;
+  points: number;
+  progress?: number;
+  total?: number;
+  completed?: boolean;
+  deadline?: string;
+  imageUrl?: string;
+  category?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  badge_id?: string;
+  user_id?: string;
 }

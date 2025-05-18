@@ -574,6 +574,54 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          action_link: string | null
+          action_text: string | null
+          created_at: string | null
+          icon: string | null
+          id: string
+          image: string | null
+          message: string
+          metadata: Json | null
+          priority: string | null
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_link?: string | null
+          action_text?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          image?: string | null
+          message: string
+          metadata?: Json | null
+          priority?: string | null
+          read?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          action_link?: string | null
+          action_text?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          image?: string | null
+          message?: string
+          metadata?: Json | null
+          priority?: string | null
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       official_content_cache: {
         Row: {
           content: string
@@ -649,6 +697,48 @@ export type Database = {
           image_url?: string | null
           reactions?: number | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          department: string | null
+          email: string | null
+          emotional_score: number | null
+          id: string
+          job_title: string | null
+          name: string | null
+          preferences: Json | null
+          role: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          department?: string | null
+          email?: string | null
+          emotional_score?: number | null
+          id: string
+          job_title?: string | null
+          name?: string | null
+          preferences?: Json | null
+          role?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          department?: string | null
+          email?: string | null
+          emotional_score?: number | null
+          id?: string
+          job_title?: string | null
+          name?: string | null
+          preferences?: Json | null
+          role?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }

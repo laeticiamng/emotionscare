@@ -29,6 +29,17 @@ export const getRoleName = (role: string | UserRole): string => {
 };
 
 /**
+ * Checks if a user has admin role
+ * @param role The user's role to check
+ * @returns Boolean indicating if user has admin role
+ */
+export const isAdminRole = (role?: string | UserRole): boolean => {
+  if (!role) return false;
+  const normalizedRole = normalizeUserMode(role);
+  return normalizedRole === 'b2b_admin' || normalizedRole === 'admin';
+};
+
+/**
  * Checks if a user has a specific role
  * @param userRole The user's current role
  * @param requiredRole The role to check for
