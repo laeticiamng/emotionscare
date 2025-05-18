@@ -1,3 +1,5 @@
+
+// Import les données mock
 import mockEmotions from './mockEmotions';
 import mockJournalEntries from './mockJournalEntries';
 import mockNotifications from './mockNotifications';
@@ -5,7 +7,7 @@ import mockPosts from './mockPosts';
 import mockUsers from './mockUsers';
 import mockBadges from './mockBadges';
 import mockVRTemplates from './mockVRTemplates';
-import mockChatMessages from './mockChatMessages';
+import mockChatMessages, { mockConversations } from './mockChatMessages';
 
 export {
   mockEmotions,
@@ -15,5 +17,6 @@ export {
   mockUsers,
   mockBadges,
   mockVRTemplates,
-  mockChatMessages
+  mockChatMessages,
+  mockConversations
 };

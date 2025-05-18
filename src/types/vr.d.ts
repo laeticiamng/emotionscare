@@ -5,6 +5,7 @@ export interface VRSessionTemplate {
   description: string;
   duration: number;
   difficulty: 'easy' | 'medium' | 'hard';
+  level?: string; // Ajout pour compatibilité avec les données existantes
   intensity: number;
   category: string;
   tags: string[];

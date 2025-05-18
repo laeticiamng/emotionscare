@@ -58,7 +58,6 @@ const CoachChatInterface: React.FC<CoachChatInterfaceProps> = ({
               <ChatMessageItem
                 key={msg.id}
                 message={msg}
-                isUser={msg.sender === 'user'}
               />
             ))
           )}

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useChat } from '@/hooks/useChat';
+import useChat from '@/hooks/useChat';
 import { ChatMessage } from '@/types/chat';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,8 +22,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   readOnly = false,
   className = ''
 }) => {
-  const { messages, addMessage, handleSend } = useChat({ initialMessages });
-  const [newMessage, setNewMessage] = useState('');
+  const { 
+    messages, 
+    input, 
+    setInput, 
+    sendMessage, 
+    handleInputChange, 
+    handleSubmit 
+  } = useChat({ initialMessages });
+  
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
   // Scroll to bottom when messages change
@@ -37,16 +44,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }, [messages]);
   
   const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
+    if (!input.trim()) return;
     
     // Either use the custom handler or the internal chat state
     if (onSendMessage) {
-      onSendMessage(newMessage);
+      onSendMessage(input);
+      setInput('');
     } else {
-      handleSend(newMessage);
+      sendMessage(input);
     }
-    
-    setNewMessage('');
   };
   
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -61,10 +67,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="space-y-4">
           {messages.map((message) => (
-            <div key={message.id} className={`flex ${message.sender || message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`flex items-start gap-2 max-w-[80%] ${message.sender || message.role === 'user' ? 'flex-row-reverse' : ''}`}>
+            <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`flex items-start gap-2 max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}>
                 <Avatar className="mt-1">
-                  {message.sender === 'user' || message.role === 'user' ? (
+                  {message.sender === 'user' ? (
                     <>
                       <AvatarFallback>U</AvatarFallback>
                       <AvatarImage src="/images/avatar.png" />
@@ -77,12 +83,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   )}
                 </Avatar>
                 <div className={`rounded-lg p-3 ${
-                  message.sender === 'user' || message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                  message.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
                 }`}>
                   <p className="text-sm">{message.text || message.content}</p>
                   {message.timestamp && (
                     <span className={`text-xs block mt-1 ${
-                      message.sender === 'user' || message.role === 'user' ? 'text-primary-foreground/80' : 'text-muted-foreground'
+                      message.sender === 'user' ? 'text-primary-foreground/80' : 'text-muted-foreground'
                     }`}>
                       {new Date(message.timestamp).toLocaleTimeString()}
                     </span>
@@ -103,13 +109,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div className="p-4 border-t">
           <div className="flex gap-2">
             <Textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              value={input}
+              onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder="Écrivez votre message..."
               className="min-h-[60px]"
             />
-            <Button size="icon" onClick={handleSendMessage} disabled={!newMessage.trim()}>
+            <Button size="icon" onClick={handleSendMessage} disabled={!input.trim()}>
               <Send className="h-4 w-4" />
             </Button>
           </div>

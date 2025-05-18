@@ -18,6 +18,7 @@ export interface MusicTrack {
   year?: number;
   genre?: string;
   name?: string;
+  tags?: string[];
 }
 
 export interface MusicPlaylist {
@@ -32,6 +33,7 @@ export interface MusicPlaylist {
   tags?: string[];
   title?: string;
   emotion?: string;
+  mood?: string;
 }
 
 export interface MusicContextType {
@@ -68,6 +70,7 @@ export interface MusicContextType {
   setPlaylist?: (playlist: MusicPlaylist | MusicTrack[]) => void;
   setCurrentTrack?: (track: MusicTrack) => void;
   generateMusic?: (prompt: string) => Promise<MusicTrack | null>;
+  getRecommendationByEmotion?: (emotion: string) => Promise<MusicTrack[]>;
 }
 
 export interface MusicDrawerProps {

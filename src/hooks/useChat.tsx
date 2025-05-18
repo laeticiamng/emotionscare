@@ -55,6 +55,10 @@ export const useChat = ({ initialMessages = [], onSendMessage }: UseChatProps = 
     setMessages([]);
   }, []);
 
+  // Ajouter ces deux méthodes pour la compatibilité avec les composants existants
+  const addMessage = sendMessage;
+  const handleSend = (text: string) => sendMessage(text);
+
   return {
     messages,
     input,
@@ -64,7 +68,9 @@ export const useChat = ({ initialMessages = [], onSendMessage }: UseChatProps = 
     sendMessage,
     handleInputChange,
     handleSubmit,
-    clearMessages
+    clearMessages,
+    addMessage,
+    handleSend
   };
 };
 

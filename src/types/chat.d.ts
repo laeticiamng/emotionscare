@@ -2,21 +2,34 @@
 export interface ChatMessage {
   id: string;
   text: string;
-  sender: 'system' | 'user' | 'assistant';
+  content?: string; // Pour la compatibilité avec différentes implémentations
+  sender: 'user' | 'assistant' | 'system';
+  role?: 'user' | 'assistant' | 'system'; // Pour la compatibilité avec différentes implémentations
   timestamp: string;
   conversation_id?: string;
-  content?: string;
-  role?: string;
+  conversationId?: string;
+  emotions?: Record<string, number>;
+  feedback?: string;
+  isOptimistic?: boolean;
+  metadata?: Record<string, any>;
 }
 
 export interface ChatConversation {
   id: string;
   title: string;
-  messages: ChatMessage[];
-  created_at: string;
   updated_at: string;
-  user_id: string;
+  created_at: string;
+  updatedAt?: string; // Pour la compatibilité avec différentes implémentations
+  createdAt?: string; // Pour la compatibilité avec différentes implémentations
   last_message?: string;
+  lastMessage?: string; // Pour la compatibilité avec différentes implémentations
+  last_message_time?: string;
+  messages?: ChatMessage[];
+  user_id?: string;
+  unread?: number;
+  category?: string;
+  status?: 'active' | 'archived' | 'deleted';
+  metadata?: Record<string, any>;
 }
 
 export interface ChatResponse {

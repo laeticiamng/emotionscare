@@ -1,67 +1,69 @@
 
-import { EmotionResult } from '@/types/emotions';
-
-// Mock emotions data
-export const mockEmotions: EmotionResult[] = [
+const mockEmotions = [
   {
-    id: "emo-1",
-    date: new Date(2025, 4, 15).toISOString(),
-    emotion: "joy",
-    score: 85,
-    user_id: "user-123",
-    confidence: 0.95
+    id: "1",
+    name: "joy",
+    label: "Joie",
+    description: "Sentiment de bonheur et de satisfaction",
+    color: "#FFD700",
+    icon: "smile"
   },
   {
-    id: "emo-2",
-    date: new Date(2025, 4, 14).toISOString(),
-    emotion: "calm",
-    score: 72,
-    user_id: "user-123",
-    confidence: 0.87
+    id: "2",
+    name: "sadness",
+    label: "Tristesse",
+    description: "Sentiment de mélancolie ou de chagrin",
+    color: "#6495ED",
+    icon: "frown"
   },
   {
-    id: "emo-3",
-    date: new Date(2025, 4, 13).toISOString(),
-    emotion: "anxiety",
-    score: 45,
-    user_id: "user-123",
-    confidence: 0.76
+    id: "3",
+    name: "anger",
+    label: "Colère",
+    description: "Sentiment intense de mécontentement ou d'hostilité",
+    color: "#FF4500",
+    icon: "angry"
   },
   {
-    id: "emo-4",
-    date: new Date(2025, 4, 12).toISOString(),
-    emotion: "sadness",
-    score: 30,
-    user_id: "user-123",
-    confidence: 0.82
+    id: "4",
+    name: "fear",
+    label: "Peur",
+    description: "Sentiment d'appréhension causé par la perception d'un danger",
+    color: "#800080",
+    icon: "shocked"
+  },
+  {
+    id: "5",
+    name: "disgust",
+    label: "Dégoût",
+    description: "Sentiment d'aversion ou de répulsion",
+    color: "#32CD32",
+    icon: "nauseated"
+  },
+  {
+    id: "6",
+    name: "surprise",
+    label: "Surprise",
+    description: "Sentiment soudain d'étonnement ou de choc",
+    color: "#FF8C00",
+    icon: "surprise"
+  },
+  {
+    id: "7",
+    name: "calm",
+    label: "Calme",
+    description: "État de tranquillité et d'absence d'agitation",
+    color: "#87CEEB",
+    icon: "relaxed"
+  },
+  {
+    id: "8",
+    name: "stress",
+    label: "Stress",
+    description: "État de tension mentale ou émotionnelle",
+    color: "#DC143C",
+    icon: "stressed"
   }
 ];
 
-// Function to get mock emotions for a specific user
-export const getUserEmotions = (userId: string = "user-123") => {
-  return mockEmotions.filter(emotion => emotion.user_id === userId);
-};
-
-// Get emotions by date range
-export const getEmotionsByDateRange = (
-  startDate: Date, 
-  endDate: Date, 
-  userId: string = "user-123"
-) => {
-  return mockEmotions.filter(emotion => {
-    const emotionDate = new Date(emotion.date as string);
-    return (
-      emotion.user_id === userId &&
-      emotionDate >= startDate &&
-      emotionDate <= endDate
-    );
-  });
-};
-
-// Get the latest emotion
-export const getLatestEmotion = (userId: string = "user-123") => {
-  const userEmotions = getUserEmotions(userId);
-  return userEmotions.sort(
-    (a, b) => new Date(b.date as string).getTime() - new Date(a.date as string).getTime()
-  )[0];
-};
+export default mockEmotions;
