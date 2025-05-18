@@ -69,11 +69,11 @@ La plateforme EmotionsCare s'intègre avec plusieurs API tierces pour fournir se
 
 1. **OpenAI** - Pour GPT-4, DALL-E et Whisper
    - Utilisation : Conseils IA, génération de texte et d'images, transcription audio
-   - Variable d'environnement : `NEXT_PUBLIC_OPENAI_API_KEY`
+   - Variable d'environnement : `VITE_OPENAI_API_KEY`
 
 2. **Hume AI** - Pour l'analyse émotionnelle avancée
    - Utilisation : Détection d'émotions dans le texte, la voix et les expressions faciales
-   - Variable d'environnement : `NEXT_PUBLIC_HUME_API_KEY`
+   - Variable d'environnement : `VITE_HUME_API_KEY`
 
 3. **MusicGen** - Pour la génération de musique personnalisée
    - Utilisation : Création de musique adaptée aux émotions
@@ -82,11 +82,11 @@ La plateforme EmotionsCare s'intègre avec plusieurs API tierces pour fournir se
 ### Configuration du fichier .env.local
 
 ```
-NEXT_PUBLIC_OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxx
-NEXT_PUBLIC_HUME_API_KEY=hume_xxxxxxxxxxxxxxxxxxxx
-NEXT_PUBLIC_APP_ENV=development
-NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_WEB_URL=http://localhost:3000
+VITE_OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxx
+VITE_HUME_API_KEY=hume_xxxxxxxxxxxxxxxxxxxx
+VITE_APP_ENV=development
+VITE_API_URL=http://localhost:3001
+VITE_WEB_URL=http://localhost:3000
 ```
 
 ## Installation et démarrage
@@ -134,10 +134,10 @@ L'application est entièrement responsive et optimisée pour les appareils mobil
 
 ## Tests et qualité
 
-- ESLint pour la qualité du code
-- TypeScript pour le typage statique
-- Tests unitaires avec Vitest
-- Tests d'intégration pour les fonctionnalités clés
+- ESLint pour la qualité du code (`npm run lint`)
+- Vérification de type TypeScript (`npm run type-check`)
+- Tests unitaires (placeholder) (`npm run test`)
+- Nettoyage du build (`npm run clean`)
 
 ## Équipe et contribution
 

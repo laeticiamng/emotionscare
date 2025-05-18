@@ -86,7 +86,7 @@ function findDuplicateTypes() {
   if (duplicates.length === 0) {
     console.log('✅ No duplicate type definitions found!');
   } else {
-    console.log('⚠️ Found duplicate type definitions:');
+    console.log('⚠ Duplicate type definitions found!');
     for (const dup of duplicates) {
       console.log(`  - ${dup.typeName} in ${dup.file}`);
     }
@@ -123,7 +123,7 @@ function findPropertyVariations() {
   if (issues.length === 0) {
     console.log('✅ No property name inconsistencies found!');
   } else {
-    console.log('⚠️ Found property name inconsistencies:');
+    console.log('⚠ Property name inconsistencies found!');
     const grouped = {};
     
     for (const issue of issues) {
@@ -160,7 +160,7 @@ function main() {
   if (noDuplicates && noVariations) {
     console.log('✅ All checks passed! The project has consistent types.');
   } else {
-    console.log('⚠️ Found inconsistencies that should be fixed.');
+    console.log('⚠ Issues found in type definitions.');
     console.log('   See the details above for what needs to be fixed.');
   }
 }
