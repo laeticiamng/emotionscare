@@ -5,9 +5,6 @@ Ce document présente un aperçu des tables de la base PostgreSQL gérée via Su
 ## Tables principales
 
 
-### abonnement_fiches
-Table d'abonnement pour les fiches.
-
 ### ai_generated_content
 - **id** : identifiant primaire
 - **identifier** : clé de référence
@@ -21,7 +18,6 @@ Table d'abonnement pour les fiches.
 - **name** : nom du badge
 - **description** : détails du badge
 - **awarded_at** : date d'obtention
-
 
 ### buddies
 - **id** : identifiant primaire
@@ -66,8 +62,6 @@ Stockage du contenu complet d'une situation d'enseignement numérique.
 - **specialty** : spécialité
 - **has_link** / **has_recommendation** : informations supplémentaires
 
-### edn_items_complete
-Version complète d'un élément avec son contenu JSON.
 
 ### emotions
 Journal des émotions d'un utilisateur (texte, score, audio, etc.).
