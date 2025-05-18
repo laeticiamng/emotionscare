@@ -1,156 +1,57 @@
-import React, { createContext, useContext, useState, useRef } from 'react';
 
-// Types et interfaces
-
-export interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  album?: string;
-  albumCover?: string;
-  duration: number;
-  audioUrl: string;
-  type?: string;
-  bpm?: number;
-  genre?: string;
-  mood?: string;
-  created_at?: string;  // Pour compatibilité
-  updated_at?: string;  // Pour compatibilité
-}
-
-export interface MusicPlaylist {
-  id: string;
-  title: string;
-  description?: string;
-  tracks: MusicTrack[];
-  totalDuration?: number;
-  coverImage?: string;
-  emotion?: string;
-  created_at?: string; // Pour compatibilité
-  updated_at?: string; // Pour compatibilité
-  createdBy?: string;
-}
+import React, { createContext, useContext, useRef, useState, useEffect } from 'react';
+import { MusicTrack, MusicPreset } from '@/types/music';
+import { musicPresets, allTracks } from '@/data/musicData';
 
 interface MusicContextType {
   currentTrack: MusicTrack | null;
-  currentPlaylist: MusicPlaylist | null;
+  audioRef: React.RefObject<HTMLAudioElement>;
   isPlaying: boolean;
   volume: number;
   currentTime: number;
   duration: number;
+  presets: MusicPreset[];
   playTrack: (track: MusicTrack) => void;
-  playPlaylist: (playlist: MusicPlaylist) => void;
-  togglePlay: () => void;
+  pauseTrack: () => void;
+  togglePlayback: () => void;
   setVolume: (volume: number) => void;
   seek: (time: number) => void;
-  nextTrack: () => void;
-  previousTrack: () => void;
-  loadPlaylistForEmotion: (emotion: string) => MusicPlaylist | null;
+  playNextTrack: () => void;
+  playPreviousTrack: () => void;
+  playPreset: (preset: MusicPreset) => void;
+  findTracksByMood: (mood: string) => MusicTrack[];
 }
 
-const MusicContext = createContext<MusicContextType>({
+const defaultContext: MusicContextType = {
   currentTrack: null,
-  currentPlaylist: null,
+  audioRef: { current: null },
   isPlaying: false,
   volume: 0.5,
   currentTime: 0,
   duration: 0,
+  presets: musicPresets,
   playTrack: () => {},
-  playPlaylist: () => {},
-  togglePlay: () => {},
+  pauseTrack: () => {},
+  togglePlayback: () => {},
   setVolume: () => {},
   seek: () => {},
-  nextTrack: () => {},
-  previousTrack: () => {},
-  loadPlaylistForEmotion: () => null,
-});
+  playNextTrack: () => {},
+  playPreviousTrack: () => {},
+  playPreset: () => {},
+  findTracksByMood: () => []
+};
 
-// Provider
+const MusicContext = createContext<MusicContextType>(defaultContext);
+
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.5);
+  const [volume, setVolumeState] = useState(0.5);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const playTrack = (track: MusicTrack) => {
-    setCurrentTrack(track);
-    setIsPlaying(true);
-    if (audioRef.current) {
-      audioRef.current.src = track.audioUrl;
-      audioRef.current.play().catch(error => console.error("Playback failed:", error));
-    }
-  };
-
-  const playPlaylist = (playlist: MusicPlaylist) => {
-    setCurrentPlaylist(playlist);
-    if (playlist.tracks && playlist.tracks.length > 0) {
-      playTrack(playlist.tracks[0]);
-    }
-  };
-
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-    if (audioRef.current) {
-      isPlaying ? audioRef.current.pause() : audioRef.current.play().catch(error => console.error("Playback failed:", error));
-    }
-  };
-
-  const seek = (time: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setCurrentTime(time);
-    }
-  };
-
-  const nextTrack = () => {
-    if (currentPlaylist && currentTrack) {
-      const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
-      if (currentIndex < currentPlaylist.tracks.length - 1) {
-        playTrack(currentPlaylist.tracks[currentIndex + 1]);
-      } else {
-        // Optionally loop back to the start of the playlist
-        playTrack(currentPlaylist.tracks[0]);
-      }
-    }
-  };
-
-  const previousTrack = () => {
-    if (currentPlaylist && currentTrack) {
-      const currentIndex = currentPlaylist.tracks.findIndex(track => track.id === currentTrack.id);
-      if (currentIndex > 0) {
-        playTrack(currentPlaylist.tracks[currentIndex - 1]);
-      } else {
-        // Optionally go to the end of the playlist
-        playTrack(currentPlaylist.tracks[currentPlaylist.tracks.length - 1]);
-      }
-    }
-  };
-
-  // Fonction pour charger une playlist en fonction d'une émotion
-  const loadPlaylistForEmotion = (emotion: string): MusicPlaylist | null => {
-    // Trouver la playlist correspondant à l'émotion
-    const playlist = mockPlaylists.find(p => p.emotion?.toLowerCase() === emotion.toLowerCase());
-    
-    if (playlist) {
-      setCurrentPlaylist({
-        ...playlist,
-        created_at: playlist.created_at || new Date().toISOString(),
-        updated_at: playlist.updated_at || new Date().toISOString(),
-      });
-      
-      if (playlist.tracks && playlist.tracks.length > 0) {
-        setCurrentTrack(playlist.tracks[0]);
-      }
-      
-      return playlist;
-    }
-    
-    return null;
-  };
-
+  // Handle audio time updates
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       setCurrentTime(audioRef.current.currentTime);
@@ -158,102 +59,145 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const handleEnded = () => {
-    nextTrack();
+  // Handle track end
+  const handleTrackEnd = () => {
+    playNextTrack();
   };
 
-  // Ensemble des valeurs à fournir
-  const value = {
-    currentTrack,
-    currentPlaylist,
-    isPlaying,
-    volume,
-    currentTime,
-    duration,
-    playTrack,
-    playPlaylist,
-    togglePlay,
-    setVolume,
-    seek,
-    nextTrack,
-    previousTrack,
-    loadPlaylistForEmotion,
+  // Play a specific track
+  const playTrack = (track: MusicTrack) => {
+    setCurrentTrack(track);
+    setIsPlaying(true);
+    // Audio element will autoplay when src changes
   };
+
+  // Pause current track
+  const pauseTrack = () => {
+    setIsPlaying(false);
+    audioRef.current?.pause();
+  };
+
+  // Toggle playback
+  const togglePlayback = () => {
+    if (isPlaying) {
+      pauseTrack();
+    } else {
+      if (currentTrack) {
+        audioRef.current?.play();
+        setIsPlaying(true);
+      }
+    }
+  };
+
+  // Set volume
+  const setVolume = (newVolume: number) => {
+    setVolumeState(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+  };
+
+  // Seek to position
+  const seek = (time: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+      setCurrentTime(time);
+    }
+  };
+
+  // Play next track in playlist
+  const playNextTrack = () => {
+    if (!currentTrack) return;
+    
+    // Find current index
+    const currentIndex = allTracks.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex === -1) return;
+    
+    // Get next index (loop back to start if at the end)
+    const nextIndex = (currentIndex + 1) % allTracks.length;
+    playTrack(allTracks[nextIndex]);
+  };
+
+  // Play previous track in playlist
+  const playPreviousTrack = () => {
+    if (!currentTrack) return;
+    
+    // Find current index
+    const currentIndex = allTracks.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex === -1) return;
+    
+    // Get previous index (loop to end if at the start)
+    const prevIndex = (currentIndex - 1 + allTracks.length) % allTracks.length;
+    playTrack(allTracks[prevIndex]);
+  };
+
+  // Play a preset (collection of tracks)
+  const playPreset = (preset: MusicPreset) => {
+    const tracksInPreset = allTracks.filter(track => preset.trackIds.includes(track.id));
+    if (tracksInPreset.length > 0) {
+      playTrack(tracksInPreset[0]);
+    }
+  };
+
+  // Find tracks by mood
+  const findTracksByMood = (mood: string): MusicTrack[] => {
+    return allTracks.filter(track => 
+      track.metadata?.mood?.toLowerCase() === mood.toLowerCase()
+    );
+  };
+
+  // Effect to handle play/pause state
+  useEffect(() => {
+    if (isPlaying) {
+      audioRef.current?.play().catch(err => {
+        console.error('Error playing audio:', err);
+        setIsPlaying(false);
+      });
+    } else {
+      audioRef.current?.pause();
+    }
+  }, [isPlaying, currentTrack]);
+
+  // Effect to set initial volume
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, []);
 
   return (
-    <MusicContext.Provider value={value}>
+    <MusicContext.Provider value={{
+      currentTrack,
+      audioRef,
+      isPlaying,
+      volume,
+      currentTime,
+      duration,
+      presets: musicPresets,
+      playTrack,
+      pauseTrack,
+      togglePlayback,
+      setVolume,
+      seek,
+      playNextTrack,
+      playPreviousTrack,
+      playPreset,
+      findTracksByMood
+    }}>
       {children}
-      <audio
-        ref={audioRef}
-        src={currentTrack ? currentTrack.audioUrl : ""}
-        volume={volume}
-        onTimeUpdate={handleTimeUpdate}
-        onEnded={handleEnded}
-      />
+      {currentTrack && (
+        <audio 
+          ref={audioRef}
+          src={currentTrack.url} 
+          onTimeUpdate={handleTimeUpdate}
+          onEnded={handleTrackEnd}
+        />
+      )}
     </MusicContext.Provider>
   );
 };
 
-// Mock data pour les playlists
-const mockPlaylists: MusicPlaylist[] = [
-  {
-    id: "playlist-happy",
-    title: "Happy Vibes",
-    description: "Morceaux joyeux pour améliorer votre humeur",
-    emotion: "happy",
-    tracks: [
-      {
-        id: "track-1",
-        title: "Walking on Sunshine",
-        artist: "Katrina & The Waves",
-        duration: 230,
-        audioUrl: "/music/walking-on-sunshine.mp3"
-      },
-      {
-        id: "track-2",
-        title: "Happy",
-        artist: "Pharrell Williams",
-        duration: 232,
-        audioUrl: "/music/happy.mp3"
-      }
-    ],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    coverImage: "/images/playlists/happy.jpg"
-  },
-  {
-    id: "playlist-calm",
-    title: "Calm & Relax",
-    description: "Musique douce pour se détendre",
-    emotion: "calm",
-    tracks: [
-      {
-        id: "track-3",
-        title: "Weightless",
-        artist: "Marconi Union",
-        duration: 480,
-        audioUrl: "/music/weightless.mp3"
-      },
-      {
-        id: "track-4",
-        title: "Nuvole Bianche",
-        artist: "Ludovico Einaudi",
-        duration: 350,
-        audioUrl: "/music/nuvole-bianche.mp3"
-      }
-    ],
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    coverImage: "/images/playlists/calm.jpg"
-  }
-];
-
-export const useMusicPlayer = () => {
-  const context = useContext(MusicContext);
-  if (!context) {
-    throw new Error("useMusicPlayer must be used within a MusicProvider");
-  }
-  return context;
-};
+// Export the hook for easy usage
+export const useMusic = () => useContext(MusicContext);
 
 export default MusicContext;

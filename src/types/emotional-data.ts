@@ -1,30 +1,21 @@
 
 export interface EmotionalData {
+  id: string;
+  user_id: string;
+  value: number;
   emotion: string;
   intensity: number;
-  timestamp: Date | string;
-  context?: string;
-  userId?: string;
-  user_id?: string;
-  id?: string;
+  timestamp: string;
   source?: string;
-  feedback?: string;
+  context?: string;
+  note?: string;
+  tags?: string[];
 }
 
-export interface EmotionalTrend {
+export interface EmotionResult {
   emotion: string;
-  count: number;
-  average_intensity: number;
-  timeframe: 'day' | 'week' | 'month';
-  trend?: 'improving' | 'declining' | 'stable';
-  primaryEmotion?: string;
-  secondaryEmotion?: string;
-  startDate?: string;
-  endDate?: string;
-  data?: EmotionalData[];
+  score: number;
+  confidence: number;
+  intensity: number;
+  recommendations: string[];
 }
-
-export type EmotionalFilter = 'all' | 'positive' | 'negative' | 'neutral' | string;
-
-// Pour compatibilité avec d'autres modules
-export type EmotionCategory = 'positive' | 'negative' | 'neutral' | 'mixed';

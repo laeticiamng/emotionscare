@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { ChatMessage } from '@/types/chat';
-import chatHistoryService from '@/lib/chat/chatHistoryService';
+import { chatHistoryService, conversationsService } from '@/lib/chat/services';
 
 export const useMessages = (conversationId: string | null) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -41,7 +41,7 @@ export const useMessages = (conversationId: string | null) => {
       };
       
       const newMessage = await chatHistoryService.addMessageToConversation(
-        messageWithStringTimestamp.conversation_id!,
+        messageWithStringTimestamp.conversationId!,
         messageWithStringTimestamp
       );
       setMessages((prevMessages) => [...prevMessages, newMessage]);

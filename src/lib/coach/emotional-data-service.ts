@@ -1,41 +1,55 @@
 
-import { EmotionResult, EmotionalData } from '@/types/types';
+import { v4 as uuidv4 } from 'uuid';
+import { EmotionalData } from '@/types/emotional-data';
+import { EmotionResult } from '@/types/emotional-data';
 
-export class EmotionalDataService {
-  // Mock storage for emotional data
-  private storage: EmotionalData[] = [];
+// Service pour gérer les données émotionnelles
+class EmotionalDataService {
+  private data: EmotionalData[] = [];
 
-  // Save emotional data
-  async saveEmotionalData(data: EmotionalData): Promise<void> {
-    this.storage.push(data);
-    console.log('Saved emotional data:', data);
-  }
-
-  // Get emotional data for a user
+  // Récupérer toutes les données pour un utilisateur
   async getUserEmotionalData(userId: string): Promise<EmotionalData[]> {
-    return this.storage.filter(data => data.userId === userId);
+    return this.data.filter(item => item.user_id === userId);
   }
 
-  // Get average emotional intensity for a user
-  async getAverageIntensity(userId: string): Promise<number> {
-    const userEmotions = await this.getUserEmotionalData(userId);
-    if (userEmotions.length === 0) return 0;
+  // Ajouter une nouvelle entrée émotionnelle
+  async addEmotionalData(data: Omit<EmotionalData, 'id'>): Promise<EmotionalData> {
+    const newEntry: EmotionalData = {
+      id: uuidv4(),
+      ...data,
+    };
     
-    const total = userEmotions.reduce((sum, data) => sum + (data.intensity || 0), 0);
-    return total / userEmotions.length;
+    this.data.push(newEntry);
+    return newEntry;
   }
 
-  // Update user's emotion trend (mock implementation)
-  async updateEmotionTrend(userId: string): Promise<void> {
-    console.log(`Updating emotion trend for user ${userId}`);
-    // In a real implementation, this would analyze recent emotions and update a trend indicator
+  // Analyser les données émotionnelles récentes
+  async analyzeRecentEmotions(userId: string): Promise<EmotionResult> {
+    // Simulation d'analyse
+    return {
+      emotion: 'calm',
+      score: 75,
+      confidence: 0.85,
+      intensity: 3,
+      recommendations: [
+        'Continuez vos exercices de méditation',
+        'Prenez des pauses régulières',
+        'Maintenez une routine de sommeil saine'
+      ]
+    };
   }
 
-  // Check for negative emotional trend (mock implementation)
-  async checkNegativeTrend(userId: string): Promise<boolean> {
-    // Mock implementation - randomly return true or false
-    return Math.random() > 0.7;
+  // Obtenir la dernière entrée émotionnelle
+  async getLatestEmotionalData(userId: string): Promise<EmotionalData | null> {
+    const userEntries = await this.getUserEmotionalData(userId);
+    if (userEntries.length === 0) return null;
+    
+    // Trie par horodatage (plus récent en premier)
+    return userEntries.sort((a, b) => 
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    )[0];
   }
 }
 
-export default EmotionalDataService;
+export const emotionalDataService = new EmotionalDataService();
+export default emotionalDataService;
