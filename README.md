@@ -184,6 +184,16 @@ L'application est entièrement responsive et optimisée pour les appareils mobil
 - Tests unitaires (placeholder) (`npm run test`)
 - Nettoyage du build (`npm run clean`)
 
+## Notifications CI
+
+Par défaut, GitHub envoie un email à chaque échec du workflow CI. Pour 
+éviter d'être submergé par ces messages :
+
+1. Ouvrez **Settings > Notifications** sur GitHub et désactivez
+   l'option *Actions*.
+2. Vous pouvez toujours réactiver les alertes en cas d'incident majeur
+   depuis cette même page.
+
 ## Monitoring & Alerting
 
 L'application intègre **Sentry** pour la surveillance des erreurs et des incidents.
