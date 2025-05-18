@@ -74,7 +74,7 @@ export const musicTracks: MusicTrack[] = [
   }
 ];
 
-export const allTracks = musicTracks; // Export this directly to resolve the import error
+export const allTracks = musicTracks; // Export allTracks explicitly
 
 export const musicPresets = [
   { id: 'calm', name: 'Calme', color: '#c4e0f3', trackIds: ['1', '5'] },
@@ -88,7 +88,7 @@ export const mockPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-calm',
     name: 'Ambiance Calme',
-    title: 'Ambiance Calme', // Pour compatibilité
+    title: 'Ambiance Calme',
     description: 'Une sélection de morceaux apaisants pour la relaxation et la méditation.',
     emotion: 'calm',
     mood: 'calm',
@@ -101,7 +101,7 @@ export const mockPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-focus',
     name: 'Concentration',
-    title: 'Concentration', // Pour compatibilité
+    title: 'Concentration',
     description: 'Améliorez votre concentration et productivité avec ces morceaux.',
     emotion: 'focused',
     mood: 'focused',
@@ -114,7 +114,7 @@ export const mockPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-happy',
     name: 'Bonne Humeur',
-    title: 'Bonne Humeur', // Pour compatibilité
+    title: 'Bonne Humeur',
     description: 'Une playlist énergisante pour remonter le moral et apporter de la joie.',
     emotion: 'happy',
     mood: 'happy',

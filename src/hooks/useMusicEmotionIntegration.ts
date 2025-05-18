@@ -1,64 +1,72 @@
 
 import { useCallback } from 'react';
-import { useMusic } from '@/contexts';
+import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
 import { EmotionMusicParams } from '@/types/music';
 
-interface EmotionMusicOptions {
-  emotion: string;
-  intensity?: number;
-}
-
-export function useMusicEmotionIntegration() {
-  const { loadPlaylistForEmotion, setOpenDrawer, setEmotion } = useMusic();
+/**
+ * Hook that integrates emotion recognition with music playback
+ */
+export const useMusicEmotionIntegration = () => {
+  const music = useMusic();
   const { toast } = useToast();
-
-  const activateMusicForEmotion = useCallback(async (options: EmotionMusicOptions) => {
-    const { emotion, intensity = 0.5 } = options;
+  
+  const getEmotionMusicDescription = (emotion: string): string => {
+    const descriptions: Record<string, string> = {
+      'happy': 'Des mélodies joyeuses pour amplifier votre bonne humeur',
+      'calm': 'Des sonorités apaisantes pour retrouver la sérénité',
+      'focus': 'Des compositions pour améliorer votre concentration',
+      'focused': 'Des compositions pour améliorer votre concentration',
+      'energetic': 'Des rythmes dynamiques pour booster votre énergie',
+      'sad': 'Des mélodies mélancoliques pour accompagner vos émotions',
+      'anxiety': 'Des sons apaisants pour réduire votre anxiété',
+      'confidence': 'Des compositions inspirantes pour renforcer votre confiance',
+      'sleep': 'Des berceuses douces pour faciliter l\'endormissement',
+      'relaxed': 'Des ambiances douces pour vous aider à vous détendre'
+    };
     
+    return descriptions[emotion.toLowerCase()] || 'Musique adaptée à votre humeur';
+  };
+  
+  const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams) => {
     try {
-      const params: EmotionMusicParams = { emotion, intensity };
-      setEmotion(emotion);
-      const playlist = await loadPlaylistForEmotion(params);
+      const playlist = await music.loadPlaylistForEmotion(params);
       
       if (playlist) {
-        setOpenDrawer(true);
+        music.setOpenDrawer(true);
         
         toast({
-          title: "Musique adaptée",
-          description: `Une playlist basée sur votre humeur "${emotion}" est maintenant active.`
+          title: "Musique activée",
+          description: `Une playlist adaptée à votre humeur ${params.emotion} est maintenant disponible.`,
         });
         
         return true;
       } else {
-        console.log(`No playlist found for emotion: ${emotion}`);
+        toast({
+          title: "Musique non disponible",
+          description: `Aucune playlist n'est disponible pour l'émotion ${params.emotion} pour le moment.`,
+          variant: "destructive",
+        });
+        
         return false;
       }
     } catch (error) {
-      console.error("Error activating music for emotion:", error);
+      console.error("Erreur lors de l'activation de la musique:", error);
+      
+      toast({
+        title: "Erreur",
+        description: "Impossible d'activer la musique pour votre émotion.",
+        variant: "destructive",
+      });
+      
       return false;
     }
-  }, [loadPlaylistForEmotion, setOpenDrawer, setEmotion, toast]);
-  
-  const getEmotionMusicDescription = useCallback((emotion: string): string => {
-    const descriptions: Record<string, string> = {
-      happy: "De la musique joyeuse et entraînante pour améliorer votre bonne humeur.",
-      sad: "Des mélodies apaisantes et réconfortantes pour vous accompagner dans ce moment.",
-      calm: "Des sons doux et apaisants pour maintenir votre tranquillité.",
-      focus: "Des rythmes qui favorisent la concentration et la productivité.",
-      energetic: "Des tempos dynamiques pour stimuler votre énergie.",
-      angry: "De la musique apaisante pour aider à gérer les émotions fortes.",
-      anxious: "Des mélodies relaxantes pour réduire l'anxiété et favoriser la détente.",
-      neutral: "Une sélection musicale équilibrée adaptée à votre journée."
-    };
-    
-    return descriptions[emotion.toLowerCase()] || descriptions.neutral;
-  }, []);
+  }, [music, toast]);
   
   return {
     activateMusicForEmotion,
-    getEmotionMusicDescription
+    getEmotionMusicDescription,
   };
-}
+};
 
 export default useMusicEmotionIntegration;

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusic } from '@/contexts/MusicContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 

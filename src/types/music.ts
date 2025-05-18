@@ -81,8 +81,7 @@ export interface MusicContextType {
   emotion: string | null;
   openDrawer: boolean;
   error?: Error | null;
-  playlists?: MusicPlaylist[];
-  isRepeating?: boolean; // Added based on error
+  isRepeating?: boolean;
   isShuffled?: boolean;
   queue?: MusicTrack[];
   progress?: number;
@@ -92,8 +91,8 @@ export interface MusicContextType {
   setMute: (muted: boolean) => void;
   toggleMute: () => void;
   seekTo: (time: number) => void;
-  togglePlayPause: () => void;
-  togglePlay: () => void;  // Added for compatibility
+  togglePlayPause?: () => void;
+  togglePlay: () => void;
   toggleDrawer?: () => void;
   closeDrawer?: () => void;
   setOpenDrawer: (open: boolean) => void;
@@ -101,8 +100,8 @@ export interface MusicContextType {
   pauseTrack: () => void;
   resumeTrack: () => void;
   nextTrack: () => void;
-  prevTrack: () => void;
-  previousTrack: () => void; // Alias for prevTrack
+  prevTrack?: () => void;
+  previousTrack: () => void;
   setEmotion: (emotion: string) => void;
   loadPlaylistForEmotion: (emotion: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
   setPlaylist: (playlist: MusicPlaylist | MusicTrack[]) => void;
@@ -124,7 +123,6 @@ export interface MusicPlayerProps {
   onEnded?: () => void;
   onError?: (error: Error) => void;
   className?: string;
-  // Additional props needed by components
   onPlay?: () => void;
   onPause?: () => void;
   onNext?: () => void;

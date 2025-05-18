@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusic } from '@/contexts/MusicContext';
 
 export function useMusicPlayer() {
   const music = useMusic();
