@@ -21,6 +21,9 @@ export interface User {
   position?: string;
   emotional_score?: number;
   preferences?: UserPreferences;
+  displayName?: string;  // Added for identity settings
+  firstName?: string;    // Added for user info
+  lastName?: string;     // Added for user info
 }
 
 export interface UserPreferences {
@@ -41,6 +44,9 @@ export interface UserPreferences {
     anonymizeReports: boolean;
     profileVisibility: string;
     anonymousMode?: boolean;
+    shareActivity?: boolean;  // Added for data privacy settings
+    shareJournal?: boolean;   // Added for data privacy settings
+    publicProfile?: boolean;  // Added for data privacy settings
   };
   notifications?: {
     enabled: boolean;
@@ -61,6 +67,11 @@ export interface UserPreferences {
     push: boolean;
     sms: boolean;
   };
+  // Identity fields
+  avatarUrl?: string;
+  displayName?: string;
+  pronouns?: string;
+  biography?: string;
 }
 
 export interface UserWithStatus {

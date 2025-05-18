@@ -1,118 +1,164 @@
 
-import { useState, useEffect } from 'react';
-import { Badge, Challenge } from '@/types/gamification';
-import { LeaderboardEntry } from '@/types/badge';
+import { useState } from 'react';
+import { Badge, Challenge, LeaderboardEntry } from '@/types/badge';
 
-export const useCommunityGamification = () => {
-  // Données simulées pour les badges
-  const mockBadges: Badge[] = [
+export function useCommunityGamification() {
+  const [badges, setBadges] = useState<Badge[]>([
     {
-      id: "1",
-      name: "Early Adopter",
-      description: "Vous êtes parmi les premiers à rejoindre notre communauté",
-      imageUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=badge1",
-      image_url: "https://api.dicebear.com/7.x/shapes/svg?seed=badge1",
-      tier: "gold",
-      icon: "trophy",
-      earned: true,
-      level: "gold",
-      category: "engagement",
-      progress: 100,
-      threshold: 1,
+      id: '1',
+      name: 'Premier pas',
+      description: 'Rejoindre la communauté',
+      imageUrl: '/badges/welcome.svg',
       unlocked: true,
+      level: 1,
+      category: 'community',
+      tier: 'bronze',
+      progress: 100,
+      threshold: 100,
       completed: true
     },
     {
-      id: "2",
-      name: "Journal Master",
-      description: "Vous avez écrit 20 entrées de journal",
-      imageUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=badge2",
-      image_url: "https://api.dicebear.com/7.x/shapes/svg?seed=badge2",
-      tier: "silver",
-      icon: "book",
-      earned: false,
-      level: "silver",
-      category: "journal",
-      progress: 14,
-      threshold: 20,
+      id: '2',
+      name: 'Communicateur',
+      description: 'Participer à 5 discussions',
+      imageUrl: '/badges/communicator.svg',
+      unlocked: true,
+      level: 2,
+      category: 'community',
+      tier: 'silver',
+      progress: 5,
+      threshold: 5,
+      completed: true
+    },
+    {
+      id: '3',
+      name: 'Influenceur',
+      description: 'Obtenir 10 likes sur vos commentaires',
+      imageUrl: '/badges/influencer.svg',
       unlocked: false,
+      level: 3,
+      category: 'community',
+      tier: 'gold',
+      progress: 4,
+      threshold: 10,
       completed: false
     }
-  ];
+  ]);
 
-  // Données simulées pour les défis
-  const mockChallenges: Challenge[] = [
+  const [challenges, setChallenges] = useState<Challenge[]>([
     {
-      id: "1",
-      title: "7 jours de méditation",
-      name: "meditation-week",
-      description: "Complétez une session de méditation chaque jour pendant une semaine",
+      id: 'c1',
+      title: 'Soutien communautaire',
+      name: 'Soutien communautaire',
+      description: 'Répondre à 3 questions d\'autres membres',
       points: 100,
-      progress: 5,
+      progress: 1,
+      goal: 3,
+      category: 'community',
       completed: false,
-      status: "in-progress",
-      category: "meditation",
-      goal: 7
+      status: 'in-progress',
+      difficulty: 'easy',
+      completions: 1,
+      total: 3
     },
     {
-      id: "2",
-      title: "Journal quotidien",
-      name: "daily-journal",
-      description: "Écrivez dans votre journal tous les jours pendant 5 jours",
+      id: 'c2',
+      title: 'Partage bienveillant',
+      name: 'Partage bienveillant',
+      description: 'Partager une expérience personnelle positive',
       points: 50,
-      progress: 2,
+      progress: 1,
+      goal: 1,
+      category: 'community',
+      completed: true,
+      status: 'completed',
+      difficulty: 'easy',
+      completions: 1,
+      total: 1
+    },
+    {
+      id: 'c3',
+      title: 'Engagement hebdomadaire',
+      name: 'Engagement hebdomadaire',
+      description: 'Participer aux discussions 5 jours cette semaine',
+      points: 200,
+      progress: 3,
+      goal: 5,
+      category: 'community',
       completed: false,
-      status: "in-progress",
-      category: "journal",
-      goal: 5
+      status: 'in-progress',
+      difficulty: 'medium',
+      completions: 3,
+      total: 5,
+      deadline: new Date(Date.now() + 3*24*60*60*1000).toISOString()
     }
-  ];
+  ]);
 
-  // Données simulées pour le classement
-  const mockLeaderboard: LeaderboardEntry[] = [
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([
     {
-      id: "1",
-      userId: "user1",
-      name: "TheMindfulOne",
-      score: 780,
+      id: 'l1',
+      userId: 'u123',
+      name: 'Marie L.',
+      username: 'marie_l',
+      points: 850,
       rank: 1,
-      badges: 5,
-      avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Felix"
+      avatar: '/avatars/user1.png',
+      score: 850
     },
     {
-      id: "2",
-      userId: "user2",
-      name: "EmotionNavigator",
-      score: 650,
+      id: 'l2',
+      userId: 'u456',
+      name: 'Thomas B.',
+      username: 'thomas_b',
+      points: 720,
       rank: 2,
-      badges: 4,
-      avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Emma"
+      avatar: '/avatars/user2.png',
+      score: 720
     },
     {
-      id: "3",
-      userId: "user3",
-      name: "SereneSpirit",
-      score: 520,
+      id: 'l3',
+      userId: 'u789',
+      name: 'Sophie C.',
+      username: 'sophie_c',
+      points: 690,
       rank: 3,
-      badges: 3,
-      avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=Sophie"
+      avatar: '/avatars/user3.png',
+      score: 690
     }
-  ];
+  ]);
+
+  const unlockBadge = (badgeId: string) => {
+    setBadges(prev => prev.map(badge => 
+      badge.id === badgeId 
+        ? { ...badge, unlocked: true, completed: true, progress: badge.threshold || 100 } 
+        : badge
+    ));
+  };
+
+  const updateProgress = (challengeId: string, progress: number) => {
+    setChallenges(prev => prev.map(challenge => {
+      if (challenge.id !== challengeId) return challenge;
+      
+      const newProgress = Math.min(progress, challenge.goal);
+      const completed = newProgress >= challenge.goal;
+      
+      return {
+        ...challenge,
+        progress: newProgress,
+        completed,
+        status: completed ? 'completed' : 'in-progress',
+        completions: newProgress,
+      };
+    }));
+  };
 
   return {
-    badges: mockBadges,
-    challenges: mockChallenges,
-    leaderboard: mockLeaderboard,
-    loading: false,
-    error: null,
-    stats: {
-      points: 350,
-      level: 4,
-      badges: mockBadges.filter(badge => badge.earned).length,
-      streak: 3,
-      streakDays: 3
-    }
+    badges,
+    challenges,
+    leaderboard,
+    unlockBadge,
+    updateProgress
   };
-};
+}
 
 export default useCommunityGamification;

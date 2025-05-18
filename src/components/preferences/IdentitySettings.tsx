@@ -1,131 +1,112 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { Control } from 'react-hook-form';
+import { FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { UserPreferences } from '@/types/preferences';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { User, Upload } from 'lucide-react';
 
 interface IdentitySettingsProps {
-  preferences: UserPreferences;
-  onChange: (preferences: Partial<UserPreferences>) => void;
+  control: Control<UserPreferences, any>;
+  isLoading: boolean;
 }
 
 const IdentitySettings: React.FC<IdentitySettingsProps> = ({
-  preferences,
-  onChange,
+  control,
+  isLoading
 }) => {
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const avatarUrl = preferences.avatarUrl || '';
-  
-  // Local state for form fields
-  const [displayName, setDisplayName] = useState(preferences.displayName || '');
-  const [pronouns, setPronouns] = useState(preferences.pronouns || '');
-  const [biography, setBiography] = useState(preferences.biography || '');
-  
-  // Handle avatar upload
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setAvatarFile(file);
-      
-      // Create a preview URL
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target && event.target.result) {
-          const updatedPreferences = {
-            ...preferences,
-            avatarUrl: event.target.result as string
-          };
-          onChange(updatedPreferences);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-  
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const updatedPreferences = {
-      ...preferences,
-      avatarUrl,
-      displayName,
-      pronouns,
-      biography
-    };
-    
-    onChange(updatedPreferences);
-  };
-  
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <div className="flex flex-col items-center space-y-4">
-          <Avatar className="w-24 h-24">
-            {avatarUrl ? (
-              <AvatarImage src={avatarUrl} alt="Photo de profil" />
-            ) : (
-              <AvatarFallback>
-                <User size={48} />
-              </AvatarFallback>
-            )}
-          </Avatar>
-          
-          <div>
-            <Label htmlFor="avatar" className="cursor-pointer inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90">
-              <Upload size={16} className="mr-2" />
-              Changer d'avatar
-            </Label>
-            <Input 
-              id="avatar" 
-              type="file" 
-              className="hidden" 
+    <div className="space-y-4">
+      {/* Pour l'avatar, nous utilisons une approche personnalisée car ce n'est pas un champ standard */}
+      <div className="flex items-center space-x-4 rounded-lg border p-3 shadow-sm">
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+          {control._formValues.avatarUrl ? (
+            <img 
+              src={control._formValues.avatarUrl} 
+              alt="Avatar utilisateur" 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="text-2xl font-semibold text-muted-foreground">
+              {control._formValues.displayName?.[0]?.toUpperCase() || 'U'}
+            </div>
+          )}
+        </div>
+        <div className="space-y-1">
+          <FormLabel>Image de profil</FormLabel>
+          <FormDescription>
+            Cette image sera affichée sur votre profil
+          </FormDescription>
+          <div className="pt-2">
+            <Input
+              type="file"
               accept="image/*"
-              onChange={handleAvatarChange}
+              disabled={isLoading}
+              onChange={(e) => {
+                // Dans une implémentation réelle, ceci téléchargerait l'image
+                // et mettrait à jour avatarUrl avec l'URL résultante
+                console.log("Image sélectionnée:", e.target.files?.[0]);
+              }}
             />
           </div>
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="displayName">Nom d'affichage</Label>
-          <Input 
-            id="displayName" 
-            value={displayName} 
-            onChange={(e) => setDisplayName(e.target.value)}
-            placeholder="Comment souhaitez-vous être appelé ?"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="pronouns">Pronoms</Label>
-          <Input 
-            id="pronouns" 
-            value={pronouns} 
-            onChange={(e) => setPronouns(e.target.value)}
-            placeholder="ex: il/lui, elle/elle, iel/ellui"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="biography">Biographie</Label>
-          <Textarea 
-            id="biography" 
-            value={biography} 
-            onChange={(e) => setBiography(e.target.value)}
-            placeholder="Parlez un peu de vous..."
-            rows={4}
-          />
-        </div>
       </div>
       
-      <Button type="submit" className="w-full">
-        Enregistrer les modifications
-      </Button>
-    </form>
+      <FormItem>
+        <FormLabel>Nom d'affichage</FormLabel>
+        <FormControl>
+          <Input 
+            placeholder="Votre nom"
+            value={control._formValues.displayName || ''}
+            onChange={(e) => {
+              control._formValues.displayName = e.target.value;
+              control._formState.dirtyFields.displayName = true;
+            }}
+            disabled={isLoading}
+          />
+        </FormControl>
+        <FormDescription>
+          Le nom qui sera affiché aux autres utilisateurs
+        </FormDescription>
+      </FormItem>
+
+      <FormItem>
+        <FormLabel>Pronoms</FormLabel>
+        <FormControl>
+          <Input 
+            placeholder="ex: il/lui, elle/elle, iel/ellui"
+            value={control._formValues.pronouns || ''}
+            onChange={(e) => {
+              control._formValues.pronouns = e.target.value;
+              control._formState.dirtyFields.pronouns = true;
+            }}
+            disabled={isLoading}
+          />
+        </FormControl>
+        <FormDescription>
+          Comment souhaitez-vous être désigné·e (facultatif)
+        </FormDescription>
+      </FormItem>
+      
+      <FormItem>
+        <FormLabel>Biographie</FormLabel>
+        <FormControl>
+          <Textarea 
+            placeholder="Partagez quelque chose à propos de vous..."
+            value={control._formValues.biography || ''}
+            onChange={(e) => {
+              control._formValues.biography = e.target.value;
+              control._formState.dirtyFields.biography = true;
+            }}
+            disabled={isLoading}
+            rows={4}
+          />
+        </FormControl>
+        <FormDescription>
+          Une brève description qui sera visible sur votre profil
+        </FormDescription>
+      </FormItem>
+    </div>
   );
 };
 

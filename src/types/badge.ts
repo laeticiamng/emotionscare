@@ -15,12 +15,15 @@ export interface Badge {
   threshold?: number;
   completed?: boolean;
   rarity?: string;
+  achieved?: boolean;
+  unlockedAt?: string;
+  unlocked_at?: string;
 }
 
 export interface Challenge {
   id: string;
   title: string;
-  name?: string; // Added to satisfy type requirements
+  name?: string;
   description: string;
   points: number;
   progress: number;
@@ -29,7 +32,11 @@ export interface Challenge {
   completed: boolean;
   status: string;
   totalSteps?: number;
-  tags?: string[]; // Added to satisfy import requirements
+  tags?: string[];
+  difficulty?: string;
+  completions?: number;
+  total?: number;
+  deadline?: string;
 }
 
 export interface LeaderboardEntry {
@@ -39,4 +46,6 @@ export interface LeaderboardEntry {
   rank: number;
   avatar?: string;
   name?: string;
+  username?: string;
+  score?: number;
 }

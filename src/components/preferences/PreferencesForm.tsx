@@ -6,7 +6,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } fr
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
-import { UserPreferences } from '@/types';
+import { UserPreferences } from '@/types/preferences';
 import DisplayPreferences from './DisplayPreferences';
 import NotificationsPreferences from './NotificationsPreferences';
 import DataPrivacySettings from './DataPrivacySettings';
@@ -22,31 +22,31 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ onClose }) => {
   const defaultValues: UserPreferences = {
     ...preferences,
     notifications: {
-      enabled: true,
-      emailEnabled: false,
-      pushEnabled: true,
-      inAppEnabled: true,
+      enabled: preferences.notifications?.enabled ?? true,
+      emailEnabled: preferences.notifications?.emailEnabled ?? false,
+      pushEnabled: preferences.notifications?.pushEnabled ?? true,
+      inAppEnabled: preferences.notifications?.inAppEnabled ?? true,
       types: {
-        system: true,
-        emotion: true,
-        coach: true,
-        journal: true,
-        community: true,
-        achievement: true,
+        system: preferences.notifications?.types?.system ?? true,
+        emotion: preferences.notifications?.types?.emotion ?? true,
+        coach: preferences.notifications?.types?.coach ?? true,
+        journal: preferences.notifications?.types?.journal ?? true,
+        community: preferences.notifications?.types?.community ?? true,
+        achievement: preferences.notifications?.types?.achievement ?? true,
       },
-      frequency: 'normal',
-      email: false,
-      push: true,
-      sms: false,
+      frequency: preferences.notifications?.frequency ?? 'normal',
+      email: preferences.notifications?.email ?? false,
+      push: preferences.notifications?.push ?? true,
+      sms: preferences.notifications?.sms ?? false,
     },
     privacy: {
-      shareData: true,
-      anonymizeReports: false,
-      profileVisibility: 'public',
-      shareActivity: true,
-      shareJournal: false,
-      publicProfile: true,
-      anonymousMode: false,
+      shareData: preferences.privacy?.shareData ?? true,
+      anonymizeReports: preferences.privacy?.anonymizeReports ?? false,
+      profileVisibility: preferences.privacy?.profileVisibility ?? 'public',
+      shareActivity: preferences.privacy?.shareActivity ?? true,
+      shareJournal: preferences.privacy?.shareJournal ?? false,
+      publicProfile: preferences.privacy?.publicProfile ?? true,
+      anonymousMode: preferences.privacy?.anonymousMode ?? false,
     },
     theme: preferences.theme || 'system',
     fontSize: preferences.fontSize || 'medium',
@@ -63,7 +63,7 @@ const PreferencesForm: React.FC<PreferencesFormProps> = ({ onClose }) => {
 
   const onSubmit = async (data: UserPreferences) => {
     try {
-      await updatePreferences(data);
+      await updatePreferences(data as Partial<UserPreferences>);
       if (onClose) onClose();
     } catch (error) {
       console.error("Failed to update preferences:", error);

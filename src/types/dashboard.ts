@@ -1,61 +1,69 @@
 
-export type KpiCardStatus = 'success' | 'warning' | 'error' | 'info';
-
-export interface KpiDelta {
-  value: number;
-  trend: 'up' | 'down' | 'neutral';
-  label?: string;
-}
+import { Badge, Challenge, LeaderboardEntry } from './badge';
 
 export interface KpiCardProps {
-  id?: string;
   title: string;
-  value: React.ReactNode;
-  delta?: number | KpiDelta | { value: number; trend: string; label?: string };
+  value: number;
+  trend?: 'up' | 'down' | 'neutral';
+  label?: string;
   icon?: React.ReactNode;
-  subtitle?: string;
-  status?: KpiCardStatus;
   className?: string;
-  isLoading?: boolean;
-  ariaLabel?: string;
+  percentage?: number;
+  subtitle?: string;
+  prefix?: string;
+  suffix?: string;
   onClick?: () => void;
-  footer?: React.ReactNode;
-  
-  // Propriétés pour le positionnement dans la grille
-  x?: number;
-  y?: number;
-  w?: number;
-  h?: number;
 }
 
-export interface DraggableKpiCardsGridProps {
-  cards: KpiCardProps[];
-  onLayout?: (layout: any) => void;
-  savedLayout?: any;
-  isEditable?: boolean;
-  onSave?: (layouts: any) => void;
-}
-
-export interface GlobalOverviewTabProps {
-  isLoading?: boolean;
-  data?: any;
-  filters?: any;
-}
-
-export interface DashboardWidgetConfig {
+export interface KpiCardData {
   id: string;
   title: string;
-  type: string;
-  size: 'sm' | 'md' | 'lg' | 'xl';
-  data: any;
-  settings?: any;
+  value: number;
+  previousValue?: number;
+  trend?: 'up' | 'down' | 'neutral';
+  percentage?: number;
+  icon?: string;
+  label?: string;
+  color?: string;
 }
 
-export interface GamificationData {
-  points: number;
-  level: number;
-  badges: number;
-  streakDays: number;
-  nextLevelPoints: number;
-  achievements: any[];
+export interface ChartData {
+  id: string;
+  type: 'line' | 'bar' | 'pie' | 'radar';
+  title: string;
+  data: any;
+  period: 'day' | 'week' | 'month' | 'year';
 }
+
+export interface DashboardState {
+  kpis: KpiCardData[];
+  charts: ChartData[];
+  badges: Badge[];
+  challenges: Challenge[];
+  leaderboard: LeaderboardEntry[];
+  loading: boolean;
+  error: Error | null;
+}
+
+export interface DashboardWidgetData {
+  id: string;
+  title: string;
+  type: 'kpi' | 'chart' | 'badges' | 'challenges' | 'leaderboard' | 'custom';
+  data: any;
+  layout?: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  };
+  settings?: Record<string, any>;
+}
+
+export interface DashboardSettings {
+  autoRefresh: boolean;
+  refreshInterval: number;
+  layout: 'grid' | 'list';
+  widgets: DashboardWidgetData[];
+}
+
+export type { LeaderboardEntry };

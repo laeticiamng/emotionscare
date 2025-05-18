@@ -4,28 +4,50 @@ import { Badge } from '@/types/badge';
 export const mockBadges: Badge[] = [
   {
     id: "1",
-    name: "Méditation Débutant",
-    description: "Complété 5 sessions de méditation guidée",
-    image_url: "/images/badges/meditation-starter.png",
-    imageUrl: "/images/badges/meditation-starter.png",
-    icon: "mindfulness",
-    threshold: 5,
-    earned: false,
-    level: "bronze",
-    category: "mindfulness",
-    unlocked: false
+    name: "Early adopter",
+    description: "Un des premiers à rejoindre la plateforme",
+    imageUrl: "/badges/early-adopter.png",
+    unlocked: true,
+    level: 1,
+    category: "system",
+    rarity: "rare"
   },
   {
     id: "2",
-    name: "Journal Émotionnel",
-    description: "Enregistré des émotions pendant 7 jours consécutifs",
-    image_url: "/images/badges/journal-streak.png",
-    imageUrl: "/images/badges/journal-streak.png",
-    icon: "journal",
-    threshold: 7,
-    earned: false,
-    level: "silver",
-    category: "tracking",
-    unlocked: false
+    name: "Émotions partagées",
+    description: "Partager ses émotions 10 fois",
+    imageUrl: "/badges/emotion-sharing.png",
+    unlocked: true,
+    level: 2,
+    category: "emotion",
+    progress: 10,
+    threshold: 10,
+    completed: true
+  },
+  {
+    id: "3",
+    name: "Journaliste en herbe",
+    description: "Créer 5 entrées de journal",
+    imageUrl: "/badges/journal-writer.png",
+    unlocked: false,
+    level: 1,
+    category: "journal",
+    progress: 3,
+    threshold: 5,
+    completed: false
+  },
+  {
+    id: "4", 
+    name: "Mélomane",
+    description: "Écouter 20 morceaux de musique",
+    imageUrl: "/badges/music-lover.png",
+    unlocked: false,
+    level: 3,
+    category: "music",
+    progress: 12,
+    threshold: 20,
+    completed: false
   }
 ];
+
+export default mockBadges;

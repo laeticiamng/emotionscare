@@ -29,7 +29,7 @@ export interface PrivacyPreference {
   shareActivity?: boolean;
   shareJournal?: boolean;
   publicProfile?: boolean;
-  anonymousMode?: boolean; // Added missing field
+  anonymousMode?: boolean;
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -62,6 +62,8 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
     shareData: true,
     anonymizeReports: false,
     profileVisibility: 'public',
+    shareActivity: true,
+    shareJournal: false,
     anonymousMode: false
   },
   soundEnabled: true,
@@ -95,6 +97,12 @@ export interface UserPreferences {
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   ambientSound?: string;
+  
+  // Identity settings
+  avatarUrl?: string;
+  displayName?: string;
+  pronouns?: string;
+  biography?: string;
   
   // Structured preferences
   notifications?: NotificationPreference;
