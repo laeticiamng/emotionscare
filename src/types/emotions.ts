@@ -1,90 +1,60 @@
 
-export interface Emotion {
-  id: string;
-  name: string;  
-  label: string;
-  color: string;
-  intensity: number;
-  icon?: string;
-  emoji?: string;
-  emotion?: string; // Pour la compatibilité avec certains hooks
-  user_id?: string;
-  date?: string;
-  score?: number;
-  confidence: number;
-  text?: string;
-  feedback?: string;
-  transcript?: string;
-  timestamp?: string;
-  source?: string;
-  audioUrl?: string;
-  textInput?: string;
-  facialExpression?: string;
-  category?: string;
-}
+/**
+ * Emotion Types
+ * --------------------------------------
+ * This file defines the official types for emotion detection and processing.
+ * Any new property or correction must be documented here and synchronized across all components.
+ */
 
 export interface EmotionResult {
   id: string;
   emotion: string;
   confidence: number;
+  intensity: number;
   timestamp?: string;
-  source?: string;
-  audioUrl?: string;
-  textInput?: string;
-  facialExpression?: string;
-  score?: number;
+  emojis: string[] | string;
+  source?: 'facial' | 'voice' | 'text' | 'combined' | 'manual' | 'scan' | 'fallback';
+  
+  // Additional fields used by various components
   text?: string;
-  emojis?: string[] | string;
-  user_id?: string;
-  userId?: string;
-  date?: string;
-  audio_url?: string;
-  ai_feedback?: string;
   feedback?: string;
-  primary_emotion?: string;
-  emotions?: Record<string, number | undefined>;
-  intensity?: number;
-  transcript?: string;
-  recommendations?: string[];
-  details?: Record<string, number>;
-  duration?: number;
-  category?: string;
-  predictedEmotion?: string;
-}
-
-export interface EnhancedEmotionResult extends EmotionResult {
-  dominantEmotion: {
-    name: string;
-    score: number;
-  }
-}
-
-export interface LiveVoiceScannerProps {
-  onEmotionDetected?: (result: EmotionResult) => void;
-  onResult?: (result: EmotionResult) => void;
-  onFinish?: () => void;
-  automaticMode?: boolean;
-  instruction?: string;
-  buttonText?: string;
-  autoStart?: boolean;
-  language?: string;
-  duration?: number;
-  className?: string;
-  withAI?: boolean;
-  onError?: (error: string) => void;
-  continuous?: boolean;
-}
-
-export interface TeamOverviewProps {
-  teamId?: string;
-  period?: 'day' | 'week' | 'month';
+  score?: number;
   userId?: string;
-  anonymized?: boolean;
-  className?: string;
-  dateRange?: any;
-  users?: any[];
-  showNames?: boolean;
-  compact?: boolean;
+  user_id?: string; // Legacy field - use userId instead
+  date?: string; // Legacy field - use timestamp instead
+  recommendations?: EmotionRecommendation[]; // Used by some components
+}
+
+export interface EmotionRecommendation {
+  id: string;
+  type: 'music' | 'activity' | 'exercise' | 'content';
+  title: string;
+  description?: string;
+  emoji?: string;
+  actionText?: string;
+  actionUrl?: string;
+}
+
+export interface Emotion {
+  name: string;
+  label?: string;
+  emoji: string;
+  color: string;
+  intensity?: number;
+  description?: string;
+  keywords?: string[];
+}
+
+export interface EmotionData {
+  id: string;
+  userId: string;
+  user_id?: string; // Legacy field - use userId instead
+  emotion: string;
+  intensity: number;
+  timestamp: string;
+  source: string;
+  text?: string;
+  context?: string;
 }
 
 export interface EmotionalTeamViewProps {
@@ -98,7 +68,7 @@ export interface EmotionalTeamViewProps {
   showGraph?: boolean;
   showMembers?: boolean;
   className?: string;
+  startDate?: string;
+  endDate?: string;
+  showNames?: boolean;
 }
-
-// Exporter EmotionalData
-export * from './emotional-data';

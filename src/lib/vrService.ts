@@ -1,5 +1,11 @@
 
-import { VRSession, VRSessionTemplate } from '@/types';
+/**
+ * MOCK DATA
+ * Ce fichier respecte strictement les types officiels VRSession et VRSessionTemplate
+ * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
+ */
+
+import { VRSession, VRSessionTemplate } from '@/types/vr';
 
 // Mock VR templates
 const vrTemplates: VRSessionTemplate[] = [
@@ -8,26 +14,32 @@ const vrTemplates: VRSessionTemplate[] = [
     title: 'Méditation en forêt',
     description: 'Une méditation immersive au cœur d\'une forêt paisible',
     duration: 600, // 10 minutes
-    type: 'meditation',
-    thumbnail: '/images/vr/forest-meditation.jpg',
-    videoUrl: '/videos/forest-meditation.mp4',
-    emotion: 'calm',
-    emotionTarget: 'calm',
-    benefits: ['Réduction du stress', 'Amélioration du sommeil', 'Clarté mentale'],
-    difficulty: 'débutant'
+    difficulty: 'débutant',
+    thumbnailUrl: '/images/vr/forest-meditation.jpg',
+    environment: 'forest',
+    category: 'meditation',
+    tags: ['nature', 'relaxation', 'méditation'],
+    immersionLevel: 'medium',
+    goalType: 'meditation',
+    audioTrack: '/audio/forest-meditation.mp3',
+    interactive: false,
+    recommendedFor: ['stress', 'anxiety']
   },
   {
     id: '2',
     title: 'Plage tropicale',
     description: 'Échappez-vous sur une plage tropicale idyllique',
     duration: 900, // 15 minutes
-    type: 'relaxation',
-    thumbnail: '/images/vr/tropical-beach.jpg',
-    videoUrl: '/videos/tropical-beach.mp4',
-    emotion: 'happy',
-    emotionTarget: 'joy',
-    benefits: ['Réduction de l\'anxiété', 'Élévation de l\'humeur', 'Détente profonde'],
-    difficulty: 'intermédiaire'
+    difficulty: 'intermédiaire',
+    thumbnailUrl: '/images/vr/tropical-beach.jpg',
+    environment: 'beach',
+    category: 'relaxation',
+    tags: ['plage', 'mer', 'soleil'],
+    immersionLevel: 'high',
+    goalType: 'relaxation',
+    audioTrack: '/audio/tropical-beach.mp4',
+    interactive: false,
+    recommendedFor: ['anxiety', 'stress']
   }
 ];
 
@@ -37,27 +49,31 @@ const vrSessions: VRSession[] = [
     id: '101',
     templateId: '1',
     userId: 'user123',
-    startTime: new Date().toISOString(),
-    endTime: new Date(Date.now() + 10 * 60000).toISOString(),
+    startedAt: new Date().toISOString(),
+    endedAt: new Date(Date.now() + 10 * 60000).toISOString(),
     duration: 600,
     completed: true,
-    emotionBefore: 'stressed',
-    emotionAfter: 'calm',
-    emotionTarget: 'calm',
-    rating: 4
+    feedback: {
+      rating: 4,
+      emotionBefore: 'stressed',
+      emotionAfter: 'calm',
+      comment: 'Très relaxant, j\'ai beaucoup aimé'
+    }
   },
   {
     id: '102',
     templateId: '2',
     userId: 'user123',
-    startTime: new Date(Date.now() - 86400000).toISOString(), // Yesterday
-    endTime: new Date(Date.now() - 86400000 + 15 * 60000).toISOString(),
+    startedAt: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+    endedAt: new Date(Date.now() - 86400000 + 15 * 60000).toISOString(),
     duration: 900,
     completed: true,
-    emotionBefore: 'anxious',
-    emotionAfter: 'relaxed',
-    emotionTarget: 'joy',
-    rating: 5
+    feedback: {
+      rating: 5,
+      emotionBefore: 'anxious',
+      emotionAfter: 'relaxed',
+      comment: 'Parfait pour se détendre'
+    }
   }
 ];
 
@@ -97,11 +113,9 @@ export const createVRSession = async (sessionData: Partial<VRSession>): Promise<
         id: Math.random().toString(36).substr(2, 9),
         templateId: sessionData.templateId || '',
         userId: sessionData.userId || '',
-        startTime: new Date().toISOString(),
+        startedAt: new Date().toISOString(),
         duration: sessionData.duration || 0,
         completed: false,
-        emotionBefore: sessionData.emotionBefore,
-        emotionTarget: sessionData.emotionTarget,
         ...sessionData
       };
       vrSessions.push(newSession);
@@ -123,7 +137,7 @@ export const completeVRSession = async (sessionId: string, sessionData: Partial<
       const updatedSession: VRSession = {
         ...vrSessions[sessionIndex],
         ...sessionData,
-        endTime: new Date().toISOString(),
+        endedAt: new Date().toISOString(),
         completed: true
       };
       
@@ -157,11 +171,11 @@ export const getRecommendedTemplates = async (emotion: string): Promise<VRSessio
   // Simulate API call delay
   return new Promise((resolve) => {
     setTimeout(() => {
-      // Filter templates that match or counter the current emotion
+      // Filter templates that are recommended for this emotion
       const recommended = vrTemplates.filter(t => 
-        t.emotionTarget === emotion || 
-        (emotion === 'stressed' && t.emotionTarget === 'calm') ||
-        (emotion === 'sad' && t.emotionTarget === 'joy')
+        t.recommendedFor?.includes(emotion) || 
+        (emotion === 'stressed' && t.goalType === 'relaxation') ||
+        (emotion === 'sad' && t.goalType === 'energizing')
       );
       resolve(recommended.length ? recommended : vrTemplates);
     }, 500);

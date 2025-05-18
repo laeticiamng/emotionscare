@@ -1,30 +1,42 @@
 
-import { EmotionResult } from '@/types';
+/**
+ * MOCK DATA
+ * Ce fichier respecte strictement le type officiel EmotionResult
+ * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
+ */
+
+import { EmotionResult } from '@/types/emotion';
 
 export const mockEmotionResults: EmotionResult[] = [
   {
+    id: "emotion-1",
     emotion: 'calm',
     confidence: 0.87,
-    timestamp: new Date(),
-    triggers: ['méditation', 'bonne nouvelle'],
-    intensity: 7,
-    secondary: ['happy', 'peaceful']
+    timestamp: new Date().toISOString(),
+    intensity: 0.7,
+    emojis: ["😌", "🧘"],
+    source: "scan",
+    text: "Je me sens calme après ma session de méditation"
   },
   {
+    id: "emotion-2",
     emotion: 'stressed',
     confidence: 0.72,
-    timestamp: new Date(Date.now() - 86400000), // 1 jour avant
-    triggers: ['réunion', 'échéance'],
-    intensity: 6,
-    secondary: ['anxious', 'worried']
+    timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 jour avant
+    intensity: 0.6,
+    emojis: ["😓", "⚡"],
+    source: "scan",
+    text: "Journée stressante avec plusieurs réunions et échéances"
   },
   {
+    id: "emotion-3",
     emotion: 'happy',
     confidence: 0.91,
-    timestamp: new Date(Date.now() - 172800000), // 2 jours avant
-    triggers: ['réussite', 'événement social'],
-    intensity: 8,
-    secondary: ['excited', 'optimistic']
+    timestamp: new Date(Date.now() - 172800000).toISOString(), // 2 jours avant
+    intensity: 0.8,
+    emojis: ["😊", "🎉"],
+    source: "manual",
+    text: "Super journée, j'ai réussi mon projet et passé du temps avec des amis"
   }
 ];
 

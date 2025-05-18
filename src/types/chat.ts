@@ -10,8 +10,10 @@ export interface ChatMessage {
   text: string;
   content?: string; // Legacy property - use text instead
   sender: 'user' | 'assistant' | 'system';
+  role?: 'user' | 'assistant' | 'system'; // For compatibility with different implementations
   timestamp: string;
   conversationId?: string;
+  conversation_id?: string; // Legacy property - use conversationId instead
   metadata?: Record<string, any>;
   attachments?: Array<{
     id: string;
@@ -20,6 +22,9 @@ export interface ChatMessage {
     name?: string;
   }>;
   isLoading?: boolean;
+  emotions?: Record<string, number>;
+  feedback?: string;
+  isOptimistic?: boolean;
 }
 
 export interface Conversation {
@@ -33,6 +38,9 @@ export interface Conversation {
   status?: 'active' | 'archived' | 'deleted';
 }
 
+// Added for backwards compatibility
+export type ChatConversation = Conversation;
+
 /**
  * Normalizes a chat message to ensure it follows the standard format
  */
@@ -43,11 +51,25 @@ export function normalizeChatMessage(
   return {
     id: message.id || `msg-${Date.now()}`,
     text: message.text || message.content || '',
-    sender: message.sender || 'user',
+    sender: message.sender || message.role || 'user',
     timestamp: message.timestamp || new Date().toISOString(),
-    conversationId: message.conversationId || conversationId,
+    conversationId: message.conversationId || message.conversation_id || conversationId,
     metadata: message.metadata || {},
     attachments: message.attachments || [],
     isLoading: message.isLoading || false
   };
+}
+
+// Additional interface for the chat hook to fix build errors
+export interface ChatHookResult {
+  messages: ChatMessage[];
+  isLoading: boolean;
+  sendMessage: (text: string) => void;
+  conversationId: string;
+  clearMessages: () => void;
+  setConversation: (id: string) => void;
+  input?: string;
+  setInput?: (text: string) => void;
+  handleInputChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
 }

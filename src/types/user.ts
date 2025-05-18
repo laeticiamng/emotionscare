@@ -29,7 +29,9 @@ export enum UserRole {
   ADMIN = 'ADMIN',
   USER = 'USER',
   MANAGER = 'MANAGER',
-  GUEST = 'GUEST'
+  GUEST = 'GUEST',
+  B2B_USER = 'b2b_user', // Added for compatibility with component checks
+  B2B_ADMIN = 'b2b_admin' // Added for compatibility with component checks
 }
 
 export interface UserPreferences {

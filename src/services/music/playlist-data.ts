@@ -1,4 +1,10 @@
 
+/**
+ * MOCK DATA
+ * Ce fichier respecte strictement les types officiels MusicTrack et MusicPlaylist
+ * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
+ */
+
 import { MusicPlaylist, MusicTrack } from '@/types/music';
 
 // Données de playlists pour diverses émotions
@@ -9,13 +15,13 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
     emotion: 'calm',
     description: 'Musique calme et relaxante',
     coverUrl: '/images/ocean-waves.jpg',
+    coverImage: '/images/ocean-waves.jpg', // For compatibility with coverImage property
     tracks: [
       {
         id: 'calm-1',
         title: 'Ocean Waves',
         artist: 'Ambient Nature',
         duration: 240,
-        url: 'https://example.com/calm1.mp3',
         audioUrl: 'https://example.com/calm1.mp3',
         coverUrl: '/images/ocean-waves.jpg',
         emotion: 'calm'
@@ -25,7 +31,6 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Forest Meditation',
         artist: 'Nature Sounds',
         duration: 300,
-        url: 'https://example.com/calm2.mp3',
         audioUrl: 'https://example.com/calm2.mp3',
         coverUrl: '/images/forest-meditation.jpg',
         emotion: 'calm'
@@ -35,7 +40,6 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Gentle Rain',
         artist: 'Sleep Harmony',
         duration: 320,
-        url: 'https://example.com/calm3.mp3',
         audioUrl: 'https://example.com/calm3.mp3',
         coverUrl: '/images/gentle-rain.jpg',
         emotion: 'calm'
@@ -48,13 +52,13 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
     emotion: 'focused',
     description: 'Musique pour se concentrer',
     coverUrl: '/images/deep-focus.jpg',
+    coverImage: '/images/deep-focus.jpg', // For compatibility with coverImage property
     tracks: [
       {
         id: 'focused-1',
         title: 'Deep Focus',
         artist: 'Study Music',
         duration: 280,
-        url: 'https://example.com/focus1.mp3',
         audioUrl: 'https://example.com/focus1.mp3',
         coverUrl: '/images/deep-focus.jpg',
         emotion: 'focused'
@@ -64,7 +68,6 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Brain Waves',
         artist: 'Concentration',
         duration: 320,
-        url: 'https://example.com/focus2.mp3',
         audioUrl: 'https://example.com/focus2.mp3',
         coverUrl: '/images/brain-waves.jpg',
         emotion: 'focused'
@@ -74,7 +77,6 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Productivity Flow',
         artist: 'Mind Works',
         duration: 300,
-        url: 'https://example.com/focus3.mp3',
         audioUrl: 'https://example.com/focus3.mp3',
         coverUrl: '/images/productivity.jpg',
         emotion: 'focused'
@@ -87,13 +89,13 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
     emotion: 'happy',
     description: 'Musique joyeuse et motivante',
     coverUrl: '/images/sunshine.jpg',
+    coverImage: '/images/sunshine.jpg', // For compatibility with coverImage property
     tracks: [
       {
         id: 'happy-1',
         title: 'Sunshine Vibes',
         artist: 'Happy Tunes',
         duration: 190,
-        url: 'https://example.com/happy1.mp3',
         audioUrl: 'https://example.com/happy1.mp3',
         coverUrl: '/images/sunshine.jpg',
         emotion: 'happy'
@@ -103,7 +105,6 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Dance of Joy',
         artist: 'Positive Energy',
         duration: 210,
-        url: 'https://example.com/happy2.mp3',
         audioUrl: 'https://example.com/happy2.mp3',
         coverUrl: '/images/dance-joy.jpg',
         emotion: 'happy'
@@ -113,7 +114,6 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Feel Good Rhythm',
         artist: 'Mood Boosters',
         duration: 230,
-        url: 'https://example.com/happy3.mp3',
         audioUrl: 'https://example.com/happy3.mp3',
         coverUrl: '/images/feel-good.jpg',
         emotion: 'happy'
@@ -126,13 +126,13 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
     emotion: 'energetic',
     description: 'Musique énergisante',
     coverUrl: '/images/power-up.jpg',
+    coverImage: '/images/power-up.jpg', // For compatibility with coverImage property
     tracks: [
       {
         id: 'energetic-1',
         title: 'Power Up',
         artist: 'Energy Boost',
         duration: 190,
-        url: 'https://example.com/energy1.mp3',
         audioUrl: 'https://example.com/energy1.mp3',
         coverUrl: '/images/power-up.jpg',
         emotion: 'energetic'
@@ -142,7 +142,6 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Workout Beats',
         artist: 'Fitness Sound',
         duration: 220,
-        url: 'https://example.com/energy2.mp3',
         audioUrl: 'https://example.com/energy2.mp3',
         coverUrl: '/images/workout.jpg',
         emotion: 'energetic'
@@ -152,7 +151,6 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Motivation Drive',
         artist: 'Active Mind',
         duration: 240,
-        url: 'https://example.com/energy3.mp3',
         audioUrl: 'https://example.com/energy3.mp3',
         coverUrl: '/images/motivation.jpg',
         emotion: 'energetic'
@@ -165,13 +163,13 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
     emotion: 'neutral',
     description: 'Musique d\'ambiance équilibrée',
     coverUrl: '/images/background.jpg',
+    coverImage: '/images/background.jpg', // For compatibility with coverImage property
     tracks: [
       {
         id: 'neutral-1',
         title: 'Background Harmony',
         artist: 'Neutral Sound',
         duration: 240,
-        url: 'https://example.com/neutral1.mp3',
         audioUrl: 'https://example.com/neutral1.mp3',
         coverUrl: '/images/background.jpg',
         emotion: 'neutral'
@@ -181,7 +179,6 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Balanced Tones',
         artist: 'Ambient Flow',
         duration: 260,
-        url: 'https://example.com/neutral2.mp3',
         audioUrl: 'https://example.com/neutral2.mp3',
         coverUrl: '/images/balanced.jpg',
         emotion: 'neutral'
@@ -191,7 +188,6 @@ export const EMOTION_PLAYLISTS: Record<string, MusicPlaylist> = {
         title: 'Easy Listening',
         artist: 'Smooth Sounds',
         duration: 280,
-        url: 'https://example.com/neutral3.mp3',
         audioUrl: 'https://example.com/neutral3.mp3',
         coverUrl: '/images/easy-listening.jpg',
         emotion: 'neutral'

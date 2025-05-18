@@ -1,13 +1,19 @@
 
+/**
+ * MOCK DATA
+ * Ce fichier respecte strictement les types officiels MusicTrack et MusicPlaylist
+ * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
+ */
+
 export const mockMusicTracks = [
   {
     id: '1',
     title: 'Peaceful Mind',
     artist: 'Ambient Sounds',
     duration: 180,
-    url: '/sounds/peaceful-mind.mp3',
-    cover: '/images/music/peaceful-cover.jpg',
-    mood: 'calm',
+    audioUrl: '/sounds/peaceful-mind.mp3',
+    coverUrl: '/images/music/peaceful-cover.jpg',
+    emotion: 'calm',
     category: 'meditation'
   },
   {
@@ -15,9 +21,9 @@ export const mockMusicTracks = [
     title: 'Focus Flow',
     artist: 'Deep Concentration',
     duration: 240,
-    url: '/sounds/focus-flow.mp3',
-    cover: '/images/music/focus-cover.jpg',
-    mood: 'focus',
+    audioUrl: '/sounds/focus-flow.mp3',
+    coverUrl: '/images/music/focus-cover.jpg',
+    emotion: 'focus',
     category: 'productivity'
   },
   {
@@ -25,9 +31,9 @@ export const mockMusicTracks = [
     title: 'Morning Energy',
     artist: 'Positive Vibes',
     duration: 190,
-    url: '/sounds/morning-energy.mp3',
-    cover: '/images/music/energy-cover.jpg',
-    mood: 'energetic',
+    audioUrl: '/sounds/morning-energy.mp3',
+    coverUrl: '/images/music/energy-cover.jpg',
+    emotion: 'energetic',
     category: 'motivation'
   },
   {
@@ -35,9 +41,9 @@ export const mockMusicTracks = [
     title: 'Evening Relaxation',
     artist: 'Sleep Well',
     duration: 300,
-    url: '/sounds/evening-relax.mp3',
-    cover: '/images/music/relax-cover.jpg',
-    mood: 'relax',
+    audioUrl: '/sounds/evening-relax.mp3',
+    coverUrl: '/images/music/relax-cover.jpg',
+    emotion: 'relax',
     category: 'sleep'
   }
 ];

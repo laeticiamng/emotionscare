@@ -3,6 +3,7 @@
  * VR Types
  * --------------------------------------
  * This file defines the official types for VR functionality.
+ * Any new property or correction must be documented here and synchronized across all components.
  */
 
 export interface VRSessionTemplate {
@@ -11,6 +12,7 @@ export interface VRSessionTemplate {
   name?: string; // Legacy property - use title instead
   description: string;
   thumbnailUrl: string;
+  thumbnail?: string; // Legacy property - use thumbnailUrl instead
   duration: number;
   difficulty?: string;
   category?: string;
@@ -21,6 +23,21 @@ export interface VRSessionTemplate {
   audioTrack?: string;
   interactive?: boolean;
   recommendedFor?: string[];
+  // Additional properties used by some components
+  intensity?: number; // Added for compatibility with UserDashboardSections
+  completionRate?: number; 
+  completion_rate?: number; // Legacy property - use completionRate instead
+  recommendedMood?: string;
+  recommended_mood?: string; // Legacy property - use recommendedMood instead
+  emotionTarget?: string;
+  emotion_target?: string; // Legacy property - use emotionTarget instead
+  preview_url?: string;
+  is_audio_only?: boolean;
+  audio_url?: string;
+  audioUrl?: string; // Format camelCase
+  benefits?: string[];
+  theme?: string;
+  emotion?: string;
 }
 
 export interface VRSession {
@@ -29,7 +46,9 @@ export interface VRSession {
   templateId: string;
   template?: VRSessionTemplate;
   startedAt: string;
+  startTime?: string; // Legacy property - use startedAt instead
   endedAt?: string;
+  endTime?: string; // Legacy property - use endedAt instead
   duration?: number;
   feedback?: {
     rating: number;
@@ -39,4 +58,14 @@ export interface VRSession {
   };
   completed: boolean;
   progress?: number;
+  // Legacy properties for compatibility
+  emotionBefore?: string; 
+  emotionAfter?: string;
+  emotionTarget?: string;
+  rating?: number;
+}
+
+export interface VRSessionWithMusicProps {
+  vrTemplate: VRSessionTemplate;
+  onComplete: (feedback: {rating: number, emotion: string}) => void;
 }

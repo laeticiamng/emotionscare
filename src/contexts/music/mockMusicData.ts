@@ -1,4 +1,10 @@
 
+/**
+ * MOCK DATA
+ * Ce fichier respecte strictement les types officiels MusicTrack et MusicPlaylist
+ * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
+ */
+
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { v4 as uuidv4 } from 'uuid';
 

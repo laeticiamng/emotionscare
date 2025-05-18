@@ -1,4 +1,10 @@
 
+/**
+ * MOCK DATA
+ * Ce fichier respecte strictement les types officiels MusicTrack et MusicPlaylist
+ * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
+ */
+
 import { MusicTrack, MusicPlaylist } from "@/types/music";
 
 export const mockTracks: MusicTrack[] = [
@@ -7,11 +13,10 @@ export const mockTracks: MusicTrack[] = [
     title: "Calm Water",
     artist: "Relaxation Artist",
     duration: 195,
-    src: "/audio/calm-water.mp3",
     audioUrl: "/audio/calm-water.mp3",
-    coverImage: "/images/calm-water.jpg",
+    coverUrl: "/images/calm-water.jpg",
     emotion: "calm",
-    intensity: 2,
+    intensity: 0.2,
     category: "meditation"
   },
   {
@@ -19,11 +24,10 @@ export const mockTracks: MusicTrack[] = [
     title: "Happy Day",
     artist: "Positive Vibes",
     duration: 184,
-    src: "/audio/happy-day.mp3",
     audioUrl: "/audio/happy-day.mp3",
-    coverImage: "/images/happy-day.jpg",
+    coverUrl: "/images/happy-day.jpg",
     emotion: "joy",
-    intensity: 4,
+    intensity: 0.4,
     category: "motivation"
   },
   {
@@ -31,11 +35,10 @@ export const mockTracks: MusicTrack[] = [
     title: "Sunset Dreams",
     artist: "Chill Waves",
     duration: 232,
-    src: "/audio/sunset-dreams.mp3",
     audioUrl: "/audio/sunset-dreams.mp3",
-    coverImage: "/images/sunset.jpg",
+    coverUrl: "/images/sunset.jpg",
     emotion: "relaxed",
-    intensity: 3,
+    intensity: 0.3,
     category: "sleep"
   },
   {
@@ -43,11 +46,10 @@ export const mockTracks: MusicTrack[] = [
     title: "Energy Boost",
     artist: "Power Up",
     duration: 156,
-    src: "/audio/energy-boost.mp3",
     audioUrl: "/audio/energy-boost.mp3",
-    coverImage: "/images/energy.jpg",
+    coverUrl: "/images/energy.jpg",
     emotion: "energetic",
-    intensity: 5,
+    intensity: 0.5,
     category: "workout"
   }
 ];

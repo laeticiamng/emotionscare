@@ -1,5 +1,11 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types';
+/**
+ * MOCK DATA
+ * Ce fichier respecte strictement les types officiels MusicTrack et MusicPlaylist
+ * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
+ */
+
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 export const mockMusicTracks: MusicTrack[] = [
   {
@@ -7,7 +13,6 @@ export const mockMusicTracks: MusicTrack[] = [
     title: 'Méditation matinale',
     artist: 'Nature Sounds',
     duration: 360, // 6 minutes
-    url: '/audio/meditation-morning.mp3',
     audioUrl: '/audio/meditation-morning.mp3',
     coverUrl: '/images/covers/meditation.jpg',
     emotion: 'calm'
@@ -17,7 +22,6 @@ export const mockMusicTracks: MusicTrack[] = [
     title: 'Focus intense',
     artist: 'Deep Work',
     duration: 1200, // 20 minutes
-    url: '/audio/focus-beats.mp3',
     audioUrl: '/audio/focus-beats.mp3',
     coverUrl: '/images/covers/focus.jpg',
     emotion: 'focused'
@@ -27,7 +31,6 @@ export const mockMusicTracks: MusicTrack[] = [
     title: 'Énergie positive',
     artist: 'Happy Vibes',
     duration: 240, // 4 minutes
-    url: '/audio/positive-energy.mp3',
     audioUrl: '/audio/positive-energy.mp3',
     coverUrl: '/images/covers/energy.jpg',
     emotion: 'happy'
