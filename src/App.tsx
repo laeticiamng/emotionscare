@@ -19,7 +19,7 @@ function App() {
               <MusicProvider>
                 <AppRouter />
                 <Toaster />
-                {process.env.NODE_ENV === 'development' && <RouteDebugger />}
+                {import.meta.env.DEV && <RouteDebugger />}
               </MusicProvider>
             </UserModeProvider>
           </UserPreferencesProvider>

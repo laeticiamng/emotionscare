@@ -31,7 +31,7 @@ const DashboardAccessError: React.FC<DashboardAccessErrorProps> = ({
               <li>Authentifié: {isAuthenticated ? 'Oui' : 'Non'}</li>
               <li>Rôle: {user?.role || 'Non défini'}</li>
               <li>Chemin actuel: {window.location.pathname}</li>
-              <li>Mode: {process.env.NODE_ENV || 'production'}</li>
+              <li>Mode: {import.meta.env.MODE || 'production'}</li>
             </ul>
           </div>
         </CardContent>
