@@ -87,7 +87,8 @@ export const ROUTES: RouteConfig = {
     settings: '/b2c/settings',
     gamification: '/b2c/gamification',
     cocon: '/b2c/cocon',
-    preferences: '/b2c/preferences'
+    preferences: '/b2c/preferences',
+    extensions: '/extensions'
   },
   b2bUser: {
     home: '/b2b/user',
@@ -103,7 +104,8 @@ export const ROUTES: RouteConfig = {
     settings: '/b2b/user/settings',
     gamification: '/b2b/user/gamification',
     cocon: '/b2b/user/cocon',
-    preferences: '/b2b/user/preferences'
+    preferences: '/b2b/user/preferences',
+    extensions: '/extensions'
   },
   b2bAdmin: {
     home: '/b2b/admin',
@@ -118,7 +120,8 @@ export const ROUTES: RouteConfig = {
     reports: '/b2b/admin/reports',
     events: '/b2b/admin/events',
     settings: '/b2b/admin/settings',
-    optimisation: '/b2b/admin/optimisation'
+    optimisation: '/b2b/admin/optimisation',
+    extensions: '/extensions'
   },
   common: {
     home: '/',

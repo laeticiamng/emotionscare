@@ -14,7 +14,8 @@ import {
   MessageSquare, 
   Glasses,
   Trophy,
-  HeartHandshake
+  HeartHandshake,
+  Box
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
@@ -134,6 +135,16 @@ const B2CNavBar: React.FC = () => {
           >
             <HeartHandshake className="mr-2 h-4 w-4" />
             Cocon
+          </Button>
+        </Link>
+
+        <Link to="/extensions">
+          <Button
+            variant={location.pathname === '/extensions' ? 'default' : 'ghost'}
+            className="w-full justify-start"
+          >
+            <Box className="mr-2 h-4 w-4" />
+            Extensions
           </Button>
         </Link>
       </nav>
