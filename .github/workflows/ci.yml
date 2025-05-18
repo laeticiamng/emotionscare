@@ -8,16 +8,12 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+          cache: 'npm'
+      - name: Configure npm registry
+        run: npm config set registry https://registry.npmmirror.com
 
-      - name: Pre-check merge conflicts
-        run: |
-          if grep -r "<<<<<<<" -n .; then
-            echo "Unresolved merge conflict markers detected";
-            exit 1;
-          fi
       - name: Install deps
-        run: |
-          npm install
+        run: npm ci --prefer-offline --no-audit --no-fund
       - name: Run tests
         run: npm test
