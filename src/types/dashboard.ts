@@ -1,129 +1,59 @@
 
-import { Badge, Challenge, LeaderboardEntry } from './badge';
-import React from 'react';
+import { ReactNode } from 'react';
 
-export type KpiCardStatus = 'idle' | 'loading' | 'success' | 'error' | 'warning' | 'info' | 'default';
+export interface EmotionalTeamViewProps {
+  period?: string;
+  anonymized?: boolean;
+  dateRange?: { from: Date; to: Date };
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
+}
 
 export interface KpiCardProps {
   title: string;
-  value: number | string;
-  trend?: 'up' | 'down' | 'neutral';
-  label?: string;
-  icon?: React.ReactNode;
+  value: string | number;
+  description?: string;
+  icon?: ReactNode;
+  status?: KpiCardStatus;
+  trend?: number;
   className?: string;
-  percentage?: number;
-  subtitle?: string | React.ReactNode;
-  prefix?: string;
-  suffix?: string;
-  onClick?: () => void;
-  // Additional props needed by admin components
-  delta?: {
+  id?: string;
+  delta?: number | {
     value: number;
     label?: string;
-    trend: string;
+    trend: 'up' | 'down' | 'neutral';
   };
-  status?: KpiCardStatus;
-  isLoading?: boolean;
+  subtitle?: ReactNode | string;
   ariaLabel?: string;
-  footer?: React.ReactNode;
-  id?: string;
-  colorMode?: 'success' | 'warning' | 'danger' | 'info' | 'default';
-  // Grid layout properties
-  x?: number;
-  y?: number;
-  w?: number;
-  h?: number;
-}
-
-export interface KpiCardData {
-  id: string;
-  title: string;
-  value: number | string;
-  previousValue?: number;
-  trend?: 'up' | 'down' | 'neutral';
-  percentage?: number;
-  icon?: string;
-  label?: string;
-  color?: string;
-}
-
-export interface ChartData {
-  id: string;
-  type: 'line' | 'bar' | 'pie' | 'radar';
-  title: string;
-  data: any;
-  period: 'day' | 'week' | 'month' | 'year';
-}
-
-export interface DashboardState {
-  kpis: KpiCardData[];
-  charts: ChartData[];
-  badges: Badge[];
-  challenges: Challenge[];
-  leaderboard: LeaderboardEntry[];
-  loading: boolean;
-  error: Error | null;
-}
-
-export interface DashboardWidgetData {
-  id: string;
-  title: string;
-  type: 'kpi' | 'chart' | 'badges' | 'challenges' | 'leaderboard' | 'custom';
-  data: any;
-  layout?: {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
-  settings?: Record<string, any>;
-}
-
-export interface DashboardSettings {
-  autoRefresh: boolean;
-  refreshInterval: number;
-  layout: 'grid' | 'list';
-  widgets: DashboardWidgetData[];
-}
-
-export interface DraggableKpiCardsGridProps {
-  cards: KpiCardProps[];
-  kpiCards?: KpiCardProps[];
-  onCardsReorder?: (cards: KpiCardProps[]) => void;
-  className?: string;
-  onSave?: (layouts: any) => void;
-  savedLayout?: any;
-  isEditable?: boolean;
-  onOrderChange?: (cards: KpiCardProps[]) => void;
+  isLoading?: boolean;
+  onClick?: () => void;
+  footer?: ReactNode;
 }
 
 export interface DashboardWidgetConfig {
   id: string;
   title: string;
-  settings?: Record<string, any>;
-  type?: string;
-  width?: number;
-  height?: number;
-  x?: number;
-  y?: number;
+  description?: string;
   visible?: boolean;
+  position?: number;
 }
 
-export interface GlobalOverviewTabProps {
-  data?: any;
-  period?: string;
-  onPeriodChange?: (period: string) => void;
+export type KpiCardStatus = 'positive' | 'negative' | 'neutral' | 'warning' | 'default' | 'info';
+
+export interface DraggableKpiCardsGridProps {
+  cards: KpiCardProps[];
+  className?: string;
+  onOrderChange?: (cards: KpiCardProps[]) => void;
+  onLayoutChange?: (layout: any) => void;
+  isEditable?: boolean;
 }
 
 export interface GamificationData {
-  points: number;
+  activeChallenges: number;
+  badges: number;
+  completedChallenges: number;
   level: number;
-  badges: number | Badge[];
+  points: number;
   streak: number;
-  streakDays?: number;
-  challenges?: Challenge[];
-  nextLevel?: number;
-  pointsToNextLevel?: number;
 }
-
-export type { LeaderboardEntry };

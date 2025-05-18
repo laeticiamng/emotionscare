@@ -11,6 +11,7 @@ EmotionsCare est une plateforme SaaS innovante dédiée au bien-être émotionne
 - **Coaching personnalisé** : Recommandations adaptées à l'état émotionnel
 - **Thérapie musicale** : Générations de musiques adaptées aux émotions détectées
 - **Journal émotionnel** : Suivi de l'évolution émotionnelle au fil du temps
+- **Personnalisation prédictive** : Interface et suggestions IA qui s'adaptent automatiquement à vos besoins
 - **Gamification** : Défis, badges et récompenses pour encourager l'engagement
 - **Réalité Virtuelle** : Sessions de relaxation immersives en VR
 - **Cocoon social** : Communauté bienveillante pour partager et progresser ensemble
@@ -79,6 +80,13 @@ La plateforme EmotionsCare s'intègre avec plusieurs API tierces pour fournir se
    - Utilisation : Création de musique adaptée aux émotions
    - Gérée par le backend
 
+4. **Supabase** - Authentification, base de données et stockage
+   - Utilisation : Gestion des utilisateurs et des fichiers
+   - Variables d'environnement : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+5. **Firebase** (optionnel) - Utilisé pour la configuration de l'exemple
+   - Variables d'environnement : `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`, `VITE_FIREBASE_MEASUREMENT_ID`
+
 ### Configuration du fichier .env.local
 
 ```
@@ -88,6 +96,9 @@ VITE_APP_ENV=development
 VITE_API_URL=http://localhost:3001
 VITE_WEB_URL=http://localhost:3000
 ```
+
+> **Note**
+> L'ancienne variable `SKIP_AUTH_CHECK` utilisée pour désactiver l'authentification en développement a été supprimée. Les tableaux de bord sont désormais toujours protégés.
 
 ### Utilisateur de test
 
@@ -124,6 +135,12 @@ npm run dev
 
 # Build pour la production
 npm run build
+
+# Exécuter les tests
+npm test
+
+# Vérifier les types TypeScript
+npm run type-check
 
 # Démarrer le serveur de production
 npm start
@@ -172,6 +189,12 @@ NEXT_PUBLIC_SENTRY_DSN=<votre_DSN_Sentry>
 
 Le tableau de bord et la gestion des alertes sont configurables directement sur
 Sentry.
+
+## Sécurité proactive
+
+Un tableau de bord dédié permet aux administrateurs de suivre les incidents et l'état de la plateforme.
+Il est accessible via la route `/b2b/admin/security`.
+Tous les utilisateurs disposent d'un widget « Sécurité » dans leurs paramètres pour consulter les dernières alertes.
 
 ## Équipe et contribution
 

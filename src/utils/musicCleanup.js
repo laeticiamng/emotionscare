@@ -107,7 +107,7 @@ async function main() {
   if (deprecatedImportsCount === 0) {
     console.log('✅ All good! No deprecated music imports found.');
   } else {
-    console.log(`⚠️  Found ${deprecatedImportsCount} files with deprecated music imports.`);
+    console.log(`⚠ Found ${deprecatedImportsCount} deprecated music imports.`);
     console.log('Please update these imports to use the official MusicContext:');
     console.log(`import { useMusic } from '${CORRECT_MUSIC_IMPORT}';`);
   }

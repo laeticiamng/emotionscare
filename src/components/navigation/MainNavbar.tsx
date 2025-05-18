@@ -3,8 +3,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeSelector } from '@/components/theme/ThemeSelector';
 import AudioControls from '@/components/audio/AudioControls';
+import UserMenu from './UserMenu';
+import GuestMenu from './GuestMenu';
+import { useAuth } from '@/contexts/AuthContext';
 
 const MainNavbar: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-background/80 dark:bg-background/80 border-b border-border">
       <div className="container flex h-16 items-center justify-between">
@@ -47,6 +52,7 @@ const MainNavbar: React.FC = () => {
         <div className="flex items-center space-x-2">
           <AudioControls minimal className="mr-2" />
           <ThemeSelector minimal className="mr-2" />
+          {isAuthenticated ? <UserMenu /> : <GuestMenu />}
         </div>
       </div>
     </header>

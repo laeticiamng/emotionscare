@@ -11,6 +11,7 @@ interface SocialCocoonDashboardProps {
   onClick: () => void;
   visualStyle: 'minimal' | 'artistic';
   zenMode: boolean;
+  className?: string;
 }
 
 const mockHashtags = [
@@ -21,18 +22,20 @@ const mockHashtags = [
   { tag: '#pausecafe', count: 22, trend: 'down' },
 ];
 
-export const SocialCocoonDashboard: React.FC<SocialCocoonDashboardProps> = ({
+const SocialCocoonDashboard: React.FC<SocialCocoonDashboardProps> = ({
   isActive,
   onClick,
   visualStyle,
-  zenMode
+  zenMode,
+  className
 }) => {
   return (
     <Card 
       className={cn(
         "premium-card overflow-hidden relative transition-all ease-in-out", 
         isActive ? "shadow-xl border-primary/20" : "",
-        zenMode ? "bg-background/70 backdrop-blur-lg border-border/50" : ""
+        zenMode ? "bg-background/70 backdrop-blur-lg border-border/50" : "",
+        className
       )}
       onClick={onClick}
     >
@@ -126,3 +129,5 @@ export const SocialCocoonDashboard: React.FC<SocialCocoonDashboardProps> = ({
     </Card>
   );
 };
+
+export default SocialCocoonDashboard;
