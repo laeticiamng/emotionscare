@@ -5,15 +5,18 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { routes } from './router';
 import { useDashboardMonitor } from './hooks/use-dashboard-monitor';
 import { useAuth } from '@/contexts/AuthContext';
+import usePreferredAccess from '@/hooks/use-preferred-access';
 
 const AppRouter: React.FC = () => {
   const content = useRoutes(routes);
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   // Add monitoring for dashboard access issues
   useDashboardMonitor();
+  // Apply unified access redirections
+  usePreferredAccess();
   
   
   if (!content) {
