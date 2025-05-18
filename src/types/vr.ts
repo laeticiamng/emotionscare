@@ -22,6 +22,7 @@ export interface VRSessionTemplate {
   audioTrack?: string;
   interactive?: boolean;
   recommendedFor?: string[];
+  objective?: string;
   // Additional properties used by some components
   intensity?: number; // Added for compatibility with UserDashboardSections
   completionRate?: number; 

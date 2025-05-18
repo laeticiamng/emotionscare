@@ -35,6 +35,8 @@ export const AI_MODEL_CONFIG = {
     defaultPersonality: 'supportive',
     defaultTone: 'encouraging',
     maxContextLength: 10,
-    memoryCapacity: 50
+    memoryCapacity: 50,
+    model: 'gpt-3.5-turbo',
+    max_tokens: 1024
   }
 };

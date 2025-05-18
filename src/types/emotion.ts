@@ -60,7 +60,10 @@ export interface EmotionData {
 
 export interface EmotionalTeamViewProps {
   teamId: string;
-  startDate?: string;
-  endDate?: string;
-  showNames?: boolean;
+  period?: string;
+  anonymized?: boolean;
+  dateRange?: [Date, Date];
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
 }
