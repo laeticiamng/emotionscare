@@ -53,6 +53,44 @@ export const getChatResponse = async (message: string): Promise<ChatResponse> =>
 };
 
 /**
+ * Récupère une réponse de support premium via l'Edge Function
+ * @param message Question de l'utilisateur
+ */
+export const getSupportResponse = async (message: string): Promise<ChatResponse> => {
+  try {
+    const { data, error } = await supabase.functions.invoke('chat-with-ai', {
+      body: {
+        message,
+        model: AI_MODEL_CONFIG['premium-support'].model,
+        temperature: AI_MODEL_CONFIG['premium-support'].temperature,
+        max_tokens: AI_MODEL_CONFIG['premium-support'].max_tokens,
+        top_p: AI_MODEL_CONFIG['premium-support'].top_p,
+        module: 'premium-support'
+      }
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return {
+      content: data.response,
+      emotion: detectEmotion(data.response),
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString()
+    };
+  } catch (error) {
+    console.error('Erreur dans getSupportResponse:', error);
+    return {
+      content: "Je suis désolé, le service de support est momentanément indisponible.",
+      emotion: 'error',
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString()
+    };
+  }
+};
+
+/**
  * Fonction simple pour détecter l'émotion à partir du texte
  * Note: Cette fonction est basique et pourrait être améliorée avec une analyse plus sophistiquée
  */
