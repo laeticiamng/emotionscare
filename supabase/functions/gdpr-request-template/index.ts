@@ -1,29 +1,30 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-
+import { requireAuth } from '../_shared/auth.ts';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
-
+  const user = await requireAuth(req);
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   try {
     const { requestType, userContext, model, temperature } = await req.json();
     
     if (!requestType) {
       throw new Error('Un type de demande doit être spécifié');
     }
-
     const openaiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiKey) {
       throw new Error('Clé API OpenAI manquante');
-    }
-    
     // Construction du prompt avec les informations utilisateur si disponibles
     let userInfo = '';
     if (userContext) {
@@ -31,8 +32,6 @@ serve(async (req) => {
       if (userContext.email) userInfo += `\nEmail: ${userContext.email}`;
       if (userContext.company) userInfo += `\nEntreprise concernée: ${userContext.company}`;
       if (userContext.details) userInfo += `\nInformations supplémentaires fournies par l'utilisateur: ${userContext.details}`;
-    }
-    
     // Mapping des types de demande vers des descriptions plus précises
     const requestTypeMap: Record<string, string> = {
       'access': "d'accès à mes données personnelles",
@@ -42,25 +41,20 @@ serve(async (req) => {
       'objection': "d'opposition au traitement de mes données personnelles",
       'restriction': "de limitation du traitement de mes données personnelles"
     };
-    
     const requestDescription = requestTypeMap[requestType] || requestType;
-
     const prompt = `
     Générez un modèle de lettre pour une demande RGPD ${requestDescription}.
     ${userInfo}
-    
     La lettre doit:
     1. Être formelle mais claire
     2. Mentionner spécifiquement le droit RGPD concerné
     3. Inclure les références juridiques appropriées
     4. Spécifier un délai de réponse conforme à la loi (1 mois)
-    
     Structurez votre réponse avec:
     1. Le modèle de lettre complet
     2. Une liste d'instructions pour compléter/envoyer la demande
     3. Le délai estimé de traitement
     `;
-
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -75,28 +69,19 @@ serve(async (req) => {
           { role: 'user', content: prompt }
         ]
       }),
-    });
-
     const responseData = await response.json();
-
     if (!response.ok) {
       console.error('Erreur OpenAI:', responseData);
       throw new Error('Erreur lors de la génération du modèle');
-    }
-
     const content = responseData.choices[0].message.content;
-    
     // Extraction des différentes sections
     let template = '';
     let instructions: string[] = [];
     let estimatedProcessingTime = '30 jours';
-    
     // Extraction du modèle de lettre
     const templateMatch = content.match(/(.+?)(?=Instructions|Liste d'instructions|Étapes suivantes|$)/s);
     if (templateMatch) {
       template = templateMatch[0].trim();
-    }
-    
     // Extraction des instructions
     const instructionsMatch = content.match(/(?:Instructions|Liste d'instructions|Étapes suivantes).*?:([\s\S]*?)(?=Délai|$)/i);
     if (instructionsMatch) {
@@ -105,31 +90,22 @@ serve(async (req) => {
         .split(/\n/)
         .map(instruction => instruction.replace(/^[•\-\*\d\.]\s*/, '').trim())
         .filter(instruction => instruction.length > 0);
-    }
-    
     // Extraction du délai de traitement
     const timeMatch = content.match(/(?:Délai|Délai estimé|Délai de traitement).*?:(.+?)(?=$|\n)/i);
     if (timeMatch) {
       estimatedProcessingTime = timeMatch[1].trim();
-    }
-    
     return new Response(
       JSON.stringify({
         template,
         instructions,
         estimatedProcessingTime
-      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Erreur:', error);
-    
-    return new Response(
       JSON.stringify({ error: error.message }),
       { 
         status: 400, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
-    );
-  }
 })
