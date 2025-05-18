@@ -66,32 +66,28 @@ serve(async (req) => {
       streakPoints = Math.min(streakDays * 2, 50); // Cap streak points at 50
     }
     
-    // Check for streak milestones and award badges if needed
+    // Retrieve existing badge names to minimize database round trips
+    const { data: existingBadgeData } = await supabase
+      .from('badges')
+      .select('name')
+      .eq('user_id', user_id);
+
+    const existingBadgeNames = new Set((existingBadgeData || []).map(b => b.name));
+    const newBadges: { user_id: string; name: string; description: string; image_url: string }[] = [];
     const earnedBadges: string[] = [];
     
     if (isFirstToday) {
       for (const milestone of STREAK_MILESTONES) {
         if (streakDays === milestone) {
-          // Check if badge already exists
-          const { data: existingBadge } = await supabase
-            .from('badges')
-            .select('id')
-            .eq('user_id', user_id)
-            .eq('name', `Série de ${milestone} jours`)
-            .single();
-            
-          if (!existingBadge) {
-            // Create new badge
-            await supabase
-              .from('badges')
-              .insert({
-                user_id,
-                name: `Série de ${milestone} jours`,
-                description: `Scanner vos émotions pendant ${milestone} jours consécutifs`,
-                image_url: `/badges/streak-${milestone}.png`,
-              });
-              
-            earnedBadges.push(`Série de ${milestone} jours`);
+          const badgeName = `Série de ${milestone} jours`;
+          if (!existingBadgeNames.has(badgeName)) {
+            newBadges.push({
+              user_id,
+              name: badgeName,
+              description: `Scanner vos émotions pendant ${milestone} jours consécutifs`,
+              image_url: `/badges/streak-${milestone}.png`,
+            });
+            earnedBadges.push(badgeName);
           }
         }
       }
@@ -106,29 +102,18 @@ serve(async (req) => {
       
     const uniqueEmotions = new Set((distinctEmotions || []).map(d => d.emojis));
     const diversityMilestones = [5, 10, 15];
-    
+
     for (const milestone of diversityMilestones) {
       if (uniqueEmotions.size === milestone) {
-        // Check if badge already exists
-        const { data: existingBadge } = await supabase
-          .from('badges')
-          .select('id')
-          .eq('user_id', user_id)
-          .eq('name', `${milestone} émotions explorées`)
-          .single();
-          
-        if (!existingBadge) {
-          // Create new badge
-          await supabase
-            .from('badges')
-            .insert({
-              user_id,
-              name: `${milestone} émotions explorées`,
-              description: `Vous avez exploré ${milestone} émotions différentes`,
-              image_url: `/badges/diversity-${milestone}.png`,
-            });
-            
-          earnedBadges.push(`${milestone} émotions explorées`);
+        const badgeName = `${milestone} émotions explorées`;
+        if (!existingBadgeNames.has(badgeName)) {
+          newBadges.push({
+            user_id,
+            name: badgeName,
+            description: `Vous avez exploré ${milestone} émotions différentes`,
+            image_url: `/badges/diversity-${milestone}.png`,
+          });
+          earnedBadges.push(badgeName);
         }
       }
     }
@@ -141,33 +126,26 @@ serve(async (req) => {
       
     // Check for scan count badges
     const countMilestones = [1, 10, 25, 50, 100, 250, 500, 1000];
-    
+
     for (const milestone of countMilestones) {
       if (count === milestone) {
-        // Check if badge already exists
-        const { data: existingBadge } = await supabase
-          .from('badges')
-          .select('id')
-          .eq('user_id', user_id)
-          .eq('name', `${milestone} scans émotionnels`)
-          .single();
-          
-        if (!existingBadge) {
-          // Create new badge
-          await supabase
-            .from('badges')
-            .insert({
-              user_id,
-              name: `${milestone} scans émotionnels`,
-              description: `Vous avez complété ${milestone} scans émotionnels`,
-              image_url: `/badges/scan-${milestone}.png`,
-            });
-            
-          earnedBadges.push(`${milestone} scans émotionnels`);
+        const badgeName = `${milestone} scans émotionnels`;
+        if (!existingBadgeNames.has(badgeName)) {
+          newBadges.push({
+            user_id,
+            name: badgeName,
+            description: `Vous avez complété ${milestone} scans émotionnels`,
+            image_url: `/badges/scan-${milestone}.png`,
+          });
+          earnedBadges.push(badgeName);
         }
       }
     }
     
+    if (newBadges.length > 0) {
+      await supabase.from('badges').insert(newBadges);
+    }
+
     const totalPointsEarned = basePoints + streakPoints;
     
     return new Response(
