@@ -13,17 +13,17 @@ const ConversationsService = {
       {
         id: 'conv1',
         title: 'First Conversation',
-        updated_at: '2023-01-15T14:22:00Z',
-        created_at: '2023-01-15T14:00:00Z',
-        last_message: 'Hello there!',
+        updatedAt: '2023-01-15T14:22:00Z',
+        createdAt: '2023-01-15T14:00:00Z',
+        lastMessage: 'Hello there!',
         user_id: userId || 'user1',
       },
       {
         id: 'conv2',
         title: 'Support Request',
-        updated_at: '2023-01-10T09:15:00Z',
-        created_at: '2023-01-10T09:00:00Z',
-        last_message: 'Thank you for your help.',
+        updatedAt: '2023-01-10T09:15:00Z',
+        createdAt: '2023-01-10T09:00:00Z',
+        lastMessage: 'Thank you for your help.',
         user_id: userId || 'user1',
       }
     ] as ChatConversation[];

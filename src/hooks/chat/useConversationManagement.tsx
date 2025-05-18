@@ -38,10 +38,10 @@ export const useConversationManagement = () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         lastMessage: "",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        last_message: "",
-        user_id: "user-123" // Normalement, l'ID utilisateur serait dynamique
+        created_at: new Date().toISOString(), // legacy field
+        updated_at: new Date().toISOString(), // legacy field
+        last_message: "", // legacy field
+        user_id: "user-123" // Normally dynamic according to logged user
       };
       
       // Dans une vraie application, sauvegarder dans la base de données

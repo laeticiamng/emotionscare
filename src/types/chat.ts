@@ -32,6 +32,13 @@ export interface Conversation {
   title: string;
   createdAt: string;
   updatedAt: string;
+  /** Latest message content */
+  lastMessage?: string;
+  /** Legacy snake_case fields for backward compatibility */
+  created_at?: string;
+  updated_at?: string;
+  last_message?: string;
+  user_id?: string;
   messages: ChatMessage[];
   summary?: string;
   participants?: string[];

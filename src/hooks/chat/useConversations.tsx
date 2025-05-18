@@ -11,11 +11,11 @@ const mockConversations: ChatConversation[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     lastMessage: "Bonjour, comment puis-je vous aider ?",
-    user_id: "user-123", // Pour compatibilité
-    created_at: new Date().toISOString(), // Pour compatibilité
-    updated_at: new Date().toISOString(), // Pour compatibilité
-    last_message: "Bonjour, comment puis-je vous aider ?", // Pour compatibilité
-    messages: [] // Pour compatibilité
+    user_id: "user-123", // legacy field
+    created_at: new Date().toISOString(), // legacy field
+    updated_at: new Date().toISOString(), // legacy field
+    last_message: "Bonjour, comment puis-je vous aider ?", // legacy field
+    messages: [] // legacy field
   },
   {
     id: uuidv4(),
@@ -23,11 +23,11 @@ const mockConversations: ChatConversation[] = [
     createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
     updatedAt: new Date(Date.now() - 86400000).toISOString(),
     lastMessage: "Merci pour votre aide !",
-    user_id: "user-123", // Pour compatibilité
-    created_at: new Date(Date.now() - 86400000).toISOString(), // Pour compatibilité
-    updated_at: new Date(Date.now() - 86400000).toISOString(), // Pour compatibilité
-    last_message: "Merci pour votre aide !", // Pour compatibilité
-    messages: [] // Pour compatibilité
+    user_id: "user-123", // legacy field
+    created_at: new Date(Date.now() - 86400000).toISOString(), // legacy field
+    updated_at: new Date(Date.now() - 86400000).toISOString(), // legacy field
+    last_message: "Merci pour votre aide !", // legacy field
+    messages: [] // legacy field
   }
 ];
 
@@ -92,11 +92,11 @@ export const useConversations = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       lastMessage: "",
-      user_id: "user-123", // Pour compatibilité
-      created_at: new Date().toISOString(), // Pour compatibilité
-      updated_at: new Date().toISOString(), // Pour compatibilité
-      last_message: "", // Pour compatibilité
-      messages: [] // Pour compatibilité
+      user_id: "user-123", // legacy field
+      created_at: new Date().toISOString(), // legacy field
+      updated_at: new Date().toISOString(), // legacy field
+      last_message: "", // legacy field
+      messages: [] // legacy field
     };
     
     mockConversations.unshift(newConversation);
