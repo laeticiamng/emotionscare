@@ -10,17 +10,17 @@ export const useCoachHandlers = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: uuidv4(),
-      text: "Bonjour, je suis votre coach virtuel. Comment puis-je vous aider aujourd'hui ?",
+      content: "Bonjour, je suis votre coach virtuel. Comment puis-je vous aider aujourd'hui ?",
       sender: "assistant",
       timestamp: createTimestamp(),
     },
   ]);
 
   // Function to add a new message
-  const addMessage = useCallback((text: string, sender: 'user' | 'assistant', options: any = {}) => {
+  const addMessage = useCallback((content: string, sender: 'user' | 'assistant', options: any = {}) => {
     const newMessage: ChatMessage = {
       id: options.id || uuidv4(),
-      text,
+      content,
       sender,
       timestamp: options.timestamp || createTimestamp(),
       ...options,
@@ -35,7 +35,7 @@ export const useCoachHandlers = () => {
     // Ensure all messages have required properties
     const validMessages: ChatMessage[] = initialMessages.map(msg => ({
       id: msg.id || uuidv4(),
-      text: msg.text || msg.content || '',
+      content: msg.content || msg.text || '',
       sender: msg.sender || 'user',
       timestamp: msg.timestamp || createTimestamp(),
       conversationId: msg.conversationId || msg.conversation_id,

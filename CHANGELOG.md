@@ -8,6 +8,16 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ### Corrigé
 - Export manquant `DEFAULT_PREFERENCES` rétabli dans `src/types/preferences.ts`.
 
+## [1.1.2] - 2025-05-20
+
+### Ajouté
+- Centralisation des types du coach et du chat (`src/types/coach.ts`, `src/types/chat.ts`).
+- Documentation `COACH_CHAT_MODULE.md` décrivant le contexte et le flux principal.
+- Test unitaire minimal pour les exports du `CoachContext`.
+
+### Modifié
+- Normalisation du `CoachContext` pour utiliser les nouveaux types.
+
 ## [1.1.0] - 2025-05-18
 
 ### Ajouté

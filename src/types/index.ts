@@ -15,6 +15,9 @@ export * from './emotional-data';
 // Export chat types
 export * from './chat';
 
+// Export coach types
+export * from './coach';
+
 // Export VR types
 export * from './vr';
 
