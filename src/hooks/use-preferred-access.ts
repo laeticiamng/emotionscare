@@ -48,15 +48,6 @@ export function usePreferredAccess() {
           ? '/b2b/user/register'
           : '/b2c/register';
       navigate(target, { replace: true });
-    } else if (location.pathname === '/') {
-      // Not authenticated but a preferred mode exists: send directly to the corresponding login
-      const target =
-        normalized === 'b2b_admin'
-          ? '/b2b/admin/login'
-          : normalized === 'b2b_user'
-          ? '/b2b/user/login'
-          : '/b2c/login';
-      navigate(target, { replace: true });
     }
   }, [isAuthenticated, isLoading, user, location.pathname, navigate]);
 }
