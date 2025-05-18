@@ -5,10 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Star, Users, Tag, Award, Activity, CheckCircle } from 'lucide-react';
+import { getVRTemplateCompletionRate, getVRTemplateRecommendedMood } from '@/utils/compatibility';
 
 interface VRTemplateDetailProps {
   template: VRSessionTemplate;
   onStart?: () => void;
+  onBack?: () => void;
+  heartRate?: number;
   className?: string;
 }
 
@@ -23,13 +26,7 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
     duration,
     difficulty,
     category,
-    rating,
-    tags,
-    features,
-    popularity,
-    imageUrl,
-    thumbnailUrl,
-    completionRate
+    tags
   } = template;
   
   const getCoverImage = () => {
@@ -67,6 +64,13 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
     );
   };
 
+  // Get values safely using optional chaining
+  const rating = template?.rating;
+  const features = template?.features;
+  const popularity = template?.popularity;
+  const completionRate = getVRTemplateCompletionRate(template);
+  const recommendedMood = getVRTemplateRecommendedMood(template);
+
   return (
     <Card className={`overflow-hidden ${className}`}>
       {/* Image banner */}
@@ -98,24 +102,24 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
               <span>{duration} min</span>
             </div>
             
-            {rating && (
+            {rating !== undefined && (
               <div className="flex items-center gap-2">
                 <Star className="h-5 w-5 text-amber-500" />
                 <span>{rating.toFixed(1)}/5</span>
               </div>
             )}
             
-            {popularity && (
+            {popularity !== undefined && (
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-blue-500" />
                 <span>{popularity}+ utilisateurs</span>
               </div>
             )}
             
-            {(completionRate || template.completionRate) && (
+            {completionRate > 0 && (
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-500" />
-                <span>{(completionRate || template.completionRate)}% terminé</span>
+                <span>{completionRate}% terminé</span>
               </div>
             )}
           </div>
@@ -136,11 +140,11 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
           )}
 
           {/* Emotion recommandée */}
-          {(template.recommendedMood || template.recommended_mood || template.emotion) && (
+          {recommendedMood && (
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">
-                Recommandé pour: <strong>{template.recommendedMood || template.recommended_mood || template.emotion}</strong>
+                Recommandé pour: <strong>{recommendedMood}</strong>
               </span>
             </div>
           )}

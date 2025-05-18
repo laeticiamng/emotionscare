@@ -28,7 +28,10 @@ const VRTemplateDetailView: React.FC<VRTemplateDetailViewProps> = ({
         onBack={onBack}
       />
       
-      <VRSessionHistory sessions={recentSessions} />
+      <VRSessionHistory 
+        sessions={recentSessions}
+        showHeader={true}
+      />
     </div>
   );
 };

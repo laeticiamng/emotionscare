@@ -53,11 +53,16 @@ const VRSessionView: React.FC<VRSessionViewProps> = ({ template, onCompleteSessi
     setIsAudioPlaying(!isPaused);
   };
 
+  // Get the session title, handling missing theme property
+  const getSessionTitle = () => {
+    return template.theme || template.title || template.name || "Session VR";
+  };
+
   return (
     <div className="space-y-6">
       <Card>
         <CardContent className="p-6 space-y-4 text-center">
-          <h2 className="text-xl font-semibold">{template.theme || template.title}</h2>
+          <h2 className="text-xl font-semibold">{getSessionTitle()}</h2>
           
           <div className="space-y-6">
             <div className="relative rounded-xl overflow-hidden border border-muted">

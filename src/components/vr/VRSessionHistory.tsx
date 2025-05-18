@@ -8,7 +8,8 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
   userId,
   limit = 5,
   showHeader = true,
-  className = ""
+  className = "",
+  onSessionSelect
 }) => {
   // Filter sessions by user if userId is provided
   const userSessions = userId 
@@ -60,7 +61,9 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
     let rating: number | undefined;
     
     if (typeof session.feedback === "object" && session.feedback) {
+      // @ts-ignore - checking dynamically
       if (session.feedback.rating !== undefined) {
+        // @ts-ignore - checking dynamically
         rating = session.feedback.rating;
       }
     } else if (typeof session.rating === "number") {
@@ -86,25 +89,36 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
       )}
       
       <div className="space-y-2">
-        {limitedSessions.map((session) => (
-          <div key={session.id} className="p-3 border rounded-lg bg-card">
-            <div className="flex justify-between items-start mb-1">
-              <h4 className="font-medium">{session.template?.title || session.template?.name || "Session VR"}</h4>
-              {getSessionRating(session)}
-            </div>
-            
-            <div className="text-sm text-muted-foreground">
-              {formatSessionDate(session)}
-            </div>
-            
-            <div className="mt-2 flex items-center justify-between">
-              <div className="text-sm">
-                {session.duration} minutes
+        {limitedSessions.map((session) => {
+          // Safe access to template properties
+          const templateTitle = session.template?.title || session.template?.name || "Session VR";
+          
+          return (
+            <div 
+              key={session.id} 
+              className="p-3 border rounded-lg bg-card"
+              onClick={() => onSessionSelect && onSessionSelect(session)}
+              role={onSessionSelect ? "button" : undefined}
+              tabIndex={onSessionSelect ? 0 : undefined}
+            >
+              <div className="flex justify-between items-start mb-1">
+                <h4 className="font-medium">{templateTitle}</h4>
+                {getSessionRating(session)}
               </div>
-              {getStatusIndicator(session)}
+              
+              <div className="text-sm text-muted-foreground">
+                {formatSessionDate(session)}
+              </div>
+              
+              <div className="mt-2 flex items-center justify-between">
+                <div className="text-sm">
+                  {session.duration} minutes
+                </div>
+                {getStatusIndicator(session)}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

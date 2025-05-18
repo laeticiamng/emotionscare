@@ -24,13 +24,31 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user }) => {
   // Helper function to check if notifications are enabled
   const areNotificationsEnabled = () => {
     const notifPref = user.preferences?.notifications;
-    if (typeof notifPref === 'boolean') {
-      return notifPref;
-    } else if (notifPref?.enabled !== undefined) {
-      return notifPref.enabled;
-    } else {
+    
+    // Check various possible structures for notifications preference
+    if (notifPref === undefined) {
       return user.preferences?.notificationsEnabled || false;
     }
+    
+    if (typeof notifPref === 'boolean') {
+      return notifPref;
+    }
+    
+    // Check if it has a nested 'enabled' property
+    if (typeof notifPref === 'object' && notifPref !== null) {
+      // @ts-ignore - We're deliberately checking for possibly undefined property
+      if (notifPref.enabled !== undefined) {
+        // @ts-ignore
+        return notifPref.enabled;
+      }
+      
+      // If we have any notification channel enabled, notifications are enabled
+      if (notifPref.email || notifPref.push || notifPref.sms) {
+        return true;
+      }
+    }
+    
+    return false;
   };
 
   return (

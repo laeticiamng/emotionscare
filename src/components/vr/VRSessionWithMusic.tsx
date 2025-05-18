@@ -7,6 +7,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   session,
   template,
   onComplete,
+  onExit,
   sessionId,
   title = "Session VR immersive",
   description = "Une expérience VR avec accompagnement musical",
@@ -23,6 +24,8 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
         <div className="flex justify-between text-sm">
           <div>Durée: {duration} min</div>
           <div>Environnement: {environment}</div>
+          {musicTrackId && <div>ID Musique: {musicTrackId}</div>}
+          {sessionId && <div>ID Session: {sessionId}</div>}
         </div>
       </div>
     </Card>

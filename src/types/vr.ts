@@ -11,7 +11,7 @@ export interface VRSessionTemplate {
   intensity: number;
   objective: string;
   type: string;
-  // Adding these fields to fix type errors
+  // Add missing properties that components are using
   audio_url?: string;
   audioTrack?: string;
   is_audio_only?: boolean;
@@ -19,6 +19,19 @@ export interface VRSessionTemplate {
   benefits?: string[];
   difficulty?: string;
   lastUsed?: Date | string;
+  // Additional properties needed for compatibility
+  theme?: string;
+  imageUrl?: string;
+  coverUrl?: string;
+  cover_url?: string;
+  rating?: number;
+  features?: string[];
+  popularity?: number;
+  completionRate?: number;
+  completion_rate?: number;
+  recommendedMood?: string;
+  recommended_mood?: string;
+  emotion?: string;
 }
 
 export interface VRSession {
@@ -33,17 +46,22 @@ export interface VRSession {
   notes?: string;
   completed?: boolean;
   feedback?: string;
-  // Adding these fields to fix type errors
+  // Adding missing fields used in components
   startedAt?: Date | string;
   completedAt?: boolean | Date | string;
   date?: Date | string;
   rating?: number;
   heartRateBefore?: number;
   heartRateAfter?: number;
+  // Add template reference for convenience
+  template?: VRSessionTemplate;
   metrics?: {
     calm?: number;
     focus?: number;
     energy?: number;
+    heartRate?: number | number[];
+    stressLevel?: number;
+    focusLevel?: number;
   };
 }
 
@@ -52,17 +70,28 @@ export interface VRSessionWithMusicProps {
   template?: VRSessionTemplate;
   onComplete?: (feedback: string) => void;
   onExit?: () => void;
+  // Adding missing properties
+  sessionId?: string;
+  title?: string;
+  description?: string;
+  duration?: number;
+  environment?: string;
+  musicTrackId?: string;
 }
 
 export interface VRTemplateDetailProps {
   template: VRSessionTemplate;
-  onStartSession: () => void;
-  onBack: () => void;
+  onStartSession?: () => void;
+  onBack?: () => void;
   heartRate?: number;
+  className?: string;
 }
 
-// Adding missing interface
 export interface VRSessionHistoryProps {
   sessions: VRSession[];
   onSessionSelect?: (session: VRSession) => void;
+  userId?: string;
+  limit?: number;
+  showHeader?: boolean;
+  className?: string;
 }
