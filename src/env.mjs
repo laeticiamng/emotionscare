@@ -1,3 +1,4 @@
+
 /**
  * Environnement centralisé
  *
@@ -34,7 +35,10 @@ export const env = {
     process.env.NEXT_PUBLIC_ALLOWED_AUDIO_TYPES || 'audio/mpeg,audio/wav,audio/ogg',
 
   // Configuration du serveur
-  NODE_ENV: process.env.NODE_ENV || 'development'
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  
+  // Configuration d'authentification
+  SKIP_AUTH_CHECK: process.env.SKIP_AUTH_CHECK === 'true' || process.env.NODE_ENV === 'development'
 };
 
 // Validation simple en mode développement
