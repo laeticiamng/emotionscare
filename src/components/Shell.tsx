@@ -8,14 +8,7 @@ import AudioControls from './audio/AudioControls';
 import MusicMiniPlayer from './music/MusicMiniPlayer';
 import { default as MusicDrawer } from './music/player/MusicDrawer';
 import { useMusic } from '@/contexts/music';
-
-interface ShellProps {
-  children?: React.ReactNode;
-  hideNav?: boolean;
-  hideFooter?: boolean;
-  className?: string;
-  immersive?: boolean;
-}
+import { ShellProps } from '@/types/layout';
 
 const Shell: React.FC<ShellProps> = ({ 
   children, 
