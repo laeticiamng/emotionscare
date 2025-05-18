@@ -1,4 +1,3 @@
-
 /**
  * Environnement centralisé
  * 
@@ -30,9 +29,6 @@ function checkEnvVars() {
   const missingVars = requiredVars.filter(key => !env[key]);
   
   if (missingVars.length > 0) {
-    console.warn(
-      `⚠️  Missing environment variables: ${missingVars.join(', ')}\n` +
-      `Create a .env.local file with the required variables.`
-    );
+    console.warn(`⚠ Missing variables: ${missingVars.join(", ")}.\nCreate a .env.local file with the required variables.`);
   }
 }
