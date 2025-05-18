@@ -1,133 +1,183 @@
 
 import React from 'react';
-import { Badge } from '@/types/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Badge, Challenge } from '@/types/badge';
+import { Award, Star, Zap, TrendingUp, Calendar, User, UserPlus } from 'lucide-react';
+import KpiCard from '@/components/dashboard/admin/KpiCard';
+import ChallengesList from './ChallengesList';
+import { cn } from '@/lib/utils';
 
 interface GamificationDashboardProps {
-  badges: Badge[];
-  points: number;
-  level: number;
-  streak: number;
-  progressToNextLevel: number;
+  userData: {
+    points: number;
+    level: number;
+    badges: Badge[];
+    streak_days: number;
+    challenges: Challenge[];
+    activityData?: {
+      total: number;
+      today: number;
+      thisWeek: number;
+      improvement: number;
+    };
+  };
+  className?: string;
 }
 
-const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
-  badges,
-  points,
-  level,
-  streak,
-  progressToNextLevel
-}) => {
-  const recentBadges = badges
-    .filter(badge => badge.unlockedAt || badge.unlocked_at)
-    .sort((a, b) => {
-      const dateA = new Date(a.unlockedAt || a.unlocked_at || '').getTime();
-      const dateB = new Date(b.unlockedAt || b.unlocked_at || '').getTime();
-      return dateB - dateA;
-    })
-    .slice(0, 3);
+const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ userData, className }) => {
+  const { points, level, badges, streak_days, challenges, activityData } = userData;
+  
+  // XP needed for next level (example formula)
+  const currentLevelXP = Math.pow(level, 2) * 100;
+  const nextLevelXP = Math.pow(level + 1, 2) * 100;
+  const xpForNextLevel = nextLevelXP - currentLevelXP;
+  const currentXPInLevel = points - currentLevelXP;
+  const progressToNextLevel = Math.min(Math.floor((currentXPInLevel / xpForNextLevel) * 100), 100);
 
-  const inProgressBadges = badges
-    .filter(badge => !(badge.unlockedAt || badge.unlocked_at) && badge.progress !== undefined && badge.progress < 100)
-    .slice(0, 3);
+  // Stats cards data
+  const statsCards = [
+    {
+      title: "Niveau",
+      value: level,
+      icon: <Star className="h-4 w-4 text-yellow-500" />,
+      colorMode: "info" as const,
+    },
+    {
+      title: "Points",
+      value: points.toLocaleString(),
+      icon: <Zap className="h-4 w-4 text-purple-500" />,
+      colorMode: "default" as const,
+    },
+    {
+      title: "Badges",
+      value: badges.length,
+      icon: <Award className="h-4 w-4 text-blue-500" />,
+      colorMode: "success" as const,
+    },
+    {
+      title: "Série",
+      value: `${streak_days} jours`,
+      icon: <Calendar className="h-4 w-4 text-green-500" />,
+      colorMode: "warning" as const,
+    },
+  ];
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Points</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{points}</div>
-            <div className="text-sm text-muted-foreground">
-              {progressToNextLevel}% vers le niveau {level + 1}
+    <div className={cn("space-y-6", className)}>
+      {/* Level progress card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-primary" />
+            Progression
+          </CardTitle>
+          <CardDescription>
+            {level === 1 
+              ? "Commencez votre aventure dès maintenant !" 
+              : "Continuez à progresser pour débloquer plus de fonctionnalités"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h3 className="font-bold text-lg">Niveau {level}</h3>
+              <p className="text-xs text-muted-foreground">
+                {currentXPInLevel.toLocaleString()} / {xpForNextLevel.toLocaleString()} XP pour niveau {level + 1}
+              </p>
             </div>
-          </CardContent>
-        </Card>
+            <div className="bg-primary/10 text-primary font-medium rounded-full px-3 py-1 text-sm">
+              {progressToNextLevel}% complété
+            </div>
+          </div>
+          <Progress value={progressToNextLevel} className="h-2" />
+          
+          {/* Activities summary */}
+          {activityData && (
+            <div className="mt-6 grid grid-cols-2 gap-4">
+              <div className="flex items-center bg-muted/50 rounded-md p-2">
+                <div className="bg-primary/10 p-2 rounded-md mr-3">
+                  <User className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Activités aujourd'hui</p>
+                  <p className="font-medium">{activityData.today}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center bg-muted/50 rounded-md p-2">
+                <div className="bg-green-100 dark:bg-green-900/20 p-2 rounded-md mr-3">
+                  <UserPlus className="h-5 w-5 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Cette semaine</p>
+                  <p className="font-medium">{activityData.thisWeek}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Niveau</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{level}</div>
-            <div className="text-sm text-muted-foreground">
-              Rang: Apprenti
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Série</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{streak} jours</div>
-            <div className="text-sm text-muted-foreground">
-              Votre plus longue série: 14 jours
-            </div>
-          </CardContent>
-        </Card>
+      {/* Stats cards grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {statsCards.map((card, index) => (
+          <KpiCard key={index} {...card} />
+        ))}
       </div>
 
+      {/* Badges section */}
       <Card>
         <CardHeader>
-          <CardTitle>Badges récents</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Award className="h-5 w-5 text-amber-500" />
+            Badges
+          </CardTitle>
+          <CardDescription>
+            Débloquez des badges en accomplissant des objectifs
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          {recentBadges.length > 0 ? (
-            <div className="grid grid-cols-3 gap-4">
-              {recentBadges.map(badge => (
-                <div key={badge.id} className="flex flex-col items-center">
-                  <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-                    <span className="text-2xl">{badge.icon || '🏆'}</span>
-                  </div>
-                  <span className="text-center mt-2 font-medium">{badge.name}</span>
-                  <span className="text-xs text-center text-muted-foreground">{badge.description}</span>
+          {badges.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              Vous n'avez pas encore obtenu de badges. Accomplissez des défis pour en gagner !
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {badges.map((badge) => (
+                <div key={badge.id} className="flex flex-col items-center text-center space-y-2 p-3 border rounded-lg">
+                  {badge.imageUrl || badge.image_url ? (
+                    <img 
+                      src={badge.imageUrl || badge.image_url} 
+                      alt={badge.name} 
+                      className="w-12 h-12 object-contain"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Award className="h-6 w-6 text-primary" />
+                    </div>
+                  )}
+                  <h3 className="font-medium text-sm">{badge.name}</h3>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{badge.description}</p>
+                  
+                  {!badge.unlocked && badge.progress !== undefined && badge.threshold !== undefined && (
+                    <div className="w-full space-y-1">
+                      <div className="flex justify-between items-center text-xs">
+                        <span>{badge.progress}</span>
+                        <span>{badge.threshold}</span>
+                      </div>
+                      <Progress value={(badge.progress / badge.threshold) * 100} />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
-          ) : (
-            <p className="text-center py-4 text-muted-foreground">Aucun badge débloqué récemment</p>
           )}
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Badges en cours</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {inProgressBadges.length > 0 ? (
-            <div className="space-y-4">
-              {inProgressBadges.map(badge => (
-                <div key={badge.id} className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                    <span className="text-xl">{badge.icon || '🏆'}</span>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium">{badge.name}</h4>
-                    <p className="text-xs text-muted-foreground mb-1">{badge.description}</p>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary" 
-                        style={{ width: `${badge.progress}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                      <span>{badge.progress}%</span>
-                      <span>{badge.threshold || 100}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center py-4 text-muted-foreground">Aucun badge en cours</p>
-          )}
-        </CardContent>
-      </Card>
+      {/* Challenges */}
+      <ChallengesList challenges={challenges} />
     </div>
   );
 };

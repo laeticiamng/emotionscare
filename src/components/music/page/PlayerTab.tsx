@@ -1,65 +1,154 @@
 
 import React from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { Card, CardContent } from '@/components/ui/card';
-import { Music } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Play, Pause, SkipBack, SkipForward, Repeat, Shuffle } from 'lucide-react';
+import { useMusic } from '@/contexts/music';
+import { MusicTrack } from '@/types/music';
+import { ProgressBar } from '../player/ProgressBar';
 
 interface PlayerTabProps {
-  currentTrack: MusicTrack | null;
-  playlist: MusicPlaylist | null;
+  className?: string;
 }
 
-const PlayerTab: React.FC<PlayerTabProps> = ({ currentTrack, playlist }) => {
-  if (!currentTrack) {
-    return (
-      <div className="flex flex-col items-center justify-center p-8 text-center">
-        <Music className="h-12 w-12 text-muted-foreground mb-2" />
-        <h3 className="text-xl font-medium">Aucune musique en cours</h3>
-        <p className="text-muted-foreground">Sélectionnez une piste dans la bibliothèque pour commencer</p>
-      </div>
-    );
-  }
+const TrackItem: React.FC<{ 
+  track: MusicTrack;
+  isActive?: boolean;
+  onClick?: () => void;
+}> = ({ track, isActive, onClick }) => (
+  <div 
+    className={`flex items-center px-3 py-2 rounded-md cursor-pointer ${
+      isActive ? 'bg-primary/10' : 'hover:bg-muted'
+    }`}
+    onClick={onClick}
+  >
+    <div className="flex-shrink-0 mr-3">
+      {track.cover ? (
+        <img 
+          src={track.cover} 
+          alt={track.name || track.title || "Album art"} 
+          className="w-10 h-10 rounded object-cover"
+        />
+      ) : (
+        <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
+          <span className="text-xs text-muted-foreground">No img</span>
+        </div>
+      )}
+    </div>
+    <div className="min-w-0 flex-1">
+      <h4 className={`text-sm font-medium truncate ${isActive ? 'text-primary' : ''}`}>
+        {track.name || track.title || "Unknown track"}
+      </h4>
+      <p className="text-xs text-muted-foreground truncate">
+        {track.artist || "Unknown artist"}
+      </p>
+    </div>
+  </div>
+);
+
+const PlayerTab: React.FC<PlayerTabProps> = ({ className }) => {
+  const { 
+    isPlaying, 
+    currentTrack, 
+    playlist, 
+    togglePlay,
+    nextTrack,
+    previousTrack, 
+    setCurrentTrack,
+    currentTime,
+    duration,
+    seekTo
+  } = useMusic();
   
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-center gap-4">
-          <div className="w-20 h-20 bg-muted rounded-md flex items-center justify-center overflow-hidden">
-            {currentTrack.coverUrl ? (
-              <img 
-                src={currentTrack.coverUrl} 
-                alt={currentTrack.title}
-                className="w-full h-full object-cover" 
+    <div className={className}>
+      {/* Now playing section with large album art */}
+      <Card className="mb-6 overflow-hidden">
+        <div className="aspect-square bg-muted">
+          {currentTrack?.cover ? (
+            <img 
+              src={currentTrack.cover} 
+              alt={currentTrack.name || currentTrack.title || "Album art"} 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+              No album art
+            </div>
+          )}
+        </div>
+        <CardContent className="p-6">
+          <h3 className="font-bold text-xl mb-1">
+            {currentTrack?.name || currentTrack?.title || "No track selected"}
+          </h3>
+          <p className="text-muted-foreground mb-4">
+            {currentTrack?.artist || "Unknown artist"}
+          </p>
+          
+          <ProgressBar 
+            currentTime={currentTime} 
+            duration={duration} 
+            onSeek={seekTo} 
+          />
+          
+          {/* Player controls */}
+          <div className="flex items-center justify-between mt-4">
+            <Button variant="ghost" size="icon" disabled>
+              <Shuffle className="h-4 w-4" />
+            </Button>
+            
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" size="icon" onClick={previousTrack}>
+                <SkipBack className="h-5 w-5" />
+              </Button>
+              
+              <Button 
+                size="icon" 
+                className="h-12 w-12 rounded-full"
+                onClick={togglePlay}
+              >
+                {isPlaying ? (
+                  <Pause className="h-6 w-6" />
+                ) : (
+                  <Play className="h-6 w-6 ml-0.5" />
+                )}
+              </Button>
+              
+              <Button variant="outline" size="icon" onClick={nextTrack}>
+                <SkipForward className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            <Button variant="ghost" size="icon" disabled>
+              <Repeat className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Playlist section */}
+      {playlist && (
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg flex items-center">
+            {playlist.title || playlist.name || "Current Playlist"}
+            <span className="ml-2 text-sm text-muted-foreground font-normal">
+              ({playlist.tracks.length} tracks)
+            </span>
+          </h3>
+          
+          <div className="space-y-1 max-h-[400px] overflow-y-auto">
+            {playlist.tracks.map((track) => (
+              <TrackItem
+                key={track.id}
+                track={track}
+                isActive={currentTrack?.id === track.id}
+                onClick={() => setCurrentTrack(track)}
               />
-            ) : (
-              <Music className="h-8 w-8 text-muted-foreground" />
-            )}
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-medium">{currentTrack.title}</h3>
-            <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
-            {playlist && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Playlist: {playlist.name || playlist.title}
-              </p>
-            )}
+            ))}
           </div>
         </div>
-        
-        {/* Player controls would go here */}
-        <div className="mt-6">
-          <div className="h-1 w-full bg-muted rounded-full">
-            <div className="h-1 w-1/3 bg-primary rounded-full" />
-          </div>
-          
-          <div className="flex justify-between text-xs text-muted-foreground mt-1">
-            <span>1:15</span>
-            <span>3:45</span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 };
 

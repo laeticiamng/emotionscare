@@ -1,80 +1,141 @@
+
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle, Lock } from 'lucide-react';
-import { Challenge } from '@/types/gamification';
+import { Challenge } from '@/types/badge';
+import { Trophy, Clock, Award, Flag } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface ChallengesListProps {
   challenges: Challenge[];
+  className?: string;
 }
 
-export const ChallengesList: React.FC<ChallengesListProps> = ({ challenges }) => {
-  return (
-    <Card>
-      <CardContent className="space-y-4">
-        {challenges.map((challenge) => {
-          // Add fallback for deadline
-          const deadlineDate = challenge.deadline ? new Date(challenge.deadline) : null;
+const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }) => {
+  // If there are no challenges
+  if (!challenges || challenges.length === 0) {
+    return (
+      <Card className={cn("border", className)}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-amber-500" />
+            Challenges
+          </CardTitle>
+          <CardDescription>
+            Aucun challenge disponible pour le moment.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground text-sm">
+            De nouveaux challenges seront bientôt disponibles. Revenez plus tard !
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
-          return (
-            <div key={challenge.id} className="relative">
-              {/* Add fallback for completed status */}
-              <div className={`rounded-md p-4 mb-2 ${
-                challenge.status === "completed" || challenge.completed ? "bg-green-100 dark:bg-green-900/20" : 
-                "bg-background border"
-              }`}>
-                <div className="flex items-start justify-between">
-                  <div>
-                    {/* Add fallback for name */}
-                    <div className="font-medium">{challenge.title || challenge.name}</div>
-                    <p className="text-sm text-muted-foreground mt-1">{challenge.description}</p>
-                    {/* Add fallback for deadline display */}
-                    {challenge.deadline && (
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Expire le {deadlineDate?.toLocaleDateString()}
+  return (
+    <Card className={cn("border", className)}>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Trophy className="h-5 w-5 text-amber-500" />
+          Challenges
+        </CardTitle>
+        <CardDescription>
+          Accomplissez des objectifs pour gagner des récompenses
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {challenges.map((challenge) => {
+            // Calculate progress percentage
+            const progress = challenge.completed 
+              ? 100 
+              : challenge.progress !== undefined && challenge.total 
+                ? Math.round((challenge.progress / challenge.total) * 100)
+                : challenge.progress !== undefined && challenge.goal
+                  ? Math.round((challenge.progress / challenge.goal) * 100)
+                  : 0;
+                  
+            // For challenges with completions
+            const completionsProgress = challenge.completions !== undefined && (challenge.total || challenge.goal)
+              ? Math.round((challenge.completions / (challenge.total || challenge.goal || 1)) * 100)
+              : 0;
+            
+            // Determine difficulty color
+            const difficultyColor = 
+              challenge.difficulty === 'hard' ? 'text-red-500' :
+              challenge.difficulty === 'medium' ? 'text-amber-500' : 
+              'text-green-500';
+            
+            // Determine status
+            const isCompleted = challenge.completed || progress >= 100;
+            
+            return (
+              <div key={challenge.id} className="relative">
+                {isCompleted && (
+                  <div className="absolute -right-1 -top-1 bg-green-500 text-white p-1 rounded-full z-10">
+                    <Award className="h-3 w-3" />
+                  </div>
+                )}
+                
+                <div className={cn(
+                  "p-4 rounded-lg border",
+                  isCompleted ? "bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800" : "bg-card"
+                )}>
+                  <div className="flex justify-between">
+                    <h3 className="font-medium text-sm">
+                      {challenge.name || challenge.title}
+                    </h3>
+                    {challenge.difficulty && (
+                      <span className={cn("text-xs font-medium", difficultyColor)}>
+                        {challenge.difficulty}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground mt-1 mb-2">
+                    {challenge.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <div className="flex items-center space-x-1">
+                      <Flag className="h-3 w-3 text-muted-foreground" />
+                      <span>
+                        {challenge.progress || challenge.completions || 0} / {challenge.total || challenge.goal || challenge.totalSteps || 1}
+                      </span>
+                    </div>
+                    
+                    {challenge.points > 0 && (
+                      <div className="font-medium text-amber-600 dark:text-amber-400">
+                        {challenge.points} points
                       </div>
                     )}
                   </div>
-                  {/* Add fallbacks for difficulty */}
-                  <div className={`text-xs px-2 py-0.5 rounded-full ${
-                    challenge.difficulty === 'easy' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                    challenge.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                    challenge.difficulty === 'hard' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400' :
-                    'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                  }`}>
-                    {challenge.difficulty || 'normal'}
-                  </div>
-                </div>
-                <div className="mt-3 flex items-center justify-between">
-                  <div>
-                    {/* Add fallback for completions */}
-                    <div className="text-sm">
-                      {challenge.completions || 0} 
-                      {challenge.completions === 1 ? ' utilisateur' : ' utilisateurs'}
+                  
+                  <Progress 
+                    value={completionsProgress || progress} 
+                    className={cn(
+                      isCompleted ? "bg-green-200 dark:bg-green-800" : "bg-blue-100 dark:bg-blue-900/20"
+                    )}
+                  />
+                  
+                  {challenge.deadline && (
+                    <div className="flex items-center text-xs mt-2 text-muted-foreground">
+                      <Clock className="h-3 w-3 mr-1" />
+                      <span>
+                        Expire le {new Date(challenge.deadline).toLocaleDateString()}
+                      </span>
                     </div>
-                    {/* Add fallbacks for completions percentage */}
-                    <div className="text-xs text-muted-foreground">
-                      {((challenge.completions || 0) / 100 * 100).toFixed(1)}% de complétion
-                    </div>
-                  </div>
-                  <div className="text-xl font-bold text-primary">{challenge.points} pts</div>
+                  )}
                 </div>
               </div>
-              {/* Add fallbacks for goal and total */}
-              <Progress value={(challenge.progress || 0) * 100} className="h-1.5" />
-              <div className="text-xs text-muted-foreground mt-1">
-                Progression: {Math.round((challenge.progress || 0) * 100)}% 
-                {challenge.goal && challenge.total ? ` (${challenge.goal}/${challenge.total})` : ''}
-              </div>
-              {challenge.status === "completed" || challenge.completed ? (
-                <div className="absolute top-2 right-2 text-green-500">
-                  <CheckCircle className="h-5 w-5" />
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </CardContent>
     </Card>
   );
 };
+
+export default ChallengesList;

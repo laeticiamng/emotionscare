@@ -1,29 +1,26 @@
 
 import React from 'react';
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { MusicTrack, MusicPlaylist, MusicDrawerProps } from '@/types/music';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
 import { useMusic } from '@/contexts/music';
-import { Card } from '@/components/ui/card';
-import TrackInfo from './TrackInfo';
-import PlayerControls from './MusicControls';
-import ProgressBar from './ProgressBar';
-import VolumeControl from './VolumeControl';
+import { MusicDrawerProps } from '@/types/music';
+import { ProgressBar } from './ProgressBar';
+import { VolumeControl } from './VolumeControl';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({
-  children,
-  isOpen,
+  open,
   onOpenChange,
-  onClose,
+  side = "right",
   playlist,
   currentTrack,
-  side = "right"
+  children
 }) => {
-  const {
-    currentTrack: contextTrack,
-    playlist: contextPlaylist,
-    isPlaying,
+  const { 
+    isPlaying, 
     togglePlay,
     prevTrack,
+    previousTrack, // Alternate name
     nextTrack,
     volume,
     setVolume,
@@ -32,96 +29,122 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
     seekTo,
     muted,
     toggleMute,
-    openDrawer,
-    setOpenDrawer
   } = useMusic();
 
-  // Use props or context values
-  const activeTrack = currentTrack || contextTrack;
-  const activePlaylist = playlist || contextPlaylist;
-  const isOpened = isOpen !== undefined ? isOpen : openDrawer;
+  // Use the most available method
+  const handlePrevious = prevTrack || previousTrack || (() => {});
   
-  const handleOpenChange = (open: boolean) => {
-    if (onOpenChange) {
-      onOpenChange(open);
-    } else {
-      setOpenDrawer(open);
-    }
-    
-    if (!open && onClose) {
-      onClose();
-    }
-  };
-
   return (
-    <Dialog open={isOpened} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <div className="flex flex-col gap-4 p-2">
-          {/* Track info */}
-          {activeTrack && (
-            <Card className="p-4">
-              <div className="flex flex-col space-y-4">
-                <div className="text-center">
-                  {activeTrack.coverUrl || activeTrack.coverImage || activeTrack.cover ? (
-                    <img 
-                      src={activeTrack.coverUrl || activeTrack.coverImage || activeTrack.cover} 
-                      alt={activeTrack.title}
-                      className="mx-auto h-40 w-40 object-cover rounded-md"
-                    />
-                  ) : (
-                    <div className="mx-auto h-40 w-40 bg-muted flex items-center justify-center rounded-md">
-                      <span className="text-4xl">♪</span>
-                    </div>
-                  )}
-                </div>
-                
-                <TrackInfo track={activeTrack} />
-                
-                {/* Playback controls */}
-                <div className="space-y-4">
-                  <ProgressBar 
-                    currentTime={currentTime} 
-                    duration={duration} 
-                    onSeek={seekTo} 
-                    showTimestamps={true}
-                  />
-                  
-                  <div className="flex flex-col space-y-2">
-                    <PlayerControls 
-                      isPlaying={isPlaying}
-                      onPlay={togglePlay}
-                      onPause={togglePlay}
-                      onPrevious={prevTrack}
-                      onNext={nextTrack}
-                    />
-                    
-                    <VolumeControl 
-                      volume={volume}
-                      isMuted={muted}
-                      onVolumeChange={setVolume}
-                      onMuteToggle={toggleMute}
-                      className="w-full justify-end"
-                      showLabel={true}
-                    />
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side={side} className="w-[320px] sm:w-[400px]">
+        <SheetHeader className="text-left mb-6">
+          <SheetTitle>Music Player</SheetTitle>
+        </SheetHeader>
+        
+        {/* Album art and track info */}
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-48 h-48 bg-muted rounded-lg overflow-hidden mb-4">
+            {currentTrack?.cover ? (
+              <img 
+                src={currentTrack.cover} 
+                alt={currentTrack.name || currentTrack.title || "Album art"} 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Volume2 className="h-12 w-12 text-muted-foreground opacity-50" />
+              </div>
+            )}
+          </div>
+          
+          <h3 className="font-semibold text-lg">
+            {currentTrack?.name || currentTrack?.title || "No track selected"}
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            {currentTrack?.artist || "Unknown artist"}
+          </p>
+        </div>
+        
+        {/* Progress bar */}
+        <ProgressBar 
+          currentTime={currentTime} 
+          duration={duration} 
+          onSeek={seekTo} 
+        />
+        
+        {/* Controls */}
+        <div className="flex items-center justify-center space-x-4 my-6">
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={handlePrevious}
+          >
+            <SkipBack className="h-5 w-5" />
+          </Button>
+          
+          <Button 
+            size="icon" 
+            className="h-12 w-12 rounded-full"
+            onClick={togglePlay}
+          >
+            {isPlaying ? (
+              <Pause className="h-6 w-6" />
+            ) : (
+              <Play className="h-6 w-6 ml-0.5" />
+            )}
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="icon"
+            onClick={nextTrack}
+          >
+            <SkipForward className="h-5 w-5" />
+          </Button>
+        </div>
+        
+        {/* Volume control */}
+        <VolumeControl 
+          volume={volume} 
+          muted={muted}
+          onVolumeChange={setVolume}
+          onMuteToggle={toggleMute}
+        />
+        
+        {/* Playlist */}
+        {playlist && playlist.tracks && playlist.tracks.length > 0 && (
+          <div className="mt-8">
+            <h3 className="font-medium text-sm mb-3">Playlist</h3>
+            <div className="space-y-2 max-h-48 overflow-y-auto pr-2">
+              {playlist.tracks.map((track, index) => (
+                <div 
+                  key={track.id || index} 
+                  className={`flex items-center p-2 rounded-md ${
+                    currentTrack?.id === track.id 
+                      ? 'bg-primary/10 text-primary' 
+                      : 'hover:bg-muted'
+                  }`}
+                >
+                  <div className="text-xs font-medium w-5 text-right mr-3">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-sm truncate">
+                      {track.name || track.title || `Track ${index + 1}`}
+                    </h4>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {track.artist || "Unknown"}
+                    </p>
                   </div>
                 </div>
-              </div>
-            </Card>
-          )}
-          
-          {/* Playlist tracks list */}
-          {activePlaylist && activePlaylist.tracks && activePlaylist.tracks.length > 0 && (
-            <div className="max-h-80 overflow-y-auto">
-              <h3 className="font-medium mb-2">
-                {activePlaylist.title || activePlaylist.name || "Current Playlist"}
-              </h3>
-              {/* Render playlist tracks here */}
-              {children}
+              ))}
             </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+          </div>
+        )}
+        
+        {children}
+      </SheetContent>
+    </Sheet>
   );
 };
 

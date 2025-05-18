@@ -1,135 +1,120 @@
 
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { useTheme } from '@/hooks/use-theme';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { useUserPreferences } from '@/contexts/PreferencesContext';
+import { useMusic } from '@/contexts/music';
+import { normalizeUserMode } from '@/utils/userModeHelpers';
 
 /**
- * This component is for testing purposes only.
- * It displays all the context values to verify they are accessible and valid.
+ * Component for testing context access and values
+ * Useful for debugging context-related issues
  */
 const TestContextAccess: React.FC = () => {
-  // Access all contexts
-  const auth = useAuth();
-  const { userMode } = useUserMode();
-  const theme = useTheme();
-  const userPreferences = useUserPreferences();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { userMode, isLoading: userModeLoading } = useUserMode();
+  const { preferences, isLoading: preferencesLoading } = useUserPreferences();
+  const { isInitialized: musicInitialized } = useMusic();
   
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <h1 className="text-2xl font-bold">Context Access Test</h1>
-      <p className="text-muted-foreground">This component displays all context values for debugging purposes.</p>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Context Access Test</h1>
       
-      <Card>
-        <CardHeader>
-          <CardTitle>Authentication Context</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div>
-              <strong>User:</strong> {auth.user ? 'Authenticated' : 'Not Authenticated'}
-              {auth.user && (
-                <Badge className="ml-2">{auth.user.role || 'No Role'}</Badge>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Auth Context */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Auth Context</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <p><strong>Loading:</strong> {authLoading ? 'Yes' : 'No'}</p>
+              <p><strong>Authenticated:</strong> {isAuthenticated ? 'Yes' : 'No'}</p>
+              {user ? (
+                <div className="space-y-2">
+                  <p><strong>User ID:</strong> {user.id}</p>
+                  <p><strong>Email:</strong> {user.email}</p>
+                  <p><strong>Name:</strong> {user.name}</p>
+                  <p><strong>Role:</strong> {user.role}</p>
+                  <p><strong>Created:</strong> {new Date(user.created_at).toLocaleString()}</p>
+                </div>
+              ) : (
+                <p className="italic text-muted-foreground">No user data</p>
               )}
             </div>
-            {auth.user && (
-              <div className="text-sm space-y-1">
-                <div><strong>ID:</strong> {auth.user.id}</div>
-                <div><strong>Name:</strong> {auth.user.name}</div>
-                <div><strong>Email:</strong> {auth.user.email}</div>
-                <div><strong>Created:</strong> {auth.user.created_at}</div>
-              </div>
-            )}
-            <div>
-              <strong>Is Loading:</strong> {auth.isLoading ? 'Yes' : 'No'}
-            </div>
-            <div>
-              <strong>Has Error:</strong> {auth.error ? 'Yes' : 'No'}
-              {auth.error && <div className="text-destructive">{auth.error.message}</div>}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>User Mode Context</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div>
-              <strong>Current Mode:</strong> <Badge>{userMode}</Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Theme Context</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div>
-              <strong>Current Theme:</strong> <Badge>{theme.theme}</Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>User Preferences Context</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {userPreferences.preferences ? (
-              <>
-                <div>
-                  <strong>Theme:</strong> {userPreferences.preferences.theme}
+          </CardContent>
+        </Card>
+        
+        {/* UserMode Context */}
+        <Card>
+          <CardHeader>
+            <CardTitle>UserMode Context</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <p><strong>Loading:</strong> {userModeLoading ? 'Yes' : 'No'}</p>
+              <p><strong>Current Mode:</strong> {userMode || 'None'}</p>
+              <p><strong>Normalized Mode:</strong> {normalizeUserMode(userMode)}</p>
+              
+              {user?.role && userMode && (
+                <div className="mt-4 p-3 rounded-md bg-muted">
+                  <p><strong>Role/Mode Match Check:</strong></p>
+                  <p>User Role: {user.role}</p>
+                  <p>User Mode: {userMode}</p>
+                  <p>Normalized Role: {normalizeUserMode(user.role)}</p>
+                  <p>Normalized Mode: {normalizeUserMode(userMode)}</p>
+                  <p className={normalizeUserMode(user.role) === normalizeUserMode(userMode) ? 'text-green-500' : 'text-red-500'}>
+                    <strong>
+                      {normalizeUserMode(user.role) === normalizeUserMode(userMode) ? '✓ MATCH' : '✗ MISMATCH'}
+                    </strong>
+                  </p>
                 </div>
-                {userPreferences.preferences.fontSize && (
-                  <div>
-                    <strong>Font Size:</strong> {userPreferences.preferences.fontSize}
-                  </div>
-                )}
-                {userPreferences.preferences.fontFamily && (
-                  <div>
-                    <strong>Font Family:</strong> {userPreferences.preferences.fontFamily}
-                  </div>
-                )}
-                <Separator />
-                <div>
-                  <strong>Notifications Enabled:</strong> {userPreferences.preferences.notifications?.enabled ? 'Yes' : 'No'}
-                </div>
-                <div>
-                  <strong>Dashboard Layout:</strong> {typeof userPreferences.preferences.dashboardLayout === 'string' ? 
-                    userPreferences.preferences.dashboardLayout : 'Custom Object'}
-                </div>
-                <div>
-                  <strong>Onboarding Completed:</strong> {userPreferences.preferences.onboardingCompleted ? 'Yes' : 'No'}
-                </div>
-              </>
-            ) : (
-              <div>No preferences available</div>
-            )}
-            
-            <Separator />
-            <div className="text-xs">
-              <details>
-                <summary>Raw Preferences Data</summary>
-                <pre className="bg-muted p-2 rounded-md overflow-auto max-h-60 text-xs mt-2">
-                  {JSON.stringify(userPreferences.preferences, null, 2)}
-                </pre>
-              </details>
+              )}
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+        
+        {/* Preferences Context */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Preferences Context</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <p><strong>Loading:</strong> {preferencesLoading ? 'Yes' : 'No'}</p>
+              
+              {preferences ? (
+                <div>
+                  <p><strong>Theme:</strong> {preferences.theme}</p>
+                  <p><strong>Language:</strong> {preferences.language}</p>
+                  <p><strong>Notifications:</strong> {preferences.notifications_enabled ? 'Enabled' : 'Disabled'}</p>
+                  <p><strong>Email Notifications:</strong> {preferences.email_notifications ? 'Enabled' : 'Disabled'}</p>
+                  <p><strong>Font Family:</strong> {preferences.fontFamily || 'Default'}</p>
+                  <p><strong>Font Size:</strong> {preferences.fontSize || 'Default'}</p>
+                  <p><strong>Reduce Motion:</strong> {preferences.reduceMotion ? 'Yes' : 'No'}</p>
+                  <p><strong>Sound Enabled:</strong> {preferences.soundEnabled ? 'Yes' : 'No'}</p>
+                  <p><strong>Ambient Sound:</strong> {preferences.ambientSound || 'None'}</p>
+                </div>
+              ) : (
+                <p className="italic text-muted-foreground">No preferences data</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Music Context */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Music Context</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <p><strong>Initialized:</strong> {musicInitialized ? 'Yes' : 'No'}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

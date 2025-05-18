@@ -3,6 +3,7 @@ import { Badge, Challenge } from './badge';
 import { UserRole } from './user';
 
 export interface KpiCardProps {
+  id?: string;
   title: string;
   value: string | number;
   trend?: number;
@@ -12,8 +13,6 @@ export interface KpiCardProps {
   footer?: React.ReactNode;
   className?: string;
   onClick?: () => void;
-  // Add missing properties
-  id?: string;
   delta?: number | {
     value: number;
     label?: string;
@@ -25,13 +24,17 @@ export interface KpiCardProps {
   loading?: boolean;
   status?: 'success' | 'warning' | 'danger' | 'info';
   trendText?: string;
+  // Props for DraggableKpiCardsGrid
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
 }
 
 export interface DraggableKpiCardsGridProps {
   cards?: KpiCardProps[];
   onSave?: (newLayout: any) => void;
   savedLayout?: any;
-  // Add missing properties
   kpiCards?: KpiCardProps[];
   onLayoutChange?: (layout: any) => void;
   className?: string;
@@ -41,6 +44,7 @@ export interface DraggableKpiCardsGridProps {
 export interface GlobalOverviewTabProps {
   period?: string;
   onPeriodChange?: (period: string) => void;
+  className?: string;
 }
 
 export interface DashboardWidgetConfig {
@@ -53,7 +57,6 @@ export interface DashboardWidgetConfig {
   y: number;
   visible: boolean;
   data?: any;
-  // Add missing properties
   settings?: Record<string, any>;
 }
 
@@ -76,7 +79,6 @@ export interface LeaderboardEntry {
   department?: string;
   level?: number;
   trend?: number;
-  // Add missing properties
   username?: string;
   userId?: string;
 }

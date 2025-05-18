@@ -1,66 +1,79 @@
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Headphones, Music } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
-import { cn } from '@/lib/utils';
+import { Slider } from '@/components/ui/slider';
+import { Play, Music } from 'lucide-react';
+import { useMusic } from '@/contexts/music';
 import { EmotionMusicParams } from '@/types/music';
 
 interface MusicRecommendationCardProps {
+  title: string;
   emotion: string;
-  intensity?: number;
-  standalone?: boolean;
-  className?: string;
+  icon?: React.ReactNode;
 }
 
-const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({
-  emotion,
-  intensity = 50,
-  standalone = false,
-  className
-}) => {
-  const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
-  
-  const handlePlay = async () => {
-    if (!emotion) return;
-    
+const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({ title, emotion, icon }) => {
+  const [intensity, setIntensity] = useState(50);
+  const [isLoading, setIsLoading] = useState(false);
+  const { getRecommendationByEmotion, setPlaylist, setCurrentTrack, setOpenDrawer } = useMusic();
+
+  const handleGenerateMusic = async () => {
+    setIsLoading(true);
     try {
-      const params = { emotion, intensity: intensity / 100 };
-      const result = await loadPlaylistForEmotion(params);
+      // Create params object
+      const params: EmotionMusicParams = {
+        emotion: emotion,
+        intensity: intensity
+      };
       
-      if (result && setOpenDrawer) {
+      const playlist = await getRecommendationByEmotion(params);
+      if (playlist && playlist.tracks.length > 0) {
+        setPlaylist(playlist);
+        setCurrentTrack(playlist.tracks[0]);
         setOpenDrawer(true);
       }
     } catch (error) {
-      console.error("Error loading music recommendation:", error);
+      console.error('Error generating music:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
-  
+
   return (
-    <Card className={cn(standalone ? 'border-2 border-primary/20' : '', className)}>
-      {standalone && (
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-lg">
-            <Music className="mr-2 h-5 w-5" />
-            Recommandation musicale
-          </CardTitle>
-        </CardHeader>
-      )}
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h4 className="font-medium">Musique pour état "{emotion}"</h4>
-            <p className="text-sm text-muted-foreground">
-              Playlist adaptée à votre humeur actuelle
-            </p>
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          {icon || <Music className="h-5 w-5" />}
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pb-3">
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm">
+            <span>Intensité</span>
+            <span className="font-medium">{intensity}%</span>
           </div>
-          <Button onClick={handlePlay} className="flex items-center gap-2">
-            <Headphones className="h-4 w-4" />
-            Écouter
-          </Button>
+          <Slider
+            value={[intensity]}
+            min={0}
+            max={100}
+            step={5}
+            onValueChange={(vals) => setIntensity(vals[0])}
+          />
         </div>
       </CardContent>
+      <CardFooter>
+        <Button 
+          className="w-full" 
+          variant="default"
+          onClick={handleGenerateMusic}
+          disabled={isLoading}
+        >
+          <Play className="h-4 w-4 mr-2" />
+          {isLoading ? 'Génération...' : 'Générer'}
+        </Button>
+      </CardFooter>
     </Card>
   );
 };

@@ -1,156 +1,153 @@
 
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { useUserPreferences } from '@/contexts/UserPreferencesContext';
-import { useToast } from '@/hooks/use-toast';
+import { useEffect, useState, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useUserPreferences } from '@/contexts/PreferencesContext';
 
-type AmbientSoundType = 'rain' | 'forest' | 'waves' | 'white-noise' | 'cafe' | 'none';
-
-interface AmbientSoundOptions {
-  defaultEnabled?: boolean;
-  defaultVolume?: number;
-  defaultType?: AmbientSoundType;
+interface Sound {
+  name: string;
+  src: string;
+  volume: number;
 }
 
-export const useAmbientSound = (options: AmbientSoundOptions = {}) => {
-  const { 
-    defaultEnabled = false,
-    defaultVolume = 0.5,
-    defaultType = 'rain'
-  } = options;
-  
+export const AMBIENT_SOUNDS: Record<string, Sound> = {
+  'nature': { 
+    name: 'Nature', 
+    src: '/sounds/ambient/nature.mp3',
+    volume: 0.4 
+  },
+  'rain': { 
+    name: 'Rain', 
+    src: '/sounds/ambient/rain.mp3', 
+    volume: 0.5 
+  },
+  'cafe': { 
+    name: 'Café', 
+    src: '/sounds/ambient/cafe.mp3', 
+    volume: 0.3 
+  },
+  'waves': { 
+    name: 'Ocean Waves', 
+    src: '/sounds/ambient/waves.mp3', 
+    volume: 0.4 
+  },
+  'fireplace': { 
+    name: 'Fireplace', 
+    src: '/sounds/ambient/fireplace.mp3', 
+    volume: 0.35 
+  },
+  'none': { 
+    name: 'No Sound', 
+    src: '', 
+    volume: 0 
+  },
+};
+
+export const useAmbientSound = () => {
+  const { isAuthenticated } = useAuth();
+  const { theme } = useTheme();
   const { preferences, updatePreferences } = useUserPreferences();
-  const { toast } = useToast();
   
-  const [isEnabled, setIsEnabled] = useState(defaultEnabled);
-  const [volume, setVolume] = useState(defaultVolume);
-  const [soundType, setSoundType] = useState<AmbientSoundType>(defaultType);
-  const [isLoading, setIsLoading] = useState(false);
+  const [currentSound, setCurrentSound] = useState<string>('none');
+  const [volume, setVolume] = useState<number>(0.3);
+  const [playing, setPlaying] = useState<boolean>(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  // Mapping des types de sons aux URLs
-  const soundUrls: Record<AmbientSoundType, string> = {
-    'rain': '/sounds/ambient/rain.mp3',
-    'forest': '/sounds/ambient/forest.mp3',
-    'waves': '/sounds/ambient/waves.mp3',
-    'white-noise': '/sounds/ambient/white-noise.mp3',
-    'cafe': '/sounds/ambient/cafe-ambience.mp3',
-    'none': ''
-  };
-  
-  // Initialisation de l'élément audio
+  // Initialize ambient sound from user preferences if available
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      audioRef.current = new Audio();
-      audioRef.current.loop = true;
-      
-      // Appliquer les préférences utilisateur si existantes
-      const userEnabled = preferences.ambientSound;
-      if (userEnabled !== undefined) {
-        setIsEnabled(userEnabled);
+    if (isAuthenticated && preferences) {
+      // Add a fallback if ambientSound is not in preferences
+      const savedSound = preferences.ambientSound || 'none';
+      if (savedSound !== 'none') {
+        setCurrentSound(savedSound);
+        setPlaying(true);
       }
     }
+  }, [isAuthenticated, preferences]);
+  
+  // Set up audio element
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
     
-    // Nettoyage
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.loop = true;
+    }
+    
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
-        audioRef.current.src = '';
+        audioRef.current = null;
       }
     };
-  }, [preferences.ambientSound]);
+  }, []);
   
-  // Gestion du changement de son
+  // Handle sound changes
   useEffect(() => {
-    if (!audioRef.current) return;
+    const audio = audioRef.current;
+    if (!audio) return;
     
-    const wasPlaying = !audioRef.current.paused;
-    const newUrl = soundUrls[soundType];
-    
-    if (!newUrl) {
-      audioRef.current.pause();
+    if (currentSound === 'none') {
+      audio.pause();
+      setPlaying(false);
       return;
     }
     
-    if (audioRef.current.src !== newUrl) {
-      setIsLoading(true);
-      audioRef.current.src = newUrl;
-      audioRef.current.load();
-      
-      audioRef.current.onloadeddata = () => {
-        setIsLoading(false);
-        if (wasPlaying && isEnabled) {
-          audioRef.current?.play().catch(err => {
-            console.error('Failed to play ambient sound:', err);
-          });
-        }
-      };
-      
-      audioRef.current.onerror = () => {
-        setIsLoading(false);
-        toast({
-          title: "Erreur de chargement",
-          description: `Impossible de charger le son d'ambiance "${soundType}"`,
-          variant: "destructive",
-        });
-      };
-    }
-  }, [soundType, soundUrls, isEnabled, toast]);
-  
-  // Gestion du volume
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  }, [volume]);
-  
-  // Gestion de l'état activé/désactivé
-  useEffect(() => {
-    if (!audioRef.current) return;
+    const sound = AMBIENT_SOUNDS[currentSound];
+    if (!sound) return;
     
-    if (isEnabled && soundType !== 'none') {
-      audioRef.current.play().catch(err => {
+    audio.src = sound.src;
+    audio.volume = volume * sound.volume;
+    
+    if (playing) {
+      audio.play().catch(err => {
         console.error('Failed to play ambient sound:', err);
-        toast({
-          title: "Erreur de lecture",
-          description: "Impossible de lire le son d'ambiance. Vérifiez les permissions audio.",
-          variant: "destructive",
-        });
-        setIsEnabled(false);
+        setPlaying(false);
       });
     } else {
-      audioRef.current.pause();
+      audio.pause();
     }
-    
-    // Mettre à jour les préférences utilisateur
-    updatePreferences({
-      ambientSound: isEnabled
-    });
-  }, [isEnabled, soundType, updatePreferences, toast]);
+  }, [currentSound, volume, playing]);
   
-  // Fonctions de contrôle
-  const toggleSound = useCallback(() => {
-    setIsEnabled(prev => !prev);
-  }, []);
+  const changeSound = async (soundKey: string) => {
+    setCurrentSound(soundKey);
+    if (soundKey !== 'none') {
+      setPlaying(true);
+      
+      // Save to user preferences if authenticated
+      if (isAuthenticated) {
+        await updatePreferences({
+          ambientSound: soundKey,
+        });
+      }
+    } else {
+      setPlaying(false);
+    }
+  };
   
-  const changeSound = useCallback((type: AmbientSoundType) => {
-    setSoundType(type);
-  }, []);
+  const togglePlay = () => {
+    setPlaying(!playing);
+  };
   
-  const adjustVolume = useCallback((value: number) => {
-    const newVolume = Math.max(0, Math.min(1, value));
+  const changeVolume = (newVolume: number) => {
+    if (audioRef.current) {
+      const sound = AMBIENT_SOUNDS[currentSound];
+      if (sound) {
+        audioRef.current.volume = newVolume * sound.volume;
+      }
+    }
     setVolume(newVolume);
-  }, []);
+  };
   
   return {
-    isEnabled,
-    soundType,
+    playing,
+    currentSound,
     volume,
-    isLoading,
-    toggleSound,
+    availableSounds: AMBIENT_SOUNDS,
     changeSound,
-    adjustVolume,
-    availableSounds: Object.keys(soundUrls).filter(s => s !== 'none') as AmbientSoundType[]
+    togglePlay,
+    changeVolume,
   };
 };
 

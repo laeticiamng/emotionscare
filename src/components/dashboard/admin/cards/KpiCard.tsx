@@ -1,107 +1,105 @@
 
-import React, { ReactNode } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { cva } from "class-variance-authority";
-import { KpiCardProps } from '@/types/dashboard';
+import { KpiCardProps } from "@/types/dashboard";
+import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 
-const KpiCard: React.FC<KpiCardProps> = ({
-  id,
+export const KpiCard = ({
   title,
   value,
-  icon,
   delta,
+  icon,
   subtitle,
+  status = "default",
+  className,
+  isLoading,
   ariaLabel,
   onClick,
-  className,
-  status,
-  trendText,
-  loading
-}) => {
-  const trendVariants = cva("text-xs flex items-center gap-1", {
-    variants: {
-      trend: {
-        up: "text-green-500 dark:text-green-400",
-        down: "text-red-500 dark:text-red-400",
-        neutral: "text-gray-500 dark:text-gray-400"
-      }
-    },
-    defaultVariants: {
-      trend: "neutral"
-    }
-  });
+  footer,
+}: KpiCardProps) => {
+  // Convert status for compatibility
+  const mappedStatus = status === 'danger' ? 'error' : status;
   
-  const statusVariants = cva("absolute top-2 right-2 w-2 h-2 rounded-full", {
-    variants: {
-      status: {
-        success: "bg-green-500",
-        warning: "bg-yellow-500",
-        error: "bg-red-500",
-        info: "bg-blue-500",
-        default: "bg-gray-500"
-      }
-    },
-    defaultVariants: {
-      status: "default"
-    }
-  });
-
-  const renderIcon = () => {
-    if (!icon) return null;
-    // Convert the icon to a ReactNode to satisfy type requirements
-    const iconElement: ReactNode = icon;
+  // Handle loading state
+  if (isLoading) {
     return (
-      <div className="rounded-md w-8 h-8 flex items-center justify-center bg-primary/10 text-primary">
-        {iconElement}
-      </div>
-    );
-  };
-  
-  return (
-    <Card 
-      className={cn(
-        "relative hover:shadow-md transition-shadow cursor-pointer", 
-        className
-      )} 
-      onClick={onClick}
-      id={id}
-    >
-      {status && <span className={statusVariants({ status })} />}
-      
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            {title}
+      <Card
+        className={cn(
+          "overflow-hidden transition-all hover:shadow-md",
+          className
+        )}
+      >
+        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+          <CardTitle
+            className="text-sm font-medium text-muted-foreground animate-pulse"
+          >
+            &nbsp;
           </CardTitle>
-          {renderIcon()}
-        </div>
-      </CardHeader>
-      
-      <CardContent>
-        {loading ? (
-          <div className="h-8 w-24 bg-muted animate-pulse rounded"></div>
-        ) : (
-          <div className="text-2xl font-bold" aria-label={ariaLabel}>
-            {value}
+          {icon && (
+            <div className="opacity-70 animate-pulse">
+              {icon}
+            </div>
+          )}
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold animate-pulse bg-muted h-8 w-24 rounded">
+            &nbsp;
           </div>
-        )}
-        
-        {delta && (
-          <div className={trendVariants({ trend: delta.trend })}>
-            {delta.trend === "up" ? "↑" : delta.trend === "down" ? "↓" : "→"}
-            {delta.value}%
-            {delta.label && <span className="text-muted-foreground ml-1">{delta.label}</span>}
-            {trendText && <span className="text-muted-foreground ml-1">{trendText}</span>}
-          </div>
-        )}
-      </CardContent>
-      
-      {subtitle && (
-        <CardFooter className="pt-0">
-          <p className="text-xs text-muted-foreground">{subtitle}</p>
-        </CardFooter>
+          <p className="text-xs text-muted-foreground mt-2 animate-pulse bg-muted h-4 w-16 rounded">
+            &nbsp;
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Convert number delta to object format for consistency in rendering
+  const deltaObj = typeof delta === 'number' 
+    ? { value: delta, trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral' } 
+    : delta;
+
+  let statusColor;
+  if (deltaObj) {
+    statusColor = deltaObj.trend === 'up' 
+      ? mappedStatus === 'default' ? 'text-emerald-600 dark:text-emerald-400' : `text-${mappedStatus}` 
+      : deltaObj.trend === 'down' 
+        ? mappedStatus === 'default' ? 'text-rose-600 dark:text-rose-400' : `text-${mappedStatus}` 
+        : 'text-gray-600 dark:text-gray-400';
+  }
+
+  return (
+    <Card
+      className={cn(
+        "overflow-hidden transition-all hover:shadow-md",
+        onClick ? "cursor-pointer" : "",
+        className
       )}
+      onClick={onClick}
+      aria-label={ariaLabel}
+    >
+      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {title}
+        </CardTitle>
+        {icon && <div className="opacity-70">{icon}</div>}
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        {deltaObj && (
+          <p className={cn("text-xs flex items-center gap-1 mt-1", statusColor)}>
+            {deltaObj.trend === 'up' && <ArrowUp className="h-3 w-3" />}
+            {deltaObj.trend === 'down' && <ArrowDown className="h-3 w-3" />}
+            {deltaObj.trend === 'neutral' && <Minus className="h-3 w-3" />}
+            {deltaObj.value !== undefined && (
+              <span>{Math.abs(deltaObj.value).toFixed(1)}%</span>
+            )}
+            {deltaObj.label && <span>{deltaObj.label}</span>}
+          </p>
+        )}
+        {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
+        {footer && <div className="mt-4">{footer}</div>}
+      </CardContent>
     </Card>
   );
 };

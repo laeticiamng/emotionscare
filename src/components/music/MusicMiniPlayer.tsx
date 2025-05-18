@@ -1,71 +1,92 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipForward } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
+import { PlayCircle, PauseCircle, Music } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useMusic } from '@/contexts/music';
+import { MusicContextType } from '@/types/music';
+
+// Provide default implementation for missing properties
+const MusicMiniPlayerWrapper: React.FC = () => {
+  const musicContext = useMusic();
+  
+  // Create an enhanced context with fallbacks for missing properties
+  const enhancedContext: MusicContextType = {
+    ...musicContext,
+    playlist: musicContext.playlist || null,
+    nextTrack: musicContext.nextTrack || (() => {}),
+  };
+  
+  return <MusicMiniPlayer context={enhancedContext} />;
+};
 
 interface MusicMiniPlayerProps {
-  onOpen: () => void;
+  context: MusicContextType;
 }
 
-const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ onOpen }) => {
+const MusicMiniPlayer = ({ context }: MusicMiniPlayerProps) => {
   const { 
-    currentTrack, 
     isPlaying, 
-    playTrack, 
-    pauseTrack, 
-    nextTrack,
-    playlist
-  } = useMusic();
-
-  const handleTogglePlay = () => {
-    if (isPlaying) {
-      pauseTrack();
-    } else if (currentTrack) {
-      playTrack(currentTrack);
-    }
-  };
-
-  if (!currentTrack) {
-    return null;
-  }
-
+    currentTrack,
+    togglePlay, 
+    setOpenDrawer,
+  } = context;
+  
   return (
-    <div className="fixed bottom-16 right-4 p-3 bg-background border shadow-md rounded-lg flex items-center gap-3 z-50">
-      <div onClick={onOpen} className="flex-1 cursor-pointer">
-        <p className="text-sm font-medium truncate max-w-[120px]">
-          {currentTrack.title}
-        </p>
-        <p className="text-xs text-muted-foreground truncate">
-          {currentTrack.artist}
-        </p>
-      </div>
-
+    <div 
+      className={cn(
+        "flex items-center justify-between px-3 py-2 rounded-lg",
+        "transition-all duration-300 ease-in-out",
+        isPlaying 
+          ? "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20" 
+          : "bg-muted/50"
+      )}
+    >
       <div className="flex items-center">
         <Button 
           variant="ghost" 
-          size="sm" 
-          className="h-8 w-8" 
-          onClick={handleTogglePlay}
-        >
-          {isPlaying ? (
-            <Pause className="h-4 w-4" />
-          ) : (
-            <Play className="h-4 w-4" />
+          size="icon" 
+          className={cn(
+            "h-8 w-8 rounded-full transition-all", 
+            isPlaying ? "text-primary bg-white dark:bg-primary/10" : "text-muted-foreground"
           )}
-        </Button>
-
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="h-8 w-8" 
-          onClick={nextTrack}
+          onClick={togglePlay}
         >
-          <SkipForward className="h-4 w-4" />
+          {isPlaying 
+            ? <PauseCircle className="h-5 w-5" />
+            : <PlayCircle className="h-5 w-5" />
+          }
         </Button>
+        
+        <div className="ml-3 cursor-pointer" onClick={() => setOpenDrawer(true)}>
+          {currentTrack ? (
+            <div>
+              <h4 className="font-medium text-sm line-clamp-1">
+                {currentTrack.name || currentTrack.title || 'Unknown Track'}
+              </h4>
+              <p className="text-xs text-muted-foreground">
+                {currentTrack.artist || 'Unknown Artist'}
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center">
+              <Music className="h-4 w-4 mr-1.5 text-muted-foreground" />
+              <span className="text-sm font-medium text-muted-foreground">Music Player</span>
+            </div>
+          )}
+        </div>
       </div>
+      
+      <Button
+        variant="ghost"
+        size="sm"
+        className="text-xs"
+        onClick={() => setOpenDrawer(true)}
+      >
+        Open
+      </Button>
     </div>
   );
 };
 
-export default MusicMiniPlayer;
+export default MusicMiniPlayerWrapper;

@@ -1,73 +1,88 @@
 
-import React, { useState } from 'react';
-import { cn } from '@/lib/utils';
-import GridLayout from 'react-grid-layout';
+import React, { useState, useEffect } from 'react';
+import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
-import KpiCard from '@/components/dashboard/admin/KpiCard';
-import { KpiCardProps, DraggableKpiCardsGridProps } from '@/types/dashboard';
+import { Button } from "@/components/ui/button";
+import { DraggableKpiCardsGridProps } from '@/types/dashboard';
+import KpiCard from '../KpiCard';
+
+const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
-  kpiCards,
-  cards,
-  onLayoutChange,
-  className,
-  isEditable = false
+  cards = [],
+  onSave,
+  savedLayout,
+  isEditable = true
 }) => {
-  // Use either cards or kpiCards prop, prioritizing cards if both are provided
-  const cardsToUse = cards || kpiCards || [];
+  const [layouts, setLayouts] = useState(savedLayout || {});
+  const [isEdit, setIsEdit] = useState(false);
 
-  const [layout, setLayout] = useState(
-    cardsToUse.map((card, index) => ({
-      i: card.id,
-      x: card.x !== undefined ? card.x : (index % 3) * 4,
-      y: card.y !== undefined ? card.y : Math.floor(index / 3),
-      w: card.w !== undefined ? card.w : 4,
-      h: card.h !== undefined ? card.h : 1,
-      minW: 1,
-      maxW: 12,
-      minH: 1,
-      maxH: 4
-    }))
-  );
+  // Generate layout based on cards if no saved layout
+  useEffect(() => {
+    if (!savedLayout && cards.length > 0) {
+      const defaultLayout = cards.map((card, index) => ({
+        i: card.id || `card-${index}`,
+        x: card.x !== undefined ? card.x : (index % 3) * 4,
+        y: card.y !== undefined ? card.y : Math.floor(index / 3) * 4,
+        w: card.w !== undefined ? card.w : 4,
+        h: card.h !== undefined ? card.h : 3,
+      }));
 
-  const handleLayoutChange = (newLayout: any) => {
-    setLayout(newLayout);
-    if (onLayoutChange) {
-      onLayoutChange(newLayout);
+      setLayouts({ lg: defaultLayout, md: defaultLayout, sm: defaultLayout });
     }
+  }, [cards, savedLayout]);
+
+  const handleLayoutChange = (current: any, all: any) => {
+    setLayouts(all);
+  };
+
+  const handleSave = () => {
+    if (onSave) {
+      onSave(layouts);
+    }
+    setIsEdit(false);
   };
 
   return (
-    <div className={cn("w-full", className)}>
-      <GridLayout
+    <div className="w-full">
+      {isEditable && (
+        <div className="mb-4 flex justify-end">
+          {isEdit ? (
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setIsEdit(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave}>
+                Save Layout
+              </Button>
+            </div>
+          ) : (
+            <Button variant="outline" onClick={() => setIsEdit(true)}>
+              Edit Layout
+            </Button>
+          )}
+        </div>
+      )}
+
+      <ResponsiveGridLayout
         className="layout"
-        layout={layout}
-        cols={12}
+        layouts={layouts}
+        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
         rowHeight={100}
-        width={1200}
+        isDraggable={isEdit}
+        isResizable={isEdit}
+        onLayoutChange={handleLayoutChange}
         margin={[16, 16]}
         containerPadding={[0, 0]}
-        isDraggable={isEditable}
-        isResizable={isEditable}
-        onLayoutChange={handleLayoutChange}
       >
-        {cardsToUse.map(card => (
-          <div key={card.id} className="shadow-sm">
-            <KpiCard
-              id={card.id}
-              title={card.title}
-              value={card.value}
-              icon={card.icon}
-              delta={card.delta}
-              subtitle={card.subtitle}
-              ariaLabel={card.ariaLabel || card.title}
-              onClick={card.onClick}
-              status={card.status}
-            />
+        {cards.map((card, index) => (
+          <div key={card.id || `card-${index}`}>
+            <KpiCard {...card} />
           </div>
         ))}
-      </GridLayout>
+      </ResponsiveGridLayout>
     </div>
   );
 };

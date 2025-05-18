@@ -4,7 +4,10 @@ export interface Badge {
   name: string;
   description: string;
   imageUrl?: string;
+  image_url?: string;
   unlocked: boolean;
+  unlocked_at?: string;
+  unlockedAt?: string;
   level?: number;
   category?: string;
   tier?: string;
@@ -13,21 +16,21 @@ export interface Badge {
   total?: number;
   user_id?: string;
   awarded_at?: string;
-  // Add missing properties
   achieved?: boolean;
   earned?: boolean;
-  image_url?: string;
-  unlockedAt?: string;
-  unlocked_at?: string;
+  threshold?: number;
 }
 
 export interface Challenge {
   id: string;
   name: string;
+  title?: string;
   description: string;
   points: number;
   progress?: number;
+  goal?: number;
   total?: number;
+  totalSteps?: number;
   completed?: boolean;
   deadline?: string;
   imageUrl?: string;
@@ -35,9 +38,6 @@ export interface Challenge {
   difficulty?: 'easy' | 'medium' | 'hard';
   badge_id?: string;
   user_id?: string;
-  // Add missing properties
-  title?: string;
-  goal?: number;
   status?: string;
-  totalSteps?: number;
+  completions?: number;
 }

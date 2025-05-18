@@ -1,31 +1,28 @@
 
-import { Theme, FontFamily, FontSize } from './theme';
-import { NotificationPreference } from './notification';
+import { ThemeName, FontFamily, FontSize } from './theme';
 
 export interface UserPreferences {
-  theme: Theme;
-  fontSize?: FontSize;
+  theme: ThemeName;
+  language: string;
+  notifications_enabled: boolean;
+  email_notifications: boolean;
   fontFamily?: FontFamily;
+  fontSize?: FontSize;
   reduceMotion?: boolean;
-  colorBlindMode?: boolean;
-  autoplayMedia?: boolean;
   soundEnabled?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  language?: string;
-  dashboardLayout?: Record<string, any> | string;
-  onboardingCompleted?: boolean;
+  dashboardLayout?: Record<string, any>;
   privacy?: {
-    shareData: boolean;
-    anonymizeReports: boolean;
-    profileVisibility: "public" | "team" | "private";
+    shareActivity?: boolean;
+    shareJournal?: boolean;
+    publicProfile?: boolean;
   };
-  notifications?: NotificationPreference;
+  onboardingCompleted?: boolean;
+  ambientSound?: string;
 }
 
 export interface UserPreferencesContextType {
   preferences: UserPreferences;
-  updatePreferences: (newPrefs: Partial<UserPreferences>) => void;
-  resetPreferences: () => void;
-  isLoading?: boolean;
+  updatePreferences: (newPreferences: Partial<UserPreferences>) => Promise<void>;
+  isLoading: boolean;
+  error: Error | null;
 }
