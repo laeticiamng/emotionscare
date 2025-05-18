@@ -7,6 +7,9 @@ import RegisterPage from './pages/common/Register';
 import B2CLogin from './pages/b2c/Login';
 import B2CRegister from './pages/b2c/Register';
 import B2BSelectionPage from './pages/B2BSelectionPage';
+import B2BUserLogin from './pages/b2b/user/Login';
+import B2BAdminLogin from './pages/b2b/admin/Login';
+import B2BUserRegister from './pages/b2b/user/Register';
 import B2CLayout from './layouts/B2CLayout';
 import B2BUserLayout from './layouts/B2BUserLayout';
 import B2BAdminLayout from './layouts/B2BAdminLayout';
@@ -75,11 +78,15 @@ export const routes: RouteObject[] = [
   // B2B Auth Routes
   {
     path: 'b2b/user/login',
-    element: <LoginPage />
+    element: <B2BUserLogin />
+  },
+  {
+    path: 'b2b/user/register',
+    element: <B2BUserRegister />
   },
   {
     path: 'b2b/admin/login',
-    element: <LoginPage />
+    element: <B2BAdminLogin />
   },
   // B2C Protected Routes
   {
