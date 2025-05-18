@@ -76,6 +76,11 @@ export const b2cNavItems: NavItemType[] = [
     icon: Trophy,
   },
   {
+    title: "Évaluation",
+    href: "/b2c/evaluation",
+    icon: BarChart2,
+  },
+  {
     title: "Paramètres",
     href: "/b2c/preferences",
     icon: Settings,
@@ -130,6 +135,11 @@ export const b2bUserNavItems: NavItemType[] = [
     icon: Trophy,
   },
   {
+    title: "Évaluation",
+    href: "/b2b/user/evaluation",
+    icon: BarChart2,
+  },
+  {
     title: "Paramètres",
     href: "/b2b/user/preferences",
     icon: Settings,
@@ -166,6 +176,11 @@ export const b2bAdminNavItems: NavItemType[] = [
   {
     title: "Rapports",
     href: "/b2b/admin/reports",
+    icon: BarChart2,
+  },
+  {
+    title: "Évaluation",
+    href: "/b2b/admin/evaluation",
     icon: BarChart2,
   },
   {

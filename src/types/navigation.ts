@@ -32,6 +32,7 @@ export interface RouteConfig {
     gamification?: string;
     cocon?: string;
     preferences?: string;
+    evaluation?: string;
   };
   b2bUser: {
     home: string;
@@ -50,6 +51,7 @@ export interface RouteConfig {
     gamification?: string;
     cocon?: string;
     preferences?: string;
+    evaluation?: string;
   };
   b2bAdmin: {
     home: string;
@@ -64,6 +66,7 @@ export interface RouteConfig {
     reports?: string;
     events?: string;
     settings?: string;
+    evaluation?: string;
   };
   common: {
     home: string;
@@ -87,7 +90,8 @@ export const ROUTES: RouteConfig = {
     settings: '/b2c/settings',
     gamification: '/b2c/gamification',
     cocon: '/b2c/cocon',
-    preferences: '/b2c/preferences'
+    preferences: '/b2c/preferences',
+    evaluation: '/b2c/evaluation'
   },
   b2bUser: {
     home: '/b2b/user',
@@ -103,7 +107,8 @@ export const ROUTES: RouteConfig = {
     settings: '/b2b/user/settings',
     gamification: '/b2b/user/gamification',
     cocon: '/b2b/user/cocon',
-    preferences: '/b2b/user/preferences'
+    preferences: '/b2b/user/preferences',
+    evaluation: '/b2b/user/evaluation'
   },
   b2bAdmin: {
     home: '/b2b/admin',
@@ -117,7 +122,8 @@ export const ROUTES: RouteConfig = {
     teams: '/b2b/admin/teams',
     reports: '/b2b/admin/reports',
     events: '/b2b/admin/events',
-    settings: '/b2b/admin/settings'
+    settings: '/b2b/admin/settings',
+    evaluation: '/b2b/admin/evaluation'
   },
   common: {
     home: '/',

@@ -14,7 +14,8 @@ import {
   MessageSquare, 
   Glasses,
   Trophy,
-  HeartHandshake
+  HeartHandshake,
+  BarChart2
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
@@ -124,6 +125,16 @@ const B2CNavBar: React.FC = () => {
           >
             <Trophy className="mr-2 h-4 w-4" />
             Défis
+          </Button>
+        </Link>
+
+        <Link to={ROUTES.b2c.evaluation}>
+          <Button
+            variant={location.pathname === ROUTES.b2c.evaluation ? "default" : "ghost"}
+            className="w-full justify-start"
+          >
+            <BarChart2 className="mr-2 h-4 w-4" />
+            Évaluation
           </Button>
         </Link>
 

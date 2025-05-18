@@ -18,7 +18,9 @@ import B2CDashboardPage from './pages/b2c/DashboardPage';
 import B2BUserDashboardPage from './pages/b2b/user/Dashboard';
 import B2BAdminDashboardPage from './pages/b2b/admin/Dashboard';
 import B2CGamificationPage from './pages/b2c/Gamification';
+import B2CEvaluationPage from './pages/b2c/Evaluation';
 import B2BUserGamificationPage from './pages/b2b/user/Gamification';
+import B2BUserEvaluationPage from './pages/b2b/user/Evaluation';
 import B2CJournalPage from './pages/b2c/Journal';
 import B2CScanPage from './pages/b2c/Scan';
 import B2CMusicPage from './pages/b2c/Music';
@@ -41,6 +43,7 @@ import B2BAdminScanPage from './pages/b2b/admin/Scan';
 import B2BAdminMusicPage from './pages/b2b/admin/Music';
 import B2BAdminTeamsPage from './pages/b2b/admin/Teams';
 import B2BAdminReportsPage from './pages/b2b/admin/Reports';
+import B2BAdminEvaluationPage from './pages/b2b/admin/Evaluation';
 import B2BAdminEventsPage from './pages/b2b/admin/Events';
 import B2BAdminSettingsPage from './pages/b2b/admin/Settings';
 import TimelinePage from './pages/TimelinePage';
@@ -173,6 +176,10 @@ export const routes: RouteObject[] = [
       {
         path: 'gamification',
         element: <B2CGamificationPage />
+      },
+      {
+        path: 'evaluation',
+        element: <B2CEvaluationPage />
       }
     ]
   },
@@ -240,6 +247,10 @@ export const routes: RouteObject[] = [
       {
         path: 'gamification',
         element: <B2BUserGamificationPage />
+      },
+      {
+        path: 'evaluation',
+        element: <B2BUserEvaluationPage />
       }
     ]
   },
@@ -279,6 +290,10 @@ export const routes: RouteObject[] = [
       {
         path: 'reports',
         element: <B2BAdminReportsPage />
+      },
+      {
+        path: 'evaluation',
+        element: <B2BAdminEvaluationPage />
       },
       {
         path: 'events',
