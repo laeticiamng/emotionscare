@@ -1,3 +1,4 @@
+
 # Flow d'accès et d'agrégation du Dashboard RH
 
 Ce schéma illustre la chaîne de traitement des données lorsqu'un administrateur accède au tableau de bord.
