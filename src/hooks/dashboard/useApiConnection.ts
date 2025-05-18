@@ -13,13 +13,8 @@ export function useApiConnection() {
         setApiCheckInProgress(true);
         setApiError(null);
         
-        // Check if Supabase is properly configured
-        const supabaseUrl = supabase.supabaseUrl;
-        if (!supabaseUrl) {
-          throw new Error('Supabase URL is not configured');
-        }
-        
-        // Try to make a simple request to validate connection
+        // Check if Supabase configuration exists by trying to make a simple request
+        // rather than accessing protected properties
         const { data, error } = await supabase.from('profiles').select('count').limit(1);
         
         if (error) {

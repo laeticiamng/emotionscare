@@ -1,96 +1,63 @@
 
-import { UserRole } from '@/types/user';
-import { normalizeUserMode } from './userModeHelpers';
+import { UserRole } from "@/types/user";
 
-/**
- * Takes a user role and returns a human-readable name
- * @param role The user role to format
- * @returns A human-readable name for the role
- */
-export const getRoleName = (role: string | UserRole): string => {
-  const normalizedRole = normalizeUserMode(role);
-  
-  switch (normalizedRole) {
+export function getRoleName(role: UserRole): string {
+  switch (role) {
     case 'b2c':
-      return 'Client';
+      return 'Particulier';
     case 'b2b_user':
       return 'Collaborateur';
     case 'b2b_admin':
-      return 'Administrateur';
+      return 'RH';
     case 'admin':
       return 'Administrateur';
-    case 'coach':
-      return 'Coach';
-    case 'therapist':
-      return 'Thérapeute';
     default:
       return 'Utilisateur';
   }
-};
+}
 
-/**
- * Checks if a user has admin role
- * @param role The user's role to check
- * @returns Boolean indicating if user has admin role
- */
-export const isAdminRole = (role?: string | UserRole): boolean => {
-  if (!role) return false;
-  const normalizedRole = normalizeUserMode(role);
-  return normalizedRole === 'b2b_admin' || normalizedRole === 'admin';
-};
+export function getRoleColor(role: UserRole): string {
+  switch (role) {
+    case 'b2c':
+      return 'text-blue-500';
+    case 'b2b_user':
+      return 'text-green-500';
+    case 'b2b_admin':
+      return 'text-purple-500';
+    case 'admin':
+      return 'text-red-500';
+    default:
+      return 'text-gray-500';
+  }
+}
 
-/**
- * Checks if a user has a specific role
- * @param userRole The user's current role
- * @param requiredRole The role to check for
- * @returns Boolean indicating if the user has the required role
- */
-export const hasRole = (userRole: string | UserRole | undefined, requiredRole: string | UserRole): boolean => {
-  if (!userRole) return false;
-  
-  const normalizedUserRole = normalizeUserMode(userRole);
-  const normalizedRequiredRole = normalizeUserMode(requiredRole);
-  
-  return normalizedUserRole === normalizedRequiredRole;
-};
+export function getRolePermissions(role: UserRole): string[] {
+  switch (role) {
+    case 'admin':
+      return ['admin', 'manage_users', 'view_analytics', 'manage_content', 'manage_settings'];
+    case 'b2b_admin':
+      return ['view_analytics', 'manage_users', 'view_team_data', 'manage_team_settings'];
+    case 'b2b_user':
+      return ['view_profile', 'manage_own_data', 'use_tools'];
+    case 'b2c':
+      return ['view_profile', 'manage_own_data', 'use_tools'];
+    default:
+      return ['view_profile', 'manage_own_data'];
+  }
+}
 
-/**
- * Checks if a user is a B2B administrator
- * @param role The user role to check
- * @returns Boolean indicating if the user is a B2B admin
- */
-export const isB2BAdmin = (role: string | UserRole | undefined): boolean => {
-  if (!role) return false;
-  return normalizeUserMode(role) === 'b2b_admin';
-};
-
-/**
- * Checks if a user is a B2B user/collaborator
- * @param role The user role to check
- * @returns Boolean indicating if the user is a B2B user
- */
-export const isB2BUser = (role: string | UserRole | undefined): boolean => {
-  if (!role) return false;
-  return normalizeUserMode(role) === 'b2b_user';
-};
-
-/**
- * Checks if a user is a B2C client
- * @param role The user role to check
- * @returns Boolean indicating if the user is a B2C client
- */
-export const isB2C = (role: string | UserRole | undefined): boolean => {
-  if (!role) return false;
-  return normalizeUserMode(role) === 'b2c';
-};
-
-/**
- * Checks if a user belongs to any B2B role
- * @param role The user role to check
- * @returns Boolean indicating if the user has any B2B role
- */
-export const isB2B = (role: string | UserRole | undefined): boolean => {
-  if (!role) return false;
-  const normalizedRole = normalizeUserMode(role);
-  return normalizedRole === 'b2b_user' || normalizedRole === 'b2b_admin';
-};
+export function canUserAccessFeature(role: UserRole, feature: string): boolean {
+  const permissions = getRolePermissions(role);
+  switch (feature) {
+    case 'admin_panel':
+      return permissions.includes('admin');
+    case 'analytics':
+      return permissions.includes('view_analytics');
+    case 'team_management':
+      return permissions.includes('manage_users');
+    case 'settings':
+      return permissions.includes('manage_settings') || permissions.includes('manage_team_settings');
+    default:
+      return permissions.includes('use_tools');
+  }
+}

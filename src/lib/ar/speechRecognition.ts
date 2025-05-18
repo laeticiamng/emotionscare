@@ -1,13 +1,12 @@
 
 import { toast } from '@/hooks/use-toast';
+import { SpeechRecognition } from '@/types/speech';
 
 export interface SpeechRecognitionResult {
   transcript: string;
   confidence: number;
   isFinal: boolean;
 }
-
-// Type definitions moved to /types
 
 export interface RecognitionOptions {
   lang?: string;
@@ -42,6 +41,10 @@ export class SpeechRecognitionService {
     try {
       // Create recognition instance
       const SpeechRecognitionConstructor = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognitionConstructor) {
+        return false;
+      }
+      
       this.recognition = new SpeechRecognitionConstructor();
       
       // Configure recognition

@@ -1,32 +1,36 @@
 
-export type Theme = 'system' | 'light' | 'dark' | 'pastel';
-export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large' | 'xlarge';
-export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'sans-serif';
-export type ThemeName = 'system' | 'light' | 'dark' | 'pastel';
+import { UserPreferences } from './user';
 
-export interface ThemeOption {
-  name: string;
-  value: ThemeName;
-  preview: string;
+export type FontFamily = 'inter' | 'roboto' | 'system' | 'open-sans' | 'poppins' | string;
+
+export type FontSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | string;
+
+export type ThemeName = 'light' | 'dark' | 'system' | 'custom' | string;
+
+export interface Theme {
+  name: ThemeName;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    text: string;
+    [key: string]: string;
+  };
+  font: {
+    family: FontFamily;
+    size: FontSize;
+  };
 }
 
 export interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
-  isDark: boolean;
-  isDarkMode?: boolean;
-  fontSize?: FontSize;
-  setFontSize?: (size: FontSize) => void;
-  fontFamily?: FontFamily;
-  setFontFamily?: (family: FontFamily) => void;
-  soundEnabled?: boolean;
-  reduceMotion?: boolean;
-  systemTheme?: 'light' | 'dark';
-  preferences?: {
-    soundEnabled: boolean;
-    reduceMotion: boolean;
-  };
-  updatePreferences?: (prefs: { soundEnabled?: boolean; reduceMotion?: boolean }) => void;
-  getContrastText?: (color: string) => 'black' | 'white';
+  theme: ThemeName;
+  setTheme: (theme: ThemeName) => void;
+  fontFamily: FontFamily;
+  setFontFamily: (fontFamily: FontFamily) => void;
+  fontSize: FontSize;
+  setFontSize: (fontSize: FontSize) => void;
+  colorAccent: string;
+  setColorAccent: (colorAccent: string) => void;
+  savePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
 }

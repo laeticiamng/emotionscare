@@ -1,3 +1,4 @@
+
 /**
  * Types officiels pour le domaine emotion.
  * Toute modification doit être synchronisée dans tous les mocks et composants.
@@ -17,13 +18,17 @@ export interface EmotionResult {
   
   // Additional fields used by various components
   text?: string;
+  transcript?: string;
+  audioUrl?: string;
+  audio_url?: string;
+  facialExpression?: string;
   feedback?: string;
-  ai_feedback?: string; // Ajouté pour compatibilité
+  ai_feedback?: string;
   score?: number;
   userId?: string;
-  user_id?: string; // Legacy field - use userId instead
-  date?: string; // Legacy field - use timestamp instead
-  recommendations?: EmotionRecommendation[] | string[]; // Used by some components
+  user_id?: string;
+  date?: string;
+  recommendations?: EmotionRecommendation[] | string[];
 }
 
 export interface EmotionRecommendation {
@@ -44,12 +49,24 @@ export interface Emotion {
   intensity?: number;
   description?: string;
   keywords?: string[];
+  id?: string;
+  confidence?: number;
+  date?: string;
+  source?: string;
+  user_id?: string;
+  userId?: string;
+  score?: number;
+  text?: string;
+  feedback?: string;
+  transcript?: string;
+  audioUrl?: string;
+  emotion?: string;
 }
 
 export interface EmotionData {
   id: string;
   userId: string;
-  user_id?: string; // Legacy field - use userId instead
+  user_id?: string;
   emotion: string;
   intensity: number;
   timestamp: string;

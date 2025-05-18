@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from './use-toast';
+import { SpeechRecognition } from '@/types/speech';
 
 export function useVoiceCommands() {
   const [isListening, setIsListening] = useState(false);

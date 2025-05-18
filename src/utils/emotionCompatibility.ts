@@ -1,4 +1,3 @@
-
 import { EmotionResult } from '@/types/emotion';
 
 /**
@@ -47,6 +46,38 @@ export function normalizeEmotionResult(data: any): EmotionResult {
   }
 
   return result;
+}
+
+/**
+ * Normalizes emotion intensity to a numeric value between 0 and 1
+ * @param intensity The intensity value which could be a string like "low", "medium", "high" or a number
+ * @returns A normalized number between 0 and 1
+ */
+export function normalizeEmotionIntensity(intensity: string | number): number {
+  if (typeof intensity === 'number') {
+    // If already a number, ensure it's between 0 and 1
+    return Math.max(0, Math.min(1, intensity));
+  }
+  
+  // If it's a percentage string like "75%"
+  if (typeof intensity === 'string' && intensity.endsWith('%')) {
+    const percentage = parseFloat(intensity);
+    if (!isNaN(percentage)) {
+      return percentage / 100;
+    }
+  }
+  
+  // Handle string values
+  switch (intensity?.toLowerCase?.()) {
+    case 'low':
+      return 0.25;
+    case 'medium':
+      return 0.5;
+    case 'high':
+      return 0.75;
+    default:
+      return 0.5; // Default to medium intensity
+  }
 }
 
 /**
