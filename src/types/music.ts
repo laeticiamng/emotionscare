@@ -20,6 +20,7 @@ export interface MusicTrack {
   mood?: string;
   isLiveRecording?: boolean;
   isInstru?: boolean;
+  name?: string; // Added for compatibility
 }
 
 export interface MusicPlaylist {
@@ -69,6 +70,7 @@ export interface MusicContextType {
   togglePlayPause: () => void;
   toggleDrawer: () => void;
   closeDrawer: () => void;
+  setOpenDrawer: (open: boolean) => void;  // Added for compatibility
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
@@ -78,6 +80,7 @@ export interface MusicContextType {
   loadPlaylistForEmotion: (emotion: string) => Promise<void>;
   setPlaylist: (playlist: MusicPlaylist | MusicTrack[]) => void;
   generateMusic: (prompt: string) => Promise<MusicTrack>;
+  togglePlay?: () => void;  // Added for compatibility
 }
 
 export interface MusicPlayerProps {
@@ -87,6 +90,16 @@ export interface MusicPlayerProps {
   onEnded?: () => void;
   onError?: (error: Error) => void;
   className?: string;
+  // Additional props needed by components
+  onPlay?: () => void;
+  onPause?: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
+  volume?: number;
+  onVolumeChange?: (volume: number) => void;
+  currentTime?: number;
+  duration?: number;
+  onSeek?: (time: number) => void;
 }
 
 export interface MusicDrawerProps {
@@ -94,4 +107,33 @@ export interface MusicDrawerProps {
   onClose: () => void;
   currentTrack: MusicTrack | null;
   recommendations?: MusicTrack[];
+}
+
+export interface MusicLibraryProps {
+  playlists?: MusicPlaylist[];
+  tracks?: MusicTrack[];
+  onPlaylistSelect?: (playlist: MusicPlaylist) => void;
+  onTrackSelect?: (track: MusicTrack) => void;
+}
+
+export interface TrackInfoProps {
+  track: MusicTrack | null;
+}
+
+export interface MusicControlsProps {
+  isPlaying: boolean;
+  onPlay: () => void;
+  onPause: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
+}
+
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
+  filters?: {
+    tempo?: 'slow' | 'medium' | 'fast';
+    genre?: string;
+    instrumental?: boolean;
+  };
 }

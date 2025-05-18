@@ -3,7 +3,7 @@ import { Badge, Challenge, LeaderboardEntry } from './badge';
 
 export interface KpiCardProps {
   title: string;
-  value: number;
+  value: number | string;
   trend?: 'up' | 'down' | 'neutral';
   label?: string;
   icon?: React.ReactNode;
@@ -13,12 +13,26 @@ export interface KpiCardProps {
   prefix?: string;
   suffix?: string;
   onClick?: () => void;
+  // Additional props needed by admin components
+  delta?: {
+    value: number;
+    label: string;
+    trend: string;
+  };
+  status?: KpiCardStatus;
+  isLoading?: boolean;
+  ariaLabel?: string;
+  footer?: React.ReactNode;
+  id?: string;
+  colorMode?: 'success' | 'warning' | 'danger' | 'info' | 'default';
 }
+
+export type KpiCardStatus = 'idle' | 'loading' | 'success' | 'error';
 
 export interface KpiCardData {
   id: string;
   title: string;
-  value: number;
+  value: number | string;
   previousValue?: number;
   trend?: 'up' | 'down' | 'neutral';
   percentage?: number;
@@ -64,6 +78,31 @@ export interface DashboardSettings {
   refreshInterval: number;
   layout: 'grid' | 'list';
   widgets: DashboardWidgetData[];
+}
+
+export interface DraggableKpiCardsGridProps {
+  cards: KpiCardProps[];
+  onCardsReorder?: (cards: KpiCardProps[]) => void;
+  className?: string;
+}
+
+export interface DashboardWidgetConfig {
+  id: string;
+  title: string;
+  settings?: Record<string, any>;
+}
+
+export interface GlobalOverviewTabProps {
+  data: any;
+  period: string;
+  onPeriodChange: (period: string) => void;
+}
+
+export interface GamificationData {
+  points: number;
+  level: number;
+  badges: number;
+  streak: number;
 }
 
 export type { LeaderboardEntry };

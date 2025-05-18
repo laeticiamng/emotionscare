@@ -1,8 +1,7 @@
 
-// Re-exporting contexts for easy import throughout the app
-export * from './ThemeContext';
-export * from './UserModeContext';
-export * from './LayoutContext';
-export * from './AuthContext';
-export * from './music';
-export * from './AudioContext';
+export { useTheme } from './ThemeContext';
+export { useAuth } from './AuthContext';
+export { useMusic } from './music/MusicContext';
+export { useUserPreferences } from './UserPreferencesContext';
+export { useUserMode } from './UserModeContext';
+export { useSession } from './SessionContext';
