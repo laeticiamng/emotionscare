@@ -4,6 +4,8 @@ import LandingPage from './pages/LandingPage';
 import NotFoundPage from './pages/NotFoundPage';
 import LoginPage from './pages/common/Login';
 import RegisterPage from './pages/common/Register';
+import B2CLogin from './pages/b2c/Login';
+import B2CRegister from './pages/b2c/Register';
 import B2BSelectionPage from './pages/B2BSelectionPage';
 import B2CLayout from './layouts/B2CLayout';
 import B2BUserLayout from './layouts/B2BUserLayout';
@@ -54,11 +56,11 @@ export const routes: RouteObject[] = [
   // B2C Auth Routes
   {
     path: 'b2c/login',
-    element: <LoginPage />
+    element: <B2CLogin />
   },
   {
     path: 'b2c/register',
-    element: <RegisterPage />
+    element: <B2CRegister />
   },
   // B2B Selection Route
   {
