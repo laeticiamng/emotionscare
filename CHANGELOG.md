@@ -71,6 +71,16 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 - Bugs d'authentification
 - Problèmes de compatibilité mobile
 
+## [0.9.1] - 2025-05-18
+
+### Ajouté
+- Documentation du routage (`docs/home-routing-audit.md`, `docs/RoutingFlow.md`)
+- Test unitaire de vérification de la route d'accueil
+- Propriété `landing` dans `src/types/navigation.ts`
+
+### Corrigé
+- Conventions d'accès public à la page d'accueil
+
 ## [0.8.0] - 2025-03-01
 
 ### Ajouté
