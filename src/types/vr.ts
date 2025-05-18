@@ -11,6 +11,14 @@ export interface VRSessionTemplate {
   intensity: number;
   objective: string;
   type: string;
+  // Adding these fields to fix type errors
+  audio_url?: string;
+  audioTrack?: string;
+  is_audio_only?: boolean;
+  preview_url?: string;
+  benefits?: string[];
+  difficulty?: string;
+  lastUsed?: Date | string;
 }
 
 export interface VRSession {
@@ -25,6 +33,18 @@ export interface VRSession {
   notes?: string;
   completed?: boolean;
   feedback?: string;
+  // Adding these fields to fix type errors
+  startedAt?: Date | string;
+  completedAt?: boolean | Date | string;
+  date?: Date | string;
+  rating?: number;
+  heartRateBefore?: number;
+  heartRateAfter?: number;
+  metrics?: {
+    calm?: number;
+    focus?: number;
+    energy?: number;
+  };
 }
 
 export interface VRSessionWithMusicProps {
@@ -39,4 +59,10 @@ export interface VRTemplateDetailProps {
   onStartSession: () => void;
   onBack: () => void;
   heartRate?: number;
+}
+
+// Adding missing interface
+export interface VRSessionHistoryProps {
+  sessions: VRSession[];
+  onSessionSelect?: (session: VRSession) => void;
 }

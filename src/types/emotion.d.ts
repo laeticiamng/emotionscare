@@ -91,7 +91,7 @@ export interface LiveVoiceScannerProps {
 export interface AudioProcessorProps {
   onResult: (analysisResult: EmotionResult) => void;
   onProcessingChange: React.Dispatch<React.SetStateAction<boolean>>;
-  isRecording?: boolean;
+  isRecording?: boolean; // Adding this field to fix type errors
 }
 
 export interface TeamOverviewProps {

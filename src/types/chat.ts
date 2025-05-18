@@ -2,6 +2,7 @@
 export interface ChatMessage {
   id: string;
   text: string;
+  content?: string; // Adding this field to fix type errors
   sender: 'user' | 'assistant' | string;
   timestamp: string | Date;
   emotion?: string;

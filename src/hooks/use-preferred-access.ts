@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,6 +18,11 @@ export function usePreferredAccess() {
 
   useEffect(() => {
     if (isLoading) return;
+
+    // Don't redirect from home page if not authenticated
+    if (location.pathname === '/' && !isAuthenticated) {
+      return;
+    }
 
     // If the user is authenticated and lands on a neutral page, redirect
     if (isAuthenticated && user) {
