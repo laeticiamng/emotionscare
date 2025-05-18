@@ -70,6 +70,7 @@ export interface RouteConfig {
     b2bSelection: string;
     unauthorized: string;
     notFound: string;
+    ethics: string;
   };
 }
 
@@ -123,6 +124,7 @@ export const ROUTES: RouteConfig = {
     home: '/',
     b2bSelection: '/b2b/selection',
     unauthorized: '/unauthorized',
-    notFound: '/not-found'
+    notFound: '/not-found',
+    ethics: '/ethique'
   }
 };

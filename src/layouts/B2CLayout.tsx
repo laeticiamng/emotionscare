@@ -16,8 +16,9 @@ const B2CLayout: React.FC = () => {
       </main>
       
       <footer className="border-t py-4">
-        <div className="container mx-auto text-center text-muted-foreground">
-          &copy; 2025 B2C Application
+        <div className="container mx-auto text-center text-muted-foreground space-y-1">
+          <div>&copy; 2025 B2C Application</div>
+          <a href="/ethique" className="underline">Portail RGPD &amp; éthique</a>
         </div>
       </footer>
     </div>
