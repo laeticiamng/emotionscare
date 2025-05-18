@@ -3,6 +3,8 @@
 
 This directory contains all the official type definitions for the application. These types serve as the single source of truth for data structures throughout the codebase.
 
+All modules must import their data types from this directory. Do not create local or duplicated type definitions elsewhere in the project.
+
 ## Guidelines for Type Definitions
 
 1. **Single Source of Truth**: Each concept should have one definitive type definition.

@@ -1,9 +1,11 @@
 
 /**
- * Emotion Types
- * --------------------------------------
- * This file defines the official types for emotion detection and processing.
+ * Types officiels pour le domaine emotion.
+ * Toute modification doit être synchronisée dans tous les mocks et composants.
+ * Ne jamais dupliquer ce type en local.
  */
+
+export type EmotionIntensity = 'low' | 'medium' | 'high' | number;
 
 export interface EmotionResult {
   id: string;
