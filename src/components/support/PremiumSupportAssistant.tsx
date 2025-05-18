@@ -6,6 +6,7 @@ import { Send, Plus, ArrowDown } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea";
 import { Message } from '@/types/support';
 import { v4 as uuidv4 } from 'uuid';
+import { getSupportResponse } from '@/services/chatService';
 
 const PremiumSupportAssistant: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -36,52 +37,47 @@ const PremiumSupportAssistant: React.FC = () => {
     setInputValue(e.target.value);
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!inputValue.trim()) return;
-    
-    // Add user message
+
     const userMessage: Message = {
       id: uuidv4(),
       content: inputValue,
-      sender: "user",
+      sender: 'user',
       timestamp: new Date()
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsTyping(true);
-    
-    // Simulate assistant response after a short delay
-    setTimeout(() => {
-      const detectedEmotion = randomEmotion();
-      
-      // Generate contextual response based on input and detected emotion
-      let responseContent = '';
-      if (inputValue.toLowerCase().includes('mot de passe')) {
-        responseContent = "Pour réinitialiser votre mot de passe, vous pouvez utiliser la fonctionnalité \"Mot de passe oublié\" sur la page de connexion. Je peux vous guider à travers ce processus si vous le souhaitez.";
-      } else if (inputValue.toLowerCase().includes('compte') || inputValue.toLowerCase().includes('inscription')) {
-        responseContent = "Je serais ravi de vous aider avec votre compte. Pourriez-vous me préciser quelle information vous recherchez ou quel problème vous rencontrez ?";
-      } else if (inputValue.toLowerCase().includes('bug') || inputValue.toLowerCase().includes('problème')) {
-        responseContent = "Je suis désolé d'apprendre que vous rencontrez un problème. Pouvez-vous me décrire plus précisément ce qui se passe ? Captures d'écran et étapes pour reproduire le problème sont toujours utiles.";
-      } else if (inputValue.toLowerCase().includes('merci')) {
-        responseContent = "C'est avec plaisir que je vous aide ! N'hésitez pas si vous avez d'autres questions.";
-      } else {
-        responseContent = "Merci pour votre message. Notre équipe d'experts se penche sur votre demande. Puis-je vous demander plus de détails pour mieux vous aider ?";
-      }
-      
+
+    try {
+      const response = await getSupportResponse(userMessage.content);
+
       const assistantResponse: Message = {
         id: uuidv4(),
-        content: responseContent,
-        sender: "assistant",
+        content: response.content,
+        sender: 'assistant',
         timestamp: new Date(),
-        emotion: detectedEmotion
+        emotion: response.emotion || randomEmotion()
       };
-      
+
       setMessages(prev => [...prev, assistantResponse]);
+    } catch (error) {
+      const fallback: Message = {
+        id: uuidv4(),
+        content: "Désolé, une erreur est survenue. Veuillez réessayer plus tard.",
+        sender: 'assistant',
+        timestamp: new Date(),
+        emotion: 'neutral'
+      };
+      setMessages(prev => [...prev, fallback]);
+      console.error('Support assistant error:', error);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
   
   return (
