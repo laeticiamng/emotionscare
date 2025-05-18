@@ -21,6 +21,18 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user }) => {
       .slice(0, 2);
   };
 
+  // Helper function to check if notifications are enabled
+  const areNotificationsEnabled = () => {
+    const notifPref = user.preferences?.notifications;
+    if (typeof notifPref === 'boolean') {
+      return notifPref;
+    } else if (notifPref?.enabled !== undefined) {
+      return notifPref.enabled;
+    } else {
+      return user.preferences?.notificationsEnabled || false;
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -87,9 +99,7 @@ const UserDetailView: React.FC<UserDetailViewProps> = ({ user }) => {
               <div>
                 <h4 className="text-sm font-medium text-muted-foreground">Notifications</h4>
                 <p className="text-sm">
-                  {user.preferences?.notifications?.enabled !== undefined ? 
-                    (user.preferences.notifications.enabled ? 'Activées' : 'Désactivées') : 
-                    (user.preferences?.notifications_enabled ? 'Activées' : 'Désactivées')}
+                  {areNotificationsEnabled() ? 'Activées' : 'Désactivées'}
                 </p>
               </div>
               <div>

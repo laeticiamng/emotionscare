@@ -21,7 +21,7 @@ const DisplayPreferences: React.FC = () => {
 
   const handleFontFamilyChange = (value: string) => {
     updatePreferences({ 
-      fontFamily: value as 'system' | 'sans' | 'serif' | 'mono' | 'rounded' 
+      fontFamily: value 
     });
   };
 
@@ -39,7 +39,7 @@ const DisplayPreferences: React.FC = () => {
 
   const handleToggleColorBlindMode = (checked: boolean) => {
     updatePreferences({ 
-      colorBlindMode: checked 
+      colorBlindMode: checked ? 'enabled' : undefined
     });
   };
 
@@ -117,7 +117,7 @@ const DisplayPreferences: React.FC = () => {
           <Label htmlFor="reduce-motion">Réduire les animations</Label>
           <Switch 
             id="reduce-motion" 
-            checked={preferences?.reduceMotion || false} 
+            checked={Boolean(preferences?.reduceMotion)} 
             onCheckedChange={handleToggleReduceMotion}
           />
         </div>
@@ -126,7 +126,7 @@ const DisplayPreferences: React.FC = () => {
           <Label htmlFor="colorblind-mode">Mode daltonien</Label>
           <Switch 
             id="colorblind-mode" 
-            checked={preferences?.colorBlindMode || false} 
+            checked={Boolean(preferences?.colorBlindMode)} 
             onCheckedChange={handleToggleColorBlindMode}
           />
         </div>
@@ -135,7 +135,7 @@ const DisplayPreferences: React.FC = () => {
           <Label htmlFor="autoplay-media">Lecture automatique des médias</Label>
           <Switch 
             id="autoplay-media" 
-            checked={preferences?.autoplayMedia || false} 
+            checked={Boolean(preferences?.autoplayMedia)} 
             onCheckedChange={handleToggleAutoplayMedia}
           />
         </div>
@@ -144,7 +144,7 @@ const DisplayPreferences: React.FC = () => {
           <Label htmlFor="sound-enabled">Sons activés</Label>
           <Switch 
             id="sound-enabled" 
-            checked={preferences?.soundEnabled || false} 
+            checked={Boolean(preferences?.soundEnabled)} 
             onCheckedChange={handleToggleSoundEnabled}
           />
         </div>

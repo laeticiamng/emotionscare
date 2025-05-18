@@ -94,7 +94,7 @@ export const KpiCard = ({
             {deltaObj.value !== undefined && (
               <span>{Math.abs(deltaObj.value).toFixed(1)}%</span>
             )}
-            {deltaObj.label && deltaObj.label && <span>{deltaObj.label}</span>}
+            {deltaObj.label && <span>{deltaObj.label}</span>}
           </p>
         )}
         {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}

@@ -13,6 +13,9 @@ export interface UserPreferencesContextType {
   privacy: string;
   preferences?: UserPreferences; // Ajout pour la compatibilité
   updatePreferences: (preferences: Partial<UserPreferences>) => void;
+  resetPreferences?: () => void;
+  isLoading?: boolean;
+  error?: Error | null;
 }
 
 export interface NotificationsPreferences {
@@ -63,6 +66,22 @@ export interface UserPreferences {
   emailNotifications?: boolean;
   pushNotifications?: boolean;
   newsletterEnabled?: boolean;
+  // Propriétés additionnelles pour résoudre les erreurs
+  ambientSound?: string;
+  activityTracking?: boolean;
+  dataSharing?: boolean;
+  audioEnabled?: boolean;
+  musicEnabled?: boolean;
+  autoScanEnabled?: boolean;
+  timezone?: string;
+  dateFormat?: string;
+  timeFormat?: string;
+  defaultDashboard?: string;
+  accessibilityMode?: boolean;
+  highContrastMode?: boolean;
+  animationsEnabled?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
 }
 
 // Utilitaire pour normaliser les préférences
@@ -91,4 +110,17 @@ export function normalizePreferences(prefs: any): UserPreferences {
 }
 
 // Re-export des préférences par défaut pour un accès centralisé
-export { DEFAULT_PREFERENCES } from '@/constants/defaults';
+export const DEFAULT_PREFERENCES: UserPreferences = {
+  theme: 'system',
+  fontSize: 'medium',
+  language: 'fr',
+  privacy: 'private',
+  notifications: {
+    enabled: true,
+    emailEnabled: true,
+    pushEnabled: false
+  },
+  soundEnabled: false,
+  autoplayMedia: true,
+  dashboardLayout: 'default'
+};
