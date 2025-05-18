@@ -7,18 +7,18 @@ import { normalizeUserMode } from '@/utils/userModeHelpers';
 
 // Function to determine the home path based on user role
 export const getRoleHomePath = (role?: string | UserRole): string => {
-  if (!role) return '/b2c';
+  if (!role) return '/b2c/dashboard';
   
   const normalizedRole = normalizeUserMode(role);
   
   switch(normalizedRole) {
     case 'b2b_admin':
-      return '/b2b/admin';
+      return '/b2b/admin/dashboard';
     case 'b2b_user':
-      return '/b2b/user';
+      return '/b2b/user/dashboard';
     case 'b2c':
     default:
-      return '/b2c';
+      return '/b2c/dashboard';
   }
 };
 

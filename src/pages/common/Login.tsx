@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { useToast } from '@/hooks/use-toast';
 import { getRoleHomePath } from '@/hooks/use-role-redirect';
 import { UserRole } from '@/types/user';
@@ -23,6 +24,7 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const { setUserMode } = useUserMode();
   const { toast } = useToast();
   
   // Determine the current mode based on URL
@@ -44,7 +46,10 @@ const Login: React.FC<LoginProps> = ({ role = 'b2c' }) => {
     
     try {
       const user = await login(email, password);
-      
+
+      // Store the user mode in context for global access
+      setUserMode(user?.role || currentMode);
+
       toast({
         title: "Connexion réussie",
         description: "Vous êtes maintenant connecté."

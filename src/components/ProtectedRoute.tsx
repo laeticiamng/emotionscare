@@ -45,11 +45,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     
     if (normalizedUserRole !== normalizedRequiredRole) {
       // If user is authenticated but doesn't have the right role, redirect to their default dashboard
-      const userDashboardPath = normalizedUserRole === 'b2b_admin' 
-        ? '/b2b/admin' 
-        : normalizedUserRole === 'b2b_user' 
-          ? '/b2b/user' 
-          : '/b2c';
+      const userDashboardPath = normalizedUserRole === 'b2b_admin'
+        ? '/b2b/admin/dashboard'
+        : normalizedUserRole === 'b2b_user'
+          ? '/b2b/user/dashboard'
+          : '/b2c/dashboard';
       
       return <Navigate to={redirectTo || userDashboardPath} />;
     }

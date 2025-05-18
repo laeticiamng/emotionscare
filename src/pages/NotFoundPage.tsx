@@ -19,14 +19,14 @@ const NotFoundPage: React.FC = () => {
     // Redirect to the appropriate dashboard based on role
     switch (user?.role) {
       case 'b2b_admin':
-        navigate('/b2b/admin');
+        navigate('/b2b/admin/dashboard');
         break;
       case 'b2b_user':
-        navigate('/b2b/user');
+        navigate('/b2b/user/dashboard');
         break;
       case 'b2c':
       default:
-        navigate('/b2c');
+        navigate('/b2c/dashboard');
         break;
     }
   };

@@ -40,19 +40,19 @@ const AppRoutes: React.FC = () => {
       {/* Routes B2C */}
       <Route path="/b2c" element={<B2CLayout />}>
         <Route path="dashboard" element={<B2CDashboard />} />
-        <Route index element={<B2CDashboard />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
       
       {/* Routes B2B User */}
       <Route path="/b2b/user" element={<B2BUserLayout />}>
         <Route path="dashboard" element={<B2BUserDashboard />} />
-        <Route index element={<B2BUserDashboard />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
       
       {/* Routes B2B Admin */}
       <Route path="/b2b/admin" element={<B2BAdminLayout />}>
         <Route path="dashboard" element={<B2BAdminDashboard />} />
-        <Route index element={<B2BAdminDashboard />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
       </Route>
       
       {/* Routes protégées avec mode utilisateur */}
@@ -62,7 +62,7 @@ const AppRoutes: React.FC = () => {
             <B2CLayout />
           </ProtectedRouteWithMode>
         }>
-          <Route index element={<B2CDashboard />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
         
         <Route path="b2b/user" element={
@@ -70,7 +70,7 @@ const AppRoutes: React.FC = () => {
             <B2BUserLayout />
           </ProtectedRouteWithMode>
         }>
-          <Route index element={<B2BUserDashboard />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
         
         <Route path="b2b/admin" element={
@@ -78,7 +78,7 @@ const AppRoutes: React.FC = () => {
             <B2BAdminLayout />
           </ProtectedRouteWithMode>
         }>
-          <Route index element={<B2BAdminDashboard />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
         </Route>
       </Route>
       
