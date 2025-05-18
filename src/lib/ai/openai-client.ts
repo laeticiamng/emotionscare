@@ -26,7 +26,7 @@ export async function callOpenAI<T>(
   cacheOptions?: { enabled: boolean, ttl: number }
 ): Promise<T> {
   // Utiliser la clé API de l'environnement ou du paramètre
-  const key = apiKey || process.env.OPENAI_API_KEY;
+  const key = apiKey || import.meta.env.VITE_OPENAI_API_KEY || import.meta.env.NEXT_PUBLIC_OPENAI_API_KEY;
   
   if (!key) {
     console.error("La clé API OpenAI est manquante");

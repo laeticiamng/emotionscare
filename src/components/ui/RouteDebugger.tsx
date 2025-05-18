@@ -7,7 +7,7 @@ export const RouteDebugger: React.FC = () => {
   const location = useLocation();
   const { user, isAuthenticated, isLoading } = useAuth();
 
-  if (process.env.NODE_ENV !== 'development') {
+  if (!import.meta.env.DEV) {
     return null;
   }
 
