@@ -9,7 +9,8 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node --test --loader ts-node/esm"
+    "test": "node --test --loader ts-node/esm",
+    "seed:test-user": "ts-node scripts/ensureTestUser.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
