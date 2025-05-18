@@ -36,6 +36,7 @@ export interface RouteConfig {
   b2bUser: {
     home: string;
     login: string;
+    register?: string;
     dashboard: string;
     journal?: string;
     scan?: string;
@@ -91,6 +92,7 @@ export const ROUTES: RouteConfig = {
   b2bUser: {
     home: '/b2b/user',
     login: '/b2b/user/login',
+    register: '/b2b/user/register',
     dashboard: '/b2b/user/dashboard',
     journal: '/b2b/user/journal',
     scan: '/b2b/user/scan',
