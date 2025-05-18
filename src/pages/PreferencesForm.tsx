@@ -7,27 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-
-// Define the interface for user preferences
-interface UserPreferences {
-  theme?: 'light' | 'dark' | 'pastel' | 'system';
-  fontSize?: 'small' | 'medium' | 'large';
-  language?: string;
-  privacy?: 'public' | 'private' | 'friends';
-  notifications?: boolean | {
-    enabled: boolean;
-    emailEnabled: boolean;
-    pushEnabled: boolean;
-    frequency?: string;
-    types?: Record<string, boolean>;
-    tone?: string;
-    quietHours?: {
-      enabled: boolean;
-      start: string;
-      end: string;
-    };
-  };
-}
+import { UserPreferences } from '@/types/preferences';
 
 interface PreferencesFormProps {
   preferences: UserPreferences;
