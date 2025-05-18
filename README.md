@@ -169,6 +169,53 @@ EmotionsCare utilise un système de design basé sur Tailwind CSS et Shadcn UI, 
 - **LayoutContext** - Mise en page et navigation
 - **MusicContext** - Lecture et gestion de la musique (source unique via `useMusic`)
 
+## Préférences utilisateur par défaut
+
+La constante `DEFAULT_PREFERENCES` centralise les valeurs initiales utilisées
+dans les contextes de préférences utilisateur. Elle est définie dans
+`src/constants/defaults.ts` et réexportée par `src/types/preferences.ts`.
+Sa structure est la suivante :
+
+```ts
+{
+  theme: 'system',
+  fontSize: 'medium',
+  fontFamily: 'system',
+  reduceMotion: false,
+  colorBlindMode: false,
+  autoplayMedia: true,
+  soundEnabled: true,
+  emotionalCamouflage: false,
+  aiSuggestions: true,
+  notifications_enabled: true,
+  language: 'fr',
+  privacy: {
+    shareData: false,
+    allowAnalytics: true,
+    showProfile: true,
+    shareActivity: true,
+    allowMessages: true,
+    allowNotifications: true
+  },
+  notifications: {
+    email: true,
+    push: true,
+    sms: false,
+    frequency: 'daily',
+    enabled: true,
+    emailEnabled: true,
+    pushEnabled: true,
+    inAppEnabled: true
+  }
+}
+```
+
+Les composants peuvent l'importer via :
+
+```ts
+import { DEFAULT_PREFERENCES } from '@/types/preferences';
+```
+
 ## Gestion du responsive
 
 L'application est entièrement responsive et optimisée pour les appareils mobiles, tablettes et desktop. Nous utilisons:
