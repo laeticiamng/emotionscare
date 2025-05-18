@@ -108,6 +108,12 @@ npm run dev
 # Build pour la production
 npm run build
 
+# Exécuter les tests
+npm test
+
+# Vérifier les types TypeScript
+npm run type-check
+
 # Démarrer le serveur de production
 npm start
 ```
@@ -136,8 +142,8 @@ L'application est entièrement responsive et optimisée pour les appareils mobil
 
 - ESLint pour la qualité du code
 - TypeScript pour le typage statique
-- Tests unitaires avec Vitest
-- Tests d'intégration pour les fonctionnalités clés
+- Tests unitaires via `node --test`
+- Tests d'intégration (à venir)
 
 ## Équipe et contribution
 
