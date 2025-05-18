@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { ThemeContextType, Theme, FontFamily, FontSize } from '@/types/theme';
 
@@ -7,7 +6,12 @@ export const ThemeContext = createContext<ThemeContextType>({
   theme: 'system',
   setTheme: () => {},
   toggleTheme: () => {},
-  isDark: false
+  isDark: false,
+  isDarkMode: false,
+  fontSize: 'medium',
+  setFontSize: () => {},
+  fontFamily: 'system',
+  setFontFamily: () => {},
 });
 
 export const useTheme = () => useContext(ThemeContext);
@@ -225,12 +229,19 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
         fontFamily,
         setFontFamily: setFontFamilyValue,
         toggleTheme,
-        getContrastText,
-        soundEnabled,
-        reduceMotion,
         systemTheme,
         preferences: { soundEnabled, reduceMotion },
-        updatePreferences
+        updatePreferences: (prefs) => {
+          if (prefs.soundEnabled !== undefined) {
+            setSoundEnabled(prefs.soundEnabled);
+            localStorage.setItem('soundEnabled', prefs.soundEnabled.toString());
+          }
+          
+          if (prefs.reduceMotion !== undefined) {
+            setReduceMotion(prefs.reduceMotion);
+            localStorage.setItem('reduceMotion', prefs.reduceMotion.toString());
+          }
+        }
       }}
     >
       {children}
