@@ -53,7 +53,7 @@ const Register: React.FC<RegisterProps> = ({ role = 'b2c' }) => {
     setIsLoading(true);
     
     try {
-      await register(email, password, name);
+      await register(name, email, password);
       
       toast({
         title: "Inscription réussie",
