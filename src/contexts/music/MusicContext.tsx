@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { MusicContextType, MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicContextType, MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { getMockMusicData } from './mockMusicData';
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
@@ -70,6 +70,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     playTrack(prevTrack);
   };
 
+  // Alias for prevTrack to handle naming inconsistencies
+  const previousTrack = prevTrack;
+
   const setPlaylist = (input: MusicPlaylist | MusicTrack[]) => {
     if (Array.isArray(input)) {
       setPlaylistState({
@@ -82,12 +85,15 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const loadPlaylistForEmotion = async (emotion: string): Promise<void> => {
-    setEmotionState(emotion);
+  const loadPlaylistForEmotion = async (emotion: string | EmotionMusicParams): Promise<void> => {
+    // Convert to string if it's an object
+    const emotionString = typeof emotion === 'string' ? emotion : emotion.emotion;
+    
+    setEmotionState(emotionString);
     
     // In a mock implementation, find a playlist that matches the emotion
     const matchingPlaylist = playlists.find(p => 
-      p.emotion?.toLowerCase() === emotion.toLowerCase()
+      p.emotion?.toLowerCase() === emotionString.toLowerCase()
     );
     
     if (matchingPlaylist) {
@@ -99,16 +105,16 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } else {
       // If no matching playlist, create one with tracks that match the emotion
       const matchingTracks = tracks.filter(t => 
-        t.emotion?.toLowerCase() === emotion.toLowerCase() ||
-        t.mood?.toLowerCase() === emotion.toLowerCase()
+        t.emotion?.toLowerCase() === emotionString.toLowerCase() ||
+        t.mood?.toLowerCase() === emotionString.toLowerCase()
       );
       
       if (matchingTracks.length > 0) {
         setPlaylistState({
-          id: `${emotion}-playlist`,
-          name: `${emotion} Playlist`,
+          id: `${emotionString}-playlist`,
+          name: `${emotionString} Playlist`,
           tracks: matchingTracks,
-          emotion: emotion,
+          emotion: emotionString,
         });
         playTrack(matchingTracks[0]);
       }
@@ -134,7 +140,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       album: "AI Generated Music",
       year: new Date().getFullYear(),
       tags: ["ai", "generated", prompt.split(" ")[0]],
-      genre: "Electronic"
+      genre: "Electronic",
+      category: "ai-generated"
     };
     
     return generatedTrack;
@@ -164,6 +171,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     resumeTrack,
     nextTrack,
     prevTrack,
+    previousTrack,
     setEmotion: setEmotionState,
     loadPlaylistForEmotion,
     setPlaylist,

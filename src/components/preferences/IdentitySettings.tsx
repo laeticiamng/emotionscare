@@ -1,112 +1,147 @@
 
-import React from 'react';
-import { Control } from 'react-hook-form';
-import { FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { UserPreferences } from '@/types/preferences';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 
 interface IdentitySettingsProps {
-  control: Control<UserPreferences, any>;
-  isLoading: boolean;
+  preferences: {
+    displayName: string;
+    pronouns: string;
+    biography: string;
+  };
+  onUpdate: (preferences: any) => void;
+  isLoading?: boolean;
 }
 
-const IdentitySettings: React.FC<IdentitySettingsProps> = ({
-  control,
-  isLoading
+const IdentitySettings: React.FC<IdentitySettingsProps> = ({ 
+  preferences: initialPreferences, 
+  onUpdate, 
+  isLoading = false 
 }) => {
-  return (
-    <div className="space-y-4">
-      {/* Pour l'avatar, nous utilisons une approche personnalisée car ce n'est pas un champ standard */}
-      <div className="flex items-center space-x-4 rounded-lg border p-3 shadow-sm">
-        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden">
-          {control._formValues.avatarUrl ? (
-            <img 
-              src={control._formValues.avatarUrl} 
-              alt="Avatar utilisateur" 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="text-2xl font-semibold text-muted-foreground">
-              {control._formValues.displayName?.[0]?.toUpperCase() || 'U'}
-            </div>
-          )}
-        </div>
-        <div className="space-y-1">
-          <FormLabel>Image de profil</FormLabel>
-          <FormDescription>
-            Cette image sera affichée sur votre profil
-          </FormDescription>
-          <div className="pt-2">
-            <Input
-              type="file"
-              accept="image/*"
-              disabled={isLoading}
-              onChange={(e) => {
-                // Dans une implémentation réelle, ceci téléchargerait l'image
-                // et mettrait à jour avatarUrl avec l'URL résultante
-                console.log("Image sélectionnée:", e.target.files?.[0]);
-              }}
-            />
-          </div>
-        </div>
-      </div>
-      
-      <FormItem>
-        <FormLabel>Nom d'affichage</FormLabel>
-        <FormControl>
-          <Input 
-            placeholder="Votre nom"
-            value={control._formValues.displayName || ''}
-            onChange={(e) => {
-              control._formValues.displayName = e.target.value;
-              control._formState.dirtyFields.displayName = true;
-            }}
-            disabled={isLoading}
-          />
-        </FormControl>
-        <FormDescription>
-          Le nom qui sera affiché aux autres utilisateurs
-        </FormDescription>
-      </FormItem>
+  // Create a mutable copy of the preferences
+  const [preferences, setPreferences] = useState({
+    displayName: initialPreferences.displayName,
+    pronouns: initialPreferences.pronouns,
+    biography: initialPreferences.biography
+  });
+  
+  const { toast } = useToast();
 
-      <FormItem>
-        <FormLabel>Pronoms</FormLabel>
-        <FormControl>
-          <Input 
-            placeholder="ex: il/lui, elle/elle, iel/ellui"
-            value={control._formValues.pronouns || ''}
-            onChange={(e) => {
-              control._formValues.pronouns = e.target.value;
-              control._formState.dirtyFields.pronouns = true;
-            }}
+  const handleDisplayNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPreferences(prev => ({
+      ...prev,
+      displayName: e.target.value
+    }));
+  };
+
+  const handlePronounsChange = (value: string) => {
+    setPreferences(prev => ({
+      ...prev,
+      pronouns: value
+    }));
+  };
+
+  const handleBiographyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setPreferences(prev => ({
+      ...prev,
+      biography: e.target.value
+    }));
+  };
+
+  const handleSave = () => {
+    onUpdate(preferences);
+    toast({
+      title: "Profil mis à jour",
+      description: "Vos informations d'identité ont été enregistrées.",
+    });
+  };
+
+  const handleReset = () => {
+    setPreferences({
+      displayName: initialPreferences.displayName,
+      pronouns: initialPreferences.pronouns,
+      biography: initialPreferences.biography
+    });
+    toast({
+      title: "Profil réinitialisé",
+      description: "Vos informations d'identité ont été réinitialisées.",
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Identité & Profil</CardTitle>
+        <CardDescription>
+          Personnalisez la façon dont vous apparaissez sur la plateforme.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="display-name">Nom d'affichage</Label>
+          <Input
+            id="display-name"
+            value={preferences.displayName}
+            onChange={handleDisplayNameChange}
+            placeholder="Votre nom public"
             disabled={isLoading}
           />
-        </FormControl>
-        <FormDescription>
-          Comment souhaitez-vous être désigné·e (facultatif)
-        </FormDescription>
-      </FormItem>
-      
-      <FormItem>
-        <FormLabel>Biographie</FormLabel>
-        <FormControl>
-          <Textarea 
-            placeholder="Partagez quelque chose à propos de vous..."
-            value={control._formValues.biography || ''}
-            onChange={(e) => {
-              control._formValues.biography = e.target.value;
-              control._formState.dirtyFields.biography = true;
-            }}
+          <p className="text-xs text-muted-foreground">
+            Ce nom sera visible par les autres utilisateurs.
+          </p>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="pronouns">Pronoms</Label>
+          <Select 
+            value={preferences.pronouns} 
+            onValueChange={handlePronounsChange}
             disabled={isLoading}
+          >
+            <SelectTrigger id="pronouns">
+              <SelectValue placeholder="Sélectionner vos pronoms" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="he/him">Il/Lui</SelectItem>
+              <SelectItem value="she/her">Elle</SelectItem>
+              <SelectItem value="they/them">Iel/Iels</SelectItem>
+              <SelectItem value="prefer-not-to-say">Préfère ne pas préciser</SelectItem>
+            </SelectContent>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Optionnel. Aide les autres à s'adresser à vous correctement.
+          </p>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="biography">Biographie</Label>
+          <Textarea
+            id="biography"
+            value={preferences.biography}
+            onChange={handleBiographyChange}
+            placeholder="Partagez quelques mots à propos de vous"
             rows={4}
+            disabled={isLoading}
           />
-        </FormControl>
-        <FormDescription>
-          Une brève description qui sera visible sur votre profil
-        </FormDescription>
-      </FormItem>
-    </div>
+          <p className="text-xs text-muted-foreground">
+            Maximum 300 caractères. {preferences.biography.length}/300
+          </p>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <Button variant="outline" onClick={handleReset} disabled={isLoading}>
+          Réinitialiser
+        </Button>
+        <Button onClick={handleSave} disabled={isLoading}>
+          {isLoading ? "Enregistrement..." : "Enregistrer le profil"}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 

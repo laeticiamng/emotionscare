@@ -27,18 +27,19 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({
   
   // Filter playlists based on search query
   const filteredPlaylists = playlists.filter(playlist => {
-    const titleMatch = (playlist.name || playlist.title || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const nameMatch = (playlist.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const titleMatch = playlist.title ? playlist.title.toLowerCase().includes(searchQuery.toLowerCase()) : false;
     const descriptionMatch = (playlist.description || '').toLowerCase().includes(searchQuery.toLowerCase());
     const tagsMatch = playlist.tags ? playlist.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) : false;
     
-    return titleMatch || descriptionMatch || tagsMatch;
+    return nameMatch || titleMatch || descriptionMatch || tagsMatch;
   });
   
   // Filter playlists based on active tab
   const getFilteredPlaylistsByTab = () => {
     switch (activeTab) {
       case 'mood':
-        return filteredPlaylists.filter(playlist => playlist.mood);
+        return filteredPlaylists.filter(playlist => playlist.mood || playlist.emotion);
       case 'favorites':
         return filteredPlaylists.filter(playlist => playlist.tags?.includes('favorite'));
       case 'recent':
@@ -110,10 +111,10 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({
                   onClick={() => handlePlaylistSelect(playlist)}
                 >
                   <div className="aspect-square bg-muted relative overflow-hidden">
-                    {playlist.cover ? (
+                    {(playlist.cover || playlist.coverUrl) ? (
                       <img 
-                        src={playlist.cover}
-                        alt={playlist.title || playlist.name || "Playlist cover"}
+                        src={playlist.cover || playlist.coverUrl}
+                        alt={playlist.name || "Playlist cover"}
                         className="w-full h-full object-cover"
                       />
                     ) : (

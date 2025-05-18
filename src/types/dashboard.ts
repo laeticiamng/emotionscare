@@ -1,6 +1,8 @@
 
 import { Badge, Challenge, LeaderboardEntry } from './badge';
 
+export type KpiCardStatus = 'idle' | 'loading' | 'success' | 'error' | 'warning' | 'info' | 'default';
+
 export interface KpiCardProps {
   title: string;
   value: number | string;
@@ -9,14 +11,14 @@ export interface KpiCardProps {
   icon?: React.ReactNode;
   className?: string;
   percentage?: number;
-  subtitle?: string;
+  subtitle?: string | React.ReactNode;
   prefix?: string;
   suffix?: string;
   onClick?: () => void;
   // Additional props needed by admin components
   delta?: {
     value: number;
-    label: string;
+    label?: string;
     trend: string;
   };
   status?: KpiCardStatus;
@@ -25,9 +27,12 @@ export interface KpiCardProps {
   footer?: React.ReactNode;
   id?: string;
   colorMode?: 'success' | 'warning' | 'danger' | 'info' | 'default';
+  // Grid layout properties
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
 }
-
-export type KpiCardStatus = 'idle' | 'loading' | 'success' | 'error';
 
 export interface KpiCardData {
   id: string;
@@ -84,6 +89,11 @@ export interface DraggableKpiCardsGridProps {
   cards: KpiCardProps[];
   onCardsReorder?: (cards: KpiCardProps[]) => void;
   className?: string;
+  onSave?: (layouts: any) => void;
+  savedLayout?: any;
+  isEditable?: boolean;
+  kpiCards?: KpiCardProps[];
+  onOrderChange?: (cards: KpiCardProps[]) => void;
 }
 
 export interface DashboardWidgetConfig {
@@ -93,9 +103,9 @@ export interface DashboardWidgetConfig {
 }
 
 export interface GlobalOverviewTabProps {
-  data: any;
-  period: string;
-  onPeriodChange: (period: string) => void;
+  data?: any;
+  period?: string;
+  onPeriodChange?: (period: string) => void;
 }
 
 export interface GamificationData {

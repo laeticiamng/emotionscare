@@ -2,16 +2,16 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { KpiCardProps } from "@/types/dashboard";
+import { KpiCardProps, KpiCardStatus } from "@/types/dashboard";
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 
-export const KpiCard = ({
+const KpiCard = ({
   title,
   value,
   delta,
   icon,
   subtitle,
-  status = 'info',
+  status = 'default',
   className,
   isLoading,
   ariaLabel,
@@ -56,13 +56,16 @@ export const KpiCard = ({
     ? { value: delta, trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral' } 
     : delta;
 
-  let statusColor;
+  // Handle status color based on card status
+  let statusColor = "";
   if (deltaObj) {
-    statusColor = deltaObj.trend === 'up' 
-      ? status === 'info' ? 'text-emerald-600 dark:text-emerald-400' : `text-${status}` 
-      : deltaObj.trend === 'down' 
-        ? status === 'info' ? 'text-rose-600 dark:text-rose-400' : `text-${status}` 
-        : 'text-gray-600 dark:text-gray-400';
+    if (deltaObj.trend === 'up') {
+      statusColor = status === 'default' || status === 'info' ? 'text-emerald-600 dark:text-emerald-400' : `text-${status}`;
+    } else if (deltaObj.trend === 'down') {
+      statusColor = status === 'default' || status === 'info' ? 'text-rose-600 dark:text-rose-400' : `text-${status}`;
+    } else {
+      statusColor = 'text-gray-600 dark:text-gray-400';
+    }
   }
 
   return (

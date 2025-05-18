@@ -4,15 +4,18 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { Button } from "@/components/ui/button";
-import { DraggableKpiCardsGridProps } from '@/types/dashboard';
+import { DraggableKpiCardsGridProps, KpiCardProps } from '@/types/dashboard';
 import KpiCard from '../KpiCard';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
   cards = [],
+  onCardsReorder,
+  onOrderChange,
   onSave,
   savedLayout,
+  className,
   isEditable = true
 }) => {
   const [layouts, setLayouts] = useState(savedLayout || {});
@@ -41,11 +44,25 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
     if (onSave) {
       onSave(layouts);
     }
+    if (onOrderChange || onCardsReorder) {
+      // Update card order based on layout
+      const orderedCards = [...cards].sort((a, b) => {
+        const layoutItemA = layouts.lg?.find((item: any) => item.i === a.id);
+        const layoutItemB = layouts.lg?.find((item: any) => item.i === b.id);
+        if (!layoutItemA || !layoutItemB) return 0;
+        return layoutItemA.y === layoutItemB.y 
+          ? layoutItemA.x - layoutItemB.x 
+          : layoutItemA.y - layoutItemB.y;
+      });
+      
+      if (onOrderChange) onOrderChange(orderedCards);
+      if (onCardsReorder) onCardsReorder(orderedCards);
+    }
     setIsEdit(false);
   };
 
   return (
-    <div className="w-full">
+    <div className={`w-full ${className || ''}`}>
       {isEditable && (
         <div className="mb-4 flex justify-end">
           {isEdit ? (

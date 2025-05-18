@@ -1,147 +1,93 @@
 
 import React from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerClose, DrawerFooter } from '@/components/ui/drawer';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
+import { X } from 'lucide-react';
+import { MusicDrawerProps, MusicTrack } from '@/types/music';
 import { useMusic } from '@/contexts/music';
-import { MusicDrawerProps } from '@/types/music';
-import { ProgressBar } from './ProgressBar';
-import { VolumeControl } from './VolumeControl';
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({
   open,
+  onClose,
   onOpenChange,
   playlist,
-  currentTrack,
+  currentTrack: propCurrentTrack,
   children
 }) => {
-  const { 
-    isPlaying, 
-    togglePlay,
-    prevTrack,
-    previousTrack, // Alternate name
-    nextTrack,
-    volume,
-    setVolume,
-    currentTime,
-    duration,
-    seekTo,
-    muted,
-    toggleMute,
-  } = useMusic();
-
-  // Use the appropriate previous track function
-  const handlePreviousTrack = () => {
-    if (typeof prevTrack === 'function') {
-      prevTrack();
-    } else if (typeof previousTrack === 'function') {
-      previousTrack();
-    }
+  const { currentTrack: contextCurrentTrack, playTrack } = useMusic();
+  
+  // Use provided track or get from context
+  const displayTrack = propCurrentTrack || contextCurrentTrack;
+  
+  // Get tracks to display from playlist or recommendations
+  const tracksToDisplay = playlist?.tracks || [];
+  
+  const handleTrackSelect = (track: MusicTrack) => {
+    playTrack(track);
   };
-
+  
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>Music Player</SheetTitle>
-        </SheetHeader>
-        
-        <div className="py-6">
-          {children ? (
-            children
-          ) : (
-            <div className="space-y-6">
-              {currentTrack && (
-                <div className="flex flex-col items-center space-y-4">
-                  {currentTrack.coverUrl && (
-                    <div className="rounded-lg overflow-hidden w-48 h-48">
-                      <img 
-                        src={currentTrack.coverUrl} 
-                        alt={currentTrack.title || 'Album cover'} 
-                        className="w-full h-full object-cover"
-                      />
+    <Drawer 
+      open={open} 
+      onClose={onClose}
+      onOpenChange={onOpenChange}
+    >
+      <DrawerContent className="max-h-[80vh]">
+        <div className="mx-auto w-full max-w-md">
+          <DrawerHeader>
+            <DrawerTitle className="flex justify-between items-center">
+              <span>{playlist?.name || 'Music Player'}</span>
+              <DrawerClose asChild>
+                <Button variant="ghost" size="icon" onClick={onClose}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </DrawerClose>
+            </DrawerTitle>
+            <DrawerDescription>
+              {playlist?.description || `${tracksToDisplay.length} tracks available`}
+            </DrawerDescription>
+          </DrawerHeader>
+          
+          <div className="p-4">
+            {children}
+            
+            {!children && (
+              <div className="space-y-4">
+                {displayTrack && (
+                  <div className="p-4 border rounded-lg bg-muted/30">
+                    <h3 className="font-medium">{displayTrack.title}</h3>
+                    <p className="text-sm text-muted-foreground">{displayTrack.artist}</p>
+                  </div>
+                )}
+                
+                <div className="space-y-2">
+                  <h3 className="font-medium">Tracks</h3>
+                  {tracksToDisplay.map((track) => (
+                    <div 
+                      key={track.id}
+                      className={`p-3 rounded-md cursor-pointer ${track.id === displayTrack?.id ? 'bg-accent' : 'hover:bg-muted'}`}
+                      onClick={() => handleTrackSelect(track)}
+                    >
+                      <div className="font-medium">{track.title}</div>
+                      <div className="text-sm text-muted-foreground">{track.artist}</div>
                     </div>
-                  )}
-                  
-                  <div className="text-center">
-                    <h3 className="font-medium text-lg">
-                      {currentTrack.title || currentTrack.name || 'Unknown Track'}
-                    </h3>
-                    <p className="text-muted-foreground">
-                      {currentTrack.artist || 'Unknown Artist'}
-                    </p>
-                  </div>
-                  
-                  <ProgressBar 
-                    currentTime={currentTime} 
-                    duration={duration} 
-                    onSeek={seekTo} 
-                  />
-                  
-                  <div className="flex items-center justify-center space-x-4">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={handlePreviousTrack}
-                    >
-                      <SkipBack />
-                    </Button>
-                    
-                    <Button 
-                      size="icon" 
-                      className="h-12 w-12 rounded-full" 
-                      onClick={togglePlay}
-                    >
-                      {isPlaying ? <Pause size={24} /> : <Play size={24} className="ml-1" />}
-                    </Button>
-                    
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={nextTrack}
-                    >
-                      <SkipForward />
-                    </Button>
-                  </div>
-                  
-                  <VolumeControl 
-                    volume={volume} 
-                    muted={muted} 
-                    onVolumeChange={setVolume} 
-                    onMuteToggle={toggleMute} 
-                  />
+                  ))}
                 </div>
-              )}
-              
-              {playlist && playlist.tracks.length > 0 && (
-                <div className="mt-6 space-y-2">
-                  <h4 className="font-medium">Playlist: {playlist.name || 'Current Playlist'}</h4>
-                  <div className="space-y-1">
-                    {playlist.tracks.map(track => (
-                      <div 
-                        key={track.id} 
-                        className={`flex items-center p-2 rounded-md ${
-                          currentTrack?.id === track.id ? 'bg-secondary' : 'hover:bg-accent'
-                        }`}
-                      >
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">
-                            {track.title || track.name || 'Unknown Track'}
-                          </p>
-                          <p className="text-sm text-muted-foreground truncate">
-                            {track.artist || 'Unknown Artist'}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
+          
+          <DrawerFooter>
+            <Button 
+              variant="outline" 
+              onClick={onClose}
+            >
+              Close
+            </Button>
+          </DrawerFooter>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DrawerContent>
+    </Drawer>
   );
 };
 

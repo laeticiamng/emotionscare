@@ -1,163 +1,235 @@
 
-import React from 'react';
-import { Control } from 'react-hook-form';
-import { FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UserPreferences } from '@/types/preferences';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertTriangle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
-interface DataPrivacySettingsProps {
-  control: Control<UserPreferences, any>;
-  isLoading: boolean;
+interface DataPrivacyProps {
+  preferences: {
+    privacy: {
+      shareData: boolean;
+      collectAnalytics: boolean;
+      cookiePreferences: {
+        necessary: boolean;
+        functional: boolean;
+        performance: boolean;
+        marketing: boolean;
+      };
+    };
+  };
+  onUpdate: (preferences: any) => void;
+  isLoading?: boolean;
 }
 
-const DataPrivacySettings: React.FC<DataPrivacySettingsProps> = ({
-  control,
-  isLoading
+const DataPrivacySettings: React.FC<DataPrivacyProps> = ({ 
+  preferences: initialPreferences, 
+  onUpdate,
+  isLoading = false
 }) => {
+  // Create a mutable copy of the preferences to work with
+  const [preferences, setPreferences] = useState({
+    privacy: {
+      ...initialPreferences.privacy,
+      cookiePreferences: {
+        ...initialPreferences.privacy.cookiePreferences
+      }
+    }
+  });
+  
+  const { toast } = useToast();
+
+  const handleShareDataToggle = () => {
+    const updatedPreferences = {
+      ...preferences,
+      privacy: {
+        ...preferences.privacy,
+        shareData: !preferences.privacy.shareData
+      }
+    };
+    setPreferences(updatedPreferences);
+  };
+
+  const handleAnalyticsToggle = () => {
+    const updatedPreferences = {
+      ...preferences,
+      privacy: {
+        ...preferences.privacy,
+        collectAnalytics: !preferences.privacy.collectAnalytics
+      }
+    };
+    setPreferences(updatedPreferences);
+  };
+
+  const handleCookieToggle = (cookieType: keyof typeof preferences.privacy.cookiePreferences) => {
+    // Don't allow toggling necessary cookies
+    if (cookieType === 'necessary') return;
+    
+    const updatedPreferences = {
+      ...preferences,
+      privacy: {
+        ...preferences.privacy,
+        cookiePreferences: {
+          ...preferences.privacy.cookiePreferences,
+          [cookieType]: !preferences.privacy.cookiePreferences[cookieType]
+        }
+      }
+    };
+    setPreferences(updatedPreferences);
+  };
+
+  const handleSave = () => {
+    onUpdate(preferences);
+    toast({
+      title: "Préférences mises à jour",
+      description: "Vos paramètres de confidentialité ont été enregistrés.",
+    });
+  };
+
+  const handleReset = () => {
+    setPreferences({
+      privacy: {
+        ...initialPreferences.privacy,
+        cookiePreferences: {
+          ...initialPreferences.privacy.cookiePreferences
+        }
+      }
+    });
+    toast({
+      title: "Préférences réinitialisées",
+      description: "Vos paramètres de confidentialité ont été rétablis.",
+    });
+  };
+
   return (
-    <div className="space-y-4">
-      <FormField
-        control={control}
-        name="privacy.shareData"
-        render={({ field }) => (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-            <div className="space-y-0.5">
-              <FormLabel>Partage de données</FormLabel>
-              <FormDescription>
-                Autoriser le partage anonyme de données pour améliorer nos services
-              </FormDescription>
+    <Card>
+      <CardHeader>
+        <CardTitle>Confidentialité des données</CardTitle>
+        <CardDescription>
+          Gérez comment vos données sont collectées et utilisées.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <Alert variant="warning" className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-900/50">
+          <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+          <AlertTitle>Important</AlertTitle>
+          <AlertDescription>
+            Ces paramètres affectent la manière dont nous personnalisons votre expérience.
+          </AlertDescription>
+        </Alert>
+        
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="share-data" className="font-medium">Partage de données</Label>
+              <p className="text-sm text-muted-foreground mt-1">
+                Autorise le partage de données anonymisées pour améliorer les services
+              </p>
             </div>
-            <FormControl>
-              <Switch
-                checked={field.value}
-                onCheckedChange={field.onChange}
-                disabled={isLoading}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      
-      <FormField
-        control={control}
-        name="privacy.anonymizeReports"
-        render={({ field }) => (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-            <div className="space-y-0.5">
-              <FormLabel>Anonymiser les rapports</FormLabel>
-              <FormDescription>
-                Anonymiser vos données dans tous les rapports et analyses
-              </FormDescription>
-            </div>
-            <FormControl>
-              <Switch
-                checked={field.value}
-                onCheckedChange={field.onChange}
-                disabled={isLoading}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      
-      <FormField
-        control={control}
-        name="privacy.profileVisibility"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Visibilité du profil</FormLabel>
-            <Select 
-              onValueChange={field.onChange} 
-              value={field.value}
+            <Switch 
+              id="share-data" 
+              checked={preferences.privacy.shareData} 
+              onCheckedChange={handleShareDataToggle}
               disabled={isLoading}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choisir la visibilité" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="public">Public</SelectItem>
-                <SelectItem value="friends">Amis uniquement</SelectItem>
-                <SelectItem value="private">Privé</SelectItem>
-              </SelectContent>
-            </Select>
-            <FormDescription>
-              Qui peut voir votre profil et vos informations
-            </FormDescription>
-          </FormItem>
-        )}
-      />
-      
-      <FormField
-        control={control}
-        name="privacy.anonymousMode"
-        render={({ field }) => (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-            <div className="space-y-0.5">
-              <FormLabel>Mode anonyme</FormLabel>
-              <FormDescription>
-                Masquer votre identité dans la communauté
-              </FormDescription>
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="collect-analytics" className="font-medium">Collecte d'analytiques</Label>
+              <p className="text-sm text-muted-foreground mt-1">
+                Permet la collecte de données d'utilisation pour améliorer l'expérience
+              </p>
             </div>
-            <FormControl>
-              <Switch
-                checked={field.value}
-                onCheckedChange={field.onChange}
+            <Switch 
+              id="collect-analytics" 
+              checked={preferences.privacy.collectAnalytics} 
+              onCheckedChange={handleAnalyticsToggle}
+              disabled={isLoading}
+            />
+          </div>
+        </div>
+        
+        <Separator />
+        
+        <div>
+          <h3 className="font-medium mb-3">Préférences de cookies</h3>
+          
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="necessary-cookies" className="font-medium">Cookies nécessaires</Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Requis pour le fonctionnement du site
+                </p>
+              </div>
+              <Switch 
+                id="necessary-cookies" 
+                checked={true} 
+                disabled={true}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="functional-cookies" className="font-medium">Cookies fonctionnels</Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Permettent des fonctionnalités améliorées
+                </p>
+              </div>
+              <Switch 
+                id="functional-cookies" 
+                checked={preferences.privacy.cookiePreferences.functional} 
+                onCheckedChange={() => handleCookieToggle('functional')}
                 disabled={isLoading}
               />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-      
-      {/* Utilisez des noms de propriétés qui existent déjà dans l'interface PrivacyPreference */}
-      {/* Nous utilisons l'approche des gestionnaires personnalisés pour shareActivity et shareJournal */}
-      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-        <div className="space-y-0.5">
-          <FormLabel>Partage d'activités</FormLabel>
-          <FormDescription>
-            Autoriser le partage de vos activités avec la communauté
-          </FormDescription>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="performance-cookies" className="font-medium">Cookies de performance</Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Nous aident à comprendre comment vous utilisez le site
+                </p>
+              </div>
+              <Switch 
+                id="performance-cookies" 
+                checked={preferences.privacy.cookiePreferences.performance} 
+                onCheckedChange={() => handleCookieToggle('performance')}
+                disabled={isLoading}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="marketing-cookies" className="font-medium">Cookies marketing</Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Utilisés pour vous montrer du contenu pertinent
+                </p>
+              </div>
+              <Switch 
+                id="marketing-cookies" 
+                checked={preferences.privacy.cookiePreferences.marketing} 
+                onCheckedChange={() => handleCookieToggle('marketing')}
+                disabled={isLoading}
+              />
+            </div>
+          </div>
         </div>
-        <Switch
-          checked={control._formValues.privacy?.shareActivity || false}
-          onCheckedChange={(checked) => {
-            const currentValues = control._formValues;
-            const updatedPrivacy = {
-              ...currentValues.privacy,
-              shareActivity: checked
-            };
-            control._formState.dirtyFields.privacy = true;
-            control._formValues.privacy = updatedPrivacy;
-          }}
-          disabled={isLoading}
-        />
-      </FormItem>
-      
-      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-        <div className="space-y-0.5">
-          <FormLabel>Partage du journal</FormLabel>
-          <FormDescription>
-            Autoriser le partage de certaines entrées de journal
-          </FormDescription>
-        </div>
-        <Switch
-          checked={control._formValues.privacy?.shareJournal || false}
-          onCheckedChange={(checked) => {
-            const currentValues = control._formValues;
-            const updatedPrivacy = {
-              ...currentValues.privacy,
-              shareJournal: checked
-            };
-            control._formState.dirtyFields.privacy = true;
-            control._formValues.privacy = updatedPrivacy;
-          }}
-          disabled={isLoading}
-        />
-      </FormItem>
-    </div>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <Button variant="outline" onClick={handleReset} disabled={isLoading}>
+          Réinitialiser
+        </Button>
+        <Button onClick={handleSave} disabled={isLoading}>
+          {isLoading ? "Enregistrement..." : "Enregistrer les préférences"}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };
 

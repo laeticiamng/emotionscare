@@ -11,18 +11,13 @@ export const KpiCard = ({
   delta,
   icon,
   subtitle,
-  status = 'info',
+  status = 'default',
   className,
   isLoading,
   ariaLabel,
   onClick,
   footer,
 }: KpiCardProps) => {
-  // Convertir status pour compatibilité
-  const mappedStatus: KpiCardStatus = status === 'error' || status === 'warning' || status === 'success' || status === 'info' 
-    ? status 
-    : 'info';
-  
   // Handle loading state
   if (isLoading) {
     return (
@@ -61,13 +56,16 @@ export const KpiCard = ({
     ? { value: delta, trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral' } 
     : delta;
 
-  let statusColor;
+  // Handle status color based on card status
+  let statusColor = "";
   if (deltaObj) {
-    statusColor = deltaObj.trend === 'up' 
-      ? mappedStatus === 'info' ? 'text-emerald-600 dark:text-emerald-400' : `text-${mappedStatus}` 
-      : deltaObj.trend === 'down' 
-        ? mappedStatus === 'info' ? 'text-rose-600 dark:text-rose-400' : `text-${mappedStatus}` 
-        : 'text-gray-600 dark:text-gray-400';
+    if (deltaObj.trend === 'up') {
+      statusColor = status === 'default' || status === 'info' ? 'text-emerald-600 dark:text-emerald-400' : `text-${status}`;
+    } else if (deltaObj.trend === 'down') {
+      statusColor = status === 'default' || status === 'info' ? 'text-rose-600 dark:text-rose-400' : `text-${status}`;
+    } else {
+      statusColor = 'text-gray-600 dark:text-gray-400';
+    }
   }
 
   return (
@@ -96,7 +94,7 @@ export const KpiCard = ({
             {deltaObj.value !== undefined && (
               <span>{Math.abs(deltaObj.value).toFixed(1)}%</span>
             )}
-            {deltaObj?.label && <span>{deltaObj.label}</span>}
+            {deltaObj.label && deltaObj.label && <span>{deltaObj.label}</span>}
           </p>
         )}
         {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
