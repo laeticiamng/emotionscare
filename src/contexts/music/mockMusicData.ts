@@ -12,7 +12,8 @@ export const getMockMusicData = () => {
       coverUrl: '/images/calm-waters.jpg',
       emotion: 'calm',
       category: 'relax',
-      genre: 'ambient'
+      genre: 'ambient',
+      intensity: 0.3
     },
     {
       id: '2',
@@ -23,7 +24,8 @@ export const getMockMusicData = () => {
       coverUrl: '/images/deep-focus.jpg',
       emotion: 'focused',
       category: 'focus',
-      genre: 'electronic'
+      genre: 'electronic',
+      intensity: 0.5
     },
     {
       id: '3',
@@ -34,7 +36,8 @@ export const getMockMusicData = () => {
       coverUrl: '/images/energy-boost.jpg',
       emotion: 'energetic',
       category: 'energy',
-      genre: 'pop'
+      genre: 'pop',
+      intensity: 0.8
     },
     {
       id: '4',
@@ -45,7 +48,8 @@ export const getMockMusicData = () => {
       coverUrl: '/images/gentle-rain.jpg',
       emotion: 'calm',
       category: 'relax',
-      genre: 'ambient'
+      genre: 'ambient',
+      intensity: 0.2
     },
     {
       id: '5',
@@ -56,7 +60,8 @@ export const getMockMusicData = () => {
       coverUrl: '/images/productive-morning.jpg',
       emotion: 'focused',
       category: 'focus',
-      genre: 'minimal'
+      genre: 'minimal',
+      intensity: 0.6
     }
   ];
 
@@ -68,6 +73,7 @@ export const getMockMusicData = () => {
       description: 'Soothing sounds for relaxation',
       coverUrl: '/images/calm-relax.jpg',
       cover: '/images/calm-relax.jpg',
+      coverImage: '/images/calm-relax.jpg',
       tracks: tracks.filter(t => t.emotion === 'calm'),
       emotion: 'calm',
       mood: 'relaxed'
@@ -79,6 +85,7 @@ export const getMockMusicData = () => {
       description: 'Enhance your concentration',
       coverUrl: '/images/focus-mode.jpg',
       cover: '/images/focus-mode.jpg',
+      coverImage: '/images/focus-mode.jpg',
       tracks: tracks.filter(t => t.emotion === 'focused'),
       emotion: 'focused',
       mood: 'concentrated'
@@ -90,6 +97,7 @@ export const getMockMusicData = () => {
       description: 'Boost your energy levels',
       coverUrl: '/images/energy-motivation.jpg',
       cover: '/images/energy-motivation.jpg',
+      coverImage: '/images/energy-motivation.jpg',
       tracks: tracks.filter(t => t.emotion === 'energetic'),
       emotion: 'energetic',
       mood: 'energetic'

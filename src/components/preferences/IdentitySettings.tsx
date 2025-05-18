@@ -1,147 +1,61 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
-interface IdentitySettingsProps {
-  preferences: {
-    displayName: string;
-    pronouns: string;
-    biography: string;
-  };
-  onUpdate: (preferences: any) => void;
-  isLoading?: boolean;
-}
-
-const IdentitySettings: React.FC<IdentitySettingsProps> = ({ 
-  preferences: initialPreferences, 
-  onUpdate, 
-  isLoading = false 
-}) => {
-  // Create a mutable copy of the preferences
-  const [preferences, setPreferences] = useState({
-    displayName: initialPreferences.displayName,
-    pronouns: initialPreferences.pronouns,
-    biography: initialPreferences.biography
-  });
-  
-  const { toast } = useToast();
-
-  const handleDisplayNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPreferences(prev => ({
-      ...prev,
-      displayName: e.target.value
-    }));
-  };
-
-  const handlePronounsChange = (value: string) => {
-    setPreferences(prev => ({
-      ...prev,
-      pronouns: value
-    }));
-  };
-
-  const handleBiographyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPreferences(prev => ({
-      ...prev,
-      biography: e.target.value
-    }));
-  };
-
-  const handleSave = () => {
-    onUpdate(preferences);
-    toast({
-      title: "Profil mis à jour",
-      description: "Vos informations d'identité ont été enregistrées.",
-    });
-  };
-
-  const handleReset = () => {
-    setPreferences({
-      displayName: initialPreferences.displayName,
-      pronouns: initialPreferences.pronouns,
-      biography: initialPreferences.biography
-    });
-    toast({
-      title: "Profil réinitialisé",
-      description: "Vos informations d'identité ont été réinitialisées.",
-    });
-  };
-
+const IdentitySettings: React.FC = () => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Identité & Profil</CardTitle>
-        <CardDescription>
-          Personnalisez la façon dont vous apparaissez sur la plateforme.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="display-name">Nom d'affichage</Label>
-          <Input
-            id="display-name"
-            value={preferences.displayName}
-            onChange={handleDisplayNameChange}
-            placeholder="Votre nom public"
-            disabled={isLoading}
-          />
-          <p className="text-xs text-muted-foreground">
-            Ce nom sera visible par les autres utilisateurs.
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium">Paramètres d'identité</h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Gérez vos informations personnelles et votre identité sur la plateforme.
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Informations personnelles</CardTitle>
+          <CardDescription>
+            Consultez et mettez à jour les informations liées à votre profil.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="default" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Information</AlertTitle>
+            <AlertDescription>
+              Pour modifier votre nom, email ou mot de passe, veuillez accéder à votre profil complet.
+            </AlertDescription>
+          </Alert>
+          
+          <Button variant="outline">
+            Accéder au profil complet
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Suppression de compte</CardTitle>
+          <CardDescription>
+            Options pour supprimer votre compte et vos données associées.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-4">
+            La suppression de votre compte est définitive et supprimera toutes vos données personnelles 
+            de notre système conformément à notre politique de confidentialité.
           </p>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="pronouns">Pronoms</Label>
-          <Select 
-            value={preferences.pronouns} 
-            onValueChange={handlePronounsChange}
-            disabled={isLoading}
-          >
-            <SelectTrigger id="pronouns">
-              <SelectValue placeholder="Sélectionner vos pronoms" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="he/him">Il/Lui</SelectItem>
-              <SelectItem value="she/her">Elle</SelectItem>
-              <SelectItem value="they/them">Iel/Iels</SelectItem>
-              <SelectItem value="prefer-not-to-say">Préfère ne pas préciser</SelectItem>
-            </SelectContent>
-          </Select>
-          <p className="text-xs text-muted-foreground">
-            Optionnel. Aide les autres à s'adresser à vous correctement.
-          </p>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="biography">Biographie</Label>
-          <Textarea
-            id="biography"
-            value={preferences.biography}
-            onChange={handleBiographyChange}
-            placeholder="Partagez quelques mots à propos de vous"
-            rows={4}
-            disabled={isLoading}
-          />
-          <p className="text-xs text-muted-foreground">
-            Maximum 300 caractères. {preferences.biography.length}/300
-          </p>
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={handleReset} disabled={isLoading}>
-          Réinitialiser
-        </Button>
-        <Button onClick={handleSave} disabled={isLoading}>
-          {isLoading ? "Enregistrement..." : "Enregistrer le profil"}
-        </Button>
-      </CardFooter>
-    </Card>
+          
+          <Button variant="destructive">
+            Demander la suppression de mon compte
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

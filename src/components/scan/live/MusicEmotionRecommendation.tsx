@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, Play } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/contexts/music';
 import { useToast } from '@/hooks/use-toast';
 import { EmotionResult } from '@/types/emotion';
 
@@ -17,18 +17,17 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
   
   const handleActivateMusic = async () => {
     try {
-      const playlist = await loadPlaylistForEmotion({
+      await loadPlaylistForEmotion({
         emotion: emotionResult.emotion.toLowerCase(),
         intensity: emotionResult.confidence
       });
       
-      if (playlist) {
-        setOpenDrawer(true);
-        toast({
-          title: 'Musique activée',
-          description: `Une playlist adaptée à votre humeur ${emotionResult.emotion} est maintenant active.`,
-        });
-      }
+      // Since loadPlaylistForEmotion returns void, we can continue execution
+      setOpenDrawer(true);
+      toast({
+        title: 'Musique activée',
+        description: `Une playlist adaptée à votre humeur ${emotionResult.emotion} est maintenant active.`,
+      });
     } catch (error) {
       console.error('Error activating music for emotion:', error);
       toast({

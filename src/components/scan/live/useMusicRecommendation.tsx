@@ -1,8 +1,8 @@
 
 import { useState, useCallback } from 'react';
-import { useMusic } from '@/contexts';
-import { MusicTrack } from '@/types';
-import { EmotionResult } from '@/types';
+import { useMusic } from '@/contexts/music';
+import { MusicTrack, EmotionMusicParams } from '@/types/music';
+import { EmotionResult } from '@/types/emotion';
 
 // Mapping of emotions to music types
 export const EMOTION_TO_MUSIC: Record<string, string> = {
@@ -22,19 +22,29 @@ export const EMOTION_TO_MUSIC: Record<string, string> = {
 export function useMusicRecommendation() {
   const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { loadPlaylistForEmotion, playTrack } = useMusic();
+  const { loadPlaylistForEmotion, playTrack, playlists } = useMusic();
   
   const loadRecommendations = useCallback(async (emotion: string) => {
     setIsLoading(true);
     try {
       const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-      const playlist = await loadPlaylistForEmotion({
+      await loadPlaylistForEmotion({
         emotion: musicType
       });
       
-      if (playlist && playlist.tracks) {
-        // Make sure all tracks have required properties
-        setRecommendedTracks(playlist.tracks);
+      // Since we can't access the return value directly, let's check current playlists
+      // or use a default playlist if available
+      if (playlists && playlists.length > 0) {
+        const matchingPlaylist = playlists.find(p => 
+          p.emotion?.toLowerCase() === musicType.toLowerCase() ||
+          p.mood?.toLowerCase() === musicType.toLowerCase()
+        );
+        
+        if (matchingPlaylist?.tracks?.length) {
+          setRecommendedTracks(matchingPlaylist.tracks);
+        } else {
+          setRecommendedTracks(playlists[0].tracks || []);
+        }
       } else {
         setRecommendedTracks([]);
       }
@@ -44,7 +54,7 @@ export function useMusicRecommendation() {
     } finally {
       setIsLoading(false);
     }
-  }, [loadPlaylistForEmotion]);
+  }, [loadPlaylistForEmotion, playlists]);
   
   const playRecommendedTrack = (track: MusicTrack) => {
     if (track) {

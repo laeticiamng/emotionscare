@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/contexts/music';
 import { EmotionMusicParams } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
 
@@ -29,7 +29,7 @@ export const useMusicEmotionIntegration = () => {
       setEmotion(params.emotion);
       
       // Load playlist for this emotion
-      const playlist = await loadPlaylistForEmotion(params);
+      await loadPlaylistForEmotion(params);
       
       // Open the music drawer
       if (!openDrawer) {

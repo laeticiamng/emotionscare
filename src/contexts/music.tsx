@@ -1,6 +1,6 @@
 
-import React, { createContext, useState, useEffect } from 'react';
-import { MusicTrack, MusicPlaylist, MusicContextType } from '@/types/music';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { MusicTrack, MusicPlaylist, MusicContextType, EmotionMusicParams } from '@/types/music';
 import { tracks, playlists } from '@/data/music';
 
 const MusicContext = createContext<MusicContextType>({
@@ -22,11 +22,13 @@ const MusicContext = createContext<MusicContextType>({
   togglePlayPause: () => {},
   toggleDrawer: () => {},
   closeDrawer: () => {},
+  setOpenDrawer: () => {},
   playTrack: () => {},
   pauseTrack: () => {},
   resumeTrack: () => {},
   nextTrack: () => {},
   prevTrack: () => {},
+  previousTrack: () => {},
   setEmotion: () => {},
   loadPlaylistForEmotion: async () => {},
   setPlaylist: () => {},
@@ -38,7 +40,8 @@ const MusicContext = createContext<MusicContextType>({
       duration: 0,
       audioUrl: ''
     };
-  }
+  },
+  togglePlay: () => {},
 });
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -125,6 +128,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
   
+  const togglePlay = togglePlayPause;
+  
   const toggleDrawer = () => {
     setOpenDrawer(!openDrawer);
   };
@@ -189,35 +194,43 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
   
+  // Alias for prevTrack for compatibility
+  const previousTrack = prevTrack;
+  
   const setEmotion = (newEmotion: string) => {
     setEmotionState(newEmotion);
     loadPlaylistForEmotion(newEmotion);
   };
   
-  const loadPlaylistForEmotion = async (emotion: string): Promise<void> => {
-    // Find a matching playlist or create one
-    const matchingPlaylist = playlists.find(p => p.emotion === emotion);
-    if (matchingPlaylist) {
-      setPlaylist(matchingPlaylist);
-    } else {
-      // Create a new playlist with matching tracks
-      const matchingTracks = tracks.filter(t => t.emotion === emotion || t.mood === emotion);
-      if (matchingTracks.length > 0) {
-        const newPlaylist: MusicPlaylist = {
-          id: `generated-${emotion}-${Date.now()}`,
-          name: `${emotion} Mix`,
-          description: `Music for ${emotion} mood`,
-          tracks: matchingTracks,
-          emotion,
-          created_at: new Date().toISOString()
-        };
-        setPlaylist(newPlaylist);
-      } else {
-        console.warn(`No tracks found for emotion: ${emotion}`);
-      }
-    }
+  const loadPlaylistForEmotion = async (emotionParam: string | EmotionMusicParams): Promise<void> => {
+    // Parse emotion parameter
+    const emotion = typeof emotionParam === 'string' ? emotionParam : emotionParam.emotion;
     
-    return Promise.resolve();
+    try {
+      // Find a matching playlist or create one
+      const matchingPlaylist = playlists.find(p => p.emotion === emotion);
+      if (matchingPlaylist) {
+        setPlaylist(matchingPlaylist);
+      } else {
+        // Create a new playlist with matching tracks
+        const matchingTracks = tracks.filter(t => t.emotion === emotion || t.mood === emotion);
+        if (matchingTracks.length > 0) {
+          const newPlaylist: MusicPlaylist = {
+            id: `generated-${emotion}-${Date.now()}`,
+            name: `${emotion} Mix`,
+            description: `Music for ${emotion} mood`,
+            tracks: matchingTracks,
+            emotion,
+            created_at: new Date().toISOString()
+          };
+          setPlaylist(newPlaylist);
+        } else {
+          console.warn(`No tracks found for emotion: ${emotion}`);
+        }
+      }
+    } catch (error) {
+      console.error(`Error loading playlist for emotion ${emotion}:`, error);
+    }
   };
   
   const setPlaylist = (newPlaylist: MusicPlaylist | MusicTrack[]) => {
@@ -272,13 +285,16 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     toggleMute,
     seekTo,
     togglePlayPause,
+    togglePlay,
     toggleDrawer,
     closeDrawer,
+    setOpenDrawer,
     playTrack,
     pauseTrack,
     resumeTrack,
     nextTrack,
     prevTrack,
+    previousTrack,
     setEmotion,
     loadPlaylistForEmotion,
     setPlaylist,
@@ -292,10 +308,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   );
 };
 
-export const useMusicContext = () => {
-  const context = React.useContext(MusicContext);
+// Define and export the useMusic hook
+export const useMusic = () => {
+  const context = useContext(MusicContext);
   if (context === undefined) {
-    throw new Error('useMusicContext must be used within a MusicProvider');
+    throw new Error('useMusic must be used within a MusicProvider');
   }
   return context;
 };

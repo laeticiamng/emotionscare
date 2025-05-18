@@ -1,5 +1,5 @@
 
-import { MusicPlaylist, MusicTrack } from '@/types/music';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 // Sample tracks
 export const sampleTracks: MusicTrack[] = [
@@ -9,6 +9,7 @@ export const sampleTracks: MusicTrack[] = [
     artist: 'Nature Sounds',
     duration: 180,
     src: '/sounds/ambient-calm.mp3',
+    audioUrl: '/sounds/ambient-calm.mp3',
     emotion: 'calm',
     genre: 'ambient'
   },
@@ -18,6 +19,7 @@ export const sampleTracks: MusicTrack[] = [
     artist: 'Meditation Masters',
     duration: 240,
     src: '/sounds/welcome.mp3',
+    audioUrl: '/sounds/welcome.mp3',
     emotion: 'relaxed',
     genre: 'meditation'
   }

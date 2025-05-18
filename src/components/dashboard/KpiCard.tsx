@@ -1,40 +1,14 @@
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { LucideIcon } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import { KpiCardStatus } from '@/types/dashboard';
+import { KpiCardStatus, KpiCardProps } from '@/types/dashboard';
 
 /**
  * KPI Card component for displaying key performance indicators
  */
-export interface KpiCardProps { 
-  id?: string;
-  title: string; 
-  value: string | number | React.ReactNode; 
-  icon?: React.ReactNode; 
-  delta?: number | {
-    value: number;
-    label?: string;
-    trend: 'up' | 'down' | 'neutral';
-  };
-  subtitle?: React.ReactNode;
-  ariaLabel?: string;
-  className?: string;
-  isLoading?: boolean;
-  onClick?: () => void;
-  status?: KpiCardStatus;
-  footer?: React.ReactNode;
-  
-  // Properties for grid positioning
-  x?: number;
-  y?: number;
-  w?: number;
-  h?: number;
-}
-
 const KpiCard: React.FC<KpiCardProps> = ({ 
   id,
   title, 
@@ -70,13 +44,15 @@ const KpiCard: React.FC<KpiCardProps> = ({
       ? { value: delta, trend: delta >= 0 ? 'up' : 'down' } 
       : delta;
     
+    const label = 'label' in deltaObj ? deltaObj.label : '';
+    
     return (
       <Badge 
         variant={getBadgeVariant(deltaObj.trend)}
         className="mt-2 font-normal"
       >
         {deltaObj.trend === 'up' ? '↑' : deltaObj.trend === 'down' ? '↓' : '○'} 
-        {deltaObj.value}% {deltaObj.label || ''}
+        {deltaObj.value}% {label}
       </Badge>
     );
   };

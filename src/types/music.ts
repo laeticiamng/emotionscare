@@ -19,6 +19,7 @@ export interface MusicTrack {
   explicit?: boolean;
   language?: string;
   mood?: string;
+  intensity?: number;
   isLiveRecording?: boolean;
   isInstru?: boolean;
   name?: string; // Added for compatibility
@@ -35,6 +36,7 @@ export interface MusicPlaylist {
   description?: string;
   coverUrl?: string;
   cover?: string; // Added for compatibility
+  coverImage?: string; // Alternative cover field
   tracks: MusicTrack[];
   emotion?: string;
   created_at?: string;
@@ -78,6 +80,7 @@ export interface MusicContextType {
   toggleMute: () => void;
   seekTo: (time: number) => void;
   togglePlayPause: () => void;
+  togglePlay: () => void;  // Added for compatibility
   toggleDrawer: () => void;
   closeDrawer: () => void;
   setOpenDrawer: (open: boolean) => void;
@@ -91,7 +94,6 @@ export interface MusicContextType {
   loadPlaylistForEmotion: (emotion: string | EmotionMusicParams) => Promise<void>;
   setPlaylist: (playlist: MusicPlaylist | MusicTrack[]) => void;
   generateMusic: (prompt: string) => Promise<MusicTrack>;
-  togglePlay?: () => void;  // Added for compatibility
   
   // Added for compatibility with other code
   getRecommendationByEmotion?: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | MusicTrack[]>;
@@ -127,12 +129,14 @@ export interface MusicPlayerProps {
 
 export interface MusicDrawerProps {
   open: boolean;
+  isOpen?: boolean;
   onClose: () => void;
   currentTrack?: MusicTrack | null;
   recommendations?: MusicTrack[];
   onOpenChange?: (open: boolean) => void;
   playlist?: MusicPlaylist | null;
   children?: React.ReactNode;
+  side?: "left" | "right" | "top" | "bottom";
 }
 
 export interface MusicLibraryProps {
@@ -141,6 +145,7 @@ export interface MusicLibraryProps {
   onPlaylistSelect?: (playlist: MusicPlaylist) => void;
   onTrackSelect?: (track: MusicTrack) => void;
   onSelectPlaylist?: (playlist: MusicPlaylist) => void; // Alias for onPlaylistSelect
+  onSelectTrack?: (track: MusicTrack) => void; // Alias for onTrackSelect
 }
 
 export interface TrackInfoProps {
@@ -151,6 +156,7 @@ export interface MusicControlsProps {
   isPlaying?: boolean;
   onPlay?: () => void;
   onPause?: () => void;
+  onTogglePlay?: () => void;
   onNext?: () => void;
   onPrevious?: () => void;
   track?: MusicTrack | null;
@@ -171,4 +177,9 @@ export interface EmotionMusicParams {
     genre?: string;
     instrumental?: boolean;
   };
+}
+
+export interface DataPrivacyProps {
+  control: any;
+  isLoading?: boolean;
 }

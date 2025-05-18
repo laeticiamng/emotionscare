@@ -1,117 +1,44 @@
 
-import { FontFamily, FontSize, ThemeName } from './theme';
-
-export interface NotificationPreference {
-  enabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled: boolean;
-  inAppEnabled: boolean;
-  types: {
-    system: boolean;
-    emotion: boolean;
-    coach: boolean;
-    journal: boolean;
-    community: boolean;
-    achievement: boolean;
-    badge?: boolean; // Added for backward compatibility
-  };
-  frequency: string;
-  email: boolean;
-  push: boolean;
-  sms?: boolean;
-  inApp?: boolean;
-}
-
-export interface PrivacyPreference {
-  shareData?: boolean;
-  anonymizeReports?: boolean;
-  profileVisibility?: string;
-  shareActivity?: boolean;
-  shareJournal?: boolean;
-  publicProfile?: boolean;
-  anonymousMode?: boolean;
+export interface UserPreferences {
+  theme: 'system' | 'light' | 'dark';
+  language: string;
+  notificationsEnabled: boolean;
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  newsletterEnabled: boolean;
+  activityTracking: boolean;
+  dataSharing: boolean;
+  audioEnabled: boolean;
+  musicEnabled: boolean;
+  autoScanEnabled: boolean;
+  timezone: string;
+  dateFormat: 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD';
+  timeFormat: '12h' | '24h';
+  defaultDashboard: 'overview' | 'analytics' | 'emotions' | 'coaching';
+  accessibilityMode: boolean;
+  highContrastMode: boolean;
+  fontSize: 'small' | 'medium' | 'large';
+  animationsEnabled: boolean;
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'system',
   language: 'fr',
-  notifications_enabled: true,
-  email_notifications: false,
+  notificationsEnabled: true,
+  emailNotifications: true,
+  pushNotifications: true,
+  newsletterEnabled: true,
+  activityTracking: true,
+  dataSharing: false,
+  audioEnabled: true,
+  musicEnabled: true,
+  autoScanEnabled: false,
+  timezone: 'Europe/Paris',
+  dateFormat: 'DD/MM/YYYY',
+  timeFormat: '24h',
+  defaultDashboard: 'overview',
+  accessibilityMode: false,
+  highContrastMode: false,
   fontSize: 'medium',
-  fontFamily: 'system',
-  notifications: {
-    enabled: true,
-    emailEnabled: false,
-    pushEnabled: true,
-    inAppEnabled: true,
-    types: {
-      system: true,
-      emotion: true,
-      coach: true,
-      journal: true,
-      community: true,
-      achievement: true,
-    },
-    frequency: 'normal',
-    email: false,
-    push: true,
-    sms: false,
-    inApp: true,
-  },
-  privacy: {
-    shareData: true,
-    anonymizeReports: false,
-    profileVisibility: 'public',
-    shareActivity: true,
-    shareJournal: false,
-    anonymousMode: false
-  },
-  soundEnabled: true,
-  reduceMotion: false,
-  colorBlindMode: false,
-  useSystemTheme: true,
-  highContrast: false,
-  onboardingCompleted: false,
-  dashboardLayout: {},
-  ambientSound: 'nature'
+  animationsEnabled: true,
 };
-
-export interface UserPreferences {
-  theme?: ThemeName;
-  fontSize?: FontSize;
-  fontFamily?: FontFamily;
-  useSystemTheme?: boolean;
-  highContrast?: boolean;
-  reduceMotion?: boolean;
-  colorBlindMode?: boolean;
-  soundEnabled?: boolean;
-  language?: string;
-  timeZone?: string;
-  dateFormat?: string;
-  notifications_enabled?: boolean;
-  email_notifications?: boolean;
-  autoplayMedia?: boolean;
-  dashboardLayout?: Record<string, any> | string;
-  onboardingCompleted?: boolean;
-  showTips?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  ambientSound?: string;
-  
-  // Identity settings
-  avatarUrl?: string;
-  displayName?: string;
-  pronouns?: string;
-  biography?: string;
-  
-  // Structured preferences
-  notifications?: NotificationPreference;
-  privacy?: PrivacyPreference;
-}
-
-export interface UserPreferencesContextType {
-  preferences: UserPreferences;
-  updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
-  isLoading: boolean;
-  error: Error | null;
-}

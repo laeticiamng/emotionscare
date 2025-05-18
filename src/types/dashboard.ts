@@ -1,5 +1,6 @@
 
 import { Badge, Challenge, LeaderboardEntry } from './badge';
+import React from 'react';
 
 export type KpiCardStatus = 'idle' | 'loading' | 'success' | 'error' | 'warning' | 'info' | 'default';
 
@@ -87,12 +88,12 @@ export interface DashboardSettings {
 
 export interface DraggableKpiCardsGridProps {
   cards: KpiCardProps[];
+  kpiCards?: KpiCardProps[];
   onCardsReorder?: (cards: KpiCardProps[]) => void;
   className?: string;
   onSave?: (layouts: any) => void;
   savedLayout?: any;
   isEditable?: boolean;
-  kpiCards?: KpiCardProps[];
   onOrderChange?: (cards: KpiCardProps[]) => void;
 }
 
@@ -100,6 +101,12 @@ export interface DashboardWidgetConfig {
   id: string;
   title: string;
   settings?: Record<string, any>;
+  type?: string;
+  width?: number;
+  height?: number;
+  x?: number;
+  y?: number;
+  visible?: boolean;
 }
 
 export interface GlobalOverviewTabProps {
@@ -111,8 +118,12 @@ export interface GlobalOverviewTabProps {
 export interface GamificationData {
   points: number;
   level: number;
-  badges: number;
+  badges: number | Badge[];
   streak: number;
+  streakDays?: number;
+  challenges?: Challenge[];
+  nextLevel?: number;
+  pointsToNextLevel?: number;
 }
 
 export type { LeaderboardEntry };
