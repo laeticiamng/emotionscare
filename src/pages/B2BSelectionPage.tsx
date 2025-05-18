@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User, Shield, ArrowLeft } from 'lucide-react';
+import { User, Shield, ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Shell from '@/Shell';
 
