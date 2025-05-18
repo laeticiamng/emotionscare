@@ -3,6 +3,16 @@
 
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.3] - 2025-05-21
+
+### Ajouté
+- Types `TeamSummary`, `AdminAccessLog` et `DashboardWidget` dans `types/dashboard.ts`.
+- Types `AnonymizedEmotion`, `TeamAnalytics` et `KpiMetric` dans `types/analytics.ts`.
+- Documentation `dashboard-rh-audit.md` et `dashboard-rh-flow.md`.
+
+### Modifié
+- Réexport des nouveaux types dans `src/types.ts`.
+
 ## [1.1.2] - 2025-05-19
 
 ### Modifié
