@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { getRoleHomePath } from './use-role-redirect';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
+import { useToast } from '@/hooks/use-toast';
 
 /**
  * Unify access flow by redirecting users based on their authentication
@@ -15,6 +16,7 @@ export function usePreferredAccess() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (isLoading) return;
@@ -27,7 +29,17 @@ export function usePreferredAccess() {
     // If the user is authenticated and lands on a neutral page, redirect
     if (isAuthenticated && user) {
       if (location.pathname === '/' || location.pathname === '/login') {
-        navigate(getRoleHomePath(user.role), { replace: true });
+        const targetPath = getRoleHomePath(user.role);
+        
+        // Show welcome toast when auto-redirecting
+        if (location.pathname === '/') {
+          toast({
+            title: `Bienvenue ${user.name || ''}`,
+            description: "Vous êtes automatiquement connecté à votre espace personnel."
+          });
+        }
+        
+        navigate(targetPath, { replace: true });
         return;
       }
       return;
@@ -55,7 +67,7 @@ export function usePreferredAccess() {
           : '/b2c/register';
       navigate(target, { replace: true });
     }
-  }, [isAuthenticated, isLoading, user, location.pathname, navigate]);
+  }, [isAuthenticated, isLoading, user, location.pathname, navigate, toast]);
 }
 
 export default usePreferredAccess;
