@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useMusic } from '@/contexts';
 import { useToast } from '@/hooks/use-toast';
+import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 
 export function useMusicRecommendation() {
   const { 
@@ -14,12 +15,12 @@ export function useMusicRecommendation() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const getRecommendationForEmotion = (emotion: string, intensity?: number) => {
+  const getRecommendationForEmotion = async (emotion: string, intensity?: number) => {
     setLoading(true);
     try {
       // Vérifions si loadPlaylistForEmotion existe et l'utilisons
       if (typeof loadPlaylistForEmotion === 'function') {
-        const result = loadPlaylistForEmotion({ emotion, intensity });
+        const result = await loadPlaylistForEmotion({ emotion, intensity });
         setLoading(false);
         return result;
       } else {

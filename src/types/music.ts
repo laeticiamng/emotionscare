@@ -1,4 +1,3 @@
-
 export interface MusicTrack {
   id: string;
   title: string;
@@ -45,6 +44,7 @@ export interface MusicPlaylist {
   isPublic?: boolean;
   tags?: string[];
   mood?: string;
+  category?: string; // Added for compatibility
 }
 
 export interface ProgressBarProps {
@@ -91,7 +91,7 @@ export interface MusicContextType {
   prevTrack: () => void;
   previousTrack: () => void; // Alias for prevTrack
   setEmotion: (emotion: string) => void;
-  loadPlaylistForEmotion: (emotion: string | EmotionMusicParams) => Promise<void>;
+  loadPlaylistForEmotion: (emotion: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
   setPlaylist: (playlist: MusicPlaylist | MusicTrack[]) => void;
   generateMusic: (prompt: string) => Promise<MusicTrack>;
   

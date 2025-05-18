@@ -19,6 +19,33 @@ export interface UserPreferences {
   highContrastMode: boolean;
   fontSize: 'small' | 'medium' | 'large';
   animationsEnabled: boolean;
+  // Ajout des propriétés manquantes
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  privacy?: {
+    dataSharing: boolean;
+    analytics: boolean;
+    thirdParty: boolean;
+  };
+  notifications?: {
+    enabled: boolean;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+    inAppEnabled: boolean;
+    types: {
+      system: boolean;
+      emotion: boolean;
+      coach: boolean;
+      journal: boolean;
+      community: boolean;
+      achievement: boolean;
+      badge?: boolean;
+    };
+    frequency: string;
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -41,4 +68,37 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   highContrastMode: false,
   fontSize: 'medium',
   animationsEnabled: true,
+  emotionalCamouflage: false,
+  aiSuggestions: false,
+  privacy: {
+    dataSharing: false,
+    analytics: true,
+    thirdParty: false
+  },
+  notifications: {
+    enabled: true,
+    emailEnabled: true,
+    pushEnabled: true,
+    inAppEnabled: true,
+    types: {
+      system: true,
+      emotion: true,
+      coach: true,
+      journal: true,
+      community: true,
+      achievement: true,
+      badge: true
+    },
+    frequency: 'daily',
+    email: true,
+    push: true,
+    sms: false
+  }
 };
+
+export interface UserPreferencesContextType {
+  preferences: UserPreferences;
+  updatePreferences: (preferences: Partial<UserPreferences>) => void;
+  resetPreferences: () => void;
+  isLoading: boolean;
+}

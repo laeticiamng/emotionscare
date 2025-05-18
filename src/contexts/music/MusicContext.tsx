@@ -85,42 +85,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  const loadPlaylistForEmotion = async (emotion: string | EmotionMusicParams): Promise<void> => {
-    // Convert to string if it's an object
-    const emotionString = typeof emotion === 'string' ? emotion : emotion.emotion;
-    
-    setEmotionState(emotionString);
-    
-    // In a mock implementation, find a playlist that matches the emotion
-    const matchingPlaylist = playlists.find(p => 
-      p.emotion?.toLowerCase() === emotionString.toLowerCase()
-    );
-    
-    if (matchingPlaylist) {
-      setPlaylistState(matchingPlaylist);
-      // Optionally start playing the first track
-      if (matchingPlaylist.tracks.length > 0) {
-        playTrack(matchingPlaylist.tracks[0]);
-      }
-    } else {
-      // If no matching playlist, create one with tracks that match the emotion
-      const matchingTracks = tracks.filter(t => 
-        t.emotion?.toLowerCase() === emotionString.toLowerCase() ||
-        t.mood?.toLowerCase() === emotionString.toLowerCase()
-      );
-      
-      if (matchingTracks.length > 0) {
-        setPlaylistState({
-          id: `${emotionString}-playlist`,
-          name: `${emotionString} Playlist`,
-          tracks: matchingTracks,
-          emotion: emotionString,
-        });
-        playTrack(matchingTracks[0]);
-      }
-    }
-  };
-
   const toggleDrawer = () => setOpenDrawer(!openDrawer);
   const closeDrawer = () => setOpenDrawer(false);
 
@@ -145,6 +109,33 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     
     return generatedTrack;
+  };
+
+  const loadPlaylistForEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
+    try {
+      const emotionName = typeof params === 'string' ? params : params.emotion;
+      
+      // In a real app, this would be an API call
+      const emotionPlaylist = playlists.find(p => 
+        p.emotion?.toLowerCase() === emotionName.toLowerCase()
+      );
+      
+      if (emotionPlaylist) {
+        setPlaylist(emotionPlaylist);
+        
+        // If no current track, set the first track
+        if (!currentTrack && emotionPlaylist.tracks.length > 0) {
+          setCurrentTrack(emotionPlaylist.tracks[0]);
+        }
+        
+        return emotionPlaylist;
+      }
+      
+      return null;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
   };
 
   const value: MusicContextType = {
@@ -176,7 +167,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     loadPlaylistForEmotion,
     setPlaylist,
     generateMusic,
-    togglePlay: togglePlayPause, // Alias for compatibility
+    togglePlay: togglePlayPause // Alias for compatibility
   };
 
   return <MusicContext.Provider value={value}>{children}</MusicContext.Provider>;
@@ -190,4 +181,4 @@ export const useMusic = (): MusicContextType => {
   return context;
 };
 
-export default MusicProvider;
+export default MusicContext;

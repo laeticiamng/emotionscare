@@ -76,11 +76,11 @@ export function useMusicRecommendation(emotionResult?: EmotionResult) {
     return false;
   };
   
-  const handlePlayMusic = (emotion: string) => {
+  const handlePlayMusic = async (emotion: string) => {
     const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
     const params: EmotionMusicParams = { emotion: musicType };
     if (loadPlaylistForEmotion) {
-      loadPlaylistForEmotion(params);
+      await loadPlaylistForEmotion(params);
     }
     return playFirstRecommendation();
   };

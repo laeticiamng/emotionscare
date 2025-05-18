@@ -6,107 +6,85 @@ export const getMockMusicData = () => {
     {
       id: '1',
       title: 'Calm Waters',
-      artist: 'Ambient Sounds',
+      artist: 'Nature Sounds',
       duration: 180,
-      audioUrl: '/audio/calm-waters.mp3',
-      coverUrl: '/images/calm-waters.jpg',
+      audioUrl: '/sounds/ambient-calm.mp3',
+      src: '/sounds/ambient-calm.mp3',
+      coverImage: '/images/covers/calm.jpg',
       emotion: 'calm',
-      category: 'relax',
-      genre: 'ambient',
-      intensity: 0.3
+      intensity: 0.8,
+      category: 'meditation'
     },
     {
       id: '2',
-      title: 'Deep Focus',
-      artist: 'Concentration Music',
+      title: 'Focus Flow',
+      artist: 'Deep Concentration',
       duration: 240,
-      audioUrl: '/audio/deep-focus.mp3',
-      coverUrl: '/images/deep-focus.jpg',
-      emotion: 'focused',
-      category: 'focus',
-      genre: 'electronic',
-      intensity: 0.5
+      audioUrl: '/sounds/focus-flow.mp3',
+      src: '/sounds/focus-flow.mp3',
+      coverImage: '/images/covers/focus.jpg',
+      emotion: 'focus',
+      intensity: 0.7,
+      category: 'productivity'
     },
     {
       id: '3',
-      title: 'Energy Boost',
-      artist: 'Motivation Tracks',
-      duration: 200,
-      audioUrl: '/audio/energy-boost.mp3',
-      coverUrl: '/images/energy-boost.jpg',
-      emotion: 'energetic',
-      category: 'energy',
-      genre: 'pop',
-      intensity: 0.8
+      title: 'Joyful Morning',
+      artist: 'Happy Tunes',
+      duration: 210,
+      audioUrl: '/sounds/happy-tunes.mp3',
+      src: '/sounds/happy-tunes.mp3',
+      coverImage: '/images/covers/happy.jpg',
+      emotion: 'happy',
+      intensity: 0.9,
+      category: 'upbeat'
     },
     {
       id: '4',
-      title: 'Gentle Rain',
-      artist: 'Nature Sounds',
+      title: 'Peaceful Meditation',
+      artist: 'Zen Master',
       duration: 300,
-      audioUrl: '/audio/gentle-rain.mp3',
-      coverUrl: '/images/gentle-rain.jpg',
-      emotion: 'calm',
-      category: 'relax',
-      genre: 'ambient',
-      intensity: 0.2
-    },
-    {
-      id: '5',
-      title: 'Productive Morning',
-      artist: 'Work Mode',
-      duration: 260,
-      audioUrl: '/audio/productive-morning.mp3',
-      coverUrl: '/images/productive-morning.jpg',
-      emotion: 'focused',
-      category: 'focus',
-      genre: 'minimal',
-      intensity: 0.6
+      audioUrl: '/sounds/meditation.mp3',
+      src: '/sounds/meditation.mp3',
+      coverImage: '/images/covers/meditation.jpg',
+      emotion: 'relaxed',
+      intensity: 0.5,
+      category: 'meditation'
     }
   ];
 
   const playlists: MusicPlaylist[] = [
     {
-      id: 'playlist-1',
-      name: 'Calm & Relax',
-      title: 'Calm & Relax',
-      description: 'Soothing sounds for relaxation',
-      coverUrl: '/images/calm-relax.jpg',
-      cover: '/images/calm-relax.jpg',
-      coverImage: '/images/calm-relax.jpg',
-      tracks: tracks.filter(t => t.emotion === 'calm'),
+      id: 'calm-playlist',
+      name: 'Calming Sounds',
+      description: 'Collection of soothing tunes for relaxation',
+      tracks: tracks.filter(t => t.emotion === 'calm' || t.emotion === 'relaxed'),
       emotion: 'calm',
-      mood: 'relaxed'
+      coverImage: '/images/playlists/calm.jpg',
+      category: 'meditation'
     },
     {
-      id: 'playlist-2',
-      name: 'Focus Mode',
-      title: 'Focus Mode',
-      description: 'Enhance your concentration',
-      coverUrl: '/images/focus-mode.jpg',
-      cover: '/images/focus-mode.jpg',
-      coverImage: '/images/focus-mode.jpg',
-      tracks: tracks.filter(t => t.emotion === 'focused'),
-      emotion: 'focused',
-      mood: 'concentrated'
+      id: 'focus-playlist',
+      name: 'Focus Tracks',
+      description: 'Music designed to enhance focus and productivity',
+      tracks: tracks.filter(t => t.emotion === 'focus'),
+      emotion: 'focus',
+      coverImage: '/images/playlists/focus.jpg',
+      category: 'productivity'
     },
     {
-      id: 'playlist-3',
-      name: 'Energy & Motivation',
-      title: 'Energy & Motivation',
-      description: 'Boost your energy levels',
-      coverUrl: '/images/energy-motivation.jpg',
-      cover: '/images/energy-motivation.jpg',
-      coverImage: '/images/energy-motivation.jpg',
-      tracks: tracks.filter(t => t.emotion === 'energetic'),
-      emotion: 'energetic',
-      mood: 'energetic'
+      id: 'happy-playlist',
+      name: 'Mood Boosters',
+      description: 'Uplifting and energizing tracks to boost your mood',
+      tracks: tracks.filter(t => t.emotion === 'happy'),
+      emotion: 'happy',
+      coverImage: '/images/playlists/happy.jpg',
+      category: 'upbeat'
     }
   ];
 
   return { tracks, playlists };
 };
 
-// Export mock data for direct consumption
 export const mockMusicTracks = getMockMusicData().tracks;
 export const mockPlaylists = getMockMusicData().playlists;
