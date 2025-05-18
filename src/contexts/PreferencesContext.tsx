@@ -1,29 +1,19 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { UserPreferences, UserPreferencesContextType } from '@/types/preferences';
-
-// Default preferences
-const defaultPreferences: UserPreferences = {
-  theme: 'system',
-  language: 'fr',
-  notifications_enabled: true,
-  email_notifications: false,
-  soundEnabled: true,
-  reduceMotion: false,
-  ambientSound: 'nature',
-};
+import { UserPreferences, UserPreferencesContextType, DEFAULT_PREFERENCES } from '@/types/preferences';
 
 // Create the context
 const PreferencesContext = createContext<UserPreferencesContextType>({
-  preferences: defaultPreferences,
+  preferences: DEFAULT_PREFERENCES,
   updatePreferences: async () => {},
+  resetPreferences: () => {},
   isLoading: false,
   error: null,
 });
 
 // Provider component
 export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+  const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -43,9 +33,15 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   };
 
-  const value = {
+  // Function to reset preferences
+  const resetPreferences = () => {
+    setPreferences(DEFAULT_PREFERENCES);
+  };
+
+  const value: UserPreferencesContextType = {
     preferences,
     updatePreferences,
+    resetPreferences,
     isLoading,
     error,
   };

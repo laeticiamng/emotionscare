@@ -6,6 +6,7 @@ import { UserPreferences, UserPreferencesContextType, DEFAULT_PREFERENCES } from
 export const UserPreferencesContext = createContext<UserPreferencesContextType>({
   preferences: DEFAULT_PREFERENCES,
   updatePreferences: async () => Promise.resolve(),
+  resetPreferences: () => {},
   isLoading: false,
   error: null,
 });
@@ -62,9 +63,15 @@ export const UserPreferencesProvider: React.FC<{ children: React.ReactNode; init
     }
   };
 
+  // Fonction pour réinitialiser les préférences
+  const resetPreferences = () => {
+    setPreferences(DEFAULT_PREFERENCES);
+  };
+
   const value: UserPreferencesContextType = {
     preferences,
     updatePreferences,
+    resetPreferences,
     isLoading,
     error
   };

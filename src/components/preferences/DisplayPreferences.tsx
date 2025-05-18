@@ -6,27 +6,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { useTheme } from '@/hooks/use-theme';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Theme, FontSize, FontFamily } from '@/types/theme';
 
 const DisplayPreferences: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const { preferences, updatePreferences } = useUserPreferences();
 
   const handleThemeChange = (value: string) => {
-    const newTheme = value as Theme;
-    setTheme(newTheme);
-    updatePreferences({ theme: newTheme });
+    // La valeur peut être system, light, dark ou pastel
+    setTheme(value);
+    updatePreferences({ theme: value as 'system' | 'light' | 'dark' | 'pastel' });
   };
 
   const handleFontFamilyChange = (value: string) => {
     updatePreferences({ 
-      fontFamily: value as FontFamily 
+      fontFamily: value as 'system' | 'sans' | 'serif' | 'mono' | 'rounded' 
     });
   };
 
   const handleFontSizeChange = (value: string) => {
     updatePreferences({ 
-      fontSize: value as FontSize 
+      fontSize: value as 'small' | 'medium' | 'large' | 'xlarge'
     });
   };
 

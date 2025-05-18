@@ -1,6 +1,6 @@
 
 export interface UserPreferences {
-  theme: 'system' | 'light' | 'dark';
+  theme: 'system' | 'light' | 'dark' | 'pastel';
   language: string;
   notificationsEnabled: boolean;
   emailNotifications: boolean;
@@ -17,15 +17,26 @@ export interface UserPreferences {
   defaultDashboard: 'overview' | 'analytics' | 'emotions' | 'coaching';
   accessibilityMode: boolean;
   highContrastMode: boolean;
-  fontSize: 'small' | 'medium' | 'large';
+  fontSize: 'small' | 'medium' | 'large' | 'xlarge';
   animationsEnabled: boolean;
-  // Ajout des propriétés manquantes
+  // Propriétés nécessaires pour les composants audio et préférences
+  ambientSound?: string;
+  soundEnabled?: boolean;
+  reduceMotion?: boolean;
+  autoplayMedia?: boolean;
+  colorBlindMode?: boolean;
+  fontFamily?: 'system' | 'sans' | 'serif' | 'mono' | 'rounded';
+  // Propriétés déjà existantes
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
   privacy?: {
     dataSharing: boolean;
     analytics: boolean;
     thirdParty: boolean;
+    // Propriétés additionnelles pour compatibilité
+    shareData?: boolean;
+    anonymizeReports?: boolean;
+    profileVisibility?: string;
   };
   notifications?: {
     enabled: boolean;
@@ -68,12 +79,21 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   highContrastMode: false,
   fontSize: 'medium',
   animationsEnabled: true,
+  soundEnabled: true,
+  ambientSound: 'nature',
+  reduceMotion: false,
+  colorBlindMode: false,
+  autoplayMedia: false,
+  fontFamily: 'system',
   emotionalCamouflage: false,
   aiSuggestions: false,
   privacy: {
     dataSharing: false,
     analytics: true,
-    thirdParty: false
+    thirdParty: false,
+    shareData: false,
+    anonymizeReports: false,
+    profileVisibility: 'public'
   },
   notifications: {
     enabled: true,
@@ -101,4 +121,5 @@ export interface UserPreferencesContextType {
   updatePreferences: (preferences: Partial<UserPreferences>) => void;
   resetPreferences: () => void;
   isLoading: boolean;
+  error?: Error | null;
 }

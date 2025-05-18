@@ -9,8 +9,12 @@ import { useUserPreferences } from '@/hooks/useUserPreferences';
 const PrivacyPreferences: React.FC = () => {
   const { preferences, updatePreferences } = useUserPreferences();
   
+  // Assurer que les propriétés sont définies avec des valeurs par défaut
   const privacySettings = preferences?.privacy || {
-    shareData: true,
+    dataSharing: false,
+    analytics: true,
+    thirdParty: false,
+    shareData: false,
     anonymizeReports: false,
     profileVisibility: 'public',
   };
@@ -20,6 +24,7 @@ const PrivacyPreferences: React.FC = () => {
       privacy: {
         ...privacySettings,
         shareData: checked,
+        dataSharing: checked, // Mise à jour des deux propriétés pour compatibilité
       },
     });
   };
@@ -57,7 +62,7 @@ const PrivacyPreferences: React.FC = () => {
           </div>
           <Switch
             id="share-data"
-            checked={privacySettings.shareData}
+            checked={privacySettings.shareData || privacySettings.dataSharing}
             onCheckedChange={handleShareDataChange}
           />
         </div>
@@ -71,7 +76,7 @@ const PrivacyPreferences: React.FC = () => {
           </div>
           <Switch
             id="anonymize-reports"
-            checked={privacySettings.anonymizeReports}
+            checked={privacySettings.anonymizeReports || false}
             onCheckedChange={handleAnonymizeReportsChange}
           />
         </div>
@@ -79,7 +84,7 @@ const PrivacyPreferences: React.FC = () => {
         <div className="space-y-2">
           <Label htmlFor="profile-visibility">Visibilité du profil</Label>
           <Select
-            value={privacySettings.profileVisibility}
+            value={privacySettings.profileVisibility || 'public'}
             onValueChange={handleProfileVisibilityChange}
           >
             <SelectTrigger id="profile-visibility">
