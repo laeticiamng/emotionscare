@@ -2,6 +2,12 @@
 import { useContext } from 'react';
 import MusicContext from '@/contexts/MusicContext';
 
+/**
+ * Hook officiel pour accéder au MusicContext
+ * -----------------------------------------
+ * Utilisez exclusivement ce hook dans tous les composants.
+ */
+
 export const useMusic = () => {
   const context = useContext(MusicContext);
   

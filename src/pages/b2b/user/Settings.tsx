@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import SecurityWidget from '@/components/security/SecurityWidget';
 
 const B2BUserSettings = () => {
   const { theme, setTheme } = useTheme();
@@ -140,6 +141,7 @@ const B2BUserSettings = () => {
         </TabsContent>
         
         <TabsContent value="privacy" className="space-y-6">
+          <SecurityWidget />
           <Card>
             <CardHeader>
               <CardTitle>Confidentialité</CardTitle>

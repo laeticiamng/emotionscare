@@ -4,14 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Music, PlayCircle } from 'lucide-react';
 import { MusicPlaylist } from '@/types/music';
-
-interface EmotionResult {
-  emotion?: string;
-  intensity?: number;
-}
+import type { EmotionResult } from '@/types/emotion';
 
 interface EmotionBasedMusicRecommendationProps {
-  emotion: EmotionResult;
+  emotion: Partial<EmotionResult>;
   onPlay?: () => void;
 }
 

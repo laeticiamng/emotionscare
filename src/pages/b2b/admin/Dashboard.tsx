@@ -1,98 +1,98 @@
-
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Home, Users, BarChart, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { SegmentProvider } from '@/contexts/SegmentContext';
+import AdminPremiumInterface from '@/components/admin/premium/AdminPremiumInterface';
+import EmotionalClimateAnalytics from '@/components/admin/premium/EmotionalClimateAnalytics';
+import CommunityDashboard from '@/components/admin/premium/CommunityDashboard';
+import HumanValueReportSection from '@/components/admin/premium/HumanValueReportSection';
+import GamificationInsights from '@/components/admin/premium/GamificationInsights';
+import SocialCocoonDashboard from '@/components/admin/premium/SocialCocoonDashboard';
+import { fetchTeamAnalytics, TeamAnalytics } from '@/services/teamAnalyticsService';
+import { generateHRInsights } from '@/lib/ai/hr-insights-service';
+import { LoadingIllustration } from '@/components/ui/loading-illustration';
+import { useAuth } from '@/contexts/AuthContext';
 
-const B2BAdminDashboard = () => {
+const B2BAdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+  const { user, isLoading } = useAuth();
+  const [analytics, setAnalytics] = useState<TeamAnalytics | null>(null);
+  const [hrSummary, setHrSummary] = useState('');
+
+  useEffect(() => {
+    const load = async () => {
+      const data = await fetchTeamAnalytics('main-team');
+      setAnalytics(data);
+      try {
+        const insight = await generateHRInsights({ trend: data.emotionalTrend });
+        if (insight.success) {
+          setHrSummary(insight.summary);
+        }
+      } catch (e) {
+        console.error('HR insights error', e);
+      }
+    };
+    load();
+  }, []);
+
+  if (isLoading || !user || !analytics) {
+    return <LoadingIllustration />;
+  }
+
   const handleLogout = () => {
-    // Clear session
     localStorage.removeItem('auth_session');
     localStorage.removeItem('user_role');
     localStorage.removeItem('userMode');
-    
-    toast({
-      title: "Déconnexion réussie",
-      description: "À bientôt !",
-    });
-    
+    toast({ title: 'Déconnexion réussie', description: 'À bientôt !' });
     navigate('/');
   };
-  
+
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Tableau de bord Administration</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate('/')}>
-            <Home className="mr-2 h-4 w-4" />
-            Accueil
-          </Button>
-          <Button variant="destructive" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Déconnexion
-          </Button>
+    <SegmentProvider>
+      <AdminPremiumInterface user={user}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <EmotionalClimateAnalytics className="order-1" />
+          <CommunityDashboard
+            isActive={false}
+            onClick={() => {}}
+            visualStyle="minimal"
+            zenMode={false}
+            className="order-2"
+          />
+          <HumanValueReportSection
+            isActive={false}
+            onClick={() => {}}
+            visualStyle="minimal"
+            zenMode={false}
+            className="order-3"
+          />
+          <GamificationInsights
+            isActive={false}
+            onClick={() => {}}
+            visualStyle="minimal"
+            zenMode={false}
+            className="order-4"
+          />
+          <SocialCocoonDashboard
+            isActive={false}
+            onClick={() => {}}
+            visualStyle="minimal"
+            zenMode={false}
+            className="order-5"
+          />
+
+          <div className="lg:col-span-2 mt-4 text-sm text-muted-foreground">
+            {hrSummary}
+          </div>
+          <div className="lg:col-span-2 mt-4 flex justify-end">
+            <button onClick={handleLogout} className="text-sm text-red-600 hover:underline">
+              Se déconnecter
+            </button>
+          </div>
         </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Users className="mr-2 h-5 w-5" />
-              Gestion des équipes
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Gérez les membres de votre organisation.
-            </p>
-            <Button className="w-full">Gérer les équipes</Button>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <BarChart className="mr-2 h-5 w-5" />
-              Statistiques de bien-être
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Analysez les tendances de bien-être de vos équipes.
-            </p>
-            <Button className="w-full">Voir les rapports</Button>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Calendar className="mr-2 h-5 w-5" />
-              Événements
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Planifiez des ateliers de bien-être pour vos équipes.
-            </p>
-            <Button className="w-full">Planifier un événement</Button>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <div className="mt-8 p-4 bg-muted rounded-lg">
-        <p className="text-sm text-muted-foreground">
-          Vous êtes connecté en tant qu'<strong>Administrateur</strong> avec le compte test: admin@exemple.fr
-        </p>
-      </div>
-    </div>
+      </AdminPremiumInterface>
+    </SegmentProvider>
   );
 };
 

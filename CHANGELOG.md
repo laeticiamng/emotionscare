@@ -3,6 +3,12 @@
 
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.0] - 2025-05-18
+
+### Ajouté
+- Module d'intelligence prédictive avec page dédiée `/predictive`
+- Lien de navigation "Prédictif" accessible à tous les rôles
+
 ## [1.0.0] - 2025-05-17
 
 ### Ajouté

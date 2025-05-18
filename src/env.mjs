@@ -1,20 +1,46 @@
 
 /**
  * Environnement centralisé
- * 
+ *
  * Ce fichier gère les variables d'environnement avec validation
+ *
+ * Les variables exposées au client doivent être lues via `import.meta.env`.
+ * Les scripts Node utilisent toujours les variables de leur propre environnement.
  */
+
+import * as Sentry from '@sentry/react';
 
 export const env = {
   // URL API
-  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://api.example.com',
-  
+  NEXT_PUBLIC_API_URL: import.meta.env.NEXT_PUBLIC_API_URL || import.meta.env.VITE_PUBLIC_API_URL || 'https://api.example.com',
+  NEXT_PUBLIC_WEB_URL: import.meta.env.NEXT_PUBLIC_WEB_URL || import.meta.env.VITE_PUBLIC_WEB_URL || 'http://localhost:3000',
+  NEXT_PUBLIC_APP_ENV: import.meta.env.NEXT_PUBLIC_APP_ENV || import.meta.env.MODE || 'development',
+
   // Clés d'API
-  NEXT_PUBLIC_OPENAI_API_KEY: process.env.NEXT_PUBLIC_OPENAI_API_KEY || '',
-  NEXT_PUBLIC_HUME_API_KEY: process.env.NEXT_PUBLIC_HUME_API_KEY || '',
-  
+  NEXT_PUBLIC_OPENAI_API_KEY: import.meta.env.NEXT_PUBLIC_OPENAI_API_KEY || import.meta.env.VITE_OPENAI_API_KEY || '',
+  NEXT_PUBLIC_HUME_API_KEY: import.meta.env.NEXT_PUBLIC_HUME_API_KEY || '',
+  // DSN Sentry pour la surveillance des erreurs
+  NEXT_PUBLIC_SENTRY_DSN: import.meta.env.NEXT_PUBLIC_SENTRY_DSN || '',
+
+  // Configuration Supabase
+  VITE_SUPABASE_URL:
+    import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  VITE_SUPABASE_ANON_KEY:
+    import.meta.env.VITE_SUPABASE_ANON_KEY ||
+    import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+  SUPABASE_SERVICE_ROLE_KEY: import.meta.env.SUPABASE_SERVICE_ROLE_KEY || '',
+
+  // Configuration uploads
+  NEXT_PUBLIC_UPLOAD_MAX_SIZE: Number(import.meta.env.NEXT_PUBLIC_UPLOAD_MAX_SIZE || '10485760'),
+  NEXT_PUBLIC_ALLOWED_IMAGE_TYPES:
+    import.meta.env.NEXT_PUBLIC_ALLOWED_IMAGE_TYPES || 'image/jpeg,image/png,image/webp',
+  NEXT_PUBLIC_ALLOWED_AUDIO_TYPES:
+    import.meta.env.NEXT_PUBLIC_ALLOWED_AUDIO_TYPES || 'audio/mpeg,audio/wav,audio/ogg',
+
   // Configuration du serveur
-  NODE_ENV: process.env.NODE_ENV || 'development'
+  NODE_ENV: import.meta.env.MODE || 'development',
+  
+  // Configuration d'authentification (plus de contournement en développement)
 };
 
 // Validation simple en mode développement
@@ -26,13 +52,14 @@ function checkEnvVars() {
   const requiredVars = [
     'NEXT_PUBLIC_API_URL'
   ];
-  
+
   const missingVars = requiredVars.filter(key => !env[key]);
-  
+
   if (missingVars.length > 0) {
-    console.warn(
-      `⚠️  Missing environment variables: ${missingVars.join(', ')}\n` +
-      `Create a .env.local file with the required variables.`
-    );
+    const message = `Missing env vars: ${missingVars.join(', ')}`;
+    console.warn(`\u26A0\uFE0F ${message}\nCreate a .env.local file with the required variables.`);
+    if (env.NEXT_PUBLIC_SENTRY_DSN) {
+      Sentry.captureMessage(message, 'error');
+    }
   }
 }

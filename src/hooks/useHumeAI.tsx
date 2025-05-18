@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { v4 as uuid } from 'uuid';
-import { EmotionResult } from '@/types/emotions';
+import { EmotionResult } from '@/types/emotion';
 
 interface HumeAIResponse {
   // Type de réponse d'API Hume (simplifié)
