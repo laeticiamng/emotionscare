@@ -89,6 +89,23 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 NEXT_PUBLIC_WEB_URL=http://localhost:3000
 ```
 
+### Utilisateur de test
+
+Un compte de test est mis à disposition pour les démonstrations :
+
+- **Email** : `utilisateur@exemple.fr`
+- **Mot de passe** : `admin`
+
+Si ce compte n'existe pas dans votre base Supabase, vous pouvez le créer
+automatiquement avec la commande suivante&nbsp;:
+
+```bash
+npx ts-node scripts/ensureTestUser.ts
+```
+
+Cette commande nécessite la variable `SUPABASE_SERVICE_ROLE_KEY` dans votre
+`.env.local` afin d'utiliser l'API d'administration Supabase.
+
 ## Installation et démarrage
 
 ```bash
