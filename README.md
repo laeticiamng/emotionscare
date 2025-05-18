@@ -156,6 +156,23 @@ L'application est entièrement responsive et optimisée pour les appareils mobil
 - Tests unitaires avec Vitest
 - Tests d'intégration pour les fonctionnalités clés
 
+## Monitoring & Alerting
+
+L'application intègre **Sentry** pour la surveillance des erreurs et des incidents.
+Le fichier `src/monitoring.ts` initialise Sentry si la variable d'environnement
+`NEXT_PUBLIC_SENTRY_DSN` est présente. Les erreurs non gérées et les variables
+d'environnement manquantes sont automatiquement reportées sur le tableau de bord
+Sentry.
+
+Pour activer la surveillance, ajoutez dans votre `.env.local` la clé :
+
+```bash
+NEXT_PUBLIC_SENTRY_DSN=<votre_DSN_Sentry>
+```
+
+Le tableau de bord et la gestion des alertes sont configurables directement sur
+Sentry.
+
 ## Équipe et contribution
 
 EmotionsCare est un produit développé par [Votre Entreprise], avec une équipe dédiée au développement, au design et à l'expérience utilisateur.
