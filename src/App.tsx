@@ -8,6 +8,9 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { UserPreferencesProvider } from '@/contexts/UserPreferencesContext';
 import AppRouter from '@/AppRouter';
 import RouteDebugger from '@/components/ui/RouteDebugger';
+import { OrchestrationProvider } from '@/contexts/OrchestrationContext';
+import { OptimizationProvider } from '@/providers/OptimizationProvider';
+import { ExtensionsProvider } from '@/providers/ExtensionsProvider';
 
 function App() {
   return (
@@ -17,9 +20,15 @@ function App() {
           <UserPreferencesProvider>
             <UserModeProvider>
               <MusicProvider>
-                <AppRouter />
-                <Toaster />
-                {process.env.NODE_ENV === 'development' && <RouteDebugger />}
+                <OptimizationProvider>
+                  <ExtensionsProvider>
+                    <OrchestrationProvider>
+                      <AppRouter />
+                      <Toaster />
+                      {import.meta.env.DEV && <RouteDebugger />}
+                    </OrchestrationProvider>
+                  </ExtensionsProvider>
+                </OptimizationProvider>
               </MusicProvider>
             </UserModeProvider>
           </UserPreferencesProvider>

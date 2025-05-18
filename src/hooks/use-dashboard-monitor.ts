@@ -1,58 +1,50 @@
 
 import { useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
 import { useLocation } from 'react-router-dom';
-import { normalizeUserMode } from '@/utils/userModeHelpers';
+import { useAuth } from '@/contexts/AuthContext';
+import { env } from '@/env.mjs';
 
-/**
- * This hook monitors dashboard access and logs detailed information for debugging
- * It doesn't perform any actions, just logs data for troubleshooting
- */
 export function useDashboardMonitor() {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-  const { userMode, isLoading: userModeLoading } = useUserMode();
   const location = useLocation();
-
+  const { user, isAuthenticated, isLoading } = useAuth();
+  
   useEffect(() => {
-    // Only log on dashboard paths to avoid spamming the console
-    if (!location.pathname.includes('dashboard')) return;
-
-    console.group('🔍 Dashboard Access Monitor');
-    console.log('📍 Current path:', location.pathname);
-    console.log('🔑 Authentication:', {
-      isAuthenticated,
-      isLoading: authLoading,
-      user: user ? {
-        id: user.id,
-        email: user.email,
-        role: user.role
-      } : null
-    });
-    
-    console.log('👤 User Mode:', {
-      mode: userMode,
-      isLoading: userModeLoading
-    });
-    
-    if (user?.role && userMode) {
-      const normalizedRole = normalizeUserMode(user.role);
-      const normalizedMode = normalizeUserMode(userMode);
+    // Ajout d'un monitoring détaillé uniquement pour les chemins de dashboard
+    if (location.pathname.includes('dashboard')) {
+      console.log('[DashboardMonitor] Location:', location.pathname);
+      console.log('[DashboardMonitor] Auth state:', { 
+        isAuthenticated, 
+        isLoading, 
+        userRole: user?.role,
+        env: {
+          NODE_ENV: env.NODE_ENV
+        }
+      });
       
-      if (normalizedRole !== normalizedMode) {
-        console.warn('⚠️ Role/Mode mismatch!', {
-          userRole: user.role,
-          normalizedRole,
-          userMode,
-          normalizedMode
-        });
-      } else {
-        console.log('✅ Role/Mode match correctly');
+      // Vérifie si l'utilisateur a un rôle valide
+      if (user && !user.role) {
+        console.warn('[DashboardMonitor] User has no role defined');
+      }
+      
+      // Vérifie si le chemin actuel correspond au rôle de l'utilisateur
+      if (user?.role && isAuthenticated) {
+        const userPath = location.pathname.toLowerCase();
+        const doesPathMatchRole = 
+          (user.role === 'b2c' && userPath.includes('/b2c/')) ||
+          (user.role === 'b2b_user' && userPath.includes('/b2b/user/')) ||
+          (user.role === 'b2b_admin' && userPath.includes('/b2b/admin/'));
+        
+        if (!doesPathMatchRole) {
+          console.warn('[DashboardMonitor] User role does not match current path', {
+            role: user.role,
+            path: location.pathname
+          });
+        }
       }
     }
-    
-    console.groupEnd();
-  }, [location.pathname, user, isAuthenticated, authLoading, userMode, userModeLoading]);
+  }, [location.pathname, isAuthenticated, isLoading, user]);
+  
+  return null;
 }
 
 export default useDashboardMonitor;

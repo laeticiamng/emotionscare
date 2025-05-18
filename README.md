@@ -11,6 +11,7 @@ EmotionsCare est une plateforme SaaS innovante dédiée au bien-être émotionne
 - **Coaching personnalisé** : Recommandations adaptées à l'état émotionnel
 - **Thérapie musicale** : Générations de musiques adaptées aux émotions détectées
 - **Journal émotionnel** : Suivi de l'évolution émotionnelle au fil du temps
+- **Personnalisation prédictive** : Interface et suggestions IA qui s'adaptent automatiquement à vos besoins
 - **Gamification** : Défis, badges et récompenses pour encourager l'engagement
 - **Réalité Virtuelle** : Sessions de relaxation immersives en VR
 - **Cocoon social** : Communauté bienveillante pour partager et progresser ensemble
@@ -69,11 +70,11 @@ La plateforme EmotionsCare s'intègre avec plusieurs API tierces pour fournir se
 
 1. **OpenAI** - Pour GPT-4, DALL-E et Whisper
    - Utilisation : Conseils IA, génération de texte et d'images, transcription audio
-   - Variable d'environnement : `NEXT_PUBLIC_OPENAI_API_KEY`
+   - Variable d'environnement : `VITE_OPENAI_API_KEY`
 
 2. **Hume AI** - Pour l'analyse émotionnelle avancée
    - Utilisation : Détection d'émotions dans le texte, la voix et les expressions faciales
-   - Variable d'environnement : `NEXT_PUBLIC_HUME_API_KEY`
+   - Variable d'environnement : `VITE_HUME_API_KEY`
 
 3. **MusicGen** - Pour la génération de musique personnalisée
    - Utilisation : Création de musique adaptée aux émotions
@@ -103,7 +104,27 @@ VITE_FIREBASE_MEASUREMENT_ID=
 NEXT_PUBLIC_APP_ENV=development
 NEXT_PUBLIC_API_URL=http://localhost:3001
 NEXT_PUBLIC_WEB_URL=http://localhost:3000
+
+
+> **Note**
+> L'ancienne variable `SKIP_AUTH_CHECK` utilisée pour désactiver l'authentification en développement a été supprimée. Les tableaux de bord sont désormais toujours protégés.
+
+### Utilisateur de test
+
+Un compte de test est mis à disposition pour les démonstrations :
+
+- **Email** : `utilisateur@exemple.fr`
+- **Mot de passe** : `admin`
+
+Si ce compte n'existe pas dans votre base Supabase, vous pouvez le créer
+automatiquement avec la commande suivante&nbsp;:
+
+```bash
+npx ts-node scripts/ensureTestUser.ts
 ```
+
+Cette commande nécessite la variable `SUPABASE_SERVICE_ROLE_KEY` dans votre
+`.env.local` afin d'utiliser l'API d'administration Supabase.
 
 ## Installation et démarrage
 
@@ -124,6 +145,12 @@ npm run dev
 # Build pour la production
 npm run build
 
+# Exécuter les tests
+npm test
+
+# Vérifier les types TypeScript
+npm run type-check
+
 # Démarrer le serveur de production
 npm start
 ```
@@ -138,7 +165,7 @@ EmotionsCare utilise un système de design basé sur Tailwind CSS et Shadcn UI, 
 - **AuthContext** - Authentification et informations utilisateur
 - **UserModeContext** - Mode utilisateur (B2B/B2C)
 - **LayoutContext** - Mise en page et navigation
-- **MusicContext** - Lecture et gestion de la musique
+- **MusicContext** - Lecture et gestion de la musique (source unique via `useMusic`)
 
 ## Gestion du responsive
 
@@ -150,10 +177,33 @@ L'application est entièrement responsive et optimisée pour les appareils mobil
 
 ## Tests et qualité
 
-- ESLint pour la qualité du code
-- TypeScript pour le typage statique
-- Tests unitaires avec Vitest
-- Tests d'intégration pour les fonctionnalités clés
+- ESLint pour la qualité du code (`npm run lint`)
+- Vérification de type TypeScript (`npm run type-check`)
+- Tests unitaires (placeholder) (`npm run test`)
+- Nettoyage du build (`npm run clean`)
+
+## Monitoring & Alerting
+
+L'application intègre **Sentry** pour la surveillance des erreurs et des incidents.
+Le fichier `src/monitoring.ts` initialise Sentry si la variable d'environnement
+`NEXT_PUBLIC_SENTRY_DSN` est présente. Les erreurs non gérées et les variables
+d'environnement manquantes sont automatiquement reportées sur le tableau de bord
+Sentry.
+
+Pour activer la surveillance, ajoutez dans votre `.env.local` la clé :
+
+```bash
+NEXT_PUBLIC_SENTRY_DSN=<votre_DSN_Sentry>
+```
+
+Le tableau de bord et la gestion des alertes sont configurables directement sur
+Sentry.
+
+## Sécurité proactive
+
+Un tableau de bord dédié permet aux administrateurs de suivre les incidents et l'état de la plateforme.
+Il est accessible via la route `/b2b/admin/security`.
+Tous les utilisateurs disposent d'un widget « Sécurité » dans leurs paramètres pour consulter les dernières alertes.
 
 ## Équipe et contribution
 

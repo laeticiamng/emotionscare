@@ -19,6 +19,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { user, isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
+  console.log('[ProtectedRoute] Auth state:', { isAuthenticated, isLoading, userRole: user?.role, requiredRole });
+
+
   // Show loading state if auth state is still being determined
   if (isLoading) {
     return <div className="p-8 text-center">Chargement...</div>;
@@ -35,6 +38,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       loginPath = '/b2b/user/login';
     }
     
+    console.log('[ProtectedRoute] Redirecting to login:', loginPath);
     return <Navigate to={loginPath} state={{ from: location }} />;
   }
 
@@ -45,11 +49,17 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     
     if (normalizedUserRole !== normalizedRequiredRole) {
       // If user is authenticated but doesn't have the right role, redirect to their default dashboard
-      const userDashboardPath = normalizedUserRole === 'b2b_admin' 
-        ? '/b2b/admin' 
-        : normalizedUserRole === 'b2b_user' 
-          ? '/b2b/user' 
-          : '/b2c';
+      const userDashboardPath = normalizedUserRole === 'b2b_admin'
+        ? '/b2b/admin/dashboard'
+        : normalizedUserRole === 'b2b_user'
+          ? '/b2b/user/dashboard'
+          : '/b2c/dashboard';
+      
+      console.log('[ProtectedRoute] Redirecting due to role mismatch:', {
+        userRole: normalizedUserRole,
+        requiredRole: normalizedRequiredRole,
+        redirectTo: redirectTo || userDashboardPath
+      });
       
       return <Navigate to={redirectTo || userDashboardPath} />;
     }

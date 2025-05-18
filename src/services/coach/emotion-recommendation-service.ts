@@ -1,16 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-
-// Types des données de recommandation
-export interface EmotionRecommendation {
-  id?: string;
-  emotion: string;
-  category: 'music' | 'vr' | 'exercise' | 'mindfulness' | 'general';
-  content: string;
-  intensity?: 'low' | 'medium' | 'high';
-  duration?: number; // minutes
-  tags?: string[];
-}
+import type { EmotionRecommendation } from '@/types/emotion';
 
 // Mapper des émotions vers des catégories de recommandations
 const emotionToCategoryMap: Record<string, string[]> = {

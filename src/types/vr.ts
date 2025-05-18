@@ -1,9 +1,8 @@
 
 /**
- * VR Types
- * --------------------------------------
- * This file defines the official types for VR functionality.
- * Any new property or correction must be documented here and synchronized across all components.
+ * Types officiels pour le domaine vr.
+ * Toute modification doit être synchronisée dans tous les mocks et composants.
+ * Ne jamais dupliquer ce type en local.
  */
 
 export interface VRSessionTemplate {

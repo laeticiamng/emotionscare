@@ -1,8 +1,8 @@
 
 /**
- * Chat Types
- * --------------------------------------
- * This file defines the official types for chat functionality.
+ * Types officiels pour le domaine chat.
+ * Toute modification doit être synchronisée dans tous les mocks et composants.
+ * Ne jamais dupliquer ce type en local.
  */
 
 export interface ChatMessage {

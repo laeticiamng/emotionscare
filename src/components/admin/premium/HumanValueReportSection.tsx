@@ -12,6 +12,7 @@ interface HumanValueReportSectionProps {
   onClick: () => void;
   visualStyle: 'minimal' | 'artistic';
   zenMode: boolean;
+  className?: string;
 }
 
 const recommendations = [
@@ -41,11 +42,12 @@ const inspirationalQuotes = [
   "La plus grande découverte de ma génération est que les êtres humains peuvent changer leur vie en modifiant leur attitude d'esprit.",
 ];
 
-export const HumanValueReportSection: React.FC<HumanValueReportSectionProps> = ({
+const HumanValueReportSection: React.FC<HumanValueReportSectionProps> = ({
   isActive,
   onClick,
   visualStyle,
-  zenMode
+  zenMode,
+  className
 }) => {
   const [quote, setQuote] = useState(inspirationalQuotes[0]);
   
@@ -65,7 +67,8 @@ export const HumanValueReportSection: React.FC<HumanValueReportSectionProps> = (
       className={cn(
         "premium-card overflow-hidden relative transition-all ease-in-out", 
         isActive ? "shadow-xl border-primary/20" : "",
-        zenMode ? "bg-background/70 backdrop-blur-lg border-border/50" : ""
+        zenMode ? "bg-background/70 backdrop-blur-lg border-border/50" : "",
+        className
       )}
       onClick={onClick}
     >
@@ -180,3 +183,6 @@ export const HumanValueReportSection: React.FC<HumanValueReportSectionProps> = (
     </Card>
   );
 };
+
+// Change from named export to default export
+export default HumanValueReportSection;

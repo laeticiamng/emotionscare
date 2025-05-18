@@ -36,6 +36,7 @@ export interface RouteConfig {
   b2bUser: {
     home: string;
     login: string;
+    register?: string;
     dashboard: string;
     journal?: string;
     scan?: string;
@@ -85,12 +86,15 @@ export const ROUTES: RouteConfig = {
     vr: '/b2c/vr',
     settings: '/b2c/settings',
     gamification: '/b2c/gamification',
+    marketplace: '/b2c/marketplace',
     cocon: '/b2c/cocon',
-    preferences: '/b2c/preferences'
+    preferences: '/b2c/preferences',
+    extensions: '/extensions'
   },
   b2bUser: {
     home: '/b2b/user',
     login: '/b2b/user/login',
+    register: '/b2b/user/register',
     dashboard: '/b2b/user/dashboard',
     journal: '/b2b/user/journal',
     scan: '/b2b/user/scan',
@@ -101,7 +105,8 @@ export const ROUTES: RouteConfig = {
     settings: '/b2b/user/settings',
     gamification: '/b2b/user/gamification',
     cocon: '/b2b/user/cocon',
-    preferences: '/b2b/user/preferences'
+    preferences: '/b2b/user/preferences',
+    extensions: '/extensions'
   },
   b2bAdmin: {
     home: '/b2b/admin',
@@ -115,7 +120,9 @@ export const ROUTES: RouteConfig = {
     teams: '/b2b/admin/teams',
     reports: '/b2b/admin/reports',
     events: '/b2b/admin/events',
-    settings: '/b2b/admin/settings'
+    settings: '/b2b/admin/settings',
+    optimisation: '/b2b/admin/optimisation',
+    extensions: '/extensions'
   },
   common: {
     home: '/',

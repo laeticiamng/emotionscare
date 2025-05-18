@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/coach';
 import { useToast } from '@/hooks/use-toast';
+import { chatCompletion, analyzeEmotion } from '@/services/openai';
 
 // Responses for different emotions
 const emotionResponses: Record<string, string[]> = {
@@ -134,62 +135,72 @@ export function useCoachHandlers() {
     }
   }, []);
 
-  // Send a message
-  const sendMessage = useCallback((text: string, sender: string) => {
-    // Add the new message to the chat
-    const newMessage: ChatMessage = {
-      id: uuidv4(),
-      content: text,
-      sender,
-      timestamp: new Date().toISOString()
-    };
-    
-    setMessages(prev => [...prev, newMessage]);
-    
-    // If it's a user message, generate a response
-    if (sender === 'user') {
-      setIsProcessing(true);
-      
-      // Simulate detecting emotion from the message
-      detectEmotionFromText(text)
-        .then(emotion => {
-          setCurrentEmotion(emotion);
-          
-          // Get appropriate responses for the detected emotion
-          const responses = emotionResponses[emotion] || emotionResponses.neutral;
-          const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-          
-          // Add a small delay to simulate thinking
-          setTimeout(() => {
+  // Send a message with AI processing
+  const sendMessage = useCallback(
+    (text: string, sender: string) => {
+      const newMessage: ChatMessage = {
+        id: uuidv4(),
+        content: text,
+        sender,
+        timestamp: new Date().toISOString()
+      };
+
+      const history = [...messages, newMessage];
+
+      setMessages(prev => [...prev, newMessage]);
+
+      if (sender === 'user') {
+        setIsProcessing(true);
+
+        const process = async () => {
+          try {
+            const emotionRes = await analyzeEmotion(text);
+            setCurrentEmotion(emotionRes.primaryEmotion);
+
+            const formatted = history.map(m => ({
+              id: m.id,
+              text: m.content,
+              sender: m.sender === 'coach' ? 'assistant' : 'user'
+            }));
+
+            const aiText = await chatCompletion(formatted, {
+              model: 'gpt-4o-mini',
+              temperature: 0.7
+            });
+
             const responseMessage: ChatMessage = {
               id: uuidv4(),
-              content: randomResponse,
+              content: aiText,
               sender: 'coach',
               timestamp: new Date().toISOString()
             };
-            
+
             setMessages(prev => [...prev, responseMessage]);
-            setIsProcessing(false);
             setHasUnreadMessages(true);
-          }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
-        })
-        .catch(error => {
-          console.error('Error detecting emotion:', error);
-          setIsProcessing(false);
-          
-          // Fallback response
-          const fallbackMessage: ChatMessage = {
-            id: uuidv4(),
-            content: "Je suis désolé, j'ai eu du mal à analyser votre message. Comment puis-je vous aider aujourd'hui ?",
-            sender: 'coach',
-            timestamp: new Date().toISOString()
-          };
-          
-          setMessages(prev => [...prev, fallbackMessage]);
-          setHasUnreadMessages(true);
-        });
-    }
-  }, []);
+          } catch (error) {
+            console.error('Error generating coach response:', error);
+            const responses =
+              emotionResponses[currentEmotion || 'neutral'] || emotionResponses.neutral;
+            const fallback = responses[Math.floor(Math.random() * responses.length)];
+            setMessages(prev => [
+              ...prev,
+              {
+                id: uuidv4(),
+                content: fallback,
+                sender: 'coach',
+                timestamp: new Date().toISOString()
+              }
+            ]);
+          } finally {
+            setIsProcessing(false);
+          }
+        };
+
+        process();
+      }
+    },
+    [messages, currentEmotion]
+  );
   
   // Clear all messages
   const clearMessages = useCallback(() => {

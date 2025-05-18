@@ -14,7 +14,7 @@ const generateImage = async (prompt: string, options: DALLEOptions = {}): Promis
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`, // This should be set in your environment
+        'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY || import.meta.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
         prompt,
