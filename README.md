@@ -60,6 +60,7 @@ src/
 - `/music` - Thérapie musicale
 - `/vr` - Sessions de réalité virtuelle
 - `/admin/dashboard` - Tableau de bord administrateur
+- `/b2b/admin/branding` - Gestion du branding et des communications
 
 ## Configuration d'environnement
 
