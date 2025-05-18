@@ -63,6 +63,7 @@ export interface RouteConfig {
     teams?: string;
     reports?: string;
     events?: string;
+    branding?: string;
     settings?: string;
   };
   common: {
@@ -117,6 +118,7 @@ export const ROUTES: RouteConfig = {
     teams: '/b2b/admin/teams',
     reports: '/b2b/admin/reports',
     events: '/b2b/admin/events',
+    branding: '/b2b/admin/branding',
     settings: '/b2b/admin/settings'
   },
   common: {
