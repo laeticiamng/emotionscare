@@ -49,6 +49,7 @@ import SanctuaryPage from './pages/SanctuaryPage';
 import ImmersiveHome from './pages/ImmersiveHome';
 import Home from './pages/Home';
 import UnifiedSettingsPage from './pages/UnifiedSettingsPage';
+import DataEthicsPage from './pages/DataEthicsPage';
 
 // Define the application routes without creating a router instance
 export const routes: RouteObject[] = [
@@ -59,6 +60,10 @@ export const routes: RouteObject[] = [
   {
     path: '/home',
     element: <Home />
+  },
+  {
+    path: 'ethique',
+    element: <DataEthicsPage />
   },
   {
     path: 'settings',

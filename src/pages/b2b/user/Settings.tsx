@@ -9,6 +9,8 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import PrivacySettings from '@/components/settings/PrivacySettings';
+import PersonalActivityLogs from '@/components/account/PersonalActivityLogs';
 
 const B2BUserSettings = () => {
   const { theme, setTheme } = useTheme();
@@ -31,10 +33,11 @@ const B2BUserSettings = () => {
       </div>
       
       <Tabs defaultValue="appearance">
-        <TabsList className="grid grid-cols-3 mb-8">
+        <TabsList className="grid grid-cols-4 mb-8">
           <TabsTrigger value="appearance">Apparence</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
+          <TabsTrigger value="ethics">Données &amp; éthique</TabsTrigger>
         </TabsList>
         
         <TabsContent value="appearance" className="space-y-6">
@@ -198,6 +201,11 @@ const B2BUserSettings = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="ethics" className="space-y-6">
+          <PrivacySettings />
+          <PersonalActivityLogs />
         </TabsContent>
       </Tabs>
     </div>
