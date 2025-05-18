@@ -1,255 +1,238 @@
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
+import { Tabs, TabsList, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
-import { 
-  RefreshCcw, 
-  LayoutDashboard, 
-  Users, 
-  BarChart, 
-  Calendar, 
-  Settings, 
-  AlertTriangle, 
-  TrendingUp 
-} from 'lucide-react';
-import DashboardHeader from './DashboardHeader';
-import GlobalOverviewTab from './tabs/overview/GlobalOverviewTab';
-import { TeamSummary, AdminAccessLog } from '@/types';
-import { useToast } from '@/hooks/use-toast';
+import { Building, ChevronDown, Users, PieChart, Bell, LayoutDashboard } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import StatsCard from '@/components/dashboard/admin/StatsCard';
+import GlobalOverviewTab from '@/components/dashboard/admin/tabs/overview/GlobalOverviewTab';
+import { useSegment } from '@/contexts/SegmentContext';
+import AccessLogsTable from '@/components/dashboard/admin/AccessLogsTable';
 
-const fadeIn = {
-  hidden: { opacity: 0, y: 10 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.5 }
-  },
-  exit: { 
-    opacity: 0,
-    transition: { duration: 0.2 }
-  }
-};
-
-const staggerContainer = {
+const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
+      staggerChildren: 0.1,
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+      damping: 15,
     }
   }
 };
 
 const EnhancedAdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [isLoading, setIsLoading] = useState(false);
-  const [teamSummaries, setTeamSummaries] = useState<TeamSummary[]>([]);
-  const [accessLogs, setAccessLogs] = useState<AdminAccessLog[]>([]);
-  const { toast } = useToast();
-  
-  useEffect(() => {
-    // Mock data for demonstration
-    setTeamSummaries([
-      { teamId: 'team-1', memberCount: 12, averageMood: 'calm', alertCount: 2, trendDirection: 'up' },
-      { teamId: 'team-2', memberCount: 8, averageMood: 'focused', alertCount: 0, trendDirection: 'stable' },
-      { teamId: 'team-3', memberCount: 15, averageMood: 'stressed', alertCount: 4, trendDirection: 'down' }
-    ]);
-    
-    setAccessLogs([
-      { adminId: 'admin-1', action: 'Dashboard access', timestamp: new Date().toISOString() },
-      { adminId: 'admin-2', action: 'Analytics export', timestamp: new Date(Date.now() - 3600000).toISOString() },
-      { adminId: 'admin-1', action: 'Team settings update', timestamp: new Date(Date.now() - 7200000).toISOString() }
-    ]);
-  }, []);
-  
-  const handleRefresh = async () => {
-    setIsLoading(true);
-    
-    try {
-      // Here you would fetch real data
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      
-      toast({
-        title: "Données actualisées",
-        description: "Les données du tableau de bord ont été mises à jour",
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur lors de l'actualisation",
-        description: "Impossible de mettre à jour les données",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { selectedSegment } = useSegment();
 
   return (
     <motion.div 
-      className="space-y-6"
+      className="pb-10"
       initial="hidden"
       animate="visible"
-      variants={staggerContainer}
+      variants={containerVariants}
     >
-      <DashboardHeader onRefresh={handleRefresh} />
-      
-      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-2 md:grid-cols-5 gap-2">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
-            <LayoutDashboard className="h-4 w-4" />
-            <span className="hidden sm:inline">Vue d'ensemble</span>
-            <span className="inline sm:hidden">Aperçu</span>
-          </TabsTrigger>
-          <TabsTrigger value="teams" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            <span>Équipes</span>
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2">
-            <BarChart className="h-4 w-4" />
-            <span>Analytiques</span>
-          </TabsTrigger>
-          <TabsTrigger value="calendar" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            <span>Calendrier</span>
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            <span>Paramètres</span>
-          </TabsTrigger>
-        </TabsList>
+      {/* Dashboard Header */}
+      <motion.div variants={itemVariants} className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight mb-1">
+            <span className="inline-flex items-center">
+              <LayoutDashboard className="mr-2 h-8 w-8 text-primary" />
+              Supervision d'équipe
+            </span>
+          </h1>
+          <p className="text-muted-foreground">
+            Accédez aux données anonymisées et synthétisées de l'ensemble du personnel
+          </p>
+        </div>
         
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            variants={fadeIn}
-            className="mt-6"
-          >
-            <TabsContent value="overview" className="mt-0">
-              <GlobalOverviewTab />
-            </TabsContent>
-            
-            <TabsContent value="teams" className="mt-0">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Gestion des équipes</CardTitle>
-                  <CardDescription>Consultez et gérez les équipes et leurs membres</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <motion.div 
-                    className="grid gap-4" 
-                    variants={staggerContainer}
-                    initial="hidden"
-                    animate="visible"
-                  >
-                    {teamSummaries.map((team) => (
-                      <motion.div 
-                        key={team.teamId}
-                        variants={fadeIn}
-                        className="p-4 border rounded-lg flex items-center justify-between hover:bg-accent/50 transition-colors"
-                      >
-                        <div>
-                          <h3 className="font-medium">Équipe {team.teamId}</h3>
-                          <p className="text-sm text-muted-foreground">{team.memberCount} membres</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Badge variant={team.trendDirection === 'down' ? 'destructive' : 'default'}>
-                            {team.averageMood}
-                          </Badge>
-                          {team.alertCount > 0 && (
-                            <Badge variant="destructive" className="flex items-center gap-1">
-                              <AlertTriangle className="h-3 w-3" />
-                              {team.alertCount}
-                            </Badge>
-                          )}
-                          <Button variant="outline" size="sm">Voir</Button>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="analytics" className="mt-0">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Analytiques</CardTitle>
-                  <CardDescription>Mesures et statistiques d'équipe</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Contenu des analytiques à venir...</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="calendar" className="mt-0">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Calendrier</CardTitle>
-                  <CardDescription>Événements et planifications</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Contenu du calendrier à venir...</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="settings" className="mt-0">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Paramètres administrateur</CardTitle>
-                  <CardDescription>Configuration et préférences</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <Card className="bg-background">
-                      <CardHeader className="p-4">
-                        <CardTitle className="text-base">Journal d'accès</CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-4 pt-0">
-                        {accessLogs.map((log, index) => (
-                          <div key={index} className="flex items-center justify-between py-2 border-b last:border-0">
-                            <div>
-                              <p className="text-sm font-medium">{log.action}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(log.timestamp).toLocaleString()}
-                              </p>
-                            </div>
-                            <Badge variant="outline">{log.adminId}</Badge>
-                          </div>
-                        ))}
-                      </CardContent>
-                    </Card>
-                    
-                    <Card className="bg-background">
-                      <CardHeader className="p-4">
-                        <CardTitle className="text-base">RGPD & Anonymisation</CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-4 pt-0">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm">Seuil minimum d'affichage</p>
-                            <p className="text-xs text-muted-foreground">
-                              Nombre minimum de personnes pour afficher des statistiques
-                            </p>
-                          </div>
-                          <Badge variant="outline" className="font-mono">5</Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </motion.div>
-        </AnimatePresence>
-      </Tabs>
+        {selectedSegment && (
+          <Badge variant="outline" className="px-4 py-2 text-sm flex items-center">
+            <Building className="h-4 w-4 mr-2" />
+            <span>Filtré par segment: {selectedSegment}</span>
+            <ChevronDown className="ml-2 h-4 w-4" />
+          </Badge>
+        )}
+      </motion.div>
+      
+      {/* Quick Stats Row */}
+      <motion.div 
+        variants={itemVariants}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+      >
+        <StatsCard 
+          title="Personnel actif" 
+          value="132" 
+          description="Membres connectés cette semaine"
+          trend={{ direction: 'up', value: 12 }}
+          icon={<Users className="h-5 w-5" />}
+        />
+        
+        <StatsCard 
+          title="Bien-être moyen" 
+          value="75%" 
+          description="Sur l'ensemble des équipes"
+          trend={{ direction: 'up', value: 4 }}
+          icon={<PieChart className="h-5 w-5" />}
+        />
+        
+        <StatsCard 
+          title="Équipes" 
+          value="8" 
+          description="Réparties sur 3 sites"
+          trend={{ direction: 'stable', value: 0 }}
+          icon={<Building className="h-5 w-5" />}
+        />
+        
+        <StatsCard 
+          title="Alertes actives" 
+          value="3" 
+          description="Nécessitant attention"
+          trend={{ direction: 'down', value: 2 }}
+          icon={<Bell className="h-5 w-5" />}
+        />
+      </motion.div>
+      
+      {/* Main Content Tabs */}
+      <motion.div variants={itemVariants}>
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid grid-cols-4 md:grid-cols-4 lg:grid-cols-5 h-auto">
+            <TabsTrigger value="overview" className="py-2">
+              <LayoutDashboard className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Vue d'ensemble</span>
+            </TabsTrigger>
+            <TabsTrigger value="teams" className="py-2">
+              <Users className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Équipes</span>
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="py-2">
+              <PieChart className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Analytics</span>
+            </TabsTrigger>
+            <TabsTrigger value="alerts" className="py-2">
+              <Bell className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Alertes</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="py-2 hidden lg:flex">
+              <Bell className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Paramètres</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="overview" className="space-y-6">
+            <GlobalOverviewTab />
+          </TabsContent>
+          
+          <TabsContent value="teams" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Équipes</CardTitle>
+                <CardDescription>
+                  Vue d'ensemble des équipes et de leur état émotionnel.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Contenu des équipes à venir prochainement.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="analytics" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Analytics</CardTitle>
+                <CardDescription>
+                  Analyses approfondies des données émotionnelles.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Contenu des analytics à venir prochainement.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="alerts" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Alertes</CardTitle>
+                <CardDescription>
+                  Alertes et notifications importantes.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Contenu des alertes à venir prochainement.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Paramètres</CardTitle>
+                <CardDescription>
+                  Configuration de la supervision d'équipe.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Contenu des paramètres à venir prochainement.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </motion.div>
+      
+      {/* Access Logs Card */}
+      <motion.div 
+        variants={itemVariants} 
+        className="mt-8"
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl flex items-center">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5 mr-2" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <path d="M16 2v5h5"></path>
+                <path d="M21 6v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12l5 3Z"></path>
+              </svg>
+              Logs d'accès
+            </CardTitle>
+            <CardDescription>
+              Journal des dernières actions effectuées par les administrateurs
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AccessLogsTable />
+          </CardContent>
+        </Card>
+      </motion.div>
     </motion.div>
   );
 };
