@@ -1,37 +1,27 @@
 
 export interface ChatMessage {
   id: string;
-  conversationId: string;
-  sender: 'user' | 'assistant' | 'system';
   text: string;
-  content?: string; // Pour compatibilité
-  role?: 'user' | 'assistant' | 'system'; // Pour compatibilité
+  sender: 'user' | 'assistant' | 'system';
   timestamp: string;
-  conversation_id?: string; // Pour compatibilité
+  conversationId?: string;
+  emotions?: Record<string, number>;
+  feedback?: string;
+  isOptimistic?: boolean;
+  metadata?: Record<string, any>;
 }
 
 export interface ChatConversation {
   id: string;
   title: string;
-  createdAt: string;
-  updatedAt: string;
-  lastMessage: string;
-  messages?: ChatMessage[]; // Pour compatibilité
-  created_at?: string; // Pour compatibilité
-  updated_at?: string; // Pour compatibilité
-  last_message?: string; // Pour compatibilité
-  user_id?: string; // Pour compatibilité
-  status?: string; // Pour compatibilité
-}
-
-export interface ChatResponse {
-  message: {
-    role: 'assistant';
-    content: string;
-  };
-  usage?: {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-  };
+  updated_at: string;
+  created_at: string;
+  last_message?: string;
+  last_message_time?: string;
+  messages?: ChatMessage[];
+  user_id?: string;
+  unread?: number;
+  category?: string;
+  status?: 'active' | 'archived' | 'deleted';
+  metadata?: Record<string, any>;
 }

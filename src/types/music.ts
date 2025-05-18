@@ -1,3 +1,4 @@
+
 export interface MusicTrack {
   id: string;
   title: string;
@@ -73,6 +74,7 @@ export interface MusicContextType {
   emotion: string | null;
   openDrawer: boolean;
   error?: Error | null;
+  playlists?: MusicPlaylist[];
   
   // Methods
   setVolume: (volume: number) => void;
@@ -81,8 +83,8 @@ export interface MusicContextType {
   seekTo: (time: number) => void;
   togglePlayPause: () => void;
   togglePlay: () => void;  // Added for compatibility
-  toggleDrawer: () => void;
-  closeDrawer: () => void;
+  toggleDrawer?: () => void;
+  closeDrawer?: () => void;
   setOpenDrawer: (open: boolean) => void;
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
@@ -93,17 +95,8 @@ export interface MusicContextType {
   setEmotion: (emotion: string) => void;
   loadPlaylistForEmotion: (emotion: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
   setPlaylist: (playlist: MusicPlaylist | MusicTrack[]) => void;
-  generateMusic: (prompt: string) => Promise<MusicTrack>;
-  
-  // Added for compatibility with other code
+  setCurrentTrack: (track: MusicTrack) => void;
   getRecommendationByEmotion?: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | MusicTrack[]>;
-  setCurrentTrack?: (track: MusicTrack) => void;
-  recommendations?: MusicTrack[];
-  isLoading?: boolean;
-  initializeMusicSystem?: () => Promise<void>;
-  allTracks?: MusicTrack[];
-  playlists?: MusicPlaylist[];
-  isMuted?: boolean;
 }
 
 export interface MusicPlayerProps {

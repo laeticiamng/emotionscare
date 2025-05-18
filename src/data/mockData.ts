@@ -1,4 +1,3 @@
-
 import mockEmotions from './mockEmotions';
 import mockJournalEntries from './mockJournalEntries';
 import mockNotifications from './mockNotifications';

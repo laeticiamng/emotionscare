@@ -1,96 +1,97 @@
 
 import { VRSessionTemplate } from '@/types/vr';
 
-const mockVRTemplates: VRSessionTemplate[] = [
+// Données fictives pour les templates de sessions VR
+export const mockVRTemplates: VRSessionTemplate[] = [
   {
-    id: '1',
-    title: 'Méditation en forêt',
-    description: 'Une session paisible dans un environnement forestier relaxant',
-    imageUrl: '/images/vr/forest-meditation.jpg',
-    duration: 10, // Durée en minutes
-    category: 'meditation',
-    level: 'beginner',
-    popularity: 4.8,
-    moodTag: ['calm', 'peaceful'],
-    environment: 'forest',
-    audioUrl: '/audio/forest-ambience.mp3',
-    goals: ['Réduire le stress', 'Améliorer la concentration'],
-    userCount: 1240
+    id: "vr-template-1",
+    title: "Méditation zen en forêt",
+    description: "Une expérience VR apaisante dans une forêt paisible pour pratiquer la méditation pleine conscience.",
+    duration: 600, // 10 minutes en secondes
+    difficulty: "easy",
+    intensity: 1,
+    category: "meditation",
+    tags: ["pleine conscience", "débutant", "nature"],
+    thumbnail: "/images/vr/forest-meditation.jpg",
+    created_at: "2023-01-15T08:30:00Z",
+    author_name: "Dr. Marie Durand",
+    average_rating: 4.8,
+    completion_count: 1245
   },
   {
-    id: '2',
-    title: 'Plage tropicale',
-    description: 'Évadez-vous sur une plage paradisiaque avec le son des vagues',
-    imageUrl: '/images/vr/tropical-beach.jpg',
-    duration: 15, // Durée en minutes
-    category: 'relaxation',
-    level: 'beginner',
-    popularity: 4.9,
-    moodTag: ['relaxed', 'peaceful'],
-    environment: 'beach',
-    audioUrl: '/audio/ocean-waves.mp3',
-    goals: ['Relaxation profonde', 'Réduction de l\'anxiété'],
-    userCount: 1835
+    id: "vr-template-2",
+    title: "Relaxation plage tropicale",
+    description: "Évadez-vous sur une plage tropicale déserte avec le son des vagues et un exercice guidé de relaxation.",
+    duration: 900, // 15 minutes en secondes
+    difficulty: "easy",
+    intensity: 2,
+    category: "relaxation",
+    tags: ["plage", "océan", "détente"],
+    thumbnail: "/images/vr/tropical-beach.jpg",
+    created_at: "2023-02-22T14:15:00Z",
+    author_name: "Sophia Martinez",
+    average_rating: 4.9,
+    completion_count: 2187
   },
   {
-    id: '3',
-    title: 'Montagne enneigée',
-    description: 'Une expérience méditative dans un paysage montagneux hivernal',
-    imageUrl: '/images/vr/snowy-mountain.jpg',
-    duration: 20, // Durée en minutes
-    category: 'mindfulness',
-    level: 'intermediate',
-    popularity: 4.7,
-    moodTag: ['focused', 'inspired'],
-    environment: 'mountain',
-    audioUrl: '/audio/mountain-wind.mp3',
-    goals: ['Clarté mentale', 'Prise de conscience'],
-    userCount: 987
+    id: "vr-template-3",
+    title: "Gestion de l'anxiété - Respiration",
+    description: "Exercices de respiration guidée dans un environnement immersif pour réduire l'anxiété et le stress.",
+    duration: 1200, // 20 minutes en secondes
+    difficulty: "medium",
+    intensity: 3,
+    category: "anxiety",
+    tags: ["respiration", "anti-stress", "thérapeutique"],
+    thumbnail: "/images/vr/breathing-exercise.jpg",
+    created_at: "2023-03-10T09:45:00Z",
+    author_name: "Dr. Thomas Laurent",
+    average_rating: 4.7,
+    completion_count: 1876
   },
   {
-    id: '4',
-    title: 'Jardin japonais',
-    description: 'Un moment de sérénité dans un jardin zen traditionnel',
-    imageUrl: '/images/vr/japanese-garden.jpg',
-    duration: 25, // Durée en minutes
-    category: 'meditation',
-    level: 'intermediate',
-    popularity: 4.6,
-    moodTag: ['peaceful', 'balanced'],
-    environment: 'garden',
-    audioUrl: '/audio/zen-garden.mp3',
-    goals: ['Équilibre mental', 'Harmonie intérieure'],
-    userCount: 756
+    id: "vr-template-4",
+    title: "Sommeil profond - Visualisation",
+    description: "Préparez-vous au sommeil avec cette session de visualisation guidée dans un environnement nocturne apaisant.",
+    duration: 1800, // 30 minutes en secondes
+    difficulty: "easy",
+    intensity: 1,
+    category: "sleep",
+    tags: ["sommeil", "nuit", "visualisation"],
+    thumbnail: "/images/vr/deep-sleep.jpg",
+    created_at: "2023-04-05T22:00:00Z",
+    author_name: "Claire Dubois",
+    average_rating: 4.9,
+    completion_count: 3214
   },
   {
-    id: '5',
-    title: 'Orage tropical',
-    description: 'Expérience immersive d\'un orage tropical depuis un abri confortable',
-    imageUrl: '/images/vr/tropical-storm.jpg',
-    duration: 30, // Durée en minutes
-    category: 'sleep',
-    level: 'beginner',
-    popularity: 4.5,
-    moodTag: ['cozy', 'reflective'],
-    environment: 'tropical',
-    audioUrl: '/audio/rain-thunder.mp3',
-    goals: ['Amélioration du sommeil', 'Relaxation profonde'],
-    userCount: 1432
+    id: "vr-template-5",
+    title: "Concentration et focus",
+    description: "Améliorez votre concentration avec cette session immersive conçue pour entraîner votre attention.",
+    duration: 1500, // 25 minutes en secondes
+    difficulty: "medium",
+    intensity: 4,
+    category: "focus",
+    tags: ["concentration", "productivité", "mental"],
+    thumbnail: "/images/vr/focus-training.jpg",
+    created_at: "2023-05-18T10:30:00Z",
+    author_name: "Dr. Nicolas Bernard",
+    average_rating: 4.6,
+    completion_count: 1523
   },
   {
-    id: '6',
-    title: 'Canyon au coucher de soleil',
-    description: 'Contemplez un magnifique coucher de soleil dans un canyon désertique',
-    imageUrl: '/images/vr/desert-canyon.jpg',
-    duration: 15, // Durée en minutes
-    category: 'relaxation',
-    level: 'beginner',
-    popularity: 4.7,
-    moodTag: ['inspired', 'peaceful'],
-    environment: 'desert',
-    audioUrl: '/audio/desert-wind.mp3',
-    goals: ['Inspiration créative', 'Apaisement mental'],
-    userCount: 891
+    id: "vr-template-6",
+    title: "Gestion de la colère - Océan calme",
+    description: "Apprenez à gérer votre colère et frustration avec cette expérience thérapeutique au bord de l'océan.",
+    duration: 1200, // 20 minutes en secondes
+    difficulty: "hard",
+    intensity: 3,
+    category: "anger",
+    tags: ["gestion émotionnelle", "thérapie", "océan"],
+    thumbnail: "/images/vr/calm-ocean.jpg",
+    created_at: "2023-06-20T16:45:00Z",
+    author_name: "Prof. Élodie Martin",
+    average_rating: 4.7,
+    completion_count: 1287
   }
 ];
 

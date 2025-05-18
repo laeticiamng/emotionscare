@@ -1,96 +1,64 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicPlaylist, MusicTrack } from '@/types/music';
 
-// Sample tracks
-export const mockTracks: MusicTrack[] = [
+// Tracks de musique fictives pour les tests
+export const mockMusicTracks: MusicTrack[] = [
   {
-    id: 'track-1',
-    title: 'Ocean Waves',
-    artist: 'Nature Sounds',
-    duration: 300,
-    url: '/audio/ocean-waves.mp3',
-    audioUrl: '/audio/ocean-waves.mp3',
-    coverUrl: '/images/waves.jpg',
+    id: 'track-001',
+    title: 'Méditation matinale',
+    artist: 'Zen Masters',
+    album: 'Sérénité Quotidienne',
+    duration: 180,
+    audioUrl: '/audio/meditation-morning.mp3',
+    coverUrl: '/images/music/cover-meditation.jpg',
     emotion: 'calm',
     genre: 'ambient',
-    album: 'Relaxation Collection',
-    year: 2023,
-    tags: ['relaxation', 'meditation', 'nature']
+    tags: ['meditation', 'morning', 'calm']
   },
   {
-    id: 'track-2',
-    title: 'Morning Energy',
-    artist: 'Positive Vibes',
+    id: 'track-002',
+    title: 'Flux océanique',
+    artist: 'Nature Sounds',
+    album: 'Sons de la nature',
     duration: 240,
-    url: '/audio/morning-energy.mp3',
-    audioUrl: '/audio/morning-energy.mp3',
-    coverUrl: '/images/sunrise.jpg',
-    emotion: 'happy',
-    genre: 'electronic',
-    album: 'Daily Boost',
-    year: 2023,
-    tags: ['energetic', 'morning', 'motivation']
-  },
-  {
-    id: 'track-3',
-    title: 'Deep Focus',
-    artist: 'Concentration',
-    duration: 360,
-    url: '/audio/deep-focus.mp3',
-    audioUrl: '/audio/deep-focus.mp3',
-    coverUrl: '/images/focus.jpg',
-    emotion: 'focus',
-    genre: 'minimal',
-    album: 'Productivity Series',
-    year: 2022,
-    tags: ['focus', 'work', 'study']
-  },
-  {
-    id: 'track-4',
-    title: 'Tranquil Rain',
-    artist: 'Nature Sounds',
-    duration: 420,
-    url: '/audio/rain.mp3',
-    audioUrl: '/audio/rain.mp3',
-    coverUrl: '/images/rain.jpg',
+    audioUrl: '/audio/ocean-flow.mp3',
+    coverUrl: '/images/music/cover-ocean.jpg',
     emotion: 'calm',
-    genre: 'ambient',
-    album: 'Sleep Sounds',
-    year: 2023,
-    tags: ['sleep', 'relaxation', 'nature']
+    genre: 'nature',
+    tags: ['ocean', 'waves', 'relax']
+  },
+  {
+    id: 'track-003',
+    title: 'Réveil dynamique',
+    artist: 'Energy Beats',
+    album: 'Morning Boost',
+    duration: 160,
+    audioUrl: '/audio/energy-wake.mp3',
+    coverUrl: '/images/music/cover-energy.jpg',
+    emotion: 'energetic',
+    genre: 'electronic',
+    tags: ['morning', 'energy', 'motivation']
   }
 ];
 
-// Sample playlists
+// Playlists fictives pour les tests
 export const mockPlaylists: MusicPlaylist[] = [
   {
-    id: 'playlist-1',
-    name: 'Relaxation Collection',
-    description: 'Calm your mind and body with these soothing tracks',
-    tracks: [mockTracks[0], mockTracks[3]],
+    id: 'playlist-calm',
+    name: 'Calme et sérénité',
+    description: 'Musiques apaisantes pour retrouver votre calme intérieur',
     emotion: 'calm',
-    coverUrl: '/images/relaxation.jpg',
-    tags: ['relaxation', 'calm', 'meditation'],
-    created_at: '2023-10-05T14:48:00.000Z'
+    tracks: mockMusicTracks.filter(track => track.emotion === 'calm'),
+    coverUrl: '/images/music/playlist-calm.jpg',
+    tags: ['calm', 'relax', 'meditation']
   },
   {
-    id: 'playlist-2',
-    name: 'Productivity Boost',
-    description: 'Music to help you focus and get things done',
-    tracks: [mockTracks[2]],
-    emotion: 'focus',
-    coverUrl: '/images/productivity.jpg',
-    tags: ['focus', 'work', 'productivity'],
-    created_at: '2023-09-15T09:30:00.000Z'
-  },
-  {
-    id: 'playlist-3',
-    name: 'Morning Motivation',
-    description: 'Start your day with positive energy',
-    tracks: [mockTracks[1]],
-    emotion: 'happy',
-    coverUrl: '/images/morning.jpg',
-    tags: ['morning', 'motivation', 'positive'],
-    created_at: '2023-10-01T07:15:00.000Z'
+    id: 'playlist-energy',
+    name: 'Boost d\'énergie',
+    description: 'Musiques dynamiques pour booster votre énergie',
+    emotion: 'energetic',
+    tracks: mockMusicTracks.filter(track => track.emotion === 'energetic'),
+    coverUrl: '/images/music/playlist-energy.jpg',
+    tags: ['energy', 'workout', 'motivation']
   }
 ];
