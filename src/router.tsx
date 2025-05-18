@@ -42,6 +42,7 @@ import B2BAdminEventsPage from './pages/b2b/admin/Events';
 import B2BAdminSettingsPage from './pages/b2b/admin/Settings';
 import ImmersiveHome from './pages/ImmersiveHome';
 import Home from './pages/Home';
+import UnifiedSettingsPage from './pages/UnifiedSettingsPage';
 
 // Define the application routes without creating a router instance
 export const routes: RouteObject[] = [
@@ -52,6 +53,14 @@ export const routes: RouteObject[] = [
   {
     path: '/home',
     element: <Home />
+  },
+  {
+    path: 'settings',
+    element: (
+      <ProtectedRoute>
+        <UnifiedSettingsPage />
+      </ProtectedRoute>
+    )
   },
   // B2C Auth Routes
   {
