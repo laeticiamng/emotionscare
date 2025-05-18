@@ -4,7 +4,6 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/types/user';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
-import { env } from '@/env.mjs';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -22,11 +21,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   console.log('[ProtectedRoute] Auth state:', { isAuthenticated, isLoading, userRole: user?.role, requiredRole });
 
-  // En mode développement, on peut ignorer les vérifications d'authentification si configuré
-  if (env.SKIP_AUTH_CHECK) {
-    console.log('[ProtectedRoute] Skipping auth check due to env settings');
-    return <>{children}</>;
-  }
 
   // Show loading state if auth state is still being determined
   if (isLoading) {

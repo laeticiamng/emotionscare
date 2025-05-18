@@ -89,6 +89,9 @@ NEXT_PUBLIC_API_URL=http://localhost:3001
 NEXT_PUBLIC_WEB_URL=http://localhost:3000
 ```
 
+> **Note**
+> L'ancienne variable `SKIP_AUTH_CHECK` utilisée pour désactiver l'authentification en développement a été supprimée. Les tableaux de bord sont désormais toujours protégés.
+
 ### Utilisateur de test
 
 Un compte de test est mis à disposition pour les démonstrations :
