@@ -28,7 +28,7 @@ export const env = {
   VITE_FIREBASE_MESSAGING_SENDER_ID: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '',
   VITE_FIREBASE_APP_ID: process.env.VITE_FIREBASE_APP_ID || '',
   VITE_FIREBASE_MEASUREMENT_ID: process.env.VITE_FIREBASE_MEASUREMENT_ID || '',
-
+  
   // Configuration du serveur
   NODE_ENV: import.meta.env.MODE || 'development',
   
@@ -51,10 +51,5 @@ function checkEnvVars() {
   const missingVars = requiredVars.filter(key => !env[key]);
 
   if (missingVars.length > 0) {
-    const message = `Missing env vars: ${missingVars.join(', ')}`;
-    console.warn(`\u26A0\uFE0F ${message}\nCreate a .env.local file with the required variables.`);
-    if (env.NEXT_PUBLIC_SENTRY_DSN) {
-      Sentry.captureMessage(message, 'error');
-    }
-  }
+    console.warn(`⚠️ Missing environment variables: ${missingVars.join(', ')}. Create a .env.local file with the required variables.`);
 }

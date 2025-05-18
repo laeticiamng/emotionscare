@@ -90,12 +90,21 @@ La plateforme EmotionsCare s'intègre avec plusieurs API tierces pour fournir se
 ### Configuration du fichier .env.local
 
 ```
-VITE_OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxx
-VITE_HUME_API_KEY=hume_xxxxxxxxxxxxxxxxxxxx
-VITE_APP_ENV=development
-VITE_API_URL=http://localhost:3001
-VITE_WEB_URL=http://localhost:3000
-```
+NEXT_PUBLIC_OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxx
+NEXT_PUBLIC_HUME_API_KEY=hume_xxxxxxxxxxxxxxxxxxxx
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_FIREBASE_MEASUREMENT_ID=
+NEXT_PUBLIC_APP_ENV=development
+NEXT_PUBLIC_API_URL=http://localhost:3001
+NEXT_PUBLIC_WEB_URL=http://localhost:3000
+
 
 > **Note**
 > L'ancienne variable `SKIP_AUTH_CHECK` utilisée pour désactiver l'authentification en développement a été supprimée. Les tableaux de bord sont désormais toujours protégés.
