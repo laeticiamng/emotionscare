@@ -7,10 +7,11 @@ export interface VRSessionTemplate {
   name?: string;
   description?: string;
   duration: number;
-  type: string;
+  type?: string;
   category?: string;
   difficulty?: 'easy' | 'medium' | 'hard';
   imageUrl?: string;
+  thumbnailUrl?: string;
   popularity?: number;
   rating?: number;
   tags?: string[];
@@ -18,6 +19,17 @@ export interface VRSessionTemplate {
   features?: string[];
   lastUsed?: string;
   completionRate?: number;
+  
+  // Propriétés additionnelles utilisées dans l'application
+  is_audio_only?: boolean;
+  audio_url?: string;
+  audioTrack?: string;
+  preview_url?: string;
+  theme?: string;
+  environment?: string;
+  intensity?: number;
+  objective?: string;
+  benefits?: string[];
 }
 
 export interface VRSession {
@@ -30,6 +42,7 @@ export interface VRSession {
   duration: number;
   startedAt?: Date | string;
   endTime?: Date | string;
+  endedAt?: Date | string;
   startTime?: Date | string;
   emotionBefore?: string;
   emotionAfter?: string;
@@ -39,15 +52,17 @@ export interface VRSession {
   heartRateBefore?: number;
   heartRateAfter?: number;
   metrics?: {
-    heartRate?: number;
+    heartRate?: number[] | number;
     stressLevel?: number;
     focusLevel?: number;
   };
   feedback?: {
     rating?: number;
     comment?: string;
+    comments?: string;
     improvements?: string[];
   };
+  end_time?: Date | string;
 }
 
 export interface VRSessionData {
@@ -65,6 +80,7 @@ export interface VRSessionWithMusicProps {
   emotion?: string;
   onComplete?: (result: { emotionBefore: string; emotionAfter: string }) => void;
   className?: string;
+  session?: VRSession;
 }
 
 export interface VRSessionHistoryProps {

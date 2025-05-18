@@ -4,9 +4,10 @@ import { UserPreferences } from '@/types/preferences';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import NotificationsPreferences from './NotificationsPreferences';
+import NotificationsPreferencesComponent from './NotificationsPreferences';
 import DisplayPreferences from './DisplayPreferences';
-import PrivacyPreferences from './PrivacyPreferences';
+import PrivacyPreferencesComponent from './PrivacyPreferences';
+import { Loader2 } from 'lucide-react';
 
 interface PreferencesFormProps {
   preferences: UserPreferences;
@@ -58,22 +59,29 @@ const PreferencesFormImpl: React.FC<PreferencesFormProps> = ({
         <CardContent>
           <TabsContent value="display">
             <DisplayPreferences 
-              theme={currentPrefs.theme} 
-              fontSize={currentPrefs.fontSize}
-              language={currentPrefs.language}
-              reduceMotion={currentPrefs.reduceMotion}
-              colorBlindMode={currentPrefs.colorBlindMode}
+              theme={currentPrefs.theme || 'system'} 
+              fontSize={currentPrefs.fontSize || 'medium'}
+              language={currentPrefs.language || 'fr'}
+              reduceMotion={currentPrefs.reduceMotion || false}
+              colorBlindMode={currentPrefs.colorBlindMode || ''}
               onUpdate={handleUpdatePreferences}
             />
           </TabsContent>
           <TabsContent value="notifications">
-            <NotificationsPreferences 
-              notifications={currentPrefs.notifications}
+            <NotificationsPreferencesComponent 
+              notifications={currentPrefs.notifications || {
+                enabled: false,
+                emailEnabled: false,
+                pushEnabled: false
+              }}
               onUpdate={handleUpdatePreferences}
             />
           </TabsContent>
           <TabsContent value="privacy">
-            <PrivacyPreferences />
+            <PrivacyPreferencesComponent 
+              privacy={currentPrefs.privacy}
+              onUpdate={handleUpdatePreferences}
+            />
           </TabsContent>
         </CardContent>
       </Tabs>
@@ -88,8 +96,9 @@ const PreferencesFormImpl: React.FC<PreferencesFormProps> = ({
         <Button 
           onClick={handleSave}
           disabled={!hasChanges || isLoading}
-          isLoading={isLoading}
+          className="relative"
         >
+          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Enregistrer
         </Button>
       </CardFooter>

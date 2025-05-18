@@ -1,121 +1,141 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import React, { useState, useRef } from 'react';
+import { Button } from "@/components/ui/button";
+import { Mic, Loader2, Square } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { v4 as uuidv4 } from 'uuid';
 import { EmotionResult } from '@/types/emotion';
-import { MicIcon } from 'lucide-react';
 
 interface VoiceEmotionScannerProps {
-  onComplete?: (result: EmotionResult) => void;
-  audioOnly?: boolean;
   onResult?: (result: EmotionResult) => void;
-  duration?: number;
-  autoStart?: boolean;
-  showVisualizer?: boolean;
-  className?: string;
 }
 
-const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({
-  onComplete,
-  audioOnly = false,
-  onResult,
-  duration = 10,
-  autoStart = false,
-  showVisualizer = true,
-  className = '',
-}) => {
-  const [isRecording, setIsRecording] = useState(autoStart);
-  const [isProcessing, setIsProcessing] = useState(false);
+const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onResult }) => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const { toast } = useToast();
 
-  const startRecording = () => {
-    setIsRecording(true);
-    
-    // Simulate recording and processing
-    setTimeout(() => {
-      setIsRecording(false);
-      setIsProcessing(true);
+  const handleStartRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
       
-      // Simulate processing time
-      setTimeout(() => {
-        setIsProcessing(false);
-        
-        // Generate a mock result
-        const result = {
-          id: crypto.randomUUID(), // Generate unique ID
-          emotion: 'calm',
-          score: 0.85,
-          confidence: 0.92,
-          text: "User audio sample processed successfully.",
-          feedback: "You sound calm and balanced. Your voice reflects inner peace.",
-        };
-        
-        if (onResult) onResult(result);
-        if (onComplete) onComplete(result);
-      }, 2000);
-    }, duration * 1000);
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+      
+      setIsRecording(true);
+      
+      toast({
+        title: "Enregistrement démarré",
+        description: "Parlez de comment vous vous sentez aujourd'hui...",
+      });
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+      toast({
+        title: "Erreur d'accès au microphone",
+        description: "Veuillez autoriser l'accès à votre microphone pour utiliser cette fonctionnalité.",
+        variant: "destructive",
+      });
+    }
   };
 
-  if (autoStart && !isRecording && !isProcessing) {
-    startRecording();
-  }
+  const handleStopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      
+      // Stop all audio tracks
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      
+      setIsRecording(false);
+      setIsAnalyzing(true);
+      
+      // Mock analysis delay
+      setTimeout(analyzeVoice, 1500);
+    }
+  };
+
+  const analyzeVoice = () => {
+    // Mock result
+    const mockResult: EmotionResult = {
+      id: uuidv4(),
+      emotion: "calm",
+      score: 0.78,
+      confidence: 0.82,
+      intensity: 0.65,
+      emojis: ["😌"],
+      text: "Je me sens plutôt bien aujourd'hui, même si j'ai eu quelques moments de stress ce matin.",
+      feedback: "Votre voix indique un état de calme relatif avec une légère tension sous-jacente.",
+      timestamp: new Date().toISOString(),
+      source: "voice"
+    };
+    
+    setIsAnalyzing(false);
+    
+    if (onResult) {
+      onResult(mockResult);
+    }
+    
+    toast({
+      title: "Analyse terminée",
+      description: `Émotion détectée : ${mockResult.emotion}`,
+    });
+  };
 
   return (
-    <Card className={className}>
-      <CardContent className="pt-6 text-center">
-        <div 
-          className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-4 transition-colors
-            ${isRecording ? 'animate-pulse bg-red-100 dark:bg-red-900' : 
-              isProcessing ? 'bg-amber-100 dark:bg-amber-900' : 
-              'bg-muted'}`}
-        >
-          <MicIcon 
-            className={`h-10 w-10 
-              ${isRecording ? 'text-red-500' : 
-                isProcessing ? 'text-amber-500' : 
-                'text-muted-foreground'}`} 
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <h3 className="font-medium text-lg">
-            {isRecording ? 'Écoute en cours...' : 
-             isProcessing ? 'Analyse en cours...' : 
-             'Prêt à analyser votre voix'}
-          </h3>
-          
-          <p className="text-muted-foreground text-sm">
-            {isRecording ? `Parlez naturellement pendant ${duration} secondes` : 
-             isProcessing ? 'Traitement de votre échantillon vocal' : 
-             'Appuyez sur le bouton pour commencer l\'analyse vocale'}
-          </p>
-        </div>
-        
-        {!isRecording && !isProcessing && !autoStart && (
-          <Button 
-            className="mt-6"
-            onClick={startRecording}
-          >
-            Démarrer l'analyse
-          </Button>
-        )}
-        
-        {showVisualizer && isRecording && (
-          <div className="mt-4 flex justify-center items-end space-x-1 h-8">
-            {[...Array(12)].map((_, i) => (
-              <div 
-                key={i}
-                className="w-1 bg-primary"
-                style={{ 
-                  height: `${Math.random() * 100}%`,
-                  animationDelay: `${i * 0.1}s`,
-                  animationDuration: `${0.5 + Math.random() * 0.5}s`
-                }}
-              />
-            ))}
+    <div className="space-y-4">
+      <div className="flex flex-col items-center justify-center border border-dashed border-border rounded-lg p-8 bg-muted/30">
+        {isRecording ? (
+          <div className="relative w-16 h-16 mb-4">
+            <div className="absolute inset-0 bg-red-500 rounded-full opacity-75 animate-ping"></div>
+            <div className="relative flex items-center justify-center w-16 h-16 bg-red-500 rounded-full">
+              <Mic className="h-8 w-8 text-white" />
+            </div>
           </div>
+        ) : (
+          <Mic className="h-12 w-12 text-muted-foreground mb-4" />
         )}
-      </CardContent>
-    </Card>
+        
+        <p className="text-center text-muted-foreground">
+          {isRecording 
+            ? "Enregistrement en cours... Parlez naturellement de votre journée et de vos sentiments." 
+            : isAnalyzing
+              ? "Analyse de votre voix en cours..."
+              : "Enregistrez votre voix pour analyser votre état émotionnel"}
+        </p>
+      </div>
+      
+      {isRecording ? (
+        <Button 
+          onClick={handleStopRecording} 
+          variant="destructive" 
+          className="w-full"
+          size="lg"
+        >
+          <Square className="mr-2 h-4 w-4" />
+          Arrêter l'enregistrement
+        </Button>
+      ) : (
+        <Button 
+          onClick={handleStartRecording} 
+          disabled={isAnalyzing} 
+          className="w-full"
+          size="lg"
+        >
+          {isAnalyzing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Analyse en cours...
+            </>
+          ) : (
+            <>
+              <Mic className="mr-2 h-4 w-4" />
+              Commencer l'enregistrement
+            </>
+          )}
+        </Button>
+      )}
+    </div>
   );
 };
 

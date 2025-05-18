@@ -1,41 +1,87 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
-interface TimePickerInputProps {
-  id?: string;
+interface TimePickerProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
-  placeholder?: string;
 }
 
-export const TimePickerInput: React.FC<TimePickerInputProps> = ({
-  id,
+export const TimePicker: React.FC<TimePickerProps> = ({
   value,
   onChange,
   className,
-  placeholder = "00:00"
 }) => {
-  const [hours, minutes] = value?.split(':').map(Number) || [0, 0];
+  const [hours, setHours] = useState('');
+  const [minutes, setMinutes] = useState('');
   
-  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const timeValue = e.target.value;
+  useEffect(() => {
+    if (value) {
+      const [h, m] = value.split(':');
+      setHours(h);
+      setMinutes(m);
+    }
+  }, [value]);
+  
+  const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value;
+    if (val === '') {
+      setHours('');
+      return;
+    }
     
-    // Validation simple du format de l'heure (peut être améliorée)
-    if (/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(timeValue)) {
-      onChange(timeValue);
+    const numVal = parseInt(val);
+    if (isNaN(numVal)) return;
+    
+    if (numVal >= 0 && numVal <= 23) {
+      setHours(val.padStart(2, '0'));
+      onChange(`${val.padStart(2, '0')}:${minutes}`);
+    }
+  };
+  
+  const handleMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value;
+    if (val === '') {
+      setMinutes('');
+      return;
+    }
+    
+    const numVal = parseInt(val);
+    if (isNaN(numVal)) return;
+    
+    if (numVal >= 0 && numVal <= 59) {
+      setMinutes(val.padStart(2, '0'));
+      onChange(`${hours}:${val.padStart(2, '0')}`);
     }
   };
 
   return (
-    <Input
-      id={id}
-      type="time"
-      value={value}
-      onChange={handleTimeChange}
-      className={className}
-      placeholder={placeholder}
-    />
+    <div className={cn("flex items-center space-x-2", className)}>
+      <Input
+        className="w-[4rem] text-center"
+        type="text"
+        maxLength={2}
+        inputMode="numeric"
+        pattern="[0-9]*"
+        value={hours}
+        onChange={handleHoursChange}
+        placeholder="HH"
+      />
+      <span className="text-lg font-medium">:</span>
+      <Input
+        className="w-[4rem] text-center"
+        type="text"
+        maxLength={2}
+        inputMode="numeric"
+        pattern="[0-9]*"
+        value={minutes}
+        onChange={handleMinutesChange}
+        placeholder="MM"
+      />
+    </div>
   );
 };
+
+export default TimePicker;

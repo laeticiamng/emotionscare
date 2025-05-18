@@ -13,10 +13,10 @@ const UserDashboardSections: React.FC = () => {
       duration: 15,
       tags: ['méditation', 'matin', 'débutant'],
       category: 'méditation',
-      environment: 'plage',
       thumbnailUrl: '/images/meditation-morning.jpg',
       intensity: 1,
-      objective: 'Apaiser l\'esprit'
+      objective: 'Apaiser l\'esprit',
+      type: 'meditation'
     },
     {
       id: '2',
@@ -26,10 +26,10 @@ const UserDashboardSections: React.FC = () => {
       duration: 25,
       tags: ['relaxation', 'stress', 'soir'],
       category: 'relaxation',
-      environment: 'forêt',
       thumbnailUrl: '/images/deep-relaxation.jpg',
       intensity: 2,
-      objective: 'Réduire le stress'
+      objective: 'Réduire le stress',
+      type: 'relaxation'
     }
   ];
 

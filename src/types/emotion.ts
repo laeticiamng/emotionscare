@@ -24,7 +24,7 @@ export interface EmotionResult {
   userId?: string;
   user_id?: string; // Legacy field - use userId instead
   date?: string; // Legacy field - use timestamp instead
-  recommendations?: EmotionRecommendation[]; // Used by some components
+  recommendations?: EmotionRecommendation[] | string[]; // Used by some components
 }
 
 export interface EmotionRecommendation {
@@ -33,6 +33,9 @@ export interface EmotionRecommendation {
   content: string;
   title?: string;
 }
+
+// Type alternatif pour la rétrocompatibilité
+export type LegacyEmotionRecommendation = string;
 
 export interface Emotion {
   name: string;
