@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 export function useApiConnection() {
   const [apiReady, setApiReady] = useState(false);
@@ -12,10 +13,19 @@ export function useApiConnection() {
         setApiCheckInProgress(true);
         setApiError(null);
         
-        // Simulate API health check
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // Check if Supabase is properly configured
+        const supabaseUrl = supabase.supabaseUrl;
+        if (!supabaseUrl) {
+          throw new Error('Supabase URL is not configured');
+        }
         
-        // Mock success response
+        // Try to make a simple request to validate connection
+        const { data, error } = await supabase.from('profiles').select('count').limit(1);
+        
+        if (error) {
+          throw error;
+        }
+        
         setApiReady(true);
       } catch (error) {
         console.error('API connection check failed:', error);
@@ -30,13 +40,17 @@ export function useApiConnection() {
   }, []);
 
   const retryConnection = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
     setApiCheckInProgress(true);
     setApiError(null);
     
     try {
-      // Simulate API check
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Try to make a simple request to validate connection
+      const { data, error } = await supabase.from('profiles').select('count').limit(1);
+      
+      if (error) {
+        throw error;
+      }
+      
       setApiReady(true);
     } catch (error) {
       console.error('API reconnection attempt failed:', error);

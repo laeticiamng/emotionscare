@@ -1,14 +1,7 @@
 
-import { createClient } from '@supabase/supabase-js';
+import { supabase as existingClient } from "@/integrations/supabase/client";
 
-const supabaseUrl = 
-  import.meta.env.NEXT_PUBLIC_SUPABASE_URL || 
-  import.meta.env.VITE_SUPABASE_URL || 
-  '';
+// Use the existing client to avoid duplicate initializations
+export const supabase = existingClient;
 
-const supabaseAnonKey = 
-  import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 
-  import.meta.env.VITE_SUPABASE_ANON_KEY || 
-  '';
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export default supabase;
