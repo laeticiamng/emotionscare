@@ -85,6 +85,7 @@ export const ROUTES: RouteConfig = {
     coach: '/b2c/coach',
     vr: '/b2c/vr',
     settings: '/b2c/settings',
+    events: '/b2c/events',
     gamification: '/b2c/gamification',
     cocon: '/b2c/cocon',
     preferences: '/b2c/preferences'
@@ -101,6 +102,7 @@ export const ROUTES: RouteConfig = {
     vr: '/b2b/user/vr',
     teams: '/b2b/user/teams',
     settings: '/b2b/user/settings',
+    events: '/b2b/user/events',
     gamification: '/b2b/user/gamification',
     cocon: '/b2b/user/cocon',
     preferences: '/b2b/user/preferences'
