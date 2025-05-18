@@ -26,3 +26,7 @@ export * from './user';
 
 // Export gamification types
 export * from './gamification';
+
+// Export navigation and layout types
+export * from './navigation';
+export * from './layout';

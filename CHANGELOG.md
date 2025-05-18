@@ -18,6 +18,17 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ### Modifié
 - Normalisation du `CoachContext` pour utiliser les nouveaux types.
 
+## [1.1.3] - 2025-05-21
+
+### Ajouté
+- Composant `AppProviders` regroupant les providers globaux.
+- Types de layout centralisés dans `src/types/layout.ts`.
+- Documentation `docs/layout-shell-audit.md` sur la structure du Shell.
+
+### Modifié
+- `App.tsx` utilise désormais `AppProviders` pour simplifier l'arbre React.
+- `Shell` et `LayoutContext` importent les nouveaux types.
+
 ## [1.1.0] - 2025-05-18
 
 ### Ajouté
