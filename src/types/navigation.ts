@@ -30,8 +30,10 @@ export interface RouteConfig {
     events?: string;
     settings?: string;
     gamification?: string;
+    marketplace?: string;
     cocon?: string;
     preferences?: string;
+    extensions?: string;
   };
   b2bUser: {
     home: string;
@@ -50,6 +52,7 @@ export interface RouteConfig {
     gamification?: string;
     cocon?: string;
     preferences?: string;
+    extensions?: string;
   };
   b2bAdmin: {
     home: string;
@@ -64,6 +67,8 @@ export interface RouteConfig {
     reports?: string;
     events?: string;
     settings?: string;
+    optimisation?: string;
+    extensions?: string;
   };
   common: {
     home: string;

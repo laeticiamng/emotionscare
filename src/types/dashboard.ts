@@ -1,59 +1,47 @@
 
-import { ReactNode } from 'react';
-
-export interface EmotionalTeamViewProps {
-  period?: string;
-  anonymized?: boolean;
-  dateRange?: { from: Date; to: Date };
-  showGraph?: boolean;
-  showMembers?: boolean;
-  className?: string;
+export interface KpiDelta {
+  value: number;
+  trend: 'up' | 'down' | 'neutral';
+  label?: string;
 }
 
 export interface KpiCardProps {
+  id?: string; // Make id optional to maintain compatibility
   title: string;
   value: string | number;
-  description?: string;
-  icon?: ReactNode;
+  delta?: number | KpiDelta;
+  icon?: React.ReactNode;
+  subtitle?: string | React.ReactNode;
   status?: KpiCardStatus;
-  trend?: number;
   className?: string;
-  id?: string;
-  delta?: number | {
-    value: number;
-    label?: string;
-    trend: 'up' | 'down' | 'neutral';
-  };
-  subtitle?: ReactNode | string;
-  ariaLabel?: string;
   isLoading?: boolean;
+  ariaLabel?: string;
   onClick?: () => void;
-  footer?: ReactNode;
+  footer?: React.ReactNode;
 }
 
+export type KpiCardStatus = 'default' | 'success' | 'warning' | 'error' | 'info';
+
+// Adding missing DashboardWidgetConfig interface
 export interface DashboardWidgetConfig {
   id: string;
   title: string;
-  description?: string;
-  visible?: boolean;
-  position?: number;
+  type: string;
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+  visible: boolean;
+  settings?: Record<string, any>;
 }
 
-export type KpiCardStatus = 'positive' | 'negative' | 'neutral' | 'warning' | 'default' | 'info';
-
+// Adding missing DraggableKpiCardsGridProps interface
 export interface DraggableKpiCardsGridProps {
-  cards: KpiCardProps[];
-  className?: string;
+  cards?: KpiCardProps[];
+  onCardsReorder?: (cards: KpiCardProps[]) => void;
   onOrderChange?: (cards: KpiCardProps[]) => void;
-  onLayoutChange?: (layout: any) => void;
+  onSave?: (layouts: any) => void;
+  savedLayout?: any;
+  className?: string;
   isEditable?: boolean;
-}
-
-export interface GamificationData {
-  activeChallenges: number;
-  badges: number;
-  completedChallenges: number;
-  level: number;
-  points: number;
-  streak: number;
 }

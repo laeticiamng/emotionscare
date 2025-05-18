@@ -1,75 +1,101 @@
-import { useState, useCallback } from 'react';
+
+import { useState } from 'react';
 import { EmotionResult } from '@/types/emotion';
 import { normalizeEmotionResult } from '@/utils/emotionCompatibility';
 
+/**
+ * Custom hook to manage emotion scanning functionality
+ */
 export function useEmotionScan() {
-  const [result, setResult] = useState<EmotionResult | null>(null);
+  const [scanResult, setScanResult] = useState<EmotionResult | null>(null);
   const [isScanning, setIsScanning] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const startScan = useCallback(async () => {
+  /**
+   * Handles text-based emotion scanning
+   */
+  const scanTextEmotion = async (text: string) => {
+    if (!text.trim()) {
+      setError("Veuillez entrer du texte pour l'analyse");
+      return;
+    }
+
     setIsScanning(true);
     setError(null);
     
     try {
-      // Simulate an API call to emotion detection service
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate API call for demo purposes
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Create a properly normalized emotion result
-      const mockResult = normalizeEmotionResult({
-        id: `emotion-${Date.now()}`,
-        emotion: 'happy',
-        confidence: 0.85,
-        emojis: ['😊', '😄'],
-        score: 78,
-        intensity: 0.7, // Using number directly
-        text: 'User expression analysis',
-        feedback: 'You seem to be in a good mood',
-        timestamp: new Date().toISOString()
-      });
+      // Mock result
+      const mockResult: Partial<EmotionResult> = {
+        id: `scan-${Date.now()}`,
+        emotion: getRandomEmotion(),
+        confidence: 0.7 + Math.random() * 0.25,
+        intensity: 0.5 + Math.random() * 0.4,
+        emojis: ['😊'],
+        text,
+        timestamp: new Date().toISOString(),
+        source: 'text'
+      };
       
-      setResult(mockResult);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Unknown error during scan'));
-      console.error('Error during emotion scan:', err);
+      const normalizedResult = normalizeEmotionResult(mockResult);
+      setScanResult(normalizedResult);
+    } catch (err: any) {
+      console.error('Error scanning text emotion:', err);
+      setError(err.message || 'Une erreur est survenue lors de l\'analyse');
     } finally {
       setIsScanning(false);
     }
-  }, []);
+  };
 
-  const resetScan = useCallback(() => {
-    setResult(null);
-    setError(null);
-  }, []);
-
-  const mockEmotionDetection = useCallback((emotion: string) => {
+  /**
+   * Handles voice-based emotion scanning
+   */
+  const scanVoiceEmotion = async (audioBlob?: Blob) => {
     setIsScanning(true);
+    setError(null);
     
-    // Simulate processing delay
-    setTimeout(() => {
-      // Create a normalized mock result
-      const mockResult = normalizeEmotionResult({
-        id: `mock-${Date.now()}`,
-        emotion,
-        confidence: 0.9,
-        emojis: ['😊', '😃'],
-        score: 85,
-        intensity: 0.8, // Using number directly
-        text: 'Mock detection',
-        timestamp: new Date().toISOString()
-      });
+    try {
+      // Simulate API call for demo purposes
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      setResult(mockResult);
+      // Mock result
+      const mockResult: Partial<EmotionResult> = {
+        id: `scan-${Date.now()}`,
+        emotion: getRandomEmotion(),
+        confidence: 0.6 + Math.random() * 0.3,
+        intensity: 0.4 + Math.random() * 0.5,
+        emojis: ['😊'],
+        timestamp: new Date().toISOString(),
+        source: 'voice',
+        transcript: "Voici ce que j'ai dit pendant l'enregistrement."
+      };
+      
+      const normalizedResult = normalizeEmotionResult(mockResult);
+      setScanResult(normalizedResult);
+    } catch (err: any) {
+      console.error('Error scanning voice emotion:', err);
+      setError(err.message || 'Une erreur est survenue lors de l\'analyse');
+    } finally {
       setIsScanning(false);
-    }, 1000);
-  }, []);
+    }
+  };
+
+  // Helper function to get random emotions for mock data
+  function getRandomEmotion(): string {
+    const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'neutral', 'calm'];
+    return emotions[Math.floor(Math.random() * emotions.length)];
+  }
 
   return {
-    result,
+    scanResult,
     isScanning,
     error,
-    startScan,
-    resetScan,
-    mockEmotionDetection,
+    scanTextEmotion,
+    scanVoiceEmotion,
+    resetScan: () => setScanResult(null)
   };
 }
+
+export default useEmotionScan;

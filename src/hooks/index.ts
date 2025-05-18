@@ -27,7 +27,7 @@ export { useMusicEmotionIntegration } from './useMusicEmotionIntegration';
 export { default as useMusicRecommendation } from './useMusicRecommendation';
 
 // Emotion hooks
-export { default as useEmotionScan } from './useEmotionScan';
+export { useEmotionScan } from './useEmotionScan';
 
 // Theme hook
 export { useTheme } from './use-theme';

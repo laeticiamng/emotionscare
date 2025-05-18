@@ -1,84 +1,112 @@
+import { EmotionResult } from '@/types/emotion';
 
 /**
- * Emotion Compatibility Utilities
- * ------------------------------
- * This file provides utility functions to help with compatibility
- * between different emotion data formats and property names.
+ * Normalizes emotion data from different sources into a consistent EmotionResult format
+ * @param data The emotion data to normalize
+ * @returns Normalized EmotionResult object
  */
-
-import { EmotionResult, EmotionIntensity } from '@/types/emotion';
-
-/**
- * Converts string-based emotion intensity to numeric value
- * @param intensity The emotion intensity as string or number
- */
-export const normalizeEmotionIntensity = (intensity: EmotionIntensity | number | undefined): number => {
-  if (intensity === undefined) {
-    return 0.5; // Default medium intensity
+export function normalizeEmotionResult(data: any): EmotionResult {
+  // Handle undefined or null data
+  if (!data) {
+    return {
+      id: crypto.randomUUID(),
+      date: new Date().toISOString(),
+      emotion: 'neutral',
+      confidence: 0.5,
+      intensity: 0.5,
+      emojis: ['😐'],
+      source: 'system',
+    };
   }
-  
+
+  // Create a base object with required fields
+  const result: EmotionResult = {
+    id: data.id || crypto.randomUUID(),
+    date: data.date || data.timestamp || new Date().toISOString(),
+    emotion: data.emotion || 'neutral',
+    confidence: data.confidence || 0.5,
+    intensity: data.intensity || 0.5,
+    emojis: data.emojis || ['😐'],
+    source: data.source || 'system',
+  };
+
+  // Handle optional fields
+  if (data.text) result.text = data.text;
+  if (data.textInput) result.text = data.textInput;
+  if (data.audio_url) result.audio_url = data.audio_url;
+  if (data.audioUrl) result.audio_url = data.audioUrl;
+  if (data.transcript) result.transcript = data.transcript;
+  if (data.facialExpression) result.facialExpression = data.facialExpression;
+  if (data.recommendations) result.recommendations = data.recommendations;
+  if (data.emotions) {
+    // Handle the case where emotions is an array of emotion objects
+    if (Array.isArray(data.emotions) && data.emotions.length > 0) {
+      result.emotion = data.emotions[0].name || result.emotion;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Normalizes emotion intensity to a numeric value between 0 and 1
+ * @param intensity The intensity value which could be a string like "low", "medium", "high" or a number
+ * @returns A normalized number between 0 and 1
+ */
+export function normalizeEmotionIntensity(intensity: string | number): number {
   if (typeof intensity === 'number') {
-    return intensity;
+    // If already a number, ensure it's between 0 and 1
+    return Math.max(0, Math.min(1, intensity));
   }
   
-  // Convert string intensity to number
-  switch(intensity.toLowerCase()) {
-    case 'very low':
-    case 'very_low':
-      return 0.1;
+  // If it's a percentage string like "75%"
+  if (typeof intensity === 'string' && intensity.endsWith('%')) {
+    const percentage = parseFloat(intensity);
+    if (!isNaN(percentage)) {
+      return percentage / 100;
+    }
+  }
+  
+  // Handle string values
+  switch (intensity?.toLowerCase?.()) {
     case 'low':
-      return 0.3;
+      return 0.25;
     case 'medium':
       return 0.5;
     case 'high':
-      return 0.7;
-    case 'very high':
-    case 'very_high':
-      return 0.9;
+      return 0.75;
     default:
-      return 0.5;
+      return 0.5; // Default to medium intensity
   }
-};
+}
 
 /**
- * Ensures an emotion result has all required properties with proper types
+ * Converts legacy emotion data formats to the current EmotionResult format
  */
-export const normalizeEmotionResult = (result: Partial<EmotionResult>): EmotionResult => {
-  return {
-    id: result.id || `emotion-${Date.now()}`,
-    emotion: result.emotion || 'neutral',
-    confidence: result.confidence || 0.5,
-    score: result.score || 0,
-    intensity: normalizeEmotionIntensity(result.intensity),
-    timestamp: result.timestamp || new Date().toISOString(),
-    metadata: result.metadata || {},
-    emojis: result.emojis || [],
-    text: result.text || '',
-    feedback: result.feedback || '',
-    // Include other properties with defaults
-    ...result
-  };
-};
+export function convertLegacyEmotionData(legacyData: any): EmotionResult {
+  return normalizeEmotionResult(legacyData);
+}
 
 /**
- * Gets the display name for an emotion
+ * Gets appropriate emoji for an emotion
  */
-export const getEmotionDisplayName = (emotionKey: string): string => {
-  const emotionMap: Record<string, string> = {
-    'happy': 'Happy',
-    'sad': 'Sad',
-    'angry': 'Angry',
-    'fearful': 'Fearful',
-    'disgusted': 'Disgusted',
-    'surprised': 'Surprised',
-    'calm': 'Calm',
-    'confused': 'Confused',
-    'neutral': 'Neutral',
-    'focused': 'Focused',
-    'relaxed': 'Relaxed',
-    'stressed': 'Stressed',
-    'anxious': 'Anxious'
+export function getEmotionEmoji(emotion: string): string {
+  const emotionEmojiMap: Record<string, string> = {
+    'happy': '😊',
+    'sad': '😢',
+    'angry': '😠',
+    'fear': '😨',
+    'surprise': '😲',
+    'disgust': '🤢',
+    'neutral': '😐',
+    'joy': '😄',
+    'calm': '😌',
+    'anxious': '😰',
+    'excited': '😃',
+    'tired': '😴',
+    'stressed': '😫',
+    'relaxed': '😌',
   };
   
-  return emotionMap[emotionKey.toLowerCase()] || emotionKey;
-};
+  return emotionEmojiMap[emotion.toLowerCase()] || '😐';
+}

@@ -12,6 +12,7 @@ jobs:
           cache: 'npm'
       - name: Configure npm registry
         run: npm config set registry https://registry.npmmirror.com
+
       - name: Install deps
         run: npm ci --prefer-offline --no-audit --no-fund
       - name: Run tests

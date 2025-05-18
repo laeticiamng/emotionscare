@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmotionResult } from '@/types/emotion';
-import { normalizeEmotionIntensity } from '@/utils/emotionCompatibility';
+import { normalizeEmotionResult } from '@/utils/emotionCompatibility';
 
 export default function LiveEmotionResults({ result, isLoading }: { result?: EmotionResult, isLoading?: boolean }) {
   // Handle null/undefined result
@@ -20,19 +21,12 @@ export default function LiveEmotionResults({ result, isLoading }: { result?: Emo
     );
   }
 
-  // We'll use the normalizeEmotionIntensity function to handle string or number intensity
-  const getIntensityPercent = () => {
-    if (!result) return 0;
-    // Convert to number and multiply by 100 to get percentage
-    return normalizeEmotionIntensity(result.intensity) * 100;
-  };
+  // We'll use the normalizeEmotionResult to ensure we have a valid emotion result
+  const normalizedResult = result ? normalizeEmotionResult(result) : undefined;
   
-  // Rest of component remains the same...
-  // ... keep existing code
-
-  // For the parts that caused errors:
-  const intensityPercent = getIntensityPercent();
-  const confidencePercent = result ? result.confidence * 100 : 0;
+  // Convert to percentage for display
+  const intensityPercent = normalizedResult ? normalizedResult.intensity * 100 : 0;
+  const confidencePercent = normalizedResult ? normalizedResult.confidence * 100 : 0;
 
   return (
     <Card className="w-full">
@@ -46,17 +40,17 @@ export default function LiveEmotionResults({ result, isLoading }: { result?: Emo
           </div>
         )}
         
-        {!isLoading && !result && (
+        {!isLoading && !normalizedResult && (
           <div>
             <p>Aucun résultat pour le moment.</p>
           </div>
         )}
         
-        {!isLoading && result && (
+        {!isLoading && normalizedResult && (
           <div className="space-y-4">
             <div>
               <h3 className="text-lg font-medium mb-2">Émotion détectée</h3>
-              <p className="text-xl font-bold">{result.emotion}</p>
+              <p className="text-xl font-bold">{normalizedResult.emotion}</p>
             </div>
             
             <div>
@@ -74,13 +68,13 @@ export default function LiveEmotionResults({ result, isLoading }: { result?: Emo
             
             <div>
               <h3 className="text-lg font-medium mb-2">Score</h3>
-              <p className="text-xl font-bold">{result.score || 'N/A'}</p>
+              <p className="text-xl font-bold">{normalizedResult.score || 'N/A'}</p>
             </div>
             
-            {(result.feedback || result.ai_feedback) && (
+            {(normalizedResult.feedback || normalizedResult.ai_feedback) && (
               <div>
                 <h3 className="text-lg font-medium mb-2">Feedback IA</h3>
-                <p className="text-muted-foreground">{result.feedback || result.ai_feedback}</p>
+                <p className="text-muted-foreground">{normalizedResult.feedback || normalizedResult.ai_feedback}</p>
               </div>
             )}
           </div>

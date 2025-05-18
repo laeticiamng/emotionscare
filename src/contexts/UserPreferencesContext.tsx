@@ -1,10 +1,15 @@
 
 import React, { createContext, useState, useContext } from 'react';
-import { UserPreferences, UserPreferencesContextType, DEFAULT_PREFERENCES } from '@/types/preferences';
+import { UserPreferences, UserPreferencesContextType, DEFAULT_PREFERENCES, NotificationsPreferences, PrivacyPreferences } from '@/types/preferences';
 
 // Création du contexte avec des valeurs par défaut
 export const UserPreferencesContext = createContext<UserPreferencesContextType>({
   preferences: DEFAULT_PREFERENCES,
+  theme: DEFAULT_PREFERENCES.theme || 'system',
+  fontSize: DEFAULT_PREFERENCES.fontSize || 'medium',
+  language: DEFAULT_PREFERENCES.language || 'fr',
+  notifications: DEFAULT_PREFERENCES.notifications as NotificationsPreferences,
+  privacy: DEFAULT_PREFERENCES.privacy || 'private',
   updatePreferences: async () => Promise.resolve(),
   resetPreferences: () => {},
   isLoading: false,
@@ -22,36 +27,57 @@ export const UserPreferencesProvider: React.FC<{ children: React.ReactNode; init
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // Lecture des propriétés principales pour le contexte
+  const theme = preferences.theme || 'system';
+  const fontSize = preferences.fontSize || 'medium';
+  const language = preferences.language || 'fr';
+  
+  // Normaliser les notifications
+  const notifications: NotificationsPreferences = typeof preferences.notifications === 'boolean'
+    ? { enabled: preferences.notifications, emailEnabled: false, pushEnabled: false }
+    : preferences.notifications || { enabled: true, emailEnabled: true, pushEnabled: false };
+  
+  // Normaliser les préférences de confidentialité
+  const privacy = preferences.privacy || 'private';
+
   // Fonction pour mettre à jour partiellement les préférences
   const updatePreferences = async (newPreferences: Partial<UserPreferences>): Promise<void> => {
     try {
       setIsLoading(true);
       setError(null);
       
-      setPreferences((prev) => ({
-        ...prev,
-        ...newPreferences,
-        // Pour les objets imbriqués, on fait un merge profond
-        ...(newPreferences.privacy && {
-          privacy: {
-            ...prev.privacy,
-            ...newPreferences.privacy,
-          },
-        }),
-        ...(newPreferences.notifications && {
-          notifications: {
-            ...prev.notifications,
-            ...newPreferences.notifications,
-            // Merge des types de notifications si présents
-            ...(newPreferences.notifications.types && {
-              types: {
-                ...prev.notifications?.types,
-                ...newPreferences.notifications.types,
-              },
-            }),
-          },
-        }),
-      }));
+      setPreferences(prev => {
+        const updated = { ...prev, ...newPreferences };
+        
+        // Pour les objets imbriqués, faire un merge manuel
+        if (newPreferences.privacy && typeof prev.privacy === 'object' && typeof newPreferences.privacy === 'object') {
+          updated.privacy = { ...(prev.privacy as PrivacyPreferences), ...(newPreferences.privacy as PrivacyPreferences) };
+        }
+        
+        if (newPreferences.notifications && typeof prev.notifications === 'object' && typeof newPreferences.notifications === 'object') {
+          const updatedNotifications = { 
+            ...prev.notifications as NotificationsPreferences,
+            ...newPreferences.notifications as NotificationsPreferences
+          };
+          
+          // Merge des types de notifications si présents
+          if (
+            prev.notifications && 
+            'types' in prev.notifications &&
+            newPreferences.notifications && 
+            'types' in newPreferences.notifications
+          ) {
+            updatedNotifications.types = {
+              ...(prev.notifications as NotificationsPreferences).types,
+              ...(newPreferences.notifications as NotificationsPreferences).types
+            };
+          }
+          
+          updated.notifications = updatedNotifications;
+        }
+        
+        return updated;
+      });
       
       return Promise.resolve();
     } catch (err) {
@@ -70,6 +96,11 @@ export const UserPreferencesProvider: React.FC<{ children: React.ReactNode; init
 
   const value: UserPreferencesContextType = {
     preferences,
+    theme,
+    fontSize,
+    language,
+    notifications,
+    privacy,
     updatePreferences,
     resetPreferences,
     isLoading,

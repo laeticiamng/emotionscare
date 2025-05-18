@@ -17,7 +17,7 @@ export const useConversationState = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       lastMessage: "",
-      user_id: "user-123", // Normalement dynamique selon l'utilisateur connecté
+      user_id: "user-123", // legacy field
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       last_message: ""
@@ -35,7 +35,7 @@ export const useConversationState = () => {
     setConversations(prev => 
       prev.map(conv => 
         conv.id === id 
-          ? { ...conv, title, updatedAt: new Date().toISOString(), updated_at: new Date().toISOString() } 
+          ? { ...conv, title, updatedAt: new Date().toISOString(), updated_at: new Date().toISOString() }
           : conv
       )
     );

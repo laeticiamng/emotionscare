@@ -5,19 +5,39 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { PrivacyPreferences } from '@/types/preferences';
 
-const PrivacyPreferences: React.FC = () => {
+const PrivacyPreferencesComponent: React.FC = () => {
   const { preferences, updatePreferences } = useUserPreferences();
   
   // Assurer que les propriétés sont définies avec des valeurs par défaut
-  const privacySettings = preferences?.privacy || {
-    dataSharing: false,
-    analytics: true,
-    thirdParty: false,
-    shareData: false,
-    anonymizeReports: false,
-    profileVisibility: 'public',
+  const getPrivacySettings = (): PrivacyPreferences => {
+    if (!preferences?.privacy) {
+      return {
+        dataSharing: false,
+        analytics: true,
+        thirdParty: false,
+        shareData: false,
+        anonymizeReports: false,
+        profileVisibility: 'public',
+      };
+    }
+    
+    if (typeof preferences.privacy === 'string') {
+      return {
+        dataSharing: preferences.privacy !== 'private',
+        analytics: preferences.privacy !== 'private',
+        thirdParty: preferences.privacy !== 'private',
+        shareData: preferences.privacy !== 'private',
+        anonymizeReports: false,
+        profileVisibility: preferences.privacy,
+      };
+    }
+    
+    return preferences.privacy;
   };
+  
+  const privacySettings = getPrivacySettings();
   
   const handleShareDataChange = (checked: boolean) => {
     updatePreferences({
@@ -105,4 +125,4 @@ const PrivacyPreferences: React.FC = () => {
   );
 };
 
-export default PrivacyPreferences;
+export default PrivacyPreferencesComponent;

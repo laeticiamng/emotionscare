@@ -43,16 +43,14 @@ const KpiCards: React.FC<KpiCardsProps> = ({
           <Card className="p-4"><Skeleton className="h-24 w-full" /></Card>
         </>
       ) : (
-        // Actual content using our new KpiCard component
+        // Actual content using our KpiCard component
         <>
           <KpiCard
             id="emotion-score-card"
             title="Score émotionnel moyen"
             value={avgEmotionalScore}
             icon={<Brain className="h-6 w-6" />}
-            subtitle={
-              <Progress value={avgEmotionalScore} className="h-2 bg-gray-100 mt-2" />
-            }
+            subtitle="Score émotionnel moyen sur la période"
             ariaLabel={`Score émotionnel moyen: ${avgEmotionalScore}/100`}
             onClick={navigateToEmotionDetails}
           />

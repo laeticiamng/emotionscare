@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { SpeechRecognition } from '@/types/speech';
 
 // Polyfill minimal pour remplacer react-speech-kit
 export const useSpeechRecognition = () => {

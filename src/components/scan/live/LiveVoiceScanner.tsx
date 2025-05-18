@@ -3,9 +3,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 import { Mic, Square } from 'lucide-react';
-import { useCoach } from '@/contexts/coach';
 
 interface LiveVoiceScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
@@ -21,7 +20,6 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [progress, setProgress] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { setLastEmotion } = useCoach();
 
   const processAudioData = useCallback(() => {
     setIsProcessing(true);
@@ -35,6 +33,11 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
         const emotions = ['joy', 'calm', 'focused', 'anxious', 'sad'];
         const emotion = emotions[Math.floor(Math.random() * emotions.length)];
         
+        const recommendations: EmotionRecommendation[] = [
+          { content: "Take a walk", category: "exercise" },
+          { content: "Practice deep breathing", category: "mindfulness" }
+        ];
+        
         const emotionResult: EmotionResult = {
           id: `scan-${Date.now()}`,
           emotion: emotion,
@@ -44,18 +47,14 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
           intensity: Math.random(),
           timestamp: new Date().toISOString(),
           feedback: "Your voice analysis reveals a balanced emotional state with slight tendencies toward the positive spectrum.",
-          recommendations: ["Take a walk", "Practice deep breathing"]
+          recommendations: recommendations,
+          source: 'voice'
         };
-        
-        // Mettre à jour le contexte Coach avec l'émotion détectée
-        if (setLastEmotion) {
-          setLastEmotion(emotion);
-        }
         
         onScanComplete(emotionResult);
       }
     }, 1500);
-  }, [onScanComplete, setLastEmotion]);
+  }, [onScanComplete]);
 
   const startRecording = useCallback(() => {
     setIsRecording(true);

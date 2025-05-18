@@ -1,184 +1,178 @@
 
 import React from 'react';
+import { VRSessionTemplate } from '@/types/vr';
 import { Button } from '@/components/ui/button';
-import { 
-  Clock, 
-  Heart, 
-  Calendar, 
-  ArrowLeft, 
-  Tag, 
-  BarChart,
-  ThumbsUp,
-  User
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { VRSessionTemplate } from '@/types';
+import { Badge } from '@/components/ui/badge';
+import { Clock, Star, Users, Tag, Award, Activity, CheckCircle } from 'lucide-react';
 
 interface VRTemplateDetailProps {
   template: VRSessionTemplate;
-  heartRate?: number;
-  onStartSession?: () => void;
-  onBack?: () => void;
+  onStart?: () => void;
   className?: string;
 }
 
 const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
   template,
-  heartRate = 75,
-  onStartSession,
-  onBack,
+  onStart,
   className = ''
 }) => {
   const {
     title,
     description,
     duration,
+    difficulty,
+    category,
+    rating,
     tags,
-    benefits,
-    emotion,
-    theme,
-    difficulty
+    features,
+    popularity,
+    imageUrl,
+    thumbnailUrl,
+    completionRate
   } = template;
   
-  // Format duration in minutes and seconds
-  const formatDuration = (seconds?: number): string => {
-    if (!seconds) return '5:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const getCoverImage = () => {
+    return (
+      template.imageUrl || 
+      template.thumbnailUrl || 
+      template.coverUrl || 
+      template.cover_url || 
+      '/images/vr-banner-bg.jpg'
+    );
   };
   
-  // Get image URL from various possible properties
-  const getImageUrl = (): string => {
-    return template.imageUrl || 
-           template.coverUrl ||
-           template.thumbnailUrl ||
-           template.cover_url ||
-           template.preview_url ||
-           '/images/vr-template-placeholder.jpg';
+  const getDifficultyColor = (difficulty?: string) => {
+    if (!difficulty) return 'bg-gray-500';
+    
+    switch (difficulty.toLowerCase()) {
+      case 'easy':
+        return 'bg-green-500 text-white';
+      case 'medium':
+        return 'bg-yellow-500 text-black';
+      case 'hard':
+        return 'bg-red-500 text-white';
+      default:
+        return 'bg-gray-500';
+    }
   };
   
+  const renderDifficulty = () => {
+    if (!difficulty) return null;
+    
+    return (
+      <Badge variant="outline" className={`${getDifficultyColor(difficulty)}`}>
+        {difficulty}
+      </Badge>
+    );
+  };
+
   return (
-    <div className={`space-y-6 ${className}`}>
-      {/* Back Button */}
-      {onBack && (
-        <Button variant="ghost" onClick={onBack} className="flex items-center gap-2 mb-2 px-2">
-          <ArrowLeft className="h-4 w-4" />
-          Back to templates
-        </Button>
-      )}
-      
-      {/* Hero Section */}
-      <div className="relative">
-        <div 
-          className="w-full h-40 rounded-lg bg-cover bg-center"
-          style={{ backgroundImage: `url(${getImageUrl()})` }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent rounded-lg" />
-        </div>
-        
-        <div className="pt-4">
-          <h2 className="text-2xl font-bold">{title}</h2>
-          
-          <div className="flex flex-wrap gap-2 mt-3">
-            {/* Duration */}
-            <Badge variant="outline" className="flex items-center gap-1">
-              <Clock className="h-3.5 w-3.5" />
-              {formatDuration(duration)} min
-            </Badge>
-            
-            {/* Theme */}
-            {theme && (
-              <Badge variant="outline" className="flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" />
-                {theme}
-              </Badge>
-            )}
-            
-            {/* Emotion */}
-            {emotion && (
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Heart className="h-3.5 w-3.5" />
-                {emotion}
-              </Badge>
-            )}
-            
-            {/* Difficulty */}
-            {difficulty && (
-              <Badge variant="outline" className="flex items-center gap-1">
-                <User className="h-3.5 w-3.5" />
-                {difficulty}
-              </Badge>
-            )}
-            
-            {/* Completion Rate */}
-            {(template.completionRate !== undefined || template.completion_rate !== undefined) && (
-              <Badge variant="outline" className="flex items-center gap-1">
-                <BarChart className="h-3.5 w-3.5" />
-                {template.completionRate || template.completion_rate || 0}% completion
-              </Badge>
-            )}
-            
-            {/* Recommended Mood */}
-            {(template.recommendedMood || template.recommended_mood) && (
-              <Badge variant="outline" className="flex items-center gap-1">
-                <ThumbsUp className="h-3.5 w-3.5" />
-                For {template.recommendedMood || template.recommended_mood}
-              </Badge>
-            )}
+    <Card className={`overflow-hidden ${className}`}>
+      {/* Image banner */}
+      <div className="relative h-48 w-full">
+        <img 
+          src={getCoverImage()} 
+          alt={title} 
+          className="h-full w-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70">
+          <div className="absolute bottom-4 left-4">
+            {renderDifficulty()}
           </div>
         </div>
       </div>
-      
-      {/* Description */}
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-muted-foreground">
-            {description || 'Experience a guided session designed to improve your emotional well-being.'}
-          </p>
-          
+
+      <CardContent className="p-6">
+        <div className="space-y-6">
+          {/* Header */}
+          <div>
+            <h2 className="text-2xl font-bold">{title}</h2>
+            <p className="text-muted-foreground mt-1">{description}</p>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-muted-foreground" />
+              <span>{duration} min</span>
+            </div>
+            
+            {rating && (
+              <div className="flex items-center gap-2">
+                <Star className="h-5 w-5 text-amber-500" />
+                <span>{rating.toFixed(1)}/5</span>
+              </div>
+            )}
+            
+            {popularity && (
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-blue-500" />
+                <span>{popularity}+ utilisateurs</span>
+              </div>
+            )}
+            
+            {(completionRate || template.completionRate) && (
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-500" />
+                <span>{(completionRate || template.completionRate)}% terminé</span>
+              </div>
+            )}
+          </div>
+
           {/* Tags */}
           {tags && tags.length > 0 && (
-            <div className="mt-4">
-              <div className="text-sm font-medium mb-2">Tags</div>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Tag className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Tags</span>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag, index) => (
-                  <Badge key={index} variant="outline" className="flex items-center gap-1">
-                    <Tag className="h-3 w-3" />
-                    {tag}
+                  <Badge key={index} variant="secondary">{tag}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Emotion recommandée */}
+          {(template.recommendedMood || template.recommended_mood || template.emotion) && (
+            <div className="flex items-center gap-2">
+              <Activity className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm">
+                Recommandé pour: <strong>{template.recommendedMood || template.recommended_mood || template.emotion}</strong>
+              </span>
+            </div>
+          )}
+
+          {/* Features */}
+          {features && features.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Award className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Caractéristiques</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {features.map((feature, index) => (
+                  <Badge key={index} variant="outline" className="bg-primary/10 hover:bg-primary/20">
+                    {feature}
                   </Badge>
                 ))}
               </div>
             </div>
           )}
-          
-          {/* Benefits */}
-          {benefits && benefits.length > 0 && (
-            <div className="mt-4">
-              <div className="text-sm font-medium mb-2">Benefits</div>
-              <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                {benefits.map((benefit, index) => (
-                  <li key={index}>{benefit}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      
-      {/* Heart Rate and Start Button */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Heart className="text-red-500 h-5 w-5" />
-          <span className="font-medium">{heartRate} BPM</span>
+
+          {/* Action button */}
+          <Button 
+            className="w-full" 
+            size="lg"
+            onClick={onStart}
+          >
+            Commencer la session
+          </Button>
         </div>
-        
-        <Button onClick={onStartSession} size="lg">
-          Start Session
-        </Button>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

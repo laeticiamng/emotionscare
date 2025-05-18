@@ -44,7 +44,7 @@ const KpiCard: React.FC<KpiCardProps> = ({
       ? { value: delta, trend: delta >= 0 ? 'up' : 'down' } 
       : delta;
     
-    const label = 'label' in deltaObj ? deltaObj.label : '';
+    const label = 'label' in deltaObj && deltaObj.label ? deltaObj.label : '';
     
     return (
       <Badge 

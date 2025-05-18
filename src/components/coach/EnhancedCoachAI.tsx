@@ -112,8 +112,8 @@ const EnhancedCoachAI = () => {
                 <h5 className="text-sm font-medium">Recommandations :</h5>
                 <ScrollArea className="h-20">
                   <ul className="list-disc list-inside text-xs text-muted-foreground">
-                    {analysisResult.recommendations.map((recommendation, index) => (
-                      <li key={index}>{recommendation}</li>
+                    {analysisResult.recommendations.map((rec, index) => (
+                      <li key={index}>{typeof rec === 'string' ? rec : rec.title}</li>
                     ))}
                   </ul>
                 </ScrollArea>

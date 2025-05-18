@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import useChat from '@/hooks/useChat';
 import { ChatMessage } from '@/types/chat';
 import { Button } from '@/components/ui/button';
@@ -15,22 +15,37 @@ interface ChatInterfaceProps {
   onSendMessage?: (message: string) => void;
   readOnly?: boolean;
   className?: string;
+  input?: string;
+  setInput?: (text: string) => void;
+  handleInputChange?: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
+  handleSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
+const ChatInterface: React.FC<ChatInterfaceProps> = ({
   initialMessages = [],
   onSendMessage,
   readOnly = false,
-  className = ''
+  className = '',
+  input: controlledInput,
+  setInput: setControlledInput,
+  handleInputChange: controlledChange,
+  handleSubmit: controlledSubmit
 }) => {
-  const { 
-    messages, 
-    input, 
-    setInput, 
-    sendMessage, 
-    handleInputChange, 
-    handleSubmit 
+  const {
+    messages,
+    input,
+    setInput,
+    sendMessage,
+    handleInputChange,
+    handleSubmit
   } = useChat({ initialMessages });
+
+  const currentInput = controlledInput ?? input;
+  const updateInput = setControlledInput ?? setInput;
+  const onChangeInput = controlledChange ?? handleInputChange;
+  const submitHandler = controlledSubmit ?? handleSubmit;
   
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
@@ -45,14 +60,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }, [messages]);
   
   const handleSendMessage = () => {
-    if (!input.trim()) return;
+    if (!currentInput.trim()) return;
     
     // Either use the custom handler or the internal chat state
     if (onSendMessage) {
-      onSendMessage(input);
-      setInput('');
+      onSendMessage(currentInput);
+      updateInput('');
     } else {
-      sendMessage(input);
+      sendMessage(currentInput);
     }
   };
   
@@ -82,13 +97,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div className="p-4 border-t">
           <div className="flex gap-2">
             <Textarea
-              value={input}
-              onChange={handleInputChange}
+              value={currentInput}
+              onChange={onChangeInput}
               onKeyDown={handleKeyDown}
               placeholder="Écrivez votre message..."
               className="min-h-[60px]"
             />
-            <Button size="icon" onClick={handleSendMessage} disabled={!input.trim()}>
+            <Button size="icon" onClick={handleSendMessage} disabled={!currentInput.trim()}>
               <Send className="h-4 w-4" />
             </Button>
           </div>

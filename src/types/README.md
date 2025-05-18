@@ -17,7 +17,7 @@ All modules must import their data types from this directory. Do not create loca
 
 - `music.ts` - All music-related types (MusicTrack, MusicPlaylist, etc.)
 - `emotion.ts` - Emotion tracking and detection types
-- `chat.ts` - Chat and messaging types
+- `chat.ts` - Chat and messaging types (`ChatHookResult`, `UseChatOptions`)
 - `vr.ts` - VR session and experience types
 
 ## Using These Types

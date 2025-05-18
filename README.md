@@ -60,6 +60,7 @@ src/
 - `/journal` - Journal émotionnel
 - `/music` - Thérapie musicale
 - `/vr` - Sessions de réalité virtuelle
+- `/predictive` - Tableau de bord d'intelligence prédictive
 - `/admin/dashboard` - Tableau de bord administrateur
 
 ## Configuration d'environnement
@@ -89,6 +90,9 @@ La plateforme EmotionsCare s'intègre avec plusieurs API tierces pour fournir se
 
 ### Configuration du fichier .env.local
 
+Un exemple de configuration est fourni dans `src/.env.example`. Copiez ce fichier
+vers `.env.local` puis renseignez vos propres clés et URLs.
+
 ```
 NEXT_PUBLIC_OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxx
 NEXT_PUBLIC_HUME_API_KEY=hume_xxxxxxxxxxxxxxxxxxxx
@@ -109,22 +113,24 @@ NEXT_PUBLIC_WEB_URL=http://localhost:3000
 > **Note**
 > L'ancienne variable `SKIP_AUTH_CHECK` utilisée pour désactiver l'authentification en développement a été supprimée. Les tableaux de bord sont désormais toujours protégés.
 
-### Utilisateur de test
+### Utilisateurs de test
 
-Un compte de test est mis à disposition pour les démonstrations :
+Trois comptes standards sont mis à disposition pour les démonstrations :
 
-- **Email** : `utilisateur@exemple.fr`
-- **Mot de passe** : `admin`
+| Email              | Mot de passe | Rôle      |
+| ------------------ | ------------ | --------- |
+| `b2c@exemple.fr`   | `b2c`        | B2C       |
+| `user@exemple.fr`  | `user`       | B2B User  |
+| `admin@exemple.fr` | `admin`      | B2B Admin |
 
-Si ce compte n'existe pas dans votre base Supabase, vous pouvez le créer
-automatiquement avec la commande suivante&nbsp;:
+Si l'un de ces comptes n'existe pas dans votre base Supabase, vous pouvez les créer ou les réinitialiser avec la commande suivante :
+
 
 ```bash
 npx ts-node scripts/ensureTestUser.ts
 ```
 
-Cette commande nécessite la variable `SUPABASE_SERVICE_ROLE_KEY` dans votre
-`.env.local` afin d'utiliser l'API d'administration Supabase.
+Cette commande nécessite la variable `SUPABASE_SERVICE_ROLE_KEY` dans votre `.env.local` afin d'utiliser l'API d'administration Supabase.
 
 ## Installation et démarrage
 
@@ -167,6 +173,53 @@ EmotionsCare utilise un système de design basé sur Tailwind CSS et Shadcn UI, 
 - **LayoutContext** - Mise en page et navigation
 - **MusicContext** - Lecture et gestion de la musique (source unique via `useMusic`)
 
+## Préférences utilisateur par défaut
+
+La constante `DEFAULT_PREFERENCES` centralise les valeurs initiales utilisées
+dans les contextes de préférences utilisateur. Elle est définie dans
+`src/constants/defaults.ts` et réexportée par `src/types/preferences.ts`.
+Sa structure est la suivante :
+
+```ts
+{
+  theme: 'system',
+  fontSize: 'medium',
+  fontFamily: 'system',
+  reduceMotion: false,
+  colorBlindMode: false,
+  autoplayMedia: true,
+  soundEnabled: true,
+  emotionalCamouflage: false,
+  aiSuggestions: true,
+  notifications_enabled: true,
+  language: 'fr',
+  privacy: {
+    shareData: false,
+    allowAnalytics: true,
+    showProfile: true,
+    shareActivity: true,
+    allowMessages: true,
+    allowNotifications: true
+  },
+  notifications: {
+    email: true,
+    push: true,
+    sms: false,
+    frequency: 'daily',
+    enabled: true,
+    emailEnabled: true,
+    pushEnabled: true,
+    inAppEnabled: true
+  }
+}
+```
+
+Les composants peuvent l'importer via :
+
+```ts
+import { DEFAULT_PREFERENCES } from '@/types/preferences';
+```
+
 ## Gestion du responsive
 
 L'application est entièrement responsive et optimisée pour les appareils mobiles, tablettes et desktop. Nous utilisons:
@@ -181,6 +234,23 @@ L'application est entièrement responsive et optimisée pour les appareils mobil
 - Vérification de type TypeScript (`npm run type-check`)
 - Tests unitaires (placeholder) (`npm run test`)
 - Nettoyage du build (`npm run clean`)
+
+### Conventions de typage
+
+Les interfaces et propriétés utilisent systématiquement l'anglais en `camelCase`.
+Les champs en `snake_case` ne subsistent que pour la compatibilité avec
+certaines sources de données. La commande `npm run type-check` doit s'exécuter
+sans erreur pour valider la cohérence des types.
+
+## Notifications CI
+
+Par défaut, GitHub envoie un email à chaque échec du workflow CI. Pour 
+éviter d'être submergé par ces messages :
+
+1. Ouvrez **Settings > Notifications** sur GitHub et désactivez
+   l'option *Actions*.
+2. Vous pouvez toujours réactiver les alertes en cas d'incident majeur
+   depuis cette même page.
 
 ## Monitoring & Alerting
 
@@ -201,9 +271,22 @@ Sentry.
 
 ## Sécurité proactive
 
+## Plan de mise en production
+
+Le document [`docs/migration-prod.md`](docs/migration-prod.md) décrit l'ensemble des étapes pour migrer la plateforme vers un environnement de production sécurisé.
+
+
 Un tableau de bord dédié permet aux administrateurs de suivre les incidents et l'état de la plateforme.
 Il est accessible via la route `/b2b/admin/security`.
 Tous les utilisateurs disposent d'un widget « Sécurité » dans leurs paramètres pour consulter les dernières alertes.
+
+## Documentation technique
+
+Vous trouverez dans le dossier `src/docs` plusieurs guides détaillés :
+
+- `ARCHITECTURE.md` : présentation de la structure du projet
+- `API_INTEGRATION.md` : intégration des services tiers
+- `BUILD_CHECKLIST.md` : étapes à vérifier avant un déploiement
 
 ## Équipe et contribution
 

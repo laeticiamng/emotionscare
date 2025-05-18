@@ -14,27 +14,32 @@ export interface EmotionResult {
   intensity: number;
   timestamp?: string;
   emojis: string[];
-  source?: 'facial' | 'voice' | 'text' | 'combined';
+  source?: 'facial' | 'voice' | 'text' | 'combined' | 'audio' | 'manual' | 'emoji' | 'scan';
   
   // Additional fields used by various components
   text?: string;
+  transcript?: string;
+  audioUrl?: string;
+  audio_url?: string;
+  facialExpression?: string;
   feedback?: string;
+  ai_feedback?: string;
   score?: number;
   userId?: string;
-  user_id?: string; // Legacy field - use userId instead
-  date?: string; // Legacy field - use timestamp instead
-  recommendations?: EmotionRecommendation[]; // Used by some components
+  user_id?: string;
+  date?: string;
+  recommendations?: EmotionRecommendation[] | string[];
 }
 
 export interface EmotionRecommendation {
-  id: string;
-  type: 'music' | 'activity' | 'exercise' | 'content';
-  title: string;
-  description?: string;
-  emoji?: string;
-  actionText?: string;
-  actionUrl?: string;
+  emotion?: string;
+  category?: 'music' | 'vr' | 'exercise' | 'mindfulness' | 'general';
+  content: string;
+  title?: string;
 }
+
+// Type alternatif pour la rétrocompatibilité
+export type LegacyEmotionRecommendation = string;
 
 export interface Emotion {
   name: string;
@@ -44,12 +49,24 @@ export interface Emotion {
   intensity?: number;
   description?: string;
   keywords?: string[];
+  id?: string;
+  confidence?: number;
+  date?: string;
+  source?: string;
+  user_id?: string;
+  userId?: string;
+  score?: number;
+  text?: string;
+  feedback?: string;
+  transcript?: string;
+  audioUrl?: string;
+  emotion?: string;
 }
 
 export interface EmotionData {
   id: string;
   userId: string;
-  user_id?: string; // Legacy field - use userId instead
+  user_id?: string;
   emotion: string;
   intensity: number;
   timestamp: string;
@@ -60,7 +77,24 @@ export interface EmotionData {
 
 export interface EmotionalTeamViewProps {
   teamId: string;
-  startDate?: string;
-  endDate?: string;
-  showNames?: boolean;
+  period?: string;
+  anonymized?: boolean;
+  dateRange?: [Date, Date];
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
+}
+
+// Interfaces pour les composants de scan des émotions
+export interface LiveVoiceScannerProps {
+  onResult?: (result: EmotionResult) => void;
+  onError?: (error: Error) => void;
+  autoStart?: boolean;
+  className?: string;
+}
+
+export interface TeamOverviewProps {
+  teamId: string;
+  period?: string;
+  showGraph?: boolean;
 }

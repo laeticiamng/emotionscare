@@ -42,6 +42,8 @@ export interface Badge {
   unlocked: boolean;
   progress: number;
   total: number;
+  earned?: boolean;
+  category?: string;
   earnedDate?: string;
   threshold?: number;
   completed?: boolean;
@@ -81,6 +83,7 @@ export interface Achievement {
 export interface LeaderboardEntry {
   id: string;
   name: string;
+  username?: string;
   score: number;
   rank: number;
   avatarUrl?: string;

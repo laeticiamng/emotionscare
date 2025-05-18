@@ -1,5 +1,5 @@
-
 import { User, UserRole } from '@/types/user';
+import { PrivacyPreferences } from '@/types/preferences';
 
 export const mockUsers: User[] = [
   {
@@ -43,10 +43,13 @@ export const mockUsers: User[] = [
         sms: false
       },
       privacy: {
+        dataSharing: true,
+        analytics: true,
+        thirdParty: true,
         shareData: true,
         anonymizeReports: false,
         profileVisibility: 'public'
-      }
+      } as PrivacyPreferences
     }
   },
   {

@@ -1,10 +1,15 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { UserPreferences, UserPreferencesContextType, DEFAULT_PREFERENCES } from '@/types/preferences';
+import { UserPreferences, UserPreferencesContextType, DEFAULT_PREFERENCES, NotificationsPreferences } from '@/types/preferences';
 
 // Create the context
 const PreferencesContext = createContext<UserPreferencesContextType>({
   preferences: DEFAULT_PREFERENCES,
+  theme: DEFAULT_PREFERENCES.theme || 'system',
+  fontSize: DEFAULT_PREFERENCES.fontSize || 'medium',
+  language: DEFAULT_PREFERENCES.language || 'fr',
+  notifications: DEFAULT_PREFERENCES.notifications as NotificationsPreferences,
+  privacy: DEFAULT_PREFERENCES.privacy || 'private',
   updatePreferences: async () => {},
   resetPreferences: () => {},
   isLoading: false,
@@ -16,6 +21,19 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
+  // Extract main properties for context
+  const theme = preferences.theme || 'system';
+  const fontSize = preferences.fontSize || 'medium';
+  const language = preferences.language || 'fr';
+  
+  // Normalize notifications
+  const notifications: NotificationsPreferences = typeof preferences.notifications === 'boolean'
+    ? { enabled: preferences.notifications, emailEnabled: false, pushEnabled: false }
+    : preferences.notifications || { enabled: true, emailEnabled: true, pushEnabled: false };
+  
+  // Normalize privacy preferences
+  const privacy = preferences.privacy || 'private';
 
   // Function to update preferences
   const updatePreferences = async (newPreferences: Partial<UserPreferences>) => {
@@ -40,6 +58,11 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const value: UserPreferencesContextType = {
     preferences,
+    theme,
+    fontSize,
+    language,
+    notifications,
+    privacy,
     updatePreferences,
     resetPreferences,
     isLoading,

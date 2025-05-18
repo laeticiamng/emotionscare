@@ -85,12 +85,12 @@ const ConversationList: React.FC<ConversationListProps> = ({
                   <div className="flex-grow pr-4">
                     <h3 className="font-medium truncate">{conversation.title}</h3>
                     <p className="text-sm text-muted-foreground truncate mt-1">
-                      {truncateText(conversation.last_message)}
+                      {truncateText(conversation.lastMessage)}
                     </p>
                   </div>
                   <div className="flex flex-col items-end">
                     <span className="text-xs text-muted-foreground">
-                      {formatDate(conversation.updated_at || conversation.created_at)}
+                      {formatDate(conversation.updatedAt || conversation.createdAt)}
                     </span>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

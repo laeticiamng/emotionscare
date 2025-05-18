@@ -1,43 +1,11 @@
 
 import { toast } from '@/hooks/use-toast';
+import { SpeechRecognition } from '@/types/speech';
 
 export interface SpeechRecognitionResult {
   transcript: string;
   confidence: number;
   isFinal: boolean;
-}
-
-// Add TypeScript declarations for the Speech Recognition API
-declare global {
-  interface Window {
-    SpeechRecognition?: new () => SpeechRecognition;
-    webkitSpeechRecognition?: new () => SpeechRecognition;
-  }
-
-  interface SpeechRecognition {
-    lang: string;
-    continuous: boolean;
-    interimResults: boolean;
-    onstart: () => void;
-    onend: () => void;
-    onerror: (event: { error: string }) => void;
-    onresult: (event: {
-      results: {
-        [key: number]: {
-          [key: number]: {
-            transcript: string;
-            confidence: number;
-          };
-          isFinal: boolean;
-          length: number;
-        };
-        length: number;
-      };
-    }) => void;
-    start: () => void;
-    stop: () => void;
-    abort: () => void;
-  }
 }
 
 export interface RecognitionOptions {
@@ -73,6 +41,10 @@ export class SpeechRecognitionService {
     try {
       // Create recognition instance
       const SpeechRecognitionConstructor = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognitionConstructor) {
+        return false;
+      }
+      
       this.recognition = new SpeechRecognitionConstructor();
       
       // Configure recognition
