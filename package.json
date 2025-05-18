@@ -14,6 +14,7 @@
     "clean": "rm -rf dist",
     "aperçu": "aperçu rapide",
     "seed:test-users": "ts-node scripts/ensureTestUser.ts"
+
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

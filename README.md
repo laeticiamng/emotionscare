@@ -121,6 +121,7 @@ Trois comptes standards sont mis à disposition pour les démonstrations :
 
 Si l'un de ces comptes n'existe pas dans votre base Supabase, vous pouvez les créer ou les réinitialiser avec la commande suivante :
 
+
 ```bash
 npx ts-node scripts/ensureTestUser.ts
 ```
