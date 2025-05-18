@@ -4,6 +4,8 @@
  * Ces tests simulent des interactions utilisateur et vérifient que le système répond correctement
  */
 
+import { describe, test } from 'node:test';
+
 // Simule un test de système complet avec assertions
 // NOTE: Ce fichier est un modèle à implémenter avec un framework de test réel
 

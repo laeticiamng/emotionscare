@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node --test --loader ts-node/esm",
+    "test": "node --test",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
     "seed:test-user": "ts-node scripts/ensureTestUser.ts"
