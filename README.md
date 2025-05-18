@@ -109,22 +109,24 @@ NEXT_PUBLIC_WEB_URL=http://localhost:3000
 > **Note**
 > L'ancienne variable `SKIP_AUTH_CHECK` utilisée pour désactiver l'authentification en développement a été supprimée. Les tableaux de bord sont désormais toujours protégés.
 
-### Utilisateur de test
+### Utilisateurs de test
 
-Un compte de test est mis à disposition pour les démonstrations :
+Trois comptes standards sont mis à disposition pour les démonstrations :
 
-- **Email** : `utilisateur@exemple.fr`
-- **Mot de passe** : `admin`
+| Email              | Mot de passe | Rôle      |
+| ------------------ | ------------ | --------- |
+| `b2c@exemple.fr`   | `b2c`        | B2C       |
+| `user@exemple.fr`  | `user`       | B2B User  |
+| `admin@exemple.fr` | `admin`      | B2B Admin |
 
-Si ce compte n'existe pas dans votre base Supabase, vous pouvez le créer
-automatiquement avec la commande suivante&nbsp;:
+Si l'un de ces comptes n'existe pas dans votre base Supabase, vous pouvez les créer ou les réinitialiser avec la commande suivante :
+
 
 ```bash
 npx ts-node scripts/ensureTestUser.ts
 ```
 
-Cette commande nécessite la variable `SUPABASE_SERVICE_ROLE_KEY` dans votre
-`.env.local` afin d'utiliser l'API d'administration Supabase.
+Cette commande nécessite la variable `SUPABASE_SERVICE_ROLE_KEY` dans votre `.env.local` afin d'utiliser l'API d'administration Supabase.
 
 ## Installation et démarrage
 

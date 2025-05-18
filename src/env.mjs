@@ -51,5 +51,8 @@ function checkEnvVars() {
   const missingVars = requiredVars.filter(key => !env[key]);
 
   if (missingVars.length > 0) {
-    console.warn(`⚠️ Missing environment variables: ${missingVars.join(', ')}. Create a .env.local file with the required variables.`);
+    const message = 'Missing environment variables: ' + missingVars.join(', ');
+    console.warn(message);
+    Sentry.captureMessage(message, 'warning');
+  }
 }
