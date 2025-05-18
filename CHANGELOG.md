@@ -31,6 +31,16 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 - Réexport des types utilisateurs et dashboard dans `types/`.
 
 
+## [1.1.3] - 2025-05-21
+
+### Ajouté
+- Documentation `docs/b2c_auth_flow.md` détaillant le flux de connexion B2C.
+- Tests unitaires de base sur `AuthContext` et `auth-service`.
+
+### Modifié
+- Suppression du hook `useAuth` obsolète et réexport depuis `AuthContext`.
+- Enrichissement des types `User` et `AuthContextType`.
+
 ## [1.1.0] - 2025-05-18
 
 ### Ajouté
