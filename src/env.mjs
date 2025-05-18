@@ -37,8 +37,7 @@ export const env = {
   // Configuration du serveur
   NODE_ENV: import.meta.env.MODE || 'development',
   
-  // Configuration d'authentification
-  SKIP_AUTH_CHECK: import.meta.env.SKIP_AUTH_CHECK === 'true' || import.meta.env.MODE === 'development'
+  // Configuration d'authentification (plus de contournement en développement)
 };
 
 // Validation simple en mode développement

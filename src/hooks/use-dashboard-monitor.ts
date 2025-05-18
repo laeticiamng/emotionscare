@@ -17,8 +17,7 @@ export function useDashboardMonitor() {
         isLoading, 
         userRole: user?.role,
         env: {
-          NODE_ENV: env.NODE_ENV,
-          SKIP_AUTH_CHECK: env.SKIP_AUTH_CHECK
+          NODE_ENV: env.NODE_ENV
         }
       });
       
