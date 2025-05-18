@@ -60,6 +60,7 @@ src/
 - `/journal` - Journal émotionnel
 - `/music` - Thérapie musicale
 - `/vr` - Sessions de réalité virtuelle
+- `/predictive` - Tableau de bord d'intelligence prédictive
 - `/admin/dashboard` - Tableau de bord administrateur
 
 ## Configuration d'environnement
@@ -88,6 +89,9 @@ La plateforme EmotionsCare s'intègre avec plusieurs API tierces pour fournir se
    - Variables d'environnement : `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`, `VITE_FIREBASE_MEASUREMENT_ID`
 
 ### Configuration du fichier .env.local
+
+Un exemple de configuration est fourni dans `src/.env.example`. Copiez ce fichier
+vers `.env.local` puis renseignez vos propres clés et URLs.
 
 ```
 NEXT_PUBLIC_OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxx
@@ -270,6 +274,14 @@ Sentry.
 Un tableau de bord dédié permet aux administrateurs de suivre les incidents et l'état de la plateforme.
 Il est accessible via la route `/b2b/admin/security`.
 Tous les utilisateurs disposent d'un widget « Sécurité » dans leurs paramètres pour consulter les dernières alertes.
+
+## Documentation technique
+
+Vous trouverez dans le dossier `src/docs` plusieurs guides détaillés :
+
+- `ARCHITECTURE.md` : présentation de la structure du projet
+- `API_INTEGRATION.md` : intégration des services tiers
+- `BUILD_CHECKLIST.md` : étapes à vérifier avant un déploiement
 
 ## Équipe et contribution
 
