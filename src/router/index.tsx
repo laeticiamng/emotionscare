@@ -1,5 +1,5 @@
 
-import { RouteObject } from 'react-router-dom';
+import { RouteObject, Navigate } from 'react-router-dom';
 import NotFoundPage from '@/pages/NotFoundPage';
 import LandingPage from '@/pages/LandingPage';
 import B2BSelectionPage from '@/pages/B2BSelectionPage';
@@ -66,7 +66,7 @@ export const routes: RouteObject[] = [
     children: [
       {
         path: '',
-        element: <B2CDashboardPage /> // Default route when accessing /b2c
+        element: <Navigate to="dashboard" replace />
       },
       {
         path: 'dashboard',
@@ -89,7 +89,7 @@ export const routes: RouteObject[] = [
     children: [
       {
         path: '',
-        element: <B2BUserDashboardPage /> // Default route when accessing /b2b/user
+        element: <Navigate to="dashboard" replace />
       },
       {
         path: 'dashboard',
@@ -112,7 +112,7 @@ export const routes: RouteObject[] = [
     children: [
       {
         path: '',
-        element: <B2BAdminDashboardPage /> // Default route when accessing /b2b/admin
+        element: <Navigate to="dashboard" replace />
       },
       {
         path: 'dashboard',
