@@ -174,6 +174,11 @@ export const b2bAdminNavItems: NavItemType[] = [
     icon: Activity,
   },
   {
+    title: "Optimisation",
+    href: "/b2b/admin/optimisation",
+    icon: BarChart2,
+  },
+  {
     title: "Paramètres",
     href: "/b2b/admin/settings",
     icon: Settings,

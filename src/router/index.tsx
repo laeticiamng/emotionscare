@@ -42,6 +42,8 @@ import B2BAdminReportsPage from '@/pages/b2b/admin/Reports';
 import B2BAdminEventsPage from '@/pages/b2b/admin/Events';
 import B2BAdminSettingsPage from '@/pages/b2b/admin/Settings';
 import B2BAdminSocialCoconPage from '@/pages/b2b/admin/SocialCocon';
+import B2BAdminOptimisationPage from '@/pages/b2b/admin/Optimisation';
+import OptimizationPage from '@/pages/OptimizationPage';
 import ImmersiveHome from '@/pages/ImmersiveHome';
 import Home from '@/pages/Home';
 import LoginPage from '@/pages/common/Login';
@@ -66,6 +68,14 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <UnifiedSettingsPage />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: 'optimisation',
+    element: (
+      <ProtectedRoute>
+        <OptimizationPage />
       </ProtectedRoute>
     )
   },
@@ -267,6 +277,10 @@ export const routes: RouteObject[] = [
       {
         path: 'social-cocon',
         element: <B2BAdminSocialCoconPage />
+      },
+      {
+        path: 'optimisation',
+        element: <B2BAdminOptimisationPage />
       },
       {
         path: 'settings',
