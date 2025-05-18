@@ -6,18 +6,12 @@ export interface UserHistory {
   preferredActivities?: string[];
 }
 
-export interface UserPreferences {
-  dailyReminders?: boolean;
-  notificationsEnabled?: boolean;
-  preferredTheme?: string;
-  emotionTrackingFrequency?: 'daily' | 'weekly' | 'onDemand';
-  notificationTone?: 'friendly' | 'neutral' | 'formal' | 'casual' | 'direct' | 'professional' | 'motivational';
-}
+import type { UserPreferences } from './preferences';
 
 export interface UserContext {
   id?: string;
   name?: string;
-  preferences?: UserPreferences;
+  preferences?: Partial<UserPreferences> & Record<string, any>;
   recentEmotions?: string[];
   recentActivities?: string[];
   userHistory?: UserHistory;

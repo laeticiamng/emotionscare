@@ -1,4 +1,6 @@
 
+import type { UserPreferences } from './preferences';
+
 export interface AuthContextType {
   user: {
     id: string;
@@ -17,43 +19,4 @@ export interface AuthContextType {
   updatePreferences?: (preferences: Partial<UserPreferences>) => Promise<void>;
   updateUser?: (user: any) => Promise<void>;
   clearError?: () => void;
-}
-
-export interface UserPreferences {
-  theme: "system" | "dark" | "light" | "pastel";
-  fontSize?: string;
-  fontFamily?: string;
-  reduceMotion?: boolean;
-  colorBlindMode?: boolean;
-  autoplayMedia?: boolean;
-  soundEnabled?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  language?: string;
-  dashboardLayout?: Record<string, any> | string;
-  onboardingCompleted?: boolean;
-  privacy?: {
-    shareData: boolean;
-    anonymizeReports: boolean;
-    profileVisibility: string;
-  };
-  notifications?: {
-    enabled: boolean;
-    emailEnabled: boolean;
-    pushEnabled: boolean;
-    inAppEnabled: boolean;
-    types: {
-      system: boolean;
-      emotion: boolean;
-      coach: boolean;
-      journal: boolean;
-      community: boolean;
-      achievement: boolean;
-    };
-    frequency: string;
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-  [key: string]: any;
 }

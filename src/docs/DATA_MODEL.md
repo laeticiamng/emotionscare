@@ -4,14 +4,6 @@ Ce document présente un aperçu des tables de la base PostgreSQL gérée via Su
 
 ## Tables principales
 
-### abonnement_biovida
-- **id** : identifiant primaire
-- **email** : adresse de contact
-- **prenom** : prénom de la personne
-- **created_at** : date d'inscription
-
-### abonnement_fiches
-Structure identique à `abonnement_biovida` pour un autre type d'abonnement.
 
 ### ai_generated_content
 - **id** : identifiant primaire
@@ -26,13 +18,6 @@ Structure identique à `abonnement_biovida` pour un autre type d'abonnement.
 - **name** : nom du badge
 - **description** : détails du badge
 - **awarded_at** : date d'obtention
-
-### biovida_analyses
-- **id** : identifiant primaire
-- **email** : contact
-- **person_name** : nom de la personne analysée
-- **form_data** : réponses au formulaire (JSON)
-- **analysis_result** : résultat de l'analyse
 
 ### buddies
 - **id** : identifiant primaire
@@ -77,8 +62,6 @@ Stockage du contenu complet d'une situation d'enseignement numérique.
 - **specialty** : spécialité
 - **has_link** / **has_recommendation** : informations supplémentaires
 
-### edn_items_complete
-Version complète d'un élément avec son contenu JSON.
 
 ### emotions
 Journal des émotions d'un utilisateur (texte, score, audio, etc.).

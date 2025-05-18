@@ -45,6 +45,7 @@
 4. **Monitoring**: Tableau de bord d'utilisation des API avec graphiques et statistiques.
 5. **Interface utilisateur**: Composants UI cohérents et bien structurés.
 6. **Extensibilité**: Architecture permettant l'ajout facile de nouvelles API.
+7. **Routes sécurisées**: Toutes les routes protégées utilisent un contrôle d'authentification et sont documentées dans `src/docs/PROTECTED_ROUTES.md`.
 
 ## Domaines d'amélioration
 

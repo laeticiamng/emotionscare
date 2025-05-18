@@ -1,35 +1,81 @@
 
-import { NotificationsPreferences, UserPreferences } from './preferences';
+export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin' | string;
 
-export type UserRole = 'admin' | 'b2c' | 'b2b_user' | 'b2b_admin';
+export interface UserPreferences {
+  theme?: string;
+  fontSize?: string;
+  fontFamily?: string;
+  colorAccent?: string;
+  language?: string;
+  notificationsEnabled?: boolean;
+  emailNotifications?: boolean;
+  soundEffects?: boolean;
+  privacySettings?: PrivacyPreferences;
+  accessibilitySettings?: AccessibilitySettings;
+  dashboardLayout?: Record<string, any>;
+  onboardingCompleted?: boolean;
+  notifications?: {
+    email?: boolean;
+    push?: boolean;
+    sms?: boolean;
+    weekly?: boolean;
+    insights?: boolean;
+  };
+  [key: string]: any;
+}
+
+export interface PrivacyPreferences {
+  shareData?: boolean;
+  anonymizedData?: boolean;
+  analytics?: boolean;
+  marketing?: boolean;
+  [key: string]: boolean | undefined;
+}
+
+export interface AccessibilitySettings {
+  reduceMotion?: boolean;
+  highContrast?: boolean;
+  largeText?: boolean;
+  screenReader?: boolean;
+  [key: string]: boolean | undefined;
+}
 
 export interface User {
   id: string;
+  name: string;
   email: string;
-  name?: string;
-  role?: UserRole;
+  role: UserRole;
   avatar_url?: string;
-  avatar?: string;       // Propriété alternative pour la compatibilité
-  avatarUrl?: string;    // Propriété alternative pour la compatibilité
+  avatarUrl?: string;
+  avatar?: string;
   department?: string;
+  jobTitle?: string;
   job_title?: string;
-  position?: string;     // Propriété alternative pour la position
+  preferences?: UserPreferences;
+  emotionalScore?: number;
   emotional_score?: number;
-  joined_at?: string;    // Date d'inscription
-  created_at?: string;   // Date de création alternative
-  preferences?: UserPreferences; // Préférences utilisateur
+  position?: string;
+  joined_at?: string | Date;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  [key: string]: any;
 }
 
 export interface UserWithStatus extends User {
   status?: 'online' | 'offline' | 'away' | 'busy';
-  last_active?: string;
-  gamification?: {
-    level: number;
-    points: number;
-    badges: number;
-    streak: number;
-  };
+  lastActive?: string | Date;
 }
 
-// Re-export UserPreferences from preferences.ts
-export type { UserPreferences, NotificationsPreferences };
+// Helper types for API operations
+export type CreateUserDto = Omit<User, 'id'> & {
+  password?: string;
+};
+
+export type UpdateUserDto = Partial<User>;
+
+export type UserAuthResponse = {
+  user: User;
+  token?: string;
+  refreshToken?: string;
+  expiresIn?: number;
+};

@@ -2,6 +2,7 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { SpeechRecognition } from '@/types/speech';
 
 export interface VoiceCommandOptions {
   commands?: Record<string, () => void>;
@@ -52,10 +53,14 @@ export function useVoiceCommands(options: VoiceCommandOptions = {}) {
     setIsListening(true);
     setError(null);
     
-    // Using the Web Speech API as a fallback for development
-    // In production, this would be replaced with Whisper API
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
+    // Using the Web Speech API
+    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognitionAPI) {
+      setError("La reconnaissance vocale n'est pas disponible");
+      return;
+    }
+    
+    const recognition = new SpeechRecognitionAPI();
     
     recognition.lang = language;
     recognition.interimResults = false;
