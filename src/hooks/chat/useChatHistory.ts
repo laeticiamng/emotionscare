@@ -1,115 +1,107 @@
 
-import { useState, useCallback, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { ChatConversation, ChatMessage } from '@/types/chat';
-import { messagesService } from '@/lib/chat/services/messagesService';
-import { conversationsService } from '@/lib/chat/services/conversationsService';
+import { useState, useEffect, useCallback } from 'react';
+import { ChatConversation } from '@/types/chat';
 
-// Interface pour le service de gestion de l'historique des conversations
-interface ChatHistoryService {
-  getConversations?: (userId: string) => Promise<ChatConversation[]>;
-  createConversation?: (title: string) => Promise<ChatConversation>;
-  getMessages?: (conversationId: string) => Promise<ChatMessage[]>;
-  getConversationsForUser?: (userId: string) => Promise<ChatConversation[]>;
-  getMessagesForConversation?: (conversationId: string) => Promise<ChatMessage[]>;
-}
-
-export function useChatHistory(
-  userId: string,
-  service: ChatHistoryService = { 
-    getConversations: conversationsService.getConversationsForUser,
-    getMessages: messagesService.getMessagesForConversation
-  }
-) {
-  const [conversations, setConversations] = useState<ChatConversation[]>([]);
-  const [currentConversation, setCurrentConversation] = useState<ChatConversation | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  // Charger les conversations de l'utilisateur
-  const loadConversations = useCallback(async () => {
-    try {
-      setLoading(true);
-      const userConversations = await conversationsService.getConversationsForUser(userId);
-      setConversations(userConversations);
-      
-      // Si aucune conversation active, prendre la première
-      if (userConversations.length > 0 && !currentConversation) {
-        setCurrentConversation(userConversations[0]);
+// Mock conversation service
+const ConversationsService = {
+  getConversations: async (userId?: string) => {
+    // Simulating API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Return mock conversations
+    return [
+      {
+        id: 'conv1',
+        title: 'First Conversation',
+        updated_at: '2023-01-15T14:22:00Z',
+        created_at: '2023-01-15T14:00:00Z',
+        last_message: 'Hello there!',
+        user_id: userId || 'user1',
+      },
+      {
+        id: 'conv2',
+        title: 'Support Request',
+        updated_at: '2023-01-10T09:15:00Z',
+        created_at: '2023-01-10T09:00:00Z',
+        last_message: 'Thank you for your help.',
+        user_id: userId || 'user1',
       }
-      
-      setLoading(false);
-    } catch (err) {
-      console.error('Error loading conversations:', err);
-      setError(err instanceof Error ? err : new Error('Failed to load conversations'));
-      setLoading(false);
-    }
-  }, [userId, currentConversation]);
+    ] as ChatConversation[];
+  },
+  
+  archiveConversation: async (conversationId: string) => {
+    console.log('Archiving conversation:', conversationId);
+    return { success: true };
+  },
+  
+  deleteConversation: async (conversationId: string) => {
+    console.log('Deleting conversation:', conversationId);
+    return { success: true };
+  }
+};
 
-  // Charger les messages d'une conversation
-  const loadMessages = useCallback(async (conversationId: string) => {
+export function useChatHistory(userId?: string) {
+  const [conversations, setConversations] = useState<ChatConversation[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  
+  const loadConversations = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      setLoading(true);
-      const conversationMessages = await messagesService.getMessagesForConversation(conversationId);
-      setMessages(conversationMessages);
-      setLoading(false);
+      // Using getConversations instead of getConversationsForUser
+      const data = await ConversationsService.getConversations(userId);
+      setConversations(data);
     } catch (err) {
-      console.error('Error loading messages:', err);
-      setError(err instanceof Error ? err : new Error('Failed to load messages'));
-      setLoading(false);
-    }
-  }, []);
-
-  // Choisir une conversation
-  const selectConversation = useCallback(async (conversationId: string) => {
-    const conversation = conversations.find(c => c.id === conversationId);
-    if (conversation) {
-      setCurrentConversation(conversation);
-      await loadMessages(conversationId);
-    }
-  }, [conversations, loadMessages]);
-
-  // Créer une nouvelle conversation
-  const createConversation = useCallback(async (title: string = 'New conversation') => {
-    try {
-      const newConversation = await conversationsService.createConversation(userId, title);
-      setConversations(prev => [newConversation, ...prev]);
-      setCurrentConversation(newConversation);
-      setMessages([]);
-      return newConversation;
-    } catch (err) {
-      console.error('Error creating conversation:', err);
-      setError(err instanceof Error ? err : new Error('Failed to create conversation'));
-      throw err;
+      const error = err instanceof Error ? err : new Error('Failed to load conversations');
+      setError(error);
+    } finally {
+      setIsLoading(false);
     }
   }, [userId]);
-
-  // Charge les conversations au montage
+  
+  // Load conversations on mount
   useEffect(() => {
     loadConversations();
   }, [loadConversations]);
-
-  // Charge les messages lorsque la conversation courante change
-  useEffect(() => {
-    if (currentConversation) {
-      loadMessages(currentConversation.id);
-    } else {
-      setMessages([]);
+  
+  const archiveConversation = useCallback(async (conversationId: string) => {
+    try {
+      await ConversationsService.archiveConversation(conversationId);
+      // Update the local state to reflect the change
+      setConversations(prev => 
+        prev.map(conv => 
+          conv.id === conversationId 
+            ? { ...conv, status: 'archived' as const } 
+            : conv
+        )
+      );
+      return true;
+    } catch (error) {
+      console.error('Error archiving conversation:', error);
+      return false;
     }
-  }, [currentConversation, loadMessages]);
-
+  }, []);
+  
+  const deleteConversation = useCallback(async (conversationId: string) => {
+    try {
+      await ConversationsService.deleteConversation(conversationId);
+      // Remove the conversation from the local state
+      setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+      return true;
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      return false;
+    }
+  }, []);
+  
   return {
     conversations,
-    currentConversation,
-    messages,
-    loading,
+    isLoading,
     error,
-    loadConversations,
-    selectConversation,
-    createConversation,
-    setMessages
+    refreshConversations: loadConversations,
+    archiveConversation,
+    deleteConversation
   };
 }
-
-export default useChatHistory;

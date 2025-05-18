@@ -2,111 +2,93 @@
 /**
  * Emotion Types
  * --------------------------------------
- * This file defines the official types for emotion functionality.
+ * This file defines the official types for emotion detection and tracking functionality.
  * Any new property or correction must be documented here and synchronized across all mockData and components.
  */
 
-export type EmotionIntensity = 'low' | 'medium' | 'high' | number;
-
-export interface Emotion {
-  id: string;
-  name: string;
-  label?: string; // Added for compatibility with various components
-  color: string;
-  intensity: EmotionIntensity;
-  emoji?: string;
-  description?: string;
-  timestamp?: string; // When this emotion was recorded
-  date?: string; // Alternative date format (to be standardized)
-  tips?: string[];
-  categories?: string[];
-  value?: number; // For intensity visualization
-}
+// Emotion intensity can be represented as a string or number (0-1)
+export type EmotionIntensity = 'very low' | 'low' | 'medium' | 'high' | 'very high' | 'very_low' | 'very_high' | number;
 
 export interface EmotionResult {
   id: string;
-  emotion: string;
-  score: number;
-  confidence: number;
-  text?: string;
-  feedback?: string;
-  intensity?: EmotionIntensity;
-  timestamp?: string;
-  date?: string;
-  recommendations?: string[];
-  emojis?: string[] | string;
-  userId?: string;
-  user_id?: string; // For compatibility, to be deprecated
-  transcript?: string;
-  ai_feedback?: string;
-  source?: string;
-  audioUrl?: string;
-  audio_url?: string; // For compatibility, to be deprecated
-  textInput?: string;
-  facialExpression?: string;
-  details?: Record<string, number>;
-  duration?: number;
-  category?: string;
+  emotion: string; // Primary detected emotion
+  confidence: number; // Confidence score (0-1)
+  score: number; // Normalized score (0-100)
+  intensity: number; // Use number for unified intensity representation
+  emojis: string[]; // Associated emoji characters
+  text?: string; // Text that was analyzed
+  feedback?: string; // Feedback about the emotion
+  timestamp?: string; // ISO timestamp when the emotion was detected
+  metadata?: Record<string, any>; // Any additional data
+  // Legacy properties for compatibility
+  detected_emotion?: string;
+  detectedEmotion?: string;
+  predicted_emotion?: string;
   predictedEmotion?: string;
+  emotion_label?: string;
+  emotionLabel?: string;
+  primary_emotion?: string;
+  primaryEmotion?: string;
+  secondary_emotions?: Record<string, number>;
+  secondaryEmotions?: Record<string, number>;
+  emotion_score?: number;
+  emotionScore?: number;
 }
 
-export interface EmotionStats {
+export interface EmotionData {
+  user_id: string; // Official snake_case property
+  userId?: string; // Compatibility camelCase property
+  date: string;
   emotion: string;
-  count: number;
-  percentage: number;
+  intensity: number;
+  context?: string;
+  activity?: string;
+  notes?: string;
+  source?: 'manual' | 'scan' | 'ai' | 'chat' | 'vr' | 'system';
+  related_entries?: string[];
+  relatedEntries?: string[]; // Compatibility
 }
 
 export interface EmotionTrend {
-  date: string;
   emotion: string;
+  count: number;
+  average_intensity: number;
+  averageIntensity?: number; // Compatibility
+  first_occurrence: string;
+  firstOccurrence?: string; // Compatibility
+  last_occurrence: string;
+  lastOccurrence?: string; // Compatibility
+  trend: 'increasing' | 'decreasing' | 'stable';
+}
+
+export interface MoodData {
+  date: string;
   value: number;
+  mood: string;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
 }
 
-export interface EmotionTimelineEntry {
-  id: string;
-  date: string;
+// Re-export EmotionIntensity as string for compatibility
+export type EmotionIntensityString = 'very low' | 'low' | 'medium' | 'high' | 'very high' | 'very_low' | 'very_high';
+
+export interface EmotionPrediction {
   emotion: string;
-  intensity: EmotionIntensity;
-  note?: string;
+  probability: number;
+  timestamp: string;
+  source: string;
 }
 
-export interface LiveVoiceScannerProps {
-  onEmotionDetected?: (result: EmotionResult) => void;
-  onResult?: (result: EmotionResult) => void;
-  onFinish?: () => void;
-  automaticMode?: boolean;
-  instruction?: string;
-  buttonText?: string;
-  autoStart?: boolean;
-  language?: string;
-  duration?: number;
-  className?: string;
-  withAI?: boolean;
-  onError?: (error: string) => void;
-  continuous?: boolean;
-}
-
-export interface TeamOverviewProps {
-  teamId?: string;
-  period?: 'day' | 'week' | 'month';
-  userId?: string;
-  anonymized?: boolean;
-  className?: string;
-  dateRange?: any;
-  users?: any[];
-  showNames?: boolean;
-  compact?: boolean;
-}
-
-export interface EmotionalTeamViewProps {
-  teamId: string;
-  period?: 'day' | 'week' | 'month' | string;
-  dateRange?: [Date, Date];
-  departments?: string[];
-  showIndividuals?: boolean;
-  compact?: boolean;
-  anonymized?: boolean;
-  showGraph?: boolean;
-  showMembers?: boolean;
-  className?: string;
+export interface EmotionalData {
+  id: string;
+  user_id: string; // Official snake_case property
+  userId?: string; // Compatibility camelCase property
+  emotion: string;
+  intensity: number;
+  timestamp: string;
+  source: string;
+  text?: string;
+  context?: string;
+  metadata?: Record<string, any>;
 }

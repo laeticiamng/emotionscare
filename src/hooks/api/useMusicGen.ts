@@ -1,72 +1,58 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { useMusicPlayer } from '@/contexts/music'; // Importation corrigée
+import { useState } from 'react';
+import { MusicTrack } from '@/types/music';
+import useMusicPlayer from '@/hooks/useMusicPlayer';
 
-export interface UseMusicGenOptions {
-  autoPlay?: boolean;
-  emotion?: string;
-  duration?: number;
-}
-
-export const useMusicGen = (options: UseMusicGenOptions = {}) => {
-  const { autoPlay = false, emotion = 'neutral', duration = 60 } = options;
+export function useMusicGen() {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedTrackUrl, setGeneratedTrackUrl] = useState<string | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  
-  const musicContext = useMusicPlayer();
-  
-  const generateMusic = useCallback(async (emotionValue: string = emotion, durationValue: number = duration) => {
+  const [generatedTrack, setGeneratedTrack] = useState<MusicTrack | null>(null);
+  const { playTrack } = useMusicPlayer();
+
+  const generateMusic = async (prompt: string): Promise<MusicTrack | null> => {
     setIsGenerating(true);
-    setError(null);
     
     try {
-      // Dans une véritable application, nous appellerions une API de génération de musique
-      // Pour cette simulation, nous utiliserons un délai pour simuler la génération
+      // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // URL simulée pour un morceau généré
-      const mockTrackUrl = `/api/music/generated/${emotionValue}_${Date.now()}.mp3`;
-      setGeneratedTrackUrl(mockTrackUrl);
+      // Mock generated track
+      const newTrack: MusicTrack = {
+        id: `gen-${Date.now()}`,
+        title: `Generated from: ${prompt.slice(0, 20)}...`,
+        artist: 'AI Composer',
+        duration: 180,
+        audioUrl: '/audio/generated-audio.mp3',
+        url: '/audio/generated-audio.mp3',
+        coverUrl: '/images/ai-generated-music.jpg',
+        // Additional required properties
+        album: 'AI Generated',
+        year: new Date().getFullYear(),
+        genre: 'Electronic',
+      };
       
-      if (autoPlay && musicContext) {
-        // Simuler la lecture de la piste générée
-        musicContext.playTrack({
-          id: `generated-${Date.now()}`,
-          title: `Musique générée pour ${emotionValue}`,
-          artist: 'IA Musicien',
-          duration: durationValue,
-          audioUrl: mockTrackUrl
-        });
-      }
-      
-      return mockTrackUrl;
-    } catch (e) {
-      const errorObj = e instanceof Error ? e : new Error("Erreur lors de la génération de musique");
-      setError(errorObj);
+      setGeneratedTrack(newTrack);
+      return newTrack;
+    } catch (error) {
+      console.error('Error generating music:', error);
       return null;
     } finally {
       setIsGenerating(false);
     }
-  }, [autoPlay, emotion, duration, musicContext]);
-  
-  return {
-    generateMusic,
-    isGenerating,
-    generatedTrackUrl,
-    error,
-    playGeneratedTrack: () => {
-      if (generatedTrackUrl && musicContext) {
-        musicContext.playTrack({
-          id: `generated-${Date.now()}`,
-          title: `Musique générée pour ${emotion}`,
-          artist: 'IA Musicien',
-          duration,
-          audioUrl: generatedTrackUrl
-        });
-      }
+  };
+
+  const playGeneratedMusic = (track?: MusicTrack | null) => {
+    const trackToPlay = track || generatedTrack;
+    if (trackToPlay && playTrack) {
+      playTrack(trackToPlay);
     }
   };
-};
+
+  return {
+    generateMusic,
+    playGeneratedMusic,
+    generatedTrack,
+    isGenerating
+  };
+}
 
 export default useMusicGen;

@@ -47,3 +47,21 @@ export interface ChatResponse {
   recommendations?: any[];
   suggestions?: string[];
 }
+
+// Creating a compatibility utility function for chat service
+export const normalizeChatMessage = (message: Partial<ChatMessage>, conversationId: string): ChatMessage => {
+  return {
+    id: message.id || `msg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+    text: message.text || message.content || '',
+    content: message.content || message.text || '',
+    sender: message.sender || message.role || 'user',
+    role: message.role || message.sender || 'user',
+    timestamp: message.timestamp || new Date().toISOString(),
+    conversationId: message.conversationId || message.conversation_id || conversationId,
+    conversation_id: message.conversationId || message.conversation_id || conversationId,
+    emotions: message.emotions || {},
+    feedback: message.feedback || '',
+    isOptimistic: message.isOptimistic || false,
+    metadata: message.metadata || {}
+  };
+};

@@ -1,42 +1,38 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmotionResult } from '@/types/emotion';
+import { normalizeEmotionIntensity } from '@/utils/emotionCompatibility';
 
-interface LiveEmotionResultsProps {
-  result: EmotionResult | null;
-  isLoading?: boolean;
-}
-
-const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result, isLoading }) => {
-  if (isLoading) {
+export default function LiveEmotionResults({ result, isLoading }: { result?: EmotionResult, isLoading?: boolean }) {
+  // Handle null/undefined result
+  if (!result && !isLoading) {
     return (
-      <Card className="w-full">
+      <Card>
         <CardHeader>
-          <CardTitle>Analyse en cours...</CardTitle>
+          <CardTitle>Emotion Analysis</CardTitle>
         </CardHeader>
         <CardContent>
-          <p>Veuillez patienter pendant que nous analysons vos émotions.</p>
+          <div className="text-center py-4">
+            No emotion detected yet. Please start a scan.
+          </div>
         </CardContent>
       </Card>
     );
   }
 
-  if (!result) {
-    return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Aucun résultat</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Aucune émotion détectée pour le moment.</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  // We'll use the normalizeEmotionIntensity function to handle string or number intensity
+  const getIntensityPercent = () => {
+    if (!result) return 0;
+    // Convert to number and multiply by 100 to get percentage
+    return normalizeEmotionIntensity(result.intensity) * 100;
+  };
+  
+  // Rest of component remains the same...
+  // ... keep existing code
 
-  // Calculer une valeur d'intensité par défaut si elle n'existe pas
-  const displayIntensity = result.intensity !== undefined ? result.intensity : (result.score / 100);
+  // For the parts that caused errors:
+  const intensityPercent = getIntensityPercent();
+  const confidencePercent = result ? result.confidence * 100 : 0;
 
   return (
     <Card className="w-full">
@@ -68,11 +64,11 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result, isLoadi
               <div className="w-full bg-secondary rounded-full h-2.5">
                 <div
                   className="bg-primary h-2.5 rounded-full"
-                  style={{ width: `${displayIntensity * 100}%` }}
+                  style={{ width: `${intensityPercent}%` }}
                 ></div>
               </div>
               <p className="text-right text-sm text-muted-foreground mt-1">
-                {Math.round(displayIntensity * 100)}%
+                {Math.round(intensityPercent)}%
               </p>
             </div>
             
@@ -93,5 +89,3 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result, isLoadi
     </Card>
   );
 };
-
-export default LiveEmotionResults;

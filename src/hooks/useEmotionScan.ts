@@ -1,132 +1,75 @@
-
 import { useState, useCallback } from 'react';
-import { EmotionResult } from '@/types/emotions';
-import { analyzeEmotion, fetchLatestEmotion } from '@/lib/scanService';
+import { EmotionResult } from '@/types/emotion';
+import { normalizeEmotionResult } from '@/utils/emotionCompatibility';
 
-interface UseEmotionScanProps {
-  userId?: string;
-  onEmotionDetected?: (result: EmotionResult) => void;
-}
+export function useEmotionScan() {
+  const [result, setResult] = useState<EmotionResult | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-export const useEmotionScan = (props?: UseEmotionScanProps) => {
-  const [latestEmotion, setLatestEmotion] = useState<EmotionResult | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-
-  const userId = props?.userId || 'current-user';
-  
-  // Récupérer la dernière émotion enregistrée
-  const fetchLatest = useCallback(async () => {
-    setIsLoading(true);
-    setError('');
+  const startScan = useCallback(async () => {
+    setIsScanning(true);
+    setError(null);
     
     try {
-      const data = await fetchLatestEmotion(userId);
-      if (data) {
-        // Ensure data conforms to EmotionResult type
-        const result: EmotionResult = {
-          ...data,
-          id: data.id || `emotion-${Date.now()}`,
-          emotion: data.emotion || 'neutral',
-          confidence: data.confidence ?? 0,
-          emojis: Array.isArray(data.emojis) ? data.emojis : data.emojis ? [data.emojis] : []
-        };
-        setLatestEmotion(result);
-      }
-      return data;
+      // Simulate an API call to emotion detection service
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Create a properly normalized emotion result
+      const mockResult = normalizeEmotionResult({
+        id: `emotion-${Date.now()}`,
+        emotion: 'happy',
+        confidence: 0.85,
+        emojis: ['😊', '😄'],
+        score: 78,
+        intensity: 0.7, // Using number directly
+        text: 'User expression analysis',
+        feedback: 'You seem to be in a good mood',
+        timestamp: new Date().toISOString()
+      });
+      
+      setResult(mockResult);
     } catch (err) {
-      console.error('Error fetching latest emotion:', err);
-      setError('Impossible de récupérer votre dernière émotion');
-      return null;
+      setError(err instanceof Error ? err : new Error('Unknown error during scan'));
+      console.error('Error during emotion scan:', err);
     } finally {
-      setIsLoading(false);
+      setIsScanning(false);
     }
-  }, [userId]);
-  
-  // Analyser une émotion à partir de données fournies
-  const scanEmotion = useCallback(async (data: {
-    text?: string;
-    emojis?: string;
-    audio_url?: string;
-  }) => {
-    setIsLoading(true);
-    setError('');
+  }, []);
+
+  const resetScan = useCallback(() => {
+    setResult(null);
+    setError(null);
+  }, []);
+
+  const mockEmotionDetection = useCallback((emotion: string) => {
+    setIsScanning(true);
     
-    try {
-      // Convert the object to a string for the analyzeEmotion function
-      const textToAnalyze = data.text || '';
-      const rawResult = await analyzeEmotion(textToAnalyze);
+    // Simulate processing delay
+    setTimeout(() => {
+      // Create a normalized mock result
+      const mockResult = normalizeEmotionResult({
+        id: `mock-${Date.now()}`,
+        emotion,
+        confidence: 0.9,
+        emojis: ['😊', '😃'],
+        score: 85,
+        intensity: 0.8, // Using number directly
+        text: 'Mock detection',
+        timestamp: new Date().toISOString()
+      });
       
-      if (rawResult) {
-        const result: EmotionResult = {
-          ...rawResult,
-          id: rawResult.id || `emotion-${Date.now()}`,
-          emotion: rawResult.emotion || 'neutral',
-          confidence: rawResult.confidence ?? 0,
-          emojis: Array.isArray(rawResult.emojis) ? rawResult.emojis : rawResult.emojis ? [rawResult.emojis] : []
-        };
-        
-        setLatestEmotion(result);
-        
-        if (props?.onEmotionDetected) {
-          props.onEmotionDetected(result);
-        }
-        
-        return result;
-      }
-      
-      return null;
-    } catch (err) {
-      console.error('Error scanning emotion:', err);
-      setError('Impossible d\'analyser votre émotion');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [props]);
-  
-  // Créer un nouvel enregistrement d'émotion
-  const createEmotion = useCallback(async (data: Partial<EmotionResult>) => {
-    setIsLoading(true);
-    setError('');
-    
-    try {
-      const result: EmotionResult = {
-        id: data.id || `emo-${Date.now()}`,
-        userId: userId,
-        timestamp: data.timestamp || new Date().toISOString(),
-        emotion: data.emotion || 'neutral',
-        confidence: data.confidence ?? 0,
-        emojis: Array.isArray(data.emojis) ? data.emojis : data.emojis ? [data.emojis] : [],
-        ...data
-      };
-      
-      setLatestEmotion(result);
-      
-      if (props?.onEmotionDetected) {
-        props.onEmotionDetected(result);
-      }
-      
-      return result;
-    } catch (err) {
-      console.error('Error creating emotion record:', err);
-      setError('Impossible de créer un nouvel enregistrement d\'émotion');
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId, props]);
+      setResult(mockResult);
+      setIsScanning(false);
+    }, 1000);
+  }, []);
 
   return {
-    latestEmotion,
-    isLoading,
+    result,
+    isScanning,
     error,
-    fetchLatest,
-    createEmotion,
-    scanEmotion,
-    getLatestEmotion: fetchLatest,
-    setLatestEmotion: (emotion: EmotionResult | null) => setLatestEmotion(emotion)
+    startScan,
+    resetScan,
+    mockEmotionDetection,
   };
-};
-
-export default useEmotionScan;
+}

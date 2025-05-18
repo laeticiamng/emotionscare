@@ -1,65 +1,58 @@
-
 import { useState, useCallback } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
+import { normalizeChatMessage } from '@/types/chat'; // Import our normalization utility
 
-interface UseChatOptions {
-  initialMessages?: ChatMessage[];
-  onSendMessage?: (message: string) => void;
-}
-
-export default function useChat({ initialMessages = [], onSendMessage }: UseChatOptions = {}) {
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  const [input, setInput] = useState('');
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value);
-  };
-
-  const sendMessage = useCallback(
-    (messageText: string) => {
-      if (!messageText.trim()) return;
-
-      const userMessage: ChatMessage = {
-        id: uuidv4(),
-        text: messageText.trim(),
-        sender: 'user',
-        timestamp: new Date().toISOString(),
-      };
-
-      setMessages((prev) => [...prev, userMessage]);
-      setInput('');
-
-      // Si une fonction de callback externe est fournie, l'appeler
-      if (onSendMessage) {
-        onSendMessage(messageText);
-      } else {
-        // Sinon, simuler une réponse automatique après un court délai
-        setTimeout(() => {
-          const assistantMessage: ChatMessage = {
-            id: uuidv4(),
-            text: `Réponse à: ${messageText}`,
-            sender: 'assistant',
-            timestamp: new Date().toISOString(),
-          };
-          setMessages((prev) => [...prev, assistantMessage]);
-        }, 1000);
-      }
-    },
-    [onSendMessage]
-  );
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    sendMessage(input);
-  };
-
+// Previous useChat implementation with fix for message creation
+export const useChat = (initialConversationId = '') => {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState(initialConversationId || `conv-${Date.now()}`);
+  
+  // Send user message
+  const sendMessage = useCallback((text: string) => {
+    setIsLoading(true);
+    
+    // Create a properly normalized user message
+    const userMessage = normalizeChatMessage({
+      id: `user-${Date.now()}`,
+      text,
+      sender: 'user',
+      timestamp: new Date().toISOString()
+    }, conversationId);
+    
+    setMessages(prev => [...prev, userMessage]);
+    
+    // Simulate response
+    setTimeout(() => {
+      // Create a properly normalized assistant message
+      const assistantMessage = normalizeChatMessage({
+        id: `assistant-${Date.now()}`,
+        text: `Echo: ${text}`,
+        sender: 'assistant',
+        timestamp: new Date().toISOString()
+      }, conversationId);
+      
+      setMessages(prev => [...prev, assistantMessage]);
+      setIsLoading(false);
+    }, 1000);
+  }, [conversationId]);
+  
+  // Clear messages
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+  }, []);
+  
+  // Set conversation ID
+  const setConversation = useCallback((id: string) => {
+    setConversationId(id);
+  }, []);
+  
   return {
     messages,
-    input,
-    setInput,
-    handleInputChange,
+    isLoading,
     sendMessage,
-    handleSubmit,
+    conversationId,
+    clearMessages,
+    setConversation: setConversation
   };
-}
+};

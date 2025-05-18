@@ -37,6 +37,17 @@ export interface VRSessionTemplate {
   audioUrl?: string; // Modern naming, prefer this
   benefits?: string[];
   theme?: string;
+  
+  // Adding missing properties that caused errors
+  name?: string; // Compatibility with components using 'name' instead of 'title'
+  lastUsed?: string; // For history/usage tracking
+  imageUrl?: string; // Alternative for thumbnailUrl
+  coverUrl?: string; // Alternative for thumbnailUrl
+  cover_url?: string; // Legacy cover URL
+  audioTrack?: string; // For audio-only sessions
+  emotion?: string; // Related emotion
+  completionRate?: number; // Completion rate percentage
+  completion_rate?: number; // Legacy naming for completion rate
 }
 
 export interface VRSessionStats {
@@ -59,3 +70,41 @@ export interface VRSessionProgress {
   feedback?: string;
   rating?: number;
 }
+
+// Adding the missing VRSession type
+export interface VRSession {
+  id: string;
+  templateId: string;
+  userId: string;
+  startTime: string;
+  endTime?: string;
+  duration?: number;
+  completed: boolean;
+  progress: number; // 0-100
+  rating?: number;
+  feedback?: string;
+  emotionBefore?: string;
+  emotionAfter?: string;
+  template?: VRSessionTemplate;
+}
+
+// Adding VRSessionHistoryProps
+export interface VRSessionHistoryProps {
+  sessions?: VRSession[];
+  onSelectSession?: (session: VRSession) => void;
+  className?: string;
+}
+
+// Create a compatibility utility function to handle property name differences
+export const getVRSessionTitle = (session: VRSessionTemplate): string => {
+  return session.title || session.name || 'Unnamed Session';
+};
+
+export const getVRSessionImage = (session: VRSessionTemplate): string => {
+  return session.thumbnailUrl || 
+         session.thumbnail || 
+         session.imageUrl || 
+         session.coverUrl || 
+         session.cover_url || 
+         '/images/default-vr-session.jpg';
+};

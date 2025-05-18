@@ -1,38 +1,57 @@
 
-export interface LeaderboardEntry {
+/**
+ * Gamification Types
+ * --------------------------------------
+ * This file defines the official types for gamification functionality.
+ * Any new property or correction must be documented here and synchronized across all mockData and components.
+ */
+
+export interface Badge {
   id: string;
-  userId: string;
-  displayName?: string;
-  name?: string;
-  avatar?: string;
-  score: number;
-  rank: number;
-  team?: string;
-  department?: string;
-  level?: number;
-  badges?: number | string[];
-  position?: number; // Pour compatibilité
-}
-
-export interface GamificationStats {
-  points: number;
+  name: string;
+  description: string;
+  iconUrl: string; // Official property name
+  icon_url?: string; // Legacy property
+  earnedAt?: string; // Official property for when badge was earned
+  earned_at?: string; // Legacy property
+  category: string;
   level: number;
-  badges: number;
-  challenges: number;
-  streak: number;
-  rank?: number;
-  position?: number;
-  completedChallenges?: number;
-  activeChallenges?: number;
-  totalBadges?: number;
-  unlockedBadges?: number;
-  // Propriétés additionnelles pour la compatibilité
-  totalChallenges?: number;
-  streakDays?: number;
-  longestStreak?: number;
-  xp?: number;
-  xpToNextLevel?: number;
+  isUnlocked: boolean;
+  is_unlocked?: boolean; // Legacy property
+  requirements?: string[];
+  points?: number;
+  dateEarned?: string; // Deprecated - use earnedAt instead
 }
 
-export * from './badge';
-export * from './challenges';
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  iconUrl: string;
+  completedAt?: string;
+  progress: number; // 0-100
+  isCompleted: boolean;
+  reward?: {
+    type: string;
+    value: number;
+    description: string;
+  };
+}
+
+export interface GamificationProfile {
+  userId: string;
+  level: number;
+  points: number;
+  badges: Badge[];
+  achievements: Achievement[];
+  streaks: {
+    current: number;
+    longest: number;
+    lastActive: string;
+  };
+  challenges: {
+    active: number;
+    completed: number;
+    total: number;
+  };
+}
