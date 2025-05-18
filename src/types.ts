@@ -90,3 +90,16 @@ export type {
   VRSession,
   VRSessionWithMusicProps
 } from './types/vr';
+
+// B2B Admin dashboard types
+export type {
+  TeamSummary,
+  AdminAccessLog,
+  DashboardWidget
+} from '../types/dashboard';
+
+export type {
+  AnonymizedEmotion,
+  TeamAnalytics,
+  KpiMetric
+} from '../types/analytics';
