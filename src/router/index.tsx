@@ -47,6 +47,7 @@ import LoginPage from '@/pages/common/Login';
 import RegisterPage from '@/pages/common/Register';
 import B2CLogin from '@/pages/b2c/Login';
 import B2CRegister from '@/pages/b2c/Register';
+import UnifiedSettingsPage from '@/pages/UnifiedSettingsPage';
 
 
 // Define the application routes without creating a router instance
@@ -58,6 +59,14 @@ export const routes: RouteObject[] = [
   {
     path: '/home',
     element: <Home />
+  },
+  {
+    path: 'settings',
+    element: (
+      <ProtectedRoute>
+        <UnifiedSettingsPage />
+      </ProtectedRoute>
+    )
   },
   // B2C Auth Routes
   {
