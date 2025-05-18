@@ -3,10 +3,15 @@ import { RouteObject, Navigate } from 'react-router-dom';
 import NotFoundPage from '@/pages/NotFoundPage';
 import LandingPage from '@/pages/LandingPage';
 import B2BSelectionPage from '@/pages/B2BSelectionPage';
+import B2BUserLogin from '@/pages/b2b/user/Login';
+import B2BAdminLogin from '@/pages/b2b/admin/Login';
+import B2BUserRegister from '@/pages/b2b/user/Register';
 import B2CLayout from '@/layouts/B2CLayout';
 import B2BUserLayout from '@/layouts/B2BUserLayout';
 import B2BAdminLayout from '@/layouts/B2BAdminLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import LoginPage from '@/pages/common/Login';
+import RegisterPage from '@/pages/common/Register';
 import B2CDashboardPage from '@/pages/b2c/DashboardPage';
 import B2BUserDashboardPage from '@/pages/b2b/user/Dashboard';
 import B2BAdminDashboardPage from '@/pages/b2b/admin/Dashboard';
@@ -38,6 +43,10 @@ import B2BAdminEventsPage from '@/pages/b2b/admin/Events';
 import B2BAdminSettingsPage from '@/pages/b2b/admin/Settings';
 import ImmersiveHome from '@/pages/ImmersiveHome';
 import Home from '@/pages/Home';
+import LoginPage from '@/pages/common/Login';
+import RegisterPage from '@/pages/common/Register';
+import B2CLogin from '@/pages/b2c/Login';
+import B2CRegister from '@/pages/b2c/Register';
 
 
 // Define the application routes without creating a router instance
@@ -53,11 +62,11 @@ export const routes: RouteObject[] = [
   // B2C Auth Routes
   {
     path: 'b2c/login',
-    element: <LoginPage />
+    element: <B2CLogin />
   },
   {
     path: 'b2c/register',
-    element: <RegisterPage />
+    element: <B2CRegister />
   },
   // B2B Selection Route
   {
@@ -72,11 +81,15 @@ export const routes: RouteObject[] = [
   // B2B Auth Routes
   {
     path: 'b2b/user/login',
-    element: <LoginPage />
+    element: <B2BUserLogin />
+  },
+  {
+    path: 'b2b/user/register',
+    element: <B2BUserRegister />
   },
   {
     path: 'b2b/admin/login',
-    element: <LoginPage />
+    element: <B2BAdminLogin />
   },
   // B2C Protected Routes
   {
