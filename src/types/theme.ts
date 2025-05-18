@@ -5,7 +5,7 @@ export type FontFamily = 'inter' | 'roboto' | 'system' | 'open-sans' | 'poppins'
 
 export type FontSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | 'medium' | string;
 
-export type ThemeName = 'light' | 'dark' | 'system' | 'custom' | 'pastel' | string;
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel' | string;
 
 export type Theme = ThemeName | 'light' | 'dark' | 'system' | 'pastel';
 
@@ -14,6 +14,7 @@ export interface ThemeOption {
   value: Theme;
   icon?: string;
   description?: string;
+  preview?: string;
 }
 
 export interface ThemeContextType {

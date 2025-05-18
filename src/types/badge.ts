@@ -3,49 +3,38 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  imageUrl?: string;
-  image_url?: string;
-  unlocked: boolean;
+  imageUrl: string;
   level: number;
-  category: string;
-  tier?: string;
-  icon?: string;
-  earned?: boolean;
+  category?: string;
+  unlocked?: boolean;
   progress?: number;
-  threshold?: number;
-  completed?: boolean;
-  rarity?: string;
-  achieved?: boolean;
-  unlockedAt?: string;
-  unlocked_at?: string;
+  requiredPoints?: number;
+  color?: string;
+  icon?: string;
+  dateEarned?: string;
 }
 
 export interface Challenge {
   id: string;
   title: string;
-  name?: string;
   description: string;
   points: number;
-  progress: number;
-  goal: number;
-  category: string;
-  completed: boolean;
-  status: string;
-  totalSteps?: number;
-  tags?: string[];
-  difficulty?: string;
-  completions?: number;
+  completed?: boolean;
+  progress?: number;
   total?: number;
+  category?: string;
   deadline?: string;
+  reward?: string;
+  imageUrl?: string;
+  icon?: string;
 }
 
-export interface LeaderboardEntry {
-  id: string;
-  userId: string;
+export interface GamificationData {
+  level: number;
   points: number;
-  rank: number;
-  avatar?: string;
-  name?: string;
-  username?: string;
-  score?: number;
+  nextLevel: number;
+  badges: Badge[];
+  challenges: Challenge[];
+  streakDays: number;
+  emotionalBalance: number;
 }

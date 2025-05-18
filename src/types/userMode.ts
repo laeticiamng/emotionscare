@@ -1,41 +1,28 @@
 
-import { UserRole } from './user';
+export type UserModeType = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin';
 
-export type UserModeType = 'b2c' | 'b2b_user' | 'b2b_admin';
-
-// Helper function to normalize user mode strings
-export function normalizeUserMode(mode: string): UserModeType {
-  switch (mode.toLowerCase()) {
-    case 'b2b_admin':
-    case 'admin':
-    case 'rh':
-    case 'hr':
-      return 'b2b_admin';
-    case 'b2b_user':
-    case 'user':
-    case 'collaborator':
-    case 'employee':
-      return 'b2b_user';
-    case 'b2c':
-    case 'particular':
-    case 'individual':
-    default:
-      return 'b2c';
-  }
+export interface UserModeContextType {
+  mode: UserModeType;
+  setMode: (mode: UserModeType) => void;
+  previousMode?: UserModeType;
+  setPreviousMode?: (mode: UserModeType) => void;
+  setModeWithHistory?: (mode: UserModeType) => void;
+  goBack?: () => void;
+  isAdmin?: boolean;
+  isB2B?: boolean;
+  isB2C?: boolean;
 }
 
-// Convert user role to user mode
-export function roleToMode(role?: UserRole | string): UserModeType {
-  if (!role) return 'b2c';
-  
-  switch(role) {
-    case 'b2b_admin':
-    case 'admin':
-      return 'b2b_admin';
-    case 'b2b_user':
-      return 'b2b_user';
-    case 'b2c':
-    default:
-      return 'b2c';
-  }
-}
+export const USER_MODES = {
+  B2C: 'b2c',
+  B2B_USER: 'b2b_user',
+  B2B_ADMIN: 'b2b_admin',
+  ADMIN: 'admin'
+} as const;
+
+export const USER_MODE_LABELS: Record<UserModeType, string> = {
+  b2c: 'Particulier',
+  b2b_user: 'Collaborateur',
+  b2b_admin: 'Responsable RH',
+  admin: 'Administrateur'
+};
