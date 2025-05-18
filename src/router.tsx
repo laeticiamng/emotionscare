@@ -52,6 +52,8 @@ import ImmersiveHome from './pages/ImmersiveHome';
 import Home from './pages/Home';
 import UnifiedSettingsPage from './pages/UnifiedSettingsPage';
 import SupportPage from './pages/Support';
+import ReportingPage from './pages/ReportingPage';
+import AdminReportingPage from './pages/admin/AdminReportingPage';
 
 // Define the application routes without creating a router instance
 export const routes: RouteObject[] = [
@@ -72,6 +74,22 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <UnifiedSettingsPage />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: 'reporting',
+    element: (
+      <ProtectedRoute>
+        <ReportingPage />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: 'admin/reporting',
+    element: (
+      <ProtectedRoute requiredRole="b2b_admin">
+        <AdminReportingPage />
       </ProtectedRoute>
     )
   },
