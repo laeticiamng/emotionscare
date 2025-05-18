@@ -32,6 +32,7 @@ export interface VRSessionTemplate {
   recommendedMood?: string;
   recommended_mood?: string;
   emotion?: string;
+  immersionLevel?: string;
 }
 
 export interface VRSession {
@@ -94,4 +95,35 @@ export interface VRSessionHistoryProps {
   limit?: number;
   showHeader?: boolean;
   className?: string;
+}
+
+// Add definition for Badge which is missing some properties
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  // Additional properties needed
+  rarity?: string;
+  completed?: boolean;
+}
+
+// Add missing conversationId property to ChatMessage interface
+export interface ChatMessage {
+  id: string;
+  text: string;
+  sender: 'user' | 'assistant';
+  timestamp: Date | string;
+  options?: any;
+  conversationId?: string;
+}
+
+// Add UserNotifications interface with enabled property
+export interface UserNotifications {
+  email?: boolean;
+  push?: boolean;
+  sms?: boolean;
+  weekly?: boolean;
+  insights?: boolean;
+  enabled?: boolean;
 }

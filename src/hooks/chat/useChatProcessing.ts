@@ -1,74 +1,60 @@
 
-import { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage, ChatResponse } from '@/types/chat';
+import { useState, useCallback } from 'react';
+import { ChatMessage } from '@/types';
 
-export interface UseChatProcessingProps {
-  onProcessingStart?: () => void;
-  onProcessingComplete?: (response: string) => void;
-  onError?: (error: Error) => void;
-}
+// Simulate API response delay
+const mockDelay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const useChatProcessing = ({
-  onProcessingStart,
-  onProcessingComplete,
-  onError
-}: UseChatProcessingProps = {}) => {
+export const useChatProcessing = (
+  conversationId: string = 'default'
+) => {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const processMessage = async (message: string, conversationId: string): Promise<string | null> => {
-    setIsProcessing(true);
-    onProcessingStart?.();
-    setError(null);
+  const processMessage = useCallback(
+    async (message: string): Promise<ChatMessage> => {
+      setIsProcessing(true);
+      setError(null);
 
-    try {
-      // Création du message utilisateur
-      const userMessage: ChatMessage = {
-        id: uuidv4(),
-        conversationId: conversationId,
-        conversation_id: conversationId, // Pour compatibilité
-        content: message,
-        text: message,
-        sender: 'user',
-        role: 'user',
-        timestamp: new Date().toISOString()
-      };
+      try {
+        // Simulate API call delay
+        await mockDelay(1000);
+        
+        const userMessage: ChatMessage = {
+          id: `user-${Date.now()}`,
+          text: message,
+          sender: 'user',
+          timestamp: new Date(),
+          conversationId // Include the conversation ID
+        };
 
-      // Simuler un appel API pour traiter le message
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const responseText = `Ceci est une réponse simulée au message: "${message}"`;
-      
-      // Création du message assistant
-      const assistantMessage: ChatMessage = {
-        id: uuidv4(),
-        conversationId: conversationId,
-        conversation_id: conversationId, // Pour compatibilité
-        content: responseText,
-        text: responseText,
-        sender: 'assistant',
-        role: 'assistant',
-        timestamp: new Date().toISOString()
-      };
+        // Simulate getting assistant response
+        await mockDelay(1500);
+        
+        const assistantMessage: ChatMessage = {
+          id: `assistant-${Date.now()}`,
+          text: `Reply to: "${message}"`,
+          sender: 'assistant',
+          timestamp: new Date(),
+          conversationId // Include the conversation ID
+        };
 
-      onProcessingComplete?.(responseText);
-      return responseText;
-    } catch (e) {
-      const errorObj = e instanceof Error ? e : new Error('Une erreur est survenue lors du traitement du message');
-      setError(errorObj);
-      onError?.(errorObj);
-      return null;
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+        return assistantMessage;
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    [conversationId]
+  );
 
   return {
-    processMessage,
     isProcessing,
-    error
+    error,
+    processMessage,
+    setIsProcessing
   };
 };
-
-export default useChatProcessing;
