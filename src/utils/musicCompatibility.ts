@@ -41,3 +41,20 @@ export const normalizePlaylist = (playlist: Partial<MusicPlaylist>): MusicPlayli
     emotion: playlist.emotion || playlist.mood || ''
   };
 };
+
+// Fonctions d'accès aux propriétés du track avec gestion des variations de nommage
+export const getTrackTitle = (track: MusicTrack): string => {
+  return track.title || track.name || 'Sans titre';
+};
+
+export const getTrackArtist = (track: MusicTrack): string => {
+  return track.artist || 'Artiste inconnu';
+};
+
+export const getTrackCover = (track: MusicTrack): string | undefined => {
+  return track.coverUrl || track.coverImage || track.cover;
+};
+
+export const getTrackAudioUrl = (track: MusicTrack): string => {
+  return track.audioUrl || track.url || track.src || track.track_url || '';
+};

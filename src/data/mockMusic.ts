@@ -1,64 +1,122 @@
 
-import { MusicPlaylist, MusicTrack } from '@/types/music';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { v4 as uuidv4 } from 'uuid';
 
-// Tracks de musique fictives pour les tests
-export const mockMusicTracks: MusicTrack[] = [
+export const mockTracks: MusicTrack[] = [
   {
-    id: 'track-001',
-    title: 'Méditation matinale',
-    artist: 'Zen Masters',
-    album: 'Sérénité Quotidienne',
-    duration: 180,
-    audioUrl: '/audio/meditation-morning.mp3',
-    coverUrl: '/images/music/cover-meditation.jpg',
-    emotion: 'calm',
-    genre: 'ambient',
-    tags: ['meditation', 'morning', 'calm']
-  },
-  {
-    id: 'track-002',
-    title: 'Flux océanique',
-    artist: 'Nature Sounds',
-    album: 'Sons de la nature',
+    id: "track-1",
+    title: "Méditation calmante",
+    artist: "Relax Studio",
     duration: 240,
-    audioUrl: '/audio/ocean-flow.mp3',
-    coverUrl: '/images/music/cover-ocean.jpg',
-    emotion: 'calm',
-    genre: 'nature',
-    tags: ['ocean', 'waves', 'relax']
+    audioUrl: "/audio/meditation.mp3",
+    coverUrl: "/images/calm-cover.jpg",
+    album: "Collection calme",
+    year: 2023,
+    genre: "Ambient",
+    emotion: "calm",
+    tags: ["meditation", "calm", "relax"]
   },
   {
-    id: 'track-003',
-    title: 'Réveil dynamique',
-    artist: 'Energy Beats',
-    album: 'Morning Boost',
-    duration: 160,
-    audioUrl: '/audio/energy-wake.mp3',
-    coverUrl: '/images/music/cover-energy.jpg',
-    emotion: 'energetic',
-    genre: 'electronic',
-    tags: ['morning', 'energy', 'motivation']
+    id: "track-2",
+    title: "Énergie matinale",
+    artist: "Morning Vibes",
+    duration: 180,
+    audioUrl: "/audio/energy.mp3",
+    coverUrl: "/images/energy-cover.jpg",
+    album: "Start the Day",
+    year: 2023,
+    genre: "Electronic",
+    emotion: "energetic",
+    tags: ["morning", "energy", "motivation"]
+  },
+  {
+    id: "track-3",
+    title: "Focus profond",
+    artist: "Concentration Beats",
+    duration: 300,
+    audioUrl: "/audio/focus.mp3",
+    coverUrl: "/images/focus-cover.jpg",
+    album: "Deep Work",
+    year: 2022,
+    genre: "Instrumental",
+    emotion: "focus",
+    tags: ["focus", "work", "study"]
+  },
+  {
+    id: "track-4",
+    title: "Happy Vibes",
+    artist: "Joy Sounds",
+    duration: 210,
+    audioUrl: "/audio/happy.mp3",
+    coverUrl: "/images/happy-cover.jpg",
+    album: "Good Mood",
+    year: 2023,
+    genre: "Pop",
+    emotion: "happy",
+    tags: ["happy", "joy", "positive"]
+  },
+  {
+    id: "track-5",
+    title: "Mélancolie douce",
+    artist: "Reflective Soul",
+    duration: 270,
+    audioUrl: "/audio/melancholy.mp3",
+    coverUrl: "/images/melancholy-cover.jpg",
+    album: "Inner Thoughts",
+    year: 2022,
+    genre: "Acoustic",
+    emotion: "melancholic",
+    tags: ["melancholy", "reflection", "calm"]
   }
 ];
 
-// Playlists fictives pour les tests
 export const mockPlaylists: MusicPlaylist[] = [
   {
-    id: 'playlist-calm',
-    name: 'Calme et sérénité',
-    description: 'Musiques apaisantes pour retrouver votre calme intérieur',
-    emotion: 'calm',
-    tracks: mockMusicTracks.filter(track => track.emotion === 'calm'),
-    coverUrl: '/images/music/playlist-calm.jpg',
-    tags: ['calm', 'relax', 'meditation']
+    id: "playlist-calm",
+    name: "Moments calmes",
+    tracks: mockTracks.filter(track => track.emotion === "calm"),
+    description: "Une collection de morceaux pour la relaxation",
+    coverImage: "/images/calm-playlist.jpg",
+    emotion: "calm"
   },
   {
-    id: 'playlist-energy',
-    name: 'Boost d\'énergie',
-    description: 'Musiques dynamiques pour booster votre énergie',
-    emotion: 'energetic',
-    tracks: mockMusicTracks.filter(track => track.emotion === 'energetic'),
-    coverUrl: '/images/music/playlist-energy.jpg',
-    tags: ['energy', 'workout', 'motivation']
+    id: "playlist-energy",
+    name: "Boost d'énergie",
+    tracks: mockTracks.filter(track => track.emotion === "energetic"),
+    description: "Musique motivante pour démarrer la journée",
+    coverImage: "/images/energy-playlist.jpg",
+    emotion: "energetic"
+  },
+  {
+    id: "playlist-focus",
+    name: "Concentration maximale",
+    tracks: mockTracks.filter(track => track.emotion === "focus"),
+    description: "Pour les sessions de travail intensif",
+    coverImage: "/images/focus-playlist.jpg",
+    emotion: "focus"
+  },
+  {
+    id: "playlist-happy",
+    name: "Bonheur quotidien",
+    tracks: mockTracks.filter(track => track.emotion === "happy"),
+    description: "Des morceaux joyeux pour égayer votre journée",
+    coverImage: "/images/happy-playlist.jpg",
+    emotion: "happy"
+  },
+  {
+    id: "playlist-melancholic",
+    name: "Réflexions profondes",
+    tracks: mockTracks.filter(track => track.emotion === "melancholic"),
+    description: "Musique contemplative pour les moments calmes",
+    coverImage: "/images/melancholic-playlist.jpg",
+    emotion: "melancholic"
   }
 ];
+
+// Fonction pour récupérer les données musicales mockées
+export const getMockMusicData = () => {
+  return {
+    tracks: mockTracks,
+    playlists: mockPlaylists
+  };
+};

@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Send } from 'lucide-react';
+import ChatMessageItem from './ChatMessageItem';
 
 interface ChatInterfaceProps {
   initialMessages?: ChatMessage[];
@@ -67,35 +68,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="space-y-4">
           {messages.map((message) => (
-            <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`flex items-start gap-2 max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}>
-                <Avatar className="mt-1">
-                  {message.sender === 'user' ? (
-                    <>
-                      <AvatarFallback>U</AvatarFallback>
-                      <AvatarImage src="/images/avatar.png" />
-                    </>
-                  ) : (
-                    <>
-                      <AvatarFallback>AI</AvatarFallback>
-                      <AvatarImage src="/images/ai-avatar.png" />
-                    </>
-                  )}
-                </Avatar>
-                <div className={`rounded-lg p-3 ${
-                  message.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                }`}>
-                  <p className="text-sm">{message.text || message.content || ""}</p>
-                  {message.timestamp && (
-                    <span className={`text-xs block mt-1 ${
-                      message.sender === 'user' ? 'text-primary-foreground/80' : 'text-muted-foreground'
-                    }`}>
-                      {new Date(message.timestamp).toLocaleTimeString()}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
+            <ChatMessageItem key={message.id} message={message} />
           ))}
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-64 text-muted-foreground">

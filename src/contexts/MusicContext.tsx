@@ -1,8 +1,10 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { MusicContextType, MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
-import { getMockMusicData } from './music/mockMusicData';
+import { mockTracks, mockPlaylists } from '@/data/mockMusic';
+import { ensurePlaylist, normalizeTrack } from '@/utils/musicCompatibility';
 
+// Création du contexte avec une valeur par défaut
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -18,16 +20,18 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [openDrawer, setOpenDrawer] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
+  const [isRepeating, setIsRepeating] = useState(false);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [queue, setQueue] = useState<MusicTrack[]>([]);
 
+  // Initialiser avec des données mock
   useEffect(() => {
-    // Initialize with mock data
     try {
-      const { playlists: mockPlaylists } = getMockMusicData();
-      setPlaylists(mockPlaylists);
+      setPlaylists(mockPlaylists || []);
       setIsInitialized(true);
     } catch (error) {
       console.error("Failed to initialize music data:", error);
-      setIsInitialized(true); // Still set initialized to prevent blocking the UI
+      setIsInitialized(true); // Toujours initialiser pour éviter de bloquer l'UI
     }
   }, []);
 
@@ -35,7 +39,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   
   const seekTo = (time: number) => {
     setCurrentTime(time);
-    // In a real implementation, we would also seek the audio element
+    // Dans une implémentation réelle, nous contrôlerions aussi l'élément audio
   };
 
   const togglePlayPause = () => {
@@ -43,6 +47,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const togglePlay = togglePlayPause;
+
+  const toggleRepeat = () => {
+    setIsRepeating(!isRepeating);
+  };
+
+  const toggleShuffle = () => {
+    setIsShuffled(!isShuffled);
+  };
 
   const playTrack = (track: MusicTrack) => {
     setCurrentTrack(track);
@@ -79,7 +91,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     playTrack(prevTrack);
   };
 
-  // Alias for prevTrack to handle naming inconsistencies
+  // Alias pour prevTrack pour gérer les incohérences de nommage
   const previousTrack = prevTrack;
 
   const setPlaylist = (input: MusicPlaylist | MusicTrack[]) => {
@@ -92,6 +104,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } else {
       setPlaylistState(input);
     }
+  };
+
+  const addToQueue = (track: MusicTrack) => {
+    setQueue(prevQueue => [...prevQueue, track]);
+  };
+
+  const clearQueue = () => {
+    setQueue([]);
   };
 
   const toggleDrawer = () => setOpenDrawer(!openDrawer);
@@ -111,7 +131,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
       
       if (playlists.length > 0) {
-        return playlists[0];  // Fallback to first playlist
+        return playlists[0];  // Fallback à la première playlist
       }
       
       return [];
@@ -121,13 +141,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Mock implementation of AI music generation
+  // Implémentation mock de génération de musique IA
   const generateMusic = async (prompt: string): Promise<MusicTrack | null> => {
     try {
-      // Simulate API delay
+      // Simuler un délai d'API
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Create a mock generated track
+      // Créer une piste générée mock
       const generatedTrack: MusicTrack = {
         id: `generated-${Date.now()}`,
         title: `Generated from: ${prompt.slice(0, 20)}...`,
@@ -138,8 +158,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         album: "AI Generated Music",
         year: new Date().getFullYear(),
         tags: ["ai", "generated", prompt.split(" ")[0]],
-        genre: "Electronic",
-        category: "ai-generated"
+        genre: "Electronic"
       };
       
       return generatedTrack;
@@ -154,7 +173,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     try {
       const emotionName = typeof params === 'string' ? params : params.emotion;
       
-      // In a real app, this would be an API call
+      // Dans une vraie app, ce serait un appel API
       const emotionPlaylist = playlists.find(p => 
         p.emotion?.toLowerCase() === emotionName.toLowerCase()
       );
@@ -163,7 +182,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setPlaylistState(emotionPlaylist);
         setEmotionState(emotionName);
         
-        // If no current track, set the first track
+        // Si pas de piste courante, définir la première piste
         if (!currentTrack && emotionPlaylist.tracks.length > 0) {
           setCurrentTrack(emotionPlaylist.tracks[0]);
         }
@@ -180,6 +199,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const setEmotion = setEmotionState;
 
+  // Valeur du contexte avec toutes les propriétés et fonctions requises
   const value: MusicContextType = {
     isInitialized,
     isPlaying,
@@ -213,7 +233,14 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentTrack,
     error,
     getRecommendationByEmotion,
-    playlists
+    playlists,
+    isRepeating,
+    isShuffled,
+    toggleRepeat,
+    toggleShuffle,
+    queue,
+    addToQueue,
+    clearQueue
   };
 
   return <MusicContext.Provider value={value}>{children}</MusicContext.Provider>;

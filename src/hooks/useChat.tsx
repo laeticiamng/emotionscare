@@ -1,77 +1,65 @@
 
 import { useState, useCallback } from 'react';
-import { ChatMessage } from '@/types/chat';
 import { v4 as uuidv4 } from 'uuid';
+import { ChatMessage } from '@/types/chat';
 
-export interface UseChatProps {
+interface UseChatOptions {
   initialMessages?: ChatMessage[];
-  onSendMessage?: (message: ChatMessage) => void;
+  onSendMessage?: (message: string) => void;
 }
 
-export const useChat = ({ initialMessages = [], onSendMessage }: UseChatProps = {}) => {
+export default function useChat({ initialMessages = [], onSendMessage }: UseChatOptions = {}) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  const sendMessage = useCallback(async (text: string, sender: 'user' | 'assistant' = 'user') => {
-    if (!text.trim()) return;
-    
-    // Créer un nouveau message
-    const newMessage: ChatMessage = {
-      id: uuidv4(),
-      text,
-      sender,
-      timestamp: new Date().toISOString()
-    };
-    
-    // Ajouter à l'état local
-    setMessages(prevMessages => [...prevMessages, newMessage]);
-    
-    // Réinitialiser le champ de saisie si c'est un message utilisateur
-    if (sender === 'user') {
-      setInput('');
-    }
-    
-    // Appeler le callback si fourni
-    if (onSendMessage) {
-      onSendMessage(newMessage);
-    }
-    
-    return newMessage;
-  }, [onSendMessage]);
-
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
-  }, []);
+  };
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const sendMessage = useCallback(
+    (messageText: string) => {
+      if (!messageText.trim()) return;
+
+      const userMessage: ChatMessage = {
+        id: uuidv4(),
+        text: messageText.trim(),
+        sender: 'user',
+        timestamp: new Date().toISOString(),
+      };
+
+      setMessages((prev) => [...prev, userMessage]);
+      setInput('');
+
+      // Si une fonction de callback externe est fournie, l'appeler
+      if (onSendMessage) {
+        onSendMessage(messageText);
+      } else {
+        // Sinon, simuler une réponse automatique après un court délai
+        setTimeout(() => {
+          const assistantMessage: ChatMessage = {
+            id: uuidv4(),
+            text: `Réponse à: ${messageText}`,
+            sender: 'assistant',
+            timestamp: new Date().toISOString(),
+          };
+          setMessages((prev) => [...prev, assistantMessage]);
+        }, 1000);
+      }
+    },
+    [onSendMessage]
+  );
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim()) {
-      sendMessage(input);
-    }
-  }, [input, sendMessage]);
-
-  const clearMessages = useCallback(() => {
-    setMessages([]);
-  }, []);
-
-  // Ajouter ces deux méthodes pour la compatibilité avec les composants existants
-  const addMessage = sendMessage;
-  const handleSend = (text: string) => sendMessage(text);
+    sendMessage(input);
+  };
 
   return {
     messages,
     input,
     setInput,
-    isLoading,
-    setIsLoading,
-    sendMessage,
     handleInputChange,
+    sendMessage,
     handleSubmit,
-    clearMessages,
-    addMessage,
-    handleSend
   };
-};
-
-export default useChat;
+}

@@ -1,8 +1,8 @@
 
 export interface ChatMessage {
   id: string;
-  text: string;
-  content?: string; // Pour la compatibilité avec différentes implémentations
+  text?: string;
+  content?: string;
   sender: 'user' | 'assistant' | 'system';
   role?: 'user' | 'assistant' | 'system'; // Pour la compatibilité avec différentes implémentations
   timestamp: string;

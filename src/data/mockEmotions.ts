@@ -1,69 +1,95 @@
 
-const mockEmotions = [
+import { Emotion } from '@/types/emotion';
+import { v4 as uuidv4 } from 'uuid';
+
+const mockEmotions: Emotion[] = [
   {
-    id: "1",
-    name: "joy",
-    label: "Joie",
-    description: "Sentiment de bonheur et de satisfaction",
-    color: "#FFD700",
-    icon: "smile"
+    id: uuidv4(),
+    name: 'Joyeux',
+    label: 'happy',
+    intensity: 0.85,
+    timestamp: new Date().toISOString(),
+    description: "Un état d'esprit positif, caractérisé par la satisfaction et le plaisir.",
+    tips: [
+      "Profitez du moment présent",
+      "Partagez votre joie avec les autres",
+      "Notez ce qui vous rend heureux dans un journal"
+    ],
+    categories: ['positive', 'high-energy'],
+    color: '#FFD700'
   },
   {
-    id: "2",
-    name: "sadness",
-    label: "Tristesse",
-    description: "Sentiment de mélancolie ou de chagrin",
-    color: "#6495ED",
-    icon: "frown"
+    id: uuidv4(),
+    name: 'Calme',
+    label: 'calm',
+    intensity: 0.7,
+    timestamp: new Date(Date.now() - 86400000).toISOString(), // Hier
+    description: "État de tranquillité et de paix intérieure, d'absence d'agitation.",
+    tips: [
+      "Pratiquez la respiration profonde",
+      "Prenez un moment pour méditer",
+      "Écoutez de la musique apaisante"
+    ],
+    categories: ['positive', 'low-energy'],
+    color: '#4682B4'
   },
   {
-    id: "3",
-    name: "anger",
-    label: "Colère",
-    description: "Sentiment intense de mécontentement ou d'hostilité",
-    color: "#FF4500",
-    icon: "angry"
+    id: uuidv4(),
+    name: 'Concentré',
+    label: 'focused',
+    intensity: 0.9,
+    timestamp: new Date(Date.now() - 172800000).toISOString(), // Avant-hier
+    description: "Capacité à diriger son attention de manière soutenue sur une tâche ou une activité.",
+    tips: [
+      "Éliminez les distractions",
+      "Utilisez la technique Pomodoro",
+      "Définissez des objectifs clairs"
+    ],
+    categories: ['neutral', 'high-energy'],
+    color: '#800080'
   },
   {
-    id: "4",
-    name: "fear",
-    label: "Peur",
-    description: "Sentiment d'appréhension causé par la perception d'un danger",
-    color: "#800080",
-    icon: "shocked"
+    id: uuidv4(),
+    name: 'Anxieux',
+    label: 'anxious',
+    intensity: 0.65,
+    timestamp: new Date(Date.now() - 259200000).toISOString(), // Il y a 3 jours
+    description: "Sentiment d'inquiétude et d'appréhension face à des situations perçues comme menaçantes.",
+    tips: [
+      "Pratiquez la respiration 4-7-8",
+      "Identifiez la source de votre anxiété",
+      "Parlez-en à quelqu'un de confiance"
+    ],
+    categories: ['negative', 'high-energy'],
+    color: '#FFA500'
   },
   {
-    id: "5",
-    name: "disgust",
-    label: "Dégoût",
-    description: "Sentiment d'aversion ou de répulsion",
-    color: "#32CD32",
-    icon: "nauseated"
-  },
-  {
-    id: "6",
-    name: "surprise",
-    label: "Surprise",
-    description: "Sentiment soudain d'étonnement ou de choc",
-    color: "#FF8C00",
-    icon: "surprise"
-  },
-  {
-    id: "7",
-    name: "calm",
-    label: "Calme",
-    description: "État de tranquillité et d'absence d'agitation",
-    color: "#87CEEB",
-    icon: "relaxed"
-  },
-  {
-    id: "8",
-    name: "stress",
-    label: "Stress",
-    description: "État de tension mentale ou émotionnelle",
-    color: "#DC143C",
-    icon: "stressed"
+    id: uuidv4(),
+    name: 'Triste',
+    label: 'sad',
+    intensity: 0.5,
+    timestamp: new Date(Date.now() - 345600000).toISOString(), // Il y a 4 jours
+    description: "État émotionnel lié à la perte, la déception ou la mélancolie.",
+    tips: [
+      "Acceptez vos émotions sans jugement",
+      "Ne restez pas isolé, contactez un ami",
+      "Faites une activité qui vous plaît"
+    ],
+    categories: ['negative', 'low-energy'],
+    color: '#4169E1'
   }
 ];
 
 export default mockEmotions;
+
+export type EmotionLabel = 'happy' | 'calm' | 'focused' | 'anxious' | 'sad';
+
+export const getEmotionByLabel = (label: EmotionLabel | string): Emotion | undefined => {
+  return mockEmotions.find(emotion => emotion.label === label);
+};
+
+export const getRecentEmotions = (limit: number = 5): Emotion[] => {
+  return [...mockEmotions].sort((a, b) => 
+    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  ).slice(0, limit);
+};

@@ -1,46 +1,61 @@
 
-export interface EmotionResult {
+export interface Emotion {
   id: string;
+  name: string;
+  label: string;
+  intensity: number;
+  timestamp: string;
+  description?: string;
+  tips?: string[];
+  categories?: string[];
+  color?: string;
+}
+
+export interface EmotionResult {
   emotion: string;
-  score?: number;
   confidence: number;
   timestamp: string;
-  date?: string;
-  feedback?: string;
-  source?: string;
-  text?: string;
-  audioUrl?: string;
+  secondaryEmotions?: {
+    [key: string]: number;
+  };
 }
 
-export interface LiveVoiceScannerProps {
-  onEmotionDetected?: (result: EmotionResult) => void;
-  autoStart?: boolean;
-  showFeedback?: boolean;
+export interface EmotionEntry {
+  id: string;
+  userId: string;
+  emotion: string;
+  intensity: number;
+  notes?: string;
+  timestamp: string;
+  source: 'manual' | 'scan' | 'journal' | 'ai';
 }
 
-export interface TeamOverviewProps {
-  teamId: string;
+export interface EmotionScanResult {
+  primaryEmotion: string;
+  confidence: number;
+  secondaryEmotions: {
+    [key: string]: number;
+  };
+  timestamp: string;
+  imageData?: string;
 }
 
-export interface EmotionalTeamViewProps {
-  teamMembers: Array<{
-    id: string;
-    name: string;
-    role: string;
-    emotionResult?: EmotionResult;
-  }>;
+export interface EmotionTrend {
+  emotion: string;
+  values: number[];
+  timestamps: string[];
+  average: number;
+  color: string;
 }
 
-export type Emotion = 
-  | 'joy' 
-  | 'sadness' 
-  | 'anger' 
-  | 'fear' 
-  | 'disgust' 
-  | 'surprise' 
-  | 'neutral'
-  | 'calm'
-  | 'anxiety'
-  | 'excitement'
-  | 'confidence'
-  | 'focus';
+export interface EmotionStats {
+  mostFrequentEmotion: string;
+  averageIntensity: number;
+  emotionCounts: {
+    [key: string]: number;
+  };
+  trends: EmotionTrend[];
+  totalEntries: number;
+  periodStart: string;
+  periodEnd: string;
+}
