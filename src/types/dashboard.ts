@@ -9,3 +9,29 @@ export interface EmotionalTeamViewProps {
   showMembers?: boolean;
   className?: string;
 }
+
+export interface KpiCardProps {
+  title: string;
+  value: string | number;
+  description?: string;
+  icon?: ReactNode;
+  status?: KpiCardStatus;
+  trend?: number;
+  className?: string;
+}
+
+export interface DashboardWidgetConfig {
+  id: string;
+  title: string;
+  description?: string;
+  visible?: boolean;
+  position?: number;
+}
+
+export type KpiCardStatus = 'positive' | 'negative' | 'neutral' | 'warning';
+
+export interface DraggableKpiCardsGridProps {
+  cards: KpiCardProps[];
+  className?: string;
+}
+
