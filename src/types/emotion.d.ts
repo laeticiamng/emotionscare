@@ -1,9 +1,11 @@
 
+export type EmotionIntensity = 'low' | 'medium' | 'high' | number;
+
 export interface Emotion {
   id: string;
   name: string;
   label: string;
-  intensity: number;
+  intensity: EmotionIntensity;
   timestamp: string;
   description?: string;
   tips?: string[];
@@ -24,7 +26,7 @@ export interface EmotionEntry {
   id: string;
   userId: string;
   emotion: string;
-  intensity: number;
+  intensity: EmotionIntensity;
   notes?: string;
   timestamp: string;
   source: 'manual' | 'scan' | 'journal' | 'ai';

@@ -1,48 +1,87 @@
 
 export interface VRSessionTemplate {
   id: string;
-  title: string;
+  name: string;
   description: string;
   duration: number;
-  difficulty: 'easy' | 'medium' | 'hard';
-  level?: string; // Ajout pour compatibilité avec les données existantes
-  intensity: number;
-  category: string;
-  tags: string[];
-  thumbnail: string;
-  created_at: string;
-  updated_at?: string;
-  author_id?: string;
-  author_name?: string;
-  average_rating?: number;
-  completion_count?: number;
-  music_track_id?: string;
-  is_premium?: boolean;
+  sessionType: VRSessionType;
+  thumbnailUrl?: string;
+  intensity: string;
+  effects?: VREffect[];
+  categories?: string[];
+  status?: 'published' | 'draft' | 'archived';
+  author?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  tags?: string[];
+  rating?: number;
+  userCount?: number;
+  isFeatured?: boolean;
+  isPublic?: boolean;
+  thumbnail?: string; // Pour compatibilité (alias de thumbnailUrl)
 }
 
-export interface VRSessionHistory {
+export type VRSessionType = 
+  | 'relaxation' 
+  | 'meditation' 
+  | 'focus' 
+  | 'creativity' 
+  | 'therapy' 
+  | 'nature' 
+  | 'immersive' 
+  | 'educational' 
+  | 'custom';
+
+export interface VREffect {
   id: string;
-  user_id: string;
-  template_id: string;
-  start_time: string;
-  end_time?: string;
+  name: string;
+  description?: string;
+  type: 'visual' | 'audio' | 'haptic' | 'mixed';
+  intensity: number;
+  startTime?: number;
   duration?: number;
-  completed: boolean;
-  heart_rate_start?: number;
-  heart_rate_end?: number;
-  calories_burned?: number;
-  focus_score?: number;
-  stress_level_before?: number;
-  stress_level_after?: number;
-  emotional_state_before?: string;
-  emotional_state_after?: string;
+  parameters?: Record<string, any>;
+}
+
+export interface VRSession {
+  id: string;
+  templateId: string;
+  userId: string;
+  startTime: string;
+  endTime?: string;
+  duration: number;
+  emotionsBefore?: Record<string, number>;
+  emotionsAfter?: Record<string, number>;
+  feedback?: string;
+  rating?: number;
+  status: 'scheduled' | 'active' | 'completed' | 'cancelled';
   notes?: string;
 }
 
-export interface VRTemplateFilter {
-  category?: string;
-  difficulty?: 'easy' | 'medium' | 'hard';
-  duration?: 'short' | 'medium' | 'long';
-  tags?: string[];
-  sort?: 'popular' | 'newest' | 'rating' | 'duration';
+export interface VRStats {
+  totalSessions: number;
+  totalDuration: number;
+  averageRating: number;
+  emotionImpact: {
+    before: Record<string, number>;
+    after: Record<string, number>;
+  };
+  mostUsedTemplates: {
+    templateId: string;
+    name: string;
+    count: number;
+  }[];
+}
+
+export interface VRContextType {
+  currentSession: VRSession | null;
+  availableTemplates: VRSessionTemplate[];
+  startSession: (templateId: string) => Promise<VRSession | null>;
+  endSession: (feedback?: string, rating?: number) => Promise<boolean>;
+  loadTemplates: () => Promise<VRSessionTemplate[]>;
+  getTemplateById: (id: string) => VRSessionTemplate | null;
+  getUserStats: () => Promise<VRStats | null>;
+  isVRSupported: boolean;
+  isVRActive: boolean;
+  error: Error | null;
 }
