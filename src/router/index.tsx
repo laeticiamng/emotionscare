@@ -42,6 +42,7 @@ import B2BAdminReportsPage from '@/pages/b2b/admin/Reports';
 import B2BAdminEventsPage from '@/pages/b2b/admin/Events';
 import B2BAdminSettingsPage from '@/pages/b2b/admin/Settings';
 import B2BAdminSocialCoconPage from '@/pages/b2b/admin/SocialCocon';
+import CommunityEventsPage from '@/pages/CommunityEventsPage';
 import ImmersiveHome from '@/pages/ImmersiveHome';
 import Home from '@/pages/Home';
 import LoginPage from '@/pages/common/Login';
@@ -159,6 +160,10 @@ export const routes: RouteObject[] = [
         element: <B2CCoconPage />
       },
       {
+        path: 'events',
+        element: <CommunityEventsPage />
+      },
+      {
         path: 'gamification',
         element: <B2CGamificationPage />
       }
@@ -216,6 +221,10 @@ export const routes: RouteObject[] = [
       {
         path: 'social-cocon',
         element: <B2BUserCoconPage />
+      },
+      {
+        path: 'events',
+        element: <CommunityEventsPage />
       },
       {
         path: 'gamification',

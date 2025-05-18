@@ -37,6 +37,17 @@ export interface Group {
   tags?: string[];
 }
 
+export interface CommunityEvent {
+  id: string;
+  title: string;
+  description?: string;
+  date: string | Date;
+  location?: string;
+  participants?: number;
+  image_url?: string;
+  imageUrl?: string;
+}
+
 export interface TagSelectorProps {
   selectedTags: string[];
   maxTags?: number;
