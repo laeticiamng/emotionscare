@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { EmotionResult } from '@/types/emotion';
 import { normalizeEmotionResult } from '@/utils/emotionCompatibility';
@@ -73,3 +74,5 @@ export function useEmotionScan() {
     mockEmotionDetection,
   };
 }
+
+export default useEmotionScan;
