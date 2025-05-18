@@ -16,10 +16,10 @@ export const useChatMessages = ({ conversationId, initialMessages = [] }: UseCha
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId || '',
+      conversation_id: conversationId || '', // Pour compatibilité
       sender: 'user',
       text,
-      timestamp: new Date().toISOString(),
-      conversation_id: conversationId || '' // Pour compatibilité
+      timestamp: new Date().toISOString()
     };
     
     setMessages(prevMessages => [...prevMessages, newMessage]);
@@ -30,10 +30,10 @@ export const useChatMessages = ({ conversationId, initialMessages = [] }: UseCha
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId || '',
+      conversation_id: conversationId || '', // Pour compatibilité
       sender: 'assistant',
       text,
-      timestamp: new Date().toISOString(),
-      conversation_id: conversationId || '' // Pour compatibilité
+      timestamp: new Date().toISOString()
     };
     
     setMessages(prevMessages => [...prevMessages, newMessage]);
@@ -44,10 +44,10 @@ export const useChatMessages = ({ conversationId, initialMessages = [] }: UseCha
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId || '',
+      conversation_id: conversationId || '', // Pour compatibilité
       sender: 'system',
       text,
-      timestamp: new Date().toISOString(),
-      conversation_id: conversationId || '' // Pour compatibilité
+      timestamp: new Date().toISOString()
     };
     
     setMessages(prevMessages => [...prevMessages, newMessage]);

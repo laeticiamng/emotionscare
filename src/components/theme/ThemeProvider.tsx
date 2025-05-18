@@ -1,6 +1,14 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ThemeContextType, Theme } from '@/types/theme';
+import { Theme } from '@/types/theme';
+
+interface ThemeContextType {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
+  isDark: boolean;
+  isDarkMode?: boolean; // Pour compatibilité
+}
 
 const ThemeContext = createContext<ThemeContextType>({
   theme: 'system',

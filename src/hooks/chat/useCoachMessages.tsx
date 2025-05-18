@@ -1,48 +1,31 @@
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
 
-export function useCoachMessages() {
+export const useCoachMessages = (conversationId: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentConversationId, setCurrentConversationId] = useState(uuidv4());
 
-  const addMessage = useCallback((message: string, role: 'user' | 'system' | 'assistant' = 'user') => {
+  const addMessage = (text: string, sender: 'system' | 'user' | 'assistant') => {
     const newMessage: ChatMessage = {
       id: uuidv4(),
-      text: message,
-      content: message,
-      sender: role,
-      role: role,
-      conversation_id: currentConversationId,
+      conversationId: conversationId,
+      conversation_id: conversationId, // Pour compatibilité
+      text,
+      content: text,
+      sender,
+      role: sender,
       timestamp: new Date().toISOString()
     };
-    
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setMessages(prev => [...prev, newMessage]);
     return newMessage;
-  }, [currentConversationId]);
-
-  const clearMessages = useCallback(() => {
-    setMessages([]);
-    setCurrentConversationId(uuidv4());
-  }, []);
-
-  const startNewConversation = useCallback(() => {
-    const newConversationId = uuidv4();
-    setCurrentConversationId(newConversationId);
-    return newConversationId;
-  }, []);
+  };
 
   return {
     messages,
-    isLoading,
-    setIsLoading,
-    addMessage,
-    clearMessages,
-    currentConversationId,
-    startNewConversation
+    setMessages,
+    addMessage
   };
-}
+};
 
 export default useCoachMessages;

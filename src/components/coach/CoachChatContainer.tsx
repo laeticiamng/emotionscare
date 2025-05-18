@@ -1,145 +1,80 @@
 
-import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { useIsMobile } from '@/hooks/use-mobile';
-import ChatHeader from '@/components/coach/ChatHeader';
-import ChatMessageList from '@/components/coach/ChatMessageList';
-import ChatInputForm from '@/components/coach/ChatInputForm';
-import ConversationDrawer from '@/components/coach/ConversationDrawer';
-import ConversationList from '@/components/coach/ConversationList';
-import { useChatHistory } from '@/hooks/chat/useChatHistory';
-import { ChatMessage } from '@/types/chat';
-import { AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import React, { useEffect } from 'react';
+import CoachChatInterface from './CoachChatInterface';
+import { useChatMessages } from '@/hooks/chat/useChatMessages';
+import { useCoachChat } from '@/hooks/chat/useCoachChat';
+import { useConversations } from '@/hooks/chat/useConversations';
+import { ChatConversation, ChatMessage } from '@/types/chat';
 
 interface CoachChatContainerProps {
-  messages: ChatMessage[];
-  isLoading: boolean;
-  typingIndicator: string;
-  userMessage: string;
-  onUserMessageChange: (message: string) => void;
-  onSendMessage: (message?: string) => void;
-  onRegenerate: () => void;
-  onKeyDown: (e: React.KeyboardEvent) => void;
-  onUserTyping: () => void;
-  onBackClick?: () => void;
-  error?: string;
-  retryLoadConversations?: () => void;
+  defaultPrompt?: string;
+  onMessageSent?: (message: string) => void;
+  onResponseReceived?: (response: string) => void;
 }
 
 const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
-  messages,
-  isLoading,
-  typingIndicator,
-  userMessage,
-  onUserMessageChange,
-  onSendMessage,
-  onRegenerate,
-  onKeyDown,
-  onUserTyping,
-  onBackClick,
-  error,
-  retryLoadConversations
+  defaultPrompt,
+  onMessageSent,
+  onResponseReceived,
 }) => {
-  const isMobile = useIsMobile();
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  
+  const {
+    messages: coachMessages,
+    sendMessage: sendCoachMessage,
+    isProcessing,
+    addMessage: addCoachMessage,
+  } = useCoachChat();
+
   const {
     conversations,
-    activeConversationId,
-    deleteConversation,
-    loadMessages,
-    setActiveConversationId
-  } = useChatHistory();
+    currentConversation,
+    messages,
+    loading,
+    error,
+    loadConversations,
+    selectConversation,
+    createConversation,
+    setMessages,
+  } = useConversations();
 
-  // Handle loading conversation
-  const handleLoadConversation = async (conversationId: string) => {
-    const loadedMessages = await loadMessages(conversationId);
-    if (isMobile) {
-      setDrawerOpen(false);
+  useEffect(() => {
+    // Charge la conversation par défaut ou crée une nouvelle
+    const initChat = async () => {
+      await loadConversations();
+      
+      if (conversations.length === 0) {
+        await createConversation("Nouvelle conversation avec Coach");
+      }
+    };
+    
+    initChat();
+  }, []);
+
+  useEffect(() => {
+    if (defaultPrompt && !isProcessing) {
+      sendMessage(defaultPrompt);
     }
-    return loadedMessages;
-  };
+  }, [defaultPrompt]);
 
-  // Start new conversation
-  const handleNewConversation = () => {
-    setActiveConversationId(null);
-    if (isMobile) {
-      setDrawerOpen(false);
+  const sendMessage = async (message: string) => {
+    if (!message.trim()) return;
+    
+    onMessageSent?.(message);
+    
+    const response = await sendCoachMessage(message);
+    
+    if (response && onResponseReceived) {
+      onResponseReceived(response);
     }
+    
+    return response;
   };
-
-  const renderConversationList = () => (
-    <ConversationList
-      conversations={conversations}
-      activeConversationId={activeConversationId}
-      onConversationSelect={handleLoadConversation}
-      onNewConversation={handleNewConversation}
-      onDeleteConversation={deleteConversation}
-    />
-  );
 
   return (
-    <div className="flex h-full gap-4">
-      {/* Conversations sidebar for desktop */}
-      {!isMobile && (
-        <div className="hidden md:block w-64 h-full">
-          {renderConversationList()}
-        </div>
-      )}
-      
-      {/* Main chat area */}
-      <Card className="flex-grow flex flex-col overflow-hidden p-0 shadow-premium relative">
-        <ChatHeader 
-          onBackClick={onBackClick} 
-          title={
-            activeConversationId 
-              ? conversations.find(c => c.id === activeConversationId)?.title || "Coach IA Personnel"
-              : "Coach IA Personnel"
-          }
-          actions={
-            isMobile && (
-              <ConversationDrawer
-                isOpen={drawerOpen}
-                onOpenChange={setDrawerOpen}
-                renderContent={renderConversationList}
-              />
-            )
-          }
-        />
-        
-        {error && (
-          <Alert variant="destructive" className="m-2">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="flex justify-between items-center">
-              <span>{error}</span>
-              {retryLoadConversations && (
-                <Button variant="outline" size="sm" onClick={retryLoadConversations}>
-                  Réessayer
-                </Button>
-              )}
-            </AlertDescription>
-          </Alert>
-        )}
-        
-        <ChatMessageList 
-          messages={messages} 
-          isLoading={isLoading} 
-          typingIndicator={typingIndicator}
-        />
-        <ChatInputForm
-          userMessage={userMessage}
-          isLoading={isLoading}
-          onUserMessageChange={onUserMessageChange}
-          onSendMessage={onSendMessage}
-          onRegenerate={onRegenerate}
-          hasMessages={messages.length > 1}
-          onKeyDown={onKeyDown}
-          onTyping={onUserTyping}
-        />
-      </Card>
-    </div>
+    <CoachChatInterface
+      messages={coachMessages}
+      sendMessage={sendMessage}
+      isProcessing={isProcessing}
+    />
   );
 };
 

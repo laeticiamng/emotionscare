@@ -1,116 +1,120 @@
 
-import { useState, useCallback } from 'react';
-import { ChatMessage, ChatConversation } from '@/types/chat';
+import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { ChatConversation, ChatMessage } from '@/types/chat';
 
-interface UseConversationStateProps {
-  initialConversation?: ChatConversation;
-  userId?: string;
-}
-
-export const useConversationState = ({
-  initialConversation,
-  userId = 'current-user',
-}: UseConversationStateProps = {}) => {
+export const useConversationState = () => {
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
-  const [currentConversation, setCurrentConversation] = useState<ChatConversation | null>(
-    initialConversation || null
-  );
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Create a new conversation
-  const createNewConversation = useCallback(
-    (title = 'New conversation') => {
-      const timestamp = new Date().toISOString();
-      const conversation: ChatConversation = {
-        id: uuidv4(),
-        title,
-        user_id: userId,
-        messages: [],
-        created_at: timestamp,
-        updated_at: timestamp,
-        last_message: ''
-      };
-      
-      setConversations((prev) => [conversation, ...prev]);
-      setCurrentConversation(conversation);
-      
-      return conversation;
-    },
-    [userId]
-  );
+  // Crée une nouvelle conversation
+  const createConversation = (title: string = 'Nouvelle conversation') => {
+    const newConversation: ChatConversation = {
+      id: uuidv4(),
+      title,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      lastMessage: "",
+      user_id: "user-123", // Normalement dynamique selon l'utilisateur connecté
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      last_message: ""
+    };
 
-  // Update a conversation
-  const updateConversation = useCallback((conversationId: string, updates: Partial<ChatConversation>) => {
-    setConversations((prev) => 
-      prev.map((conv) => 
-        conv.id === conversationId
-          ? { 
-              ...conv, 
-              ...updates, 
-              updated_at: updates.updated_at || new Date().toISOString(),
-              last_message: updates.last_message || conv.last_message || '',
-            }
+    setConversations(prev => [newConversation, ...prev]);
+    setCurrentConversationId(newConversation.id);
+    setMessages([]);
+
+    return newConversation;
+  };
+
+  // Met à jour le titre d'une conversation
+  const updateConversationTitle = (id: string, title: string) => {
+    setConversations(prev => 
+      prev.map(conv => 
+        conv.id === id 
+          ? { ...conv, title, updatedAt: new Date().toISOString(), updated_at: new Date().toISOString() } 
           : conv
       )
     );
+  };
 
-    if (currentConversation?.id === conversationId) {
-      setCurrentConversation((prev) =>
-        prev ? { 
-          ...prev, 
-          ...updates, 
-          updated_at: updates.updated_at || new Date().toISOString(),
-          last_message: updates.last_message || prev.last_message || '',
-        } : prev
-      );
+  // Supprime une conversation
+  const deleteConversation = (id: string) => {
+    setConversations(prev => prev.filter(conv => conv.id !== id));
+    
+    if (currentConversationId === id) {
+      const remainingConversations = conversations.filter(conv => conv.id !== id);
+      if (remainingConversations.length > 0) {
+        setCurrentConversationId(remainingConversations[0].id);
+        // Charger les messages de la première conversation restante
+      } else {
+        setCurrentConversationId(null);
+        setMessages([]);
+      }
     }
-  }, [currentConversation]);
+  };
 
-  // Add a message to the current conversation
-  const addMessageToConversation = useCallback(
-    (message: ChatMessage) => {
-      if (!currentConversation) return;
-
-      const lastMessageText = message.content || message.text || '';
-      
-      setConversations((prev) =>
-        prev.map((conv) =>
-          conv.id === currentConversation.id
-            ? {
-                ...conv,
-                messages: [...(conv.messages || []), message],
-                last_message: lastMessageText,
-                updated_at: new Date().toISOString(),
-              }
+  // Ajoute un message à la conversation courante
+  const addMessage = (message: ChatMessage) => {
+    setMessages(prev => [...prev, message]);
+    
+    // Met à jour le dernier message de la conversation
+    if (currentConversationId) {
+      setConversations(prev => 
+        prev.map(conv => 
+          conv.id === currentConversationId 
+            ? { 
+                ...conv, 
+                lastMessage: message.text,
+                last_message: message.text,
+                updatedAt: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              } 
             : conv
         )
       );
+    }
+  };
 
-      setCurrentConversation((prev) =>
-        prev
-          ? {
-              ...prev,
-              messages: [...(prev.messages || []), message],
-              last_message: lastMessageText,
-              updated_at: new Date().toISOString(),
-            }
-          : prev
-      );
-    },
-    [currentConversation]
-  );
+  // Sélectionne une conversation et charge ses messages
+  const selectConversation = async (id: string) => {
+    setIsLoading(true);
+    setCurrentConversationId(id);
+    
+    try {
+      // Simuler le chargement des messages
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Dans une vraie application, les messages seraient chargés depuis une API
+      // Pour ce mock, on utilise un tableau vide
+      setMessages([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Au montage, crée une conversation par défaut si aucune n'existe
+  useEffect(() => {
+    if (conversations.length === 0) {
+      createConversation();
+    }
+  }, []);
 
   return {
     conversations,
-    setConversations,
-    currentConversation,
-    setCurrentConversation,
+    currentConversationId,
+    messages,
     isLoading,
-    setIsLoading,
-    createNewConversation,
-    updateConversation,
-    addMessageToConversation,
+    createConversation,
+    updateConversationTitle,
+    deleteConversation,
+    addMessage,
+    selectConversation,
+    setCurrentConversationId,
+    setMessages
   };
 };
 

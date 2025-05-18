@@ -1,84 +1,108 @@
 
 import { VRSessionTemplate } from '@/types';
 
-export const mockVRTemplates: VRSessionTemplate[] = [
+const mockVRTemplates: VRSessionTemplate[] = [
   {
-    id: '1',
-    title: 'Méditation en forêt',
-    description: 'Une expérience immersive dans une forêt paisible avec des sons naturels apaisants.',
-    thumbnailUrl: '/images/vr/forest-meditation.jpg',
-    duration: 10,
-    category: 'meditation',
-    tags: ['détente', 'nature', 'méditation'],
-    completionRate: 0.8,
-    recommendedMood: 'anxious',
-    emotion: 'calm',
-    difficulty: 'débutant'
-  },
-  {
-    id: '2',
-    title: 'Plage tropicale',
-    description: 'Échappez au stress quotidien avec cette expérience sur une plage tropicale idyllique.',
-    thumbnailUrl: '/images/vr/beach.jpg',
+    id: "template-1",
+    title: "Méditation en forêt",
+    name: "Méditation en forêt", // Ajouté
+    description: "Une séance de méditation relaxante dans un environnement forestier apaisant",
+    thumbnailUrl: "/images/vr/forest-meditation.jpg",
     duration: 15,
-    category: 'relaxation',
-    tags: ['plage', 'océan', 'relaxation'],
-    completionRate: 0.5,
-    recommendedMood: 'stressed',
-    emotion: 'calm',
-    difficulty: 'débutant'
+    category: "méditation",
+    environment: "forêt", // Ajouté
+    intensity: "faible", // Ajouté
+    objective: "Relaxation et détente", // Ajouté
+    tags: ["relaxation", "nature", "méditation guidée"],
+    completionRate: 85,
+    recommendedMood: "stress",
+    emotion: "calm",
+    difficulty: "débutant"
   },
   {
-    id: '3',
-    title: 'Ascension de montagne',
-    description: 'Une expérience motivante de randonnée virtuelle avec des vues panoramiques à couper le souffle.',
-    thumbnailUrl: '/images/vr/mountain.jpg',
+    id: "template-2",
+    title: "Évasion montagnarde",
+    name: "Évasion montagnarde", // Ajouté
+    description: "Explorez les sommets majestueux et respirez l'air pur des montagnes",
+    thumbnailUrl: "/images/vr/mountain-escape.jpg",
     duration: 20,
-    category: 'motivation',
-    tags: ['montagne', 'aventure', 'motivation'],
-    completionRate: 0.3,
-    recommendedMood: 'sad',
-    emotion: 'joy',
-    difficulty: 'intermédiaire'
+    environment: "montagne", // Ajouté
+    intensity: "modérée", // Ajouté
+    objective: "Exploration et émerveillement", // Ajouté
+    category: "exploration",
+    tags: ["aventure", "nature", "paysages"],
+    completionRate: 92,
+    recommendedMood: "curiosité",
+    emotion: "wonder",
+    difficulty: "intermédiaire"
   },
   {
-    id: '4',
-    title: 'Méditation guidée',
-    description: 'Une méditation guidée par un expert pour vous aider à atteindre un état de pleine conscience.',
-    thumbnailUrl: '/images/vr/guided-meditation.jpg',
-    duration: 12,
-    category: 'meditation',
-    tags: ['méditation', 'guidé', 'pleine conscience'],
-    completionRate: 0.9,
-    recommendedMood: 'anxious',
-    emotion: 'calm',
-    difficulty: 'débutant'
+    id: "template-3",
+    title: "Plage tropicale",
+    name: "Plage tropicale", // Ajouté
+    description: "Détendez-vous sur une plage de sable blanc avec le bruit relaxant des vagues",
+    thumbnailUrl: "/images/vr/tropical-beach.jpg",
+    duration: 25,
+    environment: "plage", // Ajouté
+    intensity: "faible", // Ajouté
+    objective: "Relaxation profonde", // Ajouté
+    category: "relaxation",
+    tags: ["plage", "océan", "détente"],
+    completionRate: 78,
+    recommendedMood: "stress",
+    emotion: "calm",
+    difficulty: "débutant"
   },
   {
-    id: '5',
-    title: 'Session de respiration profonde',
-    description: 'Techniques de respiration profonde pour réduire l\'anxiété et augmenter la concentration.',
-    thumbnailUrl: '/images/vr/breathing.jpg',
-    duration: 8,
-    category: 'breathing',
-    tags: ['respiration', 'anxiété', 'concentration'],
-    completionRate: 0.7,
-    recommendedMood: 'stressed',
-    emotion: 'focused',
-    difficulty: 'tous niveaux'
+    id: "template-4",
+    title: "Cosmos infini",
+    name: "Cosmos infini", // Ajouté
+    description: "Voyagez à travers les étoiles et explorez les merveilles de l'espace",
+    thumbnailUrl: "/images/vr/space-journey.jpg",
+    duration: 30,
+    environment: "espace", // Ajouté
+    intensity: "élevée", // Ajouté
+    objective: "Émerveillement et perspective", // Ajouté
+    category: "exploration",
+    tags: ["espace", "science", "immersif"],
+    completionRate: 95,
+    recommendedMood: "curiosité",
+    emotion: "awe",
+    difficulty: "intermédiaire"
   },
   {
-    id: '6',
-    title: 'Voyage sous-marin',
-    description: 'Explorez les merveilles de l\'océan dans cette aventure sous-marine relaxante.',
-    thumbnailUrl: '/images/vr/underwater.jpg',
-    duration: 18,
-    category: 'exploration',
-    tags: ['océan', 'découverte', 'détente'],
-    completionRate: 0.6,
-    recommendedMood: 'bored',
-    emotion: 'joy',
-    difficulty: 'intermédiaire'
+    id: "template-5",
+    title: "Jardin zen",
+    name: "Jardin zen", // Ajouté
+    description: "Pratiquez la pleine conscience dans un jardin japonais traditionnel",
+    thumbnailUrl: "/images/vr/zen-garden.jpg",
+    duration: 20,
+    environment: "jardin", // Ajouté
+    intensity: "faible", // Ajouté
+    objective: "Méditation et pleine conscience", // Ajouté
+    category: "méditation",
+    tags: ["zen", "pleine conscience", "japonais"],
+    completionRate: 88,
+    recommendedMood: "anxiété",
+    emotion: "peaceful",
+    difficulty: "tous niveaux"
+  },
+  {
+    id: "template-6",
+    title: "Aurores boréales",
+    name: "Aurores boréales", // Ajouté
+    description: "Admirez les aurores boréales depuis un paysage arctique enneigé",
+    thumbnailUrl: "/images/vr/northern-lights.jpg",
+    duration: 15,
+    environment: "arctique", // Ajouté
+    intensity: "modérée", // Ajouté
+    objective: "Contemplation et émerveillement", // Ajouté
+    category: "contemplation",
+    tags: ["arctique", "nuit", "phénomène naturel"],
+    completionRate: 90,
+    recommendedMood: "mélancolie",
+    emotion: "wonder",
+    difficulty: "débutant"
   }
 ];
 

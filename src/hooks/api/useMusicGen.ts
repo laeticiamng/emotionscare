@@ -1,158 +1,72 @@
 
-/**
- * Hook useMusicGen
- * 
- * Ce hook fournit une interface React pour utiliser les services de génération de musique
- * avec gestion d'état, chargement, et lecture.
- */
-import { useState, useCallback } from 'react';
-import { musicGen } from '@/services';
-import { MusicGenOptions, MusicGenResult } from '@/services/musicgen';
-import { AudioTrack } from '@/types/audio';
-import { useAudio } from '@/contexts';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect, useCallback } from 'react';
+import { useMusicPlayer } from '@/contexts/music'; // Importation corrigée
 
-interface UseMusicGenOptions {
+export interface UseMusicGenOptions {
   autoPlay?: boolean;
-  onGenerated?: (track: AudioTrack) => void;
-  onError?: (error: Error) => void;
+  emotion?: string;
+  duration?: number;
 }
 
-export function useMusicGen(options: UseMusicGenOptions = {}) {
+export const useMusicGen = (options: UseMusicGenOptions = {}) => {
+  const { autoPlay = false, emotion = 'neutral', duration = 60 } = options;
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedTrack, setGeneratedTrack] = useState<AudioTrack | null>(null);
+  const [generatedTrackUrl, setGeneratedTrackUrl] = useState<string | null>(null);
   const [error, setError] = useState<Error | null>(null);
   
-  const { playTrack } = useAudio();
-  const { toast } = useToast();
+  const musicContext = useMusicPlayer();
   
-  const { 
-    autoPlay = false,
-    onGenerated,
-    onError 
-  } = options;
-  
-  /**
-   * Génère une piste musicale avec les options spécifiées
-   */
-  const generateMusic = useCallback(async (options: MusicGenOptions) => {
+  const generateMusic = useCallback(async (emotionValue: string = emotion, durationValue: number = duration) => {
     setIsGenerating(true);
     setError(null);
     
     try {
-      // Génère la musique
-      const result: MusicGenResult = await musicGen.generateMusic(options);
+      // Dans une véritable application, nous appellerions une API de génération de musique
+      // Pour cette simulation, nous utiliserons un délai pour simuler la génération
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Convertit en AudioTrack
-      const track = musicGen.resultToAudioTrack(result);
-      setGeneratedTrack(track);
+      // URL simulée pour un morceau généré
+      const mockTrackUrl = `/api/music/generated/${emotionValue}_${Date.now()}.mp3`;
+      setGeneratedTrackUrl(mockTrackUrl);
       
-      // Lecture automatique si activée
-      if (autoPlay && playTrack) {
-        playTrack(track);
+      if (autoPlay && musicContext) {
+        // Simuler la lecture de la piste générée
+        musicContext.playTrack({
+          id: `generated-${Date.now()}`,
+          title: `Musique générée pour ${emotionValue}`,
+          artist: 'IA Musicien',
+          duration: durationValue,
+          audioUrl: mockTrackUrl
+        });
       }
       
-      // Notification
-      toast({
-        title: "Musique générée",
-        description: "Votre musique a été générée avec succès.",
-      });
-      
-      // Callback utilisateur
-      if (onGenerated) {
-        onGenerated(track);
-      }
-      
-      return track;
-    } catch (err) {
-      console.error('Error generating music:', err);
-      setError(err as Error);
-      
-      toast({
-        title: "Erreur de génération",
-        description: "Impossible de générer la musique. Veuillez réessayer.",
-        variant: "destructive",
-      });
-      
-      if (onError) onError(err as Error);
+      return mockTrackUrl;
+    } catch (e) {
+      const errorObj = e instanceof Error ? e : new Error("Erreur lors de la génération de musique");
+      setError(errorObj);
       return null;
     } finally {
       setIsGenerating(false);
     }
-  }, [autoPlay, playTrack, onGenerated, onError, toast]);
-  
-  /**
-   * Génère une piste musicale basée sur une émotion
-   */
-  const generateMusicByEmotion = useCallback(async (emotion: string, options: Partial<MusicGenOptions> = {}) => {
-    setIsGenerating(true);
-    setError(null);
-    
-    try {
-      // Génère la musique basée sur l'émotion
-      const track = await musicGen.generateMusicByEmotion(emotion, options);
-      setGeneratedTrack(track);
-      
-      // Lecture automatique si activée
-      if (autoPlay && playTrack) {
-        playTrack(track);
-      }
-      
-      // Notification
-      toast({
-        title: "Musique générée",
-        description: `Musique adaptée à l'émotion "${emotion}" générée avec succès.`,
-      });
-      
-      // Callback utilisateur
-      if (onGenerated) {
-        onGenerated(track);
-      }
-      
-      return track;
-    } catch (err) {
-      console.error('Error generating music by emotion:', err);
-      setError(err as Error);
-      
-      toast({
-        title: "Erreur de génération",
-        description: "Impossible de générer la musique d'ambiance. Veuillez réessayer.",
-        variant: "destructive",
-      });
-      
-      if (onError) onError(err as Error);
-      return null;
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [autoPlay, playTrack, onGenerated, onError, toast]);
-  
-  /**
-   * Joue la dernière piste générée
-   */
-  const playGeneratedTrack = useCallback(() => {
-    if (generatedTrack && playTrack) {
-      playTrack(generatedTrack);
-    }
-  }, [generatedTrack, playTrack]);
-  
-  /**
-   * Réinitialise l'état du hook
-   */
-  const reset = useCallback(() => {
-    setGeneratedTrack(null);
-    setError(null);
-  }, []);
+  }, [autoPlay, emotion, duration, musicContext]);
   
   return {
-    isGenerating,
-    generatedTrack,
-    error,
     generateMusic,
-    generateMusicByEmotion,
-    playGeneratedTrack,
-    reset
+    isGenerating,
+    generatedTrackUrl,
+    error,
+    playGeneratedTrack: () => {
+      if (generatedTrackUrl && musicContext) {
+        musicContext.playTrack({
+          id: `generated-${Date.now()}`,
+          title: `Musique générée pour ${emotion}`,
+          artist: 'IA Musicien',
+          duration,
+          audioUrl: generatedTrackUrl
+        });
+      }
+    }
   };
-}
+};
 
 export default useMusicGen;

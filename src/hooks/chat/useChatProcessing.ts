@@ -1,101 +1,74 @@
 
 import { useState } from 'react';
-import { ChatMessage, ChatConversation } from '@/types';
-import { useToast } from '@/hooks/use-toast';
 import { v4 as uuidv4 } from 'uuid';
+import { ChatMessage, ChatResponse } from '@/types/chat';
 
 export interface UseChatProcessingProps {
-  initialMessages?: ChatMessage[];
-  onSendMessage?: (message: string) => Promise<string>;
-  onStartTyping?: () => void;
-  onStopTyping?: () => void;
+  onProcessingStart?: () => void;
+  onProcessingComplete?: (response: string) => void;
+  onError?: (error: Error) => void;
 }
 
-export function useChatProcessing({
-  initialMessages = [],
-  onSendMessage,
-  onStartTyping,
-  onStopTyping
-}: UseChatProcessingProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
+export const useChatProcessing = ({
+  onProcessingStart,
+  onProcessingComplete,
+  onError
+}: UseChatProcessingProps = {}) => {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  // Send a message and get a response
-  const sendMessage = async (content: string) => {
-    if (!content.trim()) return;
-    
+  const processMessage = async (message: string, conversationId: string): Promise<string | null> => {
+    setIsProcessing(true);
+    onProcessingStart?.();
+    setError(null);
+
     try {
-      setLoading(true);
-      setError(null);
-      
-      if (onStartTyping) onStartTyping();
-      
-      // Add user message to chat
+      // Création du message utilisateur
       const userMessage: ChatMessage = {
         id: uuidv4(),
-        content: content,
-        text: content, // For compatibility with different message formats
-        sender: "user",
-        role: "user", // For compatibility
-        timestamp: new Date().toISOString(),
-        conversation_id: "current"
+        conversationId: conversationId,
+        conversation_id: conversationId, // Pour compatibilité
+        content: message,
+        text: message,
+        sender: 'user',
+        role: 'user',
+        timestamp: new Date().toISOString()
       };
+
+      // Simuler un appel API pour traiter le message
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      setMessages(prev => [...prev, userMessage]);
+      const responseText = `Ceci est une réponse simulée au message: "${message}"`;
       
-      // Simulate typing delay for better UX
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // Get response from AI
-      let responseContent = "I couldn't process your request.";
-      
-      if (onSendMessage) {
-        responseContent = await onSendMessage(content);
-      }
-      
-      // Add AI response to chat
-      const aiMessage: ChatMessage = {
+      // Création du message assistant
+      const assistantMessage: ChatMessage = {
         id: uuidv4(),
-        content: responseContent,
-        text: responseContent,
-        sender: "assistant",
-        role: "assistant",
-        timestamp: new Date().toISOString(),
-        conversation_id: "current"
+        conversationId: conversationId,
+        conversation_id: conversationId, // Pour compatibilité
+        content: responseText,
+        text: responseText,
+        sender: 'assistant',
+        role: 'assistant',
+        timestamp: new Date().toISOString()
       };
-      
-      setMessages(prev => [...prev, aiMessage]);
-      
-    } catch (err) {
-      console.error('Error processing message:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred while processing your message');
-      
-      toast({
-        title: 'Error',
-        description: 'Failed to process your message. Please try again.',
-        variant: 'destructive',
-      });
-      
+
+      onProcessingComplete?.(responseText);
+      return responseText;
+    } catch (e) {
+      const errorObj = e instanceof Error ? e : new Error('Une erreur est survenue lors du traitement du message');
+      setError(errorObj);
+      onError?.(errorObj);
+      return null;
     } finally {
-      setLoading(false);
-      if (onStopTyping) onStopTyping();
+      setIsProcessing(false);
     }
   };
 
-  // Clear all messages
-  const clearMessages = () => {
-    setMessages([]);
-  };
-
   return {
-    messages,
-    loading,
-    error,
-    sendMessage,
-    clearMessages
+    processMessage,
+    isProcessing,
+    error
   };
-}
+};
 
 export default useChatProcessing;
