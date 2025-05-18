@@ -1,7 +1,7 @@
 
 # Music Context
 
-This directory contains the official Music Context and related utilities for the application.
+This directory contains exports and utilities for the **unique** MusicContext used in the application.
 
 ## Important Guidelines
 
@@ -12,10 +12,8 @@ This directory contains the official Music Context and related utilities for the
 
 ## Structure
 
-- `MusicContext.tsx` - The main context definition
 - `index.ts` - Exports for the context and hooks
 - `mockMusicData.ts` - Mock data for testing/development
-- `types.ts` - (Deprecated) Types for backward compatibility
 
 ## Adding New Functionality
 
@@ -27,9 +25,5 @@ When adding new music-related features:
 
 ## Legacy Hooks
 
-The following hooks are deprecated and will be removed in future versions:
-
-- `useMusicPlayer` - use `useMusic` instead
-- `usePlayerContext` - use `useMusic` instead
-
-Do not create new hooks that duplicate functionality already in the music context.
+The old provider implementations have been removed. Do **not** create new hooks
+or providers. Always use `useMusic` and `MusicProvider` from this folder.
