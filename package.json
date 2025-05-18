@@ -12,8 +12,8 @@
     "type-check": "tsc --noEmit",
     "test": "node --test --loader ts-node/esm",
     "clean": "rm -rf dist",
-    "aperçu": "aperçu rapide",
-    "seed:test-users": "ts-node scripts/ensureTestUser.ts"
+    "preview": "vite preview",
+    "seed:test-user": "ts-node scripts/ensureTestUser.ts"
 
   },
   "dependencies": {
