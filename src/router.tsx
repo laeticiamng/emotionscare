@@ -14,6 +14,30 @@ import B2BUserDashboardPage from './pages/b2b/user/Dashboard';
 import B2BAdminDashboardPage from './pages/b2b/admin/Dashboard';
 import B2CGamificationPage from './pages/b2c/Gamification';
 import B2BUserGamificationPage from './pages/b2b/user/Gamification';
+import B2CJournalPage from './pages/b2c/Journal';
+import B2CScanPage from './pages/b2c/Scan';
+import B2CMusicPage from './pages/b2c/Music';
+import B2CCoachPage from './pages/b2c/Coach';
+import B2CCoachChatPage from './pages/b2c/CoachChat';
+import B2CVRPage from './pages/b2c/VR';
+import B2CPreferencesPage from './pages/b2c/Preferences';
+import B2CSettingsPage from './pages/b2c/Settings';
+import B2CCoconPage from './pages/b2c/Cocon';
+import B2BUserJournalPage from './pages/b2b/user/Journal';
+import B2BUserScanPage from './pages/b2b/user/Scan';
+import B2BUserMusicPage from './pages/b2b/user/Music';
+import B2BUserCoachPage from './pages/b2b/user/Coach';
+import B2BUserVRPage from './pages/b2b/user/VR';
+import B2BUserPreferencesPage from './pages/b2b/user/Preferences';
+import B2BUserSettingsPage from './pages/b2b/user/Settings';
+import B2BUserCoconPage from './pages/b2b/user/Cocon';
+import B2BAdminJournalPage from './pages/b2b/admin/Journal';
+import B2BAdminScanPage from './pages/b2b/admin/Scan';
+import B2BAdminMusicPage from './pages/b2b/admin/Music';
+import B2BAdminTeamsPage from './pages/b2b/admin/Teams';
+import B2BAdminReportsPage from './pages/b2b/admin/Reports';
+import B2BAdminEventsPage from './pages/b2b/admin/Events';
+import B2BAdminSettingsPage from './pages/b2b/admin/Settings';
 import ImmersiveHome from './pages/ImmersiveHome';
 import Home from './pages/Home';
 
@@ -73,6 +97,42 @@ export const routes: RouteObject[] = [
         element: <B2CDashboardPage />
       },
       {
+        path: 'journal',
+        element: <B2CJournalPage />
+      },
+      {
+        path: 'scan',
+        element: <B2CScanPage />
+      },
+      {
+        path: 'music',
+        element: <B2CMusicPage />
+      },
+      {
+        path: 'coach',
+        element: <B2CCoachPage />
+      },
+      {
+        path: 'coach-chat',
+        element: <B2CCoachChatPage />
+      },
+      {
+        path: 'vr',
+        element: <B2CVRPage />
+      },
+      {
+        path: 'preferences',
+        element: <B2CPreferencesPage />
+      },
+      {
+        path: 'settings',
+        element: <B2CSettingsPage />
+      },
+      {
+        path: 'cocon',
+        element: <B2CCoconPage />
+      },
+      {
         path: 'gamification',
         element: <B2CGamificationPage />
       }
@@ -96,6 +156,38 @@ export const routes: RouteObject[] = [
         element: <B2BUserDashboardPage />
       },
       {
+        path: 'journal',
+        element: <B2BUserJournalPage />
+      },
+      {
+        path: 'scan',
+        element: <B2BUserScanPage />
+      },
+      {
+        path: 'music',
+        element: <B2BUserMusicPage />
+      },
+      {
+        path: 'coach',
+        element: <B2BUserCoachPage />
+      },
+      {
+        path: 'vr',
+        element: <B2BUserVRPage />
+      },
+      {
+        path: 'preferences',
+        element: <B2BUserPreferencesPage />
+      },
+      {
+        path: 'settings',
+        element: <B2BUserSettingsPage />
+      },
+      {
+        path: 'cocon',
+        element: <B2BUserCoconPage />
+      },
+      {
         path: 'gamification',
         element: <B2BUserGamificationPage />
       }
@@ -117,6 +209,34 @@ export const routes: RouteObject[] = [
       {
         path: 'dashboard',
         element: <B2BAdminDashboardPage />
+      },
+      {
+        path: 'journal',
+        element: <B2BAdminJournalPage />
+      },
+      {
+        path: 'scan',
+        element: <B2BAdminScanPage />
+      },
+      {
+        path: 'music',
+        element: <B2BAdminMusicPage />
+      },
+      {
+        path: 'teams',
+        element: <B2BAdminTeamsPage />
+      },
+      {
+        path: 'reports',
+        element: <B2BAdminReportsPage />
+      },
+      {
+        path: 'events',
+        element: <B2BAdminEventsPage />
+      },
+      {
+        path: 'settings',
+        element: <B2BAdminSettingsPage />
       }
     ]
   },
