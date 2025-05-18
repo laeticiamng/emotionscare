@@ -6,3 +6,4 @@ export { useMusic } from './music';
 export { useUserPreferences } from './UserPreferencesContext';
 export { useUserMode } from './UserModeContext';
 export { useSession } from './SessionContext';
+export { useOrchestration } from './OrchestrationContext';

@@ -40,6 +40,9 @@ import B2BAdminTeamsPage from './pages/b2b/admin/Teams';
 import B2BAdminReportsPage from './pages/b2b/admin/Reports';
 import B2BAdminEventsPage from './pages/b2b/admin/Events';
 import B2BAdminSettingsPage from './pages/b2b/admin/Settings';
+import TimelinePage from './pages/TimelinePage';
+import WorldPage from './pages/WorldPage';
+import SanctuaryPage from './pages/SanctuaryPage';
 import ImmersiveHome from './pages/ImmersiveHome';
 import Home from './pages/Home';
 
@@ -135,6 +138,18 @@ export const routes: RouteObject[] = [
         element: <B2CCoconPage />
       },
       {
+        path: 'timeline',
+        element: <TimelinePage />
+      },
+      {
+        path: 'world',
+        element: <WorldPage />
+      },
+      {
+        path: 'sanctuaire',
+        element: <SanctuaryPage />
+      },
+      {
         path: 'gamification',
         element: <B2CGamificationPage />
       }
@@ -188,6 +203,18 @@ export const routes: RouteObject[] = [
       {
         path: 'cocon',
         element: <B2BUserCoconPage />
+      },
+      {
+        path: 'timeline',
+        element: <TimelinePage />
+      },
+      {
+        path: 'world',
+        element: <WorldPage />
+      },
+      {
+        path: 'sanctuaire',
+        element: <SanctuaryPage />
       },
       {
         path: 'gamification',
