@@ -89,3 +89,6 @@ export function normalizePreferences(prefs: any): UserPreferences {
       prefs.notifications || { enabled: true, emailEnabled: true, pushEnabled: false }
   };
 }
+
+// Re-export des préférences par défaut pour un accès centralisé
+export { DEFAULT_PREFERENCES } from '@/constants/defaults';

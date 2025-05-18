@@ -3,6 +3,11 @@
 
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.1] - 2025-05-19
+
+### Corrigé
+- Export manquant `DEFAULT_PREFERENCES` rétabli dans `src/types/preferences.ts`.
+
 ## [1.1.0] - 2025-05-18
 
 ### Ajouté
