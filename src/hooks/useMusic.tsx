@@ -1,6 +1,6 @@
 
 import { useContext } from 'react';
-import MusicContext from '@/contexts/music';
+import MusicContext from '@/contexts/MusicContext';
 
 export const useMusic = () => {
   const context = useContext(MusicContext);

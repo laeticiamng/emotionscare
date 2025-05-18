@@ -56,29 +56,34 @@ export interface MusicContextType {
   isShuffled?: boolean;
   queue?: MusicTrack[];
   error?: Error | null;
+  progress?: number;
 
   // Actions de base
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
   togglePlay: () => void;
+  togglePlayPause?: () => void; // alias pour togglePlay
   nextTrack: () => void;
+  prevTrack?: () => void; // alias pour previousTrack
   previousTrack: () => void;
   seekTo: (time: number) => void;
   setVolume: (volume: number) => void;
   setMute: (muted: boolean) => void;
   toggleMute?: () => void;
+  setProgress?: (progress: number) => void;
   
   // Gestion de playlist
   setPlaylist: (playlist: MusicPlaylist | MusicTrack[]) => void;
   setCurrentTrack: (track: MusicTrack) => void;
   loadPlaylistForEmotion: (emotion: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
-  getRecommendationByEmotion: (emotion: string | EmotionMusicParams) => Promise<MusicPlaylist | MusicTrack[]>;
+  getRecommendationByEmotion?: (emotion: string | EmotionMusicParams) => Promise<MusicPlaylist | MusicTrack[]>;
   
   // UI
   setOpenDrawer: (open: boolean) => void;
   toggleDrawer?: () => void;
   closeDrawer?: () => void;
+  setEmotion: (emotion: string) => void;
   
   // Features avancées
   generateMusic?: (prompt: string) => Promise<MusicTrack | null>;
