@@ -7,38 +7,7 @@ export interface SpeechRecognitionResult {
   isFinal: boolean;
 }
 
-// Add TypeScript declarations for the Speech Recognition API
-declare global {
-  interface Window {
-    SpeechRecognition?: new () => SpeechRecognition;
-    webkitSpeechRecognition?: new () => SpeechRecognition;
-  }
-
-  interface SpeechRecognition {
-    lang: string;
-    continuous: boolean;
-    interimResults: boolean;
-    onstart: () => void;
-    onend: () => void;
-    onerror: (event: { error: string }) => void;
-    onresult: (event: {
-      results: {
-        [key: number]: {
-          [key: number]: {
-            transcript: string;
-            confidence: number;
-          };
-          isFinal: boolean;
-          length: number;
-        };
-        length: number;
-      };
-    }) => void;
-    start: () => void;
-    stop: () => void;
-    abort: () => void;
-  }
-}
+// Type definitions moved to /types
 
 export interface RecognitionOptions {
   lang?: string;

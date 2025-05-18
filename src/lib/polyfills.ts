@@ -13,11 +13,5 @@ if (!Array.prototype.findLast) {
   };
 }
 
-// Extend the Array prototype
-declare global {
-  interface Array<T> {
-    findLast(predicate: (value: T, index: number, obj: T[]) => unknown): T | undefined;
-  }
-}
-
+// Type definitions moved to /types
 export {};
