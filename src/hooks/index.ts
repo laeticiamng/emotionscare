@@ -1,6 +1,6 @@
 
-// Auth hooks
-export { useAuth } from './useAuth';
+// Auth hooks re-exported from the global AuthContext
+export { useAuth } from '@/contexts/AuthContext';
 
 // UI state hooks
 export { useLocalStorage } from './useLocalStorage';

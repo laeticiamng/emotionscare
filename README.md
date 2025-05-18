@@ -287,6 +287,7 @@ Vous trouverez dans le dossier `src/docs` plusieurs guides détaillés :
 - `ARCHITECTURE.md` : présentation de la structure du projet
 - `API_INTEGRATION.md` : intégration des services tiers
 - `BUILD_CHECKLIST.md` : étapes à vérifier avant un déploiement
+- `../docs/b2c_auth_flow.md` : description du flux d'authentification B2C
 
 ## Équipe et contribution
 
