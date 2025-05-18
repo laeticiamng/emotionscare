@@ -1,22 +1,19 @@
 
 // Import les données mock
 import mockEmotions from './mockEmotions';
-import mockJournalEntries from './mockJournalEntries';
-import mockNotifications from './mockNotifications';
-import mockPosts from './mockPosts';
-import mockUsers from './mockUsers';
-import mockBadges from './mockBadges';
-import mockVRTemplates from './mockVRTemplates';
-import mockChatMessages, { mockConversations } from './mockChatMessages';
+import { mockConversations, mockChatMessages } from './mockChatMessages';
 
 export {
   mockEmotions,
-  mockJournalEntries,
-  mockNotifications,
-  mockPosts,
-  mockUsers,
-  mockBadges,
-  mockVRTemplates,
   mockChatMessages,
   mockConversations
 };
+
+// Pour les imports manquants, créons des exports par défaut vides
+// Ces données peuvent être complétées plus tard selon les besoins
+export const mockJournalEntries = [];
+export const mockNotifications = [];
+export const mockPosts = [];
+export const mockUsers = [];
+export const mockBadges = [];
+export const mockVRTemplates = [];

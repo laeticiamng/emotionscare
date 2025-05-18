@@ -35,7 +35,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message }) => {
                 : 'bg-muted'
             }`}
           >
-            <p className="text-sm">{message.text}</p>
+            <p className="text-sm">{message.text || message.content}</p>
           </div>
           <p className="text-xs text-muted-foreground mt-1 px-1">
             {formattedTime}

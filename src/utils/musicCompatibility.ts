@@ -1,48 +1,43 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicPlaylist, MusicTrack } from '@/types/music';
+import { v4 as uuidv4 } from 'uuid';
 
-/**
- * Utilitaire pour récupérer l'URL de couverture d'un track, en gérant les différentes propriétés possibles
- */
-export function getTrackCover(track: MusicTrack | null): string | undefined {
-  if (!track) return undefined;
-  return track.coverUrl || track.cover || track.coverImage;
-}
-
-/**
- * Utilitaire pour récupérer le titre d'un track, en gérant les différentes propriétés possibles
- */
-export function getTrackTitle(track: MusicTrack | null): string {
-  if (!track) return 'No Track';
-  return track.title || track.name || `Track ${track.id}`;
-}
-
-/**
- * Utilitaire pour récupérer l'artiste d'un track
- */
-export function getTrackArtist(track: MusicTrack | null): string {
-  if (!track) return 'Unknown Artist';
-  return track.artist || 'Unknown Artist';
-}
-
-/**
- * Utilitaire pour récupérer l'URL audio d'un track
- */
-export function getTrackAudioUrl(track: MusicTrack | null): string | undefined {
-  if (!track) return undefined;
-  return track.audioUrl || track.src || track.url || track.track_url;
-}
-
-/**
- * Convertit un tableau de MusicTrack en MusicPlaylist si nécessaire
- */
-export function ensurePlaylist(input: MusicTrack[] | MusicPlaylist): MusicPlaylist {
+// Fonction pour assurer qu'un élément est une playlist complète
+export const ensurePlaylist = (input: MusicPlaylist | MusicTrack[]): MusicPlaylist => {
   if (Array.isArray(input)) {
     return {
-      id: `playlist-${Date.now()}`,
-      name: 'Generated Playlist',
-      tracks: input,
+      id: `playlist-${uuidv4()}`,
+      name: 'Playlist générée',
+      tracks: input
     };
   }
   return input;
-}
+};
+
+// Fonction pour normaliser un morceau de musique
+export const normalizeTrack = (track: Partial<MusicTrack>): MusicTrack => {
+  return {
+    id: track.id || uuidv4(),
+    title: track.title || track.name || 'Sans titre',
+    artist: track.artist || 'Artiste inconnu',
+    duration: track.duration || 0,
+    audioUrl: track.audioUrl || track.url || track.src || track.track_url || '',
+    coverUrl: track.coverUrl || track.coverImage || track.cover || '',
+    album: track.album || '',
+    year: track.year || new Date().getFullYear(),
+    genre: track.genre || '',
+    tags: track.tags || []
+  };
+};
+
+// Normaliser une playlist
+export const normalizePlaylist = (playlist: Partial<MusicPlaylist>): MusicPlaylist => {
+  return {
+    id: playlist.id || uuidv4(),
+    name: playlist.name || playlist.title || 'Sans titre',
+    tracks: Array.isArray(playlist.tracks) ? playlist.tracks.map(normalizeTrack) : [],
+    description: playlist.description || '',
+    coverImage: playlist.coverImage || playlist.coverUrl || playlist.cover || '',
+    emotion: playlist.emotion || playlist.mood || ''
+  };
+};

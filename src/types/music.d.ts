@@ -48,12 +48,13 @@ export interface MusicContextType {
   openDrawer: boolean;
   isInitialized: boolean;
   error?: Error | null;
+  playlists?: MusicPlaylist[];
   
   // Actions
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
-  togglePlay?: () => void;
+  togglePlay: () => void;
   togglePlayPause: () => void;
   nextTrack: () => void;
   prevTrack: () => void;
@@ -70,7 +71,7 @@ export interface MusicContextType {
   setPlaylist?: (playlist: MusicPlaylist | MusicTrack[]) => void;
   setCurrentTrack?: (track: MusicTrack) => void;
   generateMusic?: (prompt: string) => Promise<MusicTrack | null>;
-  getRecommendationByEmotion?: (emotion: string) => Promise<MusicTrack[]>;
+  getRecommendationByEmotion?: (emotion: string | EmotionMusicParams) => Promise<MusicPlaylist | MusicTrack[]>;
 }
 
 export interface MusicDrawerProps {

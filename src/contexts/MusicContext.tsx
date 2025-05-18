@@ -17,12 +17,18 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [emotion, setEmotionState] = useState<string | null>(null);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-
-  const { tracks, playlists } = getMockMusicData();
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
 
   useEffect(() => {
     // Initialize with mock data
-    setIsInitialized(true);
+    try {
+      const { playlists: mockPlaylists } = getMockMusicData();
+      setPlaylists(mockPlaylists);
+      setIsInitialized(true);
+    } catch (error) {
+      console.error("Failed to initialize music data:", error);
+      setIsInitialized(true); // Still set initialized to prevent blocking the UI
+    }
   }, []);
 
   const toggleMute = () => setMuted(!muted);
@@ -36,7 +42,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsPlaying(!isPlaying);
   };
 
-  const togglePlay = togglePlayPause; // Alias pour la compatibilité
+  const togglePlay = togglePlayPause;
 
   const playTrack = (track: MusicTrack) => {
     setCurrentTrack(track);
@@ -92,12 +98,27 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const closeDrawer = () => setOpenDrawer(false);
 
   // Pour la compatibilité avec les composants existants
-  const getRecommendationByEmotion = async (emotion: string): Promise<MusicTrack[]> => {
-    const matchingPlaylist = playlists.find(p => 
-      p.emotion?.toLowerCase() === emotion.toLowerCase()
-    );
-    
-    return matchingPlaylist?.tracks || [];
+  const getRecommendationByEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | MusicTrack[]> => {
+    try {
+      const emotionName = typeof params === 'string' ? params : params.emotion;
+      
+      const matchingPlaylist = playlists.find(p => 
+        p.emotion?.toLowerCase() === emotionName.toLowerCase()
+      );
+      
+      if (matchingPlaylist) {
+        return matchingPlaylist;
+      }
+      
+      if (playlists.length > 0) {
+        return playlists[0];  // Fallback to first playlist
+      }
+      
+      return [];
+    } catch (error) {
+      console.error("Error getting recommendations:", error);
+      return [];
+    }
   };
 
   // Mock implementation of AI music generation
@@ -191,7 +212,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     generateMusic,
     setCurrentTrack,
     error,
-    getRecommendationByEmotion
+    getRecommendationByEmotion,
+    playlists
   };
 
   return <MusicContext.Provider value={value}>{children}</MusicContext.Provider>;

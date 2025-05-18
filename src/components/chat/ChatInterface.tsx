@@ -85,7 +85,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 <div className={`rounded-lg p-3 ${
                   message.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
                 }`}>
-                  <p className="text-sm">{message.text || message.content}</p>
+                  <p className="text-sm">{message.text || message.content || ""}</p>
                   {message.timestamp && (
                     <span className={`text-xs block mt-1 ${
                       message.sender === 'user' ? 'text-primary-foreground/80' : 'text-muted-foreground'
