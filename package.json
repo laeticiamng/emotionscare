@@ -10,6 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "node --test --loader ts-node/esm",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist",
     "seed:test-user": "ts-node scripts/ensureTestUser.ts"
   },
   "dependencies": {
