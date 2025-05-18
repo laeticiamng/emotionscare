@@ -176,6 +176,12 @@ NEXT_PUBLIC_SENTRY_DSN=<votre_DSN_Sentry>
 Le tableau de bord et la gestion des alertes sont configurables directement sur
 Sentry.
 
+## Sécurité proactive
+
+Un tableau de bord dédié permet aux administrateurs de suivre les incidents et l'état de la plateforme.
+Il est accessible via la route `/b2b/admin/security`.
+Tous les utilisateurs disposent d'un widget « Sécurité » dans leurs paramètres pour consulter les dernières alertes.
+
 ## Équipe et contribution
 
 EmotionsCare est un produit développé par [Votre Entreprise], avec une équipe dédiée au développement, au design et à l'expérience utilisateur.
