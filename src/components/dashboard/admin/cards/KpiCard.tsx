@@ -11,7 +11,7 @@ export const KpiCard = ({
   delta,
   icon,
   subtitle,
-  status = "default",
+  status = 'info',  // Changed from 'default' to 'info' which is allowed by the type
   className,
   isLoading,
   ariaLabel,
@@ -62,9 +62,9 @@ export const KpiCard = ({
   let statusColor;
   if (deltaObj) {
     statusColor = deltaObj.trend === 'up' 
-      ? mappedStatus === 'default' ? 'text-emerald-600 dark:text-emerald-400' : `text-${mappedStatus}` 
+      ? mappedStatus === 'info' ? 'text-emerald-600 dark:text-emerald-400' : `text-${mappedStatus}` 
       : deltaObj.trend === 'down' 
-        ? mappedStatus === 'default' ? 'text-rose-600 dark:text-rose-400' : `text-${mappedStatus}` 
+        ? mappedStatus === 'info' ? 'text-rose-600 dark:text-rose-400' : `text-${mappedStatus}` 
         : 'text-gray-600 dark:text-gray-400';
   }
 

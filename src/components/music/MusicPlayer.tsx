@@ -3,6 +3,7 @@ import React from 'react';
 import { useMusic } from '@/contexts';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume, VolumeX, Music } from 'lucide-react';
+import { getTrackCover, getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
 
 interface MusicProgressBarProps {
   currentTime?: number;
@@ -14,7 +15,10 @@ interface MusicProgressBarProps {
 const MusicProgressBar: React.FC<MusicProgressBarProps> = ({
   currentTime = 0,
   duration = 0,
-  formatTime = (sec) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`,
+  formatTime = (sec) => {
+    if (isNaN(sec) || !isFinite(sec)) return '0:00';
+    return `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
+  },
   onSeek
 }) => {
   return (
@@ -50,6 +54,7 @@ const MusicPlayer: React.FC = () => {
   } = useMusic();
 
   const formatTime = (seconds: number) => {
+    if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
     const min = Math.floor(seconds / 60);
     const sec = Math.floor(seconds % 60);
     return `${min}:${sec < 10 ? '0' : ''}${sec}`;
@@ -64,16 +69,20 @@ const MusicPlayer: React.FC = () => {
     );
   }
 
+  const coverUrl = getTrackCover(currentTrack);
+  const title = getTrackTitle(currentTrack);
+  const artist = getTrackArtist(currentTrack);
+
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-900 dark:to-blue-900/20 p-4 rounded-lg shadow-inner">
       <div className="flex flex-col md:flex-row items-center gap-4">
         {/* Album cover and info */}
         <div className="flex items-center gap-4 w-full md:w-auto">
           <div className="min-w-12 h-12 bg-blue-200 dark:bg-blue-800/30 rounded shadow-md overflow-hidden">
-            {currentTrack.coverUrl ? (
+            {coverUrl ? (
               <img 
-                src={currentTrack.coverUrl} 
-                alt={currentTrack.title} 
+                src={coverUrl} 
+                alt={title} 
                 className="w-full h-full object-cover"
               />
             ) : (
@@ -83,8 +92,8 @@ const MusicPlayer: React.FC = () => {
             )}
           </div>
           <div className="flex flex-col overflow-hidden">
-            <p className="font-medium text-blue-800 dark:text-blue-200 truncate">{currentTrack.title}</p>
-            <p className="text-sm text-blue-600/70 dark:text-blue-400/70 truncate">{currentTrack.artist}</p>
+            <p className="font-medium text-blue-800 dark:text-blue-200 truncate">{title}</p>
+            <p className="text-sm text-blue-600/70 dark:text-blue-400/70 truncate">{artist}</p>
           </div>
         </div>
 

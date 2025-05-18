@@ -15,9 +15,26 @@ export interface UserPreferences {
     shareActivity?: boolean;
     shareJournal?: boolean;
     publicProfile?: boolean;
+    shareData?: boolean;
+    anonymizeReports?: boolean;
+    profileVisibility?: string;
   };
   onboardingCompleted?: boolean;
   ambientSound?: string;
+  colorBlindMode?: boolean;
+  autoplayMedia?: boolean;
+  notifications?: {
+    enabled?: boolean;
+    emailEnabled?: boolean;
+    pushEnabled?: boolean;
+    inAppEnabled?: boolean;
+    types?: Record<string, boolean>;
+    frequency?: string;
+    email?: boolean;
+    push?: boolean;
+    sms?: boolean;
+    inApp?: boolean;
+  };
 }
 
 export interface UserPreferencesContextType {

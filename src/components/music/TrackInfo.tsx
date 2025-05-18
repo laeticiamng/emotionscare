@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { MusicTrack } from '@/types';
+import { getTrackCover, getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
 
 interface TrackInfoProps {
   track: MusicTrack;
@@ -11,13 +12,17 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   track, 
   className = '' 
 }) => {
+  const coverUrl = getTrackCover(track);
+  const title = getTrackTitle(track);
+  const artist = getTrackArtist(track);
+  
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       <div className="flex-shrink-0 w-10 h-10">
-        {track.coverUrl ? (
+        {coverUrl ? (
           <img 
-            src={track.coverUrl} 
-            alt={track.title} 
+            src={coverUrl} 
+            alt={title} 
             className="w-full h-full object-cover rounded-md"
           />
         ) : (
@@ -28,9 +33,9 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
       </div>
       
       <div className="min-w-0 flex-1">
-        <h4 className="font-medium truncate">{track.title}</h4>
+        <h4 className="font-medium truncate">{title}</h4>
         <p className="text-sm text-muted-foreground truncate">
-          {track.artist || 'Unknown Artist'}
+          {artist}
         </p>
       </div>
     </div>

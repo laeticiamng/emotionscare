@@ -28,6 +28,8 @@ export interface Notification {
   message: string;
   read: boolean;
   created_at: string;
+  timestamp?: string;  // Added for compatibility
+  createdAt?: string;   // Added for compatibility
   user_id: string;
   action_link?: string;
   action_text?: string;

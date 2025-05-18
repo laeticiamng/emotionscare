@@ -19,6 +19,8 @@ export interface Badge {
   achieved?: boolean;
   earned?: boolean;
   threshold?: number;
+  rarity?: string;
+  completed?: boolean;
 }
 
 export interface Challenge {

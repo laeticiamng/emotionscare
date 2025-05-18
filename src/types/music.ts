@@ -6,15 +6,23 @@ export interface MusicTrack {
   artist?: string;
   duration?: number;
   cover?: string;
+  coverUrl?: string;
+  coverImage?: string;
+  cover_url?: string;
   audioUrl?: string; 
   src?: string; // For compatibility with existing code
   url?: string; // For compatibility with existing code
+  track_url?: string;
   genre?: string;
   mood?: string;
+  emotion?: string;
+  intensity?: number;
   bpm?: number;
   tags?: string[];
   created_at?: string;
   user_id?: string;
+  album?: string;
+  year?: number;
 }
 
 export interface MusicPlaylist {
@@ -23,16 +31,22 @@ export interface MusicPlaylist {
   title?: string;
   description?: string;
   cover?: string;
+  coverUrl?: string;
+  coverImage?: string;
   tracks: MusicTrack[];
   mood?: string;
+  emotion?: string;
   tags?: string[];
   created_at?: string;
+  createdAt?: string;
+  createdBy?: string;
+  isPublic?: boolean;
   user_id?: string;
 }
 
 export interface EmotionMusicParams {
   emotion: string;
-  intensity: number;
+  intensity?: number;
 }
 
 export interface MusicContextType {
@@ -46,6 +60,8 @@ export interface MusicContextType {
   muted: boolean;
   emotion: string | null;
   openDrawer: boolean;
+  isLoading?: boolean;
+  error?: Error | null;
   setVolume: (volume: number) => void;
   togglePlay: () => void;
   nextTrack: () => void;
@@ -57,12 +73,20 @@ export interface MusicContextType {
   setPlaylist: (playlist: MusicPlaylist) => void;
   getRecommendationByEmotion: (params: EmotionMusicParams | string) => Promise<MusicPlaylist>;
   setOpenDrawer: (open: boolean) => void;
-  generateMusic: (prompt: string) => Promise<MusicTrack | null>;
+  generateMusic?: (prompt: string) => Promise<MusicTrack | null>;
+  // Adding missing methods that appear in the error messages
+  playTrack?: (track: MusicTrack) => void;
+  pauseTrack?: () => void;
+  resumeTrack?: () => void;
+  setEmotion?: (emotion: string) => void;
+  loadPlaylistForEmotion?: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
 }
 
 export interface MusicDrawerProps {
   open?: boolean;
+  isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
   playlist?: MusicPlaylist | null;
   currentTrack?: MusicTrack | null;
   side?: "left" | "right" | "top" | "bottom";
@@ -73,6 +97,7 @@ export interface ProgressBarProps {
   currentTime: number;
   duration: number;
   onSeek: (time: number) => void;
+  progress?: number; // Added for compatibility
 }
 
 export interface VolumeControlProps {
@@ -87,13 +112,42 @@ export interface MusicControlsProps {
   onPlay: () => void;
   onNext: () => void;
   onPrev: () => void;
+  minimal?: boolean;
+  track?: MusicTrack | null;
+  progress?: number;
+  duration?: number;
+  currentTime?: number;
+  volume?: number;
+  onPause?: () => void;
+  onPrevious?: () => void;
+  onVolumeChange?: (volume: number) => void;
+  onSeek?: (time: number) => void;
 }
 
 export interface MusicLibraryProps {
-  playlists: MusicPlaylist[];
-  onSelectPlaylist: (playlist: MusicPlaylist) => void;
+  playlists?: MusicPlaylist[];
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
+  onTrackSelect?: (track: MusicTrack) => void;
+  onPlaylistSelect?: (playlist: MusicPlaylist) => void;
+  currentTrack?: MusicTrack | null;
 }
 
-export interface TrackInfoProps {
-  track: MusicTrack;
+export interface MusicPlayerProps {
+  track?: MusicTrack;
+  isPlaying?: boolean;
+  onPlay?: () => void;
+  onPause?: () => void;
+  onNext?: () => void;
+  onPrevious?: () => void;
+  volume?: number;
+  onVolumeChange?: (volume: number) => void;
+  progress?: number;
+  duration?: number;
+  currentTime?: number;
+  onSeek?: (time: number) => void;
+}
+
+export interface MusicMoodVisualizationProps {
+  mood?: string;
+  intensity?: number;
 }

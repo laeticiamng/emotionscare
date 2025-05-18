@@ -1,0 +1,69 @@
+
+import React, { createContext, useContext, useState } from 'react';
+import { UserPreferences, UserPreferencesContextType } from '@/types/preferences';
+
+// Default preferences
+const defaultPreferences: UserPreferences = {
+  theme: 'system',
+  language: 'fr',
+  notifications_enabled: true,
+  email_notifications: false,
+  soundEnabled: true,
+  reduceMotion: false,
+  ambientSound: 'nature',
+};
+
+// Create the context
+const PreferencesContext = createContext<UserPreferencesContextType>({
+  preferences: defaultPreferences,
+  updatePreferences: async () => {},
+  isLoading: false,
+  error: null,
+});
+
+// Provider component
+export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  // Function to update preferences
+  const updatePreferences = async (newPreferences: Partial<UserPreferences>) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Implement the actual update logic here (e.g., API call to update user preferences)
+      // For now, we'll just update the local state
+      setPreferences({ ...preferences, ...newPreferences });
+    } catch (err: any) {
+      setError(err instanceof Error ? err : new Error('Failed to update preferences'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const value = {
+    preferences,
+    updatePreferences,
+    isLoading,
+    error,
+  };
+
+  return (
+    <PreferencesContext.Provider value={value}>
+      {children}
+    </PreferencesContext.Provider>
+  );
+};
+
+// Hook to use the preferences context
+export const usePreferences = () => {
+  const context = useContext(PreferencesContext);
+  if (context === undefined) {
+    throw new Error('usePreferences must be used within a PreferencesProvider');
+  }
+  return context;
+};
+
+export default PreferencesContext;

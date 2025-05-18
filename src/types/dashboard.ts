@@ -1,4 +1,3 @@
-
 import { Badge, Challenge } from './badge';
 import { UserRole } from './user';
 
@@ -22,7 +21,7 @@ export interface KpiCardProps {
   ariaLabel?: string;
   isLoading?: boolean;
   loading?: boolean;
-  status?: 'success' | 'warning' | 'danger' | 'info';
+  status?: 'success' | 'warning' | 'danger' | 'info' | 'default';
   trendText?: string;
   // Props for DraggableKpiCardsGrid
   x?: number;
