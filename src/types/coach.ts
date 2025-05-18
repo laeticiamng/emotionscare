@@ -3,16 +3,17 @@ export interface ChatMessage {
   id: string;
   text?: string;  // For backward compatibility
   content?: string; // New field that will replace text
-  sender: 'user' | 'assistant' | 'system' | 'coach';
+  sender: 'user' | 'assistant' | 'system' | 'coach' | string; // Added string for flexibility with context
   timestamp: Date | string;
   conversationId?: string;
   role?: string; // For backward compatibility
   isLoading?: boolean;
+  emojis?: string[] | string; // Added for emotion analysis
 }
 
 export interface CoachMessageProps {
   message: ChatMessage;
-  isLast?: boolean;
+  isLast?: boolean; // Added isLast property
 }
 
 export interface CoachChatProps {
@@ -24,6 +25,14 @@ export interface CoachChatProps {
   showHeader?: boolean;
   showInput?: boolean;
   embedded?: boolean;
+}
+
+// Add CoachCharacterProps interface
+export interface CoachCharacterProps {
+  size?: 'sm' | 'md' | 'lg';
+  animate?: boolean;
+  className?: string;
+  onInteract?: () => void;
 }
 
 export interface Conversation {

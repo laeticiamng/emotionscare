@@ -1,6 +1,4 @@
 
-import { ReactNode } from "react";
-
 export interface SegmentOption {
   key: string;
   label: string;
@@ -25,5 +23,5 @@ export interface SegmentContextType {
 }
 
 export interface SegmentProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }

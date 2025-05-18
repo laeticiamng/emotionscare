@@ -6,10 +6,14 @@ export interface Badge {
   icon: string;
   achieved: boolean;
   achievedAt?: Date | string;
+  unlockedAt?: Date | string; // Added for backward compatibility
+  unlocked_at?: Date | string; // Added for backward compatibility
   progress?: number;
   total?: number;
   rarity?: string;
   completed?: boolean;
+  imageUrl?: string; // Added for backward compatibility
+  image_url?: string; // Added for backward compatibility
 }
 
 export interface Challenge {
@@ -23,4 +27,11 @@ export interface Challenge {
   completed: boolean;
   deadline?: Date;
   category?: string;
+  
+  // Adding properties for backwards compatibility
+  name?: string;
+  difficulty?: string;
+  completions?: number;
+  goal?: number;
+  totalSteps?: number;
 }

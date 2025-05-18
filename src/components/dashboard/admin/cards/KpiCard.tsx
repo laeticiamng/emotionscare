@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { KpiCardProps, KpiCardStatus, KpiDelta } from "@/types/dashboard";
+import { KpiCardProps, KpiCardStatus } from "@/types/dashboard";
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 
 export const KpiCard = ({
@@ -11,7 +11,7 @@ export const KpiCard = ({
   delta,
   icon,
   subtitle,
-  status = 'neutral', // Changed from 'default' to valid KpiCardStatus
+  status = 'neutral', // Changed to valid KpiCardStatus
   className,
   isLoading,
   ariaLabel,
@@ -91,13 +91,13 @@ export const KpiCard = ({
         <div className="text-2xl font-bold">{value}</div>
         {deltaObj && (
           <p className={cn("text-xs flex items-center gap-1 mt-1", statusColor)}>
-            {deltaObj.trend === 'up' || deltaObj.direction === 'up' && <ArrowUp className="h-3 w-3" />}
-            {deltaObj.trend === 'down' || deltaObj.direction === 'down' && <ArrowDown className="h-3 w-3" />}
+            {(deltaObj.trend === 'up' || deltaObj.direction === 'up') && <ArrowUp className="h-3 w-3" />}
+            {(deltaObj.trend === 'down' || deltaObj.direction === 'down') && <ArrowDown className="h-3 w-3" />}
             {(deltaObj.trend === 'neutral' || deltaObj.direction === 'stable' || (!deltaObj.trend && !deltaObj.direction)) && <Minus className="h-3 w-3" />}
             {deltaObj.value !== undefined && (
               <span>{Math.abs(Number(deltaObj.value)).toFixed(1)}%</span>
             )}
-            {'label' in deltaObj && deltaObj.label && <span>{deltaObj.label}</span>}
+            {('label' in deltaObj && deltaObj.label) && <span>{deltaObj.label}</span>}
           </p>
         )}
         {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}

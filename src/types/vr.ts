@@ -15,13 +15,13 @@ export interface VRSessionTemplate {
   tags?: string[];
   objective?: string;
   type?: string;
-  audio_url?: string;
-  audioTrack?: string;
-  preview_url?: string;
-  is_audio_only?: boolean;
-  benefits?: string[];
-  difficulty?: string;
-  lastUsed?: Date | string;
+  audio_url?: string; // Added for backward compatibility
+  audioTrack?: string; // Added for backward compatibility
+  preview_url?: string; // Added for backward compatibility
+  is_audio_only?: boolean; // Added for backward compatibility
+  benefits?: string[]; // Added for backward compatibility
+  difficulty?: string; // Added for backward compatibility
+  lastUsed?: Date | string; // Added for backward compatibility
 }
 
 export interface VRSession {
@@ -32,14 +32,14 @@ export interface VRSession {
   endTime: Date | null;
   duration: number | null;
   metrics: VRSessionMetrics;
-  completed?: boolean;
-  completedAt?: Date | string;
-  heartRateBefore?: number;
-  heartRateAfter?: number;
-  feedback?: string;
-  rating?: number;
-  startedAt?: Date | string;
-  date?: Date | string;
+  completed?: boolean; // Added for backward compatibility
+  completedAt?: Date | string; // Added for backward compatibility
+  heartRateBefore?: number; // Added for backward compatibility
+  heartRateAfter?: number; // Added for backward compatibility
+  feedback?: string; // Added for backward compatibility
+  rating?: number; // Added for backward compatibility
+  startedAt?: Date | string; // Added for backward compatibility
+  date?: Date | string; // Added for backward compatibility
 }
 
 export interface VRSessionMetrics {
@@ -61,4 +61,6 @@ export interface VRTemplateDetailProps {
 export interface VRSessionHistoryProps {
   sessions: VRSession[];
   onSelect?: (session: VRSession) => void;
+  emptyMessage?: string; // Added for backward compatibility
+  limitDisplay?: number; // Added for backward compatibility
 }

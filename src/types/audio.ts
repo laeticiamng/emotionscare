@@ -9,6 +9,7 @@ export interface AudioTrack {
   mood?: string;
   bpm?: number;
   genre?: string;
+  description?: string; // Added for backward compatibility
 }
 
 export interface AudioPlaylist {
@@ -22,7 +23,7 @@ export interface AudioPlaylist {
 }
 
 export interface AudioProcessorProps {
-  isRecording: boolean;
+  isRecording?: boolean; // Made optional with ?
   onResult?: (result: any) => void;
   onProcessingChange?: (isProcessing: boolean) => void;
 }

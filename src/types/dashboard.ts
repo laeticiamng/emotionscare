@@ -46,7 +46,7 @@ export interface GlobalOverviewTabProps {
 }
 
 export interface KpiCardProps {
-  id?: string;
+  id?: string; // Made optional with ?
   title: string;
   value: string | number;
   status?: KpiCardStatus;
@@ -54,16 +54,17 @@ export interface KpiCardProps {
     value: number;
     trend: 'up' | 'down' | 'neutral';
     label?: string;
+    direction?: 'up' | 'down' | 'stable'; // Added for backward compatibility
   };
   icon?: React.ReactNode;
-  subtitle?: string;
+  subtitle?: string; // Made optional with ?
   details?: string;
   trend?: string;
   className?: string;
-  isLoading?: boolean;
-  ariaLabel?: string;
-  onClick?: () => void;
-  footer?: React.ReactNode;
+  isLoading?: boolean; // Made optional with ?
+  ariaLabel?: string; // Made optional with ?
+  onClick?: () => void; // Made optional with ?
+  footer?: React.ReactNode; // Made optional with ?
 }
 
 export type KpiCardStatus = 'positive' | 'negative' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'default';
@@ -71,7 +72,7 @@ export type KpiDelta = {
   value: number;
   direction: 'up' | 'down' | 'stable';
   label?: string;
-  trend?: 'up' | 'down' | 'neutral';
+  trend?: 'up' | 'down' | 'neutral'; // Added for backward compatibility
 };
 
 export interface DashboardWidgetConfig extends DashboardWidget {
@@ -81,7 +82,7 @@ export interface DashboardWidgetConfig extends DashboardWidget {
 }
 
 export interface DraggableKpiCardsGridProps {
-  cards: KpiCardProps[];
+  cards?: KpiCardProps[];
   onReorder?: (newOrder: KpiCardProps[]) => void;
   onCardsReorder?: (cards: KpiCardProps[]) => void;
   onOrderChange?: (cards: KpiCardProps[]) => void;
@@ -90,4 +91,18 @@ export interface DraggableKpiCardsGridProps {
   className?: string;
   isEditable?: boolean;
   kpiCards?: KpiCardProps[];
+}
+
+// Add GamificationData interface
+export interface GamificationData {
+  activeUsersPercent: number;
+  totalBadges: number;
+  badgeLevels: {
+    level: string;
+    count: number;
+  }[];
+  topChallenges: {
+    name: string;
+    completions: number;
+  }[];
 }

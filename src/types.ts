@@ -1,6 +1,7 @@
 
 export type {
   User,
+  AuthUser,
   UserRole,
   UserWithStatus
 } from './types/user';
@@ -34,7 +35,9 @@ export type {
   DraggableKpiCardsGridProps, 
   GlobalOverviewTabProps,
   DashboardWidgetConfig,
-  GamificationData
+  GamificationData,
+  KpiCardStatus,
+  KpiDelta
 } from './types/dashboard';
 
 export type { SidebarContextType } from './types/sidebar';
@@ -60,14 +63,19 @@ export type {
 export type {
   ChatMessage,
   ChatConversation,
-  ChatResponse
-} from './types/chat';
+  ChatResponse,
+  CoachCharacterProps,
+  CoachMessageProps,
+  CoachChatProps
+} from './types/coach';
 
 export type {
   MoodData,
   AudioPlaylist,
+  AudioTrack,
+  AudioProcessorProps,
   EmotionalData
-} from './types/other';
+} from './types/audio';
 
 export type {
   Story
@@ -79,7 +87,7 @@ export type {
   LiveVoiceScannerProps,
   TeamOverviewProps,
   EmotionalTeamViewProps
-} from './types/emotions';
+} from './types/emotion';
 
 export type {
   JournalEntry
@@ -88,7 +96,8 @@ export type {
 export type {
   VRSessionTemplate,
   VRSession,
-  VRSessionWithMusicProps
+  VRSessionWithMusicProps,
+  VRSessionHistoryProps
 } from './types/vr';
 
 // B2B Admin dashboard types
@@ -96,10 +105,16 @@ export type {
   TeamSummary,
   AdminAccessLog,
   DashboardWidget
-} from '../types/dashboard';
+} from './types/dashboard';
 
 export type {
   AnonymizedEmotion,
   TeamAnalytics,
   KpiMetric
-} from '../types/analytics';
+} from './types/analytics';
+
+export type {
+  SegmentOption,
+  SegmentDimension,
+  SegmentContextType
+} from './types/segment';
