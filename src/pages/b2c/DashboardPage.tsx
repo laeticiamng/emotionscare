@@ -10,13 +10,16 @@ import MusicPlayer from '@/components/music/MusicPlayer';
 import RecommendedPresets from '@/components/music/RecommendedPresets';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useMusic } from '@/contexts/music';
+import { motion } from 'framer-motion';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import { TrendingUp } from 'lucide-react';
 
 // Composant pour le widget de journal rapide
 const QuickJournalWidget = () => {
   const navigate = useNavigate();
   
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow">
+    <Card className="premium-card interactive-card">
       <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
         <CardTitle className="text-lg flex items-center">
           <FileText className="h-5 w-5 mr-2 text-blue-500" />
@@ -59,7 +62,7 @@ const EmotionalWeatherWidget = () => {
   };
   
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow">
+    <Card className="premium-card interactive-card">
       <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
         <CardTitle className="text-lg flex items-center">
           <Brain className="h-5 w-5 mr-2 text-blue-500" />
@@ -94,7 +97,7 @@ const MusicWidget = () => {
   const { currentTrack, isPlaying } = useMusic();
   
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow">
+    <Card className="premium-card interactive-card">
       <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
         <CardTitle className="text-lg flex items-center">
           <Music className="h-5 w-5 mr-2 text-blue-500" />
@@ -122,7 +125,7 @@ const SocialCoconWidget = () => {
   const navigate = useNavigate();
   
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow">
+    <Card className="premium-card interactive-card">
       <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
         <CardTitle className="text-lg flex items-center">
           <Users className="h-5 w-5 mr-2 text-blue-500" />
@@ -150,7 +153,7 @@ const AICoachWidget = () => {
   const navigate = useNavigate();
   
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow">
+    <Card className="premium-card interactive-card">
       <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
         <CardTitle className="text-lg flex items-center">
           <MessageSquare className="h-5 w-5 mr-2 text-blue-500" />
@@ -172,12 +175,35 @@ const AICoachWidget = () => {
   );
 };
 
+const OptimizationWidget = () => {
+  const navigate = useNavigate();
+
+  return (
+    <Card className="premium-card interactive-card">
+      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+        <CardTitle className="text-lg flex items-center">
+          <TrendingUp className="h-5 w-5 mr-2 text-blue-500" />
+          Amélioration continue
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-4">
+        <p className="text-sm text-muted-foreground mb-4">
+          Consultez vos statistiques d'usage et recevez des suggestions personnalisées.
+        </p>
+        <Button onClick={() => navigate('/optimisation')} className="w-full" variant="outline">
+          Voir mon reporting
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
 // Composant pour le widget timeline
 const TimelineWidget = () => {
   const navigate = useNavigate();
   
   return (
-    <Card className="shadow-md hover:shadow-lg transition-shadow">
+    <Card className="premium-card interactive-card">
       <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
         <CardTitle className="text-lg flex items-center">
           <Activity className="h-5 w-5 mr-2 text-blue-500" />
@@ -220,12 +246,19 @@ const B2CDashboardPage: React.FC = () => {
   };
   
   return (
-    <div className="container mx-auto py-6 px-4 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{getWelcomeMessage()}</h1>
-        <p className="text-muted-foreground">
-          Bienvenue sur votre espace personnel EmotionsCare.
-        </p>
+    <div className="container mx-auto py-8 px-4 max-w-7xl space-y-8">
+      <div className="relative overflow-hidden rounded-3xl premium-gradient shadow-soft-blue">
+        <img
+          src="/images/vr-banner-bg.jpg"
+          alt="Bienvenue"
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
+        />
+        <div className="relative p-8">
+          <DashboardHeader user={user} />
+          <p className="text-muted-foreground mt-2">
+            {getWelcomeMessage()}
+          </p>
+        </div>
       </div>
       
       <Tabs defaultValue="dashboard" className="mb-8">
@@ -236,18 +269,31 @@ const B2CDashboardPage: React.FC = () => {
         </TabsList>
         
         <TabsContent value="dashboard" className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <motion.div
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
             <EmotionalWeatherWidget />
             <QuickJournalWidget />
             <MusicWidget />
             <SocialCoconWidget />
             <AICoachWidget />
             <TimelineWidget />
-          </div>
+            <OptimizationWidget />
+          </motion.div>
         </TabsContent>
         
         <TabsContent value="emotions" className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <motion.div
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
             <EmotionalWeatherWidget />
             <TimelineWidget />
             <div className="md:col-span-2">
@@ -262,15 +308,22 @@ const B2CDashboardPage: React.FC = () => {
                 </CardContent>
               </Card>
             </div>
-          </div>
+          </motion.div>
         </TabsContent>
         
         <TabsContent value="activities" className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <QuickJournalWidget />
-            <AICoachWidget />
-            <SocialCoconWidget />
-            <div>
+          <motion.div
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
+           <QuickJournalWidget />
+           <AICoachWidget />
+           <SocialCoconWidget />
+            <OptimizationWidget />
+           <div>
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -288,7 +341,7 @@ const B2CDashboardPage: React.FC = () => {
                 </CardContent>
               </Card>
             </div>
-          </div>
+          </motion.div>
         </TabsContent>
       </Tabs>
       

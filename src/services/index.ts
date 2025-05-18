@@ -12,6 +12,7 @@ import musicGenService from './musicgen';
 import whisperService from './whisper';
 import humeAIService from './humeai';
 import dalleService from './dalle';
+import innovationService from './innovationService';
 import { env } from '@/env.mjs';
 
 // Type pour le statut des API
@@ -31,6 +32,7 @@ class APIServices {
   public whisper = whisperService;
   public humeAI = humeAIService;
   public dalle = dalleService;
+  public innovation = innovationService;
   
   constructor() {
     // Initialisation des statuts d'API
@@ -149,3 +151,4 @@ export const musicGen = musicGenService;
 export const whisper = whisperService;
 export const humeAI = humeAIService;
 export const dalle = dalleService;
+export const innovation = innovationService;

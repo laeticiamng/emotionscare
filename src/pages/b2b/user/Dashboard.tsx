@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Home, BookOpen, Music2, MessageSquare } from 'lucide-react';
+import { LogOut, Home, BookOpen, Music2, MessageSquare, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const B2BUserDashboard = () => {
@@ -83,6 +83,23 @@ const B2BUserDashboard = () => {
               Discutez avec votre coach pour améliorer votre bien-être au travail.
             </p>
             <Button className="w-full">Parler à mon coach</Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <TrendingUp className="mr-2 h-5 w-5" />
+              Amélioration continue
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              Consultez vos statistiques d'usage et recevez des suggestions personnalisées.
+            </p>
+            <Button className="w-full" variant="outline" onClick={() => navigate('/optimisation')}>
+              Voir mon reporting
+            </Button>
           </CardContent>
         </Card>
       </div>

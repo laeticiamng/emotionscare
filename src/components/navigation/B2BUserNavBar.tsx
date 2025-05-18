@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Music, Scan, MessageSquare, Glasses, Trophy, Settings, HeartHandshake } from 'lucide-react';
+import { Home, BookOpen, Music, Scan, MessageSquare, Glasses, Trophy, Settings, HeartHandshake, Box } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import ConfirmationModal from '@/components/ui/confirmation-modal';
@@ -32,6 +32,7 @@ const B2BUserNavBar: React.FC = () => {
       <NavItem to={ROUTES.b2bUser.vr} isActive={isActive(ROUTES.b2bUser.vr)} icon={<Glasses className="h-5 w-5" />} label="VR" />
       <NavItem to={ROUTES.b2bUser.gamification} isActive={isActive(ROUTES.b2bUser.gamification)} icon={<Trophy className="h-5 w-5" />} label="Défis" />
       <NavItem to={ROUTES.b2bUser.cocon} isActive={isActive(ROUTES.b2bUser.cocon)} icon={<HeartHandshake className="h-5 w-5" />} label="Cocon" />
+      <NavItem to="/extensions" isActive={isActive('/extensions')} icon={<Box className="h-5 w-5" />} label="Extensions" />
       <NavItem to={ROUTES.b2bUser.preferences} isActive={isActive(ROUTES.b2bUser.preferences)} icon={<Settings className="h-5 w-5" />} label="Paramètres" />
       
       <button 

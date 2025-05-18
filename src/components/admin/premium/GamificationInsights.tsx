@@ -11,6 +11,7 @@ interface GamificationInsightsProps {
   onClick: () => void;
   visualStyle: 'minimal' | 'artistic';
   zenMode: boolean;
+  className?: string;
 }
 
 // Mock data for badge levels
@@ -27,18 +28,20 @@ const topChallengesData = [
   { name: 'Lecture bien-être', completions: 63, progress: 31 }
 ];
 
-export const GamificationInsights: React.FC<GamificationInsightsProps> = ({
+const GamificationInsights: React.FC<GamificationInsightsProps> = ({
   isActive,
   onClick,
   visualStyle,
-  zenMode
+  zenMode,
+  className
 }) => {
   return (
     <Card 
       className={cn(
         "premium-card overflow-hidden relative transition-all ease-in-out", 
         isActive ? "shadow-xl border-primary/20" : "",
-        zenMode ? "bg-background/70 backdrop-blur-lg border-border/50" : ""
+        zenMode ? "bg-background/70 backdrop-blur-lg border-border/50" : "",
+        className
       )}
       onClick={onClick}
     >
@@ -126,3 +129,6 @@ export const GamificationInsights: React.FC<GamificationInsightsProps> = ({
     </Card>
   );
 };
+
+// Change from named export to default export
+export default GamificationInsights;

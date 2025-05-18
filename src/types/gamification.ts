@@ -1,9 +1,8 @@
 
 /**
- * Gamification Types
- * --------------------------------------
- * This file defines the official types for gamification functionality.
- * Any new property or correction must be documented here and synchronized across all components.
+ * Types officiels pour le domaine gamification.
+ * Toute modification doit être synchronisée dans tous les mocks et composants.
+ * Ne jamais dupliquer ce type en local.
  */
 
 export interface GamificationStats {

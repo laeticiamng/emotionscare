@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import SecurityWidget from '@/components/security/SecurityWidget';
 
 const Settings = () => {
   const { theme, setTheme } = useTheme();
@@ -145,6 +146,7 @@ const Settings = () => {
         </TabsContent>
         
         <TabsContent value="security" className="space-y-6">
+          <SecurityWidget />
           <Card>
             <CardHeader>
               <CardTitle>Sécurité et confidentialité</CardTitle>

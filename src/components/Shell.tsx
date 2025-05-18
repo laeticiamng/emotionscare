@@ -5,6 +5,9 @@ import MainNavbar from './navigation/MainNavbar';
 import MainFooter from './navigation/MainFooter';
 import { useTheme } from '@/contexts/ThemeContext';
 import AudioControls from './audio/AudioControls';
+import MusicMiniPlayer from './music/MusicMiniPlayer';
+import { default as MusicDrawer } from './music/player/MusicDrawer';
+import { useMusic } from '@/contexts/music';
 
 interface ShellProps {
   children?: React.ReactNode;
@@ -22,6 +25,7 @@ const Shell: React.FC<ShellProps> = ({
   immersive = false
 }) => {
   const { theme, soundEnabled = false, reduceMotion = false } = useTheme();
+  const { openDrawer, toggleDrawer, playlist, currentTrack } = useMusic();
   
   return (
     <div className={`flex flex-col min-h-screen ${className} ${theme}`}>
@@ -53,6 +57,20 @@ const Shell: React.FC<ShellProps> = ({
           <AudioControls minimal />
         </div>
       )}
+
+      <div className="fixed bottom-4 left-4 z-50">
+        <MusicMiniPlayer />
+      </div>
+
+      <MusicDrawer
+        open={openDrawer}
+        onClose={toggleDrawer}
+        onOpenChange={(open) => {
+          if (!open) toggleDrawer();
+        }}
+        playlist={playlist || undefined}
+        currentTrack={currentTrack || undefined}
+      />
 
       {/* Footer */}
       {!hideFooter && <MainFooter />}
