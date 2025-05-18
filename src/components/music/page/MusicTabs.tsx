@@ -2,6 +2,7 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MusicTrack } from '@/types/music';
+import { Music, Bookmark } from 'lucide-react';
 
 interface MusicTabsProps {
   tracks: MusicTrack[];
@@ -9,75 +10,78 @@ interface MusicTabsProps {
 }
 
 const MusicTabs: React.FC<MusicTabsProps> = ({ tracks, onSelectTrack }) => {
-  // Group tracks by emotion/genre
-  const calmTracks = tracks.filter(track => 
-    track.emotion === 'calm' || 
-    track.emotion === 'relaxed' || 
-    track.genre === 'ambient'
-  );
-  
-  const energeticTracks = tracks.filter(track => 
-    track.emotion === 'joy' || 
-    track.emotion === 'happy' || 
-    track.genre === 'upbeat'
-  );
-  
+  // Filters for different music categories
   const focusTracks = tracks.filter(track => 
-    track.emotion === 'neutral' || 
-    track.emotion === 'focused' || 
-    track.genre === 'concentration'
+    (track.genre && track.genre.toLowerCase().includes('focus')) || 
+    (track.category && track.category.toLowerCase().includes('focus')) ||
+    (track.emotion && track.emotion.toLowerCase().includes('focus'))
   );
   
+  const relaxTracks = tracks.filter(track => 
+    (track.genre && track.genre.toLowerCase().includes('relax')) || 
+    (track.category && track.category.toLowerCase().includes('relax')) ||
+    (track.emotion && track.emotion.toLowerCase().includes('calm'))
+  );
+  
+  const energyTracks = tracks.filter(track => 
+    (track.genre && track.genre.toLowerCase().includes('energy')) || 
+    (track.category && track.category.toLowerCase().includes('energy')) ||
+    (track.emotion && track.emotion.toLowerCase().includes('energy'))
+  );
+
+  // Function to render track list
+  const renderTrackList = (trackList: MusicTrack[]) => (
+    <div className="space-y-2">
+      {trackList.length === 0 ? (
+        <div className="text-center py-4 text-muted-foreground">
+          Aucune piste disponible dans cette catégorie
+        </div>
+      ) : (
+        trackList.map(track => (
+          <div
+            key={track.id}
+            className="flex items-center justify-between p-3 rounded-md hover:bg-accent cursor-pointer"
+            onClick={() => onSelectTrack(track)}
+          >
+            <div className="flex items-center">
+              <Music className="h-4 w-4 mr-3 text-muted-foreground" />
+              <div>
+                <p className="font-medium">{track.title || track.name}</p>
+                <p className="text-xs text-muted-foreground">{track.artist || 'Unknown'}</p>
+              </div>
+            </div>
+            <Bookmark className="h-4 w-4 text-muted-foreground hover:text-primary" />
+          </div>
+        ))
+      )}
+    </div>
+  );
+
   return (
-    <Tabs defaultValue="calm" className="w-full">
-      <TabsList className="grid grid-cols-3 mb-4">
-        <TabsTrigger value="calm">Calme</TabsTrigger>
-        <TabsTrigger value="focus">Concentration</TabsTrigger>
-        <TabsTrigger value="energetic">Énergique</TabsTrigger>
+    <Tabs defaultValue="all" className="w-full">
+      <TabsList>
+        <TabsTrigger value="all">Toutes</TabsTrigger>
+        <TabsTrigger value="focus">Focus</TabsTrigger>
+        <TabsTrigger value="relax">Détente</TabsTrigger>
+        <TabsTrigger value="energy">Énergie</TabsTrigger>
       </TabsList>
       
-      <TabsContent value="calm">
-        {renderTrackList(calmTracks, onSelectTrack)}
+      <TabsContent value="all" className="mt-4">
+        {renderTrackList(tracks)}
       </TabsContent>
       
-      <TabsContent value="focus">
-        {renderTrackList(focusTracks, onSelectTrack)}
+      <TabsContent value="focus" className="mt-4">
+        {renderTrackList(focusTracks)}
       </TabsContent>
       
-      <TabsContent value="energetic">
-        {renderTrackList(energeticTracks, onSelectTrack)}
+      <TabsContent value="relax" className="mt-4">
+        {renderTrackList(relaxTracks)}
+      </TabsContent>
+      
+      <TabsContent value="energy" className="mt-4">
+        {renderTrackList(energyTracks)}
       </TabsContent>
     </Tabs>
-  );
-};
-
-const renderTrackList = (tracks: MusicTrack[], onSelectTrack: (track: MusicTrack) => void) => {
-  if (tracks.length === 0) {
-    return (
-      <div className="text-center py-8 text-muted-foreground">
-        <p>Aucune piste disponible dans cette catégorie</p>
-      </div>
-    );
-  }
-  
-  return (
-    <div className="space-y-2">
-      {tracks.map(track => (
-        <div 
-          key={track.id} 
-          className="flex items-center p-2 rounded-md hover:bg-accent cursor-pointer"
-          onClick={() => onSelectTrack(track)}
-        >
-          <div className="mr-4 w-10 h-10 bg-primary/20 rounded flex items-center justify-center">
-            <span className="text-lg">🎵</span>
-          </div>
-          <div>
-            <p className="font-medium">{track.title}</p>
-            <p className="text-sm text-muted-foreground">{track.artist}</p>
-          </div>
-        </div>
-      ))}
-    </div>
   );
 };
 

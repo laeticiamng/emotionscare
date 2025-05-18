@@ -6,6 +6,7 @@ import { Slider } from '@/components/ui/slider';
 import { Heart, PlayCircle } from 'lucide-react';
 import { useMusic } from '@/contexts/music';
 import { EmotionMusicParams } from '@/types/music';
+import { ensurePlaylist } from '@/utils/musicCompatibility';
 
 // Emotion preset cards for quick selection
 const emotionPresets = [
@@ -23,21 +24,32 @@ const EmotionMusicRecommendations: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGetRecommendation = async () => {
-    if (!isInitialized) return;
+    if (!isInitialized || !getRecommendationByEmotion) return;
     
     setIsLoading(true);
     try {
-      // Create EmotionMusicParams object
-      const params: EmotionMusicParams = {
-        emotion: selectedEmotion,
-        intensity: intensity,
-      };
+      // Tentative avec différentes signatures de méthode
+      let playlist;
+      try {
+        // Essai avec l'objet params
+        const params: EmotionMusicParams = {
+          emotion: selectedEmotion,
+          intensity: intensity,
+        };
+        playlist = await getRecommendationByEmotion(params);
+      } catch (err) {
+        // Fallback: essai avec juste l'émotion comme string
+        playlist = await getRecommendationByEmotion(selectedEmotion);
+      }
       
-      const playlist = await getRecommendationByEmotion(params);
-      
-      if (playlist && playlist.tracks.length > 0) {
-        setPlaylist(playlist);
-        setCurrentTrack(playlist.tracks[0]);
+      if (playlist) {
+        // Convertir en playlist si on a reçu un array
+        const formattedPlaylist = ensurePlaylist(playlist);
+        
+        if (formattedPlaylist.tracks.length > 0) {
+          setPlaylist && setPlaylist(formattedPlaylist);
+          setCurrentTrack && setCurrentTrack(formattedPlaylist.tracks[0]);
+        }
       }
     } catch (error) {
       console.error('Error getting music recommendation:', error);

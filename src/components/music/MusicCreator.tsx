@@ -21,7 +21,7 @@ const MusicCreator: React.FC = () => {
   ];
 
   const handleGenerate = async () => {
-    if (!prompt.trim()) return;
+    if (!prompt.trim() || !generateMusic || !setCurrentTrack) return;
     
     setIsGenerating(true);
     try {
@@ -32,11 +32,12 @@ const MusicCreator: React.FC = () => {
         const fullTrack: MusicTrack = {
           id: track.id || `generated-${Date.now()}`,
           name: track.name || 'Musique générée',
+          title: track.title || track.name || 'Musique générée',
           artist: 'IA Composer',
           url: track.url || track.audioUrl || track.src,
           src: track.src || track.audioUrl || track.url,
           audioUrl: track.audioUrl || track.src || track.url,
-          cover: '/images/music/ai-generated.jpg',
+          cover: track.cover || track.coverUrl || '/images/music/ai-generated.jpg',
         };
         
         setCurrentTrack(fullTrack);
@@ -113,7 +114,7 @@ const MusicCreator: React.FC = () => {
       <CardFooter>
         <Button 
           onClick={handleGenerate} 
-          disabled={isGenerating || !prompt.trim()}
+          disabled={isGenerating || !prompt.trim() || !generateMusic}
           className="w-full"
         >
           {isGenerating ? (

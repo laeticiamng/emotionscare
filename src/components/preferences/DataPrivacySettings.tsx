@@ -2,21 +2,24 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { FormControl, FormDescription, FormItem, FormLabel } from '@/components/ui/form';
-import { UserPreferences } from '@/types';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { UserPreferences } from '@/types/preferences';
+import { Shield, Eye, EyeOff } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface DataPrivacySettingsProps {
   preferences: UserPreferences;
-  onPreferenceChange: (key: string, value: any) => void;
-  disabled?: boolean;
+  onUpdatePreferences: (prefs: Partial<UserPreferences>) => void;
+  className?: string;
 }
 
-const DataPrivacySettings: React.FC<DataPrivacySettingsProps> = ({ 
-  preferences, 
-  onPreferenceChange,
-  disabled = false
+const DataPrivacySettings: React.FC<DataPrivacySettingsProps> = ({
+  preferences,
+  onUpdatePreferences,
+  className,
 }) => {
-  // Initialize privacy object if it doesn't exist with all possible properties
+  // S'assurer que privacy existe
   const privacy = preferences.privacy || {
     shareActivity: false,
     shareJournal: false,
@@ -25,105 +28,122 @@ const DataPrivacySettings: React.FC<DataPrivacySettingsProps> = ({
     anonymizeReports: false,
     profileVisibility: 'private'
   };
-  
-  const handlePrivacyChange = (key: string, value: boolean) => {
-    const updatedPrivacy = { ...privacy, [key]: value };
-    onPreferenceChange('privacy', updatedPrivacy);
+
+  const handlePrivacyChange = (key: string, value: boolean | string) => {
+    onUpdatePreferences({
+      privacy: {
+        ...(preferences.privacy || {}),
+        [key]: value,
+      },
+    });
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Confidentialité des données</CardTitle>
+    <Card className={cn("shadow-md", className)}>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center text-lg">
+          <Shield className="mr-2 h-5 w-5 text-primary" />
+          Confidentialité des données
+        </CardTitle>
         <CardDescription>
-          Gérez la visibilité de vos informations et activités sur la plateforme.
+          Configurez comment vos données sont partagées sur la plateforme.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-          <div className="space-y-0.5">
-            <FormLabel className="text-base">Partage d'activité</FormLabel>
-            <FormDescription>
-              Autorise le partage anonymisé de vos activités pour améliorer les recommandations.
-            </FormDescription>
-          </div>
-          <FormControl>
-            <Switch
-              checked={privacy.shareActivity || false}
-              onCheckedChange={(checked) => handlePrivacyChange('shareActivity', checked)}
-              disabled={disabled}
-              aria-label="Partage d'activité"
+      <CardContent className="space-y-4">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium">Partage d'activité</h4>
+              <p className="text-sm text-muted-foreground">
+                Permettre aux autres utilisateurs de voir votre activité sur la plateforme
+              </p>
+            </div>
+            <Switch 
+              checked={privacy.shareActivity || false} 
+              onCheckedChange={(value) => handlePrivacyChange('shareActivity', value)} 
             />
-          </FormControl>
-        </FormItem>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium">Partage du journal émotionnel</h4>
+              <p className="text-sm text-muted-foreground">
+                Permettre le partage anonymisé de vos entrées de journal
+              </p>
+            </div>
+            <Switch 
+              checked={privacy.shareJournal || false} 
+              onCheckedChange={(value) => handlePrivacyChange('shareJournal', value)} 
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium">Profil public</h4>
+              <p className="text-sm text-muted-foreground">
+                Rendre votre profil visible pour les autres utilisateurs
+              </p>
+            </div>
+            <Switch 
+              checked={privacy.publicProfile || false} 
+              onCheckedChange={(value) => handlePrivacyChange('publicProfile', value)} 
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium">Partage de données pour amélioration</h4>
+              <p className="text-sm text-muted-foreground">
+                Autoriser l'utilisation anonyme de vos données pour améliorer nos services
+              </p>
+            </div>
+            <Switch 
+              checked={privacy.shareData || false} 
+              onCheckedChange={(value) => handlePrivacyChange('shareData', value)} 
+            />
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium">Anonymiser les rapports</h4>
+              <p className="text-sm text-muted-foreground">
+                Supprimer toutes les données d'identification des rapports
+              </p>
+            </div>
+            <Switch 
+              checked={privacy.anonymizeReports || false} 
+              onCheckedChange={(value) => handlePrivacyChange('anonymizeReports', value)} 
+            />
+          </div>
+        </div>
         
-        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-          <div className="space-y-0.5">
-            <FormLabel className="text-base">Journal émotionnel</FormLabel>
-            <FormDescription>
-              Autorise le partage anonymisé des données de votre journal pour la recherche.
-            </FormDescription>
-          </div>
-          <FormControl>
-            <Switch
-              checked={privacy.shareJournal || false}
-              onCheckedChange={(checked) => handlePrivacyChange('shareJournal', checked)}
-              disabled={disabled}
-              aria-label="Partage du journal émotionnel"
-            />
-          </FormControl>
-        </FormItem>
-        
-        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-          <div className="space-y-0.5">
-            <FormLabel className="text-base">Profil public</FormLabel>
-            <FormDescription>
-              Rend votre profil visible pour les autres utilisateurs de la plateforme.
-            </FormDescription>
-          </div>
-          <FormControl>
-            <Switch
-              checked={privacy.publicProfile || false}
-              onCheckedChange={(checked) => handlePrivacyChange('publicProfile', checked)}
-              disabled={disabled}
-              aria-label="Profil public"
-            />
-          </FormControl>
-        </FormItem>
-
-        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-          <div className="space-y-0.5">
-            <FormLabel className="text-base">Partage de données</FormLabel>
-            <FormDescription>
-              Partagez vos données pour aider à améliorer nos services.
-            </FormDescription>
-          </div>
-          <FormControl>
-            <Switch
-              checked={privacy.shareData || false}
-              onCheckedChange={(checked) => handlePrivacyChange('shareData', checked)}
-              disabled={disabled}
-              aria-label="Partage de données"
-            />
-          </FormControl>
-        </FormItem>
-
-        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-          <div className="space-y-0.5">
-            <FormLabel className="text-base">Rapports anonymisés</FormLabel>
-            <FormDescription>
-              Anonymiser vos données dans les rapports et analyses.
-            </FormDescription>
-          </div>
-          <FormControl>
-            <Switch
-              checked={privacy.anonymizeReports || false}
-              onCheckedChange={(checked) => handlePrivacyChange('anonymizeReports', checked)}
-              disabled={disabled}
-              aria-label="Rapports anonymisés"
-            />
-          </FormControl>
-        </FormItem>
+        <div className="space-y-3 pt-3 border-t">
+          <h4 className="font-medium">Visibilité du profil</h4>
+          <RadioGroup 
+            value={privacy.profileVisibility || 'private'} 
+            onValueChange={(value) => handlePrivacyChange('profileVisibility', value)}
+            className="space-y-2"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="private" id="private" />
+              <Label htmlFor="private" className="flex items-center">
+                <EyeOff className="mr-2 h-4 w-4" /> 
+                Privé (visible uniquement par vous)
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="contacts" id="contacts" />
+              <Label htmlFor="contacts">Visible par vos contacts</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="public" id="public" />
+              <Label htmlFor="public" className="flex items-center">
+                <Eye className="mr-2 h-4 w-4" />
+                Public (visible par tous)
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
       </CardContent>
     </Card>
   );

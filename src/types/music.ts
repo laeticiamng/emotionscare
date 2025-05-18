@@ -16,6 +16,11 @@ export interface MusicTrack {
   intensity?: number;
   category?: string;
   tags?: string[];
+  genre?: string;
+  album?: string;
+  year?: number;
+  created_at?: string;
+  mood?: string;
 }
 
 export interface MusicPlaylist {
@@ -28,6 +33,9 @@ export interface MusicPlaylist {
   category?: string;
   coverUrl?: string;
   cover?: string;
+  tags?: string[];
+  mood?: string;
+  created_at?: string;
 }
 
 export interface EmotionMusicParams {
@@ -58,15 +66,17 @@ export interface MusicContextType {
   setVolume: (volume: number) => void;
   seekTo: (time: number) => void;
   setEmotion: (emotion: string) => void;
-  loadPlaylistForEmotion: (params: EmotionMusicParams) => Promise<MusicPlaylist | null>;
+  loadPlaylistForEmotion: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
   setOpenDrawer: (open: boolean) => void;
   toggleMute: () => void;
   // Méthodes additionnelles nécessaires
   setCurrentTrack?: (track: MusicTrack) => void;
-  setPlaylist?: (playlist: MusicPlaylist) => void;
-  getRecommendationByEmotion?: (emotion: string) => MusicTrack[];
+  setPlaylist?: (playlist: MusicPlaylist | MusicTrack[]) => void;
+  getRecommendationByEmotion?: (params: EmotionMusicParams | string) => Promise<MusicPlaylist>;
+  generateMusic?: (prompt: string) => Promise<MusicTrack | null>;
 }
 
+// Exportons le reste des interfaces telles quelles
 export interface MusicDrawerProps {
   children?: React.ReactNode;
   isOpen?: boolean;
@@ -126,6 +136,7 @@ export interface MusicLibraryProps {
   playlists?: MusicPlaylist[];
   onTrackSelect?: (track: MusicTrack) => void;
   onPlaylistSelect?: (playlist: MusicPlaylist) => void;
+  onSelectPlaylist?: (playlist: MusicPlaylist) => void;
   currentTrack?: MusicTrack | null;
   isLoading?: boolean;
 }

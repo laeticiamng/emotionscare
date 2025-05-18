@@ -4,7 +4,6 @@ import { Brain, CalendarDays, Trophy } from 'lucide-react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import CountUp from 'react-countup';
 import KpiCard from './admin/KpiCard';
 import { useNavigate } from 'react-router-dom';
 

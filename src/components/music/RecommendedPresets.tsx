@@ -6,6 +6,7 @@ import { useMusic } from '@/contexts/music';
 import { Heart, PlayCircle, Zap, Smile, Brain, Home, Moon, Music } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EmotionMusicParams } from '@/types/music';
+import { ensurePlaylist } from '@/utils/musicCompatibility';
 
 interface PresetButtonProps {
   label: string;
@@ -47,18 +48,34 @@ const RecommendedPresets: React.FC = () => {
     setLoading(preset.label);
     
     try {
-      // Create params object
-      const params: EmotionMusicParams = {
-        emotion: preset.emotion,
-        intensity: preset.intensity,
-      };
+      if (!getRecommendationByEmotion) {
+        console.error("getRecommendationByEmotion function is not available");
+        return;
+      }
+
+      // On appelle soit avec l'émotion seule, soit avec l'objet complet selon l'implémentation
+      let playlist;
+      try {
+        // Essai avec l'objet params
+        const params: EmotionMusicParams = {
+          emotion: preset.emotion,
+          intensity: preset.intensity,
+        };
+        playlist = await getRecommendationByEmotion(params);
+      } catch (err) {
+        // Fallback: essai avec juste l'émotion comme string
+        playlist = await getRecommendationByEmotion(preset.emotion);
+      }
       
-      const playlist = await getRecommendationByEmotion(params);
-      
-      if (playlist && playlist.tracks.length > 0) {
-        setPlaylist(playlist);
-        setCurrentTrack(playlist.tracks[0]);
-        setOpenDrawer(true);
+      if (playlist) {
+        // Convertir en playlist si on a reçu un array
+        const formattedPlaylist = ensurePlaylist(playlist);
+        
+        if (formattedPlaylist.tracks.length > 0) {
+          setPlaylist && setPlaylist(formattedPlaylist);
+          setCurrentTrack && setCurrentTrack(formattedPlaylist.tracks[0]);
+          setOpenDrawer && setOpenDrawer(true);
+        }
       }
     } catch (error) {
       console.error('Error loading preset:', error);

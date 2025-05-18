@@ -1,21 +1,35 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MusicLibraryProps, MusicPlaylist, MusicTrack } from '@/types/music';
 import { Music, PlayCircle, Search, Heart, Clock, List } from 'lucide-react';
 
-const MusicLibrary: React.FC<MusicLibraryProps> = ({ playlists, onSelectPlaylist }) => {
+const MusicLibrary: React.FC<MusicLibraryProps> = ({ 
+  playlists = [], 
+  onTrackSelect,
+  onPlaylistSelect,
+  onSelectPlaylist
+}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
+  
+  const handlePlaylistSelect = (playlist: MusicPlaylist) => {
+    // Use the appropriate handler based on availability
+    if (onSelectPlaylist) {
+      onSelectPlaylist(playlist);
+    } else if (onPlaylistSelect) {
+      onPlaylistSelect(playlist);
+    }
+  };
   
   // Filter playlists based on search query
   const filteredPlaylists = playlists.filter(playlist => {
     const titleMatch = (playlist.name || playlist.title || '').toLowerCase().includes(searchQuery.toLowerCase());
     const descriptionMatch = (playlist.description || '').toLowerCase().includes(searchQuery.toLowerCase());
-    const tagsMatch = playlist.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    const tagsMatch = playlist.tags ? playlist.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) : false;
     
     return titleMatch || descriptionMatch || tagsMatch;
   });
@@ -29,8 +43,9 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({ playlists, onSelectPlaylist
         return filteredPlaylists.filter(playlist => playlist.tags?.includes('favorite'));
       case 'recent':
         return [...filteredPlaylists].sort((a, b) => {
-          if (!a.created_at || !b.created_at) return 0;
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return dateB - dateA;
         }).slice(0, 5);
       default:
         return filteredPlaylists;
@@ -92,7 +107,7 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({ playlists, onSelectPlaylist
                 <Card 
                   key={playlist.id}
                   className="overflow-hidden transition-all hover:shadow-md cursor-pointer"
-                  onClick={() => onSelectPlaylist(playlist)}
+                  onClick={() => handlePlaylistSelect(playlist)}
                 >
                   <div className="aspect-square bg-muted relative overflow-hidden">
                     {playlist.cover ? (

@@ -1,7 +1,8 @@
+
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { KpiCardProps } from "@/types/dashboard";
+import { KpiCardProps, KpiCardStatus } from "@/types/dashboard";
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 
 export const KpiCard = ({
@@ -10,15 +11,17 @@ export const KpiCard = ({
   delta,
   icon,
   subtitle,
-  status = 'info',  // Changed from 'default' to 'info' which is allowed by the type
+  status = 'info',
   className,
   isLoading,
   ariaLabel,
   onClick,
   footer,
 }: KpiCardProps) => {
-  // Convert status for compatibility
-  const mappedStatus = status === 'danger' ? 'error' : status;
+  // Convertir status pour compatibilité
+  const mappedStatus: KpiCardStatus = status === 'error' || status === 'warning' || status === 'success' || status === 'info' 
+    ? status 
+    : 'info';
   
   // Handle loading state
   if (isLoading) {

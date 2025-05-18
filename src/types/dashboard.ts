@@ -8,6 +8,7 @@ export interface KpiDelta {
 }
 
 export interface KpiCardProps {
+  id?: string;
   title: string;
   value: React.ReactNode;
   delta?: number | KpiDelta | { value: number; trend: string; label?: string };
@@ -19,6 +20,12 @@ export interface KpiCardProps {
   ariaLabel?: string;
   onClick?: () => void;
   footer?: React.ReactNode;
+  
+  // Propriétés pour le positionnement dans la grille
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
 }
 
 export interface DraggableKpiCardsGridProps {
@@ -26,6 +33,7 @@ export interface DraggableKpiCardsGridProps {
   onLayout?: (layout: any) => void;
   savedLayout?: any;
   isEditable?: boolean;
+  onSave?: (layouts: any) => void;
 }
 
 export interface GlobalOverviewTabProps {

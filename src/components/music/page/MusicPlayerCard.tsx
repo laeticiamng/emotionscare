@@ -54,19 +54,22 @@ const MusicPlayerCard: React.FC<MusicPlayerCardProps> = ({
   return (
     <Card>
       <CardContent className="p-4">
-        <MusicPlayer 
-          track={currentTrack}
-          isPlaying={isPlaying}
-          onPlay={handlePlay}
-          onPause={handlePause}
-          onNext={handleNextTrack}
-          onPrevious={handlePreviousTrack}
-          volume={volume}
-          onVolumeChange={setVolume}
-          currentTime={currentTime}
-          duration={duration}
-          onSeek={handleSeek}
-        />
+        {currentTrack && (
+          <MusicPlayer 
+            track={currentTrack}
+            autoPlay={isPlaying}
+            onPlay={handlePlay}
+            onPause={handlePause}
+            onNext={handleNextTrack}
+            onPrevious={handlePreviousTrack}
+            onEnded={handleNextTrack}
+            volume={volume}
+            onVolumeChange={setVolume}
+            currentTime={currentTime}
+            duration={duration}
+            onSeek={handleSeek}
+          />
+        )}
       </CardContent>
     </Card>
   );
