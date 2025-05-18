@@ -24,6 +24,10 @@ export interface KpiCardProps {
     label?: string;
     trend: 'up' | 'down' | 'neutral';
   };
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
   subtitle?: ReactNode | string;
   ariaLabel?: string;
   isLoading?: boolean;
@@ -35,6 +39,7 @@ export interface DashboardWidgetConfig {
   id: string;
   title: string;
   description?: string;
+  settings?: Record<string, any>;
   visible?: boolean;
   position?: number;
 }
@@ -46,6 +51,9 @@ export interface DraggableKpiCardsGridProps {
   className?: string;
   onOrderChange?: (cards: KpiCardProps[]) => void;
   onLayoutChange?: (layout: any) => void;
+  onCardsReorder?: (cards: KpiCardProps[]) => void;
+  onSave?: (layout: any) => void;
+  savedLayout?: any;
   isEditable?: boolean;
 }
 

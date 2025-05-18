@@ -7,30 +7,30 @@ import MusicDrawer from './components/music/player/MusicDrawer';
 import { useMusic } from './contexts/music';
 
 interface ShellProps {
-  enfants?: React.ReactNode;
+  children?: React.ReactNode;
   hideNav?: boolean;
 }
 
-const Shell: React.FC<ShellProps> = ({ enfants, hideNav = false }) => {
+const Shell: React.FC<ShellProps> = ({ children, hideNav = false }) => {
   const { openDrawer, toggleDrawer, playlist, currentTrack } = useMusic();
 
   return (
     <div className="flex flex-col min-h-screen">
       {!hideNav && <MainNavbar />}
 
-      <main className="flex-1 bg-gradient-to-b de-l'arrière-plan à-muted/20">
-        {enfants || <Outlet />}
+      <main className="flex-1 bg-gradient-to-b from-background to-muted/20">
+        {children || <Outlet />}
       </main>
 
-      <div className="fixe bas-4 droite-4 z-50">
+      <div className="fixed bottom-4 right-4 z-50">
         <MusicMiniPlayer />
       </div>
 
       <MusicDrawer
-        ouvert={openDrawer}
+        open={openDrawer}
         onClose={toggleDrawer}
-        onOpenChange={(ouvrir) => {
-          if (!ouvrir) toggleDrawer();
+        onOpenChange={(open) => {
+          if (!open) toggleDrawer();
         }}
         playlist={playlist || undefined}
         currentTrack={currentTrack || undefined}
