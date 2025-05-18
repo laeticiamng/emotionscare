@@ -3,6 +3,13 @@
 
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.2] - 2025-05-19
+
+### Modifié
+- Centralisation du typage des préférences utilisateur.
+- Ajout d'`AccessibilityPreferences` et uniformisation des imports.
+- Ajout d'une documentation d'audit du module de préférences utilisateur.
+
 ## [1.1.1] - 2025-05-19
 
 ### Corrigé

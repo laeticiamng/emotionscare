@@ -1,10 +1,13 @@
 
 export type {
   User,
-  UserPreferences,
   UserRole,
   UserWithStatus
 } from './types/user';
+
+export type {
+  UserPreferences,
+} from './types/preferences';
 
 export type {
   UserPreferencesContextType,

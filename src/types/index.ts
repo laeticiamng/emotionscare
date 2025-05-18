@@ -20,6 +20,7 @@ export * from './vr';
 
 // Export user types
 export * from './user';
+export * from './preferences';
 
 // Export gamification types
 export * from './gamification';

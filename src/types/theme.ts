@@ -1,5 +1,5 @@
 
-import { UserPreferences } from './user';
+import { UserPreferences } from './preferences';
 
 export type FontFamily = 'inter' | 'roboto' | 'system' | 'open-sans' | 'poppins' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'sans-serif' | string;
 
