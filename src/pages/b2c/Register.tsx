@@ -35,7 +35,7 @@ const RegisterPage: React.FC = () => {
     setIsLoading(true);
     
     try {
-      await register(email, password, name);
+      await register(name, email, password);
       toast({
         title: "Inscription réussie",
         description: "Votre compte a été créé avec succès",
