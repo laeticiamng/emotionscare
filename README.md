@@ -79,11 +79,27 @@ La plateforme EmotionsCare s'intègre avec plusieurs API tierces pour fournir se
    - Utilisation : Création de musique adaptée aux émotions
    - Gérée par le backend
 
+4. **Supabase** - Authentification, base de données et stockage
+   - Utilisation : Gestion des utilisateurs et des fichiers
+   - Variables d'environnement : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+5. **Firebase** (optionnel) - Utilisé pour la configuration de l'exemple
+   - Variables d'environnement : `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`, `VITE_FIREBASE_MEASUREMENT_ID`
+
 ### Configuration du fichier .env.local
 
 ```
 NEXT_PUBLIC_OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxx
 NEXT_PUBLIC_HUME_API_KEY=hume_xxxxxxxxxxxxxxxxxxxx
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_FIREBASE_MEASUREMENT_ID=
 NEXT_PUBLIC_APP_ENV=development
 NEXT_PUBLIC_API_URL=http://localhost:3001
 NEXT_PUBLIC_WEB_URL=http://localhost:3000
