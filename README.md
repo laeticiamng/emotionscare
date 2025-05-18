@@ -184,6 +184,13 @@ L'application est entièrement responsive et optimisée pour les appareils mobil
 - Tests unitaires (placeholder) (`npm run test`)
 - Nettoyage du build (`npm run clean`)
 
+### Conventions de typage
+
+Les interfaces et propriétés utilisent systématiquement l'anglais en `camelCase`.
+Les champs en `snake_case` ne subsistent que pour la compatibilité avec
+certaines sources de données. La commande `npm run type-check` doit s'exécuter
+sans erreur pour valider la cohérence des types.
+
 ## Notifications CI
 
 Par défaut, GitHub envoie un email à chaque échec du workflow CI. Pour 
