@@ -40,7 +40,8 @@ const RegisterPage: React.FC = () => {
         title: "Inscription réussie",
         description: "Votre compte a été créé avec succès",
       });
-      navigate('/dashboard');
+      // Redirige immédiatement vers le tableau de bord dédié aux particuliers
+      navigate('/b2c/dashboard');
     } catch (error: any) {
       toast({
         title: "Erreur d'inscription",
