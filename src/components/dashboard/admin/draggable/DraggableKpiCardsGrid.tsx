@@ -26,10 +26,10 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
     if (!savedLayout && cards.length > 0) {
       const defaultLayout = cards.map((card, index) => ({
         i: card.id || `card-${index}`,
-        x: card.x !== undefined ? card.x : (index % 3) * 4,
-        y: card.y !== undefined ? card.y : Math.floor(index / 3) * 4,
-        w: card.w !== undefined ? card.w : 4,
-        h: card.h !== undefined ? card.h : 3,
+        x: ('x' in card && card.x !== undefined) ? card.x : (index % 3) * 4,
+        y: ('y' in card && card.y !== undefined) ? card.y : Math.floor(index / 3) * 4,
+        w: ('w' in card && card.w !== undefined) ? card.w : 4,
+        h: ('h' in card && card.h !== undefined) ? card.h : 3,
       }));
 
       setLayouts({ lg: defaultLayout, md: defaultLayout, sm: defaultLayout });
@@ -47,8 +47,10 @@ const DraggableKpiCardsGrid: React.FC<DraggableKpiCardsGridProps> = ({
     if (onOrderChange || onCardsReorder) {
       // Update card order based on layout
       const orderedCards = [...cards].sort((a, b) => {
-        const layoutItemA = layouts.lg?.find((item: any) => item.i === a.id);
-        const layoutItemB = layouts.lg?.find((item: any) => item.i === b.id);
+        const idA = a.id || '';
+        const idB = b.id || '';
+        const layoutItemA = layouts.lg?.find((item: any) => item.i === idA);
+        const layoutItemB = layouts.lg?.find((item: any) => item.i === idB);
         if (!layoutItemA || !layoutItemB) return 0;
         return layoutItemA.y === layoutItemB.y 
           ? layoutItemA.x - layoutItemB.x 

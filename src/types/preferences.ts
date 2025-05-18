@@ -50,9 +50,9 @@ export interface PrivacyPreferences {
   dataSharing: boolean;
   analytics: boolean;
   thirdParty: boolean;
-  shareData: boolean;
-  anonymizeReports: boolean;
-  profileVisibility: string;
+  shareData?: boolean; // For backwards compatibility
+  anonymizeReports?: boolean;
+  profileVisibility?: string;
 }
 
 export interface UserPreferences {
@@ -64,7 +64,7 @@ export interface UserPreferences {
   // Champs supplémentaires utilisés par les composants
   fontFamily?: string;
   reduceMotion?: boolean;
-  colorBlindMode?: string;
+  colorBlindMode?: boolean | string; // Allow both boolean and string
   autoplayMedia?: boolean;
   soundEnabled?: boolean;
   dashboardLayout?: string | object;

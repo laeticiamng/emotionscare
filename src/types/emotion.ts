@@ -1,4 +1,3 @@
-
 /**
  * Types officiels pour le domaine emotion.
  * Toute modification doit être synchronisée dans tous les mocks et composants.
@@ -14,7 +13,7 @@ export interface EmotionResult {
   intensity: number;
   timestamp?: string;
   emojis: string[];
-  source?: 'facial' | 'voice' | 'text' | 'combined' | 'audio' | 'manual' | 'emoji';
+  source?: 'facial' | 'voice' | 'text' | 'combined' | 'audio' | 'manual' | 'emoji' | 'scan';
   
   // Additional fields used by various components
   text?: string;

@@ -8,8 +8,12 @@ export interface Message {
 }
 
 export interface ChatResponse {
-  content: string;
+  id?: string;
+  content?: string;
   emotion?: string;
+  message?: string;
+  sender?: string;
+  timestamp?: string;
 }
 
 export interface SupportHistory {

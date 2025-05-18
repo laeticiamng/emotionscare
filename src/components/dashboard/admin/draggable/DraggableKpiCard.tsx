@@ -5,8 +5,12 @@ import { CSS } from "@dnd-kit/utilities";
 import { KpiCardProps } from '@/types';
 import KpiCard from '../KpiCard';
 
+interface DraggableKpiCardProps extends KpiCardProps {
+  id: string; // Required for the drag functionality
+}
+
 // Component for a draggable KPI card
-const DraggableKpiCard = (props: KpiCardProps) => {
+const DraggableKpiCard = (props: DraggableKpiCardProps) => {
   const {
     attributes,
     listeners,

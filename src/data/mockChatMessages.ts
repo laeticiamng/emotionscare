@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage, ChatConversation } from '@/types/chat';
+import { ChatMessage, Conversation } from '@/types/chat';
 
 // Générer des horodatages récents
 const generateRecentTime = (minutesAgo: number): string => {
@@ -49,15 +49,17 @@ export const mockChatMessages: ChatMessage[] = [
 ];
 
 // Conversations de démonstration
-export const mockConversations: ChatConversation[] = [
+export const mockConversations: Conversation[] = [
   {
     id: "conv-1",
     title: "Discussion sur le stress au travail",
     messages: mockChatMessages.filter(m => m.conversationId === "conv-1"),
     created_at: generateRecentTime(10),
     updated_at: generateRecentTime(6),
+    createdAt: generateRecentTime(10),
+    updatedAt: generateRecentTime(6),
     user_id: "user-123",
-    last_message: "La gestion de multiples projets avec des délais serrés peut être difficile. Avez-vous essayé des techniques de gestion du temps ou de priorisation ?"
+    lastMessage: "La gestion de multiples projets avec des délais serrés peut être difficile. Avez-vous essayé des techniques de gestion du temps ou de priorisation ?"
   },
   {
     id: "conv-2",
@@ -65,8 +67,10 @@ export const mockConversations: ChatConversation[] = [
     messages: [],
     created_at: generateRecentTime(1440), // Il y a 1 jour
     updated_at: generateRecentTime(1380),
+    createdAt: generateRecentTime(1440),
+    updatedAt: generateRecentTime(1380),
     user_id: "user-123",
-    last_message: "Essayez d'établir une routine régulière de sommeil et d'éviter les écrans avant de vous coucher."
+    lastMessage: "Essayez d'établir une routine régulière de sommeil et d'éviter les écrans avant de vous coucher."
   },
   {
     id: "conv-3",
@@ -74,8 +78,10 @@ export const mockConversations: ChatConversation[] = [
     messages: [],
     created_at: generateRecentTime(2880), // Il y a 2 jours
     updated_at: generateRecentTime(2820),
+    createdAt: generateRecentTime(2880),
+    updatedAt: generateRecentTime(2820),
     user_id: "user-123",
-    last_message: "La méditation de pleine conscience peut vous aider à vous concentrer sur le moment présent."
+    lastMessage: "La méditation de pleine conscience peut vous aider à vous concentrer sur le moment présent."
   }
 ];
 

@@ -30,8 +30,8 @@ export interface ChatMessage {
 export interface Conversation {
   id: string;
   title: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
   /** Latest message content */
   lastMessage?: string;
   /** Legacy snake_case fields for backward compatibility */
@@ -89,8 +89,10 @@ export interface UseChatOptions {
 }
 
 export interface ChatResponse {
-  id: string;
-  message: string;
-  sender: string;
-  timestamp: string;
+  id?: string;
+  message?: string;
+  content?: string;
+  sender?: string;
+  timestamp?: string;
+  emotion?: string;
 }

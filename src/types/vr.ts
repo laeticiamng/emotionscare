@@ -19,6 +19,9 @@ export interface VRSessionTemplate {
   features?: string[];
   lastUsed?: string;
   completionRate?: number;
+  goalType?: string;
+  interactive?: boolean;
+  immersionLevel?: string; // Added missing field used in mockVRTemplates
   
   // Propriétés additionnelles utilisées dans l'application
   is_audio_only?: boolean;
@@ -102,4 +105,11 @@ export interface VRSessionHistoryProps {
   limit?: number;
   showHeader?: boolean;
   className?: string;
+}
+
+export interface VRTemplateDetailProps {
+  template: VRSessionTemplate;
+  heartRate?: number; // Make heartRate optional to fix the error
+  onStartSession: () => void;
+  onBack: () => void;
 }

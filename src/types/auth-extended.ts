@@ -16,7 +16,16 @@ export function adaptAuthPreferences(authPrefs: AuthUserPreferences): AppUserPre
     soundEnabled: authPrefs.soundEnabled,
     dashboardLayout: authPrefs.dashboardLayout,
     onboardingCompleted: authPrefs.onboardingCompleted,
-    privacy: authPrefs.privacy,
+    privacy: typeof authPrefs.privacy === 'string' ? 
+      authPrefs.privacy : 
+      {
+        dataSharing: authPrefs.privacy?.shareData || false,
+        analytics: false,
+        thirdParty: false,
+        shareData: authPrefs.privacy?.shareData || false,
+        anonymizeReports: authPrefs.privacy?.anonymizeReports || false,
+        profileVisibility: authPrefs.privacy?.profileVisibility || 'private'
+      },
     notifications: authPrefs.notifications,
     language: authPrefs.language,
     emotionalCamouflage: authPrefs.emotionalCamouflage,
