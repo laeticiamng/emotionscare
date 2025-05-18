@@ -20,8 +20,10 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ className = "" }) =
   const location = useLocation();
 
   const handleLogout = async () => {
-    await logout();
-    setOpen(false);
+    if (logout) {
+      await logout();
+      setOpen(false);
+    }
   };
 
   const toggleTheme = () => {
@@ -47,7 +49,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ className = "" }) =
       </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="right" className="w-[80%] max-w-sm p-0 bg-background">
+        <SheetContent className="w-[80%] max-w-sm p-0 bg-background">
           <div className="flex flex-col h-full">
             <SheetHeader className="p-4 border-b">
               <div className="flex justify-between items-center">

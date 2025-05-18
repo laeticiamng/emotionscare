@@ -1,116 +1,86 @@
 
-import React, { useState } from 'react';
-import { Filter } from 'lucide-react';
-import { Button } from "@/components/ui/button";
+import React from 'react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useSegment } from '@/contexts/SegmentContext';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
-export const SegmentSelector: React.FC = () => {
-  const { segment, setSegment, dimensions, isLoading, activeDimension, activeOption } = useSegment();
-  const { toast } = useToast();
-  const [isOpen, setIsOpen] = useState(false);
+const SegmentSelector: React.FC = () => {
+  const { 
+    segment = 'all',
+    setSegment,
+    dimensions = [],
+    isLoading,
+    activeDimension,
+    activeOption
+  } = useSegment();
 
-  const handleSelectOption = (dimensionKey: string, optionKey: string) => {
-    setSegment({
-      dimensionKey,
-      optionKey
-    });
-    setIsOpen(false);
-    
-    toast({
-      title: "Segment mis à jour",
-      description: `Les données sont maintenant filtrées par ce segment.`
-    });
+  const handleDimensionSelect = (dimension: string) => {
+    if (!setSegment) return;
+    setSegment(dimension);
   };
 
   const handleClearFilter = () => {
-    setSegment({
-      dimensionKey: null,
-      optionKey: null
-    });
-    setIsOpen(false);
-    
-    toast({
-      title: "Filtre réinitialisé",
-      description: "Toutes les données sont maintenant affichées sans filtrage."
-    });
+    if (!setSegment) return;
+    setSegment(null);
   };
 
-  // Create the button label based on selection
-  const buttonLabel = activeOption 
-    ? `${activeDimension?.label}: ${activeOption.label}` 
-    : "Segment";
+  if (isLoading) {
+    return <div>Chargement des segments...</div>;
+  }
 
   return (
-    <div className="relative">
-      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-        <DropdownMenuTrigger asChild disabled={isLoading}>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className={`h-9 px-3 flex items-center gap-2 w-48 justify-between ${
-              activeOption ? 'border-primary text-primary' : ''
-            }`}
+    <div className="flex flex-wrap items-center gap-3">
+      <div className="flex items-center space-x-2">
+        <span className="text-sm font-medium">Filtrer par:</span>
+        
+        {dimensions.map((dimension) => (
+          <Select 
+            key={dimension.key} 
+            value={activeDimension === dimension.key ? activeOption : undefined}
+            onValueChange={(value) => handleDimensionSelect(value)}
           >
-            <span className="truncate">{buttonLabel}</span>
-            <Filter className="h-4 w-4 flex-shrink-0" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>Filtrer par segment</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          
-          {dimensions.map((dimension) => (
-            <DropdownMenuSub key={dimension.key}>
-              <DropdownMenuSubTrigger>
-                <span>{dimension.label}</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuPortal>
-                <DropdownMenuSubContent>
-                  {dimension.options.map((option) => (
-                    <DropdownMenuItem 
-                      key={option.key}
-                      className={
-                        segment.dimensionKey === dimension.key && 
-                        segment.optionKey === option.key ? 
-                        "bg-primary/10" : ""
-                      }
-                      onClick={() => handleSelectOption(dimension.key, option.key)}
-                    >
-                      {option.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuSubContent>
-              </DropdownMenuPortal>
-            </DropdownMenuSub>
-          ))}
-          
-          {activeOption && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                className="text-destructive focus:text-destructive"
-                onClick={handleClearFilter}
-              >
-                Effacer le filtre
-              </DropdownMenuItem>
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+            <SelectTrigger className="h-8 w-[180px]">
+              <SelectValue placeholder={dimension.label} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>{dimension.label}</SelectLabel>
+                {dimension.options.map((option) => (
+                  <SelectItem 
+                    key={option.key} 
+                    value={option.key}
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        ))}
+      </div>
+      
+      {segment && segment !== 'all' && (
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="h-8 px-2 text-xs" 
+          onClick={handleClearFilter}
+        >
+          Effacer les filtres
+          <X className="ml-1 h-3 w-3" />
+        </Button>
+      )}
     </div>
   );
 };
+
+export default SegmentSelector;

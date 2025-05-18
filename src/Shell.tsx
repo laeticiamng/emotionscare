@@ -19,7 +19,8 @@ const Shell: React.FC<ShellProps> = ({
   className = "" 
 }) => {
   const { openDrawer, toggleDrawer, playlist, currentTrack } = useMusic();
-  const { theme, reduceMotion } = useTheme();
+  const { theme, preferences } = useTheme();
+  const reduceMotion = preferences?.reduceMotion ?? false;
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {

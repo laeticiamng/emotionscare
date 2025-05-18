@@ -1,7 +1,7 @@
 
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'sans-serif';
-export type FontSize = 'small' | 'medium' | 'large';
+export type FontSize = 'small' | 'medium' | 'large' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface ThemeContextType {
   theme: Theme;
@@ -19,4 +19,12 @@ export interface ThemeContextType {
     reduceMotion: boolean;
   };
   updatePreferences?: (prefs: { soundEnabled?: boolean; reduceMotion?: boolean }) => void;
+  soundEnabled?: boolean;
+  reduceMotion?: boolean;
+}
+
+export interface ThemeOption {
+  value: Theme;
+  label: string;
+  icon?: React.ReactNode;
 }

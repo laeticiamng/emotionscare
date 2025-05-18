@@ -1,3 +1,4 @@
+
 export interface ChatMessage {
   id: string;
   content?: string;
@@ -28,4 +29,9 @@ export interface ChatContextType {
   isTyping: boolean;
   sendMessage: (content: string) => Promise<void>;
   clearMessages: () => void;
+}
+
+export interface CoachMessageProps {
+  message: ChatMessage;
+  isLast?: boolean;
 }

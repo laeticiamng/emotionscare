@@ -1,65 +1,78 @@
 
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { AdminAccessLog } from '@/types/dashboard';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { AdminAccessLog } from '@/types/dashboard';
-import { Eye, FileText, Settings, UserCheck } from 'lucide-react';
 
-const mockAccessLogs: AdminAccessLog[] = [
-  { 
-    adminId: 'admin1',
-    action: 'Consultation des données du segment Marketing',
-    timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString()
+// Mock data for demo purposes
+const mockLogs: AdminAccessLog[] = [
+  {
+    id: '1',
+    userId: 'user-1',
+    userName: 'Thomas Durand',
+    adminId: 'admin-1',
+    action: 'Visualisation données',
+    resource: 'Tableau de bord analytique',
+    timestamp: new Date(Date.now() - 1000 * 60 * 5),
+    ip: '192.168.1.1'
   },
-  { 
-    adminId: 'admin2',
-    action: 'Téléchargement du rapport anonymisé',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString()
+  {
+    id: '2',
+    userId: 'user-2',
+    userName: 'Sophie Martin',
+    adminId: 'admin-1',
+    action: 'Export rapport',
+    resource: 'Rapports mensuels',
+    timestamp: new Date(Date.now() - 1000 * 60 * 30),
+    ip: '192.168.1.2'
   },
-  { 
-    adminId: 'admin1',
-    action: 'Modification des paramètres de notification',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString()
+  {
+    id: '3',
+    userId: 'user-3',
+    userName: 'Marie Lambert',
+    adminId: 'admin-2',
+    action: 'Modification paramètres',
+    resource: 'Configuration système',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60),
+    ip: '192.168.1.3'
   },
-  { 
-    adminId: 'admin3',
-    action: 'Vérification d\'identité d\'un utilisateur',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString()
-  },
+  {
+    id: '4',
+    userId: 'user-4',
+    userName: 'Pierre Dupont',
+    adminId: 'admin-1',
+    action: 'Ajout utilisateur',
+    resource: 'Gestion utilisateurs',
+    timestamp: new Date(Date.now() - 1000 * 60 * 120),
+    ip: '192.168.1.4'
+  }
 ];
-
-const getActionIcon = (action: string) => {
-  if (action.includes('Consultation')) return <Eye className="h-4 w-4 text-blue-500" />;
-  if (action.includes('Téléchargement')) return <FileText className="h-4 w-4 text-green-500" />;
-  if (action.includes('Modification')) return <Settings className="h-4 w-4 text-amber-500" />;
-  if (action.includes('Vérification')) return <UserCheck className="h-4 w-4 text-purple-500" />;
-  return null;
-};
 
 const AccessLogsTable: React.FC = () => {
   return (
-    <div className="relative overflow-x-auto rounded-md">
+    <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="whitespace-nowrap">Admin</TableHead>
-            <TableHead>Action</TableHead>
-            <TableHead className="text-right">Quand</TableHead>
+            <TableHead>Administrateur</TableHead>
+            <TableHead className="hidden md:table-cell">Action</TableHead>
+            <TableHead>Ressource</TableHead>
+            <TableHead className="hidden lg:table-cell">IP</TableHead>
+            <TableHead className="text-right">Horodatage</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {mockAccessLogs.map((log, index) => (
-            <TableRow key={index}>
-              <TableCell className="font-medium">Admin {log.adminId.charAt(log.adminId.length - 1)}</TableCell>
-              <TableCell>
-                <div className="flex items-center">
-                  {getActionIcon(log.action)}
-                  <span className="ml-2">{log.action}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-right text-muted-foreground">
-                {formatDistanceToNow(new Date(log.timestamp), { addSuffix: true, locale: fr })}
+          {mockLogs.map((log) => (
+            <TableRow key={log.id}>
+              <TableCell className="font-medium">{log.userName}</TableCell>
+              <TableCell className="hidden md:table-cell">{log.action}</TableCell>
+              <TableCell>{log.resource}</TableCell>
+              <TableCell className="hidden lg:table-cell">{log.ip}</TableCell>
+              <TableCell className="text-right">
+                {typeof log.timestamp === 'string' 
+                  ? formatDistanceToNow(new Date(log.timestamp), { addSuffix: true, locale: fr })
+                  : formatDistanceToNow(log.timestamp, { addSuffix: true, locale: fr })}
               </TableCell>
             </TableRow>
           ))}
