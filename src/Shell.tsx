@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import MainNavbar from './components/navigation/MainNavbar';
@@ -27,7 +28,7 @@ const Shell: React.FC<ShellProps> = ({ children, hideNav = false }) => {
       </div>
 
       <MusicDrawer
-        open={openDrawer}
+        open={openDrawer} 
         onClose={toggleDrawer}
         onOpenChange={(open) => {
           if (!open) toggleDrawer();
