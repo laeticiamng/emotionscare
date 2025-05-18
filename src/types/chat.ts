@@ -1,9 +1,14 @@
 
+/**
+ * Message utilisé dans les conversations du module de chat.
+ */
 export interface ChatMessage {
   id: string;
-  text: string;
-  content?: string; // Adding this field to fix type errors
+  /** Contenu textuel du message */
+  content: string;
+  /** Expéditeur du message */
   sender: 'user' | 'assistant' | string;
+  /** Date d'envoi */
   timestamp: string | Date;
   emotion?: string;
   feedback?: string;
@@ -17,8 +22,8 @@ export interface ChatMessage {
 export interface ChatConversation {
   id: string;
   title: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
   lastMessage: string;
   user_id?: string;
   created_at?: string;
@@ -35,3 +40,4 @@ export type ChatResponse = {
 };
 
 export type Conversation = ChatConversation; // Alias for backward compatibility
+

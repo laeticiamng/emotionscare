@@ -2,22 +2,7 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useCoachHandlers } from './useCoachHandlers';
-
-export interface Message {
-  id: string;
-  content: string;
-  sender: 'user' | 'coach';
-  timestamp: Date;
-  isLoading?: boolean;
-}
-
-export interface Conversation {
-  id: string;
-  title: string;
-  messages: Message[];
-  createdAt: Date;
-  lastUpdated: Date;
-}
+import type { Conversation, ChatMessage, CoachSession, Suggestion } from '@/types/coach';
 
 export interface CoachContextType {
   conversations: Conversation[];
@@ -115,7 +100,7 @@ export const CoachProvider: React.FC<{children: React.ReactNode}> = ({ children 
 
     // Add welcome message from coach
     setTimeout(() => {
-      const welcomeMessage: Message = {
+      const welcomeMessage: ChatMessage = {
         id: `msg-${Date.now()}`,
         content: `Bonjour ! Je suis ${coachCharacter.name}, votre coach personnel. Comment puis-je vous aider aujourd'hui ?`,
         sender: 'coach',
@@ -141,7 +126,7 @@ export const CoachProvider: React.FC<{children: React.ReactNode}> = ({ children 
     if (!content.trim() || !currentConversationId) return;
 
     // Add user message
-    const userMessage: Message = {
+    const userMessage: ChatMessage = {
       id: `msg-u-${Date.now()}`,
       content,
       sender: 'user',
@@ -149,7 +134,7 @@ export const CoachProvider: React.FC<{children: React.ReactNode}> = ({ children 
     };
 
     // Create temporary loading message
-    const tempMessage: Message = {
+    const tempMessage: ChatMessage = {
       id: `msg-c-${Date.now()}`,
       content: '...',
       sender: 'coach',
