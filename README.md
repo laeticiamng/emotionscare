@@ -267,6 +267,11 @@ Sentry.
 
 ## Sécurité proactive
 
+## Plan de mise en production
+
+Le document [`docs/migration-prod.md`](docs/migration-prod.md) décrit l'ensemble des étapes pour migrer la plateforme vers un environnement de production sécurisé.
+
+
 Un tableau de bord dédié permet aux administrateurs de suivre les incidents et l'état de la plateforme.
 Il est accessible via la route `/b2b/admin/security`.
 Tous les utilisateurs disposent d'un widget « Sécurité » dans leurs paramètres pour consulter les dernières alertes.
