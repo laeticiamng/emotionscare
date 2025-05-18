@@ -30,6 +30,7 @@ export interface EmotionRecommendation {
   emotion: string;
   category: 'music' | 'vr' | 'exercise' | 'mindfulness' | 'general';
   content: string;
+  title?: string; // Ajout du champ title manquant
 }
 
 export interface Emotion {

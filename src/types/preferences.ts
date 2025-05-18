@@ -11,6 +11,7 @@ export interface UserPreferencesContextType {
   language: string;
   notifications: NotificationsPreferences;
   privacy: string;
+  preferences?: UserPreferences; // Ajout pour la compatibilité
   updatePreferences: (preferences: Partial<UserPreferences>) => void;
 }
 
@@ -38,14 +39,30 @@ export interface NotificationsPreferences {
     end: string;
   };
   tone?: string;
+  // Champs supplémentaires utilisés par les composants
+  newsletterEnabled?: boolean;
 }
 
 export interface UserPreferences {
   theme?: 'light' | 'dark' | 'pastel' | 'system';
-  fontSize?: 'small' | 'medium' | 'large';
+  fontSize?: 'small' | 'medium' | 'large' | 'xlarge';
   language?: string;
   privacy?: 'public' | 'private' | 'friends';
   notifications?: NotificationsPreferences | boolean;
+  // Champs supplémentaires utilisés par les composants
+  fontFamily?: string;
+  reduceMotion?: boolean;
+  colorBlindMode?: string;
+  autoplayMedia?: boolean;
+  soundEnabled?: boolean;
+  dashboardLayout?: string | object;
+  onboardingCompleted?: boolean;
+  shareData?: boolean;
+  anonymizedData?: boolean;
+  notificationsEnabled?: boolean;
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
+  newsletterEnabled?: boolean;
 }
 
 // Utilitaire pour normaliser les préférences

@@ -9,9 +9,15 @@ export interface User {
   name?: string;
   role?: UserRole;
   avatar_url?: string;
+  avatar?: string;       // Propriété alternative pour la compatibilité
+  avatarUrl?: string;    // Propriété alternative pour la compatibilité
   department?: string;
   job_title?: string;
+  position?: string;     // Propriété alternative pour la position
   emotional_score?: number;
+  joined_at?: string;    // Date d'inscription
+  created_at?: string;   // Date de création alternative
+  preferences?: UserPreferences; // Préférences utilisateur
 }
 
 export interface UserWithStatus extends User {
