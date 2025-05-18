@@ -44,6 +44,7 @@ import B2BAdminSettingsPage from '@/pages/b2b/admin/Settings';
 import B2BAdminSocialCoconPage from '@/pages/b2b/admin/SocialCocon';
 import B2BAdminOptimisationPage from '@/pages/b2b/admin/Optimisation';
 import OptimizationPage from '@/pages/OptimizationPage';
+import ExtensionsPage from '@/pages/ExtensionsPage';
 import ImmersiveHome from '@/pages/ImmersiveHome';
 import Home from '@/pages/Home';
 import LoginPage from '@/pages/common/Login';
@@ -76,6 +77,14 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <OptimizationPage />
+      </ProtectedRoute>
+    )
+  },
+  {
+    path: 'extensions',
+    element: (
+      <ProtectedRoute>
+        <ExtensionsPage />
       </ProtectedRoute>
     )
   },

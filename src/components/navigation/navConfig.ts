@@ -71,6 +71,11 @@ export const b2cNavItems: NavItemType[] = [
     icon: HeartHandshake,
   },
   {
+    title: "Extensions",
+    href: "/extensions",
+    icon: Box,
+  },
+  {
     title: "Défis",
     href: "/b2c/gamification",
     icon: Trophy,
@@ -125,6 +130,11 @@ export const b2bUserNavItems: NavItemType[] = [
     icon: HeartHandshake,
   },
   {
+    title: "Extensions",
+    href: "/extensions",
+    icon: Box,
+  },
+  {
     title: "Défis",
     href: "/b2b/user/gamification",
     icon: Trophy,
@@ -172,6 +182,11 @@ export const b2bAdminNavItems: NavItemType[] = [
     title: "Événements",
     href: "/b2b/admin/events",
     icon: Activity,
+  },
+  {
+    title: "Extensions",
+    href: "/extensions",
+    icon: Box,
   },
   {
     title: "Optimisation",

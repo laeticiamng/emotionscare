@@ -15,6 +15,7 @@ export { useAudioPlayer } from './useAudioPlayer';
 export { useMusic } from './useMusic';
 export { useMusicControls } from './useMusicControls';
 export { useMusicGen } from './api/useMusicGen';
+export { useExtensions } from '@/providers/ExtensionsProvider';
 
 // User mode hooks
 export { default as useUserModeHelpers } from './useUserModeHelpers';
