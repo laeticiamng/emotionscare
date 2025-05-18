@@ -1,71 +1,76 @@
 
-/**
- * Types officiels pour le domaine vr.
- * Toute modification doit être synchronisée dans tous les mocks et composants.
- * Ne jamais dupliquer ce type en local.
- */
+import { EmotionResult } from '@/types/emotion';
 
 export interface VRSessionTemplate {
   id: string;
   title: string;
-  name?: string; // Legacy property - use title instead
-  description: string;
-  thumbnailUrl: string;
-  thumbnail?: string; // Legacy property - use thumbnailUrl instead
+  name?: string;
+  description?: string;
   duration: number;
-  difficulty?: string;
+  type: string;
   category?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  imageUrl?: string;
+  popularity?: number;
+  rating?: number;
   tags?: string[];
-  environment?: string; // Compatible with existing components
-  immersionLevel?: 'low' | 'medium' | 'high';
-  goalType?: 'relaxation' | 'focus' | 'meditation' | 'energizing';
-  audioTrack?: string;
-  interactive?: boolean;
-  recommendedFor?: string[];
-  objective?: string;
-  // Additional properties used by some components
-  intensity?: number; // Added for compatibility with UserDashboardSections
-  completionRate?: number; 
-  completion_rate?: number; // Legacy property - use completionRate instead
-  recommendedMood?: string;
-  recommended_mood?: string; // Legacy property - use recommendedMood instead
-  emotionTarget?: string;
-  emotion_target?: string; // Legacy property - use emotionTarget instead
-  preview_url?: string;
-  is_audio_only?: boolean;
-  audio_url?: string;
-  audioUrl?: string; // Format camelCase
-  benefits?: string[];
-  theme?: string;
   emotion?: string;
+  features?: string[];
+  lastUsed?: string;
+  completionRate?: number;
 }
 
 export interface VRSession {
   id: string;
-  userId: string;
-  templateId: string;
+  templateId?: string;
   template?: VRSessionTemplate;
-  startedAt: string;
-  startTime?: string; // Legacy property - use startedAt instead
-  endedAt?: string;
-  endTime?: string; // Legacy property - use endedAt instead
-  duration?: number;
-  feedback?: {
-    rating: number;
-    comment?: string;
-    emotionBefore?: string;
-    emotionAfter?: string;
-  };
-  completed: boolean;
-  progress?: number;
-  // Legacy properties for compatibility
-  emotionBefore?: string; 
+  userId: string;
+  completed?: boolean;
+  completedAt?: string;
+  duration: number;
+  startedAt?: Date | string;
+  endTime?: Date | string;
+  startTime?: Date | string;
+  emotionBefore?: string;
   emotionAfter?: string;
-  emotionTarget?: string;
+  date?: string;
+  status?: 'completed' | 'in_progress' | 'scheduled';
   rating?: number;
+  heartRateBefore?: number;
+  heartRateAfter?: number;
+  metrics?: {
+    heartRate?: number;
+    stressLevel?: number;
+    focusLevel?: number;
+  };
+  feedback?: {
+    rating?: number;
+    comment?: string;
+    improvements?: string[];
+  };
+}
+
+export interface VRSessionData {
+  id: string;
+  template: VRSessionTemplate;
+  startedAt: string;
+  completedAt?: string;
+  duration: number;
+  emotionBefore: string;
+  emotionAfter: string;
 }
 
 export interface VRSessionWithMusicProps {
-  vrTemplate: VRSessionTemplate;
-  onComplete: (feedback: {rating: number, emotion: string}) => void;
+  sessionId?: string;
+  emotion?: string;
+  onComplete?: (result: { emotionBefore: string; emotionAfter: string }) => void;
+  className?: string;
+}
+
+export interface VRSessionHistoryProps {
+  sessions: VRSession[];
+  userId?: string;
+  limit?: number;
+  showHeader?: boolean;
+  className?: string;
 }

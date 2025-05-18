@@ -1,84 +1,41 @@
 
-/**
- * Emotion Compatibility Utilities
- * ------------------------------
- * This file provides utility functions to help with compatibility
- * between different emotion data formats and property names.
- */
-
-import { EmotionResult, EmotionIntensity } from '@/types/emotion';
+import { EmotionIntensity } from '@/types/emotion';
 
 /**
- * Converts string-based emotion intensity to numeric value
- * @param intensity The emotion intensity as string or number
+ * Normalise l'intensité émotionnelle en une valeur numérique entre 0 et 1
+ * @param intensity L'intensité émotionnelle (string ou number)
+ * @returns Une valeur normalisée entre 0 et 1
  */
-export const normalizeEmotionIntensity = (intensity: EmotionIntensity | number | undefined): number => {
-  if (intensity === undefined) {
-    return 0.5; // Default medium intensity
-  }
-  
+export function normalizeEmotionIntensity(intensity: EmotionIntensity): number {
   if (typeof intensity === 'number') {
-    return intensity;
+    // Si c'est déjà un nombre, nous nous assurons qu'il est entre 0 et 1
+    return Math.max(0, Math.min(1, intensity));
   }
   
-  // Convert string intensity to number
-  switch(intensity.toLowerCase()) {
-    case 'very low':
-    case 'very_low':
-      return 0.1;
+  // Si c'est une chaîne, convertir en nombre
+  switch (intensity) {
     case 'low':
-      return 0.3;
+      return 0.25;
     case 'medium':
       return 0.5;
     case 'high':
-      return 0.7;
-    case 'very high':
-    case 'very_high':
-      return 0.9;
+      return 0.85;
     default:
-      return 0.5;
+      return 0.5; // Valeur par défaut
   }
-};
+}
 
 /**
- * Ensures an emotion result has all required properties with proper types
+ * Convertit une intensité numérique en catégorie textuelle
+ * @param intensity Valeur numérique entre 0 et 1
+ * @returns Catégorie d'intensité (low, medium, high)
  */
-export const normalizeEmotionResult = (result: Partial<EmotionResult>): EmotionResult => {
-  return {
-    id: result.id || `emotion-${Date.now()}`,
-    emotion: result.emotion || 'neutral',
-    confidence: result.confidence || 0.5,
-    score: result.score || 0,
-    intensity: normalizeEmotionIntensity(result.intensity),
-    timestamp: result.timestamp || new Date().toISOString(),
-    metadata: result.metadata || {},
-    emojis: result.emojis || [],
-    text: result.text || '',
-    feedback: result.feedback || '',
-    // Include other properties with defaults
-    ...result
-  };
-};
-
-/**
- * Gets the display name for an emotion
- */
-export const getEmotionDisplayName = (emotionKey: string): string => {
-  const emotionMap: Record<string, string> = {
-    'happy': 'Happy',
-    'sad': 'Sad',
-    'angry': 'Angry',
-    'fearful': 'Fearful',
-    'disgusted': 'Disgusted',
-    'surprised': 'Surprised',
-    'calm': 'Calm',
-    'confused': 'Confused',
-    'neutral': 'Neutral',
-    'focused': 'Focused',
-    'relaxed': 'Relaxed',
-    'stressed': 'Stressed',
-    'anxious': 'Anxious'
-  };
-  
-  return emotionMap[emotionKey.toLowerCase()] || emotionKey;
-};
+export function getIntensityCategory(intensity: number): 'low' | 'medium' | 'high' {
+  if (intensity < 0.33) {
+    return 'low';
+  } else if (intensity < 0.66) {
+    return 'medium';
+  } else {
+    return 'high';
+  }
+}

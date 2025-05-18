@@ -14,11 +14,12 @@ export interface EmotionResult {
   intensity: number;
   timestamp?: string;
   emojis: string[];
-  source?: 'facial' | 'voice' | 'text' | 'combined';
+  source?: 'facial' | 'voice' | 'text' | 'combined' | 'audio' | 'manual' | 'emoji';
   
   // Additional fields used by various components
   text?: string;
   feedback?: string;
+  ai_feedback?: string; // Ajouté pour compatibilité
   score?: number;
   userId?: string;
   user_id?: string; // Legacy field - use userId instead
@@ -27,10 +28,10 @@ export interface EmotionResult {
 }
 
 export interface EmotionRecommendation {
-  emotion: string;
-  category: 'music' | 'vr' | 'exercise' | 'mindfulness' | 'general';
+  emotion?: string;
+  category?: 'music' | 'vr' | 'exercise' | 'mindfulness' | 'general';
   content: string;
-  title?: string; // Ajout du champ title manquant
+  title?: string;
 }
 
 export interface Emotion {

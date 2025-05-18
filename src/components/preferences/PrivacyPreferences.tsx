@@ -5,12 +5,13 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { PrivacyPreferences as PrivacyPreferencesType } from '@/types/preferences';
 
 const PrivacyPreferences: React.FC = () => {
   const { preferences, updatePreferences } = useUserPreferences();
   
   // Assurer que les propriétés sont définies avec des valeurs par défaut
-  const privacySettings = preferences?.privacy || {
+  const defaultPrivacy: PrivacyPreferencesType = {
     dataSharing: false,
     analytics: true,
     thirdParty: false,
@@ -19,31 +20,41 @@ const PrivacyPreferences: React.FC = () => {
     profileVisibility: 'public',
   };
   
+  const privacySettings = typeof preferences?.privacy === 'object' 
+    ? preferences.privacy as PrivacyPreferencesType
+    : defaultPrivacy;
+  
   const handleShareDataChange = (checked: boolean) => {
+    const newPrivacy = {
+      ...privacySettings,
+      shareData: checked,
+      dataSharing: checked, // Mise à jour des deux propriétés pour compatibilité
+    };
+    
     updatePreferences({
-      privacy: {
-        ...privacySettings,
-        shareData: checked,
-        dataSharing: checked, // Mise à jour des deux propriétés pour compatibilité
-      },
+      privacy: newPrivacy
     });
   };
   
   const handleAnonymizeReportsChange = (checked: boolean) => {
+    const newPrivacy = {
+      ...privacySettings,
+      anonymizeReports: checked,
+    };
+    
     updatePreferences({
-      privacy: {
-        ...privacySettings,
-        anonymizeReports: checked,
-      },
+      privacy: newPrivacy
     });
   };
   
   const handleProfileVisibilityChange = (value: string) => {
+    const newPrivacy = {
+      ...privacySettings,
+      profileVisibility: value,
+    };
+    
     updatePreferences({
-      privacy: {
-        ...privacySettings,
-        profileVisibility: value,
-      },
+      privacy: newPrivacy
     });
   };
 
@@ -62,7 +73,7 @@ const PrivacyPreferences: React.FC = () => {
           </div>
           <Switch
             id="share-data"
-            checked={privacySettings.shareData || privacySettings.dataSharing}
+            checked={privacySettings?.shareData || privacySettings?.dataSharing || false}
             onCheckedChange={handleShareDataChange}
           />
         </div>
@@ -76,7 +87,7 @@ const PrivacyPreferences: React.FC = () => {
           </div>
           <Switch
             id="anonymize-reports"
-            checked={privacySettings.anonymizeReports || false}
+            checked={privacySettings?.anonymizeReports || false}
             onCheckedChange={handleAnonymizeReportsChange}
           />
         </div>
@@ -84,7 +95,7 @@ const PrivacyPreferences: React.FC = () => {
         <div className="space-y-2">
           <Label htmlFor="profile-visibility">Visibilité du profil</Label>
           <Select
-            value={privacySettings.profileVisibility || 'public'}
+            value={privacySettings?.profileVisibility || 'public'}
             onValueChange={handleProfileVisibilityChange}
           >
             <SelectTrigger id="profile-visibility">

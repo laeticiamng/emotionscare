@@ -10,7 +10,7 @@ export interface UserPreferencesContextType {
   fontSize: string;
   language: string;
   notifications: NotificationsPreferences;
-  privacy: string;
+  privacy: string | PrivacyPreferences;
   preferences?: UserPreferences; // Ajout pour la compatibilité
   updatePreferences: (preferences: Partial<UserPreferences>) => void;
   resetPreferences?: () => void;
@@ -46,11 +46,20 @@ export interface NotificationsPreferences {
   newsletterEnabled?: boolean;
 }
 
+export interface PrivacyPreferences {
+  dataSharing: boolean;
+  analytics: boolean;
+  thirdParty: boolean;
+  shareData: boolean;
+  anonymizeReports: boolean;
+  profileVisibility: string;
+}
+
 export interface UserPreferences {
   theme?: 'light' | 'dark' | 'pastel' | 'system';
   fontSize?: 'small' | 'medium' | 'large' | 'xlarge';
   language?: string;
-  privacy?: 'public' | 'private' | 'friends';
+  privacy?: string | PrivacyPreferences;
   notifications?: NotificationsPreferences | boolean;
   // Champs supplémentaires utilisés par les composants
   fontFamily?: string;

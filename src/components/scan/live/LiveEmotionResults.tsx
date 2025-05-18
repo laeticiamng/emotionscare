@@ -28,9 +28,6 @@ export default function LiveEmotionResults({ result, isLoading }: { result?: Emo
   };
   
   // Rest of component remains the same...
-  // ... keep existing code
-
-  // For the parts that caused errors:
   const intensityPercent = getIntensityPercent();
   const confidencePercent = result ? result.confidence * 100 : 0;
 
