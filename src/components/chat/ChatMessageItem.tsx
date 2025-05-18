@@ -18,7 +18,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message }) => {
     '';
   
   // Message text content (compatibility with both text and content properties)
-  const messageContent = message.text || message.content || '';
+  const messageContent = message.content || message.text || '';
   
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>

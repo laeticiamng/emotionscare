@@ -1,49 +1,22 @@
 
-import { UserPreferences } from './preferences';
-
-export type FontFamily = 'inter' | 'roboto' | 'system' | 'open-sans' | 'poppins' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'sans-serif' | string;
-
-export type FontSize = 'xs' | 'sm' | 'base' | 'lg' | 'xl' | 'medium' | string;
-
-export type ThemeName = 'light' | 'dark' | 'system' | 'pastel' | string;
-
-export type Theme = ThemeName | 'light' | 'dark' | 'system' | 'pastel';
-
-export interface ThemeOption {
-  name: string;
-  value: Theme;
-  icon?: string;
-  description?: string;
-  preview?: string;
-}
+export type Theme = 'light' | 'dark' | 'system' | 'pastel';
+export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded' | 'monospace' | 'sans-serif';
+export type FontSize = 'small' | 'medium' | 'large';
 
 export interface ThemeContextType {
-  theme: ThemeName;
-  setTheme: (theme: ThemeName) => void;
-  fontFamily: FontFamily;
-  setFontFamily: (fontFamily: FontFamily) => void;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
+  isDark: boolean;
+  isDarkMode: boolean;
   fontSize: FontSize;
-  setFontSize: (fontSize: FontSize) => void;
-  colorAccent?: string;
-  setColorAccent?: (colorAccent: string) => void;
-  savePreferences?: (preferences: Partial<UserPreferences>) => Promise<void>;
-  toggleTheme?: () => void;
-  isDark?: boolean;
-  isDarkMode?: boolean;
+  setFontSize: (size: FontSize) => void;
+  fontFamily: FontFamily;
+  setFontFamily: (family: FontFamily) => void;
   systemTheme?: 'dark' | 'light';
   preferences?: {
     soundEnabled: boolean;
     reduceMotion: boolean;
   };
-  soundEnabled?: boolean;
-  reduceMotion?: boolean;
   updatePreferences?: (prefs: { soundEnabled?: boolean; reduceMotion?: boolean }) => void;
-  getContrastText?: (color: string) => 'black' | 'white';
-}
-
-export interface UserThemePreferences {
-  theme: Theme;
-  fontFamily: FontFamily;
-  fontSize: FontSize;
-  colorAccent?: string;
 }

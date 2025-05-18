@@ -1,43 +1,31 @@
-
-/**
- * Message utilisé dans les conversations du module de chat.
- */
 export interface ChatMessage {
   id: string;
-  /** Contenu textuel du message */
-  content: string;
-  /** Expéditeur du message */
-  sender: 'user' | 'assistant' | string;
-  /** Date d'envoi */
+  content?: string;
+  text?: string; // For backward compatibility
+  sender: string;
+  role?: string; // For backward compatibility
   timestamp: string | Date;
-  emotion?: string;
-  feedback?: string;
-  isFeedbackEnabled?: boolean;
   isLoading?: boolean;
-  type?: string;
-  attachments?: any[];
-  metadata?: Record<string, any>;
+  conversationId?: string;
 }
 
 export interface ChatConversation {
   id: string;
   title: string;
-  createdAt: Date | string;
-  updatedAt: Date | string;
-  lastMessage: string;
-  user_id?: string;
-  created_at?: string;
-  updated_at?: string;
-  last_message?: string;
   messages: ChatMessage[];
+  createdAt: Date;
+  lastUpdated: Date;
+  lastMessage?: string;
+  userId?: string;
 }
 
-export type ChatResponse = {
-  message: string;
-  emotion?: string;
-  recommendations?: string[];
-  metadata?: Record<string, any>;
-};
+// Other chat-related types
+export type ChatRole = 'user' | 'assistant' | 'system' | 'coach';
+export type ChatStatus = 'idle' | 'loading' | 'error' | 'success';
 
-export type Conversation = ChatConversation; // Alias for backward compatibility
-
+export interface ChatContextType {
+  messages: ChatMessage[];
+  isTyping: boolean;
+  sendMessage: (content: string) => Promise<void>;
+  clearMessages: () => void;
+}

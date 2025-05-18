@@ -9,6 +9,7 @@ export function useChatMessages(initialMessages: ChatMessage[] = []) {
     const newMessage: ChatMessage = {
       id: `msg-${Date.now()}`,
       text,
+      content: text, // Ensure both properties are set for compatibility
       sender,
       timestamp: new Date().toISOString(),
       ...options
@@ -22,22 +23,21 @@ export function useChatMessages(initialMessages: ChatMessage[] = []) {
     setMessages(initialMessages);
   }, []);
 
-  // Fonctions supplémentaires pour gérer les messages
-  const sendMessageHandler = useCallback(async (text: string) => {
+  const sendMessageHandler = useCallback(async (text: string, previousMessages: ChatMessage[] = []) => {
     // Handle sending message logic
-    const userMessage = addMessage(text, 'user');
-    return userMessage;
-  }, [addMessage]);
+    console.log('Sending message:', text, 'Previous messages:', previousMessages);
+    return `Response to: ${text}`;
+  }, []);
 
   const analyzeEmotionHandler = useCallback(async (text: string) => {
     // Handle emotion analysis logic
     console.log('Analyzing emotion for:', text);
-    return { emotion: 'neutral', confidence: 0.5 };
+    return { emotion: 'neutral', score: 0.5 };
   }, []);
 
-  const getRecommendationsHandler = useCallback(async (emotion: string) => {
+  const getRecommendationsHandler = useCallback((category: string) => {
     // Handle getting recommendations logic
-    console.log('Getting recommendations for emotion:', emotion);
+    console.log('Getting recommendations for category:', category);
     return ['Recommendation 1', 'Recommendation 2'];
   }, []);
 

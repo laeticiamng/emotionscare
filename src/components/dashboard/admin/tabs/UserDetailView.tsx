@@ -1,143 +1,116 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { User } from '@/types/user';
-import { Badge } from '@/components/ui/badge';
-import { getRoleName } from '@/utils/roleUtils';
+import { ArrowLeft, Mail, Phone, MapPin, Calendar } from 'lucide-react';
+import UserSessionsTab from './UserSessionsTab';
+import UserEmotionsTab from './UserEmotionsTab';
+import UserActivityTab from './UserActivityTab';
 
 interface UserDetailViewProps {
-  user: User;
+  userId: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role?: string;
+    department?: string;
+    phone?: string;
+    location?: string;
+    joinDate?: string | Date;
+    emotionalScore?: number;
+    avatarUrl?: string;
+  };
+  onBack: () => void;
 }
 
-const UserDetailView: React.FC<UserDetailViewProps> = ({ user }) => {
-  const getInitials = (name: string = '') => {
-    return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
-  // Helper function to check if notifications are enabled
-  const areNotificationsEnabled = () => {
-    const notifPref = user.preferences?.notifications;
-    
-    // Check various possible structures for notifications preference
-    if (notifPref === undefined) {
-      return user.preferences?.notificationsEnabled || false;
-    }
-    
-    if (typeof notifPref === 'boolean') {
-      return notifPref;
-    }
-    
-    // Check if it has a nested 'enabled' property
-    if (typeof notifPref === 'object' && notifPref !== null) {
-      // @ts-ignore - We're deliberately checking for possibly undefined property
-      if (notifPref.enabled !== undefined) {
-        // @ts-ignore
-        return notifPref.enabled;
-      }
-      
-      // If we have any notification channel enabled, notifications are enabled
-      if (notifPref.email || notifPref.push || notifPref.sms) {
-        return true;
-      }
-    }
-    
-    return false;
-  };
-
+const UserDetailView: React.FC<UserDetailViewProps> = ({ userId, user, onBack }) => {
+  // Format date properly if it's a Date object
+  const formattedJoinDate = user.joinDate 
+    ? typeof user.joinDate === 'string'
+      ? user.joinDate
+      : format(new Date(user.joinDate), 'dd MMMM yyyy', { locale: fr })
+    : 'Date inconnue';
+  
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Détails de l'utilisateur</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex items-center space-x-4">
-          <Avatar className="h-16 w-16">
-            <AvatarImage src={user.avatar || user.avatarUrl || user.avatar_url} />
-            <AvatarFallback>{getInitials(user.name || '')}</AvatarFallback>
-          </Avatar>
-          <div>
-            <h3 className="text-xl font-bold">{user.name}</h3>
-            <p className="text-muted-foreground">{user.email}</p>
-            <Badge variant="secondary" className="mt-2">{getRoleName(user.role)}</Badge>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
+          <ArrowLeft className="h-4 w-4" />
+          Retour à la liste
+        </Button>
+      </div>
+      
+      <Card>
+        <CardHeader className="pb-0">
+          <CardTitle>Profil utilisateur</CardTitle>
+          <CardDescription>Détails de l'utilisateur et activités</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row gap-6 pt-6">
+            <div className="flex flex-col items-center">
+              <Avatar className="h-24 w-24">
+                {user.avatarUrl && <AvatarImage src={user.avatarUrl} alt={user.name} />}
+                <AvatarFallback className="text-lg">{user.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <h3 className="mt-4 text-lg font-medium">{user.name}</h3>
+              <p className="text-sm text-muted-foreground">{user.role}</p>
+              {user.emotionalScore !== undefined && (
+                <div className="mt-2 px-2 py-1 bg-primary/10 text-primary rounded-md text-xs">
+                  Score émotionnel : {user.emotionalScore}%
+                </div>
+              )}
+            </div>
+            
+            <div className="flex-1 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span>{user.email}</span>
+                </div>
+                {user.phone && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <span>{user.phone}</span>
+                  </div>
+                )}
+                {user.department && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <span>{user.department}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span>Inscrit le {formattedJoinDate}</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        <Tabs defaultValue="general">
-          <TabsList className="w-full">
-            <TabsTrigger value="general" className="flex-1">Général</TabsTrigger>
-            <TabsTrigger value="preferences" className="flex-1">Préférences</TabsTrigger>
-          </TabsList>
-          <TabsContent value="general" className="space-y-4 pt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">ID</h4>
-                <p className="text-sm truncate">{user.id}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Date d'inscription</h4>
-                <p className="text-sm">{user.joined_at || user.created_at || 'Non disponible'}</p>
-              </div>
-              {user.department && (
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground">Département</h4>
-                  <p className="text-sm">{user.department}</p>
-                </div>
-              )}
-              {user.position && (
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground">Position</h4>
-                  <p className="text-sm">{user.position}</p>
-                </div>
-              )}
-              {user.emotional_score !== undefined && (
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground">Score émotionnel</h4>
-                  <p className="text-sm">{user.emotional_score}</p>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-          <TabsContent value="preferences" className="space-y-4 pt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Thème</h4>
-                <p className="text-sm">{user.preferences?.theme || 'Défaut'}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Langue</h4>
-                <p className="text-sm">{user.preferences?.language || 'Français'}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Notifications</h4>
-                <p className="text-sm">
-                  {areNotificationsEnabled() ? 'Activées' : 'Désactivées'}
-                </p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Layout dashboard</h4>
-                <p className="text-sm">
-                  {user.preferences?.dashboardLayout ? 
-                    (typeof user.preferences.dashboardLayout === 'string' ? 
-                      user.preferences.dashboardLayout : 'Personnalisé') : 
-                    'Défaut'}
-                </p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-muted-foreground">Onboarding complété</h4>
-                <p className="text-sm">{user.preferences?.onboardingCompleted ? 'Oui' : 'Non'}</p>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+      <Tabs defaultValue="activity" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="activity">Activité</TabsTrigger>
+          <TabsTrigger value="emotions">Émotions</TabsTrigger>
+          <TabsTrigger value="sessions">Sessions</TabsTrigger>
+        </TabsList>
+        <TabsContent value="activity">
+          <UserActivityTab userId={userId} />
+        </TabsContent>
+        <TabsContent value="emotions">
+          <UserEmotionsTab userId={userId} />
+        </TabsContent>
+        <TabsContent value="sessions">
+          <UserSessionsTab userId={userId} />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
