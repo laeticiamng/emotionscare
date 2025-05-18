@@ -14,7 +14,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useBranding } from '@/hooks/useBranding';
 import { cn } from '@/lib/utils';
 import { useNotificationBadge } from '@/hooks/useNotificationBadge';
-import { Bell, Home, Settings, User, Users, GraduationCap, BookOpenCheck, BarChart, LogOut } from 'lucide-react';
+import { Bell, Home, Settings, User, Users, GraduationCap, BookOpenCheck, BarChart, LogOut, Sparkles } from 'lucide-react';
 
 export function MainNavigation() {
   const { user, logout } = useAuth();
@@ -50,6 +50,7 @@ export function MainNavigation() {
     { label: 'Profil', href: '/profile', icon: <User className="mr-2 h-4 w-4" /> },
     { label: 'Paramètres', href: '/settings', icon: <Settings className="mr-2 h-4 w-4" /> },
     { label: 'Dashboard', href: '/dashboard', icon: <BarChart className="mr-2 h-4 w-4" /> },
+    { label: 'Prédictif', href: '/predictive', icon: <Sparkles className="mr-2 h-4 w-4" /> },
     { label: 'Équipe', href: '/team', icon: <Users className="mr-2 h-4 w-4" /> },
     { label: 'Formations', href: '/training', icon: <GraduationCap className="mr-2 h-4 w-4" /> },
     { label: 'Ressources', href: '/resources', icon: <BookOpenCheck className="mr-2 h-4 w-4" /> },

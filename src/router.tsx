@@ -51,6 +51,7 @@ import ImmersiveHome from './pages/ImmersiveHome';
 import Home from './pages/Home';
 import UnifiedSettingsPage from './pages/UnifiedSettingsPage';
 import SupportPage from './pages/Support';
+import PredictiveDashboardPage from './pages/PredictiveDashboardPage';
 
 // Define the application routes without creating a router instance
 export const routes: RouteObject[] = [
@@ -174,6 +175,10 @@ export const routes: RouteObject[] = [
       {
         path: 'gamification',
         element: <B2CGamificationPage />
+      },
+      {
+        path: 'predictive',
+        element: <PredictiveDashboardPage />
       }
     ]
   },
@@ -241,6 +246,10 @@ export const routes: RouteObject[] = [
       {
         path: 'gamification',
         element: <B2BUserGamificationPage />
+      },
+      {
+        path: 'predictive',
+        element: <PredictiveDashboardPage />
       }
     ]
   },
@@ -292,6 +301,10 @@ export const routes: RouteObject[] = [
       {
         path: 'settings',
         element: <B2BAdminSettingsPage />
+      },
+      {
+        path: 'predictive',
+        element: <PredictiveDashboardPage />
       }
     ]
   },
