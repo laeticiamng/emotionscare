@@ -3,6 +3,12 @@
 
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.4] - 2025-05-22
+
+### Corrigé
+- Redirection automatique des utilisateurs authentifiés sur la page `/b2b/selection` vers leur tableau de bord respectif.
+- Documentation QA `docs/b2b-selection-qa.md` détaillant le problème et la solution.
+
 ## [1.1.3] - 2025-05-21
 
 ### Ajouté
