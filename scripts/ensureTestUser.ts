@@ -21,34 +21,76 @@ const supabase = createClient(supabaseUrl, serviceKey, {
   auth: { autoRefreshToken: false, persistSession: false }
 });
 
-async function ensureTestUser() {
-  const email = 'utilisateur@exemple.fr';
-  const password = 'admin';
-
-  const { data: existing, error: fetchError } = await supabase.auth.admin.getUserByEmail(email);
-  if (fetchError) {
-    console.error('Error fetching user:', fetchError.message);
-    return;
-  }
-
-  if (existing?.user) {
-    console.log('Test user already exists.');
-    return;
-  }
-
-  const { data, error } = await supabase.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { name: 'Utilisateur test', role: 'b2c' }
-  });
-
-  if (error) {
-    console.error('Error creating test user:', error.message);
-    return;
-  }
-
-  console.log('Test user created:', data.user?.id);
+interface TestUser {
+  email: string;
+  password: string;
+  role: 'b2c' | 'b2b_user' | 'b2b_admin';
+  name: string;
 }
 
-ensureTestUser().then(() => process.exit(0));
+const testUsers: TestUser[] = [
+  {
+    email: 'b2c@exemple.fr',
+    password: 'b2c',
+    role: 'b2c',
+    name: 'Utilisateur B2C'
+  },
+  {
+    email: 'user@exemple.fr',
+    password: 'user',
+    role: 'b2b_user',
+    name: 'Utilisateur B2B'
+  },
+  {
+    email: 'admin@exemple.fr',
+    password: 'admin',
+    role: 'b2b_admin',
+    name: 'Administrateur B2B'
+  }
+];
+
+async function ensureTestUsers() {
+  for (const { email, password, role, name } of testUsers) {
+    const { data: existing, error: fetchError } = await supabase.auth.admin.getUserByEmail(email);
+
+    if (fetchError) {
+      console.error(`Error fetching user ${email}:`, fetchError.message);
+      continue;
+    }
+
+    if (existing?.user) {
+      const currentRole = existing.user.user_metadata?.role;
+      const currentName = existing.user.user_metadata?.name;
+      if (currentRole !== role || currentName !== name) {
+        const { error: updateError } = await supabase.auth.admin.updateUserById(existing.user.id, {
+          password,
+          email_confirm: true,
+          user_metadata: { role, name }
+        });
+        if (updateError) {
+          console.error(`Error updating user ${email}:`, updateError.message);
+        } else {
+          console.log(`Test user ${email} updated.`);
+        }
+      } else {
+        console.log(`Test user ${email} already exists.`);
+      }
+      continue;
+    }
+
+    const { error: createError } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { name, role }
+    });
+
+    if (createError) {
+      console.error(`Error creating user ${email}:`, createError.message);
+    } else {
+      console.log(`Test user ${email} created.`);
+    }
+  }
+}
+
+ensureTestUsers().then(() => process.exit(0));

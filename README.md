@@ -111,21 +111,22 @@ NEXT_PUBLIC_WEB_URL=http://localhost:3000
 
 ### Utilisateurs de test
 
-Trois comptes sont mis à disposition pour vérifier le routage selon les rôles :
+Trois comptes standards sont mis à disposition pour les démonstrations :
 
-- **B2C** : `b2c@exemple.fr` / `b2c`
-- **B2B Utilisateur** : `user@exemple.fr` / `user`
-- **B2B Admin** : `admin@exemple.fr` / `admin`
+| Email              | Mot de passe | Rôle      |
+| ------------------ | ------------ | --------- |
+| `b2c@exemple.fr`   | `b2c`        | B2C       |
+| `user@exemple.fr`  | `user`       | B2B User  |
+| `admin@exemple.fr` | `admin`      | B2B Admin |
 
-Si ces comptes n'existent pas dans votre base Supabase, vous pouvez les créer
-automatiquement avec la commande suivante&nbsp;:
+Si l'un de ces comptes n'existe pas dans votre base Supabase, vous pouvez les créer ou les réinitialiser avec la commande suivante :
+
 
 ```bash
 npx ts-node scripts/ensureTestUser.ts
 ```
 
-Cette commande nécessite la variable `SUPABASE_SERVICE_ROLE_KEY` dans votre
-`.env.local` afin d'utiliser l'API d'administration Supabase.
+Cette commande nécessite la variable `SUPABASE_SERVICE_ROLE_KEY` dans votre `.env.local` afin d'utiliser l'API d'administration Supabase.
 
 ## Installation et démarrage
 
