@@ -1,36 +1,19 @@
 
-import React from 'react';
-
-export interface LayoutProps {
-  children: React.ReactNode;
-  withSidebar?: boolean;
-  withNavbar?: boolean;
-  withFooter?: boolean;
-  className?: string;
-}
-
-export interface ShellProps {
-  children: React.ReactNode;
-  className?: string;
-  hideNav?: boolean;
-  hideFooter?: boolean;
-  immersive?: boolean;
-}
+import { ReactNode } from 'react';
+import { Theme } from './theme';
 
 export interface LayoutContextType {
+  sidebarCollapsed: boolean;
   sidebarOpen: boolean;
-  setSidebarOpen: (open: boolean) => void;
-  toggleSidebar?: () => void;
-  theme: string;
-  setTheme: (theme: string) => void;
-  fullscreen: boolean;
-  setFullscreen: (fullscreen: boolean) => void;
-  sidebarCollapsed?: boolean;
-  setSidebarCollapsed?: (collapsed: boolean) => void;
+  toggleSidebar: () => void;
+  setSidebarCollapsed: (collapsed: boolean) => void;
+  setSidebarOpen?: (open: boolean) => void;
+  theme?: Theme;
+  setTheme?: (theme: Theme) => void;
+  fullscreen?: boolean;
+  setFullscreen?: (fullscreen: boolean) => void;
 }
 
 export interface LayoutProviderProps {
-  children: React.ReactNode;
-  initialTheme?: string;
-  initialSidebarState?: boolean;
+  children: ReactNode;
 }

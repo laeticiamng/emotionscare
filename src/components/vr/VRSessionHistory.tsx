@@ -131,7 +131,10 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
         
         {sessions.length > limitDisplay && (
           <div className="text-center mt-4">
-            <Button variant="ghost" onClick={() => handleSelect && handleSelect(sessions[0])}>
+            <Button 
+              variant="ghost" 
+              onClick={() => handleSelect && handleSelect(sessions[0])}
+            >
               Voir plus de sessions
             </Button>
           </div>

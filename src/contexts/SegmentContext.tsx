@@ -1,30 +1,6 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-
-interface SegmentOption {
-  key: string;
-  label: string;
-}
-
-interface SegmentDimension {
-  key: string;
-  label: string;
-  options: SegmentOption[];
-}
-
-interface SegmentContextType {
-  segments: string[];
-  selectedSegment: string | null;
-  setSelectedSegment: (segment: string | null) => void;
-  
-  // Additional properties needed by components
-  segment?: string;
-  setSegment?: (segment: string | null) => void;
-  dimensions?: SegmentDimension[];
-  isLoading?: boolean;
-  activeDimension?: string;
-  activeOption?: string;
-}
+import { SegmentOption, SegmentDimension, SegmentContextType } from '@/types/segment';
 
 const SegmentContext = createContext<SegmentContextType | undefined>(undefined);
 
@@ -44,39 +20,47 @@ export const SegmentProvider: React.FC<SegmentProviderProps> = ({ children }) =>
   const [segments] = useState<string[]>(['Marketing', 'Design', 'Technique', 'Support', 'RH', 'Finance']);
   const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
   const [segment, setSegment] = useState<string>('all');
+  const [selectedDimension, setSelectedDimension] = useState<SegmentDimension | null>(null);
+  const [selectedOption, setSelectedOption] = useState<SegmentOption | null>(null);
   const [dimensions] = useState<SegmentDimension[]>([
     {
+      id: 'Department',
       key: 'Department',
+      name: 'Département',
       label: 'Département',
       options: [
-        { key: 'all', label: 'Tous' },
-        { key: 'marketing', label: 'Marketing' },
-        { key: 'design', label: 'Design' },
-        { key: 'tech', label: 'Technique' },
-        { key: 'support', label: 'Support' },
-        { key: 'hr', label: 'RH' },
-        { key: 'finance', label: 'Finance' },
+        { id: 'all', key: 'all', label: 'Tous', value: 'all' },
+        { id: 'marketing', key: 'marketing', label: 'Marketing', value: 'marketing' },
+        { id: 'design', key: 'design', label: 'Design', value: 'design' },
+        { id: 'tech', key: 'tech', label: 'Technique', value: 'tech' },
+        { id: 'support', key: 'support', label: 'Support', value: 'support' },
+        { id: 'hr', key: 'hr', label: 'RH', value: 'hr' },
+        { id: 'finance', key: 'finance', label: 'Finance', value: 'finance' },
       ]
     },
     {
+      id: 'Role',
       key: 'Role',
+      name: 'Rôle',
       label: 'Rôle',
       options: [
-        { key: 'all', label: 'Tous' },
-        { key: 'manager', label: 'Manager' },
-        { key: 'employee', label: 'Employé' },
-        { key: 'intern', label: 'Stagiaire' },
+        { id: 'all', key: 'all', label: 'Tous', value: 'all' },
+        { id: 'manager', key: 'manager', label: 'Manager', value: 'manager' },
+        { id: 'employee', key: 'employee', label: 'Employé', value: 'employee' },
+        { id: 'intern', key: 'intern', label: 'Stagiaire', value: 'intern' },
       ]
     },
     {
+      id: 'Location',
       key: 'Location',
+      name: 'Localisation',
       label: 'Localisation',
       options: [
-        { key: 'all', label: 'Tous' },
-        { key: 'paris', label: 'Paris' },
-        { key: 'lyon', label: 'Lyon' },
-        { key: 'marseille', label: 'Marseille' },
-        { key: 'remote', label: 'Télétravail' },
+        { id: 'all', key: 'all', label: 'Tous', value: 'all' },
+        { id: 'paris', key: 'paris', label: 'Paris', value: 'paris' },
+        { id: 'lyon', key: 'lyon', label: 'Lyon', value: 'lyon' },
+        { id: 'marseille', key: 'marseille', label: 'Marseille', value: 'marseille' },
+        { id: 'remote', key: 'remote', label: 'Télétravail', value: 'remote' },
       ]
     }
   ]);
@@ -86,12 +70,17 @@ export const SegmentProvider: React.FC<SegmentProviderProps> = ({ children }) =>
 
   return (
     <SegmentContext.Provider value={{ 
+      dimensions,
+      selectedDimension,
+      selectedOption,
+      setSelectedDimension,
+      setSelectedOption,
+      // Additional props
       segments, 
       selectedSegment, 
       setSelectedSegment,
       segment,
       setSegment,
-      dimensions,
       isLoading,
       activeDimension,
       activeOption

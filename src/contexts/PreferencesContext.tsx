@@ -1,12 +1,17 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { UserPreferences, UserPreferencesContextType, DEFAULT_PREFERENCES, NotificationsPreferences } from '@/types/preferences';
+import { 
+  UserPreferences, 
+  UserPreferencesContextType, 
+  DEFAULT_PREFERENCES, 
+  NotificationsPreferences
+} from '@/types/preferences';
 
 // Create the context
 const PreferencesContext = createContext<UserPreferencesContextType>({
   preferences: DEFAULT_PREFERENCES,
   theme: DEFAULT_PREFERENCES.theme || 'system',
-  fontSize: DEFAULT_PREFERENCES.fontSize || 'medium',
+  fontSize: DEFAULT_PREFERENCES.fontSize || 'md',
   language: DEFAULT_PREFERENCES.language || 'fr',
   notifications: DEFAULT_PREFERENCES.notifications as NotificationsPreferences,
   privacy: DEFAULT_PREFERENCES.privacy || 'private',
@@ -24,13 +29,55 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Extract main properties for context
   const theme = preferences.theme || 'system';
-  const fontSize = preferences.fontSize || 'medium';
+  const fontSize = preferences.fontSize || 'md';
   const language = preferences.language || 'fr';
   
-  // Normalize notifications
-  const notifications: NotificationsPreferences = typeof preferences.notifications === 'boolean'
-    ? { enabled: preferences.notifications, emailEnabled: false, pushEnabled: false }
-    : preferences.notifications || { enabled: true, emailEnabled: true, pushEnabled: false };
+  // Normalize notifications with type safety
+  let notifications: NotificationsPreferences;
+  
+  if (typeof preferences.notifications === 'boolean') {
+    notifications = { 
+      enabled: preferences.notifications, 
+      emailEnabled: false, 
+      pushEnabled: false,
+      types: {
+        news: true,
+        updates: true,
+        reminders: true,
+        alerts: true,
+        emotions: true,
+        insights: true
+      },
+      frequency: 'daily',
+      quietHours: {
+        enabled: false,
+        from: '22:00',
+        to: '08:00'
+      },
+      tone: 'friendly'
+    };
+  } else {
+    notifications = preferences.notifications as NotificationsPreferences || {
+      enabled: true,
+      emailEnabled: true,
+      pushEnabled: false,
+      types: {
+        news: true,
+        updates: true,
+        reminders: true,
+        alerts: true,
+        emotions: true,
+        insights: true
+      },
+      frequency: 'daily',
+      quietHours: {
+        enabled: false,
+        from: '22:00',
+        to: '08:00'
+      },
+      tone: 'friendly'
+    };
+  }
   
   // Normalize privacy preferences
   const privacy = preferences.privacy || 'private';
@@ -44,8 +91,10 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
       // Implement the actual update logic here (e.g., API call to update user preferences)
       // For now, we'll just update the local state
       setPreferences({ ...preferences, ...newPreferences });
+      return Promise.resolve();
     } catch (err: any) {
       setError(err instanceof Error ? err : new Error('Failed to update preferences'));
+      return Promise.reject(err);
     } finally {
       setIsLoading(false);
     }

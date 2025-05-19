@@ -30,7 +30,7 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result, classNa
           <div>
             <h3 className="text-lg font-semibold">{result.emotion}</h3>
             <p className="text-sm text-muted-foreground">
-              Confiance: {Math.round(result.confidence * 100)}% | Intensité: {Math.round(result.intensity || 0 * 100)}%
+              Confiance: {Math.round(result.confidence * 100)}% | Intensité: {Math.round((result.intensity || 0) * 100)}%
             </p>
           </div>
         </div>

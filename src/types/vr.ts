@@ -66,7 +66,7 @@ export interface VRSessionHistoryProps {
   limit?: number;
   showHeader?: boolean;
   className?: string;
-  onSessionSelect?: (sessionId: string) => void;
+  onSessionSelect?: (session: VRSession) => void;
   sessions?: VRSession[];
   onSelect?: (template: VRSessionTemplate | VRSession) => void;
   emptyMessage?: string;

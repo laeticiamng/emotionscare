@@ -28,42 +28,53 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
   allowFiltering = true,
 }) => {
   const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
-  const [selectedDimension, setSelectedDimension] = useState<string | null>(null);
+  const [selectedDimensionId, setSelectedDimensionId] = useState<string | null>(null);
   const segmentContext = useSegment();
 
-  // Define default context handlers
-  const defaultContextHandlers: Pick<SegmentContextType, 'setSelectedDimension' | 'setSelectedOption' | 'dimensions'> = {
-    setSelectedDimension: (_: string) => {},
-    setSelectedOption: (_: string) => {},
-    dimensions: [] as SegmentDimension[]
+  // Define default context handlers with correct type signatures
+  const defaultContextHandlers: Partial<SegmentContextType> = {
+    dimensions: [] as SegmentDimension[],
+    setSelectedDimension: () => {},
+    setSelectedOption: () => {},
   };
 
   // Use either context or defaults
   const {
-    setSelectedDimension: contextSetSelectedDimension,
-    setSelectedOption: contextSetSelectedOption,
-    dimensions: contextDimensions
+    dimensions: contextDimensions,
+    setSelectedDimension,
+    setSelectedOption
   } = segmentContext || defaultContextHandlers;
 
   // If dimensions are provided in props, use them instead of context
-  const availableDimensions = dimensions.length > 0 ? dimensions : contextDimensions;
+  const availableDimensions = dimensions.length > 0 ? dimensions : (contextDimensions || []);
 
   const handleDimensionChange = (value: string) => {
-    setSelectedDimension(value);
-    if (contextSetSelectedDimension) {
-      contextSetSelectedDimension(value);
+    setSelectedDimensionId(value);
+    
+    // Find the full dimension object
+    const dimension = availableDimensions.find(d => d.id === value);
+    if (dimension && setSelectedDimension) {
+      setSelectedDimension(dimension);
     }
   };
 
   const handleOptionChange = (value: string) => {
-    if (contextSetSelectedOption) {
-      contextSetSelectedOption(value);
+    // Find the full option object
+    if (!selectedDimensionId) return;
+    
+    const dimension = availableDimensions.find(d => d.id === selectedDimensionId);
+    if (!dimension) return;
+    
+    const option = dimension.options.find(o => o.value === value);
+    
+    if (option && setSelectedOption) {
+      setSelectedOption(option);
     }
   };
 
   const getCurrentDimensionOptions = (): SegmentOption[] => {
-    if (!selectedDimension) return [];
-    const dimension = availableDimensions.find(d => d.id === selectedDimension);
+    if (!selectedDimensionId) return [];
+    const dimension = availableDimensions.find(d => d.id === selectedDimensionId);
     return dimension ? dimension.options : [];
   };
 
@@ -89,7 +100,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
               <SelectContent>
                 {availableDimensions.map((dim) => (
                   <SelectItem key={dim.id} value={dim.id}>
-                    {dim.label}
+                    {dim.label || dim.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -105,7 +116,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
       </CardHeader>
       
       <CardContent>
-        {selectedDimension && getCurrentDimensionOptions().length > 0 && (
+        {selectedDimensionId && getCurrentDimensionOptions().length > 0 && (
           <div className="mb-4">
             <Select onValueChange={handleOptionChange}>
               <SelectTrigger className="w-full h-8">

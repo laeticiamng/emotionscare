@@ -1,52 +1,54 @@
 
-import { NotificationPreference, NotificationFrequency } from './notification';
+import { Theme, FontSize, FontFamily } from './theme';
+import { NotificationFrequency, NotificationTone } from './notification';
 
-export type ThemeType = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSizeType = 'small' | 'medium' | 'large' | 'xlarge';
-export type FontFamily = 'sans' | 'serif' | 'mono' | 'system' | 'rounded';
-export type PrivacyLevel = 'private' | 'friends' | 'public';
+export interface NotificationsPreferences {
+  enabled: boolean;
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  inAppEnabled?: boolean;
+  types?: {
+    news?: boolean;
+    updates?: boolean;
+    reminders?: boolean;
+    alerts?: boolean;
+    emotions?: boolean;
+    insights?: boolean;
+  };
+  frequency?: NotificationFrequency;
+  quietHours?: {
+    enabled: boolean;
+    from: string;
+    to: string;
+  };
+  tone?: NotificationTone;
+}
 
 export interface PrivacyPreferences {
-  shareActivity?: boolean;
-  shareEmotionalStatus?: boolean;
-  shareJournal?: boolean;
-  shareBadges?: boolean;
-  shareProfile?: boolean;
-  defaultVisibility?: PrivacyLevel;
-  // Add fields used in PrivacyPreferences.tsx
-  dataSharing?: boolean;
-  analytics?: boolean;
-  thirdParty?: boolean;
-  shareData?: boolean;
-  anonymizeReports?: boolean;
-  profileVisibility?: string;
+  shareData: boolean;
+  shareEmotions: boolean;
+  shareActivity: boolean;
+  publicProfile: boolean;
 }
 
 export interface UserPreferences {
-  theme: ThemeType;
-  fontSize?: FontSizeType;
+  theme?: Theme;
+  fontSize?: FontSize;
   fontFamily?: FontFamily;
   language?: string;
-  notifications?: NotificationPreference | boolean;
-  privacy?: PrivacyLevel | PrivacyPreferences;
-  soundEnabled?: boolean;
-  reduceMotion?: boolean;
-  highContrast?: boolean;
+  notifications?: NotificationsPreferences | boolean;
+  privacy?: PrivacyPreferences | 'private' | 'public';
+  vibration?: boolean;
+  soundEffects?: boolean;
+  darkMode?: boolean;
   colorBlindMode?: boolean;
-  animationReduced?: boolean;
-  autoplayMedia?: boolean;
-  dataUsage?: 'low' | 'medium' | 'high';
-  ambientSound?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  shareData?: boolean; // For DataPrivacySettings.tsx
-  anonymizedData?: boolean; // For DataPrivacySettings.tsx
+  highContrast?: boolean;
+  reduceMotion?: boolean;
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'system',
-  fontSize: 'medium',
-  fontFamily: 'system',
+  fontSize: 'md',
   language: 'fr',
   notifications: {
     enabled: true,
@@ -54,67 +56,45 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
     pushEnabled: false,
     inAppEnabled: true,
     types: {
-      system: true,
-      emotion: true,
-      coach: true,
-      journal: true,
-      community: true,
-      achievement: true,
-      badge: true,
-      challenge: true,
-      reminder: true,
-      info: true,
-      warning: true,
-      error: true,
-      success: true,
-      streak: true,
-      urgent: true
+      news: true,
+      updates: true,
+      reminders: true,
+      alerts: true,
+      emotions: true,
+      insights: true
     },
-    frequency: 'immediate'
+    frequency: 'daily',
+    quietHours: {
+      enabled: false,
+      from: '22:00',
+      to: '08:00'
+    },
+    tone: 'friendly'
   },
   privacy: 'private',
-  soundEnabled: true,
-  reduceMotion: false,
-  highContrast: false,
+  vibration: true,
+  soundEffects: true,
+  darkMode: false,
   colorBlindMode: false,
-  autoplayMedia: true,
-  dataUsage: 'medium',
-  ambientSound: true,
-  emotionalCamouflage: false,
-  aiSuggestions: true
+  highContrast: false,
+  reduceMotion: false
 };
 
 export interface UserPreferencesContextType {
   preferences: UserPreferences;
-  theme: ThemeType;
-  fontSize: FontSizeType;
+  theme: Theme;
+  fontSize: FontSize;
   language: string;
-  notifications: NotificationPreference;
-  privacy: PrivacyLevel | PrivacyPreferences;
+  notifications: NotificationsPreferences;
+  privacy: PrivacyPreferences | 'private' | 'public';
   updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
   resetPreferences: () => void;
   isLoading: boolean;
   error: Error | null;
 }
 
-// Function to normalize preferences with default values
-export const normalizePreferences = (prefs: Partial<UserPreferences> | null): UserPreferences => {
-  if (!prefs) {
-    return DEFAULT_PREFERENCES;
-  }
-  
-  return {
-    ...DEFAULT_PREFERENCES,
-    ...prefs
-  };
-};
-
-// Updated interface for PreferencesForm.tsx
 export interface UserPreferencesFormProps {
-  preferences: UserPreferences;
   onSave: (preferences: UserPreferences) => void;
   isLoading?: boolean;
+  preferences: UserPreferences;
 }
-
-// Export NotificationsPreferences
-export type NotificationsPreferences = NotificationPreference;

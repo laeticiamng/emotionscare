@@ -1,5 +1,6 @@
 
 import { createContext, useEffect, useState } from "react";
+import { ThemeContextType } from "@/types/theme";
 
 type Theme = "dark" | "light" | "system";
 
@@ -9,15 +10,19 @@ type ThemeProviderProps = {
   storageKey?: string;
 };
 
-type ThemeProviderState = {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-};
-
-export const ThemeProviderContext = createContext<ThemeProviderState>({
+// Create a default context with required properties
+const defaultThemeContext: ThemeContextType = {
   theme: "system",
   setTheme: () => null,
-});
+  fontSize: "md",
+  setFontSize: () => {},
+  systemTheme: "light",
+  isDarkMode: false,
+  soundEnabled: false,
+  reduceMotion: false,
+};
+
+export const ThemeProviderContext = createContext<ThemeContextType>(defaultThemeContext);
 
 export function ThemeProvider({
   children,
@@ -28,6 +33,8 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
+  const [fontSize, setFontSize] = useState("md");
+  const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -39,6 +46,7 @@ export function ThemeProvider({
         ? "dark"
         : "light";
 
+      setSystemTheme(systemTheme);
       root.classList.add(systemTheme);
       return;
     }
@@ -52,6 +60,11 @@ export function ThemeProvider({
       localStorage.setItem(storageKey, theme);
       setTheme(theme);
     },
+    fontSize,
+    setFontSize,
+    systemTheme,
+    soundEnabled: false,
+    reduceMotion: false,
   };
 
   return (

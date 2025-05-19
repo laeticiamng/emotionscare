@@ -3,7 +3,6 @@ import React from 'react';
 import { EmotionScanFormProps } from '@/types/emotion'; 
 import EmotionScanForm from './EmotionScanForm';
 
-// Update the component props to match EmotionScanFormProps
 const ScanTabContent: React.FC<{ 
   onClose: () => void; 
   userId: string;
@@ -18,12 +17,16 @@ const ScanTabContent: React.FC<{
       <EmotionScanForm 
         onScanComplete={(result) => {
           // Handle scan result
-          onEmotionDetected(); 
-          onClose();
+          if (onEmotionDetected) {
+            onEmotionDetected(); 
+          }
+          if (onClose) {
+            onClose();
+          }
         }} 
-        onClose={onClose}
         userId={userId}
         onEmotionDetected={onEmotionDetected}
+        onClose={onClose}
       />
     </div>
   );
