@@ -2,19 +2,21 @@
 # Changelog
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
-## [1.1.9] - 2025-05-26
-
-### Corrigé
-- Nettoyage des commentaires superflus dans `Notification` et uniformisation des types
-- Mise à jour du hook `use-notifications` pour importer `NotificationFilter`
-- Harmonisation des énumérations `NotificationType` et `NotificationFilter`
-
 ## [1.1.8] - 2025-05-26
 
 ### Corrigé
-- Typage `Notification` complété (`linkTo`, `content`, `date`, `isRead`)
-- Alignement des hooks et services sur ce type unifié
-- Nettoyage des déclarations locales dans `useNotifications`
+- Typage unifié de `ThemeContextType` avec les préférences d'accessibilité
+  (`reduceMotion`, `setReduceMotion`, etc.).
+- Création de `OrchestrationContextType` dans `src/types/orchestration.ts` et
+  ajustement des imports correspondants.
+- Correction de `AppProviders` avec l'ordre complet des providers.
+- Ajout de `history` dans l'état initial de `MusicContext`.
+
+### Technique
+- Mise à jour des exports globaux dans `src/types.ts`.
+
+
+
 
 ## [1.1.5] - 2025-05-23
 

@@ -41,8 +41,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // State
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
-  const [queue, setQueue] = useState<MusicQueueItem[]>([]);
-  const [history, setHistory] = useState<MusicQueueItem[]>([]);
+  const [queue, setQueue] = useState<MusicTrack[]>([]);
+  const [history, setHistory] = useState<MusicTrack[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.75);
   const [muted, setMuted] = useState(false);
@@ -235,6 +235,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsPlaying,
     setIsInitialized,
     setCurrentTrack,
+    setHistory,
     setEmotion,
   };
 

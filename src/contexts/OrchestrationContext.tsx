@@ -2,7 +2,18 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { v4 as uuidv4 } from 'uuid';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
+import {
+  MoodEvent,
+  Prediction,
+  PredictionRecommendation,
+  EmotionalLocation,
+  SanctuaryWidget,
+  EmotionalSynthesis,
+  OrchestrationEvent,
+  OrchestrationContextType
+} from '@/types/orchestration';
+import { EmotionResult } from '@/types/emotion';
 
 // Fix the import for types - import from local types folder rather than @types
 import { EmotionSource } from '@/types/orchestration';

@@ -1,29 +1,37 @@
 
-export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large' | 'xlarge';
-export type FontFamily = 'sans' | 'serif' | 'mono' | 'system' | 'rounded';
-
-export interface Theme {
-  name: ThemeName;
-  label: string;
-  className: string;
-  value?: string;
-}
+export type Theme = 'light' | 'dark' | 'system' | 'pastel';
+export type FontSize =
+  | 'xs'
+  | 'sm'
+  | 'small'
+  | 'medium'
+  | 'md'
+  | 'lg'
+  | 'large'
+  | 'xl'
+  | 'xlarge';
+export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded';
 
 export interface ThemeContextType {
-  theme: ThemeName;
-  setTheme: (theme: ThemeName) => void;
-  toggleTheme: () => void;
-  isDark: boolean;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
   isDarkMode: boolean;
-  fontSize: FontSize;
-  setFontSize: (size: FontSize) => void;
-  fontFamily: FontFamily;
-  setFontFamily: (family: FontFamily) => void;
-  systemTheme: ThemeName;
+  isDark?: boolean;
+  toggleTheme: () => void;
+  fontSize?: FontSize;
+  setFontSize?: (size: FontSize) => void;
+  fontFamily?: FontFamily;
+  setFontFamily?: (family: FontFamily) => void;
+  systemTheme?: 'light' | 'dark';
+  preferences?: any;
+  updatePreferences?: (newPrefs: any) => void;
+  getContrastText?: (color: string) => string;
   soundEnabled?: boolean;
-  reduceMotion: boolean;
   setSoundEnabled?: (enabled: boolean) => void;
+  reduceMotion: boolean;
+
+
+
   setReduceMotion: (reduced: boolean) => void;
   preferences?: any;
   updatePreferences?: (prefs: any) => void;
