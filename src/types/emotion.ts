@@ -1,10 +1,12 @@
 
+
 export interface EmotionRecommendation {
   type: string;
   title: string;
   description: string;
   content: string;
   category: string;
+  emotion?: string;
 }
 
 export interface EmotionResult {
@@ -24,6 +26,7 @@ export interface EmotionResult {
   primaryEmotion?: string; // For EnhancedCoachAI
   date?: string; // For EmotionScanResult
   audioUrl?: string; // For AudioProcessor
+  transcript?: string; // Added missing property
 }
 
 export interface LiveVoiceScannerProps {
@@ -37,7 +40,7 @@ export interface LiveVoiceScannerProps {
 
 export interface EmotionScanFormProps {
   onScanComplete?: (result: EmotionResult) => void;
-  userId?: string;
+  userId?: string; // Added missing property
   onEmotionDetected?: () => void;
   onClose?: () => void;
 }
@@ -77,3 +80,4 @@ export interface Emotion {
   value?: string;
   id?: string;
 }
+

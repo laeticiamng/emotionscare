@@ -7,6 +7,7 @@ const UserDashboardSections: React.FC = () => {
   const recommendedSessions: VRSessionTemplate[] = [
     {
       id: '1',
+      name: 'Méditation matinale',
       title: 'Méditation matinale',
       description: 'Commencez votre journée avec une méditation guidée pour un esprit clair',
       duration: 15,
@@ -20,6 +21,7 @@ const UserDashboardSections: React.FC = () => {
     },
     {
       id: '2',
+      name: 'Relaxation profonde',
       title: 'Relaxation profonde',
       description: 'Une session immersive pour libérer le stress et retrouver l\'équilibre',
       duration: 25,
@@ -47,12 +49,12 @@ const UserDashboardSections: React.FC = () => {
                 {session.thumbnailUrl && (
                   <img 
                     src={session.thumbnailUrl} 
-                    alt={session.title}
+                    alt={session.title || session.name}
                     className="w-full h-full object-cover rounded"
                   />
                 )}
               </div>
-              <h4 className="font-medium">{session.title}</h4>
+              <h4 className="font-medium">{session.title || session.name}</h4>
               <p className="text-sm text-muted-foreground">{session.description}</p>
               <div className="flex items-center gap-2 mt-2">
                 <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">

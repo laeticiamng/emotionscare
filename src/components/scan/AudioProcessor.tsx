@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, StopCircle, AlertCircle } from 'lucide-react';
@@ -155,7 +154,8 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
             text: "J'ai passé une journée tranquille aujourd'hui.",
             audioUrl: URL.createObjectURL(audioBlob),
             transcript: "J'ai passé une journée tranquille aujourd'hui.",
-            emotions: {}  // Add empty emotions object to satisfy type
+            emotions: {},  // Add empty emotions object to satisfy type
+            emojis: ['😌', '🧘‍♂️'] // Add required emojis property
           };
           
           onResult(fakeResult);
