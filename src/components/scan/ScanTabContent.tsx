@@ -1,4 +1,8 @@
 
+import React from 'react';
+import { EmotionScanFormProps } from '@/types/emotion'; 
+import EmotionScanForm from './EmotionScanForm';
+
 // Update the component props to match EmotionScanFormProps
 const ScanTabContent: React.FC<{ 
   onClose: () => void; 
@@ -6,7 +10,7 @@ const ScanTabContent: React.FC<{
 }> = ({ onClose, userId }) => {
   const onEmotionDetected = () => {
     // Handle emotion detection
-    // This will be a prop we'll update the EmotionScanForm to use
+    // This will be used by EmotionScanForm
   };
 
   return (
@@ -14,12 +18,15 @@ const ScanTabContent: React.FC<{
       <EmotionScanForm 
         onScanComplete={(result) => {
           // Handle scan result
-          onEmotionDetected(); // Call the function that was previously passed as a prop
+          onEmotionDetected(); 
           onClose();
         }} 
         onClose={onClose}
         userId={userId}
+        onEmotionDetected={onEmotionDetected}
       />
     </div>
   );
 };
+
+export default ScanTabContent;
