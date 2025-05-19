@@ -74,6 +74,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
           <div className="mt-4">
             <TabsContent value="voice" className="m-0">
               <LiveVoiceScanner 
+                onScanComplete={handleAnalysisComplete}
                 onResult={handleAnalysisComplete}
                 isProcessing={isProcessing}
                 setIsProcessing={setIsProcessing}

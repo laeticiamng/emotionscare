@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff, Loader2 } from 'lucide-react';
@@ -107,12 +106,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
   const processAudio = async (audioBlob: Blob) => {
     updateProcessingState(true);
     // Simulate audio processing with a mock result
-    const mockResult = {
-      emotion: 'Happy',
-      intensity: Math.random(),
-      score: Math.random() * 100,
-      feedback: 'Voix joyeuse détectée',
-    };
+    const mockResult = generateMockResult();
     
     // Update to use the correct properties
     if (onResult && mockResult) {
@@ -125,7 +119,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
         id: 'mock-id-' + Date.now(),
         emotion: mockResult.emotion,
         score: mockResult.score,
-        confidence: 0.85,
+        confidence: mockResult.confidence,
         text: "Sample text",
         emojis: ["😊"],
         recommendations: recommendations,
@@ -166,6 +160,34 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       {error && <p className="text-red-500">{error}</p>}
     </div>
   );
+};
+
+const generateMockResult = (): EmotionResult => {
+  // Create valid recommendations
+  const recommendations: EmotionRecommendation[] = [
+    { 
+      type: "music",
+      title: "Relax playlist", 
+      description: "Soothing sounds to relax your mind",
+      content: "Check out our curated playlist for relaxation", 
+    },
+    { 
+      type: "exercise",
+      title: "Quick breathing", 
+      description: "Simple breathing exercise",
+      content: "Try this 2-minute breathing exercise" 
+    }
+  ];
+  
+  return {
+    id: `audio-analysis-${Date.now()}`,
+    emotion: Math.random() > 0.5 ? 'calm' : 'happy',
+    confidence: Math.random() * 0.3 + 0.7,
+    intensity: Math.random() * 0.5 + 0.5,
+    recommendations,
+    text: "Sample audio for analysis",
+    timestamp: new Date().toISOString()
+  };
 };
 
 export default AudioProcessor;

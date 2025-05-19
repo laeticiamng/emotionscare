@@ -1,4 +1,6 @@
 
+// Re-export all types from respective type files
+
 export type {
   User,
   AuthUser,
@@ -8,9 +10,7 @@ export type {
 
 export type {
   UserPreferences,
-} from './types/preferences';
-
-export type {
+  UserPreferencesFormProps,
   UserPreferencesContextType,
 } from './types/preferences';
 
@@ -20,6 +20,7 @@ export type {
   ThemeName,
   Theme,
   ThemeContextType,
+  ThemeOption,
 } from './types/theme';
 
 export type {
@@ -35,10 +36,13 @@ export type {
   DraggableKpiCardsGridProps, 
   GlobalOverviewTabProps,
   DashboardWidgetConfig,
+  DashboardWidget,
   GamificationData,
   KpiCardStatus,
   KpiDelta,
-  KpiCardsGridProps
+  KpiCardsGridProps,
+  TeamSummary,
+  AdminAccessLog
 } from './types/dashboard';
 
 export type { SidebarContextType } from './types/sidebar';
@@ -90,7 +94,8 @@ export type {
   EmotionalTeamViewProps,
   EmotionRecommendation,
   TextEmotionScannerProps,
-  EmojiEmotionScannerProps
+  EmojiEmotionScannerProps,
+  VoiceEmotionScannerProps
 } from './types/emotion';
 
 export type {
@@ -101,15 +106,15 @@ export type {
   VRSessionTemplate,
   VRSession,
   VRSessionWithMusicProps,
-  VRSessionHistoryProps
+  VRSessionHistoryProps,
+  VRTemplateDetailProps
 } from './types/vr';
 
-// B2B Admin dashboard types
 export type {
-  TeamSummary,
-  AdminAccessLog,
-  DashboardWidget
-} from './types/dashboard';
+  SegmentOption,
+  SegmentDimension,
+  SegmentContextType
+} from './types/segment';
 
 export type {
   AnonymizedEmotion,
@@ -118,7 +123,8 @@ export type {
 } from './types/analytics';
 
 export type {
-  SegmentOption,
-  SegmentDimension,
-  SegmentContextType
-} from './types/segment';
+  ScanType,
+  ScanResult,
+  ScanHistoryItem,
+  EmotionGamificationStats
+} from './types/scan';

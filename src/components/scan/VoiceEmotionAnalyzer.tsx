@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 import { Button } from '@/components/ui/button';
@@ -43,7 +44,7 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult })
     setTimeout(() => {
       setIsProcessing(false);
       
-      // Create mock recommendations that are proper EmotionRecommendation objects
+      // Create mock recommendations
       const recommendations: EmotionRecommendation[] = [
         { 
           type: "music", 

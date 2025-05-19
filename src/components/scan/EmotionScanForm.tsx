@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import TextEmotionScanner from './TextEmotionScanner';
@@ -21,7 +20,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
   const [scanMethod, setScanMethod] = useState<'text' | 'voice'>('text');
   const [scanResult, setScanResult] = useState<EmotionResult | null>(null);
   const [isLoadingResult, setIsLoadingResult] = useState(false);
-  
+
   const handleScanResult = (result: EmotionResult) => {
     setScanResult(result);
     

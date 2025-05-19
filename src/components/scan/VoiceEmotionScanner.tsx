@@ -1,144 +1,119 @@
 
-import React, { useState, useRef } from 'react';
-import { Button } from "@/components/ui/button";
-import { Mic, Loader2, Square } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { v4 as uuidv4 } from 'uuid';
-import { EmotionResult } from '@/types/emotion';
+import React, { useState } from 'react';
+import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
+import { Button } from '@/components/ui/button';
+import { Mic, StopCircle } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
-interface VoiceEmotionScannerProps {
+export interface VoiceEmotionScannerProps {
   onResult?: (result: EmotionResult) => void;
-  onComplete?: (result: EmotionResult) => void;
+  onProcessingChange?: (isProcessing: boolean) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onResult, onComplete }) => {
+const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ 
+  onResult, 
+  onProcessingChange,
+  isProcessing: externalIsProcessing,
+  setIsProcessing: externalSetIsProcessing 
+}) => {
   const [isRecording, setIsRecording] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const { toast } = useToast();
+  const [progress, setProgress] = useState(0);
+  const [localIsProcessing, setLocalIsProcessing] = useState(false);
+  
+  const isProcessing = externalIsProcessing !== undefined ? externalIsProcessing : localIsProcessing;
+  const setIsProcessing = externalSetIsProcessing || ((value) => {
+    setLocalIsProcessing(value);
+    if (onProcessingChange) {
+      onProcessingChange(value);
+    }
+  });
 
-  const handleStartRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      
-      mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start();
-      
-      setIsRecording(true);
-      
-      toast({
-        title: "Enregistrement démarré",
-        description: "Parlez de comment vous vous sentez aujourd'hui...",
+  const startRecording = () => {
+    setIsRecording(true);
+    setProgress(0);
+    
+    // Simulate recording progress
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          stopRecording();
+          return 100;
+        }
+        return prev + 10;
       });
-    } catch (error) {
-      console.error("Error accessing microphone:", error);
-      toast({
-        title: "Erreur d'accès au microphone",
-        description: "Veuillez autoriser l'accès à votre microphone pour utiliser cette fonctionnalité.",
-        variant: "destructive",
-      });
-    }
+    }, 500);
   };
-
-  const handleStopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
+  
+  const stopRecording = () => {
+    setIsRecording(false);
+    setIsProcessing(true);
+    
+    // Simulate processing delay
+    setTimeout(() => {
+      setIsProcessing(false);
       
-      // Stop all audio tracks
-      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      // Create mock recommendations that are proper EmotionRecommendation objects
+      const recommendations: EmotionRecommendation[] = [
+        { 
+          type: "music", 
+          title: "Calm playlist", 
+          description: "Soothing music to relax",
+          content: "Check out our curated relaxation playlist" 
+        },
+        { 
+          type: "exercise", 
+          title: "Quick stretch", 
+          description: "Light exercise to release tension",
+          content: "Try these simple desk stretches" 
+        },
+        { 
+          type: "meditation", 
+          title: "5-minute meditation", 
+          description: "Brief mindfulness break",
+          content: "Focus on your breath for 5 minutes" 
+        }
+      ];
       
-      setIsRecording(false);
-      setIsAnalyzing(true);
-      
-      // Mock analysis delay
-      setTimeout(analyzeVoice, 1500);
-    }
+      if (onResult) {
+        onResult({
+          id: `voice-analysis-${Date.now()}`,
+          emotion: 'calm',
+          confidence: 0.85,
+          intensity: 0.7,
+          recommendations,
+          timestamp: new Date().toISOString(),
+          emojis: ['😌', '🧘'],
+          text: "Analyzing your voice detected calm emotional patterns"
+        });
+      }
+    }, 2000);
   };
-
-  const analyzeVoice = () => {
-    // Mock result
-    const mockResult: EmotionResult = {
-      id: uuidv4(),
-      emotion: "calm",
-      confidence: 0.82,
-      intensity: 0.65,
-      emojis: ["😌"],
-      text: "Je me sens plutôt bien aujourd'hui, même si j'ai eu quelques moments de stress ce matin.",
-      feedback: "Votre voix indique un état de calme relatif avec une légère tension sous-jacente.",
-      timestamp: new Date().toISOString(),
-      source: "voice",
-      score: 0.78
-    };
-    
-    setIsAnalyzing(false);
-    
-    if (onResult) {
-      onResult(mockResult);
-    }
-    
-    if (onComplete) {
-      onComplete(mockResult);
-    }
-    
-    toast({
-      title: "Analyse terminée",
-      description: `Émotion détectée : ${mockResult.emotion}`,
-    });
-  };
-
+  
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col items-center justify-center border border-dashed border-border rounded-lg p-8 bg-muted/30">
+    <div className="flex flex-col items-center justify-center p-6 bg-muted rounded-lg">
+      <Button
+        onClick={startRecording}
+        disabled={isRecording || isProcessing}
+        className="p-4 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 disabled:opacity-50"
+      >
         {isRecording ? (
-          <div className="relative w-16 h-16 mb-4">
-            <div className="absolute inset-0 bg-red-500 rounded-full opacity-75 animate-ping"></div>
-            <div className="relative flex items-center justify-center w-16 h-16 bg-red-500 rounded-full">
-              <Mic className="h-8 w-8 text-white" />
-            </div>
-          </div>
+          <StopCircle className="h-8 w-8 animate-spin" />
         ) : (
-          <Mic className="h-12 w-12 text-muted-foreground mb-4" />
+          <Mic className="h-8 w-8" />
         )}
-        
-        <p className="text-center text-muted-foreground">
-          {isRecording 
-            ? "Enregistrement en cours... Parlez naturellement de votre journée et de vos sentiments." 
-            : isAnalyzing
-              ? "Analyse de votre voix en cours..."
-              : "Enregistrez votre voix pour analyser votre état émotionnel"}
-        </p>
-      </div>
-      
-      {isRecording ? (
-        <Button 
-          onClick={handleStopRecording} 
-          variant="destructive" 
-          className="w-full"
-          size="lg"
-        >
-          <Square className="mr-2 h-4 w-4" />
-          Arrêter l'enregistrement
-        </Button>
-      ) : (
-        <Button 
-          onClick={handleStartRecording} 
-          disabled={isAnalyzing} 
-          className="w-full"
-          size="lg"
-        >
-          {isAnalyzing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyse en cours...
-            </>
-          ) : (
-            <>
-              <Mic className="mr-2 h-4 w-4" />
-              Commencer l'enregistrement
-            </>
-          )}
-        </Button>
+      </Button>
+      <p className="mt-4 text-center text-sm">
+        {isRecording
+          ? "Enregistrement en cours... Veuillez parler naturellement."
+          : isProcessing
+          ? "Traitement de votre voix..."
+          : "Cliquez pour enregistrer votre voix"}
+      </p>
+      {isRecording && (
+        <Progress value={progress} max={100} className="mt-4" />
       )}
     </div>
   );

@@ -24,6 +24,8 @@ export interface VRSessionTemplate {
   audio_url?: string;
   audioTrack?: string;
   preview_url?: string;
+  theme?: string;
+  difficulty?: string;
 }
 
 export interface VRSession {
@@ -33,6 +35,7 @@ export interface VRSession {
   duration: number;
   completed?: boolean;
   startedAt?: Date | string;
+  startTime?: Date | string;
   date?: Date | string;
   completedAt?: Date | string;
   template?: VRSessionTemplate;
@@ -50,16 +53,28 @@ export interface VRSession {
 }
 
 export interface VRSessionWithMusicProps {
-  sessionTemplate: VRSessionTemplate;
+  sessionTemplate?: VRSessionTemplate;
+  session?: VRSession;
+  template?: VRSessionTemplate;
   onComplete?: () => void;
+  onExit?: () => void;
+  sessionId?: string;
+  title?: string;
+  description?: string;
+  duration?: number;
+  environment?: string;
   className?: string;
 }
 
 export interface VRSessionHistoryProps {
   sessions: VRSession[];
-  onSelect: (session: VRSession) => void;
+  onSelect?: (session: VRSession) => void;
+  onSessionSelect?: (session: VRSession) => void;
   emptyMessage?: string;
   limitDisplay?: number;
+  limit?: number;
+  userId?: string;
+  showHeader?: boolean;
   className?: string;
 }
 

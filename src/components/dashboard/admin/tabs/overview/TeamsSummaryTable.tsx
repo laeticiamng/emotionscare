@@ -9,62 +9,46 @@ const mockTeams: TeamSummary[] = [
   {
     id: '1',
     name: 'Équipe Marketing',
-    count: 12,
-    emotionAverage: '78%',
-    trend: "up",
-    lastUpdated: new Date(),
     memberCount: 12,
-    averageEmotionalScore: 78,
-    leaderName: 'Marie Lambert',
-    department: 'Marketing',
     activeUsers: 10,
+    averageScore: 78,
+    trend: 3.2,
     trendDirection: 'up',
-    trendValue: 3.2
+    trendValue: 3.2,
+    department: 'Marketing',
   },
   {
     id: '2',
     name: 'Équipe Technique',
-    count: 18,
-    emotionAverage: '72%',
-    trend: "down",
-    lastUpdated: new Date(),
     memberCount: 18,
-    averageEmotionalScore: 72,
-    leaderName: 'Thomas Durand',
-    department: 'Technique',
     activeUsers: 15,
+    averageScore: 72,
+    trend: -2.1,
     trendDirection: 'down',
-    trendValue: 2.1
+    trendValue: 2.1,
+    department: 'Technique',
   },
   {
     id: '3',
     name: 'Équipe Design',
-    count: 8,
-    emotionAverage: '82%',
-    trend: "up",
-    lastUpdated: new Date(),
     memberCount: 8,
-    averageEmotionalScore: 82,
-    leaderName: 'Sophie Martin',
-    department: 'Design',
     activeUsers: 8,
+    averageScore: 82,
+    trend: 4.5,
     trendDirection: 'up',
-    trendValue: 4.5
+    trendValue: 4.5,
+    department: 'Design',
   },
   {
     id: '4',
     name: 'Équipe Finance',
-    count: 6,
-    emotionAverage: '68%',
-    trend: "neutral",
-    lastUpdated: new Date(),
     memberCount: 6,
-    averageEmotionalScore: 68,
-    leaderName: 'Pierre Dupont',
-    department: 'Finance',
     activeUsers: 5,
+    averageScore: 68,
+    trend: 0.3,
     trendDirection: 'stable',
-    trendValue: 0.3
+    trendValue: 0.3,
+    department: 'Finance',
   }
 ];
 
@@ -92,14 +76,14 @@ const TeamsSummaryTable = () => {
                 <div className="flex items-center justify-center">
                   <div
                     className={`inline-block h-2 w-2 rounded-full mr-2 ${
-                      (team.averageEmotionalScore || 0) > 75
+                      (team.averageScore || 0) > 75
                         ? 'bg-green-500'
-                        : (team.averageEmotionalScore || 0) > 65
+                        : (team.averageScore || 0) > 65
                         ? 'bg-yellow-500'
                         : 'bg-red-500'
                     }`}
                   />
-                  {team.averageEmotionalScore}%
+                  {team.averageScore}%
                 </div>
               </TableCell>
               <TableCell className="text-center hidden md:table-cell">
