@@ -15,3 +15,5 @@ export const formatTime = (seconds: number): string => {
   
   return `${formattedMinutes}:${formattedSeconds}`;
 };
+
+export default formatTime;

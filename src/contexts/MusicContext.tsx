@@ -1,11 +1,21 @@
 
-import React, { createContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useCallback, useContext } from 'react';
 import { MusicContextType, MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
-import { normalizeTrack, ensurePlaylist } from '@/utils/musicCompatibility';
-import { emotionPlaylists } from '@/data/emotionPlaylists';
+import { normalizeTrack } from '@/utils/musicCompatibility';
 
-// Création du contexte avec une valeur par défaut
+// Create the context with a default value
 export const MusicContext = createContext<MusicContextType>({} as MusicContextType);
+
+// Export hook to use the context
+export const useMusic = (): MusicContextType => {
+  const context = useContext(MusicContext);
+  
+  if (context === undefined) {
+    throw new Error('useMusic must be used within a MusicProvider');
+  }
+  
+  return context;
+};
 
 interface MusicProviderProps {
   children: React.ReactNode;
@@ -23,26 +33,12 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [isInitialized, setIsInitialized] = useState(true);
 
   // Fonction pour charger une playlist selon une émotion
-  const loadPlaylistForEmotion = useCallback(async (params: EmotionMusicParams): Promise<MusicPlaylist> => {
-    const { emotion, intensity = 0.5 } = params;
+  const loadPlaylistForEmotion = useCallback(async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
+    const emotion = typeof params === 'string' ? params : params.emotion;
+    const intensity = typeof params === 'string' ? 0.5 : (params.intensity ?? 0.5);
     
-    // Recherche dans les playlists prédéfinies
-    const matchingPlaylists = emotionPlaylists.filter(p => 
-      p.emotion?.toLowerCase() === emotion.toLowerCase()
-    );
-    
-    if (matchingPlaylists.length > 0) {
-      // Utiliser l'intensité pour choisir une playlist
-      const playlistIndex = Math.min(
-        Math.floor(intensity * matchingPlaylists.length),
-        matchingPlaylists.length - 1
-      );
-      
-      return matchingPlaylists[playlistIndex];
-    }
-    
-    // Playlist par défaut si rien ne correspond
-    return {
+    // Simulate loading a playlist
+    const mockPlaylist: MusicPlaylist = {
       id: `emotion-${Date.now()}`,
       name: `Playlist ${emotion}`,
       title: `Playlist ${emotion}`,
@@ -69,7 +65,17 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
       coverImage: '/images/covers/ambient.jpg',
       mood: [emotion]
     };
+    
+    return mockPlaylist;
   }, []);
+
+  // Alias for backward compatibility
+  const getRecommendationByEmotion = useCallback((emotion: string | EmotionMusicParams, intensity: number = 0.5) => {
+    if (typeof emotion === 'string') {
+      return loadPlaylistForEmotion({ emotion, intensity });
+    }
+    return loadPlaylistForEmotion(emotion);
+  }, [loadPlaylistForEmotion]);
 
   // Fonction pour générer une musique à partir d'un prompt
   const generateMusic = useCallback(async (prompt: string): Promise<MusicTrack> => {
@@ -90,11 +96,6 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
       tags: ['generated']
     };
   }, []);
-
-  // Fonction pour récupérer une recommendation selon une émotion (alias)
-  const getRecommendationByEmotion = useCallback((emotion: string, intensity: number = 0.5) => {
-    return loadPlaylistForEmotion({ emotion, intensity });
-  }, [loadPlaylistForEmotion]);
 
   // Fonctions de contrôle de lecture
   const playTrack = useCallback((track: MusicTrack) => {
@@ -140,6 +141,21 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     setMuted(prev => !prev);
   }, []);
 
+  // Set emotion function
+  const setEmotion = useCallback((emotion: string) => {
+    console.log(`Setting emotion to ${emotion}`);
+  }, []);
+
+  // Find tracks by mood
+  const findTracksByMood = useCallback((mood: string): MusicTrack[] => {
+    return [];
+  }, []);
+
+  // Toggle drawer function
+  const toggleDrawer = useCallback(() => {
+    setOpenDrawer(prev => !prev);
+  }, []);
+
   // Valeur du contexte
   const contextValue: MusicContextType = {
     currentTrack,
@@ -147,7 +163,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     playlist,
     setPlaylist,
     isPlaying,
-    setIsPlaying,
+    setIsPlaying: setIsPlaying, // Make sure it's included
     volume,
     setVolume,
     currentTime,
@@ -168,7 +184,22 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     loadPlaylistForEmotion,
     getRecommendationByEmotion,
     generateMusic,
-    isInitialized
+    isInitialized,
+    setEmotion,
+    findTracksByMood,
+    toggleDrawer,
+    isShuffled: false,
+    isRepeating: false,
+    toggleShuffle: () => {},
+    toggleRepeat: () => {},
+    queue: [],
+    addToQueue: () => {},
+    clearQueue: () => {},
+    loadPlaylist: () => {},
+    shufflePlaylist: () => {},
+    error: null,
+    setIsInitialized: setIsInitialized,
+    playlists: []
   };
 
   return (
