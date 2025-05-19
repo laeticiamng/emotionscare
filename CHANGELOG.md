@@ -2,6 +2,20 @@
 # Changelog
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.9] - 2025-05-26
+
+### Corrigé
+- Nettoyage des commentaires superflus dans `Notification` et uniformisation des types
+- Mise à jour du hook `use-notifications` pour importer `NotificationFilter`
+- Harmonisation des énumérations `NotificationType` et `NotificationFilter`
+
+## [1.1.8] - 2025-05-26
+
+### Corrigé
+- Typage `Notification` complété (`linkTo`, `content`, `date`, `isRead`)
+- Alignement des hooks et services sur ce type unifié
+- Nettoyage des déclarations locales dans `useNotifications`
+
 ## [1.1.5] - 2025-05-23
 
 ### Ajouté
