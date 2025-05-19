@@ -31,6 +31,16 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ### Modifié
 - Mise à jour de `README.md` pour référencer ces nouveaux documents
 
+## [1.1.8] - 2025-05-26
+
+### Corrigé
+- Chemins d'import des types globaux (ex. `@/types/global`) remplacés par l'alias `@types/*`.
+- Les types d'orchestration sont désormais centralisés dans `types/orchestration.ts` et réexportés via `src/types.ts` et `src/types/index.ts`.
+- Suppression des doublons `types/analytics.d.ts` et `types/dashboard.d.ts`.
+
+### Autre
+- Mise à jour des configurations TypeScript pour déclarer l'alias `@types/*`.
+
 ## [1.1.4] - 2025-05-22
 
 ### Corrigé
