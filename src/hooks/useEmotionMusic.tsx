@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 
 export interface UseEmotionMusicReturn {
   recommendation: MusicPlaylist | null;

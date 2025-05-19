@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Music, Play } from 'lucide-react';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
-import { useMusicContext } from '@/contexts/MusicContext';
-import { ensurePlaylist, convertToPlaylist } from '@/utils/musicCompatibility';
+import { useMusic } from '@/hooks/useMusic';
 
 interface EmotionMusicRecommendationsProps {
   emotion: string;
@@ -25,7 +24,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
 }) => {
   const [loading, setLoading] = useState(false);
   const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
-  const musicContext = useMusicContext();
+  const musicContext = useMusic();
 
   useEffect(() => {
     const loadRecommendation = async () => {

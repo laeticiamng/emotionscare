@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
