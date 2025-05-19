@@ -7,3 +7,4 @@ export { useUserPreferences } from './UserPreferencesContext';
 export { useUserMode } from './UserModeContext';
 export { useSession } from './SessionContext';
 export { useOrchestration } from './OrchestrationContext';
+export { useSupport } from './SupportContext';

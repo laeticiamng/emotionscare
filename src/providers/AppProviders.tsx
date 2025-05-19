@@ -27,6 +27,9 @@ const AppProviders: React.FC<LayoutProviderProps> = ({ children }) => (
                 <OnboardingProvider steps={DEFAULT_ONBOARDING_STEPS}>
                   {children}
                 </OnboardingProvider>
+                
+                    
+                  </SupportProvider>
                 </OrchestrationProvider>
               </ExtensionsProvider>
             </OptimizationProvider>

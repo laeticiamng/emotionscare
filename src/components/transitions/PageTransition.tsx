@@ -65,4 +65,5 @@ const PageTransition: React.FC<PageTransitionProps> = ({
   );
 };
 
+export { PageTransition };
 export default PageTransition;

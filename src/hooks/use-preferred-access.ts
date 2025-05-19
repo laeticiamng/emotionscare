@@ -4,7 +4,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { getModeDashboardPath, normalizeUserMode } from '@/utils/userModeHelpers';
-import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * Hook qui gère la redirection automatique des utilisateurs
@@ -26,16 +25,45 @@ const usePreferredAccess = () => {
       const normalizedRole = normalizeUserMode(user.role);
       const dashboardPath = getModeDashboardPath(normalizedRole);
       
-      navigate(dashboardPath, { replace: true });
-      
-      // Montrer un toast animé pour expliquer la redirection
-      toast({
-        title: "Redirection automatique",
-        description: `Vous êtes connecté en tant que ${normalizedRole === 'b2b_admin' ? 'administrateur' : 'collaborateur'}`,
-        variant: "default"
-      });
+      // Ajouter un léger délai pour une meilleure expérience visuelle
+      setTimeout(() => {
+        navigate(dashboardPath, { replace: true });
+        
+        // Montrer un toast animé pour expliquer la redirection
+        toast({
+          title: "Redirection automatique",
+          description: `Vous êtes connecté en tant que ${normalizedRole === 'b2b_admin' ? 'administrateur' : 'collaborateur'}`,
+          variant: "default"
+        });
+      }, 300);
       
       console.log('[usePreferredAccess] Redirected user to dashboard:', dashboardPath);
+    }
+    
+    // Si l'utilisateur tente d'accéder à un dashboard qui ne correspond pas à son rôle,
+    // le rediriger vers le bon dashboard
+    if (isAuthenticated && user?.role && 
+        (location.pathname.includes('/dashboard') || location.pathname.includes('/profile'))) {
+      
+      const normalizedRole = normalizeUserMode(user.role);
+      const correctPathPrefix = 
+        normalizedRole === 'b2b_admin' ? '/b2b/admin' :
+        normalizedRole === 'b2b_user' ? '/b2b/user' :
+        '/b2c';
+      
+      // Vérifier si l'utilisateur est sur le mauvais dashboard
+      if (!location.pathname.startsWith(correctPathPrefix)) {
+        const correctDashboardPath = getModeDashboardPath(normalizedRole);
+        
+        toast({
+          title: "Accès non autorisé",
+          description: `Redirection vers votre espace ${normalizedRole === 'b2b_admin' ? 'administrateur' : 
+            normalizedRole === 'b2b_user' ? 'collaborateur' : 'personnel'}`,
+          variant: "default"
+        });
+        
+        navigate(correctDashboardPath, { replace: true });
+      }
     }
   }, [isAuthenticated, user, isLoading, navigate, location.pathname, toast]);
 
