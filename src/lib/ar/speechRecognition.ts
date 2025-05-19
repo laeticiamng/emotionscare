@@ -1,6 +1,5 @@
 
 import { toast } from '@/hooks/use-toast';
-import { SpeechRecognition } from '@/types/speech';
 
 export interface SpeechRecognitionResult {
   transcript: string;
@@ -19,7 +18,7 @@ export interface RecognitionOptions {
 }
 
 export class SpeechRecognitionService {
-  private recognition: SpeechRecognition | null = null;
+  private recognition: any = null;
   private isSupported: boolean = false;
   private isListening: boolean = false;
   
@@ -63,18 +62,19 @@ export class SpeechRecognitionService {
         if (options.onEnd) options.onEnd();
       };
       
-      this.recognition.onerror = (event) => {
+      this.recognition.onerror = (event: any) => {
         if (options.onError) options.onError(event.error);
       };
       
-      this.recognition.onresult = (event) => {
-        if (options.onResult && event.results.length > 0) {
-          const lastResult = event.results[event.results.length - 1];
+      this.recognition.onresult = (event: any) => {
+        if (options.onResult && event.results && event.results.length > 0) {
+          const lastResultIndex = event.resultIndex || 0;
+          const lastResult = event.results[lastResultIndex];
           
-          if (lastResult.length > 0) {
+          if (lastResult && lastResult[0]) {
             const transcript = lastResult[0].transcript;
             const confidence = lastResult[0].confidence;
-            const isFinal = lastResult.isFinal;
+            const isFinal = lastResult.isFinal !== undefined ? lastResult.isFinal : true;
             
             options.onResult({
               transcript,

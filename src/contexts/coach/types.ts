@@ -8,6 +8,7 @@ export interface CoachContextType {
   loading?: boolean;
   conversations: ChatConversation[];
   currentConversation: ChatConversation | null;
+  activeConversationId?: string | null;
   sendMessage: (
     content: string,
     sender?: 'user' | 'assistant' | 'system' | 'coach'
@@ -20,4 +21,10 @@ export interface CoachContextType {
   characterImage?: string;
   characterRole?: string;
   currentEmotion?: string | null;
+  lastEmotion?: string | null;
+  emotionHistory?: any[];
+  addMessage?: (message: Omit<ChatMessage, 'id'>) => void;
+  startNewConversation?: (title?: string) => string;
+  setActiveConversation?: (id: string) => void;
+  updateLastEmotion?: (emotion: string) => void;
 }

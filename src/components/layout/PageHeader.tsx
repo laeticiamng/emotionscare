@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
 import ThemeSelector from '@/components/theme/ThemeSelector';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/hooks/use-theme';
 import { ThemeName } from '@/types/theme';
 
 interface PageHeaderProps {

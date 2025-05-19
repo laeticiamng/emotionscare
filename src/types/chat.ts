@@ -1,4 +1,3 @@
-
 // Define the types for Chat related components
 
 export interface ChatMessage {
@@ -15,6 +14,8 @@ export interface ChatMessage {
   emotion?: string; // Added for emotional context
   /** Flag for UI helpers identifying if message was sent by the user */
   isUser?: boolean;
+  /** Flag to indicate loading state for UI */
+  isLoading?: boolean;
 }
 
 export interface ChatConversation {
