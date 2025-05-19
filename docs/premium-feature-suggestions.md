@@ -48,3 +48,46 @@ Ce document regroupe les pistes d'améliorations proposées pour la version prem
 - Analytics avancés intégrés (engagement, feedback, heatmaps de navigation)
 - Intégration d'API tierces (Slack, Teams, outils RH, calendriers, etc.)
 - Rappel bien-être automatique (push/e‑mail) personnalisé selon le profil émotionnel
+
+## Suggestions Premium Nouvelles — Modules 1 à 8 (Codex/Fond)
+
+### 1. Page d’accueil immersive & sélection de mode
+- Accueil personnalisé via reconnaissance device/profil : affichage dynamique selon les préférences déjà enregistrées (dark mode, langue…).
+- Landing multilingue auto-détectée, avec auto-switch du contenu selon la langue/navigateur.
+- Système de tracking RGPD-friendly qui propose de personnaliser l’accueil dès la première visite (onboarding interactif avec save « en guest »).
+
+### 2. Connexion/Inscription B2C & expérience post-login
+- Authentification biométrique (FaceID, TouchID) pour mobile, si device compatible.
+- Score de sécurité de mot de passe avec conseils en temps réel (zxcvbn ou algo custom).
+- Pré-inscription via réseaux sociaux (OAuth) avec mapping auto du profil et onboarding émotionnel dès la première connexion.
+
+### 3. Connexion/Inscription & Dashboard B2B (User/Admin)
+- Intégration d’un « Company Directory » automatique (remontée des collègues, rôles, équipes, onboarding collectif).
+- Système de « badge de présence/émotion » partagé en équipe : chaque collaborateur renseigne/partage son humeur du jour, visible en dashboard.
+- Suivi de « parcours émotionnel entreprise » : analytics anonymisés sur l’évolution globale de l’ambiance.
+
+### 4. Shell, layout général et navigation premium
+- Layout « adaptive cards » : dashboard qui s’auto-restructure selon la taille d’écran ou les préférences utilisateur.
+- « Side drawer universel » contextuel : suggestions, rappels, aide IA affichés dynamiquement selon l’endroit où tu navigues.
+- Shortcuts globaux personnalisables (type « Cmd+K palette » à la Linear/Slack) pour accéder à n’importe quelle feature/page en 1 ou 2 touches.
+
+### 5. Module musique & MusicDrawer intelligent
+- Playlist « émotion du jour » auto-générée selon le carnet émotionnel et le calendrier (lundi « focus », vendredi « relax », etc.).
+- Mode « collaboratif live » : plusieurs utilisateurs écoutent la même playlist synchronisée en temps réel (pour teambuilding/rituel RH).
+- Personnalisation de la spatialisation audio (3D/binaural si casque compatible).
+
+### 6. Coach IA & chat émotionnel
+- Système de « mémoire émotionnelle IA » : l’IA retient le contexte, les problématiques récurrentes, propose des rappels, des synthèses de suivi (« il y a 7 jours, vous disiez…»).
+- « Coaching multi-modal » : le coach IA peut envoyer des conseils vocaux, vidéos, ou intégrer des exercices interactifs (breathing, mini-jeux d’attention).
+- Analyse sentimentale en live (avec consentement) sur la voix ou l’expression faciale lors des chats vidéo.
+
+### 7. Paramètres utilisateur & personnalisation
+- Gestion d’« identité multiple » : possibilité de switcher entre plusieurs profils utilisateurs/personas (pro, perso, guest…).
+- Historique complet des préférences et possibilité de « rollback » (restaurer une ancienne config/thème).
+- Centre de préférences « IA-powered » : suggestions automatiques pour améliorer le bien-être en fonction de l’usage (« essayez le mode relax plus souvent le soir !»).
+
+### 8. Dashboard RH & Supervision collective B2B
+- Module « prévention proactive » : détection automatique des signaux faibles (AEG, absentéisme, stress) avec alertes et recommandations d’action personnalisées pour les RH.
+- Comparaison inter-équipes / inter-sites / historique avec visualisation temps réel (heatmaps, clusters déémotions…).
+- Intégration d’objectifs bien-être d’équipe : suivi d’engagement collectif (ex. « Objectif équipe : 90% de humeurs positives cette semaine », avec feedback IA).
+
