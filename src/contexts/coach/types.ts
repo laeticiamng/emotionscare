@@ -4,7 +4,7 @@ import { ChatMessage } from '@/types/chat';
 export interface CoachContextType {
   messages: ChatMessage[];
   isTyping: boolean;
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (content: string, history?: any[]) => Promise<string>;
   clearMessages: () => void;
   isOpen?: boolean;
   setIsOpen?: (open: boolean) => void;
@@ -12,4 +12,5 @@ export interface CoachContextType {
   characterName?: string;
   characterImage?: string;
   characterRole?: string;
+  loading?: boolean;
 }

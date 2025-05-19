@@ -14,13 +14,17 @@ export interface Badge {
   unlockedAt?: string;
   unlocked_at?: string;
   date?: string;
-  category?: string; // Add category for compatibility
-  achieved?: boolean; // Add achieved property for GamificationSummaryCard
+  category?: string;
+  achieved?: boolean;
+  earned?: boolean;
+  rarity?: string;
+  icon?: string;
 }
 
 export interface Challenge {
   id: string;
   title: string;
+  name?: string;
   description: string;
   progress: number;
   goal: number;
@@ -28,4 +32,13 @@ export interface Challenge {
   status: string;
   reward: any;
   unlocked: boolean;
+  category?: string;
+  difficulty?: string;
+  completions?: number;
+  total?: number;
+  totalSteps?: number;
+  deadline?: string;
+  completed?: boolean;
+  isCompleted?: boolean;
+  icon?: string;
 }

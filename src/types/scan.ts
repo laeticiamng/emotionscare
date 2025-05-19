@@ -6,6 +6,8 @@ export interface EmotionScanFormProps {
   onEmotionDetected?: () => void;
   onClose?: () => void;
   onScanComplete?: (result: EmotionResult) => void;
+  defaultTab?: string;
+  onProcessingChange?: (processing: boolean) => void;
 }
 
 export type ScanType = 'text' | 'facial' | 'audio' | 'manual' | 'voice' | 'emoji';

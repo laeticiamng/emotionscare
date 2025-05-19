@@ -23,10 +23,10 @@ export interface EmotionResult {
   emojis?: string[];
   emotions?: Record<string, number>;
   user_id?: string;
-  textInput?: string; // Added to support existing code
-  audioUrl?: string; // Added to support existing code
-  facialExpression?: string; // Added to support existing code
-  transcript?: string; // Added to support existing code
+  textInput?: string;
+  audioUrl?: string;
+  facialExpression?: string;
+  transcript?: string;
   
   // Add missing properties that are used in components
   score?: number;
@@ -35,6 +35,7 @@ export interface EmotionResult {
   ai_feedback?: string;
   date?: string;
   recommendations?: EmotionRecommendation[];
+  category?: string;
 }
 
 // Update EmotionRecommendation to include all used properties
@@ -79,13 +80,14 @@ export interface TextEmotionScannerProps {
 }
 
 export interface EmojiEmotionScannerProps {
-  onSelect?: (emotion: string) => void;
+  onResult?: (result: EmotionResult) => void;
   onClose?: () => void;
 }
 
 export interface VoiceEmotionScannerProps {
   onResult?: (result: EmotionResult) => void;
   onClose?: () => void;
+  onProcessingChange?: (processing: boolean) => void;
 }
 
 // Add EmotionScanFormProps for ScanTabContent component
@@ -94,4 +96,6 @@ export interface EmotionScanFormProps {
   onEmotionDetected?: () => void;
   onClose?: () => void;
   onScanComplete?: (result: EmotionResult) => void;
+  defaultTab?: string;
+  onProcessingChange?: (processing: boolean) => void;
 }

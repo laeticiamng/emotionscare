@@ -2,32 +2,31 @@
 import { Badge } from '@/types/badge';
 
 /**
- * Normalize badge properties to handle different property names across components
+ * Normalizes a badge object to ensure all required properties are present
  */
-export const normalizeBadge = (badge: any): Badge => {
+export function normalizeBadge(badge: any): Badge {
   return {
-    id: badge.id,
-    name: badge.name,
-    description: badge.description,
-    imageUrl: badge.imageUrl || badge.image_url || badge.image || badge.icon_url || '',
-    earned: badge.earned || badge.unlocked || badge.achieved || !!badge.earnedAt || !!badge.unlockedAt || !!badge.unlocked_at || false,
-    progress: badge.progress || 0,
-    earnedAt: badge.earnedAt || badge.unlockedAt || badge.unlocked_at || badge.dateEarned,
-    isNew: badge.isNew || false,
-    category: badge.category || '',
+    id: badge.id || `badge-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+    name: badge.name || 'Unknown Badge',
+    description: badge.description || 'No description',
+    imageUrl: badge.imageUrl || badge.image_url || badge.icon || '/badges/default.png',
+    image_url: badge.image_url || badge.imageUrl || badge.icon || '/badges/default.png',
+    unlocked: badge.unlocked || badge.completed || !!badge.unlockedAt || !!badge.unlocked_at || false,
+    level: badge.level || 1,
     tier: badge.tier || 'bronze',
-    threshold: badge.threshold || badge.total || 100,
-    // Propriétés additionnelles pour compatibilité
-    image_url: badge.imageUrl || badge.image_url || badge.image || badge.icon_url || '',
-    image: badge.imageUrl || badge.image_url || badge.image || badge.icon_url || '',
-    unlocked: badge.earned || badge.unlocked || badge.achieved || !!badge.earnedAt || !!badge.unlockedAt || !!badge.unlocked_at || false,
-    achieved: badge.earned || badge.unlocked || badge.achieved || !!badge.earnedAt || !!badge.unlockedAt || !!badge.unlocked_at || false
+    progress: badge.progress !== undefined ? badge.progress : 0,
+    threshold: badge.threshold !== undefined ? badge.threshold : 100,
+    completed: badge.completed || badge.unlocked || false,
+    category: badge.category || 'general',
+    earned: badge.earned || badge.achieved || badge.unlocked || false,
+    rarity: badge.rarity || 'common',
+    icon: badge.icon || badge.imageUrl || badge.image_url || '/badges/default.png',
   };
-};
+}
 
 /**
- * Normalize an array of badges
+ * Normalizes an array of badge objects
  */
-export const normalizeBadges = (badges: any[]): Badge[] => {
+export function normalizeBadges(badges: any[]): Badge[] {
   return badges.map(normalizeBadge);
-};
+}

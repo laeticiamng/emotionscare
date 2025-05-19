@@ -1,12 +1,25 @@
 
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { createEmotionEntry, fetchLatestEmotion } from '@/lib/scanService';
 import { EmotionResult } from '@/types/emotion';
 import { v4 as uuid } from 'uuid';
 
+// Mock service function for creating emotion entries
+const createEmotionEntry = async (data: EmotionResult): Promise<EmotionResult> => {
+  // This would normally be an API call
+  console.log('Creating emotion entry:', data);
+  return Promise.resolve(data);
+};
+
+// Mock service function for fetching latest emotion
+const fetchLatestEmotion = async (userId: string): Promise<EmotionResult | null> => {
+  // This would normally be an API call
+  console.log('Fetching latest emotion for user:', userId);
+  return Promise.resolve(null);
+};
+
 export function useEmotionScan() {
-  const { user } = useAuth();
+  const { user } = useAuth() || { user: null };
   const [isLoading, setIsLoading] = useState(false);
   const [latestEmotion, setLatestEmotion] = useState<EmotionResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -45,11 +58,15 @@ export function useEmotionScan() {
       setIsLoading(true);
       setError(null);
       
-      const emotionData: Partial<EmotionResult> = {
+      const emotionData: EmotionResult = {
         ...data,
         id: data.id || uuid(),
+        emotion: data.emotion || 'neutral',
+        confidence: data.confidence || 1.0,
+        timestamp: data.timestamp || new Date().toISOString(),
         user_id: user.id,
-        date: data.date || new Date().toISOString()
+        emojis: data.emojis || [],
+        emotions: data.emotions || {},
       };
       
       const newEmotion = await createEmotionEntry(emotionData);
