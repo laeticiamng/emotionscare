@@ -63,14 +63,22 @@ export interface NotificationMessage {
 export interface Notification {
   id: string;
   title: string;
-  message: string;
+  /** Main text content of the notification */
+  message?: string;
+  /** Optional alternative content field */
+  content?: string;
   type: string;
   userId: string;
   read: boolean;
+  /** Some hooks also use the `isRead` property */
+  isRead?: boolean;
   createdAt: string;
   timestamp?: string;
+  /** Alternative date field for older components */
+  date?: string;
   action_text?: string;
   action_link?: string;
+  linkTo?: string;
   metadata?: Record<string, any>;
   image?: string;
   icon?: string;

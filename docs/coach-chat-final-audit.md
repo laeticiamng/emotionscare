@@ -20,6 +20,7 @@ Plusieurs erreurs de typage ont été corrigées:
 - Conflit de type dans les composants coach
 - Incohérences entre les interfaces `ChatMessage` des différents fichiers
 - Manque de typage strict pour les émotions et recommandations
+- Absence de synchronisation entre `contexts/coach` et `types/chat`
 
 ## 2. Améliorations implémentées
 
@@ -66,6 +67,7 @@ Plusieurs erreurs de typage ont été corrigées:
 - **Lazy loading**: Chargement asynchrone des avatars et animations lourdes
 - **Découplage UI/logique**: Séparation claire entre la présentation et la logique métier
 - **Composants atomiques**: Architecture modulaire facilitant la maintenance
+- **Types unifiés**: `ChatMessage` et `Conversation` partagés entre les contextes
 
 ## 4. Recommandations futures
 

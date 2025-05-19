@@ -323,6 +323,7 @@ Des audits complémentaires sont disponibles dans le dossier `docs` :
 - `scan-audio-type-fixes.md` : corrections de typage pour les modules scan/audio
 - `ui-polish-restoration.md` : rétablissement de l'apparence initiale
 
+
 ## Équipe et contribution
 
 EmotionsCare est un produit développé par [Votre Entreprise], avec une équipe dédiée au développement, au design et à l'expérience utilisateur.

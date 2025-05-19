@@ -54,12 +54,15 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
                     Session #{session.id.substring(0, 6)}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {formatDistance(new Date(session.startTime), new Date(), { addSuffix: true })}
+                    {formatDistance(new Date(session.startTime || session.startedAt || session.createdAt || new Date()), new Date(), { addSuffix: true })}
                   </div>
                 </div>
-                {session.endTime && (
+                {(session.endTime || session.endedAt) && (
                   <div className="text-xs text-muted-foreground mt-1">
-                    Duration: {formatDistance(new Date(session.startTime), new Date(session.endTime))}
+                    Duration: {formatDistance(
+                      new Date(session.startTime || session.startedAt || session.createdAt || new Date()),
+                      new Date(session.endTime || session.endedAt || new Date())
+                    )}
                   </div>
                 )}
               </div>

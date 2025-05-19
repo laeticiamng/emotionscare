@@ -2,6 +2,13 @@
 # Changelog
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.8] - 2025-05-26
+
+### Corrigé
+- Typage `Notification` complété (`linkTo`, `content`, `date`, `isRead`)
+- Alignement des hooks et services sur ce type unifié
+- Nettoyage des déclarations locales dans `useNotifications`
+
 ## [1.1.5] - 2025-05-23
 
 ### Ajouté
@@ -48,6 +55,10 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 
 ### Ajouté
 - Documentation `docs/scan-audio-type-fixes.md` décrivant les corrections.
+
+
+
+
 
 ## [1.1.4] - 2025-05-22
 

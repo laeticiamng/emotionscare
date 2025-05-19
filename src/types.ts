@@ -99,6 +99,16 @@ export type {
 } from './types/emotion';
 
 export type {
+  MoodEvent,
+  Prediction,
+  PredictionRecommendation,
+  EmotionalLocation,
+  SanctuaryWidget,
+  EmotionalSynthesis,
+  OrchestrationEvent
+} from '@types/orchestration';
+
+export type {
   JournalEntry
 } from './types/journal';
 

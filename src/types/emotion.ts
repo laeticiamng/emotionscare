@@ -1,4 +1,3 @@
-
 export interface EmotionData {
   emotion: string;
   confidence: number;
@@ -7,6 +6,8 @@ export interface EmotionData {
   arousal?: number;
   dominance?: number;
   timestamp?: string;
+  tags?: string[];
+  value?: number;
 }
 
 export interface EmotionRecommendation {
@@ -23,6 +24,8 @@ export interface EmotionRecommendation {
   duration?: number;
   intensity?: 'low' | 'medium' | 'high';
   tags?: string[];
+  actionLink?: string;
+  actionText?: string;
 }
 
 export interface EmotionResult {
@@ -38,6 +41,7 @@ export interface EmotionResult {
   sessionId?: string;
   language?: string;
   data?: EmotionData[];
+  tags?: string[]; // Added tags property
 
   // Extended fields for compatibility
   id?: string;
@@ -54,7 +58,12 @@ export interface EmotionResult {
   emotions?: Record<string, number>;
   date?: string; // Date for display
   audioUrl?: string;
+  audio_url?: string; // Alternative name
   transcript?: string;
+  facialExpression?: string;
+  textInput?: string;
+  user_id?: string; // Alternative name
+  isLoading?: boolean;
 }
 
 export type EmotionSource =
@@ -64,9 +73,11 @@ export type EmotionSource =
   | 'emoji'
   | 'system'
   | 'ai'
+  | 'manual'
   | 'live-voice'
   | 'voice-analyzer'
-  | 'audio-processor';
+  | 'audio-processor'
+  | 'text-analysis';
 
 export interface EmotionHistoryItem extends EmotionResult {
   id: string;
@@ -98,6 +109,41 @@ export interface Emotion {
   color: string;
   icon?: string;
   description?: string;
+  id?: string;
+  emotion?: string;
+  emoji?: string;
+  confidence?: number;
+  intensity?: number;
+  date?: string;
+  source?: string;
+  text?: string;
+  transcript?: string;
+  audioUrl?: string;
+  feedback?: string;
+  score?: number;
+  userId?: string;
+  user_id?: string;
+}
+
+export interface MoodData {
+  emotion: string;
+  intensity: number;
+  date?: string;  // Added missing property
+  timestamp: string;
+  context?: string;
+  source?: string;
+  id?: string;
+  userId?: string; // Added missing property
+}
+
+export interface EmotionPrediction {
+  emotion: string;
+  probability: number;
+  triggers?: string[];
+  timeframe?: string;
+  recommendations?: string[];
+  timestamp?: string; // Added missing property
+  confidence?: number; // Added missing property
 }
 
 export interface EmojiEmotionScannerProps {
@@ -112,12 +158,12 @@ export interface EmojiEmotionScannerProps {
 export interface EmotionalTeamViewProps {
   teamId: string;
   period?: 'day' | 'week' | 'month';
-  anonymized?: boolean; // Added for compatibility
-  dateRange?: [Date, Date]; // Added for compatibility
-  showGraph?: boolean; // Added for compatibility
-  showMembers?: boolean; // Added for compatibility
-  className?: string; // Added for compatibility
-  showDetails?: boolean; // Added for compatibility
+  anonymized?: boolean;
+  dateRange?: [Date, Date];
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
+  showDetails?: boolean;
 }
 
 export interface TextEmotionScannerProps {

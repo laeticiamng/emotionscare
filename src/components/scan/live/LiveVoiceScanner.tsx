@@ -19,7 +19,7 @@ const randomEmotion = (): string => {
 
 // Create a mock result generator function
 const createMockResult = (): EmotionResult => {
-  const emotion = randomEmotion();
+  const detectedEmotion = randomEmotion();
   const recommendations: EmotionRecommendation[] = [
     {
       id: "rec-live-1",
@@ -41,7 +41,7 @@ const createMockResult = (): EmotionResult => {
 
   return {
     id: `voice-${Date.now()}`,
-    emotion: emotion,
+    emotion: detectedEmotion,
     confidence: Math.random() * 0.4 + 0.6,
     intensity: Math.random() * 0.5 + 0.5,
     recommendations: recommendations,

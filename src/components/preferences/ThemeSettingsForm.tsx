@@ -2,10 +2,10 @@
 import React from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { useTheme } from '@/contexts/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Moon, Sun, Monitor, PenTool } from 'lucide-react';
-import { FontSize, FontFamily, Theme } from '@/types/theme';
+import { FontSize, FontFamily, ThemeName } from '@/types/theme';
 
 const ThemeSettingsForm = () => {
   const { theme, setTheme, fontSize, setFontSize, fontFamily, setFontFamily } = useTheme();
@@ -22,7 +22,7 @@ const ThemeSettingsForm = () => {
         <CardContent>
           <RadioGroup
             value={theme}
-            onValueChange={(value) => setTheme(value as Theme)}
+            onValueChange={(value) => setTheme(value as ThemeName)}
             className="grid grid-cols-2 sm:grid-cols-4 gap-2"
           >
             <div className="flex items-center space-x-2">
