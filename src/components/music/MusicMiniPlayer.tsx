@@ -4,6 +4,7 @@ import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
 
 interface MusicMiniPlayerProps {
   className?: string;
@@ -17,7 +18,7 @@ const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
     resume,
     next,
     previous,
-    prevTrack, // Use prevTrack instead of previousTrack
+    prevTrack,
     muted,
     toggleMute 
   } = useMusic();
@@ -52,6 +53,9 @@ const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
     return null;
   }
 
+  const title = getTrackTitle(currentTrack);
+  const artist = getTrackArtist(currentTrack);
+
   return (
     <div className={cn("flex items-center space-x-2", className)}>
       <Button onClick={handlePrevious} size="icon" variant="ghost">
@@ -83,9 +87,9 @@ const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
       </Button>
 
       <div className="hidden sm:block truncate max-w-[120px]">
-        <p className="text-xs font-medium truncate">{currentTrack?.title || 'Sans titre'}</p>
+        <p className="text-xs font-medium truncate">{title || 'Sans titre'}</p>
         <p className="text-xs text-muted-foreground truncate">
-          {currentTrack?.artist || 'Artiste inconnu'}
+          {artist || 'Artiste inconnu'}
         </p>
       </div>
     </div>

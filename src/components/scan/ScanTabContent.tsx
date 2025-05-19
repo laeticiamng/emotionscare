@@ -44,7 +44,6 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({
       ) : (
         <EmotionScanForm 
           onScanComplete={handleScanComplete}
-          onEmotionDetected={onEmotionDetected}
           onClose={onClose}
         />
       )}

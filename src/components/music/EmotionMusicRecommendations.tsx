@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Music } from 'lucide-react';
+import { Play, Music } from 'lucide-react';
 import { useMusic } from '@/hooks/useMusic';
-import { ensurePlaylist, convertToPlaylist } from '@/utils/musicCompatibility';
+import { ensurePlaylist } from '@/utils/musicCompatibility';
 import { EmotionMusicParams } from '@/types/music';
 
 interface EmotionMusicRecommendationsProps {
@@ -60,7 +60,9 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   }, [emotion]);
 
   const handlePlayMusic = async () => {
-    await loadPlaylistForEmotion(recommendedEmotion);
+    if (loadPlaylistForEmotion) {
+      await loadPlaylistForEmotion(recommendedEmotion);
+    }
   };
 
   return (

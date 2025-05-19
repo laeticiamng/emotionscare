@@ -1,186 +1,194 @@
 
-/**
- * MOCK DATA
- * Ce fichier respecte strictement les types officiels MusicTrack et MusicPlaylist
- * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
- */
-
 import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { v4 as uuidv4 } from 'uuid';
+import { mapAudioUrlToUrl } from '@/utils/musicCompatibility';
 
-// Tracks de musique fictifs
-export const mockMusicTracks: MusicTrack[] = [
+// Corrected mock tracks with url property
+export const mockTracks: MusicTrack[] = [
   {
-    id: '1',
-    title: 'Ocean Calm',
+    id: 'track-1',
+    title: 'Sérénité du matin',
     artist: 'Nature Sounds',
-    audioUrl: '/audio/ocean-calm.mp3',
-    coverUrl: '/images/music/ocean.jpg',
-    duration: 245,
+    audioUrl: '/audio/morning-serenity.mp3',
+    url: '/audio/morning-serenity.mp3',
+    coverUrl: '/images/covers/nature-morning.jpg',
+    duration: 180,
     emotion: 'calm',
-    intensity: 0.3,
-    album: 'Nature Relaxation',
+    intensity: 3,
+    album: 'Sons de la Nature',
     year: 2022,
-    tags: ['ocean', 'calm', 'nature']
+    tags: ['calm', 'morning', 'nature']
   },
   {
-    id: '2',
-    title: 'Forest Meditation',
-    artist: 'Relaxation Masters',
-    audioUrl: '/audio/forest-meditation.mp3',
-    coverUrl: '/images/music/forest.jpg',
-    duration: 320,
-    emotion: 'calm',
-    intensity: 0.2,
-    album: 'Deep Relaxation',
+    id: 'track-2',
+    title: 'Méditation profonde',
+    artist: 'Zen Master',
+    audioUrl: '/audio/deep-meditation.mp3',
+    url: '/audio/deep-meditation.mp3',
+    coverUrl: '/images/covers/meditation.jpg',
+    duration: 240,
+    emotion: 'relaxed',
+    intensity: 2,
+    album: 'Méditation Zen',
     year: 2021,
-    tags: ['forest', 'meditation', 'nature']
+    tags: ['relaxed', 'zen', 'meditation']
   },
   {
-    id: '3',
-    title: 'Energy Boost',
-    artist: 'Workout Music',
-    audioUrl: '/audio/energy-boost.mp3',
-    coverUrl: '/images/music/energy.jpg',
+    id: 'track-3',
+    title: 'Énergie matinale',
+    artist: 'Wake Up',
+    audioUrl: '/audio/morning-energy.mp3',
+    url: '/audio/morning-energy.mp3',
+    coverUrl: '/images/covers/energy.jpg',
     duration: 195,
     emotion: 'energetic',
-    intensity: 0.8,
-    album: 'Workout Hits',
+    intensity: 8,
+    album: 'Réveil Énergique',
     year: 2023,
-    tags: ['workout', 'energy', 'motivation']
+    tags: ['energetic', 'morning', 'motivation']
   },
   {
-    id: '4',
-    title: 'Deep Focus',
-    artist: 'Concentration Zone',
-    audioUrl: '/audio/deep-focus.mp3',
-    coverUrl: '/images/music/focus.jpg',
-    duration: 380,
-    emotion: 'focus',
-    intensity: 0.5,
-    album: 'Study Sessions',
+    id: 'track-4',
+    title: 'Focus optimal',
+    artist: 'Concentration',
+    audioUrl: '/audio/optimal-focus.mp3',
+    url: '/audio/optimal-focus.mp3',
+    coverUrl: '/images/covers/focus.jpg',
+    duration: 320,
+    emotion: 'focused',
+    intensity: 6,
+    album: 'Concentration Maximale',
     year: 2022,
-    tags: ['focus', 'study', 'concentration']
+    tags: ['focused', 'work', 'productivity']
   },
   {
-    id: '5',
-    title: 'Raindrops',
-    artist: 'Nature Sounds',
-    audioUrl: '/audio/raindrops.mp3',
-    coverUrl: '/images/music/rain.jpg',
-    duration: 290,
-    emotion: 'calm',
-    intensity: 0.4,
-    album: 'Nature Relaxation',
-    year: 2022,
-    tags: ['rain', 'calm', 'nature']
+    id: 'track-5',
+    title: 'Apaisement nocturne',
+    artist: 'Night Sounds',
+    audioUrl: '/audio/night-calm.mp3',
+    url: '/audio/night-calm.mp3',
+    coverUrl: '/images/covers/night.jpg',
+    duration: 360,
+    emotion: 'relaxed',
+    intensity: 2,
+    album: 'Nuits Tranquilles',
+    year: 2021,
+    tags: ['relaxed', 'night', 'sleep']
   },
   {
-    id: '6',
-    title: 'Morning Joy',
-    artist: 'Happy Tunes',
+    id: 'track-6',
+    title: 'Joie matinale',
+    artist: 'Happy Day',
     audioUrl: '/audio/morning-joy.mp3',
-    coverUrl: '/images/music/morning.jpg',
+    url: '/audio/morning-joy.mp3',
+    coverUrl: '/images/covers/joy.jpg',
     duration: 210,
     emotion: 'happy',
-    intensity: 0.6,
-    album: 'Positive Vibes',
+    intensity: 7,
+    album: 'Jours Heureux',
     year: 2023,
     tags: ['happy', 'morning', 'joy']
   },
   {
-    id: '7',
-    title: 'Evening Reflection',
-    artist: 'Calm Composers',
-    audioUrl: '/audio/evening-reflection.mp3',
-    coverUrl: '/images/music/evening.jpg',
-    duration: 340,
+    id: 'track-7',
+    title: 'Nostalgie douce',
+    artist: 'Memory Lane',
+    audioUrl: '/audio/sweet-nostalgia.mp3',
+    url: '/audio/sweet-nostalgia.mp3',
+    coverUrl: '/images/covers/nostalgia.jpg',
+    duration: 285,
     emotion: 'melancholic',
-    intensity: 0.4,
-    album: 'Reflective Moments',
-    year: 2021,
-    tags: ['evening', 'reflection', 'calm']
+    intensity: 4,
+    album: 'Souvenirs',
+    year: 2020,
+    tags: ['melancholic', 'memories', 'reflection']
   },
   {
-    id: '8',
-    title: 'Productivity Flow',
-    artist: 'Concentration Zone',
-    audioUrl: '/audio/productivity-flow.mp3',
-    coverUrl: '/images/music/productivity.jpg',
-    duration: 360,
-    emotion: 'focus',
-    intensity: 0.7,
-    album: 'Deep Work',
+    id: 'track-8',
+    title: 'Calme intérieur',
+    artist: 'Peace Within',
+    audioUrl: '/audio/inner-peace.mp3',
+    url: '/audio/inner-peace.mp3',
+    coverUrl: '/images/covers/peace.jpg',
+    duration: 330,
+    emotion: 'calm',
+    intensity: 2,
+    album: 'Paix Intérieure',
     year: 2022,
-    tags: ['productivity', 'focus', 'flow']
+    tags: ['calm', 'peaceful', 'balance']
   }
 ];
 
-// Playlists par émotion
-export const mockPlaylists: MusicPlaylist[] = [
+// Define the compatible format for tracks
+export const compatibleTrack = {
+  id: 'track-demo',
+  title: 'Démonstration',
+  artist: 'EmotionsCare',
+  url: '/audio/demo.mp3',
+  cover: '/images/covers/demo.jpg',
+  coverUrl: '/images/covers/demo.jpg',
+  coverImage: '/images/covers/demo.jpg',
+  duration: 120,
+  audioUrl: '/audio/demo.mp3',
+  src: '/audio/demo.mp3',
+  track_url: '/audio/demo.mp3',
+  album: 'Démos',
+  year: 2023,
+  tags: ['demo', 'showcase'],
+  genre: 'Ambient',
+  emotion: 'neutral',
+  mood: 'calm',
+  category: ['demo', 'ambient'],
+  intensity: 5,
+  name: 'Démonstration'
+};
+
+// Make sure all tracks are compatible
+export const allTracks: MusicTrack[] = mockTracks.map(mapAudioUrlToUrl);
+
+// Playlists for different emotions
+export const mockMusicPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-calm',
-    name: 'Calme et Sérénité',
-    title: 'Calme et Sérénité',
-    description: 'Des sons apaisants pour retrouver la paix intérieure',
-    coverImage: '/images/music/playlist-calm.jpg',
+    title: 'Moments de calme',
+    description: 'Une sélection de musiques apaisantes pour retrouver votre sérénité',
+    coverUrl: '/images/covers/calm-playlist.jpg',
+    tracks: mockTracks.filter(track => ['calm', 'relaxed'].includes(track.emotion || '')),
     emotion: 'calm',
-    tracks: mockMusicTracks.filter(t => t.emotion === 'calm')
-  },
-  {
-    id: 'playlist-focus',
-    name: 'Concentration Maximale',
-    title: 'Concentration Maximale',
-    description: 'Musique idéale pour les sessions de travail intense',
-    coverImage: '/images/music/playlist-focus.jpg',
-    emotion: 'focus',
-    tracks: mockMusicTracks.filter(t => t.emotion === 'focus')
+    mood: ['calm', 'peaceful'],
+    category: ['relaxation', 'wellness'],
+    tags: ['calm', 'meditation', 'relax']
   },
   {
     id: 'playlist-energy',
-    name: 'Boost d\'Énergie',
-    title: 'Boost d\'Énergie',
-    description: 'Des rythmes entraînants pour retrouver votre dynamisme',
-    coverImage: '/images/music/playlist-energy.jpg',
+    title: 'Boost d\'énergie',
+    description: 'Des morceaux dynamiques pour vous donner un regain d\'énergie',
+    coverUrl: '/images/covers/energy-playlist.jpg',
+    tracks: mockTracks.filter(track => ['energetic', 'happy'].includes(track.emotion || '')),
     emotion: 'energetic',
-    tracks: mockMusicTracks.filter(t => t.emotion === 'energetic')
+    mood: ['energetic', 'upbeat'],
+    category: ['motivation', 'fitness'],
+    tags: ['energy', 'workout', 'motivation']
   },
   {
-    id: 'playlist-happy',
-    name: 'Joie et Bonne Humeur',
-    title: 'Joie et Bonne Humeur',
-    description: 'Des mélodies positives pour égayer votre journée',
-    coverImage: '/images/music/playlist-happy.jpg',
-    emotion: 'happy',
-    tracks: mockMusicTracks.filter(t => t.emotion === 'happy')
+    id: 'playlist-focus',
+    title: 'Concentration maximale',
+    description: 'La musique idéale pour rester concentré pendant votre travail',
+    coverUrl: '/images/covers/focus-playlist.jpg',
+    tracks: mockTracks.filter(track => ['focused'].includes(track.emotion || '')),
+    emotion: 'focused',
+    mood: ['focused', 'concentrated'],
+    category: ['work', 'study'],
+    tags: ['focus', 'productivity', 'concentration']
   },
   {
-    id: 'playlist-melancholy',
-    name: 'Moments de Réflexion',
-    title: 'Moments de Réflexion',
-    description: 'Une ambiance douce pour les moments de contemplation',
-    coverImage: '/images/music/playlist-melancholy.jpg',
-    emotion: 'melancholic',
-    tracks: mockMusicTracks.filter(t => t.emotion === 'melancholic')
+    id: 'playlist-relax',
+    title: 'Détente profonde',
+    description: 'Plongez dans un état de relaxation optimale avec cette sélection',
+    coverUrl: '/images/covers/relax-playlist.jpg',
+    tracks: mockTracks.filter(track => ['relaxed', 'calm'].includes(track.emotion || '')),
+    emotion: 'relaxed',
+    mood: ['relaxed', 'tranquil'],
+    category: ['sleep', 'wellness'],
+    tags: ['relax', 'chill', 'unwind']
   }
 ];
-
-// Fonction pour obtenir les données de musique
-export function getMockMusicData() {
-  return {
-    tracks: mockMusicTracks,
-    playlists: mockPlaylists
-  };
-}
-
-// Fonction d'aide pour créer un nouveau morceau
-export function createTrack(data: Partial<MusicTrack>): MusicTrack {
-  return {
-    id: uuidv4(),
-    title: 'Sans titre',
-    artist: 'Inconnu',
-    duration: 180,
-    audioUrl: '',
-    ...data
-  };
-}

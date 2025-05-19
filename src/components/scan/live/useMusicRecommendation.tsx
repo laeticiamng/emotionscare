@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { MusicTrack, EmotionMusicParams } from '@/types/music';
+import { findTracksByMood } from '@/utils/musicCompatibility';
 
 // Mapping of emotions to music types
 export const EMOTION_TO_MUSIC: Record<string, string> = {
@@ -35,9 +36,8 @@ export function useMusicRecommendation() {
         // Set recommended tracks from the playlist
         setRecommendedTracks(result.tracks);
       } else {
-        // Try to get tracks by mood directly if available
-        const moodTracks = music.findTracksByMood(musicType);
-        setRecommendedTracks(moodTracks);
+        // If no tracks found, create empty array
+        setRecommendedTracks([]);
       }
     } catch (error) {
       console.error('Error loading music recommendations:', error);
@@ -48,7 +48,7 @@ export function useMusicRecommendation() {
   }, [music]);
   
   const playRecommendedTrack = useCallback((track: MusicTrack) => {
-    if (track) {
+    if (track && music.playTrack) {
       music.playTrack(track);
     }
   }, [music]);
@@ -63,16 +63,27 @@ export function useMusicRecommendation() {
   
   const handlePlayMusic = useCallback(async (emotion: string) => {
     const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-    const playlist = await music.loadPlaylistForEmotion({
-      emotion: musicType
-    });
-    
-    if (playlist && playlist.tracks.length > 0) {
-      music.playTrack(playlist.tracks[0]);
-      return true;
+    if (music.loadPlaylistForEmotion) {
+      const playlist = await music.loadPlaylistForEmotion({
+        emotion: musicType
+      });
+      
+      if (playlist && playlist.tracks.length > 0 && music.playTrack) {
+        music.playTrack(playlist.tracks[0]);
+        return true;
+      }
     }
     return false;
   }, [music]);
+  
+  // Find tracks by mood function
+  const findTracksByMoodWrapper = useCallback((mood: string) => {
+    const allTracks: MusicTrack[] = [];
+    if (music.currentPlaylist && music.currentPlaylist.tracks) {
+      return findTracksByMood(music.currentPlaylist.tracks, mood);
+    }
+    return allTracks;
+  }, [music.currentPlaylist]);
   
   return {
     recommendedTracks,
@@ -81,6 +92,7 @@ export function useMusicRecommendation() {
     playFirstRecommendation,
     handlePlayMusic,
     loadRecommendations,
+    findTracksByMood: findTracksByMoodWrapper,
     EMOTION_TO_MUSIC
   };
 }

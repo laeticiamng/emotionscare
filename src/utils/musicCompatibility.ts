@@ -29,12 +29,15 @@ export function ensureTrack(track: any): MusicTrack {
     url: '',
   };
 
+  // Map audioUrl to url if url is missing
+  const url = track.url || track.audioUrl || track.src || track.track_url || '';
+
   return {
     ...track,
     id: track.id || `track-${Date.now()}`,
     title: track.title || track.name || 'Sans titre',
     artist: track.artist || 'Artiste inconnu',
-    url: track.url || track.audioUrl || track.src || track.track_url || '',
+    url: url,
     cover: track.cover || track.coverUrl || track.coverImage || '',
   };
 }
@@ -115,27 +118,14 @@ export async function getRecommendationByEmotion(
   };
 }
 
-// Interface for type marker "Playlist"
-export interface Playlist {
-  id: string;
-  name: string;
-  tracks: any[];
-}
-
-// Helper function to convert MusicPlaylist to Playlist
-export function convertToPlaylist(musicPlaylist: MusicPlaylist): Playlist {
-  return {
-    id: musicPlaylist.id,
-    name: musicPlaylist.title || musicPlaylist.name || 'Sans titre',
-    tracks: musicPlaylist.tracks,
-  };
-}
-
-// Helper function to convert Playlist to MusicPlaylist
-export function convertToMusicPlaylist(playlist: Playlist): MusicPlaylist {
-  return {
-    id: playlist.id,
-    title: playlist.name,
-    tracks: playlist.tracks.map(ensureTrack),
-  };
+// Helper function to find tracks by mood from a collection
+export function findTracksByMood(tracks: MusicTrack[], mood: string): MusicTrack[] {
+  if (!Array.isArray(tracks) || !mood) return [];
+  
+  return tracks.filter(track => {
+    const trackMood = track.mood || track.emotion || '';
+    const trackTags = track.tags || [];
+    return trackMood.toLowerCase().includes(mood.toLowerCase()) || 
+           trackTags.some(tag => tag.toLowerCase().includes(mood.toLowerCase()));
+  });
 }

@@ -1,11 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Music, Disc } from 'lucide-react';
 import { useMusic } from '@/hooks/useMusic';
-import { ensurePlaylist } from '@/utils/musicCompatibility';
-import { MusicPlaylist } from '@/types/music';
 
 interface RecommendedPresetsProps {
   className?: string;
@@ -30,7 +28,9 @@ const RecommendedPresets: React.FC<RecommendedPresetsProps> = ({
   const handlePlayPreset = async (presetId: string) => {
     setLoading(true);
     try {
-      await loadPlaylistForEmotion(presetId);
+      if (loadPlaylistForEmotion) {
+        await loadPlaylistForEmotion(presetId);
+      }
     } catch (error) {
       console.error('Error loading preset:', error);
     } finally {

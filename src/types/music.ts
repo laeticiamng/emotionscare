@@ -35,6 +35,7 @@ export interface MusicPlaylist {
   category?: string | string[];
   tags?: string[];
   name?: string; // Pour compatibilité
+  creator?: string; // Pour afficher l'auteur de la playlist
 }
 
 export interface MusicQueueItem extends MusicTrack {
@@ -56,38 +57,38 @@ export interface MusicState {
 
 export interface MusicContextType extends MusicState {
   // Fonctions de lecture
-  play: (track: MusicTrack, playlist?: MusicPlaylist) => void;
-  pause: () => void;
+  play?: (track: MusicTrack, playlist?: MusicPlaylist) => void;
+  pause?: () => void;
   pauseTrack?: () => void; // Alias pour pause
-  resume: () => void;
+  resume?: () => void;
   resumeTrack?: () => void; // Alias pour resume
-  stop: () => void;
-  next: () => void;
+  stop?: () => void;
+  next?: () => void;
   nextTrack?: () => void; // Alias pour next
-  previous: () => void;
+  previous?: () => void;
   previousTrack?: () => void; // Alias pour previous
   prevTrack?: () => void; // Alias pour previous
   togglePlay?: () => void; // Basculer entre pause/play
   playTrack?: (track: MusicTrack) => void; // Alias pour play
 
   // Contrôles
-  setVolume: (volume: number) => void;
-  toggleMute: () => void;
-  toggleShuffle: () => void;
-  setRepeat: (mode: 'off' | 'track' | 'playlist') => void;
-  seekTo: (time: number) => void;
+  setVolume?: (volume: number) => void;
+  toggleMute?: () => void;
+  toggleShuffle?: () => void;
+  setRepeat?: (mode: 'off' | 'track' | 'playlist') => void;
+  seekTo?: (time: number) => void;
 
   // Gestion des playlists
-  playPlaylist: (playlist: MusicPlaylist, startTrackId?: string) => void;
+  playPlaylist?: (playlist: MusicPlaylist, startTrackId?: string) => void;
   loadPlaylistForEmotion?: (params: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
   generateMusic?: (params: any) => Promise<MusicTrack | null>;
   setPlaylist?: (playlist: MusicPlaylist | null) => void;
   setCurrentTrack?: (track: MusicTrack | null) => void;
   
   // Gestion de la queue
-  addToQueue: (track: MusicTrack) => void;
-  removeFromQueue: (index: number) => void;
-  clearQueue: () => void;
+  addToQueue?: (track: MusicTrack) => void;
+  removeFromQueue?: (index: number) => void;
+  clearQueue?: () => void;
 
   // UI state
   currentTime?: number;
@@ -106,6 +107,9 @@ export interface MusicContextType extends MusicState {
   
   // Aliases for compatibility
   setTrack?: (track: MusicTrack | null) => void;
+  
+  // Function to find tracks by mood
+  findTracksByMood?: (mood: string) => MusicTrack[];
 }
 
 export interface EmotionMusicParams {
