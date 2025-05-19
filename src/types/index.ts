@@ -1,39 +1,12 @@
-/**
- * Type Index
- * --------------------------------------
- * Re-exports all types from respective domain files for easier imports
- */
 
-// Export music types
-export * from './music';
-
-// Export emotion types
-export * from './emotion';
-export * from './emotional-data';
-
-// Export chat types
-export * from './chat';
-
-// Export coach types
-export * from './coach';
-
-// Export VR types
-export * from './vr';
-
-// Export user types
-export * from './user';
+// Re-export all types from their respective files
 export * from './preferences';
-
-// Export gamification types
-export * from './gamification';
-
-// Export navigation types
-export * from './navigation';
-
-// Export specific types
-export * from './auth';
-export * from './theme';
-export * from './badge';
 export * from './dashboard';
+export * from './user';
+export * from './theme';
 export * from './segment';
-export * from './scan';
+export * from './notification';
+export * from './emotion';
+export * from './vr';
+export * from './layout';
+// Add other type exports as needed

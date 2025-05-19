@@ -22,14 +22,12 @@ const PremiumFeatures: React.FC<PremiumFeaturesProps> = ({
 }) => {
   const handleEmotionalCamouflageChange = (enabled: boolean) => {
     onChange({
-      ...preferences,
       emotionalCamouflage: enabled
     });
   };
   
   const handleAiSuggestionsChange = (enabled: boolean) => {
     onChange({
-      ...preferences,
       aiSuggestions: enabled
     });
   };

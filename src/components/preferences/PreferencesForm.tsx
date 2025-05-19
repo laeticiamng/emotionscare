@@ -1,15 +1,9 @@
 
 import React from 'react';
-import { UserPreferences } from '@/types/preferences';
+import { UserPreferences, UserPreferencesFormProps } from '@/types/preferences';
 import PreferencesFormImpl from './PreferencesFormImpl';
 
-interface PreferencesFormProps {
-  preferences: UserPreferences;
-  onSave: (values: Partial<UserPreferences>) => Promise<void>;
-  isLoading?: boolean;
-}
-
-const PreferencesForm: React.FC<PreferencesFormProps> = (props) => {
+const PreferencesForm: React.FC<UserPreferencesFormProps> = (props) => {
   return <PreferencesFormImpl {...props} />;
 };
 

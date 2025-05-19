@@ -34,7 +34,7 @@ const PrivacyPreferencesComponent: React.FC = () => {
       };
     }
     
-    return preferences.privacy;
+    return preferences.privacy as PrivacyPreferences;
   };
   
   const privacySettings = getPrivacySettings();

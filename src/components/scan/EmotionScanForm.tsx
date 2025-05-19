@@ -21,12 +21,16 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
   const [scanResult, setScanResult] = useState<EmotionResult | null>(null);
   const [isLoadingResult, setIsLoadingResult] = useState(false);
 
-  const handleScanResult = (result: EmotionResult) => {
+  const handleEmotionResult = (result: EmotionResult) => {
     setScanResult(result);
     
     if (onEmotionDetected) {
       onEmotionDetected(result);
     }
+  };
+  
+  const handleVoiceProcessingChange = (isProcessing: boolean) => {
+    setIsProcessing(isProcessing);
   };
   
   const renderResult = () => {
@@ -72,7 +76,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
         
         <TabsContent value="text">
           <TextEmotionScanner 
-            onResult={handleScanResult}
+            onResult={handleEmotionResult}
             isProcessing={isLoadingResult}
             setIsProcessing={setIsLoadingResult}
           />
@@ -80,8 +84,8 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
         
         <TabsContent value="voice">
           <VoiceEmotionScanner 
-            onResult={handleScanResult}
-            onProcessingChange={setIsLoadingResult}
+            onResult={handleEmotionResult} 
+            onProcessingChange={handleVoiceProcessingChange} 
           />
         </TabsContent>
       </Tabs>

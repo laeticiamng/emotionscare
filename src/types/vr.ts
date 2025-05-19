@@ -36,7 +36,7 @@ export interface VRSession {
   completed?: boolean;
   startedAt?: Date | string;
   startTime?: Date | string;
-  date?: Date | string;
+  date?: string;
   completedAt?: Date | string;
   template?: VRSessionTemplate;
   notes?: string;
@@ -63,6 +63,7 @@ export interface VRSessionWithMusicProps {
   description?: string;
   duration?: number;
   environment?: string;
+  musicTrackId?: string;
   className?: string;
 }
 

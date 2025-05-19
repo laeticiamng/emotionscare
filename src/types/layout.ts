@@ -1,30 +1,18 @@
 
-import { ReactNode } from 'react';
-
-export interface ShellProps {
-  children?: ReactNode;
-  hideNav?: boolean;
-  hideFooter?: boolean;
-  immersive?: boolean;
-  className?: string;
+export interface LayoutContextType {
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+  toggleSidebar: () => void;
+  showHeader: boolean;
+  setShowHeader: (show: boolean) => void;
+  fullscreen: boolean;
+  setFullscreen: (full: boolean) => void;
+  contentWidth: string;
+  setContentWidth: (width: string) => void;
 }
 
-export interface MainNavbarProps {
-  className?: string;
-  transparent?: boolean;
-  logo?: string;
-}
-
-export interface MainFooterProps {
-  className?: string;
-  simple?: boolean;
-}
-
-export interface UserNavProps {
-  className?: string;
-}
-
-export interface MobileMenuProps {
-  isOpen: boolean;
-  onClose: () => void;
+export interface LayoutProviderProps {
+  children: React.ReactNode;
+  defaultSidebarOpen?: boolean;
+  defaultShowHeader?: boolean;
 }

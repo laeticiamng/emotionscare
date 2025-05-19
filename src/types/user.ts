@@ -1,39 +1,33 @@
 
-export type UserRole = 'user' | 'admin' | 'b2c' | 'b2b_user' | 'b2b_admin';
+export type UserRole = 'user' | 'admin' | 'manager' | 'guest' | 'b2c' | 'b2b_user' | 'b2b_admin';
 
 export interface User {
   id: string;
-  name?: string;
   email: string;
+  name?: string;
   role?: UserRole;
-  avatar?: string;
-  avatar_url?: string; // For backward compatibility
-  avatarUrl?: string; // For backward compatibility
-  displayName?: string; // For backward compatibility
-  created_at?: Date | string; // For backward compatibility
-  preferences?: any;
+  avatar_url?: string;
+  created_at?: string;
   position?: string;
   department?: string;
-  joined_at?: Date | string;
+  joined_at?: string;
 }
 
 export interface AuthUser {
   id: string;
-  name: string;
   email: string;
-  role?: string;
+  name: string;
+  role?: UserRole;
   avatar?: string;
-  avatar_url?: string; // For backward compatibility
-  avatarUrl?: string; // For backward compatibility
-  displayName?: string; // For backward compatibility
-  company?: string;
-  department?: string;
+  created_at?: string;
   position?: string;
-  createdAt?: Date | string;
-  created_at?: Date | string;
+  department?: string;
+  joined_at?: string;
 }
 
 export interface UserWithStatus extends User {
-  status?: 'active' | 'inactive' | 'pending';
-  lastActive?: Date;
+  status?: 'online' | 'away' | 'offline' | 'busy';
+  lastSeen?: Date;
+  mood?: string;
+  moodEmoji?: string;
 }

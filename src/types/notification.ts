@@ -1,71 +1,30 @@
 
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
-export type NotificationTone = 'formal' | 'friendly' | 'casual' | 'professional';
-
-export type NotificationType = 
-  | 'system' 
-  | 'emotion' 
-  | 'coach' 
-  | 'journal' 
-  | 'community' 
-  | 'achievement'
-  | 'badge'
-  | 'challenge'
-  | 'reminder'
-  | 'info'
-  | 'warning'
-  | 'error'
-  | 'success'
-  | 'streak'
-  | 'urgent';
-
-export type NotificationFilter = NotificationType | 'all' | 'read' | 'unread';
-
-export interface Notification {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  read: boolean;
-  created_at: string;
-  timestamp?: string;  // Added for compatibility
-  createdAt?: string;   // Added for compatibility
-  user_id: string;
-  action_link?: string;
-  action_text?: string;
-  metadata?: Record<string, any>;
-  priority?: 'low' | 'medium' | 'high' | 'urgent';
-  icon?: string;
-  image?: string;
-}
+export type NotificationType = 'system' | 'emotion' | 'coach' | 'journal' | 'community' | 'badge' | 'challenge' | 'achievement' | 'reminder';
+export type NotificationTone = 'gentle' | 'neutral' | 'assertive';
 
 export interface NotificationPreference {
+  enabled: boolean;
+  frequency: NotificationFrequency;
+  tone?: NotificationTone;
+  channels: {
+    email: boolean;
+    push: boolean;
+    inApp: boolean;
+  };
+}
+
+export interface NotificationsPreferences {
   enabled: boolean;
   emailEnabled?: boolean;
   pushEnabled?: boolean;
   inAppEnabled?: boolean;
-  frequency?: NotificationFrequency;
-  types?: {
-    system?: boolean;
-    emotion?: boolean;
-    coach?: boolean;
-    journal?: boolean;
-    community?: boolean;
-    achievement?: boolean;
-    badge?: boolean;
-    challenge?: boolean;
-    reminder?: boolean;
-    info?: boolean;
-    warning?: boolean;
-    error?: boolean;
-    success?: boolean;
-    streak?: boolean;
-    urgent?: boolean;
-    [key: string]: boolean | undefined;
-  };
-  email?: boolean;
-  push?: boolean;
-  sms?: boolean;
-  inApp?: boolean;
+  types?: Record<NotificationType, boolean>;
+  frequency: NotificationFrequency;
   tone?: NotificationTone;
+  quietHours?: {
+    enabled: boolean;
+    start: string;
+    end: string;
+  };
 }

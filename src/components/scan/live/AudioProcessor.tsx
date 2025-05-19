@@ -110,9 +110,21 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
     
     // Update to use the correct properties
     if (onResult && mockResult) {
-      const recommendations: EmotionRecommendation[] = [
-        { title: "Appreciate your mood", content: "Take a moment to appreciate your positive mood", category: "general" },
-        { title: "Share happiness", content: "Share your happiness with someone", category: "general" }
+      const mockRecommendations: EmotionRecommendation[] = [
+        {
+          type: "music",
+          title: "Playlist apaisante",
+          description: "Musique pour vous détendre",
+          content: "Écoutez notre playlist de détente",
+          category: "relaxation"
+        },
+        {
+          type: "exercise",
+          title: "Exercices de respiration",
+          description: "Techniques de respiration simple",
+          content: "Essayez la respiration 4-7-8",
+          category: "wellness"
+        }
       ];
       
       onResult({
@@ -122,7 +134,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
         confidence: mockResult.confidence,
         text: "Sample text",
         emojis: ["😊"],
-        recommendations: recommendations,
+        recommendations: mockRecommendations,
         intensity: mockResult.intensity,
         feedback: mockResult.feedback,
         timestamp: new Date(),
