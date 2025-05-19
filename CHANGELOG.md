@@ -45,6 +45,7 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ### Modifié
 - Mise à jour de `README.md` pour référencer ces nouveaux documents
 
+
 ## [1.1.9] - 2025-05-27
 
 ### Ajouté
@@ -62,7 +63,6 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 
 ### Ajouté
 - Documentation `docs/scan-audio-type-fixes.md` décrivant les corrections.
-
 
 
 
