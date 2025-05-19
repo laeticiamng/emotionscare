@@ -1,44 +1,43 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmotionResult, EmojiEmotionScannerProps } from '@/types/emotion';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 
-const emojis = [
-  { emoji: "😊", emotion: "happy", description: "Joyeux" },
-  { emoji: "😢", emotion: "sad", description: "Triste" },
-  { emoji: "😠", emotion: "angry", description: "En colère" },
-  { emoji: "😨", emotion: "afraid", description: "Effrayé" },
-  { emoji: "😮", emotion: "surprised", description: "Surpris" },
-  { emoji: "🤢", emotion: "disgusted", description: "Dégoûté" },
-  { emoji: "😌", emotion: "relaxed", description: "Détendu" },
-  { emoji: "😴", emotion: "tired", description: "Fatigué" },
-  { emoji: "🥰", emotion: "loved", description: "Aimé" },
-  { emoji: "😐", emotion: "neutral", description: "Neutre" },
-  { emoji: "😰", emotion: "anxious", description: "Anxieux" },
-  { emoji: "🤔", emotion: "thoughtful", description: "Pensif" }
+// Liste d'émojis pour exprimer des émotions
+const emotionEmojis = [
+  { emoji: "😊", emotion: "joy" },
+  { emoji: "😢", emotion: "sadness" },
+  { emoji: "😡", emotion: "anger" },
+  { emoji: "😮", emotion: "surprise" },
+  { emoji: "😨", emotion: "fear" },
+  { emoji: "😐", emotion: "neutral" },
+  { emoji: "🤢", emotion: "disgust" },
+  { emoji: "😍", emotion: "love" },
+  { emoji: "😴", emotion: "tired" },
+  { emoji: "😎", emotion: "cool" },
+  { emoji: "🤔", emotion: "thoughtful" },
+  { emoji: "😒", emotion: "annoyed" },
+  { emoji: "😳", emotion: "embarrassed" },
+  { emoji: "🙄", emotion: "bored" },
+  { emoji: "😇", emotion: "grateful" }
 ];
 
 const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({ 
-  onResult, 
-  onProcessingChange, 
-  isProcessing, 
-  setIsProcessing 
+  onResult,
+  onProcessingChange,
+  isProcessing: externalIsProcessing,
+  setIsProcessing: externalSetIsProcessing
 }) => {
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
-  const [intensity, setIntensity] = useState<number>(50);
-  const [processing, setProcessing] = useState(false);
-
+  const [localIsProcessing, setLocalIsProcessing] = useState(false);
+  
   // Use external state if provided, otherwise use local state
-  const isLoading = isProcessing !== undefined ? isProcessing : processing;
-  const setIsLoading = setIsProcessing || setProcessing;
+  const isProcessing = externalIsProcessing !== undefined ? externalIsProcessing : localIsProcessing;
+  const setIsProcessing = externalSetIsProcessing || setLocalIsProcessing;
 
   const handleEmojiSelect = (emoji: string, emotion: string) => {
     setSelectedEmoji(emoji);
-  };
-
-  const handleIntensityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIntensity(parseInt(e.target.value));
   };
 
   const handleSubmit = () => {
@@ -47,40 +46,38 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
     if (onProcessingChange) {
       onProcessingChange(true);
     }
-    setIsLoading(true);
-    
-    const selectedEmojiObj = emojis.find(e => e.emoji === selectedEmoji);
-    
-    // Simulate processing delay
+    setIsProcessing(true);
+
+    // Trouver l'émotion correspondant à l'emoji sélectionné
+    const selectedEmojiData = emotionEmojis.find(item => item.emoji === selectedEmoji);
+    const emotionName = selectedEmojiData ? selectedEmojiData.emotion : 'neutral';
+
+    // Simuler un délai de traitement
     setTimeout(() => {
       const result: EmotionResult = {
         id: `emoji-${Date.now()}`,
-        emotion: selectedEmojiObj?.emotion || 'neutral',
-        primaryEmotion: selectedEmojiObj?.emotion || 'neutral', // Added for components that use primaryEmotion
-        confidence: 0.9, // High confidence since user selected directly
-        intensity: intensity / 100,
+        emotion: emotionName,
+        confidence: 0.9,
+        intensity: 0.8,
         source: 'emoji',
         timestamp: new Date().toISOString(),
         emojis: [selectedEmoji],
         recommendations: [
           {
-            id: `rec1-${Date.now()}`,
+            id: `rec-emoji-1-${Date.now()}`,
             type: "activity",
             title: "Activité recommandée",
-            description: "Une activité adaptée à votre humeur actuelle",
-            content: "Une activité qui peut vous aider dans votre état émotionnel actuel.",
-            emotion: selectedEmojiObj?.emotion || 'neutral'
+            description: "Une activité pour vous aider à vous sentir mieux",
+            emotion: emotionName
           },
           {
-            id: `rec2-${Date.now()}`,
+            id: `rec-emoji-2-${Date.now()}`,
             type: "music",
             title: "Musique recommandée",
-            description: "Une playlist qui correspond à votre état émotionnel",
-            content: "Des morceaux de musique sélectionnés pour vous aider à gérer cette émotion.",
-            emotion: selectedEmojiObj?.emotion || 'neutral'
+            description: "Une playlist adaptée à votre humeur",
+            emotion: emotionName
           }
-        ],
-        score: intensity // Added for components that use score
+        ]
       };
       
       if (onResult) {
@@ -90,64 +87,41 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
       if (onProcessingChange) {
         onProcessingChange(false);
       }
-      setIsLoading(false);
+      setIsProcessing(false);
     }, 1000);
   };
 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Exprimez votre émotion avec un emoji</CardTitle>
+        <CardTitle>Sélectionnez un émoji qui représente votre humeur</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-6 gap-2">
-          {emojis.map((item) => (
-            <Button
-              key={item.emoji}
-              variant={selectedEmoji === item.emoji ? "default" : "ghost"}
-              className={`h-14 text-2xl ${selectedEmoji === item.emoji ? 'ring-2 ring-primary' : ''}`}
+        <div className="grid grid-cols-5 gap-3 text-center">
+          {emotionEmojis.map((item, index) => (
+            <button
+              key={index}
               onClick={() => handleEmojiSelect(item.emoji, item.emotion)}
-              disabled={isLoading}
+              className={`text-4xl p-2 rounded-lg transition-all ${
+                selectedEmoji === item.emoji 
+                  ? 'bg-primary/20 scale-110' 
+                  : 'hover:bg-secondary/50'
+              }`}
+              disabled={isProcessing}
+              aria-label={`Emoji représentant ${item.emotion}`}
             >
               {item.emoji}
-            </Button>
+            </button>
           ))}
         </div>
-        
-        {selectedEmoji && (
-          <div className="space-y-2 pt-4">
-            <label className="block text-sm font-medium">
-              Intensité: {intensity}%
-            </label>
-            <input
-              type="range"
-              min="10"
-              max="100"
-              value={intensity}
-              onChange={handleIntensityChange}
-              className="w-full"
-              disabled={isLoading}
-            />
-            <p className="text-xs text-muted-foreground">
-              Réglez le curseur pour indiquer l'intensité de cette émotion.
-            </p>
-          </div>
-        )}
       </CardContent>
       <CardFooter>
         <Button 
-          onClick={handleSubmit} 
-          className="w-full" 
-          disabled={!selectedEmoji || isLoading}
+          onClick={handleSubmit}
+          disabled={!selectedEmoji || isProcessing}
+          className="w-full"
         >
-          {isLoading ? (
-            <>
-              <span className="animate-spin mr-2">⏳</span> 
-              Traitement en cours...
-            </>
-          ) : (
-            'Confirmer cette émotion'
-          )}
+          {isProcessing ? 'Analyse en cours...' : 'Analyser mon émotion'}
         </Button>
       </CardFooter>
     </Card>

@@ -1,3 +1,4 @@
+
 // This file would contain the types related to emotions
 export interface Emotion {
   id: string;
@@ -59,6 +60,15 @@ export interface EmotionRecommendation {
   emotion: string;
   content?: string;
   category?: string;
+}
+
+export interface EmotionPrediction {
+  emotion: string;
+  probability: number;
+  confidence: number;
+  score: number;
+  timestamp: string;
+  source: string;
 }
 
 export interface TextEmotionScannerProps {

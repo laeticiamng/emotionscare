@@ -24,6 +24,7 @@ export interface ChatConversation {
   lastMessage?: string; // For backward compatibility
   last_message?: string; // For backward compatibility
   created_at?: string; // For backward compatibility
+  updated_at?: string; // For backward compatibility
   user_id?: string; // For backward compatibility
   participants?: string[]; // Added for compatibility with mockChatMessages
 }
@@ -40,11 +41,18 @@ export interface ChatHookResult {
   isLoading: boolean;
   sendMessage: (content: string) => Promise<void>;
   error: Error | null;
+  input: string;
+  setInput: (input: string) => void;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleSubmit: (e: React.FormEvent) => void;
 }
 
 export interface UseChatOptions {
   initialMessages?: ChatMessage[];
   onResponse?: (message: ChatMessage) => void;
+  onError?: (error: Error) => void;
+  conversationId?: string;
+  initialConversationId?: string;
 }
 
 export const normalizeChatMessage = (message: any): ChatMessage => {
