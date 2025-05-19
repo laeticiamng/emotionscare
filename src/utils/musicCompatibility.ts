@@ -56,9 +56,9 @@ export const convertToMusicTrack = (track: Track): MusicTrack => {
 export const convertToTrack = (musicTrack: MusicTrack): Track => {
   return {
     id: musicTrack.id,
-    title: musicTrack.title,
-    name: musicTrack.name || musicTrack.title,
-    artist: musicTrack.artist,
+    title: musicTrack.title || musicTrack.name || '',
+    name: musicTrack.name || musicTrack.title || '',
+    artist: musicTrack.artist || '',
     url: musicTrack.audioUrl || musicTrack.url || '',
     cover: musicTrack.coverUrl || musicTrack.cover,
     audioUrl: musicTrack.audioUrl || musicTrack.url || '',

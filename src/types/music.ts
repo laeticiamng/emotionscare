@@ -6,7 +6,7 @@
 // Interface de base pour une piste musicale
 export interface MusicTrack {
   id: string;
-  title: string;
+  title?: string;
   name?: string;
   artist?: string;
   duration?: number;
@@ -23,6 +23,8 @@ export interface MusicTrack {
   category?: string;
   isLiked?: boolean;
   album?: string;
+  intensity?: number;
+  year?: number;
 }
 
 // Interface pour une playlist musicale
@@ -131,7 +133,7 @@ export interface MusicContextType {
   setVolume: (volume: number) => void;
   playlists: MusicPlaylist[];
   currentPlaylist: MusicPlaylist | null;
-  loadPlaylistForEmotion: (emotion: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
+  loadPlaylistForEmotion: (params: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
   queue: MusicTrack[];
   addToQueue: (track: MusicTrack) => void;
   clearQueue: () => void;

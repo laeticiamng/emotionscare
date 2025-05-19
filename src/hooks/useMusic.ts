@@ -8,4 +8,4 @@
  */
 
 export { useMusic } from '@/contexts/MusicContext';
-export default { useMusic };
+export default useMusic;
