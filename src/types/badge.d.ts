@@ -1,37 +1,53 @@
 
-// Define badge types for the application
-export interface Badge {
-  id: string; 
-  name: string;
-  description: string;
-  imageUrl: string;
-  category: string;
-  unlockedAt: string | null;
-  progress?: number;
-  totalPoints?: number;
-  level?: number;
-  isUnlocked?: boolean;
-}
+// Types liés aux badges et gamification
 
-// Challenge type for gamification features
-export interface Challenge {
+export interface Badge {
   id: string;
   name: string;
-  title?: string;
   description: string;
-  points: number;
-  progress: number;
-  goal: number;
-  category: string;
-  completed: boolean;
-  status: string;
-  totalSteps: number;
-  icon: string;
-  reward: string;
+  image?: string;
   unlocked: boolean;
+  progress?: number;
+  category?: string;
+  timestamp?: string;
+  icon?: string;
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
 }
 
-export interface BadgeCollection {
-  recent: Badge[];
-  all: Badge[];
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  points: number;
+  reward?: Badge | string;
+  progress: number;
+  goal: number;
+  status: 'active' | 'completed' | 'locked';
+  category?: string;
+  unlocked: boolean;
+  type?: string;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  username?: string;
+  name: string;
+  points: number;
+  rank: number;
+  avatar?: string;
+  badges: Badge[];
+  progress?: number;
+}
+
+export interface GamificationStats {
+  points: number;
+  badges: number;
+  level: number;
+  completedChallenges: number;
+  activeChallenges: number;
+  rank?: number;
+  streaks?: Record<string, number>;
+  achievements?: Badge[];
+  progressToNextLevel?: number;
 }
