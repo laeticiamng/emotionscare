@@ -1,4 +1,3 @@
-
 export interface EmotionData {
   emotion: string;
   confidence: number;
@@ -129,11 +128,12 @@ export interface Emotion {
 export interface MoodData {
   emotion: string;
   intensity: number;
-  date?: string;
+  date?: string;  // Added missing property
   timestamp: string;
   context?: string;
   source?: string;
   id?: string;
+  userId?: string; // Added missing property
 }
 
 export interface EmotionPrediction {
@@ -142,6 +142,8 @@ export interface EmotionPrediction {
   triggers?: string[];
   timeframe?: string;
   recommendations?: string[];
+  timestamp?: string; // Added missing property
+  confidence?: number; // Added missing property
 }
 
 export interface EmojiEmotionScannerProps {

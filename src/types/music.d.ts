@@ -46,6 +46,7 @@ export interface MusicContextType {
   setCurrentTime: (time: number) => void;
   setDuration: (duration: number) => void;
   setIsPlaying: (isPlaying: boolean) => void; // Added to fix error
+  setIsInitialized: (isInitialized: boolean) => void; // Added to fix error
 }
 
 export interface MusicDrawerProps {

@@ -11,7 +11,7 @@ class EmotionalDataService {
   }
 
   // Save new emotional data
-  async saveEmotionalData(data: Omit<EmotionalData, 'id'>): Promise<EmotionalData> {
+  async saveEmotionalData(data: EmotionalData): Promise<EmotionalData> {
     // Ensure it has an ID
     const entryWithId = {
       ...data,
