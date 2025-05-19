@@ -7,7 +7,7 @@ import './App.css';
 import AuthTransition from '@/components/auth/AuthTransition';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { MusicProvider } from '@/contexts/MusicContext';
+import { MusicProvider } from '@/providers/MusicProvider';
 
 const App: React.FC = () => {
   return (

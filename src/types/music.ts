@@ -79,8 +79,8 @@ export interface MusicContextType {
   resumeTrack: () => void;
   previousTrack: () => void;
   nextTrack: () => void;
-  setTrack?: (track: MusicTrack) => void;
-  setPlaylist?: (playlist: MusicPlaylist) => void;
+  setTrack?: (track: MusicTrack | null) => void;
+  setPlaylist?: (playlist: MusicPlaylist | null) => void;
   setVolume?: (volume: number) => void;
   setMuted?: (muted: boolean) => void;
   seekTo?: (time: number) => void;
@@ -120,11 +120,14 @@ export interface ProgressBarProps {
   currentTime: number;
   duration: number;
   onSeek: (time: number) => void;
+  formatTime?: (time: number) => string;
 }
 
 export interface VolumeControlProps {
   volume: number;
   muted: boolean;
+  isMuted?: boolean;
   onVolumeChange: (volume: number) => void;
-  onMuteToggle: () => void;
+  onMuteToggle?: () => void;
+  className?: string;
 }

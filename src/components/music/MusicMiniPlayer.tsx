@@ -1,51 +1,98 @@
 
 import React from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { motion } from 'framer-motion';
+import { useMusic } from '@/providers/MusicProvider';
+import { Play, Pause, SkipBack, SkipForward, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Music, ChevronUp } from 'lucide-react';
-import { getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
+import { cn } from '@/lib/utils';
 
-const MusicMiniPlayer: React.FC = () => {
-  const { isPlaying, currentTrack, togglePlay, toggleDrawer } = useMusic();
+interface MusicMiniPlayerProps {
+  className?: string;
+}
 
-  // Si aucun morceau n'est sélectionné, ne pas afficher le lecteur
-  if (!currentTrack) {
-    return null;
-  }
+const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
+  const { 
+    currentTrack, 
+    isPlaying, 
+    togglePlay, 
+    nextTrack, 
+    previousTrack,
+    toggleDrawer
+  } = useMusic();
 
-  // Utiliser les fonctions utilitaires pour obtenir des informations cohérentes
-  const title = getTrackTitle(currentTrack);
-  const artist = getTrackArtist(currentTrack);
+  if (!currentTrack) return null;
 
   return (
-    <div className="bg-background border rounded-full shadow-lg flex items-center p-1 pr-3 fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="rounded-full"
-        onClick={togglePlay}
-      >
-        {isPlaying ? (
-          <Pause className="h-4 w-4" />
-        ) : (
-          <Play className="h-4 w-4" />
-        )}
-      </Button>
-      
-      <div className="ml-2 mr-3">
-        <p className="text-sm font-medium line-clamp-1">{title}</p>
-        <p className="text-xs text-muted-foreground line-clamp-1">{artist}</p>
-      </div>
-      
-      <Button
-        variant="ghost"
-        size="icon"
-        className="rounded-full"
+    <motion.div 
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      className={cn(
+        "flex items-center space-x-2 bg-background/80 backdrop-blur-md rounded-full px-3 py-1 border shadow-sm",
+        className
+      )}
+    >
+      {/* Track Info with Album art */}
+      <div 
+        className="flex items-center cursor-pointer"
         onClick={toggleDrawer}
       >
-        <ChevronUp className="h-4 w-4" />
-      </Button>
-    </div>
+        <div className="h-7 w-7 rounded-full overflow-hidden flex-shrink-0 bg-primary/10">
+          {currentTrack.cover || currentTrack.coverUrl ? (
+            <img 
+              src={currentTrack.cover || currentTrack.coverUrl} 
+              alt={currentTrack.title} 
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="h-full w-full flex items-center justify-center">
+              <Music className="h-3 w-3" />
+            </div>
+          )}
+        </div>
+        <div className="ml-2 hidden sm:block max-w-[120px]">
+          <p className="text-xs font-medium truncate">{currentTrack.title}</p>
+          <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
+        </div>
+      </div>
+      
+      {/* Controls */}
+      <div className="flex items-center space-x-1">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6 rounded-full"
+          onClick={previousTrack}
+        >
+          <SkipBack className="h-3 w-3" />
+          <span className="sr-only">Previous</span>
+        </Button>
+        
+        <Button
+          variant="default"
+          size="icon"
+          className="h-6 w-6 rounded-full"
+          onClick={togglePlay}
+        >
+          {isPlaying ? (
+            <Pause className="h-3 w-3" />
+          ) : (
+            <Play className="h-3 w-3" />
+          )}
+          <span className="sr-only">{isPlaying ? 'Pause' : 'Play'}</span>
+        </Button>
+        
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6 rounded-full"
+          onClick={nextTrack}
+        >
+          <SkipForward className="h-3 w-3" />
+          <span className="sr-only">Next</span>
+        </Button>
+      </div>
+    </motion.div>
   );
 };
 

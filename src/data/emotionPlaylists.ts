@@ -1,5 +1,5 @@
 
-import { MusicPlaylist, MusicTrack } from '@/types/music';
+import { MusicPlaylist } from '@/types/music';
 import { relaxingNatureSounds, focusBeats, energyBoost, calmMeditation } from './music';
 
 // Pour les playlists d'émotion, nous allons utiliser un objet avec mood comme tableau ou string
