@@ -132,7 +132,7 @@ export const CoachContextProvider: React.FC<CoachContextProviderProps> = ({ chil
   return (
     <CoachContext.Provider value={{ 
       sendMessage, 
-      analyzeEmotion, 
+      analyzeEmotion,
       getRecommendations, 
       loading,
       isTyping,

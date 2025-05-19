@@ -6,7 +6,7 @@ import { Bot, User } from 'lucide-react';
 import { ChatMessage } from '@/types/chat';
 
 interface CoachMessageProps {
-  message: ChatMessage;
+  message: ChatMessage & { isLoading?: boolean };
   isLast?: boolean;
 }
 

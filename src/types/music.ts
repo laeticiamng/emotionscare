@@ -80,6 +80,9 @@ export interface MusicContextType extends MusicState {
   toggleShuffle?: () => void;
   setRepeat?: (mode: 'off' | 'track' | 'playlist') => void;
   seekTo?: (time: number) => void;
+  
+  // Add the missing property
+  setCurrentTime?: (time: number) => void;
 
   // Gestion des playlists
   playPlaylist?: (playlist: MusicPlaylist, startTrackId?: string) => void;

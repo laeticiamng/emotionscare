@@ -1,3 +1,4 @@
+
 import { ChatMessage, ChatConversation } from '@/types/chat';
 import { EmotionResult } from '@/types/emotion';
 
@@ -27,7 +28,27 @@ export interface CoachContextType {
   startNewConversation?: (title?: string) => string;
   setActiveConversation?: (id: string) => void;
   updateLastEmotion?: (emotion: string) => void;
+  // Add the missing property
+  analyzeEmotion?: (text: string) => Promise<{ emotion: string; score: number }>;
+  getRecommendations?: (category: string) => string[];
+  // Add a property for the CoachService for compatibility
+  coachService?: any;
 }
 
 // Export CoachContextProps as an alias of CoachContextType for backward compatibility
 export type CoachContextProps = CoachContextType;
+
+// Add the CoachNotification type that's missing from lib/coach/types
+export interface CoachNotification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  timestamp: Date | string;
+  read?: boolean;
+  action?: {
+    id: string;
+    type: string;
+    payload: any;
+  };
+}

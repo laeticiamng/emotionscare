@@ -17,16 +17,48 @@ export interface RecognitionOptions {
   onResult?: (result: SpeechRecognitionResult) => void;
 }
 
-// Add missing SpeechRecognition definitions to the Window interface
+// Define a constructor interface for SpeechRecognition
+interface SpeechRecognitionConstructor {
+  new(): SpeechRecognition;
+}
+
+// Define the SpeechRecognition interface
+interface SpeechRecognition extends EventTarget {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  start(): void;
+  stop(): void;
+  abort(): void;
+  onstart: (event: Event) => void;
+  onend: (event: Event) => void;
+  onerror: (event: ErrorEvent) => void;
+  onresult: (event: SpeechRecognitionEvent) => void;
+}
+
+// Define the SpeechRecognitionEvent interface
+interface SpeechRecognitionEvent extends Event {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
+}
+
+// Define the SpeechRecognitionResultList interface
+interface SpeechRecognitionResultList {
+  [index: number]: SpeechRecognitionResult;
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+}
+
+// Add the missing definitions to the Window interface
 declare global {
   interface Window {
-    SpeechRecognition: any;
-    webkitSpeechRecognition: any;
+    SpeechRecognition: SpeechRecognitionConstructor;
+    webkitSpeechRecognition: SpeechRecognitionConstructor;
   }
 }
 
 export class SpeechRecognitionService {
-  private recognition: any = null;
+  private recognition: SpeechRecognition | null = null;
   private isSupported: boolean = false;
   private isListening: boolean = false;
   
@@ -70,16 +102,16 @@ export class SpeechRecognitionService {
         if (options.onEnd) options.onEnd();
       };
       
-      this.recognition.onerror = (event: any) => {
+      this.recognition.onerror = (event: ErrorEvent) => {
         if (options.onError) options.onError(event.error);
       };
       
-      this.recognition.onresult = (event: any) => {
+      this.recognition.onresult = (event: SpeechRecognitionEvent) => {
         if (options.onResult && event.results) {
           const lastResultIndex = event.resultIndex || 0;
           
           // Safely check if event.results has the expected structure
-          if (event.results[lastResultIndex] && event.results[lastResultIndex][0]) {
+          if (event.results[lastResultIndex]) {
             const currentResult = event.results[lastResultIndex];
             const firstAlternative = currentResult[0];
             

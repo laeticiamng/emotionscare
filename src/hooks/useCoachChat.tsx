@@ -16,28 +16,26 @@ export const useCoachChat = () => {
   const sendMessage = useCallback(async (message: string) => {
     try {
       setIsProcessing(true);
-      // Use the existing messages as history
-      const response = await coach.sendMessage(message, messages);
+      // Fix the params to ensure we're passing the message correctly
+      const response = await coach.sendMessage(message, 'user');
       
       setMessages(prevMessages => {
-        const userMessage: ChatMessage = {
+        const userMessage: ChatMessage = { 
           id: uuidv4(),
           conversationId: 'coach',
-          sender: 'user',
-          text: message,
+          sender: 'user', 
           content: message,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString() 
         };
-
-        const assistantMessage: ChatMessage = {
-          id: uuidv4(),
+        
+        const assistantMessage: ChatMessage = { 
+          id: uuidv4(), 
           conversationId: 'coach',
-          sender: 'assistant',
-          text: response,
+          sender: 'assistant', 
           content: response,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString() 
         };
-
+        
         return [...prevMessages, userMessage, assistantMessage];
       });
       return response;
@@ -47,18 +45,19 @@ export const useCoachChat = () => {
     } finally {
       setIsProcessing(false);
     }
-  }, [coach, messages]);
+  }, [coach]);
   
   const addMessage = useCallback((text: string, sender: 'system' | 'user' | 'ai' | 'assistant') => {
-    const newMessage: ChatMessage = {
+    const newMessage: ChatMessage = { 
       id: uuidv4(),
       conversationId: 'coach',
-      sender: sender === 'ai' ? 'assistant' : sender,
-      text,
+      sender: sender === 'ai' ? 'assistant' : sender, 
       content: text,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString() 
     };
+    
     setMessages(prevMessages => [...prevMessages, newMessage]);
+    return newMessage;
   }, []);
   
   const clearMessages = useCallback(() => {
