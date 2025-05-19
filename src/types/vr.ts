@@ -35,6 +35,7 @@ export interface VRSessionTemplate {
   emotion_target?: string;
   recommendedMood?: string;
   recommended_mood?: string;
+  intensity?: string;
 }
 
 export interface VRSession {

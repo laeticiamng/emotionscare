@@ -3,43 +3,53 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  imageUrl?: string;
-  image_url?: string;
+  imageUrl: string;
+  category: string;
+  unlockCriteria?: string;
+  points?: number;
   unlocked?: boolean;
-  level?: number;
-  tier?: string;
-  progress?: number;
-  threshold?: number;
-  completed?: boolean;
   unlockedAt?: string;
-  unlocked_at?: string;
-  date?: string;
-  category?: string;
-  achieved?: boolean;
+  progress?: number;
+  // Compatibility fields
   earned?: boolean;
   rarity?: string;
   icon?: string;
-  total?: number; // Add this for compatibility
+  total?: number;
+  level?: string;
 }
 
 export interface Challenge {
   id: string;
   title: string;
-  name?: string;
   description: string;
-  progress: number;
-  goal: number;
-  points: number;
-  status: string;
-  reward: any;
+  reward: string;
   unlocked: boolean;
+  // Compatibility fields
+  name?: string;
+  points?: number;
+  progress?: number;
+  goal?: number;
   category?: string;
+  completed?: boolean;
+  isCompleted?: boolean;
+  status?: string;
   difficulty?: string;
   completions?: number;
   total?: number;
   totalSteps?: number;
-  deadline?: string;
-  completed?: boolean;
-  isCompleted?: boolean;
   icon?: string;
+  deadline?: string;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  username: string;
+  avatar: string;
+  points: number;
+  rank: number;
+  // Compatibility fields
+  level?: string;
+  progress?: number;
+  lastActive?: string;
 }
