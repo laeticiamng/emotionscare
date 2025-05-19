@@ -6,7 +6,7 @@ export interface VRSessionTemplate {
   description: string;
   thumbnailUrl?: string;
   imageUrl?: string;
-  coverUrl?: string; 
+  coverUrl?: string;
   cover_url?: string;
   preview_url?: string;
   duration: number;
@@ -67,7 +67,6 @@ export interface VRSessionFeedback {
 export interface VRSessionWithMusicProps {
   template?: VRSessionTemplate;
   session?: VRSession;
-  sessionTemplate?: VRSessionTemplate;
   onComplete?: (session?: VRSession) => void;
   onExit?: () => void;
   musicEnabled?: boolean;

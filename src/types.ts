@@ -57,7 +57,8 @@ export type {
   MusicControlsProps,
   MusicLibraryProps,
   EmotionMusicParams,
-  TrackInfoProps
+  TrackInfoProps,
+  MusicCategory
 } from './types/music';
 
 export type {
@@ -141,5 +142,6 @@ export type {
 
 // Add this to avoid the duplicate definition error
 export type { 
-  UseAudioPlayerStateReturn 
+  UseAudioPlayerStateReturn,
+  AudioPlayerContextType
 } from './types/audio-player';

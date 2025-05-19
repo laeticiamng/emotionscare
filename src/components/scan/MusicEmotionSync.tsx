@@ -1,8 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
-import { useMusic } from '@/hooks/useMusic';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 
 interface MusicEmotionSyncProps {
   className?: string;
@@ -11,27 +11,21 @@ interface MusicEmotionSyncProps {
 
 const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({ className, lastEmotion }) => {
   const [isSynced, setIsSynced] = useState(false);
-  const { loadPlaylistForEmotion, setEmotion } = useMusic();
+  const { activateMusicForEmotion } = useMusicEmotionIntegration();
   
   // Sync music with emotion when enabled and emotion changes
   useEffect(() => {
     if (isSynced && lastEmotion) {
-      loadPlaylistForEmotion(lastEmotion);
-      if (setEmotion) {
-        setEmotion(lastEmotion);
-      }
+      activateMusicForEmotion(lastEmotion);
     }
-  }, [isSynced, lastEmotion, loadPlaylistForEmotion, setEmotion]);
+  }, [isSynced, lastEmotion, activateMusicForEmotion]);
   
   const handleToggle = (checked: boolean) => {
     setIsSynced(checked);
     
     if (checked && lastEmotion) {
       // Immediately sync when enabling
-      loadPlaylistForEmotion(lastEmotion);
-      if (setEmotion) {
-        setEmotion(lastEmotion);
-      }
+      activateMusicForEmotion(lastEmotion);
     }
   };
   

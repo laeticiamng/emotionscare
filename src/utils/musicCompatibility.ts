@@ -1,148 +1,92 @@
 
-import { MusicTrack, MusicPlaylist, MusicQueueItem, EmotionMusicParams } from '@/types/music';
+import { MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
 
-// Function to ensure playlist compatibility between different interface versions
+/**
+ * Ensures a playlist object conforms to MusicPlaylist interface
+ */
 export function ensurePlaylist(playlist: any): MusicPlaylist {
-  if (!playlist) return {
-    id: 'default-empty',
-    title: 'Liste vide',
-    tracks: [],
-  };
-
-  // Ensure the playlist has an id
-  const ensuredPlaylist = {
-    ...playlist,
-    id: playlist.id || `playlist-${Date.now()}`,
-    title: playlist.title || playlist.name || 'Playlist sans titre',
-    tracks: Array.isArray(playlist.tracks) ? playlist.tracks.map(ensureTrack) : [],
-  };
-
-  return ensuredPlaylist;
-}
-
-// Generic converter to normalize any playlist-like object
-export function convertToPlaylist(data: any): MusicPlaylist {
-  if (!data) {
-    return { id: `playlist-${Date.now()}`, title: 'Playlist', tracks: [] };
-  }
-  // If an array is provided, assume it's a list of tracks
-  if (Array.isArray(data)) {
+  if (!playlist) {
     return {
-      id: `playlist-${Date.now()}`,
-      title: 'Playlist',
-      tracks: data.map(ensureTrack)
+      id: 'empty',
+      title: 'Empty Playlist',
+      tracks: []
     };
   }
+  
+  return {
+    id: playlist.id || 'playlist-' + Date.now(),
+    title: playlist.title || playlist.name || 'Untitled Playlist',
+    name: playlist.name || playlist.title || 'Untitled Playlist',
+    description: playlist.description || '',
+    tracks: Array.isArray(playlist.tracks) ? playlist.tracks.map(ensureTrack) : [],
+    emotion: playlist.emotion || '',
+    coverUrl: playlist.coverUrl || playlist.cover_url || '',
+    userId: playlist.userId || playlist.user_id || '',
+    isPublic: playlist.isPublic || false,
+  };
+}
 
+/**
+ * Ensures a track object conforms to MusicTrack interface
+ */
+export function ensureTrack(track: any): MusicTrack {
+  if (!track) {
+    return {
+      id: 'empty',
+      title: 'Unknown Track',
+      url: '',
+      duration: 0
+    };
+  }
+  
+  return {
+    id: track.id || 'track-' + Date.now(),
+    title: track.title || track.name || 'Untitled Track',
+    artist: track.artist || 'Unknown Artist',
+    album: track.album || '',
+    url: track.url || track.src || track.audioUrl || '',
+    audioUrl: track.audioUrl || track.url || track.src || '',
+    coverUrl: track.coverUrl || track.cover_url || track.cover || '',
+    duration: track.duration || 0,
+    emotion: track.emotion || track.mood || '',
+    genre: track.genre || '',
+    isLiked: track.isLiked || false,
+    mood: track.mood || track.emotion || '',
+  };
+}
+
+/**
+ * Convert from one playlist format to MusicPlaylist
+ */
+export function convertToPlaylist(data: any): MusicPlaylist {
   return ensurePlaylist(data);
 }
 
-// Function to ensure track compatibility
-export function ensureTrack(track: any): MusicTrack {
-  if (!track) return {
-    id: 'empty-track',
-    title: 'Piste non disponible',
-    artist: 'Inconnu',
-    url: '',
-  };
-
-  // Map audioUrl to url if url is missing
-  const url = track.url || track.audioUrl || track.src || track.track_url || '';
-
-  return {
-    ...track,
-    id: track.id || `track-${Date.now()}`,
-    title: track.title || track.name || 'Sans titre',
-    artist: track.artist || 'Artiste inconnu',
-    url: url,
-    cover: track.cover || track.coverUrl || track.coverImage || '',
-  };
-}
-
-// Function to get track cover (with fallback)
-export function getTrackCover(track: MusicTrack | null): string {
-  if (!track) return '';
-  return track.cover || track.coverUrl || track.coverImage || '';
-}
-
-// Function to get track title (with fallback)
-export function getTrackTitle(track: MusicTrack | null): string {
-  if (!track) return 'Sans titre';
-  return track.title || track.name || 'Sans titre';
-}
-
-// Function to get track artist (with fallback)
-export function getTrackArtist(track: MusicTrack | null): string {
-  if (!track) return 'Artiste inconnu';
-  return track.artist || 'Artiste inconnu';
-}
-
-// Function to get track URL (with fallback)
-export function getTrackUrl(track: MusicTrack | null): string {
-  if (!track) return '';
-  return track.url || track.audioUrl || track.src || track.track_url || '';
-}
-
-// Function to normalize a track to ensure all required properties
-export function normalizeTrack(track: any): MusicTrack {
-  return ensureTrack(track);
-}
-
-// Function to ensure an item is an array
-export function ensureArray<T>(item: T | T[] | null | undefined): T[] {
-  if (Array.isArray(item)) return item;
-  if (item === null || item === undefined) return [];
-  return [item];
-}
-
-// Function to map audioUrl to url (for compatibility)
-export function mapAudioUrlToUrl(track: MusicTrack): MusicTrack {
-  if (!track.url && track.audioUrl) {
-    return {
-      ...track,
-      url: track.audioUrl
-    };
-  }
-  return track;
-}
-
-// Support for getRecommendationByEmotion for compatibility
-export async function getRecommendationByEmotion(
-  params: string | EmotionMusicParams
-): Promise<MusicPlaylist | null> {
-  // Simple implementation for compatibility
-  const emotion = typeof params === 'string' ? params : params.emotion || 'calm';
-  
-  // Return a simulated playlist based on emotion
-  return {
-    id: `playlist-${emotion}`,
-    title: `Musique pour ${emotion}`,
-    tracks: [
-      {
-        id: `track-${emotion}-1`,
-        title: `Mélodie ${emotion} 1`,
-        artist: 'EmotionsCare Music',
-        url: '',
-      },
-      {
-        id: `track-${emotion}-2`,
-        title: `Mélodie ${emotion} 2`,
-        artist: 'EmotionsCare Music',
-        url: '',
-      }
-    ],
-    emotion: emotion,
-  };
-}
-
-// Helper function to find tracks by mood from a collection
+/**
+ * Find tracks by mood/emotion in a collection of tracks
+ */
 export function findTracksByMood(tracks: MusicTrack[], mood: string): MusicTrack[] {
-  if (!Array.isArray(tracks) || !mood) return [];
+  if (!tracks || !Array.isArray(tracks) || tracks.length === 0) return [];
+  
+  const normalizedMood = mood.toLowerCase();
   
   return tracks.filter(track => {
-    const trackMood = track.mood || track.emotion || '';
-    const trackTags = track.tags || [];
-    return trackMood.toLowerCase().includes(mood.toLowerCase()) || 
-           trackTags.some(tag => tag.toLowerCase().includes(mood.toLowerCase()));
+    const trackEmotion = (track.emotion || '').toLowerCase();
+    const trackMood = (track.mood || '').toLowerCase();
+    
+    return trackEmotion.includes(normalizedMood) || 
+           normalizedMood.includes(trackEmotion) ||
+           trackMood.includes(normalizedMood) ||
+           normalizedMood.includes(trackMood);
   });
+}
+
+/**
+ * Create a music params object from emotion string or object
+ */
+export function createMusicParams(emotion: string | EmotionMusicParams): EmotionMusicParams {
+  if (typeof emotion === 'string') {
+    return { emotion };
+  }
+  return emotion;
 }

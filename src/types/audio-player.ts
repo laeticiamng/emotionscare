@@ -5,8 +5,8 @@ export interface UseAudioPlayerStateReturn {
   currentTime: number;
   volume: number;
   muted: boolean;
-  currentTrack?: any;
   track?: any;
+  currentTrack?: any;
   loop: boolean;
   autoplay: boolean;
   play: () => Promise<void>;

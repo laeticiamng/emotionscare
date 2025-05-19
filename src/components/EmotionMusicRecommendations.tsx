@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Music, Play } from 'lucide-react';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { useMusic } from '@/hooks/useMusic';
-import { convertToPlaylist } from '@/utils/musicCompatibility';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 
 interface EmotionMusicRecommendationsProps {
   emotion: string;
@@ -26,7 +26,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   const [loading, setLoading] = useState(false);
   const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
   const music = useMusic();
-
+  const { activateMusicForEmotion } = useMusicEmotionIntegration();
 
   useEffect(() => {
     const loadRecommendation = async () => {
@@ -39,18 +39,12 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
           intensity,
         };
         
-        let newPlaylist = null;
+        // Use the new integration hook to load music recommendations
+        const success = await activateMusicForEmotion(params);
         
-        // Essayer loadPlaylistForEmotion ou getRecommendationByEmotion
-        if (music.loadPlaylistForEmotion) {
-          newPlaylist = await music.loadPlaylistForEmotion(params);
-        } else if (music.getRecommendationByEmotion) {
-          newPlaylist = await music.getRecommendationByEmotion(params);
-        }
-        
-        if (newPlaylist) {
-          // Normaliser la playlist pour éviter les erreurs de typage
-          setPlaylist(convertToPlaylist(newPlaylist));
+        // Get the current playlist if available
+        if (success && music.currentPlaylist) {
+          setPlaylist(music.currentPlaylist);
         }
       } catch (error) {
         console.error('Erreur lors du chargement des recommandations musicales:', error);
@@ -60,29 +54,12 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
     };
     
     loadRecommendation();
-  }, [emotion, intensity]);
+  }, [emotion, intensity, activateMusicForEmotion, music.currentPlaylist]);
 
   const handlePlayMusic = () => {
-    if (playlist && music.playPlaylist) {
+    if (playlist && playlist.tracks && playlist.tracks.length > 0) {
       if (onPlayStart) onPlayStart();
-      if (playlist.tracks && playlist.tracks.length > 0) {
-        // Jouer la première piste et ouvrir le drawer si disponible
-        music.playPlaylist(playlist);
-
-        // Si une fonction spécifique pour définir la piste courante existe
-        if (music.currentTrack !== null && playlist.tracks[0]) {
-          if (typeof music.play === 'function') {
-            music.play(playlist.tracks[0], playlist);
-          }
-        }
-
-        // Ouvrir le drawer si cette fonction existe
-        if (music.toggleDrawer) {
-          music.toggleDrawer();
-        } else if (music.openDrawer !== undefined && typeof music.setOpenDrawer === 'function') {
-          music.setOpenDrawer(true);
-        }
-      }
+      activateMusicForEmotion({ emotion, intensity });
     }
   };
 

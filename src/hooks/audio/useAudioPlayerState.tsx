@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { MusicTrack } from '@/types/music';
 
@@ -6,11 +7,28 @@ interface UseAudioPlayerStateReturn {
   setTrack: (track: MusicTrack) => void;
   isPlaying: boolean;
   setIsPlaying: (isPlaying: boolean) => void;
+  currentTime: number;
+  duration: number;
+  volume: number;
+  isLoading: boolean;
+  error: string;
+  muted: boolean;
+  currentTrack: MusicTrack | null;
+  seekTo: (time: number) => void;
+  toggleMute: () => void;
+  playTrack: (track: MusicTrack) => void;
+  setVolume: (value: number) => void;
 }
 
 export function useAudioPlayerState(): UseAudioPlayerStateReturn {
   const [trackState, setTrackState] = useState<MusicTrack | null>(null);
   const [isPlayingState, setIsPlayingState] = useState(false);
+  const [currentTimeState, setCurrentTimeState] = useState(0);
+  const [durationState, setDurationState] = useState(0);
+  const [volumeState, setVolumeState] = useState(0.7);
+  const [isLoadingState, setIsLoadingState] = useState(false);
+  const [errorState, setErrorState] = useState('');
+  const [mutedState, setMutedState] = useState(false);
 
   useEffect(() => {
     console.log('Current track:', trackState);
@@ -32,10 +50,43 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
     setTrackState(completeTrack);
   };
 
+  const seek = (time: number) => {
+    setCurrentTimeState(time);
+  };
+
+  const toggleMuteFunc = () => {
+    setMutedState(!mutedState);
+  };
+
+  const playTrackFunc = (track: MusicTrack) => {
+    setCurrentTrack(track);
+    setIsPlayingState(true);
+  };
+
+  const setVolumeFunc = (value: number) => {
+    setVolumeState(value);
+    if (value > 0 && mutedState) {
+      setMutedState(false);
+    }
+  };
+
   return {
     track: trackState,
     setTrack: setCurrentTrack,
     isPlaying: isPlayingState,
     setIsPlaying: setIsPlayingState,
+    currentTime: currentTimeState,
+    duration: durationState,
+    volume: volumeState,
+    isLoading: isLoadingState,
+    error: errorState,
+    muted: mutedState,
+    currentTrack: trackState,
+    seekTo: seek,
+    toggleMute: toggleMuteFunc,
+    playTrack: playTrackFunc,
+    setVolume: setVolumeFunc
   };
 }
+
+export default useAudioPlayerState;

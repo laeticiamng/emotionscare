@@ -3,47 +3,24 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music, Play } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
-import { useToast } from '@/hooks/use-toast';
 import { EmotionResult } from '@/types/emotion';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 
 interface MusicEmotionRecommendationProps {
   emotionResult: EmotionResult;
 }
 
 const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({ emotionResult }) => {
-  const music = useMusic();
-  const { toast } = useToast();
+  const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
   
   const handleActivateMusic = async () => {
     try {
-      const playlist = await music.loadPlaylistForEmotion({
+      await activateMusicForEmotion({
         emotion: emotionResult.emotion.toLowerCase(),
         intensity: emotionResult.confidence
       });
-      
-      if (playlist && music.setPlaylist) {
-        music.setPlaylist(playlist);
-        if (playlist.tracks.length > 0 && music.playTrack) {
-          music.playTrack(playlist.tracks[0]);
-        }
-      }
-      
-      if (music.setOpenDrawer) {
-        music.setOpenDrawer(true);
-      }
-      
-      toast({
-        title: 'Musique activée',
-        description: `Une playlist adaptée à votre humeur ${emotionResult.emotion} est maintenant active.`,
-      });
     } catch (error) {
       console.error('Error activating music for emotion:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible d\'activer la musique adaptée à votre humeur.',
-        variant: 'destructive',
-      });
     }
   };
   

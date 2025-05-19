@@ -1,5 +1,11 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Music, Play, Pause } from 'lucide-react';
+import { useMusic } from '@/hooks/useMusic';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
+import { MusicTrack } from '@/types/music';
 
 interface VRMusicIntegrationProps {
   sessionId: string;
@@ -7,51 +13,102 @@ interface VRMusicIntegrationProps {
   onMusicReady?: () => void;
 }
 
-const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({ 
-  sessionId, 
-  emotionTarget, 
-  onMusicReady 
+const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
+  sessionId,
+  emotionTarget,
+  onMusicReady
 }) => {
-  // These would be fetched from an API based on the emotion target
-  const recommendedTrackId: string = `track_${emotionTarget}_${sessionId}`;
+  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const music = useMusic();
+  const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
   
-  // Track information
-  const trackTitle: string = `Music for ${emotionTarget}`;
-  
-  // Artist information
-  const artistName: string = "EmotionalSounds";
-
-  // Audio URL (would come from an API)
-  const audioUrl: string = `/music/${emotionTarget}-ambient.mp3`;
-
-  React.useEffect(() => {
-    // Simulating music loading and preparation
-    const timer = setTimeout(() => {
-      if (onMusicReady) {
-        onMusicReady();
-      }
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, [onMusicReady]);
-
-  return (
-    <div className="p-4 bg-primary/5 rounded-lg">
-      <h3 className="font-medium mb-2">Music Integration</h3>
-      <p className="text-sm text-muted-foreground mb-3">
-        Enhanced with music that complements your {emotionTarget} experience
-      </p>
+  // Automatically load music when component mounts
+  useEffect(() => {
+    const loadRecommendation = async () => {
+      setIsLoading(true);
       
-      <div className="flex items-center gap-3 bg-card p-3 rounded-md">
-        <div className="h-12 w-12 bg-primary/20 rounded flex items-center justify-center">
-          <span className="text-primary">♪</span>
+      try {
+        const success = await activateMusicForEmotion({
+          emotion: emotionTarget,
+          intensity: 0.7
+        });
+        
+        if (success && onMusicReady) {
+          onMusicReady();
+        }
+        
+        if (music.currentTrack) {
+          setCurrentTrack(music.currentTrack);
+        }
+      } catch (error) {
+        console.error('Failed to load recommended music:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadRecommendation();
+  }, [emotionTarget, activateMusicForEmotion, music.currentTrack, onMusicReady]);
+  
+  const handleTogglePlay = () => {
+    if (music.isPlaying) {
+      music.pauseTrack ? music.pauseTrack() : (music.pause && music.pause());
+    } else {
+      music.resumeTrack ? music.resumeTrack() : (music.resume && music.resume());
+    }
+  };
+  
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Music className="h-5 w-5 mr-2 text-primary" />
+          Musique immersive
+        </CardTitle>
+        <CardDescription>
+          Musique adaptée à cette session immersive
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="bg-muted/40 p-3 rounded-md">
+            <p className="text-sm font-medium">Thème émotionnel</p>
+            <p className="text-sm text-muted-foreground">{emotionTarget.charAt(0).toUpperCase() + emotionTarget.slice(1)}</p>
+          </div>
+          
+          {currentTrack && (
+            <div className="bg-primary/10 p-3 rounded-md">
+              <p className="text-sm font-medium">{currentTrack.title}</p>
+              <p className="text-xs text-muted-foreground">{currentTrack.artist}</p>
+            </div>
+          )}
+          
+          <Button 
+            onClick={handleTogglePlay} 
+            className="w-full" 
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="flex items-center">
+                <Music className="animate-pulse mr-2 h-4 w-4" />
+                Chargement...
+              </span>
+            ) : music.isPlaying ? (
+              <>
+                <Pause className="mr-2 h-4 w-4" />
+                Pause
+              </>
+            ) : (
+              <>
+                <Play className="mr-2 h-4 w-4" />
+                Jouer
+              </>
+            )}
+          </Button>
         </div>
-        <div>
-          <p className="font-medium text-sm">{trackTitle}</p>
-          <p className="text-xs text-muted-foreground">{artistName}</p>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

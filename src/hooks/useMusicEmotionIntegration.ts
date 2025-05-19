@@ -1,71 +1,108 @@
 
-import { useCallback } from 'react';
-import { useMusic } from '@/providers/MusicProvider';
+import { useEffect, useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { EmotionMusicParams } from '@/types/music';
+import { useMusic } from '@/hooks/useMusic';
+import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { createMusicParams, convertToPlaylist } from '@/utils/musicCompatibility';
 
-/**
- * Hook that integrates emotion recognition with music playback
- */
+// Map of emotions to descriptions
+const EMOTION_DESCRIPTIONS: Record<string, string> = {
+  calm: 'Des sons apaisants pour favoriser la relaxation et la sérénité.',
+  happy: 'Des mélodies joyeuses pour amplifier votre bonne humeur.',
+  sad: 'Des compositions douces pour vous accompagner dans vos moments mélancoliques.',
+  angry: 'Des rythmes pour canaliser et apaiser les sentiments de colère.',
+  anxious: 'De la musique apaisante pour réduire l\'anxiété et le stress.',
+  energetic: 'Des rythmes dynamiques pour renforcer votre énergie.',
+  focused: 'Des sons ambiants pour améliorer votre concentration.',
+  peaceful: 'Des mélodies douces pour cultiver un sentiment de paix intérieure.',
+  excited: 'Des compositions entraînantes pour accompagner votre enthousiasme.',
+  stressed: 'Des sons relaxants pour vous aider à gérer votre stress.',
+  default: 'Une sélection musicale adaptée à votre état émotionnel.'
+};
+
 export const useMusicEmotionIntegration = () => {
   const music = useMusic();
   const { toast } = useToast();
+  const [isActivating, setIsActivating] = useState(false);
   
-  const getEmotionMusicDescription = (emotion: string): string => {
-    const descriptions: Record<string, string> = {
-      'happy': 'Des mélodies joyeuses pour amplifier votre bonne humeur',
-      'calm': 'Des sonorités apaisantes pour retrouver la sérénité',
-      'focus': 'Des compositions pour améliorer votre concentration',
-      'focused': 'Des compositions pour améliorer votre concentration',
-      'energetic': 'Des rythmes dynamiques pour booster votre énergie',
-      'sad': 'Des mélodies mélancoliques pour accompagner vos émotions',
-      'anxiety': 'Des sons apaisants pour réduire votre anxiété',
-      'confidence': 'Des compositions inspirantes pour renforcer votre confiance',
-      'sleep': 'Des berceuses douces pour faciliter l\'endormissement',
-      'relaxed': 'Des ambiances douces pour vous aider à vous détendre'
-    };
-    
-    return descriptions[emotion.toLowerCase()] || 'Musique adaptée à votre humeur';
-  };
-  
-  const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams) => {
+  // Activate music for a specific emotion
+  const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams | string) => {
+    setIsActivating(true);
     try {
-      const playlist = await music.loadPlaylistForEmotion(params);
+      const musicParams = createMusicParams(params);
+      let playlist: MusicPlaylist | null = null;
+      
+      // Try different methods to get emotion-based music
+      if (music.loadPlaylistForEmotion) {
+        playlist = await music.loadPlaylistForEmotion(musicParams);
+      } else if (music.getRecommendationByEmotion) {
+        playlist = await music.getRecommendationByEmotion(musicParams);
+      } else if (music.playEmotion) {
+        music.playEmotion(musicParams.emotion);
+        return true;
+      }
       
       if (playlist) {
-        music.setOpenDrawer(true);
+        // Convert to standard format
+        const formattedPlaylist = convertToPlaylist(playlist);
         
-        toast({
-          title: "Musique activée",
-          description: `Une playlist adaptée à votre humeur ${params.emotion} est maintenant disponible.`,
-        });
-        
-        return true;
-      } else {
-        toast({
-          title: "Musique non disponible",
-          description: `Aucune playlist n'est disponible pour l'émotion ${params.emotion} pour le moment.`,
-          variant: "destructive",
-        });
-        
-        return false;
+        // Play the playlist
+        if (formattedPlaylist.tracks.length > 0) {
+          if (music.setPlaylist && music.playTrack) {
+            music.setPlaylist(formattedPlaylist);
+            music.playTrack(formattedPlaylist.tracks[0]);
+          } else if (music.playPlaylist) {
+            music.playPlaylist(formattedPlaylist);
+          } else if (music.play) {
+            music.play(formattedPlaylist.tracks[0], formattedPlaylist);
+          }
+          
+          // Open the music drawer if available
+          if (music.setOpenDrawer) {
+            music.setOpenDrawer(true);
+          } else if (music.toggleDrawer) {
+            music.toggleDrawer();
+          }
+          
+          toast({
+            title: 'Musique activée',
+            description: `Playlist "${formattedPlaylist.title}" adaptée à votre humeur.`,
+          });
+          
+          return true;
+        }
       }
-    } catch (error) {
-      console.error("Erreur lors de l'activation de la musique:", error);
       
       toast({
-        title: "Erreur",
-        description: "Impossible d'activer la musique pour votre émotion.",
-        variant: "destructive",
+        title: 'Aucune musique disponible',
+        description: 'Impossible de trouver une playlist adaptée à cette émotion.',
+        variant: 'destructive',
       });
       
       return false;
+    } catch (error) {
+      console.error('Error activating music for emotion:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'activer la musique pour cette émotion.',
+        variant: 'destructive',
+      });
+      return false;
+    } finally {
+      setIsActivating(false);
     }
   }, [music, toast]);
+  
+  // Get description for an emotion
+  const getEmotionMusicDescription = useCallback((emotion: string): string => {
+    const normalizedEmotion = emotion.toLowerCase();
+    return EMOTION_DESCRIPTIONS[normalizedEmotion] || EMOTION_DESCRIPTIONS.default;
+  }, []);
   
   return {
     activateMusicForEmotion,
     getEmotionMusicDescription,
+    isActivating
   };
 };
 

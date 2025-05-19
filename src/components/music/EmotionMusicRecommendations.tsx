@@ -4,8 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Music } from 'lucide-react';
 import { useMusic } from '@/hooks/useMusic';
-import { ensurePlaylist } from '@/utils/musicCompatibility';
-import { EmotionMusicParams } from '@/types/music';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 
 interface EmotionMusicRecommendationsProps {
   emotion?: string;
@@ -16,13 +15,8 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   emotion = "calm",
   className = ""
 }) => {
-  const { 
-    currentTrack, 
-    playTrack, 
-    isPlaying, 
-    pauseTrack, 
-    loadPlaylistForEmotion 
-  } = useMusic();
+  const music = useMusic();
+  const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
   
   const [recommendedEmotion, setRecommendedEmotion] = useState(emotion);
   
@@ -60,9 +54,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   }, [emotion]);
 
   const handlePlayMusic = async () => {
-    if (loadPlaylistForEmotion) {
-      await loadPlaylistForEmotion(recommendedEmotion);
-    }
+    await activateMusicForEmotion(recommendedEmotion);
   };
 
   return (

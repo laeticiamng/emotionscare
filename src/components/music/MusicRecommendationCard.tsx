@@ -4,9 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Music } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
-import { EmotionMusicParams } from '@/types/music';
-import { ensurePlaylist } from '@/utils/musicCompatibility';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 import { useToast } from '@/hooks/use-toast';
 
 interface MusicRecommendationCardProps {
@@ -18,52 +16,23 @@ interface MusicRecommendationCardProps {
 const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({ title, emotion, icon }) => {
   const [intensity, setIntensity] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
-  const music = useMusic();
+  const { activateMusicForEmotion } = useMusicEmotionIntegration();
   const { toast } = useToast();
 
   const handleGenerateMusic = async () => {
     setIsLoading(true);
     try {
-      // Utiliser loadPlaylistForEmotion s'il existe, sinon simuler
-      const params: EmotionMusicParams = {
+      const success = await activateMusicForEmotion({
         emotion: emotion,
         intensity: intensity / 100
-      };
+      });
       
-      let playlist;
-      if (music.loadPlaylistForEmotion) {
-        playlist = await music.loadPlaylistForEmotion(params);
-      } else if (music.getRecommendationByEmotion) {
-        playlist = await music.getRecommendationByEmotion(params); // Fixed: removed the second argument
-      } else {
-        // Simulation si aucune méthode n'est disponible
+      if (!success) {
         toast({
-          title: "Fonctionnalité limitée",
-          description: "La génération de musique par émotion n'est pas disponible actuellement."
+          title: "Aucun morceau trouvé",
+          description: "Essayez avec une autre émotion ou un autre niveau d'intensité",
+          variant: "destructive"
         });
-        setIsLoading(false);
-        return;
-      }
-      
-      if (playlist) {
-        const formattedPlaylist = ensurePlaylist(playlist);
-        
-        if (formattedPlaylist.tracks.length > 0) {
-          if (music.setPlaylist) music.setPlaylist(formattedPlaylist);
-          if (music.setCurrentTrack) music.setCurrentTrack(formattedPlaylist.tracks[0]);
-          if (music.setOpenDrawer) music.setOpenDrawer(true);
-          
-          toast({
-            title: "Playlist générée",
-            description: `${formattedPlaylist.tracks.length} morceaux basés sur l'émotion "${emotion}"`
-          });
-        } else {
-          toast({
-            title: "Aucun morceau trouvé",
-            description: "Essayez avec une autre émotion ou un autre niveau d'intensité",
-            variant: "destructive"
-          });
-        }
       }
     } catch (error) {
       console.error('Error generating music:', error);
