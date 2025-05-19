@@ -1,141 +1,86 @@
 
 import { MusicTrack, MusicPlaylist, Track, Playlist } from '@/types/music';
+import { v4 as uuid } from 'uuid';
 
 /**
- * Récupère le titre d'une piste de façon compatible entre différentes interfaces
+ * Extraire la propriété cover d'une piste
  */
-export const getTrackTitle = (track: any): string => {
-  if (!track) return 'Unknown Track';
-  return track.title || track.name || 'Unknown Track';
+export const getTrackCover = (track: MusicTrack | Track): string => {
+  return track.coverUrl || track.cover || track.coverImage || '';
 };
 
 /**
- * Récupère l'artiste d'une piste de façon compatible entre différentes interfaces
+ * Extraire le titre d'une piste
  */
-export const getTrackArtist = (track: any): string => {
-  if (!track) return 'Unknown Artist';
-  return track.artist || 'Unknown Artist';
+export const getTrackTitle = (track: MusicTrack | Track): string => {
+  return track.title || track.name || 'Titre inconnu';
 };
 
 /**
- * Récupère l'URL de couverture d'une piste de façon compatible entre différentes interfaces
+ * Extraire l'artiste d'une piste
  */
-export const getTrackCover = (track: any): string | undefined => {
-  if (!track) return undefined;
-  return track.cover || track.coverUrl || track.coverImage || undefined;
+export const getTrackArtist = (track: MusicTrack | Track): string => {
+  return track.artist || 'Artiste inconnu';
 };
 
 /**
- * Récupère l'URL audio d'une piste de façon compatible entre différentes interfaces
+ * Extraire l'URL audio d'une piste
  */
-export const getTrackAudioUrl = (track: any): string => {
-  if (!track) return '';
+export const getTrackUrl = (track: MusicTrack | Track): string => {
   return track.url || track.audioUrl || track.src || track.track_url || '';
 };
 
 /**
- * Convertit un objet de type Track en type MusicTrack
+ * Convertir un objet quelconque en MusicTrack valide
  */
-export const convertToMusicTrack = (track: Track): MusicTrack => {
+export const normalizeTrack = (track: any): MusicTrack => {
   return {
-    id: track.id,
-    title: track.title || track.name || '',
-    name: track.name || track.title || '',
-    artist: track.artist || '',
+    id: track.id || uuid(),
+    title: track.title || track.name || 'Sans titre',
+    name: track.name || track.title,
+    artist: track.artist || 'Artiste inconnu',
     duration: track.duration || 0,
-    audioUrl: track.audioUrl || track.url || '',
-    url: track.url || track.audioUrl || '',
-    coverUrl: track.cover || undefined,
-    cover: track.cover || undefined
+    url: getTrackUrl(track),
+    audioUrl: track.audioUrl || track.url || track.src,
+    cover: track.cover || track.coverUrl || '',
+    coverUrl: track.coverUrl || track.cover || '',
+    coverImage: track.coverImage || track.coverUrl || track.cover || '',
+    emotion: track.emotion || '',
+    mood: Array.isArray(track.mood) ? track.mood : track.mood ? [track.mood] : [],
+    genre: track.genre || '',
+    album: track.album || '',
+    tags: track.tags || []
   };
 };
 
 /**
- * Convertit un objet de type MusicTrack en type Track
+ * Convertir un array en playlist
  */
-export const convertToTrack = (musicTrack: MusicTrack): Track => {
-  return {
-    id: musicTrack.id,
-    title: musicTrack.title || musicTrack.name || '',
-    name: musicTrack.name || musicTrack.title || '',
-    artist: musicTrack.artist || '',
-    url: musicTrack.audioUrl || musicTrack.url || '',
-    cover: musicTrack.coverUrl || musicTrack.cover,
-    audioUrl: musicTrack.audioUrl || musicTrack.url || '',
-    duration: musicTrack.duration || 0
-  };
-};
-
-/**
- * Convertit un objet de type MusicPlaylist en type Playlist
- */
-export const convertToPlaylist = (musicPlaylist: MusicPlaylist): Playlist => {
-  return {
-    id: musicPlaylist.id,
-    name: musicPlaylist.name || musicPlaylist.title || 'Untitled Playlist',
-    title: musicPlaylist.title || musicPlaylist.name || 'Untitled Playlist',
-    tracks: musicPlaylist.tracks.map(track => convertToTrack(track))
-  };
-};
-
-/**
- * Convertit un objet de type Playlist en type MusicPlaylist
- */
-export const convertToMusicPlaylist = (playlist: Playlist): MusicPlaylist => {
-  return {
-    id: playlist.id,
-    name: playlist.name || playlist.title || 'Untitled Playlist',
-    title: playlist.title || playlist.name || 'Untitled Playlist',
-    tracks: playlist.tracks.map(track => convertToMusicTrack(track)),
-    description: ''
-  };
-};
-
-/**
- * S'assure qu'un objet est bien de type Playlist
- */
-export const ensurePlaylist = (playlist: any): Playlist => {
-  if (!playlist) {
-    return { id: 'empty', name: 'Empty Playlist', tracks: [] };
-  }
-  
-  // Si c'est un tableau, convertir en playlist
-  if (Array.isArray(playlist)) {
+export const ensurePlaylist = (data: any): MusicPlaylist => {
+  if (Array.isArray(data)) {
+    // Si c'est un array de pistes, créer une playlist
     return {
-      id: 'generated',
-      name: 'Generated Playlist',
-      title: 'Generated Playlist',
-      tracks: playlist.map(track => ensureTrack(track))
+      id: `playlist-${Date.now()}`,
+      name: 'Playlist générée',
+      title: 'Playlist générée',
+      tracks: data.map(normalizeTrack)
+    };
+  } else if (data && data.tracks) {
+    // Si c'est un objet avec un tableau de pistes, normaliser les pistes
+    return {
+      ...data,
+      id: data.id || `playlist-${Date.now()}`,
+      name: data.name || data.title || 'Playlist',
+      title: data.title || data.name || 'Playlist',
+      tracks: Array.isArray(data.tracks) ? data.tracks.map(normalizeTrack) : []
+    };
+  } else {
+    // Créer une playlist vide par défaut
+    return {
+      id: `playlist-${Date.now()}`,
+      name: 'Playlist vide',
+      title: 'Playlist vide',
+      tracks: []
     };
   }
-  
-  // Si c'est déjà une playlist, s'assurer que les tracks sont correctes
-  return {
-    id: playlist.id || 'unknown',
-    name: playlist.name || playlist.title || 'Untitled Playlist',
-    title: playlist.title || playlist.name || 'Untitled Playlist',
-    tracks: Array.isArray(playlist.tracks) 
-      ? playlist.tracks.map(track => ensureTrack(track)) 
-      : []
-  };
-};
-
-/**
- * S'assure qu'un objet est bien de type Track
- */
-export const ensureTrack = (track: any): Track => {
-  if (!track) {
-    return { id: 'empty', url: '', name: 'Unknown Track' };
-  }
-  
-  return {
-    id: track.id || 'unknown',
-    title: track.title || track.name || 'Unknown Track',
-    name: track.name || track.title || 'Unknown Track',
-    artist: track.artist || 'Unknown Artist',
-    url: track.url || track.audioUrl || '',
-    audioUrl: track.audioUrl || track.url || '',
-    cover: track.cover || track.coverUrl || track.coverImage,
-    duration: track.duration || 0
-  };
 };

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Heart, PlayCircle } from 'lucide-react';
 import { useMusic } from '@/contexts/music';
-import { EmotionMusicParams } from '@/types/music';
+import { EmotionMusicParams, MusicContextType, MusicPlaylist } from '@/types/music';
 import { ensurePlaylist } from '@/utils/musicCompatibility';
 
 // Emotion preset cards for quick selection
@@ -18,37 +18,30 @@ const emotionPresets = [
 ];
 
 const EmotionMusicRecommendations: React.FC = () => {
-  const { getRecommendationByEmotion, setPlaylist, setCurrentTrack, isInitialized } = useMusic();
+  const music = useMusic() as MusicContextType;
   const [selectedEmotion, setSelectedEmotion] = useState('calm');
   const [intensity, setIntensity] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGetRecommendation = async () => {
-    if (!isInitialized || !getRecommendationByEmotion) return;
+    if (!music.loadPlaylistForEmotion) return;
     
     setIsLoading(true);
     try {
-      // Tentative avec différentes signatures de méthode
-      let playlist;
-      try {
-        // Essai avec l'objet params
-        const params: EmotionMusicParams = {
-          emotion: selectedEmotion,
-          intensity: intensity,
-        };
-        playlist = await getRecommendationByEmotion(params);
-      } catch (err) {
-        // Fallback: essai avec juste l'émotion comme string
-        playlist = await getRecommendationByEmotion(selectedEmotion);
-      }
+      const params: EmotionMusicParams = {
+        emotion: selectedEmotion,
+        intensity: intensity,
+      };
+      
+      // Utiliser loadPlaylistForEmotion au lieu de getRecommendationByEmotion car c'est plus stable
+      const playlist = await music.loadPlaylistForEmotion(params);
       
       if (playlist) {
-        // Convertir en playlist si on a reçu un array
         const formattedPlaylist = ensurePlaylist(playlist);
         
         if (formattedPlaylist.tracks.length > 0) {
-          setPlaylist && setPlaylist(formattedPlaylist);
-          setCurrentTrack && setCurrentTrack(formattedPlaylist.tracks[0]);
+          music.setPlaylist && music.setPlaylist(formattedPlaylist);
+          music.setCurrentTrack && music.setCurrentTrack(formattedPlaylist.tracks[0]);
         }
       }
     } catch (error) {
@@ -110,7 +103,7 @@ const EmotionMusicRecommendations: React.FC = () => {
         </Button>
         <Button
           onClick={handleGetRecommendation}
-          disabled={isLoading || !isInitialized}
+          disabled={isLoading}
           className="flex items-center gap-1"
         >
           {isLoading ? (

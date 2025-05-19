@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useMusic } from '@/contexts/music';
 import { Heart, PlayCircle, Zap, Smile, Brain, Home, Moon, Music } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { EmotionMusicParams } from '@/types/music';
+import { EmotionMusicParams, MusicContextType } from '@/types/music';
 import { ensurePlaylist } from '@/utils/musicCompatibility';
 
 interface PresetButtonProps {
@@ -32,7 +32,7 @@ const PresetButton: React.FC<PresetButtonProps> = ({ label, icon, onClick, color
 );
 
 const RecommendedPresets: React.FC = () => {
-  const { getRecommendationByEmotion, setPlaylist, setCurrentTrack, setOpenDrawer } = useMusic();
+  const music = useMusic() as MusicContextType;
   const [loading, setLoading] = useState<string | null>(null);
 
   const presets = [
@@ -48,33 +48,21 @@ const RecommendedPresets: React.FC = () => {
     setLoading(preset.label);
     
     try {
-      if (!getRecommendationByEmotion) {
-        console.error("getRecommendationByEmotion function is not available");
-        return;
-      }
-
-      // On appelle soit avec l'émotion seule, soit avec l'objet complet selon l'implémentation
-      let playlist;
-      try {
-        // Essai avec l'objet params
-        const params: EmotionMusicParams = {
-          emotion: preset.emotion,
-          intensity: preset.intensity,
-        };
-        playlist = await getRecommendationByEmotion(params);
-      } catch (err) {
-        // Fallback: essai avec juste l'émotion comme string
-        playlist = await getRecommendationByEmotion(preset.emotion);
-      }
+      // Utiliser loadPlaylistForEmotion car c'est plus stable
+      const params: EmotionMusicParams = {
+        emotion: preset.emotion,
+        intensity: preset.intensity / 100,
+      };
+      
+      const playlist = await music.loadPlaylistForEmotion(params);
       
       if (playlist) {
-        // Convertir en playlist si on a reçu un array
         const formattedPlaylist = ensurePlaylist(playlist);
         
         if (formattedPlaylist.tracks.length > 0) {
-          setPlaylist && setPlaylist(formattedPlaylist);
-          setCurrentTrack && setCurrentTrack(formattedPlaylist.tracks[0]);
-          setOpenDrawer && setOpenDrawer(true);
+          music.setPlaylist && music.setPlaylist(formattedPlaylist);
+          music.setCurrentTrack && music.setCurrentTrack(formattedPlaylist.tracks[0]);
+          music.setOpenDrawer && music.setOpenDrawer(true);
         }
       }
     } catch (error) {

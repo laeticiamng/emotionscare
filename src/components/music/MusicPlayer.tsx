@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { useMusic } from '@/contexts';
+import { useMusic } from '@/contexts/music';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume, VolumeX, Music } from 'lucide-react';
 import { getTrackCover, getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
+import { MusicContextType } from '@/types/music';
 
 interface MusicProgressBarProps {
   currentTime?: number;
@@ -38,20 +39,26 @@ const MusicProgressBar: React.FC<MusicProgressBarProps> = ({
 };
 
 const MusicPlayer: React.FC = () => {
+  const music = useMusic() as MusicContextType;
   const { 
     currentTrack,
     isPlaying,
-    volume,
-    currentTime,
-    duration,
     togglePlay,
     nextTrack,
-    previousTrack,
-    seekTo,
-    setVolume,
-    toggleMute,
-    muted
-  } = useMusic();
+    pauseTrack,
+    resumeTrack,
+    error
+  } = music;
+  
+  // Valeurs par défaut si non disponibles dans le contexte
+  const volume = music.volume !== undefined ? music.volume : 0.5;
+  const currentTime = music.currentTime || 0;
+  const duration = music.duration || 0;
+  const previousTrack = music.previousTrack || (() => console.log('Previous track not implemented'));
+  const seekTo = music.seekTo || ((time: number) => console.log('Seek not implemented', time));
+  const setVolume = music.setVolume || ((vol: number) => console.log('Set volume not implemented', vol));
+  const toggleMute = music.toggleMute || (() => console.log('Toggle mute not implemented'));
+  const muted = music.muted !== undefined ? music.muted : false;
 
   const formatTime = (seconds: number) => {
     if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
@@ -127,8 +134,8 @@ const MusicPlayer: React.FC = () => {
           </div>
 
           <MusicProgressBar
-            currentTime={currentTime || 0}
-            duration={duration || 100}
+            currentTime={currentTime}
+            duration={duration}
             onSeek={seekTo}
             formatTime={formatTime}
           />

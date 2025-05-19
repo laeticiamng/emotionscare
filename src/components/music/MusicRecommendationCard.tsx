@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Music } from 'lucide-react';
 import { useMusic } from '@/contexts/music';
-import { EmotionMusicParams } from '@/types/music';
+import { EmotionMusicParams, MusicContextType } from '@/types/music';
 import { ensurePlaylist } from '@/utils/musicCompatibility';
 
 interface MusicRecommendationCardProps {
@@ -17,38 +17,26 @@ interface MusicRecommendationCardProps {
 const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({ title, emotion, icon }) => {
   const [intensity, setIntensity] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
-  const { getRecommendationByEmotion, setPlaylist, setCurrentTrack, setOpenDrawer } = useMusic();
+  const music = useMusic() as MusicContextType;
 
   const handleGenerateMusic = async () => {
     setIsLoading(true);
     try {
-      if (!getRecommendationByEmotion) {
-        console.error("getRecommendationByEmotion function is not available");
-        return;
-      }
-
-      // Tentative avec différentes signatures de méthode
-      let playlist;
-      try {
-        // Essai avec l'objet params
-        const params: EmotionMusicParams = {
-          emotion: emotion,
-          intensity: intensity
-        };
-        playlist = await getRecommendationByEmotion(params);
-      } catch (err) {
-        // Fallback: essai avec juste l'émotion comme string
-        playlist = await getRecommendationByEmotion(emotion);
-      }
-
+      // Utiliser loadPlaylistForEmotion car c'est plus stable
+      const params: EmotionMusicParams = {
+        emotion: emotion,
+        intensity: intensity / 100
+      };
+      
+      const playlist = await music.loadPlaylistForEmotion(params);
+      
       if (playlist) {
-        // Convertir en playlist si on a reçu un array
         const formattedPlaylist = ensurePlaylist(playlist);
         
         if (formattedPlaylist.tracks.length > 0) {
-          setPlaylist && setPlaylist(formattedPlaylist);
-          setCurrentTrack && setCurrentTrack(formattedPlaylist.tracks[0]);
-          setOpenDrawer && setOpenDrawer(true);
+          music.setPlaylist && music.setPlaylist(formattedPlaylist);
+          music.setCurrentTrack && music.setCurrentTrack(formattedPlaylist.tracks[0]);
+          music.setOpenDrawer && music.setOpenDrawer(true);
         }
       }
     } catch (error) {

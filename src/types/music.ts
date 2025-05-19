@@ -6,7 +6,7 @@
 // Interface de base pour une piste musicale
 export interface MusicTrack {
   id: string;
-  title?: string;
+  title: string;
   name?: string;
   artist?: string;
   duration?: number;
@@ -25,7 +25,7 @@ export interface MusicTrack {
   album?: string;
   intensity?: number;
   year?: number;
-  tags?: string[]; // Ajout de la propriété tags manquante
+  tags?: string[];
 }
 
 // Interface pour une playlist musicale
@@ -41,7 +41,7 @@ export interface MusicPlaylist {
   mood?: string;
   emotion?: string;
   isCustom?: boolean;
-  tags?: string[]; // Ajout de la propriété tags manquante
+  tags?: string[];
 }
 
 // Interface pour les paramètres de music par émotion
@@ -166,7 +166,7 @@ export interface MusicContextType {
 // Interface du type Track utilisée dans les composants existants
 export interface Track {
   id: string;
-  title?: string;
+  title: string;
   name?: string;
   artist?: string;
   url: string;
