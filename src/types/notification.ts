@@ -26,5 +26,17 @@ export interface Notification {
   category?: string;
   expiry?: string | Date;
   data?: Record<string, any>;
-  userId?: string; // ID de l'utilisateur auquel la notification est destinée
+  userId?: string;
 }
+
+// Notification preferences
+export interface NotificationPreference {
+  type: NotificationType;
+  enabled: boolean;
+  frequency: NotificationFrequency;
+  channels: NotificationChannel[];
+  timePreference?: 'any' | 'morning' | 'afternoon' | 'evening';
+}
+
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
+export type NotificationChannel = 'app' | 'email' | 'sms' | 'push';
