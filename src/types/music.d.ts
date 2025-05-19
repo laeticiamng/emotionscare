@@ -3,134 +3,76 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  duration: number;
-  audioUrl: string;
-  url?: string;
+  albumTitle?: string;
   coverUrl?: string;
-  category?: string;
+  audioUrl: string;
+  duration: number;
   emotion?: string;
   mood?: string;
+  intensity?: number;
+  year?: number | string;
+  tags?: string[] | string;
+  category?: string | string[];
 }
 
 export interface MusicPlaylist {
   id: string;
   title: string;
-  name?: string;
-  tracks: MusicTrack[];
   description?: string;
+  coverUrl?: string;
+  coverImage?: string;
+  tracks: MusicTrack[];
+  mood?: string;
   emotion?: string;
-  author?: string;
-  category?: string;
+  category?: string | string[];
+  creator?: string;
+  src?: string;
 }
+
+export type MusicCategory = 'relax' | 'focus' | 'energy' | 'sleep' | 'meditation' | 'mood' | 'custom';
 
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
-  playlist: MusicPlaylist | null;
-  playlists?: MusicPlaylist[];
+  currentPlaylist: MusicPlaylist | null;
+  playlists: MusicPlaylist[];
   isPlaying: boolean;
   volume: number;
-  progress?: number;
   duration: number;
   muted: boolean;
-  isRepeating?: boolean;
-  isShuffling?: boolean;
   currentTime: number;
+  isLoading?: boolean;
+  error?: string;
+  openDrawer?: boolean;
+  playlist?: MusicPlaylist | null;
+  
+  // Playback controls
   togglePlay: () => void;
   toggleMute: () => void;
-  toggleRepeat?: () => void;
-  toggleShuffle?: () => void;
-  setVolume: (value: number) => void;
-  setProgress?: (value: number) => void;
+  setVolume: (volume: number) => void;
   playTrack: (track: MusicTrack) => void;
   nextTrack: () => void;
   prevTrack: () => void;
   previousTrack?: () => void;
-  addTrack?: (track: MusicTrack) => void;
-  setPlaylist?: (playlist: MusicPlaylist) => void;
-  setCurrentTime?: (time: number) => void;
-  setDuration?: (duration: number) => void;
-  setIsPlaying?: (isPlaying: boolean) => void;
-  setIsInitialized?: (isInitialized: boolean) => void;
   pauseTrack?: () => void;
   resumeTrack?: () => void;
+  play?: () => void;
   pause?: () => void;
   resume?: () => void;
-  seek?: (time: number) => void;
-  seekTo?: (time: number) => void;
-  loadPlaylistForEmotion?: (params: EmotionMusicParams) => Promise<MusicPlaylist | null>;
-  getRecommendationByEmotion?: (params: EmotionMusicParams) => Promise<MusicPlaylist | null>;
-  playEmotion?: (emotion: string) => void;
-  setEmotion?: (emotion: string) => void;
-  openDrawer?: boolean;
-  setOpenDrawer?: (open: boolean) => void;
-  toggleDrawer?: () => void;
-  error?: Error | null;
-  isInitialized?: boolean;
-  play?: (track?: MusicTrack, playlist?: MusicPlaylist) => void;
-  playPlaylist?: (playlist: MusicPlaylist) => void;
   next?: () => void;
   previous?: () => void;
-  generateMusic?: (params: any) => Promise<MusicTrack>;
-}
-
-export interface MusicDrawerProps {
-  isOpen?: boolean;
-  onClose?: () => void;
-}
-
-export interface ProgressBarProps {
-  value?: number;
-  max?: number;
-  onChange?: (value: number) => void;
-  currentTime?: number;
-  duration?: number;
-  onSeek?: (time: number) => void;
-  formatTime?: (seconds: number) => string;
-}
-
-export interface VolumeControlProps {
-  volume?: number;
-  isMuted?: boolean;
-  onVolumeChange?: (value: number) => void;
-  onMuteToggle?: () => void;
-  className?: string;
-}
-
-export interface MusicControlsProps {
-  isPlaying: boolean;
-  isRepeating?: boolean;
-  isShuffling?: boolean;
-  onPlay: () => void;
-  onPrev: () => void;
-  onNext: () => void;
-  onRepeat?: () => void;
-  onShuffle?: () => void;
-}
-
-export interface MusicLibraryProps {
-  tracks: MusicTrack[];
-  onSelect: (track: MusicTrack) => void;
-  currentTrackId?: string;
-}
-
-export interface EmotionMusicParams {
-  emotion: string;
-  intensity?: number;
-}
-
-export interface TrackInfoProps {
-  track: MusicTrack;
-  className?: string;
-}
-
-export type MusicCategory = 'calm' | 'focus' | 'energy' | 'sleep' | 'joy' | 'sadness' | 'all';
-
-export interface MusicPreference {
-  id: string;
-  userId: string;
-  favoriteGenres: string[];
-  favoriteArtists: string[];
-  dislikedGenres?: string[];
-  volume?: number;
-  autoplay?: boolean;
+  seekTo?: (time: number) => void;
+  toggleDrawer?: () => void;
+  setOpenDrawer?: (isOpen: boolean) => void;
+  
+  // Music management
+  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
+  getRecommendationByEmotion?: (emotion: string) => Promise<MusicTrack | null>;
+  setEmotion?: (emotion: string) => void;
+  generateMusic?: (params: any) => Promise<MusicTrack | null>;
+  setPlaylist?: (playlist: MusicPlaylist) => void;
+  setCurrentTrack?: (track: MusicTrack) => void;
+  playPlaylist?: (playlist: MusicPlaylist) => void;
+  toggleRepeat?: () => void;
+  toggleShuffle?: () => void;
+  isInitialized?: boolean;
 }

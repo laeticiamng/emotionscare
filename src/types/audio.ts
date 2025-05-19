@@ -1,4 +1,3 @@
-
 export interface AudioTrack {
   id: string;
   title: string;
@@ -21,10 +20,21 @@ export interface MoodData {
   mood: string;
   intensity: number;
   timestamp: Date;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
 }
 
 export interface AudioProcessorProps {
   onAnalyze?: (data: EmotionalData) => void;
+  onResult?: (result: any) => void;
+  onProcessingChange?: (isProcessing: boolean) => void;
+  isRecording?: boolean;
+  duration?: number;
+  autoStart?: boolean;
+  className?: string;
+  mode?: 'continuous' | 'manual' | 'auto';
+  visualize?: boolean;
   threshold?: number;
   children?: React.ReactNode;
 }

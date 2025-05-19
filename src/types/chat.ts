@@ -10,7 +10,7 @@ export interface ChatMessage {
   conversation_id?: string; // For backward compatibility
   attachments?: string[];
   metadata?: Record<string, any>;
-  role?: string; // Optional role property to support different message types
+  role?: 'user' | 'assistant' | 'system' | 'coach'; // Optional role property to support different message types
   text?: string; // For backward compatibility
   emotion?: string; // Added for emotional context
   /** Flag for UI helpers identifying if message was sent by the user */
