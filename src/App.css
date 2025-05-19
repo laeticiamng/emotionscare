@@ -1,7 +1,7 @@
-
 /* Import premium styles */
 @import './styles/premium.css';
 @import './styles/glass.css';
+@import './styles/auth-animations.css';
 
 /* App-specific styles */
 #root {

@@ -1,20 +1,21 @@
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import AppRouter from './AppRouter';
+import './App.css';
+import AuthTransition from '@/components/auth/AuthTransition';
 
-import { BrowserRouter as Router } from 'react-router-dom';
-import { Toaster } from '@/components/ui/toaster';
-import AppRouter from '@/AppRouter';
-import RouteDebugger from '@/components/ui/RouteDebugger';
-import AppProviders from '@/providers/AppProviders';
+const App: React.FC = () => {
 
-function App() {
   return (
-    <Router>
-      <AppProviders>
-        <AppRouter />
-        <Toaster />
-        {import.meta.env.DEV && <RouteDebugger />}
-      </AppProviders>
-    </Router>
+    <BrowserRouter>
+      <ThemeProvider>
+        <AuthTransition>
+          <AppRouter />
+        </AuthTransition>
+      </ThemeProvider>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;

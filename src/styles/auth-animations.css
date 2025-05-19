@@ -1,0 +1,121 @@
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Form-specific animations */
+.input-focused {
+  transform: scale(1.02);
+  transition: transform 0.3s ease-out;
+}
+
+.label-float {
+  transform: translateY(-20px) scale(0.85);
+  color: theme('colors.primary.DEFAULT');
+  transition: all 0.3s ease-out;
+}
+
+/* Button hover effects */
+.premium-button {
+  transition: all 0.3s ease-out;
+}
+
+.premium-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+}
+
+.premium-button:active {
+  transform: translateY(1px);
+}
+
+/* Welcome message animations */
+.welcome-text {
+  background: linear-gradient(90deg, #3b82f6, #6366f1);
+  background-size: 200% 200%;
+  animation: gradientBG 6s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes gradientBG {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Loading dots animation */
+.loading-dots span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: currentColor;
+  border-radius: 50%;
+  margin: 0 3px;
+}
+
+.loading-dots span:nth-child(1) {
+  animation: pulse 1.5s infinite 0s;
+}
+
+.loading-dots span:nth-child(2) {
+  animation: pulse 1.5s infinite 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation: pulse 1.5s infinite 0.4s;
+}
