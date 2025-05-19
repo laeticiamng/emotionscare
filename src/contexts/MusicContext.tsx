@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { MusicContextType, MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { MusicContextType, MusicTrack, MusicPlaylist, MusicQueueItem, EmotionMusicParams } from '@/types/music';
 import { getPlaylistByEmotion } from '@/data/emotionPlaylists';
 import { mapAudioUrlToUrl } from '@/utils/musicCompatibility';
 
@@ -10,6 +10,7 @@ const defaultMusicState: MusicContextType = {
   currentPlaylist: null,
   playlist: null,
   queue: [],
+  history: [],
   isPlaying: false,
   volume: 0.75,
   muted: false,
@@ -27,6 +28,9 @@ const defaultMusicState: MusicContextType = {
   resumeTrack: () => {},
   previousTrack: () => {},
   nextTrack: () => {},
+  addToQueue: () => {},
+  removeFromQueue: () => {},
+  clearQueue: () => {},
 };
 
 // Create context
@@ -38,6 +42,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [queue, setQueue] = useState<MusicTrack[]>([]);
+  const [history, setHistory] = useState<MusicTrack[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.75);
   const [muted, setMuted] = useState(false);
@@ -52,11 +57,17 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Functions to control playback
   const playTrack = useCallback((track: MusicTrack) => {
-    // Ensure the track has a url property
     const processedTrack = mapAudioUrlToUrl(track);
     setCurrentTrack(processedTrack);
     setIsPlaying(true);
-  }, []);
+    setHistory(h => [
+      ...h,
+      {
+        ...processedTrack,
+        playlistId: currentPlaylist ? currentPlaylist.id : undefined,
+      },
+    ]);
+  }, [currentPlaylist]);
 
   const pauseTrack = useCallback(() => {
     setIsPlaying(false);
@@ -161,12 +172,31 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentTime(time);
   }, []);
 
+  const addToQueue = useCallback(
+    (track: MusicTrack) => {
+      setQueue(q => [
+        ...q,
+        { ...track, playlistId: currentPlaylist ? currentPlaylist.id : undefined }
+      ]);
+    },
+    [currentPlaylist]
+  );
+
+  const removeFromQueue = useCallback((index: number) => {
+    setQueue(q => q.filter((_, i) => i !== index));
+  }, []);
+
+  const clearQueue = useCallback(() => {
+    setQueue([]);
+  }, []);
+
   // Value object to be passed to consumers
   const value: MusicContextType = {
     currentTrack,
     currentPlaylist,
     playlist: currentPlaylist,
     queue,
+    history,
     isPlaying,
     volume,
     muted,
@@ -189,6 +219,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setVolume,
     setMuted,
     seekTo,
+    addToQueue,
+    removeFromQueue,
+    clearQueue,
     setRepeat,
     toggleShuffle,
     toggleRepeat,
@@ -202,6 +235,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsPlaying,
     setIsInitialized,
     setCurrentTrack,
+    setHistory,
     setEmotion,
   };
 

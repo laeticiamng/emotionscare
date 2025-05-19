@@ -90,13 +90,23 @@ export type {
   Emotion,
   EmotionResult,
   LiveVoiceScannerProps,
-  TeamOverviewProps,
   EmotionalTeamViewProps,
   EmotionRecommendation,
   TextEmotionScannerProps,
   EmojiEmotionScannerProps,
-  VoiceEmotionScannerProps
+  VoiceEmotionScannerProps,
+  VoiceEmotionAnalyzerProps
 } from './types/emotion';
+
+export type {
+  MoodEvent,
+  Prediction,
+  PredictionRecommendation,
+  EmotionalLocation,
+  SanctuaryWidget,
+  EmotionalSynthesis,
+  OrchestrationEvent
+} from '@types/orchestration';
 
 export type {
   JournalEntry
@@ -128,3 +138,14 @@ export type {
   ScanHistoryItem,
   EmotionGamificationStats
 } from './types/scan';
+
+export type {
+  MoodEvent,
+  EmotionalLocation,
+  SanctuaryWidget,
+  Prediction,
+  PredictionRecommendation,
+  EmotionalSynthesis,
+  OrchestrationEvent,
+  OrchestrationContextType
+} from './types/orchestration';

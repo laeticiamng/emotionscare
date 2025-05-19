@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types/theme';
+import { ThemeName, FontFamily, FontSize, ThemeContextType } from '@/types/theme';
 
 // Default values
 const defaultContext: ThemeContextType = {
@@ -10,9 +10,9 @@ const defaultContext: ThemeContextType = {
   toggleTheme: () => {},
   isDark: false,
   isDarkMode: false,
-  fontSize: "medium",
+  fontSize: "md",
   setFontSize: () => {},
-  fontFamily: "system",
+  fontFamily: "sans",
   setFontFamily: () => {},
   systemTheme: "light",
   soundEnabled: false,
@@ -38,12 +38,12 @@ export const useTheme = () => {
 
 // Provider component
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useLocalStorage<Theme>('theme', 'system');
-  const [fontFamily, setFontFamily] = useLocalStorage<FontFamily>('fontFamily', 'system');
-  const [fontSize, setFontSize] = useLocalStorage<FontSize>('fontSize', 'medium');
+  const [theme, setTheme] = useLocalStorage<ThemeName>('theme', 'system');
+  const [fontFamily, setFontFamily] = useLocalStorage<FontFamily>('fontFamily', 'sans');
+  const [fontSize, setFontSize] = useLocalStorage<FontSize>('fontSize', 'md');
   const [soundEnabled, setSoundEnabled] = useLocalStorage<boolean>('soundEnabled', false);
   const [reduceMotion, setReduceMotion] = useLocalStorage<boolean>('reduceMotion', false);
-  const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
+  const [systemTheme, setSystemTheme] = useState<ThemeName>("light");
   const [preferences, setPreferences] = useLocalStorage<any>('preferences', {});
   
   // Add useEffect to detect system theme preference
@@ -64,7 +64,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const isDark = theme === 'dark';
 
   const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light');
+    setTheme(prev => 
+      prev === 'light' ? 'dark' : 
+      prev === 'dark' ? 'system' : 'light'
+    );
   };
 
   const getContrastText = (color: string) => {

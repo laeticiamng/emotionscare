@@ -5,7 +5,7 @@
  * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
  */
 
-import { VRSession, VRSessionTemplate } from '@/types/vr';
+import { VRSession, VRSessionTemplate, VRSessionFeedback } from '@/types/vr';
 
 // Mock VR templates
 const vrTemplates: VRSessionTemplate[] = [
@@ -14,7 +14,7 @@ const vrTemplates: VRSessionTemplate[] = [
     title: 'Méditation en forêt',
     description: 'Une méditation immersive au cœur d\'une forêt paisible',
     duration: 600, // 10 minutes
-    difficulty: 'débutant',
+    difficulty: 'beginner', // Corrigé de "débutant"
     thumbnailUrl: '/images/vr/forest-meditation.jpg',
     environment: 'forest',
     category: 'meditation',
@@ -30,7 +30,7 @@ const vrTemplates: VRSessionTemplate[] = [
     title: 'Plage tropicale',
     description: 'Échappez-vous sur une plage tropicale idyllique',
     duration: 900, // 15 minutes
-    difficulty: 'intermédiaire',
+    difficulty: 'intermediate', // Corrigé de "intermédiaire"
     thumbnailUrl: '/images/vr/tropical-beach.jpg',
     environment: 'beach',
     category: 'relaxation',
@@ -53,12 +53,13 @@ const vrSessions: VRSession[] = [
     endedAt: new Date(Date.now() + 10 * 60000).toISOString(),
     duration: 600,
     completed: true,
+    progress: 100,
     feedback: {
       rating: 4,
       emotionBefore: 'stressed',
       emotionAfter: 'calm',
       comment: 'Très relaxant, j\'ai beaucoup aimé'
-    }
+    } as VRSessionFeedback
   },
   {
     id: '102',
@@ -68,12 +69,13 @@ const vrSessions: VRSession[] = [
     endedAt: new Date(Date.now() - 86400000 + 15 * 60000).toISOString(),
     duration: 900,
     completed: true,
+    progress: 100,
     feedback: {
       rating: 5,
       emotionBefore: 'anxious',
       emotionAfter: 'relaxed',
       comment: 'Parfait pour se détendre'
-    }
+    } as VRSessionFeedback
   }
 ];
 
@@ -116,6 +118,7 @@ export const createVRSession = async (sessionData: Partial<VRSession>): Promise<
         startedAt: new Date().toISOString(),
         duration: sessionData.duration || 0,
         completed: false,
+        progress: 0,
         ...sessionData
       };
       vrSessions.push(newSession);
@@ -138,7 +141,8 @@ export const completeVRSession = async (sessionId: string, sessionData: Partial<
         ...vrSessions[sessionIndex],
         ...sessionData,
         endedAt: new Date().toISOString(),
-        completed: true
+        completed: true,
+        progress: 100
       };
       
       vrSessions[sessionIndex] = updatedSession;

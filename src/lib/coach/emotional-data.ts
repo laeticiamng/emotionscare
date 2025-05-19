@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { EmotionalData } from '@/types/emotional-data';
+import { EmotionalData } from '@/hooks/coach/types';
 
 // Données émotionnelles en mémoire pour la démo
 let emotionalDataStore: EmotionalData[] = [];
@@ -36,17 +36,17 @@ export const getLatestEmotionalData = (userId: string): EmotionalData | null => 
 export const addContextualEmotionalData = (
   userId: string, 
   emotion: string, 
-  value: number, 
+  intensity: number, 
   partialData: Partial<EmotionalData> = {}
 ): EmotionalData => {
   const newEntry = addEmotionalData({
     user_id: userId,
     emotion,
-    value,
-    intensity: partialData.intensity || 5,
+    intensity: intensity || partialData.intensity || 5,
     timestamp: new Date().toISOString(),
     source: partialData.source || 'manual',
-    ...partialData
+    context: partialData.context,
+    tags: partialData.tags
   });
   
   return newEntry;

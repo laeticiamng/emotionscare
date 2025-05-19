@@ -3,53 +3,48 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  imageUrl?: string;
-  image_url?: string;
-  category?: string;
-  level?: number | string;
-  achieved?: boolean;
-  progress?: number;
-  maxProgress?: number;
-  dateAwarded?: string;
-  unlockCriteria?: string;
-  xp?: number;
-  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  
-  // Additional properties to ensure compatibility
-  unlocked?: boolean;
-  unlockedAt?: string;
-  unlocked_at?: string;
-  image?: string;
-  timestamp?: string;
   icon?: string;
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
+  image?: string;
+  imageUrl?: string; // Pour compatibilité
+  image_url?: string; // Pour compatibilité
+  category?: string;
   earned?: boolean;
-  threshold?: number;
+  achieved?: boolean; // Pour compatibilité
+  unlocked?: boolean; // Pour compatibilité
+  date_earned?: string;
+  dateAwarded?: string; // Pour compatibilité
+  unlockedAt?: string; // Pour compatibilité
+  unlocked_at?: string; // Pour compatibilité
+  timestamp?: string; // Pour compatibilité
+  prerequisites?: string[];
+  points?: number;
+  user_id?: string;
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
+  level?: number; // Pour compatibilité
+  rarity?: string; // Pour compatibilité
+  threshold?: number; // Pour compatibilité avec progress/threshold pattern
+  progress?: number;
   completed?: boolean;
-  total?: number;
 }
 
 export interface Challenge {
   id: string;
-  title?: string;
   name?: string;
+  title?: string;
   description: string;
-  category?: string;
-  goal: number | string;
-  points?: number;
-  progress?: number;
+  points: number;
+  status: string;
+  progress: number;
+  category: string;
   completed?: boolean;
-  status?: string;
-  totalSteps?: number;
-  unlocked?: boolean;
-  reward?: any;
-  difficulty?: string;
-  completions?: number;
-  total?: number;
-  deadline?: string;
+  reward?: string | Badge;
+  unlocked: boolean;
   type?: string;
-  isCompleted?: boolean;
-  icon?: string;
-  value?: any;
-  tags?: string[];
+  goal?: number;
+  total?: number; // Pour tracking progress total
+  totalSteps?: number; // Alternative pour total
+  difficulty?: string; // Pour niveau de difficulté
+  completions?: number; // Pour tracking completions
+  deadline?: string; // Pour tracking deadline
+  isCompleted?: boolean; // Pour compatibilité
 }

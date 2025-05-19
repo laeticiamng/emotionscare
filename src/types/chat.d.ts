@@ -1,6 +1,4 @@
 
-// Types liés au chat et aux conversations
-
 export interface ChatMessage {
   id: string;
   sender: 'user' | 'assistant' | 'system' | 'coach';
@@ -31,4 +29,5 @@ export interface ChatConversation {
   user_id?: string;
   participants?: string[];
   emotion?: string;
+
 }

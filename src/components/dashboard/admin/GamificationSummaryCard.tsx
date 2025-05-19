@@ -17,7 +17,7 @@ const GamificationSummaryCard: React.FC<GamificationSummaryCardProps> = ({
   className
 }) => {
   const completedChallenges = challenges.filter(challenge => challenge.completed).length;
-  const unlockedBadges = badges.filter(badge => badge.achieved).length;
+  const unlockedBadges = badges.filter(badge => badge.earned || badge.achieved || badge.unlocked).length;
   
   return (
     <Card className={className}>

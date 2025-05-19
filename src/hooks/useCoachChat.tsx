@@ -16,8 +16,8 @@ export const useCoachChat = () => {
   const sendMessage = useCallback(async (message: string) => {
     try {
       setIsProcessing(true);
-      // Use the existing messages as history
-      const response = await coach.sendMessage(message, messages);
+      // Fix parameter to pass string content and string sender type
+      const response = await coach.sendMessage(message, 'user');
       
       setMessages(prevMessages => {
         const userMessage: ChatMessage = {
@@ -38,16 +38,18 @@ export const useCoachChat = () => {
           timestamp: new Date().toISOString()
         };
 
+        
+        
         return [...prevMessages, userMessage, assistantMessage];
       });
       return response;
     } catch (error) {
       console.error('Error sending message:', error);
-      return null;
+      return '';
     } finally {
       setIsProcessing(false);
     }
-  }, [coach, messages]);
+  }, [coach]);
   
   const addMessage = useCallback((text: string, sender: 'system' | 'user' | 'assistant' | 'coach') => {
     const newMessage: ChatMessage = {
@@ -59,6 +61,7 @@ export const useCoachChat = () => {
       timestamp: new Date().toISOString()
     };
     setMessages(prevMessages => [...prevMessages, newMessage]);
+    
   }, []);
   
   const clearMessages = useCallback(() => {

@@ -35,7 +35,7 @@ const GdprRightsSection: React.FC = () => {
   const rights = [
     {
       id: 'access',
-      title: 'Droit d'accès',
+      title: "Droit d'accès",
       description: 'Vous pouvez demander à accéder à toutes vos données personnelles que nous traitons',
       article: 'article 15'
     },
@@ -47,7 +47,7 @@ const GdprRightsSection: React.FC = () => {
     },
     {
       id: 'erasure',
-      title: 'Droit à l'effacement',
+      title: "Droit à l'effacement",
       description: 'Vous pouvez demander la suppression de vos données personnelles dans certaines conditions',
       article: 'article 17'
     },
@@ -65,7 +65,7 @@ const GdprRightsSection: React.FC = () => {
     },
     {
       id: 'objection',
-      title: 'Droit d'opposition',
+      title: "Droit d'opposition",
       description: 'Vous pouvez vous opposer au traitement de vos données personnelles',
       article: 'article 21'
     }
