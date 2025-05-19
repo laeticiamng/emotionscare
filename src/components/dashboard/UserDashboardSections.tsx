@@ -7,14 +7,13 @@ const UserDashboardSections: React.FC = () => {
   const recommendedSessions: VRSessionTemplate[] = [
     {
       id: '1',
-      name: 'Méditation matinale',
-      title: 'Méditation matinale', // Pour compatibilité
+      title: 'Méditation matinale',
+      name: 'Méditation matinale', // Pour compatibilité
       description: 'Commencez votre journée avec une méditation guidée pour un esprit clair',
       duration: 15,
-      imageUrl: '/images/meditation-morning.jpg',
-      environmentId: 'env-1', // Add required field
-      category: 'méditation',
       thumbnailUrl: '/images/meditation-morning.jpg',
+      environmentId: 'env-1', 
+      category: 'méditation',
       intensity: 1,
       objective: 'Apaiser l\'esprit',
       type: 'meditation',
@@ -22,14 +21,13 @@ const UserDashboardSections: React.FC = () => {
     },
     {
       id: '2',
-      name: 'Relaxation profonde',
-      title: 'Relaxation profonde', // Pour compatibilité
+      title: 'Relaxation profonde',
+      name: 'Relaxation profonde', // Pour compatibilité
       description: 'Une session immersive pour libérer le stress et retrouver l\'équilibre',
       duration: 25,
-      imageUrl: '/images/deep-relaxation.jpg', 
-      environmentId: 'env-2', // Add required field
-      category: 'relaxation',
       thumbnailUrl: '/images/deep-relaxation.jpg',
+      environmentId: 'env-2', 
+      category: 'relaxation',
       intensity: 2,
       objective: 'Réduire le stress',
       type: 'relaxation',

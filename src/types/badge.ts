@@ -2,31 +2,30 @@
 export interface Badge {
   id: string;
   name: string;
-  description?: string;
+  description: string;
+  image_url?: string;
   imageUrl?: string;
-  image_url?: string; // For backward compatibility
-  level?: string;
-  unlockedAt?: Date | string;
-  unlocked_at?: Date | string; // For backward compatibility
+  icon_url?: string;
+  tier?: string;
   unlocked?: boolean;
-  category?: string;
+  completed?: boolean;
+  unlockedAt?: Date | string;
+  progress?: number;
   threshold?: number;
 }
 
 export interface Challenge {
   id: string;
+  title?: string;
   name?: string;
-  title: string;
   description: string;
-  category?: string;
-  points?: number;
-  icon?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
   completed?: boolean;
   progress?: number;
-  unlocked?: boolean;
-  deadline?: Date | string;
-  difficulty?: string;
-  completions?: number;
   goal?: number;
+  total?: number; // For backward compatibility
   totalSteps?: number;
+  completions?: number;
+  deadline?: Date | string;
+  points: number;
 }

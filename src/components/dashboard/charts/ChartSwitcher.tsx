@@ -32,7 +32,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
   const segmentContext = useSegment();
 
   // En cas d'absence du contexte, utilisez des valeurs par défaut
-  const contextValue: SegmentContextType = segmentContext || {
+  const defaultContext: SegmentContextType = {
     dimensions: [],
     selectedDimension: '',
     selectedOption: '',
@@ -44,7 +44,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
   };
 
   // Si des dimensions sont fournies en props, utilisez-les au lieu du contexte
-  const availableDimensions = dimensions.length > 0 ? dimensions : contextValue.dimensions;
+  const availableDimensions = dimensions.length > 0 ? dimensions : segmentContext?.dimensions || [];
 
   const handleDimensionChange = (value: string) => {
     setSelectedDimension(value);
@@ -61,7 +61,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
 
   const getCurrentDimensionOptions = (): SegmentOption[] => {
     if (!selectedDimension) return [];
-    const dimension = availableDimensions.find(d => d.key === selectedDimension);
+    const dimension = availableDimensions.find(d => d.id === selectedDimension || d.key === selectedDimension);
     return dimension ? dimension.options : [];
   };
 
@@ -86,7 +86,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {availableDimensions.map((dim) => (
-                  <SelectItem key={dim.key} value={dim.key}>
+                  <SelectItem key={dim.id || dim.key} value={dim.id || dim.key || ''}>
                     {dim.label}
                   </SelectItem>
                 ))}
@@ -111,7 +111,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {getCurrentDimensionOptions().map((option) => (
-                  <SelectItem key={option.dimensionKey + option.optionKey} value={option.value}>
+                  <SelectItem key={option.id} value={option.value}>
                     {option.label}
                   </SelectItem>
                 ))}

@@ -4,6 +4,7 @@ import { Link, useLocation, NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 // Fix incorrect import
 import ThemeSelector from '@/components/theme/ThemeSelector';
+import { useTheme } from '@/contexts/ThemeContext';
 import AudioControls from '@/components/audio/AudioControls';
 import UserMenu from './UserMenu';
 import GuestMenu from './GuestMenu';
@@ -16,6 +17,7 @@ const MainNavbar: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const { theme, setTheme } = useTheme();
 
   // Menu items with icons
   const navigationItems = [
@@ -106,7 +108,7 @@ const MainNavbar: React.FC = () => {
         {/* Right Menu Controls */}
         <div className="flex items-center space-x-2">
           <AudioControls minimal className="mr-2 hidden sm:flex" />
-          <ThemeSelector minimal className="mr-2" />
+          <ThemeSelector currentTheme={theme} onChange={setTheme} minimal className="mr-2" />
           
           {/* User Menu or Guest Menu */}
           <AnimatePresence mode="wait">

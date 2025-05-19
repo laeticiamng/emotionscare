@@ -41,25 +41,25 @@ const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ userData,
       title: "Niveau",
       value: level,
       icon: <Star className="h-4 w-4 text-yellow-500" />,
-      colorMode: "info" as const,
+      status: "info" as const,
     },
     {
       title: "Points",
       value: points.toLocaleString(),
       icon: <Zap className="h-4 w-4 text-purple-500" />,
-      colorMode: "default" as const,
+      status: "neutral" as const,
     },
     {
       title: "Badges",
       value: badges.length,
       icon: <Award className="h-4 w-4 text-blue-500" />,
-      colorMode: "success" as const,
+      status: "success" as const,
     },
     {
       title: "Série",
       value: `${streak_days} jours`,
       icon: <Calendar className="h-4 w-4 text-green-500" />,
-      colorMode: "warning" as const,
+      status: "warning" as const,
     },
   ];
 
@@ -160,7 +160,8 @@ const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ userData,
                   <h3 className="font-medium text-sm">{badge.name}</h3>
                   <p className="text-xs text-muted-foreground line-clamp-2">{badge.description}</p>
                   
-                  {!badge.unlocked && badge.progress !== undefined && badge.threshold !== undefined && (
+                  {!badge.unlocked && !badge.completed && !badge.unlockedAt && 
+                   badge.progress !== undefined && badge.threshold !== undefined && (
                     <div className="w-full space-y-1">
                       <div className="flex justify-between items-center text-xs">
                         <span>{badge.progress}</span>

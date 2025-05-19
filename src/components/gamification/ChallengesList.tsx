@@ -51,15 +51,13 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }
             // Calculate progress percentage
             const progress = challenge.completed 
               ? 100 
-              : challenge.progress !== undefined && challenge.total 
-                ? Math.round((challenge.progress / challenge.total) * 100)
-                : challenge.progress !== undefined && challenge.goal
-                  ? Math.round((challenge.progress / challenge.goal) * 100)
-                  : 0;
+              : challenge.progress !== undefined && (challenge.goal || challenge.total || challenge.totalSteps)
+                ? Math.round((challenge.progress / (challenge.goal || challenge.total || challenge.totalSteps || 1)) * 100)
+                : 0;
                   
             // For challenges with completions
-            const completionsProgress = challenge.completions !== undefined && (challenge.total || challenge.goal)
-              ? Math.round((challenge.completions / (challenge.total || challenge.goal || 1)) * 100)
+            const completionsProgress = challenge.completions !== undefined && (challenge.goal || challenge.total || challenge.totalSteps)
+              ? Math.round((challenge.completions / (challenge.goal || challenge.total || challenge.totalSteps || 1)) * 100)
               : 0;
             
             // Determine difficulty color
@@ -102,7 +100,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }
                     <div className="flex items-center space-x-1">
                       <Flag className="h-3 w-3 text-muted-foreground" />
                       <span>
-                        {challenge.progress || challenge.completions || 0} / {challenge.total || challenge.goal || challenge.totalSteps || 1}
+                        {challenge.progress || challenge.completions || 0} / {challenge.goal || challenge.total || challenge.totalSteps || 1}
                       </span>
                     </div>
                     

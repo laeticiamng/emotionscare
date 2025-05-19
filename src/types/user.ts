@@ -1,29 +1,35 @@
 
-export interface AuthUser {
+export type UserRole = 'user' | 'admin' | 'b2c' | 'b2b_user' | 'b2b_admin';
+
+export interface User {
   id: string;
+  name?: string;
   email: string;
-  displayName?: string;
-  name?: string; // Added for backward compatibility
+  role?: UserRole;
   avatar?: string;
   avatar_url?: string; // For backward compatibility
-  avatarUrl?: string; // Additional backward compatibility
-  role?: UserRole;
-  position?: string; // Added for backward compatibility
-  department?: string; // Added for backward compatibility
-  joined_at?: Date | string; // Added for backward compatibility
+  avatarUrl?: string; // For backward compatibility
+  displayName?: string; // For backward compatibility
+  created_at?: Date | string; // For backward compatibility
+  preferences?: any;
 }
 
-export type UserRole = 'admin' | 'user' | 'guest' | 'b2c' | 'b2b_user' | 'b2b_admin';
-
-export interface UserWithStatus extends AuthUser {
-  status: 'online' | 'offline' | 'away';
-  lastSeen?: Date;
-}
-
-// Add User interface for older components
-export interface User extends AuthUser {
-  // Additional fields that might be used in older components
-  position?: string;
+export interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  role?: string;
+  avatar?: string;
+  avatar_url?: string; // For backward compatibility
+  avatarUrl?: string; // For backward compatibility
+  displayName?: string; // For backward compatibility
+  company?: string;
   department?: string;
-  joined_at?: Date | string;
+  position?: string;
+  createdAt?: Date | string;
+}
+
+export interface UserWithStatus extends User {
+  status?: 'active' | 'inactive' | 'pending';
+  lastActive?: Date;
 }

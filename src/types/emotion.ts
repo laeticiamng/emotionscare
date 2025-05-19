@@ -1,71 +1,33 @@
 
-export type Emotion = 
-  | 'joy' 
-  | 'sadness' 
-  | 'anger' 
-  | 'fear' 
-  | 'disgust' 
-  | 'surprise' 
-  | 'neutral'
-  | 'happy'
-  | 'calm'
-  | 'relaxed'
-  | 'anxious'
-  | 'stressed'
-  | 'melancholic'
-  | 'energetic'
-  | 'focused'
-  | 'excited'
-  | 'worried'
-  | 'tired'
-  | 'content'
-  | string;
+export interface Emotion {
+  id: string;
+  name: string;
+  color: string;
+  intensity: number;
+}
 
 export interface EmotionResult {
-  emotion: Emotion;
+  primaryEmotion: string;
+  secondaryEmotion?: string;
+  intensity: number;
+  recommendations: EmotionRecommendation[];
   score?: number;
-  confidence?: number;
-  timestamp?: Date | string;
-  date?: Date | string;  // Pour rétrocompatibilité
-  feedback?: string;
-  ai_feedback?: string;  // Pour rétrocompatibilité
-  source?: 'text' | 'voice' | 'facial' | 'emoji';
-  id?: string;
-  userId?: string;
-  user_id?: string;  // Pour rétrocompatibilité
-  text?: string;
-  textInput?: string;  // Pour rétrocompatibilité
-  intensity?: number;
-  emojis?: string[];
-  recommendations?: EmotionRecommendation[];
-  audioUrl?: string;
-  transcript?: string;
 }
 
 export interface LiveVoiceScannerProps {
   onResult?: (result: EmotionResult) => void;
-  onScanComplete?: (result: EmotionResult) => void;
-  onAnalysisComplete?: (result: EmotionResult) => void;
-  showControls?: boolean;
-  showVisualizer?: boolean;
-  autoStart?: boolean;
-  duration?: number;
-  className?: string;
   isProcessing?: boolean;
   setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface TeamOverviewProps {
-  teamId?: string;
+  teamId: string;
   period?: 'day' | 'week' | 'month';
-  showIndividuals?: boolean;
-  anonymized?: boolean;
 }
 
 export interface EmotionalTeamViewProps {
   teamId: string;
-  period?: 'day' | 'week' | 'month';
-  anonymized?: boolean;
+  period?: string;
   dateRange?: [Date, Date];
   showGraph?: boolean;
   showMembers?: boolean;
@@ -73,27 +35,16 @@ export interface EmotionalTeamViewProps {
 }
 
 export interface EmotionRecommendation {
+  type: string;
   title: string;
-  description?: string;
-  content?: string;  // Pour rétrocompatibilité
-  category?: string;
-  type?: 'music' | 'activity' | 'meditation' | 'vr' | 'text';
-  url?: string;
-  iconUrl?: string;
+  description: string;
+  action?: string;
 }
 
 export interface TextEmotionScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  onAnalysisComplete?: (result: EmotionResult) => void;
-  isProcessing?: boolean;
-  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
-  className?: string;
+  onResult: (result: EmotionResult) => void;
 }
 
 export interface EmojiEmotionScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  onAnalysisComplete?: (result: EmotionResult) => void;
-  isProcessing?: boolean;
-  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
-  className?: string;
+  onSelect: (emotion: string) => void;
 }
