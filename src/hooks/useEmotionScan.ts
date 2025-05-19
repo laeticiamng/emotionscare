@@ -1,7 +1,8 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { EmotionResult } from '@/types/emotion';
 import { normalizeEmotionResult } from '@/utils/emotionCompatibility';
+import { v4 as uuid } from 'uuid';
 
 /**
  * Custom hook to manage emotion scanning functionality
@@ -27,8 +28,8 @@ export function useEmotionScan() {
       // Simulate API call for demo purposes
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Mock result
-      const mockResult: Partial<EmotionResult> = {
+      // Mock result - create a complete object with all required fields
+      const mockResult: EmotionResult = normalizeEmotionResult({
         id: `scan-${Date.now()}`,
         emotion: getRandomEmotion(),
         confidence: 0.7 + Math.random() * 0.25,
@@ -37,10 +38,9 @@ export function useEmotionScan() {
         text,
         timestamp: new Date().toISOString(),
         source: 'text'
-      };
+      });
       
-      const normalizedResult = normalizeEmotionResult(mockResult);
-      setScanResult(normalizedResult);
+      setScanResult(mockResult);
     } catch (err: any) {
       console.error('Error scanning text emotion:', err);
       setError(err.message || 'Une erreur est survenue lors de l\'analyse');
@@ -60,8 +60,8 @@ export function useEmotionScan() {
       // Simulate API call for demo purposes
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Mock result
-      const mockResult: Partial<EmotionResult> = {
+      // Mock result - create a complete object with all required fields
+      const mockResult: EmotionResult = normalizeEmotionResult({
         id: `scan-${Date.now()}`,
         emotion: getRandomEmotion(),
         confidence: 0.6 + Math.random() * 0.3,
@@ -70,10 +70,9 @@ export function useEmotionScan() {
         timestamp: new Date().toISOString(),
         source: 'voice',
         transcript: "Voici ce que j'ai dit pendant l'enregistrement."
-      };
+      });
       
-      const normalizedResult = normalizeEmotionResult(mockResult);
-      setScanResult(normalizedResult);
+      setScanResult(mockResult);
     } catch (err: any) {
       console.error('Error scanning voice emotion:', err);
       setError(err.message || 'Une erreur est survenue lors de l\'analyse');

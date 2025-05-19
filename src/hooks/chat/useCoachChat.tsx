@@ -22,6 +22,7 @@ export const useCoachChat = () => {
         conversationId: 'coach-conversation',
         sender: 'user',
         text: message,
+        content: message, // Set both text and content for compatibility
         timestamp: new Date().toISOString()
       };
       
@@ -37,6 +38,7 @@ export const useCoachChat = () => {
         conversationId: 'coach-conversation',
         sender: 'assistant',
         text: response,
+        content: response, // Set both text and content for compatibility
         timestamp: new Date().toISOString()
       };
       
@@ -58,6 +60,7 @@ export const useCoachChat = () => {
       conversationId: 'coach-conversation',
       sender: sender === 'ai' ? 'assistant' : sender,
       text,
+      content: text, // Set both text and content for compatibility
       timestamp: new Date().toISOString()
     };
     

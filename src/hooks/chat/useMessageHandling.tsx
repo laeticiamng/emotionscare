@@ -10,8 +10,9 @@ export const useMessageHandling = (conversationId: string) => {
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId,
-      conversation_id: conversationId, // Pour compatibilité
+      conversation_id: conversationId, // For compatibility
       text,
+      content: text, // Set both text and content for compatibility
       sender: role,
       timestamp: new Date().toISOString()
     };

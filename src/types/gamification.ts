@@ -21,7 +21,6 @@ export interface Challenge {
   totalSteps?: number;
   isCompleted?: boolean;
   icon?: string;
-  name?: string;
 }
 
 export interface LeaderboardEntry {
@@ -37,6 +36,7 @@ export interface LeaderboardEntry {
   score?: number;
   avatar?: string;
   level?: number;
+  progress?: number; // Add this for compatibility
 }
 
 // Export Badge from here as well for compatibility

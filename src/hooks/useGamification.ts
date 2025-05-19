@@ -1,149 +1,152 @@
-
 import { useState, useEffect } from 'react';
-import { Badge, Challenge, LeaderboardEntry } from '@/types/badge';
+import { Challenge, LeaderboardEntry } from '@/types/gamification';
+import { Badge } from '@/types/badge';
+import { normalizeChallenge } from '@/utils/challengeUtils';
+import { normalizeBadge } from '@/utils/badgeUtils';
 
-export const useGamification = () => {
-  // État local pour stocker les données de gamification
+export function useGamification() {
   const [badges, setBadges] = useState<Badge[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [userPoints, setUserPoints] = useState<number>(0);
-  const [userRank, setUserRank] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [points, setPoints] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [loading, setLoading] = useState(true);
 
-  // Charger les données initiales
   useEffect(() => {
+    // Simulate API call
     const fetchGamificationData = async () => {
-      setLoading(true);
       try {
-        // Dans une implémentation réelle, ces données viendraient d'une API
-        await new Promise(resolve => setTimeout(resolve, 500)); // Simuler un délai réseau
+        // Wait a bit to simulate network request
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-        // Badges simulés
-        const mockBadges: Badge[] = [
-          {
-            id: "1",
-            name: "Première émotion",
-            description: "Enregistrer votre première émotion",
-            imageUrl: "/badges/first-emotion.png",
+        // Mock data
+        const mockBadges = [
+          normalizeBadge({
+            id: 'badge1',
+            name: 'First Steps',
+            description: 'Complete your first profile',
+            imageUrl: '/badges/badge-1.svg',
             unlocked: true,
             level: 1,
-            category: "émotions",
-            progress: 100,
-            threshold: 100,
-            completed: true
-          },
-          {
-            id: "2",
-            name: "Journal régulier",
-            description: "Utiliser le journal 5 jours consécutifs",
-            imageUrl: "/badges/journal-streak.png",
-            unlocked: true,
-            level: 2,
-            category: "journal",
-            progress: 100,
-            threshold: 100,
-            completed: true
-          },
-          {
-            id: "3",
-            name: "Explorer de la musique",
-            description: "Écouter 10 morceaux différents",
-            imageUrl: "/badges/music-explorer.png",
+            category: 'onboarding',
+            tier: 'bronze'
+          }),
+          normalizeBadge({
+            id: 'badge2',
+            name: 'Emotion Master',
+            description: 'Track 10 different emotions',
+            imageUrl: '/badges/badge-2.svg',
             unlocked: false,
-            level: 1,
-            category: "musique",
-            progress: 6,
-            threshold: 10,
-            completed: false
-          }
+            level: 2,
+            category: 'emotion',
+            tier: 'silver'
+          }),
+          normalizeBadge({
+            id: 'badge3',
+            name: 'Consistent User',
+            description: 'Use the app for 7 consecutive days',
+            imageUrl: '/badges/badge-3.svg',
+            unlocked: false,
+            level: 3,
+            category: 'activity',
+            tier: 'gold'
+          })
         ];
 
-        // Défis simulés
-        const mockChallenges: Challenge[] = [
-          {
-            id: "ch1",
-            title: "Semaine de pleine conscience",
-            name: "Semaine de pleine conscience",
-            description: "Pratiquer une activité de pleine conscience pendant 5 jours",
-            points: 100,
+        // Mock challenge data using the normalizeChallenge utility
+        const mockChallenges = [
+          normalizeChallenge({
+            id: 'challenge1',
+            title: 'Daily Check-in',
+            name: 'Daily Check-in',
+            description: 'Log your emotions once per day',
+            points: 50,
             progress: 3,
-            goal: 5,
-            category: "bien-être",
-            completed: false,
-            status: "in-progress",
-            difficulty: "medium",
-            completions: 3,
-            total: 5
-          },
-          {
-            id: "ch2",
-            title: "Diversité émotionnelle",
-            name: "Diversité émotionnelle",
-            description: "Enregistrer 7 émotions différentes",
-            points: 150,
-            progress: 4,
             goal: 7,
-            category: "émotions",
+            category: 'daily',
             completed: false,
-            status: "in-progress",
-            difficulty: "easy",
-            completions: 4,
+            status: 'active',
+            difficulty: 'easy',
+            completions: 3,
             total: 7
-          },
-          {
-            id: "ch3",
-            title: "Partage communautaire",
-            name: "Partage communautaire",
-            description: "Partager 3 entrées de journal avec la communauté",
-            points: 200,
-            progress: 0,
-            goal: 3,
-            category: "communauté",
+          }),
+          normalizeChallenge({
+            id: 'challenge2',
+            title: 'Emotion Explorer',
+            name: 'Emotion Explorer',
+            description: 'Track 5 different emotions in a week',
+            points: 100,
+            progress: 2,
+            goal: 5,
+            category: 'weekly',
             completed: false,
-            status: "not-started",
-            difficulty: "hard",
-            completions: 0,
-            total: 3
-          }
+            status: 'active',
+            difficulty: 'medium',
+            completions: 2,
+            total: 5
+          }),
+          normalizeChallenge({
+            id: 'challenge3',
+            title: 'Meditation Master',
+            name: 'Meditation Master',
+            description: 'Complete 10 meditation sessions',
+            points: 200,
+            progress: 4,
+            goal: 10,
+            category: 'monthly',
+            completed: false,
+            status: 'active',
+            difficulty: 'hard',
+            completions: 4,
+            total: 10
+          })
         ];
 
-        // Classement simulé
-        const mockLeaderboard: LeaderboardEntry[] = [
+        // Mock leaderboard
+        const mockLeaderboard = [
           {
-            id: "l1",
-            userId: "u1",
-            name: "Emma J.",
-            username: "emma_j",
+            id: 'user1',
+            userId: 'user1',
+            username: 'EmotionExplorer',
             points: 1250,
-            rank: 1
+            position: 1,
+            avatarUrl: '/avatars/avatar1.png',
+            rank: 1,
+            level: 10,
+            progress: 75
           },
           {
-            id: "l2",
-            userId: "u2",
-            name: "Thomas W.",
-            username: "thomas_w",
+            id: 'user2',
+            userId: 'user2',
+            username: 'MindfulMaster',
             points: 980,
-            rank: 2
+            position: 2,
+            avatarUrl: '/avatars/avatar2.png',
+            rank: 2,
+            level: 8,
+            progress: 50
           },
           {
-            id: "l3",
-            userId: "current",
-            name: "Vous",
-            username: "current_user",
-            points: 820,
-            rank: 3
+            id: 'user3',
+            userId: 'user3',
+            username: 'JoyfulJourney',
+            points: 750,
+            position: 3,
+            avatarUrl: '/avatars/avatar3.png',
+            rank: 3,
+            level: 6,
+            progress: 25
           }
         ];
 
         setBadges(mockBadges);
         setChallenges(mockChallenges);
         setLeaderboard(mockLeaderboard);
-        setUserPoints(820); // Points de l'utilisateur actuel
-        setUserRank(3); // Rang de l'utilisateur actuel
+        setPoints(850);
+        setLevel(7);
+        setLoading(false);
       } catch (error) {
-        console.error("Erreur lors du chargement des données de gamification:", error);
-      } finally {
+        console.error('Error fetching gamification data:', error);
         setLoading(false);
       }
     };
@@ -206,12 +209,12 @@ export const useGamification = () => {
     badges,
     challenges,
     leaderboard,
-    userPoints,
-    userRank,
+    points,
+    level,
     loading,
     unlockBadge,
     updateChallengeProgress
   };
-};
+}
 
 export default useGamification;

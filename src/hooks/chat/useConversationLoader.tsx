@@ -22,7 +22,8 @@ const extendedChatHistoryService = {
         user_id: userId, // legacy field
         created_at: new Date().toISOString(), // legacy field
         updated_at: new Date().toISOString(), // legacy field
-        last_message: "Dernier message de test" // legacy field
+        last_message: "Dernier message de test", // legacy field
+        messages: [] // Add empty messages array
       },
       {
         id: "conv-2",
@@ -33,7 +34,8 @@ const extendedChatHistoryService = {
         user_id: userId, // legacy field
         created_at: new Date(Date.now() - 86400000).toISOString(), // legacy field
         updated_at: new Date(Date.now() - 3600000).toISOString(), // legacy field
-        last_message: "Un autre message de test" // legacy field
+        last_message: "Un autre message de test", // legacy field
+        messages: [] // Add empty messages array
       }
     ];
   }

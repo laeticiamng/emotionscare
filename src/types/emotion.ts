@@ -6,10 +6,12 @@ export interface Emotion {
   intensity?: number;
   timestamp?: string;
   user_id?: string;
+  userId?: string; // For compatibility
   emotion?: string; // For backward compatibility
   description?: string;
   color?: string;
   emoji?: string;
+  label?: string; // Add label property
 }
 
 export interface EmotionResult {
@@ -20,11 +22,13 @@ export interface EmotionResult {
   timestamp: string;
   source?: string;
   text?: string;
-  emojis?: string[];
+  emojis: string[];
   emotions?: Record<string, number>;
   user_id?: string;
+  userId?: string; // For compatibility
   textInput?: string;
   audioUrl?: string;
+  audio_url?: string; // For compatibility
   facialExpression?: string;
   transcript?: string;
   
@@ -38,7 +42,6 @@ export interface EmotionResult {
   category?: string;
 }
 
-// Update EmotionRecommendation to include all used properties
 export interface EmotionRecommendation {
   id?: string;
   type?: string;
@@ -51,27 +54,23 @@ export interface EmotionRecommendation {
   emotion?: string;
 }
 
-// Add these interfaces for component compatibility
-export interface TeamOverviewProps {
-  teamId: string;
-  period?: string;
-  showGraph?: boolean;
-}
-
-export interface EmotionalTeamViewProps {
-  teamId: string;
-  period?: string;
-  anonymized?: boolean;
-  dateRange?: [Date, Date];
-  showGraph?: boolean;
-  showMembers?: boolean;
-  className?: string;
+// Add EmotionScanFormProps for ScanTabContent component
+export interface EmotionScanFormProps {
+  userId?: string;
+  onEmotionDetected?: () => void;
+  onClose?: () => void;
+  onScanComplete?: (result: EmotionResult) => void;
+  defaultTab?: string;
+  onProcessingChange?: (processing: boolean) => void;
 }
 
 // Add these interfaces for component compatibility
 export interface LiveVoiceScannerProps {
   onResult?: (result: EmotionResult) => void;
   onClose?: () => void;
+  onError?: (error: Error) => void;
+  autoStart?: boolean;
+  className?: string;
 }
 
 export interface TextEmotionScannerProps {
@@ -90,12 +89,18 @@ export interface VoiceEmotionScannerProps {
   onProcessingChange?: (processing: boolean) => void;
 }
 
-// Add EmotionScanFormProps for ScanTabContent component
-export interface EmotionScanFormProps {
-  userId?: string;
-  onEmotionDetected?: () => void;
-  onClose?: () => void;
-  onScanComplete?: (result: EmotionResult) => void;
-  defaultTab?: string;
-  onProcessingChange?: (processing: boolean) => void;
+export interface TeamOverviewProps {
+  teamId: string;
+  period?: string;
+  showGraph?: boolean;
+}
+
+export interface EmotionalTeamViewProps {
+  teamId: string;
+  period?: string;
+  anonymized?: boolean;
+  dateRange?: [Date, Date];
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
 }

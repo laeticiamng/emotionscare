@@ -1,83 +1,63 @@
 
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
+import { v4 as uuid } from 'uuid';
 
 /**
- * Normalizes an emotion result to handle different structure variations
- * that may come from different APIs or components
+ * Normalizes emotion result data to ensure compatibility with all components
  */
-export function normalizeEmotionResult(result: EmotionResult): EmotionResult {
-  if (!result) return {} as EmotionResult;
-  
-  // Default values
-  const normalized: EmotionResult = {
-    emotion: result.emotion || '',
-    score: result.score || 0,
-    confidence: result.confidence || 0,
+export function normalizeEmotionResult(data: Partial<EmotionResult>): EmotionResult {
+  return {
+    id: data.id || uuid(),
+    emotion: data.emotion || 'neutral',
+    confidence: data.confidence || 0.5,
+    intensity: data.intensity || 0.5,
+    timestamp: data.timestamp || new Date().toISOString(),
+    source: data.source || 'manual',
+    emojis: data.emojis || [],
+    text: data.text || '',
+    emotions: data.emotions || {},
+    
+    // Add compatibility fields with fallbacks
+    primaryEmotion: data.primaryEmotion || data.emotion || 'neutral',
+    score: data.score || data.confidence || 0.5,
+    date: data.date || data.timestamp || new Date().toISOString(),
+    feedback: data.feedback || data.ai_feedback || '',
+    ai_feedback: data.ai_feedback || data.feedback || '',
+    user_id: data.user_id || data.userId || '',
+    userId: data.userId || data.user_id || '',
+    audioUrl: data.audioUrl || data.audio_url || '',
+    audio_url: data.audio_url || data.audioUrl || '',
+    textInput: data.textInput || data.text || '',
+    recommendations: data.recommendations || [],
+    transcript: data.transcript || '',
+    facialExpression: data.facialExpression || ''
   };
-  
-  // Handle timestamps in different formats
-  if (result.timestamp) {
-    normalized.timestamp = result.timestamp;
-  } else if (result.date) {
-    normalized.timestamp = result.date;
-  }
-  
-  // Handle text content
-  if (result.text) {
-    normalized.text = result.text;
-  } else if (result.textInput) {
-    normalized.text = result.textInput;
-  }
-  
-  // Handle feedback
-  if (result.feedback) {
-    normalized.feedback = result.feedback;
-  } else if (result.ai_feedback) {
-    normalized.feedback = result.ai_feedback;
-  }
-  
-  // Handle user identification
-  if (result.userId) {
-    normalized.userId = result.userId;
-  } else if (result.user_id) {
-    normalized.userId = result.user_id;
-  }
-  
-  // Copy other properties
-  if (result.intensity !== undefined) normalized.intensity = result.intensity;
-  if (result.source) normalized.source = result.source;
-  if (result.id) normalized.id = result.id;
-  if (result.emojis) normalized.emojis = result.emojis;
-  if (result.recommendations) normalized.recommendations = result.recommendations;
-  if (result.audioUrl) normalized.audioUrl = result.audioUrl;
-  if (result.transcript) normalized.transcript = result.transcript;
-  
-  return normalized;
 }
 
 /**
- * Calculates a numeric intensity based on confidence and score
+ * Normalizes emotion recommendation data
  */
-export function calculateIntensity(result: EmotionResult): number {
-  if (!result) return 0;
-  
-  // If intensity is already provided, use that
-  if (result.intensity !== undefined) {
-    return result.intensity;
-  }
-  
-  // Calculate based on confidence and/or score
-  if (result.confidence !== undefined && result.score !== undefined) {
-    return (result.confidence + result.score / 100) / 2;
-  }
-  
-  if (result.confidence !== undefined) {
-    return result.confidence;
-  }
-  
-  if (result.score !== undefined) {
-    return result.score / 100;
-  }
-  
-  return 0.5; // Default middle value
+export function normalizeEmotionRecommendation(data: Partial<EmotionRecommendation>): EmotionRecommendation {
+  return {
+    id: data.id || uuid(),
+    type: data.type || 'general',
+    title: data.title || '',
+    description: data.description || '',
+    content: data.content || data.description || '',
+    category: data.category || 'general',
+    emotion: data.emotion || 'neutral',
+    actionLink: data.actionLink || '',
+    actionText: data.actionText || ''
+  };
+}
+
+/**
+ * Convert string recommendations to EmotionRecommendation objects
+ */
+export function convertStringRecommendations(recommendations: string[]): EmotionRecommendation[] {
+  return recommendations.map(rec => ({
+    content: rec,
+    type: 'general',
+    category: 'general'
+  }));
 }

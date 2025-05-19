@@ -3,12 +3,12 @@ export interface ChatMessage {
   id: string;
   sender: string;
   content: string;
+  text?: string; // For backward compatibility
   timestamp: string;
   isUser?: boolean;
   emotion?: string;
   attachments?: string[];
   role?: string;
-  text?: string;
   isLoading?: boolean;
   conversationId?: string;
   conversation_id?: string; // For compatibility
@@ -51,6 +51,7 @@ export function normalizeChatMessage(message: any): ChatMessage {
     id: message.id || `msg-${Date.now()}`,
     sender: message.sender || message.role || 'system',
     content: message.content || message.text || '',
+    text: message.text || message.content || '',
     timestamp: message.timestamp || message.created_at || new Date().toISOString()
   };
 }

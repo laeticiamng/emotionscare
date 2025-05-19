@@ -1,40 +1,26 @@
 
-export type UserRole = 'user' | 'admin' | 'manager' | 'guest' | 'b2c' | 'b2b_user' | 'b2b_admin';
-
 export interface User {
   id: string;
   email: string;
-  name: string; // Changed from optional to required to match AuthUser
-  role?: UserRole;
-  avatar_url?: string;
+  name?: string;
+  firstName?: string; // Add this for compatibility
+  lastName?: string;
   avatar?: string;
-  avatarUrl?: string;
-  created_at?: string;
-  position?: string;
-  department?: string;
-  joined_at?: string;
-  preferences?: any;
-  emotional_score?: number;
-  job_title?: string;
+  role?: string;
+  status?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface AuthUser {
-  id: string;
-  email: string;
-  name: string;
-  role?: UserRole;
-  avatar?: string;
-  avatar_url?: string;
-  avatarUrl?: string;
-  created_at?: string;
-  position?: string;
-  department?: string;
-  joined_at?: string;
+export type UserRole = 'admin' | 'manager' | 'user' | 'guest';
+
+export interface AuthUser extends User {
+  token?: string;
+  isAuthenticated?: boolean;
 }
 
 export interface UserWithStatus extends User {
-  status?: 'online' | 'away' | 'offline' | 'busy';
-  lastSeen?: Date;
-  mood?: string;
-  moodEmoji?: string;
+  status: 'online' | 'offline' | 'away' | 'busy';
+  lastActive?: string;
+  firstName?: string; // Add this for compatibility
 }

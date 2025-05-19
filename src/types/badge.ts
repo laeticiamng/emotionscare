@@ -19,6 +19,7 @@ export interface Badge {
   earned?: boolean;
   rarity?: string;
   icon?: string;
+  total?: number; // Add this for compatibility
 }
 
 export interface Challenge {
