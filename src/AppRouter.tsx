@@ -4,12 +4,51 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import HomePage from './pages/HomePage';
 import B2CPage from './pages/b2c/Home';
 import B2BSelectionPage from './pages/b2b/Selection';
-import B2BComponentsPage from './pages/b2b/Components';
 import Index from './pages/Index';
 import ImmersiveHome from './pages/ImmersiveHome';
 import ChooseMode from './pages/common/ChooseMode';
-import PageNotFound from './pages/errors/PageNotFound';
 import { useUserMode } from './contexts/UserModeContext';
+
+// Create a basic PageNotFound component
+const PageNotFound: React.FC = () => {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-6">
+      <h1 className="text-4xl font-bold mb-4">Page Not Found</h1>
+      <p className="text-lg text-muted-foreground mb-8">The page you are looking for doesn't exist or has been moved.</p>
+      <button 
+        onClick={() => window.history.back()}
+        className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+      >
+        Go Back
+      </button>
+    </div>
+  );
+};
+
+// Create a basic B2B Components page to replace the missing import
+const B2BComponentsPage: React.FC = () => {
+  return (
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">B2B Components</h1>
+      <p className="mb-4">This page showcases B2B components for the application.</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Example component cards would go here */}
+        <div className="border rounded-lg p-4 shadow-sm">
+          <h3 className="text-lg font-medium">Component 1</h3>
+          <p className="text-muted-foreground">Description of component 1</p>
+        </div>
+        <div className="border rounded-lg p-4 shadow-sm">
+          <h3 className="text-lg font-medium">Component 2</h3>
+          <p className="text-muted-foreground">Description of component 2</p>
+        </div>
+        <div className="border rounded-lg p-4 shadow-sm">
+          <h3 className="text-lg font-medium">Component 3</h3>
+          <p className="text-muted-foreground">Description of component 3</p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const AppRouter: React.FC = () => {
   const { userMode, isLoading } = useUserMode();

@@ -79,3 +79,63 @@ export const getUserModeRoutePrefix = (mode: UserModeType | string): string => {
       return '/';
   }
 };
+
+/**
+ * Get the login path for a specific user mode
+ */
+export const getModeLoginPath = (mode: UserModeType | string): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  switch(normalizedMode) {
+    case 'b2c':
+      return '/b2c/login';
+    case 'b2b_user':
+      return '/b2b/user/login';
+    case 'b2b_admin':
+      return '/b2b/admin/login';
+    case 'admin':
+      return '/admin/login';
+    default:
+      return '/login';
+  }
+};
+
+/**
+ * Get the dashboard path for a specific user mode
+ */
+export const getModeDashboardPath = (mode: UserModeType | string): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  switch(normalizedMode) {
+    case 'b2c':
+      return '/b2c/dashboard';
+    case 'b2b_user':
+      return '/b2b/user/dashboard';
+    case 'b2b_admin':
+      return '/b2b/admin/dashboard';
+    case 'admin':
+      return '/admin/dashboard';
+    default:
+      return '/dashboard';
+  }
+};
+
+/**
+ * Get display name for a user mode
+ */
+export const getUserModeDisplayName = (mode: string): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  switch(normalizedMode) {
+    case 'b2c':
+      return 'Particulier';
+    case 'b2b_admin':
+      return 'Administrateur B2B';
+    case 'b2b_user':
+      return 'Collaborateur B2B';
+    case 'admin':
+      return 'Administrateur';
+    default:
+      return 'Utilisateur';
+  }
+};
