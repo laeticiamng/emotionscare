@@ -18,9 +18,10 @@ export interface User {
   position?: string; // Add position field
   department?: string; // Add department field
   preferences?: Record<string, any>; // Add preferences field
+  emotional_score?: number; // For backward compatibility
 }
 
-export type UserRole = 'admin' | 'manager' | 'user' | 'guest' | 'b2c';
+export type UserRole = 'admin' | 'manager' | 'user' | 'guest' | 'b2c' | 'b2b_user' | 'b2b_admin';
 
 export interface AuthUser extends User {
   token?: string;

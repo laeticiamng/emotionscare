@@ -7,6 +7,8 @@ export interface EmotionScanFormProps {
   userId?: string;
   defaultTab?: string;
   onProcessingChange?: (isProcessing: boolean) => void;
+  onScanComplete?: (result: any) => void;
+  onClose?: () => void;
 }
 
 export interface Emotion {
@@ -17,6 +19,7 @@ export interface Emotion {
   color?: string;
   icon?: string;
   intensity?: number;
+  confidence?: number;
 }
 
 export interface EmotionResult {
@@ -79,6 +82,7 @@ export interface EmotionalTeamViewProps {
   showGraph?: boolean;
   showMembers?: boolean;
   className?: string;
+  teamId?: string;
 }
 
 export interface TextEmotionScannerProps {
