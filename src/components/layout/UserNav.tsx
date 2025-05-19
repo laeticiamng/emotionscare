@@ -29,7 +29,7 @@ export function UserNav() {
   };
 
   // Use avatar, avatar_url, or avatarUrl in that order of preference
-  const userAvatar = user?.avatar || user?.avatar_url || (user?.avatarUrl as string | undefined);
+  const userAvatar = user?.avatar || user?.avatar_url || user?.avatarUrl;
   const userName = user?.displayName || user?.name || "Utilisateur";
 
   return (

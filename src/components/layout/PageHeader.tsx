@@ -2,7 +2,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
-// Fix incorrect import
 import ThemeSelector from '@/components/theme/ThemeSelector';
 import { useTheme } from '@/contexts/ThemeContext';
 

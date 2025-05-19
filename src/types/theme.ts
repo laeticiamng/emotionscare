@@ -17,6 +17,7 @@ export interface ThemeContextType {
   preferences?: {
     reduceMotion?: boolean;
     highContrast?: boolean;
+    soundEnabled?: boolean;
   };
   updatePreferences?: (prefs: any) => void;
   reduceMotion?: boolean;

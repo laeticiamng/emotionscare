@@ -21,6 +21,10 @@ export interface KpiCardProps {
   onClick?: () => void;
   footer?: React.ReactNode;
   ariaLabel?: string;
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
 }
 
 export interface KpiCardsGridProps {
@@ -29,9 +33,10 @@ export interface KpiCardsGridProps {
 
 export interface DraggableKpiCardsGridProps {
   cards: KpiCardProps[];
+  kpiCards?: KpiCardProps[];
   onCardsReorder?: (cards: KpiCardProps[]) => void;
-  onOrderChange?: (newOrder: string[]) => void;
-  onSave?: () => void;
+  onOrderChange?: (newOrder: KpiCardProps[]) => void;
+  onSave?: (layouts: any) => void;
   savedLayout?: { [id: string]: any };
   className?: string;
   isEditable?: boolean;
@@ -54,6 +59,8 @@ export interface DashboardWidgetConfig {
 
 export interface GlobalOverviewTabProps {
   className?: string;
+  data?: any;
+  isLoading?: boolean;
 }
 
 export interface TeamSummary {
@@ -61,6 +68,7 @@ export interface TeamSummary {
   name: string;
   teamId?: string; // For backward compatibility
   memberCount?: number;
+  count?: number; // For backward compatibility
   activeUsers?: number;
   emotionalScore?: number;
   averageEmotionalScore?: number;
@@ -77,6 +85,9 @@ export interface AdminAccessLog {
   details: string;
   timestamp: string | Date;
   ip?: string;
+  userId?: string; // For backward compatibility
+  userName?: string; // For backward compatibility
+  resource?: string; // For backward compatibility
 }
 
 export interface DashboardWidget {

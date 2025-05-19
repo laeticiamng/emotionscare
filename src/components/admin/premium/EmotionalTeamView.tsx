@@ -6,7 +6,7 @@ import { EmotionalTeamViewProps } from '@/types/emotion';
 const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({ 
   teamId, 
   period = 'week',
-  anonymized,
+  anonymized = false,
   dateRange,
   showGraph = true, 
   showMembers = true,
@@ -21,6 +21,7 @@ const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
         <div>
           <p>Team ID: {teamId}</p>
           <p>Period: {period}</p>
+          <p>Anonymized: {anonymized ? 'Yes' : 'No'}</p>
           {dateRange && (
             <p>
               Date Range: {dateRange[0].toLocaleDateString()} - {dateRange[1].toLocaleDateString()}

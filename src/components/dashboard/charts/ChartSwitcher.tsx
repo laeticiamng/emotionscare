@@ -31,37 +31,27 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
   const [selectedDimension, setSelectedDimension] = useState<string | null>(null);
   const segmentContext = useSegment();
 
-  // En cas d'absence du contexte, utilisez des valeurs par défaut
-  const defaultContext: SegmentContextType = {
-    dimensions: [],
-    selectedDimension: '',
-    selectedOption: '',
-    setSelectedDimension: () => {},
-    setSelectedOption: () => {},
-    resetSegmentation: () => {},
-    addDimension: () => {},
-    removeDimension: () => {},
-  };
+  // Use default context values if segmentContext is undefined
+  const {
+    setSelectedDimension: contextSetSelectedDimension = () => {},
+    setSelectedOption: contextSetSelectedOption = () => {},
+  } = segmentContext || {};
 
-  // Si des dimensions sont fournies en props, utilisez-les au lieu du contexte
+  // If dimensions are provided in props, use them instead of context
   const availableDimensions = dimensions.length > 0 ? dimensions : segmentContext?.dimensions || [];
 
   const handleDimensionChange = (value: string) => {
     setSelectedDimension(value);
-    if (segmentContext) {
-      segmentContext.setSelectedDimension(value);
-    }
+    contextSetSelectedDimension(value);
   };
 
   const handleOptionChange = (value: string) => {
-    if (segmentContext) {
-      segmentContext.setSelectedOption(value);
-    }
+    contextSetSelectedOption(value);
   };
 
   const getCurrentDimensionOptions = (): SegmentOption[] => {
     if (!selectedDimension) return [];
-    const dimension = availableDimensions.find(d => d.id === selectedDimension || d.key === selectedDimension);
+    const dimension = availableDimensions.find(d => d.id === selectedDimension);
     return dimension ? dimension.options : [];
   };
 
@@ -86,7 +76,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
               </SelectTrigger>
               <SelectContent>
                 {availableDimensions.map((dim) => (
-                  <SelectItem key={dim.id || dim.key} value={dim.id || dim.key || ''}>
+                  <SelectItem key={dim.id} value={dim.id}>
                     {dim.label}
                   </SelectItem>
                 ))}

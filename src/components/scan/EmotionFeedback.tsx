@@ -35,8 +35,8 @@ const EmotionFeedback: React.FC<EmotionFeedbackProps> = ({
         <h3 className="text-lg font-medium mb-2">Votre ressenti</h3>
         <p className="text-sm text-muted-foreground mb-4">
           Ajouter votre propre ressenti sur cette analyse qui a détecté 
-          <span className="font-medium"> {result.emotion} </span> 
-          avec un score de {result.score}%.
+          <span className="font-medium"> {result.primaryEmotion || result.emotion} </span> 
+          avec un score de {result.score || Math.round((result.intensity || 0) * 100)}%.
         </p>
         
         <Textarea

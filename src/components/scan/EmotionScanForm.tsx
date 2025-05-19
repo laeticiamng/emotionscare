@@ -39,15 +39,15 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
         <div className="p-4 rounded-lg bg-muted">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-              {scanResult.emotion === 'joy' && '😊'}
-              {scanResult.emotion === 'calm' && '😌'}
-              {scanResult.emotion === 'anxious' && '😰'}
-              {scanResult.emotion === 'sad' && '😔'}
-              {!['joy', 'calm', 'anxious', 'sad'].includes(scanResult.emotion) && '😐'}
+              {(scanResult.primaryEmotion === 'joy' || scanResult.emotion === 'joy') && '😊'}
+              {(scanResult.primaryEmotion === 'calm' || scanResult.emotion === 'calm') && '😌'}
+              {(scanResult.primaryEmotion === 'anxious' || scanResult.emotion === 'anxious') && '😰'}
+              {(scanResult.primaryEmotion === 'sad' || scanResult.emotion === 'sad') && '😔'}
+              {!['joy', 'calm', 'anxious', 'sad'].includes(scanResult.primaryEmotion || scanResult.emotion || '') && '😐'}
             </div>
             <div>
-              <p className="font-medium">Émotion détectée: <span className="text-primary">{scanResult.emotion}</span></p>
-              <p className="text-sm text-muted-foreground">Score de confiance: {Math.round((scanResult.confidence || 0) * 100)}%</p>
+              <p className="font-medium">Émotion détectée: <span className="text-primary">{scanResult.primaryEmotion || scanResult.emotion}</span></p>
+              <p className="text-sm text-muted-foreground">Score de confiance: {Math.round((scanResult.intensity || scanResult.confidence || 0) * 100)}%</p>
             </div>
           </div>
           
@@ -72,11 +72,19 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
         </TabsList>
         
         <TabsContent value="text">
-          <TextEmotionScanner onResult={handleScanResult} />
+          <TextEmotionScanner 
+            onResult={handleScanResult}
+            isProcessing={isLoadingResult}
+            setIsProcessing={setIsLoadingResult}
+          />
         </TabsContent>
         
         <TabsContent value="voice">
-          <VoiceEmotionScanner onResult={handleScanResult} />
+          <VoiceEmotionScanner 
+            onResult={handleScanResult}
+            isProcessing={isLoadingResult}
+            setIsProcessing={setIsLoadingResult}
+          />
         </TabsContent>
       </Tabs>
       

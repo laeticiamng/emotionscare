@@ -20,9 +20,12 @@ const AudioControls: React.FC<AudioControlsProps> = ({ minimal = false, classNam
   };
 
   const toggleMute = () => {
-    updatePreferences({
-      soundEnabled: !soundEnabled
-    });
+    if (updatePreferences) {
+      updatePreferences({
+        ...preferences,
+        soundEnabled: !soundEnabled
+      });
+    }
   };
 
   if (minimal) {

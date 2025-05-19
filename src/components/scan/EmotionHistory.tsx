@@ -41,16 +41,18 @@ const EmotionHistory: React.FC<EmotionHistoryProps> = ({ history }) => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {history.map((item) => (
-                  <tr key={item.id}>
+                {history.map((item, index) => (
+                  <tr key={item.id || index}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{item.emotion}</div>
+                      <div className="text-sm text-gray-900">{item.primaryEmotion || item.emotion}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{item.score}</div>
+                      <div className="text-sm text-gray-900">{item.score || Math.round((item.intensity || 0) * 100)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{formatDate(item.timestamp || new Date())}</div>
+                      <div className="text-sm text-gray-900">
+                        {item.timestamp ? formatDate(item.timestamp) : 'Unknown date'}
+                      </div>
                     </td>
                   </tr>
                 ))}

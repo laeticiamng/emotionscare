@@ -10,6 +10,7 @@ export interface Badge {
   unlocked?: boolean;
   completed?: boolean;
   unlockedAt?: Date | string;
+  unlocked_at?: Date | string; // For backward compatibility
   progress?: number;
   threshold?: number;
 }

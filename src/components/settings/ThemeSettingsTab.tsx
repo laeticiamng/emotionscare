@@ -1,7 +1,7 @@
 
 import React from 'react';
 import ThemeSelector from './ThemeSelector';
-import { Theme } from '@/types/theme';
+import { Theme, FontFamily } from '@/types/theme';
 
 interface ThemeSettingsTabProps {
   currentTheme: Theme;

@@ -1,4 +1,3 @@
-
 /**
  * Type Index
  * --------------------------------------
@@ -30,3 +29,11 @@ export * from './gamification';
 
 // Export navigation types
 export * from './navigation';
+
+// Export specific types
+export * from './auth';
+export * from './theme';
+export * from './badge';
+export * from './dashboard';
+export * from './segment';
+export * from './scan';

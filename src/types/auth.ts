@@ -4,11 +4,15 @@ export interface AuthUser {
   name: string;
   email: string;
   role?: string;
-  avatar?: string; // Added missing property
+  avatar?: string;
+  avatar_url?: string; // For backward compatibility
+  avatarUrl?: string; // For backward compatibility
+  displayName?: string; // For backward compatibility
   company?: string;
   department?: string;
   position?: string;
   createdAt?: Date | string;
+  created_at?: Date | string; // For backward compatibility
 }
 
 export interface AuthContextType {
@@ -18,7 +22,7 @@ export interface AuthContextType {
   error: Error | null;
   login: (email: string, password: string) => Promise<AuthUser | null>;
   register: (name: string, email: string, password: string) => Promise<AuthUser | null>;
-  logout: () => Promise<void>; // Added missing property
+  logout: () => Promise<void>;
   clearError?: () => void;
-  updateUser?: (userData: Partial<AuthUser>) => Promise<void>; // Added missing property
+  updateUser?: (userData: Partial<AuthUser>) => Promise<void>;
 }

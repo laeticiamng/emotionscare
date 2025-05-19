@@ -52,7 +52,7 @@ const EnhancedCoachAI = () => {
     const safeEmojis = ensureArrayEmojis(result.emojis);
     
     // Use safeEmojis instead of result.emojis
-    console.log('Emotion detected:', result.emotion, 'with emojis:', safeEmojis);
+    console.log('Emotion detected:', result.primaryEmotion || result.emotion, 'with emojis:', safeEmojis);
   };
 
   const handleAnalyze = async () => {
@@ -96,12 +96,12 @@ const EnhancedCoachAI = () => {
           <div className="rounded-md border p-4">
             <h4 className="text-md font-medium">Analyse émotionnelle :</h4>
             <p className="text-sm text-muted-foreground">
-              Émotion détectée : <Badge variant="secondary">{analysisResult.emotion}</Badge>
+              Émotion détectée : <Badge variant="secondary">{analysisResult.primaryEmotion || analysisResult.emotion}</Badge>
             </p>
             <p className="text-sm text-muted-foreground">
-              Confiance : {Math.round((analysisResult.confidence || 0.5) * 100)}%
+              Confiance : {Math.round((analysisResult.intensity || analysisResult.confidence || 0.5) * 100)}%
             </p>
-            {analysisResult.feedback && (
+            {(analysisResult.feedback) && (
               <div className="mt-2">
                 <h5 className="text-sm font-medium">Feedback de l'IA :</h5>
                 <p className="text-xs text-muted-foreground">{analysisResult.feedback}</p>
@@ -113,7 +113,7 @@ const EnhancedCoachAI = () => {
                 <ScrollArea className="h-20">
                   <ul className="list-disc list-inside text-xs text-muted-foreground">
                     {analysisResult.recommendations.map((rec, index) => (
-                      <li key={index}>{typeof rec === 'string' ? rec : rec.title}</li>
+                      <li key={index}>{typeof rec === 'string' ? rec : rec.title || rec.description}</li>
                     ))}
                   </ul>
                 </ScrollArea>
