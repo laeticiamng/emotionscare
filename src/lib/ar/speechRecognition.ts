@@ -37,7 +37,7 @@ interface SpeechRecognitionInstance extends EventTarget {
   onend: ((event: Event) => void) | null;
 }
 
-// Fix the global declaration by not redeclaring properties
+// Declare global augmentation without duplicate properties
 declare global {
   interface Window {
     SpeechRecognition?: SpeechRecognitionConstructor;

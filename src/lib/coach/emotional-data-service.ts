@@ -60,13 +60,8 @@ class EmotionalDataService {
   convertFromEmotionResult(result: EmotionResult): EmotionalData {
     // Handle compatibility between different EmotionSource types
     let source: EmotionSource = 'system';
-    if (result.source === 'text' || 
-        result.source === 'voice' || 
-        result.source === 'facial' || 
-        result.source === 'ai' || 
-        result.source === 'manual' ||
-        result.source === 'system') {
-      source = result.source;
+    if (['text', 'voice', 'facial', 'ai', 'manual', 'system', 'emoji', 'live-voice', 'voice-analyzer', 'audio-processor', 'text-analysis'].includes(result.source as string)) {
+      source = result.source as EmotionSource;
     }
     
     return {
@@ -77,7 +72,7 @@ class EmotionalDataService {
       timestamp: result.timestamp || new Date().toISOString(),
       context: result.text || undefined,
       source: source,
-      tags: [] // Initialize with empty array for compatibility
+      tags: result.tags || [] // Support tags if available
     };
   }
   
