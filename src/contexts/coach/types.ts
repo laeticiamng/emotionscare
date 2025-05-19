@@ -1,10 +1,14 @@
 
-import { ChatMessage } from '@/types/chat';
+import { ChatMessage, ChatConversation } from '@/types/chat';
 
 export interface CoachContextType {
   messages: ChatMessage[];
   isTyping: boolean;
-  sendMessage: (content: string, history?: any[]) => Promise<string>;
+  isProcessing: boolean;
+  loading?: boolean;
+  conversations?: ChatConversation[];
+  currentConversation?: ChatConversation | null;
+  sendMessage: (content: string, sender?: 'user' | 'coach' | 'assistant' | 'system') => Promise<string>;
   clearMessages: () => void;
   isOpen?: boolean;
   setIsOpen?: (open: boolean) => void;
@@ -12,5 +16,5 @@ export interface CoachContextType {
   characterName?: string;
   characterImage?: string;
   characterRole?: string;
-  loading?: boolean;
+  currentEmotion?: string | null;
 }

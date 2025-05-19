@@ -1,7 +1,7 @@
 
 import React from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import CoachChat from '@/components/coach/CoachChat';
+import EnhancedCoachChat from '@/components/coach/EnhancedCoachChat';
 
 const CoachChatPage: React.FC = () => {
   return (
@@ -10,7 +10,7 @@ const CoachChatPage: React.FC = () => {
         <h1 className="text-3xl font-bold mb-6">Chat avec votre Coach</h1>
         
         <div className="bg-background rounded-lg border h-full overflow-hidden">
-          <CoachChat 
+          <EnhancedCoachChat 
             initialMessage="Bonjour, comment puis-je vous aider aujourd'hui ?" 
             showCharacter={true}
             showHeader={true}

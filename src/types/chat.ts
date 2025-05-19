@@ -3,7 +3,7 @@
 
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'assistant' | 'system';
+  sender: 'user' | 'assistant' | 'system' | 'coach';
   content: string;
   timestamp: string;
   conversationId?: string;
@@ -12,6 +12,7 @@ export interface ChatMessage {
   metadata?: Record<string, any>;
   role?: string; // Optional role property to support different message types
   text?: string; // For backward compatibility
+  emotion?: string; // Added for emotional context
 }
 
 export interface ChatConversation {
@@ -27,6 +28,7 @@ export interface ChatConversation {
   updated_at?: string; // For backward compatibility
   user_id?: string; // For backward compatibility
   participants?: string[]; // Added for compatibility with mockChatMessages
+  emotion?: string; // Added for emotional context
 }
 
 export interface ChatResponse {

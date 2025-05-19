@@ -1,7 +1,7 @@
 
 import React from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
-import CoachChat from '@/components/coach/CoachChat';
+import EnhancedCoachChat from '@/components/coach/EnhancedCoachChat';
 
 const B2BUserCoachChatPage: React.FC = () => {
   return (
@@ -10,7 +10,7 @@ const B2BUserCoachChatPage: React.FC = () => {
         <h1 className="text-3xl font-bold mb-6">Dialogue professionnel</h1>
         
         <div className="bg-background rounded-lg border h-full overflow-hidden">
-          <CoachChat 
+          <EnhancedCoachChat 
             initialMessage="Bonjour, comment se passe votre journée de travail ? Je suis là pour vous aider à maintenir un bon équilibre professionnel." 
             showCharacter={true}
             showHeader={true}
