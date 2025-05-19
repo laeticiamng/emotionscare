@@ -151,17 +151,21 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
         duration: scanDuration - timeRemaining,
         recommendations: [
           {
+            id: 'live-music',
             type: 'music',
             title: 'Playlist méditative',
             description: 'Des sons pour maintenir votre état de calme',
-            icon: 'music'
-          } as unknown as string,
+            icon: 'music',
+            emotion: emotion,
+          },
           {
+            id: 'live-activity',
             type: 'activity',
             title: 'Exercice de respiration',
             description: 'Prenez 5 minutes pour approfondir votre état de calme',
-            icon: 'activity'
-          } as unknown as string
+            icon: 'activity',
+            emotion: emotion,
+          },
         ]
       };
       

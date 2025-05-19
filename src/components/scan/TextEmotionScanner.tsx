@@ -44,21 +44,21 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
         text: text,
         recommendations: [
           {
+            id: 'music-recommendation',
             type: 'music',
             title: 'Playlist de réflexion',
             description: 'Une sélection musicale pour accompagner votre réflexion.',
             icon: 'music',
-            id: 'music-recommendation',
-            emotion: 'thoughtful'
-          } as unknown as string,
+            emotion: 'thoughtful',
+          },
           {
+            id: 'activity-recommendation',
             type: 'activity',
             title: 'Journal de pensées',
             description: 'Prenez le temps de noter vos réflexions dans un journal.',
             icon: 'book',
-            id: 'activity-recommendation',
-            emotion: 'thoughtful'
-          } as unknown as string,
+            emotion: 'thoughtful',
+          },
         ],
       };
 

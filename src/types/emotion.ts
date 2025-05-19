@@ -1,24 +1,60 @@
 
+export interface EmotionData {
+  emotion: string;
+  confidence: number;
+  intensity?: number;
+  valence?: number;
+  arousal?: number;
+  dominance?: number;
+  timestamp?: string;
+}
+
+export interface EmotionRecommendation {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  emotion?: string;
+  content?: string;
+  category?: string;
+  action?: string;
+  link?: string;
+  icon?: string;
+  duration?: number;
+  intensity?: 'low' | 'medium' | 'high';
+  tags?: string[];
+}
+
 export interface EmotionResult {
   emotion: string;
   confidence: number;
+  intensity?: number;
   secondaryEmotions?: string[];
-  timestamp: string;
-  source: 'text' | 'voice' | 'facial' | 'emoji' | 'system' | 'ai';
+  timestamp?: string;
+  source?: EmotionSource;
   text?: string;
   duration?: number;
   userId?: string;
   sessionId?: string;
-  
+  language?: string;
+  data?: EmotionData[];
+
   // Extended fields for compatibility
   id?: string;
   primaryEmotion?: string;
   score?: number;
-  intensity?: number;
   feedback?: string;
-  recommendations?: string[];
+  recommendations?: EmotionRecommendation[];
+  triggers?: string[];
+  context?: object;
+  model?: string;
+  raw?: any;
+  ai_feedback?: string;
   emojis?: string[];
+  emotions?: Record<string, number>;
   date?: string; // Date for display
+  audioUrl?: string;
+  transcript?: string;
 }
 
 export type EmotionSource = 'text' | 'voice' | 'facial' | 'emoji' | 'system' | 'ai';
@@ -46,20 +82,6 @@ export interface EmotionalState {
   baseline: string;
   trends: EmotionTrend[];
   recentHistory: EmotionHistoryItem[];
-}
-
-// Extended types for compatibility
-export interface EmotionRecommendation {
-  type: string;
-  title: string;
-  description: string;
-  action?: string;
-  link?: string;
-  icon?: string;
-  id?: string; // Added for compatibility
-  emotion?: string; // Added to fix build errors
-  content?: string; // Added to fix build errors
-  category?: string; // Added to fix build errors
 }
 
 export interface Emotion {

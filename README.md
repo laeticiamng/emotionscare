@@ -291,6 +291,20 @@ Un tableau de bord dédié permet aux administrateurs de suivre les incidents et
 Il est accessible via la route `/b2b/admin/security`.
 Tous les utilisateurs disposent d'un widget « Sécurité » dans leurs paramètres pour consulter les dernières alertes.
 
+## Types d'émotion unifiés
+
+Les interfaces `EmotionResult` et `EmotionRecommendation` se trouvent dans `src/types/emotion.ts`.
+Elles sont utilisées par tous les modules de scan et de recommandations. Les champs
+suivants sont disponibles :
+
+- `EmotionResult` : informations détaillées sur l'émotion détectée (confidence,
+  intensity, recommandations, etc.).
+- `EmotionRecommendation` : objet décrivant une action ou une ressource associée
+  à l'émotion (type, titre, description, lien, etc.).
+
+Les mocks du dossier `src/mocks` respectent désormais strictement ces
+définitions pour éviter les erreurs de typage lors du build.
+
 ## Documentation technique
 
 Vous trouverez dans le dossier `src/docs` plusieurs guides détaillés :

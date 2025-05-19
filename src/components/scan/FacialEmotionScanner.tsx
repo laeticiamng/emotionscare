@@ -97,17 +97,21 @@ const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({
         source: 'facial',
         recommendations: [
           {
+            id: 'facial-music',
             type: 'music',
             title: 'Playlist joyeuse',
             description: 'Des morceaux pour maintenir votre bonne humeur',
-            icon: 'music'
-          } as unknown as string,
+            icon: 'music',
+            emotion: 'happy',
+          },
           {
+            id: 'facial-activity',
             type: 'activity',
             title: 'Activité créative',
             description: 'Profitez de cette énergie positive pour créer quelque chose',
-            icon: 'activity'
-          } as unknown as string
+            icon: 'activity',
+            emotion: 'happy',
+          },
         ]
       };
       
