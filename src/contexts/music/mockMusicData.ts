@@ -1,133 +1,188 @@
+
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
+// Define mock tracks
 export const mockTracks: MusicTrack[] = [
   {
-    id: "mock-track-1",
-    title: "Endless Calm",
-    artist: "DeepFlow",
-    coverUrl: "/images/music/calm1.jpg",
-    audioUrl: "/audio/calm1.mp3",
+    id: 'track-1',
+    title: 'Calm Waters',
+    artist: 'Ocean Sounds',
+    audioUrl: '/audio/calm-waters.mp3',
+    url: '/audio/calm-waters.mp3',
+    coverUrl: '/images/covers/calm-waters.jpg',
     duration: 180,
-    emotion: "calm",
-    intensity: 3,
-    tags: "calm,gentle,peaceful",
-    albumTitle: '',
+    emotion: 'calm',
+    mood: 'relaxed',
+    intensity: 0.3,
+    tags: ['nature', 'meditation', 'sleep'],
+    category: 'relax'
   },
   {
-    id: "mock-track-2",
-    title: "Focus Zone",
-    artist: "BrainSync",
-    coverUrl: "/images/music/focus1.jpg",
-    audioUrl: "/audio/focus1.mp3",
-    duration: 210,
-    emotion: "focus",
-    intensity: 5,
-    tags: "focus,study,concentration",
-    albumTitle: '',
-  },
-  {
-    id: "mock-track-3",
-    title: "Energy Boost",
-    artist: "PowerBeats",
-    coverUrl: "/images/music/energy1.jpg",
-    audioUrl: "/audio/energy1.mp3",
-    duration: 150,
-    emotion: "energy",
-    intensity: 7,
-    tags: "energy,workout,motivation",
-    albumTitle: '',
-  },
-  {
-    id: "mock-track-4",
-    title: "Dream Weaver",
-    artist: "SleepCycle",
-    coverUrl: "/images/music/sleep1.jpg",
-    audioUrl: "/audio/sleep1.mp3",
+    id: 'track-2',
+    title: 'Deep Focus',
+    artist: 'Brain Waves',
+    audioUrl: '/audio/deep-focus.mp3',
+    url: '/audio/deep-focus.mp3',
+    coverUrl: '/images/covers/deep-focus.jpg',
     duration: 240,
-    emotion: "sleep",
-    intensity: 2,
-    tags: "sleep,relax,night",
-    albumTitle: '',
+    emotion: 'focused',
+    mood: 'concentrated',
+    intensity: 0.5,
+    tags: ['focus', 'work', 'study'],
+    category: 'focus'
   },
   {
-    id: "mock-track-5",
-    title: "Inner Peace",
-    artist: "ZenMaster",
-    coverUrl: "/images/music/meditation1.jpg",
-    audioUrl: "/audio/meditation1.mp3",
+    id: 'track-3',
+    title: 'Energy Boost',
+    artist: 'Workout Mix',
+    audioUrl: '/audio/energy-boost.mp3',
+    url: '/audio/energy-boost.mp3',
+    coverUrl: '/images/covers/energy-boost.jpg',
+    duration: 160,
+    emotion: 'energetic',
+    mood: 'motivated',
+    intensity: 0.8,
+    tags: ['workout', 'energy', 'motivation'],
+    category: 'energy'
+  },
+  {
+    id: 'track-4',
+    title: 'Peaceful Mind',
+    artist: 'Meditation Masters',
+    audioUrl: '/audio/peaceful-mind.mp3',
+    url: '/audio/peaceful-mind.mp3',
+    coverUrl: '/images/covers/peaceful-mind.jpg',
     duration: 300,
-    emotion: "meditation",
-    intensity: 4,
-    tags: "meditation,yoga,mindfulness",
-    albumTitle: '',
+    emotion: 'peaceful',
+    mood: 'calm',
+    intensity: 0.2,
+    tags: ['meditation', 'relax', 'mindfulness'],
+    category: 'meditation'
   },
   {
-    id: "mock-track-6",
-    title: "Mellow Mood",
-    artist: "ChillWave",
-    coverUrl: "/images/music/mood1.jpg",
-    audioUrl: "/audio/mood1.mp3",
+    id: 'track-5',
+    title: 'Happy Vibes',
+    artist: 'Joy Makers',
+    audioUrl: '/audio/happy-vibes.mp3',
+    url: '/audio/happy-vibes.mp3',
+    coverUrl: '/images/covers/happy-vibes.jpg',
     duration: 200,
-    emotion: "mood",
-    intensity: 6,
-    tags: "mood,chill,vibes",
-    albumTitle: '',
+    emotion: 'happy',
+    mood: 'joyful',
+    intensity: 0.7,
+    tags: ['happy', 'joyful', 'uplifting'],
+    category: 'mood'
+  },
+  {
+    id: 'track-6',
+    title: 'Emotional Release',
+    artist: 'Soul Therapy',
+    audioUrl: '/audio/emotional-release.mp3',
+    url: '/audio/emotional-release.mp3',
+    coverUrl: '/images/covers/emotional-release.jpg',
+    duration: 280,
+    emotion: 'sad',
+    mood: 'reflective',
+    intensity: 0.4,
+    tags: ['emotional', 'reflective', 'cathartic'],
+    category: 'mood'
+  },
+  {
+    id: 'track-7',
+    title: 'Stress Relief',
+    artist: 'Anxiety Free',
+    audioUrl: '/audio/stress-relief.mp3',
+    url: '/audio/stress-relief.mp3',
+    coverUrl: '/images/covers/stress-relief.jpg',
+    duration: 320,
+    emotion: 'relaxed',
+    mood: 'calm',
+    intensity: 0.3,
+    tags: ['stress', 'anxiety', 'relief'],
+    category: 'relax'
+  },
+  {
+    id: 'track-8',
+    title: 'Dream Journey',
+    artist: 'Sleep Well',
+    audioUrl: '/audio/dream-journey.mp3',
+    url: '/audio/dream-journey.mp3',
+    coverUrl: '/images/covers/dream-journey.jpg',
+    duration: 360,
+    emotion: 'sleepy',
+    mood: 'drowsy',
+    intensity: 0.1,
+    tags: ['sleep', 'dreams', 'night'],
+    category: 'sleep'
   }
 ];
 
+// Define mock playlists
 export const mockPlaylists: MusicPlaylist[] = [
   {
-    id: "playlist-calm",
-    title: "Calm Collection",
-    description: "Gentle sounds for peaceful moments",
-    coverUrl: "/images/playlists/calm.jpg",
-    tracks: [],
-    mood: "calm",
-    category: "relax"
+    id: 'playlist-1',
+    title: 'Relaxation Collection',
+    name: 'Relaxation Collection',
+    description: 'Soothing sounds to help you relax and unwind',
+    coverUrl: '/images/covers/relaxation.jpg',
+    coverImage: '/images/covers/relaxation.jpg',
+    tracks: mockTracks.filter(track => 
+      track.category === 'relax' || 
+      track.emotion === 'calm' || 
+      track.emotion === 'peaceful'
+    ),
+    emotion: 'calm',
+    mood: 'relaxed',
+    tags: ['relax', 'calm', 'peace'],
+    category: 'relax'
   },
   {
-    id: "playlist-focus",
-    title: "Focus Tracks",
-    description: "Music to enhance your concentration",
-    coverUrl: "/images/playlists/focus.jpg",
-    tracks: [],
-    mood: "focus",
-    category: "focus"
+    id: 'playlist-2',
+    title: 'Focus & Productivity',
+    name: 'Focus & Productivity',
+    description: 'Music designed to enhance concentration and productivity',
+    coverUrl: '/images/covers/focus.jpg',
+    coverImage: '/images/covers/focus.jpg',
+    tracks: mockTracks.filter(track => 
+      track.category === 'focus' || 
+      track.emotion === 'focused'
+    ),
+    emotion: 'focused',
+    mood: 'concentrated',
+    tags: ['focus', 'work', 'study'],
+    category: 'focus'
   },
   {
-    id: "playlist-energy",
-    title: "Energy Playlist",
-    description: "Uplifting beats to power your day",
-    coverUrl: "/images/playlists/energy.jpg",
-    tracks: [],
-    mood: "energy",
-    category: "energy"
+    id: 'playlist-3',
+    title: 'Energy & Motivation',
+    name: 'Energy & Motivation',
+    description: 'Boost your energy and find motivation',
+    coverUrl: '/images/covers/energy.jpg',
+    coverImage: '/images/covers/energy.jpg',
+    tracks: mockTracks.filter(track => 
+      track.category === 'energy' || 
+      track.emotion === 'energetic' ||
+      track.emotion === 'happy'
+    ),
+    emotion: 'energetic',
+    mood: 'motivated',
+    tags: ['energy', 'motivation', 'workout'],
+    category: 'energy'
   },
   {
-    id: "playlist-sleep",
-    title: "Sleep Sounds",
-    description: "Soothing melodies for a restful night",
-    coverUrl: "/images/playlists/sleep.jpg",
-    tracks: [],
-    mood: "sleep",
-    category: "sleep"
-  },
-  {
-    id: "playlist-meditation",
-    title: "Meditation Mix",
-    description: "Ambient textures for inner peace",
-    coverUrl: "/images/playlists/meditation.jpg",
-    tracks: [],
-    mood: "meditation",
-    category: "meditation"
-  },
-  {
-    id: "playlist-mood",
-    title: "Mood Booster",
-    description: "Eclectic tracks to lift your spirits",
-    coverUrl: "/images/playlists/mood.jpg",
-    tracks: [],
-    mood: "mood",
-    category: "mood"
+    id: 'playlist-4',
+    title: 'Sleep & Dreams',
+    name: 'Sleep & Dreams',
+    description: 'Gentle sounds to help you fall asleep',
+    coverUrl: '/images/covers/sleep.jpg',
+    coverImage: '/images/covers/sleep.jpg',
+    tracks: mockTracks.filter(track => 
+      track.category === 'sleep' || 
+      track.emotion === 'sleepy'
+    ),
+    emotion: 'sleepy',
+    mood: 'drowsy',
+    tags: ['sleep', 'night', 'dreams'],
+    category: 'sleep'
   }
 ];

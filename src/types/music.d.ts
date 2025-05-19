@@ -13,6 +13,16 @@ export interface MusicTrack {
   year?: number | string;
   tags?: string[] | string;
   category?: string | string[];
+  // Additional properties for compatibility
+  cover?: string;
+  coverImage?: string;
+  url?: string;
+  src?: string;
+  track_url?: string;
+  name?: string;
+  album?: string;
+  isLiked?: boolean;
+  genre?: string;
 }
 
 export interface MusicPlaylist {
@@ -27,6 +37,13 @@ export interface MusicPlaylist {
   category?: string | string[];
   creator?: string;
   src?: string;
+  // Additional properties for compatibility
+  name?: string;
+  cover?: string;
+  isPublic?: boolean;
+  userId?: string;
+  author?: string;
+  tags?: string[] | string;
 }
 
 export type MusicCategory = 'relax' | 'focus' | 'energy' | 'sleep' | 'meditation' | 'mood' | 'custom';
