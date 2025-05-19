@@ -7,6 +7,7 @@ export const sampleTracks: MusicTrack[] = [
     id: '1',
     title: 'Calm Waters',
     artist: 'Nature Sounds',
+    url: '/sounds/ambient-calm.mp3',
     duration: 180,
     src: '/sounds/ambient-calm.mp3',
     audioUrl: '/sounds/ambient-calm.mp3',
@@ -17,6 +18,7 @@ export const sampleTracks: MusicTrack[] = [
     id: '2',
     title: 'Peaceful Mind',
     artist: 'Meditation Masters',
+    url: '/sounds/welcome.mp3',
     duration: 240,
     src: '/sounds/welcome.mp3',
     audioUrl: '/sounds/welcome.mp3',
@@ -30,9 +32,11 @@ export const defaultPlaylists: MusicPlaylist[] = [
   {
     id: 'calm-playlist',
     name: 'Calming Sounds',
+    title: 'Calming Sounds',
     tracks: sampleTracks,
     description: 'Relaxing sounds to calm your mind',
-    tags: ['calm', 'relax', 'meditation']
+    tags: ['calm', 'relax', 'meditation'],
+    creator: 'EmotionsCare'
   }
 ];
 

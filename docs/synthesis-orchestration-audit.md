@@ -16,7 +16,7 @@ Ce document analyse la mise en place actuelle de la synthèse émotionnelle glob
 
 ## 3. Typage et structure
 
-- Les types globaux sont dispersés : certains dans `src/types`, d'autres dans les fichiers des contextes. Il n'existe pas encore de fichier unique `types/global.ts` pour centraliser toutes les entités partagées.
+- Les types globaux sont dispersés : certains dans `src/types`, d'autres dans les fichiers des contextes. Il n'existe pas encore de fichier unique `types/orchestration.ts` pour centraliser toutes les entités partagées.
 - Le contexte d'orchestration expose l'interface `MoodEvent` comprenant `id`, `timestamp`, `mood` et `source`.
 - Les prédictions IA sont typées via `Prediction` et `PredictionRecommendation` dans `PredictiveAnalyticsContext.tsx`.
 
@@ -54,7 +54,7 @@ not ok 2 - src/tests/global.test.js
 
 1. **GlobalContextProvider** : créer un fichier `src/providers/GlobalContextProvider.tsx` regroupant `PredictiveAnalyticsProvider` et `OrchestrationProvider` pour centraliser la récupération et la distribution des données transverses.
 2. **EventBus** : mettre en place un bus d'événements ou utiliser un store (Zustand/Redux Toolkit) pour permettre la synchronisation instantanée entre les modules (ex. changement d'émotion ⇒ mise à jour de la musique, de la météo et du coach).
-3. **Centralisation du typage** : créer `src/types/global.ts` pour définir `MoodEvent`, `Prediction`, `AnalyticsEvent`, etc., puis réexporter via `src/types/index.ts`.
+3. **Centralisation du typage** : créer `types/orchestration.ts` pour définir `MoodEvent`, `Prediction`, `AnalyticsEvent`, etc., puis réexporter via `src/types/index.ts`.
 4. **Connexion des widgets** : faire consommer `useOrchestration` et `usePredictiveAnalytics` dans `/world` et `/sanctuary` afin d'afficher des synthèses évolutives et partagées.
 5. **Gestion des droits** : définir des niveaux d'accès (user, admin, RH) pour chaque route de synthèse et appliquer l'anonymisation des données collectives.
 6. **Tests automatisés** : ajouter des tests unitaires pour `OrchestrationContext` et `PredictiveAnalyticsContext`, ainsi qu'une intégration vérifiant la propagation des événements via l'EventBus.

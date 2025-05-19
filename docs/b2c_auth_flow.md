@@ -10,8 +10,9 @@ Ce document décrit la logique de connexion, d'inscription et de gestion de sess
 ## Processus
 1. **Inscription** : `authService.signUp` crée l'utilisateur dans Supabase et enregistre les métadonnées (nom, rôle, préférences). A la réussite, le listener d'état d'authentification hydrate le `AuthContext`.
 2. **Connexion** : `authService.signIn` vérifie les identifiants. Après succès, le listener d'auth récupère le profil complet et met à jour `user`.
-3. **Redirection** : après une connexion réussie, l'utilisateur est redirigé vers `/b2c/dashboard`.
-4. **Déconnexion** : `authService.signOut` révoque la session Supabase puis le listener nettoie l'état local.
+3. **Lien magique** : `authService.sendMagicLink` permet une connexion sans mot de passe en envoyant un email contenant un token à usage unique.
+4. **Redirection** : après une connexion réussie, l'utilisateur est redirigé vers `/b2c/dashboard`.
+5. **Déconnexion** : `authService.signOut` révoque la session Supabase puis le listener nettoie l'état local.
 
 ## Routage sécurisé
 - Les pages sous `/b2c/*` utilisent le composant `ProtectedRoute` pour empêcher l'accès sans authentification.

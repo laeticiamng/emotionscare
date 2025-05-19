@@ -17,33 +17,41 @@ const B2CLogin = () => {
   const [showTransition, setShowTransition] = useState(false);
   const [magicLinkEmail, setMagicLinkEmail] = useState('');
   const [showMagicLink, setShowMagicLink] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, sendMagicLink } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
-      await login(email, password);
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw new Error('invalid-email');
+      }
+      if (!password) {
+        throw new Error('missing-password');
+      }
+
+      await login(email, password, rememberMe);
       setShowTransition(true);
       // Note: La redirection se fera après l'animation de transition
     } catch (error: any) {
       console.error('Login error:', error);
       toast({
         title: "Problème de connexion",
-        description: "Veuillez vérifier vos identifiants et réessayer.",
+        description: "Identifiants invalides",
         variant: "destructive",
       });
       setIsLoading(false);
     }
   };
-  
-  const handleMagicLinkRequest = (e: React.FormEvent) => {
+
+  const handleMagicLinkRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!magicLinkEmail) {
       toast({
         title: "Email requis",
@@ -52,14 +60,20 @@ const B2CLogin = () => {
       });
       return;
     }
-    
-    toast({
-      title: "Lien magique envoyé!",
-      description: "Veuillez vérifier votre boîte mail pour vous connecter sans mot de passe.",
-      variant: "default",
-    });
-    
-    setShowMagicLink(false);
+    const success = await sendMagicLink(magicLinkEmail);
+    if (success) {
+      toast({
+        title: "Lien magique envoyé!",
+        description: "Veuillez vérifier votre boîte mail pour vous connecter sans mot de passe.",
+      });
+      setShowMagicLink(false);
+    } else {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer le lien de connexion",
+        variant: "destructive",
+      });
+    }
   };
 
   const containerVariants = {
@@ -160,10 +174,12 @@ const B2CLogin = () => {
                     variants={itemVariants}
                   >
                     <div className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
-                        id="remember" 
+                      <input
+                        type="checkbox"
+                        id="remember"
                         className="rounded text-primary focus:ring-primary"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
                       />
                       <label htmlFor="remember" className="text-muted-foreground">Se souvenir de moi</label>
                     </div>

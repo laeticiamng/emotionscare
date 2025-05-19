@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@/types/user';
+import authService from '@/services/auth-service';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -8,9 +9,10 @@ interface AuthContextType {
   loading: boolean;
   isLoading: boolean; // Added to match usage in components
   error: string | null;
-  login: (email: string, password: string) => Promise<User | null>;
+  login: (email: string, password: string, remember?: boolean) => Promise<User | null>;
   register: (name: string, email: string, password: string) => Promise<User | null>;
   logout: () => Promise<void>;
+  sendMagicLink?: (email: string) => Promise<boolean>;
   clearError?: () => void;
   updateUser?: (userData: Partial<User>) => Promise<User | null>; // Added to match usage in components
   updatePreferences?: (preferences: any) => Promise<void>;
@@ -25,15 +27,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if the user is already logged in
+    // Verify existing session on mount via Supabase
     const checkAuthStatus = async () => {
       try {
-        // Simulate authentication check
-        const storedUser = localStorage.getItem('user');
-        
-        if (storedUser) {
-          const userData = JSON.parse(storedUser);
-          setUser(userData);
+        const { user } = await authService.getCurrentUser();
+
+        if (user) {
+          setUser(user);
           setIsAuthenticated(true);
         }
       } catch (error) {
@@ -46,36 +46,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuthStatus();
   }, []);
 
-  const login = async (email: string, password: string): Promise<User | null> => {
+  const login = async (email: string, password: string, remember = true): Promise<User | null> => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      // Simulate login API call
-      console.log('Logging in with:', email, password);
-      
-      // For demo purposes, create a mock user
-      const userData: User = {
-        id: 'user-123',
-        email: email,
-        name: email.split('@')[0],
-        role: email.includes('admin') ? 'admin' : 'user',
-        created_at: new Date().toISOString(),
-        preferences: {
-          theme: 'system',
-          language: 'fr'
+      const { user, error } = await authService.signIn({ email, password });
+
+      if (error || !user) {
+        throw error || new Error('Invalid credentials');
+      }
+
+      // If the user does not want to be remembered, remove stored session after login
+      if (!remember && typeof window !== 'undefined') {
+        const storageKey = Object.keys(localStorage).find((k) => k.startsWith('sb-') && k.endsWith('-auth-token'));
+        if (storageKey) {
+          const session = localStorage.getItem(storageKey);
+          sessionStorage.setItem(storageKey, session || '');
+          localStorage.removeItem(storageKey);
         }
-      };
-      
-      // Store user in local storage
-      localStorage.setItem('user', JSON.stringify(userData));
-      
-      setUser(userData);
+      }
+
+      setUser(user);
       setIsAuthenticated(true);
-      return userData;
-    } catch (error) {
+      return user;
+    } catch (error: any) {
       console.error('Login error:', error);
-      setError('Failed to login. Please check your credentials.');
+      setError('Identifiants invalides');
       return null;
     } finally {
       setLoading(false);
@@ -85,33 +82,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (name: string, email: string, password: string): Promise<User | null> => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      // Simulate registration API call
-      console.log('Registering with:', name, email, password);
-      
-      // For demo purposes, create a mock user
-      const userData: User = {
-        id: 'user-' + Math.random().toString(36).substring(2, 9),
-        email: email,
-        name: name,
-        role: 'user',
-        created_at: new Date().toISOString(),
-        preferences: {
-          theme: 'system',
-          language: 'fr'
-        }
-      };
-      
-      // Store user in local storage
-      localStorage.setItem('user', JSON.stringify(userData));
-      
-      setUser(userData);
+      const { user, error } = await authService.signUp({ name, email, password, role: 'b2c' });
+
+      if (error || !user) {
+        throw error || new Error('Registration failed');
+      }
+
+      setUser(user);
       setIsAuthenticated(true);
-      return userData;
-    } catch (error) {
+      return user;
+    } catch (error: any) {
       console.error('Registration error:', error);
-      setError('Failed to register. Please try again.');
+      setError('Une erreur est survenue lors de l\'inscription');
       return null;
     } finally {
       setLoading(false);
@@ -120,16 +104,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async (): Promise<void> => {
     setLoading(true);
-    
+
     try {
-      // Simulate logout API call
-      localStorage.removeItem('user');
-      
+      const { error } = await authService.signOut();
+
+      if (error) throw error;
+
       setUser(null);
       setIsAuthenticated(false);
     } catch (error) {
       console.error('Logout error:', error);
-      setError('Failed to logout. Please try again.');
+      setError('Erreur lors de la déconnexion');
     } finally {
       setLoading(false);
     }
@@ -143,17 +128,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateUser = async (userData: Partial<User>): Promise<User | null> => {
     setLoading(true);
     try {
-      const storedUser = localStorage.getItem('user');
-      if (!storedUser) {
+      if (!user) {
         throw new Error('No user found');
       }
-      
-      const currentUser = JSON.parse(storedUser);
-      const updatedUser = { ...currentUser, ...userData };
-      
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+
+      const { success, error } = await authService.updateUserProfile(user.id, userData);
+
+      if (!success || error) throw error;
+
+      const updatedUser = { ...user, ...userData };
       setUser(updatedUser);
-      
+
       return updatedUser;
     } catch (error) {
       console.error('Update user error:', error);
@@ -168,22 +153,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updatePreferences = async (preferences: any): Promise<void> => {
     setLoading(true);
     try {
-      const storedUser = localStorage.getItem('user');
-      if (!storedUser) {
+      if (!user) {
         throw new Error('No user found');
       }
-      
-      const currentUser = JSON.parse(storedUser);
-      const updatedUser = { 
-        ...currentUser, 
-        preferences: { ...currentUser.preferences, ...preferences } 
+
+      const { success, error } = await authService.updateUserPreferences(user.id, preferences);
+
+      if (!success || error) throw error;
+
+      const updatedUser = {
+        ...user,
+        preferences: { ...user.preferences, ...preferences }
       };
-      
-      localStorage.setItem('user', JSON.stringify(updatedUser));
       setUser(updatedUser);
     } catch (error) {
       console.error('Update preferences error:', error);
       setError('Failed to update preferences. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const sendMagicLink = async (email: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { success, error } = await authService.sendMagicLink(email);
+      if (!success || error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Magic link error:', error);
+      setError('Impossible d\'envoyer le lien de connexion');
+      return false;
     } finally {
       setLoading(false);
     }
@@ -200,7 +202,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout,
     clearError,
     updateUser,
-    updatePreferences
+    updatePreferences,
+    sendMagicLink
   };
 
   return (
