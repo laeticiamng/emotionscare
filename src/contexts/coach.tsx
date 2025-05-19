@@ -5,7 +5,7 @@ import { createContext, useState, useContext } from 'react';
 export interface ChatMessage {
   id: string;
   content: string;
-  sender: 'user' | 'coach' | string;
+  sender: 'user' | 'assistant' | 'system' | 'coach';
   timestamp: string;
 }
 
@@ -16,7 +16,7 @@ export interface CoachContextType {
   setLastEmotion?: (emotion: string | null) => void;
   // Ajout des propriétés manquantes pour CoachChat
   messages: ChatMessage[];
-  sendMessage: (text: string, sender: string) => void;
+  sendMessage: (text: string, sender: 'user' | 'assistant' | 'system' | 'coach') => void;
   isProcessing: boolean;
   clearMessages: () => void;
   currentEmotion: string | null;
@@ -52,7 +52,10 @@ export const CoachProvider = ({ children }: { children: React.ReactNode }) => {
     setIsActive(prev => !prev);
   };
 
-  const sendMessage = (text: string, sender: string) => {
+  const sendMessage = (
+    text: string,
+    sender: 'user' | 'assistant' | 'system' | 'coach'
+  ) => {
     const newMessage: ChatMessage = {
       id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       content: text,

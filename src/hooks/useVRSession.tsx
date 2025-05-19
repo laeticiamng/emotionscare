@@ -2,103 +2,83 @@
 import { useState, useEffect } from 'react';
 import { VRSessionTemplate, VRSession } from '@/types/vr';
 
-export const useVRSession = () => {
-  const [availableSessions, setAvailableSessions] = useState<VRSessionTemplate[]>([
+export const useVRSession = (userId: string) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [activeTemplates, setActiveTemplates] = useState<VRSessionTemplate[]>([]);
+  
+  // Mock data for VR sessions
+  const mockTemplates: VRSessionTemplate[] = [
     {
-      id: '1',
-      title: 'Morning Meditation',
-      name: 'Morning Meditation',
-      description: 'Start your day with a calm and focused mind',
-      thumbnailUrl: '/images/vr-meditation.jpg',
+      id: 'template-1',
+      title: 'Méditation matinale',
+      description: 'Commencez votre journée avec une méditation guidée pour un esprit clair',
       duration: 15,
-      difficulty: 'Beginner',
-      category: 'Meditation',
-      tags: ['morning', 'focus', 'calm'],
-      immersionLevel: 'Medium', // Required property
-      goalType: 'Focus', // Required property
-      interactive: false // Required property
+      thumbnailUrl: '/images/meditation-morning.jpg',
+      environmentId: 'env-1',
+      category: 'méditation',
+      intensity: 1,
+      difficulty: 'beginner', // Corrigé
+      immersionLevel: 'Medium',
+      goalType: 'Focus',
+      interactive: false,
+      tags: ['morning', 'calm', 'focus']
     },
     {
-      id: '2',
-      title: 'Stress Relief',
-      name: 'Stress Relief',
-      description: 'Release tension and find your center',
-      thumbnailUrl: '/images/vr-stress-relief.jpg',
-      duration: 20,
-      difficulty: 'Intermediate',
-      category: 'Relaxation',
-      tags: ['stress', 'relaxation', 'evening'],
-      immersionLevel: 'Deep', // Required property
-      goalType: 'Relaxation', // Required property
-      interactive: false // Required property
+      id: 'template-2',
+      title: 'Relaxation profonde',
+      description: 'Une session immersive pour libérer le stress et retrouver l\'équilibre',
+      duration: 25,
+      thumbnailUrl: '/images/deep-relaxation.jpg',
+      environmentId: 'env-2',
+      category: 'relaxation',
+      intensity: 2,
+      difficulty: 'intermediate', // Corrigé
+      immersionLevel: 'Deep',
+      goalType: 'Relaxation',
+      interactive: false,
+      tags: ['stress-relief', 'evening', 'sleep']
     }
-  ]);
+  ];
 
-  const [currentSession, setCurrentSession] = useState<VRSession | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  // Simulate loading available sessions
   useEffect(() => {
-    const loadSessions = async () => {
-      setLoading(true);
-      try {
-        // In a real app, fetch from API
-        await new Promise(res => setTimeout(res, 500)); // Simulate network delay
-        // Sessions already set in initial state
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Failed to load VR sessions'));
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Simuler un chargement
+    const timer = setTimeout(() => {
+      setActiveTemplates(mockTemplates);
+      setIsLoading(false);
+    }, 1000);
     
-    loadSessions();
+    return () => clearTimeout(timer);
   }, []);
 
-  // Start a new VR session
-  const startSession = (templateId: string) => {
-    const template = availableSessions.find(s => s.id === templateId);
-    
-    if (!template) {
-      const err = new Error(`VR session template with id ${templateId} not found`);
-      setError(err);
-      throw err;
-    }
-    
-    const newSession: VRSession = {
-      id: `session-${Date.now()}`,
-      templateId: template.id,
-      userId: 'current-user', // Would be dynamic in a real app
-      startTime: new Date().toISOString(),
-      metrics: {}
-    };
-    
-    setCurrentSession(newSession);
-    return newSession;
+  const startSession = (templateId: string): Promise<VRSession> => {
+    return new Promise((resolve) => {
+      // Simuler une interaction avec l'API
+      setTimeout(() => {
+        const session: VRSession = {
+          id: `session-${Date.now()}`,
+          templateId,
+          userId,
+          progress: 0,
+          completed: false,
+          duration: 0,
+          startTime: new Date().toISOString()
+        };
+        
+        resolve(session);
+      }, 500);
+    });
   };
 
-  // End the current session
-  const endSession = () => {
-    if (!currentSession) return null;
-    
-    const endedSession: VRSession = {
-      ...currentSession,
-      endTime: new Date().toISOString(),
-      completed: true
-    };
-    
-    setCurrentSession(null);
-    return endedSession;
+  const completeSession = (sessionId: string) => {
+    // Logique de finalisation de session
+    console.log(`Session ${sessionId} completed`);
   };
 
   return {
-    availableSessions,
-    currentSession,
-    loading,
-    error,
+    isLoading,
+    templates: activeTemplates,
     startSession,
-    endSession
+    completeSession
   };
 };
 

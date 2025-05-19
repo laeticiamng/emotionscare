@@ -29,10 +29,16 @@ export interface ThemeContextType {
   soundEnabled?: boolean;
   setSoundEnabled?: (enabled: boolean) => void;
   reduceMotion: boolean;
+
+
+
   setReduceMotion: (reduced: boolean) => void;
+  preferences?: any;
+  updatePreferences?: (prefs: any) => void;
+  getContrastText?: (color: string) => string;
 }
 
 export interface ThemeProviderProps {
   children: React.ReactNode;
-  defaultTheme?: Theme;
+  defaultTheme?: ThemeName;
 }

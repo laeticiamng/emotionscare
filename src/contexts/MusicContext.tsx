@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { MusicContextType, MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { MusicContextType, MusicTrack, MusicPlaylist, MusicQueueItem, EmotionMusicParams } from '@/types/music';
 import { getPlaylistByEmotion } from '@/data/emotionPlaylists';
 import { mapAudioUrlToUrl } from '@/utils/musicCompatibility';
 
@@ -28,6 +28,9 @@ const defaultMusicState: MusicContextType = {
   resumeTrack: () => {},
   previousTrack: () => {},
   nextTrack: () => {},
+  addToQueue: () => {},
+  removeFromQueue: () => {},
+  clearQueue: () => {},
 };
 
 // Create context
@@ -54,11 +57,17 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Functions to control playback
   const playTrack = useCallback((track: MusicTrack) => {
-    // Ensure the track has a url property
     const processedTrack = mapAudioUrlToUrl(track);
     setCurrentTrack(processedTrack);
     setIsPlaying(true);
-  }, []);
+    setHistory(h => [
+      ...h,
+      {
+        ...processedTrack,
+        playlistId: currentPlaylist ? currentPlaylist.id : undefined,
+      },
+    ]);
+  }, [currentPlaylist]);
 
   const pauseTrack = useCallback(() => {
     setIsPlaying(false);
@@ -163,6 +172,24 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setCurrentTime(time);
   }, []);
 
+  const addToQueue = useCallback(
+    (track: MusicTrack) => {
+      setQueue(q => [
+        ...q,
+        { ...track, playlistId: currentPlaylist ? currentPlaylist.id : undefined }
+      ]);
+    },
+    [currentPlaylist]
+  );
+
+  const removeFromQueue = useCallback((index: number) => {
+    setQueue(q => q.filter((_, i) => i !== index));
+  }, []);
+
+  const clearQueue = useCallback(() => {
+    setQueue([]);
+  }, []);
+
   // Value object to be passed to consumers
   const value: MusicContextType = {
     currentTrack,
@@ -192,6 +219,9 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setVolume,
     setMuted,
     seekTo,
+    addToQueue,
+    removeFromQueue,
+    clearQueue,
     setRepeat,
     toggleShuffle,
     toggleRepeat,

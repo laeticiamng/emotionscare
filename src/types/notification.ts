@@ -44,19 +44,55 @@ export interface NotificationPreference {
 export interface Notification {
   id: string;
   title: string;
-  content: string;
+  /**
+   * Main text of the notification. `message` can also be used by some
+   * components so both are kept.
+   */
+  content?: string;
+  message?: string;
   read: boolean;
+  /**
+   * Some hooks use `isRead` instead of `read`.
+   */
+  isRead?: boolean;
   type: string;
   createdAt: string;
   created_at?: string;
-  userId?: string;
   timestamp?: string;
+  /**
+   * Alternative date field used in older components.
+   */
+  date?: string;
+  userId?: string;
   icon?: string;
   action?: string;
   actionUrl?: string;
+  /**
+   * Optional navigation target.
+   */
+  linkTo?: string;
   category?: string;
-  message?: string; // Ajout pour la compatibilité avec les hooks existants
 }
 
-export type NotificationFilter = string;
-export type NotificationType = string;
+export type NotificationType =
+  | 'system'
+  | 'emotion'
+  | 'coach'
+  | 'journal'
+  | 'community'
+  | 'achievement'
+  | 'badge'
+  | 'challenge'
+  | 'reminder'
+  | 'info'
+  | 'warning'
+  | 'error'
+  | 'success'
+  | 'streak'
+  | 'urgent';
+
+export type NotificationFilter =
+  | 'all'
+  | 'unread'
+  | 'read'
+  | NotificationType;

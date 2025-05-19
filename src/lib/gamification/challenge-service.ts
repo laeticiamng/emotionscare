@@ -1,5 +1,5 @@
 
-import { Challenge } from '@/types/gamification';
+import { Challenge } from '@/types/badge';
 
 export const getChallenges = async (userId: string): Promise<Challenge[]> => {
   // Mock implementation - fetching challenges for a specific user
@@ -9,24 +9,26 @@ export const getChallenges = async (userId: string): Promise<Challenge[]> => {
       name: 'Journal quotidien',
       title: 'Journal quotidien',
       description: 'Enregistrer une émotion chaque jour pendant 7 jours',
-      type: 'streak',
       points: 50,
       status: 'active',
       progress: 3,
       category: 'daily',
-      completed: false
+      completed: false,
+      unlocked: true,
+      reward: {}
     },
     {
       id: '2',
       name: 'Méditation matinale',
       title: 'Méditation matinale',
       description: 'Compléter 5 sessions de méditation',
-      type: 'completion',
       points: 75,
       status: 'active',
       progress: 2,
       category: 'mindfulness',
-      completed: false
+      completed: false,
+      unlocked: true,
+      reward: {}
     }
   ];
 };

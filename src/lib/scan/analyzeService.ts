@@ -1,4 +1,3 @@
-
 import { Emotion, EmotionResult } from '@/types/emotion';
 
 // Function to calculate the primary emotion from the text
@@ -120,6 +119,57 @@ export const analyzeEmotion = async (data: {
   } else {
     throw new Error("No text or audio provided for emotion analysis");
   }
+};
+
+// Function to analyze text for emotion
+export const analyzeTextEmotion = async (text: string): Promise<EmotionAnalysis> => {
+  // Simulation d'analyse de texte
+  return {
+    name: text.toLowerCase().includes('happy') ? 'joy' : 
+           text.toLowerCase().includes('sad') ? 'sadness' : 'neutral',
+    intensity: 0.7,
+    score: 0.85
+  };
+};
+
+// Function to analyze audio for emotion
+export const analyzeAudioEmotion = async (audioFile: File): Promise<Record<string, number>> => {
+  // Ici nous simulons l'analyse - dans une vraie implémentation, nous enverrions
+  // le fichier à une API d'analyse audio
+  await new Promise(resolve => setTimeout(resolve, 1500));
+
+  // Convertir le tableau d'analyses en Record<string, number>
+  const emotions: EmotionAnalysis[] = [
+    { name: 'joy', intensity: 0.7, score: 0.8 },
+    { name: 'neutral', intensity: 0.2, score: 0.15 },
+    { name: 'surprise', intensity: 0.1, score: 0.05 }
+  ];
+  
+  // Convertir en Record<string, number>
+  return emotions.reduce((acc, emotion) => {
+    acc[emotion.name] = emotion.score;
+    return acc;
+  }, {} as Record<string, number>);
+};
+
+// Function to analyze image for emotion
+export const analyzeImageEmotion = async (imageFile: File): Promise<Record<string, number>> => {
+  // Ici nous simulons l'analyse - dans une vraie implémentation, nous enverrions
+  // l'image à une API d'analyse faciale
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  // Convertir le tableau d'analyses en Record<string, number>
+  const emotions: EmotionAnalysis[] = [
+    { name: 'neutral', intensity: 0.5, score: 0.6 },
+    { name: 'joy', intensity: 0.4, score: 0.3 },
+    { name: 'surprise', intensity: 0.1, score: 0.1 }
+  ];
+  
+  // Convertir en Record<string, number>
+  return emotions.reduce((acc, emotion) => {
+    acc[emotion.name] = emotion.score;
+    return acc;
+  }, {} as Record<string, number>);
 };
 
 export default analyzeEmotion;

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { VRSessionTemplate, VRSessionWithMusicProps } from '@/types/vr';
+import { VRSessionTemplate, VRSession, VRSessionWithMusicProps } from '@/types/vr';
 import VRMusicIntegration from './VRMusicIntegration';
 import VRSessionView from './VRSessionView';
 

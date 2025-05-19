@@ -2,8 +2,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
-import ThemeSelector from '@/components/theme/ThemeSelector';
+import ThemeSelector from '@/components/settings/ThemeSelector';
 import { useTheme } from '@/contexts/ThemeContext';
+import { ThemeName } from '@/types/theme';
 
 interface PageHeaderProps {
   title: string;
@@ -26,8 +27,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({ title, description, className }
       </div>
       <div className="flex items-center space-x-2">
         <ThemeSelector currentTheme={theme} onChange={setTheme} minimal />
-        <Button size="sm" variant="outline">
-          <Search className="mr-2 h-4 w-4" />
+        <Button size="sm" variant="outline" className="flex items-center gap-2 hover:bg-muted/80 transition-all duration-300">
+          <Search className="h-4 w-4" />
           Search
         </Button>
       </div>

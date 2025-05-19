@@ -2,181 +2,110 @@
 import React from 'react';
 import { VRSessionTemplate } from '@/types/vr';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Clock, Users, Star, ChevronLeft } from 'lucide-react';
+import { formatDuration, getDifficultyClass } from './utils';
 import { Badge } from '@/components/ui/badge';
-import { Clock, Star, Users, Tag, Award, Activity, CheckCircle } from 'lucide-react';
-import { getVRTemplateCompletionRate, getVRTemplateRecommendedMood } from '@/utils/compatibility';
 
 interface VRTemplateDetailProps {
   template: VRSessionTemplate;
+  heartRate?: number;
   onStart?: () => void;
   onBack?: () => void;
-  heartRate?: number;
-  className?: string;
 }
 
 const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
   template,
+  heartRate,
   onStart,
-  className = ''
+  onBack
 }) => {
-  const {
-    title,
-    description,
-    duration,
-    difficulty,
-    category,
-    tags
-  } = template;
-  
-  const getCoverImage = () => {
-    return (
-      template.imageUrl || 
-      template.thumbnailUrl || 
-      template.coverUrl || 
-      template.cover_url || 
-      '/images/vr-banner-bg.jpg'
-    );
-  };
-  
-  const getDifficultyColor = (difficulty?: string) => {
-    if (!difficulty) return 'bg-gray-500';
-    
-    switch (difficulty.toLowerCase()) {
-      case 'easy':
-        return 'bg-green-500 text-white';
-      case 'medium':
-        return 'bg-yellow-500 text-black';
-      case 'hard':
-        return 'bg-red-500 text-white';
-      default:
-        return 'bg-gray-500';
-    }
-  };
-  
-  const renderDifficulty = () => {
-    if (!difficulty) return null;
-    
-    return (
-      <Badge variant="outline" className={`${getDifficultyColor(difficulty)}`}>
-        {difficulty}
-      </Badge>
-    );
+  // Utilisons l'image disponible en suivant l'ordre de priorité
+  const getImageUrl = () => {
+    if (template.thumbnailUrl) return template.thumbnailUrl;
+    if (template.imageUrl) return template.imageUrl;
+    if (template.coverUrl) return template.coverUrl;
+    if (template.cover_url) return template.cover_url;
+    if (template.preview_url) return template.preview_url;
+    return '/images/vr-placeholder.jpg';
   };
 
-  // Get values safely using optional chaining
-  const rating = template?.rating;
-  const features = template?.features;
-  const popularity = template?.popularity;
-  const completionRate = getVRTemplateCompletionRate(template);
-  const recommendedMood = getVRTemplateRecommendedMood(template);
+  // Gérer l'événement de début de session
+  const handleStart = () => {
+    if (onStart) onStart();
+  };
+
+  // Gérer l'événement de retour
+  const handleBack = () => {
+    if (onBack) onBack();
+  };
 
   return (
-    <Card className={`overflow-hidden ${className}`}>
-      {/* Image banner */}
-      <div className="relative h-48 w-full">
+    <div className="space-y-6">
+      {onBack && (
+        <Button variant="ghost" size="sm" onClick={handleBack} className="mb-2">
+          <ChevronLeft className="mr-1 h-4 w-4" />
+          Retour
+        </Button>
+      )}
+      
+      <div className="relative h-48 md:h-64 rounded-lg overflow-hidden bg-muted">
         <img 
-          src={getCoverImage()} 
-          alt={title} 
-          className="h-full w-full object-cover object-center"
+          src={getImageUrl()} 
+          alt={template.title} 
+          className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70">
-          <div className="absolute bottom-4 left-4">
-            {renderDifficulty()}
-          </div>
-        </div>
       </div>
+      
+      <div>
+        <h1 className="text-2xl font-bold">{template.title}</h1>
+        <p className="text-muted-foreground mt-2">{template.description}</p>
 
-      <CardContent className="p-6">
-        <div className="space-y-6">
-          {/* Header */}
-          <div>
-            <h2 className="text-2xl font-bold">{title}</h2>
-            <p className="text-muted-foreground mt-1">{description}</p>
+        <div className="flex flex-wrap gap-2 mt-4">
+          <div className="flex items-center text-sm">
+            <Clock className="h-4 w-4 mr-1" />
+            {formatDuration(template.duration)}
           </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-muted-foreground" />
-              <span>{duration} min</span>
-            </div>
-            
-            {rating !== undefined && (
-              <div className="flex items-center gap-2">
-                <Star className="h-5 w-5 text-amber-500" />
-                <span>{rating.toFixed(1)}/5</span>
-              </div>
-            )}
-            
-            {popularity !== undefined && (
-              <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-blue-500" />
-                <span>{popularity}+ utilisateurs</span>
-              </div>
-            )}
-            
-            {completionRate > 0 && (
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <span>{completionRate}% terminé</span>
-              </div>
-            )}
+          
+          <div className="flex items-center text-sm">
+            <Badge variant="outline" className={getDifficultyClass(template.difficulty)}>
+              {template.difficulty}
+            </Badge>
           </div>
-
-          {/* Tags */}
-          {tags && tags.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Tags</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag, index) => (
-                  <Badge key={index} variant="secondary">{tag}</Badge>
-                ))}
-              </div>
+          
+          {template.rating && (
+            <div className="flex items-center text-sm">
+              <Star className="h-4 w-4 mr-1 text-amber-500" />
+              {template.rating.toFixed(1)}
             </div>
           )}
-
-          {/* Emotion recommandée */}
-          {recommendedMood && (
-            <div className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">
-                Recommandé pour: <strong>{recommendedMood}</strong>
-              </span>
-            </div>
-          )}
-
-          {/* Features */}
-          {features && features.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Award className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Caractéristiques</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {features.map((feature, index) => (
-                  <Badge key={index} variant="outline" className="bg-primary/10 hover:bg-primary/20">
-                    {feature}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Action button */}
-          <Button 
-            className="w-full" 
-            size="lg"
-            onClick={onStart}
-          >
-            Commencer la session
-          </Button>
         </div>
-      </CardContent>
-    </Card>
+
+        {template.features && template.features.length > 0 && (
+          <div className="mt-4">
+            <h3 className="text-sm font-medium mb-2">Fonctionnalités</h3>
+            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+              {template.features.map((feature, index) => (
+                <li key={index}>{feature}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {template.tags && template.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-4">
+            {template.tags.map(tag => (
+              <Badge key={tag} variant="secondary" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
+        
+        <Button onClick={handleStart} className="w-full mt-6">
+          Démarrer la session
+        </Button>
+      </div>
+    </div>
   );
 };
 
