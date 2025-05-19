@@ -51,6 +51,7 @@ export interface MusicState {
   shuffle: boolean;
   volume: number;
   muted: boolean;
+  openDrawer?: boolean;
 }
 
 export interface MusicContextType extends MusicState {
@@ -65,9 +66,9 @@ export interface MusicContextType extends MusicState {
   nextTrack?: () => void; // Alias pour next
   previous: () => void;
   previousTrack?: () => void; // Alias pour previous
+  prevTrack?: () => void; // Alias pour previous
   togglePlay?: () => void; // Basculer entre pause/play
   playTrack?: (track: MusicTrack) => void; // Alias pour play
-  prevTrack?: () => void; // Alias pour previous
 
   // Contrôles
   setVolume: (volume: number) => void;
@@ -95,10 +96,9 @@ export interface MusicContextType extends MusicState {
   loading?: boolean;
   isInitialized?: boolean;
   playlist?: MusicPlaylist | null;
-  
-  // UI controls
   toggleDrawer?: () => void;
   setOpenDrawer?: (open: boolean) => void;
+  openDrawer?: boolean;
   
   // Emotion-specific
   setEmotion?: (emotion: string) => void;
@@ -121,13 +121,17 @@ export interface ProgressBarProps {
   currentTime: number;
   duration: number;
   onSeek: (time: number) => void;
+  formatTime?: (time: number) => string;
+  className?: string;
 }
 
 export interface VolumeControlProps {
   volume: number;
   onVolumeChange: (volume: number) => void;
   muted?: boolean;
+  isMuted?: boolean;
   onMuteToggle?: () => void;
+  className?: string;
 }
 
 export enum MusicCategory {
