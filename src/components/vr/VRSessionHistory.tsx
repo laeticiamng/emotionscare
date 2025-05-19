@@ -1,86 +1,121 @@
 
 import React from 'react';
-import { VRSession } from '@/types/vr';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { formatDistance } from 'date-fns';
-
-export interface VRSessionHistoryProps {
-  sessions?: VRSession[];
-  onSelect?: (session: VRSession) => void;
-  emptyMessage?: string;
-  limitDisplay?: number;
-  showHeader?: boolean;
-  className?: string;
-  onSessionSelect?: (session: VRSession) => void;
-}
+import { formatDistanceToNow, format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { Clock, Calendar, CheckCircle } from 'lucide-react';
+import { VRSessionHistoryProps } from '@/types/vr';
+import { getVRSessionStartTime, getVRSessionEndTime } from '@/utils/vrCompatibility';
 
 const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
-  sessions = [],
+  sessions,
   onSelect,
-  emptyMessage = "No session history available",
-  limitDisplay,
+  onSessionSelect,
+  emptyMessage = "Aucune session récente",
+  limitDisplay = 5,
   showHeader = true,
-  className = "",
-  onSessionSelect
+  className = ""
 }) => {
-  const handleSelect = (session: VRSession) => {
+  // Use compatibility helpers for consistent access
+  const handleSessionClick = (session: any) => {
     if (onSelect) {
       onSelect(session);
-    } else if (onSessionSelect) {
+    }
+    if (onSessionSelect) {
       onSessionSelect(session);
     }
   };
-  
-  const displaySessions = limitDisplay ? sessions.slice(0, limitDisplay) : sessions;
-  
-  const getSessionTime = (session: VRSession) => {
-    return session.startTime || session.startedAt || session.createdAt || new Date();
+
+  // Helper function to format date nicely with fallbacks
+  const formatDate = (date: string | Date | undefined) => {
+    if (!date) return "Date inconnue";
+    try {
+      if (typeof date === 'string') {
+        return format(new Date(date), 'dd/MM/yyyy HH:mm', { locale: fr });
+      }
+      return format(date, 'dd/MM/yyyy HH:mm', { locale: fr });
+    } catch (e) {
+      return "Date invalide";
+    }
   };
-  
-  const getSessionEndTime = (session: VRSession) => {
-    return session.endTime || session.endedAt || new Date();
+
+  // Helper function to format relative time with fallbacks
+  const formatRelativeTime = (date: string | Date | undefined) => {
+    if (!date) return "";
+    try {
+      if (typeof date === 'string') {
+        return formatDistanceToNow(new Date(date), { addSuffix: true, locale: fr });
+      }
+      return formatDistanceToNow(date, { addSuffix: true, locale: fr });
+    } catch (e) {
+      return "";
+    }
   };
-  
+
+  const displaySessions = sessions.slice(0, limitDisplay);
+
+  if (displaySessions.length === 0) {
+    return (
+      <Card className={className}>
+        {showHeader && (
+          <CardHeader>
+            <CardTitle>Historique des sessions</CardTitle>
+          </CardHeader>
+        )}
+        <CardContent>
+          <p className="text-center text-muted-foreground py-8">{emptyMessage}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className={className}>
       {showHeader && (
         <CardHeader>
-          <CardTitle>Session History</CardTitle>
+          <CardTitle>Historique des sessions</CardTitle>
         </CardHeader>
       )}
       <CardContent>
-        {displaySessions.length > 0 ? (
-          <div className="space-y-4">
-            {displaySessions.map(session => (
-              <div 
+        <div className="space-y-4">
+          {displaySessions.map(session => {
+            const startTime = getVRSessionStartTime(session);
+            const endTime = getVRSessionEndTime(session);
+            
+            return (
+              <div
                 key={session.id}
-                onClick={() => handleSelect(session)} 
-                className="p-3 border rounded-md hover:bg-muted/50 cursor-pointer transition-colors"
+                className="flex items-center p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                onClick={() => handleSessionClick(session)}
               >
-                <div className="flex justify-between">
-                  <div className="font-medium">
-                    Session #{session.id.substring(0, 6)}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {formatDistance(new Date(getSessionTime(session)), new Date(), { addSuffix: true })}
-                  </div>
+                <div className="mr-4">
+                  {session.completed ? (
+                    <CheckCircle className="text-green-500 h-8 w-8" />
+                  ) : (
+                    <Clock className="text-amber-500 h-8 w-8" />
+                  )}
                 </div>
-                {(session.endTime || session.endedAt) && (
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Duration: {formatDistance(
-                      new Date(getSessionTime(session)),
-                      new Date(getSessionEndTime(session))
-                    )}
+                <div className="flex-1">
+                  <p className="font-medium">Session #{session.id.slice(0, 6)}</p>
+                  <div className="flex items-center text-sm text-muted-foreground gap-2 mt-1">
+                    <Calendar className="h-3 w-3" />
+                    <span>{formatDate(startTime)}</span>
+                    <span className="text-xs">({formatRelativeTime(startTime)})</span>
                   </div>
-                )}
+                  {session.completed && endTime && (
+                    <p className="text-sm text-green-600 mt-1">Terminée {formatRelativeTime(endTime)}</p>
+                  )}
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium">{session.duration} min</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {session.progress ? `${Math.round(session.progress * 100)}%` : ''}
+                  </p>
+                </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-4 text-muted-foreground">
-            {emptyMessage}
-          </div>
-        )}
+            );
+          })}
+        </div>
       </CardContent>
     </Card>
   );

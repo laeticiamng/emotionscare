@@ -1,42 +1,61 @@
 
-export type NotificationType = 
-  | 'system' 
-  | 'achievement' 
-  | 'challenge' 
-  | 'reminder' 
-  | 'message' 
-  | 'friend_request' 
-  | 'group_invitation' 
-  | 'event' 
-  | 'milestone' 
-  | 'update' 
-  | 'promotion'
-  | 'invitation';
+export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never';
+
+export interface NotificationTypes {
+  system?: boolean;
+  emotions?: boolean;
+  reports?: boolean;
+  messages?: boolean;
+  insights?: boolean;
+  reminders?: boolean;
+  achievements?: boolean;
+  recommendations?: boolean;
+  sessions?: boolean;
+  community?: boolean;
+  challenges?: boolean;
+  events?: boolean;
+  updates?: boolean;
+  urgent?: boolean;
+}
+
+export interface NotificationPreference {
+  id: string;
+  userId: string;
+  category: string;
+  enabled: boolean;
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  inAppEnabled: boolean;
+  types: NotificationTypes;
+  frequency: NotificationFrequency;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface NotificationSettings {
+  preferences: NotificationPreference[];
+  globalEnabled: boolean;
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  inAppEnabled: boolean;
+}
 
 export interface Notification {
   id: string;
+  userId: string;
   title: string;
   message: string;
-  type: NotificationType;
-  createdAt: string | Date;
-  read: boolean;
-  actionUrl?: string;
-  imageUrl?: string;
-  priority?: 'low' | 'normal' | 'high';
-  category?: string;
-  expiry?: string | Date;
-  data?: Record<string, any>;
-  userId?: string;
+  type: keyof NotificationTypes;
+  isRead: boolean;
+  isArchived: boolean;
+  link?: string;
+  createdAt: string;
+  expiresAt?: string;
+  priority: 'low' | 'normal' | 'high' | 'urgent';
+  metadata?: Record<string, any>;
 }
 
-// Notification preferences
-export interface NotificationPreference {
-  type: NotificationType;
-  enabled: boolean;
-  frequency: NotificationFrequency;
-  channels: NotificationChannel[];
-  timePreference?: 'any' | 'morning' | 'afternoon' | 'evening';
+export interface NotificationGroup {
+  date: string;
+  notifications: Notification[];
 }
-
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
-export type NotificationChannel = 'app' | 'email' | 'sms' | 'push';

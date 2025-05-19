@@ -1,150 +1,131 @@
 
 import React from 'react';
-import { VRSession } from '@/types/vr';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { HeartPulse, Activity, Brain } from 'lucide-react';
+import { Activity, Heart, Brain, TrendingUp } from 'lucide-react';
+import { VRSession } from '@/types/vr';
+import { getVRSessionHeartRateBefore, getVRSessionHeartRateAfter, getVRSessionMetrics } from '@/utils/vrCompatibility';
 
 interface VRSessionStatsProps {
   session: VRSession;
   className?: string;
 }
 
-const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = '' }) => {
-  // Calculate stats
-  const calculateHeartRateChange = () => {
-    if (session.heartRateBefore !== undefined && session.heartRateAfter !== undefined) {
-      return session.heartRateAfter - session.heartRateBefore;
-    }
-    return 0;
-  };
+const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = "" }) => {
+  // Use compatibility helpers
+  const heartRateBefore = getVRSessionHeartRateBefore(session);
+  const heartRateAfter = getVRSessionHeartRateAfter(session);
+  const heartRateChange = heartRateAfter !== undefined && heartRateBefore !== undefined 
+    ? heartRateAfter - heartRateBefore 
+    : undefined;
   
-  const calculateAverageHeartRate = () => {
-    if (session.metrics && session.metrics.heartRate) {
-      if (Array.isArray(session.metrics.heartRate)) {
-        return session.metrics.heartRate.length > 0 
-          ? Math.round(session.metrics.heartRate.reduce((sum, rate) => sum + rate, 0) / session.metrics.heartRate.length) 
-          : 0;
-      } else {
-        return session.metrics.heartRate;
+  const metrics = getVRSessionMetrics(session);
+  
+  const formatMetricValue = (value: any): string => {
+    if (value === undefined || value === null) return 'N/A';
+    if (typeof value === 'number') return value.toString();
+    if (Array.isArray(value)) {
+      if (value.length === 0) return 'N/A';
+      if (typeof value[0] === 'number') {
+        const avg = value.reduce((sum, val) => sum + val, 0) / value.length;
+        return avg.toFixed(1);
       }
     }
-    return 0;
+    return String(value);
   };
   
-  const getHeartRateArray = () => {
-    if (session.metrics && session.metrics.heartRate && Array.isArray(session.metrics.heartRate)) {
-      return session.metrics.heartRate;
+  const renderMetrics = () => {
+    if (!metrics || Object.keys(metrics).length === 0) {
+      return (
+        <p className="text-center text-muted-foreground py-4">Aucune métrique disponible</p>
+      );
     }
-    return [];
+
+    return (
+      <div className="grid grid-cols-2 gap-4">
+        {metrics.stressLevel !== undefined && (
+          <div className="bg-muted/50 p-3 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium">Niveau de stress</p>
+              <Brain className="h-4 w-4 text-blue-500" />
+            </div>
+            <p className="text-2xl font-bold">{formatMetricValue(metrics.stressLevel)}</p>
+          </div>
+        )}
+        
+        {metrics.focusLevel !== undefined && (
+          <div className="bg-muted/50 p-3 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-medium">Niveau de focus</p>
+              <TrendingUp className="h-4 w-4 text-green-500" />
+            </div>
+            <p className="text-2xl font-bold">{formatMetricValue(metrics.focusLevel)}</p>
+          </div>
+        )}
+        
+        {Object.entries(metrics).map(([key, value]) => {
+          // Skip already handled metrics
+          if (['stressLevel', 'focusLevel', 'heartRate', 'heartRateBefore', 'heartRateAfter'].includes(key)) {
+            return null;
+          }
+          
+          return (
+            <div key={key} className="bg-muted/50 p-3 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</p>
+                <Activity className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-2xl font-bold">{formatMetricValue(value)}</p>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
-  
-  const getStressLevel = () => {
-    return session.metrics?.stressLevel || 0;
-  };
-  
-  const getFocusLevel = () => {
-    return session.metrics?.focusLevel || 0;
-  };
-  
-  const heartRateChange = calculateHeartRateChange();
-  const averageHeartRate = calculateAverageHeartRate();
-  const heartRateArray = getHeartRateArray();
-  const stressLevel = getStressLevel();
-  const focusLevel = getFocusLevel();
   
   return (
-    <Card className={`w-full ${className}`}>
+    <Card className={className}>
       <CardHeader>
-        <CardTitle className="text-lg">Statistiques de session</CardTitle>
+        <CardTitle className="flex items-center">
+          <Activity className="h-5 w-5 mr-2 text-primary" />
+          Statistiques de la session
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Heart rate */}
-          <div className="p-4 bg-muted rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Fréquence cardiaque</p>
-                <div className="flex items-end gap-2">
-                  <p className="text-2xl font-bold">{averageHeartRate}</p>
-                  <p className="text-sm text-muted-foreground mb-1">bpm moy.</p>
-                </div>
+      <CardContent>
+        <div className="space-y-6">
+          {(heartRateBefore !== undefined || heartRateAfter !== undefined) && (
+            <div className="bg-muted/30 p-4 rounded-lg">
+              <div className="flex items-center mb-2">
+                <Heart className="h-5 w-5 mr-2 text-red-500" />
+                <h3 className="font-medium">Fréquence cardiaque</h3>
               </div>
-              <HeartPulse className="text-rose-500 h-8 w-8" />
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                {heartRateBefore !== undefined && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Avant</p>
+                    <p className="text-xl font-bold">{heartRateBefore} bpm</p>
+                  </div>
+                )}
+                {heartRateAfter !== undefined && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">Après</p>
+                    <p className="text-xl font-bold">{heartRateAfter} bpm</p>
+                  </div>
+                )}
+              </div>
+              {heartRateChange !== undefined && (
+                <div className="mt-2 flex items-center">
+                  <p className="text-sm mr-2">Évolution:</p>
+                  <span className={`text-sm font-medium ${heartRateChange < 0 ? 'text-green-500' : heartRateChange > 0 ? 'text-red-500' : 'text-muted-foreground'}`}>
+                    {heartRateChange > 0 ? '+' : ''}{heartRateChange} bpm
+                  </span>
+                </div>
+              )}
             </div>
-            
-            {session.heartRateBefore !== undefined && session.heartRateAfter !== undefined && (
-              <div className="mt-3 text-xs">
-                <span className="inline-flex items-center">
-                  Avant: {session.heartRateBefore} bpm 
-                  <span className="mx-2">→</span> 
-                  Après: {session.heartRateAfter} bpm
-                  {heartRateChange !== 0 && (
-                    <span className={`ml-2 ${heartRateChange < 0 ? 'text-emerald-500' : heartRateChange > 0 ? 'text-rose-500' : ''}`}>
-                      ({heartRateChange > 0 ? '+' : ''}{heartRateChange})
-                    </span>
-                  )}
-                </span>
-              </div>
-            )}
-            
-            {heartRateArray.length > 0 && (
-              <div className="mt-3 h-12">
-                <div className="flex items-end h-full space-x-1">
-                  {heartRateArray.slice(0, 20).map((value, index) => (
-                    <div 
-                      key={index}
-                      style={{ 
-                        height: `${Math.min(100, value / 2)}%`,
-                        width: `${100 / Math.min(20, heartRateArray.length)}%` 
-                      }}
-                      className="bg-rose-500/60 rounded-t-sm"
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          )}
           
-          {/* Stress level */}
-          <div className="p-4 bg-muted rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Niveau de stress</p>
-                <div className="flex items-end gap-2">
-                  <p className="text-2xl font-bold">{stressLevel || 'N/A'}</p>
-                  <p className="text-sm text-muted-foreground mb-1">/100</p>
-                </div>
-              </div>
-              <Activity className="text-amber-500 h-8 w-8" />
-            </div>
-            
-            <div className="mt-3 h-3 bg-muted-foreground/20 rounded-full">
-              <div 
-                className="h-3 bg-gradient-to-r from-green-500 to-amber-500 rounded-full"
-                style={{ width: `${stressLevel || 0}%` }}
-              ></div>
-            </div>
-          </div>
-          
-          {/* Focus level */}
-          <div className="p-4 bg-muted rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Concentration</p>
-                <div className="flex items-end gap-2">
-                  <p className="text-2xl font-bold">{focusLevel || 'N/A'}</p>
-                  <p className="text-sm text-muted-foreground mb-1">/100</p>
-                </div>
-              </div>
-              <Brain className="text-blue-500 h-8 w-8" />
-            </div>
-            
-            <div className="mt-3 h-3 bg-muted-foreground/20 rounded-full">
-              <div 
-                className="h-3 bg-gradient-to-r from-blue-300 to-blue-600 rounded-full"
-                style={{ width: `${focusLevel || 0}%` }}
-              ></div>
-            </div>
+          <div className="bg-muted/30 p-4 rounded-lg">
+            <h3 className="font-medium mb-4">Métriques</h3>
+            {renderMetrics()}
           </div>
         </div>
       </CardContent>

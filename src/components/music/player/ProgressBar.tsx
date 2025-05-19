@@ -1,33 +1,45 @@
 
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
-import { ProgressBarProps } from '@/types/music';
+import type { ProgressBarProps } from '@/types/music';
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({
+const ProgressBar: React.FC<ProgressBarProps> = ({ 
+  value = 0,
+  max = 100,
+  onChange,
   currentTime = 0,
   duration = 0,
   onSeek,
-  formatTime = (seconds) => {
-    if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+  formatTime = (sec) => {
+    const minutes = Math.floor(sec / 60);
+    const seconds = Math.floor(sec % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 }) => {
-  const handleSeek = (value: number[]) => {
-    if (onSeek) {
-      onSeek(value[0]);
+  const handleChange = (values: number[]) => {
+    const newValue = values[0];
+    if (onChange) {
+      onChange(newValue);
+    }
+    if (onSeek && duration) {
+      const seekTime = (newValue / 100) * duration;
+      onSeek(seekTime);
     }
   };
 
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  
   return (
-    <div className="w-full space-y-1">
+    <div className="space-y-2">
       <Slider
-        value={[currentTime]} 
-        max={duration || 100}
-        step={1}
-        onValueChange={handleSeek}
+        value={[progress]}
+        max={100}
+        step={0.1}
+        onValueChange={handleChange}
+        className="cursor-pointer"
+        aria-label="Audio progress"
       />
+      
       <div className="flex justify-between text-xs text-muted-foreground">
         <span>{formatTime(currentTime)}</span>
         <span>{formatTime(duration)}</span>

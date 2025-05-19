@@ -15,14 +15,9 @@ export function ensurePlaylist(playlist: any): MusicPlaylist {
   
   return {
     id: playlist.id || 'playlist-' + Date.now(),
-    title: playlist.title || playlist.name || 'Untitled Playlist',
-    name: playlist.name || playlist.title || 'Untitled Playlist',
-    description: playlist.description || '',
+    title: playlist.name || playlist.title || 'Untitled Playlist',
     tracks: Array.isArray(playlist.tracks) ? playlist.tracks.map(ensureTrack) : [],
-    emotion: playlist.emotion || '',
-    coverUrl: playlist.coverUrl || playlist.cover_url || '',
-    userId: playlist.userId || playlist.user_id || '',
-    isPublic: playlist.isPublic || false,
+    description: playlist.description || '',
   };
 }
 
@@ -34,8 +29,10 @@ export function ensureTrack(track: any): MusicTrack {
     return {
       id: 'empty',
       title: 'Unknown Track',
+      artist: 'Unknown Artist',
+      duration: 0,
       url: '',
-      duration: 0
+      audioUrl: ''
     };
   }
   
@@ -43,15 +40,11 @@ export function ensureTrack(track: any): MusicTrack {
     id: track.id || 'track-' + Date.now(),
     title: track.title || track.name || 'Untitled Track',
     artist: track.artist || 'Unknown Artist',
-    album: track.album || '',
-    url: track.url || track.src || track.audioUrl || '',
-    audioUrl: track.audioUrl || track.url || track.src || '',
-    coverUrl: track.coverUrl || track.cover_url || track.cover || '',
     duration: track.duration || 0,
+    url: track.url || track.audioUrl || '',
+    audioUrl: track.audioUrl || track.url || '',
+    coverUrl: track.coverUrl || track.cover_url || '',
     emotion: track.emotion || track.mood || '',
-    genre: track.genre || '',
-    isLiked: track.isLiked || false,
-    mood: track.mood || track.emotion || '',
   };
 }
 
@@ -63,25 +56,6 @@ export function convertToPlaylist(data: any): MusicPlaylist {
 }
 
 /**
- * Find tracks by mood/emotion in a collection of tracks
- */
-export function findTracksByMood(tracks: MusicTrack[], mood: string): MusicTrack[] {
-  if (!tracks || !Array.isArray(tracks) || tracks.length === 0) return [];
-  
-  const normalizedMood = mood.toLowerCase();
-  
-  return tracks.filter(track => {
-    const trackEmotion = (track.emotion || '').toLowerCase();
-    const trackMood = (track.mood || '').toLowerCase();
-    
-    return trackEmotion.includes(normalizedMood) || 
-           normalizedMood.includes(trackEmotion) ||
-           trackMood.includes(normalizedMood) ||
-           normalizedMood.includes(trackMood);
-  });
-}
-
-/**
  * Create a music params object from emotion string or object
  */
 export function createMusicParams(emotion: string | EmotionMusicParams): EmotionMusicParams {
@@ -89,4 +63,51 @@ export function createMusicParams(emotion: string | EmotionMusicParams): Emotion
     return { emotion };
   }
   return emotion;
+}
+
+/**
+ * Gets track title with fallback
+ */
+export function getTrackTitle(track?: MusicTrack | null): string {
+  if (!track) return 'Unknown Track';
+  return track.title || 'Unknown Track';
+}
+
+/**
+ * Gets track artist with fallback
+ */
+export function getTrackArtist(track?: MusicTrack | null): string {
+  if (!track) return 'Unknown Artist';
+  return track.artist || 'Unknown Artist';
+}
+
+/**
+ * Gets track cover URL with fallback
+ */
+export function getTrackCover(track?: MusicTrack | null): string {
+  if (!track) return '';
+  return track.coverUrl || '';
+}
+
+/**
+ * Gets track URL with fallback
+ */
+export function getTrackUrl(track?: MusicTrack | null): string {
+  if (!track) return '';
+  return track.url || track.audioUrl || '';
+}
+
+/**
+ * Ensures array type
+ */
+export function ensureArray<T>(items: T | T[] | undefined | null): T[] {
+  if (!items) return [];
+  return Array.isArray(items) ? items : [items];
+}
+
+/**
+ * Normalize track data
+ */
+export function normalizeTrack(track: any): MusicTrack {
+  return ensureTrack(track);
 }

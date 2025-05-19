@@ -72,6 +72,7 @@ export interface VRSessionWithMusicProps {
   musicEnabled?: boolean;
   backgroundMusic?: string;
   environment?: string;
+  sessionTemplate?: VRSessionTemplate;
 }
 
 export interface VRTemplateDetailProps {

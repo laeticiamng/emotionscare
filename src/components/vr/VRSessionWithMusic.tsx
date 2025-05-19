@@ -7,6 +7,7 @@ import VRSessionView from './VRSessionView';
 
 const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   template,
+  sessionTemplate,
   session,
   onComplete,
   onExit,
@@ -15,6 +16,9 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   environment
 }) => {
   const [isMusicReady, setIsMusicReady] = useState(false);
+  
+  // Use either template or sessionTemplate prop
+  const activeTemplate = template || sessionTemplate;
   
   const handleMusicReady = () => {
     setIsMusicReady(true);
@@ -28,7 +32,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
     }
   };
   
-  if (!template) {
+  if (!activeTemplate) {
     return (
       <div className="p-4 text-center">
         <p className="text-muted-foreground mb-4">Session template not found</p>
@@ -42,7 +46,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
           <VRSessionView 
-            template={template}
+            template={activeTemplate}
             onCompleteSession={handleCompleteSession}
           />
         </div>
@@ -50,7 +54,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
         <div>
           <VRMusicIntegration
             sessionId={session?.id || 'new-session'}
-            emotionTarget={environment || 'calm'}
+            emotionTarget={environment || activeTemplate.environment || 'calm'}
             onMusicReady={handleMusicReady}
           />
         </div>

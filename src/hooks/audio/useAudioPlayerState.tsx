@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MusicTrack } from '@/types/music';
 
 interface UseAudioPlayerStateReturn {
@@ -46,29 +46,31 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
       ...track,
       duration: track.duration || 0, // Ensure duration is present
       url: track.url || track.audioUrl || '', // Ensure url is present
+      audioUrl: track.audioUrl || track.url || '',
+      artist: track.artist || 'Unknown Artist',
     };
     setTrackState(completeTrack);
   };
 
-  const seek = (time: number) => {
+  const seek = useCallback((time: number) => {
     setCurrentTimeState(time);
-  };
+  }, []);
 
-  const toggleMuteFunc = () => {
+  const toggleMuteFunc = useCallback(() => {
     setMutedState(!mutedState);
-  };
+  }, [mutedState]);
 
-  const playTrackFunc = (track: MusicTrack) => {
+  const playTrackFunc = useCallback((track: MusicTrack) => {
     setCurrentTrack(track);
     setIsPlayingState(true);
-  };
+  }, []);
 
-  const setVolumeFunc = (value: number) => {
+  const setVolumeFunc = useCallback((value: number) => {
     setVolumeState(value);
     if (value > 0 && mutedState) {
       setMutedState(false);
     }
-  };
+  }, [mutedState]);
 
   return {
     track: trackState,

@@ -1,106 +1,154 @@
 
-import React, { useRef, useEffect, useState } from 'react';
-import { Play, Pause } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { VRSessionTemplate } from '@/types/vr';
-import { useToast } from '@/hooks/use-toast';
+import { getVRTemplateAudioUrl } from '@/utils/vrCompatibility';
 
 interface VRAudioSessionProps {
   template: VRSessionTemplate;
-  isPaused: boolean;
-  onTogglePause: () => void;
-  onComplete: () => void;
+  autoplay?: boolean;
+  className?: string;
 }
 
 const VRAudioSession: React.FC<VRAudioSessionProps> = ({
   template,
-  isPaused,
-  onTogglePause,
-  onComplete
+  autoplay = false,
+  className = ""
 }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [audioError, setAudioError] = useState(false);
-  const { toast } = useToast();
+  
+  // Get audio URL using compatibility helper
+  const audioUrl = getVRTemplateAudioUrl(template);
   
   useEffect(() => {
-    // Initialize audio element
-    const audioUrl = template.audioUrl || template.audio_url || template.audioTrack;
-    if (audioUrl && !audioRef.current) {
-      const audio = new Audio(audioUrl);
-      
-      // Add event listeners
-      audio.addEventListener('ended', onComplete);
-      audio.addEventListener('error', () => {
-        setAudioError(true);
-        toast({
-          title: "Erreur audio",
-          description: "Impossible de charger le fichier audio. Veuillez réessayer.",
-          variant: "destructive"
-        });
+    // Create audio element
+    const audio = new Audio(audioUrl || '');
+    audioRef.current = audio;
+    
+    // Set up event listeners
+    audio.addEventListener('loadedmetadata', () => {
+      setDuration(audio.duration);
+    });
+    
+    audio.addEventListener('timeupdate', () => {
+      setCurrentTime(audio.currentTime);
+    });
+    
+    audio.addEventListener('ended', () => {
+      setIsPlaying(false);
+    });
+    
+    // Autoplay if enabled
+    if (autoplay && audioUrl) {
+      audio.play().catch(err => {
+        console.error('Autoplay failed:', err);
       });
-      
-      audioRef.current = audio;
+      setIsPlaying(true);
     }
     
-    // Cleanup function
+    // Clean up
     return () => {
-      if (audioRef.current) {
-        audioRef.current.removeEventListener('ended', onComplete);
-        audioRef.current.pause();
-      }
+      audio.pause();
+      audio.src = '';
+      audio.removeEventListener('loadedmetadata', () => {});
+      audio.removeEventListener('timeupdate', () => {});
+      audio.removeEventListener('ended', () => {});
     };
-  }, [template, onComplete, toast]);
+  }, [audioUrl, autoplay]);
   
-  // Handle play/pause
-  useEffect(() => {
+  // Format time as mm:ss
+  const formatTime = (timeInSeconds: number) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+  
+  // Toggle play/pause
+  const togglePlay = () => {
     if (!audioRef.current) return;
     
-    if (!isPaused) {
-      const playPromise = audioRef.current.play();
-      // Handle play() promise
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.error("Erreur de lecture audio:", error);
-          setAudioError(true);
-        });
-      }
-    } else {
+    if (isPlaying) {
       audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(console.error);
     }
-  }, [isPaused]);
+    
+    setIsPlaying(!isPlaying);
+  };
+  
+  // Toggle mute
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+    
+    audioRef.current.muted = !isMuted;
+    setIsMuted(!isMuted);
+  };
   
   return (
-    <div className="bg-gradient-to-br from-purple-900 to-indigo-600 p-10 rounded-lg flex flex-col items-center justify-center space-y-6">
-      <div className="h-32 w-32 rounded-full bg-indigo-700/50 flex items-center justify-center">
-        {isPaused ? (
-          <Play className="h-16 w-16 text-white" />
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Volume2 className="h-5 w-5 mr-2 text-primary" />
+          Audio de la session
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {!audioUrl ? (
+          <p className="text-center text-muted-foreground py-4">
+            Aucun audio disponible pour cette session
+          </p>
         ) : (
-          <Pause className="h-16 w-16 text-white" />
+          <div className="space-y-4">
+            <div className="bg-muted/30 p-3 rounded-lg">
+              <p className="text-sm font-medium mb-2">Progression</p>
+              <div className="flex items-center space-x-2 text-sm">
+                <span>{formatTime(currentTime)}</span>
+                <div className="flex-1 bg-muted rounded-full h-1.5">
+                  <div 
+                    className="bg-primary h-full rounded-full" 
+                    style={{ width: `${(currentTime / duration) * 100}%` }}
+                  />
+                </div>
+                <span>{formatTime(duration)}</span>
+              </div>
+            </div>
+            
+            <div className="flex justify-center space-x-4">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleMute}
+                aria-label={isMuted ? 'Activer le son' : 'Désactiver le son'}
+              >
+                {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+              </Button>
+              
+              <Button
+                onClick={togglePlay}
+                className="w-32"
+                aria-label={isPlaying ? 'Pause' : 'Lecture'}
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause className="mr-2 h-4 w-4" /> Pause
+                  </>
+                ) : (
+                  <>
+                    <Play className="mr-2 h-4 w-4" /> Lecture
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         )}
-      </div>
-      <div className="text-white text-xl font-medium">
-        {audioError ? "Problème audio détecté" : "Méditation guidée"}
-      </div>
-      
-      {audioError && (
-        <Button
-          variant="outline"
-          className="border-white/30 hover:bg-white/10 text-white"
-          onClick={() => {
-            if (audioRef.current) {
-              audioRef.current.load();
-              setAudioError(false);
-              const playPromise = audioRef.current.play();
-              if (playPromise !== undefined) {
-                playPromise.catch(() => setAudioError(true));
-              }
-            }
-          }}
-        >
-          Réessayer
-        </Button>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
