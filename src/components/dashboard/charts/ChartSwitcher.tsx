@@ -32,7 +32,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
   const segmentContext = useSegment();
 
   // Define default context handlers
-  const defaultContextHandlers = {
+  const defaultContextHandlers: Pick<SegmentContextType, 'setSelectedDimension' | 'setSelectedOption' | 'dimensions'> = {
     setSelectedDimension: (_: string) => {},
     setSelectedOption: (_: string) => {},
     dimensions: [] as SegmentDimension[]
@@ -40,9 +40,9 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
 
   // Use either context or defaults
   const {
-    setSelectedDimension: contextSetSelectedDimension = defaultContextHandlers.setSelectedDimension,
-    setSelectedOption: contextSetSelectedOption = defaultContextHandlers.setSelectedOption,
-    dimensions: contextDimensions = defaultContextHandlers.dimensions
+    setSelectedDimension: contextSetSelectedDimension,
+    setSelectedOption: contextSetSelectedOption,
+    dimensions: contextDimensions
   } = segmentContext || defaultContextHandlers;
 
   // If dimensions are provided in props, use them instead of context

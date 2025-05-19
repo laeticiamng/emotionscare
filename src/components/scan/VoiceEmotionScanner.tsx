@@ -33,7 +33,10 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({
 
   return (
     <div className="space-y-4">
-      <VoiceEmotionAnalyzer onResult={handleResult} />
+      <VoiceEmotionAnalyzer 
+        onResult={handleResult}
+        onStartRecording={handleStartRecording}
+      />
       
       {isProcessing && (
         <div className="text-center text-sm text-muted-foreground">

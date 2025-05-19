@@ -14,12 +14,6 @@ interface ThemeSettingsTabProps {
   onFontSizeChange?: (fontSize: FontSize) => void;
 }
 
-interface ThemeOption {
-  value: string;
-  label: string;
-  preview: string;
-}
-
 const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   currentTheme,
   onThemeChange,
@@ -29,7 +23,7 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   onFontSizeChange
 }) => {
   // Theme options
-  const themes: ThemeOption[] = [
+  const themes = [
     { value: 'light', label: 'Light', preview: '#ffffff' },
     { value: 'dark', label: 'Dark', preview: '#1f2937' },
     { value: 'system', label: 'System', preview: 'linear-gradient(to right, #ffffff 50%, #1f2937 50%)' }
@@ -186,13 +180,13 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
                     )}
                   >
                     <span 
-                      className={cn(
+                      className={
                         size.value === "xs" ? "text-xs" : 
                         size.value === "sm" ? "text-sm" : 
                         size.value === "md" ? "text-base" : 
                         size.value === "lg" ? "text-lg" :
                         "text-xl"
-                      )}
+                      }
                     >
                       {size.label}
                     </span>

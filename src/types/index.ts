@@ -6,6 +6,7 @@ export * from './user';
 export * from './theme';
 export * from './segment';
 export * from './notification';
+export * from './notifications';
 export * from './emotion';
 export * from './vr';
 export * from './layout';

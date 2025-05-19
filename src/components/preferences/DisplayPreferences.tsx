@@ -1,190 +1,209 @@
 
 import React from 'react';
+import { useForm } from 'react-hook-form';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserPreferences } from '@/types/preferences';
+import ThemePreview from './ThemePreview';
 
 interface DisplayPreferencesProps {
-  theme: string;
-  fontSize: string;
-  language: string;
-  reduceMotion?: boolean;
-  colorBlindMode?: string;
-  onUpdate: (values: Partial<UserPreferences>) => void;
+  preferences: UserPreferences;
+  onSave: (values: Partial<UserPreferences>) => Promise<void>;
+  isLoading?: boolean;
 }
 
-const DisplayPreferences = ({
-  theme,
-  fontSize,
-  language,
-  reduceMotion = false,
-  colorBlindMode,
-  onUpdate
-}: DisplayPreferencesProps) => {
+const DisplayPreferences: React.FC<DisplayPreferencesProps> = ({ preferences, onSave, isLoading = false }) => {
+  const { register, handleSubmit, setValue, watch } = useForm<UserPreferences>({
+    defaultValues: {
+      theme: preferences.theme || 'system',
+      fontSize: preferences.fontSize || 'medium',
+      fontFamily: preferences.fontFamily || 'system',
+      highContrast: preferences.highContrast || false,
+      reduceMotion: preferences.reduceMotion || false,
+      colorBlindMode: preferences.colorBlindMode || false,
+    }
+  });
+  
+  const currentTheme = watch('theme');
+  const currentFontSize = watch('fontSize');
+  
+  const handleThemeChange = async (theme: string) => {
+    setValue('theme', theme as 'light' | 'dark' | 'system' | 'pastel');
+    await onSave({ theme: theme as 'light' | 'dark' | 'system' | 'pastel' });
+  };
+  
+  const handleFontSizeChange = async (size: string) => {
+    setValue('fontSize', size as 'small' | 'medium' | 'large' | 'xlarge');
+    await onSave({ fontSize: size as 'small' | 'medium' | 'large' | 'xlarge' });
+  };
+  
+  const handleFontFamilyChange = async (family: string) => {
+    setValue('fontFamily', family as 'sans' | 'serif' | 'mono' | 'system' | 'rounded');
+    await onSave({ fontFamily: family as 'sans' | 'serif' | 'mono' | 'system' | 'rounded' });
+  };
+  
+  const themes = [
+    { value: 'light', label: 'Lumineux' },
+    { value: 'dark', label: 'Sombre' },
+    { value: 'system', label: 'Système' },
+    { value: 'pastel', label: 'Pastel' }
+  ];
+
+  const fontSizes = [
+    { value: 'small', label: 'Petit' },
+    { value: 'medium', label: 'Moyen' },
+    { value: 'large', label: 'Grand' },
+    { value: 'xlarge', label: 'Très grand' }
+  ];
+
+  const fontFamilies = [
+    { value: 'sans', label: 'Sans-serif' },
+    { value: 'serif', label: 'Serif' },
+    { value: 'mono', label: 'Monospace' },
+    { value: 'system', label: 'Système' },
+    { value: 'rounded', label: 'Arrondi' }
+  ];
+  
+  const handleToggleHighContrast = async (checked: boolean) => {
+    setValue('highContrast', checked);
+    await onSave({ highContrast: checked });
+  };
+  
+  const handleToggleReduceMotion = async (checked: boolean) => {
+    setValue('reduceMotion', checked);
+    await onSave({ reduceMotion: checked });
+  };
+  
+  const handleToggleColorBlindMode = async (checked: boolean) => {
+    setValue('colorBlindMode', checked);
+    await onSave({ colorBlindMode: checked });
+  };
+
   return (
     <div className="space-y-6">
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Thème</h3>
-        <RadioGroup
-          value={theme}
-          onValueChange={(value) => onUpdate({ theme: value as 'light' | 'dark' | 'pastel' | 'system' })}
-          className="grid grid-cols-4 gap-4"
-        >
+      <Card>
+        <CardHeader>
+          <CardTitle>Thème et couleurs</CardTitle>
+          <CardDescription>Personnalisez l'apparence de l'application</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
           <div>
-            <RadioGroupItem value="light" id="light" className="peer sr-only" />
-            <Label
-              htmlFor="light"
-              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-4 hover:bg-gray-50 hover:border-accent peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-            >
-              <div className="rounded-full w-8 h-8 border bg-white mb-2"></div>
-              <span className="block w-full text-center">Clair</span>
-            </Label>
+            <Label htmlFor="theme">Thème visuel</Label>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-2">
+              {themes.map((theme) => (
+                <div key={theme.value} className="relative group">
+                  <button
+                    type="button"
+                    className={`w-full h-full rounded-lg overflow-hidden border-2 transition-all ${
+                      theme.value === currentTheme ? 'border-primary ring-1 ring-primary' : 'border-border hover:border-primary/50'
+                    }`}
+                    onClick={() => handleThemeChange(theme.value)}
+                    disabled={isLoading}
+                  >
+                    <div className="aspect-video w-full">
+                      <ThemePreview theme={theme.value as any} />
+                    </div>
+                    <div className="p-2 text-center text-sm font-medium">
+                      {theme.label}
+                    </div>
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
           
-          <div>
-            <RadioGroupItem value="dark" id="dark" className="peer sr-only" />
-            <Label
-              htmlFor="dark"
-              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-gray-950 p-4 hover:bg-gray-900 hover:border-accent peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-            >
-              <div className="rounded-full w-8 h-8 border bg-gray-800 mb-2"></div>
-              <span className="block w-full text-center text-white">Sombre</span>
-            </Label>
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="font-size">Taille du texte</Label>
+              <Select 
+                value={currentFontSize} 
+                onValueChange={handleFontSizeChange}
+                disabled={isLoading}
+              >
+                <SelectTrigger id="font-size">
+                  <SelectValue placeholder="Choisir une taille de texte" />
+                </SelectTrigger>
+                <SelectContent>
+                  {fontSizes.map((size) => (
+                    <SelectItem key={size.value} value={size.value}>
+                      {size.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="font-family">Police d'écriture</Label>
+              <Select 
+                value={preferences.fontFamily || 'system'} 
+                onValueChange={handleFontFamilyChange}
+                disabled={isLoading}
+              >
+                <SelectTrigger id="font-family">
+                  <SelectValue placeholder="Choisir une police" />
+                </SelectTrigger>
+                <SelectContent>
+                  {fontFamilies.map((font) => (
+                    <SelectItem key={font.value} value={font.value}>
+                      {font.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          
-          <div>
-            <RadioGroupItem value="pastel" id="pastel" className="peer sr-only" />
-            <Label
-              htmlFor="pastel"
-              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-gradient-to-r from-pink-100 to-blue-100 p-4 hover:opacity-90 hover:border-accent peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-            >
-              <div className="rounded-full w-8 h-8 border bg-gradient-to-r from-pink-200 to-blue-200 mb-2"></div>
-              <span className="block w-full text-center">Pastel</span>
-            </Label>
-          </div>
-          
-          <div>
-            <RadioGroupItem value="system" id="system" className="peer sr-only" />
-            <Label
-              htmlFor="system"
-              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-gradient-to-r from-white to-gray-900 p-4 hover:opacity-90 hover:border-accent peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-            >
-              <div className="rounded-full w-8 h-8 border bg-gradient-to-r from-white to-gray-800 mb-2"></div>
-              <span className="block w-full text-center">Système</span>
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
+        </CardContent>
+      </Card>
       
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Taille de police</h3>
-        <RadioGroup
-          value={fontSize}
-          onValueChange={(value) => onUpdate({ fontSize: value as 'small' | 'medium' | 'large' | 'xlarge' })}
-          className="grid grid-cols-4 gap-4"
-        >
-          <div>
-            <RadioGroupItem value="small" id="small" className="peer sr-only" />
-            <Label
-              htmlFor="small"
-              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-4 hover:bg-gray-50 hover:border-accent peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-            >
-              <span className="text-sm">Aa</span>
-              <span className="block w-full text-center text-xs">Petite</span>
-            </Label>
+      <Card>
+        <CardHeader>
+          <CardTitle>Accessibilité</CardTitle>
+          <CardDescription>Options d'accessibilité et de confort visuel</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="high-contrast" className="block">Contraste élevé</Label>
+              <p className="text-sm text-muted-foreground">Augmenter le contraste pour faciliter la lecture</p>
+            </div>
+            <Switch
+              id="high-contrast"
+              checked={preferences.highContrast || false}
+              onCheckedChange={handleToggleHighContrast}
+              disabled={isLoading}
+            />
           </div>
           
-          <div>
-            <RadioGroupItem value="medium" id="medium" className="peer sr-only" />
-            <Label
-              htmlFor="medium"
-              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-4 hover:bg-gray-50 hover:border-accent peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-            >
-              <span className="text-base">Aa</span>
-              <span className="block w-full text-center text-xs">Moyenne</span>
-            </Label>
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="reduce-motion" className="block">Réduire les animations</Label>
+              <p className="text-sm text-muted-foreground">Limiter les effets de mouvement et les animations</p>
+            </div>
+            <Switch
+              id="reduce-motion"
+              checked={preferences.reduceMotion || false}
+              onCheckedChange={handleToggleReduceMotion}
+              disabled={isLoading}
+            />
           </div>
           
-          <div>
-            <RadioGroupItem value="large" id="large" className="peer sr-only" />
-            <Label
-              htmlFor="large"
-              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-4 hover:bg-gray-50 hover:border-accent peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-            >
-              <span className="text-lg">Aa</span>
-              <span className="block w-full text-center text-xs">Grande</span>
-            </Label>
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="color-blind" className="block">Mode daltonien</Label>
+              <p className="text-sm text-muted-foreground">Ajuster les couleurs pour les personnes daltoniennes</p>
+            </div>
+            <Switch
+              id="color-blind"
+              checked={Boolean(preferences.colorBlindMode)}
+              onCheckedChange={handleToggleColorBlindMode}
+              disabled={isLoading}
+            />
           </div>
-          
-          <div>
-            <RadioGroupItem value="xlarge" id="xlarge" className="peer sr-only" />
-            <Label
-              htmlFor="xlarge"
-              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-4 hover:bg-gray-50 hover:border-accent peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-            >
-              <span className="text-xl">Aa</span>
-              <span className="block w-full text-center text-xs">Très grande</span>
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
-      
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Langue</h3>
-        <Select
-          value={language}
-          onValueChange={(value) => onUpdate({ language: value })}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Sélectionnez une langue" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="fr">Français</SelectItem>
-            <SelectItem value="en">English</SelectItem>
-            <SelectItem value="es">Español</SelectItem>
-            <SelectItem value="de">Deutsch</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Accessibilité</h3>
-        
-        <div className="flex items-center justify-between">
-          <Label htmlFor="reduce-motion" className="flex-grow">
-            Réduire les animations
-            <p className="text-sm text-muted-foreground">
-              Limite les effets de mouvement et les transitions
-            </p>
-          </Label>
-          <Switch
-            id="reduce-motion"
-            checked={reduceMotion}
-            onCheckedChange={(checked) => onUpdate({ reduceMotion: checked })}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="color-blind-mode">Mode daltonien</Label>
-          <Select
-            value={colorBlindMode || 'none'}
-            onValueChange={(value) => onUpdate({ colorBlindMode: value === 'none' ? '' : value })}
-          >
-            <SelectTrigger id="color-blind-mode" className="w-full">
-              <SelectValue placeholder="Sélectionnez un mode" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Aucun</SelectItem>
-              <SelectItem value="protanopia">Protanopie</SelectItem>
-              <SelectItem value="deuteranopia">Deutéranopie</SelectItem>
-              <SelectItem value="tritanopia">Tritanopie</SelectItem>
-              <SelectItem value="achromatopsia">Achromatopsie</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

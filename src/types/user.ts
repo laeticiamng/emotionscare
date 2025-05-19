@@ -7,6 +7,7 @@ export interface User {
   name?: string;
   role?: UserRole;
   avatar_url?: string;
+  avatar?: string;
   created_at?: string;
   position?: string;
   department?: string;
@@ -19,6 +20,7 @@ export interface AuthUser {
   name: string;
   role?: UserRole;
   avatar?: string;
+  avatar_url?: string;
   created_at?: string;
   position?: string;
   department?: string;

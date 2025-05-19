@@ -1,10 +1,11 @@
 
 export interface PrivacyPreferences {
   dataSharing?: boolean;
+  shareData?: boolean;
   analytics?: boolean;
   thirdParty?: boolean;
-  shareData?: boolean;
   anonymizeReports?: boolean;
+  anonymizedData?: boolean;
   profileVisibility?: 'private' | 'team' | 'organization' | 'public';
 }
 
@@ -38,7 +39,7 @@ export interface NotificationsPreferences {
   }
 }
 
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never' | 'custom';
 export type NotificationType = 'system' | 'emotion' | 'coach' | 'journal' | 'community';
 
 export interface UserPreferences {
@@ -60,6 +61,8 @@ export interface UserPreferences {
   colorBlindMode?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
+  shareData?: boolean;
+  anonymizedData?: boolean;
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {

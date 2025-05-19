@@ -16,3 +16,11 @@ export interface LayoutProviderProps {
   defaultSidebarOpen?: boolean;
   defaultShowHeader?: boolean;
 }
+
+export interface ShellProps {
+  children?: React.ReactNode;
+  hideNav?: boolean;
+  hideFooter?: boolean;
+  className?: string;
+  immersive?: boolean;
+}

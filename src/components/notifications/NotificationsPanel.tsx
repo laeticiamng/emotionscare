@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Bell } from 'lucide-react';
-import { Notification, NotificationFilter } from '@/types/notification';
+import { Notification, NotificationFilter } from '@/types/notifications';
 import { filterNotifications } from './notificationFilterUtils';
 import NotificationItem from './NotificationItem';
 

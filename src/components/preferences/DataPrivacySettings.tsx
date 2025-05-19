@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -43,7 +44,7 @@ const DataPrivacySettings: React.FC<DataPrivacyProps> = ({
               render={({ field }) => (
                 <Switch
                   id="data-sharing"
-                  checked={field.value}
+                  checked={Boolean(field.value)}
                   onCheckedChange={field.onChange}
                   disabled={isLoading}
                 />
@@ -58,7 +59,7 @@ const DataPrivacySettings: React.FC<DataPrivacyProps> = ({
               render={({ field }) => (
                 <Switch
                   id="anonymized-data"
-                  checked={field.value}
+                  checked={Boolean(field.value)}
                   onCheckedChange={field.onChange}
                   disabled={isLoading}
                 />

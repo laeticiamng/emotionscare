@@ -6,7 +6,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { Notification } from '@/types/notification';
+import { Notification } from '@/types/notifications';
 import NotificationList from './NotificationList';
 
 interface NotificationDrawerProps {

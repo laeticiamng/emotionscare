@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Notification } from '@/types/notification';
+import { Notification } from '@/types/notifications';
 import NotificationItem from './NotificationItem';
 
 interface NotificationListProps {

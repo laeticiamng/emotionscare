@@ -1,97 +1,88 @@
+
 import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import TextEmotionScanner from './TextEmotionScanner';
-import VoiceEmotionScanner from './VoiceEmotionScanner';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card } from '@/components/ui/card';
 import { EmotionResult } from '@/types/emotion';
+import VoiceEmotionScanner from './VoiceEmotionScanner';
+import TextEmotionScanner from './TextEmotionScanner';
+import EmojiEmotionScanner from './EmojiEmotionScanner';
+import FacialEmotionScanner from './FacialEmotionScanner';
 
 interface EmotionScanFormProps {
-  userId?: string;
-  onEmotionDetected?: (result: EmotionResult) => void;
-  onClose?: () => void;
+  onScanComplete: (result: EmotionResult) => void;
+  defaultTab?: string;
+  onProcessingChange?: (isProcessing: boolean) => void;
 }
 
 const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
-  userId,
-  onEmotionDetected,
-  onClose
+  onScanComplete,
+  defaultTab = 'voice',
+  onProcessingChange,
 }) => {
-  const [scanMethod, setScanMethod] = useState<'text' | 'voice'>('text');
-  const [scanResult, setScanResult] = useState<EmotionResult | null>(null);
-  const [isLoadingResult, setIsLoadingResult] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>(defaultTab);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-  const handleEmotionResult = (result: EmotionResult) => {
-    setScanResult(result);
-    
-    if (onEmotionDetected) {
-      onEmotionDetected(result);
+  const handleProcessingChange = (processing: boolean) => {
+    setIsProcessing(processing);
+    if (onProcessingChange) {
+      onProcessingChange(processing);
     }
   };
-  
-  const handleVoiceProcessingChange = (isProcessing: boolean) => {
-    setIsProcessing(isProcessing);
+
+  const handleScanResult = (result: EmotionResult) => {
+    handleProcessingChange(false);
+    onScanComplete(result);
   };
-  
-  const renderResult = () => {
-    if (!scanResult) return null;
-    
-    return (
-      <div className="mt-6 animate-fade-in">
-        <h3 className="text-lg font-medium mb-2">Résultat de l'analyse</h3>
-        <div className="p-4 rounded-lg bg-muted/50">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-              {(scanResult.primaryEmotion === 'joy' || scanResult.emotion === 'joy') && '😊'}
-              {(scanResult.primaryEmotion === 'calm' || scanResult.emotion === 'calm') && '😌'}
-              {(scanResult.primaryEmotion === 'anxious' || scanResult.emotion === 'anxious') && '😰'}
-              {(scanResult.primaryEmotion === 'sad' || scanResult.emotion === 'sad') && '😔'}
-              {!['joy', 'calm', 'anxious', 'sad'].includes(scanResult.primaryEmotion || scanResult.emotion || '') && '😐'}
-            </div>
-            <div>
-              <p className="font-medium">Émotion détectée: <span className="text-primary">{scanResult.primaryEmotion || scanResult.emotion}</span></p>
-              <p className="text-sm text-muted-foreground">Score de confiance: {Math.round((scanResult.intensity || scanResult.confidence || 0) * 100)}%</p>
-            </div>
-          </div>
-          
-          {scanResult.feedback && (
-            <p className="text-sm mt-3">{scanResult.feedback}</p>
-          )}
-          
-          <div className="flex justify-end mt-4">
-            <Button variant="outline" size="sm" onClick={onClose}>Fermer</Button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-  
+
   return (
-    <div className="space-y-4">
-      <Tabs defaultValue={scanMethod} onValueChange={(value) => setScanMethod(value as 'text' | 'voice')}>
-        <TabsList className="grid grid-cols-2 mb-4">
-          <TabsTrigger value="text">Analyse textuelle</TabsTrigger>
-          <TabsTrigger value="voice">Analyse vocale</TabsTrigger>
+    <Card className="w-full">
+      <Tabs
+        defaultValue={defaultTab}
+        value={activeTab}
+        onValueChange={(value) => {
+          if (!isProcessing) {
+            setActiveTab(value);
+          }
+        }}
+        className="w-full"
+      >
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="voice" disabled={isProcessing}>
+            Par la voix
+          </TabsTrigger>
+          <TabsTrigger value="text" disabled={isProcessing}>
+            Par le texte
+          </TabsTrigger>
+          <TabsTrigger value="emoji" disabled={isProcessing}>
+            Par emoji
+          </TabsTrigger>
+          {/*<TabsTrigger value="facial" disabled={isProcessing}>
+            Visage
+          </TabsTrigger>*/}
         </TabsList>
-        
-        <TabsContent value="text">
-          <TextEmotionScanner 
-            onResult={handleEmotionResult}
-            isProcessing={isLoadingResult}
-            setIsProcessing={setIsLoadingResult}
-          />
-        </TabsContent>
-        
-        <TabsContent value="voice">
-          <VoiceEmotionScanner 
-            onResult={handleEmotionResult} 
-            onProcessingChange={handleVoiceProcessingChange} 
-          />
-        </TabsContent>
+
+        <div className="p-4">
+          <TabsContent value="voice" className="space-y-4 mt-0">
+            <VoiceEmotionScanner 
+              onResult={handleScanResult} 
+              onProcessingChange={handleProcessingChange}
+            />
+          </TabsContent>
+
+          <TabsContent value="text" className="space-y-4 mt-0">
+            <TextEmotionScanner onResult={handleScanResult} />
+          </TabsContent>
+
+          <TabsContent value="emoji" className="space-y-4 mt-0">
+            <EmojiEmotionScanner onResult={handleScanResult} />
+          </TabsContent>
+
+          <TabsContent value="facial" className="space-y-4 mt-0">
+            <FacialEmotionScanner onResult={handleScanResult} />
+          </TabsContent>
+        </div>
       </Tabs>
-      
-      {scanResult && renderResult()}
-    </div>
+    </Card>
   );
 };
 

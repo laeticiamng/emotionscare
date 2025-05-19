@@ -1,95 +1,109 @@
 
-export interface TeamSummary {
-  id: string;
-  name: string;
-  memberCount: number;
-  activeUsers: number;
-  averageScore?: number;
-  emotionalAverage?: string;
-  count?: number;
-  trend?: number;
-  averageEmotionalScore?: number;
-  trendDirection?: 'up' | 'down' | 'stable';
-  trendValue?: number;
-  department?: string;
-  leaderName?: string;
-  lastUpdated?: Date;
-}
-
-export interface AdminAccessLog {
-  id: string;
-  timestamp: string;
-  action: string;
-  userId?: string;
-  userName?: string;
-  adminName?: string;
-  resource?: string;
-  details?: string;
-  ip?: string;
-}
-
-export interface DashboardWidget {
-  id: string;
-  title: string;
-  type: string;
-  size: 'small' | 'medium' | 'large';
-  data?: any;
-  width?: number;
-  height?: number;
-  settings?: Record<string, any>;
-}
-
-export type DashboardWidgetConfig = DashboardWidget & {
-  x: number;
-  y: number;
-  visible: boolean;
-  settings?: Record<string, any>;
-};
-
-export type KpiCardStatus = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
-
-export type KpiDelta = {
-  value: number;
-  trend?: 'up' | 'down' | 'neutral';
-  direction?: 'up' | 'down' | 'stable';
-  label?: string;
-};
-
 export interface KpiCardProps {
-  id?: string;
+  id: string;
   title: string;
   value: string | number;
-  delta?: number | KpiDelta;
+  delta?: number | { value: number; label?: string; trend: 'up' | 'down' | 'neutral' };
+  status?: KpiCardStatus;
   icon?: React.ReactNode;
   subtitle?: string | React.ReactNode;
-  className?: string;
-  status?: KpiCardStatus;
-  isLoading?: boolean;
-  ariaLabel?: string;
-  onClick?: () => void;
   footer?: React.ReactNode;
+  className?: string;
+  isLoading?: boolean;
+  onClick?: () => void;
+  ariaLabel?: string;
 }
 
 export interface DraggableKpiCardsGridProps {
   cards?: KpiCardProps[];
   kpiCards?: KpiCardProps[];
-  onOrderChange?: (newOrder: KpiCardProps[]) => void;
-  onCardsReorder?: (cards: KpiCardProps[]) => void;
-  onSave?: (layouts: any) => void;
-  savedLayout?: any;
-  className?: string;
-  isEditable?: boolean;
-  onLayoutChange?: (layout: any) => void;
+  onOrderChange?: (cards: KpiCardProps[]) => void;
 }
 
 export interface GlobalOverviewTabProps {
   period?: string;
   onPeriodChange?: (period: string) => void;
+}
+
+export interface DashboardWidgetConfig {
+  id: string;
+  title: string;
+  description?: string;
+  type: string;
+  size?: 'small' | 'medium' | 'large';
+  refreshInterval?: number;
+  permissions?: string[];
+  dataSource?: string;
+  settings?: Record<string, any>;
+}
+
+export interface DashboardWidget {
+  id: string;
+  title: string;
+  content?: React.ReactNode;
+  type?: string;
   data?: any;
+  size?: 'small' | 'medium' | 'large';
   isLoading?: boolean;
-  className?: string;
+  error?: Error | null;
+  refresh?: () => void;
+  lastUpdated?: Date;
+  config?: DashboardWidgetConfig;
+}
+
+export interface GamificationData {
+  badges: number;
+  streak: number;
+  points: number;
+  level: number;
+  nextLevelProgress: number;
+  achievements: { name: string; date: string }[];
+}
+
+export type KpiCardStatus = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+
+export interface KpiDelta {
+  value: number;
+  trend: 'up' | 'down' | 'neutral';
+  label?: string;
 }
 
 export interface KpiCardsGridProps {
-  cards?: KpiCardProps[];
+  cards: Array<{
+    id: string;
+    title: string;
+    value: string | number;
+    delta?: KpiDelta | number;
+    status?: KpiCardStatus;
+    icon?: React.ReactNode;
+    subtitle?: string | React.ReactNode;
+    footer?: React.ReactNode;
+    className?: string;
+    isLoading?: boolean;
+    onClick?: () => void;
+  }>;
+}
+
+export interface TeamSummary {
+  id: string;
+  name: string;
+  members: number;
+  department?: string;
+  activity?: number;
+  engagement?: number;
+  emotionAverage?: number;
+  averageEmotionalScore?: number;
+  trendDirection?: 'up' | 'down' | 'stable';
+  trendValue?: number;
+}
+
+export interface AdminAccessLog {
+  id: string;
+  action: string;
+  timestamp: string | Date;
+  details?: string;
+  userId?: string;
+  adminName?: string;
+  ip?: string;
+  status?: 'success' | 'failed' | 'pending';
 }

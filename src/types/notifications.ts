@@ -4,16 +4,16 @@ export interface Notification {
   user_id: string;
   title: string;
   message: string;
-  type: 'system' | 'emotion' | 'challenge' | 'achievement' | 'reminder';
+  type: NotificationType;
   read: boolean;
-  timestamp: string;  // For compatibility with existing code
-  createdAt: string;  // For compatibility with existing code
-  created_at: string; // Standard format
+  timestamp: string;
+  created_at?: string;
+  createdAt?: string;
 }
 
 export type NotificationType = 'system' | 'emotion' | 'challenge' | 'achievement' | 'reminder' | 'info' | 'warning' | 'error' | 'success' | 'journal' | 'user' | 'urgent';
 
-export type NotificationFilter = 'all' | 'unread' | 'read' | 'urgent' | 'system' | 'journal' | 'emotion' | 'user';
+export type NotificationFilter = 'all' | 'unread' | 'read' | NotificationType;
 
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 

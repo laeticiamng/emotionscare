@@ -10,16 +10,17 @@ export interface Emotion {
 export interface EmotionResult {
   id?: string;
   emotion?: string;
+  primaryEmotion?: string;
   confidence?: number;
   intensity?: number;
   timestamp?: string;
   recommendations?: EmotionRecommendation[];
   emojis?: string[];
   text?: string;
-  feedback?: string;
   source?: string;
   date?: string;
   user_id?: string;
+  feedback?: string;
 }
 
 export interface EmotionRecommendation {
@@ -48,6 +49,10 @@ export interface EmotionalTeamViewProps {
   period?: string;
   anonymized?: boolean;
   data?: any[];
+  dateRange?: [Date, Date];
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
 }
 
 export interface TextEmotionScannerProps {
@@ -60,5 +65,5 @@ export interface EmojiEmotionScannerProps {
 
 export interface VoiceEmotionScannerProps {
   onResult: (result: EmotionResult) => void;
-  onProcessingChange?: React.Dispatch<React.SetStateAction<boolean>> | ((value: boolean) => void);
+  onProcessingChange?: (isProcessing: boolean) => void;
 }

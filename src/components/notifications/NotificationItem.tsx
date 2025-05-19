@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Notification, NotificationType } from '@/types/notification';
+import { Notification, NotificationType } from '@/types/notifications';
 import { Button } from '@/components/ui/button';
 import { Bell, Check } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
