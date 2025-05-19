@@ -6,11 +6,20 @@
  * Import from this file instead of directly referencing the implementation.
  */
 
-// Export everything from the MusicContext implementation
-export * from '@/contexts/MusicContext';
+// Export everything from the MusicContext implementation but not using star export
+export { 
+  MusicContext, 
+  MusicProvider, 
+  useMusicContext 
+} from '@/contexts/MusicContext';
 
 // Export the types
-export * from '@/types/music';
+export type { 
+  MusicContextType,
+  MusicTrack,
+  MusicPlaylist
+} from '@/types/music';
 
-// Export the default context
-export { default } from '@/contexts/MusicContext';
+// Export the default context explicitly rather than using star export
+import MusicContextDefault from '@/contexts/MusicContext';
+export { MusicContextDefault as default };
