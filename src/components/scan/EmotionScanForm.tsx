@@ -36,7 +36,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
     return (
       <div className="mt-6 animate-fade-in">
         <h3 className="text-lg font-medium mb-2">Résultat de l'analyse</h3>
-        <div className="p-4 rounded-lg bg-muted">
+        <div className="p-4 rounded-lg bg-muted/50">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
               {(scanResult.primaryEmotion === 'joy' || scanResult.emotion === 'joy') && '😊'}
@@ -82,8 +82,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
         <TabsContent value="voice">
           <VoiceEmotionScanner 
             onResult={handleScanResult}
-            isProcessing={isLoadingResult}
-            setIsProcessing={setIsLoadingResult}
+            onProcessingChange={setIsLoadingResult}
           />
         </TabsContent>
       </Tabs>

@@ -8,7 +8,7 @@ import { Theme, FontSize, FontFamily } from '@/types/theme';
 const DisplayPreferences: React.FC = () => {
   const [theme, setTheme] = useState<Theme>('system');
   const [fontSize, setFontSize] = useState<FontSize>('md');
-  const [fontFamily, setFontFamily] = useState<FontFamily>('system');
+  const [fontFamily, setFontFamily] = useState<FontFamily>('sans');
 
   const handleThemeChange = (value: Theme) => {
     setTheme(value);
@@ -73,10 +73,10 @@ const DisplayPreferences: React.FC = () => {
               <SelectValue placeholder="Sélectionnez une police" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="system">Système</SelectItem>
               <SelectItem value="sans">Sans-serif</SelectItem>
               <SelectItem value="serif">Serif</SelectItem>
               <SelectItem value="mono">Monospace</SelectItem>
+              <SelectItem value="system">Système</SelectItem>
               <SelectItem value="rounded">Arrondie</SelectItem>
             </SelectContent>
           </Select>

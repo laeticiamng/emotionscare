@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,18 +7,27 @@ import { Mic, Square } from 'lucide-react';
 
 interface LiveVoiceScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
   autoStart?: boolean;
   scanDuration?: number; // in seconds
 }
 
 const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
   onScanComplete,
+  onResult,
+  isProcessing: externalIsProcessing,
+  setIsProcessing: externalSetIsProcessing,
   autoStart = false,
   scanDuration = 10
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [localIsProcessing, setLocalIsProcessing] = useState(false);
+  
+  const isProcessing = externalIsProcessing !== undefined ? externalIsProcessing : localIsProcessing;
+  const setIsProcessing = externalSetIsProcessing || setLocalIsProcessing;
 
   const processAudioData = useCallback(() => {
     setIsProcessing(true);
@@ -28,14 +36,26 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
     setTimeout(() => {
       setIsProcessing(false);
       
-      if (onScanComplete) {
+      if (onScanComplete || onResult) {
         // Create mock result
         const emotions = ['joy', 'calm', 'focused', 'anxious', 'sad'];
         const emotion = emotions[Math.floor(Math.random() * emotions.length)];
         
         const recommendations: EmotionRecommendation[] = [
-          { title: "Take a walk", content: "Take a walk outside to clear your mind", category: "exercise" },
-          { title: "Deep breathing", content: "Practice deep breathing for relaxation", category: "mindfulness" }
+          { 
+            type: "exercise",
+            title: "Take a walk", 
+            description: "Helps clear your mind", 
+            content: "Take a walk outside to clear your mind", 
+            category: "exercise" 
+          },
+          { 
+            type: "mindfulness",
+            title: "Deep breathing", 
+            description: "Promotes relaxation",
+            content: "Practice deep breathing for relaxation", 
+            category: "mindfulness" 
+          }
         ];
         
         const emotionResult: EmotionResult = {
@@ -48,13 +68,15 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
           timestamp: new Date(),
           feedback: "Your voice analysis reveals a balanced emotional state with slight tendencies toward the positive spectrum.",
           recommendations: recommendations,
-          source: 'voice'
+          source: 'voice',
+          text: "Sample audio analysis text"
         };
         
-        onScanComplete(emotionResult);
+        if (onScanComplete) onScanComplete(emotionResult);
+        if (onResult) onResult(emotionResult);
       }
     }, 1500);
-  }, [onScanComplete]);
+  }, [onScanComplete, onResult, setIsProcessing]);
 
   const startRecording = useCallback(() => {
     setIsRecording(true);

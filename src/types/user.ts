@@ -12,6 +12,9 @@ export interface User {
   displayName?: string; // For backward compatibility
   created_at?: Date | string; // For backward compatibility
   preferences?: any;
+  position?: string;
+  department?: string;
+  joined_at?: Date | string;
 }
 
 export interface AuthUser {
@@ -27,6 +30,7 @@ export interface AuthUser {
   department?: string;
   position?: string;
   createdAt?: Date | string;
+  created_at?: Date | string;
 }
 
 export interface UserWithStatus extends User {

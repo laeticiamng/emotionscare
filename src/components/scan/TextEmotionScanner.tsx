@@ -1,102 +1,90 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { EmotionResult } from '@/types/emotion';
-import { Send, AlertCircle } from 'lucide-react';
+import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
+import { Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface TextEmotionScannerProps {
-  onResult?: (result: EmotionResult) => void;
+  onResult: (result: EmotionResult) => void;
   isProcessing?: boolean;
   setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  minLength?: number;
 }
 
 const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
   onResult,
-  isProcessing = false,
-  setIsProcessing,
+  isProcessing: externalIsProcessing,
+  setIsProcessing: externalSetIsProcessing,
+  minLength = 10
 }) => {
   const [text, setText] = useState('');
   const [error, setError] = useState<string | null>(null);
-
+  const [localIsProcessing, setLocalIsProcessing] = useState(false);
+  
+  // Use external state if provided, otherwise use local state
+  const isProcessing = externalIsProcessing !== undefined ? externalIsProcessing : localIsProcessing;
+  const setIsProcessing = externalSetIsProcessing || setLocalIsProcessing;
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
-    if (error) {
-      setError(null);
-    }
+    if (error) setError(null);
   };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!text.trim()) {
-      setError('Veuillez entrer du texte pour l\'analyse.');
+  
+  const analyzeText = async () => {
+    if (text.trim().length < minLength) {
+      setError(`Veuillez entrer au moins ${minLength} caractères`);
       return;
     }
     
-    if (text.trim().length < 10) {
-      setError('Veuillez entrer un texte plus long pour une meilleure analyse.');
-      return;
-    }
-    
-    // Set processing state
-    if (setIsProcessing) {
-      setIsProcessing(true);
-    }
+    setIsProcessing(true);
     
     try {
-      // Simulate API call for emotion analysis
-      setTimeout(() => {
-        const fakeEmotions = ['happy', 'calm', 'sad', 'anxious', 'relaxed', 'energetic', 'focused'];
-        const randomEmotion = fakeEmotions[Math.floor(Math.random() * fakeEmotions.length)];
-        const randomConfidence = 0.5 + Math.random() * 0.4;
-        
-        // Create result
-        const result: EmotionResult = {
-          emotion: randomEmotion,
-          confidence: randomConfidence,
-          timestamp: new Date().toISOString(),
-          source: 'text',
-          text: text,
-          recommendations: [
-            {
-              title: 'Activité recommandée',
-              description: `Une activité adaptée à votre humeur ${randomEmotion}`,
-              category: 'activité'
-            },
-            {
-              title: 'Musique',
-              description: `Une playlist pour accompagner votre humeur ${randomEmotion}`,
-              category: 'musique'
-            }
-          ]
-        };
-        
-        if (onResult) {
-          onResult(result);
-        }
-        
-        // Reset processing state
-        if (setIsProcessing) {
-          setIsProcessing(false);
-        }
-        
-      }, 1500);
+      // Simulate API call with a timeout
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
+      // Mock data - in a real app, this would come from the API
+      const emotions = ['happy', 'calm', 'anxious', 'sad', 'excited', 'frustrated'];
+      const emotion = emotions[Math.floor(Math.random() * emotions.length)];
+      
+      const recommendations: EmotionRecommendation[] = [
+        {
+          type: "general",
+          title: "Mindful reading", 
+          description: "Take time to read something enjoyable",
+          category: "mindfulness"
+        },
+        {
+          type: "exercise",
+          title: "Quick walk", 
+          description: "A short walk can help clear your mind",
+          category: "physical"
+        }
+      ];
+      
+      const result: EmotionResult = {
+        id: `text-analysis-${Date.now()}`,
+        emotion: emotion,
+        primaryEmotion: emotion,
+        confidence: 0.75 + Math.random() * 0.2,
+        intensity: 0.5 + Math.random() * 0.5,
+        text: text,
+        timestamp: new Date().toISOString(),
+        recommendations: recommendations,
+        emojis: ["😊", "😌"]
+      };
+      
+      onResult(result);
     } catch (err) {
       console.error('Error analyzing text:', err);
-      setError('Une erreur est survenue lors de l\'analyse. Veuillez réessayer.');
-      
-      // Reset processing state
-      if (setIsProcessing) {
-        setIsProcessing(false);
-      }
+      setError('Une erreur est survenue lors de l\'analyse');
+    } finally {
+      setIsProcessing(false);
     }
   };
-
+  
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={analyzeText} className="space-y-4">
       <div>
         <Textarea
           placeholder="Décrivez votre journée, vos pensées ou vos émotions actuelles..."
@@ -113,7 +101,7 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center mt-2 text-destructive gap-2 text-sm"
           >
-            <AlertCircle className="h-4 w-4" />
+            <Loader2 className="h-4 w-4" />
             <span>{error}</span>
           </motion.div>
         )}
@@ -122,7 +110,7 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
       <div className="flex justify-end">
         <Button 
           type="submit" 
-          disabled={isProcessing || text.length < 10}
+          disabled={isProcessing || text.length < minLength}
           className="flex items-center gap-2"
         >
           {isProcessing ? (
@@ -132,7 +120,7 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
             </>
           ) : (
             <>
-              <Send className="h-4 w-4" />
+              <Loader2 className="h-4 w-4" />
               <span>Analyser</span>
             </>
           )}

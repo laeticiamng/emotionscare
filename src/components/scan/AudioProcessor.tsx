@@ -128,31 +128,37 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
       
       // Simulate an analysis result (in a real app, send to server and process)
       setTimeout(() => {
-        const fakeResult: EmotionResult = {
-          emotion: 'calm',
-          score: 0.85,
-          confidence: 0.85,
-          timestamp: new Date().toISOString(),
-          source: 'voice',
-          recommendations: [
-            {
-              title: 'Méditation guidée',
-              description: 'Faites une courte méditation pour maintenir votre calme',
-              category: 'méditation',
-              content: 'Prenez 5 minutes pour respirer profondément',
-            },
-            {
-              title: 'Musique relaxante',
-              description: 'Écoutez de la musique apaisante',
-              category: 'musique',
-              content: 'Une playlist de sons de nature et musique ambiante',
-            }
-          ],
-          audioUrl: URL.createObjectURL(audioBlob),
-          transcript: "J'ai passé une journée tranquille aujourd'hui."
-        };
+        const recommendations: EmotionRecommendation[] = [
+          {
+            type: 'meditation',
+            title: 'Méditation guidée',
+            description: 'Faites une courte méditation pour maintenir votre calme',
+            category: 'méditation',
+            content: 'Prenez 5 minutes pour respirer profondément',
+          },
+          {
+            type: 'music',
+            title: 'Musique relaxante',
+            description: 'Écoutez de la musique apaisante',
+            category: 'musique',
+            content: 'Une playlist de sons de nature et musique ambiante',
+          }
+        ];
         
         if (onResult) {
+          const fakeResult: EmotionResult = {
+            id: `scan-${Date.now()}`,
+            emotion: 'calm',
+            score: 0.85,
+            confidence: 0.85,
+            timestamp: new Date().toISOString(),
+            source: 'voice',
+            recommendations: recommendations,
+            text: "J'ai passé une journée tranquille aujourd'hui.",
+            audioUrl: URL.createObjectURL(audioBlob),
+            transcript: "J'ai passé une journée tranquille aujourd'hui."
+          };
+          
           onResult(fakeResult);
         }
         

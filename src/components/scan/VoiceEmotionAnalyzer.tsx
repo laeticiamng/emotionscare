@@ -1,70 +1,105 @@
-
-import React, { useState, useEffect } from 'react';
-import { Mic, Loader } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
-import { EmotionResult } from '@/types/emotion';
+import React, { useState } from 'react';
+import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
+import { Button } from '@/components/ui/button';
+import { Mic, StopCircle } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 interface VoiceEmotionAnalyzerProps {
-  userId: string;
-  onResult?: (result: EmotionResult) => void;
+  onResult: (result: EmotionResult) => void;
 }
 
-const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ userId, onResult }) => {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isListening, setIsListening] = useState(false);
+const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult }) => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [progress, setProgress] = useState(0);
   
-  const startAnalysis = () => {
-    setIsAnalyzing(true);
-    setIsListening(true);
+  const maxRecordingTime = 15;
+  
+  const startRecording = () => {
+    setIsRecording(true);
+    setProgress(0);
+    setRecordingTime(0);
     
-    // Simuler une analyse après 2 secondes
+    // Simulate recording progress
+    const interval = setInterval(() => {
+      setRecordingTime(prev => {
+        if (prev >= maxRecordingTime) {
+          clearInterval(interval);
+          stopRecording();
+          return maxRecordingTime;
+        }
+        setProgress((prev + 1) / maxRecordingTime * 100);
+        return prev + 1;
+      });
+    }, 1000);
+  };
+  
+  const stopRecording = () => {
+    setIsRecording(false);
+    setIsProcessing(true);
+    
+    // Simulate processing delay
     setTimeout(() => {
-      const analyzeResult = analyzeVoice();
-      setIsAnalyzing(false);
-      setIsListening(false);
+      setIsProcessing(false);
       
-      if (onResult) {
-        onResult(analyzeResult);
-      }
+      // Create mock recommendations that are proper EmotionRecommendation objects
+      const recommendations: EmotionRecommendation[] = [
+        { 
+          type: "music", 
+          title: "Calm playlist", 
+          description: "Soothing music to relax",
+          content: "Check out our curated relaxation playlist" 
+        },
+        { 
+          type: "exercise", 
+          title: "Quick stretch", 
+          description: "Light exercise to release tension",
+          content: "Try these simple desk stretches" 
+        },
+        { 
+          type: "meditation", 
+          title: "5-minute meditation", 
+          description: "Brief mindfulness break",
+          content: "Focus on your breath for 5 minutes" 
+        }
+      ];
+      
+      onResult({
+        emotion: 'calm',
+        confidence: 0.85,
+        intensity: 0.7,
+        id: `voice-analysis-${Date.now()}`,
+        recommendations: recommendations,
+        timestamp: new Date().toISOString(),
+        emojis: ['😌', '🧘']
+      });
     }, 2000);
   };
   
-  const analyzeVoice = (): EmotionResult => {
-    // Simuler un résultat d'analyse
-    return {
-      id: uuidv4(),
-      userId: userId,
-      emotion: "calm",
-      score: 0.75,
-      confidence: 0.82,
-      intensity: 0.65,
-      timestamp: new Date().toISOString(),
-      recommendations: ["Musique relaxante", "Exercices de respiration", "Pause méditative"],
-      ai_feedback: "Votre voix indique un état de calme qui pourrait être renforcé par des exercices de pleine conscience.",
-      emojis: ["😌", "🧘‍♀️"]
-    };
-  };
-
   return (
     <div className="flex flex-col items-center justify-center p-6 bg-muted rounded-lg">
-      <button
-        onClick={startAnalysis}
-        disabled={isAnalyzing}
+      <Button
+        onClick={startRecording}
+        disabled={isRecording}
         className="p-4 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 disabled:opacity-50"
       >
-        {isAnalyzing ? (
-          <Loader className="h-8 w-8 animate-spin" />
+        {isRecording ? (
+          <StopCircle className="h-8 w-8 animate-spin" />
         ) : (
           <Mic className="h-8 w-8" />
         )}
-      </button>
+      </Button>
       <p className="mt-4 text-center text-sm">
-        {isListening
-          ? "Écoute en cours... Veuillez parler naturellement."
-          : isAnalyzing
-          ? "Analyse de votre voix..."
-          : "Cliquez pour analyser votre voix"}
+        {isRecording
+          ? "Enregistrement en cours... Veuillez parler naturellement."
+          : isProcessing
+          ? "Traitement de votre voix..."
+          : "Cliquez pour enregistrer votre voix"}
       </p>
+      {isRecording && (
+        <Progress value={progress} max={100} className="mt-4" />
+      )}
     </div>
   );
 };

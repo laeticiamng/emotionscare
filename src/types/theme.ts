@@ -3,9 +3,15 @@ export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 
 export type Theme = ThemeName;
 
-export type FontFamily = 'sans' | 'serif' | 'mono' | 'rounded';
+export type FontFamily = 'sans' | 'serif' | 'mono' | 'rounded' | 'system' | 'monospace' | 'sans-serif';
 
-export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large' | 'xlarge';
+
+export interface ThemeOption {
+  value: string;
+  label: string;
+  preview: string;
+}
 
 export interface ThemeContextType {
   theme: Theme;
@@ -21,4 +27,12 @@ export interface ThemeContextType {
   };
   updatePreferences?: (prefs: any) => void;
   reduceMotion?: boolean;
+  toggleTheme?: () => void;
+  isDarkMode?: boolean;
+  isDark?: boolean;
+  soundEnabled?: boolean;
+  setSoundEnabled?: (enabled: boolean) => void;
+  setReduceMotion?: (reduced: boolean) => void;
+  systemTheme?: 'dark' | 'light';
+  getContrastText?: (color: string) => 'black' | 'white';
 }

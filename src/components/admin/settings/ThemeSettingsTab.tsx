@@ -3,7 +3,7 @@ import React from 'react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Theme, FontFamily, FontSize, ThemeOption } from '@/types/theme';
+import { Theme, FontFamily, FontSize } from '@/types/theme';
 
 interface ThemeSettingsTabProps {
   currentTheme: string;
@@ -12,6 +12,12 @@ interface ThemeSettingsTabProps {
   onFontFamilyChange?: (fontFamily: FontFamily) => void;
   fontSize?: FontSize;
   onFontSizeChange?: (fontSize: FontSize) => void;
+}
+
+interface ThemeOption {
+  value: string;
+  label: string;
+  preview: string;
 }
 
 const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
@@ -35,10 +41,10 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   
   // Font family options
   const fontFamilies: {value: FontFamily, label: string}[] = [
-    { value: "system", label: "System Default" },
     { value: "sans", label: "Sans" },
     { value: "serif", label: "Serif" },
     { value: "mono", label: "Monospace" },
+    { value: "system", label: "System Default" },
     { value: "rounded", label: "Rounded" }
   ];
   

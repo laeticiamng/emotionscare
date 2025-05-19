@@ -146,11 +146,11 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="font-medium">Confiance:</div>
-                  <div>{Math.round(result.confidence * 100)}%</div>
+                  <div>{Math.round((result.confidence || 0) * 100)}%</div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="font-medium">Date:</div>
-                  <div>{new Date(result.date).toLocaleString()}</div>
+                  <div>{result.date ? new Date(result.date).toLocaleString() : new Date().toLocaleString()}</div>
                 </div>
                 {result.text && (
                   <div className="grid grid-cols-2 gap-2 text-sm">
@@ -164,7 +164,7 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({
           
           {showMusic && (
             <TabsContent value="music">
-              <MusicRecommendation emotion={result.emotion} intensity={result.score / 100} />
+              <MusicRecommendation emotion={result.emotion || ''} intensity={(result.score || 50) / 100} />
             </TabsContent>
           )}
         </Tabs>

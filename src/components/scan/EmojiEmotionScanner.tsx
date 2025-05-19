@@ -1,113 +1,100 @@
-
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { EmotionResult } from '@/types/emotion';
-import { motion } from 'framer-motion';
+import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 
 interface EmojiEmotionScannerProps {
   onResult?: (result: EmotionResult) => void;
+  onSelect?: (emotion: string) => void;
   isProcessing?: boolean;
   setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
   onResult,
-  isProcessing = false,
-  setIsProcessing,
+  onSelect,
+  isProcessing: externalIsProcessing,
+  setIsProcessing: externalSetIsProcessing
 }) => {
-  const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
+  const [localIsProcessing, setLocalIsProcessing] = useState(false);
   
-  const emojis = [
-    { emoji: '😊', emotion: 'happy', label: 'Heureux' },
-    { emoji: '😌', emotion: 'calm', label: 'Calme' },
-    { emoji: '😢', emotion: 'sad', label: 'Triste' },
-    { emoji: '😡', emotion: 'anger', label: 'En colère' },
-    { emoji: '😰', emotion: 'anxious', label: 'Anxieux' },
-    { emoji: '😴', emotion: 'tired', label: 'Fatigué' },
-    { emoji: '🤔', emotion: 'confused', label: 'Pensif' },
-    { emoji: '😮', emotion: 'surprised', label: 'Surpris' },
+  // Use external state if provided, otherwise use local state
+  const isProcessing = externalIsProcessing !== undefined ? externalIsProcessing : localIsProcessing;
+  const setIsProcessing = externalSetIsProcessing || setLocalIsProcessing;
+  
+  const emotions = [
+    { emoji: "😊", name: "happy", label: "Heureux" },
+    { emoji: "😔", name: "sad", label: "Triste" },
+    { emoji: "😠", name: "angry", label: "En colère" },
+    { emoji: "😌", name: "calm", label: "Calme" },
+    { emoji: "😰", name: "anxious", label: "Anxieux" },
+    { emoji: "😴", name: "tired", label: "Fatigué" },
+    { emoji: "😲", name: "surprised", label: "Surpris" },
+    { emoji: "🤔", name: "confused", label: "Perplexe" }
   ];
   
-  const handleEmojiSelect = (emoji: string, emotion: string) => {
+  const handleSelectEmotion = async (emotion: string) => {
     if (isProcessing) return;
     
-    setSelectedEmoji(emoji);
-    
-    if (setIsProcessing) {
-      setIsProcessing(true);
+    if (onSelect) {
+      onSelect(emotion);
     }
     
-    // Simulate processing delay
-    setTimeout(() => {
+    if (onResult) {
+      setIsProcessing(true);
+      
+      // Simulate processing delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Create recommendations
+      const recommendations: EmotionRecommendation[] = [
+        {
+          type: "activity",
+          title: "Activité recommandée",
+          description: "Une activité adaptée à votre état émotionnel",
+          category: "general",
+          content: "Try a new activity"
+        },
+        {
+          type: "music",
+          title: "Playlist recommandée",
+          description: "Musique pour accompagner votre humeur",
+          category: "music",
+          content: "Listen to a curated playlist"
+        }
+      ];
+      
       const result: EmotionResult = {
+        id: `emoji-${Date.now()}`,
         emotion: emotion,
-        confidence: 0.9, // High confidence as user directly selected the emotion
+        primaryEmotion: emotion,
+        confidence: 1.0, // User selected, so 100% confidence
+        intensity: 0.8,
         timestamp: new Date().toISOString(),
-        source: 'emoji',
-        recommendations: [
-          {
-            title: 'Activité recommandée',
-            description: `Une activité adaptée à votre humeur ${emotion}`,
-            category: 'activité'
-          },
-          {
-            title: 'Musique',
-            description: `Une playlist pour accompagner votre humeur ${emotion}`,
-            category: 'musique'
-          }
-        ]
+        recommendations: recommendations,
+        emojis: [emotions.find(e => e.name === emotion)?.emoji || "😊"]
       };
       
-      if (onResult) {
-        onResult(result);
-      }
-      
-      if (setIsProcessing) {
-        setIsProcessing(false);
-      }
-    }, 1000);
+      onResult(result);
+      setIsProcessing(false);
+    }
   };
   
   return (
-    <div className="space-y-4">
-      <div className="text-sm text-center text-muted-foreground mb-2">
-        Sélectionnez l'emoji qui représente le mieux votre humeur actuelle
-      </div>
-      
-      <div className="grid grid-cols-4 gap-2">
-        {emojis.map((item) => (
-          <motion.div
-            key={item.emotion}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+    <Card>
+      <CardContent className="grid grid-cols-4 gap-4">
+        {emotions.map((emotion) => (
+          <button
+            key={emotion.name}
+            className="p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+            onClick={() => handleSelectEmotion(emotion.name)}
+            disabled={isProcessing}
           >
-            <Card 
-              className={`cursor-pointer transition-all ${
-                selectedEmoji === item.emoji 
-                  ? 'border-primary bg-primary/5' 
-                  : 'hover:border-primary/50'
-              } ${isProcessing && selectedEmoji !== item.emoji ? 'opacity-50' : ''}`}
-              onClick={() => handleEmojiSelect(item.emoji, item.emotion)}
-            >
-              <CardContent className="p-3 flex flex-col items-center justify-center text-center">
-                <div className="text-3xl mb-1">{item.emoji}</div>
-                <div className="text-xs font-medium">{item.label}</div>
-              </CardContent>
-            </Card>
-          </motion.div>
+            <span className="text-3xl">{emotion.emoji}</span>
+            <p className="text-sm text-muted-foreground mt-1">{emotion.label}</p>
+          </button>
         ))}
-      </div>
-      
-      {isProcessing && (
-        <div className="flex justify-center mt-4">
-          <div className="flex items-center gap-2">
-            <div className="h-4 w-4 border-2 border-t-transparent border-primary rounded-full animate-spin"></div>
-            <span className="text-sm">Analyse en cours...</span>
-          </div>
-        </div>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

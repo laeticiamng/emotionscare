@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { ThemeContextType } from "@/types/theme";
+import { ThemeContextType, Theme, FontSize, FontFamily } from "@/types/theme";
 
 const ThemeContext = React.createContext<ThemeContextType>({
   theme: "system",
@@ -10,9 +10,9 @@ const ThemeContext = React.createContext<ThemeContextType>({
   toggleTheme: () => {},
   isDark: false,
   isDarkMode: false,
-  fontSize: "medium",
+  fontSize: "md",
   setFontSize: () => {},
-  fontFamily: "system",
+  fontFamily: "sans",
   setFontFamily: () => {},
 });
 
@@ -39,18 +39,18 @@ export function ThemeProvider({
     return defaultTheme;
   });
 
-  const [fontSize, setFontSize] = React.useState<string>(() => {
+  const [fontSize, setFontSize] = React.useState<FontSize>(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("fontSize") || "medium";
+      return (localStorage.getItem("fontSize") as FontSize) || "md";
     }
-    return "medium";
+    return "md";
   });
 
-  const [fontFamily, setFontFamily] = React.useState<string>(() => {
+  const [fontFamily, setFontFamily] = React.useState<FontFamily>(() => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("fontFamily") || "system";
+      return (localStorage.getItem("fontFamily") as FontFamily) || "sans";
     }
-    return "system";
+    return "sans";
   });
 
   const isDarkMode = React.useMemo(() => {
@@ -106,11 +106,15 @@ export function ThemeProvider({
         setTheme,
         toggleTheme,
         isDarkMode,
-        fontSize: fontSize as any,
-        setFontSize: setFontSize as any,
-        fontFamily: fontFamily as any,
-        setFontFamily: setFontFamily as any,
-        isDark
+        fontSize,
+        setFontSize,
+        fontFamily,
+        setFontFamily,
+        isDark,
+        soundEnabled: true,
+        reduceMotion: false,
+        setSoundEnabled: () => {},
+        setReduceMotion: () => {},
       }}
       {...props}
     >
