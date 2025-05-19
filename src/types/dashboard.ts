@@ -1,4 +1,3 @@
-
 export interface KpiCardProps {
   id: string;
   title: string;
@@ -7,7 +6,7 @@ export interface KpiCardProps {
   delta?: {
     value: number;
     trend: 'up' | 'down' | 'neutral';
-    direction?: 'up' | 'down' | 'stable';
+    direction: 'up' | 'down' | 'stable'; // Ensuring direction exists
     label?: string;
   };
   status?: KpiCardStatus;
@@ -86,8 +85,8 @@ export interface AdminAccessLog {
   resource?: string;
   ip?: string;
   adminName?: string;
-  userId?: string;
-  details?: string;
+  userId?: string;  // Added missing property
+  details?: string; // Added missing property
 }
 
 export interface DraggableKpiCardsGridProps {

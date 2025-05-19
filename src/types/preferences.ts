@@ -29,6 +29,9 @@ export interface UserPreferences {
   animationReduced?: boolean;
   autoplayMedia?: boolean;
   dataUsage?: 'low' | 'medium' | 'high';
+  ambientSound?: boolean; // Added for useAmbientSound.ts
+  emotionalCamouflage?: boolean; // Added for PremiumFeatures.tsx
+  aiSuggestions?: boolean; // Added for PremiumFeatures.tsx
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -66,7 +69,10 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   highContrast: false,
   colorBlindMode: false,
   autoplayMedia: true,
-  dataUsage: 'medium'
+  dataUsage: 'medium',
+  ambientSound: true,
+  emotionalCamouflage: false,
+  aiSuggestions: true
 };
 
 export interface UserPreferencesContextType {
@@ -80,4 +86,23 @@ export interface UserPreferencesContextType {
   resetPreferences: () => void;
   isLoading: boolean;
   error: Error | null;
+}
+
+// Function to normalize preferences with default values
+export const normalizePreferences = (prefs: Partial<UserPreferences> | null): UserPreferences => {
+  if (!prefs) {
+    return DEFAULT_PREFERENCES;
+  }
+  
+  return {
+    ...DEFAULT_PREFERENCES,
+    ...prefs
+  };
+};
+
+// Added for PreferencesForm.tsx
+export interface UserPreferencesFormProps {
+  preferences: UserPreferences;
+  onSave: (preferences: UserPreferences) => void;
+  isLoading?: boolean;
 }

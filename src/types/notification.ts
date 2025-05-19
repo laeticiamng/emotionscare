@@ -56,3 +56,28 @@ export interface NotificationPreference {
 }
 
 export type NotificationsPreferences = NotificationPreference;
+
+// Add missing category field to EmotionRecommendation
+export interface EmotionRecommendation {
+  type: string;
+  title: string;
+  description: string;
+  content: string;
+  category: string;
+}
+
+// Add missing fields to EmotionResult
+export interface EmotionResult {
+  id: string;
+  emotion: string;
+  confidence: number;
+  timestamp: string;
+  recommendations?: EmotionRecommendation[];
+  emotions: any[]; // Added required property
+  primaryEmotion?: string;
+  intensity?: number;
+  text?: string;
+  emojis?: string[];
+  audioUrl?: string;
+  transcript?: string;
+}
