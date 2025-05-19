@@ -90,12 +90,12 @@ export type {
   Emotion,
   EmotionResult,
   LiveVoiceScannerProps,
-  TeamOverviewProps,
   EmotionalTeamViewProps,
   EmotionRecommendation,
   TextEmotionScannerProps,
   EmojiEmotionScannerProps,
-  VoiceEmotionScannerProps
+  VoiceEmotionScannerProps,
+  VoiceEmotionAnalyzerProps
 } from './types/emotion';
 
 export type {

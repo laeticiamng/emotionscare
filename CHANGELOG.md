@@ -31,6 +31,24 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ### Modifié
 - Mise à jour de `README.md` pour référencer ces nouveaux documents
 
+## [1.1.9] - 2025-05-27
+
+### Ajouté
+- Bouton de sauvegarde animé dans `DataPrivacySettings` permettant d'enregistrer les préférences.
+- Documentation `docs/ui-polish-restoration.md` décrivant la restauration de l'interface.
+
+### Modifié
+- `README.md` référence ce nouveau document.
+
+## [1.1.8] - 2025-05-26
+
+### Modifié
+- Alignement des types liés aux scans audio et vocaux (`EmotionSource`, `AudioProcessorProps`, etc.).
+- Suppression des interfaces locales remplacées par les définitions centralisées.
+
+### Ajouté
+- Documentation `docs/scan-audio-type-fixes.md` décrivant les corrections.
+
 ## [1.1.4] - 2025-05-22
 
 ### Corrigé

@@ -3,6 +3,7 @@ import React from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Control, Controller } from 'react-hook-form';
 import { UserPreferences } from '@/types/preferences';
 import { motion } from 'framer-motion';
@@ -18,6 +19,7 @@ export interface DataPrivacyProps {
   isAnonymizedDataEnabled?: boolean;
   control?: Control<UserPreferences, any>;
   isLoading?: boolean;
+  onSave?: () => void;
 }
 
 const DataPrivacySettings: React.FC<DataPrivacyProps> = ({
@@ -28,6 +30,7 @@ const DataPrivacySettings: React.FC<DataPrivacyProps> = ({
   isAnonymizedDataEnabled = true,
   control,
   isLoading = false,
+  onSave,
 }) => {
   const { toast } = useToast();
 
@@ -48,6 +51,17 @@ const DataPrivacySettings: React.FC<DataPrivacyProps> = ({
         variant: "success",
       });
     }
+  };
+
+  const handleSave = () => {
+    if (onSave) {
+      onSave();
+    }
+    toast({
+      title: "Préférences enregistrées",
+      description: "Vos paramètres de confidentialité ont été enregistrés.",
+      variant: "success",
+    });
   };
 
   // If control is provided, use react-hook-form Controller
@@ -173,6 +187,16 @@ const DataPrivacySettings: React.FC<DataPrivacyProps> = ({
               Toutes vos préférences sont protégées et peuvent être modifiées à tout moment
             </div>
           </CardFooter>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="pt-4"
+          >
+            <Button onClick={handleSave} className="w-full">
+              Enregistrer les préférences
+            </Button>
+          </motion.div>
         </Card>
       </motion.div>
     );
@@ -274,6 +298,16 @@ const DataPrivacySettings: React.FC<DataPrivacyProps> = ({
             Toutes vos préférences sont protégées et peuvent être modifiées à tout moment
           </div>
         </CardFooter>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+          className="pt-4"
+        >
+          <Button onClick={handleSave} className="w-full">
+            Enregistrer les préférences
+          </Button>
+        </motion.div>
       </Card>
     </motion.div>
   );
