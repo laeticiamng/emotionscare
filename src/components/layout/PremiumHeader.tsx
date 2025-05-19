@@ -1,321 +1,158 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Search, Bell, User, Menu, X, Command, Settings, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { 
-  Menu, 
-  X, 
-  Home, 
-  BarChart2, 
-  Music, 
-  MessageSquare, 
-  Settings, 
-  User, 
-  Bell, 
-  Search,
-  ChevronDown,
-  SunMoon,
-  LogOut
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger, 
-  DropdownMenuSeparator
-} from '@/components/ui/dropdown-menu';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { useTheme } from '@/contexts/ThemeContext';
 import { cn } from '@/lib/utils';
+import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
 import MusicMiniPlayer from '@/components/music/MusicMiniPlayer';
-import { useMusic } from '@/hooks/useMusic';
 
-interface NavItem {
-  label: string;
-  href: string;
-  icon: React.ReactNode;
-  badge?: string | number;
+interface PremiumHeaderProps {
+  className?: string;
+  onOpenMenu?: () => void;
+  onCloseMenu?: () => void;
+  isMenuOpen?: boolean;
 }
 
-const mainNavItems: NavItem[] = [
-  { label: 'Accueil', href: '/', icon: <Home className="h-5 w-5" /> },
-  { label: 'Dashboard', href: '/dashboard', icon: <BarChart2 className="h-5 w-5" /> },
-  { label: 'Musique', href: '/music', icon: <Music className="h-5 w-5" /> },
-  { label: 'Coach', href: '/coach', icon: <MessageSquare className="h-5 w-5" />, badge: 'New' },
-  { label: 'Paramètres', href: '/settings', icon: <Settings className="h-5 w-5" /> },
-];
-
-export const PremiumHeader = () => {
-  const location = useLocation();
-  const isMobile = useIsMobile();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { currentTrack } = useMusic();
+const PremiumHeader: React.FC<PremiumHeaderProps> = ({
+  className,
+  onOpenMenu,
+  onCloseMenu,
+  isMenuOpen = false
+}) => {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const { theme, isDarkMode } = useTheme();
+  const { scrollY } = useScroll();
   
-  // Check if current route matches nav item
-  const isActive = (path: string) => {
-    if (path === '/') {
-      return location.pathname === path;
-    }
-    return location.pathname.startsWith(path);
-  };
+  const headerBgOpacity = useTransform(scrollY, [0, 50], [0.5, 0.95]);
+  const headerBlur = useTransform(scrollY, [0, 50], [0, 12]);
+  const headerShadowOpacity = useTransform(scrollY, [0, 50], [0, 0.1]);
   
-  // Listen for scroll events to modify header appearance
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      setScrolled(window.scrollY > 20);
     };
     
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   
+  const toggleMenu = () => {
+    if (isMenuOpen && onCloseMenu) {
+      onCloseMenu();
+    } else if (!isMenuOpen && onOpenMenu) {
+      onOpenMenu();
+    }
+  };
+  
   return (
-    <header
+    <motion.header
       className={cn(
-        "sticky top-0 z-40 w-full transition-all duration-200",
-        isScrolled 
-          ? "bg-background/80 backdrop-blur-lg border-b shadow-sm" 
-          : "bg-transparent"
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 py-2",
+        scrolled ? "py-2" : "py-4",
+        isDarkMode ? "text-white" : "text-gray-800",
+        className
       )}
+      style={{
+        backgroundColor: isDarkMode 
+          ? `rgba(15, 23, 42, ${headerBgOpacity})` 
+          : `rgba(255, 255, 255, ${headerBgOpacity})`,
+        backdropFilter: `blur(${headerBlur}px)`,
+        boxShadow: `0 4px 6px rgba(0, 0, 0, ${headerShadowOpacity})`
+      }}
     >
-      <div className="container flex h-16 items-center justify-between px-4">
-        {/* Logo & Mobile Menu Button */}
-        <div className="flex items-center gap-4">
-          {isMobile && (
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="h-6 w-6" />
-                  <span className="sr-only">Toggle menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="flex flex-col">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="font-bold text-xl">EmotionsCare</div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <X className="h-5 w-5" />
-                  </Button>
-                </div>
-                
-                <nav className="flex flex-col space-y-1">
-                  {mainNavItems.map((item) => (
-                    <Button
-                      key={item.href}
-                      variant={isActive(item.href) ? "secondary" : "ghost"}
-                      asChild
-                      className="justify-start px-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      <Link to={item.href}>
-                        {item.icon}
-                        <span className="ml-2">{item.label}</span>
-                        {item.badge && (
-                          <Badge 
-                            variant="outline" 
-                            className="ml-auto bg-primary text-primary-foreground"
-                          >
-                            {item.badge}
-                          </Badge>
-                        )}
-                      </Link>
-                    </Button>
-                  ))}
-                </nav>
-                
-                <div className="mt-auto pt-4">
-                  <Button 
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() => {
-                      alert("Déconnexion simulée");
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Déconnexion
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
-          )}
+      <div className="container max-w-7xl mx-auto flex items-center justify-between">
+        {/* Logo and Mobile Menu Toggle */}
+        <div className="flex items-center">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="mr-2 lg:hidden"
+            onClick={toggleMenu}
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </Button>
           
-          <Link to="/" className="flex items-center space-x-2 font-bold text-xl">
-            <span className="hidden sm:inline">EmotionsCare</span>
-            <span className="sm:hidden">EC</span>
-          </Link>
+          <motion.div 
+            className="text-xl font-bold"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            EmotionsCare
+          </motion.div>
         </div>
         
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1">
-          {mainNavItems.map((item) => (
-            <Button
-              key={item.href}
-              variant={isActive(item.href) ? "secondary" : "ghost"}
-              size="sm"
-              asChild
-              className="gap-1.5"
+        {/* Central Navigation - Desktop Only */}
+        <nav className="hidden lg:flex items-center space-x-1">
+          {["Accueil", "Dashboard", "Coach", "Musique", "Scanner", "Social"].map((item, index) => (
+            <motion.div
+              key={item}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + index * 0.05 }}
             >
-              <Link to={item.href}>
-                {item.icon}
-                <span>{item.label}</span>
-                {item.badge && (
-                  <Badge 
-                    variant="outline" 
-                    className="ml-1 bg-primary text-primary-foreground"
-                  >
-                    {item.badge}
-                  </Badge>
-                )}
-              </Link>
-            </Button>
+              <Button variant="ghost" className="px-3">
+                {item}
+              </Button>
+            </motion.div>
           ))}
         </nav>
         
-        {/* Right Side Actions */}
-        <div className="flex items-center gap-2">
-          {/* Global Search */}
-          <AnimatePresence>
-            {isSearchOpen ? (
-              <motion.div
-                initial={{ width: 40, opacity: 0 }}
-                animate={{ width: "100%", opacity: 1 }}
-                exit={{ width: 40, opacity: 0 }}
-                className="relative flex items-center"
-              >
-                <Input 
-                  placeholder="Rechercher..." 
-                  className="w-full pr-8"
-                  autoFocus
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0"
-                  onClick={() => setIsSearchOpen(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </motion.div>
-            ) : (
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => setIsSearchOpen(true)}
-              >
-                <Search className="h-5 w-5" />
-                <span className="sr-only">Rechercher</span>
+        {/* Right Controls */}
+        <div className="flex items-center space-x-1">
+          {/* Search */}
+          <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Search size={20} />
               </Button>
-            )}
-          </AnimatePresence>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <div className="flex items-center border rounded-md px-3 py-2">
+                <Search size={16} className="text-muted-foreground mr-2" />
+                <Input 
+                  type="text" 
+                  placeholder="Rechercher..." 
+                  className="border-0 p-0 shadow-none focus-visible:ring-0" 
+                />
+                <div className="text-xs text-muted-foreground ml-auto">
+                  <kbd className="rounded border px-1">⌘</kbd>
+                  <kbd className="rounded border px-1 ml-1">K</kbd>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
           
-          {/* Theme Toggle */}
+          {/* Quick Command Menu */}
           <Button variant="ghost" size="icon">
-            <SunMoon className="h-5 w-5" />
-            <span className="sr-only">Theme</span>
+            <Command size={20} />
           </Button>
           
           {/* Notifications */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
-                <span className="sr-only">Notifications</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
-              <div className="flex items-center justify-between p-2">
-                <span className="font-semibold">Notifications</span>
-                <Button variant="ghost" size="sm">
-                  Tout marquer comme lu
-                </Button>
-              </div>
-              <DropdownMenuSeparator />
-              <div className="max-h-96 overflow-auto py-1">
-                {[1, 2, 3].map((i) => (
-                  <DropdownMenuItem key={i} className="p-3 cursor-pointer">
-                    <div>
-                      <p className="font-medium">Nouvelle fonctionnalité disponible</p>
-                      <p className="text-sm text-muted-foreground">
-                        Découvrez les dernières améliorations de l'application.
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">Il y a 2h</p>
-                    </div>
-                  </DropdownMenuItem>
-                ))}
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild className="p-2 cursor-pointer">
-                <Link to="/notifications" className="w-full text-center font-medium">
-                  Voir toutes les notifications
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button variant="ghost" size="icon">
+            <Bell size={20} />
+          </Button>
           
-          {/* User Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="flex items-center gap-2 pr-2 pl-0"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src="/avatar-placeholder.jpg" alt="Avatar" />
-                  <AvatarFallback>EC</AvatarFallback>
-                </Avatar>
-                <span className="hidden lg:inline font-medium">Jean Dupont</span>
-                <ChevronDown className="h-4 w-4 opacity-50" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link to="/profile">
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Mon profil</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/settings">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Paramètres</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => alert("Déconnexion simulée")}>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Déconnexion</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {/* Theme Switcher */}
+          <ThemeSwitcher size="icon" />
+          
+          {/* Mini Music Player */}
+          <div className="hidden sm:block">
+            <MusicMiniPlayer className="ml-2" />
+          </div>
+          
+          {/* User Profile */}
+          <Button variant="ghost" size="icon" className="ml-2">
+            <User size={20} />
+          </Button>
         </div>
       </div>
-      
-      {/* Mini Music Player (appears when music is playing) */}
-      <AnimatePresence>
-        {currentTrack && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="absolute bottom-0 left-1/2 -translate-x-1/2 transform mb-2"
-          >
-            <MusicMiniPlayer />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
+    </motion.header>
   );
 };
 

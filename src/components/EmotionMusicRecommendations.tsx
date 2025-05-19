@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Heart, PlayCircle } from 'lucide-react';
 import { useMusic } from '@/contexts/music';
-import { EmotionMusicParams, MusicContextType, MusicPlaylist } from '@/types/music';
+import { EmotionMusicParams, MusicPlaylist } from '@/types/music';
 import { ensurePlaylist } from '@/utils/musicCompatibility';
 
 // Emotion preset cards for quick selection
@@ -18,13 +18,16 @@ const emotionPresets = [
 ];
 
 const EmotionMusicRecommendations: React.FC = () => {
-  const music = useMusic() as MusicContextType;
+  const music = useMusic();
   const [selectedEmotion, setSelectedEmotion] = useState('calm');
   const [intensity, setIntensity] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGetRecommendation = async () => {
-    if (!music.loadPlaylistForEmotion) return;
+    if (!music.loadPlaylistForEmotion) {
+      console.error('loadPlaylistForEmotion is not available');
+      return;
+    }
     
     setIsLoading(true);
     try {
@@ -33,15 +36,15 @@ const EmotionMusicRecommendations: React.FC = () => {
         intensity: intensity,
       };
       
-      // Utiliser loadPlaylistForEmotion au lieu de getRecommendationByEmotion car c'est plus stable
+      // Utiliser loadPlaylistForEmotion car c'est plus stable
       const playlist = await music.loadPlaylistForEmotion(params);
       
       if (playlist) {
         const formattedPlaylist = ensurePlaylist(playlist);
         
-        if (formattedPlaylist.tracks.length > 0) {
-          music.setPlaylist && music.setPlaylist(formattedPlaylist);
-          music.setCurrentTrack && music.setCurrentTrack(formattedPlaylist.tracks[0]);
+        if (formattedPlaylist.tracks.length > 0 && music.setCurrentTrack && music.setPlaylist) {
+          music.setPlaylist(formattedPlaylist);
+          music.setCurrentTrack(formattedPlaylist.tracks[0]);
         }
       }
     } catch (error) {

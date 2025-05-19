@@ -34,6 +34,7 @@ export interface MusicPlaylist {
   mood?: string | string[];
   category?: string | string[];
   tags?: string[];
+  name?: string; // Pour compatibilité
 }
 
 export interface MusicQueueItem extends MusicTrack {
@@ -66,6 +67,7 @@ export interface MusicContextType extends MusicState {
   previousTrack?: () => void; // Alias pour previous
   togglePlay?: () => void; // Basculer entre pause/play
   playTrack?: (track: MusicTrack) => void; // Alias pour play
+  prevTrack?: () => void; // Alias pour previous
 
   // Contrôles
   setVolume: (volume: number) => void;
@@ -76,7 +78,7 @@ export interface MusicContextType extends MusicState {
 
   // Gestion des playlists
   playPlaylist: (playlist: MusicPlaylist, startTrackId?: string) => void;
-  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
+  loadPlaylistForEmotion?: (params: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
   generateMusic?: (params: any) => Promise<MusicTrack | null>;
   setPlaylist?: (playlist: MusicPlaylist | null) => void;
   setCurrentTrack?: (track: MusicTrack | null) => void;
@@ -91,10 +93,19 @@ export interface MusicContextType extends MusicState {
   duration?: number;
   error?: Error | null;
   loading?: boolean;
+  isInitialized?: boolean;
+  playlist?: MusicPlaylist | null;
   
   // UI controls
   toggleDrawer?: () => void;
   setOpenDrawer?: (open: boolean) => void;
+  
+  // Emotion-specific
+  setEmotion?: (emotion: string) => void;
+  getRecommendationByEmotion?: (params: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
+  
+  // Aliases for compatibility
+  setTrack?: (track: MusicTrack | null) => void;
 }
 
 export interface EmotionMusicParams {
@@ -105,3 +116,27 @@ export interface EmotionMusicParams {
   tempo?: 'slow' | 'medium' | 'fast';
   duration?: number;
 }
+
+export interface ProgressBarProps {
+  currentTime: number;
+  duration: number;
+  onSeek: (time: number) => void;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  onVolumeChange: (volume: number) => void;
+  muted?: boolean;
+  onMuteToggle?: () => void;
+}
+
+export enum MusicCategory {
+  ALL = 'all',
+  FOCUS = 'focus',
+  RELAX = 'relax',
+  ENERGY = 'energy',
+  SLEEP = 'sleep',
+  MEDITATION = 'meditation'
+}
+
+export type MusicPlayerMode = 'mini' | 'full' | 'drawer';

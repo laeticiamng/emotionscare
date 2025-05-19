@@ -24,10 +24,18 @@ const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
   const togglePlay = () => {
     if (musicContext.togglePlay) {
       musicContext.togglePlay();
-    } else if (isPlaying && musicContext.pause) {
-      musicContext.pause();
-    } else if (!isPlaying && musicContext.resume) {
-      musicContext.resume();
+    } else if (isPlaying) {
+      if (musicContext.pauseTrack) {
+        musicContext.pauseTrack();
+      } else if (musicContext.pause) {
+        musicContext.pause();
+      }
+    } else if (!isPlaying) {
+      if (musicContext.resumeTrack) {
+        musicContext.resumeTrack();
+      } else if (musicContext.resume) {
+        musicContext.resume();
+      }
     }
   };
   
@@ -42,6 +50,8 @@ const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
   const previousTrack = () => {
     if (musicContext.previousTrack) {
       musicContext.previousTrack();
+    } else if (musicContext.prevTrack) {
+      musicContext.prevTrack();
     } else if (musicContext.previous) {
       musicContext.previous();
     }

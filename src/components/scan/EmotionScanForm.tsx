@@ -1,146 +1,152 @@
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EmotionResult } from '@/types/emotion';
-
-// Import necessary components and placeholders
-const TextEmotionScanner = ({ onResult, onProcessingChange }: { 
-  onResult: (result: EmotionResult) => void;
-  onProcessingChange: (isProcessing: boolean) => void; 
-}) => (
-  <div>
-    <p className="text-center mb-4">Saisissez un texte pour analyser votre émotion</p>
-    <Button onClick={() => {
-      onProcessingChange(true);
-      setTimeout(() => {
-        onResult({ 
-          emotion: 'Joie', 
-          confidence: 0.85,
-          analysis: 'Texte positif et optimiste',
-          suggestions: ['Cultivez cette énergie positive', 'Partagez votre joie']
-        });
-        onProcessingChange(false);
-      }, 1500);
-    }} className="w-full">
-      Analyser le texte de démonstration
-    </Button>
-  </div>
-);
-
-// Similarly for other scanner components with proper props
-const FacialEmotionScanner = ({ onResult, onProcessingChange }: { 
-  onResult: (result: EmotionResult) => void;
-  onProcessingChange: (isProcessing: boolean) => void; 
-}) => (
-  <div className="text-center">
-    <p className="mb-4">Utilisez votre caméra pour analyser votre expression faciale</p>
-    <Button onClick={() => {
-      onProcessingChange(true);
-      setTimeout(() => {
-        onResult({ 
-          emotion: 'Neutre', 
-          confidence: 0.72,
-          analysis: 'Expression faciale neutre détectée',
-          suggestions: ['Essayez de sourire', 'Prenez une pause relaxante']
-        });
-        onProcessingChange(false);
-      }, 1500);
-    }} className="w-full">
-      Simulation analyse faciale
-    </Button>
-  </div>
-);
-
-const VoiceEmotionScanner = ({ onResult, onProcessingChange }: { 
-  onResult: (result: EmotionResult) => void;
-  onProcessingChange: (isProcessing: boolean) => void; 
-}) => (
-  <div className="text-center">
-    <p className="mb-4">Parlez pour analyser les émotions dans votre voix</p>
-    <Button onClick={() => {
-      onProcessingChange(true);
-      setTimeout(() => {
-        onResult({ 
-          emotion: 'Calme', 
-          confidence: 0.65,
-          analysis: 'Voix posée et calme détectée',
-          suggestions: ['Gardez cette sérénité', 'Pratiquez la pleine conscience']
-        });
-        onProcessingChange(false);
-      }, 1500);
-    }} className="w-full">
-      Simulation analyse vocale
-    </Button>
-  </div>
-);
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Smile, Film, Mic, Send } from 'lucide-react';
 
 interface EmotionScanFormProps {
-  onResult: (result: EmotionResult) => void;
+  onScanComplete: (result: EmotionResult) => void;
 }
 
-export const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onResult }) => {
+const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onScanComplete }) => {
+  const [text, setText] = useState('');
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('text');
-  const [isProcessing, setIsProcessing] = useState(false);
-  
-  const handleProcessingChange = (processing: boolean) => {
-    setIsProcessing(processing);
+
+  const handleTextSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    // Simulons une analyse d'émotion
+    setTimeout(() => {
+      const result: EmotionResult = {
+        emotion: 'calm',
+        confidence: 0.85,
+        secondaryEmotions: ['focused', 'relaxed'],
+        timestamp: new Date().toISOString(),
+        source: 'text',
+        text: text
+      };
+      
+      onScanComplete(result);
+      setLoading(false);
+      setText('');
+    }, 1500);
+  };
+
+  const handleVoiceAnalysis = () => {
+    setLoading(true);
+    
+    // Simulons une analyse vocale
+    setTimeout(() => {
+      const result: EmotionResult = {
+        emotion: 'happy',
+        confidence: 0.92,
+        secondaryEmotions: ['excited', 'energetic'],
+        timestamp: new Date().toISOString(),
+        source: 'voice'
+      };
+      
+      onScanComplete(result);
+      setLoading(false);
+    }, 2000);
+  };
+
+  const handleFacialAnalysis = () => {
+    setLoading(true);
+    
+    // Simulons une analyse faciale
+    setTimeout(() => {
+      const result: EmotionResult = {
+        emotion: 'focused',
+        confidence: 0.78,
+        secondaryEmotions: ['calm', 'neutral'],
+        timestamp: new Date().toISOString(),
+        source: 'facial'
+      };
+      
+      onScanComplete(result);
+      setLoading(false);
+    }, 2500);
   };
 
   return (
-    <Card className="overflow-hidden">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="p-6"
-      >
-        <Tabs 
-          defaultValue="text" 
-          value={activeTab} 
-          onValueChange={setActiveTab}
-          className="w-full"
-        >
-          <TabsList className="grid grid-cols-3 mb-8">
-            <TabsTrigger value="text">Texte</TabsTrigger>
-            <TabsTrigger value="facial">Visage</TabsTrigger>
-            <TabsTrigger value="voice">Voix</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="text" className="mt-0 space-y-4">
-            <TextEmotionScanner 
-              onResult={onResult} 
-              onProcessingChange={handleProcessingChange} 
-            />
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle className="text-xl font-medium">Comment vous sentez-vous ?</CardTitle>
+      </CardHeader>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-3 mb-4">
+          <TabsTrigger value="text" className="flex items-center gap-2">
+            <Send className="w-4 h-4" />
+            <span className="hidden sm:inline">Texte</span>
+          </TabsTrigger>
+          <TabsTrigger value="voice" className="flex items-center gap-2">
+            <Mic className="w-4 h-4" />
+            <span className="hidden sm:inline">Voix</span>
+          </TabsTrigger>
+          <TabsTrigger value="facial" className="flex items-center gap-2">
+            <Film className="w-4 h-4" />
+            <span className="hidden sm:inline">Visage</span>
+          </TabsTrigger>
+        </TabsList>
+        <CardContent>
+          <TabsContent value="text">
+            <form onSubmit={handleTextSubmit}>
+              <Textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Décrivez comment vous vous sentez en ce moment..."
+                className="resize-none min-h-[120px]"
+              />
+              <div className="mt-4 flex justify-end">
+                <Button type="submit" disabled={!text.trim() || loading}>
+                  {loading ? 'Analyse...' : 'Analyser'}
+                </Button>
+              </div>
+            </form>
           </TabsContent>
           
-          <TabsContent value="facial" className="mt-0 space-y-4">
-            <FacialEmotionScanner 
-              onResult={onResult} 
-              onProcessingChange={handleProcessingChange} 
-            />
+          <TabsContent value="voice">
+            <div className="text-center py-6">
+              <Button
+                variant="outline" 
+                size="lg"
+                className="rounded-full h-20 w-20 flex items-center justify-center"
+                onClick={handleVoiceAnalysis}
+                disabled={loading}
+              >
+                <Mic className={`h-8 w-8 ${loading ? 'animate-pulse' : ''}`} />
+              </Button>
+              <p className="mt-4">{loading ? 'Analyse vocale en cours...' : 'Cliquez pour commencer l\'analyse vocale'}</p>
+            </div>
           </TabsContent>
           
-          <TabsContent value="voice" className="mt-0 space-y-4">
-            <VoiceEmotionScanner 
-              onResult={onResult} 
-              onProcessingChange={handleProcessingChange} 
-            />
+          <TabsContent value="facial">
+            <div className="text-center py-6">
+              <Button 
+                variant="outline"
+                size="lg"
+                className="rounded-full h-20 w-20 flex items-center justify-center"
+                onClick={handleFacialAnalysis}
+                disabled={loading}
+              >
+                <Film className={`h-8 w-8 ${loading ? 'animate-pulse' : ''}`} />
+              </Button>
+              <p className="mt-4">{loading ? 'Analyse faciale en cours...' : 'Cliquez pour activer la caméra'}</p>
+            </div>
           </TabsContent>
-        </Tabs>
-        
-        {isProcessing && (
-          <div className="flex justify-center mt-6">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-              className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full"
-            />
-          </div>
-        )}
-      </motion.div>
+        </CardContent>
+      </Tabs>
+      <CardFooter className="flex justify-center">
+        <div className="text-sm text-muted-foreground">
+          <Smile className="inline-block mr-1 h-4 w-4" />
+          L'analyse émotionnelle est confidentielle
+        </div>
+      </CardFooter>
     </Card>
   );
 };

@@ -1,162 +1,139 @@
 
 import React, { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/contexts/ThemeContext';
-import { useIsMobile } from '@/hooks/use-mobile';
-import PremiumHeader from './PremiumHeader';
-import PremiumFooter from './PremiumFooter';
+import CommandMenu from '@/components/layout/CommandMenu';
+import NotificationToast from '@/components/layout/NotificationToast';
+import ScrollProgress from '@/components/ui/ScrollProgress';
 import { cn } from '@/lib/utils';
 
 interface PremiumShellProps {
-  children?: React.ReactNode;
-  hideNav?: boolean;
-  hideFooter?: boolean;
-  immersive?: boolean;
-  contentClassName?: string;
+  children: React.ReactNode;
+  header?: React.ReactNode;
+  footer?: React.ReactNode;
+  sidebar?: React.ReactNode;
   className?: string;
 }
 
-/**
- * Premium shell component with modern animations and responsive design
- */
-const PremiumShell: React.FC<PremiumShellProps> = ({ 
-  children, 
-  hideNav = false,
-  hideFooter = false,
-  immersive = false,
-  contentClassName = "",
-  className = ""
+const PremiumShell: React.FC<PremiumShellProps> = ({
+  children,
+  header,
+  footer,
+  sidebar,
+  className
 }) => {
-  const { theme, reduceMotion } = useTheme();
-  const [scrolled, setScrolled] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const isMobile = useIsMobile();
+  const [isCommandOpen, setIsCommandOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { isDarkMode, reduceMotion } = useTheme();
   
-  // Handle scroll effects
+  // Track command+K keyboard shortcut
   useEffect(() => {
-    const handleScroll = () => {
-      // Update scrolled state for header effects
-      const isScrolled = window.scrollY > 10;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Command+K or Ctrl+K to open command menu
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandOpen(true);
       }
       
-      // Calculate scroll progress for progress bar
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const progress = height ? Math.min(window.scrollY / height, 1) : 0;
-      setScrollProgress(progress);
+      // Escape to close sidebar on mobile
+      if (e.key === 'Escape' && isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
     };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [scrolled]);
-
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSidebarOpen]);
+  
   return (
     <div className={cn(
-      "flex flex-col min-h-screen bg-background transition-colors duration-300", 
-      className, 
-      theme
+      "min-h-screen flex flex-col w-full relative",
+      isDarkMode ? "bg-slate-950 text-white" : "bg-white text-slate-900",
+      className
     )}>
-      {/* Scroll Progress Indicator */}
-      <div 
-        className="fixed top-0 left-0 h-1 bg-primary z-50 transition-transform duration-200 ease-in-out origin-left"
-        style={{ transform: `scaleX(${scrollProgress})` }}
+      {/* Progress Indicator */}
+      <ScrollProgress
+        color={isDarkMode ? "primary" : "blue-500"}
+        height={3}
       />
       
-      {/* Background Gradient */}
-      <div className={cn(
-        "fixed inset-0 -z-10 pointer-events-none transition-opacity duration-500",
-        theme === 'light' 
-          ? 'bg-gradient-to-b from-blue-50/50 to-white' 
-          : theme === 'dark' 
-            ? 'bg-gradient-to-b from-gray-900 to-black/80' 
-            : 'bg-gradient-to-b from-blue-100/50 to-blue-50/30'
-      )} />
-
-      {/* Floating decorative elements for immersive mode */}
-      {immersive && !reduceMotion && (
-        <div className="fixed inset-0 -z-5 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full opacity-20 dark:opacity-10">
-            {[...Array(8)].map((_, i) => (
-              <motion.div
-                key={i}
-                className={cn(
-                  "absolute rounded-full",
-                  theme === 'dark' ? 'bg-blue-400' : 'bg-blue-500'
-                )}
-                style={{
-                  width: Math.random() * 8 + 4,
-                  height: Math.random() * 8 + 4,
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                }}
-                animate={{
-                  y: [0, -100, 0],
-                  opacity: [0.3, 0.8, 0.3],
-                }}
-                transition={{
-                  duration: Math.random() * 20 + 10,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Header */}
-      {!hideNav && (
-        <motion.header
-          initial={{ y: -10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className={cn(
-            "sticky top-0 z-50 w-full transition-all duration-300",
-            scrolled
-              ? 'bg-background/80 backdrop-blur-lg shadow-sm'
-              : 'bg-transparent'
-          )}
-        >
-          <PremiumHeader scrolled={scrolled} />
-        </motion.header>
-      )}
-
-      {/* Main Content */}
-      <main className={cn(
-        "flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 relative",
-        contentClassName
-      )}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={location.pathname}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
-            className="w-full"
-          >
-            {children || <Outlet />}
-          </motion.div>
-        </AnimatePresence>
-      </main>
-
-      {/* Footer */}
-      {!hideFooter && (
-        <motion.footer
-          initial={{ y: 10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <PremiumFooter />
-        </motion.footer>
-      )}
+      {header}
       
-      {/* Command palette (Cmd+K) */}
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
-        <div id="command-palette-container"></div>
-      </div>
+      {/* Main Content with Sidebar */}
+      <main className="flex-1 flex flex-col md:flex-row w-full pt-16">
+        {/* Sidebar for larger screens */}
+        {sidebar && (
+          <AnimatePresence>
+            <div className="hidden md:block">
+              {sidebar}
+            </div>
+          </AnimatePresence>
+        )}
+        
+        {/* Sidebar Overlay for Mobile */}
+        {sidebar && isSidebarOpen && (
+          <AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-40 md:hidden"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          </AnimatePresence>
+        )}
+        
+        {/* Mobile Sidebar */}
+        {sidebar && (
+          <AnimatePresence>
+            {isSidebarOpen && (
+              <motion.div
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ 
+                  type: reduceMotion ? "tween" : "spring", 
+                  stiffness: 300, 
+                  damping: 30,
+                  duration: reduceMotion ? 0.1 : undefined
+                }}
+                className="fixed top-0 left-0 h-screen z-50 md:hidden"
+              >
+                {sidebar}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
+        
+        {/* Main Content Area */}
+        <div className="flex-1 w-full">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={window.location.pathname}
+              initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+              animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+              exit={reduceMotion ? { opacity: 1 } : { opacity: 0, y: -10 }}
+              transition={{ duration: reduceMotion ? 0 : 0.25 }}
+              className="flex-1 w-full"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </main>
+      
+      {/* Footer */}
+      {footer}
+      
+      {/* Command Menu */}
+      <CommandMenu 
+        open={isCommandOpen} 
+        onOpenChange={setIsCommandOpen} 
+      />
+      
+      {/* Toast Notifications */}
+      <NotificationToast />
     </div>
   );
 };

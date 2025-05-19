@@ -32,7 +32,7 @@ const PresetButton: React.FC<PresetButtonProps> = ({ label, icon, onClick, color
 );
 
 const RecommendedPresets: React.FC = () => {
-  const music = useMusic() as MusicContextType;
+  const music = useMusic();
   const [loading, setLoading] = useState<string | null>(null);
 
   const presets = [
@@ -54,15 +54,21 @@ const RecommendedPresets: React.FC = () => {
         intensity: preset.intensity / 100,
       };
       
+      if (!music.loadPlaylistForEmotion) {
+        console.error('loadPlaylistForEmotion is not available');
+        setLoading(null);
+        return;
+      }
+      
       const playlist = await music.loadPlaylistForEmotion(params);
       
       if (playlist) {
         const formattedPlaylist = ensurePlaylist(playlist);
         
         if (formattedPlaylist.tracks.length > 0) {
-          music.setPlaylist && music.setPlaylist(formattedPlaylist);
-          music.setCurrentTrack && music.setCurrentTrack(formattedPlaylist.tracks[0]);
-          music.setOpenDrawer && music.setOpenDrawer(true);
+          if (music.setPlaylist) music.setPlaylist(formattedPlaylist);
+          if (music.setCurrentTrack) music.setCurrentTrack(formattedPlaylist.tracks[0]);
+          if (music.setOpenDrawer) music.setOpenDrawer(true);
         }
       }
     } catch (error) {
