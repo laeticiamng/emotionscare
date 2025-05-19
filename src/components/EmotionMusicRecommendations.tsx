@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Music, Play } from 'lucide-react';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { useMusic } from '@/hooks/useMusic';
+import { ensurePlaylist, convertToPlaylist } from '@/utils/musicCompatibility';
 
 interface EmotionMusicRecommendationsProps {
   emotion: string;
@@ -24,7 +25,8 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
 }) => {
   const [loading, setLoading] = useState(false);
   const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
-  const musicContext = useMusic();
+  const music = useMusic();
+
 
   useEffect(() => {
     const loadRecommendation = async () => {
@@ -40,10 +42,10 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
         let newPlaylist = null;
         
         // Essayer loadPlaylistForEmotion ou getRecommendationByEmotion
-        if (musicContext.loadPlaylistForEmotion) {
-          newPlaylist = await musicContext.loadPlaylistForEmotion(params);
-        } else if (musicContext.getRecommendationByEmotion) {
-          newPlaylist = await musicContext.getRecommendationByEmotion(params);
+        if (music.loadPlaylistForEmotion) {
+          newPlaylist = await music.loadPlaylistForEmotion(params);
+        } else if (music.getRecommendationByEmotion) {
+          newPlaylist = await music.getRecommendationByEmotion(params);
         }
         
         if (newPlaylist) {
@@ -60,24 +62,24 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   }, [emotion, intensity]);
 
   const handlePlayMusic = () => {
-    if (playlist && musicContext.playPlaylist) {
+    if (playlist && music.playPlaylist) {
       if (onPlayStart) onPlayStart();
       if (playlist.tracks && playlist.tracks.length > 0) {
         // Jouer la première piste et ouvrir le drawer si disponible
-        musicContext.playPlaylist(playlist);
-        
+        music.playPlaylist(playlist);
+
         // Si une fonction spécifique pour définir la piste courante existe
-        if (musicContext.currentTrack !== null && playlist.tracks[0]) {
-          if (typeof musicContext.play === 'function') {
-            musicContext.play(playlist.tracks[0], playlist);
+        if (music.currentTrack !== null && playlist.tracks[0]) {
+          if (typeof music.play === 'function') {
+            music.play(playlist.tracks[0], playlist);
           }
         }
-        
+
         // Ouvrir le drawer si cette fonction existe
-        if (musicContext.toggleDrawer) {
-          musicContext.toggleDrawer();
-        } else if (musicContext.openDrawer !== undefined && typeof musicContext.setOpenDrawer === 'function') {
-          musicContext.setOpenDrawer(true);
+        if (music.toggleDrawer) {
+          music.toggleDrawer();
+        } else if (music.openDrawer !== undefined && typeof music.setOpenDrawer === 'function') {
+          music.setOpenDrawer(true);
         }
       }
     }

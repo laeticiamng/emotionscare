@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MusicTrack } from '@/types';
+import { MusicTrack } from '@/types/music';
 import { getTrackCover, getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
 
 interface TrackInfoProps {
