@@ -27,6 +27,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
   const music = useMusic();
 
+
   useEffect(() => {
     const loadRecommendation = async () => {
       if (!emotion) return;

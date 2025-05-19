@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/hooks/useMusic';
 import { EmotionMusicParams } from '@/types/music';
 
 interface UseCommunityAmbienceOptions {

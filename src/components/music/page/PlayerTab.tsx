@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Play, Pause, SkipBack, SkipForward, Heart, Volume, VolumeX } from 'lucide-react';

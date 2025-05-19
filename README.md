@@ -165,6 +165,8 @@ npm start
 
 EmotionsCare utilise un système de design basé sur Tailwind CSS et Shadcn UI, avec prise en charge des thèmes clairs et sombres. Le thème est configurable par l'utilisateur et peut s'adapter automatiquement aux préférences système.
 
+Le `ThemeContext` expose également des préférences d'accessibilité comme `soundEnabled` et `reduceMotion` ainsi que leurs setters correspondants. Ces valeurs sont définies dans `src/types/theme.ts` et stockées via `useLocalStorage`.
+
 ## Contextes globaux
 
 - **ThemeContext** - Gestion du thème (clair/sombre)

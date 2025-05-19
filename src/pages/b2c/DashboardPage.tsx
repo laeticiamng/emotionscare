@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import MusicPlayer from '@/components/music/MusicPlayer';
 import RecommendedPresets from '@/components/music/RecommendedPresets';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/hooks/useMusic';
 import { motion } from 'framer-motion';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { TrendingUp } from 'lucide-react';
