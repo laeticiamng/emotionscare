@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Music, Play } from 'lucide-react';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { useMusic } from '@/hooks/useMusic';
-import { ensurePlaylist, convertToPlaylist } from '@/utils/musicCompatibility';
+import { ensurePlaylist } from '@/utils/musicCompatibility';
 
 interface EmotionMusicRecommendationsProps {
   emotion: string;
