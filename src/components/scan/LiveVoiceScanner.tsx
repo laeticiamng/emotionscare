@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -142,7 +141,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
     // Simulate API processing delay
     setTimeout(() => {
       // Mock result
-      const result: EmotionResult = {
+      const detectedEmotion: EmotionResult = {
         emotion: 'calm',
         confidence: 0.78,
         secondaryEmotions: ['focused', 'neutral'],
@@ -156,7 +155,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
             title: 'Playlist méditative',
             description: 'Des sons pour maintenir votre état de calme',
             icon: 'music',
-            emotion: emotion,
+            emotion: detectedEmotion.emotion,
           },
           {
             id: 'live-activity',
@@ -164,13 +163,15 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
             title: 'Exercice de respiration',
             description: 'Prenez 5 minutes pour approfondir votre état de calme',
             icon: 'activity',
-            emotion: emotion,
+            emotion: detectedEmotion.emotion,
           },
         ]
       };
       
+      setResult(detectedEmotion || { emotion: 'neutral', intensity: 0.5 });
+      
       if (onScanComplete) {
-        onScanComplete(result);
+        onScanComplete(detectedEmotion || { emotion: 'neutral', intensity: 0.5 });
       }
     }, 1500);
   };

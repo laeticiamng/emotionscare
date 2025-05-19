@@ -1,10 +1,10 @@
 
 import { createContext, useEffect, useState } from "react";
-import { ThemeContextType, Theme, FontSize, FontFamily } from "@/types/theme";
+import { ThemeContextType, ThemeName, FontSize, FontFamily } from "@/types/theme";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
-  defaultTheme?: Theme;
+  defaultTheme?: ThemeName;
   storageKey?: string;
 };
 
@@ -20,10 +20,10 @@ const defaultThemeContext: ThemeContextType = {
   fontFamily: "sans",
   setFontFamily: () => {},
   systemTheme: "light",
-  soundEnabled: false,
   reduceMotion: false,
-  setSoundEnabled: () => {},
-  setReduceMotion: () => {}
+  setReduceMotion: () => {},
+  soundEnabled: false,
+  setSoundEnabled: () => {}
 };
 
 export const ThemeProviderContext = createContext<ThemeContextType>(defaultThemeContext);
@@ -34,12 +34,12 @@ export function ThemeProvider({
   storageKey = "ui-theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+  const [theme, setTheme] = useState<ThemeName>(
+    () => (localStorage.getItem(storageKey) as ThemeName) || defaultTheme
   );
   const [fontSize, setFontSize] = useState<FontSize>("md");
   const [fontFamily, setFontFamily] = useState<FontFamily>("sans");
-  const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
+  const [systemTheme, setSystemTheme] = useState<ThemeName>("light");
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
 
@@ -48,7 +48,10 @@ export function ThemeProvider({
   const isDark = isDarkMode; // Alias
 
   const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+    setTheme(prevTheme => 
+      prevTheme === 'dark' ? 'light' : 
+      prevTheme === 'light' ? 'system' : 'dark'
+    );
   };
 
   useEffect(() => {
@@ -61,7 +64,7 @@ export function ThemeProvider({
         ? "dark"
         : "light";
 
-      setSystemTheme(systemTheme);
+      setSystemTheme(systemTheme as ThemeName);
       root.classList.add(systemTheme);
       return;
     }
@@ -71,7 +74,7 @@ export function ThemeProvider({
 
   const value: ThemeContextType = {
     theme,
-    setTheme: (theme: Theme) => {
+    setTheme: (theme: ThemeName) => {
       localStorage.setItem(storageKey, theme);
       setTheme(theme);
     },

@@ -3,11 +3,11 @@ import React from 'react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Theme, FontFamily, FontSize } from '@/types/theme';
+import { ThemeName, FontFamily, FontSize } from '@/types/theme';
 
 interface ThemeSettingsTabProps {
   currentTheme: string;
-  onThemeChange: (theme: Theme) => void;
+  onThemeChange: (theme: ThemeName) => void;
   fontFamily?: FontFamily;
   onFontFamilyChange?: (fontFamily: FontFamily) => void;
   fontSize?: FontSize;
@@ -30,7 +30,7 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   ];
   
   const handleThemeChange = (value: string) => {
-    onThemeChange(value as Theme);
+    onThemeChange(value as ThemeName);
   };
   
   // Font family options
@@ -49,9 +49,9 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   
   // Font size options
   const fontSizes: {value: FontSize, label: string}[] = [
-    { value: "small", label: "Small" },
-    { value: "medium", label: "Medium" },
-    { value: "large", label: "Large" }
+    { value: "sm", label: "Small" },
+    { value: "md", label: "Medium" },
+    { value: "lg", label: "Large" }
   ];
   
   const handleFontSizeChange = (value: FontSize) => {
@@ -158,9 +158,9 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
                   className={cn(
                     "flex items-center justify-center rounded-md border p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer",
                     fontSize === size.value && "bg-accent text-accent-foreground",
-                    size.value === "small" && "text-sm",
-                    size.value === "medium" && "text-base",
-                    size.value === "large" && "text-lg"
+                    size.value === "sm" && "text-sm",
+                    size.value === "md" && "text-base",
+                    size.value === "lg" && "text-lg"
                   )}
                 >
                   {size.label}

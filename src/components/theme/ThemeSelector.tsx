@@ -1,22 +1,74 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Sun, Moon, Monitor, Palette } from 'lucide-react';
-import { Theme } from '@/types/theme';
+import { ThemeName } from '@/types/theme';
 import { motion } from 'framer-motion';
 
 interface ThemeSelectorProps {
-  currentTheme: Theme;
-  onChange: (theme: Theme) => void;
+  currentTheme: ThemeName | string;
+  onChange: (theme: ThemeName) => void;
   minimal?: boolean; // Add minimal prop for use in navbar
   className?: string; // Add className prop
 }
 
 const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange, minimal = false, className = '' }) => {
+  const handleThemeChange = (value: string) => {
+    // Validate that the value is a valid Theme before passing it to onChange
+    if (value === 'light' || value === 'dark' || value === 'system' || value === 'pastel') {
+      onChange(value as ThemeName);
+    }
+  };
+  
+  // Render a simplified version for minimal mode (used in navbar)
+  if (minimal) {
+    return (
+      <div className={`flex items-center space-x-1 ${className}`}>
+        <Button
+          variant={currentTheme === 'light' ? "secondary" : "ghost"}
+          size="icon"
+          className="w-8 h-8"
+          onClick={() => handleThemeChange('light')}
+          title="Light Mode"
+        >
+          <Sun className="h-4 w-4" />
+          {currentTheme === 'light' && (
+            <span className="sr-only">Active</span>
+          )}
+        </Button>
+        <Button
+          variant={currentTheme === 'dark' ? "secondary" : "ghost"}
+          size="icon"
+          className="w-8 h-8"
+          onClick={() => handleThemeChange('dark')}
+          title="Dark Mode"
+        >
+          <Moon className="h-4 w-4" />
+          {currentTheme === 'dark' && (
+            <span className="sr-only">Active</span>
+          )}
+        </Button>
+        <Button
+          variant={currentTheme === 'system' ? "secondary" : "ghost"}
+          size="icon"
+          className="w-8 h-8"
+          onClick={() => handleThemeChange('system')}
+          title="System Mode"
+        >
+          <Monitor className="h-4 w-4" />
+          {currentTheme === 'system' && (
+            <span className="sr-only">Active</span>
+          )}
+        </Button>
+      </div>
+    );
+  }
+  
+  // Render full theme selector
   const themes = [
     { 
-      id: 'light', 
+      id: 'light' as ThemeName, 
       name: 'Clair', 
       description: 'Mode clair, idéal pour la journée',
       icon: Sun,
@@ -24,7 +76,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange, m
       text: 'text-gray-900 dark:text-gray-900'
     },
     { 
-      id: 'dark', 
+      id: 'dark' as ThemeName, 
       name: 'Sombre', 
       description: 'Mode sombre, confortable pour la nuit',
       icon: Moon,
@@ -32,7 +84,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange, m
       text: 'text-white'
     },
     { 
-      id: 'system', 
+      id: 'system' as ThemeName, 
       name: 'Système', 
       description: 'Suit les préférences de votre appareil',
       icon: Monitor,
@@ -40,7 +92,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange, m
       text: 'text-gray-900 dark:text-white'
     },
     { 
-      id: 'pastel', 
+      id: 'pastel' as ThemeName, 
       name: 'Pastel', 
       description: 'Couleurs douces et relaxantes',
       icon: Palette,
@@ -49,39 +101,6 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange, m
     }
   ];
   
-  const handleThemeChange = (themeId: string) => {
-    onChange(themeId as Theme);
-  };
-  
-  // Render a simplified version for minimal mode (used in navbar)
-  if (minimal) {
-    return (
-      <div className={`flex items-center space-x-1 ${className}`}>
-        {themes.map((theme) => {
-          const Icon = theme.icon;
-          const isActive = currentTheme === theme.id;
-          
-          return (
-            <Button
-              key={theme.id}
-              variant={isActive ? "secondary" : "ghost"}
-              size="icon"
-              className="w-8 h-8"
-              onClick={() => handleThemeChange(theme.id)}
-              title={theme.name}
-            >
-              <Icon className="h-4 w-4" />
-              {isActive && (
-                <span className="sr-only">Actif</span>
-              )}
-            </Button>
-          );
-        })}
-      </div>
-    );
-  }
-  
-  // Render full theme selector
   return (
     <Card className={`w-full ${className}`}>
       <CardHeader>
