@@ -30,10 +30,6 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
   const [recording, setRecording] = useState(false);
   const coach = useCoach();
   
-  // Check if these properties exist in the coach context before using them
-  const conversations = coach.conversations || [];
-  const currentConversation = coach.currentConversation || null;
-  
   // Quick suggestions based on emotional state
   const suggestions = [
     "Comment puis-je gérer mon stress ?",
@@ -44,10 +40,10 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
   
   // Add initial message if it exists
   useEffect(() => {
-    if (initialMessage && coach.messages.length === 0) {
+    if (initialMessage && coach.messages && coach.messages.length === 0) {
       coach.sendMessage(initialMessage, 'coach');
     }
-  }, [initialMessage]);
+  }, [initialMessage, coach]);
   
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +71,7 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
       
       <ScrollArea className="flex-1 p-4" style={{ maxHeight }}>
         <div className="space-y-6">
-          {coach.messages.map((message, index) => (
+          {coach.messages && coach.messages.map((message, index) => (
             <CoachMessage
               key={message.id || index}
               message={message}

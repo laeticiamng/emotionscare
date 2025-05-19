@@ -20,8 +20,8 @@ export interface RecognitionOptions {
 // Add missing SpeechRecognition definitions to the Window interface
 declare global {
   interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
   }
 }
 

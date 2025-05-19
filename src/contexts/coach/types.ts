@@ -1,4 +1,3 @@
-
 import { ChatMessage, ChatConversation } from '@/types/chat';
 import { EmotionResult } from '@/types/emotion';
 
@@ -29,3 +28,6 @@ export interface CoachContextType {
   setActiveConversation?: (id: string) => void;
   updateLastEmotion?: (emotion: string) => void;
 }
+
+// Export CoachContextProps as an alias of CoachContextType for backward compatibility
+export type CoachContextProps = CoachContextType;

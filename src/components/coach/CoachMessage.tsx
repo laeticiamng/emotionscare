@@ -16,8 +16,6 @@ const CoachMessage: React.FC<CoachMessageProps> = ({
 }) => {
   const isCoach = message.sender === 'coach' || message.sender === 'assistant' || message.role === 'assistant';
   const content = message.content || message.text || '';
-  // Safely access isLoading by checking if it exists on the message
-  const isLoading = message.isLoading || false;
   
   return (
     <div className={cn(
@@ -35,7 +33,7 @@ const CoachMessage: React.FC<CoachMessageProps> = ({
         isCoach 
           ? "bg-muted text-foreground" 
           : "bg-primary text-primary-foreground",
-        isLoading && "animate-pulse"
+        message.isLoading && "animate-pulse"
       )}>
         {content}
       </div>

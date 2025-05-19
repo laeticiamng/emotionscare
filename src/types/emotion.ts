@@ -7,8 +7,8 @@ export interface EmotionData {
   arousal?: number;
   dominance?: number;
   timestamp?: string;
-  tags?: string[]; // Added missing tags property
-  value?: number; // Added missing value property
+  tags?: string[];
+  value?: number;
 }
 
 export interface EmotionRecommendation {
@@ -25,8 +25,8 @@ export interface EmotionRecommendation {
   duration?: number;
   intensity?: 'low' | 'medium' | 'high';
   tags?: string[];
-  actionLink?: string; // Added missing property
-  actionText?: string; // Added missing property
+  actionLink?: string;
+  actionText?: string;
 }
 
 export interface EmotionResult {
@@ -75,7 +75,8 @@ export type EmotionSource =
   | 'ai'
   | 'live-voice'
   | 'voice-analyzer'
-  | 'audio-processor';
+  | 'audio-processor'
+  | 'text-analysis';
 
 export interface EmotionHistoryItem extends EmotionResult {
   id: string;
@@ -123,24 +124,42 @@ export interface Emotion {
   user_id?: string;
 }
 
+export interface MoodData {
+  emotion: string;
+  intensity: number;
+  date?: string;
+  timestamp: string;
+  context?: string;
+  source?: string;
+  id?: string;
+}
+
+export interface EmotionPrediction {
+  emotion: string;
+  probability: number;
+  triggers?: string[];
+  timeframe?: string;
+  recommendations?: string[];
+}
+
 export interface EmojiEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
   onCancel?: () => void;
-  onResult?: (result: EmotionResult) => void; // Added for compatibility
-  isProcessing?: boolean; // Added for compatibility
-  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>; // Added for compatibility
-  onProcessingChange?: (isProcessing: boolean) => void; // Added for compatibility
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  onProcessingChange?: (isProcessing: boolean) => void;
 }
 
 export interface EmotionalTeamViewProps {
   teamId: string;
   period?: 'day' | 'week' | 'month';
-  anonymized?: boolean; // Added for compatibility
-  dateRange?: [Date, Date]; // Added for compatibility
-  showGraph?: boolean; // Added for compatibility
-  showMembers?: boolean; // Added for compatibility
-  className?: string; // Added for compatibility
-  showDetails?: boolean; // Added for compatibility
+  anonymized?: boolean;
+  dateRange?: [Date, Date];
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
+  showDetails?: boolean;
 }
 
 export interface TextEmotionScannerProps {
