@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
  * Hook qui gère la redirection automatique des utilisateurs
  * notamment depuis la page /b2b/selection vers le bon tableau de bord
  */
-export default function usePreferredAccess() {
+const usePreferredAccess = () => {
   const { user, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,4 +40,7 @@ export default function usePreferredAccess() {
   }, [isAuthenticated, user, isLoading, navigate, location.pathname, toast]);
 
   return { isAuthenticated, user, isLoading };
-}
+};
+
+export { usePreferredAccess };
+export default usePreferredAccess;
