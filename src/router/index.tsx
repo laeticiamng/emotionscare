@@ -65,6 +65,18 @@ export const routes: RouteObject[] = [
     element: <Home />
   },
   {
+    path: "choose-mode",
+    element: <OnboardingModePage />
+  },
+  {
+    path: "onboarding",
+    element: <OnboardingPage />
+  },
+  {
+    path: "onboarding-experience",
+    element: <OnboardingExperiencePage />
+  },
+  {
     path: 'settings',
     element: (
       <ProtectedRoute>

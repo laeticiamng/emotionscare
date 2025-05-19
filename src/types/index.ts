@@ -12,4 +12,5 @@ export * from './vr';
 export * from './layout';
 export * from './widget'; // Add if this exists
 export * from './music';
+export * from './onboarding';
 // Add other type exports as needed

@@ -315,6 +315,7 @@ Vous trouverez dans le dossier `src/docs` plusieurs guides détaillés :
 - `home-routing-audit.md` : audit et conventions d'accès public
 - `RoutingFlow.md` : schéma du flux d'accès (accueil → login → dashboard)
 - `unified-access-adaptive-audit.md` : logique d'accès centralisée et expérience adaptative
+- `onboarding-training-audit.md` : structure du module d'onboarding
 
 
 ## Équipe et contribution
