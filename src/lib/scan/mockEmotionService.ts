@@ -21,7 +21,7 @@ export const mockEmotionData: EmotionResult[] = [
     feedback: "C'est formidable de voir votre joie. Prenez le temps de savourer ce moment.",
     intensity: 0.8,
     emojis: ["😊", "🎉"],
-    source: "manual"
+    source: "text"
   },
   {
     id: "e2",
@@ -36,7 +36,7 @@ export const mockEmotionData: EmotionResult[] = [
     feedback: "Le stress temporaire est normal. Essayez de diviser vos tâches en plus petites portions gérables.",
     intensity: 0.7,
     emojis: ["😓", "⏰"],
-    source: "scan"
+    source: "text"
   },
   {
     id: "e3",
@@ -51,7 +51,7 @@ export const mockEmotionData: EmotionResult[] = [
     feedback: "La méditation est une excellente pratique pour maintenir l'équilibre émotionnel. Continuez ainsi !",
     intensity: 0.6,
     emojis: ["😌", "🧘"],
-    source: "manual"
+    source: "text"
   },
   {
     id: "e4",
@@ -66,7 +66,7 @@ export const mockEmotionData: EmotionResult[] = [
     feedback: "Assurez-vous de bien vous reposer ce soir. Considérez une routine de sommeil plus régulière.",
     intensity: 0.7,
     emojis: ["😴", "🛌"],
-    source: "scan"
+    source: "text"
   },
   {
     id: "e5",
@@ -81,7 +81,7 @@ export const mockEmotionData: EmotionResult[] = [
     feedback: "La gratitude est l'une des émotions les plus bénéfiques. Envisagez de tenir un journal de gratitude.",
     intensity: 0.8,
     emojis: ["🙏", "💙"],
-    source: "manual"
+    source: "text"
   }
 ];
 

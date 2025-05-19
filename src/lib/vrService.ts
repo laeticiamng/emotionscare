@@ -23,7 +23,7 @@ const vrTemplates: VRSessionTemplate[] = [
     goalType: 'meditation',
     audioTrack: '/audio/forest-meditation.mp3',
     interactive: false,
-    recommendedFor: ['stress', 'anxiety']
+    recommendedMood: 'relaxation'
   },
   {
     id: '2',
@@ -39,7 +39,7 @@ const vrTemplates: VRSessionTemplate[] = [
     goalType: 'relaxation',
     audioTrack: '/audio/tropical-beach.mp4',
     interactive: false,
-    recommendedFor: ['anxiety', 'stress']
+    recommendedMood: 'relaxation'
   }
 ];
 
@@ -172,8 +172,8 @@ export const getRecommendedTemplates = async (emotion: string): Promise<VRSessio
   return new Promise((resolve) => {
     setTimeout(() => {
       // Filter templates that are recommended for this emotion
-      const recommended = vrTemplates.filter(t => 
-        t.recommendedFor?.includes(emotion) || 
+      const recommended = vrTemplates.filter(t =>
+        t.recommendedMood === emotion ||
         (emotion === 'stressed' && t.goalType === 'relaxation') ||
         (emotion === 'sad' && t.goalType === 'energizing')
       );

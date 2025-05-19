@@ -13,6 +13,7 @@ export const mockTracks: MusicTrack[] = [
     id: "track-1",
     title: "Méditation calmante",
     artist: "Relax Studio",
+    url: "/audio/meditation.mp3",
     duration: 240,
     audioUrl: "/audio/meditation.mp3",
     coverUrl: "/images/calm-cover.jpg",
@@ -26,6 +27,7 @@ export const mockTracks: MusicTrack[] = [
     id: "track-2",
     title: "Énergie matinale",
     artist: "Morning Vibes",
+    url: "/audio/energy.mp3",
     duration: 180,
     audioUrl: "/audio/energy.mp3",
     coverUrl: "/images/energy-cover.jpg",
@@ -39,6 +41,7 @@ export const mockTracks: MusicTrack[] = [
     id: "track-3",
     title: "Focus profond",
     artist: "Concentration Beats",
+    url: "/audio/focus.mp3",
     duration: 300,
     audioUrl: "/audio/focus.mp3",
     coverUrl: "/images/focus-cover.jpg",
@@ -52,6 +55,7 @@ export const mockTracks: MusicTrack[] = [
     id: "track-4",
     title: "Happy Vibes",
     artist: "Joy Sounds",
+    url: "/audio/happy.mp3",
     duration: 210,
     audioUrl: "/audio/happy.mp3",
     coverUrl: "/images/happy-cover.jpg",
@@ -65,6 +69,7 @@ export const mockTracks: MusicTrack[] = [
     id: "track-5",
     title: "Mélancolie douce",
     artist: "Reflective Soul",
+    url: "/audio/melancholy.mp3",
     duration: 270,
     audioUrl: "/audio/melancholy.mp3",
     coverUrl: "/images/melancholy-cover.jpg",
@@ -79,6 +84,7 @@ export const mockTracks: MusicTrack[] = [
 export const mockPlaylists: MusicPlaylist[] = [
   {
     id: "playlist-calm",
+    title: "Moments calmes",
     name: "Moments calmes",
     tracks: mockTracks.filter(track => track.emotion === "calm"),
     description: "Une collection de morceaux pour la relaxation",
@@ -87,6 +93,7 @@ export const mockPlaylists: MusicPlaylist[] = [
   },
   {
     id: "playlist-energy",
+    title: "Boost d'énergie",
     name: "Boost d'énergie",
     tracks: mockTracks.filter(track => track.emotion === "energetic"),
     description: "Musique motivante pour démarrer la journée",
@@ -95,6 +102,7 @@ export const mockPlaylists: MusicPlaylist[] = [
   },
   {
     id: "playlist-focus",
+    title: "Concentration maximale",
     name: "Concentration maximale",
     tracks: mockTracks.filter(track => track.emotion === "focus"),
     description: "Pour les sessions de travail intensif",
@@ -103,6 +111,7 @@ export const mockPlaylists: MusicPlaylist[] = [
   },
   {
     id: "playlist-happy",
+    title: "Bonheur quotidien",
     name: "Bonheur quotidien",
     tracks: mockTracks.filter(track => track.emotion === "happy"),
     description: "Des morceaux joyeux pour égayer votre journée",
@@ -111,6 +120,7 @@ export const mockPlaylists: MusicPlaylist[] = [
   },
   {
     id: "playlist-melancholic",
+    title: "Réflexions profondes",
     name: "Réflexions profondes",
     tracks: mockTracks.filter(track => track.emotion === "melancholic"),
     description: "Musique contemplative pour les moments calmes",

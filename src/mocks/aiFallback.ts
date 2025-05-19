@@ -33,7 +33,7 @@ export const mockEmotions = [
     emojis: ["😊", "🎉"],
     feedback: "Vous semblez être de bonne humeur. Profitez de cette énergie positive !",
     intensity: 0.85,
-    source: "scan",
+    source: "text",
   },
   {
     id: "emotion-2",
@@ -48,7 +48,7 @@ export const mockEmotions = [
     emojis: ["😌"],
     feedback: "Vous êtes dans un état calme et équilibré. C'est idéal pour la concentration.",
     intensity: 0.7,
-    source: "scan",
+    source: "text",
   }
 ];
 
@@ -67,6 +67,6 @@ export const createFallbackEmotion = (userId: string = 'user-1') => {
     emojis: ["😐"],
     feedback: "Nous n'avons pas pu analyser précisément votre état émotionnel.",
     intensity: 0.6,
-    source: "fallback",
+    source: "system",
   };
 };

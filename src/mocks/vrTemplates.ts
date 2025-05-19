@@ -22,7 +22,7 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     immersionLevel: 'medium',
     goalType: 'meditation',
     interactive: false,
-    recommendedFor: ['stress', 'anxiety']
+    recommendedMood: 'relaxation'
   },
   {
     id: '2',
@@ -38,7 +38,7 @@ export const mockVRTemplates: VRSessionTemplate[] = [
     immersionLevel: 'high',
     goalType: 'relaxation',
     interactive: false,
-    recommendedFor: ['anxiety', 'stress']
+    recommendedMood: 'relaxation'
   }
 ];
 
