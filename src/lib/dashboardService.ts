@@ -1,6 +1,6 @@
 
 import { MoodData } from '@/types/emotion';
-import { EmotionPrediction } from '@/types/index';
+import { EmotionPrediction } from '@/types/emotion';
 
 export interface DashboardStats {
   trends: { label: string; value: number }[];
@@ -54,12 +54,17 @@ function generateMockMoodData(): MoodData[] {
     
     // Create properly typed MoodData
     const entry: MoodData = {
+      id: `mood-${i}`,
+      userId: 'user123',
       date: date.toISOString().split('T')[0],
-      value: Math.random() * 100,
-      mood: selectRandomMood(),
+      emotion: selectRandomMood(),
+      intensity: Math.random() * 100,
+      timestamp: date.toISOString(),
       sentiment: Math.random() * 2 - 1, // -1 to 1
-      anxiety: Math.random() * 100,
+      mood: selectRandomMood(),
       energy: Math.random() * 100,
+      anxiety: Math.random() * 100,
+      score: Math.random() * 100,
     };
     
     data.push(entry);

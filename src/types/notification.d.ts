@@ -25,6 +25,7 @@ export interface NotificationPreference {
   pushEnabled?: boolean;
   inAppEnabled?: boolean;
   types?: NotificationType[];
+  type?: string;
   settings?: Record<string, any>;
 }
 

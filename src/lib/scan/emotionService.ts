@@ -1,4 +1,5 @@
-import { EmotionPrediction } from '@/types';
+
+import { EmotionPrediction } from '@/types/emotion';
 
 // Fix the type mismatch issues
 export const analyzeEmotion = () => {
@@ -15,12 +16,10 @@ export const analyzeEmotion = () => {
   
   // Return a properly formatted EmotionPrediction
   const prediction: EmotionPrediction = {
-    predictedEmotion: emotion.name,
     emotion: emotion.name,
     probability: 0.85,
     confidence: emotion.confidence,
-    triggers: ["work stress", "deadlines"],
-    recommendations: ["Take a break", "Practice mindfulness"]
+    score: emotion.score
   };
   
   return prediction;

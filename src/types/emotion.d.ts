@@ -46,6 +46,11 @@ export interface MoodData {
   date?: string;
   score?: number;
   source?: string;
+  value?: any;
+  mood?: string;
+  sentiment?: number;
+  anxiety?: number;
+  energy?: number;
 }
 
 export interface EmotionTrackingData {
@@ -86,27 +91,47 @@ export interface VoiceEmotionScannerProps {
   onProcessingChange?: (processing: boolean) => void;
 }
 
+export interface LiveVoiceScannerProps {
+  onResult: (result: EmotionResult) => void;
+  onProcessingChange?: (processing: boolean) => void;
+}
+
 export interface EmotionPrediction {
   emotion: string;
   probability: number;
   confidence?: number;
   score?: number;
+  predictedEmotion?: string;
+  timestamp?: string;
+  source?: string;
+  triggers?: string[];
+  recommendations?: string[];
 }
 
 export interface EnhancedEmotionResult extends EmotionResult {
   analysis: string;
   suggestedActions: string[];
   relatedEmotions: EmotionPrediction[];
+  emotions?: Record<string, number>;
+  dominantEmotion?: {
+    name: string;
+    score: number;
+  };
 }
 
 export interface EmotionalTeamViewProps {
   teamId?: string;
+  period?: string;
   anonymized?: boolean;
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
+  dateRange?: [Date, Date];
   showGraph?: boolean;
   showMembers?: boolean;
+  className?: string;
+}
+
+export interface TeamOverviewProps {
+  teamId: string;
+  period?: string;
+  showAverages?: boolean;
   className?: string;
 }

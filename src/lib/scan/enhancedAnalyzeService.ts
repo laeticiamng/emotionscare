@@ -1,8 +1,8 @@
+
 import { EmotionResult, EnhancedEmotionResult } from '@/types/emotion';
-import { openAIClient } from '../api/openAIClient';
 
 // Enhanced analysis service for emotion scans
-export const analyzeEmotion = async (text: string): Promise<EnhancedEmotionResult> => {
+export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
   try {
     // In a real implementation, this would call OpenAI API
     console.log('Analyzing emotion with enhanced service:', text);
@@ -11,30 +11,26 @@ export const analyzeEmotion = async (text: string): Promise<EnhancedEmotionResul
     const baseResult: EmotionResult = {
       id: `scan-${Date.now()}`,
       emotion: 'neutral',
-      score: 0.75,
+      primaryEmotion: 'neutral',
+      intensity: 0.5,
       confidence: 0.8,
-      text: text
+      score: 0.75,
+      source: 'text-analysis',
+      timestamp: new Date().toISOString(),
+      text: text,
+      feedback: "Vous semblez vous exprimer de façon neutre.",
+      recommendations: [
+        {
+          id: '1',
+          emotion: 'neutral',
+          title: "Prenez un moment pour réfléchir",
+          description: "La neutralité peut cacher des émotions plus profondes"
+        }
+      ],
+      emojis: ["😐"]
     };
     
-    // Enhanced result with additional fields required by EnhancedEmotionResult
-    const enhancedResult: EnhancedEmotionResult = {
-      ...baseResult,
-      emotions: {
-        joy: 0.2,
-        sadness: 0.1,
-        anger: 0.05,
-        fear: 0.1,
-        surprise: 0.15,
-        disgust: 0.05,
-        neutral: 0.35
-      },
-      dominantEmotion: {
-        name: 'neutral',
-        score: 0.35
-      }
-    };
-    
-    return enhancedResult;
+    return baseResult;
     
   } catch (error) {
     console.error('Error in enhanced emotion analysis:', error);
