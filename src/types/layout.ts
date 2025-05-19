@@ -12,11 +12,15 @@ export interface LayoutProps {
 export interface ShellProps {
   children: React.ReactNode;
   className?: string;
+  hideNav?: boolean;
+  hideFooter?: boolean;
+  immersive?: boolean;
 }
 
 export interface LayoutContextType {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
+  toggleSidebar?: () => void;
   theme: string;
   setTheme: (theme: string) => void;
   fullscreen: boolean;
