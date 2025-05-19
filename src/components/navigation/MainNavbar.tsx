@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ThemeSelector } from '@/components/theme/ThemeSelector';
+// Fix incorrect import
+import ThemeSelector from '@/components/theme/ThemeSelector';
 import AudioControls from '@/components/audio/AudioControls';
 import UserMenu from './UserMenu';
 import GuestMenu from './GuestMenu';

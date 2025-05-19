@@ -9,9 +9,11 @@ import { motion } from 'framer-motion';
 interface ThemeSelectorProps {
   currentTheme: Theme;
   onChange: (theme: Theme) => void;
+  minimal?: boolean; // Add minimal prop for use in navbar
+  className?: string; // Add className prop
 }
 
-const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange }) => {
+const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange, minimal = false, className = '' }) => {
   const themes = [
     { 
       id: 'light', 
@@ -51,8 +53,37 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange })
     onChange(themeId as Theme);
   };
   
+  // Render a simplified version for minimal mode (used in navbar)
+  if (minimal) {
+    return (
+      <div className={`flex items-center space-x-1 ${className}`}>
+        {themes.map((theme) => {
+          const Icon = theme.icon;
+          const isActive = currentTheme === theme.id;
+          
+          return (
+            <Button
+              key={theme.id}
+              variant={isActive ? "secondary" : "ghost"}
+              size="icon"
+              className="w-8 h-8"
+              onClick={() => handleThemeChange(theme.id)}
+              title={theme.name}
+            >
+              <Icon className="h-4 w-4" />
+              {isActive && (
+                <span className="sr-only">Actif</span>
+              )}
+            </Button>
+          );
+        })}
+      </div>
+    );
+  }
+  
+  // Render full theme selector
   return (
-    <Card className="w-full">
+    <Card className={`w-full ${className}`}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <span>Thème</span>
@@ -107,3 +138,6 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange })
 };
 
 export default ThemeSelector;
+
+// Also export as named export for backward compatibility
+export { ThemeSelector };

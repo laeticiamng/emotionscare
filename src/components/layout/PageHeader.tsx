@@ -1,35 +1,35 @@
-
-import React from "react";
-import { cn } from "@/lib/utils";
-import { ThemeSelector } from '@/components/theme/ThemeSelector';
-import AudioControls from '@/components/audio/AudioControls';
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Search } from 'lucide-react';
+// Fix incorrect import
+import ThemeSelector from '@/components/theme/ThemeSelector';
 
 interface PageHeaderProps {
-  heading: string;
-  text?: string;
-  children?: React.ReactNode;
+  title: string;
+  description?: string;
   className?: string;
 }
 
-export function PageHeader({
-  heading,
-  text,
-  children,
-  className,
-}: PageHeaderProps) {
+const PageHeader: React.FC<PageHeaderProps> = ({ title, description, className }) => {
   return (
-    <div className={cn("flex items-center justify-between px-2", className)}>
-      <div className="grid gap-1">
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-          {heading}
-        </h1>
-        {text && <p className="text-muted-foreground">{text}</p>}
+    <div className={`flex items-center justify-between space-y-2 font-semibold ${className}`}>
+      <div className="space-y-1">
+        <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+        {description && (
+          <p className="text-sm text-muted-foreground">
+            {description}
+          </p>
+        )}
       </div>
-      <div className="flex items-center gap-2">
-        <AudioControls minimal />
-        <ThemeSelector minimal />
-        {children}
+      <div className="flex items-center space-x-2">
+        <ThemeSelector />
+        <Button size="sm" variant="outline">
+          <Search className="mr-2 h-4 w-4" />
+          Search
+        </Button>
       </div>
     </div>
   );
-}
+};
+
+export default PageHeader;
