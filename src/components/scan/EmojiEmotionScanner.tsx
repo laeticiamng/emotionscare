@@ -19,7 +19,12 @@ const emojis = [
   { emoji: "🤔", emotion: "thoughtful", description: "Pensif" }
 ];
 
-const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({ onResult, onProcessingChange, isProcessing, setIsProcessing }) => {
+const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({ 
+  onResult, 
+  onProcessingChange, 
+  isProcessing, 
+  setIsProcessing 
+}) => {
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
   const [intensity, setIntensity] = useState<number>(50);
   const [processing, setProcessing] = useState(false);
@@ -51,7 +56,7 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({ onResult, onP
       const result: EmotionResult = {
         id: `emoji-${Date.now()}`,
         emotion: selectedEmojiObj?.emotion || 'neutral',
-        primaryEmotion: selectedEmojiObj?.emotion || 'neutral', // Added missing property
+        primaryEmotion: selectedEmojiObj?.emotion || 'neutral', // Added for components that use primaryEmotion
         confidence: 0.9, // High confidence since user selected directly
         intensity: intensity / 100,
         source: 'emoji',
@@ -60,14 +65,16 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({ onResult, onP
         recommendations: [
           {
             title: "Activité recommandée",
-            description: "Une activité adaptée à votre humeur actuelle"
+            description: "Une activité adaptée à votre humeur actuelle",
+            content: "Une activité qui peut vous aider dans votre état émotionnel actuel."
           },
           {
             title: "Musique recommandée",
-            description: "Une playlist qui correspond à votre état émotionnel"
+            description: "Une playlist qui correspond à votre état émotionnel",
+            content: "Des morceaux de musique sélectionnés pour vous aider à gérer cette émotion."
           }
         ],
-        score: intensity // Added missing property
+        score: intensity // Added for components that use score
       };
       
       if (onResult) {

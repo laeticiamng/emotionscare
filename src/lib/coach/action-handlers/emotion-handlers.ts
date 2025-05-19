@@ -1,90 +1,121 @@
 
-import { EmotionalData } from '@/types/emotional-data';
-import { emotionalDataService } from '../emotional-data-service';
+import { v4 as uuidv4 } from 'uuid';
+import emotionalDataService from '../emotional-data-service';
 
-/**
- * Handles storing a new emotional data entry
- */
-export async function handleEmotionDetected(
-  userId: string,
-  emotion: string,
-  intensity: number = 0.5,
-  source: string = 'scan'
-): Promise<boolean> {
-  try {
-    // Create emotional data entry with the detected emotion
-    const emotionalData: EmotionalData = {
-      id: `emotion-${Date.now()}`,
-      user_id: userId, // Using snake_case as the official property
-      emotion: emotion,
-      intensity: intensity,
-      timestamp: new Date().toISOString(),
-      source: source
-    };
+export const emotionActionHandlers = {
+  /**
+   * Handle recording a new emotion
+   */
+  recordEmotion: async (payload: any) => {
+    const { emotion, intensity, context } = payload;
     
-    // Store the data
-    await emotionalDataService.saveEmotionalData(emotionalData);
-    return true;
-  } catch (error) {
-    console.error('Failed to handle emotion detection:', error);
-    return false;
-  }
-}
-
-/**
- * Updates an existing emotional data entry
- */
-export async function handleEmotionFeedback(
-  userId: string,
-  emotionId: string,
-  feedback: string
-): Promise<boolean> {
-  try {
-    // Update emotional data with user feedback
-    const update: Partial<EmotionalData> = {
-      user_id: userId, // Using snake_case as the official property
-      id: emotionId,
-      metadata: {
-        userFeedback: feedback,
-        feedbackTimestamp: new Date().toISOString()
-      }
-    };
+    if (!emotion) {
+      throw new Error('Emotion is required');
+    }
     
-    await emotionalDataService.updateEmotionalData(emotionId, update);
-    return true;
-  } catch (error) {
-    console.error('Failed to update emotion with feedback:', error);
-    return false;
-  }
-}
-
-/**
- * Records a manual emotion entry from the user
- */
-export async function handleManualEmotionEntry(
-  userId: string,
-  emotion: string,
-  intensity: number,
-  notes?: string,
-  context?: string
-): Promise<boolean> {
-  try {
-    // Create emotional data entry with the user's manual input
-    const emotionalData: Partial<EmotionalData> = {
-      id: `emotion-manual-${Date.now()}`,
-      user_id: userId, // Using snake_case as the official property
+    // Add the emotion to the emotional data service
+    const result = emotionalDataService.addEmotionalData({
       emotion,
-      intensity,
+      intensity: intensity || 0.5,
       timestamp: new Date().toISOString(),
-      source: 'manual',
-      context,
-      text: notes
-    };
+      context
+    });
     
-    await emotionalDataService.saveEmotionalData(emotionalData as EmotionalData);
-    return true;
-  } catch (error) {
-    console.error('Failed to save manual emotion entry:', error);
-    return false;
+    return {
+      success: true,
+      result
+    };
+  },
+  
+  /**
+   * Handle updating an existing emotion
+   */
+  updateEmotion: async (payload: any) => {
+    const { id, emotion, intensity, context } = payload;
+    
+    if (!id) {
+      throw new Error('Emotion ID is required');
+    }
+    
+    // Update the emotion in the emotional data service
+    const result = emotionalDataService.addEmotionalData({
+      emotion,
+      intensity: intensity || 0.5,
+      timestamp: new Date().toISOString(),
+      context
+    });
+    
+    return {
+      success: true,
+      result
+    };
+  },
+  
+  /**
+   * Handle tracking emotion over time
+   */
+  trackEmotionTrend: async (payload: any) => {
+    const { period } = payload;
+    
+    // Get all emotional data
+    const allData = emotionalDataService.getAllEmotionalData();
+    
+    // Filter based on period if specified
+    let filteredData = allData;
+    if (period) {
+      const now = new Date();
+      const periodStart = new Date();
+      
+      switch (period) {
+        case 'day':
+          periodStart.setDate(now.getDate() - 1);
+          break;
+        case 'week':
+          periodStart.setDate(now.getDate() - 7);
+          break;
+        case 'month':
+          periodStart.setMonth(now.getMonth() - 1);
+          break;
+        default:
+          break;
+      }
+      
+      filteredData = allData.filter(item => {
+        const itemDate = new Date(item.timestamp);
+        return itemDate >= periodStart && itemDate <= now;
+      });
+    }
+    
+    // Calculate trends
+    const trends: Record<string, { count: number, totalIntensity: number }> = {};
+    
+    filteredData.forEach(item => {
+      if (!trends[item.emotion]) {
+        trends[item.emotion] = { count: 0, totalIntensity: 0 };
+      }
+      
+      trends[item.emotion].count++;
+      trends[item.emotion].totalIntensity += item.intensity;
+    });
+    
+    // Format results
+    const results = Object.entries(trends).map(([emotion, data]) => ({
+      emotion,
+      count: data.count,
+      avgIntensity: data.totalIntensity / data.count
+    }));
+    
+    // Save the tracking result
+    emotionalDataService.addEmotionalData({
+      emotion: 'tracking',
+      intensity: 0,
+      timestamp: new Date().toISOString(),
+      context: JSON.stringify(results)
+    });
+    
+    return {
+      success: true,
+      results
+    };
   }
-}
+};

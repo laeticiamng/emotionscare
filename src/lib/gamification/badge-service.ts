@@ -1,73 +1,52 @@
 
-import { Badge } from '@/types/gamification';
+// For fixing imports conflicts, we'll rename the imported Badge type
+import { Badge as BadgeType } from '@/types/badge';
 
-// Define a Badge interface if not already defined in types
-interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  iconUrl: string;
-  earnedAt?: string; // Use this instead of dateEarned
-  category: string;
-  level: number;
-  isUnlocked: boolean;
+// In-memory storage for badges
+let badges: BadgeType[] = [];
+
+// Add a badge
+export function addBadge(badge: Omit<BadgeType, 'id'>): BadgeType {
+  const newBadge: BadgeType = {
+    id: `badge-${Date.now()}`,
+    ...badge as any
+  };
+  
+  badges.push(newBadge);
+  return newBadge;
 }
 
-export const getBadgesForUser = async (userId: string): Promise<Badge[]> => {
-  // Mock API call delay
-  await new Promise(resolve => setTimeout(resolve, 600));
-  
-  // Return mock badges
-  return [
-    {
-      id: 'badge-1',
-      name: 'Emotion Explorer',
-      description: 'Completed your first emotion scan',
-      iconUrl: '/badges/emotion-explorer.svg',
-      earnedAt: '2023-01-15T10:30:00Z',
-      category: 'scan',
-      level: 1,
-      isUnlocked: true
-    },
-    {
-      id: 'badge-2',
-      name: 'Focused Mind',
-      description: 'Achieved focus state 5 times',
-      iconUrl: '/badges/focused-mind.svg',
-      earnedAt: '2023-01-20T14:45:00Z',
-      category: 'focus',
-      level: 2,
-      isUnlocked: true
-    },
-    // Add a badge that's not unlocked yet
-    {
-      id: 'badge-3',
-      name: 'Meditation Master',
-      description: 'Complete 10 meditation sessions',
-      iconUrl: '/badges/meditation-master.svg',
-      category: 'meditation',
-      level: 3,
-      isUnlocked: false
-    }
-  ];
+// Get all badges
+export function getAllBadges(): BadgeType[] {
+  return [...badges];
+}
+
+// Get badges by user
+export function getBadgesByUser(userId: string): BadgeType[] {
+  return badges.filter(badge => badge.user_id === userId);
+}
+
+// Get badges by category
+export function getBadgesByCategory(category: string): BadgeType[] {
+  return badges.filter(badge => badge.category === category);
+}
+
+// Get badge by ID
+export function getBadgeById(id: string): BadgeType | undefined {
+  return badges.find(badge => badge.id === id);
+}
+
+// Export getBadges for compatibility
+export const getBadges = getAllBadges;
+
+// Badge service object
+const badgeService = {
+  addBadge,
+  getAllBadges,
+  getBadgesByUser,
+  getBadgesByCategory,
+  getBadgeById,
+  getBadges
 };
 
-export const unlockBadge = async (
-  userId: string, 
-  badgeId: string
-): Promise<Badge> => {
-  // Mock API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // Return the unlocked badge
-  return {
-    id: badgeId,
-    name: 'Newly Unlocked Badge',
-    description: 'You just unlocked this badge!',
-    iconUrl: '/badges/new-badge.svg',
-    earnedAt: new Date().toISOString(), // Use earnedAt instead of dateEarned
-    category: 'achievement',
-    level: 1,
-    isUnlocked: true
-  };
-};
+export default badgeService;

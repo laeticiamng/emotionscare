@@ -24,6 +24,8 @@ export type EmotionalData = {
   intensity: number;
   timestamp: Date | string;
   context?: string;
+  value?: number; // Added this property
+  tags?: string[]; // Added this property
 };
 
 export type EmotionalTrend = {

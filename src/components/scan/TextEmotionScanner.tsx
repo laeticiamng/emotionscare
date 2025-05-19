@@ -1,138 +1,109 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { EmotionResult, TextEmotionScannerProps } from '@/types/emotion';
 
-const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({ onResult, onProcessingChange, isProcessing, setIsProcessing }) => {
-  const [text, setText] = useState<string>("");
-  const [processing, setProcessing] = useState<boolean>(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
+const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({ 
+  onResult, 
+  onProcessingChange,
+  isProcessing: externalIsProcessing,
+  setIsProcessing: externalSetIsProcessing
+}) => {
+  const [text, setText] = useState<string>('');
+  const [localIsProcessing, setLocalIsProcessing] = useState(false);
+  
   // Use external state if provided, otherwise use local state
-  const isLoading = isProcessing !== undefined ? isProcessing : processing;
-  const setIsLoading = setIsProcessing || setProcessing;
+  const isProcessing = externalIsProcessing !== undefined ? externalIsProcessing : localIsProcessing;
+  const setIsProcessing = externalSetIsProcessing || setLocalIsProcessing;
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
   };
 
   const handleSubmit = () => {
-    if (!text.trim()) return;
+    if (text.trim().length < 3) return;
     
-    // Call onProcessingChange if provided
     if (onProcessingChange) {
       onProcessingChange(true);
     }
-    setIsLoading(true);
-
-    // Simulate API call delay
+    setIsProcessing(true);
+    
+    // Simulate processing delay
     setTimeout(() => {
-      // Mock emotion detection
+      // Create a sample emotion result (in a real app, this would come from an API)
       const result: EmotionResult = {
         id: `text-${Date.now()}`,
-        emotion: getRandomEmotion(text),
-        primaryEmotion: getRandomEmotion(text), // Added for component compatibility
-        confidence: 0.7 + Math.random() * 0.2,
-        intensity: 0.6 + Math.random() * 0.3,
+        emotion: determineMockEmotion(text),
+        primaryEmotion: determineMockEmotion(text), // Added for components that use primaryEmotion
+        confidence: 0.85,
+        intensity: 0.75,
         source: 'text',
         timestamp: new Date().toISOString(),
         text: text,
-        emojis: getEmojisForText(text),
         recommendations: [
           {
-            title: "Pratiquez la pleine conscience",
-            description: "Prenez 5 minutes pour vous concentrer sur votre respiration"
+            title: "Take a break",
+            description: "Consider taking a short break to reset your mind",
+            content: "Taking a break can help you refocus and recharge."
           },
           {
-            title: "Écoutez de la musique apaisante",
-            description: "Une playlist de musique calme peut aider à équilibrer vos émotions"
+            title: "Mindfulness exercise",
+            description: "A quick mindfulness exercise to center yourself",
+            content: "Focus on your breathing for 2 minutes to recenter your thoughts."
           }
         ],
-        score: Math.round((0.6 + Math.random() * 0.3) * 100) // Added for component compatibility
+        score: Math.round(Math.random() * 100) // Added for components that use score
       };
       
       if (onResult) {
         onResult(result);
       }
       
-      // Call onProcessingChange if provided
       if (onProcessingChange) {
         onProcessingChange(false);
       }
-      setIsLoading(false);
-    }, 1500);
+      setIsProcessing(false);
+    }, 2000);
   };
 
-  // Utility function to get a random emotion based on text
-  const getRandomEmotion = (text: string): string => {
-    const positiveWords = ["heureux", "content", "joie", "super", "bien", "agréable", "bon", "satisfait"];
-    const negativeWords = ["triste", "déprimé", "malheureux", "mauvais", "difficile", "pénible", "mal"];
-    
+  // Simple mock emotion detector based on keywords
+  const determineMockEmotion = (text: string): string => {
     const lowerText = text.toLowerCase();
-    
-    let isPositive = positiveWords.some(word => lowerText.includes(word));
-    let isNegative = negativeWords.some(word => lowerText.includes(word));
-    
-    if (isPositive && !isNegative) return "happy";
-    if (isNegative && !isPositive) return "sad";
-    if (isPositive && isNegative) return "mixed";
-    
-    // If no clear emotions detected, return one of these common states
-    const emotions = ["neutral", "calm", "thoughtful", "focused"];
-    return emotions[Math.floor(Math.random() * emotions.length)];
-  };
-  
-  // Get emojis based on detected emotion
-  const getEmojisForText = (text: string): string[] => {
-    const emotion = getRandomEmotion(text);
-    
-    switch (emotion) {
-      case "happy": return ["😊", "😄", "🙂"];
-      case "sad": return ["😔", "😢", "🙁"];
-      case "mixed": return ["😐", "🤔", "😕"];
-      case "neutral": return ["😐", "😶"];
-      case "calm": return ["😌", "🧘"];
-      case "thoughtful": return ["🤔", "🧐"];
-      case "focused": return ["🧐", "🤓"];
-      default: return ["😐"];
+    if (lowerText.includes('happy') || lowerText.includes('joy') || lowerText.includes('excited')) {
+      return 'joy';
+    } else if (lowerText.includes('sad') || lowerText.includes('depressed') || lowerText.includes('unhappy')) {
+      return 'sadness';
+    } else if (lowerText.includes('angry') || lowerText.includes('frustrated') || lowerText.includes('mad')) {
+      return 'anger';
+    } else if (lowerText.includes('scared') || lowerText.includes('fear') || lowerText.includes('anxious')) {
+      return 'fear';
+    } else if (lowerText.includes('calm') || lowerText.includes('peaceful') || lowerText.includes('relaxed')) {
+      return 'calm';
+    } else {
+      return 'neutral';
     }
   };
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Partagez ce que vous ressentez</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Textarea 
-          placeholder="Décrivez vos émotions et sentiments actuels..."
+      <CardContent className="pt-4">
+        <Textarea
+          placeholder="Décrivez comment vous vous sentez en ce moment..."
           value={text}
           onChange={handleTextChange}
-          disabled={isLoading}
-          ref={textareaRef}
-          rows={5}
-          className="resize-none"
+          className="min-h-[120px]"
+          disabled={isProcessing}
         />
-        <p className="text-xs text-muted-foreground mt-2">
-          Plus votre description est précise, plus l'analyse sera pertinente.
-        </p>
       </CardContent>
       <CardFooter>
         <Button 
-          onClick={handleSubmit} 
-          disabled={text.trim().length < 10 || isLoading}
+          onClick={handleSubmit}
+          disabled={text.trim().length < 3 || isProcessing}
           className="w-full"
         >
-          {isLoading ? (
-            <>
-              <div className="animate-spin h-4 w-4 mr-2 border-2 border-current border-t-transparent rounded-full"></div>
-              Analyse en cours...
-            </>
-          ) : (
-            'Analyser mes émotions'
-          )}
+          {isProcessing ? 'Analyse en cours...' : 'Analyser mes émotions'}
         </Button>
       </CardFooter>
     </Card>

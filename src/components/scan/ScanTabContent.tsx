@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { EmotionScanFormProps } from '@/types/emotion'; 
+import { EmotionResult } from '@/types/emotion'; 
 import EmotionScanForm from './EmotionScanForm';
 
 const ScanTabContent: React.FC<{ 

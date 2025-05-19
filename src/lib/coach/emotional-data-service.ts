@@ -1,55 +1,74 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { EmotionalData } from '@/types/emotional-data';
-import { EmotionResult } from '@/types/emotional-data';
+import { EmotionalData } from '../hooks/coach/types';
+import { EmotionResult } from '@/types/emotion';
 
-// Service pour gérer les données émotionnelles
+// In-memory storage for emotional data
+let emotionalData: EmotionalData[] = [];
+
 class EmotionalDataService {
-  private data: EmotionalData[] = [];
-
-  // Récupérer toutes les données pour un utilisateur
-  async getUserEmotionalData(userId: string): Promise<EmotionalData[]> {
-    return this.data.filter(item => item.user_id === userId);
+  // Get all emotional data
+  getAllEmotionalData(): EmotionalData[] {
+    return [...emotionalData];
   }
-
-  // Ajouter une nouvelle entrée émotionnelle
-  async addEmotionalData(data: Omit<EmotionalData, 'id'>): Promise<EmotionalData> {
-    const newEntry: EmotionalData = {
+  
+  // Get emotional data by ID
+  getEmotionalDataById(id: string): EmotionalData | undefined {
+    return emotionalData.find(data => data.id === id);
+  }
+  
+  // Add new emotional data
+  addEmotionalData(data: Omit<EmotionalData, 'id'>): EmotionalData {
+    const newData = {
       id: uuidv4(),
       ...data,
+      timestamp: data.timestamp || new Date().toISOString()
     };
     
-    this.data.push(newEntry);
-    return newEntry;
+    emotionalData.push(newData);
+    return newData;
   }
-
-  // Analyser les données émotionnelles récentes
-  async analyzeRecentEmotions(userId: string): Promise<EmotionResult> {
-    // Simulation d'analyse
+  
+  // Update emotional data
+  updateEmotionalData(id: string, data: Partial<EmotionalData>): EmotionalData | null {
+    const index = emotionalData.findIndex(item => item.id === id);
+    
+    if (index === -1) return null;
+    
+    emotionalData[index] = {
+      ...emotionalData[index],
+      ...data
+    };
+    
+    return emotionalData[index];
+  }
+  
+  // Delete emotional data
+  deleteEmotionalData(id: string): boolean {
+    const initialLength = emotionalData.length;
+    emotionalData = emotionalData.filter(item => item.id !== id);
+    
+    return emotionalData.length < initialLength;
+  }
+  
+  // Clear all emotional data
+  clearEmotionalData(): void {
+    emotionalData = [];
+  }
+  
+  // Convert from EmotionResult to EmotionalData
+  convertFromEmotionResult(result: EmotionResult): EmotionalData {
     return {
-      emotion: 'calm',
-      score: 75,
-      confidence: 0.85,
-      intensity: 3,
-      recommendations: [
-        'Continuez vos exercices de méditation',
-        'Prenez des pauses régulières',
-        'Maintenez une routine de sommeil saine'
-      ]
+      id: result.id,
+      emotion: result.emotion,
+      intensity: result.intensity,
+      timestamp: result.timestamp,
+      context: result.text || undefined
     };
   }
-
-  // Obtenir la dernière entrée émotionnelle
-  async getLatestEmotionalData(userId: string): Promise<EmotionalData | null> {
-    const userEntries = await this.getUserEmotionalData(userId);
-    if (userEntries.length === 0) return null;
-    
-    // Trie par horodatage (plus récent en premier)
-    return userEntries.sort((a, b) => 
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    )[0];
-  }
+  
+  // For compatibility with existing code
+  saveEmotionalData = this.addEmotionalData;
 }
 
-export const emotionalDataService = new EmotionalDataService();
-export default emotionalDataService;
+export default new EmotionalDataService();

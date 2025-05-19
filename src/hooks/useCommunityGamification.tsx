@@ -1,177 +1,198 @@
+
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/types/badge';
+import { Challenge, LeaderboardEntry } from '@/types/gamification';
 
 export function useCommunityGamification() {
-  const [badges, setBadges] = useState<Badge[]>([
+  const [currentChallenge, setCurrentChallenge] = useState<Challenge | null>(null);
+  
+  // Mock data for badges
+  const badges: Badge[] = [
     {
-      id: '1',
-      name: 'Consistent Tracker',
-      description: 'Track emotions for 7 consecutive days',
-      imageUrl: '/badges/consistent-tracker.png',
-      level: '1', // Changed to string 
+      id: "badge1",
+      name: "Emotional Intelligence",
+      description: "Demonstrated exceptional emotional awareness and intelligence",
+      imageUrl: "/images/badges/ei-badge.png",
+      level: 2,
       unlocked: true,
-      progress: 7,
-      total: 7,
-      completed: true,
-      tier: 'bronze', // Added to type
+      unlockedAt: new Date().toISOString(),
+      category: "emotional",
+      rarity: "rare",
+      tier: "gold",
+      progress: 100,
+      threshold: 100,
+      completed: true
     },
     {
-      id: '2',
-      name: 'Mindfulness Master',
-      description: 'Complete 10 meditation sessions',
-      imageUrl: '/badges/mindfulness-master.png',
-      level: '2', // Changed to string
+      id: "badge2",
+      name: "Meditation Master",
+      description: "Completed 10 meditation sessions",
+      imageUrl: "/images/badges/meditation-badge.png",
+      level: 1,
+      unlocked: true,
+      unlockedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+      category: "wellness",
+      rarity: "common",
+      tier: "silver",
+      progress: 10,
+      threshold: 10,
+      completed: true
+    },
+    {
+      id: "badge3",
+      name: "Social Butterfly",
+      description: "Connected with 5 team members",
+      imageUrl: "/images/badges/social-badge.png",
+      level: 3,
       unlocked: false,
-      progress: 6,
-      total: 10,
-      completed: false,
-      tier: 'silver', // Added to type
-    },
-    {
-      id: '3',
-      name: 'Emotion Explorer',
-      description: 'Record 5 different emotions',
-      imageUrl: '/badges/emotion-explorer.png',
-      level: '1', // Changed to string
-      unlocked: true,
-      progress: 5,
-      total: 5,
-      completed: true,
-      tier: 'gold', // Added to type
+      category: "social",
+      rarity: "epic",
+      tier: "platinum",
+      progress: 3,
+      threshold: 5,
+      completed: false
     }
-  ]);
-
-  const [challenges, setChallenges] = useState<Challenge[]>([
+  ];
+  
+  // Mock challenges data
+  const challenges: Challenge[] = [
     {
-      id: 'c1',
-      title: 'Soutien communautaire',
-      name: 'Soutien communautaire',
-      description: 'Répondre à 3 questions d\'autres membres',
-      points: 100,
-      progress: 1,
-      goal: 3,
-      category: 'community',
-      completed: false,
-      status: 'in-progress',
-      difficulty: 'easy',
-      completions: 1,
-      total: 3,
-      reward: {
-        type: 'points',
-        value: 100
-      },
-      unlocked: true
-    },
-    {
-      id: 'c2',
-      title: 'Partage bienveillant',
-      name: 'Partage bienveillant',
-      description: 'Partager une expérience personnelle positive',
-      points: 50,
-      progress: 1,
-      goal: 1,
-      category: 'community',
-      completed: true,
-      status: 'completed',
-      difficulty: 'easy',
-      completions: 1,
-      total: 1,
-      reward: {
-        type: 'points',
-        value: 50
-      },
-      unlocked: true
-    },
-    {
-      id: 'c3',
-      title: 'Engagement hebdomadaire',
-      name: 'Engagement hebdomadaire',
-      description: 'Participer aux discussions 5 jours cette semaine',
-      points: 200,
+      id: "challenge1",
+      title: "Daily Reflection",
+      name: "Daily Reflection",
+      description: "Complete a daily reflection for 5 consecutive days",
       progress: 3,
       goal: 5,
-      category: 'community',
       completed: false,
-      status: 'in-progress',
-      difficulty: 'medium',
-      completions: 3,
-      total: 5,
-      deadline: new Date(Date.now() + 3*24*60*60*1000).toISOString(),
-      reward: {
-        type: 'badge',
-        value: 'community-star'
-      },
+      category: "wellness",
+      status: "in-progress",
+      difficulty: "easy",
+      points: 50,
+      totalSteps: 5,
+      icon: "calendar",
+      reward: "badge123",
+      unlocked: true
+    },
+    {
+      id: "challenge2",
+      title: "Team Connection",
+      name: "Team Connection",
+      description: "Share emotions with 3 team members",
+      progress: 2,
+      goal: 3,
+      completed: false,
+      category: "social",
+      status: "in-progress",
+      difficulty: "medium",
+      points: 75,
+      totalSteps: 3,
+      icon: "users",
+      reward: "badge456",
       unlocked: true
     }
-  ]);
-
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([
+  ];
+  
+  // Mock leaderboard data
+  const leaderboard: LeaderboardEntry[] = [
     {
-      id: 'l1',
-      userId: 'u123',
-      name: 'Marie L.',
-      username: 'marie_l',
-      points: 850,
-      position: 1,
+      id: "user1",
+      userId: "user1",
+      username: "JohnDoe",
+      points: 1250,
       rank: 1,
-      score: 850,
-      avatarUrl: '/avatars/user1.png'
+      badges: 8,
+      streak: 12,
+      avatarUrl: "/images/avatars/avatar1.png"
     },
     {
-      id: 'l2',
-      userId: 'u456',
-      name: 'Thomas B.',
-      username: 'thomas_b',
-      points: 720,
-      position: 2,
+      id: "user2",
+      userId: "user2",
+      username: "JaneSmith",
+      points: 1100,
       rank: 2,
-      score: 720,
-      avatarUrl: '/avatars/user2.png'
+      badges: 7,
+      streak: 8,
+      avatarUrl: "/images/avatars/avatar2.png"
     },
     {
-      id: 'l3',
-      userId: 'u789',
-      name: 'Sophie C.',
-      username: 'sophie_c',
-      points: 690,
-      position: 3,
+      id: "user3",
+      userId: "user3",
+      username: "MikeJohnson",
+      points: 950,
       rank: 3,
-      score: 690,
-      avatarUrl: '/avatars/user3.png'
+      badges: 6,
+      streak: 5,
+      avatarUrl: "/images/avatars/avatar3.png"
     }
-  ]);
-
-  const unlockBadge = (badgeId: string) => {
-    setBadges(prev => prev.map(badge => 
-      badge.id === badgeId 
-        ? { ...badge, unlocked: true, completed: true, progress: badge.threshold || 100 } 
-        : badge
-    ));
+  ];
+  
+  const { data: gamificationStats } = useQuery({
+    queryKey: ['gamification', 'stats'],
+    queryFn: () => {
+      // Mock API call
+      return Promise.resolve({
+        points: 750,
+        level: 3,
+        rank: "Explorer",
+        streakDays: 7,
+        badges: 5,
+        streak: 7,
+        nextLevelPoints: 1000,
+        progress: 75,
+        completedChallenges: 8,
+        totalChallenges: 15,
+      });
+    }
+  });
+  
+  const { data: badgesData } = useQuery({
+    queryKey: ['gamification', 'badges'],
+    queryFn: () => {
+      // Mock API call
+      return Promise.resolve(badges);
+    }
+  });
+  
+  const { data: challengesData } = useQuery({
+    queryKey: ['gamification', 'challenges'],
+    queryFn: () => {
+      // Mock API call
+      return Promise.resolve(challenges);
+    }
+  });
+  
+  const { data: leaderboardData } = useQuery({
+    queryKey: ['gamification', 'leaderboard'],
+    queryFn: () => {
+      // Mock API call
+      return Promise.resolve(leaderboard);
+    }
+  });
+  
+  const startChallenge = (challengeId: string) => {
+    const challenge = challenges.find(c => c.id === challengeId);
+    if (challenge) {
+      setCurrentChallenge(challenge);
+      return Promise.resolve(challenge);
+    }
+    return Promise.reject("Challenge not found");
   };
-
-  const updateProgress = (challengeId: string, progress: number) => {
-    setChallenges(prev => prev.map(challenge => {
-      if (challenge.id !== challengeId) return challenge;
-      
-      const newProgress = Math.min(progress, challenge.goal || 0);
-      const completed = newProgress >= (challenge.goal || 0);
-      
-      return {
-        ...challenge,
-        progress: newProgress,
-        completed,
-        status: completed ? 'completed' : 'in-progress',
-        completions: newProgress,
-      };
-    }));
+  
+  const updateChallengeProgress = (challengeId: string, progress: number) => {
+    // In a real app, this would update the progress via an API call
+    return Promise.resolve({ success: true, progress });
   };
-
+  
   return {
-    badges,
-    challenges,
-    leaderboard,
-    unlockBadge,
-    updateProgress
+    badges: badgesData || [],
+    challenges: challengesData || [],
+    leaderboard: leaderboardData || [],
+    currentChallenge,
+    stats: gamificationStats,
+    startChallenge,
+    updateChallengeProgress,
+    isLoading: false
   };
 }
 

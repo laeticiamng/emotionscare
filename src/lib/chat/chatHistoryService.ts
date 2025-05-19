@@ -1,114 +1,102 @@
 
+import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage, ChatConversation } from '@/types/chat';
 
-// Service de gestion de l'historique des conversations
-export class ChatHistoryService {
-  private conversations: ChatConversation[] = [];
-  
-  constructor() {
-    this.loadFromLocalStorage();
-  }
-  
-  // Charger les conversations depuis le localStorage
-  private loadFromLocalStorage() {
-    try {
-      const storedConversations = localStorage.getItem('chat-conversations');
-      if (storedConversations) {
-        this.conversations = JSON.parse(storedConversations);
-      }
-    } catch (error) {
-      console.error('Failed to load conversations from localStorage:', error);
-    }
-  }
-  
-  // Sauvegarder les conversations dans le localStorage
-  private saveToLocalStorage() {
-    try {
-      localStorage.setItem('chat-conversations', JSON.stringify(this.conversations));
-    } catch (error) {
-      console.error('Failed to save conversations to localStorage:', error);
-    }
-  }
-  
-  // Créer une nouvelle conversation
-  createConversation(title: string): ChatConversation {
-    const newConversation: ChatConversation = {
-      id: `conv-${Date.now()}`,
-      title,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      lastMessage: ''
-    };
+const STORAGE_KEY = 'chat_history';
+
+/**
+ * Get all conversations from local storage
+ */
+export function getConversations(): ChatConversation[] {
+  try {
+    const storedData = localStorage.getItem(STORAGE_KEY);
+    if (!storedData) return [];
     
-    this.conversations.push(newConversation);
-    this.saveToLocalStorage();
+    const conversations = JSON.parse(storedData);
     
-    return newConversation;
-  }
-  
-  // Ajouter un message à une conversation
-  addMessage(conversationId: string, message: Omit<ChatMessage, 'id' | 'conversationId'>): ChatMessage {
-    const conversation = this.conversations.find(c => c.id === conversationId);
-    
-    if (!conversation) {
-      throw new Error(`Conversation with id ${conversationId} not found`);
-    }
-    
-    const newMessage: ChatMessage = {
-      id: `msg-${Date.now()}`,
-      conversationId,
-      sender: message.sender,
-      text: message.text,
-      timestamp: new Date().toISOString()
-    };
-    
-    // Mise à jour de la conversation
-    conversation.lastMessage = message.text;
-    conversation.updatedAt = new Date().toISOString();
-    
-    this.saveToLocalStorage();
-    
-    return newMessage;
-  }
-  
-  // Obtenir une conversation par son ID
-  getConversation(conversationId: string): ChatConversation | undefined {
-    return this.conversations.find(c => c.id === conversationId);
-  }
-  
-  // Obtenir toutes les conversations
-  getAllConversations(): ChatConversation[] {
-    return [...this.conversations].sort((a, b) => 
-      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    );
-  }
-  
-  // Supprimer une conversation
-  deleteConversation(conversationId: string): boolean {
-    const initialLength = this.conversations.length;
-    this.conversations = this.conversations.filter(c => c.id !== conversationId);
-    
-    if (this.conversations.length !== initialLength) {
-      this.saveToLocalStorage();
-      return true;
-    }
-    
-    return false;
-  }
-  
-  // Mettre à jour le titre d'une conversation
-  updateConversationTitle(conversationId: string, newTitle: string): boolean {
-    const conversation = this.conversations.find(c => c.id === conversationId);
-    
-    if (conversation) {
-      conversation.title = newTitle;
-      conversation.updatedAt = new Date().toISOString();
-      this.saveToLocalStorage();
-      return true;
-    }
-    
-    return false;
+    return Array.isArray(conversations) ? conversations : [];
+  } catch (error) {
+    console.error('Error retrieving chat history:', error);
+    return [];
   }
 }
 
-export default new ChatHistoryService();
+/**
+ * Create a new conversation
+ */
+export function createConversation(title: string = 'New Conversation'): ChatConversation {
+  const newId = uuidv4();
+  const now = new Date().toISOString();
+  
+  const conversation: ChatConversation = {
+    id: newId,
+    title,
+    createdAt: now,
+    updatedAt: now,
+    lastMessage: '',
+    messages: [] // Include the required messages array
+  };
+  
+  // Store in local storage
+  const conversations = getConversations();
+  conversations.push(conversation);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+  
+  return conversation;
+}
+
+/**
+ * Get all messages for a specific conversation
+ */
+export function getMessages(conversationId: string): ChatMessage[] {
+  const conversations = getConversations();
+  const conversation = conversations.find(c => c.id === conversationId);
+  
+  return conversation?.messages || [];
+}
+
+/**
+ * Add a new message to a conversation
+ */
+export function addMessage(conversationId: string, sender: 'user' | 'assistant' | 'system', text: string): ChatMessage {
+  const message: ChatMessage = {
+    id: uuidv4(),
+    conversationId,
+    sender,
+    content: text, // Include the required content property
+    timestamp: new Date().toISOString(),
+    text // For backward compatibility
+  };
+  
+  // Update storage
+  const conversations = getConversations();
+  const conversationIndex = conversations.findIndex(c => c.id === conversationId);
+  
+  if (conversationIndex !== -1) {
+    const conversation = conversations[conversationIndex];
+    if (!conversation.messages) conversation.messages = [];
+    conversation.messages.push(message);
+    conversation.updatedAt = message.timestamp;
+    conversation.lastMessage = text;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+  }
+  
+  return message;
+}
+
+/**
+ * Delete a conversation by ID
+ */
+export function deleteConversation(conversationId: string): boolean {
+  let conversations = getConversations();
+  const initialLength = conversations.length;
+  
+  conversations = conversations.filter(c => c.id !== conversationId);
+  
+  if (conversations.length !== initialLength) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+    return true;
+  }
+  
+  return false;
+}

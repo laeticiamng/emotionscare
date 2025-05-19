@@ -2,12 +2,12 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
-import { EmotionResult, EmotionScanFormProps } from '@/types/emotion';
+import { EmotionResult } from '@/types/emotion';
 import VoiceEmotionScanner from './VoiceEmotionScanner';
 import TextEmotionScanner from './TextEmotionScanner';
 import EmojiEmotionScanner from './EmojiEmotionScanner';
 
-// Adding interface if not already defined in types
+// Define the props interface directly here instead of importing it
 interface EmotionScanFormProps {
   onScanComplete?: (result: EmotionResult) => void;
   userId?: string;

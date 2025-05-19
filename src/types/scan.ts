@@ -3,7 +3,7 @@ import { EmotionResult } from './emotion';
 
 export interface EmotionScanFormProps {
   userId?: string;
-  onEmotionDetected?: () => void;
+  onEmotionDetected?: (result: EmotionResult) => void;
   onClose?: () => void;
   onScanComplete?: (result: EmotionResult) => void;
   defaultTab?: string;
@@ -45,6 +45,33 @@ export interface EmotionGamificationStats {
   total_scans: number;
   streak_days: number;
   highest_emotion?: string;
+}
+
+// Add MoodData interface that was missing from emotion.ts
+export interface MoodData {
+  emotion: string;
+  intensity: number;
+  timestamp: string;
+  date?: string; // Added this property
+}
+
+// Add EmotionPrediction interface that was missing
+export interface EmotionPrediction {
+  predictedEmotion: string;
+  emotion: string;
+  probability: number;
+  confidence: number;
+  triggers?: string[];
+  recommendations?: string[];
+}
+
+// Add EnhancedEmotionResult interface
+export interface EnhancedEmotionResult extends EmotionResult {
+  emotions: Record<string, number>;
+  dominantEmotion: {
+    name: string;
+    score: number;
+  };
 }
 
 export { EmotionResult };

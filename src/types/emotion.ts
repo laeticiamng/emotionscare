@@ -16,6 +16,8 @@ export interface Emotion {
   score?: number; // Added for compatibility
   userId?: string; // Added for compatibility
   user_id?: string; // Added for compatibility
+  value?: number; // Added for compatibility
+  tags?: string[]; // Added for compatibility
 }
 
 export interface EmotionResult {
@@ -41,6 +43,7 @@ export interface EmotionResult {
   primaryEmotion?: string;
   score?: number;
   date?: string;
+  userId?: string; // Added for compatibility
 }
 
 export interface EmotionRecommendation {
@@ -93,3 +96,18 @@ export interface EmotionScanFormProps {
 }
 
 export type EmotionHistory = EmotionResult[];
+
+export interface LiveVoiceScannerProps {
+  onScanComplete?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  autoStart?: boolean;
+  scanDuration?: number; // in seconds
+}
+
+export interface TeamOverviewProps {
+  teamId: string;
+  period?: string;
+  showDetails?: boolean;
+}

@@ -1,144 +1,87 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { Notification, NotificationFilter } from '@/types/notification';
-import { v4 as uuid } from 'uuid';
+import { useState, useEffect } from 'react';
+import { Notification } from '@/types/notification';
 
-interface UseNotificationsOptions {
-  userId?: string;
-  fetchOnMount?: boolean;
-  limit?: number;
-}
-
-export const useNotifications = (options: UseNotificationsOptions = {}) => {
-  const { userId, fetchOnMount = true, limit = 20 } = options;
-  
+export function useNotifications(userId?: string) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  const fetchNotifications = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // Mock implementation, would be replaced with real API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const mockNotifications: Notification[] = Array.from({ length: limit }, (_, i) => ({
-        id: `notif-${i}`,
-        user_id: userId || 'current-user',
-        title: `Notification ${i}`,
-        message: `This is notification message ${i}`,
-        type: i % 5 === 0 ? 'system' : 
-              i % 4 === 0 ? 'emotion' :
-              i % 3 === 0 ? 'journal' :
-              i % 2 === 0 ? 'achievement' : 'info',
-        read: i % 3 === 0,
-        timestamp: new Date(Date.now() - i * 3600000).toISOString(),
-        created_at: new Date(Date.now() - i * 3600000).toISOString()
-      }));
-      
-      setNotifications(mockNotifications);
-      
-      // Count unread notifications
-      const unread = mockNotifications.filter(n => !n.read).length;
-      setUnreadCount(unread);
-      
-      return mockNotifications;
-    } catch (err) {
-      console.error('Error fetching notifications:', err);
-      setError('Failed to load notifications');
-      return [];
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId, limit]);
-  
-  const fetchUnreadCount = useCallback(async () => {
-    try {
-      // Mock implementation
-      const count = notifications.filter(n => !n.read).length;
-      setUnreadCount(count);
-      return count;
-    } catch (err) {
-      console.error('Error fetching unread count:', err);
-      return 0;
-    }
-  }, [notifications]);
-  
-  const markAsRead = useCallback(async (notificationId: string) => {
-    try {
-      // Update local state
-      setNotifications(prev => prev.map(notification => 
-        notification.id === notificationId 
-          ? { ...notification, read: true } 
-          : notification
-      ));
-      
-      // Update unread count
-      fetchUnreadCount();
-      
-      return true;
-    } catch (err) {
-      console.error('Error marking notification as read:', err);
-      return false;
-    }
-  }, [fetchUnreadCount]);
-  
-  const markAllAsRead = useCallback(async () => {
-    try {
-      // Update local state
-      setNotifications(prev => prev.map(notification => ({ ...notification, read: true })));
-      setUnreadCount(0);
-      
-      return true;
-    } catch (err) {
-      console.error('Error marking all notifications as read:', err);
-      return false;
-    }
-  }, []);
-  
-  const addNotification = useCallback(async (notification: Omit<Notification, 'id' | 'timestamp' | 'read'>) => {
-    try {
-      // Generate a new notification with required fields
-      const newNotification: Notification = {
-        id: uuid(),
-        ...notification,
-        timestamp: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        read: false
-      };
-      
-      // Update local state
-      setNotifications(prev => [newNotification, ...prev]);
-      setUnreadCount(prev => prev + 1);
-      
-      return newNotification.id;
-    } catch (err) {
-      console.error('Error adding notification:', err);
-      throw err;
-    }
-  }, []);
-  
-  // Initial fetch
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    if (fetchOnMount) {
-      fetchNotifications();
+    if (!userId) {
+      setIsLoading(false);
+      return;
     }
-  }, [fetchOnMount, fetchNotifications]);
-  
+
+    const fetchNotifications = async () => {
+      setIsLoading(true);
+      try {
+        // In a real app, this would be an API call
+        // For now, we'll simulate with mock data
+        const mockNotifications = [
+          {
+            id: '1',
+            user_id: userId,
+            title: 'Nouvelle analyse émotionnelle',
+            message: 'Votre analyse émotionnelle quotidienne est prête',
+            type: 'emotion',
+            read: false,
+            timestamp: new Date().toISOString(),
+            created_at: new Date().toISOString()
+          },
+          {
+            id: '2', 
+            user_id: userId,
+            title: 'Rappel de méditation',
+            message: 'N\'oubliez pas votre session de méditation quotidienne',
+            type: 'reminder',
+            read: true,
+            timestamp: new Date(Date.now() - 86400000).toISOString(),
+            created_at: new Date(Date.now() - 86400000).toISOString()
+          }
+        ];
+
+        // Convert to proper Notification objects
+        const formattedNotifications: Notification[] = mockNotifications.map(n => ({
+          id: n.id,
+          userId: n.user_id,
+          title: n.title,
+          message: n.message,
+          type: n.type,
+          read: n.read,
+          createdAt: n.created_at,
+          timestamp: n.timestamp
+        }));
+
+        setNotifications(formattedNotifications);
+        setUnreadCount(formattedNotifications.filter(n => !n.read).length);
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, [userId]);
+
+  const markAsRead = (id: string) => {
+    setNotifications(notifications.map(n => 
+      n.id === id ? { ...n, read: true } : n
+    ));
+    setUnreadCount(prev => Math.max(0, prev - 1));
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })));
+    setUnreadCount(0);
+  };
+
   return {
     notifications,
     unreadCount,
     isLoading,
-    error,
-    fetchNotifications,
-    fetchUnreadCount,
     markAsRead,
-    markAllAsRead,
-    addNotification
+    markAllAsRead
   };
-};
-
-export default useNotifications;
+}

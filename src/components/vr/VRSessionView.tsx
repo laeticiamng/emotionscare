@@ -8,9 +8,10 @@ import { VRSession, VRSessionTemplate } from '@/types/vr';
 import { durationToNumber, formatDuration } from './utils';
 
 interface VRSessionViewProps {
-  session: VRSession;
+  session?: VRSession;
   template?: VRSessionTemplate;
   onContinue?: () => void;
+  onCompleteSession?: () => void; // Added this prop
   className?: string;
 }
 
@@ -18,10 +19,13 @@ const VRSessionView: React.FC<VRSessionViewProps> = ({
   session,
   template,
   onContinue,
+  onCompleteSession, // Added this prop
   className = "",
 }) => {
   // Calculate progress percentage
   const calculateProgress = (): number => {
+    if (!session) return 0;
+    
     if (session.completed) return 100;
     
     if (session.startTime && session.endTime) {
@@ -35,12 +39,20 @@ const VRSessionView: React.FC<VRSessionViewProps> = ({
     // If template has duration, use that
     if (template) {
       const durationMs = durationToNumber(template.duration) * 60 * 1000; // convert to ms
-      const startTimestamp = new Date(session.startTime).getTime();
+      const startTimestamp = new Date(session?.startTime || new Date()).getTime();
       const elapsed = Date.now() - startTimestamp;
       return Math.min(100, Math.max(0, (elapsed / durationMs) * 100));
     }
     
     return 0;
+  };
+
+  const handleContinue = () => {
+    if (onContinue) onContinue();
+  };
+
+  const handleComplete = () => {
+    if (onCompleteSession) onCompleteSession();
   };
   
   return (
@@ -62,10 +74,10 @@ const VRSessionView: React.FC<VRSessionViewProps> = ({
           <div className="absolute inset-0 flex items-center justify-center">
             <Badge 
               className={`text-lg py-2 px-4 ${
-                session.completed ? 'bg-green-500' : 'bg-blue-500'
+                session?.completed ? 'bg-green-500' : 'bg-blue-500'
               }`}
             >
-              {session.completed ? 'Terminée' : 'En cours'}
+              {session?.completed ? 'Terminée' : 'En cours'}
             </Badge>
           </div>
         </div>
@@ -82,7 +94,7 @@ const VRSessionView: React.FC<VRSessionViewProps> = ({
           <div className="border rounded p-2">
             <span className="text-xs text-muted-foreground block">Début</span>
             <span className="font-medium">
-              {new Date(session.startTime).toLocaleString()}
+              {session?.startTime ? new Date(session.startTime).toLocaleString() : new Date().toLocaleString()}
             </span>
           </div>
           <div className="border rounded p-2">
@@ -93,18 +105,18 @@ const VRSessionView: React.FC<VRSessionViewProps> = ({
           </div>
         </div>
         
-        {session.completed ? (
+        {session?.completed ? (
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => onContinue && onContinue()}
+            onClick={handleComplete}
           >
             Recommencer cette session
           </Button>
         ) : (
           <Button
             className="w-full"
-            onClick={() => onContinue && onContinue()}
+            onClick={handleContinue}
           >
             Continuer la session
           </Button>
