@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import EnhancedLoginForm from '@/components/auth/EnhancedLoginForm';
 import PageTransition from '@/components/transitions/PageTransition';
 import AnimatedBackground from '@/components/immersive/AnimatedBackground';
