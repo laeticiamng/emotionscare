@@ -1,87 +1,64 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MusicTrack } from '@/types/music';
-import { Music, Bookmark } from 'lucide-react';
+import { TabsContent } from '@/components/ui/tabs';
+import { MusicPlaylist, MusicCategory } from '@/types/music';
+import { ensureArray } from '@/utils/musicCompatibility';
 
 interface MusicTabsProps {
-  tracks: MusicTrack[];
-  onSelectTrack: (track: MusicTrack) => void;
+  playlists: MusicPlaylist[];
+  renderPlaylist: (playlist: MusicPlaylist) => React.ReactNode;
 }
 
-const MusicTabs: React.FC<MusicTabsProps> = ({ tracks, onSelectTrack }) => {
-  // Filters for different music categories
-  const focusTracks = tracks.filter(track => 
-    (track.genre && track.genre.toLowerCase().includes('focus')) || 
-    (track.category && track.category.toLowerCase().includes('focus')) ||
-    (track.emotion && track.emotion.toLowerCase().includes('focus'))
-  );
+const MusicTabs: React.FC<MusicTabsProps> = ({ playlists, renderPlaylist }) => {
+  // Helper function to check if a playlist matches a category
+  const matchesCategory = (playlist: MusicPlaylist, category: string): boolean => {
+    if (!playlist.category) return false;
+    
+    const categories = ensureArray(playlist.category);
+    return categories.some(cat => 
+      typeof cat === 'string' && cat.toLowerCase() === category.toLowerCase()
+    );
+  };
   
-  const relaxTracks = tracks.filter(track => 
-    (track.genre && track.genre.toLowerCase().includes('relax')) || 
-    (track.category && track.category.toLowerCase().includes('relax')) ||
-    (track.emotion && track.emotion.toLowerCase().includes('calm'))
-  );
+  // Filter playlists by category
+  const getPlaylistsByCategory = (category: string): MusicPlaylist[] => {
+    return playlists.filter(playlist => matchesCategory(playlist, category));
+  };
+
+  const relaxationPlaylists = getPlaylistsByCategory('relaxation');
+  const focusPlaylists = getPlaylistsByCategory('focus');
+  const energyPlaylists = getPlaylistsByCategory('energy');
   
-  const energyTracks = tracks.filter(track => 
-    (track.genre && track.genre.toLowerCase().includes('energy')) || 
-    (track.category && track.category.toLowerCase().includes('energy')) ||
-    (track.emotion && track.emotion.toLowerCase().includes('energy'))
-  );
-
-  // Function to render track list
-  const renderTrackList = (trackList: MusicTrack[]) => (
-    <div className="space-y-2">
-      {trackList.length === 0 ? (
-        <div className="text-center py-4 text-muted-foreground">
-          Aucune piste disponible dans cette catégorie
-        </div>
-      ) : (
-        trackList.map(track => (
-          <div
-            key={track.id}
-            className="flex items-center justify-between p-3 rounded-md hover:bg-accent cursor-pointer"
-            onClick={() => onSelectTrack(track)}
-          >
-            <div className="flex items-center">
-              <Music className="h-4 w-4 mr-3 text-muted-foreground" />
-              <div>
-                <p className="font-medium">{track.title || track.name}</p>
-                <p className="text-xs text-muted-foreground">{track.artist || 'Unknown'}</p>
-              </div>
-            </div>
-            <Bookmark className="h-4 w-4 text-muted-foreground hover:text-primary" />
-          </div>
-        ))
-      )}
-    </div>
-  );
-
   return (
-    <Tabs defaultValue="all" className="w-full">
-      <TabsList>
-        <TabsTrigger value="all">Toutes</TabsTrigger>
-        <TabsTrigger value="focus">Focus</TabsTrigger>
-        <TabsTrigger value="relax">Détente</TabsTrigger>
-        <TabsTrigger value="energy">Énergie</TabsTrigger>
-      </TabsList>
-      
-      <TabsContent value="all" className="mt-4">
-        {renderTrackList(tracks)}
+    <>
+      <TabsContent value="relaxation" className="space-y-4">
+        <h2 className="text-2xl font-semibold">Relaxation & Meditation</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {relaxationPlaylists.map(playlist => renderPlaylist(playlist))}
+        </div>
       </TabsContent>
       
-      <TabsContent value="focus" className="mt-4">
-        {renderTrackList(focusTracks)}
+      <TabsContent value="focus" className="space-y-4">
+        <h2 className="text-2xl font-semibold">Focus & Concentration</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {focusPlaylists.map(playlist => renderPlaylist(playlist))}
+        </div>
       </TabsContent>
       
-      <TabsContent value="relax" className="mt-4">
-        {renderTrackList(relaxTracks)}
+      <TabsContent value="energy" className="space-y-4">
+        <h2 className="text-2xl font-semibold">Energy & Motivation</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {energyPlaylists.map(playlist => renderPlaylist(playlist))}
+        </div>
       </TabsContent>
       
-      <TabsContent value="energy" className="mt-4">
-        {renderTrackList(energyTracks)}
+      <TabsContent value="all" className="space-y-4">
+        <h2 className="text-2xl font-semibold">All Playlists</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {playlists.map(playlist => renderPlaylist(playlist))}
+        </div>
       </TabsContent>
-    </Tabs>
+    </>
   );
 };
 

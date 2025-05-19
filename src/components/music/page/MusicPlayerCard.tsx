@@ -1,201 +1,213 @@
 
-import React, { useState } from 'react';
+import React, { SyntheticEvent, useRef, useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { MusicTrack } from '@/types/music';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, SkipBack, SkipForward, Volume, Volume1, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, Volume2, VolumeX } from 'lucide-react';
+import { MusicTrack } from '@/types/music';
 import { getTrackTitle, getTrackCover, getTrackArtist, getTrackUrl } from '@/utils/musicCompatibility';
 
 interface MusicPlayerCardProps {
-  tracks: MusicTrack[];
+  track: MusicTrack;
+  onNext?: () => void;
+  onPrevious?: () => void;
+  className?: string;
+  autoPlay?: boolean;
+  onEnd?: () => void;
 }
 
-const MusicPlayerCard: React.FC<MusicPlayerCardProps> = ({ 
-  tracks = [] // Provide default empty array
+const MusicPlayerCard: React.FC<MusicPlayerCardProps> = ({
+  track,
+  onNext,
+  onPrevious,
+  className = '',
+  autoPlay = false,
+  onEnd
 }) => {
-  // State for the current track
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(
-    tracks.length > 0 ? tracks[0] : null
-  );
-  
-  // Basic player controls
+  const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.8);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
-  
-  // Handle play/pause
-  const handleTogglePlay = () => {
-    setIsPlaying(prev => !prev);
-  };
+  const [volume, setVolume] = useState(0.75);
+  const [muted, setMuted] = useState(false);
 
-  const handlePlay = () => setIsPlaying(true);
-  const handlePause = () => setIsPlaying(false);
-  
-  // Handle track change
-  const handleNextTrack = () => {
-    if (!currentTrack || tracks.length <= 1) return;
-    
-    const currentIndex = tracks.findIndex(t => t.id === currentTrack.id);
-    const nextIndex = (currentIndex + 1) % tracks.length;
-    setCurrentTrack(tracks[nextIndex]);
-  };
-  
-  const handlePreviousTrack = () => {
-    if (!currentTrack || tracks.length <= 1) return;
-    
-    const currentIndex = tracks.findIndex(t => t.id === currentTrack.id);
-    const prevIndex = (currentIndex - 1 + tracks.length) % tracks.length;
-    setCurrentTrack(tracks[prevIndex]);
-  };
+  useEffect(() => {
+    if (audioRef.current) {
+      if (autoPlay) {
+        audioRef.current.play().catch(err => {
+          console.error("Autoplay prevented:", err);
+        });
+      }
+    }
+  }, [track, autoPlay]);
 
-  const handleSeek = (time: number) => {
-    setCurrentTime(time);
-  };
-
-  const handleVolumeChange = (newVolume: number) => {
-    setVolume(newVolume);
-    if (newVolume > 0) {
-      setIsMuted(false);
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play().catch(err => {
+          console.error("Play prevented:", err);
+        });
+      }
     }
   };
 
-  const handleToggleMute = () => {
-    setIsMuted(!isMuted);
+  const handleTimeUpdate = (e: SyntheticEvent<HTMLAudioElement, Event>) => {
+    setCurrentTime(e.currentTarget.currentTime);
   };
 
-  const formatTime = (seconds: number) => {
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' + sec : sec}`;
+  const handleLoadedMetadata = (e: SyntheticEvent<HTMLAudioElement, Event>) => {
+    setDuration(e.currentTarget.duration);
   };
 
-  const VolumeIcon = () => {
-    if (isMuted || volume === 0) return <VolumeX size={20} />;
-    if (volume < 0.3) return <Volume size={20} />;
-    if (volume < 0.7) return <Volume1 size={20} />;
-    return <Volume2 size={20} />;
+  const handleSeek = (value: number[]) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = value[0];
+      setCurrentTime(value[0]);
+    }
   };
-  
-  // Return a simple message if no tracks
-  if (!currentTrack) {
-    return (
-      <Card>
-        <CardContent className="p-6 text-center">
-          <p className="text-muted-foreground">No tracks available</p>
-        </CardContent>
-      </Card>
-    );
-  }
-  
+
+  const toggleMute = () => {
+    setMuted(!muted);
+    if (audioRef.current) {
+      audioRef.current.muted = !muted;
+    }
+  };
+
+  const handleVolumeChange = (value: number[]) => {
+    const newVolume = value[0];
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
+  const handleEnd = () => {
+    setIsPlaying(false);
+    if (onEnd) onEnd();
+    if (onNext) onNext();
+  };
+
+  const coverUrl = getTrackCover(track);
+  const title = getTrackTitle(track);
+  const artist = getTrackArtist(track);
+  const audioUrl = getTrackUrl(track);
+
   return (
-    <Card>
-      <CardContent className="p-4">
-        {currentTrack && (
-          <div className="space-y-4">
-            {/* Track info */}
-            <div className="flex items-center gap-3">
-              <div className="h-16 w-16 rounded-md overflow-hidden bg-muted">
-                {getTrackCover(currentTrack) ? (
-                  <img 
-                    src={getTrackCover(currentTrack)} 
-                    alt={getTrackTitle(currentTrack)}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full flex items-center justify-center text-muted-foreground">
-                    ♪
-                  </div>
-                )}
-              </div>
-              <div>
-                <h3 className="font-medium">{getTrackTitle(currentTrack)}</h3>
-                <p className="text-sm text-muted-foreground">{getTrackArtist(currentTrack)}</p>
-              </div>
-            </div>
-            
-            {/* Audio element */}
-            <audio
-              src={getTrackUrl(currentTrack)}
-              autoPlay={isPlaying}
-              loop={false}
-              onPlay={handlePlay}
-              onPause={handlePause}
-              onEnded={handleNextTrack}
-              onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
-              onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
-              onVolumeChange={(e) => setVolume(e.currentTarget.volume)}
-              muted={isMuted}
-              volume={volume}
+    <Card className={`overflow-hidden ${className}`}>
+      <CardContent className="p-0">
+        <div className="aspect-square w-full bg-slate-200 dark:bg-slate-800 relative">
+          {coverUrl ? (
+            <img 
+              src={coverUrl} 
+              alt={title} 
+              className="w-full h-full object-cover" 
             />
-            
-            {/* Progress bar */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{formatTime(currentTime)}</span>
-                <span>{formatTime(duration)}</span>
-              </div>
+          ) : (
+            <div className="flex items-center justify-center w-full h-full">
+              <span className="text-6xl text-muted-foreground">♪</span>
+            </div>
+          )}
+        </div>
+        
+        <div className="p-4">
+          <h3 className="font-medium text-lg truncate">{title}</h3>
+          <p className="text-muted-foreground truncate mb-4">{artist}</p>
+          
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground w-8">
+                {formatTime(currentTime)}
+              </span>
               <Slider
                 value={[currentTime]}
+                min={0}
                 max={duration || 100}
                 step={1}
-                onValueChange={(values) => handleSeek(values[0])}
+                onValueChange={handleSeek}
+                className="flex-1"
               />
+              <span className="text-xs text-muted-foreground w-8">
+                {formatTime(duration)}
+              </span>
             </div>
             
-            {/* Controls */}
             <div className="flex justify-between items-center">
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10"
-                  onClick={handleToggleMute}
-                >
-                  <VolumeIcon />
-                </Button>
-                <Slider
-                  value={[isMuted ? 0 : volume]}
-                  max={1}
-                  step={0.01}
-                  onValueChange={(values) => handleVolumeChange(values[0])}
-                  className="w-24"
-                />
-              </div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={onPrevious}
+                disabled={!onPrevious}
+              >
+                <SkipBack size={20} />
+              </Button>
               
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10"
-                  onClick={handlePreviousTrack}
-                >
-                  <SkipBack />
-                </Button>
-                <Button
-                  variant="default"
-                  size="icon"
-                  className="h-12 w-12 rounded-full"
-                  onClick={handleTogglePlay}
-                >
-                  {isPlaying ? <Pause /> : <Play />}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10"
-                  onClick={handleNextTrack}
-                >
-                  <SkipForward />
-                </Button>
-              </div>
+              <Button 
+                variant="default" 
+                size="icon" 
+                className="h-10 w-10 rounded-full"
+                onClick={togglePlay}
+              >
+                {isPlaying ? <Pause size={20} /> : <Play size={20} className="ml-1" />}
+              </Button>
               
-              <div className="w-[72px]"></div> {/* Spacer for balance */}
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={onNext}
+                disabled={!onNext}
+              >
+                <SkipForward size={20} />
+              </Button>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleMute}
+                className="w-8"
+              >
+                {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+              </Button>
+              <Slider
+                value={[muted ? 0 : volume]}
+                min={0}
+                max={1}
+                step={0.01}
+                onValueChange={handleVolumeChange}
+                className="flex-1"
+              />
             </div>
           </div>
-        )}
+        </div>
+        
+        <audio 
+          ref={audioRef}
+          src={audioUrl}
+          autoPlay={autoPlay}
+          loop={false}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onEnded={handleEnd}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onVolumeChange={(e) => {
+            if (audioRef.current) {
+              setVolume(audioRef.current.volume);
+              setMuted(audioRef.current.muted);
+            }
+          }}
+          muted={muted}
+          // Setting volume via ref instead of attribute
+        />
       </CardContent>
     </Card>
   );

@@ -1,261 +1,321 @@
 
-import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { cn } from '@/lib/utils';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { 
+  Menu, 
+  X, 
+  Home, 
+  BarChart2, 
+  Music, 
+  MessageSquare, 
+  Settings, 
+  User, 
+  Bell, 
+  Search,
+  ChevronDown,
+  SunMoon,
+  LogOut
+} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
+  DropdownMenuTrigger, 
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
-import { 
-  Home, 
-  Music, 
-  MessageCircle, 
-  Users, 
-  LayoutDashboard, 
-  Settings,
-  Sun,
-  Moon,
-  LogOut,
-  Bell,
-  Menu,
-  X
-} from 'lucide-react';
-import { useMusic } from '@/providers/MusicProvider';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import MusicMiniPlayer from '@/components/music/MusicMiniPlayer';
+import { useMusic } from '@/hooks/useMusic';
 
-interface PremiumHeaderProps {
-  scrolled: boolean;
+interface NavItem {
+  label: string;
+  href: string;
+  icon: React.ReactNode;
+  badge?: string | number;
 }
 
-const PremiumHeader: React.FC<PremiumHeaderProps> = ({ scrolled }) => {
-  const { theme, setTheme, toggleTheme } = useTheme();
-  const { user, isAuthenticated, logout } = useAuth();
-  const { currentTrack, isPlaying } = useMusic();
+const mainNavItems: NavItem[] = [
+  { label: 'Accueil', href: '/', icon: <Home className="h-5 w-5" /> },
+  { label: 'Dashboard', href: '/dashboard', icon: <BarChart2 className="h-5 w-5" /> },
+  { label: 'Musique', href: '/music', icon: <Music className="h-5 w-5" /> },
+  { label: 'Coach', href: '/coach', icon: <MessageSquare className="h-5 w-5" />, badge: 'New' },
+  { label: 'Paramètres', href: '/settings', icon: <Settings className="h-5 w-5" /> },
+];
+
+export const PremiumHeader = () => {
+  const location = useLocation();
+  const isMobile = useIsMobile();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const navigationItems = [
-    { to: "/dashboard", icon: <LayoutDashboard className="h-4 w-4 mr-2" />, label: "Dashboard" },
-    { to: "/emotions", icon: <Home className="h-4 w-4 mr-2" />, label: "Émotions" },
-    { to: "/music", icon: <Music className="h-4 w-4 mr-2" />, label: "Music" },
-    { to: "/coach", icon: <MessageCircle className="h-4 w-4 mr-2" />, label: "Coach" },
-    { to: "/community", icon: <Users className="h-4 w-4 mr-2" />, label: "Communauté" }
-  ];
-
+  const { currentTrack } = useMusic();
+  
+  // Check if current route matches nav item
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === path;
+    }
+    return location.pathname.startsWith(path);
+  };
+  
+  // Listen for scroll events to modify header appearance
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
   return (
-    <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-      {/* Logo */}
-      <div className="flex items-center">
-        <Link 
-          to="/" 
-          className="flex items-center space-x-2"
-        >
-          <motion.div 
-            whileHover={{ rotate: 10 }}
-            transition={{ duration: 0.2 }}
-            className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center"
-          >
-            <span className="text-white font-bold text-sm">EC</span>
-          </motion.div>
-          <motion.span 
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.2 }}
-            className="text-xl font-semibold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent hidden sm:inline-block"
-          >
-            EmotionsCare
-          </motion.span>
-        </Link>
-      </div>
-      
-      {/* Desktop Navigation */}
-      <nav className="hidden md:flex items-center space-x-1 flex-1 justify-center">
-        {navigationItems.map((item) => (
-          <NavLink 
-            key={item.to} 
-            to={item.to} 
-            className={({ isActive }) => cn(
-              "relative px-3 py-2 rounded-md text-sm font-medium transition-all flex items-center",
-              isActive 
-                ? "text-primary" 
-                : "text-foreground/70 hover:text-foreground hover:bg-accent/50"
-            )}
-          >
-            {({ isActive }) => (
-              <>
-                {item.icon}
-                {item.label}
-                {isActive && (
-                  <motion.div 
-                    layoutId="navbar-active-indicator"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"
-                    transition={{ type: "spring", duration: 0.4 }}
-                  />
-                )}
-              </>
-            )}
-          </NavLink>
-        ))}
-      </nav>
-      
-      {/* Right Menu Controls */}
-      <div className="flex items-center space-x-2">
-        {/* Mini Music Player when track is active */}
-        {currentTrack && (
-          <div className="hidden sm:block">
-            <MusicMiniPlayer />
-          </div>
-        )}
-        
-        {/* Theme Toggle */}
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={toggleTheme} 
-          className="rounded-full"
-        >
-          {theme === 'dark' ? (
-            <Sun className="h-5 w-5" />
-          ) : (
-            <Moon className="h-5 w-5" />
+    <header
+      className={cn(
+        "sticky top-0 z-40 w-full transition-all duration-200",
+        isScrolled 
+          ? "bg-background/80 backdrop-blur-lg border-b shadow-sm" 
+          : "bg-transparent"
+      )}
+    >
+      <div className="container flex h-16 items-center justify-between px-4">
+        {/* Logo & Mobile Menu Button */}
+        <div className="flex items-center gap-4">
+          {isMobile && (
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="flex flex-col">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="font-bold text-xl">EmotionsCare</div>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+                
+                <nav className="flex flex-col space-y-1">
+                  {mainNavItems.map((item) => (
+                    <Button
+                      key={item.href}
+                      variant={isActive(item.href) ? "secondary" : "ghost"}
+                      asChild
+                      className="justify-start px-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Link to={item.href}>
+                        {item.icon}
+                        <span className="ml-2">{item.label}</span>
+                        {item.badge && (
+                          <Badge 
+                            variant="outline" 
+                            className="ml-auto bg-primary text-primary-foreground"
+                          >
+                            {item.badge}
+                          </Badge>
+                        )}
+                      </Link>
+                    </Button>
+                  ))}
+                </nav>
+                
+                <div className="mt-auto pt-4">
+                  <Button 
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      alert("Déconnexion simulée");
+                      setMobileMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Déconnexion
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
           )}
-          <span className="sr-only">Toggle theme</span>
-        </Button>
+          
+          <Link to="/" className="flex items-center space-x-2 font-bold text-xl">
+            <span className="hidden sm:inline">EmotionsCare</span>
+            <span className="sm:hidden">EC</span>
+          </Link>
+        </div>
         
-        {/* Notifications */}
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <Bell className="h-5 w-5" />
-          <span className="sr-only">Notifications</span>
-        </Button>
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-1">
+          {mainNavItems.map((item) => (
+            <Button
+              key={item.href}
+              variant={isActive(item.href) ? "secondary" : "ghost"}
+              size="sm"
+              asChild
+              className="gap-1.5"
+            >
+              <Link to={item.href}>
+                {item.icon}
+                <span>{item.label}</span>
+                {item.badge && (
+                  <Badge 
+                    variant="outline" 
+                    className="ml-1 bg-primary text-primary-foreground"
+                  >
+                    {item.badge}
+                  </Badge>
+                )}
+              </Link>
+            </Button>
+          ))}
+        </nav>
         
-        {/* User Menu or Login/Register Buttons */}
-        {isAuthenticated ? (
+        {/* Right Side Actions */}
+        <div className="flex items-center gap-2">
+          {/* Global Search */}
+          <AnimatePresence>
+            {isSearchOpen ? (
+              <motion.div
+                initial={{ width: 40, opacity: 0 }}
+                animate={{ width: "100%", opacity: 1 }}
+                exit={{ width: 40, opacity: 0 }}
+                className="relative flex items-center"
+              >
+                <Input 
+                  placeholder="Rechercher..." 
+                  className="w-full pr-8"
+                  autoFocus
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0"
+                  onClick={() => setIsSearchOpen(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </motion.div>
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setIsSearchOpen(true)}
+              >
+                <Search className="h-5 w-5" />
+                <span className="sr-only">Rechercher</span>
+              </Button>
+            )}
+          </AnimatePresence>
+          
+          {/* Theme Toggle */}
+          <Button variant="ghost" size="icon">
+            <SunMoon className="h-5 w-5" />
+            <span className="sr-only">Theme</span>
+          </Button>
+          
+          {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user?.avatar} alt={user?.name || "User"} />
-                  <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
-                </Avatar>
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
+                <span className="sr-only">Notifications</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {user?.email || "user@example.com"}
-                  </p>
-                </div>
-              </DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-80">
+              <div className="flex items-center justify-between p-2">
+                <span className="font-semibold">Notifications</span>
+                <Button variant="ghost" size="sm">
+                  Tout marquer comme lu
+                </Button>
+              </div>
               <DropdownMenuSeparator />
+              <div className="max-h-96 overflow-auto py-1">
+                {[1, 2, 3].map((i) => (
+                  <DropdownMenuItem key={i} className="p-3 cursor-pointer">
+                    <div>
+                      <p className="font-medium">Nouvelle fonctionnalité disponible</p>
+                      <p className="text-sm text-muted-foreground">
+                        Découvrez les dernières améliorations de l'application.
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">Il y a 2h</p>
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild className="p-2 cursor-pointer">
+                <Link to="/notifications" className="w-full text-center font-medium">
+                  Voir toutes les notifications
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          {/* User Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="flex items-center gap-2 pr-2 pl-0"
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="/avatar-placeholder.jpg" alt="Avatar" />
+                  <AvatarFallback>EC</AvatarFallback>
+                </Avatar>
+                <span className="hidden lg:inline font-medium">Jean Dupont</span>
+                <ChevronDown className="h-4 w-4 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
                 <Link to="/profile">
-                  Profile
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Mon profil</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/settings">
                   <Settings className="mr-2 h-4 w-4" />
-                  Settings
+                  <span>Paramètres</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => logout()}>
+              <DropdownMenuItem onClick={() => alert("Déconnexion simulée")}>
                 <LogOut className="mr-2 h-4 w-4" />
-                Log out
+                <span>Déconnexion</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        ) : (
-          <div className="hidden sm:flex items-center space-x-2">
-            <Button variant="ghost" asChild>
-              <Link to="/login">Log in</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/register">Sign up</Link>
-            </Button>
-          </div>
-        )}
-        
-        {/* Mobile Menu Toggle */}
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="md:hidden"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          <span className="sr-only">Menu</span>
-        </Button>
+        </div>
       </div>
       
-      {/* Mobile Menu */}
+      {/* Mini Music Player (appears when music is playing) */}
       <AnimatePresence>
-        {mobileMenuOpen && (
+        {currentTrack && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ type: "spring", bounce: 0.3 }}
-            className="absolute top-16 left-0 right-0 bg-background border-b shadow-lg md:hidden z-50"
+            exit={{ opacity: 0, y: 10 }}
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 transform mb-2"
           >
-            <div className="container mx-auto py-4 px-6">
-              <nav className="flex flex-col space-y-2">
-                {navigationItems.map((item) => (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    className={({ isActive }) => cn(
-                      "flex items-center rounded-md px-3 py-2 text-sm font-medium",
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-foreground/70 hover:text-foreground hover:bg-accent/50"
-                    )}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.icon}
-                    {item.label}
-                  </NavLink>
-                ))}
-                <NavLink
-                  to="/settings"
-                  className={({ isActive }) => cn(
-                    "flex items-center rounded-md px-3 py-2 text-sm font-medium",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground/70 hover:text-foreground hover:bg-accent/50"
-                  )}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
-                </NavLink>
-                
-                {!isAuthenticated && (
-                  <div className="flex flex-col space-y-2 pt-2 border-t border-border/50">
-                    <Button variant="outline" asChild className="w-full">
-                      <Link to="/login" onClick={() => setMobileMenuOpen(false)}>Log in</Link>
-                    </Button>
-                    <Button asChild className="w-full">
-                      <Link to="/register" onClick={() => setMobileMenuOpen(false)}>Sign up</Link>
-                    </Button>
-                  </div>
-                )}
-              </nav>
-            </div>
+            <MusicMiniPlayer />
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </header>
   );
 };
 
