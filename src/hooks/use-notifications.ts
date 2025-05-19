@@ -1,8 +1,10 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Notification, NotificationFilter, NotificationType } from '@/types/notification';
+import { Notification, NotificationFrequency, NotificationType } from '@/types/notification';
+
+// Define NotificationFilter type locally since it's not exported from notification.ts
+type NotificationFilter = 'all' | 'unread' | 'read' | NotificationType;
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);

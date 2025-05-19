@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -44,18 +43,22 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
         
         const recommendations: EmotionRecommendation[] = [
           { 
+            id: `rec1-${Date.now()}`,
+            emotion: emotion,
             type: "exercise",
             title: "Take a walk", 
             description: "Helps clear your mind", 
             content: "Take a walk outside to clear your mind",
-            category: "exercise" // Added category field
+            category: "exercise"
           },
           { 
+            id: `rec2-${Date.now()}`,
+            emotion: emotion,
             type: "mindfulness",
             title: "Deep breathing", 
             description: "Promotes relaxation",
             content: "Practice deep breathing for relaxation",
-            category: "mindfulness" // Added category field
+            category: "mindfulness" 
           }
         ];
         
@@ -66,12 +69,12 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
           score: Math.random() * 0.5 + 0.5,
           confidence: Math.random() * 0.3 + 0.7,
           intensity: Math.random(),
-          timestamp: new Date().toISOString(), // Converting to string
+          timestamp: new Date().toISOString(), 
           feedback: "Your voice analysis reveals a balanced emotional state with slight tendencies toward the positive spectrum.",
           recommendations: recommendations,
           source: 'voice',
           text: "Sample audio analysis text",
-          emotions: {} // Add empty emotions object to satisfy type
+          emotions: {}
         };
         
         if (onScanComplete) onScanComplete(emotionResult);

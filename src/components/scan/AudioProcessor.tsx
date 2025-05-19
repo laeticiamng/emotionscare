@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, StopCircle, AlertCircle } from 'lucide-react';
@@ -129,6 +130,8 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
       setTimeout(() => {
         const recommendations: EmotionRecommendation[] = [
           {
+            id: "med-1",
+            emotion: "calm",
             type: 'meditation',
             title: 'Méditation guidée',
             description: 'Faites une courte méditation pour maintenir votre calme',
@@ -136,6 +139,8 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
             content: 'Prenez 5 minutes pour respirer profondément',
           },
           {
+            id: "music-1",
+            emotion: "relaxed",
             type: 'music',
             title: 'Musique relaxante',
             description: 'Écoutez de la musique apaisante',
@@ -149,9 +154,9 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
             id: `scan-${Date.now()}`,
             emotion: 'calm',
             confidence: 0.85,
-            intensity: 0.7, // Added required intensity field
+            intensity: 0.7,
             timestamp: new Date().toISOString(),
-            source: 'voice', // Added required source field
+            source: 'voice',
             recommendations: recommendations,
             text: "J'ai passé une journée tranquille aujourd'hui.",
             audioUrl: URL.createObjectURL(audioBlob),

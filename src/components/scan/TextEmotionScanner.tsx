@@ -44,14 +44,20 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
         text: text,
         recommendations: [
           {
+            id: `rec1-${Date.now()}`,
+            type: "activity",
             title: "Take a break",
             description: "Consider taking a short break to reset your mind",
-            content: "Taking a break can help you refocus and recharge."
+            content: "Taking a break can help you refocus and recharge.",
+            emotion: determineMockEmotion(text)
           },
           {
+            id: `rec2-${Date.now()}`,
+            type: "exercise",
             title: "Mindfulness exercise",
             description: "A quick mindfulness exercise to center yourself",
-            content: "Focus on your breathing for 2 minutes to recenter your thoughts."
+            content: "Focus on your breathing for 2 minutes to recenter your thoughts.",
+            emotion: determineMockEmotion(text)
           }
         ],
         score: Math.round(Math.random() * 100) // Added for components that use score

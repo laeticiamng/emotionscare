@@ -1,4 +1,3 @@
-
 // This file would contain the types related to emotions
 export interface Emotion {
   id: string;
@@ -20,15 +19,8 @@ export interface Emotion {
   tags?: string[];
   emojis?: string[] | string;
   ai_feedback?: string;
-  recommendations?: Array<{
-    id: string;
-    type: string;
-    title: string;
-    description: string;
-    emotion: string;
-    content?: string;
-    category?: string;
-  }> | string[];
+  recommendations?: EmotionRecommendation[] | string[];
+  textInput?: string;
 }
 
 export interface EmotionResult {
@@ -49,16 +41,14 @@ export interface EmotionResult {
   value?: number;
   ai_feedback?: string;
   emojis?: string[] | string;
-  recommendations?: Array<{
-    id: string;
-    type: string;
-    title: string;
-    description: string;
-    emotion: string;
-    content?: string;
-    category?: string;
-  }> | string[];
+  recommendations?: EmotionRecommendation[] | string[];
   tags?: string[];
+  textInput?: string;
+  facialExpression?: string;
+  dominantEmotion?: {
+    name: string;
+    score: number;
+  };
 }
 
 export interface EmotionRecommendation {

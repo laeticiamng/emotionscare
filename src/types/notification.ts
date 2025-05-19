@@ -14,6 +14,7 @@ export interface NotificationPreference {
   pushEnabled?: boolean;
   inAppEnabled?: boolean;
   type?: string;
+  category?: string;
   types?: {
     system?: boolean;
     emotion?: boolean;
@@ -31,10 +32,37 @@ export interface NotificationPreference {
     streak?: boolean;
     urgent?: boolean;
   };
+  channels?: {
+    email: boolean;
+    push: boolean;
+    inApp: boolean;
+  };
 }
 
 export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never' | 'immediate';
 export type NotificationTone = 'formal' | 'friendly' | 'motivational' | 'minimal';
+export type NotificationType = 
+  | 'emotion' 
+  | 'journal' 
+  | 'coaching' 
+  | 'community' 
+  | 'system' 
+  | 'achievement' 
+  | 'badge' 
+  | 'challenge' 
+  | 'reminder' 
+  | 'info' 
+  | 'warning' 
+  | 'error' 
+  | 'success' 
+  | 'streak' 
+  | 'urgent';
+
+export type NotificationFilter =
+  | 'all'
+  | 'unread'
+  | 'read'
+  | NotificationType;
 
 export interface Notification {
   id: string;
@@ -51,6 +79,9 @@ export interface Notification {
   image?: string;
   icon?: string;
   priority?: string;
+  created_at?: string;
+  isRead?: boolean;
+  linkTo?: string;
 }
 
 export interface NotificationState {

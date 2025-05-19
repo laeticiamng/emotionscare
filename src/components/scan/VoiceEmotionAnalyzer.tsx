@@ -21,6 +21,8 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult, o
   
   const mockRecommendations: EmotionRecommendation[] = [
     {
+      id: "rec-voice-1",
+      emotion: "calm",
       type: "activity",
       title: "Exercice de respiration",
       description: "3 minutes de respiration profonde",
@@ -28,6 +30,8 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult, o
       category: "wellness"
     },
     {
+      id: "rec-voice-2",
+      emotion: "relaxed",
       type: "music",
       title: "Playlist recommandée",
       description: "Musique relaxante pour vous aider à vous détendre",

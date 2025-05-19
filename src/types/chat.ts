@@ -23,6 +23,9 @@ export interface ChatConversation {
   isActive?: boolean; // Optional property for UI state
   lastMessage?: string; // For backward compatibility
   last_message?: string; // For backward compatibility
+  created_at?: string; // For backward compatibility
+  user_id?: string; // For backward compatibility
+  participants?: string[]; // Added for compatibility with mockChatMessages
 }
 
 export interface ChatResponse {
@@ -30,3 +33,25 @@ export interface ChatResponse {
   emotion?: string;
   suggestions?: string[];
 }
+
+// Adding the missing types referenced in useChat.tsx
+export interface ChatHookResult {
+  messages: ChatMessage[];
+  isLoading: boolean;
+  sendMessage: (content: string) => Promise<void>;
+  error: Error | null;
+}
+
+export interface UseChatOptions {
+  initialMessages?: ChatMessage[];
+  onResponse?: (message: ChatMessage) => void;
+}
+
+export const normalizeChatMessage = (message: any): ChatMessage => {
+  return {
+    id: message.id || `msg-${Date.now()}`,
+    sender: message.sender || message.role || 'assistant',
+    content: message.content || message.text || '',
+    timestamp: message.timestamp || new Date().toISOString(),
+  };
+};

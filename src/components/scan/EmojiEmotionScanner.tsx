@@ -64,14 +64,20 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
         emojis: [selectedEmoji],
         recommendations: [
           {
+            id: `rec1-${Date.now()}`,
+            type: "activity",
             title: "Activité recommandée",
             description: "Une activité adaptée à votre humeur actuelle",
-            content: "Une activité qui peut vous aider dans votre état émotionnel actuel."
+            content: "Une activité qui peut vous aider dans votre état émotionnel actuel.",
+            emotion: selectedEmojiObj?.emotion || 'neutral'
           },
           {
+            id: `rec2-${Date.now()}`,
+            type: "music",
             title: "Musique recommandée",
             description: "Une playlist qui correspond à votre état émotionnel",
-            content: "Des morceaux de musique sélectionnés pour vous aider à gérer cette émotion."
+            content: "Des morceaux de musique sélectionnés pour vous aider à gérer cette émotion.",
+            emotion: selectedEmojiObj?.emotion || 'neutral'
           }
         ],
         score: intensity // Added for components that use score
