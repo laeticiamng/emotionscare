@@ -10,8 +10,8 @@ import B2CLoginPage from './pages/b2c/Login';
 import B2CRegisterPage from './pages/b2c/Register';
 import B2CForgotPasswordPage from './pages/b2c/ForgotPassword';
 import B2CResetPasswordPage from './pages/b2c/ResetPassword';
-import Unauthorized from './pages/common/Unauthorized';
 import ProfilePage from './pages/Profile';
+import Unauthorized from './pages/common/Unauthorized';
 
 const AppRouter: React.FC = () => {
   return (
