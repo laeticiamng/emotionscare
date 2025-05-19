@@ -7,16 +7,16 @@ import { X, Info, AlertTriangle, CheckCircle, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const NotificationToast: React.FC = () => {
-  // Ce composant est principalement pour le rendu, la logique d'affichage 
-  // des toasts sera gérée par le useToast hook
+  // This component is mainly for rendering, the logic for displaying 
+  // toasts will be handled by the useToast hook
   const { toast, toasts, dismiss } = useToast();
 
-  // Fonction de démonstration pour afficher un toast
+  // Demo function to display a toast
   const showExampleToast = () => {
     toast({
       title: "Notification",
       description: "Cette fonctionnalité sera bientôt disponible!",
-      action: <ToastAction altText="Fermer" onClick={() => {}}>Fermer</ToastAction>,
+      action: <ToastAction altText="Fermer">Fermer</ToastAction>,
     });
   };
 

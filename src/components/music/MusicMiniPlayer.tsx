@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useMusicContext } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -17,10 +17,10 @@ const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
     resume,
     next,
     previous,
-    prevTrack, // Utilisation de prevTrack au lieu de previousTrack
+    prevTrack, // Use prevTrack instead of previousTrack
     muted,
     toggleMute 
-  } = useMusicContext();
+  } = useMusic();
 
   const handlePlayPause = () => {
     if (isPlaying) {

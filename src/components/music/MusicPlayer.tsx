@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume, VolumeX, Music } from 'lucide-react';
 import { getTrackCover, getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
@@ -50,7 +50,7 @@ const MusicPlayer: React.FC = () => {
     error
   } = music;
   
-  // Valeurs par défaut si non disponibles dans le contexte
+  // Default values if not available in context
   const volume = music.volume !== undefined ? music.volume : 0.5;
   const currentTime = music.currentTime || 0;
   const duration = music.duration || 0;

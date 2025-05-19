@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { EmotionResult, EmojiEmotionScannerProps, EmotionRecommendation } from '@/types/emotion';
+import { EmotionResult, EmojiEmotionScannerProps } from '@/types/emotion';
 import { Smile, X } from 'lucide-react';
 
 const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
@@ -16,7 +16,7 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
-  // Liste des émojis avec les émotions associées
+  // List of emojis with associated emotions
   const emojis = [
     { emoji: '😊', emotion: 'happy', description: 'Heureux' },
     { emoji: '😢', emotion: 'sad', description: 'Triste' },
@@ -33,11 +33,11 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
     setSelectedEmoji(emoji);
     setProcessing(true);
     
-    // Notifier le composant parent que le traitement est en cours
+    // Notify parent component that processing is in progress
     if (onProcessingChange) onProcessingChange(true);
     if (setIsProcessing) setIsProcessing(true);
 
-    // Simuler un délai de traitement
+    // Simulate processing delay
     setTimeout(() => {
       const result: EmotionResult = {
         emotion: emotion,
@@ -52,24 +52,26 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
             title: 'Écoutez de la musique apaisante',
             description: 'Nous vous recommandons d\'écouter une playlist adaptée à votre émotion.',
             icon: 'music',
-            id: 'music-recommendation'
+            id: 'music-recommendation',
+            emotion: emotion
           } as unknown as string,
           {
             type: 'activity',
             title: 'Activité recommandée',
             description: 'Une activité pour vous aider à maintenir ou améliorer votre état émotionnel.',
             icon: 'activity',
-            id: 'activity-recommendation'
+            id: 'activity-recommendation',
+            emotion: emotion
           } as unknown as string,
         ],
       };
       
-      // Notifier le composant parent que le traitement est terminé
+      // Notify parent component that processing is complete
       if (onProcessingChange) onProcessingChange(false);
       if (setIsProcessing) setIsProcessing(false);
       setProcessing(false);
       
-      // Appeler le callback avec le résultat
+      // Call callback with result
       if (onScanComplete) onScanComplete(result);
       if (onResult) onResult(result);
     }, 1500);

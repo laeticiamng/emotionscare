@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Music } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
-import { ensurePlaylist, convertToMusicPlaylist } from '@/utils/musicCompatibility';
+import { useMusic } from '@/hooks/useMusic';
+import { ensurePlaylist, convertToPlaylist } from '@/utils/musicCompatibility';
 import { EmotionMusicParams } from '@/types/music';
 
 interface EmotionMusicRecommendationsProps {
@@ -66,8 +66,8 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Music className="h-5 w-5" />
+        <CardTitle className="flex items-center">
+          <Music className="mr-2 h-5 w-5 text-primary" />
           {currentEmotionData.title}
         </CardTitle>
       </CardHeader>
@@ -75,33 +75,17 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
         <p className="text-sm text-muted-foreground mb-4">
           {currentEmotionData.description}
         </p>
-        
         <Button 
-          onClick={isPlaying ? pauseTrack : handlePlayMusic}
-          className="w-full flex items-center justify-center gap-2"
-          variant="outline"
+          onClick={handlePlayMusic}
+          className="w-full"
+          variant="default"
         >
-          {isPlaying ? (
-            <>
-              <Pause className="h-4 w-4" />
-              Pause
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4" />
-              Écouter
-            </>
-          )}
+          <Play className="mr-2 h-4 w-4" />
+          Écouter la musique recommandée
         </Button>
-        
-        {currentTrack && isPlaying && (
-          <div className="mt-4 text-xs text-center text-muted-foreground">
-            Lecture en cours: {currentTrack.title || currentTrack.name} - {currentTrack.artist}
-          </div>
-        )}
       </CardContent>
     </Card>
   );
-};
+}
 
 export default EmotionMusicRecommendations;

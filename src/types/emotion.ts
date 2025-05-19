@@ -10,7 +10,7 @@ export interface EmotionResult {
   userId?: string;
   sessionId?: string;
   
-  // Champs étendus pour la compatibilité
+  // Extended fields for compatibility
   id?: string;
   primaryEmotion?: string;
   score?: number;
@@ -18,7 +18,7 @@ export interface EmotionResult {
   feedback?: string;
   recommendations?: string[];
   emojis?: string[];
-  date?: string; // Date pour l'affichage
+  date?: string; // Date for display
 }
 
 export type EmotionSource = 'text' | 'voice' | 'facial' | 'emoji' | 'system' | 'ai';
@@ -48,7 +48,7 @@ export interface EmotionalState {
   recentHistory: EmotionHistoryItem[];
 }
 
-// Types étendus pour la compatibilité
+// Extended types for compatibility
 export interface EmotionRecommendation {
   type: string;
   title: string;
@@ -56,7 +56,10 @@ export interface EmotionRecommendation {
   action?: string;
   link?: string;
   icon?: string;
-  id?: string; // Ajouté pour la compatibilité
+  id?: string; // Added for compatibility
+  emotion?: string; // Added to fix build errors
+  content?: string; // Added to fix build errors
+  category?: string; // Added to fix build errors
 }
 
 export interface Emotion {
@@ -69,19 +72,47 @@ export interface Emotion {
 export interface EmojiEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
   onCancel?: () => void;
-  onResult?: (result: EmotionResult) => void; // Ajouté pour compatibilité
-  isProcessing?: boolean; // Ajouté pour compatibilité
-  setIsProcessing?: (isProcessing: boolean) => void; // Ajouté pour compatibilité
-  onProcessingChange?: (isProcessing: boolean) => void; // Ajouté pour compatibilité
+  onResult?: (result: EmotionResult) => void; // Added for compatibility
+  isProcessing?: boolean; // Added for compatibility
+  setIsProcessing?: (isProcessing: boolean) => void; // Added for compatibility
+  onProcessingChange?: (isProcessing: boolean) => void; // Added for compatibility
 }
 
 export interface EmotionalTeamViewProps {
   teamId: string;
   period?: 'day' | 'week' | 'month';
-  anonymized?: boolean; // Ajouté pour compatibilité
-  dateRange?: [Date, Date]; // Ajouté pour compatibilité
-  showGraph?: boolean; // Ajouté pour compatibilité
-  showMembers?: boolean; // Ajouté pour compatibilité
-  className?: string; // Ajouté pour compatibilité
-  showDetails?: boolean; // Ajouté pour compatibilité
+  anonymized?: boolean; // Added for compatibility
+  dateRange?: [Date, Date]; // Added for compatibility
+  showGraph?: boolean; // Added for compatibility
+  showMembers?: boolean; // Added for compatibility
+  className?: string; // Added for compatibility
+  showDetails?: boolean; // Added for compatibility
+}
+
+export interface TextEmotionScannerProps {
+  onScanComplete?: (result: EmotionResult) => void;
+  onCancel?: () => void;
+  isProcessing?: boolean;
+  setIsProcessing?: (isProcessing: boolean) => void;
+  onProcessingChange?: (isProcessing: boolean) => void;
+}
+
+export interface AudioEmotionScannerProps {
+  onComplete?: (result: EmotionResult) => void;
+  onCancel?: () => void;
+  autoStart?: boolean;
+}
+
+export interface LiveVoiceScannerProps {
+  onScanComplete?: (result: EmotionResult) => void;
+  onCancel?: () => void;
+  autoStart?: boolean;
+  scanDuration?: number;
+}
+
+export interface EmotionScanFormProps {
+  onScanComplete: (result: EmotionResult) => void;
+  onEmotionDetected?: () => void;
+  onClose?: () => void;
+  userId?: string;
 }

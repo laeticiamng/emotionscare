@@ -1,111 +1,112 @@
 
 import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { EmotionResult, TextEmotionScannerProps, EmotionRecommendation } from '@/types/emotion';
-import { getEmotionEmojis } from '@/utils/emotionUtils';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { EmotionResult, TextEmotionScannerProps } from '@/types/emotion';
+import { MessageSquare, X, Loader } from 'lucide-react';
 
-const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({ 
-  onResult, 
+const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
+  onScanComplete,
+  onCancel,
+  isProcessing,
+  setIsProcessing,
   onProcessingChange,
-  isProcessing: externalIsProcessing,
-  setIsProcessing: externalSetIsProcessing
 }) => {
-  const [text, setText] = useState("");
-  const [localIsProcessing, setLocalIsProcessing] = useState(false);
-  
-  // Use external state if provided, otherwise use local state
-  const isProcessing = externalIsProcessing !== undefined ? externalIsProcessing : localIsProcessing;
-  const setIsProcessing = externalSetIsProcessing || setLocalIsProcessing;
+  const [text, setText] = useState('');
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+    if (error) setError(null);
+  };
 
   const handleSubmit = () => {
-    if (!text.trim()) return;
-    
-    if (onProcessingChange) {
-      onProcessingChange(true);
+    if (!text.trim()) {
+      setError('Veuillez entrer du texte pour analyser vos émotions.');
+      return;
     }
-    setIsProcessing(true);
-    
-    // Simulate processing delay
+
+    setProcessing(true);
+    if (setIsProcessing) setIsProcessing(true);
+    if (onProcessingChange) onProcessingChange(true);
+
+    // Simulate API call with timeout
     setTimeout(() => {
-      // Create fake emotion analysis result
-      const emotions = ["joy", "sadness", "anger", "fear", "surprise", "disgust"];
-      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      const confidence = 0.5 + Math.random() * 0.5; // Random between 0.5 and 1.0
-      const emojis = getEmotionEmojis(randomEmotion);
-      
-      // Create recommendations with proper id and emotion fields
-      const recommendations: EmotionRecommendation[] = [
-        {
-          id: `rec-text-1-${uuidv4()}`,
-          type: "activity",
-          title: "Exercice de respiration",
-          description: "Un exercice de respiration peut vous aider à vous sentir mieux",
-          emotion: randomEmotion,
-          content: "Respirez profondément pendant 5 minutes"
-        },
-        {
-          id: `rec-text-2-${uuidv4()}`,
-          type: "music",
-          title: "Musique recommandée",
-          description: "Écoutez cette playlist pour vous détendre",
-          emotion: randomEmotion,
-          content: "Playlist de relaxation disponible dans l'onglet musique"
-        }
-      ];
-      
+      // Mock result
       const result: EmotionResult = {
-        id: `text-${Date.now()}`,
-        emotion: randomEmotion,
-        confidence: confidence,
-        intensity: confidence * 0.8,
+        emotion: 'thoughtful',
+        confidence: 0.75,
+        secondaryEmotions: ['calm', 'focused'],
         timestamp: new Date().toISOString(),
         source: 'text',
         text: text,
-        textInput: text,
-        emojis: emojis,
-        recommendations: recommendations
+        recommendations: [
+          {
+            type: 'music',
+            title: 'Playlist de réflexion',
+            description: 'Une sélection musicale pour accompagner votre réflexion.',
+            icon: 'music',
+            id: 'music-recommendation',
+            emotion: 'thoughtful'
+          } as unknown as string,
+          {
+            type: 'activity',
+            title: 'Journal de pensées',
+            description: 'Prenez le temps de noter vos réflexions dans un journal.',
+            icon: 'book',
+            id: 'activity-recommendation',
+            emotion: 'thoughtful'
+          } as unknown as string,
+        ],
       };
-      
-      if (onResult) {
-        onResult(result);
+
+      setProcessing(false);
+      if (setIsProcessing) setIsProcessing(false);
+      if (onProcessingChange) onProcessingChange(false);
+
+      if (onScanComplete) {
+        onScanComplete(result);
       }
-      
-      if (onProcessingChange) {
-        onProcessingChange(false);
-      }
-      setIsProcessing(false);
-    }, 1500);
+    }, 2000);
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Analyse d'émotions par texte</CardTitle>
+        <CardTitle className="flex items-center">
+          <MessageSquare className="mr-2" />
+          <span>Analyse textuelle d'émotion</span>
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="emotion-text">Décrivez votre état émotionnel actuel</Label>
-          <Textarea
-            id="emotion-text"
-            placeholder="Comment vous sentez-vous aujourd'hui? Décrivez vos émotions..."
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={5}
-            disabled={isProcessing}
-          />
-        </div>
+        <Textarea
+          placeholder="Exprimez ce que vous ressentez actuellement..."
+          value={text}
+          onChange={handleTextChange}
+          rows={5}
+          className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
+          disabled={processing}
+        />
+        {error && (
+          <p className="text-sm text-red-500">{error}</p>
+        )}
       </CardContent>
-      <CardFooter>
-        <Button 
-          onClick={handleSubmit}
-          className="w-full"
-          disabled={!text.trim() || isProcessing}
-        >
-          {isProcessing ? 'Analyse en cours...' : 'Analyser mes émotions'}
+      <CardFooter className="flex justify-between">
+        <Button variant="ghost" onClick={onCancel} disabled={processing}>
+          <X className="mr-2 h-4 w-4" />
+          Annuler
+        </Button>
+        <Button onClick={handleSubmit} disabled={processing || !text.trim()}>
+          {processing ? (
+            <>
+              <Loader className="mr-2 h-4 w-4 animate-spin" />
+              Analyse en cours...
+            </>
+          ) : (
+            'Analyser mes émotions'
+          )}
         </Button>
       </CardFooter>
     </Card>
