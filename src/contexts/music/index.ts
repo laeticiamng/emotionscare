@@ -8,7 +8,7 @@
 
 // Export the hook for accessing music functionality
 // This is the ONLY hook to use for music features
-export { useMusic } from '@/hooks/useMusic';
+export { useMusic } from '@/contexts/MusicContext';
 
 // Export the default context
 export { default } from '@/contexts/MusicContext';

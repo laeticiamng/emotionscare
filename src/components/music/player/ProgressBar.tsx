@@ -1,29 +1,31 @@
 
 import React from 'react';
-import { Slider } from "@/components/ui/slider";
+import { Slider } from '@/components/ui/slider';
 import { ProgressBarProps } from '@/types/music';
 
-export const ProgressBar: React.FC<ProgressBarProps> = ({ 
-  currentTime, 
-  duration, 
-  onSeek 
+export const ProgressBar: React.FC<ProgressBarProps> = ({
+  currentTime = 0,
+  duration = 0,
+  onSeek,
+  formatTime = (seconds) => {
+    if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+  }
 }) => {
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
-
   const handleSeek = (value: number[]) => {
-    onSeek(value[0]);
+    if (onSeek) {
+      onSeek(value[0]);
+    }
   };
 
   return (
-    <div className="space-y-1">
-      <Slider 
+    <div className="w-full space-y-1">
+      <Slider
         value={[currentTime]} 
-        max={Math.max(duration, 1)} 
-        step={0.1} 
+        max={duration || 100}
+        step={1}
         onValueChange={handleSeek}
       />
       <div className="flex justify-between text-xs text-muted-foreground">
@@ -33,3 +35,5 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     </div>
   );
 };
+
+export default ProgressBar;

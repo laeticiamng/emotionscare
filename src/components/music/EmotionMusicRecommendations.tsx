@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Music } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
-import { ensurePlaylist } from '@/utils/musicCompatibility';
+import { ensurePlaylist, convertToMusicPlaylist } from '@/utils/musicCompatibility';
+import { EmotionMusicParams } from '@/types/music';
 
 interface EmotionMusicRecommendationsProps {
   emotion?: string;
@@ -58,8 +59,8 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
     }
   }, [emotion]);
 
-  const handlePlayMusic = () => {
-    loadPlaylistForEmotion(recommendedEmotion);
+  const handlePlayMusic = async () => {
+    await loadPlaylistForEmotion(recommendedEmotion);
   };
 
   return (
