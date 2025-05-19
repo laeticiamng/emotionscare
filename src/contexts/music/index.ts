@@ -9,8 +9,7 @@
 // Export everything from the MusicContext implementation but not using star export
 export { 
   MusicContext, 
-  MusicProvider, 
-  useMusicContext 
+  MusicProvider
 } from '@/contexts/MusicContext';
 
 // Export the types

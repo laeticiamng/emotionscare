@@ -2,7 +2,6 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { SpeechRecognition } from '@/types/speech';
 
 export interface VoiceCommandOptions {
   commands?: Record<string, () => void>;

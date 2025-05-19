@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Mic, Moon, Sun, Volume2, VolumeX } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useTheme } from '@/hooks/use-theme';
-// Fix: Import as a named export instead of default export
+// Import as a named export instead of default export
 import { useVoiceCommands } from '@/hooks/useVoiceCommands';
 
 const ImmersiveHome: React.FC = () => {

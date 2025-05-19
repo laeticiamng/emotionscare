@@ -1,3 +1,4 @@
+
 // Auth hooks re-exported from the global AuthContext
 export { useAuth } from '@/contexts/AuthContext';
 

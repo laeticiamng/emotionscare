@@ -8,7 +8,3 @@ export type {
   UserPreference, 
   UserRole 
 };
-
-// If there's a default export in the original file:
-// import UserDefault from '../src/types/user';
-// export default UserDefault;
