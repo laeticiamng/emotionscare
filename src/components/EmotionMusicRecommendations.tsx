@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Music, Play } from 'lucide-react';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { useMusic } from '@/hooks/useMusic';
-import { ensurePlaylist } from '@/utils/musicCompatibility';
+import { convertToPlaylist } from '@/utils/musicCompatibility';
 
 interface EmotionMusicRecommendationsProps {
   emotion: string;
@@ -49,7 +49,8 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
         }
         
         if (newPlaylist) {
-          setPlaylist(newPlaylist);
+          // Normaliser la playlist pour éviter les erreurs de typage
+          setPlaylist(convertToPlaylist(newPlaylist));
         }
       } catch (error) {
         console.error('Erreur lors du chargement des recommandations musicales:', error);
