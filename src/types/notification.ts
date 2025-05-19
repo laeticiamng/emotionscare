@@ -74,5 +74,25 @@ export interface Notification {
   category?: string;
 }
 
-export type NotificationFilter = string;
-export type NotificationType = string;
+export type NotificationType =
+  | 'system'
+  | 'emotion'
+  | 'coach'
+  | 'journal'
+  | 'community'
+  | 'achievement'
+  | 'badge'
+  | 'challenge'
+  | 'reminder'
+  | 'info'
+  | 'warning'
+  | 'error'
+  | 'success'
+  | 'streak'
+  | 'urgent';
+
+export type NotificationFilter =
+  | 'all'
+  | 'unread'
+  | 'read'
+  | NotificationType;

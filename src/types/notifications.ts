@@ -58,6 +58,6 @@ export interface Notification {
   imageUrl?: string;
   priority?: 'low' | 'normal' | 'high' | 'urgent';
   source?: 'system' | 'user' | 'application';
-  created_at?: string;  // Added missing property
-  createdAt?: string;   // Added missing property
+  created_at?: string;
+  createdAt?: string;
 }
