@@ -1,81 +1,83 @@
 
-export type FontFamily = 'system' | 'sans' | 'serif' | 'mono';
-export type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
-export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
+import { NotificationsPreferences, NotificationFrequency } from './notification';
 
-export interface UserPreferences {
-  fontSize: FontSize;
-  fontFamily: FontFamily;
-  theme: ThemeName;
-  language: string;
-  notifications: boolean;
-  emailNotifications: boolean;
-  soundEffects: boolean;
-  animationReduced: boolean;
-  highContrast: boolean;
-  dateFormat: string;
-  timeFormat: string;
-  colorBlindMode?: boolean;
-  reduceMotion?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  shareData?: boolean;
-  anonymizedData?: boolean;
-  ambientSound?: string;
-  soundEnabled?: boolean;
-  privacy?: PrivacyPreferences;
-  notifications?: NotificationsPreferences;
-}
+export type ThemeType = 'light' | 'dark' | 'system' | 'pastel';
+export type FontSizeType = 'small' | 'medium' | 'large' | 'xlarge';
+export type FontFamily = 'sans' | 'serif' | 'mono' | 'system' | 'rounded';
+export type PrivacyLevel = 'private' | 'friends' | 'public';
 
 export interface PrivacyPreferences {
-  shareData: boolean;
-  anonymizedData: boolean;
-  dataRetention: number;
-  consentToAI: boolean;
-  profileVisibility: 'private' | 'team' | 'organization' | 'public';
+  shareActivity?: boolean;
+  shareEmotionalStatus?: boolean;
+  shareJournal?: boolean;
+  shareBadges?: boolean;
+  shareProfile?: boolean;
+  defaultVisibility?: PrivacyLevel;
 }
 
-export interface NotificationsPreferences {
-  enabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled: boolean;
-  inAppEnabled: boolean;
-  types: {
-    system: boolean;
-    emotion: boolean;
-    coach: boolean;
-    journal: boolean;
-    community: boolean;
-    achievement?: boolean;
-    badge?: boolean;
-    challenge?: boolean;
-    reminder?: boolean;
-    info?: boolean;
-    warning?: boolean;
-    error?: boolean;
-    success?: boolean;
-    streak?: boolean;
-  };
-  frequency: NotificationFrequency;
-  tone?: string;
-  quietHours?: {
-    enabled: boolean;
-    start: string;
-    end: string;
-  };
+export interface UserPreferences {
+  theme: ThemeType;
+  fontSize?: FontSizeType;
+  fontFamily?: FontFamily;
+  language?: string;
+  notifications?: NotificationsPreferences | boolean;
+  privacy?: PrivacyLevel | PrivacyPreferences;
+  soundEnabled?: boolean;
+  reduceMotion?: boolean;
+  highContrast?: boolean;
+  colorBlindMode?: boolean;
+  animationReduced?: boolean;
+  autoplayMedia?: boolean;
+  dataUsage?: 'low' | 'medium' | 'high';
 }
 
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
-
-export interface UserPreferencesFormProps {
-  preferences: UserPreferences;
-  onSave: (values: Partial<UserPreferences>) => Promise<void>;
-  isLoading?: boolean;
-}
+export const DEFAULT_PREFERENCES: UserPreferences = {
+  theme: 'system',
+  fontSize: 'medium',
+  fontFamily: 'system',
+  language: 'fr',
+  notifications: {
+    enabled: true,
+    emailEnabled: true,
+    pushEnabled: false,
+    inAppEnabled: true,
+    types: {
+      system: true,
+      emotion: true,
+      coach: true,
+      journal: true,
+      community: true,
+      achievement: true,
+      badge: true,
+      challenge: true,
+      reminder: true,
+      info: true,
+      warning: true,
+      error: true,
+      success: true,
+      streak: true,
+      urgent: true
+    },
+    frequency: 'immediate'
+  },
+  privacy: 'private',
+  soundEnabled: true,
+  reduceMotion: false,
+  highContrast: false,
+  colorBlindMode: false,
+  autoplayMedia: true,
+  dataUsage: 'medium'
+};
 
 export interface UserPreferencesContextType {
   preferences: UserPreferences;
-  updatePreferences: (newPreferences: Partial<UserPreferences>) => Promise<void>;
+  theme: ThemeType;
+  fontSize: FontSizeType;
+  language: string;
+  notifications: NotificationsPreferences;
+  privacy: PrivacyLevel | PrivacyPreferences;
+  updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
+  resetPreferences: () => void;
   isLoading: boolean;
   error: Error | null;
 }

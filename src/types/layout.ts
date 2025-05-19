@@ -25,6 +25,8 @@ export interface LayoutContextType {
   setTheme: (theme: string) => void;
   fullscreen: boolean;
   setFullscreen: (fullscreen: boolean) => void;
+  sidebarCollapsed?: boolean;
+  setSidebarCollapsed?: (collapsed: boolean) => void;
 }
 
 export interface LayoutProviderProps {

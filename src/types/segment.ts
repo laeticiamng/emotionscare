@@ -1,26 +1,31 @@
 
 export interface SegmentOption {
   id: string;
-  label: string;
   value: string;
-  count?: number;
+  label: string;
   color?: string;
 }
 
 export interface SegmentDimension {
   id: string;
+  name: string;
   label: string;
-  type: 'category' | 'range' | 'date' | 'boolean';
   options: SegmentOption[];
 }
 
 export interface SegmentContextType {
+  selectedSegment: string | null;
+  setSelectedSegment: (segment: string | null) => void;
+  selectedDepartment: string | null;
+  setSelectedDepartment: (department: string | null) => void;
+  selectedTeam: string | null;
+  setSelectedTeam: (team: string | null) => void;
   dimensions: SegmentDimension[];
-  selectedSegment?: string;
-  setSelectedSegment?: (segment: string) => void;
-  selectedDimension?: string;
-  selectedOption?: string;
-  setSelectedDimension: (dimension: string) => void;
-  setSelectedOption: (option: string) => void;
-  clearSegment?: () => void;
+  setDimensions: (dimensions: SegmentDimension[]) => void;
+  selectedDimension: string | null;
+  setSelectedDimension: (dimension: string | null) => void;
+  selectedOption: string | null;
+  setSelectedOption: (option: string | null) => void;
+  options: SegmentOption[];
+  setOptions: (options: SegmentOption[]) => void;
 }

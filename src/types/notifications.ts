@@ -1,28 +1,40 @@
 
+export type NotificationType =
+  | 'system'
+  | 'emotion'
+  | 'coach'
+  | 'journal'
+  | 'community'
+  | 'achievement'
+  | 'badge'
+  | 'challenge'
+  | 'reminder'
+  | 'info'
+  | 'warning'
+  | 'error'
+  | 'success'
+  | 'streak'
+  | 'urgent';
+
+export type NotificationFilter =
+  | 'all'
+  | 'unread'
+  | 'read'
+  | NotificationType;
+
 export interface Notification {
   id: string;
-  user_id: string;
+  type: NotificationType;
   title: string;
   message: string;
-  type: NotificationType;
+  timestamp: string | Date;
   read: boolean;
-  timestamp: string;
-  created_at?: string;
-  createdAt?: string;
-}
-
-export type NotificationType = 'system' | 'emotion' | 'challenge' | 'achievement' | 'reminder' | 'info' | 'warning' | 'error' | 'success' | 'journal' | 'user' | 'urgent';
-
-export type NotificationFilter = 'all' | 'unread' | 'read' | NotificationType;
-
-export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
-
-export interface NotificationSettings {
-  enabled: boolean;
-  email: boolean;
-  push: boolean;
-  frequency: 'immediate' | 'daily' | 'weekly';
-  doNotDisturb: boolean;
-  doNotDisturbStart?: string;
-  doNotDisturbEnd?: string;
+  action?: {
+    label: string;
+    url: string;
+  };
+  icon?: string;
+  imageUrl?: string;
+  priority?: 'low' | 'normal' | 'high' | 'urgent';
+  source?: 'system' | 'user' | 'application';
 }
