@@ -48,6 +48,9 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 - Mise à jour de `README.md` pour référencer ces nouveaux documents
 
 
+
+
+
 ## [1.1.9] - 2025-05-27
 
 ### Ajouté

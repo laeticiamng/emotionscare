@@ -1,26 +1,33 @@
 
 export interface ChatMessage {
   id: string;
-  content?: string;
-  text?: string;
   sender: 'user' | 'assistant' | 'system' | 'coach';
+  content: string;
   timestamp: string;
-  isLoading?: boolean;
   conversationId?: string;
-  role?: 'user' | 'assistant' | 'system';
+  conversation_id?: string;
+  text?: string;
+  role?: string;
+  attachments?: string[];
+  metadata?: Record<string, any>;
+  emotion?: string;
+  isUser?: boolean;
 }
 
 export interface ChatConversation {
   id: string;
   title: string;
-  lastMessage?: string;
-  messages?: ChatMessage[];
+  messages: ChatMessage[];
   createdAt: string;
   updatedAt: string;
-}
+  lastMessage?: string;
+  metadata?: Record<string, any>;
+  isActive?: boolean;
+  last_message?: string;
+  created_at?: string;
+  updated_at?: string;
+  user_id?: string;
+  participants?: string[];
+  emotion?: string;
 
-export interface ChatResponse {
-  message: string;
-  action?: string;
-  data?: any;
 }

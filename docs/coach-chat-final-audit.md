@@ -68,6 +68,7 @@ Plusieurs erreurs de typage ont été corrigées:
 - **Découplage UI/logique**: Séparation claire entre la présentation et la logique métier
 - **Composants atomiques**: Architecture modulaire facilitant la maintenance
 - **Types unifiés**: `ChatMessage` et `Conversation` partagés entre les contextes
+- **Enums cohérents**: paramètre `sender` unifié dans tous les hooks
 
 ## 4. Recommandations futures
 

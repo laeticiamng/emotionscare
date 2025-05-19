@@ -47,11 +47,11 @@ export const useCoachChat = () => {
     }
   }, [coach]);
   
-  const addMessage = useCallback((text: string, sender: 'system' | 'user' | 'ai' | 'assistant') => {
-    const newMessage: ChatMessage = {
+  const addMessage = useCallback((text: string, sender: 'system' | 'user' | 'assistant' | 'coach') => {
+    const newMessage: ChatMessage = { 
       id: uuidv4(),
       conversationId: 'coach',
-      sender: sender === 'ai' ? 'assistant' : sender,
+      sender,
       content: text,
       timestamp: new Date().toISOString()
     };

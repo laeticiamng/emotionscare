@@ -137,7 +137,10 @@ export function useCoachHandlers() {
 
   // Send a message with AI processing
   const sendMessage = useCallback(
-    (text: string, sender: string) => {
+    (
+      text: string,
+      sender: 'user' | 'assistant' | 'system' | 'coach'
+    ) => {
       const newMessage: ChatMessage = {
         id: uuidv4(),
         content: text,

@@ -20,21 +20,25 @@ export const useCoachChat = () => {
       const response = await coach.sendMessage(message, 'user');
       
       setMessages(prevMessages => {
-        const userMessage: ChatMessage = { 
+        const userMessage: ChatMessage = {
           id: uuidv4(),
           conversationId: 'coach',
-          sender: 'user', 
+          sender: 'user',
+          text: message,
           content: message,
-          timestamp: new Date().toISOString() 
+          timestamp: new Date().toISOString()
         };
-        
-        const assistantMessage: ChatMessage = { 
-          id: uuidv4(), 
+
+        const assistantMessage: ChatMessage = {
+          id: uuidv4(),
           conversationId: 'coach',
-          sender: 'assistant', 
+          sender: 'assistant',
+          text: response,
           content: response,
-          timestamp: new Date().toISOString() 
+          timestamp: new Date().toISOString()
         };
+
+        
         
         return [...prevMessages, userMessage, assistantMessage];
       });
@@ -47,17 +51,17 @@ export const useCoachChat = () => {
     }
   }, [coach]);
   
-  const addMessage = useCallback((text: string, sender: 'system' | 'user' | 'ai' | 'assistant') => {
-    const newMessage: ChatMessage = { 
+  const addMessage = useCallback((text: string, sender: 'system' | 'user' | 'assistant' | 'coach') => {
+    const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: 'coach',
-      sender: sender === 'ai' ? 'assistant' : sender, 
+      sender,
+      text,
       content: text,
-      timestamp: new Date().toISOString() 
+      timestamp: new Date().toISOString()
     };
-    
     setMessages(prevMessages => [...prevMessages, newMessage]);
-    return newMessage;
+    
   }, []);
   
   const clearMessages = useCallback(() => {
