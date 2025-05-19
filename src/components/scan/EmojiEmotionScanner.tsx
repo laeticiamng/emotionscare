@@ -73,7 +73,8 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
         timestamp: new Date().toISOString(),
         recommendations: recommendations,
         emojis: [emotions.find(e => e.name === emotion)?.emoji || "😊"],
-        emotions: {} // Add empty emotions object to satisfy type
+        emotions: {},
+        source: 'emoji' // Added required source field
       };
       
       onResult(result);

@@ -10,9 +10,9 @@ import FacialEmotionScanner from './FacialEmotionScanner';
 
 const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
   onScanComplete,
-  userId, // Added to match interface
-  onEmotionDetected, // Used in ScanTabContent
-  onClose, // Used in ScanTabContent
+  userId,
+  onEmotionDetected,
+  onClose,
   defaultTab = 'voice',
   onProcessingChange,
 }) => {
@@ -34,7 +34,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
     
     // Call onEmotionDetected if provided
     if (onEmotionDetected) {
-      onEmotionDetected();
+      onEmotionDetected(result);  // Pass the result to onEmotionDetected
     }
     
     // Call onClose if provided

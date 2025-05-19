@@ -6,11 +6,14 @@ interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
   loading: boolean;
+  isLoading: boolean; // Added to match usage in components
   error: string | null;
   login: (email: string, password: string) => Promise<User | null>;
   register: (name: string, email: string, password: string) => Promise<User | null>;
   logout: () => Promise<void>;
   clearError?: () => void;
+  updateUser?: (userData: Partial<User>) => Promise<User | null>; // Added to match usage in components
+  updatePreferences?: (preferences: any) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -136,15 +139,68 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setError(null);
   };
 
+  // Add updateUser function
+  const updateUser = async (userData: Partial<User>): Promise<User | null> => {
+    setLoading(true);
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser) {
+        throw new Error('No user found');
+      }
+      
+      const currentUser = JSON.parse(storedUser);
+      const updatedUser = { ...currentUser, ...userData };
+      
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      
+      return updatedUser;
+    } catch (error) {
+      console.error('Update user error:', error);
+      setError('Failed to update user. Please try again.');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add updatePreferences function
+  const updatePreferences = async (preferences: any): Promise<void> => {
+    setLoading(true);
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser) {
+        throw new Error('No user found');
+      }
+      
+      const currentUser = JSON.parse(storedUser);
+      const updatedUser = { 
+        ...currentUser, 
+        preferences: { ...currentUser.preferences, ...preferences } 
+      };
+      
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    } catch (error) {
+      console.error('Update preferences error:', error);
+      setError('Failed to update preferences. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value = {
     isAuthenticated,
     user,
     loading,
+    isLoading: loading, // Add alias for isLoading
     error,
     login,
     register,
     logout,
-    clearError
+    clearError,
+    updateUser,
+    updatePreferences
   };
 
   return (

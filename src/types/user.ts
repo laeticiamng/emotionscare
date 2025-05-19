@@ -17,6 +17,8 @@ export interface User {
   joined_at?: string; // For backward compatibility
   position?: string; // Add position field
   department?: string; // Add department field
+  job_title?: string; // Add job_title field for backward compatibility
+  displayName?: string; // Add displayName field for backward compatibility
   preferences?: Record<string, any>; // Add preferences field
   emotional_score?: number; // For backward compatibility
 }

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 
 interface LiveEmotionResultsProps {
   result?: EmotionResult;
@@ -15,6 +15,23 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result, classNa
   if (!result) {
     return <div className={className}>Aucun résultat à afficher.</div>;
   }
+
+  // Helper function to handle recommendations that might be strings or objects
+  const renderRecommendation = (rec: string | EmotionRecommendation, index: number) => {
+    if (typeof rec === 'string') {
+      return (
+        <Badge key={index} variant="secondary">
+          {rec}
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge key={index} variant="secondary">
+          {rec.title} - {rec.description}
+        </Badge>
+      );
+    }
+  };
 
   return (
     <Card className={className}>
@@ -39,11 +56,11 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result, classNa
           <h4 className="text-md font-semibold">Recommandations</h4>
           <ScrollArea className="h-[150px] w-full space-y-2">
             {result.recommendations && result.recommendations.length > 0 ? (
-              result.recommendations.map((recommendation, index) => (
-                <Badge key={index} variant="secondary">
-                  {recommendation.title} - {recommendation.description}
-                </Badge>
-              ))
+              <div className="flex flex-wrap gap-2">
+                {result.recommendations.map((recommendation, index) => 
+                  renderRecommendation(recommendation, index)
+                )}
+              </div>
             ) : (
               <p className="text-sm text-muted-foreground">Aucune recommandation pour le moment.</p>
             )}

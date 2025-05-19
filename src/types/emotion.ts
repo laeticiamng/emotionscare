@@ -1,4 +1,3 @@
-
 // Define the EmotionScanFormProps type
 export interface EmotionScanFormProps {
   onEmotionDetected?: (result: EmotionResult) => void;
@@ -43,7 +42,7 @@ export interface EmotionResult {
   audioUrl?: string;
   audio_url?: string;
   textInput?: string;
-  recommendations?: Array<EmotionRecommendation | string>;
+  recommendations?: Array<EmotionRecommendation>;
   transcript?: string;
   facialExpression?: string;
 }

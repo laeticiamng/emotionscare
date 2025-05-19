@@ -1,39 +1,52 @@
 
 export interface ChatMessage {
   id: string;
-  conversationId: string;
   sender: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: string;
-  // Backward compatibility fields
-  text?: string;
-  conversation_id?: string;
+  conversationId: string;
+  role?: string; // For backward compatibility
+  isUser?: boolean; // For backward compatibility
+  isTyping?: boolean;
+  attachments?: string[];
+  metadata?: Record<string, any>;
 }
 
 export interface ChatConversation {
   id: string;
   title: string;
+  messages: ChatMessage[];
   createdAt: string;
   updatedAt: string;
-  lastMessage: string;
-  messages: ChatMessage[];
-  // Backward compatibility fields
-  user_id?: string;
-  created_at?: string;
-  updated_at?: string;
-  last_message?: string;
+  lastMessage?: string;
+  isActive?: boolean; // Add for backward compatibility
+  participants?: string[];
+  metadata?: Record<string, any>;
 }
 
-export interface Notification {
+export interface ChatResponse {
   id: string;
-  userId: string;
-  title: string;
-  message: string;
-  type: string;
-  read: boolean;
-  createdAt: string;
-  // Backward compatibility fields
-  user_id?: string;
-  created_at?: string;
-  timestamp?: string;
+  content: string;
+  role?: string;
+  timestamp: string;
+  metadata?: Record<string, any>;
+}
+
+// Additional interfaces for components
+export interface CoachCharacterProps {
+  status?: 'online' | 'offline' | 'typing';
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+export interface CoachMessageProps {
+  message: ChatMessage;
+  isLast?: boolean;
+  className?: string;
+}
+
+export interface CoachChatProps {
+  conversationId?: string;
+  autoFocus?: boolean;
+  className?: string;
 }

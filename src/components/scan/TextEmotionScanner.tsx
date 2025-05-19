@@ -3,136 +3,123 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
-import { Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { getEmotionEmojis } from '@/utils/emotionUtils';
 
 interface TextEmotionScannerProps {
-  onResult: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
+  placeholder?: string;
   isProcessing?: boolean;
   setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
-  minLength?: number;
 }
 
-const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
+const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({ 
   onResult,
+  placeholder = "Décrivez ce que vous ressentez...",
   isProcessing: externalIsProcessing,
-  setIsProcessing: externalSetIsProcessing,
-  minLength = 10
+  setIsProcessing: externalSetIsProcessing
 }) => {
   const [text, setText] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [localIsProcessing, setLocalIsProcessing] = useState(false);
   
   // Use external state if provided, otherwise use local state
   const isProcessing = externalIsProcessing !== undefined ? externalIsProcessing : localIsProcessing;
   const setIsProcessing = externalSetIsProcessing || setLocalIsProcessing;
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-    if (error) setError(null);
-  };
-  
-  const analyzeText = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (text.trim().length < minLength) {
-      setError(`Veuillez entrer au moins ${minLength} caractères`);
-      return;
-    }
+  const handleAnalyze = async () => {
+    if (!text.trim() || isProcessing) return;
     
     setIsProcessing(true);
     
     try {
-      // Simulate API call with a timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Simulate API call for emotion analysis
+      await new Promise(resolve => setTimeout(resolve, 1200));
       
-      // Mock data - in a real app, this would come from the API
-      const emotions = ['happy', 'calm', 'anxious', 'sad', 'excited', 'frustrated'];
-      const emotion = emotions[Math.floor(Math.random() * emotions.length)];
+      // Mock emotions based on keywords in text
+      let detectedEmotion = 'neutral';
+      let confidenceScore = 0.7;
+      
+      const lowerText = text.toLowerCase();
+      if (lowerText.includes('content') || lowerText.includes('heureux') || lowerText.includes('bien')) {
+        detectedEmotion = 'happy';
+        confidenceScore = 0.85;
+      } else if (lowerText.includes('triste') || lowerText.includes('déprimé')) {
+        detectedEmotion = 'sad';
+        confidenceScore = 0.88;
+      } else if (lowerText.includes('colère') || lowerText.includes('énervé') || lowerText.includes('frustré')) {
+        detectedEmotion = 'angry';
+        confidenceScore = 0.9;
+      } else if (lowerText.includes('peur') || lowerText.includes('stress') || lowerText.includes('anxieux')) {
+        detectedEmotion = 'anxious';
+        confidenceScore = 0.82;
+      } else if (lowerText.includes('calme') || lowerText.includes('détendu') || lowerText.includes('paisible')) {
+        detectedEmotion = 'calm';
+        confidenceScore = 0.87;
+      }
       
       const recommendations: EmotionRecommendation[] = [
         {
-          type: "general",
-          title: "Mindful reading", 
-          description: "Take time to read something enjoyable",
-          category: "mindfulness",
-          content: "Find a book or article that interests you and read for 15 minutes"
+          type: "activity",
+          title: "Activité recommandée",
+          description: "Une activité adaptée à votre état émotionnel actuel",
+          category: "general", 
+          content: "Try a new activity"
         },
         {
-          type: "exercise",
-          title: "Quick walk", 
-          description: "A short walk can help clear your mind",
-          category: "physical",
-          content: "Take a 10-minute walk outside to refresh your mind"
+          type: "music",
+          title: "Playlist recommandée",
+          description: "Des morceaux pour accompagner votre humeur",
+          category: "music",
+          content: "Listen to a curated playlist"
         }
       ];
       
-      const result: EmotionResult = {
-        id: `text-analysis-${Date.now()}`,
-        emotion: emotion,
-        primaryEmotion: emotion,
-        confidence: 0.75 + Math.random() * 0.2,
-        intensity: 0.5 + Math.random() * 0.5,
-        text: text,
-        timestamp: new Date().toISOString(),
-        recommendations: recommendations,
-        emojis: ["😊", "😌"],
-        emotions: {} // Add empty emotions object to satisfy type
-      };
-      
-      onResult(result);
-    } catch (err) {
-      console.error('Error analyzing text:', err);
-      setError('Une erreur est survenue lors de l\'analyse');
+      if (onResult) {
+        const result: EmotionResult = {
+          id: `text-${Date.now()}`,
+          emotion: detectedEmotion,
+          primaryEmotion: detectedEmotion,
+          confidence: confidenceScore,
+          intensity: 0.7,
+          text: text,
+          timestamp: new Date().toISOString(),
+          recommendations: recommendations,
+          emojis: getEmotionEmojis(detectedEmotion),
+          emotions: {},
+          source: 'text' // Added required source field
+        };
+        
+        onResult(result);
+      }
+    } catch (error) {
+      console.error('Error analyzing text:', error);
     } finally {
       setIsProcessing(false);
     }
   };
-  
+
   return (
-    <form onSubmit={analyzeText} className="space-y-4">
-      <div>
-        <Textarea
-          placeholder="Décrivez votre journée, vos pensées ou vos émotions actuelles..."
-          value={text}
-          onChange={handleInputChange}
-          rows={4}
-          disabled={isProcessing}
-          className="resize-none focus-visible:ring-1 focus-visible:ring-primary"
-        />
-        
-        {error && (
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center mt-2 text-destructive gap-2 text-sm"
-          >
-            <Loader2 className="h-4 w-4" />
-            <span>{error}</span>
-          </motion.div>
-        )}
-      </div>
+    <div className="space-y-4">
+      <Textarea
+        placeholder={placeholder}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={4}
+        className="resize-none"
+        disabled={isProcessing}
+      />
       
-      <div className="flex justify-end">
-        <Button 
-          type="submit" 
-          disabled={isProcessing || text.length < minLength}
-          className="flex items-center gap-2"
-        >
-          {isProcessing ? (
-            <>
-              <div className="h-4 w-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
-              <span>Analyse en cours...</span>
-            </>
-          ) : (
-            <>
-              <Loader2 className="h-4 w-4" />
-              <span>Analyser</span>
-            </>
-          )}
-        </Button>
-      </div>
-    </form>
+      <Button 
+        onClick={handleAnalyze} 
+        disabled={!text.trim() || isProcessing} 
+        className="w-full"
+      >
+        {isProcessing ? 'Analyse en cours...' : 'Analyser mon texte'}
+      </Button>
+      
+      <p className="text-xs text-muted-foreground text-center">
+        Décrivez vos émotions, ce que vous ressentez, ou partagez votre état d'esprit actuel.
+      </p>
+    </div>
   );
 };
 
