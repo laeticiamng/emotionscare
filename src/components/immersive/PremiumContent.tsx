@@ -58,8 +58,6 @@ const PremiumContent: React.FC<PremiumContentProps> = ({
     });
     
     navigate(ROUTES.common.b2bSelection);
-      
-    }
   };
   
   // Animation variants
