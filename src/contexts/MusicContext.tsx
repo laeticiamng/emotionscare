@@ -1,280 +1,178 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { MusicTrack, MusicPlaylist, MusicContextType, EmotionMusicParams } from '@/types/music';
-import { convertToMusicTrack, convertToMusicPlaylist, convertToTrack, convertToPlaylist } from '@/utils/musicCompatibility';
+import React, { createContext, useState, useCallback } from 'react';
+import { MusicContextType, MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { normalizeTrack, ensurePlaylist } from '@/utils/musicCompatibility';
+import { emotionPlaylists } from '@/data/emotionPlaylists';
 
-const MusicContext = createContext<MusicContextType | undefined>(undefined);
+// Création du contexte avec une valeur par défaut
+export const MusicContext = createContext<MusicContextType>({} as MusicContextType);
 
-export const useMusic = () => {
-  const context = useContext(MusicContext);
-  if (!context) {
-    throw new Error('useMusic must be used within a MusicProvider');
-  }
-  return context;
-};
+interface MusicProviderProps {
+  children: React.ReactNode;
+}
 
-export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [playlist, setPlaylistState] = useState<MusicPlaylist | null>(null);
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [volume, setVolume] = useState(0.5);
+  const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.8);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [muted, setMuted] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
   const [isInitialized, setIsInitialized] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
-  const [queue, setQueue] = useState<MusicTrack[]>([]);
-  const [isShuffled, setIsShuffled] = useState(false);
-  const [isRepeating, setIsRepeating] = useState(false);
 
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-  };
-
-  const toggleDrawer = () => {
-    setOpenDrawer(!openDrawer);
-  };
-
-  const playTrack = (track: MusicTrack) => {
-    setCurrentTrack(track);
-    setIsPlaying(true);
-  };
-
-  const pauseTrack = () => {
-    setIsPlaying(false);
-  };
-
-  const resumeTrack = () => {
-    setIsPlaying(true);
-  };
-
-  const nextTrack = () => {
-    if (!playlist || !currentTrack) return;
+  // Fonction pour charger une playlist selon une émotion
+  const loadPlaylistForEmotion = useCallback(async (params: EmotionMusicParams): Promise<MusicPlaylist> => {
+    const { emotion, intensity = 0.5 } = params;
     
-    const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
-    if (currentIndex === -1 || currentIndex === playlist.tracks.length - 1) {
-      // Si c'est le dernier morceau, on revient au premier
-      playTrack(playlist.tracks[0]);
-    } else {
-      // Sinon on passe au suivant
-      playTrack(playlist.tracks[currentIndex + 1]);
-    }
-  };
-
-  const previousTrack = () => {
-    if (!playlist || !currentTrack) return;
+    // Recherche dans les playlists prédéfinies
+    const matchingPlaylists = emotionPlaylists.filter(p => 
+      p.emotion?.toLowerCase() === emotion.toLowerCase()
+    );
     
-    const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
-    if (currentIndex === -1 || currentIndex === 0) {
-      // Si c'est le premier morceau, on va au dernier
-      playTrack(playlist.tracks[playlist.tracks.length - 1]);
-    } else {
-      // Sinon on revient au précédent
-      playTrack(playlist.tracks[currentIndex - 1]);
+    if (matchingPlaylists.length > 0) {
+      // Utiliser l'intensité pour choisir une playlist
+      const playlistIndex = Math.min(
+        Math.floor(intensity * matchingPlaylists.length),
+        matchingPlaylists.length - 1
+      );
+      
+      return matchingPlaylists[playlistIndex];
     }
-  };
-
-  const setPlaylist = (newPlaylist: MusicPlaylist) => {
-    setPlaylistState(newPlaylist);
-    if (newPlaylist.tracks.length > 0 && !currentTrack) {
-      setCurrentTrack(newPlaylist.tracks[0]);
-    }
-  };
-
-  const toggleMute = () => {
-    setMuted(!muted);
-  };
-
-  const seekTo = (time: number) => {
-    setCurrentTime(time);
-  };
-
-  const toggleShuffle = () => {
-    setIsShuffled(!isShuffled);
-  };
-
-  const toggleRepeat = () => {
-    setIsRepeating(!isRepeating);
-  };
-
-  const addToQueue = (track: MusicTrack) => {
-    setQueue([...queue, track]);
-  };
-
-  const clearQueue = () => {
-    setQueue([]);
-  };
-
-  const loadPlaylist = (playlist: MusicPlaylist) => {
-    setPlaylistState(playlist);
-    if (playlist.tracks.length > 0) {
-      setCurrentTrack(playlist.tracks[0]);
-    }
-  };
-
-  const shufflePlaylist = () => {
-    if (!playlist) return;
     
-    const shuffled = [...playlist.tracks].sort(() => Math.random() - 0.5);
-    const shuffledPlaylist = {
-      ...playlist,
-      tracks: shuffled
+    // Playlist par défaut si rien ne correspond
+    return {
+      id: `emotion-${Date.now()}`,
+      name: `Playlist ${emotion}`,
+      title: `Playlist ${emotion}`,
+      description: `Musique générée pour l'émotion ${emotion}`,
+      emotion: emotion,
+      tracks: [
+        {
+          id: 'default-track-1',
+          title: 'Ambient Melody',
+          artist: 'EmotionsCare',
+          duration: 180,
+          url: '/audio/samples/ambient.mp3',
+          cover: '/images/covers/ambient.jpg',
+          coverUrl: '/images/covers/ambient.jpg',
+          audioUrl: '/audio/samples/ambient.mp3',
+          emotion: emotion,
+          mood: [emotion],
+          genre: 'Ambient',
+          album: 'Emotions',
+          tags: [emotion]
+        }
+      ],
+      source: 'generated',
+      coverImage: '/images/covers/ambient.jpg',
+      mood: [emotion]
     };
+  }, []);
+
+  // Fonction pour générer une musique à partir d'un prompt
+  const generateMusic = useCallback(async (prompt: string): Promise<MusicTrack> => {
+    // Simulation
+    return {
+      id: `generated-${Date.now()}`,
+      title: `Musique basée sur: ${prompt.substring(0, 20)}...`,
+      artist: 'IA Music Generator',
+      duration: 180,
+      url: '/audio/samples/generated.mp3',
+      cover: '/images/covers/generated.jpg',
+      coverUrl: '/images/covers/generated.jpg',
+      audioUrl: '/audio/samples/generated.mp3',
+      emotion: 'custom',
+      mood: ['custom'],
+      genre: 'AI Generated',
+      album: 'Generated Music',
+      tags: ['generated']
+    };
+  }, []);
+
+  // Fonction pour récupérer une recommendation selon une émotion (alias)
+  const getRecommendationByEmotion = useCallback((emotion: string, intensity: number = 0.5) => {
+    return loadPlaylistForEmotion({ emotion, intensity });
+  }, [loadPlaylistForEmotion]);
+
+  // Fonctions de contrôle de lecture
+  const playTrack = useCallback((track: MusicTrack) => {
+    setCurrentTrack(normalizeTrack(track));
+    setIsPlaying(true);
+  }, []);
+
+  const pauseTrack = useCallback(() => {
+    setIsPlaying(false);
+  }, []);
+
+  const resumeTrack = useCallback(() => {
+    setIsPlaying(true);
+  }, []);
+
+  const previousTrack = useCallback(() => {
+    if (!playlist || !currentTrack) return;
     
-    setPlaylistState(shuffledPlaylist);
-  };
-
-  // Fonction simulée pour charger une playlist basée sur l'émotion
-  const loadPlaylistForEmotion = async (emotion: string | EmotionMusicParams): Promise<MusicPlaylist | null> => {
-    try {
-      // Ici, on simule un appel API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Pour l'instant, on retourne un mock
-      const mockPlaylist: MusicPlaylist = {
-        id: 'emotion-playlist',
-        name: typeof emotion === 'string' ? `${emotion} Music` : `${emotion.emotion} Music`,
-        title: typeof emotion === 'string' ? `${emotion} Music` : `${emotion.emotion} Music`,
-        description: 'Generated playlist based on your emotion',
-        tracks: [
-          {
-            id: 'track1',
-            title: 'Relaxing Song',
-            name: 'Relaxing Song',
-            artist: 'Ambient Artist',
-            duration: 180,
-            url: 'https://example.com/audio1.mp3',
-            audioUrl: 'https://example.com/audio1.mp3',
-            cover: 'https://example.com/cover1.jpg',
-            coverUrl: 'https://example.com/cover1.jpg',
-          },
-          {
-            id: 'track2',
-            title: 'Calming Tune',
-            name: 'Calming Tune',
-            artist: 'Relaxation Master',
-            duration: 240,
-            url: 'https://example.com/audio2.mp3',
-            audioUrl: 'https://example.com/audio2.mp3',
-            cover: 'https://example.com/cover2.jpg',
-            coverUrl: 'https://example.com/cover2.jpg',
-          }
-        ],
-      };
-      
-      setPlaylistState(mockPlaylist);
-      if (mockPlaylist.tracks.length > 0) {
-        setCurrentTrack(mockPlaylist.tracks[0]);
-      }
-      
-      return mockPlaylist;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Unknown error');
-      setError(error);
-      return null;
+    const currentIndex = playlist.tracks.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex > 0) {
+      const prevTrack = playlist.tracks[currentIndex - 1];
+      setCurrentTrack(prevTrack);
+      setIsPlaying(true);
     }
-  };
+  }, [playlist, currentTrack]);
 
-  // Alias pour la compatibilité
-  const getRecommendationByEmotion = loadPlaylistForEmotion;
-  
-  // Simuler la génération de musique
-  const generateMusic = async (params: any): Promise<MusicTrack | null> => {
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockTrack: MusicTrack = {
-        id: `generated-${Date.now()}`,
-        title: 'Generated Song',
-        name: 'Generated Song',
-        artist: 'AI Composer',
-        duration: 200,
-        url: 'https://example.com/generated.mp3',
-        audioUrl: 'https://example.com/generated.mp3',
-        cover: 'https://example.com/cover-gen.jpg',
-        coverUrl: 'https://example.com/cover-gen.jpg',
-      };
-      
-      setCurrentTrack(mockTrack);
-      return mockTrack;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Unknown error');
-      setError(error);
-      return null;
+  const nextTrack = useCallback(() => {
+    if (!playlist || !currentTrack) return;
+    
+    const currentIndex = playlist.tracks.findIndex(track => track.id === currentTrack.id);
+    if (currentIndex < playlist.tracks.length - 1) {
+      const nextTrack = playlist.tracks[currentIndex + 1];
+      setCurrentTrack(nextTrack);
+      setIsPlaying(true);
     }
-  };
-  
-  // Fonction pour trouver des pistes par humeur
-  const findTracksByMood = (mood: string): MusicTrack[] => {
-    // Simuler la recherche par humeur
-    return [
-      {
-        id: 'mood-track1',
-        title: `${mood} Melody`,
-        name: `${mood} Melody`,
-        artist: 'Mood Master',
-        duration: 210,
-        url: 'https://example.com/mood1.mp3',
-        audioUrl: 'https://example.com/mood1.mp3',
-        cover: 'https://example.com/mood-cover1.jpg',
-        coverUrl: 'https://example.com/mood-cover1.jpg',
-      }
-    ];
-  };
-  
-  // Fonction pour définir l'émotion actuelle
-  const setEmotion = (emotion: string) => {
-    console.log(`Setting emotion to: ${emotion}`);
-    // Cette fonction pourrait mettre à jour l'état ou déclencher d'autres actions
-  };
+  }, [playlist, currentTrack]);
 
-  const value: MusicContextType = {
-    isPlaying,
+  const seekTo = useCallback((time: number) => {
+    setCurrentTime(time);
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    setMuted(prev => !prev);
+  }, []);
+
+  // Valeur du contexte
+  const contextValue: MusicContextType = {
     currentTrack,
-    isInitialized,
-    togglePlay,
+    setCurrentTrack,
+    playlist,
+    setPlaylist,
+    isPlaying,
+    setIsPlaying,
+    volume,
+    setVolume,
+    currentTime,
+    setCurrentTime,
+    duration,
+    setDuration,
+    muted,
+    setMuted,
+    openDrawer,
+    setOpenDrawer,
     playTrack,
     pauseTrack,
     resumeTrack,
-    nextTrack,
     previousTrack,
-    volume,
-    setVolume,
-    playlists,
-    currentPlaylist: playlist,
-    loadPlaylistForEmotion,
-    queue,
-    addToQueue,
-    clearQueue,
-    loadPlaylist,
-    shufflePlaylist,
-    setOpenDrawer,
-    openDrawer,
-    error,
+    nextTrack,
     seekTo,
-    isShuffled,
-    isRepeating,
-    toggleShuffle,
-    toggleRepeat,
-    duration,
-    currentTime,
-    // Alias et fonctions supplémentaires pour compatibilité
-    getRecommendationByEmotion,
-    setPlaylist,
-    setCurrentTrack,
-    findTracksByMood,
-    toggleDrawer,
     toggleMute,
-    muted,
+    loadPlaylistForEmotion,
+    getRecommendationByEmotion,
     generateMusic,
-    setEmotion,
-    playlist
+    isInitialized
   };
 
   return (
-    <MusicContext.Provider value={value}>
+    <MusicContext.Provider value={contextValue}>
       {children}
     </MusicContext.Provider>
   );

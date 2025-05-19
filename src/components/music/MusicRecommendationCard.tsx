@@ -4,9 +4,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Music } from 'lucide-react';
-import { useMusic } from '@/contexts/music';
-import { EmotionMusicParams, MusicContextType } from '@/types/music';
+import { useMusic } from '@/hooks/useMusic';
+import { EmotionMusicParams } from '@/types/music';
 import { ensurePlaylist } from '@/utils/musicCompatibility';
+import { useToast } from '@/hooks/use-toast';
 
 interface MusicRecommendationCardProps {
   title: string;
@@ -17,30 +18,60 @@ interface MusicRecommendationCardProps {
 const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({ title, emotion, icon }) => {
   const [intensity, setIntensity] = useState(50);
   const [isLoading, setIsLoading] = useState(false);
-  const music = useMusic() as MusicContextType;
+  const music = useMusic();
+  const { toast } = useToast();
 
   const handleGenerateMusic = async () => {
     setIsLoading(true);
     try {
-      // Utiliser loadPlaylistForEmotion car c'est plus stable
+      // Utiliser loadPlaylistForEmotion s'il existe, sinon simuler
       const params: EmotionMusicParams = {
         emotion: emotion,
         intensity: intensity / 100
       };
       
-      const playlist = await music.loadPlaylistForEmotion(params);
+      let playlist;
+      if (music.loadPlaylistForEmotion) {
+        playlist = await music.loadPlaylistForEmotion(params);
+      } else if (music.getRecommendationByEmotion) {
+        playlist = await music.getRecommendationByEmotion(emotion, intensity / 100);
+      } else {
+        // Simulation si aucune méthode n'est disponible
+        toast({
+          title: "Fonctionnalité limitée",
+          description: "La génération de musique par émotion n'est pas disponible actuellement."
+        });
+        setIsLoading(false);
+        return;
+      }
       
       if (playlist) {
         const formattedPlaylist = ensurePlaylist(playlist);
         
         if (formattedPlaylist.tracks.length > 0) {
-          music.setPlaylist && music.setPlaylist(formattedPlaylist);
-          music.setCurrentTrack && music.setCurrentTrack(formattedPlaylist.tracks[0]);
-          music.setOpenDrawer && music.setOpenDrawer(true);
+          if (music.setPlaylist) music.setPlaylist(formattedPlaylist);
+          if (music.setCurrentTrack) music.setCurrentTrack(formattedPlaylist.tracks[0]);
+          if (music.setOpenDrawer) music.setOpenDrawer(true);
+          
+          toast({
+            title: "Playlist générée",
+            description: `${formattedPlaylist.tracks.length} morceaux basés sur l'émotion "${emotion}"`
+          });
+        } else {
+          toast({
+            title: "Aucun morceau trouvé",
+            description: "Essayez avec une autre émotion ou un autre niveau d'intensité",
+            variant: "destructive"
+          });
         }
       }
     } catch (error) {
       console.error('Error generating music:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer la musique. Veuillez réessayer.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }

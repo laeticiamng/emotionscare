@@ -8,6 +8,7 @@
  */
 
 import { MusicContextType } from '@/types/music';
+import { useMusic as useMusicHook } from './useMusic.tsx';
 
-export { useMusic } from './useMusic.tsx';
+export const useMusic = useMusicHook;
 export default useMusic;

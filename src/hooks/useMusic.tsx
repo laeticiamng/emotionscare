@@ -16,7 +16,7 @@ export const useMusic = (): MusicContextType => {
     throw new Error('useMusic must be used within a MusicProvider');
   }
   
-  return context as MusicContextType;
+  return context;
 };
 
 export default useMusic;

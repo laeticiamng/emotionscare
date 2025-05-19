@@ -1,39 +1,50 @@
 
-import React, { useEffect } from 'react';
-import { useMusic } from '@/contexts';
-import MusicPlayer from '../MusicPlayer';
+import React from 'react';
+import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Music } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface MusicLayoutProps {
   children: React.ReactNode;
 }
 
 const MusicLayout: React.FC<MusicLayoutProps> = ({ children }) => {
-  const { isPlaying, currentTrack, isInitialized } = useMusic();
+  const music = useMusic();
+  const isInitialized = music.isInitialized !== false; // Par défaut true si non défini
 
-  return (
-    <div className="flex flex-col min-h-screen space-y-4">
-      <div className="flex-1 container mx-auto p-4">
-        {isInitialized ? (
-          <>
-            {children}
-            
-            {currentTrack && (
-              <div className="fixed bottom-0 left-0 right-0 z-50">
-                <MusicPlayer />
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="flex flex-col items-center justify-center min-h-[50vh]">
-            <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-            <p className="text-muted-foreground">Initialisation du système audio...</p>
-          </div>
-        )}
+  if (!isInitialized) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Music className="h-5 w-5" />
+              Module musical
+            </CardTitle>
+            <CardDescription>
+              Initialisation du système audio...
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center py-6">
+            <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+            <p className="mt-4 text-muted-foreground">Chargement des ressources audio</p>
+          </CardContent>
+          <CardFooter>
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => window.location.reload()}
+            >
+              Recharger
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return <>{children}</>;
 };
 
 export default MusicLayout;
