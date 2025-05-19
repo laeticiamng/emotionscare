@@ -1,76 +1,30 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
-import WelcomeMessage from '@/components/transitions/WelcomeMessage';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 
 interface AuthTransitionProps {
   children: React.ReactNode;
 }
 
 const AuthTransition: React.FC<AuthTransitionProps> = ({ children }) => {
-  const [showWelcome, setShowWelcome] = useState(false);
-  const { isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Get the timestamp of the last login from session storage
-  const getLastLoginTimestamp = useCallback(() => {
-    return sessionStorage.getItem('last_login_timestamp');
-  }, []);
-  
-  // Set the timestamp of the current login in session storage
-  const setLoginTimestamp = useCallback(() => {
-    sessionStorage.setItem('last_login_timestamp', Date.now().toString());
-  }, []);
-  
-  // Check if this is a fresh login
-  const isFreshLogin = useCallback(() => {
-    const lastLogin = getLastLoginTimestamp();
-    const currentTime = Date.now();
-    
-    // If no last login or login was more than 5 seconds ago
-    if (!lastLogin || currentTime - parseInt(lastLogin) > 5000) {
-      setLoginTimestamp();
-      return true;
-    }
-    
-    return false;
-  }, [getLastLoginTimestamp, setLoginTimestamp]);
-  
-  useEffect(() => {
-    // If user is authenticated and just logged in
-    if (isAuthenticated && user) {
-      const path = location.pathname;
-      
-      // If on login or register page
-      if (path === '/b2c/login' || path === '/b2c/register') {
-        // Check if this is a fresh login
-        if (isFreshLogin()) {
-          // Show welcome message
-          setShowWelcome(true);
-        } else {
-          // Just redirect
-          navigate('/b2c/dashboard');
-        }
-      }
-    }
-  }, [isAuthenticated, user, location.pathname, navigate, isFreshLogin]);
-  
-  // Handle completion of welcome message
-  const handleWelcomeComplete = () => {
-    navigate('/b2c/dashboard');
-  };
-  
   return (
     <>
-      {children}
+      <Helmet>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
+        <meta name="description" content="EmotionsCare - Prenez soin de votre bien-être émotionnel" />
+      </Helmet>
       
-      {/* Welcome message overlay */}
-      {showWelcome && (
-        <WelcomeMessage onComplete={handleWelcomeComplete} />
-      )}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        {children}
+      </motion.div>
     </>
   );
 };

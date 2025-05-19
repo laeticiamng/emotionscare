@@ -5,15 +5,18 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import AppRouter from './AppRouter';
 import './App.css';
 import AuthTransition from '@/components/auth/AuthTransition';
+import { HelmetProvider } from 'react-helmet-async';
 
 const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <ThemeProvider>
-        <AuthTransition>
-          <AppRouter />
-        </AuthTransition>
-      </ThemeProvider>
+      <HelmetProvider>
+        <ThemeProvider>
+          <AuthTransition>
+            <AppRouter />
+          </AuthTransition>
+        </ThemeProvider>
+      </HelmetProvider>
     </BrowserRouter>
   );
 };
