@@ -1,144 +1,84 @@
 
-import { MusicPlaylist } from '@/types/music';
+import { MusicPlaylist, MusicTrack } from '@/types/music';
+import { relaxingNatureSounds, focusBeats, energyBoost, calmMeditation } from './music';
 
-// Sample playlists for different emotions
-export const emotionPlaylists: MusicPlaylist[] = [
-  {
-    id: 'calm-1',
-    name: 'Calme Zen',
-    title: 'Calme Zen',
-    description: 'Une sélection de morceaux apaisants et zen pour vous aider à vous détendre',
-    emotion: 'calm',
-    coverImage: '/images/covers/calm.jpg',
-    source: 'curated',
-    mood: ['calm', 'relaxed', 'peaceful'],
-    tracks: [
-      {
-        id: 'calm-track-1',
-        title: 'Méditation du Matin',
-        artist: 'ZenMasters',
-        duration: 240,
-        url: '/audio/samples/calm-1.mp3',
-        cover: '/images/covers/calm-1.jpg',
-        genre: 'Ambient',
-        mood: ['calm', 'meditation'],
-        album: 'Calm Sessions'
-      },
-      {
-        id: 'calm-track-2',
-        title: 'Forêt Paisible',
-        artist: 'Nature Sounds',
-        duration: 320,
-        url: '/audio/samples/calm-2.mp3',
-        cover: '/images/covers/calm-2.jpg',
-        genre: 'Nature',
-        mood: ['calm', 'nature'],
-        album: 'Forest Sounds'
-      }
-    ]
-  },
-  {
-    id: 'focus-1',
-    name: 'Concentration Profonde',
-    title: 'Concentration Profonde',
-    description: 'Musique idéale pour améliorer votre concentration et productivité',
-    emotion: 'focus',
-    coverImage: '/images/covers/focus.jpg',
-    source: 'curated',
-    mood: ['focus', 'concentration', 'productivity'],
-    tracks: [
-      {
-        id: 'focus-track-1',
-        title: 'Deep Focus',
-        artist: 'BrainWave',
-        duration: 280,
-        url: '/audio/samples/focus-1.mp3',
-        cover: '/images/covers/focus-1.jpg',
-        genre: 'Electronic',
-        mood: ['focus', 'concentration'],
-        album: 'Focus Sessions'
-      },
-      {
-        id: 'focus-track-2',
-        title: 'Study Flow',
-        artist: 'MindTunes',
-        duration: 310,
-        url: '/audio/samples/focus-2.mp3',
-        cover: '/images/covers/focus-2.jpg',
-        genre: 'Instrumental',
-        mood: ['focus', 'study'],
-        album: 'Productivity Mix'
-      }
-    ]
-  },
-  {
-    id: 'energy-1',
-    name: 'Boost d\'Énergie',
-    title: 'Boost d\'Énergie',
-    description: 'Des rythmes dynamiques pour vous motiver et stimuler votre énergie',
-    emotion: 'energetic',
-    coverImage: '/images/covers/energy.jpg',
-    source: 'curated',
-    mood: ['energetic', 'upbeat', 'motivated'],
-    tracks: [
-      {
-        id: 'energy-track-1',
-        title: 'Morning Boost',
-        artist: 'EnergyBeats',
-        duration: 190,
-        url: '/audio/samples/energy-1.mp3',
-        cover: '/images/covers/energy-1.jpg',
-        genre: 'Dance',
-        mood: ['energetic', 'upbeat'],
-        album: 'Energy Mix'
-      },
-      {
-        id: 'energy-track-2',
-        title: 'Workout Power',
-        artist: 'FitTunes',
-        duration: 225,
-        url: '/audio/samples/energy-2.mp3',
-        cover: '/images/covers/energy-2.jpg',
-        genre: 'Electronic',
-        mood: ['energetic', 'workout'],
-        album: 'Fitness Beats'
-      }
-    ]
-  },
-  {
-    id: 'happy-1',
-    name: 'Joie & Bonne Humeur',
-    title: 'Joie & Bonne Humeur',
-    description: 'Une sélection de morceaux joyeux pour égayer votre journée',
-    emotion: 'happy',
-    coverImage: '/images/covers/happy.jpg',
-    source: 'curated',
-    mood: ['happy', 'joyful', 'cheerful'],
-    tracks: [
-      {
-        id: 'happy-track-1',
-        title: 'Sunny Day',
-        artist: 'HappyTunes',
-        duration: 210,
-        url: '/audio/samples/happy-1.mp3',
-        cover: '/images/covers/happy-1.jpg',
-        genre: 'Pop',
-        mood: ['happy', 'cheerful'],
-        album: 'Happy Days'
-      },
-      {
-        id: 'happy-track-2',
-        title: 'Good Vibes',
-        artist: 'PositiveBeats',
-        duration: 195,
-        url: '/audio/samples/happy-2.mp3',
-        cover: '/images/covers/happy-2.jpg',
-        genre: 'Indie Pop',
-        mood: ['happy', 'positive'],
-        album: 'Feel Good Mix'
-      }
-    ]
-  }
-];
+// Pour les playlists d'émotion, nous allons utiliser un objet avec mood comme tableau ou string
+export const joyPlaylist: MusicPlaylist = {
+  id: 'joy-playlist-001',
+  title: 'Joie et Bonheur',
+  description: 'Musique pour célébrer et amplifier vos moments de joie',
+  cover: '/images/music/joy-cover.jpg',
+  tracks: relaxingNatureSounds.tracks.slice(0, 4),
+  mood: ['joy', 'happiness', 'excitement'],
+  emotion: 'joy',
+  category: ['happiness', 'energy'],
+  author: 'EmotionsCare'
+};
 
-export default emotionPlaylists;
+export const calmPlaylist: MusicPlaylist = {
+  id: 'calm-playlist-001',
+  title: 'Calme et Sérénité',
+  description: 'Sons relaxants pour retrouver calme et équilibre',
+  cover: '/images/music/calm-cover.jpg',
+  tracks: calmMeditation.tracks,
+  mood: ['calm', 'peaceful', 'serene'],
+  emotion: 'calm',
+  category: ['relaxation', 'meditation'],
+  author: 'EmotionsCare'
+};
+
+export const sadnessPlaylist: MusicPlaylist = {
+  id: 'sadness-playlist-001',
+  title: 'Mélancolie Apaisante',
+  description: 'Musique qui accompagne et transforme la tristesse',
+  cover: '/images/music/sadness-cover.jpg',
+  tracks: calmMeditation.tracks.slice(2, 6),
+  mood: ['sadness', 'melancholy', 'reflection'],
+  emotion: 'sadness',
+  category: ['sadness', 'meditation'],
+  author: 'EmotionsCare'
+};
+
+export const angerPlaylist: MusicPlaylist = {
+  id: 'anger-playlist-001',
+  title: 'Canalisez l\'Énergie',
+  description: 'Musique pour transformer la colère en énergie positive',
+  cover: '/images/music/anger-cover.jpg',
+  tracks: energyBoost.tracks,
+  mood: ['anger', 'energy', 'transformation'],
+  emotion: 'anger',
+  category: ['energy', 'focus'],
+  author: 'EmotionsCare'
+};
+
+export const emotionPlaylists: Record<string, MusicPlaylist> = {
+  joy: joyPlaylist,
+  calm: calmPlaylist,
+  sadness: sadnessPlaylist,
+  anger: angerPlaylist,
+};
+
+// Fonction utilitaire pour obtenir une playlist par émotion
+export const getPlaylistByEmotion = (emotion: string): MusicPlaylist | null => {
+  const normalizedEmotion = emotion.toLowerCase();
+  // Correspondance entre les émotions détectées et nos playlists disponibles
+  const emotionMap: Record<string, string> = {
+    joy: 'joy',
+    happiness: 'joy',
+    excited: 'joy',
+    calm: 'calm',
+    peaceful: 'calm',
+    sad: 'sadness',
+    sadness: 'sadness',
+    melancholy: 'sadness',
+    anger: 'anger',
+    frustration: 'anger',
+    anxious: 'calm',
+    anxiety: 'calm',
+    fear: 'calm',
+    neutral: 'calm',
+  };
+
+  const playlistKey = emotionMap[normalizedEmotion] || 'calm';
+  return emotionPlaylists[playlistKey] || null;
+};

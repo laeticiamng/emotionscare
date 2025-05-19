@@ -2,72 +2,42 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { getRoleHomePath } from './use-role-redirect';
-import { normalizeUserMode } from '@/utils/userModeHelpers';
 import { useToast } from '@/hooks/use-toast';
 
 /**
- * Unify access flow by redirecting users based on their authentication
- * status and stored preferred mode. When visiting generic paths like
- * `/` or `/login`, the user is automatically routed to the most
- * relevant area of the app.
+ * Hook qui gère la redirection automatique des utilisateurs
+ * notamment depuis la page /b2b/selection vers le bon tableau de bord
  */
-export function usePreferredAccess() {
-  const { isAuthenticated, isLoading, user } = useAuth();
+export default function usePreferredAccess() {
+  const { user, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
 
   useEffect(() => {
+    // Ne rien faire pendant le chargement
     if (isLoading) return;
 
-    // Don't redirect from home page if not authenticated
-    if (location.pathname === '/' && !isAuthenticated) {
-      return;
-    }
-
-    // If the user is authenticated and lands on a neutral page, redirect
-    if (isAuthenticated && user) {
-      if (location.pathname === '/' || location.pathname === '/login') {
-        const targetPath = getRoleHomePath(user.role);
-        
-        // Show welcome toast when auto-redirecting
-        if (location.pathname === '/') {
-          toast({
-            title: `Bienvenue ${user.name || ''}`,
-            description: "Vous êtes automatiquement connecté à votre espace personnel."
-          });
-        }
-        
-        navigate(targetPath, { replace: true });
-        return;
+    // Si l'utilisateur est sur /b2b/selection et est authentifié,
+    // le rediriger vers son tableau de bord approprié
+    if (location.pathname === '/b2b/selection' && isAuthenticated && user?.role) {
+      const role = user.role.toLowerCase();
+      
+      if (role === 'b2b_admin') {
+        navigate('/b2b/admin/dashboard', { replace: true });
+        toast({
+          title: "Redirection automatique",
+          description: "Vous êtes connecté en tant qu'administrateur",
+        });
+      } else if (role === 'b2b_user') {
+        navigate('/b2b/user/dashboard', { replace: true });
+        toast({
+          title: "Redirection automatique",
+          description: "Vous êtes connecté en tant que collaborateur",
+        });
       }
-      return;
     }
+  }, [isAuthenticated, user, isLoading, navigate, location.pathname, toast]);
 
-    // User not authenticated: auto-select login/register page based on stored mode
-    const storedMode = localStorage.getItem('userMode');
-    if (!storedMode) return;
-    const normalized = normalizeUserMode(storedMode);
-
-    if (location.pathname === '/login') {
-      const target =
-        normalized === 'b2b_admin'
-          ? '/b2b/admin/login'
-          : normalized === 'b2b_user'
-          ? '/b2b/user/login'
-          : '/b2c/login';
-      navigate(target, { replace: true });
-    } else if (location.pathname === '/register') {
-      const target =
-        normalized === 'b2b_admin'
-          ? '/b2b/admin/register'
-          : normalized === 'b2b_user'
-          ? '/b2b/user/register'
-          : '/b2c/register';
-      navigate(target, { replace: true });
-    }
-  }, [isAuthenticated, isLoading, user, location.pathname, navigate, toast]);
+  return { isAuthenticated, user, isLoading };
 }
-
-export default usePreferredAccess;

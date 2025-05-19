@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building, ArrowLeft } from 'lucide-react';
+import { Building, ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -44,7 +44,7 @@ const B2BUserLogin = () => {
       
       toast({
         title: "Connexion réussie",
-        description: "Bienvenue dans votre espace collaborateur EmotionsCare."
+        description: `Bienvenue ${user?.name || ''} dans votre espace collaborateur EmotionsCare.`
       });
 
       // Small delay to show the success message before redirecting
@@ -69,12 +69,34 @@ const B2BUserLogin = () => {
     }
   };
 
+  const buttonVariants = {
+    hover: {
+      scale: 1.03,
+      boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
+      transition: { type: "spring", stiffness: 400, damping: 10 }
+    },
+    tap: {
+      scale: 0.97,
+      transition: { type: "spring", stiffness: 400, damping: 10 }
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100/50 p-4 dark:from-slate-900 dark:to-blue-900/20">
-      {/* Ambient background */}
+      {/* Ambient background with animation */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-br from-blue-200/40 to-transparent rounded-full filter blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-blue-200/40 to-transparent rounded-full filter blur-3xl"></div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.3 }}
+          transition={{ duration: 1.5 }}
+          className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-br from-blue-200/40 to-transparent rounded-full filter blur-3xl"
+        />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.3 }}
+          transition={{ duration: 1.5, delay: 0.5 }}
+          className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-blue-200/40 to-transparent rounded-full filter blur-3xl"
+        />
       </div>
       
       <motion.div
@@ -103,7 +125,12 @@ const B2BUserLogin = () => {
           
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
+              <motion.div 
+                className="space-y-2"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.4 }}
+              >
                 <Label htmlFor="email" className="text-sm font-medium">Email professionnel</Label>
                 <Input 
                   id="email" 
@@ -112,12 +139,18 @@ const B2BUserLogin = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-white/50 dark:bg-slate-800/50 border-blue-100 dark:border-blue-900/50 focus:border-blue-300 transition-all"
+                  className="bg-white/50 dark:bg-slate-800/50 border-blue-100 dark:border-blue-900/50 focus:border-blue-300 transition-all focus:ring-2 focus:ring-blue-500/50"
                   autoComplete="email"
+                  aria-label="Adresse email professionnelle"
                 />
-              </div>
+              </motion.div>
               
-              <div className="space-y-2">
+              <motion.div 
+                className="space-y-2"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.4 }}
+              >
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password" className="text-sm font-medium">Mot de passe</Label>
                   <Button 
@@ -138,44 +171,75 @@ const B2BUserLogin = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-white/50 dark:bg-slate-800/50 border-blue-100 dark:border-blue-900/50 focus:border-blue-300 transition-all"
+                  className="bg-white/50 dark:bg-slate-800/50 border-blue-100 dark:border-blue-900/50 focus:border-blue-300 transition-all focus:ring-2 focus:ring-blue-500/50"
                   autoComplete="current-password"
+                  aria-label="Mot de passe"
                 />
-              </div>
+              </motion.div>
               
-              <Button 
-                type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-all" 
-                disabled={isLoading}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.4 }}
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="tap"
               >
-                {isLoading ? 
-                  <div className="flex items-center gap-2">
-                    <span className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-                    Connexion...
-                  </div> : 
-                  "Se connecter"
-                }
-              </Button>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white transition-all" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Connexion...
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <span>Se connecter</span>
+                      <ChevronRight className="h-4 w-4" />
+                    </div>
+                  )}
+                </Button>
+              </motion.div>
             </form>
           </CardContent>
           
           <CardFooter className="flex flex-col gap-4">
-            <Button 
-              variant="outline" 
-              className="w-full border-blue-200 dark:border-blue-900/50 hover:bg-blue-50 dark:hover:bg-blue-900/20" 
-              onClick={() => navigate('/b2b/user/register')}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.4 }}
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              className="w-full"
             >
-              Demander un accès
-            </Button>
+              <Button 
+                variant="outline" 
+                className="w-full border-blue-200 dark:border-blue-900/50 hover:bg-blue-50 dark:hover:bg-blue-900/20" 
+                onClick={() => navigate('/b2b/user/register')}
+              >
+                Demander un accès
+              </Button>
+            </motion.div>
             
-            <Button 
-              variant="ghost" 
-              className="text-muted-foreground hover:text-blue-600 flex items-center gap-1" 
-              onClick={() => navigate('/')}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.4 }}
+              className="w-full"
             >
-              <ArrowLeft className="h-4 w-4" />
-              Retour à l'accueil
-            </Button>
+              <Button 
+                variant="ghost" 
+                className="text-muted-foreground hover:text-blue-600 flex items-center gap-1 w-full justify-center" 
+                onClick={() => navigate('/')}
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Retour à l'accueil
+              </Button>
+            </motion.div>
           </CardFooter>
         </Card>
       </motion.div>

@@ -5,12 +5,11 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { routes } from './router';
 import { useDashboardMonitor } from './hooks/use-dashboard-monitor';
 import { useAuth } from '@/contexts/AuthContext';
-import usePreferredAccess from '@/hooks/use-preferred-access';
+import usePreferredAccess from './hooks/use-preferred-access';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const AppRouter: React.FC = () => {
   const content = useRoutes(routes);
-  const { isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
 
   // Add monitoring for dashboard access issues
@@ -23,9 +22,23 @@ const AppRouter: React.FC = () => {
   }
   
   return (
-    <Suspense fallback={<LoadingSpinner />}>
-      {content}
-    </Suspense>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <LoadingSpinner />
+          </div>
+        }>
+          {content}
+        </Suspense>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

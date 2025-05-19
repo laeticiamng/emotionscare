@@ -1,184 +1,78 @@
 
-/**
- * Types partagés pour le module de musique
- */
+export type MusicCategory = 'relaxation' | 'focus' | 'energy' | 'sleep' | 'happiness' | 'sadness' | 'anger' | 'fear' | 'surprise' | 'meditation' | 'ambient' | 'nature';
 
-// Interface de base pour une piste musicale
 export interface MusicTrack {
   id: string;
   title: string;
-  name?: string;
-  artist?: string;
-  duration?: number;
-  coverUrl?: string;
-  audioUrl?: string;
-  url?: string;
-  cover?: string;
-  src?: string;
-  track_url?: string;
-  coverImage?: string;
-  mood?: string[];
-  emotion?: string;
-  genre?: string;
-  category?: string;
-  isLiked?: boolean;
+  artist: string;
   album?: string;
-  intensity?: number;
-  year?: number;
+  cover?: string;
+  url: string;
+  duration?: number;
+  mood?: string | string[];
+  category?: MusicCategory | MusicCategory[];
+  bpm?: number;
   tags?: string[];
+  isPlaying?: boolean;
+  created_at?: string;
 }
 
-// Interface pour une playlist musicale
 export interface MusicPlaylist {
   id: string;
-  name: string;
   title?: string;
   description?: string;
-  coverUrl?: string;
   cover?: string;
-  coverImage?: string;
   tracks: MusicTrack[];
-  mood?: string;
+  mood?: string | string[];
   emotion?: string;
-  isCustom?: boolean;
-  tags?: string[];
+  category?: MusicCategory | MusicCategory[];
+  created_at?: string;
+  author?: string;
 }
 
-// Interface pour les paramètres de music par émotion
-export interface EmotionMusicParams {
-  emotion: string;
-  intensity?: number;
-  duration?: number;
-  tempo?: number;
-}
-
-// Interface pour les paramètres du player musical
-export interface MusicPlayerProps {
-  track: MusicTrack | null;
-  autoPlay?: boolean;
-  onPlay?: () => void;
-  onPause?: () => void;
-  onNext?: () => void;
-  onPrevious?: () => void;
-  onEnded?: () => void;
-  volume?: number;
-  onVolumeChange?: (volume: number) => void;
-  currentTime?: number;
-  duration?: number;
-  onSeek?: (time: number) => void;
-  className?: string;
-}
-
-// Interface pour la barre de progression
-export interface ProgressBarProps {
-  currentTime?: number;
-  duration?: number;
-  onSeek?: (time: number) => void;
-  formatTime?: (seconds: number) => string;
-}
-
-// Interface pour le contrôle du volume
-export interface VolumeControlProps {
-  volume: number;
-  onVolumeChange: (volume: number) => void;
-  isMuted?: boolean;
-  onMuteToggle?: () => void;
-  className?: string;
-}
-
-// Interface pour les préférences musicales de l'utilisateur
-export interface MusicPreferences {
-  volume: number;
-  autoplay: boolean;
-  crossfade: boolean;
-  equalizer: {
-    bass: number;
-    mid: number;
-    treble: number;
-  };
-  favorites: string[];
-}
-
-// Interface pour une session musicale
-export interface MusicSession {
-  id: string;
-  startTime: string;
-  endTime?: string;
-  tracks: string[];
-  totalDuration: number;
-  emotion?: string;
-  feedback?: number;
-}
-
-// Interface pour les paramètres d'humeur musicale
-export interface MusicMood {
-  name: string;
-  description: string;
-  color: string;
-  icon: string;
-  intensity: number;
-  bpm: number[];
-}
-
-// Interface pour le contexte de musique
 export interface MusicContextType {
-  isPlaying: boolean;
+  // State
   currentTrack: MusicTrack | null;
+  currentPlaylist: MusicPlaylist | null;
+  queue: MusicTrack[];
+  isPlaying: boolean;
+  volume: number;
+  muted: boolean;
+  currentTime: number;
+  duration: number;
+  repeat: 'off' | 'track' | 'playlist';
+  shuffle: boolean;
+  openDrawer: boolean;
   isInitialized: boolean;
-  togglePlay: () => void;
+  
+  // Actions
   playTrack: (track: MusicTrack) => void;
   pauseTrack: () => void;
   resumeTrack: () => void;
-  nextTrack: () => void;
   previousTrack: () => void;
-  volume: number;
-  setVolume: (volume: number) => void;
-  playlists: MusicPlaylist[];
-  currentPlaylist: MusicPlaylist | null;
-  loadPlaylistForEmotion: (params: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
-  queue: MusicTrack[];
-  addToQueue: (track: MusicTrack) => void;
-  clearQueue: () => void;
-  loadPlaylist: (playlist: MusicPlaylist) => void;
-  shufflePlaylist: () => void;
-  setOpenDrawer: (open: boolean) => void;
-  openDrawer: boolean;
-  error: Error | null;
-  seekTo: (time: number) => void;
-  isShuffled: boolean;
-  isRepeating: boolean;
-  toggleShuffle: () => void;
-  toggleRepeat: () => void;
-  duration: number;
-  currentTime: number;
-  getRecommendationByEmotion: (params: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
+  nextTrack: () => void;
+  setTrack: (track: MusicTrack) => void;
   setPlaylist: (playlist: MusicPlaylist) => void;
-  setCurrentTrack: (track: MusicTrack) => void;
-  findTracksByMood: (mood: string) => MusicTrack[];
-  toggleDrawer: () => void;
-  toggleMute: () => void;
-  muted: boolean;
-  generateMusic: (params: any) => Promise<MusicTrack | MusicPlaylist | null>;
-  setEmotion: (emotion: string) => void;
-  playlist: MusicPlaylist | null;
+  setVolume: (volume: number) => void;
+  setMuted: (muted: boolean) => void;
+  seekTo: (time: number) => void;
+  setRepeat: (mode: 'off' | 'track' | 'playlist') => void;
+  toggleShuffle: () => void;
+  setOpenDrawer: (open: boolean) => void;
+  loadPlaylistForEmotion: (emotion: string) => Promise<boolean>;
+  getPlaylistById: (id: string) => MusicPlaylist | null;
+  loadPlaylist: (playlist: MusicPlaylist) => void;
+  clearQueue: () => void;
+  addToQueue: (track: MusicTrack) => void;
+  removeFromQueue: (trackId: string) => void;
+  setCurrentTime: (time: number) => void;
+  setDuration: (duration: number) => void;
+  setIsPlaying: (isPlaying: boolean) => void;
+  setIsInitialized: (isInitialized: boolean) => void;
 }
 
-// Interface du type Track utilisée dans les composants existants
-export interface Track {
-  id: string;
-  title: string;
-  name?: string;
-  artist?: string;
-  url: string;
-  cover?: string;
-  audioUrl?: string;
-  duration?: number;
-}
+export interface Track extends MusicTrack {}
 
-// Interface du type Playlist utilisée dans les composants existants
-export interface Playlist {
-  id: string;
-  name: string;
-  title?: string;
-  tracks: Track[];
+export interface MusicProviderProps {
+  children: React.ReactNode;
 }
