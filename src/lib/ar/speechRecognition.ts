@@ -37,10 +37,12 @@ interface SpeechRecognitionInstance extends EventTarget {
   onend: ((event: Event) => void) | null;
 }
 
-// Déclaration globale pour corriger les erreurs de type
+// Use TypeScript interfaces for global declarations
 declare global {
-  var SpeechRecognition: SpeechRecognitionConstructor | undefined;
-  var webkitSpeechRecognition: SpeechRecognitionConstructor | undefined;
+  interface Window {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  }
 }
 
 let recognition: SpeechRecognitionInstance | null = null;

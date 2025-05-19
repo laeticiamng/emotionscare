@@ -81,8 +81,9 @@ export interface MusicContextType extends MusicState {
   setRepeat?: (mode: 'off' | 'track' | 'playlist') => void;
   seekTo?: (time: number) => void;
   
-  // Ajout de la propriété manquante
+  // Time-related properties and methods
   setCurrentTime?: (time: number) => void;
+  setDuration?: (duration: number) => void;
 
   // Gestion des playlists
   playPlaylist?: (playlist: MusicPlaylist, startTrackId?: string) => void;

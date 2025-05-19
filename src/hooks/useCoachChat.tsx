@@ -17,7 +17,7 @@ export const useCoachChat = () => {
     try {
       setIsProcessing(true);
       // Correction du paramètre pour bien passer le message et le type d'expéditeur
-      const response = await coach.sendMessage(message);
+      const response = await coach.sendMessage(message, 'user');
       
       setMessages(prevMessages => {
         const userMessage: ChatMessage = { 

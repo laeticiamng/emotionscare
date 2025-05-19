@@ -1,9 +1,10 @@
+
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'sonner';
 
-// Correction de l'import des types
+// Fix the import for types - import from local types folder rather than @types
 import { EmotionSource } from '@/types/orchestration';
 import { EmotionResult } from '@/types/emotion';
 
@@ -145,7 +146,7 @@ export const OrchestrationProvider: React.FC<{ children: React.ReactNode }> = ({
   const processEmotionResult = useCallback((result: EmotionResult) => {
     if (!result || !result.emotion) return;
     
-    // Fix type casting to ensure compatibility
+    // Cast the source to ensure compatibility with the EmotionSource type
     const source = (result.source || 'text') as EmotionSource;
     
     recordEmotionEvent(
@@ -158,12 +159,12 @@ export const OrchestrationProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Fonction pour obtenir les derniers événements
   const getRecentEvents = (count?: number) => {
-    return state.events.slice(-count || 10);
+    return state.events.slice(0, count || 10);
   };
 
   // Fonction pour obtenir les événements par type
   const getEventsByType = (type: string, count?: number) => {
-    return state.events.filter(event => event.type === type).slice(-count || 10);
+    return state.events.filter(event => event.type === type).slice(0, count || 10);
   };
 
   // Fonction pour effacer tous les événements

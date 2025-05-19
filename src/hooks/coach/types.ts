@@ -1,85 +1,40 @@
 
-// Coach hook shared types
-export type CoachEmotionData = {
-  emotion: string;
-  score: number;
-};
-
-export type CoachAction = {
-  id: string;
-  type: string;
-  payload: any;
-  created_at?: string;
-};
-
-export type CoachEvent = {
-  id: string;
-  type: string;
-  data: any;
-  timestamp: Date | string;
-};
-
-export type EmotionalData = {
-  emotion: string;
-  intensity: number;
-  timestamp: Date | string;
-  context?: string;
-  value?: number;
-  tags?: string[];
-};
-
-export type EmotionalTrend = {
+export interface EmotionalTrend {
   emotion: string;
   count: number;
-  average_intensity: number;
-  timeframe: 'day' | 'week' | 'month';
-};
+  average: number;
+  change: number;
+  period: string;
+}
 
-export type CoachNotification = {
+export interface EmotionalData {
   id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'warning' | 'success' | 'error';
-  timestamp: Date | string;
-  read?: boolean;
-  action?: CoachAction;
-};
+  user_id: string;
+  emotion: string;
+  intensity: number;
+  timestamp: string;
+  source?: string;
+  context?: string;
+  tags?: string[];
+}
 
-export const AI_MODEL_CONFIG = {
-  chat: {
-    model: 'gpt-4o-mini',
-    temperature: 0.7,
-    max_tokens: 500,
-    top_p: 1,
-    stream: false,
-    cacheEnabled: true,
-    cacheTTL: 3600
-  },
-  journal: {
-    model: 'gpt-4o-mini',
-    temperature: 0.5,
-    max_tokens: 1000,
-    top_p: 1,
-    stream: false,
-    cacheEnabled: true,
-    cacheTTL: 7200
-  },
-  coach: {
-    model: 'gpt-4o-mini',
-    temperature: 0.3,
-    max_tokens: 500,
-    top_p: 1,
-    stream: false,
-    cacheEnabled: true,
-    cacheTTL: 3600
-  },
-  scan: {
-    model: 'gpt-4o-mini',
-    temperature: 0.2,
-    max_tokens: 300,
-    top_p: 1,
-    stream: false,
-    cacheEnabled: true,
-    cacheTTL: 1800
-  }
-};
+export type EmotionSource = 'text' | 'voice' | 'facial' | 'manual' | 'ai' | 'system';
+
+export interface EmotionalStats {
+  dominant: string;
+  average: number;
+  count: number;
+  timeline: {
+    date: string;
+    value: number;
+    emotion: string;
+  }[];
+}
+
+export interface EmotionalRecommendation {
+  type: string;
+  title: string;
+  description: string;
+  actionUrl?: string;
+  actionText?: string;
+}

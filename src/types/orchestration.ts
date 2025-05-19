@@ -1,80 +1,67 @@
 
-// Orchestration types
-export type EmotionSource = 
-  | 'text'
-  | 'voice'
-  | 'facial'
-  | 'emoji'
-  | 'system'
-  | 'ai'
-  | 'live-voice'
-  | 'voice-analyzer'
-  | 'audio-processor'
-  | 'text-analysis';
+import { EmotionResult } from '@/types/emotion';
+
+// Define needed orchestration types
+export type EmotionSource = 'text' | 'voice' | 'facial' | 'manual' | 'ai' | 'system';
 
 export interface MoodEvent {
   id: string;
-  emotion: string;
-  intensity: number;
+  user_id: string;
   timestamp: string;
+  mood: string;
+  intensity: number;
   source: EmotionSource;
   context?: string;
-  userId?: string;
 }
 
 export interface Prediction {
   id: string;
-  emotion: string;
-  probability: number;
-  timeframe: 'hour' | 'day' | 'week';
-  triggers?: string[];
+  user_id: string;
   timestamp: string;
-  userId: string;
+  prediction_type: string;
+  prediction_data: any;
+  confidence: number;
+  expires_at?: string;
 }
 
 export interface PredictionRecommendation {
   id: string;
-  action: string;
+  prediction_id: string;
+  type: string;
+  title: string;
   description: string;
-  category: string;
-  predictionId: string;
-  impact: number;
+  action_url?: string;
+  priority: number;
 }
 
 export interface EmotionalLocation {
   id: string;
   name: string;
   description?: string;
-  emotionTags: string[];
-  intensity: number;
-  coordinates?: {
-    lat: number;
-    long: number;
-  };
+  lat: number;
+  lng: number;
+  radius: number;
+  emotion_profile: Record<string, number>;
+  visits_count: number;
+  last_visit?: string;
 }
 
 export interface SanctuaryWidget {
   id: string;
-  type: 'meditation' | 'breathing' | 'journal' | 'music' | 'vr';
+  type: string;
   title: string;
-  description: string;
-  emotionTags: string[];
-  duration: number;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  content: any;
+  priority: number;
+  emotion_trigger?: string;
 }
 
 export interface EmotionalSynthesis {
-  id: string;
-  userId: string;
-  dominantEmotion: string;
-  emotionalSignature: Record<string, number>;
-  lastUpdate: string;
-  period: 'day' | 'week' | 'month';
-  trends: {
-    emotion: string;
-    change: number;
-    direction: 'up' | 'down' | 'stable';
-  }[];
+  dominant_emotion: string;
+  emotion_distribution: Record<string, number>;
+  intensity_avg: number;
+  period_start: string;
+  period_end: string;
+  data_points: number;
 }
 
 export interface OrchestrationEvent {
@@ -82,6 +69,6 @@ export interface OrchestrationEvent {
   type: string;
   timestamp: string;
   data: any;
+  user_id: string;
   source: string;
-  userId: string;
 }

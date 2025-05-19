@@ -1,3 +1,4 @@
+
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 // Correction des types de catégorie qui doivent être des tableaux de chaînes
@@ -11,7 +12,7 @@ export const relaxationTracks: MusicTrack[] = [
     duration: 180,
     emotion: 'calm',
     mood: 'peaceful',
-    category: ['relax', 'meditation'], // Correction du type (tableau au lieu de chaîne)
+    category: ['relax', 'meditation'],
     tags: ['morning', 'meditation', 'calm']
   },
   {
@@ -50,7 +51,7 @@ export const focusTracks: MusicTrack[] = [
     duration: 240,
     emotion: 'focused',
     mood: 'concentrated',
-    category: ['focus', 'work'], // Correction du type (tableau au lieu de chaîne)
+    category: ['focus', 'work'],
     tags: ['work', 'study', 'concentration']
   },
   {
@@ -89,7 +90,7 @@ export const energyTracks: MusicTrack[] = [
     duration: 150,
     emotion: 'energetic',
     mood: 'upbeat',
-    category: ['energy', 'morning'], // Correction du type (tableau au lieu de chaîne)
+    category: ['energy', 'morning'],
     tags: ['morning', 'workout', 'energy']
   },
   {
@@ -128,7 +129,7 @@ export const sleepTracks: MusicTrack[] = [
     duration: 300,
     emotion: 'sleepy',
     mood: 'relaxed',
-    category: ['sleep', 'night'], // Correction du type (tableau au lieu de chaîne)
+    category: ['sleep', 'night'],
     tags: ['night', 'sleep', 'relaxation']
   },
   {
@@ -167,7 +168,7 @@ export const meditationTracks: MusicTrack[] = [
     duration: 240,
     emotion: 'peaceful',
     mood: 'introspective',
-    category: ['meditation', 'mindfulness'], // Correction du type (tableau au lieu de chaîne)
+    category: ['meditation', 'mindfulness'],
     tags: ['meditation', 'mindfulness', 'peace']
   },
   {

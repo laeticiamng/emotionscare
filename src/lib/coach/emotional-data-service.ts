@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { EmotionalData } from '../hooks/coach/types';
+import { EmotionalData } from '@/hooks/coach/types';
 import { EmotionResult } from '@/types/emotion';
 
 // In-memory storage for emotional data
@@ -60,10 +60,12 @@ class EmotionalDataService {
   convertFromEmotionResult(result: EmotionResult): EmotionalData {
     return {
       id: result.id,
+      user_id: result.userId || 'unknown',
       emotion: result.emotion,
-      intensity: result.intensity,
-      timestamp: result.timestamp,
-      context: result.text || undefined
+      intensity: result.intensity || result.score || 5,
+      timestamp: result.timestamp || new Date().toISOString(),
+      context: result.text || undefined,
+      source: result.source || 'system'
     };
   }
   
@@ -71,4 +73,5 @@ class EmotionalDataService {
   saveEmotionalData = this.addEmotionalData;
 }
 
-export default new EmotionalDataService();
+const emotionalDataService = new EmotionalDataService();
+export default emotionalDataService;
