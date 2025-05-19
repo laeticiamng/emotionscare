@@ -100,3 +100,25 @@ export type OrchestrationEvent =
   | { type: 'RECOMMENDATION_COMPLETED'; payload: string }
   | { type: 'INSIGHT_GENERATED'; payload: Prediction }
   | { type: 'SYNTHESIS_UPDATED'; payload: EmotionalSynthesis };
+
+// Interface du contexte d'orchestration partagé
+export interface OrchestrationContextType {
+  events: MoodEvent[];
+  predictions: Prediction[];
+  recommendations: PredictionRecommendation[];
+  locations: EmotionalLocation[];
+  sanctuaryWidgets: SanctuaryWidget[];
+  synthesis: EmotionalSynthesis | null;
+  activeLocation: string | null;
+  activeEvent: string | null;
+  loading: boolean;
+
+  addEvent: (event: MoodEvent) => void;
+  addEmotionResult: (result: EmotionResult) => void;
+  addRecommendation: (recommendation: PredictionRecommendation) => void;
+  completeRecommendation: (id: string) => void;
+  addPrediction: (prediction: Prediction) => void;
+  setActiveLocation: (id: string | null) => void;
+  setActiveEvent: (id: string | null) => void;
+  updateSynthesis: (synthesis: EmotionalSynthesis) => void;
+}

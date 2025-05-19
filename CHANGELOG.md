@@ -2,6 +2,17 @@
 # Changelog
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.8] - 2025-05-26
+
+### Corrigé
+- Typage unifié de `ThemeContextType` avec les préférences d'accessibilité
+  (`reduceMotion`, `setReduceMotion`, etc.).
+- Création de `OrchestrationContextType` dans `src/types/orchestration.ts` et
+  ajustement des imports correspondants.
+
+### Technique
+- Mise à jour des exports globaux dans `src/types.ts`.
+
 ## [1.1.5] - 2025-05-23
 
 ### Ajouté
