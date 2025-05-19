@@ -11,8 +11,10 @@ export interface AuthUser {
   company?: string;
   department?: string;
   position?: string;
+  preferences?: Record<string, any>;
   createdAt?: Date | string;
   created_at?: Date | string; // For backward compatibility
+  joined_at?: Date | string; // For backward compatibility
 }
 
 export interface AuthContextType {

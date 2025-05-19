@@ -12,7 +12,7 @@ const UserDashboardSections: React.FC = () => {
       description: 'Commencez votre journée avec une méditation guidée pour un esprit clair',
       duration: 15,
       thumbnailUrl: '/images/meditation-morning.jpg',
-      environment: 'env-1', // Changed from environmentId to environment
+      environmentId: 'env-1', // Changed to environmentId 
       category: 'méditation',
       intensity: 1,
       difficulty: 'Beginner',
@@ -28,7 +28,7 @@ const UserDashboardSections: React.FC = () => {
       description: 'Une session immersive pour libérer le stress et retrouver l\'équilibre',
       duration: 25,
       thumbnailUrl: '/images/deep-relaxation.jpg',
-      environment: 'env-2', // Changed from environmentId to environment
+      environmentId: 'env-2', // Changed to environmentId
       category: 'relaxation',
       intensity: 2,
       difficulty: 'Intermediate',

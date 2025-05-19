@@ -6,4 +6,7 @@ export interface VRSessionHistoryProps {
   onSelect?: (session: VRSession) => void;
   emptyMessage?: string;
   limitDisplay?: number;
+  showHeader?: boolean;
+  className?: string;
+  onSessionSelect?: (session: VRSession) => void;
 }

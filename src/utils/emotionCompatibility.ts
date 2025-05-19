@@ -56,8 +56,14 @@ export function normalizeEmotionRecommendation(data: Partial<EmotionRecommendati
  */
 export function convertStringRecommendations(recommendations: string[]): EmotionRecommendation[] {
   return recommendations.map(rec => ({
+    id: uuid(),
     content: rec,
     type: 'general',
-    category: 'general'
+    category: 'general',
+    description: rec,
+    title: '',
+    emotion: 'neutral',
+    actionLink: '',
+    actionText: ''
   }));
 }
