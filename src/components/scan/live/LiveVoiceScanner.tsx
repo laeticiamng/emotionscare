@@ -3,17 +3,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
+import {
+  EmotionResult,
+  EmotionRecommendation,
+  LiveVoiceScannerProps,
+} from '@/types/emotion';
 import { Mic, Square } from 'lucide-react';
 
-export interface LiveVoiceScannerProps {
-  onScanComplete?: (result: EmotionResult) => void;
-  onResult?: (result: EmotionResult) => void;
-  isProcessing?: boolean;
-  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
-  autoStart?: boolean;
-  scanDuration?: number; // in seconds
-}
 
 // Helper function to generate a random emotion for mock data
 const randomEmotion = (): string => {

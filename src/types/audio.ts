@@ -1,4 +1,4 @@
-
+import { EmotionResult } from './emotion';
 export interface AudioTrack {
   id: string;
   title: string;
@@ -23,8 +23,14 @@ export interface AudioPlaylist {
 }
 
 export interface AudioProcessorProps {
-  onResult: (result: any) => void;
+  onResult?: (result: EmotionResult) => void;
+  onProcessingChange?: (isProcessing: boolean) => void;
   isRecording?: boolean;
+  duration?: number;
+  autoStart?: boolean;
+  className?: string;
+  mode?: 'voice' | 'ambient' | 'both';
+  visualize?: boolean;
 }
 
 // Types for emotional data in audio context
