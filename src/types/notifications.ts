@@ -27,8 +27,29 @@ export interface Notification {
   type: NotificationType;
   title: string;
   message: string;
+  /**
+   * Optional rich content field used by some hooks
+   */
+  content?: string;
+  /**
+   * Date of creation. Some parts of the code still reference `date`
+   * instead of `timestamp` or `createdAt`.
+   */
+  date?: string;
+  /**
+   * Creation timestamp. Accepts both string and Date for flexibility.
+   */
   timestamp: string | Date;
+  /**
+   * Indicates whether the notification has been read. `isRead` is kept for
+   * backward compatibility with some hooks.
+   */
   read: boolean;
+  isRead?: boolean;
+  /**
+   * Optional navigation link associated with the notification.
+   */
+  linkTo?: string;
   action?: {
     label: string;
     url: string;

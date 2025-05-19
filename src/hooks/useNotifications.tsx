@@ -1,17 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { Notification } from '@/types/notifications';
 
-// Types for notifications
-export interface Notification {
-  id: string;
-  type: 'info' | 'warning' | 'success' | 'error' | 'system' | 'invitation' | 'reminder';
-  title: string;
-  message: string;
-  date: string;
-  isRead: boolean;
-  linkTo?: string;
-}
+// Local filter type used by this hook
 
 export type NotificationFilter = 'all' | 'unread' | 'invitation' | 'reminder' | 'system';
 
