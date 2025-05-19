@@ -43,7 +43,7 @@ export type {
   KpiCardsGridProps,
   TeamSummary,
   AdminAccessLog
-} from './types/dashboard';
+} from '@types/dashboard';
 
 export type { SidebarContextType } from './types/sidebar';
 
@@ -99,6 +99,16 @@ export type {
 } from './types/emotion';
 
 export type {
+  MoodEvent,
+  Prediction,
+  PredictionRecommendation,
+  EmotionalLocation,
+  SanctuaryWidget,
+  EmotionalSynthesis,
+  OrchestrationEvent
+} from '@types/orchestration';
+
+export type {
   JournalEntry
 } from './types/journal';
 
@@ -120,7 +130,7 @@ export type {
   AnonymizedEmotion,
   TeamAnalytics,
   KpiMetric
-} from './types/analytics';
+} from '@types/analytics';
 
 export type {
   ScanType,

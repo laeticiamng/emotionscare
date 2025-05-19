@@ -7,7 +7,7 @@ Ce document résume l'analyse technique du tableau de bord RH et propose des pis
 
 - **Gestion des accès** : `ProtectedRoute` vérifie correctement l'authentification et le rôle `b2b_admin` pour toutes les pages sous `/b2b/admin`.
 - **Agrégation et anonymisation** : la logique d'agrégation est dispersée dans plusieurs composants. Les données émotionnelles sont importées sans toujours passer par un service dédié d'anonymisation.
-- **Typage** : les types liés aux KPI et aux analytics sont partiellement définis dans `src/types/dashboard.ts` mais ne couvrent pas toutes les métriques.
+- **Typage** : les types liés aux KPI et aux analytics sont partiellement définis dans `types/dashboard.ts` mais ne couvrent pas toutes les métriques.
 
 ## Correctifs proposés
 

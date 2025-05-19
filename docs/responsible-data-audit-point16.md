@@ -7,7 +7,7 @@ Ce document analyse l’état actuel du dépôt concernant la gestion responsabl
 - `AuthContext` et `SessionContext` gèrent l’authentification et stockent la session dans `localStorage`.
 - `UserPreferencesContext` centralise les préférences (incluant `PrivacyPreferences`).
 - Aucune `EthicsContext` ou `AuditContext` n’existe pour tracer les accès ou gérer les consentements.
-- Le type `AdminAccessLog` défini dans `src/types/dashboard.ts` n’est pas exploité par un provider global.
+- Le type `AdminAccessLog` défini dans `types/dashboard.ts` n’est pas exploité par un provider global.
 
 ## 2. Typage et entités liées à la privacy
 

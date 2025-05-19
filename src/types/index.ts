@@ -1,7 +1,8 @@
 
 // Re-export all types from their respective files
 export * from './preferences';
-export * from './dashboard';
+export * from '@types/dashboard';
+export * from '@types/analytics';
 export * from './user';
 export * from './theme';
 export * from './segment';
@@ -13,4 +14,5 @@ export * from './layout';
 export * from './widget'; // Add if this exists
 export * from './music';
 export * from './onboarding';
+export * from '@types/orchestration';
 // Add other type exports as needed
