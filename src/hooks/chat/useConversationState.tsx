@@ -17,10 +17,10 @@ export const useConversationState = () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       lastMessage: "",
-      user_id: "user-123", // legacy field
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       last_message: "",
+      user_id: "user-123", // legacy field
       messages: [] // Add empty messages array
     };
 
@@ -36,7 +36,12 @@ export const useConversationState = () => {
     setConversations(prev => 
       prev.map(conv => 
         conv.id === id 
-          ? { ...conv, title, updatedAt: new Date().toISOString(), updated_at: new Date().toISOString() }
+          ? { 
+              ...conv, 
+              title, 
+              updatedAt: new Date().toISOString(),
+              updated_at: new Date().toISOString() // legacy field
+            }
           : conv
       )
     );
@@ -69,8 +74,8 @@ export const useConversationState = () => {
           conv.id === currentConversationId 
             ? { 
                 ...conv, 
-                lastMessage: message.text,
-                last_message: message.text,
+                lastMessage: message.content || message.text || "",
+                last_message: message.content || message.text || "",
                 updatedAt: new Date().toISOString(),
                 updated_at: new Date().toISOString()
               } 

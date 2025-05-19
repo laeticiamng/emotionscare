@@ -1,11 +1,10 @@
-
 export interface VRSessionTemplate {
   id: string;
   title: string;
   name?: string;
   description: string;
   thumbnailUrl: string;
-  duration: number;
+  duration: string | number; // Accept both string and number
   difficulty: string;
   category: string;
   tags: string[];
@@ -35,7 +34,7 @@ export interface VRSessionTemplate {
   emotion_target?: string;
   recommendedMood?: string;
   recommended_mood?: string;
-  intensity?: string;
+  intensity?: number | string;
 }
 
 export interface VRSession {

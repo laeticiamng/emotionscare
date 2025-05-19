@@ -1,162 +1,140 @@
 
-import { useState, useCallback } from 'react';
-import { v4 as uuid } from 'uuid';
+import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { EmotionResult } from '@/types/emotion';
 
-interface HumeAIResponse {
-  // Type de réponse d'API Hume (simplifié)
-  emotions: {
-    name: string;
-    score: number;
-  }[];
-  success: boolean;
-  error?: string;
-}
+// Mock Hume AI service
+const mockAnalyzeEmotion = async (input: string | File): Promise<EmotionResult> => {
+  // Simulate API processing time
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Generate a random emotion with confidence
+  const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust', 'neutral'];
+  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+  const confidence = 0.5 + Math.random() * 0.5; // Between 0.5 and 1.0
+  const intensity = 0.3 + Math.random() * 0.7; // Between 0.3 and 1.0
+  
+  return {
+    id: uuidv4(),
+    emotion: randomEmotion,
+    confidence,
+    intensity,
+    timestamp: new Date().toISOString(),
+    source: typeof input === 'string' ? 'text' : 'audio',
+    recommendations: [
+      { title: 'Take a break', description: 'Step away from your work for 5 minutes' },
+      { title: 'Deep breathing', description: 'Try 5 deep breaths' },
+    ],
+    emotions: {
+      joy: Math.random(),
+      sadness: Math.random(),
+      anger: Math.random(),
+      fear: Math.random(),
+      surprise: Math.random(),
+    }
+  };
+};
 
-interface UseHumeAIProps {
-  apiKey?: string;
-  onResult?: (result: EmotionResult) => void;
-}
-
-export const useHumeAI = ({ apiKey, onResult }: UseHumeAIProps = {}) => {
+export const useHumeAI = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const [lastResult, setLastResult] = useState<EmotionResult | null>(null);
 
-  // Fonction pour traiter les résultats bruts de l'API Hume
-  const processEmotionResults = (humeResponse: HumeAIResponse): EmotionResult | null => {
-    if (!humeResponse.success || !humeResponse.emotions || humeResponse.emotions.length === 0) {
-      return null;
-    }
-
-    // Trier les émotions par score et prendre la plus forte
-    const sortedEmotions = [...humeResponse.emotions].sort((a, b) => b.score - a.score);
-    const primaryEmotion = sortedEmotions[0];
-
-    return {
-      id: uuid(), // Générer un ID unique
-      emotion: primaryEmotion.name.toLowerCase(),
-      confidence: primaryEmotion.score,
-      timestamp: new Date().toISOString(),
-      emotions: sortedEmotions.reduce((acc, emotion) => {
-        acc[emotion.name.toLowerCase()] = emotion.score;
-        return acc;
-      }, {} as Record<string, number>)
-    };
-  };
-
-  // Analyse de texte
-  const analyzeText = useCallback(async (text: string) => {
+  // Analyze emotions from text
+  const analyzeText = async (text: string): Promise<EmotionResult> => {
     if (!text.trim()) {
-      setError('Texte vide, impossible d\'analyser');
-      return null;
+      const error = new Error('Text input cannot be empty');
+      setError(error);
+      throw error;
     }
 
     setLoading(true);
     setError(null);
 
     try {
-      // Simulation d'appel API (à remplacer par un vrai appel à Hume API)
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // In a real app, make API call to Hume AI
+      const result = await mockAnalyzeEmotion(text);
       
-      // Résultat simulé
-      const mockResult: EmotionResult = {
-        id: uuid(), // Ajout d'un ID unique
-        emotion: text.includes('heureux') ? 'joy' : 
-                 text.includes('triste') ? 'sadness' : 
-                 text.includes('énervé') ? 'anger' : 'neutral',
-        confidence: 0.85,
-        timestamp: new Date().toISOString(),
-        source: 'text',
+      // Add text-specific fields
+      const finalResult: EmotionResult = {
+        ...result,
         textInput: text
       };
-      
-      setLastResult(mockResult);
-      
-      if (onResult) {
-        onResult(mockResult);
-      }
-      
-      return mockResult;
+
+      setLastResult(finalResult);
+      return finalResult;
     } catch (err) {
-      console.error('Error analyzing text with HumeAI:', err);
-      setError(err instanceof Error ? err.message : 'Erreur lors de l\'analyse du texte');
-      return null;
+      const error = err instanceof Error ? err : new Error('Failed to analyze text');
+      setError(error);
+      throw error;
     } finally {
       setLoading(false);
     }
-  }, [onResult]);
+  };
 
-  // Analyse audio
-  const analyzeAudio = useCallback(async (audioBlob: Blob) => {
+  // Analyze emotions from audio
+  const analyzeAudio = async (audioFile: File): Promise<EmotionResult> => {
+    if (!audioFile) {
+      const error = new Error('Audio file is required');
+      setError(error);
+      throw error;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      // Simulation d'appel API (à remplacer par un vrai appel à Hume API)
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      // In a real app, make API call to Hume AI
+      const result = await mockAnalyzeEmotion(audioFile);
       
-      // Résultat simulé
-      const mockResult: EmotionResult = {
-        id: uuid(), // Ajout d'un ID unique
-        emotion: Math.random() > 0.5 ? 'calm' : 'joy',
-        confidence: 0.78,
-        timestamp: new Date().toISOString(),
-        source: 'audio',
-        audioUrl: URL.createObjectURL(audioBlob)
+      // Add audio-specific fields
+      const finalResult: EmotionResult = {
+        ...result,
+        audioUrl: URL.createObjectURL(audioFile)
       };
-      
-      setLastResult(mockResult);
-      
-      if (onResult) {
-        onResult(mockResult);
-      }
-      
-      return mockResult;
+
+      setLastResult(finalResult);
+      return finalResult;
     } catch (err) {
-      console.error('Error analyzing audio with HumeAI:', err);
-      setError(err instanceof Error ? err.message : 'Erreur lors de l\'analyse audio');
-      return null;
+      const error = err instanceof Error ? err : new Error('Failed to analyze audio');
+      setError(error);
+      throw error;
     } finally {
       setLoading(false);
     }
-  }, [onResult]);
+  };
 
-  // Analyse d'expression faciale
-  const analyzeFacial = useCallback(async (imageBlob: Blob) => {
+  // Analyze emotions from facial expressions
+  const analyzeFacial = async (imageFile: File): Promise<EmotionResult> => {
+    if (!imageFile) {
+      const error = new Error('Image file is required');
+      setError(error);
+      throw error;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      // Simulation d'appel API (à remplacer par un vrai appel à Hume API)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // In a real app, make API call to Hume AI
+      const result = await mockAnalyzeEmotion(imageFile);
       
-      // Résultat simulé
-      const mockResult: EmotionResult = {
-        id: uuid(), // Ajout d'un ID unique
-        emotion: Math.random() > 0.6 ? 'joy' : 
-                 Math.random() > 0.3 ? 'neutral' : 'surprise',
-        confidence: 0.82,
-        timestamp: new Date().toISOString(),
-        source: 'facial',
-        facialExpression: 'smile'
+      // Add facial-specific fields
+      const finalResult: EmotionResult = {
+        ...result,
+        facialExpression: result.emotion
       };
-      
-      setLastResult(mockResult);
-      
-      if (onResult) {
-        onResult(mockResult);
-      }
-      
-      return mockResult;
+
+      setLastResult(finalResult);
+      return finalResult;
     } catch (err) {
-      console.error('Error analyzing facial expression with HumeAI:', err);
-      setError(err instanceof Error ? err.message : 'Erreur lors de l\'analyse de l\'expression faciale');
-      return null;
+      const error = err instanceof Error ? err : new Error('Failed to analyze facial expression');
+      setError(error);
+      throw error;
     } finally {
       setLoading(false);
     }
-  }, [onResult]);
+  };
 
   return {
     analyzeText,

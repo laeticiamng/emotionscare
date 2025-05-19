@@ -28,6 +28,7 @@ export interface ChatConversation {
   user_id?: string; // Add for backward compatibility
   created_at?: string; // Add for backward compatibility
   updated_at?: string; // Add for backward compatibility
+  last_message?: string; // Add for backward compatibility
 }
 
 export interface ChatResponse {

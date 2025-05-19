@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface DeviceInfo {
   isMobile: boolean;
@@ -14,7 +14,7 @@ interface DeviceInfo {
   isTouchDevice: boolean;
 }
 
-export default function useDeviceDetection(): DeviceInfo {
+export function useDeviceDetection(): DeviceInfo {
   const [deviceInfo, setDeviceInfo] = useState<DeviceInfo>({
     isMobile: false,
     isTablet: false,
@@ -25,49 +25,46 @@ export default function useDeviceDetection(): DeviceInfo {
     isChrome: false,
     isFirefox: false,
     isEdge: false,
-    isTouchDevice: false,
+    isTouchDevice: false
   });
 
   useEffect(() => {
-    // Only run on client side
-    if (typeof window === 'undefined') return;
-
     const userAgent = navigator.userAgent.toLowerCase();
     
-    // Check for mobile and tablet
+    // Check if mobile
     const isMobile = /iphone|ipod|android|blackberry|opera mini|opera mobi|skyfire|maemo|windows phone|palm|iemobile|symbian|symbianos|fennec/i.test(userAgent);
+    
+    // Check if tablet
     const isTablet = /ipad|tablet|playbook|silk|android(?!.*mobile)/i.test(userAgent);
-    const isDesktop = !isMobile && !isTablet;
     
     // Check OS
-    const isIOS = /ipad|iphone|ipod/i.test(userAgent) && !window.MSStream;
-    const isAndroid = /android/i.test(userAgent);
+    const isIOS = /ipad|iphone|ipod/.test(userAgent) && !(window as any).MSStream;
+    const isAndroid = /android/.test(userAgent);
     
     // Check browser
-    const isSafari = /safari/i.test(userAgent) && !/chrome/i.test(userAgent);
-    const isChrome = /chrome/i.test(userAgent) && !/edge|edg/i.test(userAgent);
-    const isFirefox = /firefox/i.test(userAgent);
-    const isEdge = /edge|edg/i.test(userAgent);
+    const isSafari = /safari/.test(userAgent) && !/chrome/.test(userAgent);
+    const isChrome = /chrome/.test(userAgent) && !/edge|edg/.test(userAgent);
+    const isFirefox = /firefox/.test(userAgent);
+    const isEdge = /edge|edg/.test(userAgent);
     
-    // Touch device check
-    const isTouchDevice = 'ontouchstart' in window || 
-                          navigator.maxTouchPoints > 0 || 
-                          // @ts-ignore - Some browsers may have this property
-                          navigator.msMaxTouchPoints > 0;
+    // Check for touch device
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     
     setDeviceInfo({
       isMobile,
       isTablet,
-      isDesktop,
+      isDesktop: !isMobile && !isTablet,
       isIOS,
       isAndroid,
       isSafari,
       isChrome,
       isFirefox,
       isEdge,
-      isTouchDevice,
+      isTouchDevice
     });
   }, []);
-
+  
   return deviceInfo;
 }
+
+export default useDeviceDetection;

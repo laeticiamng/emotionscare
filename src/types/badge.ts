@@ -4,7 +4,7 @@ export interface Badge {
   name: string;
   description: string;
   imageUrl: string;
-  level: string;
+  level: string | number; // Accept both string and number
   unlocked?: boolean;
   unlockedAt?: string;
   category?: string;

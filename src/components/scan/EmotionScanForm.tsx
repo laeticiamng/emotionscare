@@ -7,6 +7,16 @@ import VoiceEmotionScanner from './VoiceEmotionScanner';
 import TextEmotionScanner from './TextEmotionScanner';
 import EmojiEmotionScanner from './EmojiEmotionScanner';
 
+// Adding interface if not already defined in types
+interface EmotionScanFormProps {
+  onScanComplete?: (result: EmotionResult) => void;
+  userId?: string;
+  onEmotionDetected?: (result: EmotionResult) => void;
+  onClose?: () => void;
+  defaultTab?: string;
+  onProcessingChange?: (processing: boolean) => void;
+}
+
 const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
   onScanComplete,
   userId,

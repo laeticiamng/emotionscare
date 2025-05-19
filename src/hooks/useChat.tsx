@@ -27,8 +27,10 @@ export function useChat({
       id: uuidv4(),
       sender,
       content,
+      text: content, // Add for backward compatibility
       timestamp: new Date().toISOString(),
       conversationId: conversationId || initialConversationId || uuidv4(),
+      conversation_id: conversationId || initialConversationId || uuidv4(), // Add for backward compatibility
     };
     
     setMessages((prev) => [...prev, newMessage]);

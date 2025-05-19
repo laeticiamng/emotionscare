@@ -5,7 +5,22 @@
  * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
  */
 
-import { Badge, Challenge, LeaderboardEntry } from '@/types/gamification';
+import { Badge, Challenge } from '@/types/badge';
+
+// Using type LeaderboardEntry here as it's referenced but not defined
+interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  name: string;
+  points: number;
+  score?: number; // For backwards compatibility
+  rank: number;
+  avatarUrl: string;
+  level: number | string;
+  progress: number;
+  lastActive?: string; // Add this field to type
+  trend?: string;
+}
 
 export const mockBadges: Badge[] = [
   {
@@ -15,11 +30,13 @@ export const mockBadges: Badge[] = [
     icon: "🌅", 
     imageUrl: "/badges/early-bird.png",
     unlocked: true,
-    level: 1,
+    level: "1", // Convert to string for compatibility
     progress: 5,
     total: 5,
     completed: true,
-    threshold: 5
+    threshold: 5,
+    achieved: true, // Add for backward compatibility
+    earned: true // Add for backward compatibility
   },
   {
     id: "2",
@@ -28,11 +45,13 @@ export const mockBadges: Badge[] = [
     icon: "🧠",
     imageUrl: "/badges/emotion-master.png",
     unlocked: true,
-    level: 2,
+    level: "2", // Convert to string for compatibility
     progress: 30,
     total: 30,
     completed: true,
-    threshold: 30
+    threshold: 30,
+    achieved: true,
+    earned: true
   },
   {
     id: "3",
@@ -41,11 +60,13 @@ export const mockBadges: Badge[] = [
     icon: "✏️",
     imageUrl: "/badges/journal-pro.png",
     unlocked: false,
-    level: 1,
+    level: "1", // Convert to string for compatibility
     progress: 15,
     total: 20,
     completed: false,
-    threshold: 20
+    threshold: 20,
+    achieved: false,
+    earned: false
   }
 ];
 
@@ -60,9 +81,13 @@ export const mockChallenges: Challenge[] = [
     goal: 7,
     category: "habit",
     completed: false,
+    isCompleted: false, // Add for component compatibility
     status: "ongoing",
     totalSteps: 7,
-    icon: "📅"
+    icon: "📅",
+    total: 7, // Required by Challenge interface
+    reward: "badge-daily-check", // Add required property
+    unlocked: true // Add required property
   },
   {
     id: "ch2",
@@ -74,9 +99,13 @@ export const mockChallenges: Challenge[] = [
     goal: 5,
     category: "emotion",
     completed: true,
+    isCompleted: true, // Add for component compatibility
     status: "completed",
     totalSteps: 5,
-    icon: "😊"
+    icon: "😊",
+    total: 5, // Required by Challenge interface
+    reward: "badge-emotion-track", // Add required property
+    unlocked: true // Add required property
   },
   {
     id: "ch3",
@@ -88,9 +117,13 @@ export const mockChallenges: Challenge[] = [
     goal: 3,
     category: "journal",
     completed: false,
+    isCompleted: false, // Add for component compatibility
     status: "ongoing",
     totalSteps: 3,
-    icon: "📝"
+    icon: "📝",
+    total: 3, // Required by Challenge interface
+    reward: "badge-journal", // Add required property
+    unlocked: true // Add required property
   }
 ];
 

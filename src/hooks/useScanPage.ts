@@ -1,106 +1,102 @@
 
 import { useState, useEffect } from 'react';
 import { EmotionResult } from '@/types/emotion';
-import { Emotion } from '@/types/emotion';
 
-export function useScanPage() {
-  const [currentTab, setCurrentTab] = useState('voice');
-  const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  
-  // Convert EmotionResult to Emotion for compatibility
-  const convertToEmotion = (result: EmotionResult): Emotion => {
-    return {
-      id: result.id,
-      name: result.emotion,
-      label: result.emotion,
-      color: getColorForEmotion(result.emotion),
-      intensity: result.intensity || 0,
-      confidence: result.confidence,
-      date: result.date || result.timestamp,
-      source: result.source,
-      user_id: result.user_id || result.userId,
-      score: result.score,
-      text: result.text,
-      feedback: result.feedback,
-      transcript: result.transcript,
-      audioUrl: result.audioUrl || result.audio_url
-    };
-  };
-  
-  // Helper function to determine color based on emotion
-  const getColorForEmotion = (emotion: string): string => {
-    const emotionColors: Record<string, string> = {
-      joy: '#FFD700',
-      happiness: '#FFD700',
-      sadness: '#6495ED',
-      anger: '#FF4500',
-      fear: '#800080',
-      surprise: '#FF69B4',
-      disgust: '#32CD32',
-      neutral: '#A9A9A9',
-      calm: '#87CEEB',
-      anxiety: '#FFA07A'
-    };
-    
-    return emotionColors[emotion.toLowerCase()] || '#A9A9A9';
-  };
-  
-  // Load scan history
+// Mock emotion data
+const mockEmotions: EmotionResult[] = [
+  {
+    id: '1',
+    emotion: 'joy',
+    confidence: 0.85,
+    intensity: 0.75,
+    source: 'voice',
+    timestamp: new Date().toISOString(),
+    recommendations: [
+      { title: 'Maintain this mood', description: 'Continue your current activities' },
+      { title: 'Share your joy', description: 'Connect with a friend or family member' }
+    ]
+  },
+  {
+    id: '2',
+    emotion: 'neutral',
+    confidence: 0.92,
+    intensity: 0.40,
+    source: 'text',
+    timestamp: new Date(Date.now() - 86400000).toISOString(),
+    recommendations: [
+      { title: 'Boost your mood', description: 'Try a quick walk outside' },
+      { title: 'Practice mindfulness', description: '5-minute meditation' }
+    ]
+  },
+  {
+    id: '3',
+    emotion: 'stressed',
+    confidence: 0.78,
+    intensity: 0.65,
+    source: 'emoji',
+    timestamp: new Date(Date.now() - 172800000).toISOString(),
+    recommendations: [
+      { title: 'Relax your mind', description: 'Deep breathing exercise' },
+      { title: 'Take a break', description: '10 minutes away from screens' }
+    ]
+  }
+];
+
+export const useScanPage = (userId?: string) => {
+  const [isScanning, setIsScanning] = useState(false);
+  const [emotions, setEmotions] = useState<EmotionResult[]>(mockEmotions);
+  const [currentEmotion, setCurrentEmotion] = useState<EmotionResult | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Simulate loading emotions for a user
   useEffect(() => {
-    const fetchHistory = async () => {
-      setIsLoading(true);
-      try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // Mock data
-        const mockHistory: EmotionResult[] = [
-          {
-            id: 'scan-1',
-            date: new Date(Date.now() - 86400000).toISOString(),
-            emotion: 'joy',
-            confidence: 0.87,
-            intensity: 75,
-            source: 'voice'
-          },
-          {
-            id: 'scan-2',
-            date: new Date(Date.now() - 172800000).toISOString(),
-            emotion: 'calm',
-            confidence: 0.91,
-            intensity: 65,
-            source: 'text'
-          }
-        ];
-        
-        setScanHistory(mockHistory);
-      } catch (error) {
-        console.error('Error loading scan history:', error);
-        setErrorMessage('Impossible de charger l\'historique des scans.');
-      } finally {
-        setIsLoading(false);
-      }
+    if (userId) {
+      // In a real app, we would fetch emotions from an API
+      // For now, we just use the mock data
+      // setEmotions(mockEmotions);
+    }
+  }, [userId]);
+
+  const startScan = () => {
+    setIsScanning(true);
+    setIsModalOpen(true);
+  };
+
+  const cancelScan = () => {
+    setIsScanning(false);
+    setIsModalOpen(false);
+  };
+
+  const completeScan = (result: EmotionResult) => {
+    setIsScanning(false);
+    setIsModalOpen(false);
+    
+    // Add the new emotion to the list
+    const newEmotion: EmotionResult = {
+      ...result,
+      id: `emotion-${Date.now()}`,
+      timestamp: new Date().toISOString() // Ensure we have a timestamp
     };
     
-    fetchHistory();
-  }, []);
-  
-  // Handle new emotion scan result
-  const handleScanResult = (result: EmotionResult) => {
-    setScanHistory(prev => [result, ...prev]);
+    setCurrentEmotion(newEmotion);
+    setEmotions(prev => [newEmotion, ...prev]);
+
+    // In a real app, we would save this to a database
+    console.log('New emotion recorded:', newEmotion);
+    
+    return newEmotion;
   };
-  
+
   return {
-    currentTab,
-    setCurrentTab,
-    scanHistory,
-    isLoading,
-    errorMessage,
-    handleScanResult,
-    convertToEmotion
+    emotions,
+    currentEmotion,
+    isScanning,
+    isModalOpen,
+    startScan,
+    cancelScan,
+    completeScan,
+    setIsModalOpen
   };
-}
+};
 
 export default useScanPage;

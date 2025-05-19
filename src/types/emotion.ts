@@ -1,113 +1,54 @@
-
-// Define the EmotionScanFormProps type
-export interface EmotionScanFormProps {
-  onEmotionDetected?: (result: EmotionResult) => void;
-  onError?: (error: string) => void;
-  className?: string;
-  userId?: string;
-  defaultTab?: string;
-  onProcessingChange?: (isProcessing: boolean) => void;
-  onScanComplete?: (result: any) => void;
-  onClose?: () => void;
-}
-
+// This file would contain the types related to emotions
 export interface Emotion {
   id: string;
-  name: string;
-  label?: string;
-  description?: string;
-  color?: string;
-  icon?: string;
-  intensity?: number;
-  confidence?: number;
-  emotion?: string; // Added for compatibility
-  date?: string; // Added for compatibility
-  text?: string;
-  transcript?: string;
-  audioUrl?: string;
-  feedback?: string;
-  score?: number;
-  userId?: string;
-  user_id?: string;
+  emotion: string;
+  intensity: number;
+  timestamp: string;
   source?: string;
+  // Add other properties as needed
 }
 
 export interface EmotionResult {
   id: string;
   emotion: string;
   confidence: number;
-  intensity: number; // Required field
+  intensity: number;
+  source: string;
   timestamp: string;
-  source: string; // Required field
-  emojis?: string[];
-  text?: string;
-  emotions?: Record<string, number>;
-  // Compatibility fields
-  primaryEmotion?: string;
-  score?: number;
-  date?: string;
+  recommendations?: (string | EmotionRecommendation)[];
   feedback?: string;
   ai_feedback?: string;
-  user_id?: string;
-  userId?: string;
-  audioUrl?: string;
-  audio_url?: string;
+  emojis?: string[];
+  emotions?: Record<string, number>;
+  // Additional optional fields for compatibility
   textInput?: string;
-  recommendations?: EmotionRecommendation[];
-  transcript?: string;
+  audioUrl?: string;
   facialExpression?: string;
+  text?: string;
+  transcript?: string;
 }
 
 export interface EmotionRecommendation {
   id?: string;
-  type: string;
   title: string;
-  description: string;
-  content?: string;
+  description?: string;
+  type?: string;
   category?: string;
-  emotion?: string;
-  actionLink?: string;
-  actionText?: string;
-}
-
-export interface LiveVoiceScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  onProcessingChange?: (isProcessing: boolean) => void;
-  duration?: number;
-  autoStart?: boolean;
-  withTranscript?: boolean;
-}
-
-export interface TeamOverviewProps {
-  period?: string;
-  anonymized?: boolean;
-  detailed?: boolean;
-  className?: string;
-}
-
-export interface EmotionalTeamViewProps {
-  period?: string;
-  anonymized?: boolean;
-  dateRange?: [Date, Date] | null;
-  showGraph?: boolean;
-  showMembers?: boolean;
-  className?: string;
-  teamId?: string;
 }
 
 export interface TextEmotionScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  onProcessingChange?: (isProcessing: boolean) => void;
-  placeholder?: string;
+  onResult: (result: EmotionResult) => void;
+  onProcessingChange?: (processing: boolean) => void;
 }
 
 export interface EmojiEmotionScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  onProcessingChange?: (isProcessing: boolean) => void;
+  onResult: (result: EmotionResult) => void;
+  onProcessingChange?: (processing: boolean) => void;
 }
 
 export interface VoiceEmotionScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  onProcessingChange?: (isProcessing: boolean) => void;
-  duration?: number;
+  onResult: (result: EmotionResult) => void;
+  onProcessingChange?: (processing: boolean) => void;
 }
+
+export type EmotionHistory = EmotionResult[];
