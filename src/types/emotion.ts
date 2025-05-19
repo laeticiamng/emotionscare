@@ -61,8 +61,12 @@ export interface TeamOverviewProps {
 
 export interface EmotionalTeamViewProps {
   teamId: string;
-  date?: Date | string;
+  period?: 'day' | 'week' | 'month';
   anonymized?: boolean;
+  dateRange?: [Date, Date];
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
 }
 
 export interface EmotionRecommendation {

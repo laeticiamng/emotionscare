@@ -1,29 +1,12 @@
 
 export interface ChatMessage {
   id: string;
-  content: string;
-  sender: 'user' | 'coach' | 'assistant' | 'system';
-  timestamp: Date | string;
-  type?: 'text' | 'suggestion' | 'action' | 'music' | 'vr' | 'emotion';
-  actions?: ChatAction[];
-  metadata?: Record<string, any>;
-}
-
-export interface ChatAction {
-  type: 'link' | 'button' | 'music' | 'vr' | 'scan';
-  label: string;
-  url?: string;
-  action?: () => void;
-  data?: any;
-}
-
-export interface ChatResponse {
-  message: string;
-  suggestions?: string[];
-  actions?: ChatAction[];
-  emotion?: string;
-  confidence?: number;
-  metadata?: Record<string, any>;
+  text?: string;
+  content?: string;
+  sender: "system" | "user" | "coach" | "assistant" | string;
+  timestamp?: Date | string;
+  role?: "system" | "user" | "assistant";
+  isLoading?: boolean;
 }
 
 export interface ChatConversation {
@@ -31,33 +14,37 @@ export interface ChatConversation {
   title: string;
   messages: ChatMessage[];
   createdAt: Date | string;
-  updatedAt: Date | string;
-  summary?: string;
-  tags?: string[];
-  emotionStart?: string;
-  emotionEnd?: string;
+  updatedAt?: Date | string;
+}
+
+export interface ChatResponse {
+  text: string;
+  conversationId: string;
+  messageId: string;
 }
 
 export interface CoachCharacterProps {
-  size?: 'sm' | 'md' | 'lg';
-  animate?: boolean;
-  emotion?: string;
-  name?: string;
-  avatar?: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   mood?: string;
-  onClick?: () => void;
+  animated?: boolean;
+  className?: string;
 }
 
 export interface CoachMessageProps {
   message: ChatMessage;
   isTyping?: boolean;
-  onActionClick?: (action: ChatAction) => void;
+  isLast?: boolean;
 }
 
 export interface CoachChatProps {
-  initialMessage?: string;
-  onSendMessage?: (message: string) => void;
-  onEmotionDetected?: (emotion: string, confidence: number) => void;
-  className?: string;
-  showVoiceInput?: boolean;
+  initialMessages?: ChatMessage[];
+  onSend?: (message: string) => void;
+  onReady?: () => void;
+  showCharacter?: boolean;
+  characterSize?: 'sm' | 'md' | 'lg' | 'xl';
+  characterMood?: string;
+  showControls?: boolean;
+  showHeader?: boolean;
+  showInput?: boolean;
+  embedded?: boolean;
 }

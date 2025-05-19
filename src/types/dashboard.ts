@@ -36,6 +36,11 @@ export interface KpiCardsGridProps {
 
 export interface DraggableKpiCardsGridProps extends KpiCardsGridProps {
   onReorder?: (newCards: KpiCardProps[]) => void;
+  onOrderChange?: (cards: KpiCardProps[]) => void;
+  onCardsReorder?: (newCards: KpiCardProps[]) => void;
+  onSave?: (layout: any) => void;
+  savedLayout?: any;
+  isEditable?: boolean;
 }
 
 export interface GlobalOverviewTabProps {
@@ -60,6 +65,16 @@ export interface TeamSummary {
   emotionAverage: string;
   trend: "up" | "down" | "neutral";
   lastUpdated: Date | string;
+  teamId?: string;
+  memberCount?: number;
+  averageMood?: string | number;
+  alertCount?: number;
+  trendDirection?: 'up' | 'down' | 'stable';
+  averageEmotionalScore?: number;
+  activeUsers?: number;
+  trendValue?: number;
+  leaderName?: string;
+  department?: string;
 }
 
 export interface AdminAccessLog {
@@ -71,6 +86,7 @@ export interface AdminAccessLog {
   timestamp: Date | string;
   ip?: string;
   userAgent?: string;
+  adminId?: string;
 }
 
 export interface DashboardWidget {

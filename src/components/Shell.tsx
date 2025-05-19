@@ -17,9 +17,9 @@ const Shell: React.FC<ShellProps> = ({
   className = "",
   immersive = false
 }) => {
-  const { theme, preferences } = useTheme();
-  const soundEnabled = preferences?.soundEnabled ?? false;
-  const reduceMotion = preferences?.reduceMotion ?? false;
+  const { theme } = useTheme();
+  const soundEnabled = useTheme().preferences?.soundEnabled ?? false;
+  const reduceMotion = useTheme().preferences?.reduceMotion ?? false;
   const { openDrawer, toggleDrawer, playlist, currentTrack } = useMusic();
   
   return (

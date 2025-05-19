@@ -38,7 +38,7 @@ export function UserNav() {
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
             <AvatarImage src={userAvatar} alt={userName || 'Avatar'} />
-            <AvatarFallback>{userName?.charAt(0) || 'U'}</AvatarFallback>
+            <AvatarFallback>{(userName && userName.charAt(0)) || 'U'}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
