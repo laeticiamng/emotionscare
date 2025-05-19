@@ -1,4 +1,3 @@
-
 // This file would contain the types related to emotions
 export interface Emotion {
   id: string;
@@ -27,34 +26,19 @@ export interface EmotionResult {
   intensity: number;
   source: string;
   timestamp: string;
-  recommendations?: (string | EmotionRecommendation)[];
-  feedback?: string;
-  ai_feedback?: string;
-  emojis?: string[];
-  emotions?: Record<string, number>;
-  // Additional optional fields for compatibility
-  textInput?: string;
-  audioUrl?: string;
-  audio_url?: string; // Added for compatibility
-  facialExpression?: string;
-  text?: string;
-  transcript?: string;
-  // Adding fields that are used in components but weren't in the type
   primaryEmotion?: string;
   score?: number;
   date?: string;
-  userId?: string; // Added for compatibility
+  emotions?: Record<string, number>;
 }
 
 export interface EmotionRecommendation {
-  id?: string;
+  id: string;
+  type: string;
   title: string;
-  description?: string;
-  type?: string;
-  category?: string;
-  content?: string; // Added for compatibility
-  actionUrl?: string; // Added for compatibility
-  icon?: string; // Added for compatibility
+  description: string;
+  emotion: string;
+  content?: string;
 }
 
 export interface TextEmotionScannerProps {
@@ -79,18 +63,14 @@ export interface VoiceEmotionScannerProps {
 export interface EmotionalTeamViewProps {
   teamId: string;
   period?: string;
-  anonymized?: boolean;
-  dateRange?: [Date, Date];
-  showGraph?: boolean;
-  showMembers?: boolean;
-  className?: string;
+  showDetails?: boolean;
 }
 
 export interface EmotionScanFormProps {
-  onScanComplete?: (result: EmotionResult) => void;
   userId?: string;
   onEmotionDetected?: (result: EmotionResult) => void;
   onClose?: () => void;
+  onScanComplete?: (result: EmotionResult) => void;
   defaultTab?: string;
   onProcessingChange?: (processing: boolean) => void;
 }
@@ -110,4 +90,12 @@ export interface TeamOverviewProps {
   teamId: string;
   period?: string;
   showDetails?: boolean;
+}
+
+export interface EnhancedEmotionResult extends EmotionResult {
+  emotions: Record<string, number>;
+  dominantEmotion: {
+    name: string;
+    score: number;
+  };
 }
