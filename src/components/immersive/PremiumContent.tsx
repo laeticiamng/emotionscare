@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Building, User, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { ROUTES } from '@/types/navigation';
 import { toast } from '@/hooks/use-toast';
 
 interface PremiumContentProps {
@@ -40,30 +41,24 @@ const PremiumContent: React.FC<PremiumContentProps> = ({
   
   // Handle navigation
   const handleB2CClick = () => {
-    if (onClick) {
-      onClick('/b2c/login');
-    } else {
-      toast({
-        title: "Mode personnel activé",
-        description: "Vous accédez à l'espace personnel EmotionsCare"
-      });
-      
-      setUserMode('b2c');
-      localStorage.setItem('userMode', 'b2c');
-      navigate('/b2c/login');
-    }
+    toast({
+      title: "Mode personnel activé",
+      description: "Vous accédez à l'espace personnel EmotionsCare"
+    });
+    
+    setUserMode('b2c');
+    localStorage.setItem('userMode', 'b2c');
+    navigate(ROUTES.b2c.login);
   };
   
   const handleB2BClick = () => {
-    if (onClick) {
-      onClick('/b2b/selection');
-    } else {
-      toast({
-        title: "Mode entreprise",
-        description: "Vous accédez à l'espace entreprise EmotionsCare"
-      });
+    toast({
+      title: "Mode entreprise",
+      description: "Vous accédez à l'espace entreprise EmotionsCare"
+    });
+    
+    navigate(ROUTES.common.b2bSelection);
       
-      navigate('/b2b/selection');
     }
   };
   
