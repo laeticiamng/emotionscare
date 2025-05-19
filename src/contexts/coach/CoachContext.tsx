@@ -1,11 +1,7 @@
 
 import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
-import {
-  ChatMessage,
-  ChatConversation,
-  CoachSession,
-  Suggestion
-} from '@/types/coach';
+import { CoachSession, Suggestion } from '@/types/coach';
+import { ChatMessage, ChatConversation } from '@/types/chat';
 
 // Mock initial conversation
 const initialConversation: ChatConversation = {

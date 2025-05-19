@@ -31,6 +31,19 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ### Modifié
 - Mise à jour de `README.md` pour référencer ces nouveaux documents
 
+## [1.1.8] - 2025-05-26
+
+### Corrigé
+- Unification des types `ChatMessage` et `ChatConversation`
+- Ajout de `isUser` et harmonisation du champ `sender`
+- Mise à jour des contextes Coach et des hooks associés
+
+## [1.1.9] - 2025-05-26
+
+### Corrigé
+- Paramètre `sender` uniformisé dans tous les hooks
+- `useCoachHandlers` typé pour la nouvelle union de sender
+
 ## [1.1.4] - 2025-05-22
 
 ### Corrigé

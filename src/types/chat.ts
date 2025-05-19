@@ -13,6 +13,8 @@ export interface ChatMessage {
   role?: string; // Optional role property to support different message types
   text?: string; // For backward compatibility
   emotion?: string; // Added for emotional context
+  /** Flag for UI helpers identifying if message was sent by the user */
+  isUser?: boolean;
 }
 
 export interface ChatConversation {

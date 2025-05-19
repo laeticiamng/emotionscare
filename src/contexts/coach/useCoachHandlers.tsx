@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage } from '@/types/coach';
+import { ChatMessage } from '@/types/chat';
 import { useToast } from '@/hooks/use-toast';
 import { chatCompletion, analyzeEmotion } from '@/services/openai';
 
@@ -137,7 +137,10 @@ export function useCoachHandlers() {
 
   // Send a message with AI processing
   const sendMessage = useCallback(
-    (text: string, sender: string) => {
+    (
+      text: string,
+      sender: 'user' | 'assistant' | 'system' | 'coach'
+    ) => {
       const newMessage: ChatMessage = {
         id: uuidv4(),
         content: text,
