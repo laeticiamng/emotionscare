@@ -6,8 +6,8 @@ export interface CoachContextType {
   isTyping: boolean;
   isProcessing: boolean;
   loading?: boolean;
-  conversations?: ChatConversation[];
-  currentConversation?: ChatConversation | null;
+  conversations: ChatConversation[];
+  currentConversation: ChatConversation | null;
   sendMessage: (
     content: string,
     sender?: 'user' | 'assistant' | 'system' | 'coach'

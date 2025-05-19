@@ -7,6 +7,8 @@ export interface EmotionData {
   arousal?: number;
   dominance?: number;
   timestamp?: string;
+  tags?: string[]; // Added missing tags property
+  value?: number; // Added missing value property
 }
 
 export interface EmotionRecommendation {
@@ -23,6 +25,8 @@ export interface EmotionRecommendation {
   duration?: number;
   intensity?: 'low' | 'medium' | 'high';
   tags?: string[];
+  actionLink?: string; // Added missing property
+  actionText?: string; // Added missing property
 }
 
 export interface EmotionResult {
@@ -54,7 +58,12 @@ export interface EmotionResult {
   emotions?: Record<string, number>;
   date?: string; // Date for display
   audioUrl?: string;
+  audio_url?: string; // Alternative name
   transcript?: string;
+  facialExpression?: string;
+  textInput?: string;
+  user_id?: string; // Alternative name
+  isLoading?: boolean;
 }
 
 export type EmotionSource =
@@ -98,6 +107,20 @@ export interface Emotion {
   color: string;
   icon?: string;
   description?: string;
+  id?: string;
+  emotion?: string;
+  emoji?: string;
+  confidence?: number;
+  intensity?: number;
+  date?: string;
+  source?: string;
+  text?: string;
+  transcript?: string;
+  audioUrl?: string;
+  feedback?: string;
+  score?: number;
+  userId?: string;
+  user_id?: string;
 }
 
 export interface EmojiEmotionScannerProps {

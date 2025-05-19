@@ -1,19 +1,12 @@
 
-// Types liés au chat et aux conversations
-
 export interface ChatMessage {
   id: string;
-  sender: 'user' | 'assistant' | 'system' | 'coach';
   content: string;
+  sender: 'user' | 'assistant' | 'system' | 'coach';
   timestamp: string;
-  conversationId?: string;
-  conversation_id?: string;
+  isLoading?: boolean;
   text?: string;
-  role?: string;
-  attachments?: string[];
-  metadata?: Record<string, any>;
-  emotion?: string;
-  isUser?: boolean;
+  role?: 'user' | 'assistant' | 'system';
 }
 
 export interface ChatConversation {
@@ -22,13 +15,10 @@ export interface ChatConversation {
   messages: ChatMessage[];
   createdAt: string;
   updatedAt: string;
-  lastMessage?: string;
-  metadata?: Record<string, any>;
-  isActive?: boolean;
-  last_message?: string;
-  created_at?: string;
-  updated_at?: string;
-  user_id?: string;
-  participants?: string[];
+}
+
+export interface ChatResponse {
+  message: string;
   emotion?: string;
+  recommendations?: any[];
 }
