@@ -1,7 +1,6 @@
+
 import React from 'react';
-import {
-  createBrowserRouter,
-} from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from './pages/HomePage';
 import B2BSelectionPage from './pages/b2b/Selection';
 import B2BAdminDashboard from './pages/b2b/admin/Dashboard';
@@ -27,103 +26,36 @@ import UnifiedSettingsPage from './pages/UnifiedSettingsPage';
 import PrivacySettingsPage from './pages/PrivacySettingsPage';
 import GdprCompliancePage from './pages/b2b/admin/GdprCompliancePage';
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <HomePage />,
-  },
-  {
-    path: "/b2b/selection",
-    element: <B2BSelectionPage />,
-  },
-  {
-    path: "/b2b/admin/dashboard",
-    element: <B2BAdminDashboard />,
-  },
-  {
-    path: "/b2b/user/dashboard",
-    element: <B2BUserDashboard />,
-  },
-  {
-    path: "/b2c",
-    element: <B2CPage />,
-  },
-  {
-    path: "/b2c/login",
-    element: <B2CLoginPage />,
-  },
-  {
-    path: "/b2c/register",
-    element: <B2CRegisterPage />,
-  },
-  {
-    path: "/b2c/forgot-password",
-    element: <B2CForgotPasswordPage />,
-  },
-  {
-    path: "/b2c/reset-password",
-    element: <B2CResetPasswordPage />,
-  },
-  {
-    path: "/profile",
-    element: <ProfilePage />,
-  },
-  {
-    path: "/settings",
-    element: <SettingsPage />,
-  },
-  {
-    path: "/user-settings",
-    element: <UserSettingsPage />,
-  },
-  {
-    path: "/b2b/admin/users",
-    element: <AdminUsersPage />,
-  },
-  {
-    path: "/b2b/admin/teams",
-    element: <AdminTeamsPage />,
-  },
-  {
-    path: "/b2b/admin/security",
-    element: <AdminSecurityPage />,
-  },
-  {
-    path: "/b2b/admin/analytics",
-    element: <AdminAnalyticsPage />,
-  },
-  {
-    path: "/b2b/admin/settings",
-    element: <AdminSettingsPage />,
-  },
-  {
-    path: "/b2b/user/settings",
-    element: <B2BUserSettingsPage />,
-  },
-  {
-    path: "/b2b/user/preferences",
-    element: <B2BUserPreferencesPage />,
-  },
-  {
-    path: "/predictive",
-    element: <PredictivePage />,
-  },
-  {
-    path: "/unauthorized",
-    element: <Unauthorized />,
-  },
-  {
-    path: "/unified-settings",
-    element: <UnifiedSettingsPage />,
-  },
-  {
-    path: '/preferences/privacy',
-    element: <PrivacySettingsPage />,
-  },
-  {
-    path: '/b2b/admin/gdpr-compliance',
-    element: <GdprCompliancePage />,
-  },
-]);
+const AppRouter: React.FC = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/b2b/selection" element={<B2BSelectionPage />} />
+      <Route path="/b2b/admin/dashboard" element={<B2BAdminDashboard />} />
+      <Route path="/b2b/user/dashboard" element={<B2BUserDashboard />} />
+      <Route path="/b2c" element={<B2CPage />} />
+      <Route path="/b2c/login" element={<B2CLoginPage />} />
+      <Route path="/b2c/register" element={<B2CRegisterPage />} />
+      <Route path="/b2c/forgot-password" element={<B2CForgotPasswordPage />} />
+      <Route path="/b2c/reset-password" element={<B2CResetPasswordPage />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/user-settings" element={<UserSettingsPage />} />
+      <Route path="/b2b/admin/users" element={<AdminUsersPage />} />
+      <Route path="/b2b/admin/teams" element={<AdminTeamsPage />} />
+      <Route path="/b2b/admin/security" element={<AdminSecurityPage />} />
+      <Route path="/b2b/admin/analytics" element={<AdminAnalyticsPage />} />
+      <Route path="/b2b/admin/settings" element={<AdminSettingsPage />} />
+      <Route path="/b2b/user/settings" element={<B2BUserSettingsPage />} />
+      <Route path="/b2b/user/preferences" element={<B2BUserPreferencesPage />} />
+      <Route path="/predictive" element={<PredictivePage />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/unified-settings" element={<UnifiedSettingsPage />} />
+      <Route path="/preferences/privacy" element={<PrivacySettingsPage />} />
+      <Route path="/b2b/admin/gdpr-compliance" element={<GdprCompliancePage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};
 
-export default router;
+export default AppRouter;
