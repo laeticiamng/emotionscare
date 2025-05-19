@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Music } from 'lucide-react';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/contexts/MusicContext';
 
 interface EmotionMusicRecommendationsProps {
   emotion?: string;

@@ -6,7 +6,7 @@ import MainNavbar from './navigation/MainNavbar';
 import MainFooter from './navigation/MainFooter';
 import MusicMiniPlayer from './music/MusicMiniPlayer';
 import MusicDrawer from './music/player/MusicDrawer';
-import { useMusic } from '@/contexts/music';
+import { useMusic } from '@/contexts/MusicContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import ScrollProgress from './ui/ScrollProgress';
 import { ShellProps } from '@/types/layout';
@@ -18,7 +18,7 @@ const Shell: React.FC<ShellProps> = ({
   immersive = false,
   className = "" 
 }) => {
-  const { openDrawer, toggleDrawer, playlist, currentTrack } = useMusic();
+  const { openDrawer, toggleDrawer } = useMusic();
   const { theme, reduceMotion } = useTheme();
   const [scrolled, setScrolled] = useState(false);
 
@@ -112,9 +112,7 @@ const Shell: React.FC<ShellProps> = ({
       </main>
 
       {/* Music Mini Player */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <MusicMiniPlayer />
-      </div>
+      <MusicMiniPlayer />
 
       {/* Music Drawer */}
       <MusicDrawer
@@ -123,8 +121,6 @@ const Shell: React.FC<ShellProps> = ({
         onOpenChange={(open) => {
           if (!open) toggleDrawer();
         }}
-        playlist={playlist || undefined}
-        currentTrack={currentTrack || undefined}
       />
 
       {/* Footer */}
