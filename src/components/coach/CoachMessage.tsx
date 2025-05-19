@@ -28,8 +28,7 @@ const CoachMessage: React.FC<CoachMessageProps> = ({
         isCoach 
           ? "bg-muted text-foreground" 
           : "bg-primary text-primary-foreground",
-        // Fixed: Check if message has isLoading property before accessing it
-        message.isLoading === true && "animate-pulse"
+        message.isLoading && "animate-pulse"
       )}>
         {content}
       </div>

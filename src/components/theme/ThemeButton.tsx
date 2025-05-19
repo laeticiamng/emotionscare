@@ -2,11 +2,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Theme } from '@/types/theme';
+import { ThemeName } from '@/types/theme';
 import { Moon, Sun } from 'lucide-react';
 
 interface ThemeButtonProps {
-  theme?: Theme;
+  theme?: ThemeName;
   onClick?: () => void;
 }
 
@@ -14,7 +14,7 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ onClick }) => {
   const { theme, setTheme, isDarkMode } = useTheme();
   
   const toggleTheme = () => {
-    const newTheme: Theme = isDarkMode ? 'light' : 'dark';
+    const newTheme: ThemeName = isDarkMode ? 'light' : 'dark';
     setTheme(newTheme);
     
     if (onClick) {

@@ -35,7 +35,17 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<ThemeName>(
-    () => (localStorage.getItem(storageKey) as ThemeName) || defaultTheme
+    () => {
+      try {
+        const storedTheme = localStorage.getItem(storageKey);
+        if (storedTheme && (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system' || storedTheme === 'pastel')) {
+          return storedTheme as ThemeName;
+        }
+      } catch (error) {
+        console.error('Error reading localStorage:', error);
+      }
+      return defaultTheme;
+    }
   );
   const [fontSize, setFontSize] = useState<FontSize>("md");
   const [fontFamily, setFontFamily] = useState<FontFamily>("sans");
@@ -74,9 +84,13 @@ export function ThemeProvider({
 
   const value: ThemeContextType = {
     theme,
-    setTheme: (theme: ThemeName) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
+    setTheme: (newTheme: ThemeName) => {
+      try {
+        localStorage.setItem(storageKey, newTheme);
+      } catch (error) {
+        console.error('Error writing to localStorage:', error);
+      }
+      setTheme(newTheme);
     },
     toggleTheme,
     isDark,

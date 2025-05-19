@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Sun, Moon, Monitor, Palette } from 'lucide-react';
 import { ThemeName } from '@/types/theme';
-import { motion } from 'framer-motion';
 
 interface ThemeSelectorProps {
   currentTheme: ThemeName | string;
@@ -14,11 +13,8 @@ interface ThemeSelectorProps {
 }
 
 const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange, minimal = false, className = '' }) => {
-  const handleThemeChange = (value: string) => {
-    // Validate that the value is a valid Theme before passing it to onChange
-    if (value === 'light' || value === 'dark' || value === 'system' || value === 'pastel') {
-      onChange(value as ThemeName);
-    }
+  const handleThemeChange = (theme: ThemeName) => {
+    onChange(theme);
   };
   
   // Render a simplified version for minimal mode (used in navbar)
@@ -118,10 +114,9 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange, m
             const isActive = currentTheme === theme.id;
             
             return (
-              <motion.div
+              <div
                 key={theme.id}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                className="transition-transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Button
                   variant="outline"
@@ -147,7 +142,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange, m
                     </div>
                   </div>
                 </Button>
-              </motion.div>
+              </div>
             );
           })}
         </div>

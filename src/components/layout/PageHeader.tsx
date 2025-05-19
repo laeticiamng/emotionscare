@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
 import ThemeSelector from '@/components/theme/ThemeSelector';
 import { useTheme } from '@/contexts/ThemeContext';
-import { ThemeName } from '@/types/theme';
 
 interface PageHeaderProps {
   title: string;

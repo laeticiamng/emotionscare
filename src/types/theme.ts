@@ -1,6 +1,6 @@
 
 export type FontFamily = 'sans' | 'serif' | 'mono' | 'rounded' | 'system';
-export type FontSize = 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large' | 'xlarge';
+export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large' | 'xlarge';
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
 
 export interface Theme {

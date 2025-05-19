@@ -23,14 +23,16 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   onFontSizeChange
 }) => {
   // Theme options
-  const themes = [
+  const themes: {value: ThemeName, label: string, preview: string}[] = [
     { value: 'light', label: 'Light', preview: '#ffffff' },
     { value: 'dark', label: 'Dark', preview: '#1f2937' },
     { value: 'system', label: 'System', preview: 'linear-gradient(to right, #ffffff 50%, #1f2937 50%)' }
   ];
   
   const handleThemeChange = (value: string) => {
-    onThemeChange(value as ThemeName);
+    if (value === 'light' || value === 'dark' || value === 'system' || value === 'pastel') {
+      onThemeChange(value as ThemeName);
+    }
   };
   
   // Font family options
@@ -38,7 +40,7 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
     { value: "sans", label: "Sans" },
     { value: "serif", label: "Serif" },
     { value: "mono", label: "Monospace" },
-    { value: "system", label: "System Default" }
+    { value: "rounded", label: "Rounded" }
   ];
   
   const handleFontFamilyChange = (value: FontFamily) => {
@@ -108,7 +110,7 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
           <RadioGroup
             defaultValue={fontFamily}
             onValueChange={handleFontFamilyChange}
-            className="grid grid-cols-2 gap-4"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4"
           >
             {fontFamilies.map((font) => (
               <div key={font.value}>
