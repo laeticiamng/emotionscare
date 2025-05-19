@@ -1,5 +1,6 @@
 
 import { ChatMessage, ChatConversation } from '@/types/chat';
+import { EmotionResult } from '@/types/emotion';
 
 export interface CoachContextType {
   messages: ChatMessage[];
@@ -22,7 +23,7 @@ export interface CoachContextType {
   characterRole?: string;
   currentEmotion?: string | null;
   lastEmotion?: string | null;
-  emotionHistory?: any[];
+  emotionHistory?: EmotionResult[];
   addMessage?: (message: Omit<ChatMessage, 'id'>) => void;
   startNewConversation?: (title?: string) => string;
   setActiveConversation?: (id: string) => void;

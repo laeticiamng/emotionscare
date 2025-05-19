@@ -2,8 +2,9 @@
 export type FontFamily = 'sans' | 'serif' | 'mono' | 'rounded' | 'system';
 export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large' | 'xlarge';
 export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
+export type Theme = ThemeName;
 
-export interface Theme {
+export interface ThemeObject {
   name: ThemeName;
   label: string;
   className: string;

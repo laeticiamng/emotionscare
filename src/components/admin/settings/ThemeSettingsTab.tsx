@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { ThemeName, FontFamily, FontSize } from '@/types/theme';
 
 interface ThemeSettingsTabProps {
-  currentTheme: string;
+  currentTheme: ThemeName;
   onThemeChange: (theme: ThemeName) => void;
   fontFamily?: FontFamily;
   onFontFamilyChange?: (fontFamily: FontFamily) => void;
@@ -26,7 +26,8 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   const themes: {value: ThemeName, label: string, preview: string}[] = [
     { value: 'light', label: 'Light', preview: '#ffffff' },
     { value: 'dark', label: 'Dark', preview: '#1f2937' },
-    { value: 'system', label: 'System', preview: 'linear-gradient(to right, #ffffff 50%, #1f2937 50%)' }
+    { value: 'system', label: 'System', preview: 'linear-gradient(to right, #ffffff 50%, #1f2937 50%)' },
+    { value: 'pastel', label: 'Pastel', preview: '#f0f9ff' }
   ];
   
   const handleThemeChange = (value: string) => {
@@ -43,9 +44,9 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
     { value: "rounded", label: "Rounded" }
   ];
   
-  const handleFontFamilyChange = (value: FontFamily) => {
+  const handleFontFamilyChange = (value: string) => {
     if (onFontFamilyChange) {
-      onFontFamilyChange(value);
+      onFontFamilyChange(value as FontFamily);
     }
   };
   
@@ -56,9 +57,9 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
     { value: "lg", label: "Large" }
   ];
   
-  const handleFontSizeChange = (value: FontSize) => {
+  const handleFontSizeChange = (value: string) => {
     if (onFontSizeChange) {
-      onFontSizeChange(value);
+      onFontSizeChange(value as FontSize);
     }
   };
 

@@ -3,20 +3,40 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Theme } from '@/types/theme';
+import { ThemeName } from '@/types/theme';
 
 interface ThemeSelectorProps {
-  currentTheme: Theme;
-  onChange: (theme: Theme) => void;
+  currentTheme: ThemeName;
+  onChange: (theme: ThemeName) => void;
+  minimal?: boolean;
 }
 
-const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange }) => {
+const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange, minimal = false }) => {
   const handleThemeChange = (value: string) => {
-    // Validate that the value is a valid Theme before passing it to onChange
+    // Validate that the value is a valid ThemeName before passing it to onChange
     if (value === 'light' || value === 'dark' || value === 'system' || value === 'pastel') {
-      onChange(value as Theme);
+      onChange(value as ThemeName);
     }
   };
+  
+  if (minimal) {
+    return (
+      <RadioGroup
+        value={currentTheme}
+        onValueChange={handleThemeChange}
+        className="flex items-center space-x-2"
+      >
+        <div className="flex items-center space-x-1">
+          <RadioGroupItem value="light" id="light-min" />
+          <Label htmlFor="light-min" className="text-xs">Light</Label>
+        </div>
+        <div className="flex items-center space-x-1">
+          <RadioGroupItem value="dark" id="dark-min" />
+          <Label htmlFor="dark-min" className="text-xs">Dark</Label>
+        </div>
+      </RadioGroup>
+    );
+  }
   
   return (
     <Card>

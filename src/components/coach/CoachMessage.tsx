@@ -1,9 +1,14 @@
 
 import React from 'react';
-import { CoachMessageProps } from '@/types/coach';
 import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { Bot, User } from 'lucide-react';
+import { ChatMessage } from '@/types/chat';
+
+interface CoachMessageProps {
+  message: ChatMessage;
+  isLast?: boolean;
+}
 
 const CoachMessage: React.FC<CoachMessageProps> = ({ 
   message,
@@ -11,6 +16,8 @@ const CoachMessage: React.FC<CoachMessageProps> = ({
 }) => {
   const isCoach = message.sender === 'coach' || message.sender === 'assistant' || message.role === 'assistant';
   const content = message.content || message.text || '';
+  // Safely access isLoading by checking if it exists on the message
+  const isLoading = message.isLoading || false;
   
   return (
     <div className={cn(
@@ -28,7 +35,7 @@ const CoachMessage: React.FC<CoachMessageProps> = ({
         isCoach 
           ? "bg-muted text-foreground" 
           : "bg-primary text-primary-foreground",
-        message.isLoading && "animate-pulse"
+        isLoading && "animate-pulse"
       )}>
         {content}
       </div>

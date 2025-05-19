@@ -17,6 +17,14 @@ export interface RecognitionOptions {
   onResult?: (result: SpeechRecognitionResult) => void;
 }
 
+// Add missing SpeechRecognition definitions to the Window interface
+declare global {
+  interface Window {
+    SpeechRecognition: typeof SpeechRecognition;
+    webkitSpeechRecognition: typeof SpeechRecognition;
+  }
+}
+
 export class SpeechRecognitionService {
   private recognition: any = null;
   private isSupported: boolean = false;
@@ -67,20 +75,25 @@ export class SpeechRecognitionService {
       };
       
       this.recognition.onresult = (event: any) => {
-        if (options.onResult && event.results && event.results.length > 0) {
+        if (options.onResult && event.results) {
           const lastResultIndex = event.resultIndex || 0;
-          const lastResult = event.results[lastResultIndex];
           
-          if (lastResult && lastResult[0]) {
-            const transcript = lastResult[0].transcript;
-            const confidence = lastResult[0].confidence;
-            const isFinal = lastResult.isFinal !== undefined ? lastResult.isFinal : true;
+          // Safely check if event.results has the expected structure
+          if (event.results[lastResultIndex] && event.results[lastResultIndex][0]) {
+            const currentResult = event.results[lastResultIndex];
+            const firstAlternative = currentResult[0];
             
-            options.onResult({
-              transcript,
-              confidence,
-              isFinal
-            });
+            if (firstAlternative) {
+              const transcript = firstAlternative.transcript;
+              const confidence = firstAlternative.confidence;
+              const isFinal = !!currentResult.isFinal;
+              
+              options.onResult({
+                transcript,
+                confidence,
+                isFinal
+              });
+            }
           }
         }
       };
