@@ -25,4 +25,5 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   clearError?: () => void;
   updateUser?: (userData: Partial<AuthUser>) => Promise<void>;
+  updatePreferences?: (preferences: any) => Promise<void>; // Added for compatibility
 }

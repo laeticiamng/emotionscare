@@ -9,7 +9,8 @@ export interface AudioTrack {
   emotion?: string;
   category?: string;
   tags?: string[];
-  audioUrl?: string; // Added to fix the error in use-audio.ts
+  audioUrl?: string;
+  description?: string;
 }
 
 export interface AudioPlaylist {
@@ -31,6 +32,9 @@ export interface MoodData {
   emotion: string;
   intensity: number;
   timestamp: string;
+  sentiment?: number; // Added for MoodLineChart
+  anxiety?: number; // Added for MoodLineChart
+  energy?: number; // Added for MoodLineChart
 }
 
 export interface EmotionalData {

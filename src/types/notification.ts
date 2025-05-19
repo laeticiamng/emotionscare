@@ -1,6 +1,6 @@
 
 // Define the types for notification preferences
-export type NotificationFrequency = 'instant' | 'hourly' | 'daily' | 'weekly' | 'never';
+export type NotificationFrequency = 'instant' | 'hourly' | 'daily' | 'weekly' | 'never' | 'immediate';
 export type NotificationTone = 'informative' | 'friendly' | 'professional' | 'minimal';
 
 export interface NotificationPreference {
@@ -11,6 +11,27 @@ export interface NotificationPreference {
     email: boolean;
     push: boolean;
     inApp: boolean;
+  };
+  // Backward compatibility fields
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  inAppEnabled?: boolean;
+  types?: {
+    system?: boolean;
+    emotion?: boolean;
+    coach?: boolean;
+    journal?: boolean;
+    community?: boolean;
+    achievement?: boolean;
+    badge?: boolean;
+    challenge?: boolean;
+    reminder?: boolean;
+    info?: boolean;
+    warning?: boolean;
+    error?: boolean;
+    success?: boolean;
+    streak?: boolean;
+    urgent?: boolean;
   };
 }
 

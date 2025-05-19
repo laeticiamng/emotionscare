@@ -27,8 +27,8 @@ export interface VRSessionTemplate {
   cover_url?: string;
   rating?: number;
   intensity?: number;
-  features?: string[];
-  popularity?: number;
+  features?: string[]; // Added for VRTemplateDetail
+  popularity?: number; // Added for VRTemplateDetail
   objective?: string;
   type?: string;
   thumbnail?: string;
@@ -48,7 +48,7 @@ export interface VRSession {
   heartRateBefore?: number;
   heartRateAfter?: number;
   completed?: boolean;
-  metrics?: {
+  metrics?: { // Added for VRSessionHistory
     heartRate?: number[] | number;
     stressLevel?: number;
     focusLevel?: number;

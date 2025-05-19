@@ -1,3 +1,4 @@
+
 export interface ChatMessage {
   id: string;
   content?: string;
@@ -46,6 +47,10 @@ export interface ChatHookResult {
   isTyping: boolean;
   sendMessage: (content: string) => Promise<void>;
   clearMessages: () => void;
+  input: string; // Added for ChatInterface
+  setInput: (value: string) => void; // Added for ChatInterface
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void; // Added for ChatInterface
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void; // Added for ChatInterface
 }
 
 export interface UseChatOptions {

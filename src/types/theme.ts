@@ -16,7 +16,7 @@ export interface ThemeContextType {
   toggleTheme?: () => void;
   isDarkMode?: boolean;
   isDark?: boolean;
-  systemTheme: "light" | "dark";
+  systemTheme: "light" | "dark"; // Required property
   soundEnabled?: boolean;
   reduceMotion?: boolean;
   setSoundEnabled?: (enabled: boolean) => void;

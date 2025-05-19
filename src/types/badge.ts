@@ -6,12 +6,22 @@ export interface Badge {
   image_url?: string;
   awarded_at?: string;
   user_id?: string;
-  tier?: string; // Added for compatibility with useCommunityGamification
+  tier?: string;
+  // Backward compatibility fields
+  imageUrl?: string;
+  date?: string;
+  unlocked?: boolean;
+  unlockedAt?: string;
+  unlocked_at?: string;
+  earned?: boolean;
+  level?: number;
+  completed?: boolean;
+  threshold?: number;
 }
 
 export interface Challenge {
   id: string;
-  name: string;
+  name?: string;
   title?: string;
   description: string;
   points?: number;
@@ -24,8 +34,11 @@ export interface Challenge {
   completions?: number;
   total?: number;
   deadline?: string;
-  reward: any; // Added for type compatibility
-  unlocked: boolean; // Added for type compatibility
+  reward: any;
+  unlocked: boolean;
+  // Added for compatibility with different components
+  totalSteps?: number;
+  isCompleted?: boolean;
 }
 
 // Add LeaderboardEntry type for useCommunityGamification
