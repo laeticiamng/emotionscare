@@ -1,116 +1,117 @@
 
-import React from 'react';
+import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Skeleton } from "@/components/ui/skeleton";
-import { KpiCardProps } from '@/types/dashboard';
+import { KpiCardProps, KpiCardStatus } from "@/types/dashboard";
+import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 
-/**
- * KPI Card component for displaying key performance indicators
- */
-const KpiCard: React.FC<KpiCardProps> = ({ 
+const KpiCard = ({
   id,
-  title, 
-  value, 
-  icon, 
-  delta, 
+  title,
+  value,
+  delta,
+  icon,
   subtitle,
-  ariaLabel,
+  status = 'neutral',
   className,
-  isLoading = false,
+  isLoading,
+  ariaLabel,
   onClick,
-  status
-}) => {
-  // Determine if the card is interactive
-  const isInteractive = typeof onClick === 'function';
-  
-  // Helper function to determine badge variant based on trend
-  const getBadgeVariant = (trend?: string) => {
-    if (!trend) return 'secondary';
-    switch (trend) {
-      case 'up': return 'success';
-      case 'down': return 'destructive';
-      default: return 'secondary';
-    }
-  };
-
-  // Helper function to format delta display
-  const renderDelta = () => {
-    if (!delta) return null;
-    
-    // Support both legacy and new delta formats
-    const deltaObj = typeof delta === 'number' 
-      ? { value: delta, trend: delta >= 0 ? 'up' : 'down' } 
-      : delta;
-    
-    const trendValue = 'trend' in deltaObj ? deltaObj.trend : 
-                      'direction' in deltaObj ? deltaObj.direction : 'neutral';
-                      
-    const label = 'label' in deltaObj && deltaObj.label ? deltaObj.label : '';
-    
+  footer,
+}: KpiCardProps) => {
+  // Handle loading state
+  if (isLoading) {
     return (
-      <Badge 
-        variant={getBadgeVariant(trendValue)}
-        className="mt-2 font-normal"
+      <Card
+        className={cn(
+          "overflow-hidden transition-all hover:shadow-md",
+          className
+        )}
       >
-        {trendValue === 'up' ? '↑' : trendValue === 'down' ? '↓' : '○'} 
-        {deltaObj.value !== undefined && Math.abs(Number(deltaObj.value)).toFixed(1)}% {label}
-      </Badge>
+        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+          <CardTitle
+            className="text-sm font-medium text-muted-foreground animate-pulse"
+          >
+            &nbsp;
+          </CardTitle>
+          {icon && (
+            <div className="opacity-70 animate-pulse">
+              {icon}
+            </div>
+          )}
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold animate-pulse bg-muted h-8 w-24 rounded">
+            &nbsp;
+          </div>
+          <p className="text-xs text-muted-foreground mt-2 animate-pulse bg-muted h-4 w-16 rounded">
+            &nbsp;
+          </p>
+        </CardContent>
+      </Card>
     );
-  };
-  
+  }
+
+  // Convert number delta to object format for consistency in rendering
+  const deltaObj = typeof delta === 'number' 
+    ? { value: delta, trend: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral' } 
+    : delta;
+
+  // Handle status color based on card status
+  let statusColor = "";
+  if (deltaObj) {
+    // Get trend value safely, checking if properties exist
+    const trendDirection = deltaObj && (
+      ('direction' in deltaObj && deltaObj.direction) || 
+      ('trend' in deltaObj && deltaObj.trend) || 
+      'neutral'
+    );
+                     
+    if (trendDirection === 'up') {
+      statusColor = status === 'neutral' || status === 'info' ? 'text-emerald-600 dark:text-emerald-400' : `text-${status}`;
+    } else if (trendDirection === 'down') {
+      statusColor = status === 'neutral' || status === 'info' ? 'text-rose-600 dark:text-rose-400' : `text-${status}`;
+    } else {
+      statusColor = 'text-gray-600 dark:text-gray-400';
+    }
+  }
+
   return (
-    <Card 
+    <Card
       id={id}
       className={cn(
-        "p-4 transition-all duration-200", 
-        isInteractive && "cursor-pointer hover:shadow-md hover:translate-y-[-2px] focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none", 
+        "overflow-hidden transition-all hover:shadow-md",
+        onClick ? "cursor-pointer" : "",
         className
       )}
-      aria-label={ariaLabel || (isInteractive ? `Voir détails ${title}` : undefined)}
-      aria-busy={isLoading}
       onClick={onClick}
-      role={isInteractive ? "button" : undefined}
-      tabIndex={isInteractive ? 0 : undefined}
+      aria-label={ariaLabel}
     >
-      <CardHeader className="p-0 pb-2 space-y-0">
-        <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-200 flex items-center">
-          {isLoading ? (
-            <>
-              <Skeleton className="h-5 w-5 mr-2 rounded-full" />
-              <Skeleton className="h-6 w-32" />
-            </>
-          ) : (
-            <>
-              {icon && <div className="mr-2 text-primary">{icon}</div>}
-              {title}
-            </>
-          )}
+      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+          {title}
         </CardTitle>
+        {icon && <div className="opacity-70">{icon}</div>}
       </CardHeader>
-      <CardContent className="p-0">
-        {isLoading ? (
-          <Skeleton className="h-8 w-24 my-2" />
-        ) : (
-          <div className="text-3xl font-bold">{value}</div>
-        )}
-        
-        {isLoading ? (
-          delta ? <Skeleton className="h-5 w-20 mt-2" /> : null
-        ) : (
-          renderDelta()
-        )}
-        
-        {subtitle && (
-          <div className="mt-2">
-            {isLoading ? (
-              <Skeleton className="h-4 w-full" />
-            ) : (
-              subtitle
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        {deltaObj && (
+          <p className={cn("text-xs flex items-center gap-1 mt-1", statusColor)}>
+            {deltaObj && 'trend' in deltaObj && deltaObj.trend === 'up' && <ArrowUp className="h-3 w-3" />}
+            {deltaObj && 'direction' in deltaObj && deltaObj.direction === 'up' && <ArrowUp className="h-3 w-3" />}
+            {deltaObj && 'trend' in deltaObj && deltaObj.trend === 'down' && <ArrowDown className="h-3 w-3" />}
+            {deltaObj && 'direction' in deltaObj && deltaObj.direction === 'down' && <ArrowDown className="h-3 w-3" />}
+            {(deltaObj && ((('trend' in deltaObj && deltaObj.trend === 'neutral') || 
+               ('direction' in deltaObj && deltaObj.direction === 'stable')) || 
+               (!('trend' in deltaObj) && !('direction' in deltaObj)))) && <Minus className="h-3 w-3" />}
+            {deltaObj && 'value' in deltaObj && deltaObj.value !== undefined && (
+              <span>{Math.abs(Number(deltaObj.value)).toFixed(1)}%</span>
             )}
-          </div>
+            {deltaObj && 'label' in deltaObj && deltaObj.label && <span>{deltaObj.label}</span>}
+          </p>
         )}
+        {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
+        {footer && <div className="mt-4">{footer}</div>}
       </CardContent>
     </Card>
   );

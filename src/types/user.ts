@@ -18,7 +18,7 @@ export interface User {
 export interface AuthUser {
   id: string;
   email: string;
-  name: string;
+  name: string | null; // Changed to allow null for compatibility
   role?: UserRole;
   avatar?: string;
   avatar_url?: string;

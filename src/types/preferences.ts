@@ -1,20 +1,46 @@
 
-export interface PrivacyPreferences {
-  dataSharing?: boolean;
+export type FontFamily = 'system' | 'sans' | 'serif' | 'mono';
+export type FontSize = 'small' | 'medium' | 'large' | 'xlarge';
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
+
+export interface UserPreferences {
+  fontSize: FontSize;
+  fontFamily: FontFamily;
+  theme: ThemeName;
+  language: string;
+  notifications: boolean;
+  emailNotifications: boolean;
+  soundEffects: boolean;
+  animationReduced: boolean;
+  highContrast: boolean;
+  dateFormat: string;
+  timeFormat: string;
+  colorBlindMode?: boolean;
+  reduceMotion?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
   shareData?: boolean;
-  analytics?: boolean;
-  thirdParty?: boolean;
-  anonymizeReports?: boolean;
   anonymizedData?: boolean;
-  profileVisibility?: 'private' | 'team' | 'organization' | 'public';
+  ambientSound?: string;
+  soundEnabled?: boolean;
+  privacy?: PrivacyPreferences;
+  notifications?: NotificationsPreferences;
+}
+
+export interface PrivacyPreferences {
+  shareData: boolean;
+  anonymizedData: boolean;
+  dataRetention: number;
+  consentToAI: boolean;
+  profileVisibility: 'private' | 'team' | 'organization' | 'public';
 }
 
 export interface NotificationsPreferences {
   enabled: boolean;
-  emailEnabled?: boolean;
-  pushEnabled?: boolean;
-  inAppEnabled?: boolean;
-  types?: {
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  inAppEnabled: boolean;
+  types: {
     system: boolean;
     emotion: boolean;
     coach: boolean;
@@ -36,46 +62,10 @@ export interface NotificationsPreferences {
     enabled: boolean;
     start: string;
     end: string;
-  }
+  };
 }
 
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never' | 'custom';
-export type NotificationType = 'system' | 'emotion' | 'coach' | 'journal' | 'community';
-
-export interface UserPreferences {
-  theme?: 'light' | 'dark' | 'system' | 'pastel';
-  fontSize?: 'small' | 'medium' | 'large' | 'xlarge';
-  fontFamily?: 'sans' | 'serif' | 'mono' | 'system' | 'rounded';
-  notifications?: boolean | NotificationsPreferences;
-  emailNotifications?: boolean;
-  soundEffects?: boolean;
-  animationReduced?: boolean;
-  highContrast?: boolean;
-  language?: string;
-  dateFormat?: string;
-  timeFormat?: string;
-  ambientSound?: string;
-  soundEnabled?: boolean;
-  privacy?: string | PrivacyPreferences;
-  reduceMotion?: boolean;
-  colorBlindMode?: boolean;
-  emotionalCamouflage?: boolean;
-  aiSuggestions?: boolean;
-  shareData?: boolean;
-  anonymizedData?: boolean;
-}
-
-export const DEFAULT_PREFERENCES: UserPreferences = {
-  theme: 'system',
-  fontSize: 'medium',
-  fontFamily: 'sans',
-  notifications: true,
-  emailNotifications: false,
-  soundEnabled: true,
-  language: 'fr',
-  ambientSound: 'nature',
-  privacy: 'private',
-};
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
 
 export interface UserPreferencesFormProps {
   preferences: UserPreferences;
@@ -85,13 +75,7 @@ export interface UserPreferencesFormProps {
 
 export interface UserPreferencesContextType {
   preferences: UserPreferences;
-  theme?: string;
-  fontSize?: string;
-  language?: string;
-  notifications?: boolean | NotificationsPreferences;
-  privacy?: string | PrivacyPreferences;
-  updatePreferences: (newPrefs: Partial<UserPreferences>) => Promise<void>;
-  resetPreferences?: () => void;
+  updatePreferences: (newPreferences: Partial<UserPreferences>) => Promise<void>;
   isLoading: boolean;
-  error?: Error | null;
+  error: Error | null;
 }

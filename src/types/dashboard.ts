@@ -78,6 +78,7 @@ export interface TeamSummary {
 }
 
 export interface AdminAccessLog {
+  id: string;  // Added id property
   adminId: string;
   action: string;
   timestamp: string;

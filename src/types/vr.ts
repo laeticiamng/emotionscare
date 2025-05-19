@@ -2,7 +2,7 @@
 export interface VRSessionTemplate {
   id: string;
   title: string;
-  name?: string; // Adding backward compatibility for name
+  name?: string; // For backward compatibility
   description: string;
   duration: number;
   thumbnailUrl?: string;
