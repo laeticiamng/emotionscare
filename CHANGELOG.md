@@ -22,6 +22,15 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ### Modifié
 - `README.md` référence désormais ce nouveau document dans la section documentation technique.
 
+## [1.1.7] - 2025-05-25
+
+### Ajouté
+- Rapport `docs/scalability-innovation-audit.md` sur l'évolutivité et l'innovation continue
+- Fichier `docs/module-registry.md` listant les modules et la roadmap technique
+
+### Modifié
+- Mise à jour de `README.md` pour référencer ces nouveaux documents
+
 ## [1.1.4] - 2025-05-22
 
 ### Corrigé
