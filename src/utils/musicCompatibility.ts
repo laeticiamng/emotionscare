@@ -1,107 +1,130 @@
 
 /**
- * Utilities to help with music type compatibility across different parts of the application
+ * Utility functions to ensure compatibility between different music type formats.
+ * These functions help bridge the gap between Track/MusicTrack and Playlist/MusicPlaylist.
  */
 
-import { MusicTrack, MusicPlaylist } from "@/types/music";
+import { Track, Playlist } from '@/services/music/types';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 /**
- * Get the cover image URL from a track, handling different property names
+ * Gets the cover URL from a track, handling different property naming
  */
-export const getTrackCover = (track: MusicTrack | null | undefined): string => {
-  if (!track) return '';
-  return track.coverUrl || track.cover || track.coverImage || '';
+export const getTrackCover = (track: MusicTrack | Track): string | undefined => {
+  return track.coverUrl || track.cover || track.coverImage || track.image_url || track.image || '';
 };
 
 /**
- * Get the title from a track, handling different property names
+ * Gets the audio URL from a track, handling different property naming
  */
-export const getTrackTitle = (track: MusicTrack | null | undefined): string => {
-  if (!track) return '';
+export const getTrackAudioUrl = (track: MusicTrack | Track): string => {
+  return track.audioUrl || track.url || track.audio_url || track.track_url || track.src || '';
+};
+
+/**
+ * Gets the track title, handling different property naming
+ */
+export const getTrackTitle = (track: MusicTrack | Track): string => {
   return track.title || track.name || 'Unknown Track';
 };
 
 /**
- * Get the artist from a track, handling different property names
+ * Gets the track artist, handling different property naming
  */
-export const getTrackArtist = (track: MusicTrack | null | undefined): string => {
-  if (!track) return '';
+export const getTrackArtist = (track: MusicTrack | Track): string => {
   return track.artist || 'Unknown Artist';
 };
 
 /**
- * Get the audio URL from a track, handling different property names
+ * Converts a Track to a MusicTrack
  */
-export const getTrackAudioUrl = (track: MusicTrack | null | undefined): string => {
-  if (!track) return '';
-  return track.audioUrl || track.url || track.src || track.track_url || '';
-};
-
-/**
- * Ensures that a value is a complete MusicTrack, filling in defaults for required fields
- */
-export const ensureTrack = (track: Partial<MusicTrack>): MusicTrack => {
+export const trackToMusicTrack = (track: Track): MusicTrack => {
   return {
-    id: track.id || `generated-${Date.now()}`,
-    title: track.title || "Unknown Title",
-    artist: track.artist || "Unknown Artist",
+    id: track.id,
+    title: track.title,
+    artist: track.artist,
     duration: track.duration || 0,
-    audioUrl: track.audioUrl || track.url || track.src || "",
-    coverUrl: track.coverUrl || track.cover || track.coverImage || "",
-    ...track
+    audioUrl: getTrackAudioUrl(track),
+    coverUrl: getTrackCover(track),
+    url: track.url
   };
 };
 
 /**
- * Ensures that an array of tracks or a partial playlist is converted to a complete MusicPlaylist
+ * Converts a MusicTrack to a Track
  */
-export const ensurePlaylist = (input: MusicPlaylist | MusicTrack[] | any): MusicPlaylist => {
-  if (Array.isArray(input)) {
+export const musicTrackToTrack = (track: MusicTrack): Track => {
+  return {
+    id: track.id,
+    title: track.title,
+    artist: track.artist,
+    duration: track.duration || 0,
+    url: getTrackAudioUrl(track),
+    cover: getTrackCover(track),
+  };
+};
+
+/**
+ * Converts a Playlist to a MusicPlaylist
+ */
+export const playlistToMusicPlaylist = (playlist: Playlist): MusicPlaylist => {
+  return {
+    id: playlist.id,
+    name: playlist.name || playlist.title || 'Unknown Playlist',
+    title: playlist.title || playlist.name,
+    tracks: playlist.tracks.map(track => trackToMusicTrack(track))
+  };
+};
+
+/**
+ * Converts a MusicPlaylist to a Playlist
+ */
+export const musicPlaylistToPlaylist = (playlist: MusicPlaylist): Playlist => {
+  return {
+    id: playlist.id,
+    name: playlist.name,
+    title: playlist.title,
+    tracks: playlist.tracks.map(track => musicTrackToTrack(track))
+  };
+};
+
+/**
+ * Ensures that whatever we get is properly formatted as a MusicPlaylist
+ */
+export const ensurePlaylist = (playlist: MusicPlaylist | Playlist | MusicTrack[]): MusicPlaylist => {
+  // If it's already a MusicPlaylist
+  if (playlist && 'tracks' in playlist) {
     return {
-      id: `playlist-${Date.now()}`,
-      name: "Custom Playlist",
-      tracks: input.map(ensureTrack),
-    };
-  } else if (input && typeof input === 'object') {
-    return {
-      id: input.id || `playlist-${Date.now()}`,
-      name: input.name || input.title || "Untitled Playlist",
-      tracks: Array.isArray(input.tracks) ? input.tracks.map(ensureTrack) : [],
-      ...input
+      id: playlist.id,
+      name: playlist.name || playlist.title || 'Unknown Playlist',
+      tracks: 'url' in playlist.tracks[0] 
+        ? playlist.tracks.map(track => trackToMusicTrack(track as any))
+        : playlist.tracks as MusicTrack[]
     };
   }
   
-  // Default empty playlist
+  // If it's an array of tracks
+  if (Array.isArray(playlist)) {
+    return {
+      id: `playlist-${Date.now()}`,
+      name: 'Generated Playlist',
+      tracks: 'url' in playlist[0] && !('audioUrl' in playlist[0])
+        ? playlist.map(track => trackToMusicTrack(track as any))
+        : playlist as MusicTrack[]
+    };
+  }
+  
+  // Fallback to empty playlist
   return {
-    id: `empty-${Date.now()}`,
-    name: "Empty Playlist",
+    id: `playlist-${Date.now()}`,
+    name: 'Empty Playlist',
     tracks: []
   };
 };
 
 /**
- * Normalizes property names for compatibility with different API sources
+ * Determines if a track is playable
  */
-export const normalizeTrackProperties = (track: any): MusicTrack => {
-  if (!track) return ensureTrack({});
-  
-  return ensureTrack({
-    ...track,
-    // Normalize URL fields
-    audioUrl: track.audioUrl || track.url || track.src || track.track_url,
-    // Normalize cover image fields
-    coverUrl: track.coverUrl || track.cover || track.coverImage,
-    // Normalize title
-    title: track.title || track.name
-  });
-};
-
-export default {
-  getTrackCover,
-  getTrackTitle,
-  getTrackArtist,
-  getTrackAudioUrl,
-  ensureTrack,
-  ensurePlaylist,
-  normalizeTrackProperties
+export const isTrackPlayable = (track: MusicTrack | Track): boolean => {
+  return !!getTrackAudioUrl(track);
 };
