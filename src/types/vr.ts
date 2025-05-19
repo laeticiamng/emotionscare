@@ -14,6 +14,10 @@ export interface VRSessionTemplate {
   tags: string[];
   difficulty?: string;
   theme?: string;
+  audio_url?: string; // Add missing fields used in VRAudioSession
+  audioTrack?: string;
+  is_audio_only?: boolean;
+  lastUsed?: string | Date;
 }
 
 export interface VRSession {
@@ -46,6 +50,10 @@ export interface VRSessionHistoryProps {
   showHeader?: boolean;
   className?: string;
   onSessionSelect?: (sessionId: string) => void;
+  sessions?: VRSession[];
+  onSelect?: (template: VRSessionTemplate) => void;
+  emptyMessage?: string;
+  limitDisplay?: number;
 }
 
 export interface VRTemplateDetailProps {

@@ -1,33 +1,22 @@
 
-export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'small' | 'medium' | 'large' | 'xlarge' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type FontFamily = 'sans' | 'serif' | 'mono' | 'system' | 'rounded';
+import { ThemeType } from './preferences';
 
-export interface ThemeOption {
-  value: Theme;
-  label: string;
-  icon?: React.ReactNode;
-}
+export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 export interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
-  isDark: boolean;
-  isDarkMode: boolean;
+  theme: ThemeType;
+  setTheme: (theme: ThemeType) => void;
   fontSize: FontSize;
-  setFontSize: (size: FontSize) => void;
-  fontFamily: FontFamily;
-  setFontFamily: (family: FontFamily) => void;
-  systemTheme?: 'dark' | 'light';
-  preferences?: {
-    soundEnabled?: boolean;
-    reduceMotion?: boolean;
-    highContrast?: boolean;
-  };
-  updatePreferences?: (prefs: {
-    soundEnabled?: boolean;
-    reduceMotion?: boolean;
-    highContrast?: boolean;
-  }) => void;
+  setFontSize: (fontSize: FontSize) => void;
+  systemTheme: ThemeType;
+  soundEnabled?: boolean;
+  reduceMotion?: boolean;
+}
+
+export interface ThemeProviderProps {
+  children: React.ReactNode;
+  defaultTheme?: ThemeType;
+  defaultFontSize?: FontSize;
+  forcedTheme?: ThemeType;
+  storageKey?: string;
 }

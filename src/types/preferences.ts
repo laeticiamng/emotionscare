@@ -13,7 +13,7 @@ export interface PrivacyPreferences {
   shareBadges?: boolean;
   shareProfile?: boolean;
   defaultVisibility?: PrivacyLevel;
-  // Add missing fields used in PrivacyPreferences.tsx
+  // Add fields used in PrivacyPreferences.tsx
   dataSharing?: boolean;
   analytics?: boolean;
   thirdParty?: boolean;
@@ -39,8 +39,8 @@ export interface UserPreferences {
   ambientSound?: boolean;
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
-  shareData?: boolean; // Added for DataPrivacySettings.tsx
-  anonymizedData?: boolean; // Added for DataPrivacySettings.tsx
+  shareData?: boolean; // For DataPrivacySettings.tsx
+  anonymizedData?: boolean; // For DataPrivacySettings.tsx
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {

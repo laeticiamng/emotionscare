@@ -73,11 +73,16 @@ export interface EmotionResult {
   confidence: number;
   timestamp: string;
   recommendations?: EmotionRecommendation[];
-  emotions: any[]; // Added required property
+  emotions: Record<string, number>;
   primaryEmotion?: string;
   intensity?: number;
   text?: string;
   emojis?: string[];
   audioUrl?: string;
+  audio_url?: string;
   transcript?: string;
+  feedback?: string;
+  ai_feedback?: string;
+  source?: string;
+  date?: string;
 }

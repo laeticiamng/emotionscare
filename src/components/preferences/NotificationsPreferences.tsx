@@ -1,278 +1,222 @@
 
 import React from 'react';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { UserPreferences, NotificationsPreferences } from '@/types/preferences';
-import { Checkbox } from '@/components/ui/checkbox';
-import { TimePicker } from '@/components/ui/time-picker';
+import { NotificationFrequency, NotificationPreference } from '@/types/notification';
 
-interface NotificationsPreferencesProps {
-  onUpdate: (values: Partial<UserPreferences>) => void;
+interface NotificationPreferencesProps {
+  preferences: NotificationPreference;
+  onUpdate: (preferences: NotificationPreference) => void;
 }
 
-const NotificationsPreferencesComponent = ({
+const NotificationPreferencesComponent: React.FC<NotificationPreferencesProps> = ({
+  preferences,
   onUpdate,
-  notifications
-}: NotificationsPreferencesProps & {
-  notifications: NotificationsPreferences | boolean;
 }) => {
-  const notifSettings = typeof notifications === 'boolean' 
-    ? { enabled: notifications, emailEnabled: false, pushEnabled: false } 
-    : notifications;
-
-  const handleToggleNotifications = (enabled: boolean) => {
-    if (typeof notifications === 'boolean') {
-      onUpdate({ notifications: enabled });
+  const handleToggle = (enabled: boolean) => {
+    if (enabled) {
+      onUpdate({
+        ...preferences,
+        enabled: true,
+      });
     } else {
-      onUpdate({ 
-        notifications: {
-          ...notifications,
-          enabled
-        }
+      onUpdate({
+        enabled: false,
+        emailEnabled: false,
+        pushEnabled: false,
+        inAppEnabled: false,
+        types: {
+          system: false,
+          emotion: false,
+          coach: false,
+          journal: false,
+          community: false,
+          achievement: false,
+          badge: false,
+          challenge: false,
+          reminder: false,
+          info: false,
+          warning: false,
+          error: false,
+          success: false,
+          streak: false,
+          urgent: false
+        },
+        frequency: 'immediate',
       });
     }
   };
 
-  const handleToggleChannel = (channel: 'emailEnabled' | 'pushEnabled' | 'inAppEnabled', value: boolean) => {
-    if (typeof notifications !== 'boolean') {
-      onUpdate({
-        notifications: {
-          ...notifications,
-          [channel]: value
-        }
-      });
-    }
+  const handleTypeToggle = (type: keyof NotificationPreference['types'], checked: boolean) => {
+    const updatedTypes = {
+      ...preferences.types,
+      [type]: checked,
+    };
+    onUpdate({ ...preferences, types: updatedTypes });
   };
 
-  const handleToggleType = (type: string, value: boolean) => {
-    if (typeof notifications !== 'boolean') {
-      onUpdate({
-        notifications: {
-          ...notifications,
-          types: {
-            ...notifications.types,
-            [type]: value
-          }
-        }
-      });
-    }
-  };
-
-  const handleQuietHoursUpdate = (property: string, value: any) => {
-    if (typeof notifications !== 'boolean') {
-      onUpdate({
-        notifications: {
-          ...notifications,
-          quietHours: {
-            ...notifications.quietHours,
-            [property]: value
-          }
-        }
-      });
-    }
+  const handleFrequencyChange = (frequency: NotificationFrequency) => {
+    onUpdate({ ...preferences, frequency });
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-medium">Notifications</h3>
-          <p className="text-sm text-muted-foreground">
-            Gérez vos préférences de notification
-          </p>
+    <Card>
+      <CardHeader>
+        <CardTitle>Préférences de notification</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <Label htmlFor="notifications-toggle" className="font-medium">
+              Activer les notifications
+            </Label>
+            <p className="text-sm text-muted-foreground">
+              Recevez des mises à jour sur vos analyses émotionnelles
+            </p>
+          </div>
+          <Switch
+            id="notifications-toggle"
+            checked={preferences.enabled}
+            onCheckedChange={handleToggle}
+          />
         </div>
-        <Switch 
-          checked={notifSettings?.enabled || false}
-          onCheckedChange={handleToggleNotifications}
-        />
-      </div>
-      
-      {notifSettings?.enabled && (
-        <>
-          <div className="space-y-4">
-            <h4 className="font-medium">Canaux de notification</h4>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="email-notif">Notifications par email</Label>
-              <Switch 
-                id="email-notif" 
-                checked={notifSettings.emailEnabled || false}
-                onCheckedChange={(checked) => handleToggleChannel('emailEnabled', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="push-notif">Notifications push</Label>
-              <Switch 
-                id="push-notif" 
-                checked={notifSettings.pushEnabled || false}
-                onCheckedChange={(checked) => handleToggleChannel('pushEnabled', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="inapp-notif">Notifications in-app</Label>
-              <Switch 
-                id="inapp-notif" 
-                checked={notifSettings.inAppEnabled || false}
-                onCheckedChange={(checked) => handleToggleChannel('inAppEnabled', checked)}
-              />
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <h4 className="font-medium">Types de notifications</h4>
-            
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="system-notif" 
-                  checked={notifSettings?.types?.system || false}
-                  onCheckedChange={(checked) => handleToggleType('system', Boolean(checked))}
-                />
-                <Label htmlFor="system-notif">Système</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="emotion-notif" 
-                  checked={notifSettings?.types?.emotion || false}
-                  onCheckedChange={(checked) => handleToggleType('emotion', Boolean(checked))}
-                />
-                <Label htmlFor="emotion-notif">Émotions</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="coach-notif" 
-                  checked={notifSettings?.types?.coach || false}
-                  onCheckedChange={(checked) => handleToggleType('coach', Boolean(checked))}
-                />
-                <Label htmlFor="coach-notif">Coach</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="journal-notif" 
-                  checked={notifSettings?.types?.journal || false}
-                  onCheckedChange={(checked) => handleToggleType('journal', Boolean(checked))}
-                />
-                <Label htmlFor="journal-notif">Journal</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="community-notif" 
-                  checked={notifSettings?.types?.community || false}
-                  onCheckedChange={(checked) => handleToggleType('community', Boolean(checked))}
-                />
-                <Label htmlFor="community-notif">Communauté</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="achievement-notif" 
-                  checked={notifSettings?.types?.achievement || false}
-                  onCheckedChange={(checked) => handleToggleType('achievement', Boolean(checked))}
-                />
-                <Label htmlFor="achievement-notif">Réalisations</Label>
+
+        {preferences.enabled && (
+          <>
+            <div className="space-y-4">
+              <Label className="font-medium">Canaux de notification</Label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="email-notifications" className="cursor-pointer">
+                    Email
+                  </Label>
+                  <Switch
+                    id="email-notifications"
+                    checked={preferences.emailEnabled || false}
+                    onCheckedChange={(checked) =>
+                      onUpdate({ ...preferences, emailEnabled: checked })
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="push-notifications" className="cursor-pointer">
+                    Notifications push
+                  </Label>
+                  <Switch
+                    id="push-notifications"
+                    checked={preferences.pushEnabled || false}
+                    onCheckedChange={(checked) =>
+                      onUpdate({ ...preferences, pushEnabled: checked })
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="in-app-notifications" className="cursor-pointer">
+                    Notifications in-app
+                  </Label>
+                  <Switch
+                    id="in-app-notifications"
+                    checked={preferences.inAppEnabled || false}
+                    onCheckedChange={(checked) =>
+                      onUpdate({ ...preferences, inAppEnabled: checked })
+                    }
+                  />
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div className="space-y-4">
-            <h4 className="font-medium">Paramètres avancés</h4>
-            
-            <div className="space-y-2">
-              <Label htmlFor="frequency-select">Fréquence</Label>
+
+            <div className="space-y-4">
+              <Label className="font-medium">Types de notification</Label>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="system-notifications" className="cursor-pointer">
+                    Système
+                  </Label>
+                  <Switch
+                    id="system-notifications"
+                    checked={preferences.types?.system || false}
+                    onCheckedChange={(checked) =>
+                      handleTypeToggle('system', checked)
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="emotion-notifications" className="cursor-pointer">
+                    Analyses émotionnelles
+                  </Label>
+                  <Switch
+                    id="emotion-notifications"
+                    checked={preferences.types?.emotion || false}
+                    onCheckedChange={(checked) =>
+                      handleTypeToggle('emotion', checked)
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="coach-notifications" className="cursor-pointer">
+                    Coach virtuel
+                  </Label>
+                  <Switch
+                    id="coach-notifications"
+                    checked={preferences.types?.coach || false}
+                    onCheckedChange={(checked) =>
+                      handleTypeToggle('coach', checked)
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="journal-notifications" className="cursor-pointer">
+                    Journal émotionnel
+                  </Label>
+                  <Switch
+                    id="journal-notifications"
+                    checked={preferences.types?.journal || false}
+                    onCheckedChange={(checked) =>
+                      handleTypeToggle('journal', checked)
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="community-notifications" className="cursor-pointer">
+                    Communauté
+                  </Label>
+                  <Switch
+                    id="community-notifications"
+                    checked={preferences.types?.community || false}
+                    onCheckedChange={(checked) =>
+                      handleTypeToggle('community', checked)
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <Label htmlFor="notification-frequency" className="font-medium">
+                Fréquence des notifications
+              </Label>
               <Select
-                value={notifSettings.frequency || 'immediate'}
-                onValueChange={(value) => {
-                  if (typeof notifications !== 'boolean') {
-                    onUpdate({
-                      notifications: {
-                        ...notifications,
-                        frequency: value
-                      }
-                    });
-                  }
-                }}
+                value={preferences.frequency}
+                onValueChange={(value) => handleFrequencyChange(value as NotificationFrequency)}
               >
-                <SelectTrigger id="frequency-select">
+                <SelectTrigger id="notification-frequency">
                   <SelectValue placeholder="Choisir une fréquence" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="immediate">Immédiate</SelectItem>
-                  <SelectItem value="hourly">Toutes les heures</SelectItem>
+                  <SelectItem value="immediate">Immédiatement</SelectItem>
                   <SelectItem value="daily">Quotidienne</SelectItem>
                   <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                  <SelectItem value="never">Jamais</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="quiet-hours">Heures silencieuses</Label>
-                <Switch 
-                  id="quiet-hours" 
-                  checked={notifSettings.quietHours?.enabled || false}
-                  onCheckedChange={(checked) => handleQuietHoursUpdate('enabled', checked)}
-                />
-              </div>
-              
-              {notifSettings.quietHours?.enabled && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="start-time">Début</Label>
-                    <TimePicker
-                      value={notifSettings.quietHours.start || '22:00'}
-                      onChange={(value) => handleQuietHoursUpdate('start', value)}
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="end-time">Fin</Label>
-                    <TimePicker
-                      value={notifSettings.quietHours.end || '07:00'}
-                      onChange={(value) => handleQuietHoursUpdate('end', value)}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="tone-select">Ton</Label>
-              <Select
-                value={notifSettings.tone || 'informational'}
-                onValueChange={(value) => {
-                  if (typeof notifications !== 'boolean') {
-                    onUpdate({
-                      notifications: {
-                        ...notifications,
-                        tone: value
-                      }
-                    });
-                  }
-                }}
-              >
-                <SelectTrigger id="tone-select">
-                  <SelectValue placeholder="Choisir un ton" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="informational">Informatif</SelectItem>
-                  <SelectItem value="friendly">Amical</SelectItem>
-                  <SelectItem value="professional">Professionnel</SelectItem>
-                  <SelectItem value="minimalist">Minimaliste</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </>
-      )}
-    </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
-export default NotificationsPreferencesComponent;
+export default NotificationPreferencesComponent;
