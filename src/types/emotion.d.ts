@@ -22,7 +22,7 @@ export interface EmotionResult {
   text?: string;
   feedback?: string;
   ai_feedback?: string;
-  recommendations?: EmotionRecommendation[];
+  recommendations?: EmotionRecommendation[] | string[];
   emojis?: string[] | string;
   tags?: string[];
   emotions?: Record<string, number>;
@@ -33,6 +33,8 @@ export interface EmotionResult {
     name: string;
     score: number;
   };
+  textInput?: string;
+  facialExpression?: string;
 }
 
 export interface EmotionRecommendation {
@@ -142,6 +144,7 @@ export interface EmotionalTeamViewProps {
   showGraph?: boolean;
   showMembers?: boolean;
   className?: string;
+  showDetails?: boolean;
 }
 
 export interface TeamOverviewProps {

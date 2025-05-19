@@ -52,7 +52,7 @@ export interface MoodData {
   emotion: string;
   intensity: number;
   timestamp: string;
-  date?: string; // Added this property
+  date?: string;
 }
 
 // Add EmotionPrediction interface that was missing

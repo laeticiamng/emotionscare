@@ -7,8 +7,31 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { NotificationFrequency, NotificationPreference } from '@/types/notification';
 
 interface NotificationPreferencesProps {
-  preferences: NotificationPreference;
-  onUpdate: (preferences: NotificationPreference) => void;
+  preferences: Partial<NotificationPreference> & {
+    enabled?: boolean;
+    emailEnabled?: boolean;
+    pushEnabled?: boolean;
+    inAppEnabled?: boolean;
+    types?: {
+      system?: boolean;
+      emotion?: boolean;
+      coach?: boolean;
+      journal?: boolean;
+      community?: boolean;
+      achievement?: boolean;
+      badge?: boolean;
+      challenge?: boolean;
+      reminder?: boolean;
+      info?: boolean;
+      warning?: boolean;
+      error?: boolean;
+      success?: boolean;
+      streak?: boolean;
+      urgent?: boolean;
+    };
+    frequency?: NotificationFrequency;
+  };
+  onUpdate: (preferences: NotificationPreferencesProps['preferences']) => void;
 }
 
 const NotificationPreferencesComponent: React.FC<NotificationPreferencesProps> = ({
@@ -24,17 +47,14 @@ const NotificationPreferencesComponent: React.FC<NotificationPreferencesProps> =
     } else {
       // Create a proper NotificationPreference object with all required fields
       onUpdate({
-        type: preferences.type,
+        id: preferences.id,
+        userId: preferences.userId,
+        category: preferences.category || '',
         enabled: false,
-        channels: {
-          email: false,
-          push: false,
-          inApp: false
-        },
-        frequency: 'immediate',
         emailEnabled: false,
         pushEnabled: false,
         inAppEnabled: false,
+        frequency: 'immediate',
         types: {
           system: false,
           emotion: false,
@@ -56,7 +76,7 @@ const NotificationPreferencesComponent: React.FC<NotificationPreferencesProps> =
     }
   };
 
-  const handleTypeToggle = (type: keyof NotificationPreference['types'], checked: boolean) => {
+  const handleTypeToggle = (type: keyof NotificationPreferencesProps['preferences']['types'], checked: boolean) => {
     if (preferences.types) {
       const updatedTypes = {
         ...preferences.types,

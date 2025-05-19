@@ -1,27 +1,23 @@
 
-// Types liés aux données émotionnelles
-
-import { EmotionResult } from './emotion';
-
-export interface EmotionalData {
-  id: string;
-  userId: string;
+export interface EmotionalTrend {
+  date: string;
   emotion: string;
   intensity: number;
-  timestamp: string;
-  source: string;
-  context?: string;
-  tags?: string[];
-  value?: any;
+  score?: number;
 }
 
-export interface EmotionalReport {
-  period: 'day' | 'week' | 'month' | 'year';
-  data: EmotionResult[];
-  summary: {
-    dominantEmotion: string;
-    averageIntensity: number;
-    emotionCounts: Record<string, number>;
-    improvement: number;
-  };
+export interface EmotionalInsight {
+  title: string;
+  description: string;
+  emotion: string;
+  date: string;
+  score: number;
+  type: 'positive' | 'neutral' | 'negative';
+}
+
+export interface EmotionalSnapshot {
+  dominantEmotion: string;
+  date: string;
+  score: number;
+  emotions: Record<string, number>;
 }
