@@ -6,6 +6,17 @@ import { UserRole } from '@/types/user';
 import { normalizeUserMode, getModeDashboardPath } from '@/utils/userModeHelpers';
 
 /**
+ * Get the home path for a specific user role
+ */
+export function getRoleHomePath(role: UserRole | string | undefined | null): string {
+  if (!role) return '/b2c/dashboard';
+  
+  // Use the existing utility function to get the dashboard path based on normalized role
+  const normalizedMode = normalizeUserMode(role);
+  return getModeDashboardPath(normalizedMode);
+}
+
+/**
  * Hook to determine the home path based on user role and handle redirections
  */
 export function useRoleRedirect() {
