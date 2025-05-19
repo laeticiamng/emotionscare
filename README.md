@@ -172,6 +172,7 @@ EmotionsCare utilise un système de design basé sur Tailwind CSS et Shadcn UI, 
 - **UserModeContext** - Mode utilisateur (B2B/B2C)
 - **LayoutContext** - Mise en page et navigation
 - **MusicContext** - Lecture et gestion de la musique (source unique via `useMusic`)
+L'ordre d'injection de ces contextes est géré par le composant `AppProviders`. La hiérarchie complète est détaillée dans `docs/layout-shell-audit.md`.
 
 ## Préférences utilisateur par défaut
 

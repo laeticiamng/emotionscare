@@ -1,7 +1,18 @@
 
 # Changelog
-
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
+
+## [1.1.5] - 2025-05-23
+
+### Ajouté
+- Documentation `docs/shell-navigation-premium-audit.md` décrivant la structure du Shell et les recommandations premium.
+
+### Modifié
+- Mise à jour de `README.md` pour préciser l'ordre d'injection des contextes.
+- Mise à jour de `docs/layout-shell-audit.md` avec la suppression de l'ancien Shell et le rappel de la hiérarchie des providers.
+
+### Supprimé
+- Fichier obsolète `src/components/Shell.tsx`.
 
 ## [1.1.4] - 2025-05-22
 
