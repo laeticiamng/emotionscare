@@ -41,7 +41,7 @@ export const useCoachChat = () => {
       return response;
     } catch (error) {
       console.error('Error sending message:', error);
-      return null;
+      return '';
     } finally {
       setIsProcessing(false);
     }
@@ -56,6 +56,7 @@ export const useCoachChat = () => {
       timestamp: new Date().toISOString()
     };
     setMessages(prevMessages => [...prevMessages, newMessage]);
+    return newMessage;
   }, []);
   
   const clearMessages = useCallback(() => {

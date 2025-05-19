@@ -19,7 +19,7 @@ export interface EmotionalData {
   value?: number; // Added to support existing codebase
 }
 
-export type EmotionSource = 'text' | 'voice' | 'facial' | 'manual' | 'ai' | 'system';
+export type EmotionSource = 'text' | 'voice' | 'facial' | 'manual' | 'ai' | 'system' | 'emoji' | 'live-voice' | 'voice-analyzer' | 'audio-processor' | 'text-analysis';
 
 export interface EmotionalStats {
   dominant: string;

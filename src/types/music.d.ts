@@ -31,7 +31,7 @@ export interface MusicContextType {
   isMuted: boolean;
   isRepeating: boolean;
   isShuffling: boolean;
-  currentTime: number; // Added missing property
+  currentTime: number;
   togglePlay: () => void;
   toggleMute: () => void;
   toggleRepeat: () => void;
@@ -43,9 +43,9 @@ export interface MusicContextType {
   prevTrack: () => void;
   addTrack: (track: MusicTrack) => void;
   setPlaylist: (playlist: MusicPlaylist) => void;
-  setCurrentTime: (time: number) => void; // Added missing property
-  setDuration: (duration: number) => void; // Added missing property
-  setIsPlaying: (isPlaying: boolean) => void; // Added missing property
+  setCurrentTime: (time: number) => void;
+  setDuration: (duration: number) => void;
+  setIsPlaying: (isPlaying: boolean) => void; // Added to fix error
 }
 
 export interface MusicDrawerProps {

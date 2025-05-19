@@ -1,6 +1,6 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { EmotionalData } from '@/hooks/coach/types';
+import { EmotionalData, EmotionSource } from '@/hooks/coach/types';
 import { EmotionResult } from '@/types/emotion';
 
 // In-memory storage for emotional data
@@ -18,7 +18,7 @@ class EmotionalDataService {
   }
   
   // Add new emotional data
-  addEmotionalData(data: Omit<EmotionalData, 'id'>): EmotionalData {
+  addEmotionalData(data: Omit<EmotionalData, "id">): EmotionalData {
     const newData = {
       id: uuidv4(),
       ...data,
@@ -58,15 +58,26 @@ class EmotionalDataService {
   
   // Convert from EmotionResult to EmotionalData
   convertFromEmotionResult(result: EmotionResult): EmotionalData {
+    // Handle compatibility between different EmotionSource types
+    let source: EmotionSource = 'system';
+    if (result.source === 'text' || 
+        result.source === 'voice' || 
+        result.source === 'facial' || 
+        result.source === 'ai' || 
+        result.source === 'manual' ||
+        result.source === 'system') {
+      source = result.source;
+    }
+    
     return {
       id: result.id || uuidv4(),
-      user_id: result.userId || 'unknown',
+      user_id: result.userId || result.user_id || 'unknown',
       emotion: result.emotion,
       intensity: result.intensity || result.score || 5,
       timestamp: result.timestamp || new Date().toISOString(),
       context: result.text || undefined,
-      source: result.source || 'system',
-      tags: result.tags || []
+      source: source,
+      tags: [] // Initialize with empty array for compatibility
     };
   }
   
