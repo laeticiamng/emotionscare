@@ -48,21 +48,21 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
         text: `Sélection emoji: ${emoji}`,
         recommendations: [
           {
+            id: 'music-recommendation',
             type: 'music',
             title: 'Écoutez de la musique apaisante',
-            description: 'Nous vous recommandons d\'écouter une playlist adaptée à votre émotion.',
+            description: "Nous vous recommandons d'écouter une playlist adaptée à votre émotion.",
             icon: 'music',
-            id: 'music-recommendation',
-            emotion: emotion
-          } as unknown as string,
+            emotion: emotion,
+          },
           {
+            id: 'activity-recommendation',
             type: 'activity',
             title: 'Activité recommandée',
             description: 'Une activité pour vous aider à maintenir ou améliorer votre état émotionnel.',
             icon: 'activity',
-            id: 'activity-recommendation',
-            emotion: emotion
-          } as unknown as string,
+            emotion: emotion,
+          },
         ],
       };
       

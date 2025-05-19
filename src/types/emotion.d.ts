@@ -11,13 +11,20 @@ export interface EmotionData {
 
 export interface EmotionResult {
   emotion: string;
-  intensity: number;
   confidence: number;
-  data?: EmotionData[];
+  intensity?: number;
+  secondaryEmotions?: string[];
   timestamp?: string;
-  source?: string;
-  language?: string;
+  source?: 'text' | 'voice' | 'facial' | 'emoji' | 'system' | 'ai';
   text?: string;
+  duration?: number;
+  userId?: string;
+  sessionId?: string;
+  language?: string;
+  data?: EmotionData[];
+  id?: string;
+  primaryEmotion?: string;
+  score?: number;
   feedback?: string;
   recommendations?: EmotionRecommendation[];
   triggers?: string[];
@@ -25,6 +32,11 @@ export interface EmotionResult {
   model?: string;
   raw?: any;
   ai_feedback?: string;
+  emojis?: string[];
+  emotions?: Record<string, number>;
+  date?: string;
+  audioUrl?: string;
+  transcript?: string;
 }
 
 export interface EmotionRecommendation {
@@ -32,9 +44,15 @@ export interface EmotionRecommendation {
   type: string;
   title: string;
   description: string;
-  emotion: string;
-  content: string;
-  category: string;
+  emotion?: string;
+  content?: string;
+  category?: string;
+  action?: string;
+  link?: string;
+  icon?: string;
+  duration?: number;
+  intensity?: 'low' | 'medium' | 'high';
+  tags?: string[];
 }
 
 export interface EmotionTrigger {
