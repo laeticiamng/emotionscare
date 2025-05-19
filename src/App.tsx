@@ -6,15 +6,18 @@ import AppRouter from './AppRouter';
 import './App.css';
 import AuthTransition from '@/components/auth/AuthTransition';
 import { HelmetProvider } from 'react-helmet-async';
+import { AuthProvider } from '@/contexts/AuthContext';
 
 const App: React.FC = () => {
   return (
     <BrowserRouter>
       <HelmetProvider>
         <ThemeProvider>
-          <AuthTransition>
-            <AppRouter />
-          </AuthTransition>
+          <AuthProvider>
+            <AuthTransition>
+              <AppRouter />
+            </AuthTransition>
+          </AuthProvider>
         </ThemeProvider>
       </HelmetProvider>
     </BrowserRouter>

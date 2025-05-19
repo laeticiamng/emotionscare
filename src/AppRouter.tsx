@@ -18,7 +18,6 @@ const AppRouter: React.FC = () => {
   // Apply unified access redirections
   usePreferredAccess();
   
-  
   if (!content) {
     console.error("[AppRouter] No route matches the current path:", location.pathname);
   }
