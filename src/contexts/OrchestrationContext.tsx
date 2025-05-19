@@ -1,15 +1,16 @@
 import React, { createContext, useContext, useState, useReducer, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  MoodEvent, 
-  Prediction, 
-  PredictionRecommendation, 
+import {
+  MoodEvent,
+  Prediction,
+  PredictionRecommendation,
   EmotionalLocation,
   SanctuaryWidget,
   EmotionalSynthesis,
-  OrchestrationEvent
-} from '@/types/global';
+  OrchestrationEvent,
+  OrchestrationContextType
+} from '@/types/orchestration';
 import { EmotionResult } from '@/types/emotion';
 
 // Données initiales pour le sanctuaire
@@ -167,28 +168,6 @@ function getEmotionColor(emotion: string): string {
   return emotionColors[emotion.toLowerCase()] || '#CCCCCC';
 }
 
-// Interface pour le contexte d'orchestration
-interface OrchestrationContextType {
-  events: MoodEvent[];
-  predictions: Prediction[];
-  recommendations: PredictionRecommendation[];
-  locations: EmotionalLocation[];
-  sanctuaryWidgets: SanctuaryWidget[];
-  synthesis: EmotionalSynthesis | null;
-  activeLocation: string | null;
-  activeEvent: string | null;
-  loading: boolean;
-  
-  // Actions
-  addEvent: (event: MoodEvent) => void;
-  addEmotionResult: (result: EmotionResult) => void;
-  addRecommendation: (recommendation: PredictionRecommendation) => void;
-  completeRecommendation: (id: string) => void;
-  addPrediction: (prediction: Prediction) => void;
-  setActiveLocation: (id: string | null) => void;
-  setActiveEvent: (id: string | null) => void;
-  updateSynthesis: (synthesis: EmotionalSynthesis) => void;
-}
 
 // Création du contexte
 const OrchestrationContext = createContext<OrchestrationContextType | undefined>(undefined);

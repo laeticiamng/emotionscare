@@ -128,3 +128,14 @@ export type {
   ScanHistoryItem,
   EmotionGamificationStats
 } from './types/scan';
+
+export type {
+  MoodEvent,
+  EmotionalLocation,
+  SanctuaryWidget,
+  Prediction,
+  PredictionRecommendation,
+  EmotionalSynthesis,
+  OrchestrationEvent,
+  OrchestrationContextType
+} from './types/orchestration';

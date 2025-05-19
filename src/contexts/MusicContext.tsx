@@ -10,6 +10,7 @@ const defaultMusicState: MusicContextType = {
   currentPlaylist: null,
   playlist: null,
   queue: [],
+  history: [],
   isPlaying: false,
   volume: 0.75,
   muted: false,
@@ -38,6 +39,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [queue, setQueue] = useState<MusicTrack[]>([]);
+  const [history, setHistory] = useState<MusicTrack[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.75);
   const [muted, setMuted] = useState(false);
@@ -167,6 +169,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     currentPlaylist,
     playlist: currentPlaylist,
     queue,
+    history,
     isPlaying,
     volume,
     muted,
@@ -202,6 +205,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setIsPlaying,
     setIsInitialized,
     setCurrentTrack,
+    setHistory,
     setEmotion,
   };
 
