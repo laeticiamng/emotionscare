@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
   UserPreferences, 
   UserPreferencesContextType, 
@@ -26,6 +26,14 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
+  // Detect browser language on mount and store it if not already set
+  useEffect(() => {
+    const browserLang = navigator.language || navigator.languages?.[0];
+    if (browserLang && !preferences.language) {
+      setPreferences((prev) => ({ ...prev, language: browserLang }));
+    }
+  }, []);
 
   // Extract main properties for context
   const theme = preferences.theme || 'system';

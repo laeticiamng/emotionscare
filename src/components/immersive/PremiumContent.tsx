@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Building, User, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { ROUTES } from '@/types/navigation';
 import { toast } from '@/hooks/use-toast';
 
 interface PremiumContentProps {
@@ -36,7 +37,7 @@ const PremiumContent: React.FC<PremiumContentProps> = ({
     
     setUserMode('b2c');
     localStorage.setItem('userMode', 'b2c');
-    navigate('/b2c/login');
+    navigate(ROUTES.b2c.login);
   };
   
   const handleB2BClick = () => {
@@ -45,7 +46,7 @@ const PremiumContent: React.FC<PremiumContentProps> = ({
       description: "Vous accédez à l'espace entreprise EmotionsCare"
     });
     
-    navigate('/b2b/selection');
+    navigate(ROUTES.common.b2bSelection);
   };
   
   // Animation variants

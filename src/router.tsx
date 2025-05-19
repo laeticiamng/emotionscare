@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { RouteObject, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -6,7 +7,7 @@ import LoginPage from './pages/common/Login';
 import RegisterPage from './pages/common/Register';
 import B2CLogin from './pages/b2c/Login';
 import B2CRegister from './pages/b2c/Register';
-import B2BSelectionPage from './pages/B2BSelectionPage';
+const B2BSelectionPage = React.lazy(() => import('./pages/B2BSelectionPage'));
 import B2BUserLogin from './pages/b2b/user/Login';
 import B2BAdminLogin from './pages/b2b/admin/Login';
 import B2BUserRegister from './pages/b2b/user/Register';
@@ -50,8 +51,8 @@ import SecurityDashboard from './pages/b2b/admin/Security';
 import TimelinePage from './pages/TimelinePage';
 import WorldPage from './pages/WorldPage';
 import SanctuaryPage from './pages/SanctuaryPage';
-import ImmersiveHome from './pages/ImmersiveHome';
-import Home from './pages/Home';
+const ImmersiveHome = React.lazy(() => import('./pages/ImmersiveHome'));
+const Home = React.lazy(() => import('./pages/Home'));
 import UnifiedSettingsPage from './pages/UnifiedSettingsPage';
 import SupportPage from './pages/Support';
 import PredictiveDashboardPage from './pages/PredictiveDashboardPage';
