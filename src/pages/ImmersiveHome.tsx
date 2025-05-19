@@ -38,7 +38,7 @@ const ImmersiveHome: React.FC = () => {
   const springX = useSpring(mouseX, springConfig);
   const springY = useSpring(mouseY, springConfig);
 
-  // Transform values for parallax layers - these functions replaced the pipe method
+  // Transform values for parallax layers using useTransform instead of pipe
   const moveBackground = useTransform(springY, [-100, 100], [5, -5]);
   const moveMiddleground = useTransform(springX, [-100, 100], [10, -10]);
   const moveForeground = useTransform(springX, [-100, 100], [15, -15]);

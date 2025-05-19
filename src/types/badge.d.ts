@@ -1,25 +1,23 @@
 
+// Define badge types for the application
 export interface Badge {
-  id: string;
+  id: string; 
   name: string;
   description: string;
-  imageUrl?: string;
-  image_url?: string;
-  unlocked: boolean;
-  level: number;
+  imageUrl: string;
   category: string;
-  tier?: string;
-  icon: string;
-  earned?: boolean;
+  unlockedAt: string | null;
   progress?: number;
-  threshold?: number;
-  completed?: boolean;
-  rarity?: string;
+  totalPoints?: number;
+  level?: number;
+  isUnlocked?: boolean;
 }
 
+// Challenge type for gamification features
 export interface Challenge {
   id: string;
-  title: string;
+  name: string;
+  title?: string;
   description: string;
   points: number;
   progress: number;
@@ -27,6 +25,13 @@ export interface Challenge {
   category: string;
   completed: boolean;
   status: string;
-  name?: string;
-  totalSteps?: number;
+  totalSteps: number;
+  icon: string;
+  reward: string;
+  unlocked: boolean;
+}
+
+export interface BadgeCollection {
+  recent: Badge[];
+  all: Badge[];
 }
