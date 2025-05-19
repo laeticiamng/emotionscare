@@ -1,117 +1,147 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { GlobalOverviewTabProps, KpiCardProps } from '@/types';
-import KpiCardsGrid from '../../KpiCardsGrid';
+import KpiCardsGrid from '@/components/dashboard/admin/KpiCardsGrid';
+import { GlobalOverviewTabProps, KpiCardProps } from '@/types/dashboard';
+import { KpiCardStatus } from '@/types/dashboard';
 
-const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ 
-  period: initialPeriod = 'week',
-  segment: initialSegment = 'all',
-  filterBy: initialFilterBy = 'all',
-  className,
-  onPeriodChange
+const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
+  data,
+  isLoading = false
 }) => {
-  const [period, setPeriod] = useState(initialPeriod);
-  const [segment, setSegment] = useState(initialSegment);
-  const [filterBy, setFilterBy] = useState(initialFilterBy);
-  const [completion, setCompletion] = useState(75);
-  const [productivity, setProductivity] = useState(60);
-  const [emotionalScore, setEmotionalScore] = useState(80);
-  
-  useEffect(() => {
-    if (onPeriodChange) {
-      onPeriodChange(period);
+  // First row of KPI cards - Performance metrics
+  const performanceMetrics: KpiCardProps[] = [
+    {
+      id: "engagement",
+      title: "Engagement",
+      value: "87%",
+      delta: {
+        value: 12,
+        trend: "up" as "up" | "down" | "neutral",
+        direction: "up" as "up" | "down" | "stable"
+      },
+      status: "success" as KpiCardStatus
+    },
+    {
+      id: "satisfaction",
+      title: "Satisfaction",
+      value: "92%",
+      delta: {
+        value: 4,
+        trend: "up" as "up" | "down" | "neutral",
+        direction: "up" as "up" | "down" | "stable"
+      },
+      status: "success" as KpiCardStatus
+    },
+    {
+      id: "stress",
+      title: "Stress Moyen",
+      value: "31%",
+      delta: {
+        value: -7,
+        trend: "down" as "up" | "down" | "neutral",
+        direction: "down" as "up" | "down" | "stable"
+      },
+      status: "success" as KpiCardStatus
     }
-  }, [period, onPeriodChange]);
-  
-  const handlePeriodChange = (newPeriod: string) => {
-    setPeriod(newPeriod);
-  };
-  
-  const handleSegmentChange = (newSegment: string) => {
-    setSegment(newSegment);
-  };
-  
-  const handleFilterByChange = (newFilterBy: string) => {
-    setFilterBy(newFilterBy);
-  };
-  
-  const kpiCards: KpiCardProps[] = [
-    { 
-      id: 'completion', 
-      title: 'Taux de complétion', 
-      value: `${completion}%`, 
-      delta: { value: 12, trend: 'up' as const }, 
-      status: 'success' as const 
-    },
-    { 
-      id: 'productivity', 
-      title: 'Productivité', 
-      value: `${productivity}%`, 
-      delta: { value: -5, trend: 'down' as const }, 
-      status: 'warning' as const 
-    },
-    { 
-      id: 'emotionalScore', 
-      title: 'Score émotionnel', 
-      value: `${emotionalScore}%`, 
-      delta: { value: 8, trend: 'up' as const }, 
-      status: 'success' as const 
-    },
   ];
-  
+
+  // Second row - HR metrics
+  const hrMetrics: KpiCardProps[] = [
+    {
+      id: "utilisateurs_actifs",
+      title: "Utilisateurs Actifs",
+      value: "219",
+      delta: {
+        value: 24,
+        trend: "up" as "up" | "down" | "neutral",
+        direction: "up" as "up" | "down" | "stable"
+      },
+      status: "success" as KpiCardStatus
+    },
+    {
+      id: "sessions",
+      title: "Sessions Hebdo.",
+      value: "412",
+      delta: {
+        value: -18,
+        trend: "down" as "up" | "down" | "neutral",
+        direction: "down" as "up" | "down" | "stable"
+      },
+      status: "warning" as KpiCardStatus
+    },
+    {
+      id: "temps_moyen",
+      title: "Temps Moyen",
+      value: "18min",
+      delta: {
+        value: 3,
+        trend: "up" as "up" | "down" | "neutral",
+        direction: "up" as "up" | "down" | "stable"
+      },
+      status: "success" as KpiCardStatus
+    }
+  ];
+
+  // Third row - Business metrics
+  const businessMetrics: KpiCardProps[] = [
+    {
+      id: "roi",
+      title: "ROI Bien-être",
+      value: "214%",
+      delta: {
+        value: 22,
+        trend: "up" as "up" | "down" | "neutral",
+        direction: "up" as "up" | "down" | "stable"
+      },
+      status: "success" as KpiCardStatus
+    },
+    {
+      id: "absences",
+      title: "Absences",
+      value: "-14%",
+      delta: {
+        value: -6,
+        trend: "down" as "up" | "down" | "neutral",
+        direction: "down" as "up" | "down" | "stable"
+      },
+      status: "success" as KpiCardStatus
+    },
+    {
+      id: "retention",
+      title: "Rétention",
+      value: "92%",
+      delta: {
+        value: 2,
+        trend: "up" as "up" | "down" | "neutral",
+        direction: "up" as "up" | "down" | "stable"
+      },
+      status: "success" as KpiCardStatus
+    }
+  ];
+
   return (
-    <div className={className}>
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle>Aperçu Global</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue={period} className="w-full">
-            <TabsList>
-              <TabsTrigger value="day" onClick={() => handlePeriodChange('day')}>Aujourd'hui</TabsTrigger>
-              <TabsTrigger value="week" onClick={() => handlePeriodChange('week')}>Cette semaine</TabsTrigger>
-              <TabsTrigger value="month" onClick={() => handlePeriodChange('month')}>Ce mois-ci</TabsTrigger>
-            </TabsList>
-            <TabsContent value="day">
-              <div>
-                <KpiCardsGrid cards={kpiCards} />
-                <div className="mt-4">
-                  <p className="text-sm text-muted-foreground">
-                    Progression quotidienne
-                  </p>
-                  <Progress value={55} />
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="week">
-              <div>
-                <KpiCardsGrid cards={kpiCards} />
-                <div className="mt-4">
-                  <p className="text-sm text-muted-foreground">
-                    Progression hebdomadaire
-                  </p>
-                  <Progress value={75} />
-                </div>
-              </div>
-            </TabsContent>
-            <TabsContent value="month">
-              <div>
-                <KpiCardsGrid cards={kpiCards} />
-                <div className="mt-4">
-                  <p className="text-sm text-muted-foreground">
-                    Progression mensuelle
-                  </p>
-                  <Progress value={90} />
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+    <div className="space-y-8">
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Vue d'ensemble</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <KpiCardsGrid cards={performanceMetrics} />
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Métriques RH</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <KpiCardsGrid cards={hrMetrics} />
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Métriques Business</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <KpiCardsGrid cards={businessMetrics} />
+        </div>
+      </section>
     </div>
   );
 };

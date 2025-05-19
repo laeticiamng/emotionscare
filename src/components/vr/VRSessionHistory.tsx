@@ -1,126 +1,143 @@
 
 import React from 'react';
-import { formatDistanceToNow } from 'date-fns';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { VRSession, VRSessionHistoryProps } from '@/types/vr';
+import { CalendarIcon, Clock, Activity } from 'lucide-react';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
-const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({ 
-  sessions = [],
+const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
+  sessions,
+  onSelect,
+  emptyMessage = "Aucune session VR récente",
+  limitDisplay = 5,
   userId,
-  limit = 5,
+  limit,
   showHeader = true,
-  className = "",
+  className = '',
   onSessionSelect
 }) => {
-  // Filter sessions by user if userId is provided
-  const userSessions = userId 
-    ? sessions.filter(session => session.userId === userId)
-    : sessions;
-  
-  // Limit the number of sessions shown
-  const limitedSessions = userSessions.slice(0, limit);
+  // Utiliser onSelect ou onSessionSelect selon ce qui est fourni
+  const handleSelect = onSessionSelect || onSelect;
 
-  if (limitedSessions.length === 0) {
+  // Calculer la date sous forme lisible
+  const formatSessionDate = (date: Date | string | null | undefined) => {
+    if (!date) return 'Date inconnue';
+    
+    try {
+      const dateObj = typeof date === 'string' ? new Date(date) : date;
+      return format(dateObj, 'PPP', { locale: fr });
+    } catch (e) {
+      console.error('Error formatting date:', e);
+      return 'Date invalide';
+    }
+  };
+
+  // Calculer la durée en format lisible
+  const formatDuration = (duration: number | null) => {
+    if (duration === null || duration === undefined) return 'Durée inconnue';
+    
+    if (duration < 60) {
+      return `${duration} sec`;
+    }
+    
+    const minutes = Math.floor(duration / 60);
+    const seconds = duration % 60;
+    return `${minutes}m${seconds > 0 ? ` ${seconds}s` : ''}`;
+  };
+
+  // Tableau des sessions à afficher (limité si nécessaire)
+  const displayedSessions = sessions.slice(0, limitDisplay);
+
+  // Vérifier s'il y a des sessions à afficher
+  if (displayedSessions.length === 0) {
     return (
-      <div className={`p-4 text-center ${className}`}>
-        <p className="text-muted-foreground">Aucune session récente</p>
-      </div>
+      <Card className={className}>
+        {showHeader && (
+          <CardHeader>
+            <CardTitle>Historique des sessions</CardTitle>
+          </CardHeader>
+        )}
+        <CardContent>
+          <div className="text-center py-6 text-muted-foreground">
+            {emptyMessage}
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
-  const formatSessionDate = (session: VRSession) => {
-    try {
-      const date = session.startedAt 
-                  ? (typeof session.startedAt === 'string' ? new Date(session.startedAt) : session.startedAt)
-                  : session.startTime 
-                  ? (typeof session.startTime === 'string' ? new Date(session.startTime) : session.startTime)
-                  : session.date 
-                  ? new Date(session.date) 
-                  : new Date();
-      
-      return formatDistanceToNow(date, { addSuffix: true });
-    } catch (err) {
-      console.error("Error formatting date:", err);
-      return "Date inconnue";
-    }
-  };
-
-  const getStatusIndicator = (session: VRSession) => {
-    const isCompleted = session.completed || session.completedAt;
-    return isCompleted ? (
-      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400">
-        Terminé
-      </span>
-    ) : (
-      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-800/30 dark:text-amber-400">
-        Partiel
-      </span>
-    );
-  };
-
-  const getSessionRating = (session: VRSession) => {
-    let rating: number | undefined;
-    
-    if (typeof session.feedback === "object" && session.feedback) {
-      // @ts-ignore - checking dynamically
-      if (session.feedback.rating !== undefined) {
-        // @ts-ignore - checking dynamically
-        rating = session.feedback.rating;
-      }
-    } else if (typeof session.rating === "number") {
-      rating = session.rating;
-    }
-    
-    if (rating === undefined) return null;
-    
-    return (
-      <div className="flex items-center">
-        <span className="text-yellow-500">★</span>
-        <span className="ml-1 text-sm">{rating}/5</span>
-      </div>
-    );
-  };
-
   return (
-    <div className={`space-y-4 ${className}`}>
+    <Card className={className}>
       {showHeader && (
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-medium">Historique des sessions</h3>
-        </div>
+        <CardHeader>
+          <CardTitle>Historique des sessions</CardTitle>
+        </CardHeader>
       )}
-      
-      <div className="space-y-2">
-        {limitedSessions.map((session) => {
-          // Safe access to template properties
-          const templateTitle = session.template?.title || session.template?.name || "Session VR";
-          
-          return (
-            <div 
-              key={session.id} 
-              className="p-3 border rounded-lg bg-card"
-              onClick={() => onSessionSelect && onSessionSelect(session)}
-              role={onSessionSelect ? "button" : undefined}
-              tabIndex={onSessionSelect ? 0 : undefined}
-            >
-              <div className="flex justify-between items-start mb-1">
-                <h4 className="font-medium">{templateTitle}</h4>
-                {getSessionRating(session)}
-              </div>
+      <CardContent>
+        <ScrollArea className="h-[400px] pr-4">
+          <div className="space-y-4">
+            {displayedSessions.map((session) => {
+              // Get session title from template if available
+              const sessionTitle = session.template?.title || 'Session VR';
               
-              <div className="text-sm text-muted-foreground">
-                {formatSessionDate(session)}
-              </div>
-              
-              <div className="mt-2 flex items-center justify-between">
-                <div className="text-sm">
-                  {session.duration} minutes
+              return (
+                <div
+                  key={session.id}
+                  className="border rounded-lg p-3 hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => handleSelect && handleSelect(session)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h4 className="font-medium">{sessionTitle}</h4>
+                      
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                        <CalendarIcon className="h-3.5 w-3.5" />
+                        <span>{formatSessionDate(session.startTime || session.startedAt || session.date)}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col items-end gap-1">
+                      <div className="flex items-center gap-1 text-sm">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>{formatDuration(session.duration)}</span>
+                      </div>
+                      
+                      {session.metrics?.emotionEnd && (
+                        <div className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-muted">
+                          <Activity className="h-3 w-3" />
+                          <span>{session.metrics.emotionEnd}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {session.template && session.template.coverUrl && (
+                    <div className="mt-2 w-full h-24 rounded-md overflow-hidden">
+                      <img 
+                        src={session.template.coverUrl} 
+                        alt={session.template.title} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                 </div>
-                {getStatusIndicator(session)}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
+              );
+            })}
+          </div>
+        </ScrollArea>
+        
+        {sessions.length > limitDisplay && (
+          <div className="text-center mt-4">
+            <Button variant="ghost" onClick={() => handleSelect && handleSelect(sessions[0])}>
+              Voir plus de sessions
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

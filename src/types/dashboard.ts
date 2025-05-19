@@ -1,112 +1,96 @@
 
-export interface DashboardWidget {
-  id: string;
+export interface KpiCardProps {
+  id?: string;
   title: string;
-  type: 'chart' | 'stat' | 'table' | 'activity';
-  size: 'small' | 'medium' | 'large' | 'full';
+  value: string | number;
+  delta?: number | KpiDelta | { 
+    value: number; 
+    trend: "up" | "down" | "neutral"; 
+    label?: string; 
+    direction?: "up" | "down" | "stable"; 
+  };
+  status?: KpiCardStatus;
+  icon?: React.ReactNode;
+  subtitle?: string;
+  className?: string;
+  isLoading?: boolean;
+  onClick?: () => void;
+  footer?: React.ReactNode;
+  ariaLabel?: string;
+}
+
+export type KpiCardStatus = 'success' | 'warning' | 'error' | 'neutral' | 'info';
+
+export interface KpiDelta {
+  value: number;
+  trend: "up" | "down" | "neutral";
+  label?: string;
+  direction?: "up" | "down" | "stable";
+}
+
+export interface KpiCardsGridProps {
+  cards?: KpiCardProps[];
+  className?: string;
+  draggable?: boolean;
+}
+
+export interface DraggableKpiCardsGridProps extends KpiCardsGridProps {
+  onReorder?: (newCards: KpiCardProps[]) => void;
+}
+
+export interface GlobalOverviewTabProps {
   data?: any;
+  isLoading?: boolean;
+}
+
+export interface DashboardWidgetConfig {
+  id: string;
+  type: string;
+  title: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
   position?: { x: number; y: number; w: number; h: number };
-  settings?: Record<string, any>;
+  data?: any;
+  settings?: any;
+}
+
+export interface TeamSummary {
+  id: string;
+  name: string;
+  count: number;
+  emotionAverage: string;
+  trend: "up" | "down" | "neutral";
+  lastUpdated: Date | string;
 }
 
 export interface AdminAccessLog {
   id: string;
   userId: string;
   userName: string;
-  adminId?: string;
   action: string;
   resource: string;
   timestamp: Date | string;
   ip?: string;
-  details?: Record<string, any>;
+  userAgent?: string;
 }
 
-export interface TeamSummary {
+export interface DashboardWidget {
   id: string;
-  name: string;
-  teamId?: string;
-  memberCount: number;
-  averageEmotionalScore?: number;
-  leaderId?: string;
-  leaderName?: string;
-  department?: string;
-  activeUsers?: number;
-  trendDirection?: 'up' | 'down' | 'stable';
-  trendValue?: number;
-  alertCount?: number;
-  averageMood?: string | number;
-}
-
-export interface GlobalOverviewTabProps {
-  period?: string;
-  segment?: string;
-  filterBy?: string;
-  className?: string;
-  onPeriodChange?: (period: string) => void;
-}
-
-export interface KpiCardProps {
-  id?: string;
+  type: 'chart' | 'kpi' | 'table' | 'list' | 'custom';
   title: string;
-  value: string | number;
-  status?: KpiCardStatus;
-  delta?: number | KpiDelta | {
-    value: number;
-    trend: 'up' | 'down' | 'neutral';
-    label?: string;
-    direction?: 'up' | 'down' | 'stable';
-  };
-  icon?: React.ReactNode;
-  subtitle?: string;
-  details?: string;
-  trend?: string;
-  className?: string;
-  isLoading?: boolean;
-  ariaLabel?: string;
-  onClick?: () => void;
-  footer?: React.ReactNode;
-}
-
-export type KpiCardStatus = 'positive' | 'negative' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'default';
-export type KpiDelta = {
-  value: number;
-  direction?: 'up' | 'down' | 'stable';
-  trend?: 'up' | 'down' | 'neutral';
-  label?: string;
-};
-
-export interface DashboardWidgetConfig extends DashboardWidget {
-  component: React.ComponentType<any>;
-  defaultProps?: Record<string, any>;
-  settings?: Record<string, any>;
-}
-
-export interface DraggableKpiCardsGridProps {
-  cards?: KpiCardProps[];
-  kpiCards?: KpiCardProps[];
-  onReorder?: (newOrder: KpiCardProps[]) => void;
-  onCardsReorder?: (cards: KpiCardProps[]) => void;
-  onOrderChange?: (cards: KpiCardProps[]) => void;
-  onSave?: (layouts: any) => void;
-  savedLayout?: any;
-  className?: string;
-  isEditable?: boolean;
+  data?: any;
+  config?: any;
+  position?: { x: number; y: number; w: number; h: number };
 }
 
 export interface GamificationData {
-  activeUsersPercent: number;
-  totalBadges: number;
-  badgeLevels: {
-    level: string;
-    count: number;
-  }[];
-  topChallenges: {
-    name: string;
-    completions: number;
-  }[];
-}
-
-// Add an interface for KpiCardsGrid component
-export interface KpiCardsGridProps {
-  cards: KpiCardProps[];
+  badges: number;
+  points: number;
+  streak: number;
+  level: number;
+  progress: number;
+  nextLevel: number;
+  nextLevelPoints: number;
+  rank?: string;
+  position?: number;
+  total?: number;
 }

@@ -1,175 +1,220 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Mic, StopCircle, Loader2 } from 'lucide-react';
-import { EmotionResult, AudioProcessorProps } from '@/types';
+import { Mic, StopCircle, AlertCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 
-const AudioProcessor: React.FC<AudioProcessorProps> = ({
+interface AudioProcessorProps {
+  onResult?: (analysisResult: EmotionResult) => void;
+  onProcessingChange?: (isProcessing: boolean) => void;
+  isRecording?: boolean;
+  duration?: number; // Duration in seconds
+  autoStart?: boolean;
+  className?: string;
+  mode?: 'voice' | 'ambient' | 'both';
+  visualize?: boolean;
+}
+
+export const AudioProcessor: React.FC<AudioProcessorProps> = ({
   onResult,
   onProcessingChange,
   isRecording: externalIsRecording,
-  onError,
-  autoStop = false,
-  duration = 15000,
-  setIsProcessing
+  duration = 15,
+  autoStart = false,
+  className = '',
+  mode = 'voice',
+  visualize = true,
 }) => {
-  const [isRecording, setIsRecording] = useState(externalIsRecording || false);
-  const [processingAudio, setProcessingAudio] = useState(false);
+  const [isRecording, setIsRecording] = useState(autoStart || false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [remainingTime, setRemainingTime] = useState(duration);
+  const { toast } = useToast();
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const timerRef = useRef<number | null>(null);
 
-  // Track controlled vs uncontrolled state
-  const isControlled = typeof externalIsRecording !== 'undefined';
-  const recordingState = isControlled ? externalIsRecording : isRecording;
-  
+  // Synchronize with external recording state if provided
   useEffect(() => {
-    if (isControlled) {
-      setIsRecording(externalIsRecording);
+    if (externalIsRecording !== undefined) {
+      if (externalIsRecording && !isRecording) {
+        startRecording();
+      } else if (!externalIsRecording && isRecording) {
+        stopRecording();
+      }
     }
-  }, [externalIsRecording, isControlled]);
+  }, [externalIsRecording]);
 
   useEffect(() => {
-    if (onProcessingChange) {
-      onProcessingChange(processingAudio);
+    if (autoStart) {
+      startRecording();
     }
-    if (setIsProcessing) {
-      setIsProcessing(processingAudio);
-    }
-  }, [processingAudio, onProcessingChange, setIsProcessing]);
+    return () => {
+      if (mediaRecorderRef.current && isRecording) {
+        stopRecording();
+      }
+      if (timerRef.current) {
+        window.clearInterval(timerRef.current);
+      }
+    };
+  }, []);
 
   const startRecording = async () => {
+    setError(null);
     try {
-      audioChunksRef.current = [];
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderRef.current = new MediaRecorder(stream);
-      
-      mediaRecorderRef.current.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
       };
-      
-      mediaRecorderRef.current.onstop = () => {
-        processAudioData();
-        stream.getTracks().forEach(track => track.stop());
+
+      mediaRecorder.onstop = () => {
+        processAudio();
       };
-      
-      mediaRecorderRef.current.start();
-      if (!isControlled) {
-        setIsRecording(true);
-      }
-      
-      // Auto-stop recording after specified duration if enabled
-      if (autoStop && duration > 0) {
-        setTimeout(() => {
-          if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRemainingTime(duration);
+
+      // Start countdown timer
+      timerRef.current = window.setInterval(() => {
+        setRemainingTime((prev) => {
+          if (prev <= 1) {
             stopRecording();
+            return 0;
           }
-        }, duration);
-      }
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
-      if (onError) {
-        onError('Failed to access microphone. Please check your permissions.');
-      }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err) {
+      console.error('Error accessing microphone:', err);
+      setError('Could not access microphone. Please check permissions.');
+      toast({
+        title: 'Erreur de microphone',
+        description: 'Impossible d\'accéder au microphone. Veuillez vérifier vos permissions.',
+        variant: 'destructive'
+      });
     }
   };
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+    if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
-      if (!isControlled) {
-        setIsRecording(false);
+      setIsRecording(false);
+      if (timerRef.current) {
+        window.clearInterval(timerRef.current);
+        timerRef.current = null;
       }
     }
   };
 
-  const processAudioData = async () => {
-    if (audioChunksRef.current.length === 0) return;
-    
-    setProcessingAudio(true);
-    
+  const processAudio = async () => {
+    if (audioChunksRef.current.length === 0) {
+      console.log('No audio recorded');
+      return;
+    }
+
+    setIsProcessing(true);
+    if (onProcessingChange) {
+      onProcessingChange(true);
+    }
+
     try {
       const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
       
-      // Mock result for demonstration purposes
-      // In a real app, you would send this audio to a server for analysis
+      // Simulate an analysis result (in a real app, send to server and process)
       setTimeout(() => {
-        const mockResult: EmotionResult = {
+        const fakeResult: EmotionResult = {
           emotion: 'calm',
           score: 0.85,
-          confidence: 0.92,
+          confidence: 0.85,
           timestamp: new Date().toISOString(),
-          source: 'audio',
-          feedback: 'You sound calm and collected.',
+          source: 'voice',
           recommendations: [
             {
-              title: 'Meditation Session',
-              content: 'Try our guided meditation to maintain this calm state.',
-              category: 'mindfulness'
+              title: 'Méditation guidée',
+              description: 'Faites une courte méditation pour maintenir votre calme',
+              category: 'méditation',
+              content: 'Prenez 5 minutes pour respirer profondément',
             },
             {
-              title: 'Calm Playlist',
-              content: 'Listen to our curated playlist to enhance your calm mood.',
-              category: 'music'
+              title: 'Musique relaxante',
+              description: 'Écoutez de la musique apaisante',
+              category: 'musique',
+              content: 'Une playlist de sons de nature et musique ambiante',
             }
-          ]
+          ],
+          audioUrl: URL.createObjectURL(audioBlob),
+          transcript: "J'ai passé une journée tranquille aujourd'hui."
         };
         
         if (onResult) {
-          onResult(mockResult);
+          onResult(fakeResult);
         }
         
-        setProcessingAudio(false);
+        setIsProcessing(false);
+        if (onProcessingChange) {
+          onProcessingChange(false);
+        }
       }, 2000);
+      
     } catch (error) {
       console.error('Error processing audio:', error);
-      if (onError) {
-        onError('Failed to process audio data.');
+      setError('Failed to process audio');
+      setIsProcessing(false);
+      if (onProcessingChange) {
+        onProcessingChange(false);
       }
-      setProcessingAudio(false);
     }
   };
 
   return (
-    <Card className="p-6">
-      <div className="flex flex-col items-center justify-center">
-        {processingAudio ? (
-          <div className="flex flex-col items-center">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="mt-3 text-center">Analyse de votre voix en cours...</p>
+    <div className={`flex flex-col items-center ${className}`}>
+      {!isRecording && !isProcessing && (
+        <Button
+          onClick={startRecording}
+          className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full p-6 h-auto w-auto"
+          disabled={isProcessing}
+        >
+          <Mic className="h-8 w-8" />
+        </Button>
+      )}
+      
+      {isRecording && (
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <Button
+              onClick={stopRecording}
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-full p-6 h-auto w-auto animate-pulse"
+            >
+              <StopCircle className="h-8 w-8" />
+            </Button>
+            <div className="absolute top-0 right-0 bg-background rounded-full px-2 py-1 text-xs font-medium">
+              {remainingTime}s
+            </div>
           </div>
-        ) : (
-          <>
-            {recordingState ? (
-              <Button 
-                variant="destructive"
-                size="lg"
-                onClick={stopRecording}
-                className="h-16 w-16 rounded-full"
-              >
-                <StopCircle className="h-8 w-8" />
-              </Button>
-            ) : (
-              <Button 
-                variant="default"
-                size="lg"
-                onClick={startRecording}
-                className="h-16 w-16 rounded-full bg-primary hover:bg-primary/90"
-              >
-                <Mic className="h-8 w-8" />
-              </Button>
-            )}
-            <p className="mt-3 text-center">
-              {recordingState 
-                ? "Parlez maintenant... Cliquez pour arrêter l'enregistrement" 
-                : "Cliquez pour commencer l'enregistrement"}
-            </p>
-          </>
-        )}
-      </div>
-    </Card>
+          <p className="text-sm text-center">Enregistrement en cours...</p>
+        </div>
+      )}
+
+      {isProcessing && (
+        <div className="flex flex-col items-center gap-2">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+          <p className="text-sm">Analyse en cours...</p>
+        </div>
+      )}
+      
+      {error && (
+        <div className="mt-4 flex items-center gap-2 text-destructive">
+          <AlertCircle className="h-4 w-4" />
+          <span className="text-sm">{error}</span>
+        </div>
+      )}
+    </div>
   );
 };
 

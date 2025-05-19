@@ -1,185 +1,159 @@
 
-import React, { useState, useEffect } from 'react';
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { ChartLine, BarChart2, BarChartHorizontal } from 'lucide-react';
-import { AbsenteeismChart } from './AbsenteeismChart';
-import { ProductivityChart } from './ProductivityChart';
-import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
-import { ZoomableChart } from '@/components/ui/chart/ZoomableChart';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { BarChart, PieChart, LineChart, Filter, Download } from 'lucide-react';
+import { SegmentContextType, SegmentDimension, SegmentOption } from '@/types/segment';
 import { useSegment } from '@/contexts/SegmentContext';
 
-export type ChartType = "line" | "bar" | "area";
-
-export interface DataPoint {
-  date: string;
-  value: number;
-}
-
-export interface ChartSwitcherProps {
+interface ChartSwitcherProps {
   title: string;
   description?: string;
-  availableViews: ChartType[];
-  defaultView?: ChartType;
-  data: DataPoint[];
-  isLoading?: boolean;
+  data?: any[];
+  dimensions?: SegmentDimension[];
+  className?: string;
+  allowDownload?: boolean;
+  allowFiltering?: boolean;
 }
 
 const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
   title,
   description,
-  availableViews,
-  defaultView,
-  data,
-  isLoading = false
+  data = [],
+  dimensions = [],
+  className = '',
+  allowDownload = true,
+  allowFiltering = true,
 }) => {
-  // Get segment context
-  const { segment, activeDimension, activeOption } = useSegment();
-  
-  // Use the first available view as default if none specified
-  const initialView = defaultView || availableViews[0] || "line";
-  
-  // Local state for the current view
-  const [view, setView] = useState<ChartType>(initialView);
-  
-  // Get the storage key for this chart based on title
-  const storageKey = `dashboard.view.${title.toLowerCase().replace(/\s+/g, '_')}`;
-  
-  // Load preferred view from localStorage on mount
-  useEffect(() => {
-    const savedView = localStorage.getItem(storageKey);
-    if (savedView && availableViews.includes(savedView as ChartType)) {
-      setView(savedView as ChartType);
-    }
-  }, [storageKey, availableViews]);
-  
-  // Save preference to localStorage when view changes
-  useEffect(() => {
-    localStorage.setItem(storageKey, view);
-  }, [view, storageKey]);
-  
-  // Handle view change
-  const handleViewChange = (newView: string) => {
-    if (newView && availableViews.includes(newView as ChartType)) {
-      setView(newView as ChartType);
+  const [chartType, setChartType] = useState<'bar' | 'line' | 'pie'>('bar');
+  const [selectedDimension, setSelectedDimension] = useState<string | null>(null);
+  const segmentContext = useSegment();
+
+  // En cas d'absence du contexte, utilisez des valeurs par défaut
+  const contextValue: SegmentContextType = segmentContext || {
+    dimensions: [],
+    selectedDimension: '',
+    selectedOption: '',
+    setSelectedDimension: () => {},
+    setSelectedOption: () => {},
+    resetSegmentation: () => {},
+    addDimension: () => {},
+    removeDimension: () => {},
+  };
+
+  // Si des dimensions sont fournies en props, utilisez-les au lieu du contexte
+  const availableDimensions = dimensions.length > 0 ? dimensions : contextValue.dimensions;
+
+  const handleDimensionChange = (value: string) => {
+    setSelectedDimension(value);
+    if (segmentContext) {
+      segmentContext.setSelectedDimension(value);
     }
   };
 
-  // Chart config for ZoomableChart
-  const chartConfig = {
-    value: { 
-      theme: { 
-        light: view === 'bar' ? '#4A90E2' : '#7ED321', 
-        dark: view === 'bar' ? '#4A90E2' : '#7ED321' 
-      },
-      label: title
-    },
-  };
-
-  // Render the appropriate chart based on current view
-  const renderChart = () => {
-    if (isLoading) {
-      return (
-        <div className="h-48 w-full flex items-center justify-center">
-          <Skeleton className="h-36 w-full rounded-md animate-pulse" />
-        </div>
-      );
-    }
-    
-    if (data.length === 0) {
-      return (
-        <div className="h-48 w-full flex items-center justify-center">
-          <p className="text-muted-foreground text-center">
-            {activeDimension && activeOption ? (
-              <>Aucune donnée pour {activeDimension?.label} → {activeOption?.label}</>
-            ) : (
-              <>Aucune donnée disponible</>
-            )}
-          </p>
-        </div>
-      );
-    }
-    
-    switch (view) {
-      case "line":
-        return <AbsenteeismChart data={data} />;
-      case "bar":
-        return <ProductivityChart data={data} />;
-      case "area":
-        return <AbsenteeismChart data={data} />; // Reusing AbsenteeismChart as it's an area chart
-      default:
-        return <AbsenteeismChart data={data} />;
+  const handleOptionChange = (value: string) => {
+    if (segmentContext) {
+      segmentContext.setSelectedOption(value);
     }
   };
 
-  // Icon mapping for each chart type
-  const chartIcons = {
-    line: <ChartLine className="h-4 w-4" />,
-    bar: <BarChart2 className="h-4 w-4" />,
-    area: <BarChartHorizontal className="h-4 w-4" />
+  const getCurrentDimensionOptions = (): SegmentOption[] => {
+    if (!selectedDimension) return [];
+    const dimension = availableDimensions.find(d => d.key === selectedDimension);
+    return dimension ? dimension.options : [];
   };
 
-  // Accessibility labels for each chart type
-  const chartLabels = {
-    line: "Afficher la courbe",
-    bar: "Afficher l'histogramme",
-    area: "Afficher l'aire"
-  };
-
-  // Display loading state or segment filter messaging
-  const getDescription = () => {
-    if (isLoading) return "Chargement...";
-    if (segment.dimensionKey && segment.optionKey && activeDimension && activeOption) {
-      return `${description || ''} - ${activeDimension?.label}: ${activeOption?.label}`;
-    }
-    return description;
-  };
+  const charts = [
+    { id: 'bar', label: 'Barres', icon: <BarChart className="h-4 w-4" /> },
+    { id: 'line', label: 'Ligne', icon: <LineChart className="h-4 w-4" /> },
+    { id: 'pie', label: 'Camembert', icon: <PieChart className="h-4 w-4" /> },
+  ];
 
   return (
-    <div className={cn(
-      "card-premium p-4 rounded-2xl shadow-sm transition-opacity duration-300",
-      isLoading && "opacity-90"
-    )}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
+    <Card className={className}>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
-          <h3 className="text-xl font-semibold">
-            {isLoading ? <Skeleton className="h-6 w-36" /> : title}
-          </h3>
-          {getDescription() && (
-            <p className="text-sm text-muted-foreground">
-              {isLoading ? <Skeleton className="h-4 w-24 mt-1" /> : getDescription()}
-            </p>
+          <CardTitle>{title}</CardTitle>
+          {description && <CardDescription>{description}</CardDescription>}
+        </div>
+        <div className="flex items-center gap-2">
+          {allowFiltering && (
+            <Select onValueChange={handleDimensionChange}>
+              <SelectTrigger className="w-[180px] h-8">
+                <SelectValue placeholder="Filtre" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableDimensions.map((dim) => (
+                  <SelectItem key={dim.key} value={dim.key}>
+                    {dim.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {allowDownload && (
+            <Button variant="outline" size="icon" className="h-8 w-8">
+              <Download className="h-4 w-4" />
+            </Button>
           )}
         </div>
-        
-        <div className="mt-2 sm:mt-0">
-          <ToggleGroup 
-            type="single" 
-            value={view} 
-            onValueChange={handleViewChange} 
-            aria-label="Sélection du type de graphique"
-            disabled={isLoading}
-            className={isLoading ? "opacity-50 pointer-events-none" : ""}
-          >
-            {availableViews.map((chartType) => (
-              <ToggleGroupItem 
-                key={chartType}
-                value={chartType}
-                aria-label={chartLabels[chartType]}
-                aria-pressed={view === chartType}
-                disabled={isLoading}
-              >
-                {chartIcons[chartType]}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-        </div>
-      </div>
+      </CardHeader>
       
-      <div className="h-48 w-full" aria-busy={isLoading}>
-        {renderChart()}
-      </div>
-    </div>
+      <CardContent>
+        {selectedDimension && getCurrentDimensionOptions().length > 0 && (
+          <div className="mb-4">
+            <Select onValueChange={handleOptionChange}>
+              <SelectTrigger className="w-full h-8">
+                <SelectValue placeholder="Choisir une option" />
+              </SelectTrigger>
+              <SelectContent>
+                {getCurrentDimensionOptions().map((option) => (
+                  <SelectItem key={option.dimensionKey + option.optionKey} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        <Tabs defaultValue="bar" value={chartType} onValueChange={(v) => setChartType(v as 'bar' | 'line' | 'pie')}>
+          <TabsList className="grid w-full grid-cols-3 h-9">
+            {charts.map(chart => (
+              <TabsTrigger 
+                key={chart.id} 
+                value={chart.id}
+                className="flex items-center gap-1.5"
+              >
+                {chart.icon}
+                <span className="hidden sm:inline-block">{chart.label}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          
+          <TabsContent value="bar" className="pt-4 h-[300px] flex items-center justify-center">
+            <div className="text-muted-foreground">
+              Graphique à barres (données de démonstration)
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="line" className="pt-4 h-[300px] flex items-center justify-center">
+            <div className="text-muted-foreground">
+              Graphique linéaire (données de démonstration)
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="pie" className="pt-4 h-[300px] flex items-center justify-center">
+            <div className="text-muted-foreground">
+              Graphique en camembert (données de démonstration)
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -1,95 +1,48 @@
 
-/* Base animations */
+/* Animation keyframes */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 @keyframes pulse {
-  0% {
+  0%, 100% {
     opacity: 1;
   }
   50% {
     opacity: 0.6;
   }
-  100% {
-    opacity: 1;
-  }
 }
 
-.animation-pulse {
-  animation: pulse 1s ease-in-out;
-}
-
-/* Slow pulse for background elements */
-@keyframes pulse-slow {
+@keyframes blob {
   0% {
-    opacity: 0.5;
-    transform: scale(1);
+    transform: translate(0px, 0px) scale(1);
   }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.05);
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
   }
   100% {
-    opacity: 0.5;
-    transform: scale(1);
+    transform: translate(0px, 0px) scale(1);
   }
 }
 
-.animate-pulse-slow {
-  animation: pulse-slow 6s ease-in-out infinite;
-}
-
-/* Animation delay utility */
-.animation-delay-1000 {
-  animation-delay: 1000ms;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2000ms;
-}
-
-/* Floating animation */
-@keyframes float {
+@keyframes spin-slow {
   0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
+    transform: rotate(0deg);
   }
   100% {
-    transform: translateY(0px);
+    transform: rotate(360deg);
   }
 }
 
-.animate-float {
-  animation: float 8s ease-in-out infinite;
-}
-
-.animate-float-delay {
-  animation: float 10s ease-in-out 1s infinite;
-}
-
-/* Gradient text animation */
-@keyframes gradient-text {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.animate-gradient-text {
-  background-size: 200% auto;
-  background-image: linear-gradient(to right, #3B82F6, #6366F1, #8B5CF6, #3B82F6);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradient-text 4s ease infinite;
-}
-
-/* Fade in animation (more detailed) */
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -100,57 +53,77 @@
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out forwards;
-  opacity: 0;
-}
-
-/* Waves animation for emotional context */
-@keyframes wave {
-  0% {
-    transform: translateX(0) translateZ(0) scaleY(1);
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
   }
-  50% {
-    transform: translateX(-25%) translateZ(0) scaleY(1.2);
-  }
-  100% {
-    transform: translateX(-50%) translateZ(0) scaleY(1);
-  }
-}
-
-.animate-wave {
-  animation: wave 12s linear infinite;
-}
-
-/* Shimmer effect for highlighting */
-@keyframes shimmer {
-  0% {
-    background-position: -100% 0;
-  }
-  100% {
-    background-position: 100% 0;
-  }
-}
-
-.animate-shimmer {
-  background: linear-gradient(90deg, 
-    rgba(255,255,255,0) 0%, 
-    rgba(255,255,255,0.6) 50%, 
-    rgba(255,255,255,0) 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
-}
-
-/* Breathe animation */
-@keyframes breathe {
-  0%, 100% {
+  to {
+    opacity: 1;
     transform: scale(1);
   }
-  50% {
-    transform: scale(1.05);
-  }
 }
 
-.animate-breathe {
-  animation: breathe 4s ease-in-out infinite;
+/* Animation classes */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-gentle {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+
+/* Animation delays */
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Transition classes */
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition-all-300 {
+  transition: all 300ms ease;
+}
+
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Hover effects */
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-elevate:hover {
+  transform: translateY(-5px);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
 }

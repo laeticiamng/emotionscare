@@ -1,181 +1,83 @@
 
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { WelcomeMessage } from '@/components/home/WelcomeMessage';
-import ThreeCanvas from '@/components/three/ThreeCanvas';
+import React, { useEffect } from 'react';
+import PremiumContent from '@/components/immersive/PremiumContent';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { motion } from 'framer-motion';
-import { User, Building, Volume2, VolumeX } from 'lucide-react';
-import '../styles/immersive-home.css';
 import { useTheme } from '@/contexts/ThemeContext';
+import '../styles/animations.css';
 
 const ImmersiveHome: React.FC = () => {
-  const navigate = useNavigate();
-  const [audioEnabled, setAudioEnabled] = useState(false);
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
-  const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
   const { theme } = useTheme();
-
-  // Determine time of day
+  
   useEffect(() => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) setTimeOfDay('morning');
-    else if (hour >= 12 && hour < 18) setTimeOfDay('afternoon');
-    else if (hour >= 18 && hour < 22) setTimeOfDay('evening');
-    else setTimeOfDay('night');
-  }, []);
-
-  // Initialize welcome audio
-  useEffect(() => {
-    const audioElement = new Audio('/sounds/ambient-calm.mp3');
-    audioElement.volume = 0.3;
-    audioElement.loop = true;
-    setAudio(audioElement);
-
+    console.log('🏠 ImmersiveHome: Composant monté');
+    document.body.classList.add('overflow-hidden');
+    
     return () => {
-      if (audioElement) {
-        audioElement.pause();
-        audioElement.src = '';
-      }
+      document.body.classList.remove('overflow-hidden');
     };
   }, []);
 
-  // Handle audio toggle
-  const toggleAudio = () => {
-    if (!audio) return;
-    
-    if (audioEnabled) {
-      audio.pause();
-    } else {
-      audio.play().catch(err => console.log('Audio playback prevented:', err));
-    }
-    setAudioEnabled(!audioEnabled);
-    
-    // Add haptic feedback for mobile devices
-    if ('vibrate' in navigator) {
-      navigator.vibrate(50);
-    }
-  };
-
-  // Navigate to B2C login
-  const goToB2CLogin = () => {
-    if ('vibrate' in navigator) {
-      navigator.vibrate(50);
-    }
-    navigate('/b2c/login');
-  };
-
-  // Navigate to B2B selection
-  const goToB2BSelection = () => {
-    if ('vibrate' in navigator) {
-      navigator.vibrate(50);
-    }
-    navigate('/b2b/selection');
-  };
-
-  // Generate greeting based on time of day
-  const getGreeting = () => {
-    switch (timeOfDay) {
-      case 'morning': return 'Bonjour';
-      case 'afternoon': return 'Bon après-midi';
-      case 'evening': return 'Bonsoir';
-      case 'night': return 'Bonne nuit';
-      default: return 'Bienvenue';
-    }
-  };
-
   return (
-    <div className={`immersive-container ${theme}`}>
-      {/* Animated background */}
-      <ThreeCanvas />
-      
-      {/* Ambient circles */}
-      <div 
-        className="ambient-circle primary" 
-        style={{
-          width: '40vw',
-          height: '40vw',
-          top: '10%',
-          left: '5%',
-          opacity: 0.3
-        }}
-      />
-      <div 
-        className="ambient-circle accent" 
-        style={{
-          width: '35vw',
-          height: '35vw',
-          bottom: '10%',
-          right: '5%',
-          opacity: 0.25
-        }}
-      />
+    <div className={`min-h-screen flex flex-col relative overflow-hidden ${
+      theme === 'dark' 
+        ? 'bg-gradient-to-b from-slate-900 to-blue-900' 
+        : 'bg-gradient-to-b from-blue-50 to-purple-100'
+    }`}>
+      {/* Header */}
+      <header className="p-4 flex justify-between items-center z-10">
+        <div className="flex items-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
+              EC
+            </div>
+          </motion.div>
+        </div>
+        
+        <ThemeToggle />
+      </header>
       
       {/* Main content */}
-      <motion.div 
-        className="relative z-10 max-w-3xl mx-auto text-center"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-      >
-        <motion.h1 
-          className="premium-title"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.8 }}
-        >
-          EmotionsCare
-        </motion.h1>
-        
+      <main className="flex-grow flex items-center justify-center relative z-10">
+        <PremiumContent greeting="Prenez soin de votre bien-être émotionnel avec une approche personnalisée" />
+      </main>
+
+      {/* Ambient background elements */}
+      <div className="absolute inset-0 overflow-hidden -z-10">
         <motion.div
           initial={{ opacity: 0 }}
+          animate={{ opacity: 0.2 }}
+          transition={{ duration: 1.5 }}
+          className="absolute top-0 -left-[30%] w-[60%] aspect-square bg-blue-500 rounded-full blur-[120px] mix-blend-multiply"
+        />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.15 }}
+          transition={{ duration: 1.5, delay: 0.3 }}
+          className="absolute top-[30%] -right-[20%] w-[50%] aspect-square bg-purple-500 rounded-full blur-[130px] mix-blend-multiply"
+        />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.1 }}
+          transition={{ duration: 1.5, delay: 0.6 }}
+          className="absolute -bottom-[10%] left-[20%] w-[40%] aspect-square bg-pink-400 rounded-full blur-[120px] mix-blend-multiply"
+        />
+      </div>
+
+      {/* Footer */}
+      <footer className="p-4 text-center text-sm text-blue-600/60 dark:text-blue-300/60 z-10">
+        <motion.p
+          initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
+          transition={{ duration: 1, delay: 1.5 }}
         >
-          <p className="premium-subtitle mb-8">
-            {getGreeting()} et bienvenue sur votre plateforme de bien-être émotionnel
-          </p>
-          
-          <WelcomeMessage className="text-lg mb-12 premium-subtitle" />
-        </motion.div>
-        
-        <motion.div 
-          className="flex flex-col sm:flex-row justify-center gap-6 mt-10"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.6 }}
-        >
-          <Button
-            onClick={goToB2CLogin}
-            className="premium-button primary flex items-center gap-2 group"
-          >
-            <User className="mr-1" />
-            <span>Je suis un particulier</span>
-          </Button>
-          
-          <Button
-            onClick={goToB2BSelection}
-            className="premium-button secondary flex items-center gap-2 group"
-          >
-            <Building className="mr-1" />
-            <span>Je suis une entreprise</span>
-          </Button>
-        </motion.div>
-      </motion.div>
-      
-      {/* Audio control button */}
-      <motion.button
-        className={`control-button absolute bottom-6 right-6 ${audioEnabled ? 'active' : ''}`}
-        onClick={toggleAudio}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        aria-label={audioEnabled ? 'Désactiver le son' : 'Activer le son'}
-      >
-        {audioEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-      </motion.button>
+          © {new Date().getFullYear()} EmotionsCare · Tous droits réservés
+        </motion.p>
+      </footer>
     </div>
   );
 };

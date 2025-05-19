@@ -5,12 +5,15 @@ import { motion } from 'framer-motion';
 import { Building, User, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { toast } from '@/hooks/use-toast';
 
 interface PremiumContentProps {
-  greeting: string;
+  greeting?: string;
 }
 
-const PremiumContent: React.FC<PremiumContentProps> = ({ greeting }) => {
+const PremiumContent: React.FC<PremiumContentProps> = ({ 
+  greeting = "Bienvenue sur la plateforme de bien-être émotionnel" 
+}) => {
   const navigate = useNavigate();
   const { setUserMode } = useUserMode();
   const [isVisible, setIsVisible] = useState(false);
@@ -26,12 +29,22 @@ const PremiumContent: React.FC<PremiumContentProps> = ({ greeting }) => {
   
   // Handle navigation
   const handleB2CClick = () => {
+    toast({
+      title: "Mode personnel activé",
+      description: "Vous accédez à l'espace personnel EmotionsCare"
+    });
+    
     setUserMode('b2c');
     localStorage.setItem('userMode', 'b2c');
     navigate('/b2c/login');
   };
   
   const handleB2BClick = () => {
+    toast({
+      title: "Mode entreprise",
+      description: "Vous accédez à l'espace entreprise EmotionsCare"
+    });
+    
     navigate('/b2b/selection');
   };
   
@@ -59,17 +72,19 @@ const PremiumContent: React.FC<PremiumContentProps> = ({ greeting }) => {
   
   return (
     <motion.div 
-      className="premium-content"
+      className="premium-content w-full max-w-4xl mx-auto px-4 sm:px-6 py-12 md:py-16"
       initial="hidden"
       animate={isVisible ? "visible" : "hidden"}
       variants={containerVariants}
     >
       <motion.div 
-        className="premium-header"
+        className="premium-header text-center mb-16"
         variants={itemVariants}
       >
-        <h1 className="premium-title">EmotionsCare</h1>
-        <p className="premium-subtitle">{greeting}</p>
+        <h1 className="premium-title text-4xl sm:text-5xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-500">EmotionsCare</h1>
+        <p className="premium-subtitle text-xl md:text-2xl text-blue-700 dark:text-blue-300 max-w-3xl mx-auto">
+          {greeting}
+        </p>
       </motion.div>
       
       <motion.div 
@@ -104,6 +119,11 @@ const PremiumContent: React.FC<PremiumContentProps> = ({ greeting }) => {
       >
         <p>Découvrez une nouvelle approche de la gestion émotionnelle</p>
       </motion.div>
+      
+      {/* Ambient background circles for visual appeal */}
+      <div className="absolute top-[20%] left-[10%] w-64 h-64 rounded-full bg-blue-500/10 blur-3xl -z-10 animate-blob"></div>
+      <div className="absolute bottom-[10%] right-[5%] w-72 h-72 rounded-full bg-violet-500/10 blur-3xl -z-10 animate-blob animation-delay-2000"></div>
+      <div className="absolute top-[40%] right-[20%] w-56 h-56 rounded-full bg-pink-500/5 blur-3xl -z-10 animate-blob animation-delay-4000"></div>
     </motion.div>
   );
 };

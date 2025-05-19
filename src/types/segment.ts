@@ -1,12 +1,12 @@
 
-import { ReactNode } from 'react';
-
 export interface SegmentOption {
-  key: string;
-  label: string;
   value: string;
-  icon?: ReactNode;
+  label: string;
   count?: number;
+  icon?: React.ReactNode;
+  color?: string;
+  dimensionKey?: string;
+  optionKey?: string;
 }
 
 export interface SegmentDimension {
@@ -14,17 +14,16 @@ export interface SegmentDimension {
   label: string;
   options: SegmentOption[];
   defaultOption?: string;
-  icon?: ReactNode;
+  icon?: React.ReactNode;
 }
 
 export interface SegmentContextType {
-  segment: {
-    dimensionKey: string;
-    optionKey: string;
-  };
-  activeDimension: SegmentDimension | null;
-  activeOption: SegmentOption | null;
   dimensions: SegmentDimension[];
-  setSegment: (dimensionKey: string, optionKey: string) => void;
-  resetSegment: () => void;
+  selectedDimension: string;
+  selectedOption: string;
+  setSelectedDimension: (dimension: string) => void;
+  setSelectedOption: (option: string) => void;
+  resetSegmentation: () => void;
+  addDimension: (dimension: SegmentDimension) => void;
+  removeDimension: (key: string) => void;
 }

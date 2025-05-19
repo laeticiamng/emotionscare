@@ -1,179 +1,153 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
   DropdownMenuShortcut,
-  DropdownMenuGroup
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  User, Settings, LogOut, Bell, BookOpen, 
-  LayoutDashboard, BadgeHelp, Shield
-} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { User, LogOut, Settings, UserCircle } from 'lucide-react';
 
-const UserMenu: React.FC = () => {
+interface UserMenuProps {
+  mobile?: boolean;
+  onClose?: () => void;
+}
+
+const UserMenu: React.FC<UserMenuProps> = ({ mobile = false, onClose }) => {
   const { user, logout } = useAuth();
-  const [open, setOpen] = React.useState(false);
-  
-  // Get user initials for avatar fallback
-  const getInitials = (name?: string) => {
-    if (!name) return "U";
-    return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 2);
+  const navigate = useNavigate();
+
+  const handleItemClick = (path: string) => {
+    if (onClose) {
+      onClose();
+    }
+    navigate(path);
   };
 
-  const menuItems = [
-    { 
-      icon: <User className="mr-2 h-4 w-4" />, 
-      label: "Profil", 
-      href: "/profile",
-      shortcut: "⇧⌘P"
-    },
-    { 
-      icon: <Bell className="mr-2 h-4 w-4" />, 
-      label: "Notifications", 
-      href: "/notifications",
-      shortcut: "⌘N" 
-    },
-    { 
-      icon: <BookOpen className="mr-2 h-4 w-4" />, 
-      label: "Journal", 
-      href: "/journal",
-      shortcut: "⌘J" 
-    },
-    { 
-      icon: <LayoutDashboard className="mr-2 h-4 w-4" />, 
-      label: "Tableau de bord", 
-      href: "/dashboard",
-      shortcut: "⌘D" 
+  const handleLogout = async () => {
+    if (onClose) {
+      onClose();
     }
-  ];
-
-  const accountItems = [
-    { 
-      icon: <Settings className="mr-2 h-4 w-4" />, 
-      label: "Paramètres", 
-      href: "/settings",
-      shortcut: "⌘S"
-    },
-    { 
-      icon: <Shield className="mr-2 h-4 w-4" />, 
-      label: "Confidentialité", 
-      href: "/privacy",
-      shortcut: "⇧⌘C"
-    },
-    { 
-      icon: <BadgeHelp className="mr-2 h-4 w-4" />, 
-      label: "Aide", 
-      href: "/help",
-      shortcut: "⌘H"
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion", error);
     }
-  ];
+  };
 
+  // Si l'utilisateur n'est pas connecté, afficher le bouton de connexion
+  if (!user) {
+    return (
+      <div className={`flex ${mobile ? 'flex-col w-full' : ''} gap-2`}>
+        <Button
+          variant={mobile ? "default" : "outline"}
+          className={mobile ? "w-full justify-center" : ""}
+          onClick={() => handleItemClick('/login')}
+        >
+          Se connecter
+        </Button>
+        <Button
+          variant={mobile ? "outline" : "default"}
+          className={mobile ? "w-full justify-center" : ""}
+          onClick={() => handleItemClick('/register')}
+        >
+          S'inscrire
+        </Button>
+      </div>
+    );
+  }
+
+  // Si l'utilisateur est connecté et que c'est la version mobile, afficher les options directement
+  if (mobile) {
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-3 p-2">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={user.avatar || user.avatar_url || user.avatarUrl} alt={user.name || 'Avatar'} />
+            <AvatarFallback>{(user.name || 'U').charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <p className="text-base font-medium">{user.name || user.email}</p>
+            <p className="text-xs text-muted-foreground">{user.email}</p>
+          </div>
+        </div>
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2"
+          onClick={() => handleItemClick('/profile')}
+        >
+          <UserCircle className="h-4 w-4" />
+          Profil
+        </Button>
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2"
+          onClick={() => handleItemClick('/settings')}
+        >
+          <Settings className="h-4 w-4" />
+          Paramètres
+        </Button>
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2 text-destructive hover:text-destructive"
+          onClick={handleLogout}
+        >
+          <LogOut className="h-4 w-4" />
+          Déconnexion
+        </Button>
+      </div>
+    );
+  }
+
+  // Version desktop avec dropdown
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full" aria-label="Menu utilisateur">
-          <Avatar className="h-9 w-9 border-2 hover:border-primary transition-all">
-            <AvatarImage 
-              src={user?.avatar || user?.avatarUrl || user?.avatar_url} 
-              alt={user?.name || 'User'} 
-            />
-            <AvatarFallback className="bg-primary/10 text-primary">
-              {getInitials(user?.name)}
-            </AvatarFallback>
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={user.avatar || user.avatar_url || user.avatarUrl} alt={user.name || 'Avatar'} />
+            <AvatarFallback>{(user.name || 'U').charAt(0)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      
-      <AnimatePresence>
-        {open && (
-          <DropdownMenuContent 
-            align="end" 
-            className="w-56"
-            forceMount
-            asChild
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: -10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
-            >
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium">{user?.name || 'Utilisateur'}</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    {user?.email || 'user@example.com'}
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              
-              <DropdownMenuSeparator />
-              
-              <DropdownMenuGroup>
-                {menuItems.map((item) => (
-                  <Link key={item.href} to={item.href}>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <span className="flex items-center">
-                        {item.icon}
-                        {item.label}
-                      </span>
-                      {item.shortcut && (
-                        <DropdownMenuShortcut>{item.shortcut}</DropdownMenuShortcut>
-                      )}
-                    </DropdownMenuItem>
-                  </Link>
-                ))}
-              </DropdownMenuGroup>
-              
-              <DropdownMenuSeparator />
-              
-              <DropdownMenuGroup>
-                {accountItems.map((item) => (
-                  <Link key={item.href} to={item.href}>
-                    <DropdownMenuItem className="cursor-pointer">
-                      <span className="flex items-center">
-                        {item.icon}
-                        {item.label}
-                      </span>
-                      {item.shortcut && (
-                        <DropdownMenuShortcut>{item.shortcut}</DropdownMenuShortcut>
-                      )}
-                    </DropdownMenuItem>
-                  </Link>
-                ))}
-              </DropdownMenuGroup>
-              
-              <DropdownMenuSeparator />
-              
-              <DropdownMenuItem 
-                className="cursor-pointer text-red-500 focus:text-red-500 dark:text-red-400 dark:focus:text-red-400" 
-                onClick={logout}
-              >
-                <span className="flex items-center">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Déconnexion
-                </span>
-                <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-              </DropdownMenuItem>
-            </motion.div>
-          </DropdownMenuContent>
-        )}
-      </AnimatePresence>
+      <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{user.name || user.email}</p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {user.email}
+            </p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem onClick={() => handleItemClick('/profile')}>
+            <User className="mr-2 h-4 w-4" />
+            <span>Profil</span>
+            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleItemClick('/settings')}>
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Paramètres</span>
+            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Déconnexion</span>
+          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
     </DropdownMenu>
   );
 };

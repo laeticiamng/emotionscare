@@ -30,14 +30,14 @@ export function UserNav() {
 
   // Use avatar, avatar_url, or avatarUrl in that order of preference
   const userAvatar = user?.avatar || user?.avatar_url || user?.avatarUrl;
-  const userName = user?.name || user?.displayName;
+  const userName = user?.displayName || user?.name || "Utilisateur";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={userAvatar} alt={userName} />
+            <AvatarImage src={userAvatar} alt={userName || 'Avatar'} />
             <AvatarFallback>{userName?.charAt(0) || 'U'}</AvatarFallback>
           </Avatar>
         </Button>
