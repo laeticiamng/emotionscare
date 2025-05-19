@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import { getTrackTitle, getTrackArtist, getTrackCover } from '@/utils/musicCompatibility';

@@ -9,7 +9,7 @@ import { Camera, ScanText, Music, ScanBarcode, Image } from 'lucide-react';
 import EmotionScanner from '@/components/scan/EmotionScanner';
 import { ScanResult, EmotionResult } from '@/types';
 import { useEmotionScan } from '@/hooks/useEmotionScan';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 
 const B2CScan: React.FC = () => {
   const [activeTab, setActiveTab] = useState('emotion');

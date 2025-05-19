@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { useBranding } from '@/contexts/BrandingContext';
 import { useStorytelling } from '@/providers/StorytellingProvider';
 import { useSoundscape } from '@/providers/SoundscapeProvider';

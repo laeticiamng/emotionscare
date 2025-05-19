@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import B2CDashboardPage from './b2c/DashboardPage';
 import AdminDashboardPage from './admin/DashboardPage';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MusicProvider } from '@/contexts/music';
+import { MusicProvider } from '@/contexts/music/index';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
