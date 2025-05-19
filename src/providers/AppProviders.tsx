@@ -7,6 +7,7 @@ import { MusicProvider } from '@/contexts/music/index';
 import { OptimizationProvider } from '@/providers/OptimizationProvider';
 import { ExtensionsProvider } from '@/providers/ExtensionsProvider';
 import { OrchestrationProvider } from '@/contexts/OrchestrationContext';
+import { SupportProvider } from '@/providers/SupportProvider';
 import { LayoutProviderProps } from '@/types/layout';
 
 /**
@@ -22,7 +23,9 @@ const AppProviders: React.FC<LayoutProviderProps> = ({ children }) => (
             <OptimizationProvider>
               <ExtensionsProvider>
                 <OrchestrationProvider>
-                  {children}
+                  <SupportProvider>
+                    {children}
+                  </SupportProvider>
                 </OrchestrationProvider>
               </ExtensionsProvider>
             </OptimizationProvider>
