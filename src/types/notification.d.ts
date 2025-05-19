@@ -1,59 +1,38 @@
 
-// Types liés aux notifications et préférences
-
+export type NotificationType = 'emotion' | 'journal' | 'coaching' | 'community' | 'system';
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
-
-export type NotificationType = 
-  | 'system' 
-  | 'emotion' 
-  | 'achievement' 
-  | 'social' 
-  | 'reminder'
-  | 'coach'
-  | 'journal'
-  | 'music'
-  | 'vr'
-  | 'buddy';
+export type NotificationChannel = 'email' | 'push' | 'in-app';
 
 export interface NotificationPreference {
   id: string;
   userId: string;
-  channel: string;
+  category: string;
   frequency: NotificationFrequency;
+  type?: NotificationType;
+  types?: NotificationType[];
   enabled?: boolean;
   emailEnabled?: boolean;
   pushEnabled?: boolean;
   inAppEnabled?: boolean;
-  types?: NotificationType[];
-  type?: string;
-  settings?: Record<string, any>;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface Notification {
+export interface NotificationSettings {
+  preferences: NotificationPreference[];
+  globalEnabled: boolean;
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+}
+
+export interface NotificationMessage {
   id: string;
   userId: string;
-  user_id?: string;
+  type: NotificationType;
   title: string;
   message: string;
-  type: string;
-  read: boolean;
-  timestamp: string;
-  createdAt?: string;
-  created_at?: string;
-  data?: any;
-}
-
-export interface CoachNotification {
-  id: string;
-  title: string;
-  message: string;
-  type: string;
-  timestamp: string;
-  action?: {
-    type: string;
-    label: string;
-    url?: string;
-    data?: any;
-  };
-  icon?: string;
+  isRead: boolean;
+  createdAt: string;
+  link?: string;
+  priority?: 'low' | 'medium' | 'high';
 }

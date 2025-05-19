@@ -20,14 +20,16 @@ const createMockResult = (): EmotionResult => {
       emotion: "calm",
       type: "activity",
       title: "Exercice de respiration",
-      description: "3 minutes de respiration profonde"
+      description: "3 minutes de respiration profonde",
+      category: "relaxation"
     },
     {
       id: "rec-2",
       emotion: "relaxed",
       type: "music",
       title: "Playlist recommandée",
-      description: "Musique relaxante pour vous aider à vous détendre"
+      description: "Musique relaxante pour vous aider à vous détendre",
+      category: "music"
     }
   ];
 
@@ -41,8 +43,8 @@ const createMockResult = (): EmotionResult => {
     emojis: ["😌", "🧘‍♀️"],
     feedback: "Vous semblez calme et détendu. Continuez ainsi!",
     emotions: { calm: 0.8, happy: 0.2 },
-    source: "live-voice", // Added required source field
-    score: Math.random() * 100 // Added for component compatibility
+    source: "live-voice",
+    score: Math.random() * 100
   };
 };
 
