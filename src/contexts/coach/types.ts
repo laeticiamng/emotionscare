@@ -8,7 +8,10 @@ export interface CoachContextType {
   loading?: boolean;
   conversations?: ChatConversation[];
   currentConversation?: ChatConversation | null;
-  sendMessage: (content: string, sender?: 'user' | 'coach' | 'assistant' | 'system') => Promise<string>;
+  sendMessage: (
+    content: string,
+    sender?: 'user' | 'assistant' | 'system' | 'coach'
+  ) => Promise<string>;
   clearMessages: () => void;
   isOpen?: boolean;
   setIsOpen?: (open: boolean) => void;

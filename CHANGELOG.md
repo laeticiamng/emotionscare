@@ -40,12 +40,11 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 
 ## [1.1.8] - 2025-05-26
 
-### Modifié
-- Alignement des types liés aux scans audio et vocaux (`EmotionSource`, `AudioProcessorProps`, etc.).
-- Suppression des interfaces locales remplacées par les définitions centralisées.
+### Corrigé
+- Unification des types `ChatMessage` et `ChatConversation`
+- Ajout de `isUser` et harmonisation du champ `sender`
+- Mise à jour des contextes Coach et des hooks associés
 
-### Ajouté
-- Documentation `docs/scan-audio-type-fixes.md` décrivant les corrections.
 
 
 ## [1.1.4] - 2025-05-22

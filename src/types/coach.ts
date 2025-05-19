@@ -1,30 +1,8 @@
 
-// Define the types for Coach related components
+// Coach types rely on shared chat interfaces
+import type { ChatMessage, ChatConversation } from './chat';
 
-export interface ChatMessage {
-  id: string;
-  sender: string;
-  content: string;
-  timestamp: string;
-  isUser?: boolean;
-  emotion?: string;
-  attachments?: string[];
-  role?: string;
-  text?: string;
-  isLoading?: boolean;
-  conversationId?: string;
-  conversation_id?: string; // For compatibility
-}
-
-export interface ChatConversation {
-  id: string;
-  title: string;
-  messages: ChatMessage[];
-  createdAt: string;
-  updatedAt: string;
-  isActive: boolean;
-  lastMessage?: string;
-}
+export type { ChatMessage, ChatConversation };
 
 export interface ChatResponse {
   content: string;

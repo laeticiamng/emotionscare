@@ -1,7 +1,7 @@
 
 import { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage } from '@/types/coach';
+import { ChatMessage } from '@/types/chat';
 import { useToast } from '@/hooks/use-toast';
 import { chatCompletion, analyzeEmotion } from '@/services/openai';
 
