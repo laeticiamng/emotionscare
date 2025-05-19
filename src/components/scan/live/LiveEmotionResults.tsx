@@ -58,7 +58,7 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result, classNa
             {result.recommendations && result.recommendations.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {result.recommendations.map((recommendation, index) => 
-                  renderRecommendation(recommendation, index)
+                  renderRecommendation(recommendation as any, index)
                 )}
               </div>
             ) : (

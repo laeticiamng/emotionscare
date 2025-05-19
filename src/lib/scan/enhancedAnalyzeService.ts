@@ -14,14 +14,16 @@ export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
         emotion: "neutral",
         title: "Prenez un moment pour réfléchir",
         description: "La neutralité peut cacher des émotions plus profondes",
-        category: "reflection"
+        category: "reflection",
+        type: "reflection"
       },
       {
         id: "rec-2",
         emotion: "neutral",
         title: "Journal émotionnel",
         description: "Notez vos émotions pour mieux les comprendre",
-        category: "activity"
+        category: "activity",
+        type: "activity"
       }
     ];
     

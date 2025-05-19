@@ -2,14 +2,38 @@
 // Notification-related types
 
 export interface NotificationPreference {
+  id?: string;
+  userId?: string;
   email: boolean;
   push: boolean;
   inApp: boolean;
   frequency: NotificationFrequency;
   tone?: NotificationTone;
+  enabled?: boolean;
+  emailEnabled?: boolean;
+  pushEnabled?: boolean;
+  inAppEnabled?: boolean;
+  type?: string;
+  types?: {
+    system?: boolean;
+    emotion?: boolean;
+    coach?: boolean;
+    journal?: boolean;
+    community?: boolean;
+    achievement?: boolean;
+    badge?: boolean;
+    challenge?: boolean;
+    reminder?: boolean;
+    info?: boolean;
+    warning?: boolean;
+    error?: boolean;
+    success?: boolean;
+    streak?: boolean;
+    urgent?: boolean;
+  };
 }
 
-export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never';
+export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never' | 'immediate';
 export type NotificationTone = 'formal' | 'friendly' | 'motivational' | 'minimal';
 
 export interface Notification {
@@ -17,9 +41,9 @@ export interface Notification {
   title: string;
   message: string;
   type: string;
-  userId: string;  // renamed from user_id
+  userId: string;
   read: boolean;
-  createdAt: string; // renamed from created_at
+  createdAt: string;
   timestamp?: string;
   action_text?: string;
   action_link?: string;

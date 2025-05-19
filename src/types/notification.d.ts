@@ -1,7 +1,8 @@
 
 export type NotificationType = 'emotion' | 'journal' | 'coaching' | 'community' | 'system' | 'achievement' | 'badge' | 'challenge' | 'reminder' | 'info' | 'warning' | 'error' | 'success' | 'streak' | 'urgent';
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
+export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never' | 'realtime';
 export type NotificationChannel = 'email' | 'push' | 'in-app';
+export type NotificationTone = 'formal' | 'friendly' | 'motivational' | 'minimal';
 
 export interface NotificationPreference {
   id: string;
@@ -37,6 +38,7 @@ export interface NotificationPreference {
     push: boolean;
     inApp: boolean;
   };
+  tone?: NotificationTone;
 }
 
 export interface NotificationSettings {
@@ -56,4 +58,36 @@ export interface NotificationMessage {
   createdAt: string;
   link?: string;
   priority?: 'low' | 'medium' | 'high';
+}
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: string;
+  userId: string;
+  read: boolean;
+  createdAt: string;
+  timestamp?: string;
+  action_text?: string;
+  action_link?: string;
+  metadata?: Record<string, any>;
+  image?: string;
+  icon?: string;
+  priority?: string;
+}
+
+export interface NotificationState {
+  notifications: Notification[];
+  unreadCount: number;
+  isLoading: boolean;
+  hasError: boolean;
+}
+
+export interface NotificationAction {
+  type: string;
+  label: string;
+  icon?: string;
+  url?: string;
+  action?: () => void;
 }

@@ -35,6 +35,7 @@ export interface EmotionResult {
   };
   textInput?: string;
   facialExpression?: string;
+  value?: any;
 }
 
 export interface EmotionRecommendation {
@@ -83,6 +84,10 @@ export interface EmotionScanFormProps {
   onEmotionDetected?: (result: EmotionResult) => void;
   onClose?: () => void;
   onProcessingChange?: (processing: boolean) => void;
+  onSave?: () => void;
+  onSaveFeedback?: (feedback: string) => void;
+  onScanSaved?: () => void;
+  onComplete?: (result: EmotionResult) => void;
 }
 
 export interface TextEmotionScannerProps {

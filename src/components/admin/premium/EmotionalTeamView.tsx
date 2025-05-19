@@ -10,7 +10,8 @@ const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
   dateRange,
   showGraph = true, 
   showMembers = true,
-  className = ''
+  className = '',
+  showDetails
 }) => {
   return (
     <Card className={className}>
@@ -29,6 +30,7 @@ const EmotionalTeamView: React.FC<EmotionalTeamViewProps> = ({
           )}
           {showGraph && <div>Graph visualization would appear here</div>}
           {showMembers && <div>Members list would appear here</div>}
+          {showDetails && <div>Additional details would appear here</div>}
         </div>
       </CardContent>
     </Card>
