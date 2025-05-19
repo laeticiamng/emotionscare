@@ -28,6 +28,7 @@ const ThemeButton: React.FC<ThemeButtonProps> = ({ onClick }) => {
       size="sm"
       onClick={toggleTheme}
       aria-label={isDarkMode ? "Switch to light theme" : "Switch to dark theme"}
+      className="hover:bg-muted/50 transition-all duration-300"
     >
       {isDarkMode ? <Sun className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}
     </Button>

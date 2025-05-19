@@ -1,157 +1,96 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Sun, Moon, Monitor, Palette } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { ThemeName } from '@/types/theme';
 
 interface ThemeSelectorProps {
-  currentTheme: ThemeName | string;
+  currentTheme: ThemeName;
   onChange: (theme: ThemeName) => void;
-  minimal?: boolean; // Add minimal prop for use in navbar
-  className?: string; // Add className prop
+  minimal?: boolean;
+  className?: string;
 }
 
-const ThemeSelector: React.FC<ThemeSelectorProps> = ({ currentTheme, onChange, minimal = false, className = '' }) => {
-  const handleThemeChange = (theme: ThemeName) => {
-    onChange(theme);
+const ThemeSelector: React.FC<ThemeSelectorProps> = ({ 
+  currentTheme, 
+  onChange,
+  minimal = false,
+  className = ""
+}) => {
+  const handleThemeChange = (value: string) => {
+    // Validate that the value is a valid ThemeName before passing it to onChange
+    if (value === 'light' || value === 'dark' || value === 'system' || value === 'pastel') {
+      onChange(value as ThemeName);
+    }
   };
   
-  // Render a simplified version for minimal mode (used in navbar)
   if (minimal) {
     return (
-      <div className={`flex items-center space-x-1 ${className}`}>
-        <Button
-          variant={currentTheme === 'light' ? "secondary" : "ghost"}
-          size="icon"
-          className="w-8 h-8"
-          onClick={() => handleThemeChange('light')}
-          title="Light Mode"
+      <div className={`flex items-center space-x-2 ${className}`}>
+        <RadioGroup
+          value={currentTheme}
+          onValueChange={handleThemeChange}
+          className="flex items-center space-x-1"
         >
-          <Sun className="h-4 w-4" />
-          {currentTheme === 'light' && (
-            <span className="sr-only">Active</span>
-          )}
-        </Button>
-        <Button
-          variant={currentTheme === 'dark' ? "secondary" : "ghost"}
-          size="icon"
-          className="w-8 h-8"
-          onClick={() => handleThemeChange('dark')}
-          title="Dark Mode"
-        >
-          <Moon className="h-4 w-4" />
-          {currentTheme === 'dark' && (
-            <span className="sr-only">Active</span>
-          )}
-        </Button>
-        <Button
-          variant={currentTheme === 'system' ? "secondary" : "ghost"}
-          size="icon"
-          className="w-8 h-8"
-          onClick={() => handleThemeChange('system')}
-          title="System Mode"
-        >
-          <Monitor className="h-4 w-4" />
-          {currentTheme === 'system' && (
-            <span className="sr-only">Active</span>
-          )}
-        </Button>
+          <div className="flex items-center space-x-1">
+            <RadioGroupItem value="light" id="light-min" className="sr-only" />
+            <Label 
+              htmlFor="light-min" 
+              className={`px-2 py-1 rounded-md cursor-pointer text-xs ${
+                currentTheme === 'light' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'
+              }`}
+            >
+              Clair
+            </Label>
+          </div>
+          <div className="flex items-center space-x-1">
+            <RadioGroupItem value="dark" id="dark-min" className="sr-only" />
+            <Label 
+              htmlFor="dark-min" 
+              className={`px-2 py-1 rounded-md cursor-pointer text-xs ${
+                currentTheme === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'
+              }`}
+            >
+              Sombre
+            </Label>
+          </div>
+        </RadioGroup>
       </div>
     );
   }
   
-  // Render full theme selector
-  const themes = [
-    { 
-      id: 'light' as ThemeName, 
-      name: 'Clair', 
-      description: 'Mode clair, idéal pour la journée',
-      icon: Sun,
-      bg: 'bg-white dark:bg-gray-100',
-      text: 'text-gray-900 dark:text-gray-900'
-    },
-    { 
-      id: 'dark' as ThemeName, 
-      name: 'Sombre', 
-      description: 'Mode sombre, confortable pour la nuit',
-      icon: Moon,
-      bg: 'bg-gray-900',
-      text: 'text-white'
-    },
-    { 
-      id: 'system' as ThemeName, 
-      name: 'Système', 
-      description: 'Suit les préférences de votre appareil',
-      icon: Monitor,
-      bg: 'bg-gradient-to-r from-blue-100 to-white dark:from-gray-800 dark:to-gray-900',
-      text: 'text-gray-900 dark:text-white'
-    },
-    { 
-      id: 'pastel' as ThemeName, 
-      name: 'Pastel', 
-      description: 'Couleurs douces et relaxantes',
-      icon: Palette,
-      bg: 'bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 dark:from-blue-900/30 dark:via-purple-900/30 dark:to-pink-900/30',
-      text: 'text-gray-900 dark:text-white'
-    }
-  ];
-  
   return (
-    <Card className={`w-full ${className}`}>
+    <Card className={className}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <span>Thème</span>
-        </CardTitle>
-        <CardDescription>
-          Personnalisez l'apparence de l'application
-        </CardDescription>
+        <CardTitle className="text-lg">Thème</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {themes.map((theme) => {
-            const Icon = theme.icon;
-            const isActive = currentTheme === theme.id;
-            
-            return (
-              <div
-                key={theme.id}
-                className="transition-transform hover:scale-[1.02] active:scale-[0.98]"
-              >
-                <Button
-                  variant="outline"
-                  className={`w-full h-auto p-0 overflow-hidden border-2 ${
-                    isActive ? 'border-primary' : 'border-border'
-                  }`}
-                  onClick={() => handleThemeChange(theme.id)}
-                >
-                  <div className="flex flex-col w-full">
-                    <div className={`w-full py-6 flex items-center justify-center ${theme.bg} ${theme.text}`}>
-                      <Icon className="h-10 w-10" />
-                    </div>
-                    <div className="w-full p-3 text-left bg-background">
-                      <div className="font-medium text-sm flex items-center gap-2">
-                        {theme.name}
-                        {isActive && (
-                          <div className="h-2 w-2 rounded-full bg-primary"></div>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {theme.description}
-                      </p>
-                    </div>
-                  </div>
-                </Button>
-              </div>
-            );
-          })}
-        </div>
+        <RadioGroup
+          value={currentTheme}
+          onValueChange={handleThemeChange}
+          className="grid grid-cols-2 gap-4"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="light" id="light" />
+            <Label htmlFor="light">Clair</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="dark" id="dark" />
+            <Label htmlFor="dark">Sombre</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="system" id="system" />
+            <Label htmlFor="system">Système</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="pastel" id="pastel" />
+            <Label htmlFor="pastel">Pastel</Label>
+          </div>
+        </RadioGroup>
       </CardContent>
     </Card>
   );
 };
 
 export default ThemeSelector;
-
-// Also export as named export for backward compatibility
-export { ThemeSelector };
