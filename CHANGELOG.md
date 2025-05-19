@@ -45,29 +45,27 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ### Modifié
 - Mise à jour de `README.md` pour référencer ces nouveaux documents
 
+## [1.1.9] - 2025-05-27
+
+### Ajouté
+- Bouton de sauvegarde animé dans `DataPrivacySettings` permettant d'enregistrer les préférences.
+- Documentation `docs/ui-polish-restoration.md` décrivant la restauration de l'interface.
+
+### Modifié
+- `README.md` référence ce nouveau document.
+
 ## [1.1.8] - 2025-05-26
 
-### Corrigé
-- Unification des types `ChatMessage` et `ChatConversation`
-- Ajout de `isUser` et harmonisation du champ `sender`
-- Mise à jour des contextes Coach et des hooks associés
-
-
-
-## [1.1.9] - 2025-05-27
-
 ### Modifié
-- Ajout de la fonction `convertToPlaylist` dans `musicCompatibility` et nettoyage des imports.
-- Contexte musical enrichi : gestion de l'historique et de la queue (fonctions `addToQueue`, `removeFromQueue`, `clearQueue`).
-- Type `MusicContextType` complété (`setMuted`).
+- Alignement des types liés aux scans audio et vocaux (`EmotionSource`, `AudioProcessorProps`, etc.).
+- Suppression des interfaces locales remplacées par les définitions centralisées.
 
-## [1.1.9] - 2025-05-27
+### Ajouté
+- Documentation `docs/scan-audio-type-fixes.md` décrivant les corrections.
 
-### Modifié
-- Ajout de la fonction `convertToPlaylist` dans `musicCompatibility` et nettoyage des imports.
-- Contexte musical enrichi : gestion de l'historique et de la queue (fonctions `addToQueue`, `removeFromQueue`, `clearQueue`).
-- Type `MusicContextType` complété (`setMuted`).
-- `EmotionMusicRecommendations` normalise désormais les playlists via `convertToPlaylist`.
+
+
+
 
 ## [1.1.4] - 2025-05-22
 

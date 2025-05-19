@@ -321,6 +321,8 @@ Des audits complémentaires sont disponibles dans le dossier `docs` :
 - `scalability-innovation-audit.md` : évolutivité et innovation continue
 - `module-registry.md` : registre des modules et roadmap
 - `scan-audio-type-fixes.md` : corrections de typage pour les modules scan/audio
+- `ui-polish-restoration.md` : rétablissement de l'apparence initiale
+
 
 ## Équipe et contribution
 

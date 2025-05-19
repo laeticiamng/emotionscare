@@ -12,9 +12,40 @@ export interface Emotion {
 export interface EmotionResult {
   emotion: string;
   confidence: number;
-  timestamp: string;
-  source?: string;
-  context?: string;
+  intensity?: number;
+  secondaryEmotions?: string[];
+  timestamp?: string;
+  source?:
+    | 'text'
+    | 'voice'
+    | 'facial'
+    | 'emoji'
+    | 'system'
+    | 'ai'
+    | 'live-voice'
+    | 'voice-analyzer'
+    | 'audio-processor';
+  text?: string;
+  duration?: number;
+  userId?: string;
+  sessionId?: string;
+  language?: string;
+  data?: EmotionData[];
+  id?: string;
+  primaryEmotion?: string;
+  score?: number;
+  feedback?: string;
+  recommendations?: EmotionRecommendation[];
+  triggers?: string[];
+  context?: object;
+  model?: string;
+  raw?: any;
+  ai_feedback?: string;
+  emojis?: string[];
+  emotions?: Record<string, number>;
+  date?: string;
+  audioUrl?: string;
+  transcript?: string;
 }
 
 export interface EmotionRecommendation {
@@ -80,4 +111,44 @@ export interface VoiceEmotionAnalyzerProps {
   showResult?: boolean;
 }
 
-export type EmotionSource = 'voice' | 'text' | 'emoji' | 'ai' | 'default' | 'system';
+export interface EmojiEmotionScannerProps {
+  onScanComplete?: (result: EmotionResult) => void;
+  onCancel?: () => void;
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  onProcessingChange?: (isProcessing: boolean) => void;
+}
+
+export interface TextEmotionScannerProps {
+  onScanComplete?: (result: EmotionResult) => void;
+  onCancel?: () => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  onProcessingChange?: (isProcessing: boolean) => void;
+}
+
+export interface AudioEmotionScannerProps {
+  onComplete?: (result: EmotionResult) => void;
+  onCancel?: () => void;
+  autoStart?: boolean;
+}
+
+export interface VoiceEmotionScannerProps {
+  onEmotionDetected: (result: EmotionResult) => void;
+}
+
+export interface VoiceEmotionAnalyzerProps {
+  onResult: (result: EmotionResult) => void;
+  onStartRecording?: () => void;
+}
+
+export interface LiveVoiceScannerProps {
+  onScanComplete?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  onCancel?: () => void;
+  autoStart?: boolean;
+  scanDuration?: number;
+}

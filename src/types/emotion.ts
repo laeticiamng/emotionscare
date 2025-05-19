@@ -149,10 +149,10 @@ export interface EmotionPrediction {
 export interface EmojiEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
   onCancel?: () => void;
-  onResult?: (result: EmotionResult) => void;
-  isProcessing?: boolean;
-  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
-  onProcessingChange?: (isProcessing: boolean) => void;
+  onResult?: (result: EmotionResult) => void; // Added for compatibility
+  isProcessing?: boolean; // Added for compatibility
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>; // Added for compatibility
+  onProcessingChange?: (isProcessing: boolean) => void; // Added for compatibility
 }
 
 export interface EmotionalTeamViewProps {
