@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/components/theme/ThemeProvider';
 import EnhancedHeader from './EnhancedHeader';
 import EnhancedFooter from './EnhancedFooter';
-import ScrollProgress from '@/components/ui/ScrollProgress';
 import CommandMenu from './CommandMenu';
 import NotificationToast from './NotificationToast';
 import { cn } from '@/lib/utils';
@@ -116,12 +115,10 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
       )}
 
       {/* Header */}
-      {!hideNav && (
-        <EnhancedHeader scrolled={scrolled} />
-      )}
+      {!hideNav && <EnhancedHeader scrolled={scrolled} />}
 
       {/* Main Content */}
-      <main className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 relative">
+      <main className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 relative mt-16">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -137,9 +134,7 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
       </main>
 
       {/* Footer */}
-      {!hideFooter && (
-        <EnhancedFooter />
-      )}
+      {!hideFooter && <EnhancedFooter />}
 
       {/* Command Menu (Cmd+K) */}
       <CommandMenu open={commandMenuOpen} onOpenChange={setCommandMenuOpen} />

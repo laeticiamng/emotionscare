@@ -49,11 +49,9 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   
   // Font size options
   const fontSizes: {value: FontSize, label: string}[] = [
-    { value: "xs", label: "Extra Small" },
-    { value: "sm", label: "Small" },
-    { value: "md", label: "Medium" },
-    { value: "lg", label: "Large" },
-    { value: "xl", label: "Extra Large" }
+    { value: "small", label: "Small" },
+    { value: "medium", label: "Medium" },
+    { value: "large", label: "Large" }
   ];
   
   const handleFontSizeChange = (value: FontSize) => {
@@ -62,7 +60,6 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
     }
   };
 
-  
   return (
     <div className="space-y-6">
       <div>
@@ -85,24 +82,16 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
               />
               <Label
                 htmlFor={`theme-${theme.value}`}
-                className="cursor-pointer"
+                className={cn(
+                  "flex flex-col items-center justify-center rounded-md p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer",
+                  currentTheme === theme.value && "bg-accent text-accent-foreground"
+                )}
               >
                 <div
-                  className={cn(
-                    "h-16 rounded-md border-2 flex items-center justify-center",
-                    currentTheme === theme.value && "border-primary"
-                  )}
+                  className="mb-2 h-10 w-10 rounded-full border"
                   style={{ background: theme.preview }}
-                >
-                  <span 
-                    className={cn(
-                      "text-xs font-medium",
-                      theme.value === 'dark' ? "text-white" : null
-                    )}
-                  >
-                    {theme.label}
-                  </span>
-                </div>
+                />
+                <span>{theme.label}</span>
               </Label>
             </div>
           ))}
@@ -113,7 +102,7 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
         <div>
           <h3 className="text-lg font-medium">Font Family</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Select a font family for the UI.
+            Select a font family for text.
           </p>
           
           <RadioGroup
@@ -130,18 +119,14 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
                 />
                 <Label
                   htmlFor={`font-${font.value}`}
-                  className="cursor-pointer"
+                  className={cn(
+                    "flex items-center justify-center rounded-md border p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer",
+                    fontFamily === font.value && "bg-accent text-accent-foreground"
+                  )}
                 >
-                  <div
-                    className={cn(
-                      "h-12 rounded-md border-2 flex items-center justify-center p-2",
-                      fontFamily === font.value && "border-primary"
-                    )}
-                  >
-                    <span className={cn("text-sm", font.value)}>
-                      {font.label}
-                    </span>
-                  </div>
+                  <span className={font.value === 'mono' ? 'font-mono' : font.value === 'serif' ? 'font-serif' : 'font-sans'}>
+                    {font.label}
+                  </span>
                 </Label>
               </div>
             ))}
@@ -153,13 +138,13 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
         <div>
           <h3 className="text-lg font-medium">Font Size</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Select the font size for the UI.
+            Select a base font size.
           </p>
           
           <RadioGroup
             defaultValue={fontSize}
             onValueChange={handleFontSizeChange}
-            className="grid grid-cols-4 gap-4"
+            className="grid grid-cols-3 gap-4"
           >
             {fontSizes.map((size) => (
               <div key={size.value}>
@@ -170,26 +155,15 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
                 />
                 <Label
                   htmlFor={`size-${size.value}`}
-                  className="cursor-pointer"
+                  className={cn(
+                    "flex items-center justify-center rounded-md border p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer",
+                    fontSize === size.value && "bg-accent text-accent-foreground",
+                    size.value === "small" && "text-sm",
+                    size.value === "medium" && "text-base",
+                    size.value === "large" && "text-lg"
+                  )}
                 >
-                  <div
-                    className={cn(
-                      "h-10 rounded-md border-2 flex items-center justify-center",
-                      fontSize === size.value && "border-primary"
-                    )}
-                  >
-                    <span 
-                      className={
-                        size.value === "xs" ? "text-xs" : 
-                        size.value === "sm" ? "text-sm" : 
-                        size.value === "md" ? "text-base" : 
-                        size.value === "lg" ? "text-lg" :
-                        "text-xl"
-                      }
-                    >
-                      {size.label}
-                    </span>
-                  </div>
+                  {size.label}
                 </Label>
               </div>
             ))}

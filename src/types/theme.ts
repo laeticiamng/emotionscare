@@ -1,7 +1,7 @@
 
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type FontFamily = 'system' | 'sans' | 'serif' | 'mono';
-export type FontSize = 'small' | 'medium' | 'large';
+export type FontSize = 'small' | 'medium' | 'large' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface ThemeContextType {
   theme: Theme;

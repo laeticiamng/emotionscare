@@ -16,9 +16,10 @@ export interface MusicTrack {
   tags?: string[];
   genre?: string;
   emotion?: string;
-  mood?: string | string[];
+  mood?: string;
   category?: string | string[];
   intensity?: number;
+  name?: string; // Pour compatibilité
 }
 
 export interface MusicPlaylist {
@@ -52,21 +53,55 @@ export interface MusicState {
 }
 
 export interface MusicContextType extends MusicState {
+  // Fonctions de lecture
   play: (track: MusicTrack, playlist?: MusicPlaylist) => void;
   pause: () => void;
+  pauseTrack?: () => void; // Alias pour pause
   resume: () => void;
+  resumeTrack?: () => void; // Alias pour resume
   stop: () => void;
   next: () => void;
+  nextTrack?: () => void; // Alias pour next
   previous: () => void;
+  previousTrack?: () => void; // Alias pour previous
+  togglePlay?: () => void; // Basculer entre pause/play
+  playTrack?: (track: MusicTrack) => void; // Alias pour play
+
+  // Contrôles
   setVolume: (volume: number) => void;
   toggleMute: () => void;
   toggleShuffle: () => void;
   setRepeat: (mode: 'off' | 'track' | 'playlist') => void;
+  seekTo: (time: number) => void;
+
+  // Gestion des playlists
   playPlaylist: (playlist: MusicPlaylist, startTrackId?: string) => void;
+  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
+  generateMusic?: (params: any) => Promise<MusicTrack | null>;
+  setPlaylist?: (playlist: MusicPlaylist | null) => void;
+  setCurrentTrack?: (track: MusicTrack | null) => void;
+  
+  // Gestion de la queue
   addToQueue: (track: MusicTrack) => void;
   removeFromQueue: (index: number) => void;
   clearQueue: () => void;
-  seekTo: (time: number) => void;
+
+  // UI state
   currentTime?: number;
+  duration?: number;
+  error?: Error | null;
+  loading?: boolean;
+  
+  // UI controls
+  toggleDrawer?: () => void;
+  setOpenDrawer?: (open: boolean) => void;
+}
+
+export interface EmotionMusicParams {
+  emotion?: string;
+  mood?: string;
+  intensity?: number;
+  genre?: string;
+  tempo?: 'slow' | 'medium' | 'fast';
   duration?: number;
 }

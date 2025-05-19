@@ -1,95 +1,87 @@
 
-import React, { useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/components/theme/ThemeProvider';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import ThemeToggle from '@/components/theme/ThemeToggle';
 import {
+  Bell,
+  Search,
+  Menu,
+  X,
   Home,
   Music,
   MessageCircle,
   Users,
   Settings,
-  Bell,
-  Menu,
-  X,
-  Search,
   ChevronDown,
-  Sun,
-  Moon,
-  Laptop,
-  Palette
+  LogOut,
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import ThemeToggle from '@/components/theme/ThemeToggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
   DropdownMenuLabel,
-  DropdownMenuGroup,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
   SheetTrigger,
-  SheetClose,
-  SheetFooter,
 } from '@/components/ui/sheet';
+import MusicMiniPlayer from '@/components/music/MusicMiniPlayer';
 
 interface EnhancedHeaderProps {
   scrolled: boolean;
 }
 
 const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled }) => {
-  const { theme, setTheme, isDarkMode } = useTheme();
-  const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
+  const { theme, isDarkMode } = useTheme();
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(3); // Mock notification count
   
   const navigationItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: <Home className="h-5 w-5" /> },
-    { path: '/emotions', label: 'Émotions', icon: <Home className="h-5 w-5" /> },
-    { path: '/music', label: 'Musique', icon: <Music className="h-5 w-5" /> },
-    { path: '/coach', label: 'Coach', icon: <MessageCircle className="h-5 w-5" /> },
-    { path: '/community', label: 'Communauté', icon: <Users className="h-5 w-5" /> },
-    { path: '/settings', label: 'Paramètres', icon: <Settings className="h-5 w-5" /> },
+    { to: "/dashboard", icon: <Home className="h-4 w-4 mr-2" />, label: "Tableau de bord" },
+    { to: "/emotions", icon: <Home className="h-4 w-4 mr-2" />, label: "Émotions" },
+    { to: "/music", icon: <Music className="h-4 w-4 mr-2" />, label: "Musique" },
+    { to: "/coach", icon: <MessageCircle className="h-4 w-4 mr-2" />, label: "Coach" },
+    { to: "/community", icon: <Users className="h-4 w-4 mr-2" />, label: "Communauté" },
+    { to: "/settings", icon: <Settings className="h-4 w-4 mr-2" />, label: "Paramètres" }
   ];
 
+  const isActiveRoute = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+
   return (
-    <motion.header
-      initial={{ y: -10, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.3 }}
+    <header
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300",
+        "fixed top-0 left-0 right-0 z-40 transition-all duration-300",
         scrolled
-          ? 'bg-background/80 backdrop-blur-lg shadow-sm'
-          : 'bg-transparent'
+          ? "bg-background/80 backdrop-blur-lg shadow-sm"
+          : "bg-transparent"
       )}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
+      <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        {/* Logo and Brand */}
+        <div className="flex items-center">
           <Link to="/" className="flex items-center space-x-2">
-            <motion.div 
+            <motion.div
               whileHover={{ rotate: 10 }}
               transition={{ duration: 0.2 }}
-              className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center"
+              className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center"
             >
-              <span className="text-white font-bold text-lg">EC</span>
+              <span className="text-white font-bold text-sm">EC</span>
             </motion.div>
-            <motion.span 
+            <motion.span
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.2 }}
@@ -98,203 +90,183 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled }) => {
               EmotionsCare
             </motion.span>
           </Link>
+        </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1 flex-1 justify-center">
-            <AnimatePresence mode="wait">
-              {navigationItems.map((item) => (
-                <NavLink 
-                  key={item.path} 
-                  to={item.path} 
-                  className={({ isActive }) => cn(
-                    "relative px-3 py-2 rounded-md text-sm font-medium transition-all flex items-center",
-                    isActive 
-                      ? "text-primary" 
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-1">
+          <AnimatePresence mode="wait">
+            {navigationItems.map((item) => (
+              <Link to={item.to} key={item.to}>
+                <motion.div
+                  className={cn(
+                    "px-3 py-2 rounded-md text-sm font-medium flex items-center relative",
+                    isActiveRoute(item.to)
+                      ? "text-primary"
                       : "text-foreground/70 hover:text-foreground hover:bg-accent/50"
                   )}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  {({ isActive }) => (
-                    <>
-                      <span className="mr-2">{item.icon}</span>
-                      {item.label}
-                      {isActive && (
-                        <motion.div 
-                          layoutId="navbar-active-indicator"
-                          className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"
-                          transition={{ type: "spring", duration: 0.4 }}
-                        />
-                      )}
-                    </>
+                  {item.icon}
+                  <span>{item.label}</span>
+                  {isActiveRoute(item.to) && (
+                    <motion.div
+                      layoutId="navbar-active-indicator"
+                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary"
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 0.2 }}
+                    />
                   )}
-                </NavLink>
-              ))}
-            </AnimatePresence>
-          </nav>
+                </motion.div>
+              </Link>
+            ))}
+          </AnimatePresence>
+        </nav>
 
-          {/* Right Menu Controls */}
-          <div className="flex items-center space-x-2">
-            {/* Theme Toggle */}
+        {/* Right Controls */}
+        <div className="flex items-center space-x-2">
+          {/* Mini Music Player */}
+          <div className="hidden md:block">
+            <MusicMiniPlayer className="mr-2" />
+          </div>
+          
+          {/* Theme Toggle */}
+          <ThemeToggle minimal className="mr-2" />
+
+          {/* Search Button */}
+          <Button variant="ghost" size="icon" aria-label="Search" className="hidden sm:flex">
+            <Search className="h-5 w-5" />
+          </Button>
+
+          {/* Notifications */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Notifications">
+                <Bell className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="w-full sm:max-w-md">
+              <SheetHeader>
+                <SheetTitle>Notifications</SheetTitle>
+              </SheetHeader>
+              <div className="py-6">
+                <p className="text-muted-foreground text-center">Pas de nouvelles notifications</p>
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          {/* User Menu */}
+          {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
-                  {theme === 'light' && <Sun className="h-5 w-5" />}
-                  {theme === 'dark' && <Moon className="h-5 w-5" />}
-                  {theme === 'system' && <Laptop className="h-5 w-5" />}
-                  {theme === 'pastel' && <Palette className="h-5 w-5" />}
+                <Button variant="ghost" size="sm" className="relative h-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.avatar} alt={user?.name || "User"} />
+                    <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as any)}>
-                  <DropdownMenuRadioItem value="light">
-                    <Sun className="mr-2 h-4 w-4" />
-                    <span>Clair</span>
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="dark">
-                    <Moon className="mr-2 h-4 w-4" />
-                    <span>Sombre</span>
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="system">
-                    <Laptop className="mr-2 h-4 w-4" />
-                    <span>Système</span>
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="pastel">
-                    <Palette className="mr-2 h-4 w-4" />
-                    <span>Pastel</span>
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/profile">Profil</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/settings">Paramètres</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => logout && logout()}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Déconnexion</span>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+          ) : (
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm" asChild>
+                <Link to="/login">Connexion</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link to="/register">S'inscrire</Link>
+              </Button>
+            </div>
+          )}
 
-            {/* Search Button */}
-            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full hidden sm:flex">
-              <Search className="h-5 w-5" />
-            </Button>
-
-            {/* Notifications */}
-            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full relative">
-              <Bell className="h-5 w-5" />
-              {notificationCount > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center"
-                >
-                  {notificationCount}
-                </motion.span>
-              )}
-            </Button>
-
-            {/* User Menu */}
-            {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-9 w-9 rounded-full p-0">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src={user?.avatar} alt={user?.name || "User"} />
-                      <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col space-y-1">
-                      <p className="font-medium text-sm">{user?.name}</p>
-                      <p className="text-xs text-muted-foreground">{user?.email}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem asChild>
-                      <Link to="/profile">Mon profil</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/settings">Paramètres</Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout}>
-                    Se déconnecter
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <Button variant="outline" asChild className="hidden sm:flex">
-                  <Link to="/login">Connexion</Link>
-                </Button>
-                <Button asChild>
-                  <Link to="/register">Inscription</Link>
-                </Button>
-              </div>
-            )}
-
-            {/* Mobile Menu Trigger */}
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] p-0">
-                <SheetHeader className="p-4 border-b">
-                  <SheetTitle className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">EC</span>
-                    </div>
-                    <span className="ml-2">EmotionsCare</span>
-                  </SheetTitle>
-                  <SheetDescription>
-                    {isAuthenticated 
-                      ? `Bonjour, ${user?.name}`
-                      : "Navigation principale"}
-                  </SheetDescription>
-                </SheetHeader>
-                
-                <div className="flex flex-col p-4 space-y-2">
+          {/* Mobile Menu Trigger */}
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="w-[80%] max-w-sm">
+              <SheetHeader>
+                <SheetTitle className="flex items-center">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">EC</span>
+                  </div>
+                  <span className="ml-2">EmotionsCare</span>
+                </SheetTitle>
+              </SheetHeader>
+              <div className="py-6">
+                <nav className="flex flex-col space-y-2">
                   {navigationItems.map((item) => (
-                    <SheetClose asChild key={item.path}>
-                      <Link
-                        to={item.path}
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <div
                         className={cn(
-                          "flex items-center py-2 px-3 rounded-md text-sm font-medium transition-colors",
-                          location.pathname === item.path
+                          "px-3 py-2 rounded-md text-sm font-medium flex items-center",
+                          isActiveRoute(item.to)
                             ? "bg-primary/10 text-primary"
-                            : "hover:bg-accent"
+                            : "hover:bg-accent/50"
                         )}
                       >
-                        <span className="mr-3">{item.icon}</span>
-                        {item.label}
-                      </Link>
-                    </SheetClose>
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </div>
+                    </Link>
                   ))}
+                </nav>
+                <div className="mt-6 pt-6 border-t">
+                  <ThemeToggle />
                 </div>
-                
-                <SheetFooter className="p-4 border-t mt-auto">
-                  {isAuthenticated ? (
-                    <Button variant="destructive" onClick={logout} className="w-full">
-                      Se déconnecter
+                {isAuthenticated ? (
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4"
+                    onClick={() => {
+                      logout && logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Déconnexion</span>
+                  </Button>
+                ) : (
+                  <div className="flex flex-col space-y-2 mt-4">
+                    <Button asChild variant="outline">
+                      <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                        Connexion
+                      </Link>
                     </Button>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-2 w-full">
-                      <SheetClose asChild>
-                        <Button variant="outline" asChild>
-                          <Link to="/login">Connexion</Link>
-                        </Button>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Button asChild>
-                          <Link to="/register">Inscription</Link>
-                        </Button>
-                      </SheetClose>
-                    </div>
-                  )}
-                </SheetFooter>
-              </SheetContent>
-            </Sheet>
-          </div>
+                    <Button asChild>
+                      <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                        S'inscrire
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
-    </motion.header>
+    </header>
   );
 };
 

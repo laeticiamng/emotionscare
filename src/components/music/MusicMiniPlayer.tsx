@@ -1,26 +1,63 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useMusic } from '@/providers/MusicProvider';
+import { useMusic } from '@/contexts/music';
 import { Play, Pause, SkipBack, SkipForward, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { MusicContextType } from '@/types/music';
+import { getTrackCover, getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
 
 interface MusicMiniPlayerProps {
   className?: string;
 }
 
 const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
-  const { 
-    currentTrack, 
-    isPlaying, 
-    togglePlay, 
-    nextTrack, 
-    previousTrack,
-    toggleDrawer
-  } = useMusic();
+  const musicContext = useMusic();
+  
+  // S'assurer que le contexte est complet avant de continuer
+  if (!musicContext) return null;
+  
+  const { currentTrack, isPlaying } = musicContext as MusicContextType;
+  
+  // Méthodes contextuelles sans vérification typée
+  const togglePlay = () => {
+    if (musicContext.togglePlay) {
+      musicContext.togglePlay();
+    } else if (isPlaying && musicContext.pause) {
+      musicContext.pause();
+    } else if (!isPlaying && musicContext.resume) {
+      musicContext.resume();
+    }
+  };
+  
+  const nextTrack = () => {
+    if (musicContext.nextTrack) {
+      musicContext.nextTrack();
+    } else if (musicContext.next) {
+      musicContext.next();
+    }
+  };
+  
+  const previousTrack = () => {
+    if (musicContext.previousTrack) {
+      musicContext.previousTrack();
+    } else if (musicContext.previous) {
+      musicContext.previous();
+    }
+  };
+  
+  const toggleDrawer = () => {
+    if (musicContext.toggleDrawer) {
+      musicContext.toggleDrawer();
+    }
+  };
 
   if (!currentTrack) return null;
+
+  const cover = getTrackCover(currentTrack);
+  const title = getTrackTitle(currentTrack);
+  const artist = getTrackArtist(currentTrack);
 
   return (
     <motion.div 
@@ -38,10 +75,10 @@ const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
         onClick={toggleDrawer}
       >
         <div className="h-7 w-7 rounded-full overflow-hidden flex-shrink-0 bg-primary/10">
-          {currentTrack.cover || currentTrack.coverUrl ? (
+          {cover ? (
             <img 
-              src={currentTrack.cover || currentTrack.coverUrl} 
-              alt={currentTrack.title} 
+              src={cover} 
+              alt={title} 
               className="h-full w-full object-cover"
             />
           ) : (
@@ -51,8 +88,8 @@ const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
           )}
         </div>
         <div className="ml-2 hidden sm:block max-w-[120px]">
-          <p className="text-xs font-medium truncate">{currentTrack.title}</p>
-          <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
+          <p className="text-xs font-medium truncate">{title}</p>
+          <p className="text-xs text-muted-foreground truncate">{artist}</p>
         </div>
       </div>
       
