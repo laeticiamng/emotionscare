@@ -3,11 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mic, StopCircle, Loader2 } from 'lucide-react';
-import { EmotionResult } from '@/types/emotion';
-
-interface VoiceEmotionScannerProps {
-  onEmotionDetected: (result: EmotionResult) => void;
-}
+import { EmotionResult, VoiceEmotionScannerProps } from '@/types/emotion';
 
 const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onEmotionDetected }) => {
   const [isRecording, setIsRecording] = useState(false);

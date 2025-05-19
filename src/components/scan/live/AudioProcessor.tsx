@@ -1,16 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
-
-interface AudioProcessorProps {
-  onResult?: (result: EmotionResult) => void;
-  onProcessingChange?: (isProcessing: boolean) => void;
-  isRecording?: boolean;
-  duration?: number; // Duration in seconds
-  autoStart?: boolean;
-  className?: string;
-  mode?: 'voice' | 'ambient' | 'both';
-  visualize?: boolean;
-}
+import { AudioProcessorProps } from '@/types/audio';
 
 export const AudioProcessor: React.FC<AudioProcessorProps> = ({ 
   onResult,

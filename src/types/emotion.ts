@@ -57,7 +57,16 @@ export interface EmotionResult {
   transcript?: string;
 }
 
-export type EmotionSource = 'text' | 'voice' | 'facial' | 'emoji' | 'system' | 'ai';
+export type EmotionSource =
+  | 'text'
+  | 'voice'
+  | 'facial'
+  | 'emoji'
+  | 'system'
+  | 'ai'
+  | 'live-voice'
+  | 'voice-analyzer'
+  | 'audio-processor';
 
 export interface EmotionHistoryItem extends EmotionResult {
   id: string;
@@ -96,7 +105,7 @@ export interface EmojiEmotionScannerProps {
   onCancel?: () => void;
   onResult?: (result: EmotionResult) => void; // Added for compatibility
   isProcessing?: boolean; // Added for compatibility
-  setIsProcessing?: (isProcessing: boolean) => void; // Added for compatibility
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>; // Added for compatibility
   onProcessingChange?: (isProcessing: boolean) => void; // Added for compatibility
 }
 
@@ -115,7 +124,7 @@ export interface TextEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
   onCancel?: () => void;
   isProcessing?: boolean;
-  setIsProcessing?: (isProcessing: boolean) => void;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
   onProcessingChange?: (isProcessing: boolean) => void;
 }
 
@@ -125,8 +134,20 @@ export interface AudioEmotionScannerProps {
   autoStart?: boolean;
 }
 
+export interface VoiceEmotionScannerProps {
+  onEmotionDetected: (result: EmotionResult) => void;
+}
+
+export interface VoiceEmotionAnalyzerProps {
+  onResult: (result: EmotionResult) => void;
+  onStartRecording?: () => void;
+}
+
 export interface LiveVoiceScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
   onCancel?: () => void;
   autoStart?: boolean;
   scanDuration?: number;
