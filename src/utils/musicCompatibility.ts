@@ -20,6 +20,23 @@ export function ensurePlaylist(playlist: any): MusicPlaylist {
   return ensuredPlaylist;
 }
 
+// Generic converter to normalize any playlist-like object
+export function convertToPlaylist(data: any): MusicPlaylist {
+  if (!data) {
+    return { id: `playlist-${Date.now()}`, title: 'Playlist', tracks: [] };
+  }
+  // If an array is provided, assume it's a list of tracks
+  if (Array.isArray(data)) {
+    return {
+      id: `playlist-${Date.now()}`,
+      title: 'Playlist',
+      tracks: data.map(ensureTrack)
+    };
+  }
+
+  return ensurePlaylist(data);
+}
+
 // Function to ensure track compatibility
 export function ensureTrack(track: any): MusicTrack {
   if (!track) return {

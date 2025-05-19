@@ -73,6 +73,7 @@ export interface MusicContextType extends MusicState {
 
   // Contrôles
   setVolume?: (volume: number) => void;
+  setMuted?: (muted: boolean) => void;
   toggleMute?: () => void;
   toggleShuffle?: () => void;
   setRepeat?: (mode: 'off' | 'track' | 'playlist') => void;

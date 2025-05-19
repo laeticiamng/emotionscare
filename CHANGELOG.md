@@ -37,6 +37,14 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 - Données mock musicales mises en conformité (`src/data/musicPlaylists.ts`).
 - Ajout des propriétés manquantes `url`, `title` et `creator`.
 
+## [1.1.9] - 2025-05-27
+
+### Modifié
+- Ajout de la fonction `convertToPlaylist` dans `musicCompatibility` et nettoyage des imports.
+- Contexte musical enrichi : gestion de l'historique et de la queue (fonctions `addToQueue`, `removeFromQueue`, `clearQueue`).
+- Type `MusicContextType` complété (`setMuted`).
+- `EmotionMusicRecommendations` normalise désormais les playlists via `convertToPlaylist`.
+
 ## [1.1.4] - 2025-05-22
 
 ### Corrigé
