@@ -1,9 +1,14 @@
 
 import React from 'react';
-import { CoachMessageProps } from '@/types/coach';
 import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { Bot, User } from 'lucide-react';
+import { ChatMessage } from '@/types/chat';
+
+interface CoachMessageProps {
+  message: ChatMessage & { isLoading?: boolean };
+  isLast?: boolean;
+}
 
 const CoachMessage: React.FC<CoachMessageProps> = ({ 
   message,

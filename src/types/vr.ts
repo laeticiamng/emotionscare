@@ -2,64 +2,54 @@
 export interface VRSessionTemplate {
   id: string;
   title: string;
-  name?: string;
   description: string;
-  thumbnailUrl: string;
-  duration: string | number; // Accept both string and number
-  difficulty: string;
+  duration: number | string;
   category: string;
-  tags: string[];
-  immersionLevel: string;
-  goalType: string;
-  interactive: boolean;
-  // Additional properties for compatibility
-  environment?: string;
-  environmentId?: string;
-  imageUrl?: string;
-  coverUrl?: string;
-  cover_url?: string;
-  preview_url?: string;
+  thumbnailUrl?: string;
+  videoUrl?: string;
   audioUrl?: string;
-  audio_url?: string;
-  audioTrack?: string;
-  theme?: string;
-  is_audio_only?: boolean;
-  benefits?: string[];
-  features?: string[];
-  lastUsed?: string;
-  rating?: number;
+  audio_url?: string; // For backward compatibility
+  audioTrack?: string; // For backward compatibility
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  tags?: string[];
+  emotion?: string;
   popularity?: number;
-  completionRate?: number;
-  completion_rate?: number;
-  emotionTarget?: string;
-  emotion_target?: string;
-  recommendedMood?: string;
-  recommended_mood?: string;
-  intensity?: number | string;
+  name?: string; // For backward compatibility
+  lastUsed?: string; // For tracking last usage
+  environmentId?: string;
+  intensity?: number;
+  immersionLevel?: string;
+  goalType?: string;
+  interactive?: boolean;
 }
 
 export interface VRSession {
   id: string;
   templateId: string;
   userId: string;
-  startTime: string;
-  endTime?: string;
-  metrics?: Record<string, any>;
-  // Additional properties for compatibility
-  completed?: boolean;
+  progress: number;
+  completed: boolean;
+  duration: number | string;
+  createdAt?: string;
+  feedback?: string;
+  rating?: number;
+  emotionBefore?: string;
+  emotionAfter?: string;
+  notes?: string;
+  startedAt?: string;
+  endedAt?: string;
+  startTime?: string; // For backward compatibility
+  endTime?: string;   // For backward compatibility
+  metrics?: Record<string, any>; // For storing various metrics
   heartRateBefore?: number;
   heartRateAfter?: number;
-  duration_seconds?: number;
-  duration?: number;
 }
 
 export interface VRSessionWithMusicProps {
-  sessionId?: string;
-  onComplete?: () => void;
-  // Additional properties for compatibility
-  template?: VRSessionTemplate;
   session?: VRSession;
-  sessionTemplate?: VRSessionTemplate;
+  template?: VRSessionTemplate;
+  sessionTemplate?: VRSessionTemplate; // For backward compatibility
+  onComplete?: () => void;
   onExit?: () => void;
   environment?: string;
   musicEnabled?: boolean;
@@ -69,17 +59,8 @@ export interface VRSessionWithMusicProps {
 export interface VRSessionHistoryProps {
   userId?: string;
   limit?: number;
-  // Additional properties for compatibility
-  sessions?: VRSession[];
-  onSelect?: (session: VRSession) => void;
-  emptyMessage?: string;
-  limitDisplay?: number;
-  showHeader?: boolean;
-  className?: string;
-  onSessionSelect?: (session: VRSession) => void;
 }
 
 export interface VRTemplateDetailProps {
   templateId: string;
-  onStart?: (template: VRSessionTemplate) => void;
 }

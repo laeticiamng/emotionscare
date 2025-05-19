@@ -1,137 +1,125 @@
 
-"use client";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { ThemeContextType, ThemeName, FontSize, FontFamily } from '@/types/theme';
 
-import * as React from "react";
-import { ThemeContextType, Theme, FontSize, FontFamily } from "@/types/theme";
-
-const ThemeContext = React.createContext<ThemeContextType>({
-  theme: "system",
+const ThemeContext = createContext<ThemeContextType>({
+  theme: 'system',
   setTheme: () => {},
   toggleTheme: () => {},
   isDark: false,
   isDarkMode: false,
-  fontSize: "md",
+  fontSize: 'md',
   setFontSize: () => {},
-  fontFamily: "sans",
+  fontFamily: 'sans',
   setFontFamily: () => {},
-  systemTheme: "light",
+  systemTheme: 'light',
+  reduceMotion: false,
+  setReduceMotion: () => {},
 });
 
 export function ThemeProvider({
   children,
-  defaultTheme = "system",
+  defaultTheme = 'system',
+  defaultFontSize = 'md',
+  defaultFontFamily = 'sans',
+  defaultReduceMotion = false,
   ...props
 }: {
   children: React.ReactNode;
-  defaultTheme?: "light" | "dark" | "system" | "pastel";
+  defaultTheme?: ThemeName;
+  defaultFontSize?: FontSize;
+  defaultFontFamily?: FontFamily;
+  defaultReduceMotion?: boolean;
 }) {
-  const [theme, setTheme] = React.useState<
-    "light" | "dark" | "system" | "pastel"
-  >(() => {
-    if (typeof window !== "undefined") {
-      return (
-        (localStorage.getItem("theme") as
-          | "light"
-          | "dark"
-          | "system"
-          | "pastel") || defaultTheme
-      );
-    }
-    return defaultTheme;
-  });
+  const [theme, setTheme] = useState<ThemeName>(defaultTheme);
+  const [systemTheme, setSystemTheme] = useState<ThemeName>('light');
+  const [fontSize, setFontSize] = useState<FontSize>(defaultFontSize);
+  const [fontFamily, setFontFamily] = useState<FontFamily>(defaultFontFamily);
+  const [reduceMotion, setReduceMotion] = useState<boolean>(defaultReduceMotion);
 
-  const [fontSize, setFontSize] = React.useState<FontSize>(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("fontSize") as FontSize) || "md";
-    }
-    return "md";
-  });
-
-  const [fontFamily, setFontFamily] = React.useState<FontFamily>(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("fontFamily") as FontFamily) || "sans";
-    }
-    return "sans";
-  });
-
-  const [systemTheme, setSystemTheme] = React.useState<"light" | "dark">("light");
-
-  const isDarkMode = React.useMemo(() => {
-    if (theme === "system") {
-      if (typeof window !== "undefined") {
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)")
-          .matches;
-        return systemPrefersDark;
-      }
-      return false;
-    }
-    return theme === "dark";
-  }, [theme]);
-
-  // Alias for isDarkMode
-  const isDark = isDarkMode;
-
-  const toggleTheme = React.useCallback(() => {
-    setTheme((prevTheme) => {
-      const newTheme = prevTheme === "dark" ? "light" : "dark";
-      if (typeof window !== "undefined") {
-        localStorage.setItem("theme", newTheme);
-      }
-      return newTheme;
-    });
-  }, []);
-
-  React.useEffect(() => {
-    const root = document.documentElement;
-
-    if (theme === "system") {
-      const systemThemeValue = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
-      setSystemTheme(systemThemeValue);
-      root.classList.remove("light", "dark");
-      root.classList.add(systemThemeValue);
+  useEffect(() => {
+    const root = window.document.documentElement;
+    
+    // Apply theme
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      setSystemTheme(systemTheme);
+      root.classList.remove('light', 'dark');
+      root.classList.add(systemTheme);
     } else {
-      root.classList.remove("light", "dark");
+      root.classList.remove('light', 'dark');
       root.classList.add(theme);
     }
+    
+    // Apply font size
+    root.style.setProperty('--font-size', fontSize);
+    
+    // Apply font family
+    root.style.setProperty('--font-family', fontFamily);
+    
+    // Apply motion preferences
+    if (reduceMotion) {
+      root.classList.add('reduce-motion');
+    } else {
+      root.classList.remove('reduce-motion');
+    }
+  }, [theme, fontSize, fontFamily, reduceMotion]);
 
-    localStorage.setItem("theme", theme);
+  // Listen for system theme changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    const handleChange = () => {
+      if (theme === 'system') {
+        const newSystemTheme = mediaQuery.matches ? 'dark' : 'light';
+        setSystemTheme(newSystemTheme);
+        document.documentElement.classList.remove('light', 'dark');
+        document.documentElement.classList.add(newSystemTheme);
+      }
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme]);
+  
+  const toggleTheme = () => {
+    setTheme(prev => {
+      if (prev === 'dark') return 'light';
+      if (prev === 'light') return 'system';
+      return 'dark';
+    });
+  };
+  
+  const isDark = theme === 'dark' || (theme === 'system' && systemTheme === 'dark');
+  
+  const value = {
+    theme,
+    setTheme,
+    toggleTheme,
+    isDark,
+    isDarkMode: isDark,
+    fontSize,
+    setFontSize,
+    fontFamily,
+    setFontFamily,
+    systemTheme,
+    reduceMotion,
+    setReduceMotion,
+  };
 
   return (
-    <ThemeContext.Provider
-      value={{
-        theme,
-        setTheme,
-        toggleTheme,
-        isDarkMode,
-        fontSize,
-        setFontSize,
-        fontFamily,
-        setFontFamily,
-        isDark,
-        soundEnabled: true,
-        reduceMotion: false,
-        setSoundEnabled: () => {},
-        setReduceMotion: () => {},
-        systemTheme,
-      }}
-      {...props}
-    >
+    <ThemeContext.Provider {...props} value={value}>
       {children}
     </ThemeContext.Provider>
   );
 }
 
 export const useTheme = () => {
-  const context = React.useContext(ThemeContext);
-
+  const context = useContext(ThemeContext);
+  
   if (context === undefined) {
-    throw new Error("useTheme must be used within a ThemeProvider");
+    throw new Error('useTheme must be used within a ThemeProvider');
   }
-
+  
   return context;
 };

@@ -4,17 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Mic, StopCircle, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
-
-interface AudioProcessorProps {
-  onResult?: (analysisResult: EmotionResult) => void;
-  onProcessingChange?: (isProcessing: boolean) => void;
-  isRecording?: boolean;
-  duration?: number; // Duration in seconds
-  autoStart?: boolean;
-  className?: string;
-  mode?: 'voice' | 'ambient' | 'both';
-  visualize?: boolean;
-}
+import { AudioProcessorProps } from '@/types/audio';
 
 export const AudioProcessor: React.FC<AudioProcessorProps> = ({
   onResult,

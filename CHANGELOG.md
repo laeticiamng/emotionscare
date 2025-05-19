@@ -2,6 +2,13 @@
 # Changelog
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.8] - 2025-05-26
+
+### Corrigé
+- Typage `Notification` complété (`linkTo`, `content`, `date`, `isRead`)
+- Alignement des hooks et services sur ce type unifié
+- Nettoyage des déclarations locales dans `useNotifications`
+
 ## [1.1.5] - 2025-05-23
 
 ### Ajouté
@@ -34,8 +41,18 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ## [1.1.8] - 2025-05-26
 
 ### Corrigé
-- Données mock musicales mises en conformité (`src/data/musicPlaylists.ts`).
-- Ajout des propriétés manquantes `url`, `title` et `creator`.
+- Unification des types `ChatMessage` et `ChatConversation`
+- Ajout de `isUser` et harmonisation du champ `sender`
+- Mise à jour des contextes Coach et des hooks associés
+
+
+
+## [1.1.9] - 2025-05-27
+
+### Modifié
+- Ajout de la fonction `convertToPlaylist` dans `musicCompatibility` et nettoyage des imports.
+- Contexte musical enrichi : gestion de l'historique et de la queue (fonctions `addToQueue`, `removeFromQueue`, `clearQueue`).
+- Type `MusicContextType` complété (`setMuted`).
 
 ## [1.1.9] - 2025-05-27
 

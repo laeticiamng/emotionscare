@@ -3,11 +3,11 @@ import React from 'react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Theme, FontFamily, FontSize } from '@/types/theme';
+import { ThemeName, FontFamily, FontSize } from '@/types/theme';
 
 interface ThemeSettingsTabProps {
-  currentTheme: string;
-  onThemeChange: (theme: Theme) => void;
+  currentTheme: ThemeName;
+  onThemeChange: (theme: ThemeName) => void;
   fontFamily?: FontFamily;
   onFontFamilyChange?: (fontFamily: FontFamily) => void;
   fontSize?: FontSize;
@@ -23,14 +23,17 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
   onFontSizeChange
 }) => {
   // Theme options
-  const themes = [
+  const themes: {value: ThemeName, label: string, preview: string}[] = [
     { value: 'light', label: 'Light', preview: '#ffffff' },
     { value: 'dark', label: 'Dark', preview: '#1f2937' },
-    { value: 'system', label: 'System', preview: 'linear-gradient(to right, #ffffff 50%, #1f2937 50%)' }
+    { value: 'system', label: 'System', preview: 'linear-gradient(to right, #ffffff 50%, #1f2937 50%)' },
+    { value: 'pastel', label: 'Pastel', preview: '#f0f9ff' }
   ];
   
   const handleThemeChange = (value: string) => {
-    onThemeChange(value as Theme);
+    if (value === 'light' || value === 'dark' || value === 'system' || value === 'pastel') {
+      onThemeChange(value as ThemeName);
+    }
   };
   
   // Font family options
@@ -38,25 +41,25 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
     { value: "sans", label: "Sans" },
     { value: "serif", label: "Serif" },
     { value: "mono", label: "Monospace" },
-    { value: "system", label: "System Default" }
+    { value: "rounded", label: "Rounded" }
   ];
   
-  const handleFontFamilyChange = (value: FontFamily) => {
+  const handleFontFamilyChange = (value: string) => {
     if (onFontFamilyChange) {
-      onFontFamilyChange(value);
+      onFontFamilyChange(value as FontFamily);
     }
   };
   
   // Font size options
   const fontSizes: {value: FontSize, label: string}[] = [
-    { value: "small", label: "Small" },
-    { value: "medium", label: "Medium" },
-    { value: "large", label: "Large" }
+    { value: "sm", label: "Small" },
+    { value: "md", label: "Medium" },
+    { value: "lg", label: "Large" }
   ];
   
-  const handleFontSizeChange = (value: FontSize) => {
+  const handleFontSizeChange = (value: string) => {
     if (onFontSizeChange) {
-      onFontSizeChange(value);
+      onFontSizeChange(value as FontSize);
     }
   };
 
@@ -108,7 +111,7 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
           <RadioGroup
             defaultValue={fontFamily}
             onValueChange={handleFontFamilyChange}
-            className="grid grid-cols-2 gap-4"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4"
           >
             {fontFamilies.map((font) => (
               <div key={font.value}>
@@ -158,9 +161,9 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
                   className={cn(
                     "flex items-center justify-center rounded-md border p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer",
                     fontSize === size.value && "bg-accent text-accent-foreground",
-                    size.value === "small" && "text-sm",
-                    size.value === "medium" && "text-base",
-                    size.value === "large" && "text-lg"
+                    size.value === "sm" && "text-sm",
+                    size.value === "md" && "text-base",
+                    size.value === "lg" && "text-lg"
                   )}
                 >
                   {size.label}

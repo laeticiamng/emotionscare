@@ -38,16 +38,23 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
   onCancel,
   initialTab = 'emoji'
 }) => {
-  const [activeTab, setActiveTab] = useState(initialTab);
+  // Fixed: Using correct type for activeTab state
+  const [activeTab, setActiveTab] = useState<'emoji' | 'text' | 'facial' | 'voice'>(initialTab);
   const [isScanning, setIsScanning] = useState(false);
   
   const handleScanComplete = (result: EmotionResult) => {
     onScanComplete(result);
   };
   
+  // Fixed: Using proper type handling for tab changes
+  const handleTabChange = (value: string) => {
+    // Safe cast since we know these are the only possible values
+    setActiveTab(value as 'emoji' | 'text' | 'facial' | 'voice');
+  };
+  
   return (
     <div className="w-full max-w-md mx-auto">
-      <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab}>
+      <Tabs defaultValue={activeTab} value={activeTab} onValueChange={handleTabChange}>
         <TabsList className="grid grid-cols-4 mb-4">
           <TabsTrigger value="emoji">Emoji</TabsTrigger>
           <TabsTrigger value="text">Texte</TabsTrigger>

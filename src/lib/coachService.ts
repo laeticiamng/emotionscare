@@ -1,6 +1,5 @@
-
 import { v4 as uuidv4 } from 'uuid';
-import { emotionalDataService } from '@/lib/coach/emotional-data-service';
+import emotionalDataService from '@/lib/coach/emotional-data-service';
 import { generateRecommendation } from '@/lib/coach/recommender';
 import { EmotionalData } from '@/types/emotional-data';
 

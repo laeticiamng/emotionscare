@@ -36,6 +36,7 @@ export interface MusicPlaylist {
   tags?: string[];
   name?: string; // Pour compatibilité
   creator?: string; // Pour afficher l'auteur de la playlist
+  author?: string; // Pour compatibilité
 }
 
 export interface MusicQueueItem extends MusicTrack {
@@ -70,6 +71,7 @@ export interface MusicContextType extends MusicState {
   prevTrack?: () => void; // Alias pour previous
   togglePlay?: () => void; // Basculer entre pause/play
   playTrack?: (track: MusicTrack) => void; // Alias pour play
+  toggleRepeat?: () => void; // Toggle repeat mode
 
   // Contrôles
   setVolume?: (volume: number) => void;
@@ -78,6 +80,14 @@ export interface MusicContextType extends MusicState {
   toggleShuffle?: () => void;
   setRepeat?: (mode: 'off' | 'track' | 'playlist') => void;
   seekTo?: (time: number) => void;
+  
+  // Time-related properties and methods
+  currentTime?: number;
+  duration?: number;
+  setCurrentTime?: (time: number) => void;
+  setDuration?: (duration: number) => void;
+  setIsPlaying?: (isPlaying: boolean) => void;
+  setIsInitialized?: (isInitialized: boolean) => void; // Added missing method
 
   // Gestion des playlists
   playPlaylist?: (playlist: MusicPlaylist, startTrackId?: string) => void;
@@ -92,8 +102,6 @@ export interface MusicContextType extends MusicState {
   clearQueue?: () => void;
 
   // UI state
-  currentTime?: number;
-  duration?: number;
   error?: Error | null;
   loading?: boolean;
   isInitialized?: boolean;
