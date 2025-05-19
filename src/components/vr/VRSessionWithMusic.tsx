@@ -26,7 +26,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   
   const handleCompleteSession = () => {
     if (onComplete) {
-      onComplete();
+      onComplete(session);
     } else if (onExit) {
       onExit();
     }

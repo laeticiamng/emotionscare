@@ -1,62 +1,79 @@
 
 import { VRSessionTemplate } from '@/types/vr';
 
-// Sample VR session templates
 export const mockVRTemplates: VRSessionTemplate[] = [
   {
-    id: 'vr-template-1',
-    name: 'Ocean Meditation',
-    title: 'Ocean Meditation',
-    description: 'Immerse yourself in the calming sounds and visuals of the ocean for deep relaxation.',
-    thumbnailUrl: '/images/vr/ocean-meditation.jpg',
-    duration: 10,
-    difficulty: 'beginner', // Corrigé de "Beginner"
-    category: 'Meditation',
-    tags: ['relaxation', 'beach', 'ocean'],
-    immersionLevel: 'Deep',
-    goalType: 'Relaxation',
-    interactive: false
-  },
-  {
-    id: 'vr-template-2',
-    name: 'Mountain Retreat',
-    title: 'Mountain Retreat',
-    description: 'Experience the serenity of mountain landscapes with guided breathing exercises.',
-    thumbnailUrl: '/images/vr/mountain-retreat.jpg',
+    id: "vr-template-1",
+    title: "Méditation en forêt",
+    name: "Méditation en forêt",
+    description: "Une session de méditation immersive dans une forêt calme avec le son des oiseaux et du vent dans les arbres.",
     duration: 15,
-    difficulty: 'intermediate', // Corrigé de "Intermediate"
-    category: 'Meditation',
-    tags: ['mountains', 'nature', 'breathing'],
-    immersionLevel: 'Medium',
-    goalType: 'Focus',
-    interactive: false
+    thumbnailUrl: "/images/vr/forest-meditation.jpg",
+    environment: "forest",
+    category: "meditation",
+    tags: ["relaxation", "nature", "beginner"],
+    difficulty: "beginner",
+    intensity: 1,
+    immersionLevel: "Medium",
+    features: ["Audio 3D", "Guide vocal", "Respirations guidées"],
+    rating: 4.8,
+    audioUrl: "/sounds/forest-meditation.mp3",
+    goalType: "relaxation" // Now included in our interface
   },
   {
-    id: 'vr-template-3',
-    name: 'Forest Mindfulness',
-    title: 'Forest Mindfulness',
-    description: 'Walk through a serene forest with interactive elements to focus your attention.',
-    thumbnailUrl: '/images/vr/forest-mindfulness.jpg',
+    id: "vr-template-2",
+    title: "Plage au coucher de soleil",
+    name: "Plage au coucher de soleil",
+    description: "Détendez-vous sur une plage paisible alors que le soleil se couche à l'horizon, avec le son apaisant des vagues.",
     duration: 20,
-    difficulty: 'intermediate', // Corrigé de "Intermediate"
-    category: 'Mindfulness',
-    tags: ['forest', 'nature', 'attention'],
-    immersionLevel: 'High',
-    goalType: 'Awareness',
-    interactive: true
+    thumbnailUrl: "/images/vr/sunset-beach.jpg",
+    environment: "beach",
+    category: "relaxation",
+    tags: ["ocean", "sunset", "calm"],
+    difficulty: "beginner",
+    intensity: 1,
+    immersionLevel: "High",
+    features: ["Ambient sounds", "Guided breathing", "Temperature simulation"],
+    rating: 4.9,
+    audioUrl: "/sounds/ocean-waves.mp3",
+    goalType: "stress-reduction" // Now included in our interface
   },
   {
-    id: 'vr-template-4',
-    name: 'Energy Boost',
-    title: 'Energy Boost',
-    description: 'A vivid experience with upbeat visuals and sounds to increase your energy levels.',
-    thumbnailUrl: '/images/vr/energy-boost.jpg',
-    duration: 10,
-    difficulty: 'beginner', // Corrigé de "All Levels"
-    category: 'Energy',
-    tags: ['energy', 'vitality', 'morning'],
-    immersionLevel: 'Medium',
-    goalType: 'Energy',
-    interactive: true
+    id: "vr-template-3",
+    title: "Montagne enneigée",
+    name: "Montagne enneigée",
+    description: "Une expérience immersive au sommet d'une montagne avec une vue panoramique sur un paysage enneigé.",
+    duration: 30,
+    thumbnailUrl: "/images/vr/snowy-mountain.jpg",
+    environment: "mountain",
+    category: "exploration",
+    tags: ["winter", "adventure", "scenery"],
+    difficulty: "intermediate",
+    intensity: 2,
+    immersionLevel: "High",
+    features: ["Interactive elements", "Weather simulation", "Guided exploration"],
+    rating: 4.7,
+    audioUrl: "/sounds/mountain-wind.mp3",
+    goalType: "mindfulness" // Now included in our interface
+  },
+  {
+    id: "vr-template-4",
+    title: "Espace et étoiles",
+    name: "Espace et étoiles",
+    description: "Flottez dans l'espace en observant des galaxies, étoiles et planètes dans une expérience cosmique méditative.",
+    duration: 25,
+    thumbnailUrl: "/images/vr/space.jpg",
+    environment: "space",
+    category: "meditation",
+    tags: ["space", "cosmic", "deep-relaxation"],
+    difficulty: "beginner",
+    intensity: 1,
+    immersionLevel: "Very High",
+    features: ["Cosmic visuals", "Ambient music", "Zero-gravity simulation"],
+    rating: 4.9,
+    audioUrl: "/sounds/cosmic-ambient.mp3",
+    goalType: "awe" // Now included in our interface
   }
 ];
+
+export default mockVRTemplates;

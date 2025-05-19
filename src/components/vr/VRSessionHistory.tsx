@@ -33,6 +33,14 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
   
   const displaySessions = limitDisplay ? sessions.slice(0, limitDisplay) : sessions;
   
+  const getSessionTime = (session: VRSession) => {
+    return session.startTime || session.startedAt || session.createdAt || new Date();
+  };
+  
+  const getSessionEndTime = (session: VRSession) => {
+    return session.endTime || session.endedAt || new Date();
+  };
+  
   return (
     <Card className={className}>
       {showHeader && (
@@ -54,14 +62,14 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
                     Session #{session.id.substring(0, 6)}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {formatDistance(new Date(session.startTime || session.startedAt || session.createdAt || new Date()), new Date(), { addSuffix: true })}
+                    {formatDistance(new Date(getSessionTime(session)), new Date(), { addSuffix: true })}
                   </div>
                 </div>
                 {(session.endTime || session.endedAt) && (
                   <div className="text-xs text-muted-foreground mt-1">
                     Duration: {formatDistance(
-                      new Date(session.startTime || session.startedAt || session.createdAt || new Date()),
-                      new Date(session.endTime || session.endedAt || new Date())
+                      new Date(getSessionTime(session)),
+                      new Date(getSessionEndTime(session))
                     )}
                   </div>
                 )}

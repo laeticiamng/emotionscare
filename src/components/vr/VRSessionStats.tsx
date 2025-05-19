@@ -10,52 +10,39 @@ interface VRSessionStatsProps {
 }
 
 const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = '' }) => {
-  // Calcul des statistiques
+  // Calculate stats
   const calculateHeartRateChange = () => {
-    if (session.heartRateBefore && session.heartRateAfter) {
+    if (session.heartRateBefore !== undefined && session.heartRateAfter !== undefined) {
       return session.heartRateAfter - session.heartRateBefore;
     }
     return 0;
   };
   
   const calculateAverageHeartRate = () => {
-    if (session.metrics) {
-      // @ts-ignore - We check for property existence dynamically
-      if (session.metrics.heartRate) {
-        // @ts-ignore
-        if (Array.isArray(session.metrics.heartRate)) {
-          // @ts-ignore
-          return session.metrics.heartRate.length > 0 
-            // @ts-ignore
-            ? Math.round(session.metrics.heartRate.reduce((sum, rate) => sum + rate, 0) / session.metrics.heartRate.length) 
-            : 0;
-        } else {
-          // @ts-ignore
-          return session.metrics.heartRate;
-        }
+    if (session.metrics && session.metrics.heartRate) {
+      if (Array.isArray(session.metrics.heartRate)) {
+        return session.metrics.heartRate.length > 0 
+          ? Math.round(session.metrics.heartRate.reduce((sum, rate) => sum + rate, 0) / session.metrics.heartRate.length) 
+          : 0;
+      } else {
+        return session.metrics.heartRate;
       }
     }
     return 0;
   };
   
   const getHeartRateArray = () => {
-    if (session.metrics) {
-      // @ts-ignore - We check for property existence dynamically
-      if (session.metrics.heartRate && Array.isArray(session.metrics.heartRate)) {
-        // @ts-ignore
-        return session.metrics.heartRate;
-      }
+    if (session.metrics && session.metrics.heartRate && Array.isArray(session.metrics.heartRate)) {
+      return session.metrics.heartRate;
     }
     return [];
   };
   
   const getStressLevel = () => {
-    // @ts-ignore - We check for property existence dynamically
     return session.metrics?.stressLevel || 0;
   };
   
   const getFocusLevel = () => {
-    // @ts-ignore - We check for property existence dynamically
     return session.metrics?.focusLevel || 0;
   };
   
@@ -72,7 +59,7 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Fréquence cardiaque */}
+          {/* Heart rate */}
           <div className="p-4 bg-muted rounded-lg">
             <div className="flex items-center justify-between">
               <div>
@@ -85,7 +72,7 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
               <HeartPulse className="text-rose-500 h-8 w-8" />
             </div>
             
-            {session.heartRateBefore && session.heartRateAfter && (
+            {session.heartRateBefore !== undefined && session.heartRateAfter !== undefined && (
               <div className="mt-3 text-xs">
                 <span className="inline-flex items-center">
                   Avant: {session.heartRateBefore} bpm 
@@ -100,7 +87,7 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
               </div>
             )}
             
-            {heartRateArray && Array.isArray(heartRateArray) && heartRateArray.length > 0 && (
+            {heartRateArray.length > 0 && (
               <div className="mt-3 h-12">
                 <div className="flex items-end h-full space-x-1">
                   {heartRateArray.slice(0, 20).map((value, index) => (
@@ -118,7 +105,7 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
             )}
           </div>
           
-          {/* Niveau de stress */}
+          {/* Stress level */}
           <div className="p-4 bg-muted rounded-lg">
             <div className="flex items-center justify-between">
               <div>
@@ -139,7 +126,7 @@ const VRSessionStats: React.FC<VRSessionStatsProps> = ({ session, className = ''
             </div>
           </div>
           
-          {/* Niveau de concentration */}
+          {/* Focus level */}
           <div className="p-4 bg-muted rounded-lg">
             <div className="flex items-center justify-between">
               <div>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { VRSessionTemplate } from '@/types';
+import { VRSessionTemplate } from '@/types/vr';
 
 interface VRHistoryListProps {
   onSelect: (template: VRSessionTemplate) => void;

@@ -1,104 +1,46 @@
 
-/**
- * Utilitaires pour les composants VR
- */
+import { VRSessionTemplate, VRDifficulty } from '@/types/vr';
 
 /**
- * Formatte la durée en minutes lisible
+ * Convert duration value to a number (minutes)
  */
-export function formatDuration(duration?: number | string): string {
-  if (!duration) return "Durée inconnue";
-  
-  const minutes = typeof duration === 'string' ? parseInt(duration, 10) : duration;
-  
-  if (isNaN(minutes)) return "Durée inconnue";
-  
-  if (minutes < 60) {
-    return `${minutes} min`;
-  } else {
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}min` : `${hours}h`;
+export function durationToNumber(duration: number | string): number {
+  if (typeof duration === 'string') {
+    return parseFloat(duration) || 0;
   }
+  return duration || 0;
 }
 
 /**
- * Convertit une durée en nombre de minutes
+ * Format duration for display
  */
-export function durationToNumber(duration?: number | string): number {
-  if (!duration) return 0;
-  return typeof duration === 'string' ? parseInt(duration, 10) : duration;
+export function formatDuration(minutes: string | number): string {
+  const mins = durationToNumber(minutes);
+  if (mins < 60) {
+    return `${mins} min`;
+  }
+  const hours = Math.floor(mins / 60);
+  const remainingMins = mins % 60;
+  return remainingMins > 0 ? `${hours}h ${remainingMins}m` : `${hours}h`;
 }
 
 /**
- * Retourne la classe CSS en fonction de la difficulté
+ * Get CSS class based on difficulty
  */
-export function getDifficultyClass(difficulty?: string): string {
-  switch(difficulty?.toLowerCase()) {
-    case 'advanced':
-    case 'avancé':
-      return 'bg-red-100 text-red-800 border-red-300';
-    case 'intermediate':
-    case 'intermédiaire':
-      return 'bg-orange-100 text-orange-800 border-orange-300';
+export function getDifficultyClass(difficulty: string): string {
+  switch (difficulty?.toLowerCase()) {
     case 'beginner':
-    case 'débutant':
+    case 'easy':
+      return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200';
+    case 'intermediate':
+    case 'medium':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+    case 'advanced':
+    case 'hard':
+      return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200';
+    case 'expert':
+      return 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200';
     default:
-      return 'bg-green-100 text-green-800 border-green-300';
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
   }
-}
-
-/**
- * Normaliser les valeurs de difficulté
- */
-export function normalizeDifficulty(difficulty?: string): "beginner" | "intermediate" | "advanced" {
-  if (!difficulty) return "beginner";
-  
-  const lowercaseDifficulty = difficulty.toLowerCase();
-  
-  if (lowercaseDifficulty === "débutant" || lowercaseDifficulty === "facile" || lowercaseDifficulty === "beginner") {
-    return "beginner";
-  } else if (lowercaseDifficulty === "intermédiaire" || lowercaseDifficulty === "intermediate") {
-    return "intermediate";
-  } else if (lowercaseDifficulty === "avancé" || lowercaseDifficulty === "difficile" || lowercaseDifficulty === "advanced") {
-    return "advanced";
-  }
-  
-  return "beginner";
-}
-
-/**
- * Extraire l'ID YouTube d'une URL
- */
-export function extractYoutubeID(url?: string): string | null {
-  if (!url) return null;
-  
-  // Regex pour extraire l'ID YouTube
-  const regex = /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-  const match = url.match(regex);
-  
-  return match ? match[1] : null;
-}
-
-/**
- * Vérifier si un template est favoris
- */
-export function isTemplateFavorite(templateId: string, favorites: string[]): boolean {
-  return favorites.includes(templateId);
-}
-
-/**
- * Calculer la durée d'une session en minutes
- */
-export function calculateSessionDuration(startTime?: string | Date, endTime?: string | Date): number {
-  if (!startTime || !endTime) return 0;
-  
-  const start = startTime instanceof Date ? startTime : new Date(startTime);
-  const end = endTime instanceof Date ? endTime : new Date(endTime);
-  
-  // Durée en millisecondes
-  const duration = end.getTime() - start.getTime();
-  
-  // Convertir en minutes
-  return Math.round(duration / (1000 * 60));
 }

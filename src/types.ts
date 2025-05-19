@@ -106,7 +106,7 @@ export type {
   SanctuaryWidget,
   EmotionalSynthesis,
   OrchestrationEvent
-} from '@types/orchestration';
+} from './types/orchestration';
 
 export type {
   JournalEntry
@@ -139,13 +139,7 @@ export type {
   EmotionGamificationStats
 } from './types/scan';
 
-export type {
-  MoodEvent,
-  EmotionalLocation,
-  SanctuaryWidget,
-  Prediction,
-  PredictionRecommendation,
-  EmotionalSynthesis,
-  OrchestrationEvent,
-  OrchestrationContextType
-} from './types/orchestration';
+// Add this to avoid the duplicate definition error
+export type { 
+  UseAudioPlayerStateReturn 
+} from './types/audio-player';

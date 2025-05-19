@@ -5,16 +5,21 @@ export interface UseAudioPlayerStateReturn {
   currentTime: number;
   volume: number;
   muted: boolean;
+  currentTrack?: any;
+  track?: any;
   loop: boolean;
   autoplay: boolean;
   play: () => Promise<void>;
   pause: () => void;
   toggle: () => void;
   seek: (time: number) => void;
+  seekTo?: (time: number) => void;
   setVolume: (volume: number) => void;
   toggleMuted: () => void;
+  toggleMute?: () => void;
   toggleLoop: () => void;
   toggleAutoplay: () => void;
+  playTrack?: (track: any) => void;
 }
 
 export interface AudioTrack {

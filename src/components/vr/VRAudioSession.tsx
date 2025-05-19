@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -48,7 +49,7 @@ const VRAudioSession: React.FC<VRAudioSessionProps> = ({
         audioRef.current.pause();
       }
     };
-  }, [template.audioUrl, template.audio_url, template.audioTrack, onComplete, toast]);
+  }, [template, onComplete, toast]);
   
   // Handle play/pause
   useEffect(() => {

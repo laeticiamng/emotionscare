@@ -19,7 +19,7 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
   onStart,
   onBack
 }) => {
-  // Utilisons l'image disponible en suivant l'ordre de priorité
+  // Use the available image following priority order
   const getImageUrl = () => {
     if (template.thumbnailUrl) return template.thumbnailUrl;
     if (template.imageUrl) return template.imageUrl;
@@ -29,12 +29,12 @@ const VRTemplateDetail: React.FC<VRTemplateDetailProps> = ({
     return '/images/vr-placeholder.jpg';
   };
 
-  // Gérer l'événement de début de session
+  // Handle session start event
   const handleStart = () => {
     if (onStart) onStart();
   };
 
-  // Gérer l'événement de retour
+  // Handle back event
   const handleBack = () => {
     if (onBack) onBack();
   };
