@@ -1,145 +1,94 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { useMusic } from '@/contexts/music';
-import { Play, Pause, SkipBack, SkipForward, Music } from 'lucide-react';
+import { useMusicContext } from '@/contexts/MusicContext';
 import { Button } from '@/components/ui/button';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { MusicContextType } from '@/types/music';
-import { getTrackCover, getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
 
 interface MusicMiniPlayerProps {
   className?: string;
 }
 
 const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
-  const musicContext = useMusic();
-  
-  // S'assurer que le contexte est complet avant de continuer
-  if (!musicContext) return null;
-  
-  const { currentTrack, isPlaying } = musicContext as MusicContextType;
-  
-  // Méthodes contextuelles sans vérification typée
-  const togglePlay = () => {
-    if (musicContext.togglePlay) {
-      musicContext.togglePlay();
-    } else if (isPlaying) {
-      if (musicContext.pauseTrack) {
-        musicContext.pauseTrack();
-      } else if (musicContext.pause) {
-        musicContext.pause();
+  const { 
+    currentTrack, 
+    isPlaying, 
+    pause, 
+    resume,
+    next,
+    previous,
+    prevTrack, // Utilisation de prevTrack au lieu de previousTrack
+    muted,
+    toggleMute 
+  } = useMusicContext();
+
+  const handlePlayPause = () => {
+    if (isPlaying) {
+      if (typeof pause === 'function') {
+        pause();
       }
-    } else if (!isPlaying) {
-      if (musicContext.resumeTrack) {
-        musicContext.resumeTrack();
-      } else if (musicContext.resume) {
-        musicContext.resume();
+    } else {
+      if (typeof resume === 'function') {
+        resume();
       }
     }
   };
-  
-  const nextTrack = () => {
-    if (musicContext.nextTrack) {
-      musicContext.nextTrack();
-    } else if (musicContext.next) {
-      musicContext.next();
-    }
-  };
-  
-  const previousTrack = () => {
-    if (musicContext.previousTrack) {
-      musicContext.previousTrack();
-    } else if (musicContext.prevTrack) {
-      musicContext.prevTrack();
-    } else if (musicContext.previous) {
-      musicContext.previous();
-    }
-  };
-  
-  const toggleDrawer = () => {
-    if (musicContext.toggleDrawer) {
-      musicContext.toggleDrawer();
+
+  const handleNext = () => {
+    if (typeof next === 'function') {
+      next();
     }
   };
 
-  if (!currentTrack) return null;
+  const handlePrevious = () => {
+    if (typeof prevTrack === 'function') {
+      prevTrack();
+    } else if (typeof previous === 'function') {
+      previous();
+    }
+  };
 
-  const cover = getTrackCover(currentTrack);
-  const title = getTrackTitle(currentTrack);
-  const artist = getTrackArtist(currentTrack);
+  if (!currentTrack) {
+    return null;
+  }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      className={cn(
-        "flex items-center space-x-2 bg-background/80 backdrop-blur-md rounded-full px-3 py-1 border shadow-sm",
-        className
-      )}
-    >
-      {/* Track Info with Album art */}
-      <div 
-        className="flex items-center cursor-pointer"
-        onClick={toggleDrawer}
-      >
-        <div className="h-7 w-7 rounded-full overflow-hidden flex-shrink-0 bg-primary/10">
-          {cover ? (
-            <img 
-              src={cover} 
-              alt={title} 
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="h-full w-full flex items-center justify-center">
-              <Music className="h-3 w-3" />
-            </div>
-          )}
-        </div>
-        <div className="ml-2 hidden sm:block max-w-[120px]">
-          <p className="text-xs font-medium truncate">{title}</p>
-          <p className="text-xs text-muted-foreground truncate">{artist}</p>
-        </div>
+    <div className={cn("flex items-center space-x-2", className)}>
+      <Button onClick={handlePrevious} size="icon" variant="ghost">
+        <SkipBack className="h-4 w-4" />
+        <span className="sr-only">Précédent</span>
+      </Button>
+
+      <Button onClick={handlePlayPause} size="icon">
+        {isPlaying ? (
+          <Pause className="h-4 w-4" />
+        ) : (
+          <Play className="h-4 w-4" />
+        )}
+        <span className="sr-only">{isPlaying ? 'Pause' : 'Lecture'}</span>
+      </Button>
+
+      <Button onClick={handleNext} size="icon" variant="ghost">
+        <SkipForward className="h-4 w-4" />
+        <span className="sr-only">Suivant</span>
+      </Button>
+
+      <Button onClick={toggleMute} size="icon" variant="ghost">
+        {muted ? (
+          <VolumeX className="h-4 w-4" />
+        ) : (
+          <Volume2 className="h-4 w-4" />
+        )}
+        <span className="sr-only">{muted ? 'Activer le son' : 'Couper le son'}</span>
+      </Button>
+
+      <div className="hidden sm:block truncate max-w-[120px]">
+        <p className="text-xs font-medium truncate">{currentTrack?.title || 'Sans titre'}</p>
+        <p className="text-xs text-muted-foreground truncate">
+          {currentTrack?.artist || 'Artiste inconnu'}
+        </p>
       </div>
-      
-      {/* Controls */}
-      <div className="flex items-center space-x-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 rounded-full"
-          onClick={previousTrack}
-        >
-          <SkipBack className="h-3 w-3" />
-          <span className="sr-only">Previous</span>
-        </Button>
-        
-        <Button
-          variant="default"
-          size="icon"
-          className="h-6 w-6 rounded-full"
-          onClick={togglePlay}
-        >
-          {isPlaying ? (
-            <Pause className="h-3 w-3" />
-          ) : (
-            <Play className="h-3 w-3" />
-          )}
-          <span className="sr-only">{isPlaying ? 'Pause' : 'Play'}</span>
-        </Button>
-        
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 rounded-full"
-          onClick={nextTrack}
-        >
-          <SkipForward className="h-3 w-3" />
-          <span className="sr-only">Next</span>
-        </Button>
-      </div>
-    </motion.div>
+    </div>
   );
 };
 

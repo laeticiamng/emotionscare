@@ -1,179 +1,154 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { EmotionResult } from '@/types/emotion';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import MusicRecommendation from './MusicRecommendation';
-import EmotionFeedback from './EmotionFeedback';
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { Save, Share, Download, ArrowRight } from 'lucide-react';
 
 interface EmotionScanResultProps {
   result: EmotionResult;
-  onSaveFeedback?: (feedback: string) => void;
-  onReset?: () => void;
-  showMusic?: boolean;
+  onSave?: () => void;
+  onShare?: () => void;
+  onDownload?: () => void;
+  onContinue?: () => void;
+  showActions?: boolean;
 }
+
+// Fonction utilitaire pour formater la date
+const formatResultDate = (result: EmotionResult): string => {
+  try {
+    // Utiliser date si disponible, sinon utiliser timestamp
+    const dateString = result.date || result.timestamp;
+    if (!dateString) return 'Date inconnue';
+
+    const date = new Date(dateString);
+    return formatDistanceToNow(date, { addSuffix: true, locale: fr });
+  } catch (error) {
+    console.error('Erreur de formatage de date:', error);
+    return 'Date invalide';
+  }
+};
+
+// Mapper les émotions à des couleurs
+const getEmotionColor = (emotion: string): string => {
+  const emotionColors: Record<string, string> = {
+    happy: 'bg-green-100 text-green-800',
+    sad: 'bg-blue-100 text-blue-800',
+    angry: 'bg-red-100 text-red-800',
+    anxious: 'bg-yellow-100 text-yellow-800',
+    neutral: 'bg-gray-100 text-gray-800',
+    surprised: 'bg-purple-100 text-purple-800',
+    fearful: 'bg-orange-100 text-orange-800',
+    disgusted: 'bg-emerald-100 text-emerald-800',
+    calm: 'bg-sky-100 text-sky-800',
+    excited: 'bg-pink-100 text-pink-800',
+    love: 'bg-red-100 text-red-800',
+    thoughtful: 'bg-indigo-100 text-indigo-800',
+    confused: 'bg-amber-100 text-amber-800',
+  };
+
+  return emotionColors[emotion.toLowerCase()] || 'bg-gray-100 text-gray-800';
+};
+
+// Fonction pour obtenir un pourcentage arrondi à partir du niveau de confiance
+const getConfidencePercentage = (confidence: number): number => {
+  return Math.round(confidence * 100);
+};
 
 const EmotionScanResult: React.FC<EmotionScanResultProps> = ({
   result,
-  onSaveFeedback,
-  onReset,
-  showMusic = true
+  onSave,
+  onShare,
+  onDownload,
+  onContinue,
+  showActions = true,
 }) => {
-  const [activeTab, setActiveTab] = useState('summary');
-  
-  const getEmotionDescription = (emotion: string) => {
-    const descriptions: Record<string, string> = {
-      happy: "Vous êtes dans un état de bonheur et de contentement. C'est un excellent moment pour être créatif et socialiser.",
-      sad: "Vous ressentez de la tristesse. Prenez soin de vous et n'hésitez pas à chercher du soutien si nécessaire.",
-      angry: "Vous ressentez de la colère ou de la frustration. Des techniques de respiration pourraient vous aider à vous calmer.",
-      anxious: "Vous êtes dans un état d'anxiété. Essayez de prendre quelques respirations profondes et de recentrer vos pensées.",
-      calm: "Vous êtes dans un état de calme et de sérénité. C'est un excellent moment pour la méditation ou la réflexion.",
-      tired: "Vous vous sentez fatigué. Envisagez de vous reposer ou de faire une courte pause.",
-      neutral: "Vous êtes dans un état émotionnel neutre et équilibré.",
-      mixed: "Vous avez des émotions mixtes. C'est normal et cela reflète la complexité de l'expérience humaine."
-    };
-    
-    return descriptions[emotion.toLowerCase()] || 
-      "Cette émotion reflète votre état actuel. Prenez conscience de ce que vous ressentez.";
-  };
-  
-  const getRecommendations = (emotion: string) => {
-    const recommendations: Record<string, string[]> = {
-      happy: [
-        "Partagez votre bonne humeur avec les autres",
-        "Engagez-vous dans des activités créatives",
-        "Profitez de cet état pour aborder des tâches difficiles"
-      ],
-      sad: [
-        "Accordez-vous un moment de pause",
-        "Contactez un ami proche ou un membre de votre famille",
-        "Écoutez de la musique apaisante"
-      ],
-      angry: [
-        "Prenez quelques respirations profondes",
-        "Faites une courte promenade si possible",
-        "Écrivez ce qui vous préoccupe dans votre journal"
-      ],
-      anxious: [
-        "Essayez un exercice de respiration guidée",
-        "Décomposez vos tâches en petites étapes gérables",
-        "Limitez votre consommation de caféine"
-      ],
-      calm: [
-        "C'est un bon moment pour la méditation",
-        "Profitez de cet état pour prendre des décisions importantes",
-        "Pratiquez la pleine conscience"
-      ]
-    };
-    
-    return recommendations[emotion.toLowerCase()] || [
-      "Prenez conscience de vos émotions",
-      "Accordez-vous un moment de réflexion",
-      "Adaptez vos activités à votre humeur actuelle"
-    ];
-  };
+  // Déterminer l'émotion principale
+  const mainEmotion = result.primaryEmotion || result.emotion || 'neutral';
+  const confidencePercentage = getConfidencePercentage(result.confidence || result.score || 0.5);
   
   return (
-    <Card>
+    <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Résultat de l'analyse</CardTitle>
+        <CardTitle className="text-xl">Résultat de votre scan émotionnel</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          {formatResultDate(result)}
+        </p>
       </CardHeader>
-      <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full mb-4">
-            <TabsTrigger value="summary">Résumé</TabsTrigger>
-            <TabsTrigger value="details">Détails</TabsTrigger>
-            {showMusic && <TabsTrigger value="music">Musique</TabsTrigger>}
-          </TabsList>
-          
-          <TabsContent value="summary" className="space-y-4">
-            <div className="p-4 border rounded-md bg-muted/50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-lg font-medium">{result.emotion}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Intensité: {result.score}%
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium">Confiance</p>
-                  <p className="text-sm">{Math.round(result.confidence * 100)}%</p>
-                </div>
-              </div>
+      <CardContent className="space-y-4">
+        {/* Émotion principale */}
+        <div className="text-center py-4">
+          <span className={`inline-block px-4 py-2 rounded-full text-sm font-medium ${getEmotionColor(mainEmotion)}`}>
+            {mainEmotion.charAt(0).toUpperCase() + mainEmotion.slice(1)}
+          </span>
+          <div className="mt-2">
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+              <div 
+                className="bg-primary h-2.5 rounded-full" 
+                style={{ width: `${confidencePercentage}%` }}
+              ></div>
             </div>
-            
-            <div>
-              <h3 className="text-md font-medium mb-2">Ce que cela signifie</h3>
-              <p className="text-sm">{getEmotionDescription(result.emotion)}</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Confiance: {confidencePercentage}%
+            </p>
+          </div>
+        </div>
+
+        {/* Émotions secondaires */}
+        {result.secondaryEmotions && result.secondaryEmotions.length > 0 && (
+          <div>
+            <h4 className="text-sm font-medium mb-2">Émotions secondaires</h4>
+            <div className="flex flex-wrap gap-2">
+              {result.secondaryEmotions.map((emotion) => (
+                <span 
+                  key={emotion}
+                  className={`px-3 py-1 rounded-full text-xs ${getEmotionColor(emotion)}`}
+                >
+                  {emotion.charAt(0).toUpperCase() + emotion.slice(1)}
+                </span>
+              ))}
             </div>
-            
-            <div>
-              <h3 className="text-md font-medium mb-2">Recommandations</h3>
-              <ul className="space-y-1 pl-5 list-disc">
-                {getRecommendations(result.emotion).map((recommendation, index) => (
-                  <li key={index} className="text-sm">{recommendation}</li>
-                ))}
-              </ul>
-            </div>
-            
-            {result.feedback ? (
-              <div className="p-4 bg-muted rounded-md">
-                <h3 className="text-sm font-medium mb-1">Votre ressenti</h3>
-                <p className="text-sm italic">{result.feedback}</p>
-              </div>
-            ) : (
-              onSaveFeedback && (
-                <div>
-                  <h3 className="text-md font-medium mb-2">Comment vous sentez-vous réellement ?</h3>
-                  <EmotionFeedback result={result} onSaveFeedback={onSaveFeedback} />
-                </div>
-              )
+          </div>
+        )}
+
+        {/* Source du scan */}
+        <div>
+          <h4 className="text-sm font-medium mb-1">Source</h4>
+          <p className="text-sm">{result.source === 'facial' ? 'Expression faciale' : 
+              result.source === 'voice' ? 'Voix' : 
+              result.source === 'text' ? 'Texte' : 
+              result.source === 'emoji' ? 'Emoji sélectionné' : 'Autre'}</p>
+        </div>
+
+        {/* Actions */}
+        {showActions && (
+          <div className="flex flex-wrap gap-2 pt-4">
+            {onSave && (
+              <Button variant="outline" size="sm" onClick={onSave}>
+                <Save className="mr-2 h-4 w-4" />
+                Enregistrer
+              </Button>
             )}
-          </TabsContent>
-          
-          <TabsContent value="details" className="space-y-4">
-            <div>
-              <h3 className="text-md font-medium mb-2">Données techniques</h3>
-              <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="font-medium">Émotion:</div>
-                  <div>{result.emotion}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="font-medium">Score:</div>
-                  <div>{result.score}%</div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="font-medium">Confiance:</div>
-                  <div>{Math.round((result.confidence || 0) * 100)}%</div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="font-medium">Date:</div>
-                  <div>{result.date ? new Date(result.date).toLocaleString() : new Date().toLocaleString()}</div>
-                </div>
-                {result.text && (
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="font-medium">Texte analysé:</div>
-                    <div>{result.text}</div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </TabsContent>
-          
-          {showMusic && (
-            <TabsContent value="music">
-              <MusicRecommendation emotion={result.emotion || ''} intensity={(result.score || 50) / 100} />
-            </TabsContent>
-          )}
-        </Tabs>
-        
-        {onReset && (
-          <div className="mt-6">
-            <Button onClick={onReset} variant="outline" className="w-full">
-              Nouvelle analyse
-            </Button>
+            {onShare && (
+              <Button variant="outline" size="sm" onClick={onShare}>
+                <Share className="mr-2 h-4 w-4" />
+                Partager
+              </Button>
+            )}
+            {onDownload && (
+              <Button variant="outline" size="sm" onClick={onDownload}>
+                <Download className="mr-2 h-4 w-4" />
+                Télécharger
+              </Button>
+            )}
+            {onContinue && (
+              <Button className="ml-auto" onClick={onContinue}>
+                Continuer
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            )}
           </div>
         )}
       </CardContent>

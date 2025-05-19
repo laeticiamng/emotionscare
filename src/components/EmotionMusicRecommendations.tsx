@@ -1,124 +1,155 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Slider } from '@/components/ui/slider';
-import { Heart, PlayCircle } from 'lucide-react';
-import { useMusic } from '@/contexts/music';
-import { EmotionMusicParams, MusicPlaylist } from '@/types/music';
-import { ensurePlaylist } from '@/utils/musicCompatibility';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Music, Play } from 'lucide-react';
+import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { useMusicContext } from '@/contexts/MusicContext';
+import { ensurePlaylist, convertToPlaylist } from '@/utils/musicCompatibility';
 
-// Emotion preset cards for quick selection
-const emotionPresets = [
-  { emotion: 'calm', label: 'Calme', color: 'bg-blue-100 hover:bg-blue-200', textColor: 'text-blue-700' },
-  { emotion: 'happy', label: 'Joyeux', color: 'bg-yellow-100 hover:bg-yellow-200', textColor: 'text-yellow-700' },
-  { emotion: 'focus', label: 'Concentré', color: 'bg-purple-100 hover:bg-purple-200', textColor: 'text-purple-700' },
-  { emotion: 'energetic', label: 'Énergique', color: 'bg-green-100 hover:bg-green-200', textColor: 'text-green-700' },
-  { emotion: 'melancholic', label: 'Mélancolique', color: 'bg-indigo-100 hover:bg-indigo-200', textColor: 'text-indigo-700' },
-];
+interface EmotionMusicRecommendationsProps {
+  emotion: string;
+  intensity?: number;
+  hideHeader?: boolean;
+  className?: string;
+  onPlayStart?: () => void;
+}
 
-const EmotionMusicRecommendations: React.FC = () => {
-  const music = useMusic();
-  const [selectedEmotion, setSelectedEmotion] = useState('calm');
-  const [intensity, setIntensity] = useState(50);
-  const [isLoading, setIsLoading] = useState(false);
+const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = ({
+  emotion,
+  intensity,
+  hideHeader = false,
+  className,
+  onPlayStart,
+}) => {
+  const [loading, setLoading] = useState(false);
+  const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
+  const musicContext = useMusicContext();
 
-  const handleGetRecommendation = async () => {
-    if (!music.loadPlaylistForEmotion) {
-      console.error('loadPlaylistForEmotion is not available');
-      return;
-    }
-    
-    setIsLoading(true);
-    try {
-      const params: EmotionMusicParams = {
-        emotion: selectedEmotion,
-        intensity: intensity,
-      };
+  useEffect(() => {
+    const loadRecommendation = async () => {
+      if (!emotion) return;
       
-      // Utiliser loadPlaylistForEmotion car c'est plus stable
-      const playlist = await music.loadPlaylistForEmotion(params);
-      
-      if (playlist) {
-        const formattedPlaylist = ensurePlaylist(playlist);
+      setLoading(true);
+      try {
+        const params: EmotionMusicParams = {
+          emotion,
+          intensity,
+        };
         
-        if (formattedPlaylist.tracks.length > 0 && music.setCurrentTrack && music.setPlaylist) {
-          music.setPlaylist(formattedPlaylist);
-          music.setCurrentTrack(formattedPlaylist.tracks[0]);
+        let newPlaylist = null;
+        
+        // Essayer loadPlaylistForEmotion ou getRecommendationByEmotion
+        if (musicContext.loadPlaylistForEmotion) {
+          newPlaylist = await musicContext.loadPlaylistForEmotion(params);
+        } else if (musicContext.getRecommendationByEmotion) {
+          newPlaylist = await musicContext.getRecommendationByEmotion(params);
+        }
+        
+        if (newPlaylist) {
+          setPlaylist(newPlaylist);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des recommandations musicales:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadRecommendation();
+  }, [emotion, intensity]);
+
+  const handlePlayMusic = () => {
+    if (playlist && musicContext.playPlaylist) {
+      if (onPlayStart) onPlayStart();
+      if (playlist.tracks && playlist.tracks.length > 0) {
+        // Jouer la première piste et ouvrir le drawer si disponible
+        musicContext.playPlaylist(playlist);
+        
+        // Si une fonction spécifique pour définir la piste courante existe
+        if (musicContext.currentTrack !== null && playlist.tracks[0]) {
+          if (typeof musicContext.play === 'function') {
+            musicContext.play(playlist.tracks[0], playlist);
+          }
+        }
+        
+        // Ouvrir le drawer si cette fonction existe
+        if (musicContext.toggleDrawer) {
+          musicContext.toggleDrawer();
+        } else if (musicContext.openDrawer !== undefined && typeof musicContext.setOpenDrawer === 'function') {
+          musicContext.setOpenDrawer(true);
         }
       }
-    } catch (error) {
-      console.error('Error getting music recommendation:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Musique & Émotions</CardTitle>
-        <CardDescription>
-          Choisissez une émotion et l'intensité pour obtenir une playlist personnalisée.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mb-6">
-          {emotionPresets.map((preset) => (
-            <Button
-              key={preset.emotion}
-              variant="outline"
-              className={`${
-                selectedEmotion === preset.emotion ? 'ring-2 ring-offset-2 ring-primary' : ''
-              } ${preset.color} ${preset.textColor} border-none`}
-              onClick={() => setSelectedEmotion(preset.emotion)}
-            >
-              {preset.label}
-            </Button>
-          ))}
-        </div>
+  if (loading) {
+    return (
+      <Card className={className}>
+        {!hideHeader && (
+          <CardHeader>
+            <CardTitle>Musique recommandée</CardTitle>
+          </CardHeader>
+        )}
+        <CardContent>
+          <div className="space-y-2">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="intensity" className="block text-sm font-medium mb-2">
-              Intensité: {intensity}%
-            </label>
-            <Slider
-              id="intensity"
-              min={0}
-              max={100}
-              step={10}
-              value={[intensity]}
-              onValueChange={(values) => setIntensity(values[0])}
-              className="w-full"
-            />
+  if (!playlist) {
+    return null;
+  }
+
+  return (
+    <Card className={className}>
+      {!hideHeader && (
+        <CardHeader>
+          <CardTitle>Musique recommandée</CardTitle>
+        </CardHeader>
+      )}
+      <CardContent>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-medium">{playlist.title || playlist.name || 'Playlist sans titre'}</h3>
+              <p className="text-sm text-muted-foreground">
+                {playlist.tracks?.length || 0} morceaux
+              </p>
+            </div>
+            <Button onClick={handlePlayMusic} size="sm">
+              <Play className="mr-2 h-4 w-4" />
+              Écouter
+            </Button>
+          </div>
+          
+          {/* Aperçu des chansons */}
+          <div className="mt-4">
+            {playlist.tracks?.slice(0, 3).map((track) => (
+              <div key={track.id} className="flex items-center py-2 border-b last:border-0">
+                <div className="bg-primary/10 rounded-full p-2 mr-2">
+                  <Music className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">{track.title || track.name}</p>
+                  <p className="text-xs text-muted-foreground">{track.artist}</p>
+                </div>
+              </div>
+            ))}
+            
+            {playlist.tracks?.length > 3 && (
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                + {playlist.tracks.length - 3} autres morceaux
+              </p>
+            )}
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-1"
-        >
-          <Heart className="h-4 w-4" />
-          Favoris
-        </Button>
-        <Button
-          onClick={handleGetRecommendation}
-          disabled={isLoading}
-          className="flex items-center gap-1"
-        >
-          {isLoading ? (
-            'Chargement...'
-          ) : (
-            <>
-              <PlayCircle className="h-4 w-4" />
-              Générer
-            </>
-          )}
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

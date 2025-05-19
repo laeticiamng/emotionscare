@@ -1,132 +1,108 @@
 
-import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { EmotionResult, EmojiEmotionScannerProps, EmotionRecommendation } from '@/types/emotion';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { EmotionResult, EmojiEmotionScannerProps, EmotionRecommendation } from '@/types/emotion';
+import { Smile, X } from 'lucide-react';
 
-// Liste d'émojis pour exprimer des émotions
-const emotionEmojis = [
-  { emoji: "😊", emotion: "joy" },
-  { emoji: "😢", emotion: "sadness" },
-  { emoji: "😡", emotion: "anger" },
-  { emoji: "😮", emotion: "surprise" },
-  { emoji: "😨", emotion: "fear" },
-  { emoji: "😐", emotion: "neutral" },
-  { emoji: "🤢", emotion: "disgust" },
-  { emoji: "😍", emotion: "love" },
-  { emoji: "😴", emotion: "tired" },
-  { emoji: "😎", emotion: "cool" },
-  { emoji: "🤔", emotion: "thoughtful" },
-  { emoji: "😒", emotion: "annoyed" },
-  { emoji: "😳", emotion: "embarrassed" },
-  { emoji: "🙄", emotion: "bored" },
-  { emoji: "😇", emotion: "grateful" }
-];
-
-const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({ 
+const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
+  onScanComplete,
+  onCancel,
   onResult,
   onProcessingChange,
-  isProcessing: externalIsProcessing,
-  setIsProcessing: externalSetIsProcessing
+  isProcessing,
+  setIsProcessing,
 }) => {
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
-  const [localIsProcessing, setLocalIsProcessing] = useState(false);
-  
-  // Use external state if provided, otherwise use local state
-  const isProcessing = externalIsProcessing !== undefined ? externalIsProcessing : localIsProcessing;
-  const setIsProcessing = externalSetIsProcessing || setLocalIsProcessing;
+  const [processing, setProcessing] = useState(false);
+
+  // Liste des émojis avec les émotions associées
+  const emojis = [
+    { emoji: '😊', emotion: 'happy', description: 'Heureux' },
+    { emoji: '😢', emotion: 'sad', description: 'Triste' },
+    { emoji: '😡', emotion: 'angry', description: 'En colère' },
+    { emoji: '😮', emotion: 'surprised', description: 'Surpris' },
+    { emoji: '😕', emotion: 'confused', description: 'Confus' },
+    { emoji: '😨', emotion: 'anxious', description: 'Anxieux' },
+    { emoji: '😐', emotion: 'neutral', description: 'Neutre' },
+    { emoji: '🥰', emotion: 'love', description: 'Amoureux' },
+    { emoji: '🤔', emotion: 'thoughtful', description: 'Pensif' }
+  ];
 
   const handleEmojiSelect = (emoji: string, emotion: string) => {
     setSelectedEmoji(emoji);
-  };
-
-  const handleSubmit = () => {
-    if (!selectedEmoji) return;
+    setProcessing(true);
     
-    if (onProcessingChange) {
-      onProcessingChange(true);
-    }
-    setIsProcessing(true);
-
-    // Trouver l'émotion correspondant à l'emoji sélectionné
-    const selectedEmojiData = emotionEmojis.find(item => item.emoji === selectedEmoji);
-    const emotionName = selectedEmojiData ? selectedEmojiData.emotion : 'neutral';
+    // Notifier le composant parent que le traitement est en cours
+    if (onProcessingChange) onProcessingChange(true);
+    if (setIsProcessing) setIsProcessing(true);
 
     // Simuler un délai de traitement
     setTimeout(() => {
-      const recommendations: EmotionRecommendation[] = [
-        {
-          id: `rec-emoji-1-${uuidv4()}`,
-          type: "activity",
-          title: "Activité recommandée",
-          description: "Une activité pour vous aider à vous sentir mieux",
-          emotion: emotionName,
-          content: "Faites une pause de 5 minutes"
-        },
-        {
-          id: `rec-emoji-2-${uuidv4()}`,
-          type: "music",
-          title: "Musique recommandée",
-          description: "Une playlist adaptée à votre humeur",
-          emotion: emotionName,
-          content: "Écoutez des morceaux relaxants"
-        }
-      ];
-      
       const result: EmotionResult = {
-        id: `emoji-${Date.now()}`,
-        emotion: emotionName,
-        confidence: 0.9,
-        intensity: 0.8,
-        source: 'emoji',
+        emotion: emotion,
+        confidence: 0.8,
+        secondaryEmotions: ['neutral'],
         timestamp: new Date().toISOString(),
-        emojis: [selectedEmoji],
-        recommendations: recommendations
+        source: 'emoji',
+        text: `Sélection emoji: ${emoji}`,
+        recommendations: [
+          {
+            type: 'music',
+            title: 'Écoutez de la musique apaisante',
+            description: 'Nous vous recommandons d\'écouter une playlist adaptée à votre émotion.',
+            icon: 'music',
+            id: 'music-recommendation'
+          } as unknown as string,
+          {
+            type: 'activity',
+            title: 'Activité recommandée',
+            description: 'Une activité pour vous aider à maintenir ou améliorer votre état émotionnel.',
+            icon: 'activity',
+            id: 'activity-recommendation'
+          } as unknown as string,
+        ],
       };
       
-      if (onResult) {
-        onResult(result);
-      }
+      // Notifier le composant parent que le traitement est terminé
+      if (onProcessingChange) onProcessingChange(false);
+      if (setIsProcessing) setIsProcessing(false);
+      setProcessing(false);
       
-      if (onProcessingChange) {
-        onProcessingChange(false);
-      }
-      setIsProcessing(false);
-    }, 1000);
+      // Appeler le callback avec le résultat
+      if (onScanComplete) onScanComplete(result);
+      if (onResult) onResult(result);
+    }, 1500);
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Sélectionnez un émoji qui représente votre humeur</CardTitle>
+        <CardTitle className="flex items-center">
+          <Smile className="mr-2" />
+          <span>Comment vous sentez-vous ?</span>
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-5 gap-3 text-center">
-          {emotionEmojis.map((item, index) => (
-            <button
-              key={index}
-              onClick={() => handleEmojiSelect(item.emoji, item.emotion)}
-              className={`text-4xl p-2 rounded-lg transition-all ${
-                selectedEmoji === item.emoji 
-                  ? 'bg-primary/20 scale-110' 
-                  : 'hover:bg-secondary/50'
-              }`}
-              disabled={isProcessing}
-              aria-label={`Emoji représentant ${item.emotion}`}
+      <CardContent>
+        <div className="grid grid-cols-3 gap-3">
+          {emojis.map(({emoji, emotion, description}) => (
+            <Button
+              key={emotion}
+              variant={selectedEmoji === emoji ? "default" : "outline"}
+              className="h-16 text-2xl"
+              disabled={processing}
+              onClick={() => handleEmojiSelect(emoji, emotion)}
             >
-              {item.emoji}
-            </button>
+              <span className="text-2xl mr-2">{emoji}</span>
+              <span className="text-xs text-muted-foreground">{description}</span>
+            </Button>
           ))}
         </div>
       </CardContent>
-      <CardFooter>
-        <Button 
-          onClick={handleSubmit}
-          disabled={!selectedEmoji || isProcessing}
-          className="w-full"
-        >
-          {isProcessing ? 'Analyse en cours...' : 'Analyser mon émotion'}
+      <CardFooter className="flex justify-between">
+        <Button variant="ghost" onClick={onCancel}>
+          <X className="mr-2 h-4 w-4" />
+          Annuler
         </Button>
       </CardFooter>
     </Card>

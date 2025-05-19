@@ -18,6 +18,7 @@ export interface EmotionResult {
   feedback?: string;
   recommendations?: string[];
   emojis?: string[];
+  date?: string; // Date pour l'affichage
 }
 
 export type EmotionSource = 'text' | 'voice' | 'facial' | 'emoji' | 'system' | 'ai';
@@ -55,6 +56,7 @@ export interface EmotionRecommendation {
   action?: string;
   link?: string;
   icon?: string;
+  id?: string; // Ajouté pour la compatibilité
 }
 
 export interface Emotion {
@@ -67,9 +69,19 @@ export interface Emotion {
 export interface EmojiEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
   onCancel?: () => void;
+  onResult?: (result: EmotionResult) => void; // Ajouté pour compatibilité
+  isProcessing?: boolean; // Ajouté pour compatibilité
+  setIsProcessing?: (isProcessing: boolean) => void; // Ajouté pour compatibilité
+  onProcessingChange?: (isProcessing: boolean) => void; // Ajouté pour compatibilité
 }
 
 export interface EmotionalTeamViewProps {
   teamId: string;
   period?: 'day' | 'week' | 'month';
+  anonymized?: boolean; // Ajouté pour compatibilité
+  dateRange?: [Date, Date]; // Ajouté pour compatibilité
+  showGraph?: boolean; // Ajouté pour compatibilité
+  showMembers?: boolean; // Ajouté pour compatibilité
+  className?: string; // Ajouté pour compatibilité
+  showDetails?: boolean; // Ajouté pour compatibilité
 }

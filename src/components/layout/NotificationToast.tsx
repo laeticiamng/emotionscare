@@ -16,7 +16,7 @@ const NotificationToast: React.FC = () => {
     toast({
       title: "Notification",
       description: "Cette fonctionnalité sera bientôt disponible!",
-      action: <ToastAction altText="Dismiss">Fermer</ToastAction>,
+      action: <ToastAction altText="Fermer" onClick={() => {}}>Fermer</ToastAction>,
     });
   };
 

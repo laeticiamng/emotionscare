@@ -1,114 +1,124 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mic, MessageSquare, Smile } from 'lucide-react';
-import { EmotionResult } from '@/types/emotion';
-import LiveVoiceScanner from './live/LiveVoiceScanner';
 import TextEmotionScanner from './TextEmotionScanner';
+import AudioEmotionScanner from './AudioEmotionScanner';
+import FacialEmotionScanner from './FacialEmotionScanner';
 import EmojiEmotionScanner from './EmojiEmotionScanner';
 import EmotionScanResult from './EmotionScanResult';
-import { motion } from 'framer-motion';
+import { EmotionResult } from '@/types/emotion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Heart, Smile, Mic, Camera, MessageSquare } from 'lucide-react';
 
 interface EmotionScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  defaultTab?: 'voice' | 'text' | 'emoji';
-  showResults?: boolean;
-  showHistory?: boolean;
+  onScanComplete?: (result: EmotionResult) => void;
+  defaultMethod?: 'text' | 'audio' | 'facial' | 'emoji';
   className?: string;
 }
 
 const EmotionScanner: React.FC<EmotionScannerProps> = ({
-  onResult,
-  defaultTab = 'voice',
-  showResults = true,
-  showHistory = false,
-  className = '',
+  onScanComplete,
+  defaultMethod = 'emoji',
+  className,
 }) => {
-  const [activeTab, setActiveTab] = useState<string>(defaultTab);
+  const [scanMethod, setScanMethod] = useState<'text' | 'audio' | 'facial' | 'emoji'>(defaultMethod);
   const [scanResult, setScanResult] = useState<EmotionResult | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleAnalysisComplete = (result: EmotionResult) => {
+  const handleScanComplete = (result: EmotionResult) => {
     setScanResult(result);
-    
-    if (onResult) {
-      onResult(result);
+    if (onScanComplete) {
+      onScanComplete(result);
     }
   };
 
+  const resetScan = () => {
+    setScanResult(null);
+  };
+
   return (
-    <Card className={`w-full ${className}`}>
+    <Card className={className}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <span className="relative flex h-3 w-3">
-            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${isProcessing ? 'bg-amber-400' : 'bg-emerald-400'} opacity-75`}></span>
-            <span className={`relative inline-flex rounded-full h-3 w-3 ${isProcessing ? 'bg-amber-500' : 'bg-emerald-500'}`}></span>
-          </span>
-          Scanner d'émotions
+        <CardTitle className="flex items-center">
+          <Heart className="mr-2 h-5 w-5 text-primary" />
+          Scanner vos émotions
         </CardTitle>
       </CardHeader>
-
       <CardContent>
-        <Tabs 
-          defaultValue={activeTab} 
-          value={activeTab}
-          onValueChange={setActiveTab} 
-          className="w-full"
-        >
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="voice" className="flex items-center gap-2" disabled={isProcessing}>
-              <Mic className="h-4 w-4" />
-              <span className="hidden sm:inline">Voix</span>
-            </TabsTrigger>
-            <TabsTrigger value="text" className="flex items-center gap-2" disabled={isProcessing}>
-              <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline">Texte</span>
-            </TabsTrigger>
-            <TabsTrigger value="emoji" className="flex items-center gap-2" disabled={isProcessing}>
-              <Smile className="h-4 w-4" />
-              <span className="hidden sm:inline">Emoji</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <div className="mt-4">
-            <TabsContent value="voice" className="m-0">
-              <LiveVoiceScanner 
-                onScanComplete={handleAnalysisComplete}
-                onResult={handleAnalysisComplete}
-                isProcessing={isProcessing}
-                setIsProcessing={setIsProcessing}
+        <AnimatePresence mode="wait">
+          {!scanResult ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Tabs value={scanMethod} onValueChange={(value) => setScanMethod(value as any)}>
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="emoji" disabled={isProcessing}>
+                    <Smile className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Emoji</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="text" disabled={isProcessing}>
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Texte</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="audio" disabled={isProcessing}>
+                    <Mic className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Audio</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="facial" disabled={isProcessing}>
+                    <Camera className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Visage</span>
+                  </TabsTrigger>
+                </TabsList>
+                <div className="mt-4">
+                  <TabsContent value="emoji">
+                    <EmojiEmotionScanner 
+                      onScanComplete={handleScanComplete}
+                      onCancel={resetScan}
+                      onResult={handleScanComplete}
+                      isProcessing={isProcessing}
+                      setIsProcessing={setIsProcessing}
+                      onProcessingChange={setIsProcessing}
+                    />
+                  </TabsContent>
+                  <TabsContent value="text">
+                    <TextEmotionScanner 
+                      onScanComplete={handleScanComplete}
+                      onCancel={resetScan}
+                    />
+                  </TabsContent>
+                  <TabsContent value="audio">
+                    <AudioEmotionScanner 
+                      onScanComplete={handleScanComplete}
+                      onCancel={resetScan}
+                    />
+                  </TabsContent>
+                  <TabsContent value="facial">
+                    <FacialEmotionScanner 
+                      onScanComplete={handleScanComplete}
+                      onCancel={resetScan}
+                    />
+                  </TabsContent>
+                </div>
+              </Tabs>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <EmotionScanResult 
+                result={scanResult}
+                onContinue={resetScan}
               />
-            </TabsContent>
-            
-            <TabsContent value="text" className="m-0">
-              <TextEmotionScanner 
-                onResult={handleAnalysisComplete}
-                isProcessing={isProcessing}
-                setIsProcessing={setIsProcessing}
-              />
-            </TabsContent>
-            
-            <TabsContent value="emoji" className="m-0">
-              <EmojiEmotionScanner 
-                onResult={handleAnalysisComplete}
-                isProcessing={isProcessing}
-                setIsProcessing={setIsProcessing}
-              />
-            </TabsContent>
-          </div>
-        </Tabs>
-
-        {showResults && scanResult && !isProcessing && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="mt-8"
-          >
-            <EmotionScanResult result={scanResult} />
-          </motion.div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </CardContent>
     </Card>
   );
