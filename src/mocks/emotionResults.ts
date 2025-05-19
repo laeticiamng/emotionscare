@@ -15,7 +15,7 @@ export const mockEmotionResults: EmotionResult[] = [
     timestamp: new Date().toISOString(),
     intensity: 0.7,
     emojis: ["😌", "🧘"],
-    source: "scan",
+    source: "text",
     text: "Je me sens calme après ma session de méditation"
   },
   {
@@ -25,7 +25,7 @@ export const mockEmotionResults: EmotionResult[] = [
     timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 jour avant
     intensity: 0.6,
     emojis: ["😓", "⚡"],
-    source: "scan",
+    source: "text",
     text: "Journée stressante avec plusieurs réunions et échéances"
   },
   {
@@ -35,7 +35,7 @@ export const mockEmotionResults: EmotionResult[] = [
     timestamp: new Date(Date.now() - 172800000).toISOString(), // 2 jours avant
     intensity: 0.8,
     emojis: ["😊", "🎉"],
-    source: "manual",
+    source: "system",
     text: "Super journée, j'ai réussi mon projet et passé du temps avec des amis"
   }
 ];

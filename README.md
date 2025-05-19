@@ -245,6 +245,14 @@ Les champs en `snake_case` ne subsistent que pour la compatibilité avec
 certaines sources de données. La commande `npm run type-check` doit s'exécuter
 sans erreur pour valider la cohérence des types.
 
+## Données de test
+
+Les fichiers de mock utilisés pendant le développement se trouvent dans les
+répertoires `src/data` et `src/mocks`. Ils respectent les interfaces TypeScript
+définies dans `src/types` et sont régulièrement alignés avec celles-ci. Veillez
+à mettre à jour ces mocks en même temps que les types pour éviter toute erreur
+de typage.
+
 ## Notifications CI
 
 Par défaut, GitHub envoie un email à chaque échec du workflow CI. Pour 
