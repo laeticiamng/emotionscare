@@ -26,6 +26,12 @@ export interface VRSessionTemplate {
   coverUrl?: string;
   cover_url?: string;
   rating?: number;
+  intensity?: number;
+  features?: string[];
+  popularity?: number;
+  objective?: string;
+  type?: string;
+  thumbnail?: string;
 }
 
 export interface VRSession {
@@ -42,6 +48,13 @@ export interface VRSession {
   heartRateBefore?: number;
   heartRateAfter?: number;
   completed?: boolean;
+  metrics?: {
+    heartRate?: number[] | number;
+    stressLevel?: number;
+    focusLevel?: number;
+    emotionEnd?: string;
+  };
+  template?: VRSessionTemplate;
 }
 
 export interface VRSessionWithMusicProps {
@@ -58,11 +71,20 @@ export interface VRSessionWithMusicProps {
 export interface VRSessionHistoryProps {
   sessions?: VRSession[];
   showHeader?: boolean;
+  onSelect?: (session: VRSession) => void;
+  emptyMessage?: string;
+  limitDisplay?: number;
+  userId?: string;
+  limit?: number;
+  className?: string;
+  onSessionSelect?: (session: VRSession) => void;
 }
 
 export interface VRTemplateDetailProps {
   template: VRSessionTemplate;
   onStartSession?: () => void;
+  onStart?: () => void;
   heartRate?: number;
   onBack?: () => void;
+  className?: string;
 }

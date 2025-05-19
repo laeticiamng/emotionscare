@@ -24,7 +24,7 @@ const VRTemplateDetailView: React.FC<VRTemplateDetailViewProps> = ({
       <VRTemplateDetail
         template={template}
         heartRate={heartRate}
-        onStartSession={onStartSession}
+        onStart={onStartSession}
         onBack={onBack}
       />
       

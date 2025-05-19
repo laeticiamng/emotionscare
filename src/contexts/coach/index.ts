@@ -1,5 +1,5 @@
 
 // Réexportation des éléments du contexte coach
-import { CoachContext, CoachProvider, CoachContextType } from './CoachContext';
+import { CoachContext, CoachProvider } from './CoachContext';
 export { CoachContext, CoachProvider };
-export type { CoachContextType };
+// Note: CoachContextType is no longer exported from CoachContext

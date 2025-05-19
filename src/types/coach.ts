@@ -12,6 +12,8 @@ export interface ChatMessage {
   role?: string;
   text?: string;
   isLoading?: boolean;
+  conversationId?: string;
+  conversation_id?: string; // For compatibility
 }
 
 export interface ChatConversation {
@@ -21,6 +23,7 @@ export interface ChatConversation {
   createdAt: string;
   updatedAt: string;
   isActive: boolean;
+  lastMessage?: string;
 }
 
 export interface ChatResponse {

@@ -30,4 +30,5 @@ export interface ThemeOption {
   name: string;
   value: Theme;
   icon?: React.ReactNode;
+  preview?: string;
 }

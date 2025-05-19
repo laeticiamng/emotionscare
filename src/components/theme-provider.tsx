@@ -14,6 +14,7 @@ const ThemeContext = React.createContext<ThemeContextType>({
   setFontSize: () => {},
   fontFamily: "sans",
   setFontFamily: () => {},
+  systemTheme: "light",
 });
 
 export function ThemeProvider({
@@ -53,21 +54,21 @@ export function ThemeProvider({
     return "sans";
   });
 
+  const [systemTheme, setSystemTheme] = React.useState<"light" | "dark">("light");
+
   const isDarkMode = React.useMemo(() => {
     if (theme === "system") {
       if (typeof window !== "undefined") {
-        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-          .matches
-          ? "dark"
-          : "light";
-        return systemTheme === "dark";
+        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)")
+          .matches;
+        return systemPrefersDark;
       }
       return false;
     }
     return theme === "dark";
   }, [theme]);
 
-  // Alias pour isDarkMode
+  // Alias for isDarkMode
   const isDark = isDarkMode;
 
   const toggleTheme = React.useCallback(() => {
@@ -84,13 +85,14 @@ export function ThemeProvider({
     const root = document.documentElement;
 
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+      const systemThemeValue = window.matchMedia("(prefers-color-scheme: dark)")
         .matches
         ? "dark"
         : "light";
 
+      setSystemTheme(systemThemeValue);
       root.classList.remove("light", "dark");
-      root.classList.add(systemTheme);
+      root.classList.add(systemThemeValue);
     } else {
       root.classList.remove("light", "dark");
       root.classList.add(theme);
@@ -115,6 +117,7 @@ export function ThemeProvider({
         reduceMotion: false,
         setSoundEnabled: () => {},
         setReduceMotion: () => {},
+        systemTheme,
       }}
       {...props}
     >

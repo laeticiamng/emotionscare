@@ -15,8 +15,10 @@ const UserDashboardSections: React.FC = () => {
       environment: 'env-1', // Changed from environmentId to environment
       category: 'méditation',
       intensity: 1,
-      objective: 'Apaiser l\'esprit',
-      type: 'meditation',
+      difficulty: 'Beginner',
+      immersionLevel: 'Medium',
+      goalType: 'Focus',
+      interactive: false,
       tags: ['morning', 'calm', 'focus']
     },
     {
@@ -29,8 +31,10 @@ const UserDashboardSections: React.FC = () => {
       environment: 'env-2', // Changed from environmentId to environment
       category: 'relaxation',
       intensity: 2,
-      objective: 'Réduire le stress',
-      type: 'relaxation',
+      difficulty: 'Intermediate',
+      immersionLevel: 'Deep',
+      goalType: 'Relaxation',
+      interactive: false,
       tags: ['stress-relief', 'evening', 'sleep']
     }
   ];

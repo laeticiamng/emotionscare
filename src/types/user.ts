@@ -15,6 +15,7 @@ export interface User {
   joined_at?: string;
   preferences?: any;
   emotional_score?: number;
+  job_title?: string;
 }
 
 export interface AuthUser {
