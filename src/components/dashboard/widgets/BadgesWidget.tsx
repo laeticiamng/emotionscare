@@ -10,11 +10,11 @@ interface BadgesWidgetProps {
 
 const BadgesWidget: React.FC<BadgesWidgetProps> = ({ badges, className }) => {
   const recentBadges = badges
-    .filter(badge => badge.unlocked || badge.unlockedAt)
+    .filter(badge => badge.unlocked || badge.achieved || badge.dateAwarded)
     .sort((a, b) => {
       // Get date values, prioritizing standard fields and falling back to compatibility fields
-      const dateA = new Date(a.unlockedAt || a.unlocked_at || '').getTime();
-      const dateB = new Date(b.unlockedAt || b.unlocked_at || '').getTime();
+      const dateA = new Date(a.dateAwarded || a.unlockedAt || a.unlocked_at || a.timestamp || '').getTime();
+      const dateB = new Date(b.dateAwarded || b.unlockedAt || b.unlocked_at || b.timestamp || '').getTime();
       return dateB - dateA;
     })
     .slice(0, 3);
@@ -30,9 +30,9 @@ const BadgesWidget: React.FC<BadgesWidgetProps> = ({ badges, className }) => {
             {recentBadges.map(badge => (
               <div key={badge.id} className="flex flex-col items-center text-center">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                  {badge.imageUrl || badge.image_url ? (
+                  {badge.imageUrl || badge.image_url || badge.image ? (
                     <img 
-                      src={badge.imageUrl || badge.image_url} 
+                      src={badge.imageUrl || badge.image_url || badge.image} 
                       alt={badge.name} 
                       className="w-12 h-12" 
                     />

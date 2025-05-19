@@ -1,7 +1,7 @@
 
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type FontFamily = 'sans' | 'serif' | 'mono' | 'inter' | 'roboto';
+export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'small' | 'medium' | 'large' | 'xlarge';
+export type FontFamily = 'sans' | 'serif' | 'mono' | 'inter' | 'roboto' | 'system' | 'rounded';
 
 export interface ThemeContextType {
   theme: Theme;
@@ -18,4 +18,7 @@ export interface ThemeContextType {
   reduceMotion?: boolean;
   setSoundEnabled?: (enabled: boolean) => void;
   setReduceMotion?: (reduced: boolean) => void;
+  getContrastText?: (color: string) => 'black' | 'white';
+  preferences?: any;
+  updatePreferences?: (prefs: any) => void;
 }

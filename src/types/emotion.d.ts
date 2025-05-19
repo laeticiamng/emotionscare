@@ -8,6 +8,19 @@ export interface Emotion {
   description?: string;
   intensity?: number;
   category?: string;
+  emotion?: string;
+  id?: string;
+  confidence?: number;
+  score?: number;
+  date?: string;
+  emoji?: string;
+  text?: string;
+  transcript?: string;
+  audioUrl?: string;
+  feedback?: string;
+  userId?: string;
+  user_id?: string;
+  value?: number;
 }
 
 export interface EmotionResult {
@@ -28,6 +41,7 @@ export interface EmotionResult {
   emotions?: Record<string, number>;
   date?: string;
   audioUrl?: string;
+  audio_url?: string;
   transcript?: string;
   dominantEmotion?: {
     name: string;
@@ -36,6 +50,8 @@ export interface EmotionResult {
   textInput?: string;
   facialExpression?: string;
   value?: any;
+  userId?: string;
+  user_id?: string;
 }
 
 export interface EmotionRecommendation {
@@ -46,6 +62,8 @@ export interface EmotionRecommendation {
   type?: string;
   content?: string;
   category?: string;
+  actionLink?: string;
+  actionText?: string;
 }
 
 export interface MoodData {
@@ -112,6 +130,7 @@ export interface FacialEmotionScannerProps {
 export interface VoiceEmotionScannerProps {
   onResult: (result: EmotionResult) => void;
   onProcessingChange?: (processing: boolean) => void;
+  onStartRecording?: () => void;
 }
 
 export interface LiveVoiceScannerProps {

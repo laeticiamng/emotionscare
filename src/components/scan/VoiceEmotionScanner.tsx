@@ -10,9 +10,14 @@ import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 interface VoiceEmotionScannerProps {
   onResult: (result: EmotionResult) => void;
   onStartRecording?: () => void;
+  onProcessingChange?: (processing: boolean) => void;
 }
 
-const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onResult, onStartRecording }) => {
+const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ 
+  onResult, 
+  onStartRecording,
+  onProcessingChange
+}) => {
   const [emotion, setEmotion] = useState("calm");
   const [confidence, setConfidence] = useState(0.75);
   const [intensity, setIntensity] = useState(0.6);
@@ -43,6 +48,10 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onResult, onS
   // Update the handleCompleted function to include the required source field
   const handleCompleted = () => {
     setProcessing(false);
+    if (onProcessingChange) {
+      onProcessingChange(false);
+    }
+    
     // Create mock emotion result
     const result: EmotionResult = {
       id: `voice-${Date.now()}`,
@@ -66,9 +75,15 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onResult, onS
   const handleStart = () => {
     setProcessing(true);
     setShowResults(false);
+    
+    if (onProcessingChange) {
+      onProcessingChange(true);
+    }
+    
     if (onStartRecording) {
       onStartRecording();
     }
+    
     setTimeout(() => {
       handleCompleted();
     }, 2000);

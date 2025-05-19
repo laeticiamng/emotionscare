@@ -1,9 +1,12 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import { EmotionResult, TextEmotionScannerProps } from '@/types/emotion';
+import { v4 as uuidv4 } from 'uuid';
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { EmotionResult, TextEmotionScannerProps, EmotionRecommendation } from '@/types/emotion';
+import { getEmotionEmojis } from '@/utils/emotionUtils';
 
 const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({ 
   onResult, 
@@ -11,19 +14,15 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
   isProcessing: externalIsProcessing,
   setIsProcessing: externalSetIsProcessing
 }) => {
-  const [text, setText] = useState<string>('');
+  const [text, setText] = useState("");
   const [localIsProcessing, setLocalIsProcessing] = useState(false);
   
   // Use external state if provided, otherwise use local state
   const isProcessing = externalIsProcessing !== undefined ? externalIsProcessing : localIsProcessing;
   const setIsProcessing = externalSetIsProcessing || setLocalIsProcessing;
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-  };
-
   const handleSubmit = () => {
-    if (text.trim().length < 3) return;
+    if (!text.trim()) return;
     
     if (onProcessingChange) {
       onProcessingChange(true);
@@ -32,35 +31,43 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
     
     // Simulate processing delay
     setTimeout(() => {
-      // Create a sample emotion result (in a real app, this would come from an API)
+      // Create fake emotion analysis result
+      const emotions = ["joy", "sadness", "anger", "fear", "surprise", "disgust"];
+      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+      const confidence = 0.5 + Math.random() * 0.5; // Random between 0.5 and 1.0
+      const emojis = getEmotionEmojis(randomEmotion);
+      
+      // Create recommendations with proper id and emotion fields
+      const recommendations: EmotionRecommendation[] = [
+        {
+          id: `rec-text-1-${uuidv4()}`,
+          type: "activity",
+          title: "Exercice de respiration",
+          description: "Un exercice de respiration peut vous aider à vous sentir mieux",
+          emotion: randomEmotion,
+          content: "Respirez profondément pendant 5 minutes"
+        },
+        {
+          id: `rec-text-2-${uuidv4()}`,
+          type: "music",
+          title: "Musique recommandée",
+          description: "Écoutez cette playlist pour vous détendre",
+          emotion: randomEmotion,
+          content: "Playlist de relaxation disponible dans l'onglet musique"
+        }
+      ];
+      
       const result: EmotionResult = {
         id: `text-${Date.now()}`,
-        emotion: determineMockEmotion(text),
-        primaryEmotion: determineMockEmotion(text), // Added for components that use primaryEmotion
-        confidence: 0.85,
-        intensity: 0.75,
-        source: 'text',
+        emotion: randomEmotion,
+        confidence: confidence,
+        intensity: confidence * 0.8,
         timestamp: new Date().toISOString(),
+        source: 'text',
         text: text,
-        recommendations: [
-          {
-            id: `rec1-${Date.now()}`,
-            type: "activity",
-            title: "Take a break",
-            description: "Consider taking a short break to reset your mind",
-            content: "Taking a break can help you refocus and recharge.",
-            emotion: determineMockEmotion(text)
-          },
-          {
-            id: `rec2-${Date.now()}`,
-            type: "exercise",
-            title: "Mindfulness exercise",
-            description: "A quick mindfulness exercise to center yourself",
-            content: "Focus on your breathing for 2 minutes to recenter your thoughts.",
-            emotion: determineMockEmotion(text)
-          }
-        ],
-        score: Math.round(Math.random() * 100) // Added for components that use score
+        textInput: text,
+        emojis: emojis,
+        recommendations: recommendations
       };
       
       if (onResult) {
@@ -71,43 +78,32 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
         onProcessingChange(false);
       }
       setIsProcessing(false);
-    }, 2000);
-  };
-
-  // Simple mock emotion detector based on keywords
-  const determineMockEmotion = (text: string): string => {
-    const lowerText = text.toLowerCase();
-    if (lowerText.includes('happy') || lowerText.includes('joy') || lowerText.includes('excited')) {
-      return 'joy';
-    } else if (lowerText.includes('sad') || lowerText.includes('depressed') || lowerText.includes('unhappy')) {
-      return 'sadness';
-    } else if (lowerText.includes('angry') || lowerText.includes('frustrated') || lowerText.includes('mad')) {
-      return 'anger';
-    } else if (lowerText.includes('scared') || lowerText.includes('fear') || lowerText.includes('anxious')) {
-      return 'fear';
-    } else if (lowerText.includes('calm') || lowerText.includes('peaceful') || lowerText.includes('relaxed')) {
-      return 'calm';
-    } else {
-      return 'neutral';
-    }
+    }, 1500);
   };
 
   return (
     <Card className="w-full">
-      <CardContent className="pt-4">
-        <Textarea
-          placeholder="Décrivez comment vous vous sentez en ce moment..."
-          value={text}
-          onChange={handleTextChange}
-          className="min-h-[120px]"
-          disabled={isProcessing}
-        />
+      <CardHeader>
+        <CardTitle>Analyse d'émotions par texte</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="emotion-text">Décrivez votre état émotionnel actuel</Label>
+          <Textarea
+            id="emotion-text"
+            placeholder="Comment vous sentez-vous aujourd'hui? Décrivez vos émotions..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={5}
+            disabled={isProcessing}
+          />
+        </div>
       </CardContent>
       <CardFooter>
         <Button 
           onClick={handleSubmit}
-          disabled={text.trim().length < 3 || isProcessing}
           className="w-full"
+          disabled={!text.trim() || isProcessing}
         >
           {isProcessing ? 'Analyse en cours...' : 'Analyser mes émotions'}
         </Button>

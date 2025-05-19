@@ -41,9 +41,9 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
     { value: "system", label: "System Default" }
   ];
   
-  const handleFontFamilyChange = (value: string) => {
+  const handleFontFamilyChange = (value: FontFamily) => {
     if (onFontFamilyChange) {
-      onFontFamilyChange(value as FontFamily);
+      onFontFamilyChange(value);
     }
   };
   
@@ -56,9 +56,9 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
     { value: "xl", label: "Extra Large" }
   ];
   
-  const handleFontSizeChange = (value: string) => {
+  const handleFontSizeChange = (value: FontSize) => {
     if (onFontSizeChange) {
-      onFontSizeChange(value as FontSize);
+      onFontSizeChange(value);
     }
   };
 

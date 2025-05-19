@@ -2,7 +2,6 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { SpeechRecognition } from '@/types/speech';
 
 export interface VoiceCommandOptions {
   commands?: Record<string, () => void>;
@@ -79,9 +78,10 @@ export function useVoiceCommands(options: VoiceCommandOptions = {}) {
       });
     };
     
-    recognition.onerror = (event) => {
-      setError(`Erreur de reconnaissance vocale: ${event.error}`);
-      onError?.(`Erreur de reconnaissance vocale: ${event.error}`);
+    recognition.onerror = (event: any) => {
+      const errorMessage = event.error || "Erreur de reconnaissance vocale";
+      setError(`Erreur de reconnaissance vocale: ${errorMessage}`);
+      onError?.(`Erreur de reconnaissance vocale: ${errorMessage}`);
       setIsListening(false);
     };
     

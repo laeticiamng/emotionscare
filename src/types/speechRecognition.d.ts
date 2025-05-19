@@ -1,4 +1,8 @@
 
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+}
+
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
   resultIndex: number;
@@ -31,7 +35,7 @@ interface SpeechRecognition extends EventTarget {
   maxAlternatives: number;
   onstart: (event: Event) => void;
   onresult: (event: SpeechRecognitionEvent) => void;
-  onerror: (event: Event) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
   onend: (event: Event) => void;
   start(): void;
   stop(): void;

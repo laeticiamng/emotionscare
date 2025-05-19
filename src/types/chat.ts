@@ -45,6 +45,9 @@ export interface ChatHookResult {
   setInput: (input: string) => void;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleSubmit: (e: React.FormEvent) => void;
+  addMessage?: (content: string, sender: 'user' | 'assistant' | 'system') => ChatMessage;
+  clearMessages?: () => void;
+  isTyping?: boolean;
 }
 
 export interface UseChatOptions {

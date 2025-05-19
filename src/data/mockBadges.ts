@@ -8,7 +8,7 @@ export const mockBadges: Badge[] = [
     description: "Un des premiers à rejoindre la plateforme",
     imageUrl: "/badges/early-adopter.png",
     unlocked: true,
-    level: "1", // Changed from number to string
+    level: 1,
     category: "system",
     rarity: "rare"
   },
@@ -18,7 +18,7 @@ export const mockBadges: Badge[] = [
     description: "Partager ses émotions 10 fois",
     imageUrl: "/badges/emotion-sharing.png",
     unlocked: true,
-    level: "2", // Changed from number to string
+    level: 2,
     category: "emotion",
     progress: 10,
     threshold: 10,
@@ -30,7 +30,7 @@ export const mockBadges: Badge[] = [
     description: "Créer 5 entrées de journal",
     imageUrl: "/badges/journal-writer.png",
     unlocked: false,
-    level: "1", // Changed from number to string
+    level: 1,
     category: "journal",
     progress: 3,
     threshold: 5,
@@ -42,7 +42,7 @@ export const mockBadges: Badge[] = [
     description: "Écouter 20 morceaux de musique",
     imageUrl: "/badges/music-lover.png",
     unlocked: false,
-    level: "3", // Changed from number to string
+    level: 3,
     category: "music",
     progress: 12,
     threshold: 20,

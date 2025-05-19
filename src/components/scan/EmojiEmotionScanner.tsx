@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { EmotionResult, EmojiEmotionScannerProps } from '@/types/emotion';
+import { v4 as uuidv4 } from 'uuid';
+import { EmotionResult, EmojiEmotionScannerProps, EmotionRecommendation } from '@/types/emotion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 
@@ -54,6 +55,25 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
 
     // Simuler un délai de traitement
     setTimeout(() => {
+      const recommendations: EmotionRecommendation[] = [
+        {
+          id: `rec-emoji-1-${uuidv4()}`,
+          type: "activity",
+          title: "Activité recommandée",
+          description: "Une activité pour vous aider à vous sentir mieux",
+          emotion: emotionName,
+          content: "Faites une pause de 5 minutes"
+        },
+        {
+          id: `rec-emoji-2-${uuidv4()}`,
+          type: "music",
+          title: "Musique recommandée",
+          description: "Une playlist adaptée à votre humeur",
+          emotion: emotionName,
+          content: "Écoutez des morceaux relaxants"
+        }
+      ];
+      
       const result: EmotionResult = {
         id: `emoji-${Date.now()}`,
         emotion: emotionName,
@@ -62,22 +82,7 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
         source: 'emoji',
         timestamp: new Date().toISOString(),
         emojis: [selectedEmoji],
-        recommendations: [
-          {
-            id: `rec-emoji-1-${Date.now()}`,
-            type: "activity",
-            title: "Activité recommandée",
-            description: "Une activité pour vous aider à vous sentir mieux",
-            emotion: emotionName
-          },
-          {
-            id: `rec-emoji-2-${Date.now()}`,
-            type: "music",
-            title: "Musique recommandée",
-            description: "Une playlist adaptée à votre humeur",
-            emotion: emotionName
-          }
-        ]
+        recommendations: recommendations
       };
       
       if (onResult) {

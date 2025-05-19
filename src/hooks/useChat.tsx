@@ -5,8 +5,7 @@ import {
   ChatMessage, 
   ChatResponse,
   ChatHookResult,
-  UseChatOptions,
-  normalizeChatMessage
+  UseChatOptions
 } from '@/types/chat';
 
 export function useChat({
@@ -74,11 +73,7 @@ export function useChat({
       
       // Call the onResponse callback if provided
       if (onResponse) {
-        onResponse({
-          id: responseMessage.id,
-          content: mockResponse,
-          timestamp: responseMessage.timestamp,
-        });
+        onResponse(responseMessage);
       }
     } catch (err) {
       console.error('Error sending message:', err);
@@ -108,11 +103,11 @@ export function useChat({
     setInput,
     isLoading,
     error,
-    addMessage,
-    clearMessages,
     sendMessage,
     handleInputChange,
     handleSubmit,
+    addMessage,
+    clearMessages,
     isTyping: isLoading,
   };
 }
