@@ -11,6 +11,7 @@ export interface ChatMessage {
   attachments?: string[];
   metadata?: Record<string, any>;
   text?: string; // Adding this for backward compatibility with existing code
+  conversation_id?: string; // For backward compatibility
 }
 
 export interface ChatConversation {
@@ -24,6 +25,7 @@ export interface ChatConversation {
   participants?: string[];
   metadata?: Record<string, any>;
   user_id?: string; // Add for backward compatibility
+  created_at?: string; // Add for backward compatibility
 }
 
 export interface ChatResponse {
@@ -52,3 +54,31 @@ export interface CoachChatProps {
   autoFocus?: boolean;
   className?: string;
 }
+
+// Adding these for useChat.tsx errors
+export interface ChatHookResult {
+  messages: ChatMessage[];
+  addMessage: (content: string, sender: 'user' | 'assistant' | 'system') => void;
+  clearMessages: () => void;
+  isLoading: boolean;
+  error: Error | null;
+}
+
+export interface UseChatOptions {
+  initialMessages?: ChatMessage[];
+  onError?: (error: Error) => void;
+  onResponse?: (response: ChatResponse) => void;
+}
+
+export const normalizeChatMessage = (message: any): ChatMessage => {
+  return {
+    id: message.id || crypto.randomUUID(),
+    sender: message.sender || message.role || 'user',
+    content: message.content || message.text || '',
+    timestamp: message.timestamp || new Date().toISOString(),
+    conversationId: message.conversationId || message.conversation_id || '',
+    role: message.role || message.sender,
+    text: message.text || message.content,
+    conversation_id: message.conversation_id || message.conversationId
+  };
+};

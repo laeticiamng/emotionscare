@@ -20,15 +20,25 @@ export interface Emotion {
   icon?: string;
   intensity?: number;
   confidence?: number;
+  emotion?: string; // Added for compatibility
+  date?: string; // Added for compatibility
+  text?: string;
+  transcript?: string;
+  audioUrl?: string;
+  feedback?: string;
+  score?: number;
+  userId?: string;
+  user_id?: string;
+  source?: string;
 }
 
 export interface EmotionResult {
   id: string;
   emotion: string;
   confidence: number;
-  intensity: number;
+  intensity: number; // Required field
   timestamp: string;
-  source: string; // Now required
+  source: string; // Required field
   emojis?: string[];
   text?: string;
   emotions?: Record<string, number>;
@@ -43,7 +53,7 @@ export interface EmotionResult {
   audioUrl?: string;
   audio_url?: string;
   textInput?: string;
-  recommendations?: Array<EmotionRecommendation>;
+  recommendations?: EmotionRecommendation[];
   transcript?: string;
   facialExpression?: string;
 }

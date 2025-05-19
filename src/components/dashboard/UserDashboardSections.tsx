@@ -10,15 +10,15 @@ const UserDashboardSections: React.FC = () => {
       name: 'Méditation matinale',
       title: 'Méditation matinale',
       description: 'Commencez votre journée avec une méditation guidée pour un esprit clair',
-      duration: '15', // Changed from number to string
+      duration: '15', // Changed to string to match type definition
       thumbnailUrl: '/images/meditation-morning.jpg',
       environmentId: 'env-1',
       category: 'méditation',
       intensity: 1,
       difficulty: 'Beginner',
-      immersionLevel: 'Medium',
-      goalType: 'Focus',
-      interactive: false,
+      immersionLevel: 'Medium', // Added required property
+      goalType: 'Focus', // Added required property
+      interactive: false, // Added required property
       tags: ['morning', 'calm', 'focus']
     },
     {
@@ -26,15 +26,15 @@ const UserDashboardSections: React.FC = () => {
       name: 'Relaxation profonde',
       title: 'Relaxation profonde',
       description: 'Une session immersive pour libérer le stress et retrouver l\'équilibre',
-      duration: '25', // Changed from number to string
+      duration: '25', // Changed to string to match type definition
       thumbnailUrl: '/images/deep-relaxation.jpg',
       environmentId: 'env-2',
       category: 'relaxation',
       intensity: 2,
       difficulty: 'Intermediate',
-      immersionLevel: 'Deep',
-      goalType: 'Relaxation',
-      interactive: false,
+      immersionLevel: 'Deep', // Added required property
+      goalType: 'Relaxation', // Added required property
+      interactive: false, // Added required property
       tags: ['stress-relief', 'evening', 'sleep']
     }
   ];

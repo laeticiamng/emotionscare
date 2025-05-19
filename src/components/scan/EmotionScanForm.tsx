@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
@@ -6,7 +5,6 @@ import { EmotionResult, EmotionScanFormProps } from '@/types/emotion';
 import VoiceEmotionScanner from './VoiceEmotionScanner';
 import TextEmotionScanner from './TextEmotionScanner';
 import EmojiEmotionScanner from './EmojiEmotionScanner';
-import FacialEmotionScanner from './FacialEmotionScanner';
 
 const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
   onScanComplete,
@@ -87,7 +85,8 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
           </TabsContent>
 
           <TabsContent value="facial" className="space-y-4 mt-0">
-            <FacialEmotionScanner onResult={handleScanResult} />
+            {/* This has been commented out but we keep it for compatibility
+            <FacialEmotionScanner onResult={handleScanResult} /> */}
           </TabsContent>
         </div>
       </Tabs>

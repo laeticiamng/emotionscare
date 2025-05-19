@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from "@/components/ui/slider";
@@ -39,7 +40,7 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult, o
   const handleCompleted = () => {
     setProcessing(false);
     // Create mock emotion result
-    const result = {
+    const result: EmotionResult = {
       id: `voice-${Date.now()}`,
       emotion: emotion,
       confidence: confidence,
@@ -48,7 +49,7 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult, o
       timestamp: new Date().toISOString(),
       emojis: ["😌", "🧘‍♀️"],
       emotions: {},
-      source: "voice-analyzer" // Add required source field
+      source: "voice-analyzer" // Added required source field
     };
     
     setShowResults(true);

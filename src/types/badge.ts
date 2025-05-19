@@ -28,17 +28,19 @@ export interface Challenge {
   total: number;
   completed: boolean;
   imageUrl?: string;
-  reward?: Badge;
+  reward?: Badge | string;
   category?: string;
   expires?: string;
+  unlocked?: boolean;
   // Adding fields needed by ChallengesList component
   title?: string;
   isCompleted?: boolean;
-  goal?: number;
+  goal?: number | string;
   totalSteps?: number;
   completions?: number;
   difficulty?: string;
   points?: number;
   deadline?: string;
   status?: string;
+  icon?: string;
 }
