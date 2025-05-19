@@ -317,6 +317,9 @@ Vous trouverez dans le dossier `src/docs` plusieurs guides détaillés :
 - `unified-access-adaptive-audit.md` : logique d'accès centralisée et expérience adaptative
 - `onboarding-training-audit.md` : structure du module d'onboarding
 
+Des audits complémentaires sont disponibles dans le dossier `docs` :
+- `scalability-innovation-audit.md` : évolutivité et innovation continue
+- `module-registry.md` : registre des modules et roadmap
 
 ## Équipe et contribution
 
