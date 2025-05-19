@@ -5,6 +5,7 @@ export interface EmotionScanFormProps {
   userId?: string;
   onEmotionDetected?: () => void;
   onClose?: () => void;
+  onScanComplete?: (result: EmotionResult) => void;
 }
 
 export type ScanType = 'text' | 'facial' | 'audio' | 'manual' | 'voice' | 'emoji';

@@ -3,5 +3,5 @@
 import { CoachContext, CoachProvider } from './CoachContext';
 export { CoachContext, CoachProvider };
 
-// Export the CoachContextType directly from types
-export { CoachContextType } from './types';
+// Export the CoachContextType properly with 'export type'
+export type { CoachContextType } from './types';
