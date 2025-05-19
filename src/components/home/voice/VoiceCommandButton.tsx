@@ -35,8 +35,8 @@ export const VoiceCommandButton: React.FC<VoiceCommandButtonProps> = ({
       description: "Je suis à votre écoute...",
     });
     
-    // In a real implementation, we would use the Web Speech API or connect to a backend
-    // For demo purposes, we'll simulate voice recognition
+    // Dans une implémentation réelle, nous utiliserions l'API Web Speech ou nous connecterions à un backend
+    // Pour des fins de démonstration, nous allons simuler la reconnaissance vocale
     setTimeout(() => {
       const simulatedCommand = "connexion à mon espace";
       
@@ -45,14 +45,14 @@ export const VoiceCommandButton: React.FC<VoiceCommandButtonProps> = ({
         description: simulatedCommand,
       });
       
-      // Execute matching commands
+      // Exécuter les commandes correspondantes
       Object.entries(commands).forEach(([phrase, callback]) => {
         if (simulatedCommand.toLowerCase().includes(phrase.toLowerCase())) {
           callback();
         }
       });
       
-      // Call the onTranscript callback if provided
+      // Appeler le callback onTranscript si fourni
       if (onTranscript) {
         onTranscript(simulatedCommand);
       }
@@ -71,6 +71,7 @@ export const VoiceCommandButton: React.FC<VoiceCommandButtonProps> = ({
       size={size}
       onClick={toggleListening}
       className={`relative ${isListening ? 'animate-pulse' : ''}`}
+      aria-label={isListening ? "Arrêter l'écoute vocale" : "Activer la commande vocale"}
     >
       {isListening ? (
         <>
