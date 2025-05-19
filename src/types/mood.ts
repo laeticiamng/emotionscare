@@ -1,37 +1,41 @@
 
 export interface MoodData {
-  id?: string;
-  date: string;
-  originalDate?: string;
-  value: number;
-  sentiment?: number;
-  anxiety?: number;
+  id: string;
+  userId: string;
+  date: string | Date;
+  mood: number;
   energy?: number;
-  mood?: string;
+  anxiety?: number;
+  notes?: string;
+  tags?: string[];
+  sentiment?: string; // positive, negative, neutral
+  emotions?: Record<string, number>;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 }
 
-export interface MoodTrend {
-  period: string;
-  average: number;
-  change: number;
-  changePercent: number;
-}
-
-export interface MoodInsight {
-  title: string;
-  description: string;
-  type: 'improvement' | 'decline' | 'neutral' | 'insight';
+export interface EmotionPrediction {
+  emotion: string;
+  probability: number;
+  intensity?: number;
   score?: number;
-  trigger?: string;
-  actionable?: boolean;
-  recommendation?: string;
+  category?: string;
 }
 
-export interface MoodStatistics {
-  average: number;
-  highest: number;
-  lowest: number;
-  trends: MoodTrend[];
-  insights: MoodInsight[];
-  completionRate: number;
+export interface EmotionAnalysis {
+  dominant: EmotionPrediction;
+  emotions: EmotionPrediction[];
+  sentiment: string;
+  intensityScore: number;
+  audioQuality?: number;
+  confidence?: number;
+}
+
+export type EmotionSource = 'text' | 'voice' | 'facial' | 'combined';
+
+export interface EmotionServiceOptions {
+  detailed?: boolean;
+  includeScores?: boolean;
+  language?: string;
+  source?: EmotionSource;
 }

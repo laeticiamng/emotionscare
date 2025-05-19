@@ -1,93 +1,85 @@
 
 export interface VRSessionTemplate {
   id: string;
-  title: string;
-  name?: string; // Pour compatibilité avec l'ancien code
-  description: string;
-  duration: number;
+  title?: string;
+  name?: string;
+  description?: string;
   thumbnailUrl?: string;
-  imageUrl?: string; // Pour compatibilité
-  coverUrl?: string; // Pour compatibilité
-  cover_url?: string; // Pour compatibilité
-  preview_url?: string; // Pour compatibilité
-  category: string;
-  environment?: string;
-  environmentId?: string;
-  tags?: string[];
+  imageUrl?: string;
+  coverUrl?: string;
+  cover_url?: string;
+  preview_url?: string;
+  duration: number | string;
   difficulty: "beginner" | "intermediate" | "advanced";
-  intensity?: number | string;
-  immersionLevel?: string;
-  goalType?: string;
-  interactive?: boolean;
+  category?: string;
+  tags?: string[];
+  type?: string;
   audioUrl?: string;
-  audio_url?: string; // Pour compatibilité
-  audioTrack?: string; // Pour compatibilité
-  completionRate?: number;
-  completion_rate?: number; // Pour compatibilité
-  emotionTarget?: string;
-  emotion_target?: string; // Pour compatibilité
-  emotion?: string; // Pour compatibilité
-  recommendedMood?: string;
-  recommended_mood?: string; // Pour compatibilité
-  createdAt?: string;
-  lastUsed?: string; // Pour historique
-  rating?: number;
-  features?: string[];
-  theme?: string;
-}
-
-export interface VRSessionFeedback {
-  rating: number;
-  emotionBefore: string;
-  emotionAfter: string;
-  comment: string;
+  audio_url?: string;
+  audioTrack?: string;
+  videoUrl?: string;
+  environment?: string;
+  isFeatured?: boolean;
+  isPremium?: boolean;
+  lastUsed?: string | Date;
+  averageRating?: number;
+  totalRatings?: number;
 }
 
 export interface VRSession {
   id: string;
   templateId: string;
+  template?: VRSessionTemplate;
   userId: string;
-  progress: number;
   completed: boolean;
-  duration: number | string;
-  createdAt?: string;
+  duration?: number;
   startedAt?: string;
-  startTime?: string; // Pour compatibilité
+  startTime?: string | Date;
   endedAt?: string;
-  endTime?: string; // Pour compatibilité
-  feedback?: string | VRSessionFeedback;
+  endTime?: string | Date;
+  feedback?: string;
   rating?: number;
   emotionBefore?: string;
   emotionAfter?: string;
   heartRateBefore?: number;
   heartRateAfter?: number;
-  metrics?: Record<string, any>;
+  createdAt?: string;
+  updatedAt?: string;
+  metrics?: VRSessionMetrics;
+}
+
+export interface VRSessionMetrics {
+  focusScore?: number;
+  relaxationScore?: number;
+  stressReduction?: number;
+  moodImprovement?: number;
+  mindfulnessScore?: number;
+  breathingRateStart?: number;
+  breathingRateEnd?: number;
+  focusDuration?: number; // in seconds
+  distractionCount?: number;
 }
 
 export interface VRSessionWithMusicProps {
-  template?: VRSessionTemplate;
-  sessionTemplate?: VRSessionTemplate; // Pour compatibilité
-  session?: VRSession;
+  sessionTemplate?: VRSessionTemplate;
   onComplete?: () => void;
   onExit?: () => void;
   environment?: string;
-  musicEnabled?: boolean;
-  backgroundMusic?: string;
+  musicTrack?: string;
 }
 
-export interface VRSessionHistoryProps {
-  sessions?: VRSession[];
-  onSelect?: (session: VRSession) => void;
-  emptyMessage?: string;
-  limitDisplay?: number;
-  showHeader?: boolean;
-  className?: string;
-  onSessionSelect?: (session: VRSession) => void;
+export interface VRStats {
+  totalSessions: number;
+  totalDuration: number;
+  averageRating: number;
+  mostUsedTemplate: string;
+  stressReduction: number;
+  moodImprovement: number;
+  completionRate: number;
 }
 
-export interface VRTemplateDetailProps {
-  template: VRSessionTemplate;
-  heartRate?: number;
-  onStart?: () => void;
-  onBack?: () => void;
-}
+export type VRCategoryType = 'meditation' | 'breathing' | 'focus' | 'sleep' | 'stress' | 'anxiety' | 'all';
+
+export type VRDifficultyType = 'beginner' | 'intermediate' | 'advanced' | 'all';
+
+export type VRDurationType = 'short' | 'medium' | 'long' | 'all';

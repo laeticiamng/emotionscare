@@ -113,3 +113,73 @@
 .pastel .glass-effect {
   @apply bg-blue-50/80 border-blue-100/30;
 }
+
+/* Animation for page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Sparkle animation for premium elements */
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+}
+
+.sparkle-element::before,
+.sparkle-element::after {
+  content: "";
+  position: absolute;
+  background: radial-gradient(white, transparent);
+  border-radius: 50%;
+  animation: sparkle 3s infinite;
+}
+
+.sparkle-element::before {
+  width: 8px;
+  height: 8px;
+  top: -4px;
+  left: -4px;
+}
+
+.sparkle-element::after {
+  width: 10px;
+  height: 10px;
+  bottom: -5px;
+  right: -5px;
+  animation-delay: 0.3s;
+}
+
+/* Micro interactions */
+.micro-bounce:active {
+  transform: scale(0.97);
+  transition: transform 0.1s;
+}
+
+.micro-press:active {
+  transform: translateY(2px);
+  transition: transform 0.1s;
+}

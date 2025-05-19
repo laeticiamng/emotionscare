@@ -1,45 +1,48 @@
 
-/**
- * MOCK DATA
- * Ce fichier respecte strictement le type officiel VRSessionTemplate
- * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
- */
-
 import { VRSessionTemplate } from '@/types/vr';
+import { normalizeDifficulty } from '@/components/vr/utils';
 
-export const mockVRTemplates: VRSessionTemplate[] = [
+export const vrTemplates: VRSessionTemplate[] = [
   {
-    id: '1',
-    title: 'Méditation en forêt',
-    description: 'Session de méditation relaxante dans un cadre forestier',
-    thumbnailUrl: '/images/vr/forest.jpg',
-    duration: 600, // 10 minutes
-    category: 'meditation',
-    tags: ['relaxation', 'nature', 'débutant'],
-    difficulty: 'débutant',
-    audioTrack: '/audio/forest-meditation.mp3',
-    environment: 'forest',
-    immersionLevel: 'medium',
-    goalType: 'meditation',
-    interactive: false,
-    recommendedMood: 'relaxation'
+    id: "template-1",
+    title: "Méditation pleine conscience",
+    name: "Méditation pleine conscience",
+    description: "Une session guidée pour cultiver l'attention et la pleine conscience.",
+    thumbnailUrl: "/images/vr/meditation-thumbnail.jpg",
+    imageUrl: "/images/vr/meditation.jpg",
+    duration: 10,
+    difficulty: normalizeDifficulty("beginner"),
+    category: "meditation",
+    audioUrl: "/audio/meditation-pleine-conscience.mp3",
+    tags: ["relaxation", "débutant", "stress"],
+    isFeatured: true
   },
   {
-    id: '2',
-    title: 'Plage tranquille',
-    description: 'Détendez-vous au son des vagues sur une plage paradisiaque',
-    thumbnailUrl: '/images/vr/beach.jpg',
-    duration: 900, // 15 minutes
-    category: 'relaxation',
-    tags: ['plage', 'mer', 'détente'],
-    difficulty: 'facile',
-    audioTrack: '/audio/beach-waves.mp3',
-    environment: 'beach',
-    immersionLevel: 'high',
-    goalType: 'relaxation',
-    interactive: false,
-    recommendedMood: 'relaxation'
+    id: "template-2",
+    title: "Respiration profonde",
+    name: "Respiration profonde",
+    description: "Apprenez à vous détendre grâce à des techniques de respiration profonde.",
+    thumbnailUrl: "/images/vr/breathing-thumbnail.jpg",
+    imageUrl: "/images/vr/breathing.jpg",
+    duration: 5,
+    difficulty: normalizeDifficulty("beginner"),
+    category: "breathing",
+    audioUrl: "/audio/respiration-profonde.mp3",
+    tags: ["relaxation", "stress", "rapide"]
+  },
+  {
+    id: "template-3",
+    title: "Méditation guidée avancée",
+    name: "Méditation guidée avancée",
+    description: "Une méditation plus profonde pour les praticiens expérimentés.",
+    thumbnailUrl: "/images/vr/advanced-meditation-thumbnail.jpg",
+    imageUrl: "/images/vr/advanced-meditation.jpg",
+    duration: 20,
+    difficulty: normalizeDifficulty("advanced"),
+    category: "meditation",
+    audioUrl: "/audio/meditation-avancee.mp3",
+    tags: ["avancé", "profond", "concentration"]
   }
 ];
 
-export default mockVRTemplates;
+export default vrTemplates;

@@ -1,18 +1,21 @@
 
-// Définition correcte des types pour SpeechRecognition
+// Type definitions for Web Speech API
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
   resultIndex: number;
+  interpretation?: any;
 }
 
 interface SpeechRecognitionResultList {
-  [index: number]: SpeechRecognitionResult;
   length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
 }
 
 interface SpeechRecognitionResult {
-  [index: number]: SpeechRecognitionAlternative;
   length: number;
+  item(index: number): SpeechRecognitionAlternative;
+  [index: number]: SpeechRecognitionAlternative;
   isFinal: boolean;
 }
 
@@ -21,95 +24,85 @@ interface SpeechRecognitionAlternative {
   confidence: number;
 }
 
-interface SpeechRecognitionConstructor {
-  new (): SpeechRecognitionInstance;
+interface SpeechGrammar {
+  src: string;
+  weight: number;
 }
 
-interface SpeechRecognitionInstance extends EventTarget {
+interface SpeechGrammarList {
+  length: number;
+  item(index: number): SpeechGrammar;
+  [index: number]: SpeechGrammar;
+  addFromURI(src: string, weight?: number): void;
+  addFromString(string: string, weight?: number): void;
+}
+
+interface SpeechRecognitionConstructor {
+  new (): SpeechRecognition;
+  prototype: SpeechRecognition;
+}
+
+interface SpeechRecognition extends EventTarget {
+  grammars: SpeechGrammarList;
+  lang: string;
   continuous: boolean;
   interimResults: boolean;
-  lang: string;
-  start: () => void;
-  stop: () => void;
-  abort: () => void;
-  onresult: ((event: SpeechRecognitionEvent) => void) | null;
-  onerror: ((event: Event) => void) | null;
-  onend: ((event: Event) => void) | null;
+  maxAlternatives: number;
+  serviceURI: string;
+
+  // Event handlers
+  onaudiostart: ((this: SpeechRecognition, ev: Event) => any) | null;
+  onaudioend: ((this: SpeechRecognition, ev: Event) => any) | null;
+  onend: ((this: SpeechRecognition, ev: Event) => any) | null;
+  onerror: ((this: SpeechRecognition, ev: Event) => any) | null;
+  onnomatch: ((this: SpeechRecognition, ev: Event) => any) | null;
+  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => any) | null;
+  onsoundstart: ((this: SpeechRecognition, ev: Event) => any) | null;
+  onsoundend: ((this: SpeechRecognition, ev: Event) => any) | null;
+  onspeechstart: ((this: SpeechRecognition, ev: Event) => any) | null;
+  onspeechend: ((this: SpeechRecognition, ev: Event) => any) | null;
+  onstart: ((this: SpeechRecognition, ev: Event) => any) | null;
+
+  // Methods
+  abort(): void;
+  start(): void;
+  stop(): void;
 }
 
-// Fix global declaration
-declare global {
-  interface Window {
-    SpeechRecognition?: SpeechRecognitionConstructor;
-    webkitSpeechRecognition?: SpeechRecognitionConstructor;
-  }
+interface Window {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
 }
 
-let recognition: SpeechRecognitionInstance | null = null;
+// Function to get the SpeechRecognition constructor
+export function getSpeechRecognition(): SpeechRecognitionConstructor | null {
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
 
-export const initSpeechRecognition = () => {
-  if (typeof window === 'undefined') return null;
+// Create a speech recognition instance
+export function createSpeechRecognition(options?: {
+  lang?: string;
+  continuous?: boolean;
+  interimResults?: boolean;
+}): SpeechRecognition | null {
+  const SpeechRecognition = getSpeechRecognition();
   
-  const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-  
-  if (!SpeechRecognitionAPI) {
-    console.warn('Speech Recognition API not supported in this browser');
+  if (!SpeechRecognition) {
+    console.error('Speech recognition not supported by this browser');
     return null;
   }
   
-  recognition = new SpeechRecognitionAPI();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = 'fr-FR';
+  const recognition = new SpeechRecognition();
+  
+  // Set default options
+  recognition.lang = options?.lang || 'fr-FR';
+  recognition.continuous = options?.continuous ?? false;
+  recognition.interimResults = options?.interimResults ?? true;
   
   return recognition;
-};
+}
 
-export const startListening = (onResult: (text: string, isFinal: boolean) => void, onError?: (error: any) => void) => {
-  if (!recognition) {
-    recognition = initSpeechRecognition();
-    
-    if (!recognition) {
-      if (onError) onError(new Error('Speech Recognition not supported'));
-      return false;
-    }
-  }
-  
-  recognition.onresult = (event: SpeechRecognitionEvent) => {
-    const resultIndex = event.resultIndex;
-    const transcript = Array.from(event.results)
-      .slice(resultIndex)
-      .map(result => result[0].transcript)
-      .join('');
-    
-    const isFinal = event.results[resultIndex].isFinal;
-    
-    onResult(transcript, isFinal);
-  };
-  
-  recognition.onerror = (event) => {
-    if (onError) onError(event);
-  };
-  
-  try {
-    recognition.start();
-    return true;
-  } catch (error) {
-    if (onError) onError(error);
-    return false;
-  }
-};
-
-export const stopListening = () => {
-  if (recognition) {
-    recognition.stop();
-    return true;
-  }
-  return false;
-};
-
-export default {
-  initSpeechRecognition,
-  startListening,
-  stopListening,
-};
+// Check if speech recognition is supported
+export function isSpeechRecognitionSupported(): boolean {
+  return (window.SpeechRecognition || window.webkitSpeechRecognition) !== undefined;
+}

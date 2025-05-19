@@ -1,118 +1,94 @@
 
-import { useState, useCallback } from 'react';
-import { Badge } from '@/types/badge';
+import { useState, useEffect } from 'react';
+import { Badge, Challenge } from '@/types/challenge';
+import { mockCommunityBadges, mockCommunityChallenges } from './community-gamification/mockData';
 
-export function useCommunityGamification() {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [participationBadges, setParticipationBadges] = useState<Badge[]>([]);
-  const [supportBadges, setSupportBadges] = useState<Badge[]>([]);
-  const [creationBadges, setCreationBadges] = useState<Badge[]>([]);
+export const useCommunityGamification = () => {
+  const [badges, setBadges] = useState<Badge[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const fetchParticipationBadges = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      // Simuler une requête API
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const mockParticipationBadges: Badge[] = [
-        {
-          id: "participation-1",
-          name: "Nouveau venu",
-          description: "A rejoint la communauté",
-          imageUrl: "/badges/participation-1.png",
-          category: "participation",
-          level: 1,
-          unlocked: true,
-          unlockCriteria: "Rejoindre la communauté",
-          rarity: "common",
-          dateAwarded: new Date().toISOString()
-        }
-      ];
-      
-      setParticipationBadges(mockParticipationBadges);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des badges de participation:", error);
-    } finally {
-      setIsLoading(false);
-    }
+  useEffect(() => {
+    const loadCommunityGamification = async () => {
+      setIsLoading(true);
+      try {
+        // Dans une vraie application, nous appellerions une API ici
+        // Pour l'instant, nous utilisons des données simulées
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        setBadges(mockCommunityBadges);
+        setChallenges(mockCommunityChallenges);
+      } catch (error) {
+        console.error("Erreur lors du chargement des données de gamification:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadCommunityGamification();
   }, []);
 
-  const fetchSupportBadges = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      // Simuler une requête API
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const mockSupportBadges: Badge[] = [
-        {
-          id: "support-1",
-          name: "Soutien",
-          description: "A soutenu 5 membres",
-          imageUrl: "/badges/support-1.png",
-          category: "support",
-          level: 1,
-          unlocked: true,
-          unlockCriteria: "Soutenir 5 membres",
-          rarity: "common",
-          dateAwarded: new Date().toISOString()
-        }
-      ];
-      
-      setSupportBadges(mockSupportBadges);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des badges de soutien:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const unlockBadge = async (badgeId: string) => {
+    // Dans une vraie application, nous appellerions une API ici
+    const updatedBadges = badges.map(badge => 
+      badge.id === badgeId 
+        ? { ...badge, unlocked: true, dateAwarded: new Date().toISOString() } 
+        : badge
+    );
+    
+    setBadges(updatedBadges);
+    return updatedBadges.find(b => b.id === badgeId);
+  };
 
-  const fetchCreationBadges = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      // Simuler une requête API
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const mockCreationBadges: Badge[] = [
-        {
-          id: "creation-1",
-          name: "Créateur",
-          description: "A créé un nouveau sujet",
-          imageUrl: "/badges/creation-1.png",
-          category: "creation",
-          level: 1,
-          unlocked: false,
-          unlockCriteria: "Créer un nouveau sujet",
-          rarity: "common"
-        }
-      ];
-      
-      setCreationBadges(mockCreationBadges);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des badges de création:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const updateChallengeProgress = async (challengeId: string, progress: number) => {
+    // Dans une vraie application, nous appellerions une API ici
+    const updatedChallenges = challenges.map(challenge => 
+      challenge.id === challengeId 
+        ? { ...challenge, progress: Math.min(progress, challenge.goal || challenge.totalSteps || 100) } 
+        : challenge
+    );
+    
+    setChallenges(updatedChallenges);
+    return updatedChallenges.find(c => c.id === challengeId);
+  };
 
-  // Stats calculées sur les badges
-  const stats = {
-    totalEarned: participationBadges.length + supportBadges.length + creationBadges.length,
-    participationPoints: participationBadges.length * 10,
-    supportPoints: supportBadges.length * 15,
-    creationPoints: creationBadges.length * 20,
-    level: 1 + Math.floor((participationBadges.length + supportBadges.length + creationBadges.length) / 3)
+  const completeChallenge = async (challengeId: string) => {
+    // Dans une vraie application, nous appellerions une API ici
+    const challenge = challenges.find(c => c.id === challengeId);
+    if (!challenge) return null;
+    
+    const updatedChallenges = challenges.map(c => 
+      c.id === challengeId 
+        ? { ...c, completed: true, progress: c.goal || c.totalSteps || 100 } 
+        : c
+    );
+    
+    setChallenges(updatedChallenges);
+    
+    // Créer un badge en récompense
+    const newBadge: Badge = {
+      id: `badge-${Date.now()}`,
+      name: `Badge ${challenge.name}`,
+      description: `Récompense pour avoir complété le défi: ${challenge.description}`,
+      imageUrl: '/badges/challenge-completed.png',
+      unlocked: true,
+      category: 'achievements',
+      dateAwarded: new Date().toISOString()
+    };
+    
+    setBadges(prev => [...prev, newBadge]);
+    
+    return newBadge;
   };
 
   return {
+    badges,
+    challenges,
     isLoading,
-    participationBadges,
-    supportBadges,
-    creationBadges,
-    fetchParticipationBadges,
-    fetchSupportBadges,
-    fetchCreationBadges,
-    stats
+    unlockBadge,
+    updateChallengeProgress,
+    completeChallenge
   };
-}
+};
 
 export default useCommunityGamification;

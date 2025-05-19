@@ -1,191 +1,173 @@
 
-/* Premium UI elements styles */
-
-/* Button styles */
-.btn-premium {
-  @apply rounded-2xl px-6 py-3 text-base font-medium transition-all duration-300;
-  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.1);
+/* Premium UI Styles for EmotionsCare */
+.premium-card {
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg transition-all duration-300;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.btn-premium:hover {
+.premium-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.15);
 }
 
-/* Card styles */
-.card-premium {
-  @apply rounded-2xl overflow-hidden backdrop-blur-sm transition-all duration-300;
+.dark .premium-card {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
 }
 
-.light .card-premium {
-  @apply bg-white/90 border border-gray-100;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+/* Glass Effect */
+.glass-effect {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.dark .card-premium {
-  @apply bg-gray-900/70 border border-gray-800;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+.light .glass-effect {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
 }
 
-.pastel .card-premium {
-  @apply bg-blue-50/80 border border-blue-100;
-  box-shadow: 0 10px 20px rgba(96, 165, 250, 0.1);
+.dark .glass-effect {
+  background: rgba(17, 25, 40, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* Glass effect variations */
-.glass-light {
-  @apply bg-white/60 backdrop-blur-md border border-white/20;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+/* Premium Button */
+.btn-premium {
+  @apply relative overflow-hidden rounded-lg px-4 py-2 font-medium transition-all;
+  background-size: 200% auto;
 }
 
-.glass-dark {
-  @apply bg-gray-900/40 backdrop-blur-md border border-gray-800/50;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+.btn-premium:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  border-radius: inherit;
+  transition: background-color 0.3s;
+  pointer-events: none;
+  z-index: -1;
 }
 
-.glass-pastel {
-  @apply bg-blue-50/70 backdrop-blur-md border border-blue-100/50;
-  box-shadow: 0 8px 32px rgba(96, 165, 250, 0.1);
+.btn-premium:hover:after {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Premium gradient backgrounds */
-.premium-gradient-light {
-  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+.btn-premium.primary {
+  @apply bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700;
 }
 
-.premium-gradient-dark {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+.btn-premium.secondary {
+  @apply bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600;
 }
 
-.premium-gradient-pastel {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+.btn-premium.success {
+  @apply bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600;
 }
 
-/* Glow effects */
-.glow-hover {
-  transition: all 0.3s ease;
+/* Premium Text Gradients */
+.text-gradient-blue {
+  @apply bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent;
 }
 
-.light .glow-hover:hover {
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+.text-gradient-purple {
+  @apply bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent;
 }
 
-.dark .glow-hover:hover {
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+.text-gradient-green {
+  @apply bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent;
 }
 
-.pastel .glow-hover:hover {
-  box-shadow: 0 0 15px rgba(96, 165, 250, 0.4);
+/* Animation Effects */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
-/* Typography premium styles */
-.text-gradient {
-  @apply bg-clip-text text-transparent;
-}
-
-.light .text-gradient {
-  background-image: linear-gradient(to right, #2563eb, #3b82f6);
-}
-
-.dark .text-gradient {
-  background-image: linear-gradient(to right, #38bdf8, #60a5fa);
-}
-
-.pastel .text-gradient {
-  background-image: linear-gradient(to right, #60a5fa, #93c5fd);
-}
-
-/* Premium shadows */
-.shadow-premium-light {
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-}
-
-.shadow-premium-dark {
-  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
-}
-
-.shadow-premium-pastel {
-  box-shadow: 0 10px 25px -5px rgba(96, 165, 250, 0.15);
-}
-
-/* Premium input fields */
-.input-premium {
-  @apply rounded-xl px-4 py-3 border transition-all duration-200;
-}
-
-.light .input-premium {
-  @apply bg-gray-50/80 border-gray-200 focus:border-blue-300 focus:ring focus:ring-blue-100;
-}
-
-.dark .input-premium {
-  @apply bg-gray-800/50 border-gray-700 focus:border-blue-500 focus:ring focus:ring-blue-500/20;
-}
-
-.pastel .input-premium {
-  @apply bg-blue-50/50 border-blue-100 focus:border-blue-300 focus:ring focus:ring-blue-200;
-}
-
-/* Premium motion animation classes */
-.motion-safe\:hover-lift {
-  @apply transition-transform duration-300;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .motion-safe\:hover-lift:hover {
-    transform: translateY(-3px);
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
   }
-  
-  .motion-safe\:hover-scale:hover {
-    transform: scale(1.03);
+  50% {
+    transform: translateY(-10px);
   }
 }
 
-/* Premium dropdown/popover */
-.dropdown-premium {
-  @apply rounded-xl overflow-hidden backdrop-blur-md p-2;
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
 }
 
-.light .dropdown-premium {
-  @apply bg-white/90 border border-gray-100 shadow-lg;
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 0 10px rgba(79, 70, 229, 0);
+  }
 }
 
-.dark .dropdown-premium {
-  @apply bg-gray-900/90 border border-gray-800 shadow-lg;
+/* Card hover effects */
+.card-hover-lift {
+  @apply transition-all duration-300;
 }
 
-.pastel .dropdown-premium {
-  @apply bg-blue-50/90 border border-blue-100 shadow-lg;
+.card-hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-/* Premium scrollbar */
-.scrollbar-premium::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Premium background effects */
+.bg-gradient-premium {
+  @apply bg-gradient-to-br from-blue-50 to-indigo-50;
 }
 
-.light .scrollbar-premium::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.03);
+.dark .bg-gradient-premium {
+  @apply from-gray-900 to-indigo-950;
 }
 
-.light .scrollbar-premium::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+/* Premium sparkles */
+.sparkle {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: sparkle-fade 2s infinite ease-in-out;
+  opacity: 0;
 }
 
-.dark .scrollbar-premium::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+@keyframes sparkle-fade {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
 }
 
-.dark .scrollbar-premium::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
+/* Premium Notifications */
+.notification-badge {
+  @apply absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full flex items-center justify-center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  animation: pulse-badge 2s infinite;
 }
 
-.pastel .scrollbar-premium::-webkit-scrollbar-track {
-  background: rgba(96, 165, 250, 0.03);
+@keyframes pulse-badge {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
 }
 
-.pastel .scrollbar-premium::-webkit-scrollbar-thumb {
-  background: rgba(96, 165, 250, 0.1);
-  border-radius: 10px;
+/* Tablet & Mobile adjustments */
+@media (max-width: 1024px) {
+  .premium-card {
+    @apply rounded-lg;
+  }
 }

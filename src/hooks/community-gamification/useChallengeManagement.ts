@@ -1,43 +1,62 @@
 
 import { useState } from 'react';
-import { completeChallenge } from '@/lib/gamificationService';
-import { Challenge } from './types';
+import { Challenge, Badge } from '@/types/challenge';
+import { updateChallenge, completeChallenge } from '@/lib/gamification/challenge-service';
 
 export const useChallengeManagement = () => {
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const markChallengeAsComplete = async (challengeId: string) => {
-    setIsProcessing(true);
-    setError(null);
-
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [lastBadgeEarned, setLastBadgeEarned] = useState<Badge | null>(null);
+  
+  /**
+   * Update challenge progress
+   */
+  const updateChallengeProgress = async (challengeId: string, progress: number): Promise<boolean> => {
     try {
-      await completeChallenge(challengeId);
-      return true;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Une erreur s'est produite";
-      setError(errorMessage);
+      setIsUpdating(true);
+      const result = await updateChallenge(challengeId, { progress });
+      return result;
+    } catch (error) {
+      console.error("Error updating challenge progress:", error);
       return false;
     } finally {
-      setIsProcessing(false);
+      setIsUpdating(false);
     }
   };
-
-  const updateChallengeProgress = (challenge: Challenge, progress: number) => {
-    // Dans une implémentation réelle, cette fonction mettrait à jour la progression
-    // dans une base de données ou un service externe
-    console.log(`Challenge ${challenge.id} progress updated to ${progress}`);
-    return {
-      ...challenge,
-      progress
-    };
+  
+  /**
+   * Complete a challenge
+   */
+  const completeChallengeAction = async (challengeId: string): Promise<boolean> => {
+    try {
+      setIsUpdating(true);
+      const result = await completeChallenge(challengeId);
+      
+      if (result.success && result.badge) {
+        setLastBadgeEarned(result.badge);
+      }
+      
+      return result.success;
+    } catch (error) {
+      console.error("Error completing challenge:", error);
+      return false;
+    } finally {
+      setIsUpdating(false);
+    }
   };
-
+  
+  /**
+   * Clear the last earned badge notification
+   */
+  const clearLastBadgeEarned = () => {
+    setLastBadgeEarned(null);
+  };
+  
   return {
-    markChallengeAsComplete,
+    isUpdating,
+    lastBadgeEarned,
     updateChallengeProgress,
-    isProcessing,
-    error
+    completeChallenge: completeChallengeAction,
+    clearLastBadgeEarned
   };
 };
 

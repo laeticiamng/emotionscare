@@ -1,121 +1,77 @@
+
 import { useState, useEffect, useCallback } from 'react';
+import { Notification, NotificationType } from '@/types/notification';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import {
-  Notification,
-  NotificationFilter,
-  NotificationType,
-} from '@/types/notifications';
-import { NotificationFrequency } from '@/types/notification';
+import { useToast } from './use-toast';
 
-
-export function useNotifications() {
+export const useNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [filter, setFilter] = useState<NotificationFilter>('all');
   const { user } = useAuth();
   const { toast } = useToast();
-  
-  // Fetch notifications based on filter
-  const fetchNotifications = async (selectedFilter: NotificationFilter = filter) => {
-    if (!user) return;
-    
-    setIsLoading(true);
+
+  // Fetch notifications
+  const fetchNotifications = useCallback(async () => {
+    if (!user) {
+      setNotifications([]);
+      setUnreadCount(0);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
     try {
-      // In a real app, this would be an API call
-      // For now, we'll use mock data
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
-      
-      // Mock notification data
+      // In a real app, we'd fetch from an API
+      // Mock data for demonstration
       const mockNotifications: Notification[] = [
         {
           id: '1',
-          type: 'info',
-          title: 'Nouveau rapport disponible',
-          message: 'Votre rapport hebdomadaire est prêt à être consulté.',
-          createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
+          type: 'achievement',
+          title: 'Badge débloqué!',
+          message: 'Vous avez débloqué le badge "Premier pas"',
           read: false,
-          userId: user.id,
-          timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // For backward compatibility
-          created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // For backward compatibility
-          linkTo: '/dashboard',
-          isRead: false
+          createdAt: new Date(Date.now() - 3600000),
+          actionUrl: '/profile/badges',
+          imageUrl: '/badges/first-step.png',
+          priority: 'normal'
         },
         {
           id: '2',
-          type: 'invitation',
-          title: 'Invitation à une session VR',
-          message: 'Jean Dupont vous invite à rejoindre une session VR relaxation.',
-          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-          read: false,
-          userId: user.id,
-          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // For backward compatibility
-          created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // For backward compatibility
-          linkTo: '/vr-sessions',
-          isRead: false
+          type: 'reminder',
+          title: 'Rappel de méditation',
+          message: 'Votre séance de méditation quotidienne vous attend',
+          read: true,
+          createdAt: new Date(Date.now() - 86400000),
+          actionUrl: '/meditation'
         },
         {
           id: '3',
-          type: 'reminder',
-          title: 'Rappel: Scan émotionnel',
-          message: 'N\'oubliez pas d\'effectuer votre scan émotionnel quotidien.',
-          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
-          read: true,
-          userId: user.id,
-          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // For backward compatibility
-          created_at: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // For backward compatibility
-          linkTo: '/scan',
-          isRead: true
-        },
-        {
-          id: '4',
-          type: 'system',
-          title: 'Maintenance système prévue',
-          message: 'Une maintenance est prévue demain à 22h00.',
-          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
-          read: true,
-          userId: user.id,
-          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // For backward compatibility
-          created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // For backward compatibility
-          linkTo: '/notifications',
-          isRead: true
+          type: 'invitation' as NotificationType,
+          title: 'Invitation à rejoindre un groupe',
+          message: 'Marie vous invite à rejoindre "Méditation matinale"',
+          read: false,
+          createdAt: new Date(Date.now() - 172800000),
+          actionUrl: '/groups/invites'
         }
       ];
-      
-      // Filter notifications based on selected filter
-      let filteredNotifications = mockNotifications;
-      if (selectedFilter === 'unread') {
-        filteredNotifications = mockNotifications.filter(n => !n.read);
-      } else if (selectedFilter !== 'all') {
-        filteredNotifications = mockNotifications.filter(n => n.type === selectedFilter);
-      }
-      
-      setNotifications(filteredNotifications);
-      const unreadNotifications = mockNotifications.filter(n => !n.read);
-      setUnreadCount(unreadNotifications.length);
+
+      setNotifications(mockNotifications);
+      setUnreadCount(mockNotifications.filter(n => !n.read).length);
     } catch (error) {
       console.error('Error fetching notifications:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de charger les notifications',
-        variant: 'destructive',
-      });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
-  
+  }, [user]);
+
   // Mark a notification as read
-  const markAsRead = async (id: string) => {
-    if (!user) return;
-    
+  const markAsRead = useCallback(async (notificationId: string) => {
     try {
-      // In a real app, this would be an API call
-      // For now, we'll update the local state
+      // In a real app, we'd call an API
       setNotifications(prev => 
-        prev.map(notification => 
-          notification.id === id ? { ...notification, read: true, isRead: true } : notification
+        prev.map(n => 
+          n.id === notificationId ? { ...n, read: true } : n
         )
       );
       
@@ -123,81 +79,78 @@ export function useNotifications() {
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Error marking notification as read:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de marquer la notification comme lue',
-        variant: 'destructive',
-      });
     }
-  };
-  
+  }, []);
+
   // Mark all notifications as read
-  const markAllAsRead = async () => {
-    if (!user) return;
-    
+  const markAllAsRead = useCallback(async () => {
     try {
-      // In a real app, this would be an API call
-      // For now, we'll update the local state
-      setNotifications(prev => prev.map(notification => ({ ...notification, read: true, isRead: true })));
+      // In a real app, we'd call an API
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
-      
-      return true;
-    } catch (err) {
-      console.error('Error marking all notifications as read:', err);
-      return false;
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
     }
-  };
-  
-  // Fetch notifications on mount and when filter changes
-  useEffect(() => {
-    if (user) {
-      fetchNotifications(filter);
+  }, []);
+
+  // Delete a notification
+  const deleteNotification = useCallback(async (notificationId: string) => {
+    try {
+      // In a real app, we'd call an API
+      const notification = notifications.find(n => n.id === notificationId);
+      
+      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+      
+      // Update unread count if needed
+      if (notification && !notification.read) {
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+    } catch (error) {
+      console.error('Error deleting notification:', error);
     }
-  }, [filter, user]);
-  
-  // Simulate real-time notification (in a real app, this would be a WebSocket connection)
-  useEffect(() => {
-    if (!user) return;
-    
-    const simulateNewNotification = () => {
-      const newNotification: Notification = {
-        id: `new-${Date.now()}`,
-        type: Math.random() > 0.5 ? 'info' : 'reminder',
-        title: 'Nouvelle notification',
-        message: `Ceci est une notification simulée générée à ${new Date().toLocaleTimeString()}`,
-        createdAt: new Date().toISOString(),
-        read: false,
-        userId: user.id,
-        timestamp: new Date().toISOString(), // For backward compatibility
-        created_at: new Date().toISOString(), // For backward compatibility
-        linkTo: '/dashboard',
-        isRead: false
-      };
-      
-      setNotifications(prev => [newNotification, ...prev]);
-      setUnreadCount(prev => prev + 1);
-      
-      toast({
-        title: 'Nouvelle notification',
-        description: newNotification.message,
-      });
+  }, [notifications]);
+
+  // Add a new notification
+  const addNotification = useCallback((notification: Omit<Notification, 'id' | 'createdAt' | 'read'>) => {
+    const newNotification: Notification = {
+      id: `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date(),
+      read: false,
+      ...notification
     };
-    
-    // Uncomment for demo purposes
-    // const interval = setInterval(simulateNewNotification, 30000); // New notification every 30 seconds
-    // return () => clearInterval(interval);
-  }, [user, toast]);
-  
+
+    setNotifications(prev => [newNotification, ...prev]);
+    setUnreadCount(prev => prev + 1);
+
+    // Show toast for the new notification
+    toast({
+      title: notification.title,
+      description: notification.message,
+      duration: 5000,
+      variant: 'default',
+      action: notification.actionUrl ? {
+        label: 'Voir',
+        onClick: () => {
+          window.location.href = notification.actionUrl || '#';
+          markAsRead(newNotification.id);
+        }
+      } : undefined
+    });
+  }, [markAsRead, toast]);
+
+  // Fetch notifications on mount and when user changes
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
   return {
     notifications,
     unreadCount,
-    isLoading,
-    filter,
-    setFilter,
-    fetchNotifications,
+    loading,
     markAsRead,
-    markAllAsRead
+    markAllAsRead,
+    deleteNotification,
+    addNotification,
+    refresh: fetchNotifications
   };
-}
-
-export default useNotifications;
+};

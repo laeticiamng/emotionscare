@@ -15,7 +15,12 @@ export const fetchUserChallenges = async (userId: string): Promise<Challenge[]> 
       progress: 3,
       goal: 5,
       unlocked: true,
-      reward: {}
+      reward: {
+        id: 'badge1',
+        name: 'Explorateur émotionnel',
+        description: 'A enregistré 5 émotions différentes',
+        imageUrl: '/badges/emotional-explorer.png'
+      } as Badge
     },
     {
       id: '2',
@@ -27,7 +32,12 @@ export const fetchUserChallenges = async (userId: string): Promise<Challenge[]> 
       progress: 1,
       goal: 3,
       unlocked: true,
-      reward: {}
+      reward: {
+        id: 'badge2',
+        name: 'Méditant novice',
+        description: 'A complété 3 sessions de méditation guidée',
+        imageUrl: '/badges/meditation-novice.png'
+      } as Badge
     },
     {
       id: '3',
@@ -39,7 +49,12 @@ export const fetchUserChallenges = async (userId: string): Promise<Challenge[]> 
       progress: 0,
       goal: 7,
       unlocked: false,
-      reward: {}
+      reward: {
+        id: 'badge3',
+        name: 'Journal régulier',
+        description: 'A écrit dans son journal pendant 7 jours consécutifs',
+        imageUrl: '/badges/consistent-journaler.png'
+      } as Badge
     }
   ];
 };
@@ -67,4 +82,23 @@ export const fetchUserBadges = async (userId: string): Promise<Badge[]> => {
       category: 'emotions'
     }
   ];
+};
+
+// Fonction pour compléter un défi
+export const completeChallenge = async (
+  challengeId: string
+): Promise<{ success: boolean; badge?: Badge }> => {
+  console.log(`Completing challenge ${challengeId}`);
+  
+  return {
+    success: true,
+    badge: {
+      id: 'new-badge',
+      name: 'Champion du défi',
+      description: 'Un défi relevé avec succès',
+      imageUrl: '/badges/challenge-completed.png',
+      unlocked: true,
+      category: 'achievements'
+    }
+  };
 };
