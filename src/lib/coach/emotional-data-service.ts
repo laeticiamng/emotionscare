@@ -59,13 +59,14 @@ class EmotionalDataService {
   // Convert from EmotionResult to EmotionalData
   convertFromEmotionResult(result: EmotionResult): EmotionalData {
     return {
-      id: result.id,
+      id: result.id || uuidv4(),
       user_id: result.userId || 'unknown',
       emotion: result.emotion,
       intensity: result.intensity || result.score || 5,
       timestamp: result.timestamp || new Date().toISOString(),
       context: result.text || undefined,
-      source: result.source || 'system'
+      source: result.source || 'system',
+      tags: result.tags || []
     };
   }
   

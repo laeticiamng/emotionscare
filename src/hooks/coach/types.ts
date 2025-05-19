@@ -13,9 +13,10 @@ export interface EmotionalData {
   emotion: string;
   intensity: number;
   timestamp: string;
-  source?: string;
+  source?: EmotionSource;
   context?: string;
   tags?: string[];
+  value?: number; // Added to support existing codebase
 }
 
 export type EmotionSource = 'text' | 'voice' | 'facial' | 'manual' | 'ai' | 'system';
@@ -37,4 +38,19 @@ export interface EmotionalRecommendation {
   description: string;
   actionUrl?: string;
   actionText?: string;
+}
+
+// Add the CoachNotification type that's missing from lib/coach/types
+export interface CoachNotification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  timestamp: Date | string;
+  read?: boolean;
+  action?: {
+    id: string;
+    type: string;
+    payload: any;
+  };
 }

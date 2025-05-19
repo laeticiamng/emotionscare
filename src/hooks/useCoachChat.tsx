@@ -16,7 +16,7 @@ export const useCoachChat = () => {
   const sendMessage = useCallback(async (message: string) => {
     try {
       setIsProcessing(true);
-      // Correction du paramètre pour bien passer le message et le type d'expéditeur
+      // Fix parameter to pass string content and string sender type
       const response = await coach.sendMessage(message, 'user');
       
       setMessages(prevMessages => {

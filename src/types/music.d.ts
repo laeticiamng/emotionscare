@@ -31,9 +31,10 @@ export interface MusicContextType {
   isMuted: boolean;
   isRepeating: boolean;
   isShuffling: boolean;
+  currentTime: number; // Added missing property
   togglePlay: () => void;
   toggleMute: () => void;
-  toggleRepeat: () => void; // Added missing property
+  toggleRepeat: () => void;
   toggleShuffle: () => void;
   setVolume: (value: number) => void;
   setProgress: (value: number) => void;
@@ -42,6 +43,9 @@ export interface MusicContextType {
   prevTrack: () => void;
   addTrack: (track: MusicTrack) => void;
   setPlaylist: (playlist: MusicPlaylist) => void;
+  setCurrentTime: (time: number) => void; // Added missing property
+  setDuration: (duration: number) => void; // Added missing property
+  setIsPlaying: (isPlaying: boolean) => void; // Added missing property
 }
 
 export interface MusicDrawerProps {
