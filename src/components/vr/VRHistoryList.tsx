@@ -33,7 +33,7 @@ const VRHistoryList: React.FC<VRHistoryListProps> = ({
               onClick={() => onSelect(template)}
               className="p-3 border rounded-md hover:bg-muted/50 cursor-pointer transition-colors"
             >
-              <div className="font-medium">{template.name || template.title}</div>
+              <div className="font-medium">{template.title || template.name}</div>
               {template.description && (
                 <div className="text-sm text-muted-foreground">{template.description}</div>
               )}

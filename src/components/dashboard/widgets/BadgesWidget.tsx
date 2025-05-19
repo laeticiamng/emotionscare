@@ -10,11 +10,15 @@ interface BadgesWidgetProps {
 
 const BadgesWidget: React.FC<BadgesWidgetProps> = ({ badges, className }) => {
   const recentBadges = badges
-    .filter(badge => badge.achieved || badge.unlocked || badge.dateAwarded)
+    .filter(badge => badge.earned || badge.achieved || badge.unlocked)
     .sort((a, b) => {
       // Get date values, prioritizing standard fields and falling back to compatibility fields
-      const dateA = new Date(a.dateAwarded || a.unlockedAt || a.unlocked_at || a.timestamp || '').getTime();
-      const dateB = new Date(b.dateAwarded || b.unlockedAt || b.unlocked_at || b.timestamp || '').getTime();
+      const dateA = new Date(
+        a.date_earned || a.dateAwarded || a.unlockedAt || a.unlocked_at || a.timestamp || ''
+      ).getTime();
+      const dateB = new Date(
+        b.date_earned || b.dateAwarded || b.unlockedAt || b.unlocked_at || b.timestamp || ''
+      ).getTime();
       return dateB - dateA;
     })
     .slice(0, 3);

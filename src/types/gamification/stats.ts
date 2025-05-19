@@ -10,5 +10,17 @@ export interface GamificationStats {
   rank: string;
   nextLevel: number;
   lastActivity: string;
-  progressToNextLevel?: number; // Added missing property
+  progressToNextLevel?: number;
+  currentLevel?: number;
+  pointsToNextLevel?: number;
+  nextLevelPoints?: number;
+  completedChallenges?: number;
+  totalChallenges?: number;
+  activeChallenges?: number;
+  streakDays?: number;
+  longestStreak?: number;
+  unlockedBadges?: number;
+  totalBadges?: number;
+  recentAchievements?: any[];
+  progress?: number;
 }
