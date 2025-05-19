@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserModeHelpers } from '@/hooks/useUserModeHelpers';
 
 interface WelcomeMessageProps {
   onComplete?: () => void;
@@ -14,6 +15,7 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
 }) => {
   const [visible, setVisible] = useState(true);
   const { user } = useAuth();
+  const { getModeName } = useUserModeHelpers();
   const [greetingMessage, setGreetingMessage] = useState('');
   
   useEffect(() => {
@@ -75,7 +77,7 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.5 }}
             >
-              Bienvenue dans votre espace personnel
+              Bienvenue dans votre espace {getModeName()}
             </motion.p>
             
             <motion.div

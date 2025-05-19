@@ -10,7 +10,7 @@ import {
   SanctuaryWidget,
   EmotionalSynthesis,
   OrchestrationEvent
-} from '@/types/global';
+} from '@/types/orchestration';
 import { EmotionResult } from '@/types/emotion';
 
 // Données initiales pour le sanctuaire

@@ -2,15 +2,10 @@
 export type UserModeType = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin';
 
 export interface UserModeContextType {
-  mode: UserModeType;
-  setMode: (mode: UserModeType) => void;
-  previousMode?: UserModeType;
-  setPreviousMode?: (mode: UserModeType) => void;
-  setModeWithHistory?: (mode: UserModeType) => void;
-  goBack?: () => void;
-  isAdmin?: boolean;
-  isB2B?: boolean;
-  isB2C?: boolean;
+  userMode: UserModeType;
+  setUserMode: (mode: UserModeType | string) => void;
+  clearUserMode: () => void;
+  isLoading: boolean;
 }
 
 export const USER_MODES = {

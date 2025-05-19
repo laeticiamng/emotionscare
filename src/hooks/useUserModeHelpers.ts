@@ -1,8 +1,10 @@
+
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
 import { useEffect } from 'react';
 import { UserRole } from '@/types/user';
+import { UserModeType } from '@/types/userMode';
 
 export function useUserModeHelpers() {
   const { userMode, setUserMode } = useUserMode();
@@ -25,7 +27,7 @@ export function useUserModeHelpers() {
         
         // Synchronize by setting userMode to match the user role
         setUserMode(normalizedRole);
-        localStorage.setItem('userMode', normalizedRole as string);
+        localStorage.setItem('userMode', normalizedRole);
         console.log('[useUserModeHelpers] Synchronized mode with role:', normalizedRole);
       }
     }

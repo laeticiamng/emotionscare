@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -50,20 +51,20 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
     // Update user role in AuthContext to keep them in sync
     if (user && updateUser) {
       // This ensures role and userMode are consistent
-      await updateUser({ role: normalizedMode as any });
+      await updateUser({ ...user, role: normalizedMode });
     }
     
     // Update localStorage values
-    localStorage.setItem('userMode', normalizedMode as string);
-    localStorage.setItem('user_role', normalizedMode as string);
+    localStorage.setItem('userMode', normalizedMode);
+    localStorage.setItem('user_role', normalizedMode);
     
     setIsOpen(false);
     
     toast({
       title: "Mode changé",
       description: `Vous utilisez maintenant EmotionsCare en mode ${
-        mode === 'b2c' ? 'Personnel' : 
-        mode === 'b2b_user' ? 'Collaborateur' : 
+        normalizedMode === 'b2c' ? 'Personnel' : 
+        normalizedMode === 'b2b_user' ? 'Collaborateur' : 
         'Administrateur'
       }.`
     });

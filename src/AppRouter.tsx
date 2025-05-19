@@ -1,11 +1,10 @@
 
 import React, { Suspense } from 'react';
-import { useRoutes, useNavigate, useLocation } from 'react-router-dom';
+import { useRoutes, useLocation } from 'react-router-dom';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { routes } from './router';
 import { useDashboardMonitor } from './hooks/use-dashboard-monitor';
-import { useAuth } from '@/contexts/AuthContext';
-import usePreferredAccess from './hooks/use-preferred-access';
+import { usePreferredAccess } from './hooks/use-preferred-access';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AppRouter: React.FC = () => {
@@ -14,6 +13,7 @@ const AppRouter: React.FC = () => {
 
   // Add monitoring for dashboard access issues
   useDashboardMonitor();
+  
   // Apply unified access redirections
   usePreferredAccess();
   

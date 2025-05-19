@@ -29,7 +29,9 @@ export function getUserModeDisplayName(mode: UserModeType): string {
     case 'b2b_user':
       return 'Collaborateur';
     case 'b2b_admin':
-      return 'RH';
+      return 'Responsable RH';
+    case 'admin':
+      return 'Administrateur';
     default:
       return 'Utilisateur';
   }

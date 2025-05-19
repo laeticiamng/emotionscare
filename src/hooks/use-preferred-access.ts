@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { getModeDashboardPath, normalizeUserMode } from '@/utils/userModeHelpers';
+import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * Hook qui gère la redirection automatique des utilisateurs
@@ -21,21 +23,19 @@ const usePreferredAccess = () => {
     // Si l'utilisateur est sur /b2b/selection et est authentifié,
     // le rediriger vers son tableau de bord approprié
     if (location.pathname === '/b2b/selection' && isAuthenticated && user?.role) {
-      const role = user.role.toLowerCase();
+      const normalizedRole = normalizeUserMode(user.role);
+      const dashboardPath = getModeDashboardPath(normalizedRole);
       
-      if (role === 'b2b_admin') {
-        navigate('/b2b/admin/dashboard', { replace: true });
-        toast({
-          title: "Redirection automatique",
-          description: "Vous êtes connecté en tant qu'administrateur",
-        });
-      } else if (role === 'b2b_user') {
-        navigate('/b2b/user/dashboard', { replace: true });
-        toast({
-          title: "Redirection automatique",
-          description: "Vous êtes connecté en tant que collaborateur",
-        });
-      }
+      navigate(dashboardPath, { replace: true });
+      
+      // Montrer un toast animé pour expliquer la redirection
+      toast({
+        title: "Redirection automatique",
+        description: `Vous êtes connecté en tant que ${normalizedRole === 'b2b_admin' ? 'administrateur' : 'collaborateur'}`,
+        variant: "default"
+      });
+      
+      console.log('[usePreferredAccess] Redirected user to dashboard:', dashboardPath);
     }
   }, [isAuthenticated, user, isLoading, navigate, location.pathname, toast]);
 

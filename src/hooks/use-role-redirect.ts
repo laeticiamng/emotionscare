@@ -3,25 +3,11 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/types/user';
-import { normalizeUserMode } from '@/utils/userModeHelpers';
+import { normalizeUserMode, getModeDashboardPath } from '@/utils/userModeHelpers';
 
-// Function to determine the home path based on user role
-export const getRoleHomePath = (role?: string | UserRole): string => {
-  if (!role) return '/b2c/dashboard';
-  
-  const normalizedRole = normalizeUserMode(role);
-  
-  switch(normalizedRole) {
-    case 'b2b_admin':
-      return '/b2b/admin/dashboard';
-    case 'b2b_user':
-      return '/b2b/user/dashboard';
-    case 'b2c':
-    default:
-      return '/b2c/dashboard';
-  }
-};
-
+/**
+ * Hook to determine the home path based on user role and handle redirections
+ */
 export function useRoleRedirect() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
@@ -41,8 +27,8 @@ export function useRoleRedirect() {
       location.pathname === '/b2b/admin/login';
     
     if (isAuthenticated && user && isExplicitLoginPage) {
-      console.log('[useRoleRedirect] Redirecting authenticated user to:', getRoleHomePath(user.role));
-      navigate(getRoleHomePath(user.role));
+      console.log('[useRoleRedirect] Redirecting authenticated user to:', getModeDashboardPath(normalizeUserMode(user.role)));
+      navigate(getModeDashboardPath(normalizeUserMode(user.role)));
     }
   }, [isAuthenticated, user, isLoading, navigate, location.pathname]);
   

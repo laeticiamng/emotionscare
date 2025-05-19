@@ -1,3 +1,4 @@
+
 # Point 12 - Audit sécurité & confidentialité (synthèse partielle)
 
 Ce document récapitule l'état actuel observé dans le dépôt concernant la sécurité et la confidentialité de la plateforme **EmotionsCare**. Il se base sur la structure du code et les fichiers présents au moment de l'audit.
@@ -28,7 +29,7 @@ Ce document récapitule l'état actuel observé dans le dépôt concernant la s�
 3. **Règles RLS** : vérifier l'application de RLS sur toutes les tables Supabase. Les fonctions utilisent `requireAuth` mais les règles de base ne sont pas fournies.
 4. **Consentement et export RGPD** : prévoir un module de gestion du consentement et des outils d'export/suppression des données utilisateur.
 5. **MFA** : aucune implémentation de double authentification n'a été identifiée. Une structure pour activer la MFA est recommandée.
-6. **Chiffrement au repos** : la documentation ne précise pas de mécanisme de chiffrement pour les données sensibles. Un chiffrage AES‑24 bits ou supérieur est recommandé.
+6. **Chiffrement au repos** : la documentation ne précise pas de mécanisme de chiffrement pour les données sensibles. Un chiffrage AES‑24 bits ou supérieur est recommandé.
 7. **Tests** : exécuter régulièrement `npm run lint`, `npm run type-check` et `npm run test` pour garantir la qualité du code et la cohérence des types.
 
 ## 5. Références utiles

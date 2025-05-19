@@ -1,3 +1,4 @@
+
 # Audit "Logique d'accès unifiée et expérience adaptative"
 
 Ce rapport détaille la structure actuelle de la gestion des accès et des redirections sur la plateforme **EmotionsCare**. Il complète les audits existants en se concentrant sur la robustesse, la centralisation et l'adaptabilité selon le rôle utilisateur et le contexte.
