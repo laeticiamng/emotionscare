@@ -1,5 +1,6 @@
 
 export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never';
+export type NotificationTone = 'friendly' | 'professional' | 'casual';
 
 export type NotificationType = 
   | 'system' 

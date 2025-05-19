@@ -25,11 +25,12 @@ export interface EmotionResult {
   id: string;
   primaryEmotion?: string;
   emotion?: string;  // For backward compatibility
-  emotions?: Record<string, number>;  // Changed to optional
+  emotions: Record<string, number>;  // Required field
   confidence: number;
   intensity?: number;
   score?: number;
   feedback?: string;
+  ai_feedback?: string; // Used in LiveEmotionResults
   text?: string;
   transcript?: string;
   emojis?: string[];
@@ -50,6 +51,15 @@ export interface EmotionRecommendation {
   category: string;
 }
 
+export interface EmotionScanFormProps {
+  onScanComplete: (result: EmotionResult) => void;
+  defaultTab?: string;
+  onProcessingChange?: (isProcessing: boolean) => void;
+  onEmotionDetected?: () => void; // Added for ScanTabContent
+  onClose?: () => void;
+  userId?: string;
+}
+
 export interface LiveVoiceScannerProps {
   onResult?: (result: EmotionResult) => void;
   onScanComplete?: (result: EmotionResult) => void;
@@ -60,6 +70,12 @@ export interface LiveVoiceScannerProps {
   isProcessing?: boolean;
   setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
   scanDuration?: number;
+}
+
+// Add proper interface for VoiceEmotionAnalyzerProps
+export interface VoiceEmotionAnalyzerProps {
+  onResult: (result: EmotionResult) => void;
+  onStartRecording?: () => void;
 }
 
 export interface TeamOverviewProps {
@@ -100,9 +116,4 @@ export interface VoiceEmotionScannerProps {
   onResult: (result: EmotionResult) => void;
   onProcessingChange?: (processing: boolean) => void;
   className?: string;
-}
-
-export interface VoiceEmotionAnalyzerProps {
-  onResult: (result: EmotionResult) => void;
-  onStartRecording?: () => void; // Added for VoiceEmotionScanner
 }

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -52,7 +53,7 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result, classNa
         <div className="space-y-2">
           <h4 className="text-md font-semibold">Feedback</h4>
           <p className="text-sm">
-            {result.feedback || "Aucun feedback disponible."}
+            {result.feedback || result.ai_feedback || "Aucun feedback disponible."}
           </p>
         </div>
       </CardContent>

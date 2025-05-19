@@ -109,7 +109,7 @@ export const normalizePreferences = (prefs: Partial<UserPreferences> | null): Us
   };
 };
 
-// Added for PreferencesForm.tsx
+// Updated interface for PreferencesForm.tsx
 export interface UserPreferencesFormProps {
   preferences: UserPreferences;
   onSave: (preferences: UserPreferences) => void;

@@ -1,32 +1,28 @@
+import { ReactNode } from 'react';
 
-export interface KpiCardProps {
-  id: string;
-  title: string;
-  value: string | number;
-  icon?: React.ReactNode;
-  delta?: {
-    value: number;
-    trend: 'up' | 'down' | 'neutral';
-    direction?: 'up' | 'down' | 'stable';
-    label?: string;
-  };
-  status?: KpiCardStatus;
-  className?: string;
-  subtitle?: React.ReactNode;
-  footer?: React.ReactNode;
-  isLoading?: boolean;
-  onClick?: () => void;
-  ariaLabel?: string;
-}
+export type KpiCardStatus = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 
-export type KpiCardStatus = 'success' | 'warning' | 'danger' | 'neutral' | 'info';
-
-export type KpiDelta = {
-  value: number;
-  trend: 'up' | 'down' | 'neutral';
+export interface KpiDelta {
+  value?: number;
+  trend?: 'up' | 'down' | 'neutral';
   direction?: 'up' | 'down' | 'stable';
   label?: string;
-};
+}
+
+export interface KpiCardProps {
+  id?: string;
+  title: string;
+  value: ReactNode;
+  delta?: KpiDelta | number;
+  icon?: ReactNode;
+  subtitle?: ReactNode;
+  status?: KpiCardStatus;
+  className?: string;
+  isLoading?: boolean;
+  ariaLabel?: string;
+  onClick?: () => void;
+  footer?: ReactNode;
+}
 
 export interface KpiCardsGridProps {
   cards: KpiCardProps[];

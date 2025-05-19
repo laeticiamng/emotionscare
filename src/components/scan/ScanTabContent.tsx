@@ -1,36 +1,25 @@
 
-import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import EmotionScanForm from './EmotionScanForm';
-
-interface ScanTabContentProps {
-  onScanComplete?: () => void;
-}
-
-const ScanTabContent: React.FC<ScanTabContentProps> = ({ onScanComplete }) => {
-  const { user } = useAuth();
-  
-  const handleEmotionDetected = () => {
-    if (onScanComplete) {
-      onScanComplete();
-    }
+// Update the component props to match EmotionScanFormProps
+const ScanTabContent: React.FC<{ 
+  onClose: () => void; 
+  userId: string;
+}> = ({ onClose, userId }) => {
+  const onEmotionDetected = () => {
+    // Handle emotion detection
+    // This will be a prop we'll update the EmotionScanForm to use
   };
-  
-  const handleClose = () => {
-    if (onScanComplete) {
-      onScanComplete();
-    }
-  };
-  
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <EmotionScanForm 
-        onEmotionDetected={handleEmotionDetected}
-        onClose={handleClose}
-        userId={user?.id}
+        onScanComplete={(result) => {
+          // Handle scan result
+          onEmotionDetected(); // Call the function that was previously passed as a prop
+          onClose();
+        }} 
+        onClose={onClose}
+        userId={userId}
       />
     </div>
   );
 };
-
-export default ScanTabContent;

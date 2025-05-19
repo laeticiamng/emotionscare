@@ -2,14 +2,14 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { VRSession, VRSessionHistoryProps } from '@/types/vr';
+import { VRSession, VRSessionHistoryProps, VRSessionTemplate } from '@/types/vr';
 import { CalendarIcon, Clock, Activity } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
-  sessions,
+  sessions = [],
   onSelect,
   emptyMessage = "Aucune session VR récente",
   limitDisplay = 5,
@@ -80,8 +80,8 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
         <ScrollArea className="h-[400px] pr-4">
           <div className="space-y-4">
             {displayedSessions.map((session) => {
-              // Get session title from template if available
-              const sessionTitle = session.template?.title || 'Session VR';
+              // Get session title - safely handle template property
+              const sessionTitle = session.templateId || 'Session VR';
               
               return (
                 <div
@@ -95,7 +95,7 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
                       
                       <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                         <CalendarIcon className="h-3.5 w-3.5" />
-                        <span>{formatSessionDate(session.startTime || session.startedAt || session.date)}</span>
+                        <span>{formatSessionDate(session.startTime)}</span>
                       </div>
                     </div>
                     
@@ -114,10 +114,10 @@ const VRSessionHistory: React.FC<VRSessionHistoryProps> = ({
                     </div>
                   </div>
                   
-                  {session.template && session.template.coverUrl && (
+                  {session.template && (
                     <div className="mt-2 w-full h-24 rounded-md overflow-hidden">
                       <img 
-                        src={session.template.coverUrl} 
+                        src={session.template.thumbnailUrl} 
                         alt={session.template.title} 
                         className="w-full h-full object-cover"
                       />

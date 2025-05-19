@@ -14,10 +14,18 @@ export interface VRSessionTemplate {
   tags: string[];
   difficulty?: string;
   theme?: string;
-  audio_url?: string; // Add missing fields used in VRAudioSession
+  audio_url?: string;
   audioTrack?: string;
   is_audio_only?: boolean;
   lastUsed?: string | Date;
+  preview_url?: string;
+  benefits?: string[];
+  imageUrl?: string;
+  coverUrl?: string;
+  cover_url?: string;
+  rating?: number;
+  features?: string[];
+  popularity?: number;
 }
 
 export interface VRSession {
@@ -31,6 +39,12 @@ export interface VRSession {
   emotionalScoreAfter?: number;
   notes?: string;
   metrics?: Record<string, any>;
+  heartRateBefore?: number;
+  heartRateAfter?: number;
+  startedAt?: string | Date;
+  date?: string | Date;
+  duration?: number;
+  template?: VRSessionTemplate; // Reference to the template
 }
 
 export interface VRSessionWithMusicProps {
@@ -42,6 +56,9 @@ export interface VRSessionWithMusicProps {
   description?: string;
   duration?: number;
   musicTrackId?: string;
+  sessionTemplate?: VRSessionTemplate;
+  onComplete?: () => void;
+  environment?: string;
 }
 
 export interface VRSessionHistoryProps {
@@ -51,7 +68,7 @@ export interface VRSessionHistoryProps {
   className?: string;
   onSessionSelect?: (sessionId: string) => void;
   sessions?: VRSession[];
-  onSelect?: (template: VRSessionTemplate) => void;
+  onSelect?: (template: VRSessionTemplate | VRSession) => void;
   emptyMessage?: string;
   limitDisplay?: number;
 }
@@ -61,4 +78,5 @@ export interface VRTemplateDetailProps {
   heartRate?: number;
   onBack?: () => void;
   onStartSession?: () => void;
+  className?: string;
 }
