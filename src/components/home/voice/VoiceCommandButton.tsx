@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { SpeechRecognition } from '@/types/speech';
 
 interface VoiceCommandButtonProps {
   onTranscript?: (transcript: string) => void;
