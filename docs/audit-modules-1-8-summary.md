@@ -61,4 +61,5 @@ Ces recommandations s'appuient sur les audits détaillés présents dans les fic
 - `docs/coach-chat-audit.md`
 - `docs/user-preferences-audit.md`
 - `docs/dashboard-rh-audit.md`
+- `docs/synthesis-orchestration-audit.md`
 
