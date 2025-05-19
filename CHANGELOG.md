@@ -14,6 +14,14 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ### Supprimé
 - Fichier obsolète `src/components/Shell.tsx`.
 
+## [1.1.6] - 2025-05-24
+
+### Ajouté
+- Rapport `docs/unified-access-adaptive-audit.md` détaillant la logique d'accès unifiée et l'expérience adaptative.
+
+### Modifié
+- `README.md` référence désormais ce nouveau document dans la section documentation technique.
+
 ## [1.1.4] - 2025-05-22
 
 ### Corrigé
