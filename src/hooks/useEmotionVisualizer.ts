@@ -1,87 +1,83 @@
 
 import { useState, useEffect } from 'react';
-import { Emotion } from '@/types';
+import { EmotionResult } from '@/types/emotion';
 
-export function useEmotionVisualizer(emotion?: Emotion | null) {
-  const [colorMapping, setColorMapping] = useState<{ [key: string]: string }>({
-    joy: '#FFD700', // Gold
-    happy: '#FFD700', // Gold
-    sadness: '#4169E1', // Royal Blue
-    sad: '#4169E1', // Royal Blue
-    anger: '#FF4500', // Orange Red
-    angry: '#FF4500', // Orange Red
-    fear: '#800080', // Purple
-    fearful: '#800080', // Purple
-    disgust: '#008000', // Green
-    surprised: '#FFA500', // Orange
-    surprise: '#FFA500', // Orange
-    neutral: '#A9A9A9', // Dark Gray
-    calm: '#40E0D0', // Turquoise
-    excited: '#FF1493', // Deep Pink
-    stressed: '#8B0000', // Dark Red
-    anxious: '#9932CC', // Dark Orchid
-  });
+interface EmotionChartData {
+  name: string;
+  value: number;
+  color: string;
+}
 
-  const [baseColor, setBaseColor] = useState<string>('#A9A9A9'); // Default gray
+export function useEmotionVisualizer(emotions: EmotionResult[], timeframe: string = 'week') {
+  const [chartData, setChartData] = useState<EmotionChartData[]>([]);
+  const [dominantEmotion, setDominantEmotion] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (emotion) {
-      // Try to get the color from the dominant emotion or name or regular emotion field
-      const emotionKey = (emotion.name || emotion.emotion || '').toLowerCase();
-      if (colorMapping[emotionKey]) {
-        setBaseColor(colorMapping[emotionKey]);
-      }
+    if (!emotions || emotions.length === 0) {
+      setLoading(false);
+      return;
     }
-  }, [emotion, colorMapping]);
 
-  const getGradient = (intensity: number = 0.5) => {
-    // Adjust intensity to be between 0.2 and 1 for better visibility
-    const adjustedIntensity = 0.2 + (intensity * 0.8);
-    
-    // Create a gradient that fades from the emotion color to white
-    return `linear-gradient(135deg, ${baseColor} ${adjustedIntensity * 100}%, rgba(255,255,255,0.8) 100%)`;
-  };
-
-  const getPulseAnimation = (intensity: number = 0.5) => {
-    // Adjust intensity to determine animation speed (higher intensity = faster pulse)
-    const speed = 3 - (intensity * 1.5); // Between 1.5s (high intensity) and 3s (low intensity)
-    
-    return {
-      animation: `pulse ${speed}s infinite ease-in-out`,
-      keyframes: `
-        @keyframes pulse {
-          0% {
-            box-shadow: 0 0 0 0 rgba(${hexToRgb(baseColor)}, 0.7);
-          }
-          70% {
-            box-shadow: 0 0 0 10px rgba(${hexToRgb(baseColor)}, 0);
-          }
-          100% {
-            box-shadow: 0 0 0 0 rgba(${hexToRgb(baseColor)}, 0);
-          }
-        }
-      `
+    // Process emotions data for visualization
+    const processData = () => {
+      setLoading(true);
+      
+      try {
+        // Count occurrences of each emotion
+        const emotionCounts: Record<string, number> = {};
+        emotions.forEach(entry => {
+          const emotionName = entry.primaryEmotion || entry.emotion || 'neutral';
+          emotionCounts[emotionName] = (emotionCounts[emotionName] || 0) + 1;
+        });
+        
+        // Convert to chart format with colors
+        const data = Object.keys(emotionCounts).map(emotion => {
+          return {
+            name: emotion,
+            value: emotionCounts[emotion],
+            color: getEmotionColor(emotion)
+          };
+        }).sort((a, b) => b.value - a.value);
+        
+        setChartData(data);
+        setDominantEmotion(data[0]?.name || 'neutral');
+      } catch (error) {
+        console.error('Error processing emotion data:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-  };
-
-  // Helper to convert hex color to RGB for box-shadow
-  const hexToRgb = (hex: string): string => {
-    // Remove # if present
-    hex = hex.replace('#', '');
     
-    // Parse the hex values
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
+    processData();
+  }, [emotions, timeframe]);
+  
+  // Helper function to get color for an emotion
+  const getEmotionColor = (emotion: string) => {
+    const colorMap: Record<string, string> = {
+      'joy': '#FFCC33',
+      'happy': '#FFCC33',
+      'sad': '#3366CC',
+      'sadness': '#3366CC',
+      'angry': '#FF3333',
+      'anger': '#FF3333',
+      'fear': '#9966CC',
+      'surprise': '#FF9900',
+      'disgust': '#669900',
+      'neutral': '#999999',
+      'calm': '#66CCCC',
+      'anxious': '#CC6699',
+      'stressed': '#CC3366',
+      'relaxed': '#66CC99'
+    };
     
-    return `${r}, ${g}, ${b}`;
+    return colorMap[emotion.toLowerCase()] || '#999999';
   };
 
   return {
-    baseColor,
-    getGradient,
-    getPulseAnimation,
-    colorMapping
+    chartData,
+    dominantEmotion,
+    loading
   };
 }
 

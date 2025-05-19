@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 
@@ -124,14 +125,12 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
             title: 'Méditation guidée',
             description: 'Faites une courte méditation pour maintenir votre calme',
             category: 'méditation',
-            content: 'Prenez 5 minutes pour respirer profondément',
           },
           {
             type: 'music',
             title: 'Musique relaxante',
             description: 'Écoutez de la musique apaisante',
             category: 'musique',
-            content: 'Une playlist de sons de nature et musique ambiante',
           }
         ];
         

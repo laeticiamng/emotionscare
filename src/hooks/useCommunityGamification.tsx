@@ -1,50 +1,43 @@
-
 import { useState } from 'react';
-import { Badge, Challenge, LeaderboardEntry } from '@/types/gamification';
+import { Badge } from '@/types/badge';
 
 export function useCommunityGamification() {
   const [badges, setBadges] = useState<Badge[]>([
     {
       id: '1',
-      name: 'Premier pas',
-      description: 'Rejoindre la communauté',
-      imageUrl: '/badges/welcome.svg',
+      name: 'Consistent Tracker',
+      description: 'Track emotions for 7 consecutive days',
+      imageUrl: '/badges/consistent-tracker.png',
+      level: '1', // Changed to string 
       unlocked: true,
-      level: 1,
-      category: 'community',
-      tier: 'bronze',
-      progress: 100,
-      threshold: 100,
+      progress: 7,
+      total: 7,
       completed: true,
-      image_url: '/badges/welcome.svg'
+      tier: 'bronze', // Added to type
     },
     {
       id: '2',
-      name: 'Communicateur',
-      description: 'Participer à 5 discussions',
-      imageUrl: '/badges/communicator.svg',
-      unlocked: true,
-      level: 2,
-      category: 'community',
-      tier: 'silver',
-      progress: 5,
-      threshold: 5,
-      completed: true,
-      image_url: '/badges/communicator.svg'
+      name: 'Mindfulness Master',
+      description: 'Complete 10 meditation sessions',
+      imageUrl: '/badges/mindfulness-master.png',
+      level: '2', // Changed to string
+      unlocked: false,
+      progress: 6,
+      total: 10,
+      completed: false,
+      tier: 'silver', // Added to type
     },
     {
       id: '3',
-      name: 'Influenceur',
-      description: 'Obtenir 10 likes sur vos commentaires',
-      imageUrl: '/badges/influencer.svg',
-      unlocked: false,
-      level: 3,
-      category: 'community',
-      tier: 'gold',
-      progress: 4,
-      threshold: 10,
-      completed: false,
-      image_url: '/badges/influencer.svg'
+      name: 'Emotion Explorer',
+      description: 'Record 5 different emotions',
+      imageUrl: '/badges/emotion-explorer.png',
+      level: '1', // Changed to string
+      unlocked: true,
+      progress: 5,
+      total: 5,
+      completed: true,
+      tier: 'gold', // Added to type
     }
   ]);
 

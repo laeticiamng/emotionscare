@@ -1,3 +1,4 @@
+
 export interface VRSessionTemplate {
   id: string;
   title: string;

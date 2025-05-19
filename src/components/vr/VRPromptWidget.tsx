@@ -1,73 +1,67 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, Timer } from 'lucide-react';
-import { VRSessionTemplate, VRSession } from '@/types';
-import { useRouter } from '@/hooks/router';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { VRSessionTemplate } from '@/types/vr';
+import { durationToNumber, formatDuration } from './utils';
 
 interface VRPromptWidgetProps {
-  template?: VRSessionTemplate;
-  latestSession?: VRSession;
+  template: VRSessionTemplate;
+  onStart?: () => void;
+  onSkip?: () => void;
   className?: string;
 }
 
 const VRPromptWidget: React.FC<VRPromptWidgetProps> = ({
   template,
-  latestSession,
-  className
+  onStart,
+  onSkip,
+  className = "",
 }) => {
-  const router = useRouter();
-  
-  const handleStartSession = () => {
-    router.push(`/vr/session/${template?.id || 'new'}`);
-  };
-  
-  const formatSessionDuration = (duration: number) => {
-    if (duration < 60) return `${duration} sec`;
-    return `${Math.floor(duration / 60)} min`;
-  };
-  
-  const hasRecentSession = latestSession && !latestSession.completed;
-  
   return (
     <Card className={className}>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-xl flex items-center">
-          <Brain className="mr-2 h-5 w-5" />
-          Micro-pause bien-être
-        </CardTitle>
-        <CardDescription>
-          Prenez quelques minutes pour vous ressourcer
-        </CardDescription>
+      <CardHeader>
+        <CardTitle className="text-xl">Session recommandée</CardTitle>
       </CardHeader>
-      <CardContent className="pb-2">
-        {template ? (
-          <div className="space-y-3">
-            <div className="font-medium">{template.title || template.name}</div>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Timer className="mr-1 h-4 w-4" />
-              {formatSessionDuration(template.duration)}
-            </div>
-            {template.description && (
-              <p className="text-sm">{template.description}</p>
-            )}
+      <CardContent className="space-y-4">
+        <div className="aspect-video rounded-lg bg-gray-100 overflow-hidden">
+          {template.thumbnailUrl && (
+            <img
+              src={template.thumbnailUrl}
+              alt={template.title}
+              className="w-full h-full object-cover"
+            />
+          )}
+        </div>
+        
+        <div>
+          <h3 className="text-lg font-medium">{template.title}</h3>
+          <p className="text-sm text-muted-foreground">{template.description}</p>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-muted/50 p-2 rounded text-center">
+            <span className="block text-xs text-muted-foreground">Durée</span>
+            <span className="font-medium">{formatDuration(template.duration)}</span>
           </div>
-        ) : (
-          <div className="text-center py-4">
-            <div className="text-sm text-muted-foreground">
-              Réduisez votre stress avec une micro-pause adaptée à votre état émotionnel
-            </div>
+          <div className="bg-muted/50 p-2 rounded text-center">
+            <span className="block text-xs text-muted-foreground">Difficulté</span>
+            <span className="font-medium">{template.difficulty}</span>
           </div>
-        )}
+        </div>
       </CardContent>
-      <CardFooter>
-        <Button 
-          onClick={handleStartSession} 
-          className="w-full" 
-          variant={template ? "default" : "outline"}
+      
+      <CardFooter className="flex justify-between">
+        <Button
+          variant="outline"
+          onClick={onSkip}
         >
-          {hasRecentSession ? "Reprendre ma session" : "Démarrer une session"}
+          Pas maintenant
+        </Button>
+        <Button
+          onClick={onStart}
+        >
+          Commencer
         </Button>
       </CardFooter>
     </Card>

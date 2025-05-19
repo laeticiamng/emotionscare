@@ -1,146 +1,116 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { Play, Pause, Timer } from 'lucide-react';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import YoutubeEmbed from './YoutubeEmbed';
-import { VRSessionTemplate } from '@/types';
+import { Button } from '@/components/ui/button';
+import { VRSession, VRSessionTemplate } from '@/types/vr';
+import { durationToNumber, formatDuration } from './utils';
 
 interface VRSessionViewProps {
-  template: VRSessionTemplate;
-  onCompleteSession: () => void;
+  session: VRSession;
+  template?: VRSessionTemplate;
+  onContinue?: () => void;
+  className?: string;
 }
 
-const VRSessionView: React.FC<VRSessionViewProps> = ({ template, onCompleteSession }) => {
-  const [elapsed, setElapsed] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const totalDurationSeconds = template.duration * 60;
-  const percentageComplete = Math.min((elapsed / totalDurationSeconds) * 100, 100);
-
-  // Auto-complete session when time is up
-  useEffect(() => {
-    if (elapsed >= totalDurationSeconds) {
-      onCompleteSession();
+const VRSessionView: React.FC<VRSessionViewProps> = ({
+  session,
+  template,
+  onContinue,
+  className = "",
+}) => {
+  // Calculate progress percentage
+  const calculateProgress = (): number => {
+    if (session.completed) return 100;
+    
+    if (session.startTime && session.endTime) {
+      const startTimestamp = new Date(session.startTime).getTime();
+      const endTimestamp = new Date(session.endTime).getTime();
+      const totalDuration = endTimestamp - startTimestamp;
+      const elapsed = Date.now() - startTimestamp;
+      return Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
     }
-  }, [elapsed, totalDurationSeconds, onCompleteSession]);
-
-  // Timer logic
-  useEffect(() => {
-    let timer: number | undefined;
-    if (!isPaused && elapsed < totalDurationSeconds) {
-      timer = window.setInterval(() => {
-        setElapsed(prev => prev + 1);
-      }, 1000);
+    
+    // If template has duration, use that
+    if (template) {
+      const durationMs = durationToNumber(template.duration) * 60 * 1000; // convert to ms
+      const startTimestamp = new Date(session.startTime).getTime();
+      const elapsed = Date.now() - startTimestamp;
+      return Math.min(100, Math.max(0, (elapsed / durationMs) * 100));
     }
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [isPaused, elapsed, totalDurationSeconds]);
-
-  // Format time remaining as mm:ss
-  const formatTimeRemaining = () => {
-    const remainingSeconds = Math.max(totalDurationSeconds - elapsed, 0);
-    const minutes = Math.floor(remainingSeconds / 60);
-    const seconds = remainingSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    return 0;
   };
-
-  const togglePlayPause = () => {
-    setIsPaused(!isPaused);
-    setIsAudioPlaying(!isPaused);
-  };
-
-  // Get the session title, handling missing theme property
-  const getSessionTitle = () => {
-    return template.theme || template.title || template.name || "Session VR";
-  };
-
+  
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardContent className="p-6 space-y-4 text-center">
-          <h2 className="text-xl font-semibold">{getSessionTitle()}</h2>
-          
-          <div className="space-y-6">
-            <div className="relative rounded-xl overflow-hidden border border-muted">
-              {template.is_audio_only ? (
-                <div className="bg-gradient-to-br from-purple-900 to-indigo-600 p-10 rounded-lg flex flex-col items-center justify-center space-y-6">
-                  <div className="h-32 w-32 rounded-full bg-indigo-700/50 flex items-center justify-center">
-                    {isPaused ? (
-                      <Play className="h-16 w-16 text-white" />
-                    ) : (
-                      <Pause className="h-16 w-16 text-white" />
-                    )}
-                  </div>
-                  <div className="text-white text-xl font-medium">Méditation guidée</div>
-                  {template.audio_url && (
-                    <audio
-                      src={template.audio_url}
-                      autoPlay={!isPaused}
-                      loop={false}
-                      onEnded={onCompleteSession}
-                      className="hidden"
-                    />
-                  )}
-                </div>
-              ) : (
-                <AspectRatio ratio={16/9} className="max-w-4xl mx-auto">
-                  <YoutubeEmbed 
-                    videoUrl={template.preview_url}
-                    autoplay={true}
-                    controls={true}
-                    showInfo={false}
-                    loop={true}
-                  />
-                </AspectRatio>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center">
-                  <Timer className="h-4 w-4 mr-1" />
-                  <span>Temps restant</span>
-                </div>
-                <span className="font-mono">{formatTimeRemaining()}</span>
-              </div>
-              <Progress value={percentageComplete} className="h-2" />
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              {template.is_audio_only && (
-                <Button 
-                  onClick={togglePlayPause}
-                  variant="outline"
-                >
-                  {isPaused ? (
-                    <>
-                      <Play className="h-4 w-4 mr-2" />
-                      Reprendre
-                    </>
-                  ) : (
-                    <>
-                      <Pause className="h-4 w-4 mr-2" />
-                      Pause
-                    </>
-                  )}
-                </Button>
-              )}
-              
-              <Button 
-                onClick={onCompleteSession}
-                variant={template.is_audio_only ? "outline" : "default"}
-              >
-                Terminer la session
-              </Button>
-            </div>
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle className="text-lg">
+          {template?.title || "Session VR"}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="aspect-video rounded-lg relative bg-muted overflow-hidden">
+          {template?.thumbnailUrl && (
+            <img
+              src={template.thumbnailUrl}
+              alt={template.title}
+              className="w-full h-full object-cover opacity-80"
+            />
+          )}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Badge 
+              className={`text-lg py-2 px-4 ${
+                session.completed ? 'bg-green-500' : 'bg-blue-500'
+              }`}
+            >
+              {session.completed ? 'Terminée' : 'En cours'}
+            </Badge>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+        
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-medium">Progression</span>
+            <span>{Math.round(calculateProgress())}%</span>
+          </div>
+          <Progress value={calculateProgress()} className="h-2" />
+        </div>
+        
+        <div className="grid grid-cols-2 gap-2">
+          <div className="border rounded p-2">
+            <span className="text-xs text-muted-foreground block">Début</span>
+            <span className="font-medium">
+              {new Date(session.startTime).toLocaleString()}
+            </span>
+          </div>
+          <div className="border rounded p-2">
+            <span className="text-xs text-muted-foreground block">Durée</span>
+            <span className="font-medium">
+              {template ? formatDuration(template.duration) : "Non spécifiée"}
+            </span>
+          </div>
+        </div>
+        
+        {session.completed ? (
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => onContinue && onContinue()}
+          >
+            Recommencer cette session
+          </Button>
+        ) : (
+          <Button
+            className="w-full"
+            onClick={() => onContinue && onContinue()}
+          >
+            Continuer la session
+          </Button>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

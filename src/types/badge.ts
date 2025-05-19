@@ -18,6 +18,10 @@ export interface Badge {
   unlocked_at?: string;
   achieved?: boolean;
   earned?: boolean;
+  // Additional fields found in usage
+  icon?: string;
+  tier?: string;
+  total?: number;
 }
 
 export interface Challenge {

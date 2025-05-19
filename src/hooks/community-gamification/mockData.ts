@@ -12,6 +12,7 @@ interface LeaderboardEntry {
   id: string;
   userId: string;
   name: string;
+  username?: string; // Added for compatibility
   points: number;
   score?: number; // For backwards compatibility
   rank: number;
@@ -27,8 +28,8 @@ export const mockBadges: Badge[] = [
     id: "1",
     name: "Early Bird",
     description: "Connect 5 days in a row before 8am",
-    icon: "🌅", 
     imageUrl: "/badges/early-bird.png",
+    icon: "🌅", // Added field
     unlocked: true,
     level: "1", // Convert to string for compatibility
     progress: 5,
@@ -42,8 +43,8 @@ export const mockBadges: Badge[] = [
     id: "2",
     name: "Emotion Master",
     description: "Record your emotions 30 days in a row",
-    icon: "🧠",
     imageUrl: "/badges/emotion-master.png",
+    icon: "🧠", // Added field
     unlocked: true,
     level: "2", // Convert to string for compatibility
     progress: 30,
@@ -57,8 +58,8 @@ export const mockBadges: Badge[] = [
     id: "3",
     name: "Journaling Pro",
     description: "Write in your journal 20 times",
-    icon: "✏️",
     imageUrl: "/badges/journal-pro.png",
+    icon: "✏️", // Added field
     unlocked: false,
     level: "1", // Convert to string for compatibility
     progress: 15,
