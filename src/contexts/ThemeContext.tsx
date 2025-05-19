@@ -4,19 +4,24 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types/theme';
 
 // Default values
-const defaultContext: ThemeContextType = { 
+const defaultContext: ThemeContextType = {
   theme: "system",
   setTheme: () => {},
-  toggleTheme: () => {}, 
-  isDark: false, 
+  toggleTheme: () => {},
+  isDark: false,
   isDarkMode: false,
-  fontSize: "medium", 
+  fontSize: "medium",
   setFontSize: () => {},
-  fontFamily: "system", 
+  fontFamily: "system",
   setFontFamily: () => {},
   systemTheme: "light",
+  soundEnabled: false,
+  setSoundEnabled: () => {},
+  reduceMotion: false,
+  setReduceMotion: () => {},
   preferences: {},
-  updatePreferences: () => {}
+  updatePreferences: () => {},
+  getContrastText: () => "#000"
 };
 
 // Create context with default values
