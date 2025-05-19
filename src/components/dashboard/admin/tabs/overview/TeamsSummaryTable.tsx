@@ -8,6 +8,7 @@ import { ChevronRight, TrendingUp, TrendingDown, ChevronsRight } from 'lucide-re
 const mockTeams: TeamSummary[] = [
   {
     id: '1',
+    teamId: '1',
     name: 'Équipe Marketing',
     memberCount: 12,
     activeUsers: 10,
@@ -19,6 +20,7 @@ const mockTeams: TeamSummary[] = [
   },
   {
     id: '2',
+    teamId: '2',
     name: 'Équipe Technique',
     memberCount: 18,
     activeUsers: 15,
@@ -30,6 +32,7 @@ const mockTeams: TeamSummary[] = [
   },
   {
     id: '3',
+    teamId: '3',
     name: 'Équipe Design',
     memberCount: 8,
     activeUsers: 8,
@@ -41,6 +44,7 @@ const mockTeams: TeamSummary[] = [
   },
   {
     id: '4',
+    teamId: '4',
     name: 'Équipe Finance',
     memberCount: 6,
     activeUsers: 5,

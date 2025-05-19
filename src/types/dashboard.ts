@@ -3,24 +3,40 @@ export interface KpiCardProps {
   id: string;
   title: string;
   value: string | number;
-  delta?: number | { value: number; label?: string; trend: 'up' | 'down' | 'neutral' };
-  status?: KpiCardStatus;
   icon?: React.ReactNode;
-  subtitle?: string | React.ReactNode;
-  footer?: React.ReactNode;
+  delta?: {
+    value: number;
+    trend: 'up' | 'down' | 'neutral';
+    direction?: 'up' | 'down' | 'stable'; // Adding direction property
+    label?: string;
+  };
+  status?: KpiCardStatus;
   className?: string;
+  subtitle?: React.ReactNode;
+  footer?: React.ReactNode;
   isLoading?: boolean;
   onClick?: () => void;
-  ariaLabel?: string;
+  ariaLabel?: string; // Adding ariaLabel property
 }
 
-export interface DraggableKpiCardsGridProps {
-  cards?: KpiCardProps[];
-  kpiCards?: KpiCardProps[];
-  onOrderChange?: (cards: KpiCardProps[]) => void;
+export type KpiCardStatus = 'success' | 'warning' | 'danger' | 'neutral' | 'info';
+
+export type KpiDelta = {
+  value: number;
+  trend: 'up' | 'down' | 'neutral';
+  direction?: 'up' | 'down' | 'stable'; // Adding direction property
+  label?: string;
+};
+
+export interface KpiCardsGridProps {
+  cards: KpiCardProps[];
+  className?: string;
 }
 
 export interface GlobalOverviewTabProps {
+  className?: string;
+  data?: any; // Adding data property
+  isLoading?: boolean; // Adding isLoading property
   period?: string;
   onPeriodChange?: (period: string) => void;
 }
@@ -28,82 +44,67 @@ export interface GlobalOverviewTabProps {
 export interface DashboardWidgetConfig {
   id: string;
   title: string;
-  description?: string;
   type: string;
-  size?: 'small' | 'medium' | 'large';
-  refreshInterval?: number;
-  permissions?: string[];
-  dataSource?: string;
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+  visible: boolean;
   settings?: Record<string, any>;
 }
 
 export interface DashboardWidget {
   id: string;
   title: string;
-  content?: React.ReactNode;
-  type?: string;
-  data?: any;
-  size?: 'small' | 'medium' | 'large';
-  isLoading?: boolean;
-  error?: Error | null;
-  refresh?: () => void;
-  lastUpdated?: Date;
-  config?: DashboardWidgetConfig;
-}
-
-export interface GamificationData {
-  badges: number;
-  streak: number;
-  points: number;
-  level: number;
-  nextLevelProgress: number;
-  achievements: { name: string; date: string }[];
-}
-
-export type KpiCardStatus = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
-
-export interface KpiDelta {
-  value: number;
-  trend: 'up' | 'down' | 'neutral';
-  label?: string;
-}
-
-export interface KpiCardsGridProps {
-  cards: Array<{
-    id: string;
-    title: string;
-    value: string | number;
-    delta?: KpiDelta | number;
-    status?: KpiCardStatus;
-    icon?: React.ReactNode;
-    subtitle?: string | React.ReactNode;
-    footer?: React.ReactNode;
-    className?: string;
-    isLoading?: boolean;
-    onClick?: () => void;
-  }>;
+  kpi: string;
+  width?: number;
+  height?: number;
+  settings?: Record<string, any>;
 }
 
 export interface TeamSummary {
   id: string;
+  teamId?: string;
   name: string;
-  members: number;
-  department?: string;
-  activity?: number;
-  engagement?: number;
-  emotionAverage?: number;
-  averageEmotionalScore?: number;
-  trendDirection?: 'up' | 'down' | 'stable';
-  trendValue?: number;
+  memberCount: number; // Adding memberCount property
+  activeUsers: number; // Adding activeUsers property
+  averageScore: number; // Adding averageScore property
+  trend: number;
+  trendDirection: 'up' | 'down' | 'stable'; // Adding trendDirection property
+  trendValue: number; // Adding trendValue property
+  department: string; // Adding department property
+  alertCount?: number;
+  averageMood?: string | number;
 }
 
 export interface AdminAccessLog {
-  id: string;
+  adminId: string;
   action: string;
-  timestamp: string | Date;
-  details?: string;
-  userId?: string;
-  adminName?: string;
-  ip?: string;
-  status?: 'success' | 'failed' | 'pending';
+  timestamp: string;
+  userName?: string; // Adding userName property
+  resource?: string; // Adding resource property
+  ip?: string; // Adding IP property
+  adminName?: string; // Adding adminName property
+}
+
+export interface DraggableKpiCardsGridProps {
+  cards?: KpiCardProps[];
+  kpiCards?: KpiCardProps[];
+  onOrderChange?: (cards: KpiCardProps[]) => void;
+  onLayoutChange?: (layout: any) => void;
+  className?: string;
+  isEditable?: boolean;
+  onCardsReorder?: (cards: any[]) => void; // Adding onCardsReorder property
+  onSave?: (layout: any) => void; // Adding onSave property
+  savedLayout?: any; // Adding savedLayout property
+}
+
+export interface GamificationData {
+  points: number;
+  level: number;
+  badges: Badge[];
+  streakDays: number;
+  challenges: Challenge[];
+  nextLevel: number;
+  pointsToNextLevel: number;
 }

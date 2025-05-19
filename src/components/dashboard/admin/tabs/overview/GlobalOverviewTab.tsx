@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import KpiCardsGrid from '@/components/dashboard/admin/KpiCardsGrid';
@@ -17,8 +16,8 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       value: "87%",
       delta: {
         value: 12,
-        trend: "up" as "up" | "down" | "neutral",
-        direction: "up" as "up" | "down" | "stable"
+        trend: "up",
+        direction: "up"
       },
       status: "success" as KpiCardStatus
     },
@@ -28,8 +27,8 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       value: "92%",
       delta: {
         value: 4,
-        trend: "up" as "up" | "down" | "neutral",
-        direction: "up" as "up" | "down" | "stable"
+        trend: "up",
+        direction: "up"
       },
       status: "success" as KpiCardStatus
     },
@@ -39,8 +38,8 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       value: "31%",
       delta: {
         value: -7,
-        trend: "down" as "up" | "down" | "neutral",
-        direction: "down" as "up" | "down" | "stable"
+        trend: "down",
+        direction: "down"
       },
       status: "success" as KpiCardStatus
     }
@@ -54,8 +53,8 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       value: "219",
       delta: {
         value: 24,
-        trend: "up" as "up" | "down" | "neutral",
-        direction: "up" as "up" | "down" | "stable"
+        trend: "up",
+        direction: "up"
       },
       status: "success" as KpiCardStatus
     },
@@ -65,8 +64,8 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       value: "412",
       delta: {
         value: -18,
-        trend: "down" as "up" | "down" | "neutral",
-        direction: "down" as "up" | "down" | "stable"
+        trend: "down",
+        direction: "down"
       },
       status: "warning" as KpiCardStatus
     },
@@ -76,8 +75,8 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       value: "18min",
       delta: {
         value: 3,
-        trend: "up" as "up" | "down" | "neutral",
-        direction: "up" as "up" | "down" | "stable"
+        trend: "up",
+        direction: "up"
       },
       status: "success" as KpiCardStatus
     }
@@ -91,8 +90,8 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       value: "214%",
       delta: {
         value: 22,
-        trend: "up" as "up" | "down" | "neutral",
-        direction: "up" as "up" | "down" | "stable"
+        trend: "up",
+        direction: "up"
       },
       status: "success" as KpiCardStatus
     },
@@ -102,8 +101,8 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       value: "-14%",
       delta: {
         value: -6,
-        trend: "down" as "up" | "down" | "neutral",
-        direction: "down" as "up" | "down" | "stable"
+        trend: "down",
+        direction: "down"
       },
       status: "success" as KpiCardStatus
     },
@@ -113,8 +112,8 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
       value: "92%",
       delta: {
         value: 2,
-        trend: "up" as "up" | "down" | "neutral",
-        direction: "up" as "up" | "down" | "stable"
+        trend: "up",
+        direction: "up"
       },
       status: "success" as KpiCardStatus
     }

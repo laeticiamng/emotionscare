@@ -10,4 +10,5 @@ export * from './notifications';
 export * from './emotion';
 export * from './vr';
 export * from './layout';
+export * from './widget'; // Add if this exists
 // Add other type exports as needed

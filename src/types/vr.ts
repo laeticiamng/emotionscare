@@ -2,16 +2,17 @@
 export interface VRSessionTemplate {
   id: string;
   title: string;
+  name?: string; // Adding backward compatibility for name
   description: string;
   duration: number;
   thumbnailUrl?: string;
-  category?: string;
-  tags?: string[];
-  creator?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  popularity?: number;
-  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  environmentId: string;
+  category: string;
+  intensity: number;
+  objective: string;
+  type: string;
+  tags: string[];
+  difficulty?: string;
   theme?: string;
 }
 
@@ -19,13 +20,13 @@ export interface VRSession {
   id: string;
   templateId: string;
   userId: string;
-  startTime?: string;
-  endTime?: string;
-  duration: number;
+  startTime?: string | Date;
+  endTime?: string | Date;
   completed: boolean;
-  emotionalStateAfter?: string;
-  emotionalStateBefore?: string;
+  emotionalScoreBefore?: number;
+  emotionalScoreAfter?: number;
   notes?: string;
+  metrics?: Record<string, any>;
 }
 
 export interface VRSessionWithMusicProps {
@@ -36,7 +37,6 @@ export interface VRSessionWithMusicProps {
   title?: string;
   description?: string;
   duration?: number;
-  environment?: string;
   musicTrackId?: string;
 }
 
@@ -45,12 +45,12 @@ export interface VRSessionHistoryProps {
   limit?: number;
   showHeader?: boolean;
   className?: string;
-  onSessionSelect?: (session: VRSession) => void;
+  onSessionSelect?: (sessionId: string) => void;
 }
 
 export interface VRTemplateDetailProps {
   template: VRSessionTemplate;
   heartRate?: number;
-  onStartSession?: () => void;
   onBack?: () => void;
+  onStartSession?: () => void;
 }

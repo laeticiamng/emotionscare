@@ -7,7 +7,8 @@ export interface User {
   name?: string;
   role?: UserRole;
   avatar_url?: string;
-  avatar?: string;
+  avatar?: string; // Adding avatar property
+  avatarUrl?: string; // Adding avatarUrl property for compatibility
   created_at?: string;
   position?: string;
   department?: string;
@@ -21,6 +22,7 @@ export interface AuthUser {
   role?: UserRole;
   avatar?: string;
   avatar_url?: string;
+  avatarUrl?: string; // Adding avatarUrl property for compatibility
   created_at?: string;
   position?: string;
   department?: string;

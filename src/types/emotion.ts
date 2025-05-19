@@ -1,54 +1,46 @@
 
 export interface Emotion {
-  id?: string;
+  id: string;
   name: string;
-  emoji?: string;
-  color?: string;
-  intensity?: number;
+  intensity: number;
+  color: string;
+  icon?: string;
+  description?: string;
 }
 
 export interface EmotionResult {
-  id?: string;
-  emotion?: string;
   primaryEmotion?: string;
-  confidence?: number;
-  intensity?: number;
-  timestamp?: string;
+  emotions: Record<string, number>;
+  confidence: number;
   recommendations?: EmotionRecommendation[];
-  emojis?: string[];
-  text?: string;
-  source?: string;
-  date?: string;
-  user_id?: string;
-  feedback?: string;
+  timestamp?: string;
+  id?: string;
 }
 
 export interface EmotionRecommendation {
-  type: string;
   title: string;
+  content: string;
+  type: string;
   description: string;
-  content?: string;
-  category?: string;
+  category: string;
 }
 
 export interface LiveVoiceScannerProps {
-  onResult: (result: EmotionResult) => void;
-  isProcessing?: boolean;
-  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>> | ((value: boolean) => void);
-  onProcessingChange?: React.Dispatch<React.SetStateAction<boolean>> | ((value: boolean) => void);
+  onResult?: (result: EmotionResult) => void;
+  processing?: boolean;
+  className?: string;
 }
 
 export interface TeamOverviewProps {
+  teamId: string;
   period?: string;
-  onPeriodChange?: (period: string) => void;
-  isLoading?: boolean;
+  anonymized?: boolean;
 }
 
 export interface EmotionalTeamViewProps {
-  teamId?: string;
+  teamId: string;
   period?: string;
   anonymized?: boolean;
-  data?: any[];
   dateRange?: [Date, Date];
   showGraph?: boolean;
   showMembers?: boolean;
@@ -57,13 +49,17 @@ export interface EmotionalTeamViewProps {
 
 export interface TextEmotionScannerProps {
   onResult: (result: EmotionResult) => void;
+  inputText?: string;
+  className?: string;
 }
 
 export interface EmojiEmotionScannerProps {
   onResult: (result: EmotionResult) => void;
+  className?: string;
 }
 
 export interface VoiceEmotionScannerProps {
   onResult: (result: EmotionResult) => void;
-  onProcessingChange?: (isProcessing: boolean) => void;
+  onProcessingChange?: (processing: boolean) => void;
+  className?: string;
 }

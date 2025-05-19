@@ -3,28 +3,24 @@ export interface SegmentOption {
   id: string;
   label: string;
   value: string;
-  key?: string;
+  count?: number;
+  color?: string;
 }
 
 export interface SegmentDimension {
   id: string;
-  key?: string;
   label: string;
+  type: 'category' | 'range' | 'date' | 'boolean';
   options: SegmentOption[];
 }
 
 export interface SegmentContextType {
   dimensions: SegmentDimension[];
+  selectedSegment?: string;
+  setSelectedSegment?: (segment: string) => void;
   selectedDimension?: string;
   selectedOption?: string;
   setSelectedDimension: (dimension: string) => void;
   setSelectedOption: (option: string) => void;
-  resetSegmentation?: () => void;
-  addDimension?: (dimension: SegmentDimension) => void;
-  removeDimension?: (id: string) => void;
-  segment?: string;
-  setSegment?: (segment: string | null) => void;
-  isLoading?: boolean;
-  activeDimension?: string;
-  activeOption?: string;
+  clearSegment?: () => void;
 }
