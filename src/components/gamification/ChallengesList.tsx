@@ -49,7 +49,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }
         <div className="space-y-4">
           {challenges.map((challenge) => {
             // Calculate progress percentage
-            const progress = challenge.completed 
+            const progress = challenge.completed || challenge.isCompleted
               ? 100 
               : challenge.progress !== undefined && (challenge.goal || challenge.total || challenge.totalSteps)
                 ? Math.round((challenge.progress / (challenge.goal || challenge.total || challenge.totalSteps || 1)) * 100)
@@ -67,7 +67,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }
               'text-green-500';
             
             // Determine status
-            const isCompleted = challenge.completed || progress >= 100;
+            const isCompleted = challenge.completed || challenge.isCompleted || progress >= 100;
             
             return (
               <div key={challenge.id} className="relative">
@@ -104,7 +104,7 @@ const ChallengesList: React.FC<ChallengesListProps> = ({ challenges, className }
                       </span>
                     </div>
                     
-                    {challenge.points > 0 && (
+                    {challenge.points && challenge.points > 0 && (
                       <div className="font-medium text-amber-600 dark:text-amber-400">
                         {challenge.points} points
                       </div>

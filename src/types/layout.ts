@@ -17,3 +17,12 @@ export interface LayoutContextType {
 export interface LayoutProviderProps {
   children: ReactNode;
 }
+
+// Adding ShellProps interface
+export interface ShellProps {
+  children?: ReactNode;
+  hideNav?: boolean;
+  hideFooter?: boolean;
+  immersive?: boolean;
+  className?: string;
+}

@@ -1,8 +1,8 @@
 
 import { ThemeType } from './preferences';
 
-export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
-export type FontFamily = 'sans' | 'serif' | 'mono' | 'system' | 'rounded';
+export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'small' | 'medium' | 'large' | 'xlarge';
+export type FontFamily = 'sans' | 'serif' | 'mono' | 'system' | 'rounded' | 'monospace' | 'sans-serif';
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
 export type ThemeName = Theme;
 export type ThemeOption = Theme;

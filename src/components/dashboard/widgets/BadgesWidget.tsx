@@ -10,10 +10,10 @@ interface BadgesWidgetProps {
 
 const BadgesWidget: React.FC<BadgesWidgetProps> = ({ badges, className }) => {
   const recentBadges = badges
-    .filter(badge => badge.unlockedAt || badge.unlocked_at)
+    .filter(badge => badge.unlocked || badge.unlockedAt || badge.unlocked_at)
     .sort((a, b) => {
-      const dateA = new Date(a.unlockedAt || a.unlocked_at || '').getTime();
-      const dateB = new Date(b.unlockedAt || b.unlocked_at || '').getTime();
+      const dateA = new Date(a.date || a.unlockedAt || a.unlocked_at || '').getTime();
+      const dateB = new Date(b.date || b.unlockedAt || b.unlocked_at || '').getTime();
       return dateB - dateA;
     })
     .slice(0, 3);
@@ -29,9 +29,9 @@ const BadgesWidget: React.FC<BadgesWidgetProps> = ({ badges, className }) => {
             {recentBadges.map(badge => (
               <div key={badge.id} className="flex flex-col items-center text-center">
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                  {badge.imageUrl || badge.image_url ? (
+                  {badge.image_url || badge.imageUrl ? (
                     <img 
-                      src={badge.imageUrl || badge.image_url} 
+                      src={badge.image_url || badge.imageUrl} 
                       alt={badge.name} 
                       className="w-12 h-12" 
                     />

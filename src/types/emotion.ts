@@ -21,6 +21,7 @@ export interface EmotionResult {
   emotions: Record<string, number>;
   score?: number;
   ai_feedback?: string; // For backward compatibility
+  primaryEmotion?: string; // Adding this for EnhancedCoachAI
 }
 
 export interface LiveVoiceScannerProps {
@@ -45,6 +46,12 @@ export interface TeamOverviewProps {
 
 export interface EmotionalTeamViewProps {
   teamId?: string;
+  period?: string;
+  anonymized?: boolean;
+  dateRange?: [Date, Date];
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
 }
 
 export interface TextEmotionScannerProps {
@@ -57,4 +64,14 @@ export interface EmojiEmotionScannerProps {
 
 export interface VoiceEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
+}
+
+// Define the Emotion type for EmotionalCheckIn
+export interface Emotion {
+  name: string;
+  emoji?: string;
+  color?: string;
+  intensity?: number;
+  value?: string;
+  id?: string;
 }

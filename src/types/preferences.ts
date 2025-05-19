@@ -44,6 +44,15 @@ export interface UserPreferences {
   colorBlindMode?: boolean;
   highContrast?: boolean;
   reduceMotion?: boolean;
+  // Adding properties used in useAmbientSound
+  ambientSound?: string;
+  soundEnabled?: boolean;
+  // Adding properties used in PremiumFeatures
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  // Adding properties used in DataPrivacySettings
+  shareData?: boolean;
+  anonymizedData?: boolean;
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -77,7 +86,13 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   darkMode: false,
   colorBlindMode: false,
   highContrast: false,
-  reduceMotion: false
+  reduceMotion: false,
+  soundEnabled: false,
+  ambientSound: 'nature',
+  shareData: false,
+  anonymizedData: true,
+  emotionalCamouflage: false,
+  aiSuggestions: true
 };
 
 export interface UserPreferencesContextType {
