@@ -263,11 +263,31 @@ export const authService = {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
-      
+
       if (error) throw error;
       return { success: true, error: null };
     } catch (error: any) {
       console.error('Error resetting password:', error);
+      return { success: false, error };
+    }
+  },
+
+  /**
+   * Envoyer un lien magique de connexion par email
+   */
+  async sendMagicLink(email: string): Promise<{ success: boolean; error: Error | null }> {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/b2c/dashboard`,
+        },
+      });
+
+      if (error) throw error;
+      return { success: true, error: null };
+    } catch (error: any) {
+      console.error('Error sending magic link:', error);
       return { success: false, error };
     }
   },
