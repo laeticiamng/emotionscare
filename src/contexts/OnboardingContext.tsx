@@ -1,30 +1,7 @@
+import type { OnboardingStep, OnboardingContextType } from "@/types/onboarding";
 
 import React, { createContext, useContext, useState } from 'react';
 
-// Define the step structure
-export interface OnboardingStep {
-  id: string;
-  title: string;
-  content: React.ReactNode;
-  required?: boolean;
-}
-
-// Define the context type
-interface OnboardingContextType {
-  currentStep: number;
-  steps: OnboardingStep[];
-  nextStep: () => boolean;
-  previousStep: () => boolean;
-  goToStep: (step: number) => boolean;
-  isStepCompleted: (step: number) => boolean;
-  completeOnboarding: () => Promise<boolean>;
-  // Added properties that were causing errors
-  loading: boolean;
-  emotion: string;
-  intensity: number;
-  userResponses: Record<string, any>;
-  handleResponse: (key: string, value: any) => void;
-}
 
 // Create context with default values
 const OnboardingContext = createContext<OnboardingContextType>({

@@ -7,7 +7,8 @@ import { MusicProvider } from '@/contexts/music/index';
 import { OptimizationProvider } from '@/providers/OptimizationProvider';
 import { ExtensionsProvider } from '@/providers/ExtensionsProvider';
 import { OrchestrationProvider } from '@/contexts/OrchestrationContext';
-import { SupportProvider } from '@/providers/SupportProvider';
+import { OnboardingProvider } from "@/contexts/OnboardingContext";
+import { DEFAULT_ONBOARDING_STEPS } from "@/data/onboardingSteps";
 import { LayoutProviderProps } from '@/types/layout';
 
 /**
@@ -23,8 +24,11 @@ const AppProviders: React.FC<LayoutProviderProps> = ({ children }) => (
             <OptimizationProvider>
               <ExtensionsProvider>
                 <OrchestrationProvider>
-                  <SupportProvider>
-                    {children}
+                <OnboardingProvider steps={DEFAULT_ONBOARDING_STEPS}>
+                  {children}
+                </OnboardingProvider>
+                
+                    
                   </SupportProvider>
                 </OrchestrationProvider>
               </ExtensionsProvider>
