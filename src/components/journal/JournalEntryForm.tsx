@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import EmotionCircleSelector from './EmotionCircleSelector';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 
 interface JournalEntryFormProps {
   onSubmit: (data: any) => void;

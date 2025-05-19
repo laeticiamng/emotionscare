@@ -3,7 +3,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Play, Pause } from 'lucide-react';
-import { MusicTrack } from '@/types';
+import { MusicTrack } from '@/types/music';
 import { getTrackCover, getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
 
 interface TrackListProps {

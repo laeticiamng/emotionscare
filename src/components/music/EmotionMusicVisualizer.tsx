@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { MusicTrack } from '@/types';
+import { MusicTrack } from '@/types/music';
 
 interface EmotionMusicVisualizerProps {
   track: MusicTrack | null;

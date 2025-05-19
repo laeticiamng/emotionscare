@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useMusic } from '@/contexts';
-import { MusicTrack } from '@/types';
+import { MusicTrack } from '@/types/music';
 import { EmotionResult } from '@/types';
 
 // Mapping des émotions vers les types de musique

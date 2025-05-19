@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
 
 export function useMusicState() {

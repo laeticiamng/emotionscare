@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { MusicTrack, MusicPlaylist } from '@/types';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
 import { mapEmotionToMusicType, getEmotionDescription } from '@/services/music/emotion-music-mapping';
 import { getPlaylistByEmotion, EMOTION_PLAYLISTS } from '@/services/music/playlist-data';

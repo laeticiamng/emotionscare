@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import MusicLibrary from '@/components/music/page/LibraryTab';
 import MusicControls from '@/components/music/page/MusicControls';
 import MusicDrawer from '@/components/music/MusicDrawer';
