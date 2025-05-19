@@ -87,6 +87,7 @@ export interface MusicContextType extends MusicState {
   setCurrentTime?: (time: number) => void;
   setDuration?: (duration: number) => void;
   setIsPlaying?: (isPlaying: boolean) => void;
+  setIsInitialized?: (isInitialized: boolean) => void; // Added missing method
 
   // Gestion des playlists
   playPlaylist?: (playlist: MusicPlaylist, startTrackId?: string) => void;

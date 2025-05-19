@@ -42,6 +42,7 @@ export interface EmotionResult {
   sessionId?: string;
   language?: string;
   data?: EmotionData[];
+  tags?: string[]; // Added tags property
 
   // Extended fields for compatibility
   id?: string;
@@ -73,6 +74,7 @@ export type EmotionSource =
   | 'emoji'
   | 'system'
   | 'ai'
+  | 'manual'
   | 'live-voice'
   | 'voice-analyzer'
   | 'audio-processor'

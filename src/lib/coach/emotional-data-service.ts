@@ -60,7 +60,14 @@ class EmotionalDataService {
   convertFromEmotionResult(result: EmotionResult): EmotionalData {
     // Handle compatibility between different EmotionSource types
     let source: EmotionSource = 'system';
-    if (['text', 'voice', 'facial', 'ai', 'manual', 'system', 'emoji', 'live-voice', 'voice-analyzer', 'audio-processor', 'text-analysis'].includes(result.source as string)) {
+    
+    // List of valid emotion sources in the EmotionSource type
+    const validSources: EmotionSource[] = [
+      'text', 'voice', 'facial', 'ai', 'manual', 'system', 
+      'emoji', 'live-voice', 'voice-analyzer', 'audio-processor', 'text-analysis'
+    ];
+    
+    if (result.source && validSources.includes(result.source as EmotionSource)) {
       source = result.source as EmotionSource;
     }
     
