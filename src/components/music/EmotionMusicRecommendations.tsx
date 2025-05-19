@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Music } from 'lucide-react';
 import { useMusic } from '@/contexts/MusicContext';
+import { ensurePlaylist } from '@/utils/musicCompatibility';
 
 interface EmotionMusicRecommendationsProps {
   emotion?: string;
@@ -94,7 +95,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
         
         {currentTrack && isPlaying && (
           <div className="mt-4 text-xs text-center text-muted-foreground">
-            Lecture en cours: {currentTrack.title} - {currentTrack.artist}
+            Lecture en cours: {currentTrack.title || currentTrack.name} - {currentTrack.artist}
           </div>
         )}
       </CardContent>

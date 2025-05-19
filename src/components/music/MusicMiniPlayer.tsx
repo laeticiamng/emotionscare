@@ -8,11 +8,12 @@ import { getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
 const MusicMiniPlayer: React.FC = () => {
   const { isPlaying, currentTrack, togglePlay, toggleDrawer } = useMusic();
 
+  // Si aucun morceau n'est sélectionné, ne pas afficher le lecteur
   if (!currentTrack) {
     return null;
   }
 
-  // Use utility functions to get title and artist, handling different property naming
+  // Utiliser les fonctions utilitaires pour obtenir des informations cohérentes
   const title = getTrackTitle(currentTrack);
   const artist = getTrackArtist(currentTrack);
 

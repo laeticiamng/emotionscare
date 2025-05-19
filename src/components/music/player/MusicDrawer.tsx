@@ -10,8 +10,6 @@ interface MusicDrawerProps {
   open: boolean;
   onClose: () => void;
   onOpenChange: (open: boolean) => void;
-  playlist?: any;
-  currentTrack?: any;
 }
 
 const MusicDrawer: React.FC<MusicDrawerProps> = ({
@@ -97,7 +95,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
             <div className="w-full mt-6">
               <h4 className="font-medium mb-2">Playlist</h4>
               <div className="max-h-64 overflow-y-auto space-y-1">
-                {playlist.tracks.map((track: any) => (
+                {playlist.tracks.map((track) => (
                   <div 
                     key={track.id}
                     className={`p-2 rounded ${currentTrack.id === track.id ? 'bg-primary/10' : 'hover:bg-muted'}`}
