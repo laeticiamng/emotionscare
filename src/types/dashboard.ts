@@ -41,11 +41,15 @@ export interface DraggableKpiCardsGridProps extends KpiCardsGridProps {
   onSave?: (layout: any) => void;
   savedLayout?: any;
   isEditable?: boolean;
+  onLayoutChange?: (layout: any) => void;
+  editable?: boolean;
 }
 
 export interface GlobalOverviewTabProps {
   data?: any;
   isLoading?: boolean;
+  period?: string;
+  onPeriodChange?: (period: string) => void;
 }
 
 export interface DashboardWidgetConfig {

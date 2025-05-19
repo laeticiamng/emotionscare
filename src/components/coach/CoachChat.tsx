@@ -72,7 +72,7 @@ const CoachChat: React.FC<CoachChatProps> = ({
       <div className="flex-1 overflow-y-auto p-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center p-6 text-muted-foreground">
-            <CoachCharacter size="lg" animate={true} />
+            <CoachCharacter size="lg" animated={true} />
             <h3 className="font-medium mt-4">Bonjour, je suis votre coach IA</h3>
             <p className="mt-1">Comment puis-je vous aider aujourd'hui ?</p>
           </div>

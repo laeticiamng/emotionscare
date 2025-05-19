@@ -24,10 +24,14 @@ export interface ChatResponse {
 }
 
 export interface CoachCharacterProps {
+  name?: string;
+  avatar?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   mood?: string;
   animated?: boolean;
+  animate?: boolean; // Added for backward compatibility
   className?: string;
+  onClick?: () => void;
 }
 
 export interface CoachMessageProps {
@@ -38,6 +42,7 @@ export interface CoachMessageProps {
 
 export interface CoachChatProps {
   initialMessages?: ChatMessage[];
+  initialMessage?: string;
   onSend?: (message: string) => void;
   onReady?: () => void;
   showCharacter?: boolean;
@@ -47,4 +52,9 @@ export interface CoachChatProps {
   showHeader?: boolean;
   showInput?: boolean;
   embedded?: boolean;
+  className?: string;
+  sessions?: any[];
+  onSelect?: (session: any) => void;
+  emptyMessage?: string;
+  limitDisplay?: number;
 }

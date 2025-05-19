@@ -8,7 +8,8 @@ const CoachCharacter: React.FC<CoachCharacterProps> = ({
   avatar,
   mood = "neutral",
   size = "md",
-  animate = false,
+  animated = false,
+  animate = false, // Added for backward compatibility
   className,
   onClick
 }) => {
@@ -19,8 +20,11 @@ const CoachCharacter: React.FC<CoachCharacterProps> = ({
     lg: "w-32 h-32"
   };
   
+  // Use either animated or animate prop for backwards compatibility
+  const isAnimated = animated || animate;
+  
   // Animation classes
-  const animationClasses = animate ? "transition-all duration-300 hover:scale-105" : "";
+  const animationClasses = isAnimated ? "transition-all duration-300 hover:scale-105" : "";
   
   // Mood color
   const getMoodColor = () => {
@@ -35,7 +39,7 @@ const CoachCharacter: React.FC<CoachCharacterProps> = ({
   };
   
   // Pulse animation for the outer ring when animated
-  const pulseClasses = animate ? "animate-pulse opacity-70" : "opacity-50";
+  const pulseClasses = isAnimated ? "animate-pulse opacity-70" : "opacity-50";
 
   return (
     <div 

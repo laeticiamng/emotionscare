@@ -12,6 +12,14 @@ export interface VRSessionTemplate {
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
   recommended?: boolean;
   theme?: string;
+  name?: string; // Added for backward compatibility
+  audio_url?: string; // Added for backward compatibility
+  audioTrack?: string; // Added for backward compatibility
+  is_audio_only?: boolean; // Added for backward compatibility
+  preview_url?: string; // Added for backward compatibility
+  lastUsed?: Date | string; // Added for backward compatibility
+  completed?: boolean; // Added for backward compatibility
+  completionRate?: number; // Added for backward compatibility
 }
 
 export interface VRSession {
@@ -25,6 +33,7 @@ export interface VRSession {
   emotionAfter?: string;
   notes?: string;
   template?: VRSessionTemplate;
+  completed?: boolean; // Added for backward compatibility
 }
 
 export interface VRSessionWithMusicProps {
@@ -46,4 +55,8 @@ export interface VRSessionHistoryProps {
   showHeader?: boolean;
   className?: string;
   onSessionSelect?: (session: VRSession) => void;
+  sessions?: VRSession[];
+  onSelect?: (session: VRSession) => void;
+  emptyMessage?: string;
+  limitDisplay?: number;
 }

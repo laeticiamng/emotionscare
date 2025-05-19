@@ -40,8 +40,8 @@ export interface Badge {
   description: string;
   icon: string;
   unlocked: boolean;
-  progress: number;
-  total: number;
+  progress?: number;
+  total?: number;
   earned?: boolean;
   category?: string;
   earnedDate?: string;
@@ -65,6 +65,7 @@ export interface Challenge {
   deadline?: string;
   completions?: number;
   totalSteps?: number;
+  total?: number; // Added for compatibility
   status?: 'completed' | 'failed' | 'locked' | 'ongoing' | 'active' | 'available' | 'in-progress';
   category?: string;
   goal?: number;

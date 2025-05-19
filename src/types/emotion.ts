@@ -44,12 +44,15 @@ export interface EmotionResult {
 
 export interface LiveVoiceScannerProps {
   onResult?: (result: EmotionResult) => void;
+  onScanComplete?: (result: EmotionResult) => void;
   onAnalysisComplete?: (result: EmotionResult) => void;
   showControls?: boolean;
   showVisualizer?: boolean;
   autoStart?: boolean;
   duration?: number;
   className?: string;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface TeamOverviewProps {

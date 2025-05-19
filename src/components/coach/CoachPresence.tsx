@@ -27,7 +27,7 @@ const CoachPresence: React.FC<CoachPresenceProps> = ({
       )}
       onClick={onClick}
     >
-      <CoachCharacter mood={mood} size={size} animate={true} />
+      <CoachCharacter mood={mood} size={size} animated={true} />
       <div className="flex-1">
         <p className="text-sm">{message}</p>
       </div>

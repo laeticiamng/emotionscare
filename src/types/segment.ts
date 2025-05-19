@@ -1,20 +1,16 @@
 
 export interface SegmentOption {
-  value: string;
+  id: string;
   label: string;
-  count?: number;
-  icon?: React.ReactNode;
-  color?: string;
+  value: string;
   dimensionKey?: string;
   optionKey?: string;
 }
 
 export interface SegmentDimension {
-  key: string;
+  id: string;
   label: string;
   options: SegmentOption[];
-  defaultOption?: string;
-  icon?: React.ReactNode;
 }
 
 export interface SegmentContextType {
@@ -25,5 +21,5 @@ export interface SegmentContextType {
   setSelectedOption: (option: string) => void;
   resetSegmentation: () => void;
   addDimension: (dimension: SegmentDimension) => void;
-  removeDimension: (key: string) => void;
+  removeDimension: (dimensionId: string) => void;
 }
