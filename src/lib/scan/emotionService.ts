@@ -19,10 +19,10 @@ export const analyzeEmotion = () => {
     emotion: emotion.name,
     probability: 0.85,
     confidence: emotion.confidence,
-    score: emotion.score
+    score: emotion.score,
+    timestamp: new Date().toISOString(),
+    source: 'emotion-service'
   };
   
   return prediction;
 };
-
-// Fix other emotion service functions where needed

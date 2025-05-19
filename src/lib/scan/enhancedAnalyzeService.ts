@@ -1,11 +1,27 @@
 
-import { EmotionResult, EnhancedEmotionResult } from '@/types/emotion';
+import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 
 // Enhanced analysis service for emotion scans
 export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
   try {
     // In a real implementation, this would call OpenAI API
     console.log('Analyzing emotion with enhanced service:', text);
+    
+    // Generate mock recommendations
+    const recommendations: EmotionRecommendation[] = [
+      {
+        id: "rec-1",
+        emotion: "neutral",
+        title: "Prenez un moment pour réfléchir",
+        description: "La neutralité peut cacher des émotions plus profondes"
+      },
+      {
+        id: "rec-2",
+        emotion: "neutral",
+        title: "Journal émotionnel",
+        description: "Notez vos émotions pour mieux les comprendre"
+      }
+    ];
     
     // Generate a basic emotion result
     const baseResult: EmotionResult = {
@@ -19,15 +35,13 @@ export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
       timestamp: new Date().toISOString(),
       text: text,
       feedback: "Vous semblez vous exprimer de façon neutre.",
-      recommendations: [
-        {
-          id: '1',
-          emotion: 'neutral',
-          title: "Prenez un moment pour réfléchir",
-          description: "La neutralité peut cacher des émotions plus profondes"
-        }
-      ],
-      emojis: ["😐"]
+      recommendations: recommendations,
+      emojis: ["😐"],
+      emotions: {
+        neutral: 0.8,
+        joy: 0.1,
+        sadness: 0.1
+      }
     };
     
     return baseResult;

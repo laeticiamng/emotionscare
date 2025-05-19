@@ -121,12 +121,16 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
       setTimeout(() => {
         const recommendations: EmotionRecommendation[] = [
           {
+            id: "med-1",
+            emotion: "calm",
             type: 'meditation',
             title: 'Méditation guidée',
             description: 'Faites une courte méditation pour maintenir votre calme',
             category: 'méditation',
           },
           {
+            id: "music-1",
+            emotion: "relaxed",
             type: 'music',
             title: 'Musique relaxante',
             description: 'Écoutez de la musique apaisante',
@@ -146,8 +150,8 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
             transcript: "J'ai passé une journée tranquille aujourd'hui.",
             emotions: {},
             emojis: ['😌', '🧘‍♂️'],
-            intensity: 0.7, // Added required intensity field
-            source: 'audio-processor' // Added required source field
+            intensity: 0.7,
+            source: 'audio-processor'
           };
           
           onResult(fakeResult);

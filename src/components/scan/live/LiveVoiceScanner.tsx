@@ -3,17 +3,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
+import { EmotionResult, EmotionRecommendation, LiveVoiceScannerProps } from '@/types/emotion';
 import { Mic, Square } from 'lucide-react';
-
-export interface LiveVoiceScannerProps {
-  onScanComplete?: (result: EmotionResult) => void;
-  onResult?: (result: EmotionResult) => void;
-  isProcessing?: boolean;
-  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
-  autoStart?: boolean;
-  scanDuration?: number; // in seconds
-}
 
 // Helper function to generate a random emotion for mock data
 const randomEmotion = (): string => {
@@ -25,11 +16,15 @@ const randomEmotion = (): string => {
 const createMockResult = (): EmotionResult => {
   const recommendations: EmotionRecommendation[] = [
     {
+      id: "rec-1",
+      emotion: "calm",
       type: "activity",
       title: "Exercice de respiration",
       description: "3 minutes de respiration profonde"
     },
     {
+      id: "rec-2",
+      emotion: "relaxed",
       type: "music",
       title: "Playlist recommandée",
       description: "Musique relaxante pour vous aider à vous détendre"
@@ -41,7 +36,7 @@ const createMockResult = (): EmotionResult => {
     emotion: randomEmotion(),
     confidence: Math.random() * 0.4 + 0.6,
     intensity: Math.random() * 0.5 + 0.5,
-    recommendations,
+    recommendations: recommendations,
     timestamp: new Date().toISOString(),
     emojis: ["😌", "🧘‍♀️"],
     feedback: "Vous semblez calme et détendu. Continuez ainsi!",

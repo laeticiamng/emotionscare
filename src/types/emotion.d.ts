@@ -25,6 +25,14 @@ export interface EmotionResult {
   recommendations?: EmotionRecommendation[];
   emojis?: string[] | string;
   tags?: string[];
+  emotions?: Record<string, number>;
+  date?: string;
+  audioUrl?: string;
+  transcript?: string;
+  dominantEmotion?: {
+    name: string;
+    score: number;
+  };
 }
 
 export interface EmotionRecommendation {
@@ -69,16 +77,24 @@ export interface EmotionScanFormProps {
   defaultTab?: string;
   isLoading?: boolean;
   error?: string;
+  userId?: string;
+  onEmotionDetected?: (result: EmotionResult) => void;
+  onClose?: () => void;
+  onProcessingChange?: (processing: boolean) => void;
 }
 
 export interface TextEmotionScannerProps {
   onResult: (result: EmotionResult) => void;
   onProcessingChange?: (processing: boolean) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface EmojiEmotionScannerProps {
   onResult: (result: EmotionResult) => void;
   onProcessingChange?: (processing: boolean) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface FacialEmotionScannerProps {
@@ -92,8 +108,12 @@ export interface VoiceEmotionScannerProps {
 }
 
 export interface LiveVoiceScannerProps {
-  onResult: (result: EmotionResult) => void;
-  onProcessingChange?: (processing: boolean) => void;
+  onScanComplete?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  autoStart?: boolean;
+  scanDuration?: number; // in seconds
 }
 
 export interface EmotionPrediction {
@@ -112,11 +132,6 @@ export interface EnhancedEmotionResult extends EmotionResult {
   analysis: string;
   suggestedActions: string[];
   relatedEmotions: EmotionPrediction[];
-  emotions?: Record<string, number>;
-  dominantEmotion?: {
-    name: string;
-    score: number;
-  };
 }
 
 export interface EmotionalTeamViewProps {

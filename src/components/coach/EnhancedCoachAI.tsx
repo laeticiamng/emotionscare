@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { analyzeEmotion } from '@/lib/scanService';
+import { analyzeEmotion } from '@/lib/scan/enhancedAnalyzeService';
 import { EmotionResult } from '@/types/emotion';
 
 const EnhancedCoachAI = () => {
@@ -29,7 +29,7 @@ const EnhancedCoachAI = () => {
     setUserEmojis([]);
   };
 
-  // Correct handling of emojis to ensure they're always an array
+  // Ensure emojis are always an array
   const ensureArrayEmojis = (emojis: string | string[] | undefined): string[] => {
     if (Array.isArray(emojis)) {
       return emojis;
@@ -40,10 +40,8 @@ const EnhancedCoachAI = () => {
     return [];
   };
 
-  // Update the function where the error appears
   const handleEmotionDetected = (result: EmotionResult) => {
     if (result) {
-      // Use the result directly
       setAnalysisResult(result);
     }
     setIsLoading(false);
@@ -51,7 +49,6 @@ const EnhancedCoachAI = () => {
     // Correct the error with emojis by ensuring they're a valid array
     const safeEmojis = ensureArrayEmojis(result.emojis);
     
-    // Use safeEmojis instead of result.emojis and add a check for primaryEmotion
     console.log('Emotion detected:', result.primaryEmotion || result.emotion || 'unknown', 'with emojis:', safeEmojis);
   };
 
