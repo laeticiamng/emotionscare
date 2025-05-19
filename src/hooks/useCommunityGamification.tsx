@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Badge, Challenge, LeaderboardEntry } from '@/types/badge';
+import { Badge, Challenge, LeaderboardEntry } from '@/types/gamification';
 
 export function useCommunityGamification() {
   const [badges, setBadges] = useState<Badge[]>([
@@ -15,7 +15,8 @@ export function useCommunityGamification() {
       tier: 'bronze',
       progress: 100,
       threshold: 100,
-      completed: true
+      completed: true,
+      image_url: '/badges/welcome.svg'
     },
     {
       id: '2',
@@ -28,7 +29,8 @@ export function useCommunityGamification() {
       tier: 'silver',
       progress: 5,
       threshold: 5,
-      completed: true
+      completed: true,
+      image_url: '/badges/communicator.svg'
     },
     {
       id: '3',
@@ -41,7 +43,8 @@ export function useCommunityGamification() {
       tier: 'gold',
       progress: 4,
       threshold: 10,
-      completed: false
+      completed: false,
+      image_url: '/badges/influencer.svg'
     }
   ]);
 
@@ -59,7 +62,12 @@ export function useCommunityGamification() {
       status: 'in-progress',
       difficulty: 'easy',
       completions: 1,
-      total: 3
+      total: 3,
+      reward: {
+        type: 'points',
+        value: 100
+      },
+      unlocked: true
     },
     {
       id: 'c2',
@@ -74,7 +82,12 @@ export function useCommunityGamification() {
       status: 'completed',
       difficulty: 'easy',
       completions: 1,
-      total: 1
+      total: 1,
+      reward: {
+        type: 'points',
+        value: 50
+      },
+      unlocked: true
     },
     {
       id: 'c3',
@@ -90,7 +103,12 @@ export function useCommunityGamification() {
       difficulty: 'medium',
       completions: 3,
       total: 5,
-      deadline: new Date(Date.now() + 3*24*60*60*1000).toISOString()
+      deadline: new Date(Date.now() + 3*24*60*60*1000).toISOString(),
+      reward: {
+        type: 'badge',
+        value: 'community-star'
+      },
+      unlocked: true
     }
   ]);
 
@@ -101,9 +119,10 @@ export function useCommunityGamification() {
       name: 'Marie L.',
       username: 'marie_l',
       points: 850,
+      position: 1,
       rank: 1,
-      avatar: '/avatars/user1.png',
-      score: 850
+      score: 850,
+      avatarUrl: '/avatars/user1.png'
     },
     {
       id: 'l2',
@@ -111,9 +130,10 @@ export function useCommunityGamification() {
       name: 'Thomas B.',
       username: 'thomas_b',
       points: 720,
+      position: 2,
       rank: 2,
-      avatar: '/avatars/user2.png',
-      score: 720
+      score: 720,
+      avatarUrl: '/avatars/user2.png'
     },
     {
       id: 'l3',
@@ -121,9 +141,10 @@ export function useCommunityGamification() {
       name: 'Sophie C.',
       username: 'sophie_c',
       points: 690,
+      position: 3,
       rank: 3,
-      avatar: '/avatars/user3.png',
-      score: 690
+      score: 690,
+      avatarUrl: '/avatars/user3.png'
     }
   ]);
 
@@ -139,8 +160,8 @@ export function useCommunityGamification() {
     setChallenges(prev => prev.map(challenge => {
       if (challenge.id !== challengeId) return challenge;
       
-      const newProgress = Math.min(progress, challenge.goal);
-      const completed = newProgress >= challenge.goal;
+      const newProgress = Math.min(progress, challenge.goal || 0);
+      const completed = newProgress >= (challenge.goal || 0);
       
       return {
         ...challenge,

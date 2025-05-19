@@ -20,6 +20,7 @@ export interface Challenge {
   unlocked: boolean;
   totalSteps?: number;
   isCompleted?: boolean;
+  icon?: string; // Added to support existing code
 }
 
 export interface LeaderboardEntry {
@@ -31,4 +32,29 @@ export interface LeaderboardEntry {
   name?: string;
   avatarUrl?: string;
   badges?: Badge[];
+  rank?: number; // Added to support existing code
+  score?: number; // Added to support existing code
+  avatar?: string; // Added to support existing code
+}
+
+// Export Badge from here as well for compatibility
+export { Badge };
+
+// Add GamificationStats interface for UserSidePanel
+export interface GamificationStats {
+  points: number;
+  level: number;
+  rank: string;
+  badges: Badge[];
+  streak: number;
+  nextLevelPoints: number;
+  progress: number;
+  completedChallenges?: number;
+  totalChallenges?: number;
+  activeChallenges?: number;
+  streakDays?: number;
+  longestStreak?: number;
+  unlockedBadges?: number;
+  totalBadges?: number;
+  recentAchievements?: Badge[];
 }

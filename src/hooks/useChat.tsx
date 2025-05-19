@@ -4,20 +4,25 @@ import { v4 as uuidv4 } from 'uuid';
 import { 
   ChatMessage, 
   ChatHookResult, 
-  UseChatOptions
+  UseChatOptions,
+  normalizeChatMessage
 } from '@/types/chat';
 
 export function useChat({
   initialMessages = [],
   conversationId = uuidv4(),
+  initialConversationId,
   onResponse
 }: UseChatOptions = {}): ChatHookResult {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [isTyping, setIsTyping] = useState(false);
   const [input, setInput] = useState("");
 
+  // Use initialConversationId if provided, otherwise use conversationId
+  const activeConversationId = initialConversationId || conversationId;
+
   const sendMessage = useCallback(async (content: string) => {
-    if (!content.trim()) return;
+    if (!content.trim()) return Promise.resolve();
 
     // Create user message
     const userMessage: ChatMessage = {
@@ -25,7 +30,7 @@ export function useChat({
       content,
       sender: 'user',
       timestamp: new Date().toISOString(),
-      conversationId
+      conversationId: activeConversationId
     };
 
     // Add user message to the chat
@@ -43,7 +48,7 @@ export function useChat({
         content: `Response to: "${content}"`,
         sender: 'assistant',
         timestamp: new Date().toISOString(),
-        conversationId
+        conversationId: activeConversationId
       };
       
       // Add assistant message to the chat
@@ -61,7 +66,7 @@ export function useChat({
     }
 
     return Promise.resolve();
-  }, [conversationId, onResponse]);
+  }, [activeConversationId, onResponse]);
 
   const clearMessages = useCallback(() => {
     setMessages([]);

@@ -18,7 +18,8 @@ export type NotificationType =
   | 'error'
   | 'success'
   | 'streak'
-  | 'urgent';
+  | 'urgent'
+  | 'invitation';
 
 export type NotificationFilter =
   | 'all'
@@ -55,6 +56,7 @@ export interface NotificationPreference {
     success?: boolean;
     streak?: boolean;
     urgent?: boolean;
+    invitation?: boolean;
   };
 }
 
@@ -72,6 +74,10 @@ export interface Notification {
   actionText?: string;
   icon?: string;
   image?: string;
+  isRead?: boolean; // Added for backward compatibility
   created_at?: string; // For backward compatibility
   timestamp?: string | Date; // For backward compatibility
+  linkTo?: string; // Added to support existing code
+  date?: string; // Added to support existing code
+  user_id?: string; // For backward compatibility
 }

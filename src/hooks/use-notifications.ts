@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Notification, NotificationFrequency, NotificationTone } from '@/types/notification';
-
-export type NotificationFilter = 'all' | 'unread' | 'invitation' | 'reminder' | 'system';
+import { Notification, NotificationFilter, NotificationType } from '@/types/notification';
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -34,7 +33,9 @@ export function useNotifications() {
           read: false,
           userId: user.id,
           timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // For backward compatibility
-          linkTo: '/dashboard'
+          created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // For backward compatibility
+          linkTo: '/dashboard',
+          isRead: false
         },
         {
           id: '2',
@@ -45,7 +46,9 @@ export function useNotifications() {
           read: false,
           userId: user.id,
           timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // For backward compatibility
-          linkTo: '/vr-sessions'
+          created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // For backward compatibility
+          linkTo: '/vr-sessions',
+          isRead: false
         },
         {
           id: '3',
@@ -56,7 +59,9 @@ export function useNotifications() {
           read: true,
           userId: user.id,
           timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // For backward compatibility
-          linkTo: '/scan'
+          created_at: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // For backward compatibility
+          linkTo: '/scan',
+          isRead: true
         },
         {
           id: '4',
@@ -67,7 +72,9 @@ export function useNotifications() {
           read: true,
           userId: user.id,
           timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // For backward compatibility
-          linkTo: '/notifications'
+          created_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // For backward compatibility
+          linkTo: '/notifications',
+          isRead: true
         }
       ];
       
@@ -80,7 +87,7 @@ export function useNotifications() {
       }
       
       setNotifications(filteredNotifications);
-      const unreadNotifications = mockNotifications.filter(n => !n.isRead);
+      const unreadNotifications = mockNotifications.filter(n => !n.read);
       setUnreadCount(unreadNotifications.length);
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -103,7 +110,7 @@ export function useNotifications() {
       // For now, we'll update the local state
       setNotifications(prev => 
         prev.map(notification => 
-          notification.id === id ? { ...notification, read: true } : notification
+          notification.id === id ? { ...notification, read: true, isRead: true } : notification
         )
       );
       
@@ -126,19 +133,13 @@ export function useNotifications() {
     try {
       // In a real app, this would be an API call
       // For now, we'll update the local state
-      setNotifications(prev => 
-        prev.map(notification => ({ ...notification, read: true }))
-      );
-      
-      // Update unread count
+      setNotifications(prev => prev.map(notification => ({ ...notification, read: true, isRead: true })));
       setUnreadCount(0);
-    } catch (error) {
-      console.error('Error marking all notifications as read:', error);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de marquer toutes les notifications comme lues',
-        variant: 'destructive',
-      });
+      
+      return true;
+    } catch (err) {
+      console.error('Error marking all notifications as read:', err);
+      return false;
     }
   };
   
@@ -163,7 +164,9 @@ export function useNotifications() {
         read: false,
         userId: user.id,
         timestamp: new Date().toISOString(), // For backward compatibility
-        linkTo: '/dashboard'
+        created_at: new Date().toISOString(), // For backward compatibility
+        linkTo: '/dashboard',
+        isRead: false
       };
       
       setNotifications(prev => [newNotification, ...prev]);
@@ -191,3 +194,5 @@ export function useNotifications() {
     markAllAsRead
   };
 }
+
+export default useNotifications;
