@@ -1,91 +1,64 @@
 
-import React, { MutableRefObject } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Volume2, VolumeX, Moon, Sun, Laptop } from 'lucide-react';
-import { useTheme } from '@/hooks/use-theme';
-import useVoiceCommand from '@/hooks/useVoiceCommand'; // Imported as default
+import { Volume2, VolumeX, Sun, Moon } from 'lucide-react';
 
 interface ImmersiveControlsProps {
-  isListening: boolean;
-  setIsListening: (listening: boolean) => void;
-  audioEnabled: boolean;
-  setAudioEnabled: (enabled: boolean) => void;
-  audioRef: MutableRefObject<HTMLAudioElement | null>;
+  soundEnabled: boolean;
+  onSoundToggle: () => void;
+  onThemeToggle: () => void;
 }
 
 const ImmersiveControls: React.FC<ImmersiveControlsProps> = ({
-  isListening,
-  setIsListening,
-  audioEnabled,
-  setAudioEnabled,
-  audioRef
+  soundEnabled,
+  onSoundToggle,
+  onThemeToggle
 }) => {
-  const { theme, setTheme } = useTheme();
-  const { toggleListening } = useVoiceCommand();
-  
-  const handleToggleAudio = () => {
-    if (audioRef.current) {
-      if (audioEnabled) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play().catch(error => {
-          console.log("Audio play failed:", error);
-        });
-      }
-      setAudioEnabled(!audioEnabled);
-    }
-  };
-  
-  const handleToggleVoice = () => {
-    setIsListening(!isListening);
-    toggleListening();
-  };
-  
-  const handleToggleTheme = () => {
-    if (theme === 'light') setTheme('dark');
-    else if (theme === 'dark') setTheme('pastel');
-    else setTheme('light');
-  };
-  
-  const getThemeIcon = () => {
-    if (theme === 'light') return <Sun size={16} />;
-    if (theme === 'dark') return <Moon size={16} />;
-    return <Laptop size={16} />;
+  // Animation variants
+  const buttonVariants = {
+    hover: { scale: 1.05 },
+    tap: { scale: 0.95 }
   };
 
   return (
-    <div className="controls-container">
-      <div className="control-group">
+    <div className="flex flex-col gap-3">
+      <motion.div
+        whileHover="hover"
+        whileTap="tap"
+        variants={buttonVariants}
+      >
         <Button
-          variant="ghost"
+          onClick={onSoundToggle}
+          variant="outline"
           size="icon"
-          className={`control-button ${audioEnabled ? 'active-control' : ''}`}
-          onClick={handleToggleAudio}
-          title={audioEnabled ? "Désactiver la musique" : "Activer la musique"}
+          className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-blue-200 dark:border-blue-900 h-10 w-10 rounded-full shadow-md hover:shadow-lg"
+          aria-label={soundEnabled ? "Désactiver le son" : "Activer le son"}
         >
-          {audioEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+          {soundEnabled ? (
+            <Volume2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          ) : (
+            <VolumeX className="h-5 w-5 text-slate-400" />
+          )}
         </Button>
-        
+      </motion.div>
+
+      <motion.div
+        whileHover="hover"
+        whileTap="tap"
+        variants={buttonVariants}
+      >
         <Button
-          variant="ghost"
+          onClick={onThemeToggle}
+          variant="outline"
           size="icon"
-          className={`control-button ${isListening ? 'active-control' : ''}`}
-          onClick={handleToggleVoice}
-          title={isListening ? "Désactiver les commandes vocales" : "Activer les commandes vocales"}
+          className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-blue-200 dark:border-blue-900 h-10 w-10 rounded-full shadow-md hover:shadow-lg"
+          aria-label="Changer le thème"
         >
-          {isListening ? <MicOff size={16} /> : <Mic size={16} />}
+          <Sun className="h-5 w-5 text-yellow-500 dark:text-yellow-400 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-5 w-5 text-slate-700 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
         </Button>
-        
-        <Button
-          variant="ghost"
-          size="icon"
-          className="control-button"
-          onClick={handleToggleTheme}
-          title="Changer le thème"
-        >
-          {getThemeIcon()}
-        </Button>
-      </div>
+      </motion.div>
     </div>
   );
 };

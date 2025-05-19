@@ -1,246 +1,205 @@
 
-import React, { useEffect, useState, useRef } from 'react';
-import PremiumContent from '@/components/immersive/PremiumContent';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import React, { useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { useTheme } from '@/contexts/ThemeContext';
-import '../styles/animations.css';
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { useMediaQuery } from '@/hooks/use-media-query';
+import { useTheme } from '@/hooks/use-theme';
 import useSound from '@/hooks/use-sound';
-import useDeviceDetection from '@/hooks/use-device-detection';
-import { useNavigate } from 'react-router-dom';
+import PremiumContent from '@/components/immersive/PremiumContent';
+import ImmersiveControls from '@/components/immersive/ImmersiveControls';
+import PageTransition from '@/components/transitions/PageTransition';
+import { Button } from '@/components/ui/button';
+import '../styles/immersive-home.css';
+import { useState, useRef } from 'react';
+
+// Sound imports
+import hoverSfx from '/sounds/hover.mp3';
+import clickSfx from '/sounds/click.mp3';
 
 const ImmersiveHome: React.FC = () => {
-  const { theme } = useTheme();
+  // Context and state
+  const { theme, setTheme } = useTheme();
+  const { language } = usePreferences();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+
+  // Sound effects
+  const [playHover] = useSound(hoverSfx, { volume: 0.5, soundEnabled });
+  const [playClick] = useSound(clickSfx, { volume: 0.4, soundEnabled });
+
+  // Motion values for parallax effect
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const parallaxRef = useRef<HTMLDivElement>(null);
-  const { isMobile } = useDeviceDetection();
-  const [isFirstVisit, setIsFirstVisit] = useState<boolean>(false);
-  const [isOnboardingVisible, setIsOnboardingVisible] = useState<boolean>(false);
-  const [welcomeMessage, setWelcomeMessage] = useState<string>("");
-  const navigate = useNavigate();
-  
-  const welcomeMessages = [
-    "Bienvenue dans votre espace émotionnel personnalisé",
-    "Découvrez comment mieux comprendre vos émotions",
-    "Prenez soin de votre bien-être émotionnel",
-    "Une nouvelle approche du bien-être au quotidien",
-    "Votre parcours émotionnel commence ici"
-  ];
-  
-  // Initialize sound effects
-  const { play: playHover } = useSound({
-    src: '/sounds/hover.mp3',
-    volume: 0.2
-  });
-  
-  const { play: playClick } = useSound({
-    src: '/sounds/click.mp3',
-    volume: 0.3
-  });
-  
-  // Initialize spring physics for smoother parallax
-  const springConfig = { damping: 25, stiffness: 300 };
+
+  // Spring animations for smoother movement
+  const springConfig = { damping: 25, stiffness: 100 };
   const springX = useSpring(mouseX, springConfig);
   const springY = useSpring(mouseY, springConfig);
-  
-  // Transform mouse position into parallax effect
-  const moveX = useTransform(springX, [0, window.innerWidth], [-15, 15]);
-  const moveY = useTransform(springY, [0, window.innerHeight], [-15, 15]);
-  
-  // Handle mouse movement for parallax effect
+
+  // Transform values for parallax layers - these functions replaced the pipe method
+  const moveBackground = useTransform(springY, [-100, 100], [5, -5]);
+  const moveMiddleground = useTransform(springX, [-100, 100], [10, -10]);
+  const moveForeground = useTransform(springX, [-100, 100], [15, -15]);
+
+  // Greeting message based on time of day & language
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    
+    if (language === 'fr') {
+      if (hour < 12) return "Bonjour et bienvenue sur EmotionsCare";
+      if (hour < 18) return "Bon après-midi, bienvenue sur EmotionsCare";
+      return "Bonsoir, bienvenue sur EmotionsCare";
+    } else if (language === 'es') {
+      if (hour < 12) return "Buenos días, bienvenido a EmotionsCare";
+      if (hour < 18) return "Buenas tardes, bienvenido a EmotionsCare";
+      return "Buenas noches, bienvenido a EmotionsCare";
+    } else {
+      if (hour < 12) return "Good morning, welcome to EmotionsCare";
+      if (hour < 18) return "Good afternoon, welcome to EmotionsCare";
+      return "Good evening, welcome to EmotionsCare";
+    }
+  };
+
+  // Check first visit for onboarding
   useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      mouseX.set(event.clientX);
-      mouseY.set(event.clientY);
-    };
-    
-    window.addEventListener('mousemove', handleMouseMove);
-    
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, [mouseX, mouseY]);
-  
-  // First visit detection and onboarding
-  useEffect(() => {
-    const hasVisitedBefore = localStorage.getItem('hasVisitedHome');
-    
+    const hasVisitedBefore = localStorage.getItem('hasVisitedLanding');
     if (!hasVisitedBefore) {
-      setIsFirstVisit(true);
-      setIsOnboardingVisible(true);
-      localStorage.setItem('hasVisitedHome', 'true');
+      setShowOnboarding(true);
+      localStorage.setItem('hasVisitedLanding', 'true');
     }
-    
-    // Random welcome message
-    const randomIndex = Math.floor(Math.random() * welcomeMessages.length);
-    setWelcomeMessage(welcomeMessages[randomIndex]);
-    
-    // Preload target pages for instant transitions
-    const preloadRoutes = ['/b2c/login', '/b2b/selection'];
-    preloadRoutes.forEach(route => {
-      const link = document.createElement('link');
-      link.rel = 'prefetch';
-      link.href = route;
-      document.head.appendChild(link);
-    });
-    
-    // Add overflow hidden to prevent scrolling
-    document.body.classList.add('overflow-hidden');
-    
-    return () => {
-      document.body.classList.remove('overflow-hidden');
-    };
-  }, [welcomeMessages]);
-  
-  // Handle haptic feedback for mobile
-  const handleHapticFeedback = () => {
-    if (navigator.vibrate && isMobile) {
-      navigator.vibrate(50); // light vibration
+
+    // Initial check for sound preference
+    const soundPref = localStorage.getItem('soundEnabled');
+    if (soundPref === 'true') {
+      setSoundEnabled(true);
     }
-  };
-  
-  const handleButtonClick = (route: string) => {
-    playClick();
-    handleHapticFeedback();
-    
-    // Add a small delay for sound to play before navigating
-    setTimeout(() => {
-      navigate(route);
-    }, 100);
-  };
-  
-  return (
-    <div className={`min-h-screen flex flex-col relative overflow-hidden ${
-      theme === 'dark' 
-        ? 'bg-gradient-to-b from-slate-900 to-blue-900' 
-        : 'bg-gradient-to-b from-blue-50 to-purple-100'
-    }`}>
-      {/* Header */}
-      <header className="p-4 flex justify-between items-center z-10">
-        <div className="flex items-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-              <span className="text-white font-bold text-sm">EC</span>
-            </div>
-          </motion.div>
-          
-          <motion.span
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="ml-2 text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 hidden sm:block"
-          >
-            EmotionsCare
-          </motion.span>
-        </div>
-        
-        <ThemeToggle />
-      </header>
+
+    // Mouse move handler for parallax
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
       
-      {/* Main content */}
-      <main className="flex-grow flex items-center justify-center relative z-10">
-        <PremiumContent 
-          greeting={welcomeMessage} 
-          onHover={playHover}
-          onClick={(route) => handleButtonClick(route)}
-        />
-      </main>
+      mouseX.set(e.clientX - centerX);
+      mouseY.set(e.clientY - centerY);
+    };
 
-      {/* Ambient background elements with parallax effect */}
-      <div ref={parallaxRef} className="absolute inset-0 overflow-hidden -z-10">
-        <motion.div
-          className="absolute top-0 -left-[30%] w-[60%] aspect-square bg-blue-500 rounded-full blur-[120px] mix-blend-multiply opacity-20 dark:opacity-10"
-          style={{ x: moveX, y: moveY }}
-        />
-        <motion.div
-          className="absolute top-[30%] -right-[20%] w-[50%] aspect-square bg-purple-500 rounded-full blur-[130px] mix-blend-multiply opacity-15 dark:opacity-10 animation-delay-2000"
-          style={{ x: moveX.pipe(v => -v/2), y: moveY.pipe(v => -v/2) }}
-        />
-        <motion.div
-          className="absolute -bottom-[10%] left-[20%] w-[40%] aspect-square bg-pink-400 rounded-full blur-[120px] mix-blend-multiply opacity-10 dark:opacity-5 animation-delay-4000"
-          style={{ x: moveX.pipe(v => v/3), y: moveY.pipe(v => v/3) }}
-        />
-        
-        {/* Interactive particle system */}
-        <div className="absolute inset-0">
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={`particle-${i}`}
-              className={`absolute rounded-full bg-white dark:bg-blue-300 ${
-                i % 3 === 0 ? 'w-1 h-1' : i % 3 === 1 ? 'w-1.5 h-1.5' : 'w-2 h-2'
-              }`}
-              animate={{
-                x: [
-                  Math.random() * window.innerWidth,
-                  Math.random() * window.innerWidth,
-                  Math.random() * window.innerWidth
-                ],
-                y: [
-                  Math.random() * window.innerHeight,
-                  Math.random() * window.innerHeight,
-                  Math.random() * window.innerHeight
-                ],
-                opacity: [0.1, 0.5, 0.1]
-              }}
-              transition={{
-                duration: 15 + Math.random() * 20,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-            />
-          ))}
-        </div>
-      </div>
+    if (isDesktop) {
+      window.addEventListener('mousemove', handleMouseMove);
+    }
 
-      {/* Onboarding overlay for first-time visitors */}
-      {isOnboardingVisible && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+    return () => {
+      if (isDesktop) {
+        window.removeEventListener('mousemove', handleMouseMove);
+      }
+    };
+  }, [mouseX, mouseY, isDesktop]);
+
+  // Toggle sound effects
+  const toggleSound = () => {
+    const newState = !soundEnabled;
+    setSoundEnabled(newState);
+    localStorage.setItem('soundEnabled', newState.toString());
+    
+    // Provide haptic feedback on mobile
+    if (navigator.vibrate && newState) {
+      navigator.vibrate(50);
+    }
+  };
+
+  // Theme toggling
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  return (
+    <PageTransition>
+      <div 
+        ref={containerRef}
+        className="min-h-screen relative overflow-hidden bg-gradient-to-b from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-900 flex flex-col justify-center items-center"
+      >
+        {/* Background layers for parallax effect */}
+        <motion.div 
+          className="absolute inset-0 z-0 opacity-30"
+          style={{ y: moveBackground }}
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-lg shadow-2xl"
-          >
-            <h2 className="text-2xl font-bold mb-4 text-blue-700 dark:text-blue-300">
-              Bienvenue sur EmotionsCare
-            </h2>
-            <p className="mb-6 text-gray-700 dark:text-gray-200">
-              Notre plateforme utilise l'intelligence artificielle pour vous aider à comprendre 
-              et gérer vos émotions. Choisissez votre mode d'accès pour commencer l'expérience.
-            </p>
-            <div className="flex justify-end">
-              <button
-                onClick={() => setIsOnboardingVisible(false)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                Commencer
-              </button>
-            </div>
-          </motion.div>
+          <div className="absolute top-1/4 left-1/6 w-96 h-96 bg-blue-300 dark:bg-blue-700 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+          <div className="absolute top-2/3 right-1/6 w-80 h-80 bg-purple-300 dark:bg-purple-700 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
         </motion.div>
-      )}
 
-      {/* Footer */}
-      <footer className="p-4 text-center text-sm text-blue-600/60 dark:text-blue-300/60 z-10">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1.5 }}
+        <motion.div 
+          className="absolute inset-0 z-0 opacity-30"
+          style={{ x: moveMiddleground }}
         >
-          © {new Date().getFullYear()} EmotionsCare · Tous droits réservés
-        </motion.p>
-      </footer>
-    </div>
+          <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-pink-200 dark:bg-pink-800 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+          <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-indigo-200 dark:bg-indigo-800 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        </motion.div>
+
+        <motion.div 
+          className="absolute inset-0 z-0 opacity-20"
+          style={{ x: moveForeground }}
+        >
+          <div className="absolute top-1/2 left-1/2 w-60 h-60 bg-cyan-200 dark:bg-cyan-800 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        </motion.div>
+
+        {/* Main content */}
+        <div className="relative z-10 w-full">
+          <PremiumContent 
+            greeting={getTimeBasedGreeting()}
+            onHover={() => soundEnabled && playHover()}
+            onClick={() => soundEnabled && playClick()}
+          />
+        </div>
+
+        {/* Controls */}
+        <div className="fixed bottom-6 right-6 z-20">
+          <ImmersiveControls
+            soundEnabled={soundEnabled} 
+            onSoundToggle={toggleSound}
+            onThemeToggle={toggleTheme}
+          />
+        </div>
+
+        {/* Simple onboarding modal */}
+        {showOnboarding && (
+          <motion.div 
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div 
+              className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-6 max-w-md w-full"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              transition={{ delay: 0.1, type: "spring" }}
+            >
+              <h2 className="text-2xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-500">
+                Bienvenue sur EmotionsCare
+              </h2>
+              <p className="text-slate-600 dark:text-slate-300 mb-4">
+                Découvrez une nouvelle approche de la gestion émotionnelle, adaptée à vos besoins personnels ou professionnels.
+              </p>
+              <div className="flex justify-end">
+                <Button 
+                  onClick={() => {
+                    setShowOnboarding(false);
+                    if (soundEnabled) playClick();
+                    if (navigator.vibrate) navigator.vibrate(50);
+                  }}
+                  className="mt-4"
+                >
+                  Commencer
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </div>
+    </PageTransition>
   );
 };
 

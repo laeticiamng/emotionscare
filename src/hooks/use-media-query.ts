@@ -1,14 +1,16 @@
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
 /**
- * Custom hook to check if a media query matches
- * @param query Media query string (e.g. "(max-width: 768px)")
- * @returns Boolean indicating if the media query matches
+ * Custom hook for responsive design
+ * Returns true if the media query matches
+ * 
+ * @param query CSS media query string e.g. '(min-width: 768px)'
+ * @returns boolean indicating if the media query matches
  */
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState<boolean>(() => {
-    // Check if window is available (for SSR compatibility)
+    // Safe check for SSR
     if (typeof window !== 'undefined') {
       return window.matchMedia(query).matches;
     }
@@ -21,21 +23,26 @@ export function useMediaQuery(query: string): boolean {
     }
 
     const mediaQuery = window.matchMedia(query);
-    const updateMatch = (e: MediaQueryListEvent | MediaQueryList) => {
-      setMatches(e.matches);
+    const handleChange = (event: MediaQueryListEvent) => {
+      setMatches(event.matches);
     };
 
     // Initial check
-    updateMatch(mediaQuery);
+    setMatches(mediaQuery.matches);
 
-    // Add listener for changes
+    // Modern browsers
     if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', updateMatch);
-      return () => mediaQuery.removeEventListener('change', updateMatch);
-    } else {
-      // Fallback for older browsers
-      mediaQuery.addListener(updateMatch);
-      return () => mediaQuery.removeListener(updateMatch);
+      mediaQuery.addEventListener('change', handleChange);
+      return () => {
+        mediaQuery.removeEventListener('change', handleChange);
+      };
+    } 
+    // Older browsers
+    else {
+      mediaQuery.addListener(handleChange);
+      return () => {
+        mediaQuery.removeListener(handleChange);
+      };
     }
   }, [query]);
 

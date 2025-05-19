@@ -1,127 +1,57 @@
 
-import { useRef, useState, useEffect } from 'react';
+/**
+ * This is a simple wrapper around the use-sound package
+ * We're using a custom implementation to avoid adding extra dependencies
+ */
 
-interface UseSoundOptions {
-  src: string;
+import { useRef, useEffect } from 'react';
+
+type PlayFunction = () => void;
+
+interface SoundOptions {
   volume?: number;
-  loop?: boolean;
-  autoPlay?: boolean;
   soundEnabled?: boolean;
+  loop?: boolean;
 }
 
-export default function useSound(options: UseSoundOptions) {
-  const { src, volume = 1, loop = false, autoPlay = false, soundEnabled = true } = options;
-  
+export default function useSound(
+  url: string,
+  { volume = 1, soundEnabled = true, loop = false }: SoundOptions = {}
+): [PlayFunction] {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  
-  // Initialize audio on mount
+
   useEffect(() => {
-    // Only create audio element if we're in a browser environment
-    if (typeof window !== 'undefined') {
-      const audio = new Audio(src);
-      audio.volume = volume;
-      audio.loop = loop;
-      
-      // Get sound preference from localStorage
-      const savedSoundPreference = localStorage.getItem('soundEnabled');
-      const effectiveSoundEnabled = savedSoundPreference !== null 
-        ? savedSoundPreference === 'true'
-        : soundEnabled;
-      
-      audio.muted = !effectiveSoundEnabled;
-      setIsMuted(!effectiveSoundEnabled);
-      
-      // Set up event listeners
-      audio.addEventListener('canplaythrough', () => {
-        setIsLoaded(true);
-        setDuration(audio.duration);
-        if (autoPlay) {
-          audio.play().catch(() => {
-            // Auto-play was prevented, do nothing
-            // Most browsers block auto-play unless there was user interaction
-          });
-        }
-      });
-      
-      audio.addEventListener('play', () => setIsPlaying(true));
-      audio.addEventListener('pause', () => setIsPlaying(false));
-      audio.addEventListener('timeupdate', () => setCurrentTime(audio.currentTime));
-      audio.addEventListener('ended', () => !loop && setIsPlaying(false));
-      
-      audioRef.current = audio;
-      
-      return () => {
-        // Clean up
-        audio.pause();
-        audio.src = '';
-        audio.remove();
+    // Create audio element if it doesn't exist
+    if (!audioRef.current) {
+      audioRef.current = new Audio(url);
+      audioRef.current.volume = volume;
+      audioRef.current.loop = loop;
+    }
+
+    // Update audio properties
+    audioRef.current.volume = volume;
+    audioRef.current.loop = loop;
+
+    // Cleanup function
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
         audioRef.current = null;
-      };
-    }
-  }, [src, volume, loop, autoPlay, soundEnabled]);
-  
-  // Function to play the sound
-  const play = () => {
-    if (audioRef.current && isLoaded) {
-      // Reset to start if it was already played
-      if (!isPlaying) {
-        audioRef.current.currentTime = 0;
       }
-      
-      audioRef.current.play().catch(error => {
-        console.error('Error playing sound:', error);
-      });
-    }
-  };
-  
-  // Function to pause the sound
-  const pause = () => {
-    if (audioRef.current && isPlaying) {
-      audioRef.current.pause();
-    }
-  };
-  
-  // Function to stop the sound
-  const stop = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
+    };
+  }, [url, volume, loop]);
+
+  // Play function
+  const play: PlayFunction = () => {
+    if (audioRef.current && soundEnabled) {
+      // Reset the audio to the beginning if it's already playing
       audioRef.current.currentTime = 0;
-    }
-  };
-  
-  // Function to toggle mute
-  const toggleMute = () => {
-    if (audioRef.current) {
-      const newMuteState = !isMuted;
-      audioRef.current.muted = newMuteState;
-      setIsMuted(newMuteState);
-      localStorage.setItem('soundEnabled', String(!newMuteState));
-    }
-  };
-  
-  // Function to set volume
-  const setVolumeLevel = (newVolume: number) => {
-    if (audioRef.current && newVolume >= 0 && newVolume <= 1) {
-      audioRef.current.volume = newVolume;
+      audioRef.current.play().catch(e => {
+        // Ignore autoplay errors - common in browsers requiring user interaction
+        console.debug('Audio playback error (likely autoplay restriction):', e);
+      });
     }
   };
 
-  return {
-    play,
-    pause,
-    stop,
-    isPlaying,
-    isLoaded,
-    isMuted,
-    toggleMute,
-    duration,
-    currentTime,
-    setVolume: setVolumeLevel,
-    audio: audioRef.current
-  };
+  return [play];
 }

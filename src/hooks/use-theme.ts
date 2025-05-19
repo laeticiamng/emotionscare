@@ -1,32 +1,45 @@
 
-import { useContext } from 'react';
-import { ThemeContext } from '@/contexts/ThemeContext';
-import { Theme } from '@/types/theme';
+import { useState, useEffect } from 'react';
 
-/**
- * A hook that provides type-safe access to the theme context
- * Ensures consistent typing across the application
- */
-export const useTheme = () => {
-  const themeContext = useContext(ThemeContext);
-  
-  if (!themeContext) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  
-  // Ensure the theme is one of the valid values
-  const validateTheme = (theme: string): Theme => {
-    if (['light', 'dark', 'system', 'pastel'].includes(theme)) {
-      return theme as Theme;
+type Theme = 'light' | 'dark' | 'system';
+
+export function useTheme() {
+  const [theme, setTheme] = useState<Theme>(() => {
+    // Check for stored theme preference
+    const storedTheme = localStorage.getItem('theme') as Theme | null;
+    return storedTheme || 'system';
+  });
+
+  // Update theme attribute on document body
+  const applyTheme = (newTheme: Theme) => {
+    const root = window.document.documentElement;
+    
+    root.classList.remove('light', 'dark');
+    
+    if (newTheme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.classList.add(systemTheme);
+    } else {
+      root.classList.add(newTheme);
     }
-    return 'system';
   };
 
-  return {
-    ...themeContext,
-    theme: validateTheme(themeContext.theme),
-    setTheme: (theme: Theme) => themeContext.setTheme(theme),
-  };
-};
+  useEffect(() => {
+    // Save to localStorage
+    localStorage.setItem('theme', theme);
+    applyTheme(theme);
+    
+    // Listen for system theme changes if using system theme
+    if (theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => {
+        applyTheme('system');
+      };
+      
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, [theme]);
 
-export default useTheme;
+  return { theme, setTheme } as const;
+}
