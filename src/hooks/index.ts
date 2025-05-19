@@ -1,4 +1,3 @@
-
 // Auth hooks re-exported from the global AuthContext
 export { useAuth } from '@/contexts/AuthContext';
 
@@ -34,3 +33,6 @@ export { useTheme } from './use-theme';
 
 // Chat hooks
 export { useChat } from './useChat';
+
+// Voice commands exports
+export { useVoiceCommands } from './useVoiceCommands';

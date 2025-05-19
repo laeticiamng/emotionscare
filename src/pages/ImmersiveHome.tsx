@@ -1,258 +1,198 @@
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { WelcomeMessage } from '@/components/home/WelcomeMessage';
-import useVoiceCommands from '@/hooks/useVoiceCommands';
-import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
-import { toast } from 'sonner';
-import { useTheme } from '@/contexts/ThemeContext';
-import '@/styles/immersive-home.css';
-
-const ThemeSelector = () => {
-  const { theme, setTheme } = useTheme();
-  
-  return (
-    <div className="absolute top-4 right-4 flex gap-2 z-10">
-      <button 
-        onClick={() => setTheme('light')} 
-        className={`control-button ${theme === 'light' ? 'active' : ''}`}
-        aria-label="Activer le thème clair"
-      >
-        ☀️
-      </button>
-      <button 
-        onClick={() => setTheme('dark')} 
-        className={`control-button ${theme === 'dark' ? 'active' : ''}`}
-        aria-label="Activer le thème sombre"
-      >
-        🌙
-      </button>
-      <button 
-        onClick={() => setTheme('pastel')} 
-        className={`control-button ${theme === 'pastel' ? 'active' : ''}`}
-        aria-label="Activer le thème pastel"
-      >
-        🌈
-      </button>
-    </div>
-  );
-};
+import { Mic, Moon, Sun, Volume2, VolumeX } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { useTheme } from '@/hooks/use-theme';
+// Fix: Import as a named export instead of default export
+import { useVoiceCommands } from '@/hooks/useVoiceCommands';
 
 const ImmersiveHome: React.FC = () => {
   const navigate = useNavigate();
-  const [soundEnabled, setSoundEnabled] = useState(false);
-  const { isListening, toggleListening, supported } = useVoiceCommands({
+  const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
+  const [audioEnabled, setAudioEnabled] = useState(false);
+  const [backgroundTrack, setBackgroundTrack] = useState<HTMLAudioElement | null>(null);
+
+  // Use the voice commands hook with named export
+  const { 
+    isListening, 
+    startListening, 
+    stopListening, 
+    transcript,
+    supported 
+  } = useVoiceCommands({
     commands: {
-      'particulier': () => navigate('/b2c/login'),
-      'entreprise': () => navigate('/b2b/selection'),
-      'administrateur': () => navigate('/b2b/admin/login'),
-      'collaborateur': () => navigate('/b2b/user/login'),
-      'je suis particulier': () => navigate('/b2c/login'),
+      'je suis un particulier': () => navigate('/b2c/login'),
       'je suis une entreprise': () => navigate('/b2b/selection'),
-      'je suis un particulier': () => navigate('/b2c/login')
     },
-    onTranscript: (text) => {
-      toast.info(`Commande vocale reconnue: "${text}"`, {
-        position: 'top-center',
-        duration: 3000
+    onError: (error) => {
+      toast({
+        title: 'Erreur de reconnaissance vocale',
+        description: error,
+        variant: 'destructive'
       });
     }
   });
 
-  const { theme } = useTheme();
-  
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    // Animation mounting effect
-    setMounted(true);
-    
-    // Preload login pages for faster transitions
-    const preloadRoutes = ['/b2c/login', '/b2b/selection'];
-    preloadRoutes.forEach(route => {
-      const link = document.createElement('link');
-      link.rel = 'prefetch';
-      link.href = route;
-      document.head.appendChild(link);
-    });
-    
-    // Ambient sound setup (commented out as it requires audio files)
-    // if (soundEnabled) {
-    //   const ambientSound = new Audio('/sounds/ambient-calm.mp3');
-    //   ambientSound.volume = 0.3;
-    //   ambientSound.loop = true;
-    //   ambientSound.play().catch(e => console.warn('Autoplay prevented:', e));
-    //   
-    //   return () => {
-    //     ambientSound.pause();
-    //     ambientSound.currentTime = 0;
-    //   };
-    // }
-  }, [soundEnabled]);
-  
-  const handleB2CClick = () => {
-    toast.success("Redirection vers l'espace particulier", {
-      position: 'top-center',
-      duration: 2000
-    });
-    
-    setTimeout(() => {
-      navigate('/b2c/login');
-    }, 300);
-  };
-  
-  const handleB2BClick = () => {
-    toast.success("Redirection vers l'espace entreprise", {
-      position: 'top-center',
-      duration: 2000
-    });
-    
-    setTimeout(() => {
-      navigate('/b2b/selection');
-    }, 300);
-  };
-  
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: {
-        when: "beforeChildren",
-        staggerChildren: 0.2
+  // Toggle audio playback
+  const toggleAudio = () => {
+    if (!backgroundTrack) {
+      const audio = new Audio('/sounds/ambient-calm.mp3');
+      audio.loop = true;
+      setBackgroundTrack(audio);
+      audio.play().catch(() => {
+        toast({
+          title: "Impossible de lire l'audio",
+          description: "Veuillez activer l'autoplay dans votre navigateur ou cliquer à nouveau pour réessayer.",
+          variant: "destructive"
+        });
+      });
+      setAudioEnabled(true);
+    } else {
+      if (audioEnabled) {
+        backgroundTrack.pause();
+      } else {
+        backgroundTrack.play().catch(console.error);
       }
+      setAudioEnabled(!audioEnabled);
     }
   };
-  
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { type: "spring", stiffness: 300, damping: 24 }
-    }
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
-  
+
+  // Clean up audio on unmount
+  useEffect(() => {
+    return () => {
+      backgroundTrack?.pause();
+      backgroundTrack?.remove();
+    };
+  }, [backgroundTrack]);
+
   return (
-    <AnimatePresence>
-      <div className={`immersive-container ${theme}`}>
-        {/* Background animated elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.6 }}
-            transition={{ duration: 2 }}
-            className="absolute w-96 h-96 ambient-circle primary top-0 left-1/4 -translate-y-1/2"
-          />
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
-            transition={{ duration: 2, delay: 0.5 }}
-            className="absolute w-80 h-80 ambient-circle accent bottom-0 right-1/4 translate-y-1/2"
-          />
-        </div>
-        
-        {/* Theme selector */}
-        <ThemeSelector />
-        
-        {/* Sound & Voice controls */}
-        <div className="absolute top-4 left-4 flex gap-3 z-10">
-          <button 
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className="control-button"
-            aria-label={soundEnabled ? "Désactiver le son" : "Activer le son"}
-          >
-            {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-          </button>
-          
-          {supported && (
-            <button 
-              onClick={toggleListening}
-              className={`control-button ${isListening ? 'voice-active' : ''}`}
-              aria-label={isListening ? "Arrêter la commande vocale" : "Activer la commande vocale"}
-            >
-              {isListening ? <Mic size={18} color="var(--primary)" /> : <MicOff size={18} />}
-            </button>
-          )}
-        </div>
-        
-        {/* Main content */}
-        <motion.div 
-          className="relative z-10 w-full max-w-4xl mx-auto text-center px-4"
-          variants={containerVariants}
-          initial="hidden"
-          animate={mounted ? "visible" : "hidden"}
-        >
-          <motion.h1 
-            className="premium-title"
-            variants={itemVariants}
-          >
-            Bienvenue sur EmotionsCare
-          </motion.h1>
-          
-          <motion.div 
-            className="premium-subtitle mb-8"
-            variants={itemVariants}
-          >
-            <WelcomeMessage className="text-lg md:text-xl text-center mb-2" />
-            <p className="mt-4 opacity-80">Choisissez votre mode d'accès</p>
-          </motion.div>
-          
-          <motion.div
-            className="flex flex-col sm:flex-row gap-6 justify-center mb-12"
-            variants={itemVariants}
-          >
-            <motion.div 
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.98 }}
-              className="flex-1"
-            >
-              <button
-                onClick={handleB2CClick}
-                className="premium-button primary w-full p-6 rounded-2xl text-lg font-semibold"
-                aria-label="Accès particulier"
-              >
-                Je suis un particulier
-              </button>
-            </motion.div>
-            
-            <motion.div 
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.98 }}
-              className="flex-1"
-            >
-              <button
-                onClick={handleB2BClick}
-                className="premium-button secondary w-full p-6 rounded-2xl text-lg font-semibold"
-                aria-label="Accès entreprise"
-              >
-                Je suis une entreprise
-              </button>
-            </motion.div>
-          </motion.div>
-          
-          <motion.p 
-            className="text-center text-sm opacity-70 max-w-xl mx-auto"
-            variants={itemVariants}
-          >
-            "Vous êtes au bon endroit pour prendre soin de vos émotions et développer votre intelligence émotionnelle."
-          </motion.p>
-          
-          {isListening && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="mt-6 p-3 bg-primary/10 rounded-xl inline-flex items-center"
-            >
-              <Mic className="mr-2" size={18} />
-              <span>Dites "Je suis un particulier" ou "Je suis une entreprise"...</span>
-            </motion.div>
-          )}
-        </motion.div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-background/80 relative overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background/20 animate-pulse"></div>
+        <div className="absolute w-[500px] h-[500px] rounded-full bg-primary/10 -top-1/4 -left-1/4 blur-3xl animate-blob"></div>
+        <div className="absolute w-[400px] h-[400px] rounded-full bg-secondary/10 -bottom-1/4 -right-1/4 blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute w-[300px] h-[300px] rounded-full bg-accent/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 blur-3xl animate-blob animation-delay-4000"></div>
       </div>
-    </AnimatePresence>
+
+      {/* Main content */}
+      <div className="relative z-10 w-full max-w-xl px-4 text-center">
+        <h1 className="text-4xl font-bold tracking-tighter mb-6 animate-fade-in">
+          EmotionsCare
+        </h1>
+        <p className="text-xl text-muted-foreground mb-12 animate-fade-in animation-delay-300">
+          Bienvenue dans votre espace de bien-être émotionnel
+        </p>
+
+        <div className="grid gap-6 animate-fade-in animation-delay-500">
+          <Button 
+            size="lg" 
+            className="h-16 text-lg font-medium transition-all hover:scale-105"
+            onClick={() => navigate('/b2c/login')}
+          >
+            Je suis un particulier
+          </Button>
+          
+          <Button 
+            size="lg" 
+            variant="outline"
+            className="h-16 text-lg font-medium transition-all hover:scale-105"
+            onClick={() => navigate('/b2b/selection')}
+          >
+            Je suis une entreprise
+          </Button>
+        </div>
+
+        <div className="mt-16 flex justify-center space-x-4 animate-fade-in animation-delay-800">
+          {supported && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`rounded-full ${isListening ? 'bg-primary text-primary-foreground animate-pulse' : ''}`}
+              onClick={isListening ? stopListening : startListening}
+              title="Commandes vocales"
+            >
+              <Mic className="h-5 w-5" />
+            </Button>
+          )}
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={toggleAudio}
+            title={audioEnabled ? "Désactiver la musique" : "Activer la musique"}
+          >
+            {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            onClick={toggleTheme}
+            title={theme === 'dark' ? "Mode clair" : "Mode sombre"}
+          >
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+        </div>
+
+        {transcript && (
+          <div className="mt-8 text-sm text-muted-foreground animate-fade-in">
+            Vous avez dit : "{transcript}"
+          </div>
+        )}
+
+        <p className="mt-12 text-sm text-muted-foreground animate-fade-in animation-delay-1000">
+          Vous êtes au bon endroit pour prendre soin de vos émotions
+        </p>
+      </div>
+
+      {/* CSS for animations */}
+      <style jsx>{`
+        @keyframes blob {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          25% { transform: translate(20px, -20px) scale(1.05); }
+          50% { transform: translate(-20px, 20px) scale(0.95); }
+          75% { transform: translate(20px, 20px) scale(1.05); }
+        }
+        .animate-blob {
+          animation: blob 30s infinite alternate;
+        }
+        .animation-delay-2000 {
+          animation-delay: -2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: -4s;
+        }
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.8s ease-out forwards;
+        }
+        .animation-delay-300 {
+          animation-delay: 0.3s;
+        }
+        .animation-delay-500 {
+          animation-delay: 0.5s;
+        }
+        .animation-delay-800 {
+          animation-delay: 0.8s;
+        }
+        .animation-delay-1000 {
+          animation-delay: 1s;
+        }
+      `}</style>
+    </div>
   );
 };
 
