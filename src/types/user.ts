@@ -1,3 +1,4 @@
+
 export type UserRole = 'user' | 'admin' | 'manager' | 'guest' | 'b2c' | 'b2b_user' | 'b2b_admin';
 
 export interface User {

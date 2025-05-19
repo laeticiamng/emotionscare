@@ -1,3 +1,4 @@
+
 export interface EmotionRecommendation {
   type: string;
   title: string;
@@ -25,6 +26,7 @@ export interface EmotionResult {
   date?: string; // For EmotionScanResult
   audioUrl?: string; // For AudioProcessor
   transcript?: string; // Added missing property
+  audio_url?: string; // For compatibility
 }
 
 export interface LiveVoiceScannerProps {

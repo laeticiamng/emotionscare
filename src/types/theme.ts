@@ -1,8 +1,8 @@
 
 import * as React from "react";
 
-export type FontFamily = "sans" | "serif" | "mono" | "system";
-export type FontSize = "xs" | "sm" | "md" | "lg" | "xl"; // Define the font sizes
+export type FontFamily = "sans" | "serif" | "mono" | "system" | "rounded" | "monospace" | "sans-serif";
+export type FontSize = "xs" | "sm" | "md" | "lg" | "xl" | "small" | "medium" | "large" | "xlarge" | "2xl" | "3xl";
 export type ThemeName = "light" | "dark" | "system" | "pastel";
 export type Theme = "light" | "dark" | "system" | "pastel";
 
@@ -21,6 +21,9 @@ export interface ThemeContextType {
   reduceMotion?: boolean;
   setSoundEnabled?: (enabled: boolean) => void;
   setReduceMotion?: (enabled: boolean) => void;
+  preferences?: any;
+  getContrastText?: (color: string) => 'black' | 'white';
+  updatePreferences?: (prefs: any) => void;
 }
 
 export interface ThemeOption {

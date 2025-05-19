@@ -1,89 +1,98 @@
 
 import { EmotionResult } from '@/types/emotion';
 
-// Sample emotion results for testing
+// Mock emotion results for development and testing
 export const mockEmotionResults: EmotionResult[] = [
   {
-    id: 'emotion-1',
+    id: '1',
     emotion: 'happy',
     confidence: 0.85,
-    intensity: 0.9,
-    timestamp: '2025-05-18T08:30:00.000Z',
+    intensity: 0.7,
+    timestamp: '2025-05-17T10:30:00Z',
     emojis: ['😊', '😃'],
-    source: 'voice',
-    text: 'Je me sens vraiment bien aujourd\'hui',
-    feedback: 'Continuez comme ça !',
+    source: 'facial',
+    text: 'I feel happy about my progress today',
+    feedback: 'Great job on maintaining a positive outlook!',
     emotions: {
       happy: 0.85,
       calm: 0.1,
-      anxious: 0.02,
-      sad: 0.03
+      sad: 0.02,
+      angry: 0.01,
+      surprised: 0.02
     }
   },
   {
-    id: 'emotion-2',
+    id: '2',
+    emotion: 'calm',
+    confidence: 0.76,
+    intensity: 0.6,
+    timestamp: '2025-05-16T15:45:00Z',
+    emojis: ['😌', '😊'],
+    source: 'voice',
+    text: 'Just finished a meditation session',
+    feedback: 'Your voice tone indicates a peaceful state of mind',
+    emotions: {
+      happy: 0.15,
+      calm: 0.76,
+      sad: 0.04,
+      angry: 0.02,
+      surprised: 0.03
+    }
+  },
+  {
+    id: '3',
     emotion: 'stressed',
-    confidence: 0.78,
-    intensity: 0.65,
-    timestamp: '2025-05-17T16:45:00.000Z',
+    confidence: 0.68,
+    intensity: 0.75,
+    timestamp: '2025-05-15T09:20:00Z',
     emojis: ['😓', '😰'],
     source: 'text',
-    text: 'Journée difficile avec beaucoup de pression',
-    feedback: 'Prenez un moment pour vous détendre',
+    text: 'Struggling with multiple deadlines this week',
+    feedback: 'I notice you\'re feeling overwhelmed. Let\'s work on prioritizing tasks.',
     emotions: {
-      stressed: 0.78,
-      anxious: 0.15,
-      tired: 0.05,
-      sad: 0.02
-    }
-  },
-  {
-    id: 'emotion-3',
-    emotion: 'calm',
-    confidence: 0.92,
-    intensity: 0.8,
-    timestamp: '2025-05-16T20:15:00.000Z',
-    emojis: ['😌', '🧘'],
-    source: 'voice',
-    text: 'Je me sens détendu après ma séance de méditation',
-    feedback: 'Excellent état de calme intérieur',
-    emotions: {
-      calm: 0.92,
       happy: 0.05,
-      focused: 0.03
+      calm: 0.1,
+      sad: 0.17,
+      angry: 0.02,
+      stressed: 0.68
     }
   },
   {
-    id: 'emotion-4',
+    id: '4',
     emotion: 'tired',
-    confidence: 0.75,
-    intensity: 0.6,
-    timestamp: '2025-05-15T22:30:00.000Z',
+    confidence: 0.72,
+    intensity: 0.65,
+    timestamp: '2025-05-14T21:00:00Z',
     emojis: ['😴', '🥱'],
-    source: 'emoji',
-    text: 'Journée épuisante, besoin de repos',
-    feedback: 'Priorisez votre sommeil ce soir',
+    source: 'combined',
+    text: 'Long day, feeling exhausted but accomplished',
+    feedback: 'You seem tired but satisfied. Consider getting proper rest tonight.',
     emotions: {
-      tired: 0.75,
-      stressed: 0.15,
-      calm: 0.05,
-      happy: 0.05
+      happy: 0.2,
+      calm: 0.08,
+      sad: 0.0,
+      tired: 0.72,
+      surprised: 0.0
     }
   },
   {
-    id: 'emotion-5',
-    emotion: 'motivated',
+    id: '5',
+    emotion: 'excited',
     confidence: 0.88,
-    intensity: 0.85,
-    timestamp: '2025-05-14T09:00:00.000Z',
-    emojis: ['💪', '🔥'],
-    source: 'text',
-    text: 'Prêt à relever tous les défis aujourd\'hui',
-    feedback: 'Votre énergie est contagieuse !',
+    intensity: 0.9,
+    timestamp: '2025-05-13T18:30:00Z',
+    emojis: ['😃', '🤩'],
+    source: 'facial',
+    text: 'Just got amazing news about the project!',
+    feedback: 'Your excitement is contagious! Great to see such positive energy.',
     emotions: {
-      motivated: 0.88,
       happy: 0.1,
-      focused: 0.02
+      excited: 0.88,
+      calm: 0.02,
+      sad: 0.0,
+      surprised: 0.0
     }
   }
 ];
+
+export default mockEmotionResults;

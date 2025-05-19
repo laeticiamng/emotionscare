@@ -38,8 +38,7 @@ const ThemeSettingsTab: React.FC<ThemeSettingsTabProps> = ({
     { value: "sans", label: "Sans" },
     { value: "serif", label: "Serif" },
     { value: "mono", label: "Monospace" },
-    { value: "system", label: "System Default" },
-    { value: "rounded", label: "Rounded" }
+    { value: "system", label: "System Default" }
   ];
   
   const handleFontFamilyChange = (value: string) => {

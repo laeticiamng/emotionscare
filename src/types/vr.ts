@@ -1,101 +1,68 @@
-// Creating a placeholder types file for VR related types
-// You may need to adjust this based on your actual types
 
+// Add VR related types here
 export interface VRSessionTemplate {
   id: string;
   name: string;
-  title?: string;
+  title: string;
   description: string;
+  thumbnailUrl: string;
   duration: number;
+  difficulty: string;
   category: string;
   tags: string[];
-  thumbnailUrl?: string;
+  immersionLevel: string;
+  goalType: string;
+  interactive: boolean;
+  benefits?: string[];
+  environmentId?: string;
+  environment?: string;
+  theme?: string;
+  is_audio_only?: boolean;
+  preview_url?: string;
+  audio_url?: string;
+  audioTrack?: string;
+  lastUsed?: string;
   imageUrl?: string;
   coverUrl?: string;
   cover_url?: string;
-  preview_url?: string;
-  difficulty?: string;
-  benefits?: string[];
-  audio_url?: string;
-  audioTrack?: string;
-  is_audio_only?: boolean;
-  lastUsed?: string;
-  theme?: string;
   rating?: number;
-  popularity?: number;
-  features?: string[];
-  completionRate?: number;
-  completion_rate?: number;
-  emotionTarget?: string;
-  emotion_target?: string;
-  recommendedMood?: string;
-  recommended_mood?: string;
-  recommendedFor?: string[];
-  environment?: string;
-  environmentId?: string;
-  immersionLevel?: string;
-  goalType?: string;
-  interactive?: boolean;
-  intensity?: number;
-  objective?: string;
-  type?: string;
 }
 
 export interface VRSession {
   id: string;
-  templateId: string;
   userId: string;
+  templateId: string;
   startTime: string;
   endTime?: string;
   duration?: number;
-  metrics?: {
-    heartRate?: number[];
-    focus?: number[];
-    relaxation?: number[];
-    stressLevel?: number;
-    focusLevel?: number;
-    emotionEnd?: string;
-  };
-  completed?: boolean;
+  emotionBefore?: string;
+  emotionAfter?: string;
+  rating?: number;
+  feedback?: string;
   heartRateBefore?: number;
   heartRateAfter?: number;
-  startedAt?: string;
-  endedAt?: string;
-  feedback?: {
-    rating?: number;
-    emotionBefore?: string;
-    emotionAfter?: string;
-    comment?: string;
-  };
-  template?: VRSessionTemplate;
+  completed?: boolean;
 }
 
-export interface VRTemplateDetailProps {
-  template: VRSessionTemplate;
-  heartRate?: number;
-  onBack?: () => void;
-  onStartSession?: () => void;
+export interface VRSessionWithMusicProps {
+  template?: VRSessionTemplate;
+  session?: VRSession;
+  sessionTemplate?: VRSessionTemplate;
+  onComplete?: () => void;
+  onExit?: () => void;
+  environment?: string;
+  musicEnabled?: boolean;
+  backgroundMusic?: string;
 }
 
 export interface VRSessionHistoryProps {
   sessions?: VRSession[];
-  onSelect?: (session: VRSession | string) => void;
-  onSessionSelect?: (session: VRSession | string) => void;
-  emptyMessage?: string;
-  limitDisplay?: number;
-  userId?: string;
-  limit?: number;
   showHeader?: boolean;
-  className?: string;
 }
 
-export interface VRSessionWithMusicProps {
+export interface VRTemplateDetailProps {
   template: VRSessionTemplate;
-  onComplete: () => void;
-  musicEnabled?: boolean;
-  backgroundMusic?: string;
-  session?: any;
-  sessionTemplate?: VRSessionTemplate;
-  onExit?: () => void;
-  environment?: string;
+  onStartSession?: () => void;
+  heartRate?: number;
+  onBack?: () => void;
 }

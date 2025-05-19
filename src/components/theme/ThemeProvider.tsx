@@ -10,7 +10,7 @@ const ThemeContext = createContext<ThemeContextType>({
   isDarkMode: false,
   fontSize: 'md',
   setFontSize: () => {},
-  systemTheme: 'system'
+  systemTheme: 'light'
 });
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -39,6 +39,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   });
 
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [preferences, setPreferences] = useState({
+    reduceMotion: false,
+    soundEnabled: true
+  });
 
   // Update the theme when the state changes
   useEffect(() => {
@@ -81,13 +85,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     root.classList.remove('text-sm', 'text-base', 'text-lg');
     
     if (fontSize === 'sm' || fontSize === 'xs') root.classList.add('text-sm');
-    if (fontSize === 'lg' || fontSize === 'xl' || fontSize === '2xl' || fontSize === '3xl') root.classList.add('text-lg');
+    if (fontSize === 'lg' || fontSize === 'xl') root.classList.add('text-lg');
     // Medium is the default, no class needed
     
     localStorage.setItem('fontSize', fontSize);
   }, [fontSize]);
 
-  // Helper pour basculer entre les thèmes
+  // Helper for toggling between themes
   const toggleTheme = () => {
     const currentIsDark = theme === 'dark' || (theme === 'system' && isDarkMode);
     setTheme(currentIsDark ? 'light' : 'dark');
@@ -113,9 +117,22 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return luminance > 0.5 ? 'black' : 'white';
   };
 
+  // Update preferences
+  const updatePreferences = (newPrefs: any) => {
+    setPreferences(prev => ({ ...prev, ...newPrefs }));
+  };
+
   // Alias for isDarkMode
   const isDark = isDarkMode;
   const systemTheme = isDark ? 'dark' : 'light';
+
+  const setSoundEnabled = (enabled: boolean) => {
+    updatePreferences({ soundEnabled: enabled });
+  };
+
+  const setReduceMotion = (reduced: boolean) => {
+    updatePreferences({ reduceMotion: reduced });
+  };
 
   return (
     <ThemeContext.Provider value={{ 
@@ -130,8 +147,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       toggleTheme,
       getContrastText,
       systemTheme,
-      soundEnabled: true,
-      reduceMotion: false
+      soundEnabled: preferences.soundEnabled,
+      reduceMotion: preferences.reduceMotion,
+      setSoundEnabled,
+      setReduceMotion,
+      preferences,
+      updatePreferences
     }}>
       {children}
     </ThemeContext.Provider>
