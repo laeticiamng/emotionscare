@@ -5,7 +5,9 @@ export interface AuthUser {
   displayName?: string;
   avatar?: string;
   avatar_url?: string; // For backward compatibility
+  avatarUrl?: string; // Additional backward compatibility
   role?: UserRole;
+  name?: string; // Added for backward compatibility
 }
 
 export type UserRole = 'admin' | 'user' | 'guest';

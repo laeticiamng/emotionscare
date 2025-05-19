@@ -61,6 +61,11 @@ export interface VRTemplateDetailProps {
 export interface VRSessionHistoryProps {
   sessions: VRSession[];
   onSelect?: (session: VRSession) => void;
-  emptyMessage?: string; // Added for backward compatibility
-  limitDisplay?: number; // Added for backward compatibility
+  emptyMessage?: string;
+  limitDisplay?: number;
+}
+
+export interface VRSessionWithMusicProps {
+  sessionTemplate: VRSessionTemplate;
+  onComplete?: () => void;
 }

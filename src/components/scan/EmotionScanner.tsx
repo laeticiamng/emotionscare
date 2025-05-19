@@ -83,7 +83,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
             </div>
             
             <AudioProcessor 
-              isRecording={isRecording} 
+              isRecording={isRecording}
               onResult={handleVoiceResult}
               onProcessingChange={setIsProcessing}
             />

@@ -2,26 +2,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff, Loader2 } from 'lucide-react';
-import { EmotionResult } from '@/types/emotion';
-
-interface AudioProcessorProps {
-  onResult?: (result: EmotionResult) => void;
-  onError?: (error: string) => void;
-  autoStop?: boolean;
-  duration?: number;
-  isProcessing?: boolean;
-  setIsProcessing?: (processing: boolean) => void;
-}
+import { EmotionResult, AudioProcessorProps } from '@/types/emotion';
 
 const AudioProcessor: React.FC<AudioProcessorProps> = ({
   onResult,
   onError,
   autoStop = true,
   duration = 5000,
-  isProcessing,
+  isRecording,
   setIsProcessing
 }) => {
-  const [isRecording, setIsRecording] = useState(false);
+  const [isActive, setIsActive] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
@@ -30,14 +21,25 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 
-    if (isRecording && autoStop) {
+    if (isActive && autoStop) {
       timeoutId = setTimeout(() => {
         stopRecording();
       }, duration);
     }
 
     return () => clearTimeout(timeoutId);
-  }, [isRecording, autoStop, duration]);
+  }, [isActive, autoStop, duration]);
+
+  // Respond to external recording state changes
+  useEffect(() => {
+    if (isRecording !== undefined) {
+      if (isRecording && !isActive) {
+        startRecording();
+      } else if (!isRecording && isActive) {
+        stopRecording();
+      }
+    }
+  }, [isRecording]);
 
   const startRecording = async () => {
     setIsProcessing?.(true);
@@ -53,13 +55,13 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       mediaRecorder.current.onstop = async () => {
         const fullBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
         setAudioBlob(fullBlob);
-        setIsRecording(false);
+        setIsActive(false);
         setIsProcessing?.(false);
         await processAudio(fullBlob);
       };
 
       mediaRecorder.current.start();
-      setIsRecording(true);
+      setIsActive(true);
       setError(null);
     } catch (err: any) {
       setError(`Erreur lors du démarrage de l'enregistrement audio: ${err.message}`);
@@ -71,13 +73,13 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
   const stopRecording = () => {
     if (mediaRecorder.current && mediaRecorder.current.state !== 'inactive') {
       mediaRecorder.current.stop();
-      setIsRecording(false);
+      setIsActive(false);
       setIsProcessing?.(false);
     }
   };
 
   const toggleRecording = () => {
-    if (isRecording) {
+    if (isActive) {
       stopRecording();
     } else {
       startRecording();
@@ -102,8 +104,8 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       feedback: "Voix joyeuse détectée",
       score: Math.round(Math.random() * 100),
       recommendations: [
-        { content: "Take a moment to appreciate your positive mood", category: "general" },
-        { content: "Share your happiness with someone", category: "general" }
+        { title: "Take a moment to appreciate your positive mood", description: "Positive reinforcement" },
+        { title: "Share your happiness with someone", description: "Social connection" }
       ]
     };
     
@@ -119,14 +121,14 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       <Button
         variant="outline"
         onClick={toggleRecording}
-        disabled={isProcessing}
+        disabled={setIsProcessing !== undefined ? false : isProcessing}
       >
-        {isProcessing ? (
+        {setIsProcessing !== undefined ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Traitement...
           </>
-        ) : isRecording ? (
+        ) : isActive ? (
           <>
             <MicOff className="mr-2 h-4 w-4" />
             Arrêter l'enregistrement

@@ -27,12 +27,16 @@ export interface CoachChatProps {
   embedded?: boolean;
 }
 
-// Add CoachCharacterProps interface
+// Update CoachCharacterProps interface to include all needed properties
 export interface CoachCharacterProps {
   size?: 'sm' | 'md' | 'lg';
   animate?: boolean;
   className?: string;
   onInteract?: () => void;
+  name?: string;
+  avatar?: string;
+  mood?: string;
+  onClick?: () => void;
 }
 
 export interface Conversation {

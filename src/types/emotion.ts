@@ -3,11 +3,25 @@ export interface EmotionResult {
   emotion: string;
   score: number;
   confidence: number;
-  timestamp?: Date;
-  source?: 'voice' | 'text' | 'emoji';
+  timestamp?: Date | string; // Allow both Date and string for flexibility
+  source?: 'voice' | 'text' | 'emoji' | 'facial' | 'scan' | 'combined' | 'audio' | 'manual';
   feedback?: string;
   emojis?: string[] | string;
-  recommendations?: Array<string | { title: string; description?: string }>;
+  recommendations?: Array<string | EmotionRecommendation | { title: string; description?: string }>;
+  id?: string; // Added for compatibility
+  intensity?: number; // Added for compatibility
+  text?: string; // Added for compatibility
+  date?: string; // Added for compatibility
+  transcript?: string; // Added for compatibility
+  textInput?: string; // Added for compatibility
+  audioUrl?: string; // Added for compatibility
+}
+
+export interface EmotionRecommendation {
+  title: string;
+  description?: string;
+  content?: string;
+  category?: string;
 }
 
 export interface EmotionRecord {
@@ -15,7 +29,7 @@ export interface EmotionRecord {
   userId: string;
   emotion: string;
   intensity: number;
-  timestamp: Date;
+  timestamp: Date | string;
   source: 'scan' | 'manual' | 'vr' | 'coach';
   notes?: string;
 }
@@ -27,6 +41,10 @@ export interface Emotion {
   score: number;
   color: string;
   icon?: string;
+  emotion?: string;
+  confidence?: number;
+  intensity?: number;
+  description?: string;
 }
 
 // Add EmotionalTeamViewProps interface
@@ -38,4 +56,30 @@ export interface EmotionalTeamViewProps {
   showGraph?: boolean;
   showMembers?: boolean;
   className?: string;
+}
+
+// Add AudioProcessorProps interface
+export interface AudioProcessorProps {
+  onResult?: (result: EmotionResult) => void;
+  onProcessingChange?: React.Dispatch<React.SetStateAction<boolean>>;
+  isRecording?: boolean;
+  onError?: (error: string) => void;
+  autoStop?: boolean;
+  duration?: number;
+  setIsProcessing?: (processing: boolean) => void;
+}
+
+// Add LiveVoiceScannerProps interface
+export interface LiveVoiceScannerProps {
+  onResult?: (result: EmotionResult) => void;
+  onError?: (error: Error) => void;
+  autoStart?: boolean;
+  className?: string;
+}
+
+// Add TeamOverviewProps interface
+export interface TeamOverviewProps {
+  teamId: string;
+  period?: string;
+  showGraph?: boolean;
 }

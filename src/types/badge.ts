@@ -14,6 +14,12 @@ export interface Badge {
   completed?: boolean;
   imageUrl?: string; // Added for backward compatibility
   image_url?: string; // Added for backward compatibility
+  unlocked?: boolean; // Added for backward compatibility
+  threshold?: number; // Added for backward compatibility
+  level?: number; // Added for backward compatibility
+  earned?: boolean; // Added for backward compatibility
+  earnedDate?: string; // Added for backward compatibility
+  category?: string; // Added for backward compatibility
 }
 
 export interface Challenge {
@@ -34,4 +40,6 @@ export interface Challenge {
   completions?: number;
   goal?: number;
   totalSteps?: number;
+  isCompleted?: boolean; // Additional backward compatibility
+  status?: 'completed' | 'failed' | 'locked' | 'ongoing' | 'active' | 'available' | 'in-progress';
 }

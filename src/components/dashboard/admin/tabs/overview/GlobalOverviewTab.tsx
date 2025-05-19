@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -39,9 +40,9 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
   };
   
   const kpiCards = [
-    { id: 'completion', title: 'Taux de complétion', value: `${completion}%`, delta: 12, status: 'success' },
-    { id: 'productivity', title: 'Productivité', value: `${productivity}%`, delta: -5, status: 'warning' },
-    { id: 'emotionalScore', title: 'Score émotionnel', value: `${emotionalScore}%`, delta: 8, status: 'success' },
+    { id: 'completion', title: 'Taux de complétion', value: `${completion}%`, delta: 12, status: 'success' as const },
+    { id: 'productivity', title: 'Productivité', value: `${productivity}%`, delta: -5, status: 'warning' as const },
+    { id: 'emotionalScore', title: 'Score émotionnel', value: `${emotionalScore}%`, delta: 8, status: 'success' as const },
   ];
   
   return (

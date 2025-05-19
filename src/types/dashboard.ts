@@ -46,7 +46,7 @@ export interface GlobalOverviewTabProps {
 }
 
 export interface KpiCardProps {
-  id?: string; // Made optional with ?
+  id?: string;
   title: string;
   value: string | number;
   status?: KpiCardStatus;
@@ -54,17 +54,17 @@ export interface KpiCardProps {
     value: number;
     trend: 'up' | 'down' | 'neutral';
     label?: string;
-    direction?: 'up' | 'down' | 'stable'; // Added for backward compatibility
+    direction?: 'up' | 'down' | 'stable';
   };
   icon?: React.ReactNode;
-  subtitle?: string; // Made optional with ?
+  subtitle?: string;
   details?: string;
   trend?: string;
   className?: string;
-  isLoading?: boolean; // Made optional with ?
-  ariaLabel?: string; // Made optional with ?
-  onClick?: () => void; // Made optional with ?
-  footer?: React.ReactNode; // Made optional with ?
+  isLoading?: boolean;
+  ariaLabel?: string;
+  onClick?: () => void;
+  footer?: React.ReactNode;
 }
 
 export type KpiCardStatus = 'positive' | 'negative' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'default';
@@ -72,7 +72,7 @@ export type KpiDelta = {
   value: number;
   direction: 'up' | 'down' | 'stable';
   label?: string;
-  trend?: 'up' | 'down' | 'neutral'; // Added for backward compatibility
+  trend?: 'up' | 'down' | 'neutral';
 };
 
 export interface DashboardWidgetConfig extends DashboardWidget {
@@ -93,7 +93,6 @@ export interface DraggableKpiCardsGridProps {
   kpiCards?: KpiCardProps[];
 }
 
-// Add GamificationData interface
 export interface GamificationData {
   activeUsersPercent: number;
   totalBadges: number;
@@ -105,4 +104,9 @@ export interface GamificationData {
     name: string;
     completions: number;
   }[];
+}
+
+// Add an interface for KpiCardsGrid component
+export interface KpiCardsGridProps {
+  cards: KpiCardProps[];
 }
