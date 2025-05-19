@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { useToast } from '@/hooks/use-toast';
 import { EmotionMusicParams } from '@/types/music';
 
