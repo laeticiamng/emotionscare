@@ -1,4 +1,5 @@
 
+// Chat types for the application
 export interface ChatMessage {
   id: string;
   sender: 'user' | 'assistant' | 'system';
@@ -26,6 +27,7 @@ export interface ChatConversation {
   metadata?: Record<string, any>;
   user_id?: string; // Add for backward compatibility
   created_at?: string; // Add for backward compatibility
+  updated_at?: string; // Add for backward compatibility
 }
 
 export interface ChatResponse {
@@ -55,19 +57,27 @@ export interface CoachChatProps {
   className?: string;
 }
 
-// Adding these for useChat.tsx errors
+// Adding these for useChat.tsx fixes
 export interface ChatHookResult {
   messages: ChatMessage[];
   addMessage: (content: string, sender: 'user' | 'assistant' | 'system') => void;
   clearMessages: () => void;
   isLoading: boolean;
   error: Error | null;
+  input: string;
+  setInput: (text: string) => void;
+  sendMessage: (text: string) => void;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  isTyping?: boolean;
 }
 
 export interface UseChatOptions {
   initialMessages?: ChatMessage[];
   onError?: (error: Error) => void;
   onResponse?: (response: ChatResponse) => void;
+  conversationId?: string;
+  initialConversationId?: string;
 }
 
 export const normalizeChatMessage = (message: any): ChatMessage => {

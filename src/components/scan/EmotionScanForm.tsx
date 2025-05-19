@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
@@ -32,7 +33,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
     
     // Call onEmotionDetected if provided
     if (onEmotionDetected) {
-      onEmotionDetected(result);  // Pass the result to onEmotionDetected
+      onEmotionDetected(result);
     }
     
     // Call onClose if provided
@@ -77,11 +78,17 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
           </TabsContent>
 
           <TabsContent value="text" className="space-y-4 mt-0">
-            <TextEmotionScanner onResult={handleScanResult} />
+            <TextEmotionScanner 
+              onResult={handleScanResult}
+              onProcessingChange={handleProcessingChange} 
+            />
           </TabsContent>
 
           <TabsContent value="emoji" className="space-y-4 mt-0">
-            <EmojiEmotionScanner onResult={handleScanResult} />
+            <EmojiEmotionScanner 
+              onResult={handleScanResult}
+              onProcessingChange={handleProcessingChange} 
+            />
           </TabsContent>
 
           <TabsContent value="facial" className="space-y-4 mt-0">

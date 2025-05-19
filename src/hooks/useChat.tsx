@@ -1,98 +1,117 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, FormEvent, ChangeEvent } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { 
   ChatMessage, 
-  ChatHookResult, 
+  ChatResponse,
+  ChatHookResult,
   UseChatOptions,
   normalizeChatMessage
 } from '@/types/chat';
 
 export function useChat({
   initialMessages = [],
-  conversationId = uuidv4(),
+  onError,
+  onResponse,
+  conversationId,
   initialConversationId,
-  onResponse
 }: UseChatOptions = {}): ChatHookResult {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  const [isTyping, setIsTyping] = useState(false);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  // Use initialConversationId if provided, otherwise use conversationId
-  const activeConversationId = initialConversationId || conversationId;
-
-  const sendMessage = useCallback(async (content: string) => {
-    if (!content.trim()) return Promise.resolve();
-
-    // Create user message
-    const userMessage: ChatMessage = {
+  // Function to add a new message to the state
+  const addMessage = useCallback((content: string, sender: 'user' | 'assistant' | 'system') => {
+    const newMessage: ChatMessage = {
       id: uuidv4(),
+      sender,
       content,
-      sender: 'user',
       timestamp: new Date().toISOString(),
-      conversationId: activeConversationId
+      conversationId: conversationId || initialConversationId || uuidv4(),
     };
-
-    // Add user message to the chat
-    setMessages((prev) => [...prev, userMessage]);
     
-    try {
-      setIsTyping(true);
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create assistant response
-      const assistantMessage: ChatMessage = {
-        id: uuidv4(),
-        content: `Response to: "${content}"`,
-        sender: 'assistant',
-        timestamp: new Date().toISOString(),
-        conversationId: activeConversationId
-      };
-      
-      // Add assistant message to the chat
-      setMessages((prev) => [...prev, assistantMessage]);
-      
-      // Notify caller if callback provided
-      if (onResponse) {
-        onResponse(assistantMessage);
-      }
-      
-    } catch (error) {
-      console.error('Error sending message:', error);
-    } finally {
-      setIsTyping(false);
-    }
+    setMessages((prev) => [...prev, newMessage]);
+    
+    return newMessage;
+  }, [conversationId, initialConversationId]);
 
-    return Promise.resolve();
-  }, [activeConversationId, onResponse]);
-
+  // Function to clear all messages
   const clearMessages = useCallback(() => {
     setMessages([]);
   }, []);
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Event handler for input changes
+  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setInput(e.target.value);
   }, []);
 
-  const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (input.trim()) {
-      sendMessage(input);
-      setInput("");
+  // Send a message and receive a response
+  const sendMessage = useCallback(async (text: string) => {
+    if (!text.trim()) return;
+    
+    // Add the user message to the state
+    addMessage(text, 'user');
+    
+    // Clear the input field
+    setInput('');
+    
+    // Set loading state
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // In a real app, this would be an API call to an AI service
+      // Simulating a response with a delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const mockResponse = `This is a mock response to "${text}"`;
+      
+      // Create the response message
+      const responseMessage = addMessage(mockResponse, 'assistant');
+      
+      // Call the onResponse callback if provided
+      if (onResponse) {
+        onResponse({
+          id: responseMessage.id,
+          content: mockResponse,
+          timestamp: responseMessage.timestamp,
+        });
+      }
+    } catch (err) {
+      console.error('Error sending message:', err);
+      
+      // Set error state
+      const error = err instanceof Error ? err : new Error('Failed to send message');
+      setError(error);
+      
+      // Call the onError callback if provided
+      if (onError) {
+        onError(error);
+      }
+    } finally {
+      setIsLoading(false);
     }
+  }, [addMessage, onError, onResponse]);
+
+  // Event handler for form submissions
+  const handleSubmit = useCallback((e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    sendMessage(input);
   }, [input, sendMessage]);
 
   return {
     messages,
-    isTyping,
-    sendMessage,
-    clearMessages,
     input,
     setInput,
+    isLoading,
+    error,
+    addMessage,
+    clearMessages,
+    sendMessage,
     handleInputChange,
-    handleSubmit
+    handleSubmit,
+    isTyping: isLoading,
   };
 }
 
