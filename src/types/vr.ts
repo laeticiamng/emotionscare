@@ -1,41 +1,44 @@
-
 // Creating a placeholder types file for VR related types
 // You may need to adjust this based on your actual types
 
 export interface VRSessionTemplate {
   id: string;
   name: string;
-  title?: string; // Added for compatibility
+  title?: string;
   description: string;
   duration: number;
   category: string;
   tags: string[];
   thumbnailUrl?: string;
-  imageUrl?: string; // Added for compatibility
-  coverUrl?: string; // Added for compatibility
-  cover_url?: string; // Added for compatibility
-  preview_url?: string; // Added for compatibility
-  difficulty?: string; // Added for compatibility
-  benefits?: string[]; // Added for compatibility
-  audio_url?: string; // Added for compatibility
-  audioTrack?: string; // Added for compatibility
-  is_audio_only?: boolean; // Added for compatibility
-  lastUsed?: string; // Added for compatibility
-  theme?: string; // Added for compatibility
-  rating?: number; // Added for compatibility
-  popularity?: number; // Added for compatibility
-  features?: string[]; // Added for compatibility
-  completionRate?: number; // Added for compatibility
-  completion_rate?: number; // Added for compatibility
-  emotionTarget?: string; // Added for compatibility
-  emotion_target?: string; // Added for compatibility
-  recommendedMood?: string; // Added for compatibility
-  recommended_mood?: string; // Added for compatibility
-  recommendedFor?: string[]; // Added for compatibility
-  environment?: string; // Added for compatibility
-  immersionLevel?: string; // Added for compatibility
-  goalType?: string; // Added for compatibility
-  interactive?: boolean; // Added for compatibility
+  imageUrl?: string;
+  coverUrl?: string;
+  cover_url?: string;
+  preview_url?: string;
+  difficulty?: string;
+  benefits?: string[];
+  audio_url?: string;
+  audioTrack?: string;
+  is_audio_only?: boolean;
+  lastUsed?: string;
+  theme?: string;
+  rating?: number;
+  popularity?: number;
+  features?: string[];
+  completionRate?: number;
+  completion_rate?: number;
+  emotionTarget?: string;
+  emotion_target?: string;
+  recommendedMood?: string;
+  recommended_mood?: string;
+  recommendedFor?: string[];
+  environment?: string;
+  environmentId?: string;
+  immersionLevel?: string;
+  goalType?: string;
+  interactive?: boolean;
+  intensity?: number;
+  objective?: string;
+  type?: string;
 }
 
 export interface VRSession {
@@ -53,25 +56,25 @@ export interface VRSession {
     focusLevel?: number;
     emotionEnd?: string;
   };
-  completed?: boolean; // Added for compatibility
-  heartRateBefore?: number; // Added for compatibility
-  heartRateAfter?: number; // Added for compatibility
-  startedAt?: string; // Added for compatibility
-  endedAt?: string; // Added for compatibility
+  completed?: boolean;
+  heartRateBefore?: number;
+  heartRateAfter?: number;
+  startedAt?: string;
+  endedAt?: string;
   feedback?: {
     rating?: number;
     emotionBefore?: string;
     emotionAfter?: string;
     comment?: string;
   };
-  template?: VRSessionTemplate; // Added for compatibility
+  template?: VRSessionTemplate;
 }
 
 export interface VRTemplateDetailProps {
   template: VRSessionTemplate;
   heartRate?: number;
   onBack?: () => void;
-  onStartSession?: () => void; // Added missing property
+  onStartSession?: () => void;
 }
 
 export interface VRSessionHistoryProps {
@@ -91,4 +94,8 @@ export interface VRSessionWithMusicProps {
   onComplete: () => void;
   musicEnabled?: boolean;
   backgroundMusic?: string;
+  session?: any;
+  sessionTemplate?: VRSessionTemplate;
+  onExit?: () => void;
+  environment?: string;
 }

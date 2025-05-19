@@ -1,60 +1,65 @@
 
+// Define the types for Coach related components
+
 export interface ChatMessage {
   id: string;
-  text?: string;
-  content?: string;
-  sender: "system" | "user" | "coach" | "assistant" | string;
-  timestamp?: Date | string;
-  role?: "system" | "user" | "assistant";
-  isLoading?: boolean;
+  sender: string;
+  content: string;
+  timestamp: string;
+  isUser?: boolean;
+  emotion?: string;
+  attachments?: string[];
 }
 
 export interface ChatConversation {
   id: string;
   title: string;
   messages: ChatMessage[];
-  createdAt: Date | string;
-  updatedAt?: Date | string;
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
 }
 
 export interface ChatResponse {
-  text: string;
-  conversationId: string;
-  messageId: string;
+  content: string;
+  emotion?: string;
+  suggestions?: string[];
 }
 
 export interface CoachCharacterProps {
-  name?: string;
-  avatar?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
-  mood?: string;
-  animated?: boolean;
-  animate?: boolean; // Added for backward compatibility
+  emotion?: string;
+  speaking?: boolean;
+  animate?: boolean;
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
-  onClick?: () => void;
 }
 
 export interface CoachMessageProps {
   message: ChatMessage;
-  isTyping?: boolean;
   isLast?: boolean;
+  showTimestamp?: boolean;
 }
 
 export interface CoachChatProps {
-  initialMessages?: ChatMessage[];
   initialMessage?: string;
-  onSend?: (message: string) => void;
-  onReady?: () => void;
-  showCharacter?: boolean;
-  characterSize?: 'sm' | 'md' | 'lg' | 'xl';
-  characterMood?: string;
-  showControls?: boolean;
-  showHeader?: boolean;
-  showInput?: boolean;
-  embedded?: boolean;
-  className?: string;
-  sessions?: any[];
-  onSelect?: (session: any) => void;
-  emptyMessage?: string;
-  limitDisplay?: number;
+  onClose?: () => void;
+  maxHeight?: string;
+}
+
+// Adding missing types
+export interface CoachSession {
+  id: string;
+  userId: string;
+  startTime: string;
+  endTime?: string;
+  topics: string[];
+  sentiment: string;
+  messages: ChatMessage[];
+}
+
+export interface Suggestion {
+  id: string;
+  text: string;
+  type: 'action' | 'question' | 'reflection';
+  context?: string;
 }

@@ -1,34 +1,30 @@
 
-import { ThemeType } from './preferences';
+import * as React from "react";
 
-export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | 'small' | 'medium' | 'large' | 'xlarge';
-export type FontFamily = 'sans' | 'serif' | 'mono' | 'system' | 'rounded' | 'monospace' | 'sans-serif';
-export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type ThemeName = Theme;
-export type ThemeOption = Theme;
+export type FontFamily = "sans" | "serif" | "mono" | "system";
+export type FontSize = "xs" | "sm" | "md" | "lg" | "xl"; // Define the font sizes
+export type ThemeName = "light" | "dark" | "system" | "pastel";
+export type Theme = "light" | "dark" | "system" | "pastel";
 
 export interface ThemeContextType {
-  theme: ThemeType;
-  setTheme: (theme: ThemeType) => void;
-  fontSize: FontSize;
-  setFontSize: (fontSize: FontSize) => void;
-  systemTheme: ThemeType;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  fontSize?: FontSize;
+  setFontSize?: (size: FontSize) => void;
+  fontFamily?: FontFamily;
+  setFontFamily?: (family: FontFamily) => void;
+  toggleTheme?: () => void;
+  isDarkMode?: boolean;
+  isDark?: boolean;
+  systemTheme: "light" | "dark";
   soundEnabled?: boolean;
   reduceMotion?: boolean;
-  preferences?: any; // For Shell.tsx and AudioControls.tsx
-  isDarkMode?: boolean; // For ThemeButton.tsx
-  isDark?: boolean;
-  toggleTheme?: () => void; // For theme-provider.tsx
-  fontFamily?: FontFamily;
-  setFontFamily?: (fontFamily: FontFamily) => void;
-  getContrastText?: (color: string) => 'black' | 'white';
-  updatePreferences?: (preferences: any) => Promise<void>;
+  setSoundEnabled?: (enabled: boolean) => void;
+  setReduceMotion?: (enabled: boolean) => void;
 }
 
-export interface ThemeProviderProps {
-  children: React.ReactNode;
-  defaultTheme?: ThemeType;
-  defaultFontSize?: FontSize;
-  forcedTheme?: ThemeType;
-  storageKey?: string;
+export interface ThemeOption {
+  name: string;
+  value: Theme;
+  icon?: React.ReactNode;
 }

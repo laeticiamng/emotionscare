@@ -1,8 +1,6 @@
 
 import { createContext, useEffect, useState } from "react";
-import { ThemeContextType } from "@/types/theme";
-
-type Theme = "dark" | "light" | "system";
+import { ThemeContextType, Theme, FontSize } from "@/types/theme";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -33,7 +31,7 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
-  const [fontSize, setFontSize] = useState("md");
+  const [fontSize, setFontSize] = useState<FontSize>("md");
   const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
@@ -54,7 +52,7 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
-  const value = {
+  const value: ThemeContextType = {
     theme,
     setTheme: (theme: Theme) => {
       localStorage.setItem(storageKey, theme);

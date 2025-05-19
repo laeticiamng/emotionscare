@@ -1,4 +1,3 @@
-
 export type UserRole = 'user' | 'admin' | 'manager' | 'guest' | 'b2c' | 'b2b_user' | 'b2b_admin';
 
 export interface User {
@@ -7,22 +6,24 @@ export interface User {
   name?: string;
   role?: UserRole;
   avatar_url?: string;
-  avatar?: string; // Adding avatar property
-  avatarUrl?: string; // Adding avatarUrl property for compatibility
+  avatar?: string;
+  avatarUrl?: string;
   created_at?: string;
   position?: string;
   department?: string;
   joined_at?: string;
+  preferences?: any;
+  emotional_score?: number;
 }
 
 export interface AuthUser {
   id: string;
   email: string;
-  name: string | null; // Changed to allow null for compatibility
+  name: string | null;
   role?: UserRole;
   avatar?: string;
   avatar_url?: string;
-  avatarUrl?: string; // Adding avatarUrl property for compatibility
+  avatarUrl?: string;
   created_at?: string;
   position?: string;
   department?: string;

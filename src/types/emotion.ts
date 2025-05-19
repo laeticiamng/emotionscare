@@ -1,5 +1,3 @@
-
-
 export interface EmotionRecommendation {
   type: string;
   title: string;
@@ -40,7 +38,7 @@ export interface LiveVoiceScannerProps {
 
 export interface EmotionScanFormProps {
   onScanComplete?: (result: EmotionResult) => void;
-  userId?: string; // Added missing property
+  userId?: string; // Added this prop
   onEmotionDetected?: () => void;
   onClose?: () => void;
 }
@@ -80,4 +78,3 @@ export interface Emotion {
   value?: string;
   id?: string;
 }
-

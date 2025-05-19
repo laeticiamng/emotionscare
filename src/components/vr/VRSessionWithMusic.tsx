@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { VRSessionTemplate, VRSessionWithMusicProps } from '@/types/vr';
@@ -11,7 +12,8 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   onComplete,
   onExit,
   environment,
-  // ... additional props
+  musicEnabled,
+  backgroundMusic
 }) => {
   const [isMusicReady, setIsMusicReady] = useState(false);
   

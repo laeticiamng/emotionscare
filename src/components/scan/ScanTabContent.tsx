@@ -23,7 +23,7 @@ const ScanTabContent: React.FC<{
           if (onClose) {
             onClose();
           }
-        }} 
+        }}
         userId={userId}
         onEmotionDetected={onEmotionDetected}
         onClose={onClose}

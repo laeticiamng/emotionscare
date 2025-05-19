@@ -1,81 +1,89 @@
 
-/**
- * MOCK DATA
- * Ce fichier respecte strictement le type officiel Emotion
- * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
- */
-
 import { EmotionResult } from '@/types/emotion';
-import { v4 as uuidv4 } from 'uuid';
 
-const mockEmotions: EmotionResult[] = [
+// Sample emotion results for testing
+export const mockEmotionResults: EmotionResult[] = [
   {
-    id: uuidv4(),
-    emotion: "happy",
-    confidence: 0.9,
-    intensity: 0.8,
-    timestamp: new Date().toISOString(),
-    emojis: ["😊", "🎉"],
-    source: "manual",
-    text: "Un état d'esprit positif, caractérisé par la satisfaction et le plaisir.",
-    feedback: "Profitez du moment présent. Partagez votre joie avec les autres."
-  },
-  {
-    id: uuidv4(),
-    emotion: "calm",
+    id: 'emotion-1',
+    emotion: 'happy',
     confidence: 0.85,
-    intensity: 0.6,
-    timestamp: new Date(Date.now() - 86400000).toISOString(), // Hier
-    emojis: ["😌", "🧘"],
-    source: "scan",
-    text: "État de tranquillité et de paix intérieure, d'absence d'agitation.",
-    feedback: "Pratiquez la respiration profonde. Prenez un moment pour méditer."
+    intensity: 0.9,
+    timestamp: '2025-05-18T08:30:00.000Z',
+    emojis: ['😊', '😃'],
+    source: 'voice',
+    text: 'Je me sens vraiment bien aujourd\'hui',
+    feedback: 'Continuez comme ça !',
+    emotions: {
+      happy: 0.85,
+      calm: 0.1,
+      anxious: 0.02,
+      sad: 0.03
+    }
   },
   {
-    id: uuidv4(),
-    emotion: "focused",
-    confidence: 0.8,
-    intensity: 0.7,
-    timestamp: new Date(Date.now() - 172800000).toISOString(), // Avant-hier
-    emojis: ["🧠", "🎯"],
-    source: "manual",
-    text: "Capacité à diriger son attention de manière soutenue sur une tâche ou une activité.",
-    feedback: "Éliminez les distractions. Utilisez la technique Pomodoro."
+    id: 'emotion-2',
+    emotion: 'stressed',
+    confidence: 0.78,
+    intensity: 0.65,
+    timestamp: '2025-05-17T16:45:00.000Z',
+    emojis: ['😓', '😰'],
+    source: 'text',
+    text: 'Journée difficile avec beaucoup de pression',
+    feedback: 'Prenez un moment pour vous détendre',
+    emotions: {
+      stressed: 0.78,
+      anxious: 0.15,
+      tired: 0.05,
+      sad: 0.02
+    }
   },
   {
-    id: uuidv4(),
-    emotion: "anxious",
+    id: 'emotion-3',
+    emotion: 'calm',
+    confidence: 0.92,
+    intensity: 0.8,
+    timestamp: '2025-05-16T20:15:00.000Z',
+    emojis: ['😌', '🧘'],
+    source: 'voice',
+    text: 'Je me sens détendu après ma séance de méditation',
+    feedback: 'Excellent état de calme intérieur',
+    emotions: {
+      calm: 0.92,
+      happy: 0.05,
+      focused: 0.03
+    }
+  },
+  {
+    id: 'emotion-4',
+    emotion: 'tired',
     confidence: 0.75,
     intensity: 0.6,
-    timestamp: new Date(Date.now() - 259200000).toISOString(), // Il y a 3 jours
-    emojis: ["😰", "⚡"],
-    source: "scan",
-    text: "Sentiment d'inquiétude et d'appréhension face à des situations perçues comme menaçantes.",
-    feedback: "Pratiquez la respiration 4-7-8. Identifiez la source de votre anxiété."
+    timestamp: '2025-05-15T22:30:00.000Z',
+    emojis: ['😴', '🥱'],
+    source: 'emoji',
+    text: 'Journée épuisante, besoin de repos',
+    feedback: 'Priorisez votre sommeil ce soir',
+    emotions: {
+      tired: 0.75,
+      stressed: 0.15,
+      calm: 0.05,
+      happy: 0.05
+    }
   },
   {
-    id: uuidv4(),
-    emotion: "sad",
-    confidence: 0.8,
-    intensity: 0.5,
-    timestamp: new Date(Date.now() - 345600000).toISOString(), // Il y a 4 jours
-    emojis: ["😢", "💙"],
-    source: "manual",
-    text: "État émotionnel lié à la perte, la déception ou la mélancolie.",
-    feedback: "Acceptez vos émotions sans jugement. Ne restez pas isolé, contactez un ami."
+    id: 'emotion-5',
+    emotion: 'motivated',
+    confidence: 0.88,
+    intensity: 0.85,
+    timestamp: '2025-05-14T09:00:00.000Z',
+    emojis: ['💪', '🔥'],
+    source: 'text',
+    text: 'Prêt à relever tous les défis aujourd\'hui',
+    feedback: 'Votre énergie est contagieuse !',
+    emotions: {
+      motivated: 0.88,
+      happy: 0.1,
+      focused: 0.02
+    }
   }
 ];
-
-export default mockEmotions;
-
-export type EmotionLabel = 'happy' | 'calm' | 'focused' | 'anxious' | 'sad';
-
-export const getEmotionByLabel = (label: EmotionLabel | string): EmotionResult | undefined => {
-  return mockEmotions.find(emotion => emotion.emotion === label);
-};
-
-export const getRecentEmotions = (limit: number = 5): EmotionResult[] => {
-  return [...mockEmotions].sort((a, b) => 
-    new Date(b.timestamp || '').getTime() - new Date(a.timestamp || '').getTime()
-  ).slice(0, limit);
-};
