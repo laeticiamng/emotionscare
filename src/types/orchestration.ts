@@ -1,105 +1,84 @@
 
-import { EmotionResult } from '@/types/emotion';
-
-// Define needed orchestration types
-export type EmotionSource = 'text' | 'voice' | 'facial' | 'manual' | 'ai' | 'system';
+import { EmotionResult } from './emotion';
 
 export interface MoodEvent {
   id: string;
-  user_id: string;
-  timestamp: string;
-  mood: string;
-  intensity: number;
-  source: EmotionSource;
-  context?: string;
+  timestamp: Date;
+  emotion: string;
+  confidence: number;
+  source: string;
+  context: Record<string, any>;
 }
 
 export interface Prediction {
   id: string;
-  user_id: string;
-  timestamp: string;
-  prediction_type: string;
-  prediction_data: any;
+  timestamp: Date;
+  emotion: string;
   confidence: number;
-  expires_at?: string;
+  prediction: string;
+  recommendations: string[]; // Array of recommendation IDs
 }
 
 export interface PredictionRecommendation {
   id: string;
-  prediction_id: string;
-  type: string;
+  type: 'vr_session' | 'music' | 'coaching' | 'activity';
+  emotion: string;
   title: string;
   description: string;
-  action_url?: string;
-  priority: number;
+  priority: 'low' | 'medium' | 'high';
 }
 
 export interface EmotionalLocation {
   id: string;
   name: string;
-  description?: string;
-  lat: number;
-  lng: number;
-  radius: number;
-  emotion_profile: Record<string, number>;
-  visits_count: number;
-  last_visit?: string;
+  coordinates?: { x: number; y: number };
+  emotion: string;
+  intensity: number;
+  timestamp: Date;
 }
 
 export interface SanctuaryWidget {
   id: string;
   type: string;
   title: string;
-  content: any;
-  priority: number;
-  emotion_trigger?: string;
+  content: string;
+  position: 'top' | 'bottom' | 'left' | 'right' | 'center';
+  emotion?: string;
 }
 
 export interface EmotionalSynthesis {
-  dominant_emotion: string;
-  emotion_distribution: Record<string, number>;
-  intensity_avg: number;
-  period_start: string;
-  period_end: string;
-  data_points: number;
+  id: string;
+  timestamp: Date;
+  dominantEmotion: string;
+  emotionHistory: string[];
+  summary: string;
+  recommendations: string[];
 }
 
 export interface OrchestrationEvent {
   id: string;
   type: string;
-  timestamp: string;
+  timestamp: Date;
   data: any;
-  user_id: string;
-  source: string;
+  processed: boolean;
 }
 
-// Actions pour le reducer d'orchestration
-export type OrchestrationEvent =
-  | { type: 'EMOTION_DETECTED'; payload: EmotionResult }
-  | { type: 'MILESTONE_REACHED'; payload: MoodEvent }
-  | { type: 'RECOMMENDATION_ADDED'; payload: PredictionRecommendation }
-  | { type: 'RECOMMENDATION_COMPLETED'; payload: string }
-  | { type: 'INSIGHT_GENERATED'; payload: Prediction }
-  | { type: 'SYNTHESIS_UPDATED'; payload: EmotionalSynthesis };
-
-// Interface du contexte d'orchestration partagé
 export interface OrchestrationContextType {
-  events: MoodEvent[];
+  currentEmotionResult: EmotionResult | null;
+  emotionHistory: EmotionResult[];
+  moodEvents: MoodEvent[];
   predictions: Prediction[];
   recommendations: PredictionRecommendation[];
-  locations: EmotionalLocation[];
   sanctuaryWidgets: SanctuaryWidget[];
+  emotionalLocations: EmotionalLocation[];
   synthesis: EmotionalSynthesis | null;
-  activeLocation: string | null;
-  activeEvent: string | null;
-  loading: boolean;
-
-  addEvent: (event: MoodEvent) => void;
+  events: OrchestrationEvent[];
+  setCurrentEmotionResult: (result: EmotionResult) => void;
   addEmotionResult: (result: EmotionResult) => void;
-  addRecommendation: (recommendation: PredictionRecommendation) => void;
-  completeRecommendation: (id: string) => void;
-  addPrediction: (prediction: Prediction) => void;
-  setActiveLocation: (id: string | null) => void;
-  setActiveEvent: (id: string | null) => void;
-  updateSynthesis: (synthesis: EmotionalSynthesis) => void;
+  addEvent: (type: string, data: any) => void;
+  processEmotionResult: (result: EmotionResult) => void;
+  generatePredictions: () => void;
+  getRecommendations: () => PredictionRecommendation[];
+  clearHistory: () => void;
+  refreshSynthesis: () => void;
 }

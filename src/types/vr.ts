@@ -79,6 +79,7 @@ export interface VRTemplateDetailProps {
   template: VRSessionTemplate;
   onStart?: () => void;
   onBack?: () => void;
+  heartRate?: number;
 }
 
 export interface VRSessionPlayerProps {

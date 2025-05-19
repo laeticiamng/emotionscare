@@ -14,6 +14,10 @@ export interface MusicTrack {
   isLiked?: boolean;
   name?: string;
   mood?: string;
+  tags?: string[];
+  intensity?: number;
+  year?: number;
+  category?: string;
 }
 
 export interface MusicPlaylist {
@@ -22,12 +26,15 @@ export interface MusicPlaylist {
   name?: string;
   description?: string;
   coverUrl?: string;
+  coverImage?: string;
   tracks: MusicTrack[];
   emotion?: string;
   isPublic?: boolean;
   userId?: string;
   category?: string;
   author?: string;
+  creator?: string;
+  tags?: string | string[];
 }
 
 export interface MusicContextType {
@@ -64,6 +71,7 @@ export interface MusicContextType {
   openDrawer?: boolean;
   setOpenDrawer?: (isOpen: boolean) => void;
   toggleDrawer?: () => void;
+  toggleRepeat?: () => void;
   
   // Alternative method names (for backwards compatibility)
   play?: (track: MusicTrack, playlist?: MusicPlaylist) => void;
@@ -92,8 +100,8 @@ export interface MusicDrawerProps {
 }
 
 export interface ProgressBarProps {
-  value: number;
-  max: number;
+  value?: number;
+  max?: number;
   onChange?: (value: number) => void;
   currentTime?: number;
   duration?: number;
@@ -102,8 +110,8 @@ export interface ProgressBarProps {
 }
 
 export interface VolumeControlProps {
-  volume: number;
-  onChange: (volume: number) => void;
+  volume?: number;
+  onChange?: (volume: number) => void;
   muted?: boolean;
   onToggleMute?: () => void;
   isMuted?: boolean;
@@ -114,8 +122,8 @@ export interface VolumeControlProps {
 
 export interface MusicControlsProps {
   isPlaying: boolean;
-  onPlay: () => void;
-  onPause: () => void;
+  onPlay?: () => void;
+  onPause?: () => void;
   onNext?: () => void;
   onPrev?: () => void;
   onPrevious?: () => void;
@@ -130,7 +138,7 @@ export interface MusicControlsProps {
 }
 
 export interface MusicLibraryProps {
-  onTrackSelect: (track: MusicTrack) => void;
+  onTrackSelect?: (track: MusicTrack) => void;
   tracks?: MusicTrack[];
   onSelect?: (track: MusicTrack) => void;
   currentTrackId?: string;
@@ -147,9 +155,5 @@ export interface TrackInfoProps {
   className?: string;
 }
 
-// Additional music-related types
-export interface MusicCategory {
-  id: string;
-  name: string;
-  description?: string;
-}
+// Category type
+export type MusicCategory = 'calm' | 'focus' | 'energy' | 'sleep' | 'joy' | 'sadness' | 'all';

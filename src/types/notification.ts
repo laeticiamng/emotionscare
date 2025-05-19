@@ -1,5 +1,5 @@
 
-export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never';
+export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never' | 'immediate';
 
 export interface NotificationTypes {
   system?: boolean;

@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { MusicTrack, EmotionMusicParams } from '@/types/music';
-import { findTracksByMood } from '@/utils/musicCompatibility';
+import { findTracksByMood, ensureArray } from '@/utils/musicCompatibility';
 
 // Mapping of emotions to music types
 export const EMOTION_TO_MUSIC: Record<string, string> = {
@@ -78,11 +78,10 @@ export function useMusicRecommendation() {
   
   // Find tracks by mood function
   const findTracksByMoodWrapper = useCallback((mood: string) => {
-    const allTracks: MusicTrack[] = [];
     if (music.currentPlaylist && music.currentPlaylist.tracks) {
       return findTracksByMood(music.currentPlaylist.tracks, mood);
     }
-    return allTracks;
+    return [] as MusicTrack[];
   }, [music.currentPlaylist]);
   
   return {

@@ -111,3 +111,27 @@ export function ensureArray<T>(items: T | T[] | undefined | null): T[] {
 export function normalizeTrack(track: any): MusicTrack {
   return ensureTrack(track);
 }
+
+/**
+ * Maps audioUrl to url if needed
+ */
+export function mapAudioUrlToUrl(track: any): MusicTrack {
+  if (track.audioUrl && !track.url) {
+    return { ...track, url: track.audioUrl };
+  }
+  if (track.url && !track.audioUrl) {
+    return { ...track, audioUrl: track.url };
+  }
+  return track;
+}
+
+/**
+ * Find tracks by mood
+ */
+export function findTracksByMood(tracks: MusicTrack[], mood: string): MusicTrack[] {
+  if (!tracks || !Array.isArray(tracks)) return [];
+  return tracks.filter(track => {
+    const trackMood = (track.mood || track.emotion || '').toLowerCase();
+    return trackMood.includes(mood.toLowerCase());
+  });
+}

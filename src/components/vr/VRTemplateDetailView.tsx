@@ -1,38 +1,28 @@
 
 import React from 'react';
-import { VRSessionTemplate, VRSession } from '@/types';
+import { VRTemplateDetailProps } from '@/types/vr';
 import VRTemplateDetail from './VRTemplateDetail';
-import VRSessionHistory from './VRSessionHistory';
 
 interface VRTemplateDetailViewProps {
-  template: VRSessionTemplate;
+  template: VRTemplateDetailProps['template'];
+  onStart: VRTemplateDetailProps['onStart'];
+  onBack: VRTemplateDetailProps['onBack'];
   heartRate?: number;
-  onStartSession?: () => void;
-  onBack?: () => void;
-  recentSessions?: VRSession[];
 }
 
-const VRTemplateDetailView: React.FC<VRTemplateDetailViewProps> = ({
-  template,
-  heartRate = 75,
-  onStartSession = () => {},
-  onBack = () => {},
-  recentSessions = []
+const VRTemplateDetailView: React.FC<VRTemplateDetailViewProps> = ({ 
+  template, 
+  onStart, 
+  onBack,
+  heartRate 
 }) => {
   return (
-    <div className="space-y-6">
-      <VRTemplateDetail
-        template={template}
-        heartRate={heartRate}
-        onStart={onStartSession}
-        onBack={onBack}
-      />
-      
-      <VRSessionHistory 
-        sessions={recentSessions}
-        showHeader={true}
-      />
-    </div>
+    <VRTemplateDetail 
+      template={template} 
+      onStart={onStart} 
+      onBack={onBack}
+      heartRate={heartRate}
+    />
   );
 };
 
