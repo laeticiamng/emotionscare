@@ -1,8 +1,7 @@
 
 import { useState, useCallback } from 'react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { MusicTrack, EmotionMusicParams } from '@/types/music';
-import { EmotionResult } from '@/types/emotion';
 
 // Mapping of emotions to music types
 export const EMOTION_TO_MUSIC: Record<string, string> = {
@@ -37,7 +36,7 @@ export function useMusicRecommendation() {
         setRecommendedTracks(result.tracks);
       } else {
         // Try to get tracks by mood directly if available
-        const moodTracks = music.findTracksByMood ? music.findTracksByMood(musicType) : [];
+        const moodTracks = music.findTracksByMood(musicType);
         setRecommendedTracks(moodTracks);
       }
     } catch (error) {
@@ -48,27 +47,32 @@ export function useMusicRecommendation() {
     }
   }, [music]);
   
-  const playRecommendedTrack = (track: MusicTrack) => {
+  const playRecommendedTrack = useCallback((track: MusicTrack) => {
     if (track) {
       music.playTrack(track);
     }
-  };
+  }, [music]);
   
-  const playFirstRecommendation = () => {
+  const playFirstRecommendation = useCallback(() => {
     if (recommendedTracks.length > 0) {
       playRecommendedTrack(recommendedTracks[0]);
       return true;
     }
     return false;
-  };
+  }, [recommendedTracks, playRecommendedTrack]);
   
-  const handlePlayMusic = async (emotion: string) => {
+  const handlePlayMusic = useCallback(async (emotion: string) => {
     const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-    await music.loadPlaylistForEmotion({
+    const playlist = await music.loadPlaylistForEmotion({
       emotion: musicType
     });
-    return playFirstRecommendation();
-  };
+    
+    if (playlist && playlist.tracks.length > 0) {
+      music.playTrack(playlist.tracks[0]);
+      return true;
+    }
+    return false;
+  }, [music]);
   
   return {
     recommendedTracks,

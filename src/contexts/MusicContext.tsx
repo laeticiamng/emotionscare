@@ -20,46 +20,56 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
   const [muted, setMuted] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [isInitialized, setIsInitialized] = useState(true);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [isRepeating, setIsRepeating] = useState(false);
+  const [queue, setQueue] = useState<MusicTrack[]>([]);
+  const [error, setError] = useState<Error | null>(null);
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
 
   // Fonction pour charger une playlist selon une émotion
   const loadPlaylistForEmotion = useCallback(async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
     const emotion = typeof params === 'string' ? params : params.emotion;
     const intensity = typeof params === 'string' ? 0.5 : (params.intensity ?? 0.5);
     
-    // Simulate loading a playlist
-    const mockPlaylist: MusicPlaylist = {
-      id: `emotion-${Date.now()}`,
-      name: `Playlist ${emotion}`,
-      title: `Playlist ${emotion}`,
-      description: `Musique générée pour l'émotion ${emotion}`,
-      emotion: emotion,
-      tracks: [
-        {
-          id: 'default-track-1',
-          title: 'Ambient Melody',
-          artist: 'EmotionsCare',
-          duration: 180,
-          url: '/audio/samples/ambient.mp3',
-          cover: '/images/covers/ambient.jpg',
-          coverUrl: '/images/covers/ambient.jpg',
-          audioUrl: '/audio/samples/ambient.mp3',
-          emotion: emotion,
-          mood: [emotion],
-          genre: 'Ambient',
-          album: 'Emotions',
-          tags: [emotion]
-        }
-      ],
-      source: 'generated',
-      coverImage: '/images/covers/ambient.jpg',
-      mood: [emotion]
-    };
-    
-    return mockPlaylist;
+    try {
+      // Simulate loading a playlist
+      const mockPlaylist: MusicPlaylist = {
+        id: `emotion-${Date.now()}`,
+        name: `Playlist ${emotion}`,
+        title: `Playlist ${emotion}`,
+        description: `Musique générée pour l'émotion ${emotion}`,
+        emotion: emotion,
+        tracks: [
+          {
+            id: 'default-track-1',
+            title: 'Ambient Melody',
+            artist: 'EmotionsCare',
+            duration: 180,
+            url: '/audio/samples/ambient.mp3',
+            cover: '/images/covers/ambient.jpg',
+            coverUrl: '/images/covers/ambient.jpg',
+            audioUrl: '/audio/samples/ambient.mp3',
+            emotion: emotion,
+            mood: [emotion],
+            genre: 'Ambient',
+            album: 'Emotions',
+            tags: [emotion]
+          }
+        ],
+        source: 'generated',
+        coverImage: '/images/covers/ambient.jpg',
+        mood: [emotion]
+      };
+      
+      return mockPlaylist;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+      return null;
+    }
   }, []);
 
   // Alias for backward compatibility
-  const getRecommendationByEmotion = useCallback((emotion: string | EmotionMusicParams, intensity: number = 0.5) => {
+  const getRecommendationByEmotion = useCallback((emotion: string | EmotionMusicParams, intensity: number = 0.5): Promise<MusicPlaylist | null> => {
     if (typeof emotion === 'string') {
       return loadPlaylistForEmotion({ emotion, intensity });
     }
@@ -150,6 +160,42 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     setIsPlaying(prev => !prev);
   }, []);
 
+  // Toggle shuffle
+  const toggleShuffle = useCallback(() => {
+    setIsShuffled(prev => !prev);
+  }, []);
+
+  // Toggle repeat
+  const toggleRepeat = useCallback(() => {
+    setIsRepeating(prev => !prev);
+  }, []);
+
+  // Add to queue
+  const addToQueue = useCallback((track: MusicTrack) => {
+    setQueue(prev => [...prev, track]);
+  }, []);
+
+  // Clear queue
+  const clearQueue = useCallback(() => {
+    setQueue([]);
+  }, []);
+
+  // Load playlist
+  const loadPlaylist = useCallback(async (playlistId: string): Promise<MusicPlaylist | null> => {
+    return null;
+  }, []);
+
+  // Shuffle playlist
+  const shufflePlaylist = useCallback(() => {
+    if (!playlist) return;
+
+    const shuffled = [...playlist.tracks].sort(() => Math.random() - 0.5);
+    setPlaylist({
+      ...playlist,
+      tracks: shuffled
+    });
+  }, [playlist]);
+
   // Valeur du contexte
   const contextValue: MusicContextType = {
     currentTrack,
@@ -182,18 +228,18 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     setEmotion,
     findTracksByMood,
     toggleDrawer,
-    isShuffled: false,
-    isRepeating: false,
-    toggleShuffle: () => {},
-    toggleRepeat: () => {},
-    queue: [],
-    addToQueue: () => {},
-    clearQueue: () => {},
-    loadPlaylist: () => {},
-    shufflePlaylist: () => {},
-    error: null,
+    isShuffled,
+    isRepeating,
+    toggleShuffle,
+    toggleRepeat,
+    queue,
+    addToQueue,
+    clearQueue,
+    loadPlaylist,
+    shufflePlaylist,
+    error,
     setIsInitialized,
-    playlists: [],
+    playlists,
     togglePlay
   };
 

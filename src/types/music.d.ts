@@ -70,37 +70,56 @@ export interface EmotionMusicParams {
 
 // Type principal pour le contexte musical
 export interface MusicContextType {
+  // Current state
   currentTrack: MusicTrack | null;
-  setCurrentTrack: (track: MusicTrack | null) => void;
   playlist: MusicPlaylist | null;
-  setPlaylist: (playlist: MusicPlaylist | null) => void;
   isPlaying: boolean;
+  volume: number;
+  currentTime: number;
+  duration: number;
+  muted: boolean;
+  openDrawer: boolean;
+  isInitialized: boolean;
+  playlists: MusicPlaylist[];
+  isShuffled: boolean;
+  isRepeating: boolean;
+  queue: MusicTrack[];
+  error: Error | null;
+  
+  // State setters
+  setCurrentTrack: (track: MusicTrack | null) => void;
+  setPlaylist: (playlist: MusicPlaylist | null) => void;
   setIsPlaying: (isPlaying: boolean) => void;
-  volume?: number;
-  setVolume?: (volume: number) => void;
-  currentTime?: number;
-  setCurrentTime?: (time: number) => void;
-  duration?: number;
-  setDuration?: (duration: number) => void;
-  muted?: boolean;
-  setMuted?: (muted: boolean) => void;
-  openDrawer?: boolean;
-  setOpenDrawer?: (open: boolean) => void;
+  setVolume: (volume: number) => void;
+  setCurrentTime: (time: number) => void;
+  setDuration: (duration: number) => void;
+  setMuted: (muted: boolean) => void;
+  setOpenDrawer: (open: boolean) => void;
+  setIsInitialized: (initialized: boolean) => void;
   
-  // Fonctions de contrôle
-  playTrack?: (track: MusicTrack) => void;
-  pauseTrack?: () => void;
-  resumeTrack?: () => void;
-  previousTrack?: () => void;
-  nextTrack?: () => void;
-  seekTo?: (time: number) => void;
-  toggleMute?: () => void;
+  // Control functions
+  playTrack: (track: MusicTrack) => void;
+  pauseTrack: () => void;
+  resumeTrack: () => void;
+  previousTrack: () => void;
+  nextTrack: () => void;
+  seekTo: (time: number) => void;
+  toggleMute: () => void;
+  togglePlay: () => void;
+  toggleShuffle: () => void;
+  toggleRepeat: () => void;
+  toggleDrawer: () => void;
   
-  // Fonctions spécifiques
-  loadPlaylistForEmotion?: (params: EmotionMusicParams) => Promise<MusicPlaylist>;
-  getRecommendationByEmotion?: (emotion: string, intensity?: number) => Promise<MusicPlaylist>;
-  generateMusic?: (prompt: string) => Promise<MusicTrack>;
+  // Data functions
+  loadPlaylistForEmotion: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
+  getRecommendationByEmotion: (emotion: string | EmotionMusicParams, intensity?: number) => Promise<MusicPlaylist | null>;
+  generateMusic: (prompt: string) => Promise<MusicTrack>;
+  findTracksByMood: (mood: string) => MusicTrack[];
+  setEmotion: (emotion: string) => void;
   
-  // État et configuration
-  isInitialized?: boolean;
+  // Playlist management
+  loadPlaylist: (playlistId: string) => Promise<MusicPlaylist | null>;
+  shufflePlaylist: () => void;
+  addToQueue: (track: MusicTrack) => void;
+  clearQueue: () => void;
 }

@@ -12,18 +12,27 @@ interface MusicEmotionRecommendationProps {
 }
 
 const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({ emotionResult }) => {
-  const { loadPlaylistForEmotion, setOpenDrawer } = useMusic();
+  const music = useMusic();
   const { toast } = useToast();
   
   const handleActivateMusic = async () => {
     try {
-      await loadPlaylistForEmotion({
+      const playlist = await music.loadPlaylistForEmotion({
         emotion: emotionResult.emotion.toLowerCase(),
         intensity: emotionResult.confidence
       });
       
-      // Since loadPlaylistForEmotion returns void, we can continue execution
-      setOpenDrawer(true);
+      if (playlist && music.setPlaylist) {
+        music.setPlaylist(playlist);
+        if (playlist.tracks.length > 0 && music.playTrack) {
+          music.playTrack(playlist.tracks[0]);
+        }
+      }
+      
+      if (music.setOpenDrawer) {
+        music.setOpenDrawer(true);
+      }
+      
       toast({
         title: 'Musique activée',
         description: `Une playlist adaptée à votre humeur ${emotionResult.emotion} est maintenant active.`,

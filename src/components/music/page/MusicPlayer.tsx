@@ -19,7 +19,9 @@ const MusicPlayer: React.FC = () => {
     volume = 0.8,
     setVolume,
     currentTime = 0,
+    setCurrentTime,
     duration = 0,
+    setDuration,
     muted = false,
     seekTo,
     toggleMute
@@ -56,7 +58,7 @@ const MusicPlayer: React.FC = () => {
         setLoading(false);
       }
     }
-  }, [currentTrack, isPlaying]);
+  }, [currentTrack, isPlaying, setIsPlaying, volume, muted]);
 
   // Mettre à jour les contrôles audio
   useEffect(() => {
@@ -80,14 +82,14 @@ const MusicPlayer: React.FC = () => {
   };
 
   const handleTimeUpdate = () => {
-    if (audioRef.current && music.setCurrentTime) {
-      music.setCurrentTime(audioRef.current.currentTime);
+    if (audioRef.current && setCurrentTime) {
+      setCurrentTime(audioRef.current.currentTime);
     }
   };
 
   const handleDurationChange = () => {
-    if (audioRef.current && music.setDuration) {
-      music.setDuration(audioRef.current.duration);
+    if (audioRef.current && setDuration) {
+      setDuration(audioRef.current.duration);
     }
   };
 
