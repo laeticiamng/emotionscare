@@ -40,9 +40,11 @@ export interface LiveVoiceScannerProps {
 
 export interface EmotionScanFormProps {
   onScanComplete?: (result: EmotionResult) => void;
-  userId?: string; // Added this prop
+  userId?: string; // Added this prop to match usage in ScanTabContent
   onEmotionDetected?: () => void;
   onClose?: () => void;
+  defaultTab?: string;
+  onProcessingChange?: (isProcessing: boolean) => void;
 }
 
 export interface TeamOverviewProps {
@@ -61,14 +63,23 @@ export interface EmotionalTeamViewProps {
 
 export interface TextEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface EmojiEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface VoiceEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Define the Emotion type for EmotionalCheckIn

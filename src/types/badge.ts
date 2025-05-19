@@ -4,42 +4,37 @@ export interface Badge {
   name: string;
   description: string;
   image_url?: string;
-  imageUrl?: string; // Alternative property
-  category?: string;
-  unlocked?: boolean;
-  unlockedAt?: string;
-  unlocked_at?: string; // Alternative property
-  date?: string;
-  level?: number;
-  earned?: boolean;
-  earnedDate?: string;
-  threshold?: number;
-  completed?: boolean;
-  progress?: number;
-  total?: number;
-  icon?: string;
-  rarity?: string;
+  awarded_at?: string;
+  user_id?: string;
+  tier?: string; // Added for compatibility with useCommunityGamification
 }
 
 export interface Challenge {
   id: string;
-  title: string;
-  name?: string; // Alternative property
+  name: string;
+  title?: string;
   description: string;
-  reward: string;
-  progress: number;
-  total: number;
-  category: string;
-  unlocked: boolean;
-  completed?: boolean;
-  isCompleted?: boolean;
-  goal?: number;
-  totalSteps?: number;
-  completions?: number;
-  difficulty?: string;
   points?: number;
+  progress?: number;
+  goal?: number;
+  category?: string;
+  completed?: boolean;
+  status?: string;
+  difficulty?: string;
+  completions?: number;
+  total?: number;
   deadline?: string;
-  threshold?: number;
-  status?: 'completed' | 'failed' | 'locked' | 'ongoing' | 'active' | 'available' | 'in-progress';
-  icon?: string;
+  reward: any; // Added for type compatibility
+  unlocked: boolean; // Added for type compatibility
+}
+
+// Add LeaderboardEntry type for useCommunityGamification
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  username: string;
+  points: number;
+  position: number;
+  avatarUrl?: string;
+  badges?: Badge[];
 }

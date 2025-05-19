@@ -23,8 +23,9 @@ export const useChatProcessing = (
         const userMessage: ChatMessage = {
           id: `user-${Date.now()}`,
           text: message,
+          content: message,
           sender: 'user',
-          timestamp: new Date(),
+          timestamp: new Date().toISOString(), // Use ISO string instead of Date
           conversationId // Include the conversation ID
         };
 
@@ -34,8 +35,9 @@ export const useChatProcessing = (
         const assistantMessage: ChatMessage = {
           id: `assistant-${Date.now()}`,
           text: `Reply to: "${message}"`,
+          content: `Reply to: "${message}"`,
           sender: 'assistant',
-          timestamp: new Date(),
+          timestamp: new Date().toISOString(), // Use ISO string instead of Date
           conversationId // Include the conversation ID
         };
 

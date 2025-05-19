@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
@@ -16,9 +15,10 @@ export const useChatMessages = ({ conversationId, initialMessages = [] }: UseCha
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId || '',
-      conversation_id: conversationId || '', // Pour compatibilité
+      conversation_id: conversationId || '', // For compatibility
       sender: 'user',
       text,
+      content: text,
       timestamp: new Date().toISOString()
     };
     
@@ -30,9 +30,10 @@ export const useChatMessages = ({ conversationId, initialMessages = [] }: UseCha
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId || '',
-      conversation_id: conversationId || '', // Pour compatibilité
+      conversation_id: conversationId || '', // For compatibility
       sender: 'assistant',
       text,
+      content: text,
       timestamp: new Date().toISOString()
     };
     
@@ -44,9 +45,10 @@ export const useChatMessages = ({ conversationId, initialMessages = [] }: UseCha
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId || '',
-      conversation_id: conversationId || '', // Pour compatibilité
+      conversation_id: conversationId || '', // For compatibility
       sender: 'system',
       text,
+      content: text,
       timestamp: new Date().toISOString()
     };
     
@@ -57,7 +59,7 @@ export const useChatMessages = ({ conversationId, initialMessages = [] }: UseCha
   const updateMessage = (id: string, text: string) => {
     setMessages(prevMessages =>
       prevMessages.map(message =>
-        message.id === id ? { ...message, text } : message
+        message.id === id ? { ...message, text, content: text } : message
       )
     );
   };
@@ -66,12 +68,12 @@ export const useChatMessages = ({ conversationId, initialMessages = [] }: UseCha
     setMessages(prevMessages => prevMessages.filter(message => message.id !== id));
   };
   
-  // Mettre à jour les messages lorsque conversationId change
+  // Update messages when conversationId changes
   useEffect(() => {
     if (conversationId) {
-      // Dans une application réelle, récupérer les messages depuis une API
-      // ici on peut simplement réinitialiser ou conserver l'état actuel
-      // selon le besoin
+      // In a real application, fetch messages from an API
+      // Here we can simply reset or keep the current state
+      // based on the requirement
     }
   }, [conversationId]);
   

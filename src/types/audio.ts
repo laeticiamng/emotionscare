@@ -5,25 +5,37 @@ export interface AudioTrack {
   artist?: string;
   duration: number;
   url: string;
-  coverUrl?: string;
-  mood?: string;
-  bpm?: number;
-  genre?: string;
-  description?: string; // Added for backward compatibility
+  cover?: string;
+  emotion?: string;
+  category?: string;
+  tags?: string[];
+  audioUrl?: string; // Added to fix the error in use-audio.ts
 }
 
 export interface AudioPlaylist {
   id: string;
   name: string;
-  description?: string;
   tracks: AudioTrack[];
-  coverUrl?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt?: string;
+  coverImage?: string;
 }
 
 export interface AudioProcessorProps {
-  isRecording?: boolean; // Made optional with ?
-  onResult?: (result: any) => void;
-  onProcessingChange?: (isProcessing: boolean) => void;
+  onResult: (result: any) => void;
+  isRecording?: boolean;
+}
+
+// Types for emotional data in audio context
+export interface MoodData {
+  emotion: string;
+  intensity: number;
+  timestamp: string;
+}
+
+export interface EmotionalData {
+  userId: string;
+  emotions: MoodData[];
+  averageIntensity: number;
+  dominantEmotion: string;
 }

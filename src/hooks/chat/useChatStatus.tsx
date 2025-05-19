@@ -9,7 +9,7 @@ export const generateSystemMessage = (
   return {
     id: uuidv4(),
     conversationId: conversationId,
-    conversation_id: conversationId, // For compatibility
+    // Remove conversation_id
     text,
     content: text,
     sender: 'system',
@@ -25,7 +25,7 @@ export const generateUserMessage = (
   return {
     id: uuidv4(),
     conversationId: conversationId,
-    conversation_id: conversationId, // For compatibility
+    // Remove conversation_id
     text,
     content: text,
     sender: 'user',
@@ -41,7 +41,7 @@ export const generateAssistantMessage = (
   return {
     id: uuidv4(),
     conversationId: conversationId,
-    conversation_id: conversationId, // For compatibility
+    // Remove conversation_id
     text,
     content: text,
     sender: 'assistant',

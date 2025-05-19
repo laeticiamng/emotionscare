@@ -2,20 +2,17 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult, EmotionScanFormProps } from '@/types/emotion';
 import VoiceEmotionScanner from './VoiceEmotionScanner';
 import TextEmotionScanner from './TextEmotionScanner';
 import EmojiEmotionScanner from './EmojiEmotionScanner';
 import FacialEmotionScanner from './FacialEmotionScanner';
 
-interface EmotionScanFormProps {
-  onScanComplete: (result: EmotionResult) => void;
-  defaultTab?: string;
-  onProcessingChange?: (isProcessing: boolean) => void;
-}
-
 const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
   onScanComplete,
+  userId, // Added to match interface
+  onEmotionDetected, // Used in ScanTabContent
+  onClose, // Used in ScanTabContent
   defaultTab = 'voice',
   onProcessingChange,
 }) => {
@@ -31,7 +28,19 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
 
   const handleScanResult = (result: EmotionResult) => {
     handleProcessingChange(false);
-    onScanComplete(result);
+    if (onScanComplete) {
+      onScanComplete(result);
+    }
+    
+    // Call onEmotionDetected if provided
+    if (onEmotionDetected) {
+      onEmotionDetected();
+    }
+    
+    // Call onClose if provided
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (

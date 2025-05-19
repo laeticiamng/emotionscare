@@ -1,88 +1,68 @@
 
 import { v4 as uuidv4 } from 'uuid';
-import { ChatMessage, Conversation } from '@/types/chat';
+import { ChatMessage, ChatConversation } from '@/types/chat';
 
-// Générer des horodatages récents
-const generateRecentTime = (minutesAgo: number): string => {
-  const date = new Date();
-  date.setMinutes(date.getMinutes() - minutesAgo);
-  return date.toISOString();
-};
-
-// Messages de démonstration
+// Mock chat messages for UI development and testing
 export const mockChatMessages: ChatMessage[] = [
   {
     id: uuidv4(),
-    text: "Bonjour, comment puis-je vous aider aujourd'hui ?",
-    sender: "assistant",
-    timestamp: generateRecentTime(10),
-    conversationId: "conv-1"
+    sender: 'assistant',
+    content: "Bonjour! Comment puis-je vous aider aujourd'hui?",
+    timestamp: new Date(Date.now() - 3600000).toISOString(),
   },
   {
     id: uuidv4(),
-    text: "Je me sens un peu stressé par mon travail.",
-    sender: "user",
-    timestamp: generateRecentTime(9),
-    conversationId: "conv-1"
+    sender: 'user',
+    content: "Je me sens un peu stressé à cause du travail.",
+    timestamp: new Date(Date.now() - 3300000).toISOString(),
   },
   {
     id: uuidv4(),
-    text: "Je comprends. Le stress au travail est courant. Pouvez-vous me dire ce qui vous stresse particulièrement ?",
-    sender: "assistant",
-    timestamp: generateRecentTime(8),
-    conversationId: "conv-1"
+    sender: 'assistant',
+    content: "Je comprends que le stress professionnel puisse être difficile. Avez-vous essayé des exercices de respiration ou de méditation? Ils peuvent être très efficaces pour gérer le stress au travail.",
+    timestamp: new Date(Date.now() - 3000000).toISOString(),
   },
   {
     id: uuidv4(),
-    text: "J'ai beaucoup de projets à gérer en même temps et les délais sont serrés.",
-    sender: "user",
-    timestamp: generateRecentTime(7),
-    conversationId: "conv-1"
+    sender: 'user',
+    content: "Pas récemment. Tu peux me suggérer quelque chose de simple?",
+    timestamp: new Date(Date.now() - 2700000).toISOString(),
   },
   {
     id: uuidv4(),
-    text: "La gestion de multiples projets avec des délais serrés peut être difficile. Avez-vous essayé des techniques de gestion du temps ou de priorisation ?",
-    sender: "assistant",
-    timestamp: generateRecentTime(6),
-    conversationId: "conv-1"
-  }
+    sender: 'assistant',
+    content: "Bien sûr! Voici un exercice simple de respiration que vous pouvez faire à votre bureau: respirez profondément par le nez pendant 4 secondes, retenez votre souffle pendant 4 secondes, puis expirez lentement par la bouche pendant 6 secondes. Répétez cela 5 fois. Cela peut vous aider à diminuer rapidement votre niveau de stress.",
+    timestamp: new Date(Date.now() - 2400000).toISOString(),
+  },
 ];
 
-// Conversations de démonstration
-export const mockConversations: Conversation[] = [
+// Mock conversations
+export const mockConversations: ChatConversation[] = [
   {
-    id: "conv-1",
-    title: "Discussion sur le stress au travail",
-    messages: mockChatMessages.filter(m => m.conversationId === "conv-1"),
-    created_at: generateRecentTime(10),
-    updated_at: generateRecentTime(6),
-    createdAt: generateRecentTime(10),
-    updatedAt: generateRecentTime(6),
-    user_id: "user-123",
-    lastMessage: "La gestion de multiples projets avec des délais serrés peut être difficile. Avez-vous essayé des techniques de gestion du temps ou de priorisation ?"
+    id: uuidv4(),
+    title: 'Gestion du stress',
+    messages: mockChatMessages.slice(0, 5),
+    createdAt: new Date(Date.now() - 3600000).toISOString(),
+    updatedAt: new Date(Date.now() - 2400000).toISOString(),
+    lastMessage: "Voici un exercice simple de respiration...",
+    isActive: true
   },
   {
-    id: "conv-2",
-    title: "Conseils pour améliorer le sommeil",
+    id: uuidv4(),
+    title: 'Amélioration du sommeil',
     messages: [],
-    created_at: generateRecentTime(1440), // Il y a 1 jour
-    updated_at: generateRecentTime(1380),
-    createdAt: generateRecentTime(1440),
-    updatedAt: generateRecentTime(1380),
-    user_id: "user-123",
-    lastMessage: "Essayez d'établir une routine régulière de sommeil et d'éviter les écrans avant de vous coucher."
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    updatedAt: new Date(Date.now() - 86400000).toISOString(),
+    lastMessage: "Je vous recommande d'essayer une routine de relaxation avant le coucher...",
+    isActive: false
   },
   {
-    id: "conv-3",
-    title: "Techniques de méditation",
+    id: uuidv4(),
+    title: 'Exercices de pleine conscience',
     messages: [],
-    created_at: generateRecentTime(2880), // Il y a 2 jours
-    updated_at: generateRecentTime(2820),
-    createdAt: generateRecentTime(2880),
-    updatedAt: generateRecentTime(2820),
-    user_id: "user-123",
-    lastMessage: "La méditation de pleine conscience peut vous aider à vous concentrer sur le moment présent."
+    createdAt: new Date(Date.now() - 172800000).toISOString(),
+    updatedAt: new Date(Date.now() - 172800000).toISOString(),
+    lastMessage: "La pleine conscience consiste à porter délibérément attention au moment présent...",
+    isActive: false
   }
 ];
-
-export default mockChatMessages;

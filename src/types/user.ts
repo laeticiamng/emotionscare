@@ -4,7 +4,7 @@ export type UserRole = 'user' | 'admin' | 'manager' | 'guest' | 'b2c' | 'b2b_use
 export interface User {
   id: string;
   email: string;
-  name?: string;
+  name: string; // Changed from optional to required to match AuthUser
   role?: UserRole;
   avatar_url?: string;
   avatar?: string;
@@ -21,7 +21,7 @@ export interface User {
 export interface AuthUser {
   id: string;
   email: string;
-  name: string | null;
+  name: string;
   role?: UserRole;
   avatar?: string;
   avatar_url?: string;

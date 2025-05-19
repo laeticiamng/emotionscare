@@ -14,7 +14,7 @@ export interface VRSessionTemplate {
   goalType: string;
   interactive: boolean;
   benefits?: string[];
-  environmentId?: string;
+  environmentId?: string; // Keep both for compatibility
   environment?: string;
   theme?: string;
   is_audio_only?: boolean;
@@ -82,7 +82,7 @@ export interface VRSessionHistoryProps {
 
 export interface VRTemplateDetailProps {
   template: VRSessionTemplate;
-  onStartSession?: () => void;
+  onStartSession?: () => void; // Added this field
   onStart?: () => void;
   heartRate?: number;
   onBack?: () => void;
