@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
 
@@ -9,8 +8,7 @@ export const generateSystemMessage = (
   return {
     id: uuidv4(),
     conversationId: conversationId,
-    // Remove conversation_id
-    text,
+    text, // Keep for backward compatibility
     content: text,
     sender: 'system',
     role: 'system',
@@ -25,8 +23,7 @@ export const generateUserMessage = (
   return {
     id: uuidv4(),
     conversationId: conversationId,
-    // Remove conversation_id
-    text,
+    text, // Keep for backward compatibility
     content: text,
     sender: 'user',
     role: 'user',
@@ -41,8 +38,7 @@ export const generateAssistantMessage = (
   return {
     id: uuidv4(),
     conversationId: conversationId,
-    // Remove conversation_id
-    text,
+    text, // Keep for backward compatibility
     content: text,
     sender: 'assistant',
     role: 'assistant',

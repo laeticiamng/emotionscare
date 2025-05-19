@@ -17,8 +17,8 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message }) => {
     formatDistanceToNow(new Date(message.timestamp), { addSuffix: true, locale: fr }) : 
     '';
   
-  // Message text content (compatibility with both text and content properties)
-  const messageContent = message.content || message.text || '';
+  // Message content (use content property)
+  const messageContent = message.content || "";
   
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>

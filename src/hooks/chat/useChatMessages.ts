@@ -15,10 +15,9 @@ export const useChatMessages = ({ conversationId, initialMessages = [] }: UseCha
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId || '',
-      conversation_id: conversationId || '', // For compatibility
-      sender: 'user',
-      text,
+      text, // Keep for backward compatibility
       content: text,
+      sender: 'user',
       timestamp: new Date().toISOString()
     };
     
@@ -30,10 +29,9 @@ export const useChatMessages = ({ conversationId, initialMessages = [] }: UseCha
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId || '',
-      conversation_id: conversationId || '', // For compatibility
-      sender: 'assistant',
-      text,
+      text, // Keep for backward compatibility
       content: text,
+      sender: 'assistant',
       timestamp: new Date().toISOString()
     };
     
@@ -45,10 +43,9 @@ export const useChatMessages = ({ conversationId, initialMessages = [] }: UseCha
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId || '',
-      conversation_id: conversationId || '', // For compatibility
-      sender: 'system',
-      text,
+      text, // Keep for backward compatibility
       content: text,
+      sender: 'system',
       timestamp: new Date().toISOString()
     };
     

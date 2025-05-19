@@ -10,9 +10,8 @@ export const useCoachChatActions = (conversationId: string) => {
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId,
-      conversation_id: conversationId, // Pour compatibilité
-      text,
       content: text,
+      text, // For backward compatibility
       sender: 'user',
       role: 'user',
       timestamp: new Date().toISOString()
@@ -25,9 +24,8 @@ export const useCoachChatActions = (conversationId: string) => {
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId,
-      conversation_id: conversationId, // Pour compatibilité
-      text,
       content: text,
+      text, // For backward compatibility
       sender: 'assistant',
       role: 'assistant',
       timestamp: new Date().toISOString()
@@ -40,9 +38,8 @@ export const useCoachChatActions = (conversationId: string) => {
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId,
-      conversation_id: conversationId, // Pour compatibilité
-      text,
       content: text,
+      text, // For backward compatibility
       sender: 'system',
       role: 'system',
       timestamp: new Date().toISOString()

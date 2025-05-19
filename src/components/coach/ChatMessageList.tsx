@@ -23,7 +23,7 @@ const ChatMessageList: React.FC<ChatMessageListProps> = ({ messages, isLoading, 
                 : 'bg-muted'
             }`}
           >
-            {message.content || message.text || ""}
+            {message.content || ""}
           </div>
         </div>
       ))}

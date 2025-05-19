@@ -1,119 +1,129 @@
-
-import React, { useState } from 'react';
-import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
+import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, StopCircle } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+import { Slider } from "@/components/ui/slider";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 
 interface VoiceEmotionAnalyzerProps {
   onResult: (result: EmotionResult) => void;
   onStartRecording?: () => void;
 }
 
-const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ 
-  onResult,
-  onStartRecording 
-}) => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
-  const [progress, setProgress] = useState(0);
+const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult, onStartRecording }) => {
+  const [emotion, setEmotion] = useState("calm");
+  const [confidence, setConfidence] = useState(0.75);
+  const [intensity, setIntensity] = useState(0.6);
+  const [showResults, setShowResults] = useState(false);
+  const [processing, setProcessing] = useState(false);
   
-  const maxRecordingTime = 15;
-  
-  const startRecording = () => {
-    setIsRecording(true);
-    setProgress(0);
-    setRecordingTime(0);
+  const mockRecommendations: EmotionRecommendation[] = [
+    {
+      type: "activity",
+      title: "Exercice de respiration",
+      description: "3 minutes de respiration profonde",
+      content: "Inspirez lentement, retenez, expirez lentement",
+      category: "wellness"
+    },
+    {
+      type: "music",
+      title: "Playlist recommandée",
+      description: "Musique relaxante pour vous aider à vous détendre",
+      content: "Écouter notre playlist zen",
+      category: "audio"
+    }
+  ];
+
+  // Update the handleCompleted function to include the required source field
+  const handleCompleted = () => {
+    setProcessing(false);
+    // Create mock emotion result
+    const result = {
+      id: `voice-${Date.now()}`,
+      emotion: emotion,
+      confidence: confidence,
+      intensity: intensity,
+      recommendations: mockRecommendations,
+      timestamp: new Date().toISOString(),
+      emojis: ["😌", "🧘‍♀️"],
+      emotions: {},
+      source: "voice-analyzer" // Add required source field
+    };
     
+    setShowResults(true);
+    
+    // Pass result to parent component
+    if (onResult) {
+      onResult(result);
+    }
+  };
+
+  const handleStart = () => {
+    setProcessing(true);
+    setShowResults(false);
     if (onStartRecording) {
       onStartRecording();
     }
-    
-    // Simulate recording progress
-    const interval = setInterval(() => {
-      setRecordingTime(prev => {
-        if (prev >= maxRecordingTime) {
-          clearInterval(interval);
-          stopRecording();
-          return maxRecordingTime;
-        }
-        setProgress((prev + 1) / maxRecordingTime * 100);
-        return prev + 1;
-      });
-    }, 1000);
-  };
-  
-  const stopRecording = () => {
-    setIsRecording(false);
-    setIsProcessing(true);
-    
-    // Simulate processing delay
     setTimeout(() => {
-      setIsProcessing(false);
-      
-      // Create mock recommendations
-      const recommendations: EmotionRecommendation[] = [
-        { 
-          type: "music", 
-          title: "Calm playlist", 
-          description: "Soothing music to relax",
-          content: "Check out our curated relaxation playlist",
-          category: "music"
-        },
-        { 
-          type: "exercise", 
-          title: "Quick stretch", 
-          description: "Light exercise to release tension",
-          content: "Try these simple desk stretches",
-          category: "exercise"
-        },
-        { 
-          type: "meditation", 
-          title: "5-minute meditation", 
-          description: "Brief mindfulness break",
-          content: "Focus on your breath for 5 minutes",
-          category: "mindfulness"
-        }
-      ];
-      
-      onResult({
-        id: `voice-analysis-${Date.now()}`,
-        emotion: 'calm',
-        confidence: 0.85,
-        intensity: 0.7,
-        recommendations: recommendations,
-        timestamp: new Date().toISOString(),
-        emojis: ['😌', '🧘'],
-        emotions: {} // Add empty emotions object to satisfy type
-      });
+      handleCompleted();
     }, 2000);
   };
-  
+
   return (
-    <div className="flex flex-col items-center justify-center p-6 bg-muted rounded-lg">
-      <Button
-        onClick={startRecording}
-        disabled={isRecording}
-        className="p-4 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 disabled:opacity-50"
-      >
-        {isRecording ? (
-          <StopCircle className="h-8 w-8 animate-spin" />
-        ) : (
-          <Mic className="h-8 w-8" />
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Analyse vocale</CardTitle>
+        <CardDescription>Simulez une analyse vocale pour détecter les émotions.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="emotion">Émotion détectée</Label>
+          <Badge variant="secondary">{emotion}</Badge>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="confidence">Confiance</Label>
+          <Slider
+            id="confidence"
+            defaultValue={[confidence * 100]}
+            max={100}
+            step={1}
+            onValueChange={(value) => setConfidence(value[0] / 100)}
+          />
+          <p className="text-sm text-muted-foreground">
+            Niveau de confiance: {Math.round(confidence * 100)}%
+          </p>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="intensity">Intensité</Label>
+          <Slider
+            id="intensity"
+            defaultValue={[intensity * 100]}
+            max={100}
+            step={1}
+            onValueChange={(value) => setIntensity(value[0] / 100)}
+          />
+          <p className="text-sm text-muted-foreground">
+            Intensité de l'émotion: {Math.round(intensity * 100)}%
+          </p>
+        </div>
+        
+        <Button onClick={handleStart} disabled={processing}>
+          {processing ? 'Analyse en cours...' : 'Simuler l\'analyse'}
+        </Button>
+        
+        {showResults && (
+          <div className="mt-4 p-3 bg-muted rounded-md">
+            <h4 className="text-sm font-medium">Résultats simulés</h4>
+            <p className="text-xs text-muted-foreground">
+              Émotion: {emotion}, Confiance: {Math.round(confidence * 100)}%, Intensité: {Math.round(intensity * 100)}%
+            </p>
+          </div>
         )}
-      </Button>
-      <p className="mt-4 text-center text-sm">
-        {isRecording
-          ? "Enregistrement en cours... Veuillez parler naturellement."
-          : isProcessing
-          ? "Traitement de votre voix..."
-          : "Cliquez pour enregistrer votre voix"}
-      </p>
-      {isRecording && (
-        <Progress value={progress} max={100} className="mt-4" />
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

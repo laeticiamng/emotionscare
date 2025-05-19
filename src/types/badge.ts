@@ -16,6 +16,8 @@ export interface Badge {
   image_url?: string;
   date?: string;
   unlocked_at?: string;
+  achieved?: boolean;
+  earned?: boolean;
 }
 
 export interface Challenge {
@@ -29,4 +31,14 @@ export interface Challenge {
   reward?: Badge;
   category?: string;
   expires?: string;
+  // Adding fields needed by ChallengesList component
+  title?: string;
+  isCompleted?: boolean;
+  goal?: number;
+  totalSteps?: number;
+  completions?: number;
+  difficulty?: string;
+  points?: number;
+  deadline?: string;
+  status?: string;
 }

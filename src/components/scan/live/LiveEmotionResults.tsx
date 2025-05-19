@@ -27,7 +27,7 @@ const LiveEmotionResults: React.FC<LiveEmotionResultsProps> = ({ result, classNa
     } else {
       return (
         <Badge key={index} variant="secondary">
-          {rec.title} - {rec.description}
+          {rec.title || "Recommendation"} - {rec.description || ""}
         </Badge>
       );
     }

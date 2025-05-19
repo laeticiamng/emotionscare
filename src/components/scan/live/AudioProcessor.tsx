@@ -145,8 +145,10 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
             text: "J'ai passé une journée tranquille aujourd'hui.",
             audioUrl: URL.createObjectURL(audioBlob),
             transcript: "J'ai passé une journée tranquille aujourd'hui.",
-            emotions: {},  // Add empty emotions object to satisfy type
-            emojis: ['😌', '🧘‍♂️'] // Add required emojis property
+            emotions: {},
+            emojis: ['😌', '🧘‍♂️'],
+            intensity: 0.7, // Added required intensity field
+            source: 'audio-processor' // Added required source field
           };
           
           onResult(fakeResult);

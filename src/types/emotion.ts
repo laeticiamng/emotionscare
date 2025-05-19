@@ -1,3 +1,4 @@
+
 // Define the EmotionScanFormProps type
 export interface EmotionScanFormProps {
   onEmotionDetected?: (result: EmotionResult) => void;
@@ -27,7 +28,7 @@ export interface EmotionResult {
   confidence: number;
   intensity: number;
   timestamp: string;
-  source: string;
+  source: string; // Now required
   emojis?: string[];
   text?: string;
   emotions?: Record<string, number>;

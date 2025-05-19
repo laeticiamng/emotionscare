@@ -10,6 +10,7 @@ export interface ChatMessage {
   isTyping?: boolean;
   attachments?: string[];
   metadata?: Record<string, any>;
+  text?: string; // Adding this for backward compatibility with existing code
 }
 
 export interface ChatConversation {
@@ -22,6 +23,7 @@ export interface ChatConversation {
   isActive?: boolean; // Add for backward compatibility
   participants?: string[];
   metadata?: Record<string, any>;
+  user_id?: string; // Add for backward compatibility
 }
 
 export interface ChatResponse {

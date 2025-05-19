@@ -46,10 +46,11 @@ const createMockResult = (): EmotionResult => {
     confidence: Math.random() * 0.4 + 0.6,
     intensity: Math.random() * 0.5 + 0.5,
     recommendations,
-    timestamp: new Date().toISOString(), // Convert Date to string
+    timestamp: new Date().toISOString(),
     emojis: ["😌", "🧘‍♀️"],
     feedback: "Vous semblez calme et détendu. Continuez ainsi!",
-    emotions: { calm: 0.8, happy: 0.2 } // Add required emotions property
+    emotions: { calm: 0.8, happy: 0.2 },
+    source: "live-voice" // Added required source field
   };
 };
 

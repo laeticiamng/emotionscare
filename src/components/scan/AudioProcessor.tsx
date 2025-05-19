@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, StopCircle, AlertCircle } from 'lucide-react';
@@ -150,7 +149,9 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
             id: `scan-${Date.now()}`,
             emotion: 'calm',
             confidence: 0.85,
+            intensity: 0.7, // Added required intensity field
             timestamp: new Date().toISOString(),
+            source: 'voice', // Added required source field
             recommendations: recommendations,
             text: "J'ai passé une journée tranquille aujourd'hui.",
             audioUrl: URL.createObjectURL(audioBlob),

@@ -10,9 +10,8 @@ export const useCoachMessages = (conversationId: string) => {
     const newMessage: ChatMessage = {
       id: uuidv4(),
       conversationId: conversationId,
-      conversation_id: conversationId, // Pour compatibilité
-      text,
       content: text,
+      text, // Keep for backward compatibility
       sender,
       role: sender,
       timestamp: new Date().toISOString()
