@@ -21,15 +21,6 @@ export interface UserWithStatus extends AuthUser {
 }
 
 // Add User interface for older components
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
-  avatar?: string;
-  avatarUrl?: string;
-  avatar_url?: string;
-  role?: string;
-  position?: string; // Added for backward compatibility
-  department?: string; // Added for backward compatibility
-  joined_at?: Date | string; // Added for backward compatibility
+export interface User extends AuthUser {
+  // Additional fields that might be used in older components
 }

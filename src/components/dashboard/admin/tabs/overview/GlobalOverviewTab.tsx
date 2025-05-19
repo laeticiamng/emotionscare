@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { GlobalOverviewTabProps } from '@/types';
+import { GlobalOverviewTabProps, KpiCardProps } from '@/types';
 import KpiCardsGrid from '../../KpiCardsGrid';
 
 const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ 
@@ -39,26 +39,26 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
     setFilterBy(newFilterBy);
   };
   
-  const kpiCards = [
+  const kpiCards: KpiCardProps[] = [
     { 
       id: 'completion', 
       title: 'Taux de complétion', 
       value: `${completion}%`, 
-      delta: { value: 12, trend: 'up' }, 
+      delta: { value: 12, trend: 'up' as const }, 
       status: 'success' as const 
     },
     { 
       id: 'productivity', 
       title: 'Productivité', 
       value: `${productivity}%`, 
-      delta: { value: -5, trend: 'down' }, 
+      delta: { value: -5, trend: 'down' as const }, 
       status: 'warning' as const 
     },
     { 
       id: 'emotionalScore', 
       title: 'Score émotionnel', 
       value: `${emotionalScore}%`, 
-      delta: { value: 8, trend: 'up' }, 
+      delta: { value: 8, trend: 'up' as const }, 
       status: 'success' as const 
     },
   ];

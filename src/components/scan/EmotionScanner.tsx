@@ -25,7 +25,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isRecording, setIsRecording] = useState<boolean>(false);
 
-  const handleTextAnalysisComplete = (result: EmotionResult) => {
+  const handleTextResult = (result: EmotionResult) => {
     if (onAnalysisComplete) {
       onAnalysisComplete({
         ...result,
@@ -34,7 +34,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
     }
   };
 
-  const handleVoiceAnalysisComplete = (result: EmotionResult) => {
+  const handleVoiceResult = (result: EmotionResult) => {
     if (onAnalysisComplete) {
       onAnalysisComplete({
         ...result,
@@ -43,7 +43,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
     }
   };
 
-  const handleEmojiAnalysisComplete = (result: EmotionResult) => {
+  const handleEmojiResult = (result: EmotionResult) => {
     if (onAnalysisComplete) {
       onAnalysisComplete({
         ...result,
@@ -89,18 +89,19 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
               onResult={handleAudioResult}
               onProcessingChange={setIsProcessing}
               isRecording={isRecording}
+              setIsProcessing={setIsProcessing}
             />
           </TabsContent>
           <TabsContent value="text" className="space-y-4">
             <TextEmotionScanner
-              onAnalysisComplete={handleTextAnalysisComplete}
+              onResult={handleTextResult}
               isProcessing={isProcessing}
               setIsProcessing={setIsProcessing}
             />
           </TabsContent>
           <TabsContent value="emoji" className="space-y-4">
             <EmojiEmotionScanner
-              onAnalysisComplete={handleEmojiAnalysisComplete}
+              onResult={handleEmojiResult}
               isProcessing={isProcessing}
               setIsProcessing={setIsProcessing}
             />

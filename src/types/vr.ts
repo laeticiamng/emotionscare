@@ -22,6 +22,8 @@ export interface VRSessionTemplate {
   benefits?: string[]; // Added for backward compatibility
   difficulty?: string; // Added for backward compatibility
   lastUsed?: Date | string; // Added for backward compatibility
+  theme?: string; // Added for backward compatibility
+  coverUrl?: string; // Added for backward compatibility
 }
 
 export interface VRSession {
@@ -40,6 +42,7 @@ export interface VRSession {
   rating?: number; // Added for backward compatibility
   startedAt?: Date | string; // Added for backward compatibility
   date?: Date | string; // Added for backward compatibility
+  template?: VRSessionTemplate; // Added for backward compatibility
 }
 
 export interface VRSessionMetrics {
@@ -63,9 +66,23 @@ export interface VRSessionHistoryProps {
   onSelect?: (session: VRSession) => void;
   emptyMessage?: string;
   limitDisplay?: number;
+  userId?: string;
+  limit?: number;
+  showHeader?: boolean;
+  className?: string;
+  onSessionSelect?: (session: VRSession) => void;
 }
 
 export interface VRSessionWithMusicProps {
   sessionTemplate: VRSessionTemplate;
   onComplete?: () => void;
+  session?: any;
+  template?: VRSessionTemplate;
+  onExit?: () => void;
+  sessionId?: string;
+  title?: string;
+  description?: string;
+  duration?: number;
+  environment?: string;
+  musicTrackId?: string;
 }

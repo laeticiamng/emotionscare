@@ -86,3 +86,18 @@ export interface TeamOverviewProps {
   period?: string;
   showGraph?: boolean;
 }
+
+// Add text and emoji scanner props
+export interface TextEmotionScannerProps {
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  onAnalysisComplete?: (result: EmotionResult) => void;
+}
+
+export interface EmojiEmotionScannerProps {
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  onAnalysisComplete?: (result: EmotionResult) => void;
+}

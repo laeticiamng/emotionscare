@@ -1,112 +1,83 @@
+
 import { EmotionResult } from '@/types/emotion';
 
 /**
- * Normalizes emotion data from different sources into a consistent EmotionResult format
- * @param data The emotion data to normalize
- * @returns Normalized EmotionResult object
+ * Normalizes an emotion result to handle different structure variations
+ * that may come from different APIs or components
  */
-export function normalizeEmotionResult(data: any): EmotionResult {
-  // Handle undefined or null data
-  if (!data) {
-    return {
-      id: crypto.randomUUID(),
-      date: new Date().toISOString(),
-      emotion: 'neutral',
-      confidence: 0.5,
-      intensity: 0.5,
-      emojis: ['😐'],
-      source: 'system',
-    };
-  }
-
-  // Create a base object with required fields
-  const result: EmotionResult = {
-    id: data.id || crypto.randomUUID(),
-    date: data.date || data.timestamp || new Date().toISOString(),
-    emotion: data.emotion || 'neutral',
-    confidence: data.confidence || 0.5,
-    intensity: data.intensity || 0.5,
-    emojis: data.emojis || ['😐'],
-    source: data.source || 'system',
-  };
-
-  // Handle optional fields
-  if (data.text) result.text = data.text;
-  if (data.textInput) result.text = data.textInput;
-  if (data.audio_url) result.audio_url = data.audio_url;
-  if (data.audioUrl) result.audio_url = data.audioUrl;
-  if (data.transcript) result.transcript = data.transcript;
-  if (data.facialExpression) result.facialExpression = data.facialExpression;
-  if (data.recommendations) result.recommendations = data.recommendations;
-  if (data.emotions) {
-    // Handle the case where emotions is an array of emotion objects
-    if (Array.isArray(data.emotions) && data.emotions.length > 0) {
-      result.emotion = data.emotions[0].name || result.emotion;
-    }
-  }
-
-  return result;
-}
-
-/**
- * Normalizes emotion intensity to a numeric value between 0 and 1
- * @param intensity The intensity value which could be a string like "low", "medium", "high" or a number
- * @returns A normalized number between 0 and 1
- */
-export function normalizeEmotionIntensity(intensity: string | number): number {
-  if (typeof intensity === 'number') {
-    // If already a number, ensure it's between 0 and 1
-    return Math.max(0, Math.min(1, intensity));
-  }
+export function normalizeEmotionResult(result: EmotionResult): EmotionResult {
+  if (!result) return {} as EmotionResult;
   
-  // If it's a percentage string like "75%"
-  if (typeof intensity === 'string' && intensity.endsWith('%')) {
-    const percentage = parseFloat(intensity);
-    if (!isNaN(percentage)) {
-      return percentage / 100;
-    }
-  }
-  
-  // Handle string values
-  switch (intensity?.toLowerCase?.()) {
-    case 'low':
-      return 0.25;
-    case 'medium':
-      return 0.5;
-    case 'high':
-      return 0.75;
-    default:
-      return 0.5; // Default to medium intensity
-  }
-}
-
-/**
- * Converts legacy emotion data formats to the current EmotionResult format
- */
-export function convertLegacyEmotionData(legacyData: any): EmotionResult {
-  return normalizeEmotionResult(legacyData);
-}
-
-/**
- * Gets appropriate emoji for an emotion
- */
-export function getEmotionEmoji(emotion: string): string {
-  const emotionEmojiMap: Record<string, string> = {
-    'happy': '😊',
-    'sad': '😢',
-    'angry': '😠',
-    'fear': '😨',
-    'surprise': '😲',
-    'disgust': '🤢',
-    'neutral': '😐',
-    'joy': '😄',
-    'calm': '😌',
-    'anxious': '😰',
-    'excited': '😃',
-    'tired': '😴',
-    'stressed': '😫',
-    'relaxed': '😌',
+  // Default values
+  const normalized: EmotionResult = {
+    emotion: result.emotion || '',
+    score: result.score || 0,
+    confidence: result.confidence || 0,
   };
   
-  return emotionEmojiMap[emotion.toLowerCase()] || '😐';
+  // Handle timestamps in different formats
+  if (result.timestamp) {
+    normalized.timestamp = result.timestamp;
+  } else if (result.date) {
+    normalized.timestamp = result.date;
+  }
+  
+  // Handle text content
+  if (result.text) {
+    normalized.text = result.text;
+  } else if (result.textInput) {
+    normalized.text = result.textInput;
+  }
+  
+  // Handle feedback
+  if (result.feedback) {
+    normalized.feedback = result.feedback;
+  } else if (result.ai_feedback) {
+    normalized.feedback = result.ai_feedback;
+  }
+  
+  // Handle user identification
+  if (result.userId) {
+    normalized.userId = result.userId;
+  } else if (result.user_id) {
+    normalized.userId = result.user_id;
+  }
+  
+  // Copy other properties
+  if (result.intensity !== undefined) normalized.intensity = result.intensity;
+  if (result.source) normalized.source = result.source;
+  if (result.id) normalized.id = result.id;
+  if (result.emojis) normalized.emojis = result.emojis;
+  if (result.recommendations) normalized.recommendations = result.recommendations;
+  if (result.audioUrl) normalized.audioUrl = result.audioUrl;
+  if (result.transcript) normalized.transcript = result.transcript;
+  
+  return normalized;
+}
+
+/**
+ * Calculates a numeric intensity based on confidence and score
+ */
+export function calculateIntensity(result: EmotionResult): number {
+  if (!result) return 0;
+  
+  // If intensity is already provided, use that
+  if (result.intensity !== undefined) {
+    return result.intensity;
+  }
+  
+  // Calculate based on confidence and/or score
+  if (result.confidence !== undefined && result.score !== undefined) {
+    return (result.confidence + result.score / 100) / 2;
+  }
+  
+  if (result.confidence !== undefined) {
+    return result.confidence;
+  }
+  
+  if (result.score !== undefined) {
+    return result.score / 100;
+  }
+  
+  return 0.5; // Default middle value
 }

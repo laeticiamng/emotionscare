@@ -37,7 +37,8 @@ export type {
   DashboardWidgetConfig,
   GamificationData,
   KpiCardStatus,
-  KpiDelta
+  KpiDelta,
+  KpiCardsGridProps
 } from './types/dashboard';
 
 export type { SidebarContextType } from './types/sidebar';
@@ -86,7 +87,10 @@ export type {
   EmotionResult,
   LiveVoiceScannerProps,
   TeamOverviewProps,
-  EmotionalTeamViewProps
+  EmotionalTeamViewProps,
+  EmotionRecommendation,
+  TextEmotionScannerProps,
+  EmojiEmotionScannerProps
 } from './types/emotion';
 
 export type {

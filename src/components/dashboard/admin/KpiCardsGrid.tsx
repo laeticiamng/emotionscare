@@ -1,7 +1,7 @@
 
 import React from 'react';
-import KpiCard from './cards/KpiCard';
-import { KpiCardsGridProps } from '@/types/dashboard';
+import KpiCard from './KpiCard';
+import { KpiCardsGridProps } from '@/types';
 
 const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ cards = [] }) => {
   return (
@@ -9,6 +9,7 @@ const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ cards = [] }) => {
       {cards.map((card) => (
         <KpiCard
           key={card.id || card.title}
+          id={card.id}
           title={card.title}
           value={card.value}
           delta={card.delta}
