@@ -11,10 +11,13 @@ export interface EmotionResult {
   id?: string; // Added for compatibility
   intensity?: number; // Added for compatibility
   text?: string; // Added for compatibility
+  textInput?: string; // Added for compatibility
   date?: string; // Added for compatibility
   transcript?: string; // Added for compatibility
-  textInput?: string; // Added for compatibility
   audioUrl?: string; // Added for compatibility
+  ai_feedback?: string; // Added for backward compatibility
+  userId?: string; // Added for backward compatibility
+  user_id?: string; // Added for backward compatibility
 }
 
 export interface EmotionRecommendation {

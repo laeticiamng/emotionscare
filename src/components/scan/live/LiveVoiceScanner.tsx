@@ -34,8 +34,8 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
         const emotion = emotions[Math.floor(Math.random() * emotions.length)];
         
         const recommendations: EmotionRecommendation[] = [
-          { content: "Take a walk", category: "exercise" },
-          { content: "Practice deep breathing", category: "mindfulness" }
+          { title: "Take a walk", content: "Take a walk outside to clear your mind", category: "exercise" },
+          { title: "Deep breathing", content: "Practice deep breathing for relaxation", category: "mindfulness" }
         ];
         
         const emotionResult: EmotionResult = {
@@ -45,7 +45,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
           score: Math.random() * 0.5 + 0.5,
           confidence: Math.random() * 0.3 + 0.7,
           intensity: Math.random(),
-          timestamp: new Date().toISOString(),
+          timestamp: new Date(),
           feedback: "Your voice analysis reveals a balanced emotional state with slight tendencies toward the positive spectrum.",
           recommendations: recommendations,
           source: 'voice'

@@ -40,9 +40,27 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
   };
   
   const kpiCards = [
-    { id: 'completion', title: 'Taux de complétion', value: `${completion}%`, delta: 12, status: 'success' as const },
-    { id: 'productivity', title: 'Productivité', value: `${productivity}%`, delta: -5, status: 'warning' as const },
-    { id: 'emotionalScore', title: 'Score émotionnel', value: `${emotionalScore}%`, delta: 8, status: 'success' as const },
+    { 
+      id: 'completion', 
+      title: 'Taux de complétion', 
+      value: `${completion}%`, 
+      delta: { value: 12, trend: 'up' }, 
+      status: 'success' as const 
+    },
+    { 
+      id: 'productivity', 
+      title: 'Productivité', 
+      value: `${productivity}%`, 
+      delta: { value: -5, trend: 'down' }, 
+      status: 'warning' as const 
+    },
+    { 
+      id: 'emotionalScore', 
+      title: 'Score émotionnel', 
+      value: `${emotionalScore}%`, 
+      delta: { value: 8, trend: 'up' }, 
+      status: 'success' as const 
+    },
   ];
   
   return (

@@ -1,109 +1,111 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { EmotionResult } from '@/types/emotion';
-import { Mic, MessageSquare } from 'lucide-react';
-import AudioProcessor from './AudioProcessor';
+import React, { useState, useEffect } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import TextEmotionScanner from './TextEmotionScanner';
+import VoiceEmotionScanner from './VoiceEmotionScanner';
+import EmojiEmotionScanner from './EmojiEmotionScanner';
+import { EmotionResult } from '@/types/emotion';
+import AudioProcessor from './AudioProcessor';
 
 interface EmotionScannerProps {
-  onResult?: (result: EmotionResult) => void;
-  defaultTab?: 'voice' | 'text';
+  onAnalysisComplete?: (result: EmotionResult) => void;
+  defaultTab?: 'text' | 'voice' | 'emoji';
+  showHistory?: boolean;
+  className?: string;
 }
 
 const EmotionScanner: React.FC<EmotionScannerProps> = ({
-  onResult,
-  defaultTab = 'voice'
+  onAnalysisComplete,
+  defaultTab = 'voice',
+  showHistory = false,
+  className,
 }) => {
   const [activeTab, setActiveTab] = useState<string>(defaultTab);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [result, setResult] = useState<EmotionResult | null>(null);
-  
-  const handleVoiceResult = (analysisResult: EmotionResult) => {
-    setResult(analysisResult);
-    
-    if (onResult) {
-      onResult(analysisResult);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+
+  const handleTextAnalysisComplete = (result: EmotionResult) => {
+    if (onAnalysisComplete) {
+      onAnalysisComplete({
+        ...result,
+        source: 'text',
+      });
     }
   };
-  
-  const handleTextResult = (analysisResult: EmotionResult) => {
-    setResult(analysisResult);
-    
-    if (onResult) {
-      onResult(analysisResult);
+
+  const handleVoiceAnalysisComplete = (result: EmotionResult) => {
+    if (onAnalysisComplete) {
+      onAnalysisComplete({
+        ...result,
+        source: 'voice',
+      });
     }
   };
-  
-  const handleRecordToggle = () => {
-    setIsRecording(!isRecording);
+
+  const handleEmojiAnalysisComplete = (result: EmotionResult) => {
+    if (onAnalysisComplete) {
+      onAnalysisComplete({
+        ...result,
+        source: 'emoji',
+      });
+    }
   };
-  
+
+  const handleAudioResult = (analysisResult: EmotionResult) => {
+    if (onAnalysisComplete) {
+      onAnalysisComplete({
+        ...analysisResult,
+        source: 'voice',
+      });
+    }
+  };
+
+  // Stop recording when changing tabs
+  useEffect(() => {
+    setIsRecording(false);
+  }, [activeTab]);
+
   return (
-    <Card>
+    <Card className={className}>
       <CardHeader>
-        <CardTitle>Scanner Émotionnel</CardTitle>
+        <CardTitle>Scanner votre émotion actuelle</CardTitle>
       </CardHeader>
-      
       <CardContent>
-        <Tabs 
-          defaultValue={defaultTab} 
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="space-y-4"
-        >
-          <TabsList className="grid grid-cols-2">
-            <TabsTrigger value="voice" className="flex items-center gap-2">
-              <Mic className="h-4 w-4" />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-3 mb-4">
+            <TabsTrigger value="voice" disabled={isProcessing}>
               Voix
             </TabsTrigger>
-            <TabsTrigger value="text" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
+            <TabsTrigger value="text" disabled={isProcessing}>
               Texte
             </TabsTrigger>
+            <TabsTrigger value="emoji" disabled={isProcessing}>
+              Emoji
+            </TabsTrigger>
           </TabsList>
-          
           <TabsContent value="voice" className="space-y-4">
-            <div className="text-center py-4">
-              <Button 
-                onClick={handleRecordToggle}
-                variant={isRecording ? "destructive" : "default"}
-                className="h-16 w-16 rounded-full flex items-center justify-center"
-                disabled={isProcessing}
-              >
-                <Mic className="h-6 w-6" />
-              </Button>
-              
-              <p className="mt-2 text-sm">
-                {isRecording ? "Cliquez pour arrêter l'enregistrement" : "Cliquez pour commencer"}
-              </p>
-            </div>
-            
-            <AudioProcessor 
-              isRecording={isRecording}
-              onResult={handleVoiceResult}
+            <AudioProcessor
+              onResult={handleAudioResult}
               onProcessingChange={setIsProcessing}
+              isRecording={isRecording}
             />
           </TabsContent>
-          
-          <TabsContent value="text">
-            <TextEmotionScanner onResult={handleTextResult} />
+          <TabsContent value="text" className="space-y-4">
+            <TextEmotionScanner
+              onAnalysisComplete={handleTextAnalysisComplete}
+              isProcessing={isProcessing}
+              setIsProcessing={setIsProcessing}
+            />
+          </TabsContent>
+          <TabsContent value="emoji" className="space-y-4">
+            <EmojiEmotionScanner
+              onAnalysisComplete={handleEmojiAnalysisComplete}
+              isProcessing={isProcessing}
+              setIsProcessing={setIsProcessing}
+            />
           </TabsContent>
         </Tabs>
-        
-        {result && (
-          <div className="mt-6 p-4 bg-muted rounded-md">
-            <h3 className="font-semibold text-lg">Résultat</h3>
-            <div className="mt-2 space-y-1">
-              <p>Émotion détectée: <span className="font-medium">{result.emotion}</span></p>
-              <p>Score: <span className="font-medium">{result.score}%</span></p>
-              <p>Confiance: <span className="font-medium">{Math.round(result.confidence * 100)}%</span></p>
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

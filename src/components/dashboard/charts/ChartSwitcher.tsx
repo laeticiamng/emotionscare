@@ -91,7 +91,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
         <div className="h-48 w-full flex items-center justify-center">
           <p className="text-muted-foreground text-center">
             {activeDimension && activeOption ? (
-              <>Aucune donnée pour {activeDimension.label} → {activeOption.label}</>
+              <>Aucune donnée pour {activeDimension?.label} → {activeOption?.label}</>
             ) : (
               <>Aucune donnée disponible</>
             )}
@@ -130,7 +130,7 @@ const ChartSwitcher: React.FC<ChartSwitcherProps> = ({
   const getDescription = () => {
     if (isLoading) return "Chargement...";
     if (segment.dimensionKey && segment.optionKey && activeDimension && activeOption) {
-      return `${description || ''} - ${activeDimension.label}: ${activeOption.label}`;
+      return `${description || ''} - ${activeDimension?.label}: ${activeOption?.label}`;
     }
     return description;
   };

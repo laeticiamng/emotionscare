@@ -8,6 +8,9 @@ export interface AuthUser {
   avatarUrl?: string; // Additional backward compatibility
   role?: UserRole;
   name?: string; // Added for backward compatibility
+  position?: string; // Added for backward compatibility
+  department?: string; // Added for backward compatibility
+  joined_at?: Date | string; // Added for backward compatibility
 }
 
 export type UserRole = 'admin' | 'user' | 'guest';
@@ -26,4 +29,7 @@ export interface User {
   avatarUrl?: string;
   avatar_url?: string;
   role?: string;
+  position?: string; // Added for backward compatibility
+  department?: string; // Added for backward compatibility
+  joined_at?: Date | string; // Added for backward compatibility
 }

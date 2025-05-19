@@ -50,7 +50,7 @@ export interface KpiCardProps {
   title: string;
   value: string | number;
   status?: KpiCardStatus;
-  delta?: KpiDelta | {
+  delta?: number | KpiDelta | {
     value: number;
     trend: 'up' | 'down' | 'neutral';
     label?: string;
@@ -70,9 +70,9 @@ export interface KpiCardProps {
 export type KpiCardStatus = 'positive' | 'negative' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'default';
 export type KpiDelta = {
   value: number;
-  direction: 'up' | 'down' | 'stable';
-  label?: string;
+  direction?: 'up' | 'down' | 'stable';
   trend?: 'up' | 'down' | 'neutral';
+  label?: string;
 };
 
 export interface DashboardWidgetConfig extends DashboardWidget {
@@ -83,6 +83,7 @@ export interface DashboardWidgetConfig extends DashboardWidget {
 
 export interface DraggableKpiCardsGridProps {
   cards?: KpiCardProps[];
+  kpiCards?: KpiCardProps[];
   onReorder?: (newOrder: KpiCardProps[]) => void;
   onCardsReorder?: (cards: KpiCardProps[]) => void;
   onOrderChange?: (cards: KpiCardProps[]) => void;
@@ -90,7 +91,6 @@ export interface DraggableKpiCardsGridProps {
   savedLayout?: any;
   className?: string;
   isEditable?: boolean;
-  kpiCards?: KpiCardProps[];
 }
 
 export interface GamificationData {

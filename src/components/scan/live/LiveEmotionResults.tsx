@@ -25,8 +25,8 @@ export default function LiveEmotionResults({ result, isLoading }: { result?: Emo
   const normalizedResult = result ? normalizeEmotionResult(result) : undefined;
   
   // Convert to percentage for display
-  const intensityPercent = normalizedResult ? normalizedResult.intensity * 100 : 0;
-  const confidencePercent = normalizedResult ? normalizedResult.confidence * 100 : 0;
+  const intensityPercent = normalizedResult && normalizedResult.intensity !== undefined ? normalizedResult.intensity * 100 : 0;
+  const confidencePercent = normalizedResult && normalizedResult.confidence !== undefined ? normalizedResult.confidence * 100 : 0;
 
   return (
     <Card className="w-full">

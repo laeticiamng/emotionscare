@@ -11,6 +11,8 @@ interface AudioProcessorProps {
   duration?: number;
   isProcessing?: boolean;
   setIsProcessing?: (processing: boolean) => void;
+  isRecording?: boolean;
+  onProcessingChange?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AudioProcessor: React.FC<AudioProcessorProps> = ({
@@ -18,14 +20,32 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
   onError,
   autoStop = true,
   duration = 5000,
-  isProcessing,
-  setIsProcessing
+  isProcessing: propIsProcessing,
+  setIsProcessing,
+  isRecording: propIsRecording,
+  onProcessingChange
 }) => {
-  const [isRecording, setIsRecording] = useState(false);
+  const [localIsRecording, setLocalIsRecording] = useState(propIsRecording || false);
+  const [localIsProcessing, setLocalIsProcessing] = useState(propIsProcessing || false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
   const [error, setError] = useState<string | null>(null);
+  
+  // Use either prop or local state for recording status
+  const isRecording = propIsRecording !== undefined ? propIsRecording : localIsRecording;
+  // Use either prop or local state for processing status
+  const isProcessing = propIsProcessing !== undefined ? propIsProcessing : localIsProcessing;
+
+  const updateProcessingState = (state: boolean) => {
+    if (setIsProcessing) {
+      setIsProcessing(state);
+    } else if (onProcessingChange) {
+      onProcessingChange(state);
+    } else {
+      setLocalIsProcessing(state);
+    }
+  };
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -40,7 +60,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
   }, [isRecording, autoStop, duration]);
 
   const startRecording = async () => {
-    setIsProcessing?.(true);
+    updateProcessingState(true);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorder.current = new MediaRecorder(stream);
@@ -53,26 +73,26 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
       mediaRecorder.current.onstop = async () => {
         const fullBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
         setAudioBlob(fullBlob);
-        setIsRecording(false);
-        setIsProcessing?.(false);
+        setLocalIsRecording(false);
+        updateProcessingState(false);
         await processAudio(fullBlob);
       };
 
       mediaRecorder.current.start();
-      setIsRecording(true);
+      setLocalIsRecording(true);
       setError(null);
     } catch (err: any) {
       setError(`Erreur lors du démarrage de l'enregistrement audio: ${err.message}`);
-      onError?.(`Erreur lors du démarrage de l'enregistrement audio: ${err.message}`);
-      setIsProcessing?.(false);
+      if (onError) onError(`Erreur lors du démarrage de l'enregistrement audio: ${err.message}`);
+      updateProcessingState(false);
     }
   };
 
   const stopRecording = () => {
     if (mediaRecorder.current && mediaRecorder.current.state !== 'inactive') {
       mediaRecorder.current.stop();
-      setIsRecording(false);
-      setIsProcessing?.(false);
+      setLocalIsRecording(false);
+      updateProcessingState(false);
     }
   };
 
@@ -85,7 +105,7 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
   };
 
   const processAudio = async (audioBlob: Blob) => {
-    setIsProcessing?.(true);
+    updateProcessingState(true);
     // Simulate audio processing with a mock result
     const mockResult = {
       emotion: 'Happy',
@@ -97,8 +117,8 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
     // Update to use the correct properties
     if (onResult && mockResult) {
       const recommendations: EmotionRecommendation[] = [
-        { content: "Take a moment to appreciate your positive mood", category: "general" },
-        { content: "Share your happiness with someone", category: "general" }
+        { title: "Appreciate your mood", content: "Take a moment to appreciate your positive mood", category: "general" },
+        { title: "Share happiness", content: "Share your happiness with someone", category: "general" }
       ];
       
       onResult({
@@ -111,12 +131,12 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
         recommendations: recommendations,
         intensity: mockResult.intensity,
         feedback: mockResult.feedback,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         source: 'voice'
       });
     }
 
-    setIsProcessing?.(false);
+    updateProcessingState(false);
   };
 
   return (

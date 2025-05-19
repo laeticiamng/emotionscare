@@ -1,27 +1,30 @@
 
+import { ReactNode } from 'react';
+
 export interface SegmentOption {
   key: string;
   label: string;
-  value?: any;
-  dimensionKey?: string;
-  optionKey?: string;
+  value: string;
+  icon?: ReactNode;
+  count?: number;
 }
 
 export interface SegmentDimension {
   key: string;
   label: string;
   options: SegmentOption[];
+  defaultOption?: string;
+  icon?: ReactNode;
 }
 
 export interface SegmentContextType {
-  segment?: string | null;
-  setSegment?: (segment: string | null) => void;
-  dimensions?: SegmentDimension[];
-  isLoading?: boolean;
-  activeDimension?: string | null;
-  activeOption?: string | null;
-}
-
-export interface SegmentProviderProps {
-  children: React.ReactNode;
+  segment: {
+    dimensionKey: string;
+    optionKey: string;
+  };
+  activeDimension: SegmentDimension | null;
+  activeOption: SegmentOption | null;
+  dimensions: SegmentDimension[];
+  setSegment: (dimensionKey: string, optionKey: string) => void;
+  resetSegment: () => void;
 }
