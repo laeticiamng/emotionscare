@@ -18,6 +18,9 @@ const PrivacyPreferencesComponent: React.FC<PrivacyPreferencesProps> = ({
     if (!privacy) {
       return {
         shareData: false,
+        shareEmotions: false,
+        shareActivity: false,
+        publicProfile: false,
         dataSharing: false,
         analytics: false,
         thirdParty: false,
@@ -28,10 +31,13 @@ const PrivacyPreferencesComponent: React.FC<PrivacyPreferencesProps> = ({
     
     if (typeof privacy === 'string') {
       return {
+        shareData: privacy !== 'private',
+        shareEmotions: privacy !== 'private',
+        shareActivity: privacy !== 'private',
+        publicProfile: privacy !== 'private',
         dataSharing: privacy !== 'private',
         analytics: privacy !== 'private',
         thirdParty: privacy !== 'private',
-        shareData: privacy !== 'private',
         anonymizeReports: true,
         profileVisibility: privacy
       };

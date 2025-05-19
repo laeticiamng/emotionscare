@@ -29,6 +29,12 @@ export interface PrivacyPreferences {
   shareEmotions: boolean;
   shareActivity: boolean;
   publicProfile: boolean;
+  // Adding new fields needed by components
+  dataSharing: boolean;
+  analytics: boolean;
+  thirdParty: boolean;
+  anonymizeReports: boolean;
+  profileVisibility: string;
 }
 
 export interface UserPreferences {
@@ -44,15 +50,17 @@ export interface UserPreferences {
   colorBlindMode?: boolean;
   highContrast?: boolean;
   reduceMotion?: boolean;
-  // Adding properties used in useAmbientSound
+  // Properties used in useAmbientSound
   ambientSound?: string;
   soundEnabled?: boolean;
-  // Adding properties used in PremiumFeatures
+  // Properties used in PremiumFeatures
   emotionalCamouflage?: boolean;
   aiSuggestions?: boolean;
-  // Adding properties used in DataPrivacySettings
+  // Properties used in DataPrivacySettings
   shareData?: boolean;
   anonymizedData?: boolean;
+  // Add animationReduced for DisplayPreferences
+  animationReduced?: boolean;
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {

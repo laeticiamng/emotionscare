@@ -14,10 +14,13 @@ const PrivacyPreferencesComponent: React.FC = () => {
   const getPrivacySettings = (): PrivacyPreferences => {
     if (!preferences?.privacy) {
       return {
+        shareData: false,
+        shareEmotions: false,
+        shareActivity: false,
+        publicProfile: false,
         dataSharing: false,
         analytics: true,
         thirdParty: false,
-        shareData: false,
         anonymizeReports: false,
         profileVisibility: 'public',
       };
@@ -25,10 +28,13 @@ const PrivacyPreferencesComponent: React.FC = () => {
     
     if (typeof preferences.privacy === 'string') {
       return {
+        shareData: preferences.privacy !== 'private',
+        shareEmotions: preferences.privacy !== 'private',
+        shareActivity: preferences.privacy !== 'private',
+        publicProfile: preferences.privacy !== 'private',
         dataSharing: preferences.privacy !== 'private',
         analytics: preferences.privacy !== 'private',
         thirdParty: preferences.privacy !== 'private',
-        shareData: preferences.privacy !== 'private',
         anonymizeReports: false,
         profileVisibility: preferences.privacy,
       };
@@ -82,7 +88,7 @@ const PrivacyPreferencesComponent: React.FC = () => {
           </div>
           <Switch
             id="share-data"
-            checked={privacySettings.shareData || privacySettings.dataSharing}
+            checked={privacySettings.shareData || privacySettings.dataSharing || false}
             onCheckedChange={handleShareDataChange}
           />
         </div>

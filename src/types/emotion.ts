@@ -21,7 +21,9 @@ export interface EmotionResult {
   emotions: Record<string, number>;
   score?: number;
   ai_feedback?: string; // For backward compatibility
-  primaryEmotion?: string; // Adding this for EnhancedCoachAI
+  primaryEmotion?: string; // For EnhancedCoachAI
+  date?: string; // For EmotionScanResult
+  audioUrl?: string; // For AudioProcessor
 }
 
 export interface LiveVoiceScannerProps {
