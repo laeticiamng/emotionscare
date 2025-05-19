@@ -1,52 +1,53 @@
 
-export interface SpeechRecognitionConstructor {
-  new(): SpeechRecognition;
+/**
+ * Speech Recognition types
+ */
+
+export interface SpeechRecognitionEvent extends Event {
+  results: {
+    [index: number]: {
+      [index: number]: {
+        transcript: string;
+        confidence: number;
+      };
+    };
+  };
+  resultIndex?: number;
 }
 
-export interface SpeechRecognition extends EventTarget {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  maxAlternatives: number;
-  serviceURI: string;
-  start(): void;
-  stop(): void;
-  abort(): void;
-  onresult: (event: SpeechRecognitionEvent) => void;
-  onerror: (event: SpeechRecognitionErrorEvent) => void;
-  onend: () => void;
-  onstart: () => void;
-}
-
-export interface SpeechRecognitionEvent {
-  results: SpeechRecognitionResultList;
-  resultIndex: number;
-  interpretation: any;
-}
-
-export interface SpeechRecognitionResultList {
-  length: number;
-  item(index: number): SpeechRecognitionResult;
-  [index: number]: SpeechRecognitionResult;
-}
-
-export interface SpeechRecognitionResult {
-  isFinal: boolean;
-  length: number;
-  item(index: number): SpeechRecognitionAlternative;
-  [index: number]: SpeechRecognitionAlternative;
-}
-
-export interface SpeechRecognitionAlternative {
-  transcript: string;
-  confidence: number;
-}
-
-export interface SpeechRecognitionErrorEvent {
+export interface SpeechRecognitionError extends Event {
   error: string;
   message: string;
 }
 
+export interface SpeechRecognitionConstructor {
+  new (): SpeechRecognition;
+}
+
+export interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  maxAlternatives: number;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionError) => void) | null;
+  onend: (() => void) | null;
+  onstart: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+  grammars: any;
+  serviceURI: string;
+  onaudiostart: ((event: Event) => void) | null;
+  onaudioend: ((event: Event) => void) | null;
+  onsoundstart: ((event: Event) => void) | null;
+  onsoundend: ((event: Event) => void) | null;
+  onspeechstart: ((event: Event) => void) | null;
+  onspeechend: ((event: Event) => void) | null;
+  onnomatch: ((event: Event) => void) | null;
+}
+
+// Extend the Window interface to include the speech recognition properties
 declare global {
   interface Window {
     SpeechRecognition: SpeechRecognitionConstructor;

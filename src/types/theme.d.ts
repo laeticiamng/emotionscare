@@ -1,44 +1,29 @@
 
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
-export type FontSize =
-  | 'xs'
-  | 'sm'
-  | 'small'
-  | 'medium'
-  | 'md'
-  | 'lg'
-  | 'large'
-  | 'xl'
-  | 'xlarge';
-export type FontFamily = 'system' | 'sans' | 'serif' | 'mono' | 'rounded';
+export type ThemeName = 'light' | 'dark' | 'system' | 'pastel';
+export type FontFamily = 'sans' | 'serif' | 'mono';
+export type FontSize = 'sm' | 'md' | 'lg' | 'xl';
 
 export interface ThemeContextType {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-  isDarkMode: boolean;
-  isDark?: boolean;
+  theme: ThemeName;
+  setTheme: (theme: ThemeName) => void;
   toggleTheme: () => void;
-  fontSize?: FontSize;
-  setFontSize?: (size: FontSize) => void;
-  fontFamily?: FontFamily;
-  setFontFamily?: (family: FontFamily) => void;
-  systemTheme?: 'light' | 'dark';
-  preferences?: any;
-  updatePreferences?: (newPrefs: any) => void;
-  getContrastText?: (color: string) => string;
-  soundEnabled?: boolean;
-  setSoundEnabled?: (enabled: boolean) => void;
+  isDark: boolean;
+  isDarkMode: boolean;
+  fontSize: FontSize;
+  setFontSize: (size: FontSize) => void;
+  fontFamily: FontFamily;
+  setFontFamily: (family: FontFamily) => void;
+  systemTheme: ThemeName;
+  soundEnabled: boolean;
+  setSoundEnabled: (enabled: boolean) => void;
   reduceMotion: boolean;
-
-
-
-  setReduceMotion: (reduced: boolean) => void;
-  preferences?: any;
-  updatePreferences?: (prefs: any) => void;
-  getContrastText?: (color: string) => string;
+  setReduceMotion: (enabled: boolean) => void;
+  preferences: Record<string, any>;
+  updatePreferences: (prefs: Record<string, any>) => void;
+  getContrastText: (color: string) => string;
 }
 
 export interface ThemeProviderProps {
   children: React.ReactNode;
-  defaultTheme?: ThemeName;
 }

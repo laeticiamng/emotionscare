@@ -1,53 +1,71 @@
 
-import { VRSessionTemplate, VRSession } from '@/types/vr';
+import { VRDifficulty } from '@/types/vr';
 
 /**
- * Obtenir l'URL de la miniature d'un template VR
+ * Extracts YouTube video ID from different URL formats
  */
-export const getVRTemplateThumbnail = (template?: VRSessionTemplate | null): string | undefined => {
-  if (!template) return undefined;
-  return template.thumbnailUrl || template.imageUrl || template.coverUrl || 
-         template.cover_url || template.preview_url;
-};
-
-/**
- * Obtenir le titre d'un template VR
- */
-export const getVRTemplateTitle = (template?: VRSessionTemplate | null): string => {
-  if (!template) return '';
-  return template.title || template.name || '';
-};
-
-/**
- * Obtenir l'URL audio d'un template VR
- */
-export const getVRTemplateAudioUrl = (template?: VRSessionTemplate | null): string | undefined => {
-  if (!template) return undefined;
-  return template.audioUrl || template.audio_url || template.audioTrack;
-};
-
-/**
- * Déterminer si une session VR est terminée
- */
-export const isVRSessionCompleted = (session?: VRSession | null): boolean => {
-  if (!session) return false;
-  return session.completed === true;
-};
-
-/**
- * Obtenir les dates de début et de fin d'une session VR
- */
-export const getVRSessionDates = (session?: VRSession | null): { 
-  start: Date | null; 
-  end: Date | null;
-} => {
-  if (!session) return { start: null, end: null };
+export const extractYoutubeID = (url: string): string | null => {
+  if (!url) return null;
   
-  const startDate = session.startedAt || session.startTime || session.createdAt;
-  const endDate = session.endedAt || session.endTime;
+  // Regular expression to match YouTube URL patterns
+  const regex = /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+  const match = url.match(regex);
   
-  return {
-    start: startDate ? new Date(startDate) : null,
-    end: endDate ? new Date(endDate) : null
-  };
+  return match ? match[1] : null;
+};
+
+/**
+ * Normalize difficulty level to standard format
+ */
+export const normalizeDifficulty = (difficulty: string | undefined): VRDifficulty => {
+  if (!difficulty) return 'beginner';
+  
+  const normalized = difficulty.toLowerCase();
+  
+  if (normalized.includes('begin') || normalized.includes('easy') || normalized.includes('débutant')) {
+    return 'beginner';
+  } else if (normalized.includes('inter') || normalized.includes('medium') || normalized.includes('modéré')) {
+    return 'intermediate';
+  } else if (normalized.includes('advan') || normalized.includes('hard') || normalized.includes('avancé')) {
+    return 'advanced';
+  } else if (normalized.includes('expert') || normalized.includes('master')) {
+    return 'expert';
+  }
+  
+  return 'beginner';
+};
+
+/**
+ * Format duration in minutes to readable format
+ */
+export const formatVRDuration = (minutes: number): string => {
+  if (minutes < 60) {
+    return `${minutes} min`;
+  } else {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return remainingMinutes > 0 
+      ? `${hours}h ${remainingMinutes}min` 
+      : `${hours}h`;
+  }
+};
+
+/**
+ * Get color based on difficulty level
+ */
+export const getDifficultyColor = (difficulty: string): string => {
+  const normalized = normalizeDifficulty(difficulty);
+  
+  switch (normalized) {
+    case 'beginner':
+      return 'bg-green-500';
+    case 'intermediate':
+      return 'bg-blue-500';
+    case 'advanced':
+      return 'bg-purple-500';
+    case 'expert':
+      return 'bg-red-500';
+    default:
+      return 'bg-gray-500';
+  }
 };

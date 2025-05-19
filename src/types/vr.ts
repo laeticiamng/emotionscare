@@ -1,85 +1,66 @@
 
 export interface VRSessionTemplate {
   id: string;
-  title?: string;
-  name?: string;
-  description?: string;
+  title: string;
+  name: string;
+  description: string;
   thumbnailUrl?: string;
   imageUrl?: string;
-  coverUrl?: string;
-  cover_url?: string;
-  preview_url?: string;
-  duration: number | string;
-  difficulty: "beginner" | "intermediate" | "advanced";
-  category?: string;
-  tags?: string[];
-  type?: string;
+  duration: number;
+  difficulty: string;
+  category: string;
   audioUrl?: string;
-  audio_url?: string;
-  audioTrack?: string;
-  videoUrl?: string;
-  environment?: string;
+  tags?: string[];
   isFeatured?: boolean;
-  isPremium?: boolean;
-  lastUsed?: string | Date;
-  averageRating?: number;
-  totalRatings?: number;
+  rating?: number;
+  features?: string[];
+  environment?: string;
+  immersionLevel?: string;
 }
 
 export interface VRSession {
   id: string;
   templateId: string;
-  template?: VRSessionTemplate;
   userId: string;
+  startTime: Date | string;
+  endTime?: Date | string;
+  duration: number;
   completed: boolean;
-  duration?: number;
-  startedAt?: string;
-  startTime?: string | Date;
-  endedAt?: string;
-  endTime?: string | Date;
-  feedback?: string;
-  rating?: number;
-  emotionBefore?: string;
-  emotionAfter?: string;
-  heartRateBefore?: number;
-  heartRateAfter?: number;
-  createdAt?: string;
-  updatedAt?: string;
-  metrics?: VRSessionMetrics;
+  progress?: number;
+  feedback?: VRSessionFeedback;
+  notes?: string;
 }
 
-export interface VRSessionMetrics {
-  focusScore?: number;
-  relaxationScore?: number;
-  stressReduction?: number;
-  moodImprovement?: number;
-  mindfulnessScore?: number;
-  breathingRateStart?: number;
-  breathingRateEnd?: number;
-  focusDuration?: number; // in seconds
-  distractionCount?: number;
+export interface VRSessionFeedback {
+  id: string;
+  sessionId: string;
+  userId: string;
+  rating: number;
+  comment?: string;
+  emotions?: Record<string, number>;
+  timestamp: Date | string;
 }
 
 export interface VRSessionWithMusicProps {
-  sessionTemplate?: VRSessionTemplate;
-  onComplete?: () => void;
+  template?: VRSessionTemplate;
+  session?: VRSession;
+  onComplete?: (session: VRSession) => void;
   onExit?: () => void;
-  environment?: string;
-  musicTrack?: string;
+  musicEnabled?: boolean;
+  backgroundMusic?: string;
 }
 
-export interface VRStats {
-  totalSessions: number;
-  totalDuration: number;
-  averageRating: number;
-  mostUsedTemplate: string;
-  stressReduction: number;
-  moodImprovement: number;
-  completionRate: number;
+export interface VRTemplateDetailProps {
+  template: VRSessionTemplate;
+  onStart?: () => void;
+  onBack?: () => void;
 }
 
-export type VRCategoryType = 'meditation' | 'breathing' | 'focus' | 'sleep' | 'stress' | 'anxiety' | 'all';
+export interface VRSessionPlayerProps {
+  session: VRSession;
+  template: VRSessionTemplate;
+  onComplete?: (session: VRSession) => void;
+  onExit?: () => void;
+}
 
-export type VRDifficultyType = 'beginner' | 'intermediate' | 'advanced' | 'all';
-
-export type VRDurationType = 'short' | 'medium' | 'long' | 'all';
+export type VRDifficulty = 'beginner' | 'intermediate' | 'advanced' | 'expert';
