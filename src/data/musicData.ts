@@ -1,142 +1,253 @@
-
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
-// Music tracks data
-export const musicTracks: MusicTrack[] = [
+// Correction des types de catégorie qui doivent être des tableaux de chaînes
+export const relaxationTracks: MusicTrack[] = [
   {
-    id: '1',
-    title: 'Méditation Profonde',
-    artist: 'Ambiance Zen',
-    url: '/audio/meditation-deep.mp3',
-    duration: 360,
-    audioUrl: '/audio/meditation-deep.mp3',
-    coverUrl: '/images/covers/meditation.jpg',
+    id: 'relax-1',
+    title: 'Méditation matinale',
+    artist: 'Zen Sounds',
+    url: '/sounds/ambient-calm.mp3',
+    cover: '/images/music/relax-1.jpg',
+    duration: 180,
     emotion: 'calm',
-    mood: ['calm'],
-    album: 'Sessions Zen',
-    year: 2023,
-    genre: 'Ambient',
-    tags: ['meditation', 'zen', 'calm']
+    mood: 'peaceful',
+    category: ['relax', 'meditation'], // Correction du type (tableau au lieu de chaîne)
+    tags: ['morning', 'meditation', 'calm']
   },
   {
-    id: '2',
-    title: 'Focus Mental',
-    artist: 'Concentration Studio',
-    url: '/audio/focus-mental.mp3',
-    duration: 480,
-    audioUrl: '/audio/focus-mental.mp3',
-    coverUrl: '/images/covers/focus.jpg',
-    emotion: 'focused',
-    mood: ['focused'],
-    album: 'Concentration Maximale',
-    year: 2022,
-    genre: 'Instrumental',
-    tags: ['focus', 'concentration', 'work']
+    id: 'relax-2',
+    title: 'Sérénité du soir',
+    artist: 'Quiet Time',
+    url: '/sounds/ambient-calm.mp3',
+    cover: '/images/music/relax-2.jpg',
+    duration: 210,
+    emotion: 'calm',
+    mood: 'serene',
+    category: ['relax', 'evening'],
+    tags: ['evening', 'relaxation', 'serenity']
   },
   {
-    id: '3',
-    title: 'Énergie Positive',
-    artist: 'Mood Boosters',
-    url: '/audio/energy-positive.mp3',
+    id: 'relax-3',
+    title: 'Oasis de paix',
+    artist: 'Inner Balance',
+    url: '/sounds/ambient-calm.mp3',
+    cover: '/images/music/relax-3.jpg',
+    duration: 200,
+    emotion: 'peaceful',
+    mood: 'tranquil',
+    category: ['relax', 'nature'],
+    tags: ['nature', 'peace', 'tranquility']
+  },
+];
+
+export const focusTracks: MusicTrack[] = [
+  {
+    id: 'focus-1',
+    title: 'Concentration profonde',
+    artist: 'Focus Wave',
+    url: '/sounds/ambient-calm.mp3',
+    cover: '/images/music/focus-1.jpg',
     duration: 240,
-    audioUrl: '/audio/energy-positive.mp3',
-    coverUrl: '/images/covers/energy.jpg',
-    emotion: 'happy',
-    mood: ['happy'],
-    album: 'Boost de Bonne Humeur',
-    year: 2023,
-    genre: 'Electronic',
-    tags: ['happy', 'energy', 'positive']
-  },
-  {
-    id: '4',
-    title: 'Relaxation Soir',
-    artist: 'Night Ambient',
-    url: '/audio/relaxation-evening.mp3',
-    duration: 600,
-    audioUrl: '/audio/relaxation-evening.mp3',
-    coverUrl: '/images/covers/relaxation.jpg',
-    emotion: 'relaxed',
-    mood: ['relaxed'],
-    album: 'Soirées Paisibles',
-    year: 2021,
-    genre: 'Ambient',
-    tags: ['relaxation', 'evening', 'sleep']
-  },
-  {
-    id: '5',
-    title: 'Méditation Guidée',
-    artist: 'Guide Zen',
-    url: '/audio/guided-meditation.mp3',
-    duration: 900,
-    audioUrl: '/audio/guided-meditation.mp3',
-    coverUrl: '/images/covers/guided.jpg',
-    emotion: 'calm',
-    mood: ['calm'],
-    album: 'Voyage Intérieur',
-    year: 2022,
-    genre: 'Guided',
-    tags: ['meditation', 'guided', 'mindfulness']
-  }
-];
-
-// Explicitly export allTracks to fix the import error
-export const allTracks = musicTracks;
-
-// Music presets
-export const musicPresets = [
-  { id: 'calm', name: 'Calme', color: '#c4e0f3', trackIds: ['1', '5'] },
-  { id: 'focus', name: 'Concentration', color: '#d4c4f3', trackIds: ['2'] },
-  { id: 'happy', name: 'Joyeux', color: '#f8e9c1', trackIds: ['3'] },
-  { id: 'energetic', name: 'Énergique', color: '#c8f4d5', trackIds: ['3'] },
-  { id: 'relaxed', name: 'Relaxant', color: '#f9d8d3', trackIds: ['4'] }
-];
-
-// Mock playlists
-export const mockPlaylists: MusicPlaylist[] = [
-  {
-    id: 'playlist-calm',
-    name: 'Ambiance Calme',
-    title: 'Ambiance Calme',
-    description: 'Une sélection de morceaux apaisants pour la relaxation et la méditation.',
-    emotion: 'calm',
-    mood: 'calm',
-    tracks: musicTracks.filter(track => track.emotion === 'calm' || (track.mood && track.mood.includes('calm'))),
-    coverImage: '/images/playlists/calm.jpg',
-    coverUrl: '/images/playlists/calm.jpg',
-    cover: '/images/playlists/calm.jpg',
-    tags: ['meditation', 'relaxation', 'calm']
-  },
-  {
-    id: 'playlist-focus',
-    name: 'Concentration',
-    title: 'Concentration',
-    description: 'Améliorez votre concentration et productivité avec ces morceaux.',
     emotion: 'focused',
-    mood: 'focused',
-    tracks: musicTracks.filter(track => track.emotion === 'focused' || (track.mood && track.mood.includes('focused'))),
-    coverImage: '/images/playlists/focus.jpg',
-    coverUrl: '/images/playlists/focus.jpg',
-    cover: '/images/playlists/focus.jpg',
-    tags: ['focus', 'work', 'concentration']
+    mood: 'concentrated',
+    category: ['focus', 'work'], // Correction du type (tableau au lieu de chaîne)
+    tags: ['work', 'study', 'concentration']
   },
   {
-    id: 'playlist-happy',
-    name: 'Bonne Humeur',
-    title: 'Bonne Humeur',
-    description: 'Une playlist énergisante pour remonter le moral et apporter de la joie.',
-    emotion: 'happy',
-    mood: 'happy',
-    tracks: musicTracks.filter(track => track.emotion === 'happy' || (track.mood && track.mood.includes('happy'))),
-    coverImage: '/images/playlists/happy.jpg',
-    coverUrl: '/images/playlists/happy.jpg',
-    cover: '/images/playlists/happy.jpg',
-    tags: ['happy', 'mood', 'positive']
+    id: 'focus-2',
+    title: 'Clarté mentale',
+    artist: 'Mind Lab',
+    url: '/sounds/ambient-calm.mp3',
+    cover: '/images/music/focus-2.jpg',
+    duration: 270,
+    emotion: 'focused',
+    mood: 'clear',
+    category: ['focus', 'study'],
+    tags: ['study', 'clarity', 'productivity']
+  },
+  {
+    id: 'focus-3',
+    title: 'Flux de travail',
+    artist: 'Task Master',
+    url: '/sounds/ambient-calm.mp3',
+    cover: '/images/music/focus-3.jpg',
+    duration: 250,
+    emotion: 'focused',
+    mood: 'productive',
+    category: ['focus', 'productivity'],
+    tags: ['productivity', 'work', 'efficiency']
+  },
+];
+
+export const energyTracks: MusicTrack[] = [
+  {
+    id: 'energy-1',
+    title: 'Réveil dynamique',
+    artist: 'Energy Beats',
+    url: '/sounds/welcome.mp3',
+    cover: '/images/music/energy-1.jpg',
+    duration: 150,
+    emotion: 'energetic',
+    mood: 'upbeat',
+    category: ['energy', 'morning'], // Correction du type (tableau au lieu de chaîne)
+    tags: ['morning', 'workout', 'energy']
+  },
+  {
+    id: 'energy-2',
+    title: 'Boost matinal',
+    artist: 'Sunrise Vibes',
+    url: '/sounds/welcome.mp3',
+    cover: '/images/music/energy-2.jpg',
+    duration: 180,
+    emotion: 'energetic',
+    mood: 'lively',
+    category: ['energy', 'workout'],
+    tags: ['workout', 'motivation', 'sunrise']
+  },
+  {
+    id: 'energy-3',
+    title: 'Rythme intense',
+    artist: 'Power Pulse',
+    url: '/sounds/welcome.mp3',
+    cover: '/images/music/energy-3.jpg',
+    duration: 160,
+    emotion: 'energetic',
+    mood: 'powerful',
+    category: ['energy', 'sports'],
+    tags: ['sports', 'power', 'intensity']
+  },
+];
+
+export const sleepTracks: MusicTrack[] = [
+  {
+    id: 'sleep-1',
+    title: 'Berceuse nocturne',
+    artist: 'Dream Sounds',
+    url: '/sounds/ambient-calm.mp3',
+    cover: '/images/music/sleep-1.jpg',
+    duration: 300,
+    emotion: 'sleepy',
+    mood: 'relaxed',
+    category: ['sleep', 'night'], // Correction du type (tableau au lieu de chaîne)
+    tags: ['night', 'sleep', 'relaxation']
+  },
+  {
+    id: 'sleep-2',
+    title: 'Douce nuit',
+    artist: 'Nighty Night',
+    url: '/sounds/ambient-calm.mp3',
+    cover: '/images/music/sleep-2.jpg',
+    duration: 330,
+    emotion: 'sleepy',
+    mood: 'calming',
+    category: ['sleep', 'bedtime'],
+    tags: ['bedtime', 'calm', 'night']
+  },
+  {
+    id: 'sleep-3',
+    title: 'Rêves paisibles',
+    artist: 'Silent Slumber',
+    url: '/sounds/ambient-calm.mp3',
+    cover: '/images/music/sleep-3.jpg',
+    duration: 360,
+    emotion: 'sleepy',
+    mood: 'peaceful',
+    category: ['sleep', 'dreams'],
+    tags: ['dreams', 'peace', 'night']
+  },
+];
+
+export const meditationTracks: MusicTrack[] = [
+  {
+    id: 'meditation-1',
+    title: 'Voyage intérieur',
+    artist: 'Mind Journey',
+    url: '/sounds/ambient-calm.mp3',
+    cover: '/images/music/meditation-1.jpg',
+    duration: 240,
+    emotion: 'peaceful',
+    mood: 'introspective',
+    category: ['meditation', 'mindfulness'], // Correction du type (tableau au lieu de chaîne)
+    tags: ['meditation', 'mindfulness', 'peace']
+  },
+  {
+    id: 'meditation-2',
+    title: 'Présence consciente',
+    artist: 'Awareness Now',
+    url: '/sounds/ambient-calm.mp3',
+    cover: '/images/music/meditation-2.jpg',
+    duration: 270,
+    emotion: 'peaceful',
+    mood: 'present',
+    category: ['meditation', 'present'],
+    tags: ['present', 'mindfulness', 'awareness']
+  },
+  {
+    id: 'meditation-3',
+    title: 'Harmonie spirituelle',
+    artist: 'Soul Sync',
+    url: '/sounds/ambient-calm.mp3',
+    cover: '/images/music/meditation-3.jpg',
+    duration: 300,
+    emotion: 'peaceful',
+    mood: 'harmonious',
+    category: ['meditation', 'spiritual'],
+    tags: ['spiritual', 'harmony', 'peace']
+  },
+];
+
+export const defaultPlaylists: MusicPlaylist[] = [
+  {
+    id: 'playlist-1',
+    title: 'Relaxation Ultime',
+    description: 'Détendez-vous avec cette sélection de morceaux apaisants.',
+    cover: '/images/playlists/relax-playlist.jpg',
+    tracks: relaxationTracks,
+    category: ['relax'],
+    tags: ['relaxation', 'calm', 'peaceful']
+  },
+  {
+    id: 'playlist-2',
+    title: 'Concentration Maximale',
+    description: 'Améliorez votre concentration avec ces pistes spécialement conçues.',
+    cover: '/images/playlists/focus-playlist.jpg',
+    tracks: focusTracks,
+    category: ['focus'],
+    tags: ['focus', 'concentration', 'productivity']
+  },
+  {
+    id: 'playlist-3',
+    title: 'Énergie Positive',
+    description: 'Dynamisez votre journée avec ces morceaux énergisants.',
+    cover: '/images/playlists/energy-playlist.jpg',
+    tracks: energyTracks,
+    category: ['energy'],
+    tags: ['energy', 'upbeat', 'motivation']
+  },
+  {
+    id: 'playlist-4',
+    title: 'Sommeil Profond',
+    description: 'Endormez-vous paisiblement avec ces mélodies douces.',
+    cover: '/images/playlists/sleep-playlist.jpg',
+    tracks: sleepTracks,
+    category: ['sleep'],
+    tags: ['sleep', 'night', 'relaxation']
+  },
+  {
+    id: 'playlist-5',
+    title: 'Méditation Guidée',
+    description: 'Trouvez votre centre avec ces pistes de méditation.',
+    cover: '/images/playlists/meditation-playlist.jpg',
+    tracks: meditationTracks,
+    category: ['meditation'],
+    tags: ['meditation', 'mindfulness', 'peace']
   }
 ];
 
-export default {
-  tracks: musicTracks,
-  playlists: mockPlaylists,
-  presets: musicPresets
-};
+export const allTracks = [
+  ...relaxationTracks,
+  ...focusTracks,
+  ...energyTracks,
+  ...sleepTracks,
+  ...meditationTracks
+];

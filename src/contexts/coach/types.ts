@@ -28,7 +28,7 @@ export interface CoachContextType {
   startNewConversation?: (title?: string) => string;
   setActiveConversation?: (id: string) => void;
   updateLastEmotion?: (emotion: string) => void;
-  // Add the missing property
+  // Ajout de la propriété manquante
   analyzeEmotion?: (text: string) => Promise<{ emotion: string; score: number }>;
   getRecommendations?: (category: string) => string[];
   // Add a property for the CoachService for compatibility
