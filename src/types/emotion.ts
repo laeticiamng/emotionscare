@@ -26,7 +26,7 @@ export interface EmotionResult {
   id: string;
   primaryEmotion?: string;
   emotion?: string;  // For backward compatibility
-  emotions: Record<string, number>;
+  emotions?: Record<string, number>;  // Changed to optional
   confidence: number;
   intensity?: number;
   score?: number;
@@ -40,6 +40,7 @@ export interface EmotionResult {
   timestamp?: string;
   source?: string;
   date?: string;
+  user_id?: string;  // Added to support FacialEmotionScanner
 }
 
 export interface EmotionRecommendation {
@@ -52,10 +53,14 @@ export interface EmotionRecommendation {
 
 export interface LiveVoiceScannerProps {
   onResult?: (result: EmotionResult) => void;
+  onScanComplete?: (result: EmotionResult) => void;
   processing?: boolean;
   className?: string;
   onError?: (error: Error) => void;
   autoStart?: boolean;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  scanDuration?: number;
 }
 
 export interface TeamOverviewProps {
@@ -80,15 +85,25 @@ export interface TextEmotionScannerProps {
   onResult: (result: EmotionResult) => void;
   inputText?: string;
   className?: string;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  minLength?: number;
 }
 
 export interface EmojiEmotionScannerProps {
-  onResult: (result: EmotionResult) => void;
-  className?: string;
+  onResult?: (result: EmotionResult) => void;
+  onSelect?: (emotion: string) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface VoiceEmotionScannerProps {
   onResult: (result: EmotionResult) => void;
   onProcessingChange?: (processing: boolean) => void;
   className?: string;
+}
+
+export interface VoiceEmotionAnalyzerProps {
+  onResult: (result: EmotionResult) => void;
+  onStartRecording?: () => void; // Added for VoiceEmotionScanner
 }

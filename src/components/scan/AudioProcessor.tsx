@@ -149,14 +149,13 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
           const fakeResult: EmotionResult = {
             id: `scan-${Date.now()}`,
             emotion: 'calm',
-            score: 0.85,
             confidence: 0.85,
             timestamp: new Date().toISOString(),
-            source: 'voice',
             recommendations: recommendations,
             text: "J'ai passé une journée tranquille aujourd'hui.",
             audioUrl: URL.createObjectURL(audioBlob),
-            transcript: "J'ai passé une journée tranquille aujourd'hui."
+            transcript: "J'ai passé une journée tranquille aujourd'hui.",
+            emotions: {}  // Add empty emotions object to satisfy type
           };
           
           onResult(fakeResult);

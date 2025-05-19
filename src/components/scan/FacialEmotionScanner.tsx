@@ -75,15 +75,14 @@ const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({ onResult })
     // Mock result data
     const mockResult: EmotionResult = {
       id: `scan-${Date.now()}`,
-      user_id: "user123",
       emotion: "happy",
       score: 0.85,
       confidence: 0.88,
       intensity: 0.75,
       emojis: ["😊"],
-      date: new Date().toISOString(),
       timestamp: new Date().toISOString(),
-      source: "facial"
+      source: "facial",
+      emotions: {} // Add empty emotions object to satisfy type
     };
     
     setIsScanning(false);

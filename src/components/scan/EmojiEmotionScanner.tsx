@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
@@ -71,7 +72,8 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
         intensity: 0.8,
         timestamp: new Date().toISOString(),
         recommendations: recommendations,
-        emojis: [emotions.find(e => e.name === emotion)?.emoji || "😊"]
+        emojis: [emotions.find(e => e.name === emotion)?.emoji || "😊"],
+        emotions: {} // Add empty emotions object to satisfy type
       };
       
       onResult(result);

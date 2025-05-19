@@ -1,5 +1,5 @@
 
-import { NotificationsPreferences, NotificationFrequency } from './notification';
+import { NotificationPreference, NotificationFrequency } from './notification';
 
 export type ThemeType = 'light' | 'dark' | 'system' | 'pastel';
 export type FontSizeType = 'small' | 'medium' | 'large' | 'xlarge';
@@ -13,6 +13,13 @@ export interface PrivacyPreferences {
   shareBadges?: boolean;
   shareProfile?: boolean;
   defaultVisibility?: PrivacyLevel;
+  // Add missing fields used in PrivacyPreferences.tsx
+  dataSharing?: boolean;
+  analytics?: boolean;
+  thirdParty?: boolean;
+  shareData?: boolean;
+  anonymizeReports?: boolean;
+  profileVisibility?: string;
 }
 
 export interface UserPreferences {
@@ -20,7 +27,7 @@ export interface UserPreferences {
   fontSize?: FontSizeType;
   fontFamily?: FontFamily;
   language?: string;
-  notifications?: NotificationsPreferences | boolean;
+  notifications?: NotificationPreference | boolean;
   privacy?: PrivacyLevel | PrivacyPreferences;
   soundEnabled?: boolean;
   reduceMotion?: boolean;
@@ -29,9 +36,11 @@ export interface UserPreferences {
   animationReduced?: boolean;
   autoplayMedia?: boolean;
   dataUsage?: 'low' | 'medium' | 'high';
-  ambientSound?: boolean; // Added for useAmbientSound.ts
-  emotionalCamouflage?: boolean; // Added for PremiumFeatures.tsx
-  aiSuggestions?: boolean; // Added for PremiumFeatures.tsx
+  ambientSound?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  shareData?: boolean; // Added for DataPrivacySettings.tsx
+  anonymizedData?: boolean; // Added for DataPrivacySettings.tsx
 }
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
@@ -80,7 +89,7 @@ export interface UserPreferencesContextType {
   theme: ThemeType;
   fontSize: FontSizeType;
   language: string;
-  notifications: NotificationsPreferences;
+  notifications: NotificationPreference;
   privacy: PrivacyLevel | PrivacyPreferences;
   updatePreferences: (preferences: Partial<UserPreferences>) => Promise<void>;
   resetPreferences: () => void;
@@ -106,3 +115,6 @@ export interface UserPreferencesFormProps {
   onSave: (preferences: UserPreferences) => void;
   isLoading?: boolean;
 }
+
+// Export NotificationsPreferences
+export type NotificationsPreferences = NotificationPreference;

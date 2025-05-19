@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmotionResult } from '@/types/scan';
+import { EmotionResult } from '@/types/emotion';
 
 interface EmotionHistoryProps {
   history: EmotionResult[];

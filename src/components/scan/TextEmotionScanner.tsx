@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -31,7 +32,9 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
     if (error) setError(null);
   };
   
-  const analyzeText = async () => {
+  const analyzeText = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (text.trim().length < minLength) {
       setError(`Veuillez entrer au moins ${minLength} caractères`);
       return;
@@ -52,13 +55,15 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
           type: "general",
           title: "Mindful reading", 
           description: "Take time to read something enjoyable",
-          category: "mindfulness"
+          category: "mindfulness",
+          content: "Find a book or article that interests you and read for 15 minutes"
         },
         {
           type: "exercise",
           title: "Quick walk", 
           description: "A short walk can help clear your mind",
-          category: "physical"
+          category: "physical",
+          content: "Take a 10-minute walk outside to refresh your mind"
         }
       ];
       
@@ -71,7 +76,8 @@ const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
         text: text,
         timestamp: new Date().toISOString(),
         recommendations: recommendations,
-        emojis: ["😊", "😌"]
+        emojis: ["😊", "😌"],
+        emotions: {} // Add empty emotions object to satisfy type
       };
       
       onResult(result);

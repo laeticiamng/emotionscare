@@ -115,13 +115,15 @@ const AudioProcessor: React.FC<AudioProcessorProps> = ({
     ];
     
     return {
+      id: `audio-${Date.now()}`,
       emotion: emotion,
-      confidence: confidence,
-      intensity: Math.round(Math.random() * 10),
+      confidence: confidence / 100,
+      intensity: Math.random(),
       recommendations,
       timestamp: new Date().toISOString(),
       text: "Analyse vocale complétée",
-      source: 'live-voice'
+      source: 'live-voice',
+      emotions: {} // Add empty emotions object to satisfy the type
     };
   };
 

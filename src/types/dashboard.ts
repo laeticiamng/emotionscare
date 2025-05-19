@@ -1,3 +1,4 @@
+
 export interface KpiCardProps {
   id: string;
   title: string;
@@ -6,7 +7,7 @@ export interface KpiCardProps {
   delta?: {
     value: number;
     trend: 'up' | 'down' | 'neutral';
-    direction: 'up' | 'down' | 'stable'; // Ensuring direction exists
+    direction?: 'up' | 'down' | 'stable';
     label?: string;
   };
   status?: KpiCardStatus;
@@ -85,8 +86,8 @@ export interface AdminAccessLog {
   resource?: string;
   ip?: string;
   adminName?: string;
-  userId?: string;  // Added missing property
-  details?: string; // Added missing property
+  userId?: string;
+  details?: string;
 }
 
 export interface DraggableKpiCardsGridProps {
@@ -109,4 +110,19 @@ export interface GamificationData {
   challenges: Challenge[];
   nextLevel: number;
   pointsToNextLevel: number;
+}
+
+// Define these types to avoid errors
+interface Badge {
+  id: string;
+  name: string;
+  description?: string;
+  image?: string;
+}
+
+interface Challenge {
+  id: string;
+  name: string;
+  description?: string;
+  completed: boolean;
 }

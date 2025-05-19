@@ -62,8 +62,9 @@ const KpiCards: React.FC<KpiCardsProps> = ({
             icon={<CalendarDays className="h-6 w-6" />}
             delta={{
               value: sessionsDelta,
-              label: "depuis le mois dernier",
-              trend: sessionsDelta >= 0 ? 'up' : 'down'
+              trend: sessionsDelta >= 0 ? 'up' : 'down',
+              direction: sessionsDelta >= 0 ? 'up' : 'down',
+              label: "depuis le mois dernier"
             }}
             ariaLabel={`Sessions VR ce mois: ${vrSessionsThisMonth}`}
             onClick={navigateToVRSessions}

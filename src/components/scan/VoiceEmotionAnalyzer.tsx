@@ -7,9 +7,13 @@ import { Progress } from '@/components/ui/progress';
 
 interface VoiceEmotionAnalyzerProps {
   onResult: (result: EmotionResult) => void;
+  onStartRecording?: () => void;
 }
 
-const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult }) => {
+const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ 
+  onResult,
+  onStartRecording 
+}) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -21,6 +25,10 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult })
     setIsRecording(true);
     setProgress(0);
     setRecordingTime(0);
+    
+    if (onStartRecording) {
+      onStartRecording();
+    }
     
     // Simulate recording progress
     const interval = setInterval(() => {
@@ -50,30 +58,34 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult })
           type: "music", 
           title: "Calm playlist", 
           description: "Soothing music to relax",
-          content: "Check out our curated relaxation playlist" 
+          content: "Check out our curated relaxation playlist",
+          category: "music"
         },
         { 
           type: "exercise", 
           title: "Quick stretch", 
           description: "Light exercise to release tension",
-          content: "Try these simple desk stretches" 
+          content: "Try these simple desk stretches",
+          category: "exercise"
         },
         { 
           type: "meditation", 
           title: "5-minute meditation", 
           description: "Brief mindfulness break",
-          content: "Focus on your breath for 5 minutes" 
+          content: "Focus on your breath for 5 minutes",
+          category: "mindfulness"
         }
       ];
       
       onResult({
+        id: `voice-analysis-${Date.now()}`,
         emotion: 'calm',
         confidence: 0.85,
         intensity: 0.7,
-        id: `voice-analysis-${Date.now()}`,
         recommendations: recommendations,
         timestamp: new Date().toISOString(),
-        emojis: ['😌', '🧘']
+        emojis: ['😌', '🧘'],
+        emotions: {} // Add empty emotions object to satisfy type
       });
     }, 2000);
   };
