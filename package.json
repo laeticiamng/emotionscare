@@ -55,6 +55,7 @@
     "@tanstack/react-query": "^5.56.2",
     "@tanstack/react-table": "^8.21.3",
     "@types/file-saver": "^2.0.5",
+    "@types/react-helmet": "^6.1.11",
     "@types/uuid": "^10.0.0",
     "canvas-confetti": "^1.9.2",
     "chart.js": "^4.4.9",

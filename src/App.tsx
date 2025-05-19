@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -6,7 +7,6 @@ import './App.css';
 import AuthTransition from '@/components/auth/AuthTransition';
 
 const App: React.FC = () => {
-
   return (
     <BrowserRouter>
       <ThemeProvider>
