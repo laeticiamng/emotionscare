@@ -7,17 +7,20 @@ import './App.css';
 import AuthTransition from '@/components/auth/AuthTransition';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { MusicProvider } from '@/contexts/music';
 
 const App: React.FC = () => {
   return (
     <BrowserRouter>
       <HelmetProvider>
         <ThemeProvider>
-          <AuthProvider>
-            <AuthTransition>
-              <AppRouter />
-            </AuthTransition>
-          </AuthProvider>
+          <MusicProvider>
+            <AuthProvider>
+              <AuthTransition>
+                <AppRouter />
+              </AuthTransition>
+            </AuthProvider>
+          </MusicProvider>
         </ThemeProvider>
       </HelmetProvider>
     </BrowserRouter>

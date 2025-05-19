@@ -10,7 +10,7 @@ interface BadgesWidgetProps {
 
 const BadgesWidget: React.FC<BadgesWidgetProps> = ({ badges, className }) => {
   const recentBadges = badges
-    .filter(badge => badge.unlocked || badge.achieved || badge.dateAwarded)
+    .filter(badge => badge.achieved || badge.unlocked || badge.dateAwarded)
     .sort((a, b) => {
       // Get date values, prioritizing standard fields and falling back to compatibility fields
       const dateA = new Date(a.dateAwarded || a.unlockedAt || a.unlocked_at || a.timestamp || '').getTime();

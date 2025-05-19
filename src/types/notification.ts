@@ -31,9 +31,14 @@ export interface NotificationPreference {
     alert?: boolean;
     important?: boolean;
     urgent?: boolean;
+    coach?: boolean;
+    journal?: boolean;
+    community?: boolean;
   };
   category?: string;
   type?: string;
+  id?: string;
+  userId?: string;
 }
 
 export interface Notification {
@@ -50,6 +55,7 @@ export interface Notification {
   action?: string;
   actionUrl?: string;
   category?: string;
+  message?: string; // Ajout pour la compatibilité avec les hooks existants
 }
 
 export type NotificationFilter = string;

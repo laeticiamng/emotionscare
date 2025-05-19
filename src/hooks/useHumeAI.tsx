@@ -1,149 +1,73 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 import { v4 as uuidv4 } from 'uuid';
-import { EmotionResult } from '@/types/emotion';
 
-// Mock Hume AI service
-const mockAnalyzeEmotion = async (input: string | File): Promise<EmotionResult> => {
-  // Simulate API processing time
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Generate a random emotion with confidence
-  const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust', 'neutral'];
-  const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-  const confidence = 0.5 + Math.random() * 0.5; // Between 0.5 and 1.0
-  const intensity = 0.3 + Math.random() * 0.7; // Between 0.3 and 1.0
-  
-  return {
-    id: uuidv4(),
-    emotion: randomEmotion,
-    confidence,
-    intensity,
-    timestamp: new Date().toISOString(),
-    source: typeof input === 'string' ? 'text' : 'audio',
-    recommendations: [
-      { title: 'Take a break', description: 'Step away from your work for 5 minutes' },
-      { title: 'Deep breathing', description: 'Try 5 deep breaths' },
-    ],
-    emotions: {
-      joy: Math.random(),
-      sadness: Math.random(),
-      anger: Math.random(),
-      fear: Math.random(),
-      surprise: Math.random(),
-    }
-  };
-};
-
-export const useHumeAI = () => {
-  const [loading, setLoading] = useState(false);
+export function useHumeAI() {
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [emotionResult, setEmotionResult] = useState<EmotionResult | null>(null);
   const [error, setError] = useState<Error | null>(null);
-  const [lastResult, setLastResult] = useState<EmotionResult | null>(null);
 
-  // Analyze emotions from text
-  const analyzeText = async (text: string): Promise<EmotionResult> => {
-    if (!text.trim()) {
-      const error = new Error('Text input cannot be empty');
-      setError(error);
-      throw error;
-    }
-
-    setLoading(true);
+  const analyzeEmotion = useCallback(async (text: string) => {
+    if (!text.trim()) return null;
+    
+    setIsProcessing(true);
     setError(null);
-
+    
     try {
-      // In a real app, make API call to Hume AI
-      const result = await mockAnalyzeEmotion(text);
+      // Simuler une requête API à HumeAI
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       
-      // Add text-specific fields
-      const finalResult: EmotionResult = {
-        ...result,
-        textInput: text
+      // Générer un résultat fictif
+      const mockResult: EmotionResult = {
+        emotion: ['joy', 'sadness', 'anger', 'fear', 'surprise'][Math.floor(Math.random() * 5)],
+        confidence: Math.random() * 0.5 + 0.5, // Entre 0.5 et 1.0
+        timestamp: new Date().toISOString(),
+        source: 'text',
+        recommendations: [
+          {
+            id: uuidv4(),
+            type: 'activity',
+            title: 'Méditation guidée',
+            description: 'Une session de méditation pour vous aider à réguler vos émotions.',
+            emotion: 'mixed',
+            content: 'Prenez quelques minutes pour vous asseoir tranquillement et respirer profondément.',
+            category: 'mindfulness'
+          },
+          {
+            id: uuidv4(),
+            type: 'music',
+            title: 'Playlist recommandée',
+            description: 'Une sélection musicale adaptée à votre état émotionnel actuel.',
+            emotion: 'mixed',
+            content: 'Écoutez notre playlist spécialement conçue pour harmoniser vos émotions.',
+            category: 'music'
+          }
+        ]
       };
-
-      setLastResult(finalResult);
-      return finalResult;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to analyze text');
-      setError(error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Analyze emotions from audio
-  const analyzeAudio = async (audioFile: File): Promise<EmotionResult> => {
-    if (!audioFile) {
-      const error = new Error('Audio file is required');
-      setError(error);
-      throw error;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      // In a real app, make API call to Hume AI
-      const result = await mockAnalyzeEmotion(audioFile);
       
-      // Add audio-specific fields
-      const finalResult: EmotionResult = {
-        ...result,
-        audioUrl: URL.createObjectURL(audioFile)
-      };
-
-      setLastResult(finalResult);
-      return finalResult;
+      setEmotionResult(mockResult);
+      return mockResult;
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to analyze audio');
+      const error = err instanceof Error ? err : new Error('Une erreur est survenue lors de l\'analyse émotionnelle');
       setError(error);
-      throw error;
+      return null;
     } finally {
-      setLoading(false);
+      setIsProcessing(false);
     }
-  };
-
-  // Analyze emotions from facial expressions
-  const analyzeFacial = async (imageFile: File): Promise<EmotionResult> => {
-    if (!imageFile) {
-      const error = new Error('Image file is required');
-      setError(error);
-      throw error;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      // In a real app, make API call to Hume AI
-      const result = await mockAnalyzeEmotion(imageFile);
-      
-      // Add facial-specific fields
-      const finalResult: EmotionResult = {
-        ...result,
-        facialExpression: result.emotion
-      };
-
-      setLastResult(finalResult);
-      return finalResult;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error('Failed to analyze facial expression');
-      setError(error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  }, []);
+  
   return {
-    analyzeText,
-    analyzeAudio,
-    analyzeFacial,
-    loading,
+    analyzeEmotion,
+    isProcessing,
+    emotionResult,
     error,
-    lastResult
+    resetState: () => {
+      setEmotionResult(null);
+      setError(null);
+      setIsProcessing(false);
+    }
   };
-};
+}
 
 export default useHumeAI;

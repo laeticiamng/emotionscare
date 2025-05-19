@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types/theme';
@@ -13,7 +14,9 @@ const defaultContext: ThemeContextType = {
   setFontSize: () => {},
   fontFamily: "system", 
   setFontFamily: () => {},
-  systemTheme: "light"  // Add the required property
+  systemTheme: "light",
+  preferences: {},
+  updatePreferences: () => {}
 };
 
 // Create context with default values
@@ -36,6 +39,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [soundEnabled, setSoundEnabled] = useLocalStorage<boolean>('soundEnabled', false);
   const [reduceMotion, setReduceMotion] = useLocalStorage<boolean>('reduceMotion', false);
   const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
+  const [preferences, setPreferences] = useLocalStorage<any>('preferences', {});
   
   // Add useEffect to detect system theme preference
   useEffect(() => {
@@ -74,19 +78,33 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return luma > 128 ? 'black' : 'white';
   };
 
+  // Function to update preferences
+  const updatePreferences = (newPrefs: any) => {
+    setPreferences((prevPrefs: any) => ({
+      ...prevPrefs,
+      ...newPrefs
+    }));
+  };
+
   return (
     <ThemeContext.Provider value={{ 
       theme, 
       setTheme, 
       isDarkMode, 
-      isDark: isDarkMode, 
+      isDark, 
       fontFamily, 
       setFontFamily, 
       fontSize, 
       setFontSize,
       toggleTheme,
       getContrastText,
-      systemTheme  // Add the required property
+      systemTheme,
+      soundEnabled,
+      setSoundEnabled,
+      reduceMotion,
+      setReduceMotion,
+      preferences,
+      updatePreferences
     }}>
       {children}
     </ThemeContext.Provider>

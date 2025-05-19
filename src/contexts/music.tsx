@@ -1,52 +1,59 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { MusicTrack, MusicPlaylist, MusicContextType, EmotionMusicParams } from '@/types/music';
-import { musicPresets, musicTracks } from '@/data/musicData';
+
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+
+interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  url: string;
+  cover?: string;
+}
+
+interface Playlist {
+  id: string;
+  name: string;
+  tracks: Track[];
+}
+
+interface MusicContextType {
+  isPlaying: boolean;
+  currentTrack: Track | null;
+  playlist: Playlist | null;
+  openDrawer: boolean;
+  togglePlay: () => void;
+  toggleDrawer: () => void;
+  playTrack: (track: Track) => void;
+  nextTrack: () => void;
+  prevTrack: () => void;
+  setPlaylist: (playlist: Playlist) => void;
+}
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
-export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isInitialized, setIsInitialized] = useState(false);
+export const useMusic = () => {
+  const context = useContext(MusicContext);
+  if (!context) {
+    throw new Error('useMusic must be used within a MusicProvider');
+  }
+  return context;
+};
+
+export const MusicProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [volume, setVolume] = useState(0.7);
-  const [muted, setMuted] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [playlist, setPlaylistState] = useState<MusicPlaylist | null>(null);
-  const [emotion, setEmotionState] = useState<string | null>(null);
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [playlist, setPlaylistState] = useState<Playlist | null>(null);
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
 
-  const { tracks, playlists } = musicTracks ? { tracks: musicTracks, playlists: [] } : { tracks: [], playlists: [] };
-
-  useEffect(() => {
-    // Initialize with mock data
-    setIsInitialized(true);
-  }, []);
-
-  const toggleMute = () => setMuted(!muted);
-  
-  const seekTo = (time: number) => {
-    setCurrentTime(time);
-    // In a real implementation, we would also seek the audio element
-  };
-
-  const togglePlayPause = () => {
+  const togglePlay = () => {
     setIsPlaying(!isPlaying);
   };
 
-  const playTrack = (track: MusicTrack) => {
+  const toggleDrawer = () => {
+    setOpenDrawer(!openDrawer);
+  };
+
+  const playTrack = (track: Track) => {
     setCurrentTrack(track);
-    setIsPlaying(true);
-    setCurrentTime(0);
-    setDuration(track.duration || 0);
-  };
-
-  const pauseTrack = () => {
-    setIsPlaying(false);
-  };
-
-  const resumeTrack = () => {
     setIsPlaying(true);
   };
 
@@ -54,139 +61,51 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (!playlist || !currentTrack) return;
     
     const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
-    if (currentIndex === -1 || currentIndex === playlist.tracks.length - 1) return;
-    
-    const nextTrack = playlist.tracks[currentIndex + 1];
-    playTrack(nextTrack);
+    if (currentIndex === -1 || currentIndex === playlist.tracks.length - 1) {
+      // Si c'est le dernier morceau, on revient au premier
+      playTrack(playlist.tracks[0]);
+    } else {
+      // Sinon on passe au suivant
+      playTrack(playlist.tracks[currentIndex + 1]);
+    }
   };
 
   const prevTrack = () => {
     if (!playlist || !currentTrack) return;
     
     const currentIndex = playlist.tracks.findIndex(t => t.id === currentTrack.id);
-    if (currentIndex <= 0) return;
-    
-    const prevTrack = playlist.tracks[currentIndex - 1];
-    playTrack(prevTrack);
-  };
-
-  // Alias for prevTrack to handle naming inconsistencies
-  const previousTrack = prevTrack;
-
-  const setPlaylist = (input: MusicPlaylist | MusicTrack[]) => {
-    if (Array.isArray(input)) {
-      setPlaylistState({
-        id: 'custom-playlist',
-        name: 'Custom Playlist',
-        tracks: input,
-      });
+    if (currentIndex === -1 || currentIndex === 0) {
+      // Si c'est le premier morceau, on va au dernier
+      playTrack(playlist.tracks[playlist.tracks.length - 1]);
     } else {
-      setPlaylistState(input);
+      // Sinon on revient au précédent
+      playTrack(playlist.tracks[currentIndex - 1]);
     }
   };
 
-  const toggleDrawer = () => setOpenDrawer(!openDrawer);
-  const closeDrawer = () => setOpenDrawer(false);
-
-  // Mock implementation of AI music generation
-  const generateMusic = async (prompt: string): Promise<MusicTrack | null> => {
-    try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Create a mock generated track
-      const generatedTrack: MusicTrack = {
-        id: `generated-${Date.now()}`,
-        title: `Generated from: ${prompt.slice(0, 20)}...`,
-        artist: "AI Composer",
-        duration: 180,
-        audioUrl: "/audio/generated-track.mp3",
-        coverUrl: "/images/ai-generated.jpg",
-        album: "AI Generated Music",
-        year: new Date().getFullYear(),
-        tags: ["ai", "generated", prompt.split(" ")[0]],
-        genre: "Electronic",
-        category: "ai-generated"
-      };
-      
-      return generatedTrack;
-    } catch (error) {
-      console.error('Error generating music:', error);
-      setError(error instanceof Error ? error : new Error('Failed to generate music'));
-      return null;
+  const setPlaylist = (newPlaylist: Playlist) => {
+    setPlaylistState(newPlaylist);
+    if (newPlaylist.tracks.length > 0 && !currentTrack) {
+      setCurrentTrack(newPlaylist.tracks[0]);
     }
   };
 
-  const loadPlaylistForEmotion = async (params: EmotionMusicParams | string): Promise<MusicPlaylist | null> => {
-    try {
-      const emotionName = typeof params === 'string' ? params : params.emotion;
-      
-      // In a real app, this would be an API call
-      const emotionPlaylist = playlists.find(p => 
-        p.emotion?.toLowerCase() === emotionName.toLowerCase()
-      );
-      
-      if (emotionPlaylist) {
-        setPlaylistState(emotionPlaylist);
-        
-        // If no current track, set the first track
-        if (!currentTrack && emotionPlaylist.tracks.length > 0) {
-          setCurrentTrack(emotionPlaylist.tracks[0]);
-        }
-        
-        return emotionPlaylist;
-      }
-      
-      return null;
-    } catch (err) {
-      console.error(err);
-      return null;
-    }
-  };
-
-  const value: MusicContextType = {
-    isInitialized,
+  const value = {
     isPlaying,
     currentTrack,
-    volume,
-    setVolume,
-    duration,
-    currentTime,
-    muted,
-    setMute: setMuted,
-    toggleMute,
-    seekTo,
-    togglePlayPause,
     playlist,
-    emotion,
     openDrawer,
+    togglePlay,
     toggleDrawer,
-    closeDrawer,
-    setOpenDrawer,
     playTrack,
-    pauseTrack,
-    resumeTrack,
     nextTrack,
     prevTrack,
-    previousTrack,
-    setEmotion: setEmotionState,
-    loadPlaylistForEmotion,
-    setPlaylist,
-    generateMusic,
-    togglePlay: togglePlayPause,
-    setCurrentTrack,
-    error
+    setPlaylist
   };
 
-  return <MusicContext.Provider value={value}>{children}</MusicContext.Provider>;
+  return (
+    <MusicContext.Provider value={value}>
+      {children}
+    </MusicContext.Provider>
+  );
 };
-
-export const useMusic = (): MusicContextType => {
-  const context = useContext(MusicContext);
-  if (context === undefined) {
-    throw new Error('useMusic must be used within a MusicProvider');
-  }
-  return context;
-};
-
-export default MusicContext;

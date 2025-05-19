@@ -4,9 +4,6 @@ import { Outlet } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import MainNavbar from './components/navigation/MainNavbar';
 import MainFooter from './components/navigation/MainFooter';
-import MusicMiniPlayer from './components/music/MusicMiniPlayer';
-import MusicDrawer from './components/music/player/MusicDrawer';
-import { useMusic } from './contexts/music';
 import { useTheme } from './contexts/ThemeContext';
 import ScrollProgress from './components/ui/ScrollProgress';
 import { ShellProps } from '@/types/layout';
@@ -18,7 +15,6 @@ const Shell: React.FC<ShellProps> = ({
   immersive = false,
   className = "" 
 }) => {
-  const { openDrawer, toggleDrawer, playlist, currentTrack } = useMusic();
   const { theme, reduceMotion } = useTheme();
   const [scrolled, setScrolled] = useState(false);
 
@@ -110,22 +106,6 @@ const Shell: React.FC<ShellProps> = ({
           </motion.div>
         </AnimatePresence>
       </main>
-
-      {/* Music Mini Player */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <MusicMiniPlayer />
-      </div>
-
-      {/* Music Drawer */}
-      <MusicDrawer
-        open={openDrawer}
-        onClose={toggleDrawer}
-        onOpenChange={(open) => {
-          if (!open) toggleDrawer();
-        }}
-        playlist={playlist || undefined}
-        currentTrack={currentTrack || undefined}
-      />
 
       {/* Footer */}
       {!hideFooter && (

@@ -1,102 +1,65 @@
 
-import { useState, useEffect } from 'react';
-import { EmotionResult } from '@/types/emotion';
+import { useState, useCallback } from 'react';
+import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
+import { v4 as uuidv4 } from 'uuid';
 
-// Mock emotion data
-const mockEmotions: EmotionResult[] = [
-  {
-    id: '1',
-    emotion: 'joy',
-    confidence: 0.85,
-    intensity: 0.75,
-    source: 'voice',
-    timestamp: new Date().toISOString(),
-    recommendations: [
-      { title: 'Maintain this mood', description: 'Continue your current activities' },
-      { title: 'Share your joy', description: 'Connect with a friend or family member' }
-    ]
-  },
-  {
-    id: '2',
-    emotion: 'neutral',
-    confidence: 0.92,
-    intensity: 0.40,
-    source: 'text',
-    timestamp: new Date(Date.now() - 86400000).toISOString(),
-    recommendations: [
-      { title: 'Boost your mood', description: 'Try a quick walk outside' },
-      { title: 'Practice mindfulness', description: '5-minute meditation' }
-    ]
-  },
-  {
-    id: '3',
-    emotion: 'stressed',
-    confidence: 0.78,
-    intensity: 0.65,
-    source: 'emoji',
-    timestamp: new Date(Date.now() - 172800000).toISOString(),
-    recommendations: [
-      { title: 'Relax your mind', description: 'Deep breathing exercise' },
-      { title: 'Take a break', description: '10 minutes away from screens' }
-    ]
-  }
-];
-
-export const useScanPage = (userId?: string) => {
-  const [isScanning, setIsScanning] = useState(false);
-  const [emotions, setEmotions] = useState<EmotionResult[]>(mockEmotions);
-  const [currentEmotion, setCurrentEmotion] = useState<EmotionResult | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Simulate loading emotions for a user
-  useEffect(() => {
-    if (userId) {
-      // In a real app, we would fetch emotions from an API
-      // For now, we just use the mock data
-      // setEmotions(mockEmotions);
+export function useScanPage() {
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
+  const [recommendations, setRecommendations] = useState<EmotionRecommendation[]>([
+    {
+      id: uuidv4(),
+      type: 'activity',
+      title: 'Respiration profonde',
+      description: 'Exercice de respiration pour vous aider à vous recentrer',
+      emotion: 'calm',
+      content: 'Pratiquez 5 respirations profondes en comptant jusqu\'à 4 à l\'inspiration et jusqu\'à 6 à l\'expiration.',
+      category: 'mindfulness'
+    },
+    {
+      id: uuidv4(),
+      type: 'music',
+      title: 'Playlist Relaxante',
+      description: 'Une sélection musicale pour retrouver votre calme',
+      emotion: 'calm',
+      content: 'Écoutez notre playlist spéciale relaxation pour vous aider à vous détendre.',
+      category: 'music'
     }
-  }, [userId]);
-
-  const startScan = () => {
-    setIsScanning(true);
-    setIsModalOpen(true);
-  };
-
-  const cancelScan = () => {
-    setIsScanning(false);
-    setIsModalOpen(false);
-  };
-
-  const completeScan = (result: EmotionResult) => {
-    setIsScanning(false);
-    setIsModalOpen(false);
+  ]);
+  
+  const [alternativeRecommendations, setAlternativeRecommendations] = useState<EmotionRecommendation[]>([
+    {
+      id: uuidv4(),
+      type: 'journal',
+      title: 'Écriture libre',
+      description: 'Écrivez librement vos pensées pendant 5 minutes',
+      emotion: 'mixed',
+      content: 'Prenez quelques minutes pour écrire tout ce qui vous passe par la tête, sans jugement.',
+      category: 'reflection'
+    },
+    {
+      id: uuidv4(),
+      type: 'activity',
+      title: 'Marche en pleine conscience',
+      description: 'Une courte marche méditative pour vous reconnecter au moment présent',
+      emotion: 'mixed',
+      content: 'Prenez 10 minutes pour marcher lentement en étant pleinement conscient de chaque pas et sensation.',
+      category: 'mindfulness'
+    }
+  ]);
+  
+  const handleScanComplete = useCallback((result: EmotionResult) => {
+    setCurrentEmotion(result.emotion);
     
-    // Add the new emotion to the list
-    const newEmotion: EmotionResult = {
-      ...result,
-      id: `emotion-${Date.now()}`,
-      timestamp: new Date().toISOString() // Ensure we have a timestamp
-    };
-    
-    setCurrentEmotion(newEmotion);
-    setEmotions(prev => [newEmotion, ...prev]);
-
-    // In a real app, we would save this to a database
-    console.log('New emotion recorded:', newEmotion);
-    
-    return newEmotion;
-  };
-
+    // En situation réelle, on utiliserait result.emotion pour déterminer les recommandations appropriées
+    console.log('Scan complété avec émotion:', result.emotion);
+  }, []);
+  
   return {
-    emotions,
     currentEmotion,
-    isScanning,
-    isModalOpen,
-    startScan,
-    cancelScan,
-    completeScan,
-    setIsModalOpen
+    recommendations,
+    alternativeRecommendations,
+    handleScanComplete
   };
-};
+}
 
 export default useScanPage;

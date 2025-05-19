@@ -1,148 +1,151 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Slider } from "@/components/ui/slider";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
+import { Mic, Square } from 'lucide-react';
+import { EmotionResult } from '@/types/emotion';
+import { v4 as uuidv4 } from 'uuid';
 
+// Définir les props explicitement pour inclure onProcessingChange
 interface VoiceEmotionScannerProps {
   onResult: (result: EmotionResult) => void;
-  onStartRecording?: () => void;
   onProcessingChange?: (processing: boolean) => void;
 }
 
 const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ 
-  onResult, 
-  onStartRecording,
-  onProcessingChange
+  onResult,
+  onProcessingChange 
 }) => {
-  const [emotion, setEmotion] = useState("calm");
-  const [confidence, setConfidence] = useState(0.75);
-  const [intensity, setIntensity] = useState(0.6);
-  const [showResults, setShowResults] = useState(false);
-  const [processing, setProcessing] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [recordingDuration, setRecordingDuration] = useState(0);
   
-  const mockRecommendations: EmotionRecommendation[] = [
-    {
-      id: "rec-voice-1",
-      emotion: "calm",
-      type: "activity",
-      title: "Exercice de respiration",
-      description: "3 minutes de respiration profonde",
-      content: "Inspirez lentement, retenez, expirez lentement",
-      category: "wellness"
-    },
-    {
-      id: "rec-voice-2",
-      emotion: "relaxed",
-      type: "music",
-      title: "Playlist recommandée",
-      description: "Musique relaxante pour vous aider à vous détendre",
-      content: "Écouter notre playlist zen",
-      category: "audio"
-    }
-  ];
-
-  // Update the handleCompleted function to include the required source field
-  const handleCompleted = () => {
-    setProcessing(false);
-    if (onProcessingChange) {
-      onProcessingChange(false);
-    }
+  const startRecording = () => {
+    setIsRecording(true);
+    setProgress(0);
+    setRecordingDuration(0);
     
-    // Create mock emotion result
-    const result: EmotionResult = {
-      id: `voice-${Date.now()}`,
-      emotion: emotion,
-      confidence: confidence,
-      intensity: intensity,
-      recommendations: mockRecommendations,
-      timestamp: new Date().toISOString(),
-      emojis: ["😌", "🧘‍♀️"],
-      source: "voice-analyzer" // Added required source field
-    };
-    
-    setShowResults(true);
-    
-    // Pass result to parent component
-    if (onResult) {
-      onResult(result);
-    }
-  };
-
-  const handleStart = () => {
-    setProcessing(true);
-    setShowResults(false);
-    
+    // Notifier le parent que le traitement commence
     if (onProcessingChange) {
       onProcessingChange(true);
     }
     
-    if (onStartRecording) {
-      onStartRecording();
+    // Simuler l'analyse vocale
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        const newProgress = prev + 5;
+        if (newProgress >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            completeAnalysis();
+          }, 500);
+          return 100;
+        }
+        return newProgress;
+      });
+      
+      setRecordingDuration(prev => prev + 0.5);
+    }, 500);
+    
+    return () => clearInterval(interval);
+  };
+  
+  const stopRecording = () => {
+    setIsRecording(false);
+    // Ici, vous arrêteriez normalement l'enregistrement audio réel
+  };
+  
+  const completeAnalysis = () => {
+    setIsRecording(false);
+    
+    // Simuler un résultat d'analyse émotionnelle
+    const mockResult: EmotionResult = {
+      emotion: ['joie', 'calme', 'inquiétude', 'excitation', 'fatigue'][Math.floor(Math.random() * 5)],
+      confidence: 0.85,
+      timestamp: new Date().toISOString(),
+      recommendations: [
+        {
+          id: uuidv4(),
+          type: 'breathing',
+          title: 'Exercice de respiration',
+          description: 'Un simple exercice de respiration pour vous recentrer',
+          emotion: 'calm',
+          content: 'Inspirez lentement pendant 4 secondes, retenez votre souffle pendant 2 secondes, puis expirez pendant 6 secondes.',
+          category: 'mindfulness'
+        },
+        {
+          id: uuidv4(),
+          type: 'music',
+          title: 'Playlist recommandée',
+          description: 'Une playlist adaptée à votre humeur actuelle',
+          emotion: 'calm',
+          content: 'Écoutez notre sélection musicale pour vous aider à gérer vos émotions.',
+          category: 'music'
+        }
+      ]
+    };
+    
+    // Notifier le parent que le traitement est terminé
+    if (onProcessingChange) {
+      onProcessingChange(false);
     }
     
-    setTimeout(() => {
-      handleCompleted();
-    }, 2000);
+    onResult(mockResult);
   };
-
+  
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Analyse vocale</CardTitle>
-        <CardDescription>Simulez une analyse vocale pour détecter les émotions.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="emotion">Émotion détectée</Label>
-          <Badge variant="secondary">{emotion}</Badge>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="confidence">Confiance</Label>
-          <Slider
-            id="confidence"
-            defaultValue={[confidence * 100]}
-            max={100}
-            step={1}
-            onValueChange={(value) => setConfidence(value[0] / 100)}
-          />
-          <p className="text-sm text-muted-foreground">
-            Niveau de confiance: {Math.round(confidence * 100)}%
+    <div className="flex flex-col items-center space-y-4">
+      <div className="text-center mb-4">
+        <h3 className="text-lg font-medium">Analyse émotionnelle vocale</h3>
+        <p className="text-sm text-muted-foreground">
+          {isRecording 
+            ? 'Parlez de ce que vous ressentez...' 
+            : 'Appuyez sur le bouton pour démarrer l\'enregistrement'}
+        </p>
+      </div>
+      
+      {isRecording && (
+        <div className="w-full bg-secondary rounded-full h-2.5 mb-4">
+          <div 
+            className="bg-primary h-2.5 rounded-full transition-all duration-300" 
+            style={{ width: `${progress}%` }}
+          ></div>
+          <p className="text-xs text-muted-foreground mt-1 text-center">
+            {recordingDuration.toFixed(1)}s
           </p>
         </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor="intensity">Intensité</Label>
-          <Slider
-            id="intensity"
-            defaultValue={[intensity * 100]}
-            max={100}
-            step={1}
-            onValueChange={(value) => setIntensity(value[0] / 100)}
-          />
-          <p className="text-sm text-muted-foreground">
-            Intensité de l'émotion: {Math.round(intensity * 100)}%
-          </p>
-        </div>
-        
-        <Button onClick={handleStart} disabled={processing}>
-          {processing ? 'Analyse en cours...' : 'Simuler l\'analyse'}
-        </Button>
-        
-        {showResults && (
-          <div className="mt-4 p-3 bg-muted rounded-md">
-            <h4 className="text-sm font-medium">Résultats simulés</h4>
-            <p className="text-xs text-muted-foreground">
-              Émotion: {emotion}, Confiance: {Math.round(confidence * 100)}%, Intensité: {Math.round(intensity * 100)}%
-            </p>
-          </div>
+      )}
+      
+      <div className="flex justify-center">
+        {!isRecording ? (
+          <Button 
+            onClick={startRecording}
+            size="lg"
+            className="rounded-full h-16 w-16 bg-primary hover:bg-primary/90"
+          >
+            <Mic className="h-6 w-6" />
+            <span className="sr-only">Démarrer l'enregistrement</span>
+          </Button>
+        ) : (
+          <Button 
+            onClick={stopRecording}
+            size="lg"
+            variant="destructive"
+            className="rounded-full h-16 w-16"
+          >
+            <Square className="h-6 w-6" />
+            <span className="sr-only">Arrêter l'enregistrement</span>
+          </Button>
         )}
-      </CardContent>
-    </Card>
+      </div>
+      
+      <div className="text-center mt-4">
+        <p className="text-sm text-muted-foreground">
+          {isRecording 
+            ? 'Cliquez sur le bouton d\'arrêt quand vous avez terminé' 
+            : 'L\'analyse vocale ne stocke pas votre enregistrement'}
+        </p>
+      </div>
+    </div>
   );
 };
 
