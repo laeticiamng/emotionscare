@@ -25,6 +25,7 @@ export interface MusicTrack {
   album?: string;
   intensity?: number;
   year?: number;
+  tags?: string[]; // Ajout de la propriété tags manquante
 }
 
 // Interface pour une playlist musicale
@@ -40,6 +41,7 @@ export interface MusicPlaylist {
   mood?: string;
   emotion?: string;
   isCustom?: boolean;
+  tags?: string[]; // Ajout de la propriété tags manquante
 }
 
 // Interface pour les paramètres de music par émotion
@@ -149,16 +151,16 @@ export interface MusicContextType {
   toggleRepeat: () => void;
   duration: number;
   currentTime: number;
-  getRecommendationByEmotion?: (params: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
-  setPlaylist?: (playlist: MusicPlaylist) => void;
-  setCurrentTrack?: (track: MusicTrack) => void;
-  findTracksByMood?: (mood: string) => MusicTrack[];
-  toggleDrawer?: () => void;
-  toggleMute?: () => void;
-  muted?: boolean;
-  generateMusic?: (params: any) => Promise<MusicTrack | MusicPlaylist | null>;
-  setEmotion?: (emotion: string) => void;
-  playlist?: MusicPlaylist | null;
+  getRecommendationByEmotion: (params: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
+  setPlaylist: (playlist: MusicPlaylist) => void;
+  setCurrentTrack: (track: MusicTrack) => void;
+  findTracksByMood: (mood: string) => MusicTrack[];
+  toggleDrawer: () => void;
+  toggleMute: () => void;
+  muted: boolean;
+  generateMusic: (params: any) => Promise<MusicTrack | MusicPlaylist | null>;
+  setEmotion: (emotion: string) => void;
+  playlist: MusicPlaylist | null;
 }
 
 // Interface du type Track utilisée dans les composants existants

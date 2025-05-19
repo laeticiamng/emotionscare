@@ -1,30 +1,42 @@
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Helmet } from 'react-helmet-async';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import PostLoginTransition from './PostLoginTransition';
 
 interface AuthTransitionProps {
   children: React.ReactNode;
 }
 
 const AuthTransition: React.FC<AuthTransitionProps> = ({ children }) => {
+  const [showTransition, setShowTransition] = useState(false);
+  const { isAuthenticated, user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // On détecte si l'utilisateur vient de se connecter
+  useEffect(() => {
+    const justLoggedIn = sessionStorage.getItem('just_logged_in');
+    
+    if (justLoggedIn && isAuthenticated && !location.pathname.includes('/dashboard')) {
+      setShowTransition(true);
+      sessionStorage.removeItem('just_logged_in');
+    }
+  }, [isAuthenticated, location.pathname]);
+  
+  const handleTransitionComplete = () => {
+    setShowTransition(false);
+    navigate('/dashboard');
+  };
+  
   return (
     <>
-      <Helmet>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
-        <meta name="description" content="EmotionsCare - Prenez soin de votre bien-être émotionnel" />
-      </Helmet>
-      
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-      >
-        {children}
-      </motion.div>
+      {children}
+      <PostLoginTransition 
+        show={showTransition} 
+        onComplete={handleTransitionComplete}
+        userName={user?.name}
+      />
     </>
   );
 };

@@ -9,5 +9,8 @@
 // Export everything from the MusicContext implementation
 export * from '@/contexts/MusicContext';
 
+// Export the types
+export * from '@/types/music';
+
 // Export the default context
 export { default } from '@/contexts/MusicContext';

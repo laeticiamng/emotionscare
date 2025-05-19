@@ -7,5 +7,5 @@
  * Toute nouvelle fonctionnalité doit passer par ce hook unique.
  */
 
-export { useMusic } from '@/contexts/MusicContext';
+export { useMusic } from './useMusic.tsx';
 export default useMusic;
