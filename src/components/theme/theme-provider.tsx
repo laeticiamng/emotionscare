@@ -1,6 +1,6 @@
 
 import { createContext, useEffect, useState } from "react";
-import { ThemeContextType, Theme, FontSize } from "@/types/theme";
+import { ThemeContextType, Theme, FontSize, FontFamily } from "@/types/theme";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -12,12 +12,18 @@ type ThemeProviderProps = {
 const defaultThemeContext: ThemeContextType = {
   theme: "system",
   setTheme: () => null,
+  toggleTheme: () => {},
+  isDark: false,
+  isDarkMode: false,
   fontSize: "md",
   setFontSize: () => {},
+  fontFamily: "sans",
+  setFontFamily: () => {},
   systemTheme: "light",
-  isDarkMode: false,
   soundEnabled: false,
   reduceMotion: false,
+  setSoundEnabled: () => {},
+  setReduceMotion: () => {}
 };
 
 export const ThemeProviderContext = createContext<ThemeContextType>(defaultThemeContext);
@@ -32,7 +38,18 @@ export function ThemeProvider({
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
   const [fontSize, setFontSize] = useState<FontSize>("md");
+  const [fontFamily, setFontFamily] = useState<FontFamily>("sans");
   const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  // Derived state
+  const isDarkMode = theme === 'dark' || (theme === 'system' && systemTheme === 'dark');
+  const isDark = isDarkMode; // Alias
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+  };
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -58,11 +75,18 @@ export function ThemeProvider({
       localStorage.setItem(storageKey, theme);
       setTheme(theme);
     },
+    toggleTheme,
+    isDark,
+    isDarkMode, 
     fontSize,
     setFontSize,
+    fontFamily,
+    setFontFamily,
     systemTheme,
-    soundEnabled: false,
-    reduceMotion: false,
+    soundEnabled,
+    setSoundEnabled,
+    reduceMotion,
+    setReduceMotion
   };
 
   return (

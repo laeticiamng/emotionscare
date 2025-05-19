@@ -58,7 +58,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
         ],
         source: 'generated',
         coverImage: '/images/covers/ambient.jpg',
-        mood: [emotion]
+        mood: [emotion] // Changed from string to string[] to match type
       };
       
       return mockPlaylist;
@@ -180,9 +180,12 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     setQueue([]);
   }, []);
 
-  // Load playlist
-  const loadPlaylist = useCallback(async (playlistId: string): Promise<MusicPlaylist | null> => {
-    return null;
+  // Load playlist - fixing signature to match the expected type
+  const loadPlaylist = useCallback((playlist: MusicPlaylist): void => {
+    setPlaylist(playlist);
+    if (playlist.tracks.length > 0) {
+      setCurrentTrack(playlist.tracks[0]);
+    }
   }, []);
 
   // Shuffle playlist
@@ -203,15 +206,10 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     playlist,
     setPlaylist,
     isPlaying,
-    setIsPlaying,
     volume,
-    setVolume,
     currentTime,
-    setCurrentTime,
     duration,
-    setDuration,
     muted,
-    setMuted,
     openDrawer,
     setOpenDrawer,
     playTrack,
@@ -240,7 +238,12 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     error,
     setIsInitialized,
     playlists,
-    togglePlay
+    togglePlay,
+    setVolume,
+    setCurrentTime,
+    setDuration,
+    setMuted,
+    setIsPlaying
   };
 
   return (

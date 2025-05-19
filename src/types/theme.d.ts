@@ -1,10 +1,26 @@
 
-// Type definitions for theme options
 export type Theme = 'light' | 'dark' | 'system' | 'pastel';
+export type FontSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type FontFamily = 'sans' | 'serif' | 'mono';
 
 export interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  toggleTheme: () => void;
+  isDark: boolean;
+  isDarkMode: boolean;
+  fontSize: FontSize;
+  setFontSize: (size: FontSize) => void;
+  fontFamily: FontFamily;
+  setFontFamily: (family: FontFamily) => void;
+  systemTheme: 'light' | 'dark';
+  soundEnabled: boolean;
   reduceMotion: boolean;
-  setReduceMotion: (reduce: boolean) => void;
+  setSoundEnabled: (enabled: boolean) => void;
+  setReduceMotion: (reduced: boolean) => void;
+}
+
+export interface ThemeProviderProps {
+  children: React.ReactNode;
+  defaultTheme?: Theme;
 }

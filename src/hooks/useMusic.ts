@@ -7,19 +7,5 @@
  * Toute nouvelle fonctionnalité doit passer par ce hook unique.
  */
 
-import { useContext } from 'react';
-import { MusicContext } from '@/contexts/MusicContext';
-import type { MusicContextType } from '@/types/music';
-
-// Export the hook directly
-export const useMusic = (): MusicContextType => {
-  const context = useContext(MusicContext);
-  
-  if (context === undefined) {
-    throw new Error('useMusic must be used within a MusicProvider');
-  }
-  
-  return context;
-};
-
-export default useMusic;
+// Re-export from the main implementation
+export { useMusic, default } from '@/hooks/useMusic.tsx';

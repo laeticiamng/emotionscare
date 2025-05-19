@@ -54,9 +54,12 @@ export interface MusicPlaylist {
   emotion?: string;
   tracks: MusicTrack[];
   description: string;
-  source: string;
-  coverImage: string;
+  source?: string;
+  coverImage?: string;
+  coverUrl?: string;
+  cover?: string;
   mood: string[];
+  tags?: string[];
 }
 
 // Types pour les paramètres
@@ -112,13 +115,13 @@ export interface MusicContextType {
   
   // Data functions
   loadPlaylistForEmotion: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
-  getRecommendationByEmotion: (emotion: string | EmotionMusicParams, intensity?: number) => Promise<MusicPlaylist | null>;
+  getRecommendationByEmotion: (params: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
   generateMusic: (prompt: string) => Promise<MusicTrack>;
   findTracksByMood: (mood: string) => MusicTrack[];
   setEmotion: (emotion: string) => void;
   
   // Playlist management
-  loadPlaylist: (playlistId: string) => Promise<MusicPlaylist | null>;
+  loadPlaylist: (playlist: MusicPlaylist) => void;
   shufflePlaylist: () => void;
   addToQueue: (track: MusicTrack) => void;
   clearQueue: () => void;

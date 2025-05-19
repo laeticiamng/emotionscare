@@ -34,7 +34,7 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({ title
       if (music.loadPlaylistForEmotion) {
         playlist = await music.loadPlaylistForEmotion(params);
       } else if (music.getRecommendationByEmotion) {
-        playlist = await music.getRecommendationByEmotion(emotion, intensity / 100);
+        playlist = await music.getRecommendationByEmotion(params); // Fixed: removed the second argument
       } else {
         // Simulation si aucune méthode n'est disponible
         toast({

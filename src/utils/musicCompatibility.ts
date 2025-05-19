@@ -1,4 +1,3 @@
-
 import { MusicTrack, Track, MusicPlaylist, Playlist } from '@/types/music';
 
 /**
@@ -44,7 +43,7 @@ export const ensurePlaylist = (playlist: Playlist | MusicPlaylist): MusicPlaylis
     source: 'source' in playlist 
       ? (playlist as MusicPlaylist).source || 'custom'
       : 'custom',
-    mood: 'mood' in playlist 
+    mood: 'mood' in playlist && (playlist as MusicPlaylist).mood
       ? Array.isArray((playlist as MusicPlaylist).mood) 
         ? (playlist as MusicPlaylist).mood 
         : [(playlist as MusicPlaylist).mood as string]
@@ -109,5 +108,5 @@ export const getPlaylistName = (playlist: MusicPlaylist | Playlist | null): stri
  */
 export const getPlaylistCover = (playlist: MusicPlaylist | Playlist | null): string => {
   if (!playlist) return '';
-  return playlist.coverImage || playlist.cover || playlist.coverUrl || '';
+  return (playlist as MusicPlaylist).coverImage || playlist.cover || (playlist as MusicPlaylist).coverUrl || '';
 };

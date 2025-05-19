@@ -1,8 +1,7 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { ThemeContextType, Theme, FontSize, FontFamily } from '@/types/theme';
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { Theme, FontFamily, FontSize, ThemeContextType } from '@/types/theme';
-
-const ThemeContext = createContext<ThemeContextType>({
+const defaultThemeContext: ThemeContextType = {
   theme: 'system',
   setTheme: () => {},
   toggleTheme: () => {},
@@ -10,41 +9,35 @@ const ThemeContext = createContext<ThemeContextType>({
   isDarkMode: false,
   fontSize: 'md',
   setFontSize: () => {},
-  systemTheme: 'light'
-});
+  fontFamily: 'sans',
+  setFontFamily: () => {},
+  systemTheme: 'light',
+  soundEnabled: false,
+  reduceMotion: false,
+  setSoundEnabled: () => {},
+  setReduceMotion: () => {}
+};
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme') as Theme;
-      return savedTheme || 'system';
-    }
-    return 'system';
-  });
-  
-  const [fontFamily, setFontFamily] = useState<FontFamily>(() => {
-    if (typeof window !== 'undefined') {
-      const storedFont = localStorage.getItem('fontFamily') as FontFamily;
-      return storedFont || 'sans';
-    }
-    return 'sans';
-  });
-  
-  const [fontSize, setFontSize] = useState<FontSize>(() => {
-    if (typeof window !== 'undefined') {
-      const storedSize = localStorage.getItem('fontSize') as FontSize;
-      return storedSize || 'md';
-    }
-    return 'md';
-  });
+export const ThemeContext = createContext<ThemeContextType>(defaultThemeContext);
 
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [preferences, setPreferences] = useState({
-    reduceMotion: false,
-    soundEnabled: true
-  });
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>('system');
+  const [fontSize, setFontSize] = useState<FontSize>('md');
+  const [fontFamily, setFontFamily] = useState<FontFamily>('sans');
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('light');
+  const [soundEnabled, setSoundEnabled] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
 
-  // Update the theme when the state changes
+  // Compute isDark and isDarkMode
+  const isDarkMode = theme === 'dark' || (theme === 'system' && systemTheme === 'dark');
+  const isDark = isDarkMode; // Alias
+
+  // Toggle theme function
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
+  // Apply theme class to document
   useEffect(() => {
     const root = window.document.documentElement;
     
@@ -91,80 +84,34 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.setItem('fontSize', fontSize);
   }, [fontSize]);
 
-  // Helper for toggling between themes
-  const toggleTheme = () => {
-    const currentIsDark = theme === 'dark' || (theme === 'system' && isDarkMode);
-    setTheme(currentIsDark ? 'light' : 'dark');
-  };
-
-  const getContrastText = (color: string): 'black' | 'white' => {
-    // Simple contrast calculation
-    let r = 0, g = 0, b = 0;
-    
-    if (color.startsWith('#')) {
-      if (color.length === 4) {
-        r = parseInt(color[1] + color[1], 16);
-        g = parseInt(color[2] + color[2], 16);
-        b = parseInt(color[3] + color[3], 16);
-      } else {
-        r = parseInt(color.slice(1, 3), 16);
-        g = parseInt(color.slice(3, 5), 16);
-        b = parseInt(color.slice(5, 7), 16);
-      }
-    }
-    
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return luminance > 0.5 ? 'black' : 'white';
-  };
-
-  // Update preferences
-  const updatePreferences = (newPrefs: any) => {
-    setPreferences(prev => ({ ...prev, ...newPrefs }));
-  };
-
-  // Alias for isDarkMode
-  const isDark = isDarkMode;
-  const systemTheme = isDark ? 'dark' : 'light';
-
-  const setSoundEnabled = (enabled: boolean) => {
-    updatePreferences({ soundEnabled: enabled });
-  };
-
-  const setReduceMotion = (reduced: boolean) => {
-    updatePreferences({ reduceMotion: reduced });
+  const value: ThemeContextType = {
+    theme,
+    setTheme,
+    toggleTheme,
+    isDark,
+    isDarkMode,
+    fontSize,
+    setFontSize,
+    fontFamily,
+    setFontFamily,
+    systemTheme,
+    soundEnabled,
+    reduceMotion,
+    setSoundEnabled,
+    setReduceMotion
   };
 
   return (
-    <ThemeContext.Provider value={{ 
-      theme, 
-      setTheme, 
-      isDarkMode,
-      isDark,
-      fontFamily, 
-      setFontFamily, 
-      fontSize, 
-      setFontSize,
-      toggleTheme,
-      getContrastText,
-      systemTheme,
-      soundEnabled: preferences.soundEnabled,
-      reduceMotion: preferences.reduceMotion,
-      setSoundEnabled,
-      setReduceMotion,
-      preferences,
-      updatePreferences
-    }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
-};
+}
 
-export const useTheme = () => {
+export function useTheme() {
   const context = useContext(ThemeContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
   return context;
-};
-
-export default ThemeProvider;
+}
