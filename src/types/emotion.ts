@@ -139,11 +139,13 @@ export interface MoodData {
 export interface EmotionPrediction {
   emotion: string;
   probability: number;
+  timestamp?: string;
+  source?: string;
+  score?: number;
   triggers?: string[];
   timeframe?: string;
   recommendations?: string[];
-  timestamp?: string; // Added missing property
-  confidence?: number; // Added missing property
+  confidence?: number;
 }
 
 export interface EmojiEmotionScannerProps {

@@ -23,7 +23,7 @@ class LeaderboardService {
         level: 8,
         rank: 1,
         avatarUrl: '/images/avatars/avatar1.jpg',
-        badges: [], // Empty array instead of number
+        badges: [], // Corrigé: c'est maintenant un tableau vide plutôt qu'un nombre
         lastActive: new Date().toISOString()
       },
       {
@@ -33,7 +33,7 @@ class LeaderboardService {
         level: 6,
         rank: 2,
         avatarUrl: '/images/avatars/avatar2.jpg',
-        badges: [], // Empty array instead of number
+        badges: [], // Corrigé: c'est maintenant un tableau vide plutôt qu'un nombre
         lastActive: new Date().toISOString()
       },
       {
@@ -43,7 +43,7 @@ class LeaderboardService {
         level: 5,
         rank: 3,
         avatarUrl: '/images/avatars/avatar3.jpg',
-        badges: [], // Empty array instead of number
+        badges: [], // Corrigé: c'est maintenant un tableau vide plutôt qu'un nombre
         lastActive: new Date().toISOString()
       }
     ];
@@ -59,7 +59,7 @@ class LeaderboardService {
         level: 8,
         rank: 1,
         avatarUrl: '/images/avatars/avatar1.jpg',
-        badges: [], // Empty array instead of number
+        badges: [], // Corrigé: c'est maintenant un tableau vide plutôt qu'un nombre
         lastActive: new Date().toISOString()
       };
     }
