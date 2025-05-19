@@ -45,6 +45,30 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ### Modifié
 - Mise à jour de `README.md` pour référencer ces nouveaux documents
 
+## [1.1.8] - 2025-05-26
+
+### Corrigé
+- Unification des types `ChatMessage` et `ChatConversation`
+- Ajout de `isUser` et harmonisation du champ `sender`
+- Mise à jour des contextes Coach et des hooks associés
+
+
+
+## [1.1.9] - 2025-05-27
+
+### Modifié
+- Ajout de la fonction `convertToPlaylist` dans `musicCompatibility` et nettoyage des imports.
+- Contexte musical enrichi : gestion de l'historique et de la queue (fonctions `addToQueue`, `removeFromQueue`, `clearQueue`).
+- Type `MusicContextType` complété (`setMuted`).
+
+## [1.1.9] - 2025-05-27
+
+### Modifié
+- Ajout de la fonction `convertToPlaylist` dans `musicCompatibility` et nettoyage des imports.
+- Contexte musical enrichi : gestion de l'historique et de la queue (fonctions `addToQueue`, `removeFromQueue`, `clearQueue`).
+- Type `MusicContextType` complété (`setMuted`).
+- `EmotionMusicRecommendations` normalise désormais les playlists via `convertToPlaylist`.
+
 ## [1.1.4] - 2025-05-22
 
 ### Corrigé

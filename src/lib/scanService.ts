@@ -27,6 +27,7 @@ export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult 
         ai_feedback: data.ai_feedback,
         emotion: data.primary_emotion || 'neutral',
         source: data.source || 'manual',
+        confidence: data.score || 0.5, // Added confidence field
       };
     }
     
@@ -50,7 +51,7 @@ export const createEmotionEntry = async (emotion: Partial<EmotionResult>): Promi
         text: emotion.text || '',
         audio_url: emotion.audio_url || emotion.audioUrl,
         ai_feedback: emotion.ai_feedback || emotion.feedback,
-        primary_emotion: emotion.primary_emotion || emotion.emotion,
+        primary_emotion: emotion.primaryEmotion || emotion.emotion,
         source: emotion.source || 'manual',
       })
       .select('*')
@@ -69,6 +70,7 @@ export const createEmotionEntry = async (emotion: Partial<EmotionResult>): Promi
       ai_feedback: data.ai_feedback,
       emotion: data.primary_emotion || 'neutral',
       source: data.source || 'manual',
+      confidence: data.score || 0.5, // Added confidence field
     };
   } catch (error) {
     console.error('Error creating emotion entry:', error);
@@ -122,6 +124,7 @@ export const fetchEmotionHistory = async (userId: string, limit = 10): Promise<E
         ai_feedback: entry.ai_feedback,
         emotion: entry.primary_emotion || 'neutral',
         source: entry.source || 'manual',
+        confidence: entry.score || 0.5, // Added confidence field
       }));
     }
     

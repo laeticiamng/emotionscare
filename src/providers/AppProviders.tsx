@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserPreferencesProvider } from '@/contexts/UserPreferencesContext';
-import { UserModeProvider } from '@/contexts/UserModeContext';
+import { UserModeProvider } from '@/contexts/UserModeProvider';
 import { MusicProvider } from '@/contexts/music/index';
 import { OptimizationProvider } from '@/providers/OptimizationProvider';
 import { ExtensionsProvider } from '@/providers/ExtensionsProvider';
@@ -24,12 +25,9 @@ const AppProviders: React.FC<LayoutProviderProps> = ({ children }) => (
             <OptimizationProvider>
               <ExtensionsProvider>
                 <OrchestrationProvider>
-                <OnboardingProvider steps={DEFAULT_ONBOARDING_STEPS}>
-                  {children}
-                </OnboardingProvider>
-                
-                    
-                  </SupportProvider>
+                  <OnboardingProvider steps={DEFAULT_ONBOARDING_STEPS}>
+                    {children}
+                  </OnboardingProvider>
                 </OrchestrationProvider>
               </ExtensionsProvider>
             </OptimizationProvider>

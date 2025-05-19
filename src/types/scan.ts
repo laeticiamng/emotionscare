@@ -51,12 +51,15 @@ export interface EmotionGamificationStats {
   highest_emotion?: string;
 }
 
-// Add MoodData interface that was missing from emotion.ts
+// Define the MoodData interface that was missing from emotion.ts
 export interface MoodData {
   emotion: string;
   intensity: number;
   timestamp: string;
   date?: string;
+  userId?: string;
+  source?: string;
+  tags?: string[];
 }
 
 // Add EmotionPrediction interface that was missing

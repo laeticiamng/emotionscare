@@ -1,85 +1,56 @@
 
-// Coach hook shared types
-export type CoachEmotionData = {
-  emotion: string;
-  score: number;
-};
-
-export type CoachAction = {
-  id: string;
-  type: string;
-  payload: any;
-  created_at?: string;
-};
-
-export type CoachEvent = {
-  id: string;
-  type: string;
-  data: any;
-  timestamp: Date | string;
-};
-
-export type EmotionalData = {
-  emotion: string;
-  intensity: number;
-  timestamp: Date | string;
-  context?: string;
-  value?: number; // Added this property
-  tags?: string[]; // Added this property
-};
-
-export type EmotionalTrend = {
+export interface EmotionalTrend {
   emotion: string;
   count: number;
-  average_intensity: number;
-  timeframe: 'day' | 'week' | 'month';
-};
+  average: number;
+  change: number;
+  period: string;
+}
 
-export type CoachNotification = {
+export interface EmotionalData {
+  id: string;
+  user_id: string;
+  emotion: string;
+  intensity: number;
+  timestamp: string;
+  source?: EmotionSource;
+  context?: string;
+  tags?: string[];
+  value?: number; // Added to support existing codebase
+}
+
+export type EmotionSource = 'text' | 'voice' | 'facial' | 'manual' | 'ai' | 'system' | 'emoji' | 'live-voice' | 'voice-analyzer' | 'audio-processor' | 'text-analysis';
+
+export interface EmotionalStats {
+  dominant: string;
+  average: number;
+  count: number;
+  timeline: {
+    date: string;
+    value: number;
+    emotion: string;
+  }[];
+}
+
+export interface EmotionalRecommendation {
+  type: string;
+  title: string;
+  description: string;
+  actionUrl?: string;
+  actionText?: string;
+}
+
+// Add the CoachNotification type that's missing from lib/coach/types
+export interface CoachNotification {
   id: string;
   title: string;
   message: string;
   type: 'info' | 'warning' | 'success' | 'error';
   timestamp: Date | string;
   read?: boolean;
-  action?: CoachAction;
-};
-
-export const AI_MODEL_CONFIG = {
-  chat: {
-    model: 'gpt-4o-mini',
-    temperature: 0.7,
-    max_tokens: 500,
-    top_p: 1,
-    stream: false,
-    cacheEnabled: true,
-    cacheTTL: 3600
-  },
-  journal: {
-    model: 'gpt-4o-mini',
-    temperature: 0.5,
-    max_tokens: 1000,
-    top_p: 1,
-    stream: false,
-    cacheEnabled: true,
-    cacheTTL: 7200
-  },
-  coach: {
-    model: 'gpt-4o-mini',
-    temperature: 0.3,
-    max_tokens: 500,
-    top_p: 1,
-    stream: false,
-    cacheEnabled: true,
-    cacheTTL: 3600
-  },
-  scan: {
-    model: 'gpt-4o-mini',
-    temperature: 0.2,
-    max_tokens: 300,
-    top_p: 1,
-    stream: false,
-    cacheEnabled: true,
-    cacheTTL: 1800
-  }
-};
+  action?: {
+    id: string;
+    type: string;
+    payload: any;
+  };
+}

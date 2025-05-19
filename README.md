@@ -320,6 +320,7 @@ Vous trouverez dans le dossier `src/docs` plusieurs guides détaillés :
 Des audits complémentaires sont disponibles dans le dossier `docs` :
 - `scalability-innovation-audit.md` : évolutivité et innovation continue
 - `module-registry.md` : registre des modules et roadmap
+- `scan-audio-type-fixes.md` : corrections de typage pour les modules scan/audio
 
 ## Équipe et contribution
 

@@ -62,6 +62,7 @@ export function useMusicService(): UseMusicServiceReturn {
         const mockPlaylists: MusicPlaylist[] = [
           {
             id: 'pl-1',
+            title: 'Relaxation', // Fixed: Using title instead of name
             name: 'Relaxation',
             tracks: [mockTracks[0]],
             emotion: 'calm',
@@ -69,6 +70,7 @@ export function useMusicService(): UseMusicServiceReturn {
           },
           {
             id: 'pl-2',
+            title: 'Concentration', // Fixed: Using title instead of name
             name: 'Concentration',
             tracks: [mockTracks[1]],
             emotion: 'focus',
@@ -76,6 +78,7 @@ export function useMusicService(): UseMusicServiceReturn {
           },
           {
             id: 'pl-3',
+            title: 'Énergie', // Fixed: Using title instead of name
             name: 'Énergie',
             tracks: [mockTracks[2]],
             emotion: 'energetic',
