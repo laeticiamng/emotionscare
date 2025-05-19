@@ -8,12 +8,12 @@ export const musicTracks: MusicTrack[] = [
     title: 'Méditation Profonde',
     artist: 'Ambiance Zen',
     duration: 360,
+    url: '/audio/meditation-deep.mp3',
     audioUrl: '/audio/meditation-deep.mp3',
     coverUrl: '/images/covers/meditation.jpg',
     emotion: 'calm',
     mood: ['calm'],
     album: 'Sessions Zen',
-    year: 2023,
     genre: 'Ambient',
     tags: ['meditation', 'zen', 'calm']
   },
@@ -22,12 +22,12 @@ export const musicTracks: MusicTrack[] = [
     title: 'Focus Mental',
     artist: 'Concentration Studio',
     duration: 480,
+    url: '/audio/focus-mental.mp3',
     audioUrl: '/audio/focus-mental.mp3',
     coverUrl: '/images/covers/focus.jpg',
     emotion: 'focused',
     mood: ['focused'],
     album: 'Concentration Maximale',
-    year: 2022,
     genre: 'Instrumental',
     tags: ['focus', 'concentration', 'work']
   },
@@ -36,12 +36,12 @@ export const musicTracks: MusicTrack[] = [
     title: 'Énergie Positive',
     artist: 'Mood Boosters',
     duration: 240,
+    url: '/audio/energy-positive.mp3',
     audioUrl: '/audio/energy-positive.mp3',
     coverUrl: '/images/covers/energy.jpg',
     emotion: 'happy',
     mood: ['happy'],
     album: 'Boost de Bonne Humeur',
-    year: 2023,
     genre: 'Electronic',
     tags: ['happy', 'energy', 'positive']
   },
@@ -50,12 +50,12 @@ export const musicTracks: MusicTrack[] = [
     title: 'Relaxation Soir',
     artist: 'Night Ambient',
     duration: 600,
+    url: '/audio/relaxation-evening.mp3',
     audioUrl: '/audio/relaxation-evening.mp3',
     coverUrl: '/images/covers/relaxation.jpg',
     emotion: 'relaxed',
     mood: ['relaxed'],
     album: 'Soirées Paisibles',
-    year: 2021,
     genre: 'Ambient',
     tags: ['relaxation', 'evening', 'sleep']
   },
@@ -64,12 +64,12 @@ export const musicTracks: MusicTrack[] = [
     title: 'Méditation Guidée',
     artist: 'Guide Zen',
     duration: 900,
+    url: '/audio/guided-meditation.mp3',
     audioUrl: '/audio/guided-meditation.mp3',
     coverUrl: '/images/covers/guided.jpg',
     emotion: 'calm',
     mood: ['calm'],
     album: 'Voyage Intérieur',
-    year: 2022,
     genre: 'Guided',
     tags: ['meditation', 'guided', 'mindfulness']
   }
@@ -77,6 +77,55 @@ export const musicTracks: MusicTrack[] = [
 
 // Explicitly export allTracks to fix the import error
 export const allTracks = musicTracks;
+
+// Define these specific playlist collections that are imported elsewhere
+export const relaxingNatureSounds: MusicPlaylist = {
+  id: 'relaxing-nature',
+  title: 'Sons de la Nature',
+  description: 'Une collection de sons naturels apaisants',
+  cover: '/images/playlists/nature.jpg',
+  tracks: musicTracks.filter(track => track.id === '1' || track.id === '4'),
+  mood: ['calm', 'relaxed'],
+  emotion: 'calm',
+  category: ['relaxation', 'nature'],
+  author: 'Nature Sounds'
+};
+
+export const focusBeats: MusicPlaylist = {
+  id: 'focus-beats',
+  title: 'Rythmes de Concentration',
+  description: 'Musique pour améliorer votre concentration',
+  cover: '/images/playlists/focus.jpg',
+  tracks: [musicTracks.find(track => track.id === '2')!],
+  mood: ['focus', 'concentration'],
+  emotion: 'focused',
+  category: ['focus'],
+  author: 'Concentration Studio'
+};
+
+export const energyBoost: MusicPlaylist = {
+  id: 'energy-boost',
+  title: 'Boost d\'Énergie',
+  description: 'Musique pour vous donner de l\'énergie',
+  cover: '/images/playlists/energy.jpg',
+  tracks: [musicTracks.find(track => track.id === '3')!],
+  mood: ['energy', 'happy'],
+  emotion: 'happy',
+  category: ['energy'],
+  author: 'Mood Boosters'
+};
+
+export const calmMeditation: MusicPlaylist = {
+  id: 'calm-meditation',
+  title: 'Méditation Calme',
+  description: 'Musique pour la méditation et la relaxation profonde',
+  cover: '/images/playlists/meditation.jpg',
+  tracks: musicTracks.filter(track => track.id === '5' || track.id === '1'),
+  mood: ['calm', 'meditation'],
+  emotion: 'calm',
+  category: ['meditation', 'relaxation'],
+  author: 'Ambiance Zen'
+};
 
 // Music presets
 export const musicPresets = [

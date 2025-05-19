@@ -32,7 +32,7 @@ export const sadnessPlaylist: MusicPlaylist = {
   title: 'Mélancolie Apaisante',
   description: 'Musique qui accompagne et transforme la tristesse',
   cover: '/images/music/sadness-cover.jpg',
-  tracks: calmMeditation.tracks.slice(2, 6),
+  tracks: calmMeditation.tracks.slice(0, 2),
   mood: ['sadness', 'melancholy', 'reflection'],
   emotion: 'sadness',
   category: ['sadness', 'meditation'],

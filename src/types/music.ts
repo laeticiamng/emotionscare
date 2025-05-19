@@ -23,6 +23,8 @@ export interface MusicTrack {
   isPlaying?: boolean;
   genre?: string;
   created_at?: string;
+  year?: number;
+  intensity?: number;
 }
 
 export interface MusicPlaylist {
@@ -111,4 +113,18 @@ export interface Track extends MusicTrack {}
 
 export interface MusicProviderProps {
   children: React.ReactNode;
+}
+
+// Props types for player components
+export interface ProgressBarProps {
+  currentTime: number;
+  duration: number;
+  onSeek: (time: number) => void;
+}
+
+export interface VolumeControlProps {
+  volume: number;
+  muted: boolean;
+  onVolumeChange: (volume: number) => void;
+  onMuteToggle: () => void;
 }
