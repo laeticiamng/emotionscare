@@ -6,17 +6,6 @@ import { normalizeTrack } from '@/utils/musicCompatibility';
 // Create the context with a default value
 export const MusicContext = createContext<MusicContextType>({} as MusicContextType);
 
-// Export hook to use the context
-export const useMusic = (): MusicContextType => {
-  const context = useContext(MusicContext);
-  
-  if (context === undefined) {
-    throw new Error('useMusic must be used within a MusicProvider');
-  }
-  
-  return context;
-};
-
 interface MusicProviderProps {
   children: React.ReactNode;
 }
@@ -156,6 +145,11 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     setOpenDrawer(prev => !prev);
   }, []);
 
+  // Define togglePlay function for compatibility
+  const togglePlay = useCallback(() => {
+    setIsPlaying(prev => !prev);
+  }, []);
+
   // Valeur du contexte
   const contextValue: MusicContextType = {
     currentTrack,
@@ -163,7 +157,7 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     playlist,
     setPlaylist,
     isPlaying,
-    setIsPlaying: setIsPlaying, // Make sure it's included
+    setIsPlaying,
     volume,
     setVolume,
     currentTime,
@@ -198,8 +192,9 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
     loadPlaylist: () => {},
     shufflePlaylist: () => {},
     error: null,
-    setIsInitialized: setIsInitialized,
-    playlists: []
+    setIsInitialized,
+    playlists: [],
+    togglePlay
   };
 
   return (
@@ -207,6 +202,17 @@ export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
       {children}
     </MusicContext.Provider>
   );
+};
+
+// Export the hook for direct usage
+export const useMusic = () => {
+  const context = useContext(MusicContext);
+  
+  if (context === undefined) {
+    throw new Error('useMusic must be used within a MusicProvider');
+  }
+  
+  return context;
 };
 
 export default MusicContext;

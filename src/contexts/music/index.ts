@@ -14,3 +14,4 @@ export * from '@/types/music';
 
 // Export the default context
 export { default } from '@/contexts/MusicContext';
+

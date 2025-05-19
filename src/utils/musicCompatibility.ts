@@ -1,3 +1,4 @@
+
 import { MusicTrack, Track, MusicPlaylist, Playlist } from '@/types/music';
 
 /**
@@ -61,4 +62,52 @@ export const convertToMusicPlaylist = (playlist: Playlist): MusicPlaylist => {
 
 export const convertToMusicTrack = (track: Track): MusicTrack => {
   return normalizeTrack(track);
+};
+
+/**
+ * Helper function to get a track's title with fallbacks
+ */
+export const getTrackTitle = (track: MusicTrack | Track | null): string => {
+  if (!track) return 'Unknown Track';
+  return track.title || track.name || 'Unknown Track';
+};
+
+/**
+ * Helper function to get a track's artist with fallback
+ */
+export const getTrackArtist = (track: MusicTrack | Track | null): string => {
+  if (!track) return 'Unknown Artist';
+  return track.artist || 'Unknown Artist';
+};
+
+/**
+ * Helper function to get a track's cover image URL with fallbacks
+ */
+export const getTrackCover = (track: MusicTrack | Track | null): string => {
+  if (!track) return '';
+  return track.cover || track.coverUrl || track.coverImage || '';
+};
+
+/**
+ * Helper function to get a track's audio URL with fallbacks
+ */
+export const getTrackUrl = (track: MusicTrack | Track | null): string => {
+  if (!track) return '';
+  return track.url || track.audioUrl || track.src || track.track_url || '';
+};
+
+/**
+ * Helper function to get a playlist's name with fallback
+ */
+export const getPlaylistName = (playlist: MusicPlaylist | Playlist | null): string => {
+  if (!playlist) return 'Unknown Playlist';
+  return playlist.name || playlist.title || 'Unknown Playlist';
+};
+
+/**
+ * Helper function to get a playlist's cover image URL with fallback
+ */
+export const getPlaylistCover = (playlist: MusicPlaylist | Playlist | null): string => {
+  if (!playlist) return '';
+  return playlist.coverImage || playlist.cover || playlist.coverUrl || '';
 };
