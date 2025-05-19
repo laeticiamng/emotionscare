@@ -15,6 +15,7 @@ import { useUserModeHelpers } from '@/hooks/useUserModeHelpers';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { motion } from 'framer-motion';
 
 interface ModeSwitcherProps {
   variant?: "default" | "outline" | "secondary" | "ghost" | "link";
@@ -29,6 +30,7 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
   const { userMode, setUserMode } = useUserMode();
   const { isB2C, isB2BUser, isB2BAdmin } = useUserModeHelpers();
   const [isOpen, setIsOpen] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const { toast } = useToast();
   const { user, updateUser } = useAuth();
   
@@ -45,6 +47,9 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
       return; // Do nothing if selecting the same mode
     }
     
+    // Set transitioning state to trigger animations
+    setIsTransitioning(true);
+    
     // Update UserModeContext
     setUserMode(normalizedMode);
     
@@ -60,73 +65,132 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
     
     setIsOpen(false);
     
+    // Show animated toast for better feedback
     toast({
       title: "Mode changé",
       description: `Vous utilisez maintenant EmotionsCare en mode ${
         normalizedMode === 'b2c' ? 'Personnel' : 
         normalizedMode === 'b2b_user' ? 'Collaborateur' : 
         'Administrateur'
-      }.`
+      }.`,
+      variant: "default",
     });
     
-    // Redirect to the appropriate page
-    switch (normalizedMode) {
-      case 'b2c':
-        navigate('/b2c/dashboard');
-        break;
-      case 'b2b_user':
-        navigate('/b2b/user/dashboard');
-        break;
-      case 'b2b_admin':
-        navigate('/b2b/admin/dashboard');
-        break;
-      default:
-        navigate('/choose-mode');
-    }
-    
-    console.log('[ModeSwitcher] Mode switched:', normalizedMode);
+    // Add a slight delay before navigation for smoother transition
+    setTimeout(() => {
+      // Redirect to the appropriate page
+      switch (normalizedMode) {
+        case 'b2c':
+          navigate('/b2c/dashboard');
+          break;
+        case 'b2b_user':
+          navigate('/b2b/user/dashboard');
+          break;
+        case 'b2b_admin':
+          navigate('/b2b/admin/dashboard');
+          break;
+        default:
+          navigate('/choose-mode');
+      }
+      
+      // Reset transitioning state after navigation
+      setTimeout(() => setIsTransitioning(false), 300);
+      
+      console.log('[ModeSwitcher] Mode switched:', normalizedMode);
+    }, 100);
+  };
+  
+  // Get the appropriate icon based on current mode
+  const getCurrentModeIcon = () => {
+    if (isB2C) return <User className="h-4 w-4" />;
+    if (isB2BUser) return <Building className="h-4 w-4" />;
+    if (isB2BAdmin) return <Shield className="h-4 w-4" />;
+    return <SwitchCamera className="h-4 w-4" />;
+  };
+  
+  // Get the name of the current mode
+  const getCurrentModeName = () => {
+    if (isB2C) return "Personnel";
+    if (isB2BUser) return "Collaborateur";
+    if (isB2BAdmin) return "Administrateur";
+    return "Changer de mode";
   };
   
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size={size} className="gap-2">
-          <SwitchCamera className="h-4 w-4" />
-          <span>Changer de mode</span>
+        <Button 
+          variant={variant} 
+          size={size} 
+          className="gap-2 transition-all duration-300 hover:shadow-md focus:ring-2 focus:ring-primary/20"
+          aria-label="Changer de mode utilisateur"
+        >
+          <motion.div
+            initial={{ rotate: 0 }}
+            animate={{ rotate: isTransitioning ? 180 : 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {getCurrentModeIcon()}
+          </motion.div>
+          <span>{getCurrentModeName()}</span>
         </Button>
       </DropdownMenuTrigger>
       
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem 
           onClick={() => handleSwitchMode('b2c')}
-          className="gap-2 cursor-pointer"
+          className="gap-2 cursor-pointer transition-colors focus:bg-blue-50 dark:focus:bg-blue-900/20"
           disabled={isB2C}
         >
           <User className="h-4 w-4" />
           <span>Mode Personnel</span>
-          {isB2C && <Check className="h-4 w-4 ml-auto" />}
+          {isB2C && (
+            <motion.div
+              initial={{ scale: 0 }} 
+              animate={{ scale: 1 }}
+              className="ml-auto"
+            >
+              <Check className="h-4 w-4 text-primary" />
+            </motion.div>
+          )}
         </DropdownMenuItem>
         
         <DropdownMenuItem 
           onClick={() => handleSwitchMode('b2b_user')}
-          className="gap-2 cursor-pointer"
+          className="gap-2 cursor-pointer transition-colors focus:bg-green-50 dark:focus:bg-green-900/20"
           disabled={isB2BUser}
         >
           <Building className="h-4 w-4" />
           <span>Mode Collaborateur</span>
-          {isB2BUser && <Check className="h-4 w-4 ml-auto" />}
+          {isB2BUser && (
+            <motion.div
+              initial={{ scale: 0 }} 
+              animate={{ scale: 1 }}
+              className="ml-auto"
+            >
+              <Check className="h-4 w-4 text-primary" />
+            </motion.div>
+          )}
         </DropdownMenuItem>
         
         <DropdownMenuSeparator />
         
         <DropdownMenuItem 
           onClick={() => handleSwitchMode('b2b_admin')}
-          className="gap-2 cursor-pointer"
+          className="gap-2 cursor-pointer transition-colors focus:bg-purple-50 dark:focus:bg-purple-900/20"
           disabled={isB2BAdmin}
         >
           <Shield className="h-4 w-4" />
           <span>Mode Administrateur</span>
-          {isB2BAdmin && <Check className="h-4 w-4 ml-auto" />}
+          {isB2BAdmin && (
+            <motion.div
+              initial={{ scale: 0 }} 
+              animate={{ scale: 1 }}
+              className="ml-auto"
+            >
+              <Check className="h-4 w-4 text-primary" />
+            </motion.div>
+          )}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

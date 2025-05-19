@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useReducer, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/hooks/use-toast';
@@ -10,7 +9,7 @@ import {
   SanctuaryWidget,
   EmotionalSynthesis,
   OrchestrationEvent
-} from '@/types/orchestration';
+} from '@/types/global';
 import { EmotionResult } from '@/types/emotion';
 
 // Données initiales pour le sanctuaire
