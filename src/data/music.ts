@@ -48,7 +48,7 @@ export const relaxingNatureSounds: MusicPlaylist = {
   mood: 'calm',
   emotion: 'calm',
   category: ['relaxation', 'nature'],
-  author: 'EmotionsCare'
+  creator: 'EmotionsCare'
 };
 
 // Define focus beats
@@ -89,7 +89,7 @@ export const focusBeats: MusicPlaylist = {
   mood: 'focus',
   emotion: 'focus',
   category: ['focus', 'ambient'],
-  author: 'EmotionsCare'
+  creator: 'EmotionsCare'
 };
 
 // Define energy boost
@@ -130,7 +130,7 @@ export const energyBoost: MusicPlaylist = {
   mood: 'energetic',
   emotion: 'energetic',
   category: ['energy', 'happiness'],
-  author: 'EmotionsCare'
+  creator: 'EmotionsCare'
 };
 
 // Define calm meditation
@@ -180,7 +180,7 @@ export const calmMeditation: MusicPlaylist = {
   mood: 'calm',
   emotion: 'calm',
   category: ['meditation', 'relaxation'],
-  author: 'EmotionsCare'
+  creator: 'EmotionsCare'
 };
 
 // All playlists

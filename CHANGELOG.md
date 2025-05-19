@@ -31,6 +31,13 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ### Modifié
 - Mise à jour de `README.md` pour référencer ces nouveaux documents
 
+## [1.1.8] - 2025-05-26
+
+### Corrigé
+- Données mock musicales mises en conformité (`src/data/musicPlaylists.ts`).
+- Ajout des propriétés manquantes `url`, `title` et `creator`.
+- Harmonisation du champ `creator` dans `src/data/music.ts`.
+
 ## [1.1.4] - 2025-05-22
 
 ### Corrigé
