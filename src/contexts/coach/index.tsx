@@ -2,28 +2,13 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { EmotionResult } from '@/types/emotion';
-
-export interface ChatMessage {
-  id: string;
-  content: string;
-  sender: 'user' | 'coach' | 'system';
-  timestamp: string;
-  role?: string;
-}
-
-export interface Conversation {
-  id: string;
-  title: string;
-  messages: ChatMessage[];
-  createdAt: string;
-  updatedAt: string;
-}
+import { ChatMessage, ChatConversation as Conversation } from '@/types/chat';
 
 export interface CoachContextType {
   messages: ChatMessage[];
   isProcessing: boolean;
   isTyping: boolean;
-  conversations: { id: string; title: string }[];
+  conversations: Conversation[];
   activeConversationId: string | null;
   lastEmotion: string | null;
   emotionHistory: EmotionResult[];
@@ -33,7 +18,7 @@ export interface CoachContextType {
   startNewConversation: (title?: string) => string;
   setActiveConversation: (id: string) => void;
   updateLastEmotion: (emotion: string) => void;
-  sendMessage: (content: string, sender: 'user' | 'coach' | 'system') => Promise<void>;
+  sendMessage: (content: string, sender: 'user' | 'assistant' | 'system' | 'coach') => Promise<void>;
 }
 
 const defaultContext: CoachContextType = {
@@ -60,7 +45,7 @@ export const useCoach = () => useContext(CoachContext);
 export const CoachProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [conversations, setConversations] = useState<{ id: string; title: string }[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [lastEmotion, setLastEmotion] = useState<string | null>(null);
   const [currentEmotion, setCurrentEmotion] = useState<string | null>(null);
@@ -91,9 +76,12 @@ export const CoachProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // Start a new conversation
   const startNewConversation = (title?: string) => {
     const id = uuidv4();
-    const newConversation = {
+    const newConversation: Conversation = {
       id,
-      title: title || `Conversation ${conversations.length + 1}`
+      title: title || `Conversation ${conversations.length + 1}`,
+      messages: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     
     setConversations(prev => [...prev, newConversation]);
@@ -143,7 +131,7 @@ export const CoachProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   // Send a message and get a response if it's from user
-  const sendMessage = async (content: string, sender: 'user' | 'coach' | 'system') => {
+  const sendMessage = async (content: string, sender: 'user' | 'assistant' | 'system' | 'coach') => {
     if (!content.trim()) return;
     
     // Add the user/system message

@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react';
-import { ChatMessage } from '@/types/coach';
+import { ChatMessage } from '@/types/chat';
 
 export function useCoachLocalStorage(
   messages: ChatMessage[],

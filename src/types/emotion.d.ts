@@ -1,12 +1,12 @@
 
-export interface EmotionData {
-  emotion: string;
-  confidence: number;
+export interface Emotion {
+  id: string;
+  name: string;
+  label?: string;
+  color: string;
+  icon?: string;
+  description?: string;
   intensity?: number;
-  valence?: number;
-  arousal?: number;
-  dominance?: number;
-  timestamp?: string;
 }
 
 export interface EmotionResult {
@@ -15,7 +15,16 @@ export interface EmotionResult {
   intensity?: number;
   secondaryEmotions?: string[];
   timestamp?: string;
-  source?: 'text' | 'voice' | 'facial' | 'emoji' | 'system' | 'ai';
+  source?:
+    | 'text'
+    | 'voice'
+    | 'facial'
+    | 'emoji'
+    | 'system'
+    | 'ai'
+    | 'live-voice'
+    | 'voice-analyzer'
+    | 'audio-processor';
   text?: string;
   duration?: number;
   userId?: string;
@@ -41,66 +50,105 @@ export interface EmotionResult {
 
 export interface EmotionRecommendation {
   id: string;
-  type: string;
+  type: 'activity' | 'reflection' | 'breathing' | 'music' | 'social';
   title: string;
   description: string;
-  emotion?: string;
-  content?: string;
-  category?: string;
-  action?: string;
-  link?: string;
   icon?: string;
+  duration?: string;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  tags?: string[];
+}
+
+export interface LiveVoiceScannerProps {
+  onEmotionDetected?: (emotion: EmotionResult) => void;
+  onStart?: () => void;
+  onStop?: () => void;
+  autoStart?: boolean;
   duration?: number;
-  intensity?: 'low' | 'medium' | 'high';
-  tags?: string[];
+  showFeedback?: boolean;
+  compact?: boolean;
 }
 
-export interface EmotionTrigger {
-  name: string;
-  description: string;
-  intensity: number;
-  emotion: string;
-  timestamp: string;
-  context?: string;
-  tags?: string[];
+export interface EmotionalTeamViewProps {
+  showHeader?: boolean;
+  showLegend?: boolean;
+  height?: string | number;
+  width?: string | number;
+  filter?: string[];
 }
 
-export interface EmotionReport {
-  id: string;
-  userId: string;
-  date: string;
-  emotions: EmotionData[];
-  dominantEmotion: string;
-  averageIntensity: number;
-  triggers?: EmotionTrigger[];
-  recommendations?: EmotionRecommendation[];
-  notes?: string;
-  tags?: string[];
+export interface TextEmotionScannerProps {
+  onEmotionDetected?: (emotion: EmotionResult) => void;
+  placeholder?: string;
+  defaultText?: string;
+  minLength?: number;
+  maxLength?: number;
+  showResults?: boolean;
+  autoAnalyze?: boolean;
 }
 
-export interface EmotionChartData {
-  name: string;
-  value: number;
-  color?: string;
+export interface EmojiEmotionScannerProps {
+  onEmotionSelected?: (emoji: string, emotion: string) => void;
+  size?: 'sm' | 'md' | 'lg';
+  grid?: boolean;
+  preselected?: string;
 }
 
-export interface EmotionScannerProps {
+export interface VoiceEmotionScannerProps {
+  onEmotionDetected?: (emotion: EmotionResult) => void;
+  duration?: number;
+  autoStart?: boolean;
+  showFeedback?: boolean;
+  showTimer?: boolean;
+  compact?: boolean;
+}
+
+export interface VoiceEmotionAnalyzerProps {
+  audioUrl: string;
+  onAnalysisComplete?: (result: EmotionResult) => void;
+  autoPlay?: boolean;
+  showWaveform?: boolean;
+  showResult?: boolean;
+}
+
+export interface EmojiEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
   onCancel?: () => void;
-  initialTab?: 'emoji' | 'text' | 'facial' | 'voice';
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  onProcessingChange?: (isProcessing: boolean) => void;
 }
 
-export interface EmotionScanResult {
-  emotion: string;
-  intensity: number;
-  confidence: number;
-  timestamp: string;
-  source: "text" | "voice" | "facial" | "emoji" | "system" | "ai";
-  recommendations?: string[];
-}
-
-export interface EmotionScanFormProps {
+export interface TextEmotionScannerProps {
   onScanComplete?: (result: EmotionResult) => void;
   onCancel?: () => void;
-  onClose?: () => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  onProcessingChange?: (isProcessing: boolean) => void;
+}
+
+export interface AudioEmotionScannerProps {
+  onComplete?: (result: EmotionResult) => void;
+  onCancel?: () => void;
+  autoStart?: boolean;
+}
+
+export interface VoiceEmotionScannerProps {
+  onEmotionDetected: (result: EmotionResult) => void;
+}
+
+export interface VoiceEmotionAnalyzerProps {
+  onResult: (result: EmotionResult) => void;
+  onStartRecording?: () => void;
+}
+
+export interface LiveVoiceScannerProps {
+  onScanComplete?: (result: EmotionResult) => void;
+  onResult?: (result: EmotionResult) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
+  onCancel?: () => void;
+  autoStart?: boolean;
+  scanDuration?: number;
 }

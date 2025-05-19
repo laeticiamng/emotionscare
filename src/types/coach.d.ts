@@ -1,30 +1,15 @@
 
 import { EmotionResult } from './types';
-
-export interface ChatMessage {
-  id: string;
-  content: string;
-  sender: 'user' | 'coach' | 'system';
-  timestamp: string;
-  role?: string;
-  text?: string;
-  conversation_id?: string;
-}
-
-export interface Conversation {
-  id: string;
-  title: string;
-  messages: ChatMessage[];
-  createdAt: string;
-  updatedAt: string;
-}
+import type { ChatMessage, ChatConversation as Conversation } from './chat';
+export type { ChatMessage, Conversation };
 
 export interface CoachContextType {
   messages: ChatMessage[];
   isProcessing: boolean;
   isTyping: boolean;
-  conversations: { id: string; title: string }[];
+  conversations: Conversation[];
   activeConversationId: string | null;
+  currentConversation: Conversation | null;
   lastEmotion: string | null;
   emotionHistory: EmotionResult[];
   currentEmotion: string | null;
@@ -33,5 +18,5 @@ export interface CoachContextType {
   startNewConversation: (title?: string) => string;
   setActiveConversation: (id: string) => void;
   updateLastEmotion: (emotion: string) => void;
-  sendMessage: (content: string, sender: 'user' | 'coach' | 'system') => Promise<void>;
+  sendMessage: (content: string, sender: 'user' | 'assistant' | 'system' | 'coach') => Promise<void>;
 }

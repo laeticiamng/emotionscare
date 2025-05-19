@@ -43,6 +43,7 @@ export function useVoiceCommands(options: VoiceCommandOptions = {}) {
   const allCommands = { ...defaultCommands, ...commands };
 
   const startListening = useCallback(() => {
+    // Using imported types for SpeechRecognition from our speech.d.ts
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       setError("La reconnaissance vocale n'est pas prise en charge par votre navigateur");
       onError?.("La reconnaissance vocale n'est pas prise en charge par votre navigateur");
@@ -52,7 +53,7 @@ export function useVoiceCommands(options: VoiceCommandOptions = {}) {
     setIsListening(true);
     setError(null);
     
-    // Using the Web Speech API
+    // Using the Web Speech API with our type definitions
     const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) {
       setError("La reconnaissance vocale n'est pas disponible");
@@ -78,7 +79,7 @@ export function useVoiceCommands(options: VoiceCommandOptions = {}) {
       });
     };
     
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event) => {
       const errorMessage = event.error || "Erreur de reconnaissance vocale";
       setError(`Erreur de reconnaissance vocale: ${errorMessage}`);
       onError?.(`Erreur de reconnaissance vocale: ${errorMessage}`);

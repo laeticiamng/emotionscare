@@ -3,53 +3,42 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  imageUrl?: string;
-  image_url?: string;
-  category?: string;
-  level?: number | string;
-  achieved?: boolean;
-  progress?: number;
-  maxProgress?: number;
-  dateAwarded?: string;
-  unlockCriteria?: string;
-  xp?: number;
-  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  
-  // Additional properties to ensure compatibility
-  unlocked?: boolean;
-  unlockedAt?: string;
-  unlocked_at?: string;
-  image?: string;
-  timestamp?: string;
   icon?: string;
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
+  image?: string;
+  imageUrl?: string; // For backward compatibility
+  image_url?: string; // For backward compatibility
+  category?: string;
   earned?: boolean;
-  threshold?: number;
-  completed?: boolean;
-  total?: number;
+  achieved?: boolean; // For backward compatibility
+  unlocked?: boolean; // For backward compatibility
+  date_earned?: string;
+  dateAwarded?: string; // For backward compatibility
+  unlockedAt?: string; // For backward compatibility
+  unlocked_at?: string; // For backward compatibility
+  timestamp?: string; // For backward compatibility
+  prerequisites?: string[];
+  points?: number;
+  user_id?: string;
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
 }
 
 export interface Challenge {
   id: string;
-  title?: string;
   name?: string;
+  title?: string;
   description: string;
-  category?: string;
-  goal: number | string;
-  points?: number;
-  progress?: number;
+  points: number;
+  status: string;
+  progress: number;
+  category: string;
   completed?: boolean;
-  status?: string;
-  totalSteps?: number;
-  unlocked?: boolean;
-  reward?: any;
-  difficulty?: string;
-  completions?: number;
-  total?: number;
-  deadline?: string;
+  reward?: string | Badge;
+  unlocked: boolean;
   type?: string;
-  isCompleted?: boolean;
-  icon?: string;
-  value?: any;
-  tags?: string[];
+  goal?: number;
+  total?: number; // For tracking progress total
+  totalSteps?: number; // Alternative for total
+  difficulty?: string; // For difficulty level
+  completions?: number; // For tracking completions
+  deadline?: string; // For deadline tracking
 }

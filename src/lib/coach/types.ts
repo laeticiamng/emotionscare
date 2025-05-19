@@ -6,7 +6,7 @@
  */
 
 import { EmotionResult } from '@/types/emotion';
-import { EmotionalTrend } from '@/types/emotional-data';
+import { EmotionalTrend } from '@/hooks/coach/types';
 
 export interface CoachAction {
   type: string;
@@ -22,6 +22,17 @@ export interface CoachState {
 }
 
 export type CoachReducer = (state: CoachState, action: CoachAction) => CoachState;
+
+// Define CoachNotification type for action handlers
+export interface CoachNotification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  timestamp: Date | string;
+  read?: boolean;
+  action?: CoachAction;
+}
 
 // AI model configuration
 export const AI_MODEL_CONFIG = {

@@ -3,14 +3,14 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ThemeSettingsTab from './ThemeSettingsTab';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Theme } from '@/types/theme';
+import { ThemeName } from '@/types/theme';
 
 const UserSettings = () => {
   const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('theme');
 
   // Properly typed theme handler
-  const handleThemeChange = (newTheme: Theme) => {
+  const handleThemeChange = (newTheme: ThemeName) => {
     setTheme(newTheme);
   };
 

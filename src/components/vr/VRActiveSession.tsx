@@ -38,7 +38,7 @@ const VRActiveSession: React.FC<VRActiveSessionProps> = ({ template, onComplete,
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Session en cours: {template.title || template.name}</CardTitle>
+        <CardTitle>Session en cours: {template.title || template.name || ""}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center space-y-4">
         <p className="text-muted-foreground text-center">

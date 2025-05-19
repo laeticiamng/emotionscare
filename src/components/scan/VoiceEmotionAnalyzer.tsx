@@ -5,12 +5,11 @@ import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
-
-interface VoiceEmotionAnalyzerProps {
-  onResult: (result: EmotionResult) => void;
-  onStartRecording?: () => void;
-}
+import {
+  EmotionResult,
+  EmotionRecommendation,
+  VoiceEmotionAnalyzerProps,
+} from '@/types/emotion';
 
 const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult, onStartRecording }) => {
   const [emotion, setEmotion] = useState("calm");

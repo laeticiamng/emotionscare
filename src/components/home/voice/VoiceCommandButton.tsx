@@ -1,8 +1,9 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { SpeechRecognition } from '@/types/speech';
 
 interface VoiceCommandButtonProps {
   onTranscript?: (transcript: string) => void;
@@ -18,51 +19,99 @@ export const VoiceCommandButton: React.FC<VoiceCommandButtonProps> = ({
   size = 'icon'
 }) => {
   const [isListening, setIsListening] = useState(false);
+  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
   const { toast } = useToast();
   
-  const toggleListening = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening();
-    }
-  };
-  
-  const startListening = () => {
-    setIsListening(true);
-    toast({
-      title: "Commande vocale activée",
-      description: "Je suis à votre écoute...",
-    });
-    
-    // In a real implementation, we would use the Web Speech API or connect to a backend
-    // For demo purposes, we'll simulate voice recognition
-    setTimeout(() => {
-      const simulatedCommand = "connexion à mon espace";
-      
-      toast({
-        title: "Commande détectée",
-        description: simulatedCommand,
-      });
-      
-      // Execute matching commands
-      Object.entries(commands).forEach(([phrase, callback]) => {
-        if (simulatedCommand.toLowerCase().includes(phrase.toLowerCase())) {
-          callback();
-        }
-      });
-      
-      // Call the onTranscript callback if provided
-      if (onTranscript) {
-        onTranscript(simulatedCommand);
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognitionInstance = new SpeechRecognition();
+        recognitionInstance.continuous = false;
+        recognitionInstance.lang = 'fr-FR';
+        recognitionInstance.interimResults = false;
+        recognitionInstance.maxAlternatives = 1;
+        
+        recognitionInstance.onstart = () => {
+          setIsListening(true);
+        };
+        
+        recognitionInstance.onresult = (event) => {
+          const transcript = event.results[0][0].transcript.toLowerCase();
+          
+          toast({
+            title: "Commande détectée",
+            description: transcript,
+          });
+          
+          // Execute commands matching the transcript
+          Object.entries(commands).forEach(([phrase, callback]) => {
+            if (transcript.toLowerCase().includes(phrase.toLowerCase())) {
+              callback();
+            }
+          });
+          
+          // Call the onTranscript callback if provided
+          if (onTranscript) {
+            onTranscript(transcript);
+          }
+        };
+        
+        recognitionInstance.onend = () => {
+          setIsListening(false);
+        };
+        
+        recognitionInstance.onerror = (event) => {
+          console.error('Speech recognition error', event.error);
+          setIsListening(false);
+          toast({
+            title: "Erreur de reconnaissance vocale",
+            description: event.error,
+            variant: "destructive",
+          });
+        };
+        
+        setRecognition(recognitionInstance);
       }
-      
-      stopListening();
-    }, 3000);
-  };
+    }
+    
+    // Cleanup
+    return () => {
+      if (recognition) {
+        recognition.abort();
+      }
+    };
+  }, [commands, onTranscript, toast]);
   
-  const stopListening = () => {
-    setIsListening(false);
+  const toggleListening = () => {
+    if (!recognition) {
+      toast({
+        title: "Non supporté",
+        description: "Votre navigateur ne prend pas en charge la reconnaissance vocale",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (isListening) {
+      recognition.stop();
+    } else {
+      try {
+        recognition.start();
+        toast({
+          title: "Commande vocale activée",
+          description: "Je suis à votre écoute...",
+        });
+      } catch (error) {
+        console.error('Error starting recognition:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de démarrer la reconnaissance vocale",
+          variant: "destructive",
+        });
+      }
+    }
   };
   
   return (
@@ -71,6 +120,7 @@ export const VoiceCommandButton: React.FC<VoiceCommandButtonProps> = ({
       size={size}
       onClick={toggleListening}
       className={`relative ${isListening ? 'animate-pulse' : ''}`}
+      aria-label={isListening ? "Arrêter l'écoute vocale" : "Activer la commande vocale"}
     >
       {isListening ? (
         <>

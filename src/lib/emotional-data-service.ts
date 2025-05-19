@@ -54,3 +54,4 @@ class EmotionalDataService {
 
 // Export a singleton instance
 export const emotionalDataService = new EmotionalDataService();
+export default emotionalDataService;

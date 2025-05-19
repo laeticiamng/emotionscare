@@ -18,7 +18,8 @@ export const emotionActionHandlers = {
       emotion,
       intensity: intensity || 0.5,
       timestamp: new Date().toISOString(),
-      context
+      context,
+      user_id: 'default-user', // Adding required user_id field
     });
     
     return {
@@ -42,7 +43,8 @@ export const emotionActionHandlers = {
       emotion,
       intensity: intensity || 0.5,
       timestamp: new Date().toISOString(),
-      context
+      context,
+      user_id: 'default-user', // Adding required user_id field
     });
     
     return {
@@ -110,7 +112,8 @@ export const emotionActionHandlers = {
       emotion: 'tracking',
       intensity: 0,
       timestamp: new Date().toISOString(),
-      context: JSON.stringify(results)
+      context: JSON.stringify(results),
+      user_id: 'default-user', // Adding required user_id field
     });
     
     return {

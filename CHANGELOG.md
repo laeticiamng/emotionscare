@@ -2,6 +2,20 @@
 # Changelog
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.9] - 2025-05-26
+
+### Corrigé
+- Nettoyage des commentaires superflus dans `Notification` et uniformisation des types
+- Mise à jour du hook `use-notifications` pour importer `NotificationFilter`
+- Harmonisation des énumérations `NotificationType` et `NotificationFilter`
+
+## [1.1.8] - 2025-05-26
+
+### Corrigé
+- Typage `Notification` complété (`linkTo`, `content`, `date`, `isRead`)
+- Alignement des hooks et services sur ce type unifié
+- Nettoyage des déclarations locales dans `useNotifications`
+
 ## [1.1.5] - 2025-05-23
 
 ### Ajouté
@@ -31,12 +45,27 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 ### Modifié
 - Mise à jour de `README.md` pour référencer ces nouveaux documents
 
+
+## [1.1.9] - 2025-05-27
+
+### Ajouté
+- Bouton de sauvegarde animé dans `DataPrivacySettings` permettant d'enregistrer les préférences.
+- Documentation `docs/ui-polish-restoration.md` décrivant la restauration de l'interface.
+
+### Modifié
+- `README.md` référence ce nouveau document.
+
 ## [1.1.8] - 2025-05-26
 
-### Corrigé
-- Données mock musicales mises en conformité (`src/data/musicPlaylists.ts`).
-- Ajout des propriétés manquantes `url`, `title` et `creator`.
-- Harmonisation du champ `creator` dans `src/data/music.ts`.
+### Modifié
+- Alignement des types liés aux scans audio et vocaux (`EmotionSource`, `AudioProcessorProps`, etc.).
+- Suppression des interfaces locales remplacées par les définitions centralisées.
+
+### Ajouté
+- Documentation `docs/scan-audio-type-fixes.md` décrivant les corrections.
+
+
+
 
 ## [1.1.4] - 2025-05-22
 

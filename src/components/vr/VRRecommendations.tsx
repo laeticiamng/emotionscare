@@ -4,9 +4,9 @@ import { VRSessionTemplate } from '@/types';
 
 export interface VRRecommendationsProps {
   templates: VRSessionTemplate[];
-  currentTemplateId?: string; // Added property
+  currentTemplateId?: string;
   showHeading?: boolean;
-  onSelect: (template: VRSessionTemplate) => void; // Added property
+  onSelect: (template: VRSessionTemplate) => void;
 }
 
 const VRRecommendations: React.FC<VRRecommendationsProps> = ({ 
@@ -20,7 +20,7 @@ const VRRecommendations: React.FC<VRRecommendationsProps> = ({
       {showHeading && <h2>VR Recommendations</h2>}
       {templates.map(template => (
         <div key={template.id} onClick={() => onSelect(template)}>
-          {template.name || template.title}
+          {template.title || template.name}
         </div>
       ))}
     </div>

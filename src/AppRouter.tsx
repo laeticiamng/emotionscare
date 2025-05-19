@@ -1,87 +1,34 @@
 
-import React, { Suspense, useEffect } from 'react';
-import { useRoutes, useLocation } from 'react-router-dom';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { routes } from './router';
-import { useDashboardMonitor } from './hooks/use-dashboard-monitor';
-import { usePreferredAccess } from './hooks/use-preferred-access';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { useToast } from '@/hooks/use-toast';
+import React from 'react';
+import { Routes, Route, Navigate } from "react-router-dom";
+import HomePage from './pages/HomePage';
+import B2BSelectionPage from './pages/b2b/Selection';
+import B2BAdminDashboard from './pages/b2b/admin/Dashboard';
+import B2BUserDashboard from './pages/b2b/user/Dashboard';
+import B2CPage from './pages/b2c/Home';
+import B2CLoginPage from './pages/b2c/Login';
+import B2CRegisterPage from './pages/b2c/Register';
+import B2CForgotPasswordPage from './pages/b2c/ForgotPassword';
+import B2CResetPasswordPage from './pages/b2c/ResetPassword';
+import ProfilePage from './pages/Profile';
+import Unauthorized from './pages/common/Unauthorized';
 
 const AppRouter: React.FC = () => {
-  const content = useRoutes(routes);
-  const location = useLocation();
-  const { userMode } = useUserMode();
-  const { toast } = useToast();
-
-  // Add monitoring for dashboard access issues
-  useDashboardMonitor();
-  
-  // Apply unified access redirections
-  usePreferredAccess();
-  
-  // Show a toast when navigating to key pages for better feedback
-  useEffect(() => {
-    const keyPageMessages: Record<string, { title: string, description: string }> = {
-      '/b2c/dashboard': {
-        title: 'Espace Personnel',
-        description: 'Bienvenue dans votre espace personnel EmotionsCare'
-      },
-      '/b2b/user/dashboard': {
-        title: 'Espace Collaborateur',
-        description: 'Bienvenue dans votre espace professionnel'
-      },
-      '/b2b/admin/dashboard': {
-        title: 'Espace Administrateur',
-        description: 'Bienvenue dans votre console d\'administration'
-      }
-    };
-    
-    if (keyPageMessages[location.pathname]) {
-      const { title, description } = keyPageMessages[location.pathname];
-      toast({
-        title,
-        description,
-        variant: "default",
-      });
-    }
-  }, [location.pathname, toast]);
-  
-  if (!content) {
-    console.error("[AppRouter] No route matches the current path:", location.pathname);
-  }
-  
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ 
-          duration: 0.3,
-          type: 'spring',
-          stiffness: 260,
-          damping: 20
-        }}
-        className="min-h-screen flex flex-col"
-      >
-        <Suspense fallback={
-          <div className="min-h-screen flex items-center justify-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <LoadingSpinner />
-            </motion.div>
-          </div>
-        }>
-          {content}
-        </Suspense>
-      </motion.div>
-    </AnimatePresence>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/b2b/selection" element={<B2BSelectionPage />} />
+      <Route path="/b2b/admin/dashboard" element={<B2BAdminDashboard />} />
+      <Route path="/b2b/user/dashboard" element={<B2BUserDashboard />} />
+      <Route path="/b2c" element={<B2CPage />} />
+      <Route path="/b2c/login" element={<B2CLoginPage />} />
+      <Route path="/b2c/register" element={<B2CRegisterPage />} />
+      <Route path="/b2c/forgot-password" element={<B2CForgotPasswordPage />} />
+      <Route path="/b2c/reset-password" element={<B2CResetPasswordPage />} />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 };
 
