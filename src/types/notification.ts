@@ -3,6 +3,29 @@
 export type NotificationFrequency = 'instant' | 'hourly' | 'daily' | 'weekly' | 'never' | 'immediate';
 export type NotificationTone = 'informative' | 'friendly' | 'professional' | 'minimal';
 
+export type NotificationType =
+  | 'system'
+  | 'emotion'
+  | 'coach'
+  | 'journal'
+  | 'community'
+  | 'achievement'
+  | 'badge'
+  | 'challenge'
+  | 'reminder'
+  | 'info'
+  | 'warning'
+  | 'error'
+  | 'success'
+  | 'streak'
+  | 'urgent';
+
+export type NotificationFilter =
+  | 'all'
+  | 'unread'
+  | 'read'
+  | NotificationType;
+
 export interface NotificationPreference {
   type: string;
   enabled: boolean;
@@ -49,4 +72,6 @@ export interface Notification {
   actionText?: string;
   icon?: string;
   image?: string;
+  created_at?: string; // For backward compatibility
+  timestamp?: string | Date; // For backward compatibility
 }

@@ -1,168 +1,193 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { Notification, NotificationFrequency, NotificationTone } from '@/types/notification';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Notification, NotificationType, NotificationFilter } from '@/types/notification';
+export type NotificationFilter = 'all' | 'unread' | 'invitation' | 'reminder' | 'system';
 
-interface UseNotificationsOptions {
-  limit?: number;
-  autoRefresh?: boolean;
-  refreshInterval?: number;
-}
-
-export const useNotifications = (
-  initialFilter: NotificationFilter = 'all',
-  options: UseNotificationsOptions = {}
-) => {
-  const { limit = 10, autoRefresh = false, refreshInterval = 60000 } = options;
-  
+export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [filter, setFilter] = useState<NotificationFilter | null>(initialFilter);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
-  const [page, setPage] = useState<number>(1);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-
-  // Fetch notifications based on current filter and page
-  const fetchNotifications = useCallback(async (reset: boolean = false) => {
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [filter, setFilter] = useState<NotificationFilter>('all');
+  const { user } = useAuth();
+  const { toast } = useToast();
+  
+  // Fetch notifications based on filter
+  const fetchNotifications = async (selectedFilter: NotificationFilter = filter) => {
+    if (!user) return;
+    
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      setError(null);
+      // In a real app, this would be an API call
+      // For now, we'll use mock data
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
       
-      const currentPage = reset ? 1 : page;
+      // Mock notification data
+      const mockNotifications: Notification[] = [
+        {
+          id: '1',
+          type: 'info',
+          title: 'Nouveau rapport disponible',
+          message: 'Votre rapport hebdomadaire est prêt à être consulté.',
+          createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
+          read: false,
+          userId: user.id,
+          timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // For backward compatibility
+          linkTo: '/dashboard'
+        },
+        {
+          id: '2',
+          type: 'invitation',
+          title: 'Invitation à une session VR',
+          message: 'Jean Dupont vous invite à rejoindre une session VR relaxation.',
+          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
+          read: false,
+          userId: user.id,
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // For backward compatibility
+          linkTo: '/vr-sessions'
+        },
+        {
+          id: '3',
+          type: 'reminder',
+          title: 'Rappel: Scan émotionnel',
+          message: 'N\'oubliez pas d\'effectuer votre scan émotionnel quotidien.',
+          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
+          read: true,
+          userId: user.id,
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // For backward compatibility
+          linkTo: '/scan'
+        },
+        {
+          id: '4',
+          type: 'system',
+          title: 'Maintenance système prévue',
+          message: 'Une maintenance est prévue demain à 22h00.',
+          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
+          read: true,
+          userId: user.id,
+          timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // For backward compatibility
+          linkTo: '/notifications'
+        }
+      ];
       
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Mock data
-      const mockNotifications: Notification[] = [];
-      for (let i = 1; i <= limit; i++) {
-        const notifId = (currentPage - 1) * limit + i;
-        mockNotifications.push({
-          id: `notif-${notifId}`,
-          title: `Notification #${notifId}`,
-          message: `This is the content of notification #${notifId}`,
-          type: (notifId % 6 === 0) ? 'badge' : 
-                 (notifId % 5 === 0) ? 'emotion' :
-                 (notifId % 4 === 0) ? 'journal' :
-                 (notifId % 3 === 0) ? 'system' : 
-                 (notifId % 2 === 0) ? 'reminder' : 'info',
-          read: notifId % 3 !== 0,
-          created_at: new Date(Date.now() - notifId * 3600000).toISOString(),
-          timestamp: new Date(Date.now() - notifId * 3600000).toISOString(),
-          user_id: 'current-user'
-        });
+      // Filter notifications based on selected filter
+      let filteredNotifications = mockNotifications;
+      if (selectedFilter === 'unread') {
+        filteredNotifications = mockNotifications.filter(n => !n.read);
+      } else if (selectedFilter !== 'all') {
+        filteredNotifications = mockNotifications.filter(n => n.type === selectedFilter);
       }
       
-      // Apply filters if specified
-      const filteredNotifs = filter && filter !== 'all' 
-        ? filter === 'unread' 
-          ? mockNotifications.filter(n => !n.read) 
-          : filter === 'read' 
-            ? mockNotifications.filter(n => n.read)
-            : mockNotifications.filter(n => n.type === filter)
-        : mockNotifications;
-      
-      if (reset) {
-        setNotifications(filteredNotifs);
-        setPage(1);
-      } else {
-        setNotifications(prev => [...prev, ...filteredNotifs]);
-        setPage(currentPage + 1);
-      }
-      
-      // Count unread notifications
-      const unread = mockNotifications.filter(n => !n.read).length;
-      setUnreadCount(unread);
-      
-      // Check if there are more notifications to fetch
-      setHasMore(mockNotifications.length === limit);
-      
-    } catch (err) {
-      console.error('Error fetching notifications:', err);
-      setError(err instanceof Error ? err : new Error('Failed to fetch notifications'));
+      setNotifications(filteredNotifications);
+      const unreadNotifications = mockNotifications.filter(n => !n.isRead);
+      setUnreadCount(unreadNotifications.length);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger les notifications',
+        variant: 'destructive',
+      });
     } finally {
       setIsLoading(false);
     }
-  }, [page, limit, filter]);
-
-  // Initial fetch
-  useEffect(() => {
-    fetchNotifications(true);
-  }, [filter]);
-
-  // Auto refresh if enabled
-  useEffect(() => {
-    if (!autoRefresh) return;
+  };
+  
+  // Mark a notification as read
+  const markAsRead = async (id: string) => {
+    if (!user) return;
     
-    const interval = setInterval(() => {
-      fetchNotifications(true);
-    }, refreshInterval);
-    
-    return () => clearInterval(interval);
-  }, [autoRefresh, refreshInterval, fetchNotifications]);
-
-  // Mark notification as read
-  const markAsRead = useCallback((id: string) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
-    
-    setUnreadCount(prev => Math.max(0, prev - 1));
-  }, []);
-
+    try {
+      // In a real app, this would be an API call
+      // For now, we'll update the local state
+      setNotifications(prev => 
+        prev.map(notification => 
+          notification.id === id ? { ...notification, read: true } : notification
+        )
+      );
+      
+      // Update unread count
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de marquer la notification comme lue',
+        variant: 'destructive',
+      });
+    }
+  };
+  
   // Mark all notifications as read
-  const markAllAsRead = useCallback(() => {
-    setNotifications(prev => 
-      prev.map(notif => ({ ...notif, read: true }))
-    );
+  const markAllAsRead = async () => {
+    if (!user) return;
     
-    setUnreadCount(0);
-  }, []);
-
-  // Delete notification
-  const deleteNotification = useCallback((id: string) => {
-    setNotifications(prev => {
-      const notifToDelete = prev.find(n => n.id === id);
-      const newNotifs = prev.filter(notif => notif.id !== id);
+    try {
+      // In a real app, this would be an API call
+      // For now, we'll update the local state
+      setNotifications(prev => 
+        prev.map(notification => ({ ...notification, read: true }))
+      );
       
-      // Update unread count if needed
-      if (notifToDelete && !notifToDelete.read) {
-        setUnreadCount(count => Math.max(0, count - 1));
-      }
+      // Update unread count
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de marquer toutes les notifications comme lues',
+        variant: 'destructive',
+      });
+    }
+  };
+  
+  // Fetch notifications on mount and when filter changes
+  useEffect(() => {
+    if (user) {
+      fetchNotifications(filter);
+    }
+  }, [filter, user]);
+  
+  // Simulate real-time notification (in a real app, this would be a WebSocket connection)
+  useEffect(() => {
+    if (!user) return;
+    
+    const simulateNewNotification = () => {
+      const newNotification: Notification = {
+        id: `new-${Date.now()}`,
+        type: Math.random() > 0.5 ? 'info' : 'reminder',
+        title: 'Nouvelle notification',
+        message: `Ceci est une notification simulée générée à ${new Date().toLocaleTimeString()}`,
+        createdAt: new Date().toISOString(),
+        read: false,
+        userId: user.id,
+        timestamp: new Date().toISOString(), // For backward compatibility
+        linkTo: '/dashboard'
+      };
       
-      return newNotifs;
-    });
-  }, []);
-
-  // Filter notifications
-  const filterNotifications = useCallback((newFilter: NotificationFilter) => {
-    if (filter === newFilter) return;
-    setFilter(newFilter);
-    // Reset will happen due to the useEffect
-  }, [filter]);
-
-  // Load more notifications
-  const loadMore = useCallback(() => {
-    if (isLoading || !hasMore) return;
-    fetchNotifications();
-  }, [isLoading, hasMore, fetchNotifications]);
-
+      setNotifications(prev => [newNotification, ...prev]);
+      setUnreadCount(prev => prev + 1);
+      
+      toast({
+        title: 'Nouvelle notification',
+        description: newNotification.message,
+      });
+    };
+    
+    // Uncomment for demo purposes
+    // const interval = setInterval(simulateNewNotification, 30000); // New notification every 30 seconds
+    // return () => clearInterval(interval);
+  }, [user, toast]);
+  
   return {
     notifications,
     unreadCount,
     isLoading,
-    error,
-    hasMore,
-    filter: filter || 'all',
-    setFilter: filterNotifications,
-    loadMore,
+    filter,
+    setFilter,
+    fetchNotifications,
     markAsRead,
-    markAllAsRead,
-    deleteNotification,
-    refresh: () => fetchNotifications(true)
+    markAllAsRead
   };
-};
-
-export default useNotifications;
+}

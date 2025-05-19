@@ -1,94 +1,94 @@
 
 import { useState, useCallback } from 'react';
-import {
-  ChatMessage,
-  ChatHookResult,
-  UseChatOptions,
-  normalizeChatMessage
+import { v4 as uuidv4 } from 'uuid';
+import { 
+  ChatMessage, 
+  ChatHookResult, 
+  UseChatOptions
 } from '@/types/chat';
 
-// Previous useChat implementation with fix for message creation
-export const useChat = (
-  options: UseChatOptions = {}
-): ChatHookResult => {
-  const { initialMessages = [], initialConversationId = '' } = options;
-
+export function useChat({
+  initialMessages = [],
+  conversationId = uuidv4(),
+  onResponse
+}: UseChatOptions = {}): ChatHookResult {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [conversationId, setConversationId] = useState(
-    initialConversationId || `conv-${Date.now()}`
-  );
-  
-  // Send user message
-  const sendMessage = useCallback((text: string) => {
-    setIsLoading(true);
-    
-    // Create a properly normalized user message
-    const userMessage = normalizeChatMessage({
-      id: `user-${Date.now()}`,
-      text,
+  const [isTyping, setIsTyping] = useState(false);
+  const [input, setInput] = useState("");
+
+  const sendMessage = useCallback(async (content: string) => {
+    if (!content.trim()) return;
+
+    // Create user message
+    const userMessage: ChatMessage = {
+      id: uuidv4(),
+      content,
       sender: 'user',
-      timestamp: new Date().toISOString()
-    }, conversationId);
+      timestamp: new Date().toISOString(),
+      conversationId
+    };
+
+    // Add user message to the chat
+    setMessages((prev) => [...prev, userMessage]);
     
-    setMessages(prev => [...prev, userMessage]);
-    
-    // Simulate response
-    setTimeout(() => {
-      // Create a properly normalized assistant message
-      const assistantMessage = normalizeChatMessage({
-        id: `assistant-${Date.now()}`,
-        text: `Echo: ${text}`,
-        sender: 'assistant',
-        timestamp: new Date().toISOString()
-      }, conversationId);
+    try {
+      setIsTyping(true);
       
-      setMessages(prev => [...prev, assistantMessage]);
-      setIsLoading(false);
-    }, 1000);
-  }, [conversationId]);
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Create assistant response
+      const assistantMessage: ChatMessage = {
+        id: uuidv4(),
+        content: `Response to: "${content}"`,
+        sender: 'assistant',
+        timestamp: new Date().toISOString(),
+        conversationId
+      };
+      
+      // Add assistant message to the chat
+      setMessages((prev) => [...prev, assistantMessage]);
+      
+      // Notify caller if callback provided
+      if (onResponse) {
+        onResponse(assistantMessage);
+      }
+      
+    } catch (error) {
+      console.error('Error sending message:', error);
+    } finally {
+      setIsTyping(false);
+    }
 
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setInput(e.target.value);
-    },
-    []
-  );
+    return Promise.resolve();
+  }, [conversationId, onResponse]);
 
-  const handleSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (!input.trim()) return;
-      sendMessage(input);
-      setInput('');
-    },
-    [input, sendMessage]
-  );
-  
-  // Clear messages
   const clearMessages = useCallback(() => {
     setMessages([]);
   }, []);
-  
-  // Set conversation ID
-  const setConversation = useCallback((id: string) => {
-    setConversationId(id);
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setInput(e.target.value);
   }, []);
-  
+
+  const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (input.trim()) {
+      sendMessage(input);
+      setInput("");
+    }
+  }, [input, sendMessage]);
+
   return {
     messages,
-    isLoading,
+    isTyping,
     sendMessage,
-    conversationId,
     clearMessages,
-    setConversation,
     input,
     setInput,
     handleInputChange,
     handleSubmit
   };
-};
+}
 
-// Add default export to fix import errors
 export default useChat;

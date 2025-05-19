@@ -1,6 +1,7 @@
 
 import React, { createContext, useState, useContext } from 'react';
 import { LayoutContextType, LayoutProviderProps } from '@/types/layout';
+import { Theme } from '@/types/theme';
 
 const defaultContext: LayoutContextType = {
   sidebarCollapsed: false,
@@ -19,7 +20,7 @@ export const LayoutContext = createContext<LayoutContextType>(defaultContext);
 export const LayoutProvider: React.FC<LayoutProviderProps> = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState<Theme>('light');
 
   const toggleSidebar = () => {
     setSidebarCollapsed(prev => !prev);

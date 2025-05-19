@@ -1,4 +1,3 @@
-
 export interface ChatMessage {
   id: string;
   content?: string;
@@ -19,10 +18,12 @@ export interface ChatConversation {
   lastUpdated?: Date | string;
   updatedAt?: string; // For backward compatibility
   lastMessage?: string;
-  userId?: string;
   user_id?: string; // For backward compatibility
+  userId?: string;
   created_at?: string; // For backward compatibility
   updated_at?: string; // For backward compatibility
+  last_message?: string; // Added for hooks compatibility
+  isActive?: boolean; // Added for mockChatMessages.ts
 }
 
 // Other chat-related types
@@ -56,6 +57,7 @@ export interface ChatHookResult {
 export interface UseChatOptions {
   initialMessages?: ChatMessage[];
   conversationId?: string;
+  initialConversationId?: string; // Added for useChat.tsx
   onResponse?: (message: ChatMessage) => void;
 }
 

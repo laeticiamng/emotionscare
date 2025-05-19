@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NotificationFrequency, NotificationPreference, NotificationType } from '@/types/notification';
+import { NotificationFrequency, NotificationPreference } from '@/types/notification';
 
 interface NotificationPreferencesProps {
   preferences: NotificationPreference;
@@ -22,8 +22,16 @@ const NotificationPreferencesComponent: React.FC<NotificationPreferencesProps> =
         enabled: true,
       });
     } else {
+      // Create a proper NotificationPreference object with all required fields
       onUpdate({
+        type: preferences.type,
         enabled: false,
+        channels: {
+          email: false,
+          push: false,
+          inApp: false
+        },
+        frequency: 'immediate',
         emailEnabled: false,
         pushEnabled: false,
         inAppEnabled: false,
@@ -43,18 +51,19 @@ const NotificationPreferencesComponent: React.FC<NotificationPreferencesProps> =
           success: false,
           streak: false,
           urgent: false
-        },
-        frequency: 'immediate',
+        }
       });
     }
   };
 
   const handleTypeToggle = (type: keyof NotificationPreference['types'], checked: boolean) => {
-    const updatedTypes = {
-      ...preferences.types,
-      [type]: checked,
-    };
-    onUpdate({ ...preferences, types: updatedTypes });
+    if (preferences.types) {
+      const updatedTypes = {
+        ...preferences.types,
+        [type]: checked,
+      };
+      onUpdate({ ...preferences, types: updatedTypes });
+    }
   };
 
   const handleFrequencyChange = (frequency: NotificationFrequency) => {

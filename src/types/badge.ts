@@ -7,6 +7,9 @@ export interface Badge {
   awarded_at?: string;
   user_id?: string;
   tier?: string;
+  category?: string; // Added for mockBadges.ts
+  icon?: string; // Added for badge.d.ts compatibility
+  rarity?: string; // Added for badge.d.ts compatibility
   // Backward compatibility fields
   imageUrl?: string;
   date?: string;
@@ -17,6 +20,7 @@ export interface Badge {
   level?: number;
   completed?: boolean;
   threshold?: number;
+  progress?: number;
 }
 
 export interface Challenge {
@@ -48,6 +52,7 @@ export interface LeaderboardEntry {
   username: string;
   points: number;
   position: number;
+  name?: string; // Added for useCommunityGamification
   avatarUrl?: string;
   badges?: Badge[];
 }
