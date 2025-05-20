@@ -106,3 +106,13 @@ export interface MusicContextType {
   createPlaylist: (name: string, tracks?: MusicTrack[]) => void;
   playEmotion: (emotion: string) => void;
 }
+
+export interface MusicSession {
+  id: string;
+  userId: string;
+  playlistId?: string;
+  trackIds: string[];
+  createdAt: string | Date;
+  updatedAt?: string | Date;
+  notes?: string;
+}
