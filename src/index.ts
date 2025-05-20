@@ -128,8 +128,8 @@ async function humeBatchJobStatus(id: string) {
 }
 
 // -------------- Exports ----------------
-// Create Hume client using the appropriate method from the hume package
-const humeClient = Hume.createClient(HUME_API_KEY);
+// Create a client instance using the Hume library's API
+const humeClient = new Hume.HumeAIClient(HUME_API_KEY);
 
 export {
   openaiText,

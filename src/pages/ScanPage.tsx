@@ -25,6 +25,7 @@ const ScanPage: React.FC<ScanPageProps> = () => {
       id: '1',
       date: '2025-05-13T10:45:00Z',
       emotion: 'joy',
+      confidence: 0.85,
       score: 0.85,
       text: 'I feel great today!'
     },
@@ -32,6 +33,7 @@ const ScanPage: React.FC<ScanPageProps> = () => {
       id: '2',
       date: '2025-05-12T15:30:00Z',
       emotion: 'calm',
+      confidence: 0.65,
       score: 0.65,
       text: 'Pretty relaxed afternoon'
     },

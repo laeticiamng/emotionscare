@@ -53,10 +53,17 @@ export interface EmotionRecommendation {
   type: 'activity' | 'reflection' | 'breathing' | 'music' | 'social';
   title: string;
   description: string;
+  emotion?: string;
+  content?: string;
+  category?: string;
+  action?: string;
+  link?: string;
   icon?: string;
-  duration?: string;
-  difficulty?: 'easy' | 'medium' | 'hard';
+  duration?: number;
+  intensity?: 'low' | 'medium' | 'high';
   tags?: string[];
+  actionLink?: string;
+  actionText?: string;
 }
 
 export interface LiveVoiceScannerProps {
@@ -151,4 +158,11 @@ export interface LiveVoiceScannerProps {
   onCancel?: () => void;
   autoStart?: boolean;
   scanDuration?: number;
+}
+
+export interface EmotionScanFormProps {
+  onScanComplete: (result: EmotionResult) => void;
+  onEmotionDetected?: (result: EmotionResult) => void;
+  onClose?: () => void;
+  userId?: string;
 }
