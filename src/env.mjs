@@ -19,6 +19,7 @@ export const env = {
   // Clés d'API
   NEXT_PUBLIC_OPENAI_API_KEY: import.meta.env.NEXT_PUBLIC_OPENAI_API_KEY || import.meta.env.VITE_OPENAI_API_KEY || '',
   NEXT_PUBLIC_HUME_API_KEY: import.meta.env.NEXT_PUBLIC_HUME_API_KEY || import.meta.env.VITE_HUME_API_KEY || '',
+  NEXT_PUBLIC_MUSICGEN_API_KEY: import.meta.env.NEXT_PUBLIC_MUSICGEN_API_KEY || import.meta.env.VITE_MUSICGEN_API_KEY || '',
   NEXT_PUBLIC_SUPABASE_URL: import.meta.env.NEXT_PUBLIC_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL || '',
   NEXT_PUBLIC_SUPABASE_ANON_KEY: import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_ANON_KEY || '',
   VITE_FIREBASE_API_KEY: import.meta.env.VITE_FIREBASE_API_KEY || '',
@@ -31,14 +32,12 @@ export const env = {
   
   // Configuration du serveur
   NODE_ENV: import.meta.env.MODE || 'development',
-  
-  // Configuration d'authentification (plus de contournement en développement)
 };
 
 // Validation simple en mode développement
-  if (env.NODE_ENV === 'development') {
-    checkEnvVars();
-  }
+if (env.NODE_ENV === 'development') {
+  checkEnvVars();
+}
 
 function checkEnvVars() {
   const requiredVars = [

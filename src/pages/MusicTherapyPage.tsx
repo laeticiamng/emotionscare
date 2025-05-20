@@ -7,10 +7,11 @@ import MusicPlayer from '@/components/music/player/MusicPlayer';
 import MusicCreator from '@/components/music/MusicCreator';
 import { Card, CardContent } from '@/components/ui/card';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { UserModeType } from '@/types';
 
 const MusicTherapyPage: React.FC = () => {
   const { userMode } = useUserMode();
-  const isB2C = userMode === 'personal' || userMode === 'b2c';
+  const isB2C = userMode === 'b2c' || userMode === 'personal';
 
   return (
     <DashboardLayout>
@@ -35,7 +36,27 @@ const MusicTherapyPage: React.FC = () => {
           <TabsContent value="listen" className="mt-6">
             <Card>
               <CardContent className="pt-6">
-                <MusicPlayer />
+                <MusicPlayer 
+                  track={{
+                    id: "default-track",
+                    title: "Relaxation ambiance",
+                    artist: "IA Musicothérapie",
+                    url: "/sounds/ambient-calm.mp3",
+                    duration: 180,
+                    cover: "/images/music/ambient-cover.jpg"
+                  }}
+                  isPlaying={false}
+                  onPlay={() => console.log('Playing music')}
+                  onPause={() => console.log('Pausing music')}
+                  onSeek={(time) => console.log('Seeking to', time)}
+                  onNext={() => console.log('Next track')}
+                  onPrevious={() => console.log('Previous track')}
+                  onVolumeChange={(volume) => console.log('Volume changed to', volume)}
+                  volume={0.7}
+                  currentTime={0}
+                  showControls={true}
+                  showProgress={true}
+                />
               </CardContent>
             </Card>
           </TabsContent>

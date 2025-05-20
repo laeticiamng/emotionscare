@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "tsc": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "build:dev": "vite build --mode development"
+    "build:dev": "vite build --mode development",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",

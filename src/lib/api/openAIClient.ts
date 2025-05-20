@@ -13,7 +13,7 @@ const isApiKeyAvailable = () => {
 // Créer une instance OpenAI avec la clé API
 const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true // Note: En production, utilisez un backend pour cacher la clé API
+  dangerouslyAllowBrowser: true // Allowing browser usage with the understanding of security implications
 });
 
 // Types

@@ -6,10 +6,38 @@ import type {
   SpeechRecognitionEvent,
 } from '@/types/voice';
 
-interface SimpleSpeechRecognition extends SpeechRecognition {}
+type SpeechRecognitionResult = {
+  isFinal: boolean;
+  [index: number]: {
+    [index: number]: {
+      transcript: string;
+      confidence: number;
+    };
+  };
+  length: number;
+};
 
-interface SimpleSpeechRecognitionConstructor {
-  new (): SimpleSpeechRecognition;
+interface SpeechRecognitionEvent extends Event {
+  resultIndex: number;
+  results: SpeechRecognitionResult;
+}
+
+interface SpeechRecognition extends EventTarget {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  maxAlternatives: number;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: Event) => void) | null;
+  onend: ((event: Event) => void) | null;
+  onstart: ((event: Event) => void) | null;
+}
+
+interface SpeechRecognitionConstructor {
+  new (): SpeechRecognition;
 }
 
 
@@ -23,7 +51,7 @@ declare global {
 }
 
 // Get the appropriate constructor for SpeechRecognition
-export const getSpeechRecognition = (): SimpleSpeechRecognitionConstructor | null => {
+export const getSpeechRecognition = (): SpeechRecognitionConstructor | null => {
   if (typeof window === 'undefined') {
     return null;
   }
@@ -41,15 +69,15 @@ export const isSpeechRecognitionSupported = (): boolean => {
 };
 
 // Create a new speech recognition instance
-export const createSpeechRecognition = (): SimpleSpeechRecognition | null => {
-  const SpeechRecognition = getSpeechRecognition();
+export const createSpeechRecognition = (): SpeechRecognition | null => {
+  const SpeechRecognitionConstructor = getSpeechRecognition();
   
-  if (!SpeechRecognition) {
+  if (!SpeechRecognitionConstructor) {
     console.warn('SpeechRecognition is not supported in this browser');
     return null;
   }
   
-  return new SpeechRecognition();
+  return new SpeechRecognitionConstructor();
 };
 
 // Export default as a utility object

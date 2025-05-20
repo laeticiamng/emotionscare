@@ -1,15 +1,20 @@
-import dotenv from "dotenv";
-dotenv.config();
 
-if (!process.env.OPENAI_API_KEY) process.env.OPENAI_API_KEY = "test";
-if (!process.env.MUSICGEN_API_KEY) process.env.MUSICGEN_API_KEY = "test";
-if (!process.env.HUME_API_KEY) process.env.HUME_API_KEY = "test";
+// In browser environments, we use import.meta.env instead of dotenv
+// This works with Vite's environment variable handling
 
-import { HumeClient } from "hume";
+// Default API keys (only for development/testing purposes)
+const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY || 'test';
+const MUSICGEN_API_KEY = import.meta.env.VITE_MUSICGEN_API_KEY || 'test';
+const HUME_API_KEY = import.meta.env.VITE_HUME_API_KEY || 'test';
+
+import * as Hume from "hume";
 import OpenAI from "openai";
 
 // ------- OPENAI GPT-4 -----------
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+const openai = new OpenAI({ 
+  apiKey: OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true // Allow browser usage with understanding of security risks
+});
 
 async function openaiText(prompt: string) {
   const resp = await openai.chat.completions.create({
@@ -27,7 +32,7 @@ async function musicgenLyrics(prompt: string) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": process.env.MUSICGEN_API_KEY!
+      "x-api-key": MUSICGEN_API_KEY
     },
     body: JSON.stringify({ prompt }),
   });
@@ -41,7 +46,7 @@ async function musicgenV1(prompt: string, lyrics?: string, title?: string) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": process.env.MUSICGEN_API_KEY!
+      "x-api-key": MUSICGEN_API_KEY
     },
     body: JSON.stringify({
       is_auto: 1,
@@ -61,7 +66,7 @@ async function musicgenV2Submit(prompt: string, lyrics?: string) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": process.env.MUSICGEN_API_KEY!
+      "x-api-key": MUSICGEN_API_KEY
     },
     body: JSON.stringify({
       is_auto: 1,
@@ -82,7 +87,7 @@ async function musicgenV2Submit(prompt: string, lyrics?: string) {
 async function musicgenV2Query(song_id: string) {
   const resp = await fetch(`https://api.topmediai.com/v2/query?song_id=${song_id}`, {
     method: "GET",
-    headers: { "x-api-key": process.env.MUSICGEN_API_KEY! },
+    headers: { "x-api-key": MUSICGEN_API_KEY },
   });
   const data = await resp.json();
   console.log("\n--- MusicGen V2 QUERY ---\n", data);
@@ -94,7 +99,7 @@ async function musicgenV2Concat(song_id: string) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": process.env.MUSICGEN_API_KEY!
+      "x-api-key": MUSICGEN_API_KEY
     },
     body: JSON.stringify({ song_id }),
   });
@@ -111,21 +116,24 @@ async function humeBatchJob(urls: string[]) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "X-Hume-Api-Key": process.env.HUME_API_KEY!
+      "X-Hume-Api-Key": HUME_API_KEY
     },
     body: JSON.stringify({ models: { face: {} }, urls }),
   });
   return resp.json();
 }
+
 async function humeBatchJobStatus(id: string) {
   const resp = await fetch(`https://api.hume.ai/v0/batch/jobs/${id}`, {
-    headers: { "X-Hume-Api-Key": process.env.HUME_API_KEY! },
+    headers: { "X-Hume-Api-Key": HUME_API_KEY },
   });
   return resp.json();
 }
 
 // -------------- Exports ----------------
-const hume = new HumeClient({ apiKey: process.env.HUME_API_KEY! });
+// Create a client instance using the Hume library's API
+// Fix for browser environment: use the createHumeClient function instead of HumeClient constructor
+const humeClient = Hume.createClient(HUME_API_KEY);
 
 export {
   openaiText,
@@ -136,5 +144,5 @@ export {
   musicgenV2Concat,
   humeBatchJob,
   humeBatchJobStatus,
-  hume,
+  humeClient as hume,
 };

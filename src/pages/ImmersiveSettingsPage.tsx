@@ -1,16 +1,18 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useTheme, FontFamily, FontSize } from '@/contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import ThemeSelector from '@/components/settings/ThemeSelector';
 import FontSettings from '@/components/settings/FontSettings';
+import { FontFamily, FontSize } from '@/types';
 
 const ImmersiveSettingsPage: React.FC = () => {
   const themeContext = useTheme();
   const theme = themeContext?.theme || 'system';
   const setTheme = themeContext?.setTheme;
-  const fontFamily = themeContext?.fontFamily || 'inter';
+  const fontFamily = themeContext?.fontFamily as FontFamily || ('inter' as FontFamily);
   const setFontFamily = themeContext?.setFontFamily;
-  const fontSize = themeContext?.fontSize || 'medium';
+  const fontSize = themeContext?.fontSize as FontSize || ('medium' as FontSize);
   const setFontSize = themeContext?.setFontSize;
   
   return (
