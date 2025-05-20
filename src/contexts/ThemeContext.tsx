@@ -118,3 +118,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     </ThemeContext.Provider>
   );
 };
+
+// Re-export theme enums for convenience
+export type { FontFamily, FontSize } from '@/types/theme';

@@ -29,3 +29,5 @@ export interface AuthContextType {
   updateUser?: (userData: Partial<AuthUser>) => Promise<void>;
   updatePreferences?: (preferences: any) => Promise<void>; // Added for compatibility
 }
+
+export { UserRole } from './user';

@@ -3,6 +3,11 @@ export interface AudioTrack {
   title: string;
   artist?: string;
   url: string;
+  audioUrl?: string;
+  description?: string;
+  summary?: string;
+  mood?: string;
+  category?: string;
   duration: number;
   coverUrl?: string;
   waveform?: number[];
@@ -11,6 +16,7 @@ export interface AudioTrack {
 export interface AudioPlaylist {
   id: string;
   title: string;
+  name?: string;
   description?: string;
   tracks: AudioTrack[];
   coverUrl?: string;

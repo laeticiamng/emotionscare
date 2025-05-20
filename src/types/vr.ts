@@ -28,6 +28,7 @@ export interface VRSessionTemplate {
   interactive?: boolean;
   thumbnail?: string;
   theme?: string;
+  recommendedMood?: string;
 }
 
 export interface VRSession {
@@ -60,8 +61,19 @@ export interface VRSessionFeedback {
   userId: string;
   rating: number;
   comment?: string;
+  emotionBefore?: string;
+  emotionAfter?: string;
+  improvements?: string;
   emotions?: Record<string, number>;
   timestamp: Date | string;
+}
+
+export interface VREnvironment {
+  id: string;
+  name: string;
+  description?: string;
+  thumbnailUrl?: string;
+  assetUrl?: string;
 }
 
 export interface VRSessionWithMusicProps {
