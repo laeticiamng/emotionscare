@@ -5,6 +5,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { UserPreferencesProvider } from '@/contexts/UserPreferencesContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { MusicProvider } from '@/contexts/music/index';
+import { LayoutProvider } from '@/contexts/LayoutContext';
 import { OptimizationProvider } from '@/providers/OptimizationProvider';
 import { ExtensionsProvider } from '@/providers/ExtensionsProvider';
 import { OrchestrationProvider } from '@/contexts/OrchestrationContext';
@@ -23,20 +24,22 @@ const AppProviders: React.FC<LayoutProviderProps> = ({ children }) => (
     <AuthProvider>
       <UserPreferencesProvider>
         <UserModeProvider>
-          <MusicProvider>
-            <OptimizationProvider>
-              <ExtensionsProvider>
-                <OrchestrationProvider>
-                  <OnboardingProvider steps={DEFAULT_ONBOARDING_STEPS}>
-                    <SupportProvider>
-                      {children}
-                      <Toaster />
-                    </SupportProvider>
-                  </OnboardingProvider>
-                </OrchestrationProvider>
-              </ExtensionsProvider>
-            </OptimizationProvider>
-          </MusicProvider>
+          <LayoutProvider>
+            <MusicProvider>
+              <OptimizationProvider>
+                <ExtensionsProvider>
+                  <OrchestrationProvider>
+                    <OnboardingProvider steps={DEFAULT_ONBOARDING_STEPS}>
+                      <SupportProvider>
+                        {children}
+                        <Toaster />
+                      </SupportProvider>
+                    </OnboardingProvider>
+                  </OrchestrationProvider>
+                </ExtensionsProvider>
+              </OptimizationProvider>
+            </MusicProvider>
+          </LayoutProvider>
         </UserModeProvider>
       </UserPreferencesProvider>
     </AuthProvider>
