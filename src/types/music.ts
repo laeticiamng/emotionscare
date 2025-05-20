@@ -140,3 +140,13 @@ export interface TrackInfoProps {
   track: MusicTrack | null;
   compact?: boolean;
 }
+
+export interface MusicSession {
+  id: string;
+  userId: string;
+  playlistId?: string;
+  trackIds: string[];
+  createdAt: string | Date;
+  updatedAt?: string | Date;
+  notes?: string;
+}

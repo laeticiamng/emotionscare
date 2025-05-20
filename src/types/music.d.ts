@@ -74,3 +74,13 @@ export interface MusicContextType {
   repeat: 'off' | 'one' | 'all';
   toggleRepeat: () => void;
 }
+
+export interface MusicSession {
+  id: string;
+  userId: string;
+  playlistId?: string;
+  trackIds: string[];
+  createdAt: string | Date;
+  updatedAt?: string | Date;
+  notes?: string;
+}
