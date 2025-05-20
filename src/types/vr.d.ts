@@ -40,13 +40,15 @@ export interface VRSessionTemplate {
   thumbnailUrl: string;
   environmentId: string;
   category: string;
-  intensity: number;
+  intensity: number | string;
   difficulty: string;
   immersionLevel: string;
   goalType: string;
   interactive: boolean;
   tags: string[];
   recommendedMood?: string;
+  environment?: string;
+  thumbnail?: string;
 }
 
 export interface VREnvironment {

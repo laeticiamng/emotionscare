@@ -1,62 +1,44 @@
 
-import { Badge } from './badge';
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  image: string;
+  unlocked: boolean;
+  unlockedAt?: string;
+  progress?: number;
+  threshold?: number;
+  user_id?: string; // Added this property
+}
+
+export interface GamificationStats {
+  level: number;
+  xp: number;
+  xpToNextLevel: number;
+  consecutiveLogins: number;
+  totalSessions: number;
+  totalMoodEntries: number;
+  totalMeditationMinutes: number;
+  badges: Badge[];
+  achievements: string[];
+  streakDays: number;
+  progressToNextLevel?: number; // Added this property
+}
 
 export interface Challenge {
   id: string;
-  name?: string;
-  title?: string;
+  title: string;
   description: string;
-  points?: number;
-  progress?: number;
-  goal?: number;
-  category?: string;
-  completed?: boolean;
-  status?: string;
-  difficulty?: string;
-  completions?: number;
-  total?: number;
-  deadline?: string;
-  reward: any;
-  unlocked: boolean;
-  totalSteps?: number;
-  isCompleted?: boolean;
-  icon?: string;
-}
-
-export interface LeaderboardEntry {
-  id: string;
-  userId: string;
-  username: string;
-  points: number;
-  position: number;
-  name?: string;
-  avatarUrl?: string;
-  badges?: Badge[];
-  rank?: number;
-  score?: number;
-  avatar?: string;
-  level?: number;
-  progress?: number; // Add this for compatibility
-}
-
-// Export Badge from here as well for compatibility
-export { Badge };
-
-// Add GamificationStats interface for UserSidePanel
-export interface GamificationStats {
-  points: number;
-  level: number;
-  rank: string;
-  badges: Badge[];
-  streak: number;
-  nextLevelPoints: number;
   progress: number;
-  completedChallenges?: number;
-  totalChallenges?: number;
-  activeChallenges?: number;
-  streakDays?: number;
-  longestStreak?: number;
-  unlockedBadges?: number;
-  totalBadges?: number;
-  recentAchievements?: Badge[];
+  threshold: number;
+  completed: boolean;
+  category: string;
+  type?: string; // Added this property
+  name?: string; // Added this property for backward compatibility
+  userId?: string;
+  reward?: any;
+  startDate?: string;
+  endDate?: string;
+  imageUrl?: string;
 }

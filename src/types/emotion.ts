@@ -30,6 +30,7 @@ export interface EmotionRecommendation {
 
 export interface EmotionResult {
   emotion: string;
+  dominantEmotion?: string; // Added this property
   confidence: number;
   intensity?: number;
   secondaryEmotions?: string[];
@@ -41,7 +42,7 @@ export interface EmotionResult {
   sessionId?: string;
   language?: string;
   data?: EmotionData[];
-  tags?: string[]; // Added tags property
+  tags?: string[];
 
   // Extended fields for compatibility
   id?: string;

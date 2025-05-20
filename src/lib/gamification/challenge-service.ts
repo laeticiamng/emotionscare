@@ -1,6 +1,48 @@
 
 import { Challenge, Badge } from '@/types/gamification';
 
+// Update challenge progress
+export const updateChallenge = async (
+  challengeId: string, 
+  data: { progress: number }
+): Promise<boolean> => {
+  try {
+    // Mock implementation for now
+    console.log(`Updating challenge ${challengeId} with progress ${data.progress}`);
+    return true;
+  } catch (error) {
+    console.error("Error updating challenge:", error);
+    return false;
+  }
+};
+
+// Complete a challenge
+export const completeChallenge = async (
+  challengeId: string
+): Promise<{ success: boolean; badge?: Badge }> => {
+  try {
+    // Mock implementation for now
+    console.log(`Completing challenge ${challengeId}`);
+    
+    // Return a mock badge as reward
+    return {
+      success: true,
+      badge: {
+        id: `badge-${Date.now()}`,
+        name: "Challenge Completed",
+        description: "You successfully completed a challenge",
+        category: "achievement",
+        image: "/badges/challenge-complete.png",
+        unlocked: true,
+        unlockedAt: new Date().toISOString()
+      }
+    };
+  } catch (error) {
+    console.error("Error completing challenge:", error);
+    return { success: false };
+  }
+};
+
 // Example challenge service
 export const ChallengeService = {
   getChallengesForUser: async (userId: string): Promise<Challenge[]> => {
@@ -8,65 +50,28 @@ export const ChallengeService = {
     return [
       {
         id: 'challenge-1',
-        title: 'Daily Check-in',
-        name: 'Daily Check-in',
-        description: 'Log your mood every day for a week',
-        type: 'streak',
-        targetValue: 7,
-        currentValue: 3,
+        title: 'First Steps',
+        description: 'Complete your first emotion scan',
+        progress: 0,
+        threshold: 1,
         completed: false,
-        difficulty: 'easy',
-        category: 'general',
-        reward: {
-          id: 'badge-weekly-checker',
-          name: 'Weekly Checker',
-          description: 'Checked in every day for a week',
-          category: 'consistency',
-          image: '/badges/weekly-checker.png',
-          unlocked: false
-        }
+        category: 'onboarding',
+        type: 'scan', 
+        userId
       },
       {
         id: 'challenge-2',
-        title: 'Emotion Master',
-        name: 'Emotion Master',
-        description: 'Identify 10 different emotions',
-        type: 'count',
-        targetValue: 10,
-        currentValue: 6,
+        title: 'Emotion Explorer',
+        description: 'Identify 5 different emotions',
+        progress: 2,
+        threshold: 5,
         completed: false,
-        difficulty: 'medium',
-        category: 'emotion',
-        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        reward: {
-          id: 'badge-emotion-master',
-          name: 'Emotion Master',
-          description: 'Identified 10 different emotions',
-          category: 'emotion',
-          image: '/badges/emotion-master.png',
-          unlocked: false
-        }
+        category: 'exploration',
+        type: 'discovery',
+        userId
       }
     ];
-  },
-
-  completeChallenge: async (userId: string, challengeId: string): Promise<Badge> => {
-    // This would typically update the challenge status in an API
-    // and return the unlocked badge
-    const badge: Badge = {
-      id: `badge-${challengeId}`,
-      name: 'Challenge Completed',
-      description: 'You completed a challenge',
-      category: 'achievement',
-      image: '/badges/challenge-complete.png',
-      unlocked: true,
-      unlockedAt: new Date().toISOString()
-    };
-    
-    return badge;
-  },
-
-  // Additional challenge-related functions
+  }
 };
 
 export default ChallengeService;

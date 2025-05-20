@@ -1,109 +1,82 @@
 
-import { useContext } from 'react';
-import { MusicContext } from '@/contexts/MusicContext';
+import { useState } from 'react';
+import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { EmotionResult } from '@/types/emotion';
-import { EmotionMusicParams, MusicContextType } from '@/types/music';
-import { findTracksByMood } from '@/utils/musicCompatibility';
+import { useMusic } from '@/contexts/MusicContext';
 
-/**
- * Custom hook to integrate music recommendations with emotion analysis
- */
 export const useMusicEmotionIntegration = () => {
-  const musicContext = useContext(MusicContext) as MusicContextType;
-  
+  const musicContext = useMusic();
+  const [isLoading, setIsLoading] = useState(false);
+
   /**
-   * Get a description of what type of music is recommended for an emotion
+   * Activate music based on an emotion
+   */
+  const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
+    setIsLoading(true);
+    try {
+      if (musicContext?.loadPlaylistForEmotion) {
+        const playlist = await musicContext.loadPlaylistForEmotion(params);
+        return playlist;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error activating music for emotion:', error);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /**
+   * Get a description for the recommended music for an emotion
    */
   const getEmotionMusicDescription = (emotion: string): string => {
-    const descriptions: Record<string, string> = {
-      joy: "Upbeat and positive music to enhance your happy mood",
-      happiness: "Upbeat and positive music to enhance your happy mood",
-      sadness: "Gentle, comforting melodies to help process emotions",
-      anger: "Calming music to help reduce stress and tension",
-      fear: "Soothing sounds to create a sense of safety and relaxation",
-      surprise: "Intriguing and dynamic compositions to complement your mood",
-      disgust: "Cleansing and refreshing audio to shift your emotional state",
-      calm: "Peaceful ambient sounds to maintain your tranquil state",
-      neutral: "Balanced and melodic tunes to accompany your balanced mood",
-      anxiety: "Soothing rhythms to help ease worry and promote relaxation",
-      stress: "Gentle sounds designed to reduce tension and promote calmness"
-    };
-    
-    return descriptions[emotion.toLowerCase()] || "Music curated for your current emotional state";
-  };
-
-  /**
-   * Activate music based on detected emotion
-   */
-  const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<void> => {
-    if (!musicContext.loadPlaylistForEmotion) {
-      console.error("Music context loadPlaylistForEmotion function not available");
-      return;
-    }
-    
-    try {
-      const playlist = await musicContext.loadPlaylistForEmotion(params);
-      if (playlist && musicContext.playPlaylist) {
-        musicContext.playPlaylist(playlist);
-      }
-    } catch (error) {
-      console.error("Error activating music for emotion:", error);
+    switch (emotion.toLowerCase()) {
+      case 'happy':
+        return 'Des mélodies enjouées pour accompagner votre bonne humeur';
+      case 'calm':
+      case 'peaceful':
+        return 'Des sons apaisants pour maintenir votre état de sérénité';
+      case 'sad':
+        return 'Des compositions douces pour vous réconforter';
+      case 'angry':
+        return 'Des rythmes apaisants pour vous aider à retrouver le calme';
+      case 'anxious':
+        return 'Des mélodies relaxantes pour apaiser votre anxiété';
+      case 'energetic':
+        return 'Des rythmes dynamiques pour soutenir votre énergie';
+      default:
+        return 'Une playlist adaptée à votre état émotionnel actuel';
     }
   };
 
   /**
-   * Process emotion result and get music recommendation
+   * Get music recommendation based on emotion analysis
    */
-  const getMusicRecommendationForEmotion = async (emotionResult: EmotionResult) => {
+  const getMusicRecommendationForEmotion = async (emotionResult: EmotionResult): Promise<MusicPlaylist | null> => {
     if (!emotionResult || !emotionResult.emotion) {
       return null;
     }
     
-    const emotion = emotionResult.emotion.toLowerCase();
-    
-    try {
-      if (!musicContext.playlists || musicContext.playlists.length === 0) {
-        console.warn("No music playlists available");
-        return null;
-      }
-      
-      // Try to find a playlist directly matching the emotion
-      let playlist = musicContext.playlists.find(p => 
-        p.emotion?.toLowerCase() === emotion || 
-        p.mood?.toLowerCase() === emotion
-      );
-      
-      // If no direct match, try to find tracks with the emotion
-      if (!playlist && musicContext.playlists.length > 0) {
-        const allTracks = musicContext.playlists.flatMap(p => p.tracks);
-        const matchingTracks = findTracksByMood(allTracks, emotion);
-        
-        if (matchingTracks.length > 0) {
-          return {
-            id: `generated-${emotion}`,
-            name: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Mix`,
-            title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Mix`,
-            tracks: matchingTracks,
-            emotion: emotion,
-            mood: emotion,
-            description: getEmotionMusicDescription(emotion)
-          };
-        }
-      }
-      
-      return playlist;
-      
-    } catch (error) {
-      console.error("Error getting music recommendation for emotion:", error);
-      return null;
-    }
+    return await activateMusicForEmotion({ 
+      emotion: emotionResult.emotion,
+      intensity: emotionResult.intensity || 0.5
+    });
   };
-  
+
+  /**
+   * Play music for a specific emotion
+   */
+  const playEmotion = async (emotion: string): Promise<MusicPlaylist | null> => {
+    return await activateMusicForEmotion({ emotion });
+  };
+
   return {
     activateMusicForEmotion,
     getEmotionMusicDescription,
     getMusicRecommendationForEmotion,
-    playEmotion: musicContext.playEmotion,
+    playEmotion,
+    isLoading
   };
 };
 

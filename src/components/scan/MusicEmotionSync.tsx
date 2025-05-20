@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 import { EmotionResult } from '@/types/emotion';
@@ -26,7 +27,7 @@ export const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({
   }, [emotionResult, autoSync]);
 
   const syncMusic = async (result: EmotionResult) => {
-    if (!result || !result.dominantEmotion) {
+    if (!result || !result.emotion) {
       return;
     }
 
@@ -41,7 +42,7 @@ export const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({
         
         toast({
           title: "Musique synchronisée",
-          description: `Une playlist adaptée à votre humeur ${result.dominantEmotion} est prête.`,
+          description: `Une playlist adaptée à votre humeur ${result.emotion} est prête.`,
           duration: 3000
         });
       }

@@ -7,7 +7,7 @@ export interface AudioTrack {
   duration: number;
   coverUrl?: string;
   audioUrl?: string;
-  description?: string;
+  description?: string; // Making sure this property exists
   summary?: string;
   category?: string;
   mood?: string;

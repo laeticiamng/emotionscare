@@ -1,9 +1,20 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { VRSessionTemplate, VRSession, VRSessionWithMusicProps } from '@/types/vr';
+import { VRSessionTemplate, VRSession } from '@/types/vr';
 import VRMusicIntegration from './VRMusicIntegration';
 import VRSessionView from './VRSessionView';
+
+interface VRSessionWithMusicProps {
+  template?: VRSessionTemplate;
+  sessionTemplate?: VRSessionTemplate;
+  session?: VRSession;
+  onComplete?: (session: VRSession) => void;
+  onExit?: () => void;
+  musicEnabled?: boolean;
+  backgroundMusic?: string;
+  environment?: string;
+}
 
 const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
   template,
@@ -53,8 +64,8 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
         
         <div>
           <VRMusicIntegration
-            sessionId={session?.id || 'new-session'}
-            emotionTarget={environment || activeTemplate.environment || 'calm'}
+            template={activeTemplate}
+            emotionTarget={environment || activeTemplate.environment}
             onMusicReady={handleMusicReady}
           />
         </div>

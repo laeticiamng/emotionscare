@@ -39,10 +39,12 @@ export const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsPr
       };
       
       const result = await activateMusicForEmotion(params);
-      setPlaylist(result);
-      
-      if (onPlaylistLoaded && result) {
-        onPlaylistLoaded(result);
+      if (result) {
+        setPlaylist(result);
+        
+        if (onPlaylistLoaded) {
+          onPlaylistLoaded(result);
+        }
       }
     } catch (error) {
       console.error('Error loading music for emotion:', error);
