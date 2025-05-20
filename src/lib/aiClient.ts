@@ -1,1 +1,4 @@
-export * from '@/index';
+
+import * as aiModules from '../index';
+
+export * from '../index';
