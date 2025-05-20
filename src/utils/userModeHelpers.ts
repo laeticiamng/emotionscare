@@ -47,6 +47,9 @@ export const getUserModeLabel = (mode: string | UserModeType): string => {
   }
 };
 
+// Add an alias for getUserModeLabel for backward compatibility
+export const getModeLabel = getUserModeLabel;
+
 /**
  * Checks if two modes are equivalent after normalization
  * @param mode1 First mode to compare
