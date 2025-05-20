@@ -2,11 +2,13 @@
 // Fix missing parameters in useCoachChat.tsx
 import { useState, useCallback } from 'react';
 import { useCoach } from '@/contexts/coach/CoachContextProvider';
+import { useAI } from '@/hooks/useAI';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
 
 export const useCoachChat = () => {
   const coach = useCoach();
+  const ai = useAI();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   
@@ -16,8 +18,7 @@ export const useCoachChat = () => {
   const sendMessage = useCallback(async (message: string) => {
     try {
       setIsProcessing(true);
-      // Fix parameter to pass string content and string sender type
-      const response = await coach.sendMessage(message, 'user');
+      const response = await ai.openaiText(message);
       
       setMessages(prevMessages => {
         const userMessage: ChatMessage = {
@@ -45,7 +46,7 @@ export const useCoachChat = () => {
     } finally {
       setIsProcessing(false);
     }
-  }, [coach]);
+  }, [ai]);
   
   const addMessage = useCallback((text: string, sender: 'system' | 'user' | 'assistant' | 'coach') => {
     const newMessage: ChatMessage = { 

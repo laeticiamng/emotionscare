@@ -1,11 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import fs from "fs/promises";
-import path from "path";
-import os from "os";
-import child_process from "child_process";
-import fetch from "node-fetch";
+if (!process.env.OPENAI_API_KEY) process.env.OPENAI_API_KEY = "test";
+if (!process.env.MUSICGEN_API_KEY) process.env.MUSICGEN_API_KEY = "test";
+if (!process.env.HUME_API_KEY) process.env.HUME_API_KEY = "test";
+
 import { HumeClient } from "hume";
 import OpenAI from "openai";
 
@@ -105,32 +104,6 @@ async function musicgenV2Concat(song_id: string) {
 }
 
 // ------- HUME TTS ---------
-const outputDir = path.join(os.tmpdir(), `hume-audio-${Date.now()}`);
-async function writeResultToFile(base64: string, name: string) {
-  await fs.mkdir(outputDir, { recursive: true });
-  const filePath = path.join(outputDir, `${name}.wav`);
-  await fs.writeFile(filePath, Buffer.from(base64, "base64"));
-  console.log("Wrote", filePath);
-}
-
-function startAudioPlayer() {
-  const proc = child_process.spawn(
-    "ffplay",
-    ["-nodisp", "-autoexit", "-infbuf", "-i", "-"],
-    { detached: true, stdio: ["pipe", "ignore", "ignore"] }
-  );
-  proc.on("error", (err: any) => {
-    if (err.code === "ENOENT")
-      console.error("⚠ ffplay not found (ffmpeg). Audio playback skipped.");
-  });
-  return {
-    sendAudio: (audio: string) => proc.stdin.write(Buffer.from(audio, "base64")),
-    stop: () => {
-      proc.stdin.end();
-      proc.unref();
-    },
-  };
-}
 
 // ------- HUME Batch ---------
 async function humeBatchJob(urls: string[]) {
@@ -151,28 +124,17 @@ async function humeBatchJobStatus(id: string) {
   return resp.json();
 }
 
-// -------------- MAIN DEMO ----------------
+// -------------- Exports ----------------
 const hume = new HumeClient({ apiKey: process.env.HUME_API_KEY! });
 
-async function main() {
-  await openaiText("Rédige-moi une idée de chanson pop positive pour l'été.");
-  await musicgenV1("Happy summer pop", "Soleil, musique, danse, tout l'été!");
-  await musicgenLyrics("Sad ballad with hope");
-
-  const v2 = await musicgenV2Submit("French electro groove", "Danse sur la plage toute la nuit");
-  const songId = v2.song_id || v2.data?.song_id;
-  if (songId) {
-    await musicgenV2Query(songId);
-    await musicgenV2Concat(songId);
-  }
-
-  const speech = await hume.tts.synthesizeJson({
-    utterances: [{ description: "A refined, British aristocrat", text: "Take an arrow from the quiver." }]
-  });
-  await writeResultToFile(speech.generations[0].audio, "speech1_0");
-
-  const batch = await humeBatchJob(["https://hume-tutorials.s3.amazonaws.com/faces.zip"]);
-  if (batch.job_id) await humeBatchJobStatus(batch.job_id);
-}
-
-main().then(() => console.log("Done")).catch(console.error);
+export {
+  openaiText,
+  musicgenLyrics,
+  musicgenV1,
+  musicgenV2Submit,
+  musicgenV2Query,
+  musicgenV2Concat,
+  humeBatchJob,
+  humeBatchJobStatus,
+  hume,
+};
