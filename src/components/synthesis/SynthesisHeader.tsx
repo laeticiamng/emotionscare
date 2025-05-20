@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Timeline, Globe, Sun, ArrowLeft } from 'lucide-react';
+import { BarChart2, Globe, Sun, ArrowLeft } from 'lucide-react';
 
 interface SynthesisRoute {
   path: string;
@@ -12,7 +12,7 @@ interface SynthesisRoute {
 }
 
 const routes: SynthesisRoute[] = [
-  { path: '/timeline', label: 'Timeline', icon: Timeline },
+  { path: '/timeline', label: 'Timeline', icon: BarChart2 },
   { path: '/world', label: 'Monde', icon: Globe },
   { path: '/sanctuary', label: 'Sanctuaire', icon: Sun }
 ];

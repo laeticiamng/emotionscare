@@ -17,6 +17,7 @@ const B2COnboardingPage = lazy(() => import('./pages/common/Onboarding'));
 const Support = lazy(() => import('./pages/Support'));
 const ExtensionsPage = lazy(() => import('./pages/ExtensionsPage'));
 const PrivacySettingsPage = lazy(() => import('./pages/PrivacySettingsPage'));
+const TimelinePage = lazy(() => import('./pages/TimelinePage'));
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
             <Route path="/b2c/onboarding" element={<B2COnboardingPage />} />
             <Route path="/world" element={<WorldPage />} />
             <Route path="/sanctuary" element={<SanctuaryPage />} />
+            <Route path="/timeline" element={<TimelinePage />} />
             <Route path="/support" element={<SupportPage />} />
             <Route path="/support-legacy" element={<Support />} />
             <Route path="/extensions" element={<ExtensionsPage />} />

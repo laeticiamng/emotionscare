@@ -1,13 +1,12 @@
 
+@import './styles/premium.css';
+@import './styles/glass.css';
+@import './styles/auth-animations.css';
+
 /* Import tailwind directives first */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Now import other CSS files that might use @layer directives */
-@import './styles/premium.css';
-@import './styles/glass.css';
-@import './styles/auth-animations.css';
 
 /* App-specific styles */
 #root {
