@@ -4,29 +4,48 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import HomePage from './pages/HomePage';
 import B2CPage from './pages/b2c/Home';
 import B2BSelectionPage from './pages/b2b/Selection';
+import B2BSelectionPremium from './pages/common/B2BSelectionPremium';
 import Index from './pages/Index';
 import ImmersiveHome from './pages/ImmersiveHome';
 import ChooseMode from './pages/common/ChooseMode';
 import PageNotFound from './pages/errors/PageNotFound';
 import { useUserMode } from './contexts/UserModeContext';
+import B2BUserPremiumLogin from './pages/b2b/user/PremiumLogin';
+import B2BAdminPremiumLogin from './pages/b2b/admin/PremiumLogin';
+import B2BUserPremiumDashboard from './pages/b2b/user/PremiumDashboard';
 
 const AppRouter: React.FC = () => {
   const { userMode, isLoading } = useUserMode();
   
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+          <p className="mt-2 text-muted-foreground">Chargement...</p>
+        </div>
+      </div>
+    );
   }
   
   return (
     <Router>
       <Routes>
+        {/* Pages publiques */}
         <Route path="/" element={<ImmersiveHome />} />
         <Route path="/old-home" element={<Index />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/b2c" element={<B2CPage />} />
-        <Route path="/b2b/selection" element={<B2BSelectionPage />} />
-        <Route path="/b2b/components" element={<B2BComponentsPage />} />
+        <Route path="/b2b/selection" element={<B2BSelectionPremium />} />
         <Route path="/choose-mode" element={<ChooseMode />} />
+        
+        {/* Pages B2B avec design premium */}
+        <Route path="/b2b/user/login" element={<B2BUserPremiumLogin />} />
+        <Route path="/b2b/admin/login" element={<B2BAdminPremiumLogin />} />
+        <Route path="/b2b/user/dashboard" element={<B2BUserPremiumDashboard />} />
+        
+        {/* Autres routes */}
+        <Route path="/b2b/components" element={<B2BComponentsPage />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </Router>

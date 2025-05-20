@@ -56,3 +56,83 @@ export const getUserModeLabel = (mode: string | UserModeType): string => {
 export const areModesEquivalent = (mode1: string | UserModeType, mode2: string | UserModeType): boolean => {
   return normalizeUserMode(mode1) === normalizeUserMode(mode2);
 };
+
+/**
+ * Gets the appropriate dashboard path for a given user mode
+ * @param mode The user mode
+ * @returns Dashboard path for the mode
+ */
+export const getModeDashboardPath = (mode: string | UserModeType): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  switch (normalizedMode) {
+    case 'b2c':
+      return '/b2c/dashboard';
+    case 'b2b_user':
+      return '/b2b/user/dashboard';
+    case 'b2b_admin':
+      return '/b2b/admin/dashboard';
+    default:
+      return '/b2c/dashboard'; // Default fallback
+  }
+};
+
+/**
+ * Gets the appropriate settings path for a given user mode
+ * @param mode The user mode
+ * @returns Settings path for the mode
+ */
+export const getModeSettingsPath = (mode: string | UserModeType): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  switch (normalizedMode) {
+    case 'b2c':
+      return '/b2c/settings';
+    case 'b2b_user':
+      return '/b2b/user/settings';
+    case 'b2b_admin':
+      return '/b2b/admin/settings';
+    default:
+      return '/b2c/settings'; // Default fallback
+  }
+};
+
+/**
+ * Gets a color theme for a specific user mode
+ * @param mode The user mode
+ * @returns CSS class or color value
+ */
+export const getModeThemeColor = (mode: string | UserModeType): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  switch (normalizedMode) {
+    case 'b2c':
+      return 'blue';
+    case 'b2b_user':
+      return 'green';
+    case 'b2b_admin':
+      return 'purple';
+    default:
+      return 'blue'; // Default fallback
+  }
+};
+
+/**
+ * Gets the icon name for a specific user mode
+ * @param mode The user mode
+ * @returns Icon name suitable for use with Lucide icons
+ */
+export const getModeIconName = (mode: string | UserModeType): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  switch (normalizedMode) {
+    case 'b2c':
+      return 'user';
+    case 'b2b_user':
+      return 'users';
+    case 'b2b_admin':
+      return 'shield';
+    default:
+      return 'user'; // Default fallback
+  }
+};
