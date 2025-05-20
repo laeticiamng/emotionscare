@@ -18,7 +18,7 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMusicLoaded, setIsMusicLoaded] = useState(false);
-  const { getMusicRecommendationForEmotion, playEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
+  const { getMusicRecommendationForEmotion, playEmotion, getEmotionMusicDescription, isLoading } = useMusicEmotionIntegration();
   
   const recommendedMood = template.recommendedMood || emotionTarget || 'calm';
   
@@ -32,12 +32,14 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
   const loadMusicForEmotion = async () => {
     try {
       if (playEmotion) {
-        playEmotion(recommendedMood);
-        setIsPlaying(true);
-        setIsMusicLoaded(true);
-        
-        if (onMusicReady) {
-          onMusicReady();
+        const result = await playEmotion(recommendedMood);
+        if (result !== null) {
+          setIsPlaying(true);
+          setIsMusicLoaded(true);
+          
+          if (onMusicReady) {
+            onMusicReady();
+          }
         }
       }
     } catch (error) {

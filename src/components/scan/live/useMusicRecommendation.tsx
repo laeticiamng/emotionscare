@@ -36,7 +36,7 @@ export const useMusicRecommendation = (options: UseMusicRecommendationOptions = 
       };
       
       const result = await activateMusicForEmotion(params);
-      if (result) {
+      if (result !== null) {
         setPlaylist(result);
       }
       return result;

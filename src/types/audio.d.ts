@@ -18,6 +18,7 @@ export interface AudioTrack {
 export interface AudioPlaylist {
   id: string;
   name: string;
+  title?: string;
   tracks: AudioTrack[];
   description?: string;
   thumbnailUrl?: string;

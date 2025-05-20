@@ -1,4 +1,3 @@
-
 export interface Badge {
   id: string;
   name: string;
@@ -63,4 +62,6 @@ export interface LeaderboardEntry {
   rank: number;
   progress?: number;
   level?: number;
+  points?: number;
+  position?: number;
 }
