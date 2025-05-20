@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@/types/user';
 import authService from '@/services/auth-service';
+import { AuthErrorCode } from '@/utils/authErrors';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -72,7 +73,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return user;
     } catch (error: any) {
       console.error('Login error:', error);
-      setError('Identifiants invalides');
+      if (error.code === AuthErrorCode.TOO_MANY_ATTEMPTS) {
+        setError("Trop de tentatives de connexion. Veuillez patienter.");
+      } else {
+        setError('Identifiants invalides');
+      }
       return null;
     } finally {
       setLoading(false);
