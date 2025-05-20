@@ -39,7 +39,7 @@ export interface Notification {
   actionText?: string;
   timestamp?: string;
   imageUrl?: string;
-  label?: string;
+  label?: string; // Added to fix errors
 }
 
 export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'none' | 'immediate';

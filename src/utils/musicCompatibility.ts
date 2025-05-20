@@ -1,116 +1,65 @@
 
-import { MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { MusicTrack, MusicPlaylist } from "@/types/music";
 
 /**
- * Helper function to get track title with fallback
+ * Find tracks by a specific mood
  */
-export const getTrackTitle = (track?: MusicTrack | null): string => {
-  if (!track) return '';
-  return track.title || track.name || 'Unknown Track';
+export const findTracksByMood = (tracks: MusicTrack[], mood: string): MusicTrack[] => {
+  return tracks.filter(track => 
+    track.mood?.toLowerCase() === mood.toLowerCase() || 
+    track.emotion?.toLowerCase() === mood.toLowerCase()
+  );
 };
 
 /**
- * Helper function to get track artist with fallback
+ * Find playlists by a specific mood
  */
-export const getTrackArtist = (track?: MusicTrack | null): string => {
-  if (!track) return '';
-  return track.artist || 'Unknown Artist';
+export const findPlaylistsByMood = (playlists: MusicPlaylist[], mood: string): MusicPlaylist[] => {
+  return playlists.filter(playlist => 
+    playlist.mood?.toLowerCase() === mood.toLowerCase() || 
+    playlist.emotion?.toLowerCase() === mood.toLowerCase()
+  );
 };
 
 /**
- * Helper function to get track cover URL with fallback
- */
-export const getTrackCover = (track?: MusicTrack | null): string => {
-  if (!track) return '';
-  return track.coverUrl || track.cover || '/images/covers/default-cover.jpg';
-};
-
-/**
- * Helper function to get track URL with fallback
- */
-export const getTrackUrl = (track?: MusicTrack | null): string => {
-  if (!track) return '';
-  return track.url || track.audioUrl || '';
-};
-
-/**
- * Normalize track data from different sources to a consistent format
+ * Convert various music track formats to the standard format
  */
 export const normalizeTrack = (track: any): MusicTrack => {
   return {
-    id: track.id || `track-${Date.now()}`,
-    title: getTrackTitle(track),
-    artist: getTrackArtist(track),
-    url: getTrackUrl(track),
-    cover: getTrackCover(track),
-    coverUrl: getTrackCover(track),
+    id: track.id || track._id || `track-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    title: track.title || track.name || "Unknown Track",
+    artist: track.artist || track.artistName || "Unknown Artist",
+    url: track.url || track.audioUrl || track.src || track.track_url || "",
+    cover: track.cover || track.coverUrl || track.coverImage || track.artwork || "",
     duration: track.duration || 0,
-    // Include other optional properties if they exist
-    ...(track.audioUrl && { audioUrl: track.audioUrl }),
-    ...(track.emotion && { emotion: track.emotion }),
-    ...(track.mood && { mood: track.mood }),
-    ...(track.category && { category: track.category }),
-    ...(track.intensity && { intensity: track.intensity }),
+    emotion: track.emotion || track.mood || "",
+    mood: track.mood || track.emotion || "",
+    album: track.album || track.albumName || "",
+    category: track.category || [],
+    tags: track.tags || []
   };
 };
 
 /**
- * Create music parameters for emotion-based recommendations
+ * Convert various playlist formats to the standard format
  */
-export const createMusicParams = (emotion: string, intensity: number = 0.5): EmotionMusicParams => {
+export const normalizePlaylist = (playlist: any): MusicPlaylist => {
   return {
-    emotion,
-    intensity,
+    id: playlist.id || playlist._id || `playlist-${Date.now()}`,
+    name: playlist.name || playlist.title || "Untitled Playlist",
+    title: playlist.title || playlist.name || "Untitled Playlist",
+    description: playlist.description || "",
+    coverUrl: playlist.coverUrl || playlist.cover || playlist.coverImage || "",
+    tracks: Array.isArray(playlist.tracks) ? playlist.tracks.map(normalizeTrack) : [],
+    emotion: playlist.emotion || playlist.mood || "",
+    mood: playlist.mood || playlist.emotion || "",
+    creator: playlist.creator || playlist.author || "Unknown"
   };
-};
-
-/**
- * Convert track array to playlist
- */
-export const convertToPlaylist = (tracks: MusicTrack[], name: string = 'Generated Playlist'): MusicPlaylist => {
-  return {
-    id: `playlist-${Date.now()}`,
-    name,
-    title: name,
-    tracks,
-  };
-};
-
-/**
- * Find tracks by mood
- */
-export const findTracksByMood = (tracks: MusicTrack[], mood: string): MusicTrack[] => {
-  if (!tracks || !Array.isArray(tracks)) return [];
-  
-  return tracks.filter(track => {
-    if (!track) return false;
-    
-    const trackMood = track.mood?.toLowerCase();
-    const trackEmotion = track.emotion?.toLowerCase();
-    const searchMood = mood.toLowerCase();
-    
-    return trackMood === searchMood || trackEmotion === searchMood;
-  });
-};
-
-/**
- * Ensure value is an array
- */
-export const ensureArray = <T>(value: T | T[]): T[] => {
-  if (Array.isArray(value)) {
-    return value;
-  }
-  return [value];
 };
 
 export default {
-  getTrackTitle,
-  getTrackArtist,
-  getTrackCover,
-  getTrackUrl,
+  findTracksByMood,
+  findPlaylistsByMood,
   normalizeTrack,
-  createMusicParams,
-  convertToPlaylist,
-  ensureArray,
-  findTracksByMood
+  normalizePlaylist
 };

@@ -1,90 +1,157 @@
+import { MusicTrack, MusicPlaylist } from '@/types/music';
 
-import { MusicPlaylist } from "@/types/music";
-import { mockTracks } from "@/contexts/music/mockMusicData";
-
-// Helper function to filter tracks by emotion
-const filterTracksByEmotion = (emotion: string) => {
-  return mockTracks.filter(track => {
-    const trackEmotion = track.emotion || track.mood || '';
-    const trackTags = track.tags || [];
-    return trackEmotion.toLowerCase().includes(emotion.toLowerCase()) || 
-           trackTags.some(tag => tag.toLowerCase().includes(emotion.toLowerCase()));
-  });
-};
-
-// Create playlists by emotion
+// Mock emotion music playlists
 export const emotionPlaylists: MusicPlaylist[] = [
   {
-    id: "playlist-calm",
-    title: "Calme et Sérénité",
-    description: "Des mélodies douces pour retrouver votre calme intérieur",
-    coverUrl: "/images/playlists/calm.jpg",
-    tracks: filterTracksByEmotion("calm"),
+    id: "calm-playlist",
+    title: "Calming Melodies",
+    name: "Calming Melodies", // Adding name property to match the type
+    description: "Relaxing melodies to help you calm down and destress",
+    coverUrl: "/images/music/calm-cover.jpg",
+    tracks: [
+      {
+        id: "calm-1",
+        title: "Gentle Waves",
+        artist: "Ocean Sounds",
+        url: "/audio/gentle-waves.mp3",
+        duration: 240,
+        emotion: "calm",
+        mood: "peaceful"
+      },
+      {
+        id: "calm-2",
+        title: "Soft Rain",
+        artist: "Nature Collective",
+        url: "/audio/soft-rain.mp3",
+        duration: 300,
+        emotion: "calm",
+        mood: "relaxed"
+      },
+      {
+        id: "calm-3",
+        title: "Piano Lullaby",
+        artist: "Sleepy Keys",
+        url: "/audio/piano-lullaby.mp3",
+        duration: 280,
+        emotion: "calm",
+        mood: "soothing"
+      }
+    ],
     emotion: "calm",
-    creator: "EmotionsCare",
+    creator: "EmotionsCare"
   },
   {
-    id: "playlist-focus",
-    title: "Concentration Profonde",
-    description: "Boostez votre productivité avec ces morceaux focus",
-    coverUrl: "/images/playlists/focus.jpg",
-    tracks: filterTracksByEmotion("focus"),
-    emotion: "focused",
-    creator: "EmotionsCare",
+    id: "happy-playlist",
+    title: "Uplifting Tunes",
+    name: "Uplifting Tunes", // Adding name property to match the type
+    description: "Positive music to boost your mood and energy levels",
+    coverUrl: "/images/music/happy-cover.jpg",
+    tracks: [
+      {
+        id: "happy-1",
+        title: "Sunshine Days",
+        artist: "Mood Lifters",
+        url: "/audio/sunshine-days.mp3",
+        duration: 198,
+        emotion: "happy",
+        mood: "energetic"
+      },
+      {
+        id: "happy-2",
+        title: "Walking on Air",
+        artist: "Joyful Beats",
+        url: "/audio/walking-on-air.mp3",
+        duration: 210,
+        emotion: "happy",
+        mood: "cheerful"
+      },
+      {
+        id: "happy-3",
+        title: "Good Vibes",
+        artist: "Positive Flow",
+        url: "/audio/good-vibes.mp3",
+        duration: 225,
+        emotion: "happy",
+        mood: "optimistic"
+      }
+    ],
+    emotion: "happy",
+    creator: "EmotionsCare"
   },
   {
-    id: "playlist-energy",
-    title: "Énergie Positive",
-    description: "Retrouvez votre dynamisme avec cette sélection énergique",
-    coverUrl: "/images/playlists/energy.jpg",
-    tracks: filterTracksByEmotion("energy"),
-    emotion: "energetic",
-    creator: "EmotionsCare",
+    id: "focus-playlist",
+    title: "Deep Concentration",
+    name: "Deep Concentration", // Adding name property to match the type
+    description: "Enhance your focus and productivity with these tracks",
+    coverUrl: "/images/music/focus-cover.jpg",
+    tracks: [
+      {
+        id: "focus-1",
+        title: "Clear Mind",
+        artist: "Concentration",
+        url: "/audio/clear-mind.mp3",
+        duration: 320,
+        emotion: "focus",
+        mood: "determined"
+      },
+      {
+        id: "focus-2",
+        title: "Study Session",
+        artist: "Brain Boost",
+        url: "/audio/study-session.mp3",
+        duration: 360,
+        emotion: "focus",
+        mood: "attentive"
+      },
+      {
+        id: "focus-3",
+        title: "Work Mode",
+        artist: "Productivity",
+        url: "/audio/work-mode.mp3",
+        duration: 340,
+        emotion: "focus",
+        mood: "efficient"
+      }
+    ],
+    emotion: "focus",
+    creator: "EmotionsCare"
   },
   {
-    id: "playlist-relax",
-    title: "Relaxation Totale",
-    description: "Laissez-vous porter par ces sons relaxants",
-    coverUrl: "/images/playlists/relax.jpg",
-    tracks: filterTracksByEmotion("relax"),
-    emotion: "relaxed",
-    creator: "EmotionsCare",
-  },
-];
-
-// Helper function to get a playlist by emotion
-export function getPlaylistByEmotion(emotion: string): MusicPlaylist | null {
-  // Try to match exact emotion
-  const exactMatch = emotionPlaylists.find(playlist => 
-    playlist.emotion?.toLowerCase() === emotion.toLowerCase()
-  );
-  
-  if (exactMatch) return exactMatch;
-  
-  // Map similar emotions
-  const emotionMappings: Record<string, string[]> = {
-    'calm': ['peaceful', 'tranquil', 'serene'],
-    'relaxed': ['chill', 'rest', 'calm'],
-    'focused': ['concentration', 'attention', 'work'],
-    'energetic': ['upbeat', 'dynamic', 'motivating'],
-    'happy': ['joy', 'upbeat', 'cheerful'],
-    'sad': ['melancholic', 'gentle', 'blue'],
-    'anxious': ['calming', 'soothing'],
-    'stressed': ['calming', 'relaxing']
-  };
-  
-  // Look for similar emotions
-  for (const [key, synonyms] of Object.entries(emotionMappings)) {
-    if (synonyms.includes(emotion.toLowerCase())) {
-      const match = emotionPlaylists.find(playlist => 
-        playlist.emotion?.toLowerCase() === key.toLowerCase()
-      );
-      if (match) return match;
-    }
+    id: "sleep-playlist",
+    title: "Sleep Soundscapes",
+    name: "Sleep Soundscapes", // Adding name property to match the type
+    description: "Peaceful sounds to help you drift into a restful sleep",
+    coverUrl: "/images/music/sleep-cover.jpg",
+    tracks: [
+      {
+        id: "sleep-1",
+        title: "Night Dreams",
+        artist: "Sleep Well",
+        url: "/audio/night-dreams.mp3",
+        duration: 450,
+        emotion: "sleep",
+        mood: "relaxed"
+      },
+      {
+        id: "sleep-2",
+        title: "Gentle Breeze",
+        artist: "Dream Weaver",
+        url: "/audio/gentle-breeze.mp3",
+        duration: 480,
+        emotion: "sleep",
+        mood: "peaceful"
+      },
+      {
+        id: "sleep-3",
+        title: "Starry Night",
+        artist: "Slumber Party",
+        url: "/audio/starry-night.mp3",
+        duration: 420,
+        emotion: "sleep",
+        mood: "calming"
+      }
+    ],
+    emotion: "sleep",
+    creator: "EmotionsCare"
   }
-  
-  // Default to calm if no match found
-  return emotionPlaylists.find(playlist => 
-    playlist.emotion?.toLowerCase() === 'calm'
-  ) || emotionPlaylists[0] || null;
-}
+];

@@ -1,96 +1,100 @@
 
 import { useState, useEffect } from 'react';
-import { useMusic } from '@/contexts';
-import { MusicTrack } from '@/types/music';
-import { EmotionResult } from '@/types';
+import { useMusicContext } from '@/contexts/MusicContext';
+import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { findTracksByMood } from '@/utils/musicCompatibility';
 
-// Mapping des émotions vers les types de musique
-export const EMOTION_TO_MUSIC: Record<string, string> = {
-  joy: 'upbeat',
-  happy: 'upbeat',
-  calm: 'ambient',
-  relaxed: 'ambient',
-  anxious: 'calming',
-  stressed: 'calming',
-  sad: 'gentle',
-  melancholic: 'gentle',
-  energetic: 'dance',
-  excited: 'dance',
-  neutral: 'focus',
-};
-
-export function useMusicRecommendation(emotionResult?: EmotionResult) {
-  const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
+/**
+ * Hook to get music recommendations based on emotions
+ */
+export const useMusicRecommendation = (defaultEmotion?: string) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { loadPlaylistForEmotion, playTrack } = useMusic();
-  
-  useEffect(() => {
-    if (emotionResult?.emotion) {
-      loadRecommendations(emotionResult.emotion);
-    }
-  }, [emotionResult]);
-  
-  const loadRecommendations = async (emotion: string) => {
+  const [error, setError] = useState<string | null>(null);
+  const [recommendation, setRecommendation] = useState<MusicPlaylist | null>(null);
+  const musicContext = useMusicContext();
+
+  /**
+   * Get a recommendation based on an emotion
+   */
+  const getRecommendation = async (emotion: string | EmotionMusicParams): Promise<MusicPlaylist | null> => {
     setIsLoading(true);
+    setError(null);
+    
     try {
-      const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-      const playlist = await loadPlaylistForEmotion({
-        emotion: musicType
-      });
+      let params: EmotionMusicParams;
       
-      if (playlist && playlist.tracks) {
-        // Make sure all tracks have required properties
-        const tracksWithRequiredProps = playlist.tracks.map(track => ({
-          ...track,
-          url: track.url || track.audioUrl || '',
-          duration: track.duration || 0
-        }));
-        setRecommendedTracks(tracksWithRequiredProps);
+      // Handle string or emotion params object
+      if (typeof emotion === 'string') {
+        params = { emotion };
       } else {
-        setRecommendedTracks([]);
+        params = emotion;
       }
-    } catch (error) {
-      console.error('Error loading music recommendations:', error);
-      setRecommendedTracks([]);
+      
+      let playlist: MusicPlaylist | null = null;
+      
+      // Try to use music context if available
+      if (musicContext.loadPlaylistForEmotion) {
+        playlist = await musicContext.loadPlaylistForEmotion(params);
+      } else {
+        // Fallback to local logic
+        if (!musicContext.playlists || musicContext.playlists.length === 0) {
+          throw new Error("No playlists available");
+        }
+        
+        // Try to find a playlist directly matching the emotion
+        playlist = musicContext.playlists.find(p => 
+          p.emotion?.toLowerCase() === params.emotion.toLowerCase() || 
+          p.mood?.toLowerCase() === params.emotion.toLowerCase()
+        ) || null;
+        
+        // If no direct match, try to generate a playlist from matching tracks
+        if (!playlist) {
+          const allTracks = musicContext.playlists.flatMap(p => p.tracks);
+          const matchingTracks = findTracksByMood(allTracks, params.emotion);
+          
+          if (matchingTracks.length > 0) {
+            playlist = {
+              id: `generated-${params.emotion}`,
+              name: `${params.emotion.charAt(0).toUpperCase() + params.emotion.slice(1)} Mix`,
+              title: `${params.emotion.charAt(0).toUpperCase() + params.emotion.slice(1)} Mix`,
+              tracks: matchingTracks,
+              emotion: params.emotion,
+              mood: params.emotion
+            };
+          }
+        }
+      }
+      
+      setRecommendation(playlist);
+      return playlist;
+      
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to get music recommendation";
+      setError(errorMessage);
+      return null;
     } finally {
       setIsLoading(false);
     }
   };
-  
-  const playRecommendedTrack = (track: MusicTrack) => {
-    if (track) {
-      playTrack({
-        ...track,
-        url: track.url || track.audioUrl || '',
-        duration: track.duration || 0
-      });
+
+  // Load default recommendation if provided
+  useEffect(() => {
+    if (defaultEmotion) {
+      getRecommendation(defaultEmotion);
     }
-  };
-  
-  const playFirstRecommendation = () => {
-    if (recommendedTracks.length > 0) {
-      playRecommendedTrack(recommendedTracks[0]);
-      return true;
-    }
-    return false;
-  };
-  
-  const handlePlayMusic = (emotion: string) => {
-    const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-    loadPlaylistForEmotion({
-      emotion: musicType
-    });
-    return playFirstRecommendation();
-  };
-  
+  }, [defaultEmotion]);
+
   return {
-    recommendedTracks,
+    recommendation,
     isLoading,
-    playRecommendedTrack,
-    playFirstRecommendation,
-    handlePlayMusic,
-    EMOTION_TO_MUSIC
+    error,
+    getRecommendation,
+    playRecommendation: () => {
+      if (recommendation && musicContext.playPlaylist) {
+        musicContext.playPlaylist(recommendation);
+      }
+    }
   };
-}
+};
 
 export default useMusicRecommendation;

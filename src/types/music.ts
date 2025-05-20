@@ -12,12 +12,13 @@ export interface MusicTrack {
   audioUrl?: string;
   emotion?: string;
   name?: string;
-  mood?: string; // Added to fix errors
+  mood?: string;
   category?: string | string[];
   tags?: string[];
   intensity?: number;
   album?: string;
-  year?: number; // Added to fix errors
+  year?: number;
+  genre?: string; // Added to fix errors
 }
 
 export interface MusicPlaylist {
@@ -32,7 +33,8 @@ export interface MusicPlaylist {
   category?: string | string[];
   coverImage?: string;
   creator?: string;
-  tags?: string[]; // Added to fix errors
+  tags?: string[];
+  cover?: string; // Added to fix errors
 }
 
 export interface MusicCategory {
@@ -81,23 +83,29 @@ export interface MusicContextType {
   generateMusic?: (prompt: string) => Promise<{ tracks: MusicTrack[] }>;
   pause?: () => void;
   resume?: () => void;
-  muted?: boolean; // Added to fix errors
-  toggleMute?: () => void; // Added to fix errors
-  togglePlay?: () => void; // Added to fix errors
-  previous?: () => void; // Added to fix errors
-  next?: () => void; // Added to fix errors
-  playlist?: MusicPlaylist | null; // Added to fix errors
-  setOpenDrawer?: (isOpen: boolean) => void; // Added to fix errors
-  isInitialized?: boolean; // Added to fix errors
-  error?: string | null; // Added to fix errors
-  setEmotion?: (emotion: string) => void; // Added to fix errors
-  setCurrentTrack?: (track: MusicTrack) => void; // Added to fix errors
-  openDrawer?: boolean; // Added to fix errors
+  muted?: boolean;
+  toggleMute?: () => void;
+  togglePlay?: () => void;
+  previous?: () => void;
+  next?: () => void;
+  playlist?: MusicPlaylist | null;
+  setOpenDrawer?: (isOpen: boolean) => void;
+  isInitialized?: boolean;
+  error?: string | null;
+  setEmotion?: (emotion: string) => void;
+  setCurrentTrack?: (track: MusicTrack) => void;
+  openDrawer?: boolean;
 }
 
 export interface MusicDrawerProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  children?: React.ReactNode;
+  isOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onClose?: () => void;
+  playlist?: MusicPlaylist | null;
+  currentTrack?: MusicTrack | null;
+  side?: "left" | "right" | "top" | "bottom";
 }
 
 export interface ProgressBarProps {
