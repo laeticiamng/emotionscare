@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import Shell from '@/Shell';
 import PrivacyDashboard from '@/components/privacy/PrivacyDashboard';
 import { motion } from 'framer-motion';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '@/components/ui/use-toast';
 
 const PrivacySettingsPage: React.FC = () => {
   const { toast } = useToast();

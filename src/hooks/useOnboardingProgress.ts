@@ -86,6 +86,19 @@ export function useOnboardingProgress() {
     // Log completion
     logStep('completion', 'complete', totalTimeSpent);
     
+    // Show confetti celebration
+    try {
+      if (window.confetti) {
+        window.confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      }
+    } catch (e) {
+      console.warn('Confetti effect unavailable:', e);
+    }
+    
     return {
       completed: true,
       timeSpent: totalTimeSpent,

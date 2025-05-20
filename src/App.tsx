@@ -15,6 +15,8 @@ const WorldPage = lazy(() => import('./pages/WorldPage'));
 const SanctuaryPage = lazy(() => import('./pages/SanctuaryPage'));
 const B2COnboardingPage = lazy(() => import('./pages/common/Onboarding'));
 const Support = lazy(() => import('./pages/Support'));
+const ExtensionsPage = lazy(() => import('./pages/ExtensionsPage'));
+const PrivacySettingsPage = lazy(() => import('./pages/PrivacySettingsPage'));
 
 function App() {
   return (
@@ -31,6 +33,8 @@ function App() {
             <Route path="/sanctuary" element={<SanctuaryPage />} />
             <Route path="/support" element={<SupportPage />} />
             <Route path="/support-legacy" element={<Support />} />
+            <Route path="/extensions" element={<ExtensionsPage />} />
+            <Route path="/privacy-settings" element={<PrivacySettingsPage />} />
             {/* Add more routes as needed */}
           </Routes>
         </Suspense>
