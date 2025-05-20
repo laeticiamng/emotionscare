@@ -2,179 +2,324 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import WelcomeMessage from '@/components/home/WelcomeMessage';
+import { Volume2, VolumeX, Moon, Sun, Mic, MicOff, Languages } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { logModeSelection } from '@/utils/modeSelectionLogger';
+import { Button } from '@/components/ui/button';
 import '../styles/immersive-home.css';
 
 const ImmersiveHome: React.FC = () => {
   const navigate = useNavigate();
-  const [theme, setTheme] = useState<'light' | 'dark' | 'pastel'>('light');
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(false);
+  const { setTheme, theme, isDarkMode, toggleTheme } = useTheme();
+  const { setUserMode } = useUserMode();
+  const [audioEnabled, setAudioEnabled] = useState<boolean>(false);
+  const [micActive, setMicActive] = useState<boolean>(false);
+  const [greeting, setGreeting] = useState<string>('');
+  const [inspirationalQuote, setInspirationalQuote] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [language, setLanguage] = useState<'fr' | 'en'>('fr');
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
-  // Determine time of day for adaptive theming and content
-  const getTimeOfDay = () => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return 'morning';
-    if (hour >= 12 && hour < 17) return 'afternoon';
-    if (hour >= 17 && hour < 21) return 'evening';
-    return 'night';
-  };
-  
-  const timeOfDay = getTimeOfDay();
-  
-  // Effect for initial animation sequence
+  // Get greeting based on time of day
   useEffect(() => {
-    // Detect user's preferred color scheme
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
+    const hour = new Date().getHours();
+    let newGreeting = '';
+    
+    if (hour >= 5 && hour < 12) {
+      newGreeting = language === 'fr' ? 'Bonjour' : 'Good morning';
+    } else if (hour >= 12 && hour < 18) {
+      newGreeting = language === 'fr' ? 'Bon après-midi' : 'Good afternoon';
+    } else {
+      newGreeting = language === 'fr' ? 'Bonsoir' : 'Good evening';
     }
     
-    // Stagger the animations for a premium feel
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 300);
+    setGreeting(newGreeting);
+  }, [language]);
+  
+  // Set inspirational quote
+  useEffect(() => {
+    const quotes = language === 'fr' 
+      ? [
+          "Prenez soin de vos émotions, elles sont le reflet de votre âme.",
+          "Chaque émotion est une opportunité de mieux vous comprendre.",
+          "La conscience de soi commence par l'écoute de ses émotions.",
+          "Vos émotions ne sont pas des faiblesses, mais des guides.",
+          "Accueillir ses émotions, c'est s'ouvrir à la guérison."
+        ]
+      : [
+          "Take care of your emotions, they reflect your soul.",
+          "Each emotion is an opportunity to understand yourself better.",
+          "Self-awareness begins with listening to your emotions.",
+          "Your emotions are not weaknesses, but guides.",
+          "Welcoming your emotions is opening yourself to healing."
+        ];
     
-    return () => clearTimeout(timer);
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    setInspirationalQuote(randomQuote);
+  }, [language]);
+  
+  // Initialize audio
+  useEffect(() => {
+    audioRef.current = new Audio('/sounds/ambient-calm.mp3');
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.4;
+    
+    // Simulate loading
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      clearTimeout(timer);
+    };
   }, []);
   
-  // Effect to toggle audio when enabled
-  useEffect(() => {
-    if (audioEnabled && audioRef.current) {
-      audioRef.current.volume = 0.2;
-      audioRef.current.play().catch(e => console.log('Audio autoplay prevented:', e));
-    }
-  }, [audioEnabled]);
-  
+  // Handle audio toggle
   const toggleAudio = () => {
-    setAudioEnabled(prev => !prev);
+    if (audioRef.current) {
+      if (audioEnabled) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play().catch(err => console.error("Audio play error:", err));
+      }
+      setAudioEnabled(!audioEnabled);
+    }
   };
   
-  const toggleTheme = () => {
-    setTheme(current => {
-      if (current === 'light') return 'dark';
-      if (current === 'dark') return 'pastel';
-      return 'light';
-    });
+  // Handle microphone toggle
+  const toggleMic = () => {
+    setMicActive(!micActive);
+    // In a full implementation, this would activate voice recognition
+    // For now, we'll just toggle the state for UI feedback
   };
   
-  const handleB2CClick = () => {
-    logModeSelection('b2c_selection_from_home');
+  // Handle mode selection
+  const handleModeSelection = (mode: 'b2c' | 'b2b') => {
+    setUserMode(mode);
+    logModeSelection(mode);
+    localStorage.setItem('userMode', mode);
     
-    // Use framer-motion's AnimatePresence for exit animations
-    setIsLoaded(false);
-    setTimeout(() => navigate('/b2c/login'), 600);
+    // Navigate based on selected mode
+    if (mode === 'b2c') {
+      navigate('/b2c/login');
+    } else {
+      navigate('/b2b/selection');
+    }
   };
   
-  const handleB2BClick = () => {
-    logModeSelection('b2b_selection_from_home');
+  // Toggle language
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'fr' ? 'en' : 'fr');
+  };
+  
+  // Background style based on time of day
+  const getTimeBasedBackground = () => {
+    const hour = new Date().getHours();
     
-    // Use framer-motion's AnimatePresence for exit animations
-    setIsLoaded(false);
-    setTimeout(() => navigate('/choose-mode'), 600);
+    if (hour >= 5 && hour < 12) {
+      return 'bg-morning';
+    } else if (hour >= 12 && hour < 18) {
+      return 'bg-afternoon';
+    } else if (hour >= 18 && hour < 22) {
+      return 'bg-evening';
+    } else {
+      return 'bg-night';
+    }
   };
   
-  return (
-    <div className={`immersive-container ${theme}`} style={{ background: `var(--background)` }}>
-      {/* Audio element */}
-      <audio ref={audioRef} loop>
-        <source src="/sounds/ambient-calm.mp3" type="audio/mp3" />
-      </audio>
-      
-      {/* Ambient background elements */}
-      <div className="ambient-circle primary w-[600px] h-[600px] top-[-100px] right-[-100px]"></div>
-      <div className="ambient-circle accent w-[500px] h-[500px] bottom-[-100px] left-[-100px]"></div>
-      
-      {/* Welcome text with typewriter effect */}
-      <div className="max-w-4xl mx-auto text-center">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={isLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: -20 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+  // Render loading screen
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/30">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
         >
-          <h1 className="premium-title">EmotionsCare</h1>
-        </motion.div>
-        
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={isLoaded ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-        >
-          <WelcomeMessage className="premium-subtitle mb-8" />
+          <motion.div 
+            className="w-20 h-20 rounded-full border-4 border-primary border-t-transparent mx-auto mb-6"
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          />
+          <motion.h1 
+            className="text-2xl font-semibold text-primary"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+          >
+            EmotionsCare
+          </motion.h1>
         </motion.div>
       </div>
+    );
+  }
+  
+  return (
+    <div className={`min-h-screen ${getTimeBasedBackground()} transition-all duration-1000`}>
+      {/* Background animation */}
+      <div className="absolute inset-0 overflow-hidden z-0">
+        <div className="ambient-circle primary w-[40vw] h-[40vw] top-[20%] left-[10%] opacity-20"></div>
+        <div className="ambient-circle accent w-[30vw] h-[30vw] bottom-[15%] right-[5%] opacity-20"></div>
+      </div>
       
-      {/* Mode selection buttons */}
-      <motion.div 
-        className="flex flex-col md:flex-row gap-6 mt-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={isLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-        transition={{ duration: 0.8, delay: 0.8 }}
-      >
-        <Button
-          onClick={handleB2CClick}
-          className="premium-button primary"
+      {/* Main content */}
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
+        {/* Logo and Controls Header */}
+        <motion.div 
+          className="absolute top-0 left-0 right-0 flex justify-between items-center p-4 md:p-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
         >
-          <span className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 1 0-16 0"></path></svg>
-            Espace Particulier
-          </span>
-        </Button>
+          {/* Logo */}
+          <div className="flex items-center">
+            <motion.div 
+              className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"
+              whileHover={{ rotate: 10, scale: 1.05 }}
+              transition={{ duration: 0.2 }}
+            >
+              <span className="text-white font-bold text-sm">EC</span>
+            </motion.div>
+            <span className="ml-2 text-xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              EmotionsCare
+            </span>
+          </div>
+          
+          {/* Controls */}
+          <div className="flex items-center space-x-3">
+            {/* Audio toggle */}
+            <motion.button 
+              className="control-button"
+              onClick={toggleAudio}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label={audioEnabled ? "Désactiver l'audio" : "Activer l'audio"}
+            >
+              {audioEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+            </motion.button>
+            
+            {/* Theme toggle */}
+            <motion.button 
+              className="control-button"
+              onClick={toggleTheme}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label={isDarkMode ? "Mode clair" : "Mode sombre"}
+            >
+              {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+            </motion.button>
+            
+            {/* Mic toggle */}
+            <motion.button 
+              className={`control-button ${micActive ? 'voice-active' : ''}`}
+              onClick={toggleMic}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label={micActive ? "Désactiver le microphone" : "Activer le microphone"}
+            >
+              {micActive ? <Mic size={16} /> : <MicOff size={16} />}
+            </motion.button>
+            
+            {/* Language toggle */}
+            <motion.button 
+              className="control-button"
+              onClick={toggleLanguage}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label="Changer de langue"
+            >
+              <Languages size={16} />
+              <span className="sr-only">{language === 'fr' ? 'Switch to English' : 'Passer en français'}</span>
+            </motion.button>
+          </div>
+        </motion.div>
         
-        <Button
-          onClick={handleB2BClick}
-          className="premium-button secondary"
+        {/* Main hero section */}
+        <motion.div 
+          className="max-w-3xl mx-auto text-center pt-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
         >
-          <span className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"></path><path d="M12 7v14"></path><path d="M3 21h18"></path></svg>
-            Espace Entreprise
-          </span>
-        </Button>
-      </motion.div>
-      
-      {/* Control buttons */}
-      <motion.div
-        className="absolute bottom-6 right-6 flex gap-3"
-        initial={{ opacity: 0 }}
-        animate={isLoaded ? { opacity: 0.8 } : { opacity: 0 }}
-        transition={{ duration: 0.5, delay: 1.2 }}
-      >
-        <button 
-          className={`control-button ${audioEnabled ? 'active' : ''}`}
-          onClick={toggleAudio}
-          aria-label={audioEnabled ? "Désactiver la musique" : "Activer la musique"}
-        >
-          {audioEnabled ? (
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 6h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8l-4-4 4-4Z"></path></svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 10v4"></path><path d="M11 10v4"></path><path d="M2 12C2 6.5 6.5 2 12 2s10 4.5 10 10-4.5 10-10 10S2 17.5 2 12z"></path></svg>
-          )}
-        </button>
+          <motion.h1 
+            className="premium-title mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            {greeting}
+          </motion.h1>
+          
+          <motion.p 
+            className="premium-subtitle mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+          >
+            {inspirationalQuote}
+          </motion.p>
+          
+          {/* Mode selection */}
+          <motion.div 
+            className="flex flex-col sm:flex-row justify-center gap-4 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+          >
+            <Button
+              onClick={() => handleModeSelection('b2c')}
+              className="premium-button primary text-lg py-6 px-8 rounded-2xl shadow-lg hover:-translate-y-1 transition-all bg-gradient-to-r from-blue-600 to-indigo-600"
+              aria-label={language === 'fr' ? "Je suis un particulier" : "I am an individual"}
+            >
+              {language === 'fr' ? "Je suis un particulier" : "I am an individual"}
+            </Button>
+            
+            <Button
+              onClick={() => handleModeSelection('b2b')}
+              className="premium-button secondary text-lg py-6 px-8 rounded-2xl bg-white/10 backdrop-blur border border-white/20 shadow-lg hover:-translate-y-1 transition-all"
+              variant="outline"
+              aria-label={language === 'fr' ? "Je suis une entreprise" : "I am a company"}
+            >
+              {language === 'fr' ? "Je suis une entreprise" : "I am a company"}
+            </Button>
+          </motion.div>
+          
+          <motion.p
+            className="text-center text-sm md:text-base text-blue-600/80 dark:text-blue-400/80 max-w-lg mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.1 }}
+          >
+            {language === 'fr' 
+              ? "Vous êtes au bon endroit pour prendre soin de vos émotions"
+              : "You're in the right place to take care of your emotions"}
+          </motion.p>
+        </motion.div>
         
-        <button 
-          className="control-button"
-          onClick={toggleTheme}
-          aria-label="Changer de thème"
+        {/* GDPR notice */}
+        <motion.div 
+          className="absolute bottom-4 left-0 right-0 flex justify-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.3 }}
         >
-          {theme === 'light' ? (
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
-          ) : theme === 'dark' ? (
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15V6"></path><path d="M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"></path><path d="M12 12H3"></path><path d="M16 6H3"></path><path d="M12 18H3"></path></svg>
-          )}
-        </button>
-        
-        <button 
-          className="control-button"
-          onClick={() => console.log('Voice mode')}
-          aria-label="Activer les commandes vocales"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path></svg>
-        </button>
-      </motion.div>
+          <div className="bg-white/30 dark:bg-black/20 backdrop-blur-md px-4 py-2 rounded-full text-xs text-center">
+            {language === 'fr' 
+              ? "Nous respectons votre vie privée."
+              : "We respect your privacy."} 
+            <button 
+              className="ml-1 text-blue-600 dark:text-blue-400 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 rounded"
+              onClick={() => {/* Open GDPR modal in full implementation */}}
+            >
+              {language === 'fr' ? "En savoir plus" : "Learn more"}
+            </button>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };
