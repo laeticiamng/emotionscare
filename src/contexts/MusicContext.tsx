@@ -1,244 +1,272 @@
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { MusicTrack, MusicPlaylist, MusicContextType, EmotionMusicParams } from '@/types/music';
-import { defaultPlaylists } from '@/data/musicPlaylists';
-import { ensureArray } from '@/utils/musicCompatibility';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { MusicContextType, MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { mockTracks, mockPlaylists } from './music/mockMusicData';
+import { useToast } from '@/hooks/use-toast';
 
-// Create the music context with default values
-export const MusicContext = createContext<MusicContextType>({
+// Initial context value with all required methods
+const initialContext: MusicContextType = {
   currentTrack: null,
   currentPlaylist: null,
   playlists: [],
   isPlaying: false,
-  volume: 0.7,
+  volume: 0.5,
   duration: 0,
   muted: false,
   currentTime: 0,
   isLoading: false,
+  error: '',
   
-  // Playback control methods
   togglePlay: () => {},
   toggleMute: () => {},
   setVolume: () => {},
   playTrack: () => {},
   nextTrack: () => {},
   prevTrack: () => {},
-  pauseTrack: () => {},
-  resumeTrack: () => {},
-  previousTrack: () => {},
-  seekTo: () => {},
-  
-  // Initialize other required methods
-  loadPlaylistForEmotion: async () => null,
-  getRecommendationByEmotion: async () => null,
-  setEmotion: () => {},
-  generateMusic: async () => null,
-  setPlaylist: () => {},
-  playPlaylist: () => {}
-});
+  addToPlaylist: () => {},
+  removeFromPlaylist: () => {},
+  createPlaylist: () => {},
+  playEmotion: () => {},
+};
 
-// Provider component
+export const MusicContext = createContext<MusicContextType>(initialContext);
+
 export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
-  const [playlists, setPlaylists] = useState<MusicPlaylist[]>(defaultPlaylists);
+  const [playlists, setPlaylists] = useState<MusicPlaylist[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.7);
-  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(0.5);
   const [muted, setMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [currentEmotion, setCurrentEmotion] = useState<string>('calm');
   
-  // Toggle play/pause
-  const togglePlay = useCallback(() => {
-    setIsPlaying(!isPlaying);
-  }, [isPlaying]);
-  
-  // Toggle mute
-  const toggleMute = useCallback(() => {
-    setMuted(!muted);
-  }, [muted]);
-  
-  // Volume control
-  const handleVolumeChange = useCallback((newVolume: number) => {
-    setVolume(newVolume);
+  const { toast } = useToast();
+
+  // Load playlists on mount
+  useEffect(() => {
+    // Load mock playlists for development
+    setPlaylists(mockPlaylists);
+    setIsInitialized(true);
   }, []);
-  
-  // Play a track
+
+  // Player controls
+  const togglePlay = useCallback(() => {
+    setIsPlaying(prev => !prev);
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    setMuted(prev => !prev);
+  }, []);
+
+  const handleSetVolume = useCallback((value: number) => {
+    setVolume(value);
+    if (value > 0 && muted) {
+      setMuted(false);
+    }
+  }, [muted]);
+
   const playTrack = useCallback((track: MusicTrack) => {
     setCurrentTrack(track);
     setIsPlaying(true);
+    // Additional logic for playing the actual audio would be here
   }, []);
-  
-  // Pause track
+
   const pauseTrack = useCallback(() => {
     setIsPlaying(false);
+    // Additional logic for pausing the actual audio would be here
   }, []);
-  
-  // Resume track
+
   const resumeTrack = useCallback(() => {
     setIsPlaying(true);
+    // Additional logic for resuming the actual audio would be here
   }, []);
-  
-  // Next track
+
   const nextTrack = useCallback(() => {
     if (!currentPlaylist || !currentTrack) return;
     
-    const tracks = currentPlaylist.tracks;
-    const currentIndex = tracks.findIndex(track => track.id === currentTrack.id);
-    
-    if (currentIndex < tracks.length - 1) {
-      playTrack(tracks[currentIndex + 1]);
-    } else {
-      // Loop back to first track
-      playTrack(tracks[0]);
+    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
+    if (currentIndex === -1 || currentIndex === currentPlaylist.tracks.length - 1) {
+      // Either track not found or it's the last track
+      return;
     }
+    
+    const nextTrack = currentPlaylist.tracks[currentIndex + 1];
+    playTrack(nextTrack);
   }, [currentPlaylist, currentTrack, playTrack]);
-  
-  // Previous track
-  const prevTrack = useCallback(() => {
+
+  const previousTrack = useCallback(() => {
     if (!currentPlaylist || !currentTrack) return;
     
-    const tracks = currentPlaylist.tracks;
-    const currentIndex = tracks.findIndex(track => track.id === currentTrack.id);
-    
-    if (currentIndex > 0) {
-      playTrack(tracks[currentIndex - 1]);
-    } else {
-      // Loop to last track
-      playTrack(tracks[tracks.length - 1]);
+    const currentIndex = currentPlaylist.tracks.findIndex(t => t.id === currentTrack.id);
+    if (currentIndex <= 0) {
+      // Either track not found or it's the first track
+      return;
     }
+    
+    const prevTrack = currentPlaylist.tracks[currentIndex - 1];
+    playTrack(prevTrack);
   }, [currentPlaylist, currentTrack, playTrack]);
-  
-  // Seek to a position
+
   const seekTo = useCallback((time: number) => {
     setCurrentTime(time);
+    // Additional logic for seeking in the actual audio would be here
   }, []);
-  
-  // Toggle drawer
+
   const toggleDrawer = useCallback(() => {
-    setOpenDrawer(!openDrawer);
-  }, [openDrawer]);
-  
-  // Load playlist for emotion
-  const loadPlaylistForEmotion = useCallback(async (params: string | EmotionMusicParams): Promise<MusicPlaylist | null> => {
-    try {
-      setIsLoading(true);
-      const emotion = typeof params === 'string' ? params : params.emotion;
-      
-      // Find a playlist that matches the emotion
-      let playlist = playlists.find(p => 
-        (p.emotion && p.emotion.toLowerCase() === emotion.toLowerCase()) ||
-        (p.mood && p.mood.toLowerCase() === emotion.toLowerCase()) ||
-        (p.tags && ensureArray(p.tags).some(tag => 
-          typeof tag === 'string' && tag.toLowerCase() === emotion.toLowerCase()
-        ))
-      );
-      
-      if (!playlist) {
-        // Create a default playlist if none exists
-        playlist = {
-          id: `generated-${Date.now()}`,
-          title: `${emotion} Mix`,
-          description: `Customized mix for ${emotion} mood`,
-          tracks: playlists.flatMap(p => p.tracks).slice(0, 5),
-          emotion: emotion,
-          mood: emotion,
-          coverUrl: "/music/covers/default.jpg"
-        };
-        
-        setPlaylists([...playlists, playlist]);
-      }
-      
-      setCurrentPlaylist(playlist);
-      return playlist;
-    } catch (error) {
-      console.error('Error loading playlist for emotion:', error);
-      setError('Failed to load playlist');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [playlists]);
-  
-  // Get recommendation by emotion
-  const getRecommendationByEmotion = useCallback(async (emotion: string): Promise<MusicPlaylist | null> => {
-    try {
-      setIsLoading(true);
-      
-      // Find tracks that match the emotion
-      const matchingTracks = playlists.flatMap(p => p.tracks).filter(track => 
-        (track.emotion && track.emotion.toLowerCase() === emotion.toLowerCase()) ||
-        (track.mood && track.mood.toLowerCase() === emotion.toLowerCase()) ||
-        (track.tags && ensureArray(track.tags).some(tag => 
-          typeof tag === 'string' && tag.toLowerCase() === emotion.toLowerCase()
-        ))
-      );
-      
-      if (matchingTracks.length > 0) {
-        const recommendedPlaylist: MusicPlaylist = {
-          id: `recommended-${Date.now()}`,
-          title: `${emotion} Recommendation`,
-          description: `Recommended tracks for ${emotion}`,
-          tracks: matchingTracks,
-          emotion: emotion,
-          mood: emotion
-        };
-        
-        return recommendedPlaylist;
-      }
-      
-      return null;
-    } catch (error) {
-      console.error('Error getting recommendation:', error);
-      setError('Failed to get recommendation');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [playlists]);
-  
-  // Set emotion
-  const setEmotion = useCallback((emotion: string) => {
-    setCurrentEmotion(emotion);
+    setOpenDrawer(prev => !prev);
   }, []);
-  
-  // Generate music (mock implementation)
-  const generateMusic = useCallback(async (params: any): Promise<MusicPlaylist | null> => {
-    try {
-      setIsLoading(true);
-      const emotion = params.emotion || 'calm';
-      
-      // For now, just return the first playlist
-      const playlist = playlists[0] || null;
-      return playlist;
-    } catch (error) {
-      console.error('Error generating music:', error);
-      setError('Failed to generate music');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [playlists]);
-  
-  // Set playlist
-  const handleSetPlaylist = useCallback((playlist: MusicPlaylist) => {
+
+  // Playlist management
+  const setPlaylist = useCallback((playlist: MusicPlaylist) => {
     setCurrentPlaylist(playlist);
   }, []);
-  
-  // Play playlist
+
   const playPlaylist = useCallback((playlist: MusicPlaylist) => {
     setCurrentPlaylist(playlist);
-    if (playlist.tracks.length > 0) {
+    if (playlist.tracks && playlist.tracks.length > 0) {
       playTrack(playlist.tracks[0]);
     }
   }, [playTrack]);
-  
-  // Context value
-  const value = {
+
+  // Emotion-based music
+  const loadPlaylistForEmotion = useCallback(async (params: string | EmotionMusicParams): Promise<MusicPlaylist | null> => {
+    setIsLoading(true);
+    try {
+      const emotion = typeof params === 'string' ? params : params.emotion;
+      
+      // Find a playlist that matches the emotion
+      const emotionPlaylist = playlists.find(p => 
+        p.emotion === emotion || 
+        p.category === emotion
+      );
+      
+      if (emotionPlaylist) {
+        setCurrentPlaylist(emotionPlaylist);
+        setIsLoading(false);
+        return emotionPlaylist;
+      }
+      
+      // If no specific playlist found, create a new one with tracks matching the emotion
+      const emotionTracks = mockTracks.filter(track => 
+        track.emotion === emotion || 
+        (typeof track.category === 'string' && track.category === emotion) ||
+        (Array.isArray(track.category) && track.category.includes(emotion))
+      );
+      
+      if (emotionTracks.length > 0) {
+        const newPlaylist: MusicPlaylist = {
+          id: `emotion-${emotion}-${Date.now()}`,
+          title: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Playlist`,
+          description: `Music for ${emotion} mood`,
+          tracks: emotionTracks,
+          emotion: emotion,
+          category: 'mood'
+        };
+        
+        setCurrentPlaylist(newPlaylist);
+        setIsLoading(false);
+        return newPlaylist;
+      }
+      
+      setIsLoading(false);
+      return null;
+    } catch (error) {
+      console.error('Error loading playlist for emotion:', error);
+      setError('Failed to load playlist for this emotion');
+      setIsLoading(false);
+      return null;
+    }
+  }, [playlists]);
+
+  const getRecommendationByEmotion = useCallback(async (emotion: string): Promise<MusicPlaylist | null> => {
+    // This is similar to loadPlaylistForEmotion but might include different logic
+    const emotionTracks = mockTracks.filter(track => 
+      track.emotion === emotion || 
+      (typeof track.category === 'string' && track.category === emotion) ||
+      (Array.isArray(track.category) && track.category.includes(emotion))
+    );
+    
+    if (emotionTracks.length > 0) {
+      return {
+        id: `recommendation-${emotion}-${Date.now()}`,
+        title: `Recommended for ${emotion}`,
+        description: `Tracks recommended for ${emotion} mood`,
+        tracks: emotionTracks,
+        emotion: emotion,
+        category: 'recommendation'
+      };
+    }
+    
+    return null;
+  }, []);
+
+  const generateMusic = useCallback(async (params: any): Promise<MusicPlaylist | null> => {
+    // In a real app, this might call an API to generate music
+    // For now, return a mock playlist
+    return getRecommendationByEmotion(params.emotion || 'calm');
+  }, [getRecommendationByEmotion]);
+
+  // Additional required methods
+  const addToPlaylist = useCallback((trackId: string, playlistId: string) => {
+    setPlaylists(prevPlaylists => {
+      return prevPlaylists.map(playlist => {
+        if (playlist.id === playlistId) {
+          const track = mockTracks.find(t => t.id === trackId);
+          if (track && !playlist.tracks.some(t => t.id === trackId)) {
+            return {
+              ...playlist,
+              tracks: [...playlist.tracks, track]
+            };
+          }
+        }
+        return playlist;
+      });
+    });
+  }, []);
+
+  const removeFromPlaylist = useCallback((trackId: string, playlistId: string) => {
+    setPlaylists(prevPlaylists => {
+      return prevPlaylists.map(playlist => {
+        if (playlist.id === playlistId) {
+          return {
+            ...playlist,
+            tracks: playlist.tracks.filter(t => t.id !== trackId)
+          };
+        }
+        return playlist;
+      });
+    });
+  }, []);
+
+  const createPlaylist = useCallback((name: string, tracks: MusicTrack[] = []) => {
+    const newPlaylist: MusicPlaylist = {
+      id: `playlist-${Date.now()}`,
+      title: name,
+      tracks: tracks,
+      description: `Custom playlist: ${name}`
+    };
+    
+    setPlaylists(prev => [...prev, newPlaylist]);
+    toast({
+      title: "Playlist created",
+      description: `"${name}" has been created successfully`
+    });
+  }, [toast]);
+
+  const playEmotion = useCallback((emotion: string) => {
+    loadPlaylistForEmotion(emotion).then(playlist => {
+      if (playlist && playlist.tracks.length > 0) {
+        playTrack(playlist.tracks[0]);
+      }
+    });
+  }, [loadPlaylistForEmotion, playTrack]);
+
+  const value: MusicContextType = {
     currentTrack,
     currentPlaylist,
     playlists,
@@ -250,47 +278,53 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     isLoading,
     error,
     openDrawer,
+    isInitialized,
     
-    // Actions
+    // Player controls
     togglePlay,
     toggleMute,
-    setVolume: handleVolumeChange,
+    setVolume: handleSetVolume,
     playTrack,
-    nextTrack,
-    prevTrack,
-    previousTrack: prevTrack,
     pauseTrack,
     resumeTrack,
+    nextTrack,
+    prevTrack: previousTrack,
+    previousTrack,
     seekTo,
-    toggleDrawer,
-    setOpenDrawer,
     
     // Aliases for compatibility
     play: playTrack,
     pause: pauseTrack,
     resume: resumeTrack,
     next: nextTrack,
-    previous: prevTrack,
+    previous: previousTrack,
+    
+    // UI controls
+    toggleDrawer,
+    setOpenDrawer,
     
     // Playlist management
+    playlist: currentPlaylist,
+    setPlaylist,
+    setCurrentTrack,
+    playPlaylist,
+    
+    // Emotion-based music
     loadPlaylistForEmotion,
     getRecommendationByEmotion,
-    setEmotion,
     generateMusic,
-    setPlaylist: handleSetPlaylist,
-    setCurrentTrack,
-    playPlaylist
+    
+    // Additional required methods
+    addToPlaylist,
+    removeFromPlaylist,
+    createPlaylist,
+    playEmotion,
   };
-  
-  return (
-    <MusicContext.Provider value={value}>
-      {children}
-    </MusicContext.Provider>
-  );
+
+  return <MusicContext.Provider value={value}>{children}</MusicContext.Provider>;
 };
 
-// Hook for using the music context
-export const useMusic = (): MusicContextType => {
+export const useMusic = () => {
   const context = useContext(MusicContext);
   if (!context) {
     throw new Error('useMusic must be used within a MusicProvider');

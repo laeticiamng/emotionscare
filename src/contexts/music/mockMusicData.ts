@@ -127,7 +127,7 @@ export const mockPlaylists: MusicPlaylist[] = [
     coverUrl: '/images/covers/relaxation.jpg',
     coverImage: '/images/covers/relaxation.jpg',
     tracks: mockTracks.filter(track => 
-      (track.category && Array.isArray(track.category) && track.category.includes('relax')) || 
+      (Array.isArray(track.category) && track.category.includes('relax')) || 
       track.emotion === 'calm' || 
       track.emotion === 'peaceful'
     ),
@@ -144,7 +144,7 @@ export const mockPlaylists: MusicPlaylist[] = [
     coverUrl: '/images/covers/focus.jpg',
     coverImage: '/images/covers/focus.jpg',
     tracks: mockTracks.filter(track => 
-      (track.category && Array.isArray(track.category) && track.category.includes('focus')) || 
+      (Array.isArray(track.category) && track.category.includes('focus')) || 
       track.emotion === 'focused'
     ),
     emotion: 'focused',
@@ -160,7 +160,7 @@ export const mockPlaylists: MusicPlaylist[] = [
     coverUrl: '/images/covers/energy.jpg',
     coverImage: '/images/covers/energy.jpg',
     tracks: mockTracks.filter(track => 
-      (track.category && Array.isArray(track.category) && track.category.includes('energy')) || 
+      (Array.isArray(track.category) && track.category.includes('energy')) || 
       track.emotion === 'energetic' ||
       track.emotion === 'happy'
     ),
@@ -177,7 +177,7 @@ export const mockPlaylists: MusicPlaylist[] = [
     coverUrl: '/images/covers/sleep.jpg',
     coverImage: '/images/covers/sleep.jpg',
     tracks: mockTracks.filter(track => 
-      (track.category && Array.isArray(track.category) && track.category.includes('sleep')) || 
+      (Array.isArray(track.category) && track.category.includes('sleep')) || 
       track.emotion === 'sleepy'
     ),
     emotion: 'sleepy',

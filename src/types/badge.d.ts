@@ -24,6 +24,7 @@ export interface Badge {
 export interface Challenge {
   id: string;
   title: string;
+  name?: string;
   description: string;
   points: number;
   reward?: Badge | string;
@@ -33,7 +34,6 @@ export interface Challenge {
   category?: string;
   unlocked: boolean;
   type?: string;
-  name?: string;
   difficulty?: string;
   completions?: number;
   total?: number;

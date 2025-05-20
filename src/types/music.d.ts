@@ -99,4 +99,10 @@ export interface MusicContextType {
   toggleRepeat?: () => void;
   toggleShuffle?: () => void;
   isInitialized?: boolean;
+
+  // Additional required methods
+  addToPlaylist: (trackId: string, playlistId: string) => void;
+  removeFromPlaylist: (trackId: string, playlistId: string) => void;
+  createPlaylist: (name: string, tracks?: MusicTrack[]) => void;
+  playEmotion: (emotion: string) => void;
 }

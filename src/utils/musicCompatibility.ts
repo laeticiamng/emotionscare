@@ -1,89 +1,60 @@
 
 import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { mockTracks } from '@/contexts/music/mockMusicData';
 
-// Map audioUrl to url for compatibility
-export const mapAudioUrlToUrl = (track: MusicTrack): MusicTrack => {
+/**
+ * Ensures the input is an array, converting single items to arrays if needed
+ */
+export const ensureArray = <T>(value: T | T[]): T[] => {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  return value ? [value] : [];
+};
+
+/**
+ * Ensures a track has all required fields and standardizes property names
+ */
+export const ensureTrack = (track: Partial<MusicTrack>): MusicTrack => {
   return {
-    ...track,
-    url: track.audioUrl || track.url // For backward compatibility
-  };
+    id: track.id || `track-${Date.now()}`,
+    title: track.title || track.name || 'Unknown Title',
+    artist: track.artist || 'Unknown Artist',
+    audioUrl: track.audioUrl || track.url || track.src || track.track_url || '',
+    duration: track.duration || 0,
+    coverUrl: track.coverUrl || track.cover || track.coverImage || '',
+    // Include any other required fields with fallbacks
+    emotion: track.emotion || undefined,
+    mood: track.mood || undefined,
+    intensity: track.intensity || undefined,
+    tags: ensureArray(track.tags || []),
+    category: ensureArray(track.category || []),
+  } as MusicTrack;
 };
 
-// Helper to ensure value is an array
-export const ensureArray = <T>(value: T | T[] | undefined): T[] => {
-  if (value === undefined) return [];
-  return Array.isArray(value) ? value : [value];
+/**
+ * Ensures a playlist has all required fields and standardizes property names
+ */
+export const ensurePlaylist = (playlist: Partial<MusicPlaylist>): MusicPlaylist => {
+  return {
+    id: playlist.id || `playlist-${Date.now()}`,
+    title: playlist.title || playlist.name || 'Untitled Playlist',
+    description: playlist.description || '',
+    coverUrl: playlist.coverUrl || playlist.cover || playlist.coverImage || '',
+    tracks: (playlist.tracks || []).map(ensureTrack),
+    emotion: playlist.emotion || undefined,
+    mood: playlist.mood || undefined,
+    category: ensureArray(playlist.category || []),
+  } as MusicPlaylist;
 };
 
-// Find tracks by mood
+/**
+ * Finds tracks by matching a mood
+ */
 export const findTracksByMood = (tracks: MusicTrack[], mood: string): MusicTrack[] => {
   return tracks.filter(track => 
     track.mood === mood || 
-    track.emotion === mood || 
-    (track.tags && (typeof track.tags === 'string' 
-      ? track.tags.includes(mood) 
-      : Array.isArray(track.tags) && track.tags.includes(mood)))
+    track.emotion === mood ||
+    (typeof track.category === 'string' && track.category === mood) ||
+    (Array.isArray(track.category) && track.category.includes(mood))
   );
-};
-
-// Get track title safely
-export const getTrackTitle = (track: MusicTrack | null): string => {
-  if (!track) return '';
-  return track.title || track.name || 'Unknown Track';
-};
-
-// Get track artist safely
-export const getTrackArtist = (track: MusicTrack | null): string => {
-  if (!track) return '';
-  return track.artist || 'Unknown Artist';
-};
-
-// Get track cover image safely
-export const getTrackCover = (track: MusicTrack | null): string => {
-  if (!track) return '';
-  return track.coverUrl || track.cover || track.coverImage || '';
-};
-
-// Get track URL safely
-export const getTrackUrl = (track: MusicTrack | null): string => {
-  if (!track) return '';
-  return track.url || track.audioUrl || '';
-};
-
-// Normalize track for compatibility
-export const normalizeTrack = (track: any): MusicTrack => {
-  return {
-    id: track.id || `track-${Date.now()}`,
-    title: track.title || track.name || 'Unknown Track',
-    artist: track.artist || 'Unknown Artist',
-    albumTitle: track.albumTitle || track.album || '',
-    coverUrl: track.coverUrl || track.cover || track.imageUrl || '',
-    audioUrl: track.audioUrl || track.url || track.src || '',
-    url: track.url || track.audioUrl || track.src || '',
-    duration: track.duration || 0,
-    emotion: track.emotion || track.mood || '',
-    mood: track.mood || track.emotion || '',
-    tags: track.tags || [],
-    intensity: track.intensity || 0,
-    year: track.year || undefined,
-    category: track.category || undefined
-  };
-};
-
-// Normalize playlists for compatibility
-export const normalizePlaylist = (playlist: any): MusicPlaylist => {
-  return {
-    id: playlist.id || `playlist-${Date.now()}`,
-    title: playlist.title || playlist.name || 'Unnamed Playlist',
-    name: playlist.name || playlist.title || 'Unnamed Playlist',
-    description: playlist.description || '',
-    coverUrl: playlist.coverUrl || playlist.cover || playlist.imageUrl || '',
-    coverImage: playlist.coverImage || playlist.coverUrl || playlist.cover || '',
-    tracks: Array.isArray(playlist.tracks) ? playlist.tracks.map(normalizeTrack) : [],
-    mood: playlist.mood || playlist.emotion || '',
-    emotion: playlist.emotion || playlist.mood || '',
-    category: playlist.category || undefined,
-    creator: playlist.creator || undefined
-  };
 };

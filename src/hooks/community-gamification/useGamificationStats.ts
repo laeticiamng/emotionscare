@@ -46,14 +46,14 @@ export const useGamificationStats = (userId?: string) => {
         
         // Calculate stats
         const totalPoints = fetchedChallenges.reduce((sum, challenge) => {
-          return sum + (challenge.completed ? challenge.points : 0);
+          return sum + (challenge.status === 'completed' ? challenge.points : 0);
         }, 0);
         
         const level = Math.floor(totalPoints / 100) + 1;
         const nextLevelPoints = level * 100;
         const percentageToNextLevel = ((totalPoints % 100) / 100) * 100;
         
-        const completedChallenges = fetchedChallenges.filter(c => c.completed).length;
+        const completedChallenges = fetchedChallenges.filter(c => c.status === 'completed').length;
         const unlockedBadges = fetchedBadges.filter(b => b.unlocked).length;
         
         setStats({
@@ -83,7 +83,7 @@ export const useGamificationStats = (userId?: string) => {
     setChallenges(prev => 
       prev.map(challenge => 
         challenge.id === challengeId 
-          ? { ...challenge, completed: true, status: 'completed' } 
+          ? { ...challenge, status: 'completed' as const } 
           : challenge
       )
     );
