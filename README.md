@@ -328,6 +328,7 @@ Des audits complémentaires sont disponibles dans le dossier `docs` :
 - `ui-polish-restoration.md` : rétablissement de l'apparence initiale
 - `shell-layout-point4-audit.md` : synthèse du Shell et de la navigation (point 4)
 - `user-preferences-point7-audit.md` : état actuel des préférences utilisateur et recommandations premium
+- `evaluation-improvement-point20-audit.md` : boucle de feedback et amélioration proactive (point 20)
 
 
 ## Équipe et contribution
