@@ -1,3 +1,4 @@
+
 // In browser environments, we use import.meta.env instead of dotenv
 // This works with Vite's environment variable handling
 
@@ -131,7 +132,8 @@ async function humeBatchJobStatus(id: string) {
 
 // -------------- Exports ----------------
 // Create a client instance using the Hume library's API
-const humeClient = new Hume.HumeClient(HUME_API_KEY);
+// Fix for browser environment: use the createHumeClient function instead of HumeClient constructor
+const humeClient = Hume.createClient(HUME_API_KEY);
 
 export {
   openaiText,

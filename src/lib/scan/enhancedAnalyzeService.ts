@@ -1,61 +1,91 @@
 
-import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
+import { EmotionResult } from '@/types';
+import { v4 as uuidv4 } from 'uuid';
 
-// Enhanced analysis service for emotion scans
-export const analyzeEmotion = async (text: string): Promise<EmotionResult> => {
-  try {
-    // In a real implementation, this would call OpenAI API
-    console.log('Analyzing emotion with enhanced service:', text);
+/**
+ * Service for enhanced emotion analysis
+ */
+class EnhancedAnalyzeService {
+  /**
+   * Analyzes text to determine emotional content
+   * @param text The text to analyze
+   * @returns Emotion analysis result
+   */
+  async analyzeEmotion(text: string): Promise<EmotionResult> {
+    // In a real implementation, this would call an AI API
+    // This is a mock implementation for demonstration
     
-    // Generate mock recommendations
-    const recommendations: EmotionRecommendation[] = [
-      {
-        id: "rec-1",
-        emotion: "neutral",
-        title: "Prenez un moment pour réfléchir",
-        description: "La neutralité peut cacher des émotions plus profondes",
-        category: "reflection",
-        type: "reflection"
-      },
-      {
-        id: "rec-2",
-        emotion: "neutral",
-        title: "Journal émotionnel",
-        description: "Notez vos émotions pour mieux les comprendre",
-        category: "activity",
-        type: "activity"
-      }
-    ];
+    // Mock emotional analysis - would be replaced with real API call
+    const emotions = ['joy', 'sadness', 'anger', 'fear', 'surprise', 'calm'];
+    const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+    const randomScore = Math.random() * 0.5 + 0.5; // Score between 0.5 and 1.0
     
-    // Generate a basic emotion result
-    const baseResult: EmotionResult = {
-      id: `scan-${Date.now()}`,
-      emotion: 'neutral',
-      primaryEmotion: 'neutral',
-      intensity: 0.5,
-      confidence: 0.8,
-      score: 0.75,
-      source: 'text-analysis',
-      timestamp: new Date().toISOString(),
-      text: text,
-      feedback: "Vous semblez vous exprimer de façon neutre.",
-      recommendations: recommendations,
-      emojis: ["😐"],
-      emotions: {
-        neutral: 0.8,
-        joy: 0.1,
-        sadness: 0.1
-      }
+    console.log(`Analyzing text: "${text}" with mock result: ${randomEmotion}`);
+    
+    // Return a consistent format for the emotion result
+    return {
+      id: uuidv4(),
+      date: new Date().toISOString(),
+      emotion: randomEmotion,
+      primaryEmotion: randomEmotion,
+      confidence: randomScore,
+      score: randomScore,
+      text: text
     };
-    
-    return baseResult;
-    
-  } catch (error) {
-    console.error('Error in enhanced emotion analysis:', error);
-    throw new Error('Failed to analyze emotion');
   }
-};
+  
+  /**
+   * Analyzes audio to determine emotional content
+   * @param audioBlob Audio data to analyze
+   * @returns Emotion analysis result
+   */
+  async analyzeAudioEmotion(audioBlob: Blob): Promise<EmotionResult> {
+    // In real implementation, this would send the audio to an emotion analysis API
+    // For demonstration, we'll return a mock result
+    
+    const emotions = ['calm', 'joy', 'excitement', 'neutrality', 'interest'];
+    const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+    const randomScore = Math.random() * 0.5 + 0.5; // Score between 0.5 and 1.0
+    
+    console.log(`Analyzing audio file of size ${audioBlob.size} bytes with mock result: ${randomEmotion}`);
+    
+    return {
+      id: uuidv4(),
+      date: new Date().toISOString(),
+      emotion: randomEmotion,
+      primaryEmotion: randomEmotion,
+      confidence: randomScore,
+      score: randomScore,
+      text: "Audio emotion analysis"
+    };
+  }
+  
+  /**
+   * Analyzes facial expressions to determine emotional content
+   * @param imageBlob Image data to analyze
+   * @returns Emotion analysis result
+   */
+  async analyzeFacialEmotion(imageBlob: Blob): Promise<EmotionResult> {
+    // In real implementation, this would send the image to a facial emotion analysis API
+    // For demonstration, we'll return a mock result
+    
+    const emotions = ['neutral', 'happy', 'surprise', 'calm', 'engaged'];
+    const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
+    const randomScore = Math.random() * 0.5 + 0.5; // Score between 0.5 and 1.0
+    
+    console.log(`Analyzing image file of size ${imageBlob.size} bytes with mock result: ${randomEmotion}`);
+    
+    return {
+      id: uuidv4(),
+      date: new Date().toISOString(),
+      emotion: randomEmotion,
+      primaryEmotion: randomEmotion,
+      confidence: randomScore,
+      score: randomScore,
+      text: "Facial emotion analysis"
+    };
+  }
+}
 
-export default {
-  analyzeEmotion
-};
+// Export a singleton instance
+export const enhancedAnalyzeService = new EnhancedAnalyzeService();
