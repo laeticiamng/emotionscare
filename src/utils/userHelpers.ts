@@ -30,6 +30,17 @@ export function getUserDisplayName(user?: User | null): string {
 }
 
 /**
+ * Get first name from user name or email
+ */
+export function getUserFirstName(user?: User | null): string {
+  if (!user) return 'Utilisateur';
+  if (user.name) {
+    return user.name.split(' ')[0];
+  }
+  return user.email?.split('@')[0] || 'Utilisateur';
+}
+
+/**
  * Get user initials for avatar
  */
 export function getUserInitials(user?: User | null): string {

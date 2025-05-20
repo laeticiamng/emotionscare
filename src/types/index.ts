@@ -13,5 +13,6 @@ export * from './layout';
 export * from './widget'; // Add if this exists
 export * from './music';
 export * from './onboarding';
+export * from './social';
 export * from '@types/orchestration';
 // Add other type exports as needed

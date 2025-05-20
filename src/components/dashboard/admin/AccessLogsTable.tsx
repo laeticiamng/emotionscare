@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AdminAccessLog } from '@/types/dashboard';
+import { AdminAccessLog } from '@types/dashboard';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 

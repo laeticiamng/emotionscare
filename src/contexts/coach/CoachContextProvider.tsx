@@ -13,7 +13,7 @@ interface CoachHandlersOptions {
   coachService?: any;
 }
 
-const CoachContext = createContext<CoachContextType | undefined>(undefined);
+export const CoachContext = createContext<CoachContextType | undefined>(undefined);
 
 interface CoachContextProviderProps {
   children: React.ReactNode;
@@ -163,3 +163,4 @@ export const useCoach = (): CoachContextType => {
   }
   return context;
 };
+export { CoachContextProvider as CoachProvider };

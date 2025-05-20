@@ -8,6 +8,7 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 - Rapport d'audit `docs/user-preferences-point7-audit.md` détaillant le mapping du `UserPreferencesContext` et les pistes premium.
 - Référence vers ce document ajoutée dans le README.
 
+
 ## [1.1.10] - 2025-05-28
 
 ### Ajouté
