@@ -11,6 +11,7 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 - Centralisation des types du dashboard et des analytics dans `types/`.
 - Services et composants importent désormais ces types via l'alias `@types/*`.
 
+
 ## [1.1.10] - 2025-05-28
 
 ### Ajouté

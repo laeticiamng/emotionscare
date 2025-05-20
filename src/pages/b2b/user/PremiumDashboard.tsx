@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Building, Smile, Mail, Bell, User, Settings } from 'lucide-react';
 import { trackPageView } from '@/utils/analytics';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { getUserAvatar, getUserFirstName } from '@/utils/userHelpers';
 
 const B2BUserPremiumDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -121,7 +124,7 @@ const B2BUserPremiumDashboard: React.FC = () => {
               Espace Collaborateur
             </h1>
             <p className="text-muted-foreground">
-              Bienvenue, {user?.name || 'Collaborateur'}
+              Bonjour {getUserFirstName(user)}, voici l'ambiance de votre équipe aujourd'hui !
             </p>
           </motion.div>
           
@@ -129,16 +132,24 @@ const B2BUserPremiumDashboard: React.FC = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            className="flex space-x-3"
+            className="flex items-center space-x-3"
           >
             <Button variant="ghost" size="icon">
               <Bell className="h-5 w-5" />
+              <span className="sr-only">Notifications</span>
             </Button>
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
-            </Button>
+            <div className="relative">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={getUserAvatar(user)} alt={user?.name} />
+                <AvatarFallback>{getUserFirstName(user).substring(0,2)}</AvatarFallback>
+              </Avatar>
+              <Badge className="absolute -bottom-1 -right-1" variant="info">
+                {user?.role === 'b2b_admin' ? 'Admin' : 'User'}
+              </Badge>
+            </div>
             <Button variant="ghost" size="icon">
               <Settings className="h-5 w-5" />
+              <span className="sr-only">Paramètres</span>
             </Button>
           </motion.div>
         </div>
