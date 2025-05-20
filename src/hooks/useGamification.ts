@@ -1,220 +1,235 @@
 import { useState, useEffect } from 'react';
-import { Challenge, LeaderboardEntry } from '@/types/gamification';
-import { Badge } from '@/types/badge';
-import { normalizeChallenge } from '@/utils/challengeUtils';
-import { normalizeBadge } from '@/utils/badgeUtils';
+import { Badge, Challenge, GamificationStats, LeaderboardEntry } from '@/types/gamification';
 
-export function useGamification() {
-  const [badges, setBadges] = useState<Badge[]>([]);
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [points, setPoints] = useState(0);
-  const [level, setLevel] = useState(1);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate API call
-    const fetchGamificationData = async () => {
-      try {
-        // Wait a bit to simulate network request
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Mock data
-        const mockBadges = [
-          normalizeBadge({
-            id: 'badge1',
-            name: 'First Steps',
-            description: 'Complete your first profile',
-            imageUrl: '/badges/badge-1.svg',
-            unlocked: true,
-            level: 1,
-            category: 'onboarding',
-            tier: 'bronze'
-          }),
-          normalizeBadge({
-            id: 'badge2',
-            name: 'Emotion Master',
-            description: 'Track 10 different emotions',
-            imageUrl: '/badges/badge-2.svg',
-            unlocked: false,
-            level: 2,
-            category: 'emotion',
-            tier: 'silver'
-          }),
-          normalizeBadge({
-            id: 'badge3',
-            name: 'Consistent User',
-            description: 'Use the app for 7 consecutive days',
-            imageUrl: '/badges/badge-3.svg',
-            unlocked: false,
-            level: 3,
-            category: 'activity',
-            tier: 'gold'
-          })
-        ];
-
-        // Mock challenge data using the normalizeChallenge utility
-        const mockChallenges = [
-          normalizeChallenge({
-            id: 'challenge1',
-            title: 'Daily Check-in',
-            name: 'Daily Check-in',
-            description: 'Log your emotions once per day',
-            points: 50,
-            progress: 3,
-            goal: 7,
-            category: 'daily',
-            completed: false,
-            status: 'active',
-            difficulty: 'easy',
-            completions: 3,
-            total: 7
-          }),
-          normalizeChallenge({
-            id: 'challenge2',
-            title: 'Emotion Explorer',
-            name: 'Emotion Explorer',
-            description: 'Track 5 different emotions in a week',
-            points: 100,
-            progress: 2,
-            goal: 5,
-            category: 'weekly',
-            completed: false,
-            status: 'active',
-            difficulty: 'medium',
-            completions: 2,
-            total: 5
-          }),
-          normalizeChallenge({
-            id: 'challenge3',
-            title: 'Meditation Master',
-            name: 'Meditation Master',
-            description: 'Complete 10 meditation sessions',
-            points: 200,
-            progress: 4,
-            goal: 10,
-            category: 'monthly',
-            completed: false,
-            status: 'active',
-            difficulty: 'hard',
-            completions: 4,
-            total: 10
-          })
-        ];
-
-        // Mock leaderboard
-        const mockLeaderboard = [
-          {
-            id: 'user1',
-            userId: 'user1',
-            username: 'EmotionExplorer',
-            points: 1250,
-            position: 1,
-            avatarUrl: '/avatars/avatar1.png',
-            rank: 1,
-            level: 10,
-            progress: 75
-          },
-          {
-            id: 'user2',
-            userId: 'user2',
-            username: 'MindfulMaster',
-            points: 980,
-            position: 2,
-            avatarUrl: '/avatars/avatar2.png',
-            rank: 2,
-            level: 8,
-            progress: 50
-          },
-          {
-            id: 'user3',
-            userId: 'user3',
-            username: 'JoyfulJourney',
-            points: 750,
-            position: 3,
-            avatarUrl: '/avatars/avatar3.png',
-            rank: 3,
-            level: 6,
-            progress: 25
-          }
-        ];
-
-        setBadges(mockBadges);
-        setChallenges(mockChallenges);
-        setLeaderboard(mockLeaderboard);
-        setPoints(850);
-        setLevel(7);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching gamification data:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchGamificationData();
-  }, []);
-
-  // Fonction pour débloquer un badge
-  const unlockBadge = async (badgeId: string): Promise<boolean> => {
-    try {
-      // Dans une implémentation réelle, cela appellerait une API
-      await new Promise(resolve => setTimeout(resolve, 300)); // Simuler un délai réseau
-      
-      setBadges(prevBadges => 
-        prevBadges.map(badge => 
-          badge.id === badgeId 
-            ? { ...badge, unlocked: true, completed: true, progress: badge.threshold || 100 } 
-            : badge
-        )
-      );
-      
-      return true;
-    } catch (error) {
-      console.error("Erreur lors du déblocage du badge:", error);
-      return false;
-    }
-  };
-
-  // Fonction pour mettre à jour la progression d'un défi
-  const updateChallengeProgress = async (challengeId: string, newProgress: number): Promise<boolean> => {
-    try {
-      // Dans une implémentation réelle, cela appellerait une API
-      await new Promise(resolve => setTimeout(resolve, 300)); // Simuler un délai réseau
-      
-      setChallenges(prevChallenges => 
-        prevChallenges.map(challenge => {
-          if (challenge.id !== challengeId) return challenge;
-          
-          const progress = Math.min(newProgress, challenge.goal);
-          const completed = progress >= challenge.goal;
-          
-          return {
-            ...challenge,
-            progress,
-            completed,
-            status: completed ? "completed" : "in-progress",
-            completions: progress
-          };
-        })
-      );
-      
-      return true;
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour du défi:", error);
-      return false;
-    }
-  };
-
-  return {
-    badges,
-    challenges,
-    leaderboard,
-    points,
-    level,
-    loading,
-    unlockBadge,
-    updateChallengeProgress
-  };
+interface UseGamificationProps {
+  userId: string;
 }
 
-export default useGamification;
+interface GamificationHook {
+  loading: boolean;
+  error: string | null;
+  userStats: GamificationStats | null;
+  badges: Badge[];
+  challenges: Challenge[];
+  leaderboardData: LeaderboardEntry[];
+  fetchUserStats: () => Promise<void>;
+  fetchBadges: () => Promise<void>;
+  fetchChallenges: () => Promise<void>;
+  fetchLeaderboardData: () => Promise<void>;
+}
+
+export const useGamification = ({ userId }: UseGamificationProps): GamificationHook => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [userStats, setUserStats] = useState<GamificationStats | null>(null);
+  const [badges, setBadges] = useState<Badge[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
+
+  const fetchUserStats = async () => {
+    setLoading(true);
+    try {
+      // Simulate API call
+      const data: GamificationStats = {
+        level: 5,
+        xp: 750,
+        xpToNextLevel: 1000,
+        consecutiveLogins: 7,
+        totalSessions: 50,
+        totalMoodEntries: 120,
+        totalMeditationMinutes: 360,
+        badges: [],
+        achievements: ['Completed 5 days streak', 'Reached level 5'],
+        streakDays: 5,
+        progressToNextLevel: 0.75,
+        points: 1500,
+        longestStreak: 10,
+        completedChallenges: 8,
+        totalChallenges: 15,
+        unlockedBadges: 5,
+        totalBadges: 10,
+      };
+      setUserStats(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch user stats');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchBadges = async () => {
+    setLoading(true);
+    try {
+      // Simulate API call
+      const data: Badge[] = [
+        {
+          id: 'badge-1',
+          name: 'Early Bird',
+          description: 'Login for 3 consecutive days',
+          category: 'Login',
+          image: '/images/badges/early-bird.png',
+          unlocked: true,
+          unlockedAt: '2024-07-15T10:00:00Z',
+          earned: true,
+          achieved: true,
+        },
+        {
+          id: 'badge-2',
+          name: 'Mood Tracker',
+          description: 'Record 10 mood entries',
+          category: 'Mood Tracking',
+          image: '/images/badges/mood-tracker.png',
+          unlocked: true,
+          unlockedAt: '2024-07-18T14:30:00Z',
+          earned: true,
+          achieved: true,
+        },
+        {
+          id: 'badge-3',
+          name: 'Meditation Master',
+          description: 'Meditate for 60 minutes',
+          category: 'Meditation',
+          image: '/images/badges/meditation-master.png',
+          unlocked: false,
+          progress: 45,
+          threshold: 60,
+          earned: false,
+          achieved: false,
+        },
+      ];
+      setBadges(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch badges');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchChallenges = async () => {
+    setLoading(true);
+    try {
+      // Simulate API call
+      const data: Challenge[] = [
+        {
+          id: 'challenge-1',
+          title: 'Daily Meditation',
+          description: 'Meditate for 15 minutes today',
+          progress: 10,
+          threshold: 15,
+          completed: false,
+          category: 'Meditation',
+          currentValue: 10,
+          targetValue: 15,
+        },
+        {
+          id: 'challenge-2',
+          title: 'Mood Tracking Streak',
+          description: 'Record your mood for the next 7 days',
+          progress: 3,
+          threshold: 7,
+          completed: false,
+          category: 'Mood Tracking',
+          currentValue: 3,
+          targetValue: 7,
+        },
+        {
+          id: 'challenge-3',
+          title: 'Reach Level 6',
+          description: 'Gain enough XP to reach level 6',
+          progress: 750,
+          threshold: 1000,
+          completed: false,
+          category: 'Progression',
+          currentValue: 750,
+          targetValue: 1000,
+        },
+      ];
+      setChallenges(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch challenges');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchLeaderboardData = async () => {
+    setLoading(true);
+    try {
+      // Simulate API call
+      const data: LeaderboardEntry[] = [
+        {
+          id: 'leader-1',
+          userId: 'user-1',
+          username: 'EcoMindful',
+          avatarUrl: '/images/avatars/avatar-1.png',
+          score: 2500,
+          rank: 1,
+          points: 2500,
+        },
+        {
+          id: 'leader-2',
+          userId: 'user-2',
+          username: 'ZenMaster',
+          avatarUrl: '/images/avatars/avatar-2.png',
+          score: 2200,
+          rank: 2,
+          points: 2200,
+        },
+        {
+          id: 'leader-3',
+          userId: 'user-3',
+          username: 'MindfulManiac',
+          avatarUrl: '/images/avatars/avatar-3.png',
+          score: 2000,
+          rank: 3,
+          points: 2000,
+        },
+      ];
+
+      setLeaderboardData(data.map((item) => ({
+        ...item,
+        score: item.points || 0, // Map points to score
+      })));
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch leaderboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserStats();
+    fetchBadges();
+    fetchChallenges();
+    fetchLeaderboardData();
+  }, [userId]);
+
+  useEffect(() => {
+    if (userStats && badges.length > 0) {
+      badges.forEach(badge => {
+        const requiredXP = parseInt(String(badge.threshold || 0), 10);
+        if (userStats.xp >= requiredXP) {
+          // Update badge status if user has enough XP
+          setBadges(prevBadges =>
+            prevBadges.map(b =>
+              b.id === badge.id ? { ...b, unlocked: true, earned: true, achieved: true } : b
+            )
+          );
+        }
+      });
+    }
+  }, [userStats, badges]);
+
+  return {
+    loading,
+    error,
+    userStats,
+    badges,
+    challenges,
+    leaderboardData,
+    fetchUserStats,
+    fetchBadges,
+    fetchChallenges,
+    fetchLeaderboardData,
+  };
+};

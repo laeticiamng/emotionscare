@@ -25,6 +25,45 @@ export function getTrackCover(track: MusicTrack): string {
 }
 
 /**
+ * Get track title with fallback
+ */
+export function getTrackTitle(track: MusicTrack | undefined): string {
+  if (!track) return 'Unknown';
+  return track.title || 'Untitled Track';
+}
+
+/**
+ * Get track artist with fallback
+ */
+export function getTrackArtist(track: MusicTrack | undefined): string {
+  if (!track) return 'Unknown Artist';
+  return track.artist || 'Unknown Artist';
+}
+
+/**
+ * Get track URL with fallback
+ */
+export function getTrackUrl(track: MusicTrack | undefined): string {
+  if (!track) return '';
+  return track.url || track.audioUrl || '';
+}
+
+/**
+ * Normalize track data to ensure consistent format
+ */
+export function normalizeTrack(data: any): MusicTrack {
+  return {
+    id: data.id || `track-${Date.now()}`,
+    title: data.title || 'Untitled Track',
+    artist: data.artist || 'Unknown Artist',
+    url: data.url || data.audioUrl || '',
+    duration: data.duration || 0,
+    coverUrl: data.coverUrl || data.cover || data.artworkUrl || '/images/music/default-cover.jpg',
+    audioUrl: data.audioUrl || data.url || '',
+  };
+}
+
+/**
  * Find tracks based on mood
  */
 export function findTracksByMood(tracks: MusicTrack[], mood: string): MusicTrack[] {
