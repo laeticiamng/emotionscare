@@ -2,7 +2,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import NotFoundPage from '@/pages/NotFoundPage';
-import LandingPage from '@/pages/LandingPage';
+import Home from '@/Home';
 import ChooseModeV2 from '@/pages/common/ChooseModeV2';
 import ProtectedRouteWithMode from '@/components/ProtectedRouteWithMode';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -31,7 +31,7 @@ const AppRoutes: React.FC = () => {
   return (
     <Routes>
       {/* Pages publiques */}
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<Home />} />
       <Route path="/choose-mode" element={<ChooseModeV2 />} />
       
       {/* Routes d'authentification */}

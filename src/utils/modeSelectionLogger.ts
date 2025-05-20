@@ -1,38 +1,26 @@
-import { Analytics } from './analytics';
-import { modeEmitter } from './modeChangeEmitter';
-
-interface ModeLog {
-  mode: string;
-  timestamp: string;
-}
 
 /**
- * Determine if analytics is enabled based on stored preferences.
- * This avoids storing any personal data if the user opted out.
+ * Utility to log mode selection events
+ * This helps with analytics tracking of how users navigate through the app
  */
-function analyticsEnabled(): boolean {
+
+export const logModeSelection = (mode: string) => {
+  console.log(`User selected mode: ${mode}`);
+  
+  // Here we could integrate with analytics services
+  // like Google Analytics, Mixpanel, or an internal tracking system
+  
+  // Log to localStorage for debugging
   try {
-    const prefsRaw = localStorage.getItem('userPreferences');
-    if (!prefsRaw) return false;
-    const prefs = JSON.parse(prefsRaw);
-    if (typeof prefs.privacy === 'string') {
-      return prefs.privacy !== 'private';
-    }
-    return !!prefs.privacy?.analytics;
-  } catch {
-    return false;
+    const logs = JSON.parse(localStorage.getItem('modeSelectionLogs') || '[]');
+    logs.push({
+      mode,
+      timestamp: new Date().toISOString()
+    });
+    localStorage.setItem('modeSelectionLogs', JSON.stringify(logs));
+  } catch (error) {
+    console.error('Failed to log mode selection', error);
   }
-}
+};
 
-/**
- * Log a mode selection event in an anonymised way.
- */
-export function logModeSelection(mode: string) {
-  const log: ModeLog = { mode, timestamp: new Date().toISOString() };
-  if (analyticsEnabled()) {
-    Analytics.trackEvent('mode', 'select', mode);
-    // Additional logging backend could be added here
-  }
-  // Emit event for other modules
-  modeEmitter.emit('modeChange', log);
-}
+export default logModeSelection;

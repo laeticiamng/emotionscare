@@ -1,4 +1,5 @@
 
+// Time of day constants
 export enum TimeOfDay {
   MORNING = 'morning',
   AFTERNOON = 'afternoon',
@@ -6,62 +7,30 @@ export enum TimeOfDay {
   NIGHT = 'night'
 }
 
-// Add DEFAULT_THEME constant
-export const DEFAULT_THEME = 'light';
+// Default values for various components
+export const DEFAULT_ANIMATION_DURATION = 300; // ms
+export const DEFAULT_TRANSITION_DURATION = 500; // ms
 
-// Add the missing DEFAULT_WELCOME_MESSAGES export
-export const DEFAULT_WELCOME_MESSAGES = {
-  morning: "Bonjour ! Comment vous sentez-vous ce matin ?",
-  afternoon: "Bon après-midi ! Comment se passe votre journée ?",
-  evening: "Bonsoir ! Comment s'est passée votre journée ?",
-  night: "Bonne soirée ! Comment vous sentez-vous avant de vous reposer ?"
+// Default greeting messages
+export const DEFAULT_GREETINGS = {
+  [TimeOfDay.MORNING]: 'Bonjour et bienvenue sur EmotionsCare',
+  [TimeOfDay.AFTERNOON]: 'Bon après-midi et bienvenue sur EmotionsCare',
+  [TimeOfDay.EVENING]: 'Bonsoir et bienvenue sur EmotionsCare',
+  [TimeOfDay.NIGHT]: 'Bonsoir et bienvenue sur EmotionsCare'
 };
 
-// Add the missing determineTimeOfDay function
-export function determineTimeOfDay(): TimeOfDay {
-  const hour = new Date().getHours();
-  
-  if (hour >= 5 && hour < 12) {
-    return TimeOfDay.MORNING;
-  } else if (hour >= 12 && hour < 18) {
-    return TimeOfDay.AFTERNOON;
-  } else if (hour >= 18 && hour < 22) {
-    return TimeOfDay.EVENING;
-  } else {
-    return TimeOfDay.NIGHT;
-  }
-}
+// Default colors for time of day
+export const TIME_COLORS = {
+  [TimeOfDay.MORNING]: '#e0f2fe', // light blue
+  [TimeOfDay.AFTERNOON]: '#dbeafe', // blue
+  [TimeOfDay.EVENING]: '#fef3c7', // amber
+  [TimeOfDay.NIGHT]: '#1e293b' // slate dark
+};
 
-export const DEFAULT_PREFERENCES = {
-  theme: 'system',
-  fontSize: 'medium',
-  fontFamily: 'system',
-  reduceMotion: false,
-  colorBlindMode: false,
-  autoplayMedia: true,
-  soundEnabled: true,
-  emotionalCamouflage: false,
-  aiSuggestions: true,
-  notifications_enabled: true,
-  language: 'fr',
-  privacy: {
-    shareData: false,
-    allowAnalytics: true,
-    // Add missing properties for UserDetailView
-    showProfile: true,
-    shareActivity: true,
-    allowMessages: true,
-    allowNotifications: true
-  },
-  notifications: {
-    email: true,
-    push: true,
-    sms: false,
-    frequency: 'daily',
-    enabled: true, // Add the missing enabled property
-    // Add properties needed by the components
-    emailEnabled: true,
-    pushEnabled: true,
-    inAppEnabled: true
-  }
+export default {
+  TimeOfDay,
+  DEFAULT_ANIMATION_DURATION,
+  DEFAULT_TRANSITION_DURATION,
+  DEFAULT_GREETINGS,
+  TIME_COLORS
 };

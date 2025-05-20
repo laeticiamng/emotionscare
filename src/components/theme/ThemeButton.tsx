@@ -1,36 +1,89 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { useTheme } from '@/contexts/ThemeContext';
-import { ThemeName } from '@/types/theme';
-import { Moon, Sun } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
-interface ThemeButtonProps {
-  theme?: ThemeName;
-  onClick?: () => void;
-}
-
-const ThemeButton: React.FC<ThemeButtonProps> = ({ onClick }) => {
-  const { theme, setTheme, isDarkMode } = useTheme();
+const ThemeButton: React.FC = () => {
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+  const { toast } = useToast();
+  
+  useEffect(() => {
+    // Check if theme is set in localStorage
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
+    
+    if (savedTheme) {
+      setTheme(savedTheme);
+      applyTheme(savedTheme);
+    } else {
+      // Check system preference
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setTheme('dark');
+        applyTheme('dark');
+      } else {
+        setTheme('light');
+        applyTheme('light');
+      }
+    }
+    
+    // Listen for system preference changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (theme === 'system') {
+        applyTheme(e.matches ? 'dark' : 'light');
+      }
+    });
+  }, []);
+  
+  const applyTheme = (newTheme: 'light' | 'dark' | 'system') => {
+    const root = window.document.documentElement;
+    
+    if (newTheme === 'system') {
+      // Check system preference
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.classList.remove('light', 'dark');
+      root.classList.add(systemTheme);
+    } else {
+      root.classList.remove('light', 'dark');
+      root.classList.add(newTheme);
+    }
+  };
   
   const toggleTheme = () => {
-    const newTheme: ThemeName = isDarkMode ? 'light' : 'dark';
-    setTheme(newTheme);
+    let newTheme: 'light' | 'dark' | 'system';
     
-    if (onClick) {
-      onClick();
+    if (theme === 'light') {
+      newTheme = 'dark';
+    } else if (theme === 'dark') {
+      newTheme = 'system';
+    } else {
+      newTheme = 'light';
     }
+    
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    applyTheme(newTheme);
+    
+    toast({
+      title: "Thème modifié",
+      description: `Le thème a été changé pour "${newTheme === 'system' ? 'Auto' : newTheme}"`,
+      variant: "default",
+    });
   };
   
   return (
     <Button 
       variant="ghost" 
-      size="sm"
+      size="icon"
       onClick={toggleTheme}
-      aria-label={isDarkMode ? "Switch to light theme" : "Switch to dark theme"}
-      className="hover:bg-muted/50 transition-all duration-300"
+      className="w-9 h-9 rounded-full"
+      aria-label="Changer de thème"
     >
-      {isDarkMode ? <Sun className="h-[1.2rem] w-[1.2rem]" /> : <Moon className="h-[1.2rem] w-[1.2rem]" />}
+      {theme === 'light' ? (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-sun"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+      ) : theme === 'dark' ? (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-moon"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+      ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-monitor"><rect width="20" height="14" x="2" y="3" rx="2"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>
+      )}
     </Button>
   );
 };
