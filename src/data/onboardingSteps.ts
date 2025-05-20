@@ -1,3 +1,4 @@
+
 import { OnboardingStep } from '@/types/onboarding';
 
 export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
