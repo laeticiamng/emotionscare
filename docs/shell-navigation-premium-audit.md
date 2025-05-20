@@ -31,10 +31,11 @@ Chaque provider se trouve dans `src/contexts` ou `src/providers` :
 2. `AuthProvider`
 3. `UserPreferencesProvider`
 4. `UserModeProvider`
-5. `MusicProvider`
-6. `OptimizationProvider`
-7. `ExtensionsProvider`
-8. `OrchestrationProvider`
+5. `LayoutProvider`
+6. `MusicProvider`
+7. `OptimizationProvider`
+8. `ExtensionsProvider`
+9. `OrchestrationProvider`
 
 Cette hiérarchie garantit que tous les modules héritent des informations de thème, d'authentification et de préférences utilisateur.
 

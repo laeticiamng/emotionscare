@@ -2,6 +2,17 @@
 # Changelog
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
+## [1.1.10] - 2025-05-28
+
+### Ajouté
+- `LayoutProvider` intègre `AppProviders` pour centraliser la gestion du sidebar et du mode plein écran.
+- Rapport d'audit `docs/shell-layout-point4-audit.md` récapitulant la structure du Shell et de la navigation.
+- Test `layoutContextExports.test.ts` vérifiant les exports du contexte de layout.
+
+### Modifié
+- Mise à jour de `docs/layout-shell-audit.md` et `docs/shell-navigation-premium-audit.md` avec la nouvelle hiérarchie des providers.
+- `README.md` référence le nouveau document d'audit et précise l'utilisation de `LayoutProvider`.
+
 ## [1.1.8] - 2025-05-26
 
 ### Corrigé

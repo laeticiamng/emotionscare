@@ -24,11 +24,12 @@ Ce rapport résume l'analyse du composant `Shell`, de la navigation et de la ges
     AuthProvider
       UserPreferencesProvider
         UserModeProvider
-          MusicProvider
-            OptimizationProvider
-              ExtensionsProvider
-                OrchestrationProvider
-                  {children}
+          LayoutProvider
+            MusicProvider
+              OptimizationProvider
+                ExtensionsProvider
+                  OrchestrationProvider
+                    {children}
 ```
 
 ## Améliorations parcours B2B
