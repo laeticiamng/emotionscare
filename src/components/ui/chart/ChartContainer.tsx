@@ -1,58 +1,41 @@
 
-import React, { ReactElement, ReactNode } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { forwardRef, HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
-interface ChartContainerProps {
-  title?: string | ReactNode;
-  className?: string;
-  contentClassName?: string;
-  children: ReactNode;
-  fullWidth?: boolean;
+export interface ChartContainerProps extends HTMLAttributes<HTMLDivElement> {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  footer?: React.ReactNode;
+  controls?: React.ReactNode;
   loading?: boolean;
-  error?: string | null;
-  headerAction?: ReactNode;
 }
 
-const ChartContainer: React.FC<ChartContainerProps> = ({
-  title,
-  className,
-  contentClassName,
-  children,
-  fullWidth = false,
-  loading = false,
-  error = null,
-  headerAction
-}) => {
-  return (
-    <Card className={cn('overflow-hidden', className)}>
-      {title && (
-        <CardHeader className="p-4">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-medium">
-              {typeof title === 'string' ? title : title}
-            </CardTitle>
-            {headerAction && headerAction}
-          </div>
-        </CardHeader>
-      )}
-      <CardContent className={cn('p-0', contentClassName)}>
-        {loading ? (
-          <div className="flex items-center justify-center p-8">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
-          </div>
-        ) : error ? (
-          <div className="p-4 text-center text-destructive">
-            <p>{error}</p>
-          </div>
-        ) : (
-          <div className={fullWidth ? 'w-full' : 'p-4'}>
-            {children}
+export const ChartContainer = forwardRef<HTMLDivElement, ChartContainerProps>(
+  ({ className, title, description, children, footer, controls, loading, ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        className={cn("space-y-3 rounded-lg border p-4 pb-8", className)}
+        {...props}
+      >
+        {(title || description || controls) && (
+          <div className="flex items-center justify-between gap-2">
+            {(title || description) && (
+              <div className="space-y-1">
+                {title && <div className="text-base font-medium">{title}</div>}
+                {description && <div className="text-sm text-muted-foreground">{description}</div>}
+              </div>
+            )}
+            {controls && <div>{controls}</div>}
           </div>
         )}
-      </CardContent>
-    </Card>
-  );
-};
+        <div className={cn("h-[200px] w-full", { "animate-pulse": loading })}>
+          {children}
+        </div>
+        {footer && <div className="text-xs text-muted-foreground">{footer}</div>}
+      </div>
+    );
+  }
+);
 
-export default ChartContainer;
+ChartContainer.displayName = "ChartContainer";

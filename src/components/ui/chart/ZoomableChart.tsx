@@ -1,101 +1,152 @@
 
-import React, { useState } from 'react';
-import { ResponsiveContainer, AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceArea } from 'recharts';
+import React, { useState, useRef, useCallback } from 'react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 
-export interface ZoomableChartProps {
-  children: React.ReactNode;
-  data: any[];
-  brushDataKey: string;
-  showControls?: boolean;
+interface ZoomableChartProps {
+  data: Array<any>;
+  xKey: string;
+  yKey: string;
+  width?: string | number;
+  height?: number;
+  margin?: { top?: number; right?: number; bottom?: number; left?: number };
+  stroke?: string;
+  fill?: string;
+  className?: string;
+  name?: string;
 }
 
-export const ZoomableChart: React.FC<ZoomableChartProps> = ({ 
-  children, 
+export const ZoomableChart: React.FC<ZoomableChartProps> = ({
   data,
-  brushDataKey,
-  showControls = true
+  xKey,
+  yKey,
+  width = "100%",
+  height = 300,
+  margin = { top: 5, right: 20, bottom: 20, left: 20 },
+  stroke = "#8884d8",
+  fill = "#8884d8",
+  className,
+  name = "Value",
 }) => {
-  const [left, setLeft] = useState<string | number>('dataMin');
-  const [right, setRight] = useState<string | number>('dataMax');
-  const [refAreaLeft, setRefAreaLeft] = useState<string | number>('');
-  const [refAreaRight, setRefAreaRight] = useState<string | number>('');
-  const [isZoomed, setIsZoomed] = useState(false);
-
-  const getAxisYDomain = (from: number, to: number, ref: string, offset: number) => {
-    const refData = data.slice(from - 1, to);
-    let [bottom, top] = [refData[0][ref], refData[0][ref]];
-
-    refData.forEach((d) => {
-      if (d[ref] > top) top = d[ref];
-      if (d[ref] < bottom) bottom = d[ref];
-    });
-
-    return [(bottom | 0) - offset, (top | 0) + offset];
-  };
-
-  const zoom = () => {
-    if (refAreaLeft === refAreaRight || refAreaRight === '') {
-      setRefAreaLeft('');
-      setRefAreaRight('');
-      return;
+  const [zoomDomain, setZoomDomain] = useState<{ start: number; end: number } | null>(null);
+  const chartRef = useRef<any>(null);
+  
+  const handleZoomIn = useCallback(() => {
+    if (!data.length) return;
+    
+    if (zoomDomain) {
+      const length = zoomDomain.end - zoomDomain.start;
+      const mid = (zoomDomain.start + zoomDomain.end) / 2;
+      const newStart = Math.max(0, Math.floor(mid - length / 4));
+      const newEnd = Math.min(data.length - 1, Math.ceil(mid + length / 4));
+      setZoomDomain({ start: newStart, end: newEnd });
+    } else {
+      const length = data.length;
+      const start = Math.floor(length / 4);
+      const end = Math.ceil(3 * length / 4);
+      setZoomDomain({ start, end });
     }
-
-    let leftValue = refAreaLeft;
-    let rightValue = refAreaRight;
-
-    if (refAreaLeft > refAreaRight) {
-      leftValue = refAreaRight;
-      rightValue = refAreaLeft;
+  }, [data, zoomDomain]);
+  
+  const handleZoomOut = useCallback(() => {
+    if (!data.length) return;
+    
+    if (zoomDomain) {
+      const length = zoomDomain.end - zoomDomain.start;
+      const mid = (zoomDomain.start + zoomDomain.end) / 2;
+      const newStart = Math.max(0, Math.floor(mid - length));
+      const newEnd = Math.min(data.length - 1, Math.ceil(mid + length));
+      
+      // If we're already showing most of the data, reset to full view
+      if (newStart <= 0 && newEnd >= data.length - 1) {
+        setZoomDomain(null);
+      } else {
+        setZoomDomain({ start: newStart, end: newEnd });
+      }
     }
+  }, [data, zoomDomain]);
+  
+  const resetZoom = useCallback(() => {
+    setZoomDomain(null);
+  }, []);
 
-    setLeft(leftValue);
-    setRight(rightValue);
-    setRefAreaLeft('');
-    setRefAreaRight('');
-    setIsZoomed(true);
-  };
-
-  const zoomOut = () => {
-    setLeft('dataMin');
-    setRight('dataMax');
-    setRefAreaLeft('');
-    setRefAreaRight('');
-    setIsZoomed(false);
-  };
+  // Filter data based on zoom domain
+  const displayData = zoomDomain 
+    ? data.slice(zoomDomain.start, zoomDomain.end + 1) 
+    : data;
 
   return (
-    <div className="w-full relative">
-      {showControls && isZoomed && (
-        <button
-          className="absolute top-0 right-0 z-10 bg-accent/70 hover:bg-accent text-accent-foreground text-xs py-1 px-2 rounded"
-          onClick={zoomOut}
+    <div className={cn("relative", className)}>
+      <div className="absolute top-0 right-0 flex gap-1 z-10">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="h-8 w-8" 
+          onClick={handleZoomIn}
         >
-          Reset Zoom
-        </button>
-      )}
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart
-          data={data}
-          onMouseDown={(e) => e && e.activeLabel && setRefAreaLeft(e.activeLabel)}
-          onMouseMove={(e) => refAreaLeft && e && e.activeLabel && setRefAreaRight(e.activeLabel)}
-          onMouseUp={zoom}
-          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          <ZoomIn className="h-4 w-4" />
+        </Button>
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="h-8 w-8" 
+          onClick={handleZoomOut}
+          disabled={!zoomDomain}
         >
+          <ZoomOut className="h-4 w-4" />
+        </Button>
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="h-8 w-8" 
+          onClick={resetZoom}
+          disabled={!zoomDomain}
+        >
+          <RotateCcw className="h-4 w-4" />
+        </Button>
+      </div>
+      
+      <ResponsiveContainer width={width} height={height}>
+        <AreaChart
+          ref={chartRef}
+          data={displayData}
+          margin={margin}
+        >
+          <defs>
+            <linearGradient id={`colorGradient-${yKey}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={fill} stopOpacity={0.8} />
+              <stop offset="95%" stopColor={fill} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
           <XAxis 
-            dataKey={brushDataKey} 
-            allowDataOverflow 
-            domain={[left, right]} 
+            dataKey={xKey} 
+            tick={{ fontSize: 12 }}
+            tickMargin={10}
           />
-          <YAxis allowDataOverflow />
-          <CartesianGrid strokeDasharray="3 3" />
-          <Tooltip />
-          
-          {React.Children.map(children, child => child)}
-          
-          {refAreaLeft && refAreaRight && (
-            <ReferenceArea x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3} />
-          )}
-        </LineChart>
+          <YAxis 
+            tick={{ fontSize: 12 }}
+            tickMargin={10}
+          />
+          <Tooltip 
+            contentStyle={{ 
+              backgroundColor: 'var(--background)',
+              borderRadius: '8px',
+              border: '1px solid var(--border)'
+            }}
+          />
+          <Area
+            type="monotone"
+            dataKey={yKey}
+            name={name}
+            stroke={stroke}
+            fillOpacity={1}
+            fill={`url(#colorGradient-${yKey})`}
+            animationDuration={300}
+          />
+        </AreaChart>
       </ResponsiveContainer>
     </div>
   );

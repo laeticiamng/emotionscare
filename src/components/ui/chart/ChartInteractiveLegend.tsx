@@ -1,50 +1,61 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
-export interface ChartInteractiveLegendProps {
-  onToggleSeries?: (dataKey: string, isHidden: boolean) => void;
-  hiddenSeries?: string[];
-  verticalAlign?: 'top' | 'middle' | 'bottom';
-  align?: 'left' | 'center' | 'right';
-  layout?: 'horizontal' | 'vertical';
-  children?: React.ReactNode;
+export interface LegendItem {
+  id: string;
+  label: string;
+  color: string;
+  value?: number | string;
+  disabled?: boolean;
 }
 
-export const ChartInteractiveLegend: React.FC<ChartInteractiveLegendProps> = ({
-  onToggleSeries,
-  hiddenSeries = [],
-  verticalAlign = 'bottom',
-  align = 'center',
-  layout = 'horizontal',
-  children
-}) => {
-  const [localHiddenSeries, setLocalHiddenSeries] = useState<string[]>(hiddenSeries);
+export interface ChartInteractiveLegendProps {
+  items: LegendItem[];
+  onToggle?: (id: string) => void;
+  className?: string;
+  orientation?: 'horizontal' | 'vertical';
+}
 
-  const handleToggle = (dataKey: string) => {
-    const isHidden = localHiddenSeries.includes(dataKey);
-    const newHiddenSeries = isHidden 
-      ? localHiddenSeries.filter(key => key !== dataKey)
-      : [...localHiddenSeries, dataKey];
-    
-    setLocalHiddenSeries(newHiddenSeries);
-    
-    if (onToggleSeries) {
-      onToggleSeries(dataKey, !isHidden);
-    }
-  };
-
+export const ChartInteractiveLegend = ({
+  items,
+  onToggle,
+  className,
+  orientation = 'horizontal',
+}: ChartInteractiveLegendProps) => {
   return (
     <div 
-      className={`
-        flex 
-        ${layout === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col'} 
-        gap-2 
-        mt-2 
-        ${verticalAlign === 'top' ? 'items-start' : verticalAlign === 'bottom' ? 'items-end' : 'items-center'} 
-        ${align === 'left' ? 'justify-start' : align === 'right' ? 'justify-end' : 'justify-center'}
-      `}
+      className={cn(
+        "flex flex-wrap gap-2 text-sm", 
+        orientation === 'vertical' ? "flex-col" : "",
+        className
+      )}
     >
-      {children}
+      {items.map((item) => (
+        <motion.button
+          key={item.id}
+          type="button"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className={cn(
+            "inline-flex items-center rounded-lg px-2 py-1",
+            "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+            item.disabled ? "opacity-50 cursor-default" : "hover:bg-muted cursor-pointer"
+          )}
+          onClick={() => onToggle && onToggle(item.id)}
+          disabled={item.disabled}
+        >
+          <div
+            className="h-3 w-3 rounded-full mr-2"
+            style={{ backgroundColor: item.color }}
+          />
+          <span>{item.label}</span>
+          {item.value !== undefined && (
+            <span className="ml-1 font-medium">{item.value}</span>
+          )}
+        </motion.button>
+      ))}
     </div>
   );
 };

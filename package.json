@@ -81,7 +81,7 @@
     "eslint-config-prettier": "^10.1.5",
     "file-saver": "^2.0.5",
     "firebase": "^11.7.3",
-    "framer-motion": "^10.18.0",
+    "framer-motion": "^12.12.1",
     "glob": "^11.0.2",
     "hume": "^0.11.0",
     "i18next": "^25.2.0",

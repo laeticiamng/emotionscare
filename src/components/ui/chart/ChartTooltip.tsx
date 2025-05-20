@@ -1,56 +1,85 @@
-
-import { TooltipProps } from 'recharts';
-import { Card } from '@/components/ui/card';
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export interface ChartTooltipProps {
-  active?: boolean;
-  payload?: any[];
-  label?: string;
-}
-
-export function getPayloadConfigFromPayload(payload: any) {
-  return {
-    value: payload.value,
-    name: payload.name,
-    color: payload.color,
-    fill: payload.fill,
-    stroke: payload.stroke,
-  };
+  children: React.ReactNode;
+  visible: boolean;
+  x?: number;
+  y?: number;
+  offset?: { x?: number; y?: number };
+  className?: string;
+  portal?: boolean;
 }
 
 export const ChartTooltip = ({
-  active,
-  payload,
-  label,
+  children,
+  visible,
+  x = 0,
+  y = 0,
+  offset = { x: 10, y: 10 },
+  className,
+  portal = true,
 }: ChartTooltipProps) => {
-  if (active && payload && payload.length) {
-    return (
-      <Card className="border shadow-md">
-        <div className="p-2">
-          <div className="text-sm font-medium">{label}</div>
-          <div className="py-1">
-            {payload.map((entry, index) => (
-              <div
-                key={index}
-                className="flex items-center text-xs py-0.5"
-              >
-                <div
-                  className="w-3 h-3 rounded-sm mr-2"
-                  style={{ backgroundColor: entry.color }}
-                />
-                <span className="text-muted-foreground mr-1">
-                  {entry.name}:
-                </span>
-                <span className="font-medium">{entry.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Card>
-    );
-  }
+  const ref = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x, y });
+  const [portalElement, setPortalElement] = useState<HTMLElement | null>(null);
 
-  return null;
+  // Adjust position based on tooltip dimensions to keep it in viewport
+  useEffect(() => {
+    if (visible && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      const adjustedX = Math.min(x + (offset.x || 0), window.innerWidth - rect.width - 10);
+      const adjustedY = Math.min(y + (offset.y || 0), window.innerHeight - rect.height - 10);
+      setPosition({ x: adjustedX, y: adjustedY });
+    }
+  }, [visible, x, y, offset.x, offset.y]);
+
+  // Setup portal element
+  useEffect(() => {
+    if (portal) {
+      let element = document.getElementById('chart-tooltip-portal');
+      if (!element) {
+        element = document.createElement('div');
+        element.id = 'chart-tooltip-portal';
+        document.body.appendChild(element);
+      }
+      setPortalElement(element);
+    }
+    
+    return () => {
+      if (portal && portalElement && !portalElement.hasChildNodes()) {
+        portalElement.remove();
+      }
+    };
+  }, [portal]);
+
+  const tooltipContent = (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          ref={ref}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ duration: 0.15 }}
+          className={cn("absolute z-50", className)}
+          style={{
+            left: position.x,
+            top: position.y,
+            pointerEvents: 'none',
+          }}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
+  return portal && portalElement
+    ? createPortal(tooltipContent, portalElement)
+    : tooltipContent;
 };
 
-export default ChartTooltip;
+export * from './ChartTooltipContent';

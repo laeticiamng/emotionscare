@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
@@ -17,6 +16,7 @@ import B2CLoginPage from './pages/b2c/Login';
 import B2CRegisterPage from './pages/b2c/Register';
 import B2CForgotPasswordPage from './pages/b2c/ForgotPasswordPage';
 import PostLoginTransition from './components/auth/PostLoginTransition';
+import ReportsAndDashboardPage from './pages/ReportsAndDashboardPage';
 
 const AppRouter: React.FC = () => {
   const { userMode, isLoading } = useUserMode();
@@ -57,6 +57,7 @@ const AppRouter: React.FC = () => {
         
         {/* Autres routes */}
         <Route path="/b2b/components" element={<B2BComponentsPage />} />
+        <Route path="/reports-dashboard" element={<ReportsAndDashboardPage />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>
     </Router>
