@@ -25,7 +25,7 @@ import { Toaster } from '@/components/ui/toaster';
  * Aggregates all global providers used by the application.
  * This helps keeping App.tsx concise and documents the provider order.
  */
-const AppProviders: React.FC<LayoutProviderProps> = ({ children }) => (
+export const AppProviders: React.FC<LayoutProviderProps> = ({ children }) => (
   <ThemeProvider>
     <AuthProvider>
       <UserPreferencesProvider>
@@ -60,4 +60,5 @@ const AppProviders: React.FC<LayoutProviderProps> = ({ children }) => (
   </ThemeProvider>
 );
 
+// Also export as default for backward compatibility
 export default AppProviders;
