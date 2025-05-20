@@ -52,6 +52,7 @@ export interface Challenge {
   imageUrl?: string;
   goal?: string;
   targetValue?: number;
+  currentValue?: number;
 }
 
 export interface LeaderboardEntry {
@@ -61,6 +62,8 @@ export interface LeaderboardEntry {
   avatarUrl?: string;
   score: number;
   rank: number;
+  points?: number;
   progress?: number;
   level?: number;
+  position?: number;
 }

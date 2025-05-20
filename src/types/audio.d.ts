@@ -13,11 +13,15 @@ export interface AudioTrack {
   mood?: string;
   tags?: string[];
   source?: string;
+  artworkUrl?: string;
+  cover?: string;
+  emotion?: string;
 }
 
 export interface AudioPlaylist {
   id: string;
   name: string;
+  title?: string;
   tracks: AudioTrack[];
   description?: string;
   thumbnailUrl?: string;
