@@ -34,13 +34,16 @@ export interface Notification {
   imageUrl?: string;
 }
 
-export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'none';
+export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'none' | 'immediate';
 
-export type NotificationTone = 'standard' | 'gentle' | 'focused' | 'none';
+export type NotificationTone = 'standard' | 'gentle' | 'focused' | 'none' | 'friendly';
 
 export interface NotificationPreference {
   type: NotificationType;
   enabled: boolean;
   frequency: NotificationFrequency;
   tone: NotificationTone;
+  id?: string;
+  userId?: string;
+  category?: string;
 }

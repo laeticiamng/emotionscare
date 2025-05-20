@@ -1,239 +1,98 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { NotificationFrequency, NotificationPreference } from '@/types/notification';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { NotificationFrequency } from '@/types/notification';
 
-interface NotificationPreferencesProps {
-  preferences: Partial<NotificationPreference> & {
-    enabled?: boolean;
-    emailEnabled?: boolean;
-    pushEnabled?: boolean;
-    inAppEnabled?: boolean;
-    types?: {
-      system?: boolean;
-      emotion?: boolean;
-      coach?: boolean;
-      journal?: boolean;
-      community?: boolean;
-      achievement?: boolean;
-      badge?: boolean;
-      challenge?: boolean;
-      reminder?: boolean;
-      info?: boolean;
-      warning?: boolean;
-      error?: boolean;
-      success?: boolean;
-      streak?: boolean;
-      urgent?: boolean;
-    };
-    frequency?: NotificationFrequency;
-  };
-  onUpdate: (preferences: NotificationPreferencesProps['preferences']) => void;
+interface NotificationSetting {
+  label: string;
+  key: string;
+  description?: string;
 }
 
-const NotificationPreferencesComponent: React.FC<NotificationPreferencesProps> = ({
-  preferences,
-  onUpdate,
+interface NotificationsPreferencesProps {
+  notifications: {
+    system?: boolean;
+    emotion?: boolean;
+    badge?: boolean;
+    challenge?: boolean;
+    message?: boolean;
+    update?: boolean;
+    mention?: boolean;
+    team?: boolean;
+    report?: boolean;
+    reminder?: boolean;
+    activity?: boolean;
+    comment?: boolean;
+    reaction?: boolean;
+    friend?: boolean;
+    coach?: boolean;
+    community?: boolean;
+    achievement?: boolean;
+  };
+  onChange: (key: string, value: boolean) => void;
+}
+
+export const NotificationsPreferences: React.FC<NotificationsPreferencesProps> = ({ 
+  notifications, 
+  onChange 
 }) => {
-  const handleToggle = (enabled: boolean) => {
-    if (enabled) {
-      onUpdate({
-        ...preferences,
-        enabled: true,
-      });
-    } else {
-      // Create a proper NotificationPreference object with all required fields
-      onUpdate({
-        id: preferences.id,
-        userId: preferences.userId,
-        category: preferences.category || '',
-        enabled: false,
-        emailEnabled: false,
-        pushEnabled: false,
-        inAppEnabled: false,
-        frequency: 'immediate',
-        types: {
-          system: false,
-          emotion: false,
-          coach: false,
-          journal: false,
-          community: false,
-          achievement: false,
-          badge: false,
-          challenge: false,
-          reminder: false,
-          info: false,
-          warning: false,
-          error: false,
-          success: false,
-          streak: false,
-          urgent: false
-        }
-      });
-    }
-  };
-
-  const handleTypeToggle = (type: keyof NotificationPreferencesProps['preferences']['types'], checked: boolean) => {
-    if (preferences.types) {
-      const updatedTypes = {
-        ...preferences.types,
-        [type]: checked,
-      };
-      onUpdate({ ...preferences, types: updatedTypes });
-    }
-  };
-
-  const handleFrequencyChange = (frequency: NotificationFrequency) => {
-    onUpdate({ ...preferences, frequency });
-  };
+  const notificationSettings: NotificationSetting[] = [
+    { label: 'Système', key: 'system', description: 'Informations importantes et mises à jour de la plateforme' },
+    { label: 'Émotions', key: 'emotion', description: 'Rapports et analyses liés à vos émotions' },
+    { label: 'Badges', key: 'badge', description: 'Quand vous gagnez de nouveaux badges' },
+    { label: 'Récompenses', key: 'achievement', description: 'Quand vous atteignez de nouveaux objectifs' },
+    { label: 'Défis', key: 'challenge', description: 'Nouveau défis disponibles et complétés' },
+    { label: 'Messages', key: 'message', description: 'Nouveaux messages privés reçus' },
+    { label: 'Mises à jour', key: 'update', description: 'Nouvelles fonctionnalités et améliorations' },
+    { label: 'Mentions', key: 'mention', description: 'Quand quelqu\'un vous mentionne' },
+    { label: 'Équipe', key: 'team', description: 'Activités et mises à jour de votre équipe' },
+    { label: 'Rapports', key: 'report', description: 'Rapports hebdomadaires et mensuels' },
+    { label: 'Rappels', key: 'reminder', description: 'Rappels quotidiens et programmés' },
+    { label: 'Activités', key: 'activity', description: 'Résumés de vos activités' },
+    { label: 'Commentaires', key: 'comment', description: 'Réponses à vos publications' },
+    { label: 'Réactions', key: 'reaction', description: 'Likes et réactions à vos contenus' },
+    { label: 'Amis', key: 'friend', description: 'Demandes d\'amitié et connexions' },
+    { label: 'Coach', key: 'coach', description: 'Conseils et suggestions de votre coach' },
+    { label: 'Communauté', key: 'community', description: 'Nouveaux événements et activités de groupe' },
+  ];
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Préférences de notification</CardTitle>
+        <CardTitle>Préférences de notifications</CardTitle>
+        <CardDescription>
+          Contrôlez quelles notifications vous souhaitez recevoir
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <Label htmlFor="notifications-toggle" className="block text-gray-700">
-              Activer les notifications
-            </Label>
-            <p className="text-sm text-muted-foreground">
-              Recevez des mises à jour sur vos analyses émotionnelles
-            </p>
-          </div>
-          <Switch
-            id="notifications-toggle"
-            checked={preferences.enabled}
-            onCheckedChange={handleToggle}
-          />
+      <CardContent>
+        <div className="space-y-4">
+          {notificationSettings.map((setting, index) => (
+            <React.Fragment key={setting.key}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor={`notification-${setting.key}`} className="font-medium">
+                    {setting.label}
+                  </Label>
+                  {setting.description && (
+                    <p className="text-sm text-muted-foreground">{setting.description}</p>
+                  )}
+                </div>
+                <Switch
+                  id={`notification-${setting.key}`}
+                  checked={notifications[setting.key as keyof typeof notifications] || false}
+                  onCheckedChange={(checked) => onChange(setting.key, checked)}
+                />
+              </div>
+              {index < notificationSettings.length - 1 && <Separator />}
+            </React.Fragment>
+          ))}
         </div>
-
-        {preferences.enabled && (
-          <>
-            <div className="space-y-4">
-              <Label className="font-medium">Canaux de notification</Label>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="email-notifications" className="cursor-pointer">
-                    Email
-                  </Label>
-                  <Switch
-                    id="email-notifications"
-                    checked={preferences.emailEnabled || false}
-                    onCheckedChange={(checked) =>
-                      onUpdate({ ...preferences, emailEnabled: checked })
-                    }
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="push-notifications" className="cursor-pointer">
-                    Notifications push
-                  </Label>
-                  <Switch
-                    id="push-notifications"
-                    checked={preferences.pushEnabled || false}
-                    onCheckedChange={(checked) =>
-                      onUpdate({ ...preferences, pushEnabled: checked })
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <Label className="font-medium">Types de notification</Label>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="system-notifications" className="cursor-pointer">
-                    Système
-                  </Label>
-                  <Switch
-                    id="system-notifications"
-                    checked={preferences.types?.system || false}
-                    onCheckedChange={(checked) =>
-                      handleTypeToggle('system', checked)
-                    }
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="emotion-notifications" className="cursor-pointer">
-                    Analyses émotionnelles
-                  </Label>
-                  <Switch
-                    id="emotion-notifications"
-                    checked={preferences.types?.emotion || false}
-                    onCheckedChange={(checked) =>
-                      handleTypeToggle('emotion', checked)
-                    }
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="coach-notifications" className="cursor-pointer">
-                    Coach virtuel
-                  </Label>
-                  <Switch
-                    id="coach-notifications"
-                    checked={preferences.types?.coach || false}
-                    onCheckedChange={(checked) =>
-                      handleTypeToggle('coach', checked)
-                    }
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="journal-notifications" className="cursor-pointer">
-                    Journal émotionnel
-                  </Label>
-                  <Switch
-                    id="journal-notifications"
-                    checked={preferences.types?.journal || false}
-                    onCheckedChange={(checked) =>
-                      handleTypeToggle('journal', checked)
-                    }
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="community-notifications" className="cursor-pointer">
-                    Communauté
-                  </Label>
-                  <Switch
-                    id="community-notifications"
-                    checked={preferences.types?.community || false}
-                    onCheckedChange={(checked) =>
-                      handleTypeToggle('community', checked)
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <Label htmlFor="notification-frequency" className="font-medium">
-                Fréquence des notifications
-              </Label>
-              <Select
-                value={preferences.frequency}
-                onValueChange={(value) => handleFrequencyChange(value as NotificationFrequency)}
-              >
-                <SelectTrigger id="notification-frequency">
-                  <SelectValue placeholder="Choisir une fréquence" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="immediate">Immédiatement</SelectItem>
-                  <SelectItem value="daily">Quotidienne</SelectItem>
-                  <SelectItem value="weekly">Hebdomadaire</SelectItem>
-                  <SelectItem value="never">Jamais</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </>
-        )}
       </CardContent>
     </Card>
   );
 };
 
-export default NotificationPreferencesComponent;
+export default NotificationsPreferences;

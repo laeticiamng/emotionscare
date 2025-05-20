@@ -62,7 +62,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
         from: '22:00',
         to: '08:00'
       },
-      tone: 'friendly'
+      tone: 'standard'
     };
   } else {
     notifications = preferences.notifications as NotificationsPreferences || {
@@ -83,7 +83,7 @@ export const PreferencesProvider: React.FC<{ children: React.ReactNode }> = ({ c
         from: '22:00',
         to: '08:00'
       },
-      tone: 'friendly'
+      tone: 'standard'
     };
   }
   

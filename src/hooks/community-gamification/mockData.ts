@@ -1,140 +1,123 @@
 
-import { Challenge, Badge, LeaderboardEntry } from '@/types/badge';
+import { Badge, Challenge, LeaderboardEntry } from '@/types/badge';
 
-// Mock challenges for demonstration purposes
+// Mock challenges data
 export const mockChallenges: Challenge[] = [
   {
-    id: 'c1',
-    title: 'Première méditation',
-    name: 'Première méditation',
-    description: 'Complétez votre première session de méditation',
-    status: 'completed',
-    type: 'achievement',
-    points: 50,
-    progress: 1,
-    goal: 1,
+    id: "challenge-1",
+    title: "Streak héroïque",
+    description: "Maintenez une utilisation quotidienne pendant 7 jours",
+    points: 150,
+    reward: "Écusson de persévérance",
+    progress: 5,
+    goal: 7,
+    status: "active",
+    category: "engagement",
     unlocked: true,
-    category: 'wellness',
-    reward: { id: 'b1', name: 'Novice en méditation', description: 'Badge de méditation', unlocked: true }
+    totalSteps: 7,
+    name: "Streak héroïque"
   },
   {
-    id: 'c2',
-    title: 'Semaine de pleine conscience',
-    name: 'Semaine de pleine conscience',
-    description: 'Complétez 5 sessions de méditation en une semaine',
-    status: 'active',
-    type: 'streak',
+    id: "challenge-2",
+    title: "Explorateur émotionnel",
+    description: "Identifiez 5 émotions différentes dans un délai de 3 jours",
     points: 200,
+    reward: "Badge d'intelligence émotionnelle",
     progress: 3,
     goal: 5,
+    status: "active",
+    category: "émotion",
     unlocked: true,
-    category: 'wellness',
-    reward: { id: 'b2', name: 'Maître de la méditation', description: 'Badge de maîtrise', unlocked: false }
+    totalSteps: 5,
+    name: "Explorateur émotionnel"
   },
   {
-    id: 'c3',
-    title: 'Explorer les émotions',
-    name: 'Explorer les émotions',
-    description: 'Enregistrez 10 entrées dans votre journal émotionnel',
-    status: 'active',
-    type: 'ongoing',
-    points: 150,
-    progress: 7,
+    id: "challenge-3",
+    title: "Journaliste assidu",
+    description: "Complétez 10 entrées de journal en utilisant des émojis expressifs",
+    points: 300,
+    reward: "Badge de réflexion profonde",
+    progress: 2,
     goal: 10,
+    status: "active",
+    category: "journal",
     unlocked: true,
-    category: 'emotional',
-    reward: { id: 'b3', name: 'Explorateur émotionnel', description: 'Badge d\'exploration', unlocked: false }
+    totalSteps: 10,
+    name: "Journaliste assidu"
   }
 ];
 
-// Mock badges for demonstration purposes
+// Mock badges data
 export const mockBadges: Badge[] = [
   {
-    id: 'b1',
-    name: 'Novice en méditation',
-    description: 'Complétez votre première session de méditation',
-    imageUrl: '/images/badges/meditation-novice.png',
-    category: 'wellness',
-    tier: 'bronze',
+    id: "badge-1",
+    name: "Premier pas",
+    description: "Première connexion à l'application",
+    image: "/images/badges/first-step.png",
     unlocked: true,
-    rarity: 'common',
-    progress: 1,
-    threshold: 1
+    rarity: "common",
+    tier: "bronze"
   },
   {
-    id: 'b2',
-    name: 'Explorateur émotionnel',
-    description: 'Identifiez 5 émotions différentes',
-    imageUrl: '/images/badges/emotion-explorer.png',
-    category: 'emotional',
-    tier: 'silver',
+    id: "badge-2",
+    name: "Observateur attentif",
+    description: "Identifiez 3 émotions différentes",
+    image: "/images/badges/observer.png",
     unlocked: true,
-    rarity: 'uncommon',
-    progress: 5,
-    threshold: 5
+    rarity: "uncommon",
+    tier: "silver"
   },
   {
-    id: 'b3',
-    name: 'Maître du sommeil',
-    description: 'Complétez 10 sessions de méditation pour le sommeil',
-    imageUrl: '/images/badges/sleep-master.png',
-    category: 'wellness',
-    tier: 'gold',
+    id: "badge-3",
+    name: "Maître zen",
+    description: "Complétez 5 séances de méditation",
+    image: "/images/badges/zen-master.png",
     unlocked: false,
-    rarity: 'rare',
-    progress: 6,
-    threshold: 10
+    progress: 3,
+    rarity: "rare",
+    tier: "gold"
   }
 ];
 
-// Mock leaderboard entries
+// Mock leaderboard data
 export const mockLeaderboard: LeaderboardEntry[] = [
   {
-    id: 'u1',
-    userId: 'u1',
-    username: 'MindfulMarie',
-    name: 'Marie Dupont',
+    id: "user-1",
+    userId: "user-1",
+    name: "Marie L.",
     points: 1250,
     rank: 1,
-    avatar: '/images/avatars/avatar1.jpg',
-    badges: [],
-    score: 1250
+    avatar: "/images/avatars/user-1.jpg",
+    badges: mockBadges.slice(0, 2)
   },
   {
-    id: 'u2',
-    userId: 'u2',
-    username: 'CalmCarlos',
-    name: 'Carlos Martin',
-    points: 1120,
-    rank: 2,
-    avatar: '/images/avatars/avatar2.jpg',
-    badges: [],
-    score: 1120
-  },
-  {
-    id: 'u3',
-    userId: 'u3',
-    username: 'SereneSelma',
-    name: 'Selma Larsson',
+    id: "user-2",
+    userId: "user-2",
+    name: "Thomas R.",
     points: 980,
-    rank: 3,
-    avatar: '/images/avatars/avatar3.jpg',
-    badges: [],
-    score: 980
+    rank: 2,
+    avatar: "/images/avatars/user-2.jpg",
+    badges: mockBadges.slice(0, 1)
   },
   {
-    id: 'current',
-    userId: 'current',
-    username: 'Vous',
-    name: 'Votre Nom',
+    id: "user-3",
+    userId: "user-3",
+    name: "Sophie G.",
+    points: 870,
+    rank: 3,
+    avatar: "/images/avatars/user-3.jpg",
+    badges: mockBadges.slice(1, 2)
+  },
+  {
+    id: "user-4",
+    userId: "user-4",
+    name: "Vous",
     points: 750,
     rank: 4,
-    avatar: '/images/avatars/avatar-you.jpg',
-    badges: [],
-    score: 750
+    avatar: "/images/avatars/default.jpg",
+    badges: mockBadges.slice(0, 1)
   }
 ];
 
-// Add exports for compatibility with other files
 export const mockCommunityBadges = mockBadges;
 export const mockCommunityChallenges = mockChallenges;

@@ -129,7 +129,7 @@ export const useNotifications = () => {
       duration: 5000,
       variant: 'default',
       action: notification.actionUrl ? {
-        label: 'Voir',
+        label: 'View',
         onClick: () => {
           window.location.href = notification.actionUrl || '#';
           markAsRead(newNotification.id);
