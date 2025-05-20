@@ -31,6 +31,7 @@ body {
   --background: #0e1325;
   --text-main: #ffffff;
   --card-bg: rgba(30, 41, 59, 0.8);
+  --primary-rgb: 91, 135, 255;
 }
 
 .immersive-container.pastel {
@@ -197,6 +198,38 @@ body {
   border-radius: 50%;
   border: 2px solid var(--primary);
   animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+/* Music visualizer bars */
+@keyframes music-wave {
+  0%, 100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1.0);
+  }
+}
+
+.music-visualizer-bar {
+  background-color: var(--primary);
+  animation: music-wave 1.2s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+.music-visualizer-bar:nth-child(2n) {
+  animation-delay: 0.2s;
+}
+
+.music-visualizer-bar:nth-child(3n) {
+  animation-delay: 0.3s;
+}
+
+.music-visualizer-bar:nth-child(4n) {
+  animation-delay: 0.4s;
+}
+
+.music-visualizer-bar:nth-child(5n) {
+  animation-delay: 0.5s;
 }
 
 /* Particles animation */

@@ -31,8 +31,10 @@ const AppRouter: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Pages publiques */}
+        {/* Page d'accueil immersive (nouvelle version premium) */}
         <Route path="/" element={<ImmersiveHome />} />
+        
+        {/* Pages publiques */}
         <Route path="/old-home" element={<Index />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/b2c" element={<B2CPage />} />
