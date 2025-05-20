@@ -325,7 +325,7 @@ Des audits complémentaires sont disponibles dans le dossier `docs` :
 - `scan-audio-type-fixes.md` : corrections de typage pour les modules scan/audio
 - `ui-polish-restoration.md` : rétablissement de l'apparence initiale
 - `shell-layout-point4-audit.md` : synthèse du Shell et de la navigation (point 4)
-- `coach-chat-audit-v2.md` : mise à jour du module Coach IA (point 6)
+- `security-privacy-point12-ultra-premium.md` : rapport détaillé sur la sécurité et la confidentialité (Point 12)
 
 
 ## Équipe et contribution
