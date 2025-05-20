@@ -1,112 +1,53 @@
 
-import { MusicTrack, MusicPlaylist } from "@/types/music";
+import { MusicTrack, AudioTrack } from '@/types/music';
 
-/**
- * Find tracks by a specific mood
- */
+// Helper functions to extract track information with compatibility across different track formats
+export const getTrackTitle = (track: MusicTrack | AudioTrack): string => {
+  return track.title || (track as any).name || 'Unknown Track';
+};
+
+export const getTrackArtist = (track: MusicTrack | AudioTrack): string => {
+  return track.artist || (track as any).creator || 'Unknown Artist';
+};
+
+export const getTrackCover = (track: MusicTrack | AudioTrack): string => {
+  return track.coverUrl || track.imageUrl || (track as any).cover || '/images/default-album-cover.jpg';
+};
+
+export const getTrackUrl = (track: MusicTrack | AudioTrack): string => {
+  return track.url || track.audioUrl || '';
+};
+
 export const findTracksByMood = (tracks: MusicTrack[], mood: string): MusicTrack[] => {
-  return tracks.filter(track => 
-    track.mood?.toLowerCase() === mood.toLowerCase() || 
-    track.emotion?.toLowerCase() === mood.toLowerCase()
-  );
+  if (!tracks || !Array.isArray(tracks)) return [];
+  
+  return tracks.filter(track => {
+    // Check various properties that might contain mood information
+    const trackMood = track.mood?.toLowerCase() || '';
+    const trackGenre = track.genre?.toLowerCase() || '';
+    const trackTags = Array.isArray(track.tags) ? track.tags.map(tag => tag.toLowerCase()) : [];
+    const trackMetadata = track.metadata || {};
+    
+    const moodLower = mood.toLowerCase();
+    
+    return trackMood.includes(moodLower) ||
+           trackGenre.includes(moodLower) ||
+           trackTags.some(tag => tag.includes(moodLower)) ||
+           (trackMetadata.mood && trackMetadata.mood.toLowerCase().includes(moodLower));
+  });
 };
 
-/**
- * Find playlists by a specific mood
- */
-export const findPlaylistsByMood = (playlists: MusicPlaylist[], mood: string): MusicPlaylist[] => {
-  return playlists.filter(playlist => 
-    playlist.mood?.toLowerCase() === mood.toLowerCase() || 
-    playlist.emotion?.toLowerCase() === mood.toLowerCase()
-  );
-};
-
-/**
- * Convert various music track formats to the standard format
- */
-export const normalizeTrack = (track: any): MusicTrack => {
-  return {
-    id: track.id || track._id || `track-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-    title: track.title || track.name || "Unknown Track",
-    artist: track.artist || track.artistName || "Unknown Artist",
-    url: track.url || track.audioUrl || track.src || track.track_url || "",
-    cover: track.cover || track.coverUrl || track.coverImage || track.artwork || "",
-    duration: track.duration || 0,
-    emotion: track.emotion || track.mood || "",
-    mood: track.mood || track.emotion || "",
-    album: track.album || track.albumName || "",
-    category: track.category || [],
-    tags: track.tags || []
-  };
-};
-
-/**
- * Convert various playlist formats to the standard format
- */
-export const normalizePlaylist = (playlist: any): MusicPlaylist => {
-  return {
-    id: playlist.id || playlist._id || `playlist-${Date.now()}`,
-    name: playlist.name || playlist.title || "Untitled Playlist",
-    title: playlist.title || playlist.name || "Untitled Playlist",
-    description: playlist.description || "",
-    coverUrl: playlist.coverUrl || playlist.cover || playlist.coverImage || "",
-    tracks: Array.isArray(playlist.tracks) ? playlist.tracks.map(normalizeTrack) : [],
-    emotion: playlist.emotion || playlist.mood || "",
-    mood: playlist.mood || playlist.emotion || "",
-    creator: playlist.creator || playlist.author || "Unknown"
-  };
-};
-
-/**
- * Helper function to ensure value is an array
- */
-export const ensureArray = <T>(value: T | T[] | undefined | null): T[] => {
+export const ensureArray = <T,>(value: T | T[] | undefined | null): T[] => {
   if (Array.isArray(value)) return value;
   if (value === undefined || value === null) return [];
   return [value];
 };
 
-/**
- * Get track title with fallback
- */
-export const getTrackTitle = (track: MusicTrack | null | undefined): string => {
-  if (!track) return "Unknown Track";
-  return track.title || track.name || "Unknown Track";
-};
-
-/**
- * Get track artist with fallback
- */
-export const getTrackArtist = (track: MusicTrack | null | undefined): string => {
-  if (!track) return "Unknown Artist";
-  return track.artist || "Unknown Artist";
-};
-
-/**
- * Get track cover image with fallback
- */
-export const getTrackCover = (track: MusicTrack | null | undefined): string => {
-  if (!track) return "";
-  return track.cover || track.coverUrl || track.coverImage || "";
-};
-
-/**
- * Get track URL with fallback
- */
-export const getTrackUrl = (track: MusicTrack | null | undefined): string => {
-  if (!track) return "";
-  return track.url || track.audioUrl || track.src || track.track_url || "";
-};
-
-// Export all utility functions as a default export as well for backward compatibility
 export default {
-  findTracksByMood,
-  findPlaylistsByMood,
-  normalizeTrack,
-  normalizePlaylist,
   getTrackTitle,
   getTrackArtist,
   getTrackCover,
   getTrackUrl,
+  findTracksByMood,
   ensureArray
 };

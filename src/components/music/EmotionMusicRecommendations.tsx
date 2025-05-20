@@ -2,9 +2,10 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Music } from 'lucide-react';
+import { Play, Music, Volume2 } from 'lucide-react';
 import { useMusic } from '@/hooks/useMusic';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
+import { motion } from 'framer-motion';
 
 interface EmotionMusicRecommendationsProps {
   emotion?: string;
@@ -19,6 +20,8 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
   
   const [recommendedEmotion, setRecommendedEmotion] = useState(emotion);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoadingMusic, setIsLoadingMusic] = useState(false);
   
   // Textes par émotion
   const emotionTexts: Record<string, { title: string; description: string }> = {
@@ -54,32 +57,68 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   }, [emotion]);
 
   const handlePlayMusic = async () => {
-    await activateMusicForEmotion({ emotion: recommendedEmotion });
+    setIsLoadingMusic(true);
+    try {
+      const result = await activateMusicForEmotion({ emotion: recommendedEmotion });
+      if (result) {
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error('Error playing music:', error);
+    } finally {
+      setIsLoadingMusic(false);
+    }
   };
 
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <Music className="mr-2 h-5 w-5 text-primary" />
-          {currentEmotionData.title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground mb-4">
-          {currentEmotionData.description}
-        </p>
-        <Button 
-          onClick={handlePlayMusic}
-          className="w-full"
-          variant="default"
-        >
-          <Play className="mr-2 h-4 w-4" />
-          Écouter la musique recommandée
-        </Button>
-      </CardContent>
-    </Card>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Card className={`overflow-hidden hover:shadow-lg transition-all duration-300 ${className}`}>
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10">
+          <CardTitle className="flex items-center">
+            <Music className="mr-2 h-5 w-5 text-primary animate-pulse-subtle" />
+            {currentEmotionData.title}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-4">
+          <p className="text-sm text-muted-foreground mb-4">
+            {currentEmotionData.description}
+          </p>
+          <Button 
+            onClick={handlePlayMusic}
+            className="w-full group hover:shadow-md bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary transition-all duration-300"
+            variant="default"
+            disabled={isLoadingMusic}
+          >
+            {isPlaying ? (
+              <>
+                <Volume2 className="mr-2 h-4 w-4 animate-pulse" />
+                <span>En cours de lecture</span>
+              </>
+            ) : (
+              <>
+                <Play className="mr-2 h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                <span>Écouter la musique recommandée</span>
+              </>
+            )}
+            
+            {isLoadingMusic && (
+              <span className="absolute inset-0 flex items-center justify-center bg-primary/20 backdrop-blur-sm">
+                <span className="loading-dots">
+                  <div className="bg-white"></div>
+                  <div className="bg-white"></div>
+                  <div className="bg-white"></div>
+                </span>
+              </span>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
-}
+};
 
 export default EmotionMusicRecommendations;

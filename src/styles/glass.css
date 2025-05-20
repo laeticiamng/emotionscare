@@ -1,204 +1,85 @@
 
 /* Glass morphism effects */
-
-@layer components {
-  .glass-light {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-  }
-
-  .glass-dark {
-    background: rgba(17, 25, 40, 0.75);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
-  }
-
-  .glass-pastel {
-    background: rgba(232, 241, 255, 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(198, 219, 255, 0.4);
-    box-shadow: 0 8px 32px rgba(100, 125, 211, 0.15);
-  }
-
-  .shadow-premium-light {
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 
-                0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  }
-
-  .shadow-premium-dark {
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 
-                0 10px 10px -5px rgba(0, 0, 0, 0.2);
-  }
-
-  .shadow-premium-pastel {
-    box-shadow: 0 10px 25px -5px rgba(100, 125, 211, 0.2), 
-                0 10px 10px -5px rgba(100, 125, 211, 0.1);
-  }
+.glass-card {
+  @apply bg-white/80 dark:bg-black/40 backdrop-blur-lg border border-white/20 dark:border-white/10 shadow-lg;
 }
 
-/* Card glass effects */
-.card-glass {
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
+.glass-light {
+  @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-md;
 }
 
-.card-glass:hover {
-  transform: translateY(-5px);
+.glass-dark {
+  @apply bg-black/40 backdrop-blur-md border border-white/10 shadow-lg;
 }
 
-.light .card-glass {
-  @apply glass-light;
+.glass-pastel {
+  @apply bg-blue-50/70 backdrop-blur-sm border border-blue-100/30 shadow-sm;
 }
 
-.dark .card-glass {
-  @apply glass-dark;
+/* Premium card styles */
+.card-premium {
+  @apply rounded-xl overflow-hidden transition-all duration-300;
 }
 
-.pastel .card-glass {
-  @apply glass-pastel;
+.light .card-premium {
+  @apply shadow-lg hover:shadow-xl bg-gradient-to-br from-white to-gray-50 border border-gray-100;
 }
 
-/* Button glass effects */
-.button-glass {
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+.dark .card-premium {
+  @apply shadow-lg hover:shadow-xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-800;
 }
 
-.light .button-glass {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  color: rgba(0, 0, 0, 0.8);
+.pastel .card-premium {
+  @apply shadow-md hover:shadow-lg bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-100;
 }
 
-.dark .button-glass {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.9);
+/* Premium button styles */
+.button-premium {
+  @apply rounded-full transition-all duration-300;
 }
 
-.pastel .button-glass {
-  background: rgba(232, 241, 255, 0.7);
-  border: 1px solid rgba(198, 219, 255, 0.7);
-  color: rgba(35, 60, 120, 0.9);
+.light .button-premium {
+  @apply shadow-md hover:shadow-lg;
 }
 
-.button-glass:hover {
-  transform: translateY(-2px);
+.dark .button-premium {
+  @apply shadow-inner hover:shadow-lg;
 }
 
-.light .button-glass:hover {
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+.pastel .button-premium {
+  @apply shadow-sm hover:shadow-md;
 }
 
-.dark .button-glass:hover {
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+/* Glow effect on hover */
+.glow-hover {
+  @apply transition-all duration-300;
 }
 
-.pastel .button-glass:hover {
-  background: rgba(232, 241, 255, 0.9);
-  box-shadow: 0 10px 20px rgba(100, 125, 211, 0.2);
+.light .glow-hover:hover {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
-/* Navbar glass effect */
-.navbar-glass {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+.dark .glow-hover:hover {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
 }
 
-.light .navbar-glass {
-  background: rgba(255, 255, 255, 0.8);
-  border-bottom: 1px solid rgba(240, 240, 240, 0.8);
+.pastel .glow-hover:hover {
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
 }
 
-.dark .navbar-glass {
-  background: rgba(17, 25, 40, 0.8);
-  border-bottom: 1px solid rgba(50, 50, 50, 0.8);
+/* Background panel with glass effect */
+.bg-panel {
+  @apply w-full rounded-2xl p-6 transition-all duration-300;
 }
 
-.pastel .navbar-glass {
-  background: rgba(232, 241, 255, 0.8);
-  border-bottom: 1px solid rgba(198, 219, 255, 0.8);
+.light .bg-panel {
+  @apply bg-white/80 backdrop-blur-sm border border-gray-100;
 }
 
-/* Glass morphism inputs */
-.input-glass {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  padding: 10px 16px;
-  font-size: 14px;
-  transition: all 0.3s ease;
+.dark .bg-panel {
+  @apply bg-gray-900/70 backdrop-blur-md border border-gray-800;
 }
 
-.light .input-glass {
-  background: rgba(255, 255, 255, 0.5);
-  color: rgba(0, 0, 0, 0.8);
-}
-
-.dark .input-glass {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.pastel .input-glass {
-  background: rgba(232, 241, 255, 0.5);
-  color: rgba(35, 60, 120, 0.9);
-}
-
-.input-glass:focus {
-  outline: none;
-  transform: translateY(-1px);
-}
-
-.light .input-glass:focus {
-  background: rgba(255, 255, 255, 0.7);
-  border-color: rgba(59, 130, 246, 0.5);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-.dark .input-glass:focus {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(99, 102, 241, 0.5);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-}
-
-.pastel .input-glass:focus {
-  background: rgba(232, 241, 255, 0.7);
-  border-color: rgba(147, 197, 253, 0.5);
-  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.2);
-}
-
-/* Glass panel for content sections */
-.panel-glass {
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-  transition: all 0.3s ease;
-}
-
-.light .panel-glass {
-  @apply glass-light;
-}
-
-.dark .panel-glass {
-  @apply glass-dark;
-}
-
-.pastel .panel-glass {
-  @apply glass-pastel;
+.pastel .bg-panel {
+  @apply bg-blue-50/70 backdrop-blur-sm border border-blue-100;
 }

@@ -91,7 +91,7 @@ export function useMusicRecommendation() {
   }, [music.currentPlaylist]);
   
   // Helper function to ensure value is an array
-  const ensureArray = <T>(value: T | T[] | undefined | null): T[] => {
+  const ensureArray = <T,>(value: T | T[] | undefined | null): T[] => {
     if (Array.isArray(value)) return value;
     if (value === undefined || value === null) return [];
     return [value];
