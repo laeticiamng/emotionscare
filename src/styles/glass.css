@@ -1,43 +1,45 @@
 
 /* Glass morphism effects */
 
-.glass-light {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-}
+@layer components {
+  .glass-light {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  }
 
-.glass-dark {
-  background: rgba(17, 25, 40, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
-}
+  .glass-dark {
+    background: rgba(17, 25, 40, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+  }
 
-.glass-pastel {
-  background: rgba(232, 241, 255, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(198, 219, 255, 0.4);
-  box-shadow: 0 8px 32px rgba(100, 125, 211, 0.15);
-}
+  .glass-pastel {
+    background: rgba(232, 241, 255, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(198, 219, 255, 0.4);
+    box-shadow: 0 8px 32px rgba(100, 125, 211, 0.15);
+  }
 
-.shadow-premium-light {
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 
-              0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
+  .shadow-premium-light {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
 
-.shadow-premium-dark {
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 
-              0 10px 10px -5px rgba(0, 0, 0, 0.2);
-}
+  .shadow-premium-dark {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 
+                0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  }
 
-.shadow-premium-pastel {
-  box-shadow: 0 10px 25px -5px rgba(100, 125, 211, 0.2), 
-              0 10px 10px -5px rgba(100, 125, 211, 0.1);
+  .shadow-premium-pastel {
+    box-shadow: 0 10px 25px -5px rgba(100, 125, 211, 0.2), 
+                0 10px 10px -5px rgba(100, 125, 211, 0.1);
+  }
 }
 
 /* Card glass effects */

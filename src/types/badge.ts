@@ -21,6 +21,7 @@ export interface Badge {
   unlockedAt?: string;
   unlocked_at?: string;
   timestamp?: string;
+  threshold?: number; // Added to fix errors
 }
 
 export interface Challenge {
@@ -35,7 +36,7 @@ export interface Challenge {
   category: string;
   unlocked?: boolean;
   totalSteps?: number;
-  name?: string;
+  name?: string; // Added to fix errors
   completed?: boolean;
   total?: number;
   completions?: number;
@@ -62,5 +63,5 @@ export interface GamificationStats {
   challenges: Challenge[];
   streakDays: number;
   nextLevelPoints: number;
-  progressToNextLevel?: number;
+  progressToNextLevel?: number; // Added to fix errors
 }

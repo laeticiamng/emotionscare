@@ -27,30 +27,32 @@ html, body, #root {
   height: 100%;
 }
 
-/* Premium theme-specific styling */
-.theme-light .premium-card {
-  @apply bg-white shadow-premium-light border border-gray-100;
-}
+@layer components {
+  /* Premium theme-specific styling */
+  .theme-light .premium-card {
+    @apply bg-white shadow-md border border-gray-100;
+  }
 
-.theme-dark .premium-card {
-  @apply glass-dark shadow-premium-dark border-gray-800;
-}
+  .theme-dark .premium-card {
+    @apply glass-dark shadow-lg border-gray-800;
+  }
 
-.theme-pastel .premium-card {
-  @apply glass-pastel shadow-premium-pastel border border-blue-100;
-}
+  .theme-pastel .premium-card {
+    @apply glass-pastel shadow-md border border-blue-100;
+  }
 
-/* Button enhancements */
-.theme-light .button-premium {
-  @apply shadow-sm hover:shadow-md transition-all duration-300;
-}
+  /* Button enhancements */
+  .theme-light .button-premium {
+    @apply shadow-sm hover:shadow-md transition-all duration-300;
+  }
 
-.theme-dark .button-premium {
-  @apply shadow-none hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] transition-all duration-300;
-}
+  .theme-dark .button-premium {
+    @apply shadow-none hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] transition-all duration-300;
+  }
 
-.theme-pastel .button-premium {
-  @apply shadow-sm hover:shadow-md transition-all duration-300;
+  .theme-pastel .button-premium {
+    @apply shadow-sm hover:shadow-md transition-all duration-300;
+  }
 }
 
 /* Loading animations */

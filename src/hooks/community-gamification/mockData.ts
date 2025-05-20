@@ -43,6 +43,9 @@ export const mockCommunityBadges: Badge[] = [
   }
 ];
 
+// Export aliases to fix import errors
+export const mockBadges = mockCommunityBadges;
+
 // Mock data for community challenges
 export const mockCommunityChallenges: Challenge[] = [
   {
@@ -82,6 +85,9 @@ export const mockCommunityChallenges: Challenge[] = [
     difficulty: "hard"
   }
 ];
+
+// Export aliases to fix import errors
+export const mockChallenges = mockCommunityChallenges;
 
 // Mock data for community leaderboard
 export const mockCommunityLeaderboard: LeaderboardEntry[] = [
@@ -136,3 +142,6 @@ export const mockCommunityLeaderboard: LeaderboardEntry[] = [
     score: 520
   }
 ];
+
+// Export aliases to fix import errors
+export const mockLeaderboard = mockCommunityLeaderboard;
