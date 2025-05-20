@@ -1,73 +1,131 @@
 
-import { useCallback } from 'react';
-import { useMusic } from './useMusic';
-import { EmotionMusicParams } from '@/types/music';
+import { useCallback, useState } from 'react';
+import { useMusic } from '@/hooks';
+import { useToast } from '@/hooks/use-toast';
+import { MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
 
-export const useMusicEmotionIntegration = () => {
-  const music = useMusic();
+export interface MusicEmotionIntegrationOptions {
+  enableAutoplay?: boolean;
+  showNotifications?: boolean;
+}
+
+/**
+ * Hook for integrating emotion detection with music recommendations
+ */
+export function useMusicEmotionIntegration(options: MusicEmotionIntegrationOptions = {}) {
+  const { enableAutoplay = true, showNotifications = true } = options;
   
-  // Map emotions to musical styles
-  const emotionToMusicType = {
-    calm: 'ambient',
-    happy: 'upbeat',
-    focused: 'concentration',
-    energetic: 'energetic',
-    sad: 'melancholic',
-    stressed: 'relaxing',
-    anxious: 'calming',
-    neutral: 'balanced'
-  };
-  
-  const getEmotionMusicDescription = useCallback((emotion: string) => {
-    const descriptions = {
-      calm: "Musique apaisante pour la relaxation",
-      happy: "Sons joyeux pour maintenir votre humeur positive",
-      focused: "Rythmes pour améliorer votre concentration",
-      energetic: "Mélodies dynamiques qui vous boostent",
-      sad: "Harmonies douces pour accompagner vos moments de mélancolie",
-      stressed: "Sons relaxants pour réduire votre niveau de stress",
-      anxious: "Compositions apaisantes pour calmer l'anxiété",
-      neutral: "Musique équilibrée pour une ambiance de fond agréable"
+  const { 
+    loadPlaylistForEmotion, 
+    playTrack,
+    currentTrack, 
+    playlist,
+    setOpenDrawer 
+  } = useMusic();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+
+  /**
+   * Activate music based on detected emotion
+   */
+  const activateMusicForEmotion = useCallback(async (
+    params: EmotionMusicParams | string,
+    intensity?: number
+  ) => {
+    setLoading(true);
+    
+    try {
+      // Normalize parameters
+      const normalizedParams: EmotionMusicParams = typeof params === 'string'
+        ? { emotion: params, intensity: intensity || 0.5 }
+        : params;
+      
+      if (!loadPlaylistForEmotion) {
+        console.warn('loadPlaylistForEmotion is not available');
+        setLoading(false);
+        return null;
+      }
+      
+      // Load playlist for the emotion
+      const recommendedPlaylist = await loadPlaylistForEmotion(normalizedParams);
+      
+      // If playlist loaded successfully and has tracks
+      if (recommendedPlaylist && Array.isArray(recommendedPlaylist.tracks) && recommendedPlaylist.tracks.length > 0) {
+        // Play the first track if autoplay is enabled
+        if (enableAutoplay && playTrack) {
+          playTrack(recommendedPlaylist.tracks[0]);
+          
+          // Open the music drawer if available
+          if (setOpenDrawer) {
+            setOpenDrawer(true);
+          }
+          
+          // Show notification toast
+          if (showNotifications) {
+            toast({
+              title: 'Musique activée',
+              description: `Lecture d'une playlist adaptée à l'émotion: ${normalizedParams.emotion}`,
+              variant: 'default',
+            });
+          }
+        }
+        
+        setLoading(false);
+        return recommendedPlaylist;
+      } else {
+        if (showNotifications) {
+          toast({
+            title: 'Aucune musique disponible',
+            description: `Aucune piste disponible pour l'émotion: ${normalizedParams.emotion}`,
+            variant: 'warning',
+          });
+        }
+        
+        setLoading(false);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error playing emotion music:', error);
+      if (showNotifications) {
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de jouer la musique',
+          variant: 'destructive',
+        });
+      }
+      
+      setLoading(false);
+      return null;
+    }
+  }, [loadPlaylistForEmotion, playTrack, setOpenDrawer, toast, enableAutoplay, showNotifications]);
+
+  /**
+   * Get description of emotion music
+   */
+  const getEmotionMusicDescription = useCallback((emotion: string): string => {
+    const descriptions: Record<string, string> = {
+      joy: "Musique enjouée et rythmée pour amplifier votre bonheur",
+      happy: "Mélodies positives pour vous maintenir dans cet état de joie",
+      calm: "Sons apaisants pour maintenir votre tranquillité",
+      relaxed: "Ambiances douces pour prolonger votre relaxation",
+      sad: "Compositions émotionnelles pour vous aider à exprimer vos émotions",
+      angry: "Musique apaisante pour transformer votre colère en sérénité",
+      anxious: "Sons relaxants pour diminuer votre anxiété",
+      focused: "Rythmes soutenus pour maintenir votre concentration",
+      energetic: "Mélodies dynamisantes pour entretenir votre énergie"
     };
     
-    return descriptions[emotion as keyof typeof descriptions] || "Musique adaptée à votre humeur";
+    return descriptions[emotion.toLowerCase()] || 
+      `Musique adaptée à votre état émotionnel: ${emotion}`;
   }, []);
-  
-  const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams) => {
-    try {
-      if (!music || !music.loadPlaylistForEmotion) {
-        console.error("Music service or loadPlaylistForEmotion not available");
-        return false;
-      }
-      
-      // Map the emotion to a music type if needed
-      if (typeof params === 'string') {
-        const musicType = emotionToMusicType[params as keyof typeof emotionToMusicType] || 'balanced';
-        params = { emotion: musicType };
-      } else if (typeof params.emotion === 'string' && emotionToMusicType[params.emotion as keyof typeof emotionToMusicType]) {
-        params.emotion = emotionToMusicType[params.emotion as keyof typeof emotionToMusicType];
-      }
-      
-      // Load the playlist
-      const playlist = await music.loadPlaylistForEmotion(params);
-      
-      // If playlist loaded successfully and has tracks, play the first one
-      if (playlist && playlist.tracks && playlist.tracks.length > 0 && music.playTrack) {
-        await music.playTrack(playlist.tracks[0]);
-        return true;
-      }
-      
-      console.warn("No tracks available for the emotion:", params);
-      return false;
-    } catch (error) {
-      console.error("Error activating music for emotion:", error);
-      return false;
-    }
-  }, [music, emotionToMusicType]);
-  
+
   return {
     activateMusicForEmotion,
     getEmotionMusicDescription,
-    emotionToMusicType
+    currentPlaylist: playlist,
+    currentTrack,
+    isLoading: loading
   };
-};
+}
+
+export default useMusicEmotionIntegration;

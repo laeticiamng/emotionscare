@@ -1,53 +1,80 @@
 
-import { MusicTrack, AudioTrack } from '@/types/music';
+/**
+ * Utility functions for music track compatibility and display
+ * across different music service formats
+ */
 
-// Helper functions to extract track information with compatibility across different track formats
-export const getTrackTitle = (track: MusicTrack | AudioTrack): string => {
-  return track.title || (track as any).name || 'Unknown Track';
+import { MusicTrack, MusicPlaylist } from '@/types/music';
+
+/**
+ * Get the cover image URL for a track
+ */
+export const getTrackCover = (track: MusicTrack | null | undefined): string => {
+  if (!track) return '';
+  return track.coverUrl || track.artworkUrl || track.cover || '/images/default-cover.jpg';
 };
 
-export const getTrackArtist = (track: MusicTrack | AudioTrack): string => {
-  return track.artist || (track as any).creator || 'Unknown Artist';
+/**
+ * Get the title of a track
+ */
+export const getTrackTitle = (track: MusicTrack | null | undefined): string => {
+  if (!track) return '';
+  return track.title || track.name || 'Unknown Track';
 };
 
-export const getTrackCover = (track: MusicTrack | AudioTrack): string => {
-  return track.coverUrl || track.imageUrl || (track as any).cover || '/images/default-album-cover.jpg';
+/**
+ * Get the artist of a track
+ */
+export const getTrackArtist = (track: MusicTrack | null | undefined): string => {
+  if (!track) return '';
+  return track.artist || track.artistName || 'Unknown Artist';
 };
 
-export const getTrackUrl = (track: MusicTrack | AudioTrack): string => {
-  return track.url || track.audioUrl || '';
+/**
+ * Get the URL of a track
+ */
+export const getTrackUrl = (track: MusicTrack | null | undefined): string => {
+  if (!track) return '';
+  return track.url || track.audioUrl || track.streamUrl || '';
 };
 
+/**
+ * Normalize a track to ensure consistent properties
+ */
+export const normalizeTrack = (track: any): MusicTrack => {
+  return {
+    id: track.id || `track-${Date.now()}`,
+    title: track.title || track.name || 'Unknown Track',
+    artist: track.artist || track.artistName || 'Unknown Artist',
+    url: track.url || track.audioUrl || track.streamUrl || '',
+    coverUrl: track.coverUrl || track.artworkUrl || track.cover || '/images/default-cover.jpg',
+    duration: track.duration || 0,
+    mood: track.mood || track.emotion || '',
+    tags: Array.isArray(track.tags) ? track.tags : [],
+  };
+};
+
+/**
+ * Find tracks by mood/emotion
+ */
 export const findTracksByMood = (tracks: MusicTrack[], mood: string): MusicTrack[] => {
-  if (!tracks || !Array.isArray(tracks)) return [];
+  const normalizedMood = mood.toLowerCase();
   
   return tracks.filter(track => {
-    // Check various properties that might contain mood information
-    const trackMood = track.mood?.toLowerCase() || '';
-    const trackGenre = track.genre?.toLowerCase() || '';
-    const trackTags = Array.isArray(track.tags) ? track.tags.map(tag => tag.toLowerCase()) : [];
-    const trackMetadata = track.metadata || {};
+    const trackMood = (track.mood || '').toLowerCase();
+    const trackTags = (track.tags || []).map(tag => tag.toLowerCase());
     
-    const moodLower = mood.toLowerCase();
-    
-    return trackMood.includes(moodLower) ||
-           trackGenre.includes(moodLower) ||
-           trackTags.some(tag => tag.includes(moodLower)) ||
-           (trackMetadata.mood && trackMetadata.mood.toLowerCase().includes(moodLower));
+    return trackMood.includes(normalizedMood) || 
+           trackTags.some(tag => tag.includes(normalizedMood));
   });
 };
 
-export const ensureArray = <T,>(value: T | T[] | undefined | null): T[] => {
-  if (Array.isArray(value)) return value;
-  if (value === undefined || value === null) return [];
-  return [value];
-};
-
-export default {
-  getTrackTitle,
-  getTrackArtist,
-  getTrackCover,
-  getTrackUrl,
-  findTracksByMood,
-  ensureArray
+/**
+ * Ensure a value is an array
+ */
+export const ensureArray = <T>(value: T | T[]): T[] => {
+  if (Array.isArray(value)) {
+    return value;
+  }
+  return value ? [value] : [];
 };

@@ -1,113 +1,65 @@
 
-import { useState, useCallback } from 'react';
-import { useMusic } from '@/hooks/useMusic';
-import { MusicTrack, EmotionMusicParams } from '@/types/music';
-import { findTracksByMood } from '@/utils/musicCompatibility';
+import { useState, useEffect } from 'react';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
+import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { ensureArray } from '@/utils/musicCompatibility';
 
-// Mapping of emotions to music types
-export const EMOTION_TO_MUSIC: Record<string, string> = {
-  joy: 'upbeat',
-  happy: 'upbeat',
-  calm: 'ambient',
-  relaxed: 'ambient',
-  anxious: 'calming',
-  stressed: 'calming',
-  sad: 'gentle',
-  melancholic: 'gentle',
-  energetic: 'dance',
-  excited: 'dance',
-  neutral: 'focus',
-};
+interface UseMusicRecommendationOptions {
+  autoActivate?: boolean;
+  defaultEmotion?: string;
+  intensity?: number;
+}
 
-export function useMusicRecommendation() {
-  const [recommendedTracks, setRecommendedTracks] = useState<MusicTrack[]>([]);
+export const useMusicRecommendation = (options: UseMusicRecommendationOptions = {}) => {
+  const { autoActivate = false, defaultEmotion, intensity = 0.5 } = options;
+  const [currentEmotion, setCurrentEmotion] = useState<string | null>(defaultEmotion || null);
+  const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const music = useMusic();
-  
-  const loadRecommendations = useCallback(async (emotion: string) => {
+  const { activateMusicForEmotion } = useMusicEmotionIntegration();
+
+  // Auto-activate music if emotion is set and autoActivate is true
+  useEffect(() => {
+    if (autoActivate && currentEmotion) {
+      loadMusicForEmotion(currentEmotion);
+    }
+  }, [currentEmotion, autoActivate]);
+
+  // Load music for emotion
+  const loadMusicForEmotion = async (emotion: string) => {
+    if (!emotion) return null;
+    
     setIsLoading(true);
     try {
-      const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
       const params: EmotionMusicParams = {
-        emotion: musicType
+        emotion,
+        intensity
       };
       
-      if (music.loadPlaylistForEmotion) {
-        const result = await music.loadPlaylistForEmotion(params);
-        
-        if (result && result.tracks && result.tracks.length > 0) {
-          // Set recommended tracks from the playlist
-          setRecommendedTracks(result.tracks);
-        } else {
-          // If no tracks found, create empty array
-          setRecommendedTracks([]);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading music recommendations:', error);
-      setRecommendedTracks([]);
+      const result = await activateMusicForEmotion(params);
+      setPlaylist(result);
+      return result;
     } finally {
       setIsLoading(false);
     }
-  }, [music]);
-  
-  const playRecommendedTrack = useCallback((track: MusicTrack) => {
-    if (track && music.playTrack) {
-      music.playTrack(track);
-    }
-  }, [music]);
-  
-  const playFirstRecommendation = useCallback(() => {
-    if (recommendedTracks.length > 0) {
-      playRecommendedTrack(recommendedTracks[0]);
-      return true;
-    }
-    return false;
-  }, [recommendedTracks, playRecommendedTrack]);
-  
-  const handlePlayMusic = useCallback(async (emotion: string) => {
-    const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-    const params: EmotionMusicParams = {
-      emotion: musicType
-    };
-    
-    if (music.loadPlaylistForEmotion) {
-      const playlist = await music.loadPlaylistForEmotion(params);
-      
-      if (playlist && playlist.tracks.length > 0 && music.playTrack) {
-        music.playTrack(playlist.tracks[0]);
-        return true;
-      }
-    }
-    return false;
-  }, [music]);
-  
-  // Find tracks by mood function
-  const findTracksByMoodWrapper = useCallback((mood: string) => {
-    if (music.currentPlaylist && music.currentPlaylist.tracks) {
-      return findTracksByMood(music.currentPlaylist.tracks, mood);
-    }
-    return [] as MusicTrack[];
-  }, [music.currentPlaylist]);
-  
-  // Helper function to ensure value is an array
-  const ensureArray = <T,>(value: T | T[] | undefined | null): T[] => {
-    if (Array.isArray(value)) return value;
-    if (value === undefined || value === null) return [];
-    return [value];
   };
-  
+
+  // Update emotion and optionally activate music
+  const updateEmotion = async (emotion: string, activate = false) => {
+    setCurrentEmotion(emotion);
+    if (activate) {
+      return loadMusicForEmotion(emotion);
+    }
+    return null;
+  };
+
   return {
-    recommendedTracks,
+    currentEmotion,
+    playlist,
     isLoading,
-    playRecommendedTrack,
-    playFirstRecommendation,
-    handlePlayMusic,
-    loadRecommendations,
-    findTracksByMood: findTracksByMoodWrapper,
-    ensureArray,
-    EMOTION_TO_MUSIC
+    updateEmotion,
+    loadMusicForEmotion,
+    tracks: playlist ? ensureArray(playlist.tracks) : [],
   };
-}
+};
 
 export default useMusicRecommendation;

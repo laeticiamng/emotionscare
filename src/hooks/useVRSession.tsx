@@ -1,85 +1,159 @@
 
 import { useState, useEffect } from 'react';
-import { VRSessionTemplate, VRSession } from '@/types/vr';
+import { VRSession, VRSessionTemplate } from '@/types/vr';
 
-export const useVRSession = (userId: string) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTemplates, setActiveTemplates] = useState<VRSessionTemplate[]>([]);
-  
-  // Mock data for VR sessions
-  const mockTemplates: VRSessionTemplate[] = [
-    {
-      id: 'template-1',
-      title: 'Méditation matinale',
-      description: 'Commencez votre journée avec une méditation guidée pour un esprit clair',
-      duration: 15,
-      thumbnailUrl: '/images/meditation-morning.jpg',
-      environmentId: 'env-1',
-      category: 'méditation',
-      intensity: 1,
-      difficulty: 'beginner', // Corrigé
-      immersionLevel: 'Medium',
-      goalType: 'Focus',
-      interactive: false,
-      tags: ['morning', 'calm', 'focus']
-    },
-    {
-      id: 'template-2',
-      title: 'Relaxation profonde',
-      description: 'Une session immersive pour libérer le stress et retrouver l\'équilibre',
-      duration: 25,
-      thumbnailUrl: '/images/deep-relaxation.jpg',
-      environmentId: 'env-2',
-      category: 'relaxation',
-      intensity: 2,
-      difficulty: 'intermediate', // Corrigé
-      immersionLevel: 'Deep',
-      goalType: 'Relaxation',
-      interactive: false,
-      tags: ['stress-relief', 'evening', 'sleep']
-    }
-  ];
+// Mock templates
+const defaultTemplates: VRSessionTemplate[] = [
+  {
+    id: 'vr-template-1',
+    name: 'Relaxation forestière',
+    title: 'Relaxation forestière',
+    description: 'Une immersion dans une forêt paisible pour la relaxation profonde',
+    duration: 600,
+    thumbnailUrl: '/images/vr/forest.jpg',
+    environmentId: 'env-forest',
+    category: 'relaxation',
+    intensity: 3,
+    difficulty: 'easy',
+    immersionLevel: 'deep',
+    goalType: 'relaxation',
+    interactive: false,
+    tags: ['nature', 'calm', 'forest', 'relaxation']
+  },
+  {
+    id: 'vr-template-2',
+    name: 'Méditation plage',
+    title: 'Méditation plage',
+    description: 'Méditation guidée sur une plage au coucher du soleil',
+    duration: 900,
+    thumbnailUrl: '/images/vr/beach.jpg',
+    environmentId: 'env-beach',
+    category: 'meditation',
+    intensity: 2,
+    difficulty: 'easy',
+    immersionLevel: 'medium',
+    goalType: 'meditation',
+    interactive: false,
+    tags: ['beach', 'sunset', 'meditation', 'ocean']
+  }
+];
 
+/**
+ * Hook for managing VR sessions
+ */
+export function useVRSession() {
+  const [sessions, setSessions] = useState<VRSession[]>([]);
+  const [templates, setTemplates] = useState<VRSessionTemplate[]>(defaultTemplates);
+  const [activeSession, setActiveSession] = useState<VRSession | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  // Load user sessions
   useEffect(() => {
-    // Simuler un chargement
-    const timer = setTimeout(() => {
-      setActiveTemplates(mockTemplates);
-      setIsLoading(false);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
+    // Here you would normally fetch from API
+    // This is just a mock implementation
+    const mockSessions: VRSession[] = [
+      {
+        id: 'session-1',
+        templateId: 'vr-template-1',
+        userId: 'user-1',
+        startTime: new Date().toISOString(),
+        startedAt: new Date().toISOString(),
+        duration: 600,
+        completed: true,
+        progress: 100,
+        feedback: {
+          id: 'feedback-1',
+          sessionId: 'session-1',
+          userId: 'user-1',
+          timestamp: new Date().toISOString(),
+          rating: 4,
+          emotionBefore: 'stressed',
+          emotionAfter: 'calm',
+          comment: 'Très relaxant'
+        }
+      }
+    ];
+
+    setSessions(mockSessions);
   }, []);
 
-  const startSession = (templateId: string): Promise<VRSession> => {
-    return new Promise((resolve) => {
-      // Simuler une interaction avec l'API
-      setTimeout(() => {
-        const session: VRSession = {
-          id: `session-${Date.now()}`,
-          templateId,
-          userId,
-          progress: 0,
-          completed: false,
-          duration: 0,
-          startTime: new Date().toISOString()
-        };
-        
-        resolve(session);
-      }, 500);
-    });
+  // Start a new VR session
+  const startSession = async (templateId: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const template = templates.find(t => t.id === templateId);
+      
+      if (!template) {
+        throw new Error('Template not found');
+      }
+      
+      const newSession: VRSession = {
+        id: `session-${Date.now()}`,
+        templateId,
+        userId: 'user-1',  // In a real app, get from auth context
+        startTime: new Date().toISOString(),
+        startedAt: new Date().toISOString(),
+        duration: template.duration,
+        completed: false,
+        progress: 0
+      };
+      
+      // In a real app, you'd save to API here
+      setSessions(prev => [...prev, newSession]);
+      setActiveSession(newSession);
+      return newSession;
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Failed to start session');
+      setError(error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const completeSession = (sessionId: string) => {
-    // Logique de finalisation de session
-    console.log(`Session ${sessionId} completed`);
+  // End an active VR session
+  const endSession = async (sessionId: string, feedback?: {
+    rating: number;
+    emotionBefore: string;
+    emotionAfter: string;
+    comment: string;
+  }) => {
+    if (!activeSession || activeSession.id !== sessionId) {
+      throw new Error('No active session found');
+    }
+    
+    const updatedSession: VRSession = {
+      ...activeSession,
+      endedAt: new Date().toISOString(),
+      completed: true,
+      progress: 100,
+      feedback: {
+        id: `feedback-${Date.now()}`,
+        sessionId: sessionId,
+        userId: activeSession.userId,
+        timestamp: new Date().toISOString(),
+        ...feedback
+      } as any // Type casting to avoid feedback property type issues
+    };
+    
+    // In a real app, you'd update via API
+    setSessions(prev => prev.map(s => s.id === sessionId ? updatedSession : s));
+    setActiveSession(null);
+    return updatedSession;
   };
 
   return {
+    sessions,
+    templates,
+    activeSession,
     isLoading,
-    templates: activeTemplates,
+    error,
     startSession,
-    completeSession
+    endSession
   };
-};
+}
 
 export default useVRSession;
