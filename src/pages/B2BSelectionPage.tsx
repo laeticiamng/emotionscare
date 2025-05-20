@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, Shield, ArrowLeft, ArrowRight } from 'lucide-react';
@@ -12,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 const B2BSelectionPage = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const { setUserMode } = useUserMode();
   const { toast } = useToast();
   
   // Redirect authenticated users directly to their dashboard
@@ -42,7 +44,7 @@ const B2BSelectionPage = () => {
       navigator.vibrate(50);
     }
     
-    localStorage.setItem('userMode', 'b2b_user');
+    setUserMode('b2b_user');
     toast({
       title: "Espace collaborateur",
       description: "Redirection vers la connexion collaborateur",
@@ -57,7 +59,7 @@ const B2BSelectionPage = () => {
       navigator.vibrate(50);
     }
     
-    localStorage.setItem('userMode', 'b2b_admin');
+    setUserMode('b2b_admin');
     toast({
       title: "Espace administration",
       description: "Redirection vers la connexion administrateur",
