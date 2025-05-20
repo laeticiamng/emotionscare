@@ -1,177 +1,168 @@
 
-import React, { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useOnboarding } from '@/contexts/OnboardingContext';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
+import { DEFAULT_ONBOARDING_STEPS } from '@/data/onboardingSteps';
+import { OnboardingStep } from '@/types/onboarding';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, ChevronLeft, ChevronRight, X } from 'lucide-react';
-import OnboardingQuizStep from './OnboardingQuizStep';
-import OnboardingFormStep from './OnboardingFormStep';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 
 interface OnboardingModalProps {
-  onClose?: () => void;
-  showSkip?: boolean;
+  onClose: () => void;
 }
 
-const OnboardingModal: React.FC<OnboardingModalProps> = ({
-  onClose,
-  showSkip = true
-}) => {
-  const {
-    steps,
-    currentStepIndex,
-    currentStep,
-    isComplete,
-    nextStep,
-    previousStep,
-    goToStep,
-    completeOnboarding,
-    userResponses
-  } = useOnboarding();
-  
-  const [isAnimating, setIsAnimating] = useState(false);
+const OnboardingModal: React.FC<OnboardingModalProps> = ({ onClose }) => {
+  const { userMode } = useUserMode();
+  const [steps, setSteps] = useState<OnboardingStep[]>(DEFAULT_ONBOARDING_STEPS);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [responses, setResponses] = useState<Record<string, any>>({});
+  const currentStep = steps[currentStepIndex];
   const progress = ((currentStepIndex + 1) / steps.length) * 100;
-  
-  useEffect(() => {
-    // Suivre l'avancement pour les analytics
-    console.log(`Viewing step ${currentStepIndex + 1}/${steps.length}: ${currentStep?.title}`);
-  }, [currentStepIndex, steps.length, currentStep]);
-  
-  if (!currentStep) return null;
-  
+
+  const handleNext = () => {
+    if (currentStepIndex < steps.length - 1) {
+      setCurrentStepIndex(prev => prev + 1);
+    } else {
+      onClose();
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentStepIndex > 0) {
+      setCurrentStepIndex(prev => prev - 1);
+    }
+  };
+
+  const handleQuizAnswer = (stepId: string, selectedAnswerId: string) => {
+    setResponses(prev => ({
+      ...prev,
+      [stepId]: selectedAnswerId
+    }));
+  };
+
+  const isQuizAnswerCorrect = (stepId: string, answerId: string | null) => {
+    if (!currentStep.quiz) return false;
+    
+    const selectedOption = currentStep.quiz.options.find(opt => opt.id === answerId);
+    return selectedOption?.isCorrect || false;
+  };
+
   return (
-    <AnimatePresence mode="wait">
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <motion.div
-          key={`onboarding-step-${currentStepIndex}`}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ type: "spring", damping: 20 }}
-          className="w-full max-w-2xl"
-          onAnimationStart={() => setIsAnimating(true)}
-          onAnimationComplete={() => setIsAnimating(false)}
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="bg-white dark:bg-slate-900 rounded-lg shadow-xl w-full max-w-md relative overflow-hidden"
+      >
+        {/* Progress bar */}
+        <div 
+          className="h-1 bg-primary transition-all duration-300 ease-in-out"
+          style={{ width: `${progress}%` }}
+        />
+        
+        {/* Close button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="absolute right-2 top-2 rounded-full"
         >
-          <Card className="overflow-hidden shadow-xl border-primary/20">
-            {/* Header with progress bar */}
-            <CardHeader className="pb-2 relative">
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-2xl">{currentStep.title}</CardTitle>
-                {onClose && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onClose}
-                    className="absolute top-2 right-2"
-                    aria-label="Fermer la formation"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-              <CardDescription>{currentStep.description}</CardDescription>
-              <Progress value={progress} className="mt-2 h-1" aria-label={`Progression: ${Math.round(progress)}%`} />
-              <div className="text-xs text-muted-foreground mt-1">
-                Étape {currentStepIndex + 1} sur {steps.length}
-              </div>
-            </CardHeader>
-
-            {/* Content based on step type */}
-            <CardContent className="pt-4 pb-6 min-h-[200px]">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Fermer</span>
+        </Button>
+        
+        <div className="p-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep.id}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <h2 className="text-xl font-bold mb-2">{currentStep.title}</h2>
+              <p className="text-muted-foreground mb-6">{currentStep.description}</p>
+              
+              {/* Step content based on type */}
+              {currentStep.type === 'info' && currentStep.content && (
+                <div className="mb-6 p-4 bg-muted rounded-md">
+                  {currentStep.content}
+                </div>
+              )}
+              
               {currentStep.type === 'quiz' && currentStep.quiz && (
-                <OnboardingQuizStep 
-                  question={currentStep.quiz.question}
-                  options={currentStep.quiz.options}
-                  stepId={currentStep.id}
-                />
-              )}
-              
-              {currentStep.type === 'form' && currentStep.form && (
-                <OnboardingFormStep
-                  fields={currentStep.form.fields}
-                  stepId={currentStep.id}
-                />
-              )}
-              
-              {(currentStep.type === 'info' || currentStep.type === 'welcome') && (
-                <div className="prose dark:prose-invert max-w-none">
-                  {currentStep.content || currentStep.description}
+                <div className="mb-6 space-y-3">
+                  <p className="font-medium">{currentStep.quiz.question}</p>
+                  
+                  <div className="space-y-2">
+                    {currentStep.quiz.options.map(option => {
+                      const isSelected = responses[currentStep.id] === option.id;
+                      const isCorrect = option.isCorrect;
+                      
+                      // Only show correctness if an answer is selected
+                      const showCorrectness = responses[currentStep.id] !== undefined;
+                      
+                      return (
+                        <button
+                          key={option.id}
+                          className={`w-full text-left p-3 rounded-md border transition-all ${
+                            isSelected
+                              ? isCorrect
+                                ? "border-green-500 bg-green-100 dark:bg-green-900/20"
+                                : "border-red-500 bg-red-100 dark:bg-red-900/20"
+                              : "border-muted hover:border-primary"
+                          }`}
+                          onClick={() => handleQuizAnswer(currentStep.id, option.id)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span>{option.text}</span>
+                            
+                            {showCorrectness && isSelected && (
+                              <span className={isCorrect ? "text-green-600" : "text-red-600"}>
+                                {isCorrect ? "✓" : "✗"}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
               
-              {currentStep.type === 'completion' && (
-                <div className="text-center p-4">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
-                    transition={{ delay: 0.3, type: "spring", damping: 10 }}
-                    className="inline-block mb-4"
-                  >
-                    <CheckCircle size={60} className="text-green-500 mx-auto" />
-                  </motion.div>
-                  <p className="text-lg mt-4">Vous avez terminé votre formation !</p>
-                </div>
-              )}
-            </CardContent>
-
-            {/* Navigation buttons */}
-            <CardFooter className="flex justify-between pt-2 border-t">
-              <div>
-                {currentStepIndex > 0 && (
-                  <Button
-                    variant="ghost"
-                    onClick={previousStep}
-                    disabled={isAnimating}
-                    className="flex items-center gap-1"
-                    aria-label="Précédent"
-                  >
-                    <ChevronLeft size={16} /> Précédent
-                  </Button>
-                )}
-              </div>
-              
-              <div className="flex gap-2">
-                {showSkip && !currentStep.isRequired && currentStepIndex < steps.length - 1 && (
-                  <Button
-                    variant="outline"
-                    onClick={nextStep}
-                    disabled={isAnimating}
-                    aria-label="Passer cette étape"
-                  >
-                    Passer
-                  </Button>
-                )}
+              {/* Step actions */}
+              <div className="flex justify-between mt-6">
+                <Button
+                  variant="ghost"
+                  onClick={handlePrevious}
+                  disabled={currentStepIndex === 0}
+                >
+                  Précédent
+                </Button>
                 
-                {currentStepIndex < steps.length - 1 ? (
-                  <Button
-                    onClick={nextStep}
-                    disabled={
-                      isAnimating || 
-                      (currentStep.type === 'quiz' && currentStep.quiz && 
-                        !userResponses[currentStep.id])
-                    }
-                    className="flex items-center gap-1"
-                    aria-label="Suivant"
-                  >
-                    Suivant <ChevronRight size={16} />
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={completeOnboarding}
-                    disabled={isAnimating}
-                    className="bg-green-600 hover:bg-green-700"
-                    aria-label="Terminer"
-                  >
-                    Terminer
-                  </Button>
-                )}
+                <div className="text-sm text-muted-foreground">
+                  {currentStepIndex + 1} / {steps.length}
+                </div>
+                
+                <Button 
+                  onClick={handleNext}
+                  disabled={
+                    // Disable next button if quiz answer is required but not correct
+                    currentStep.type === 'quiz' && 
+                    currentStep.isRequired &&
+                    (!responses[currentStep.id] || !isQuizAnswerCorrect(currentStep.id, responses[currentStep.id]))
+                  }
+                >
+                  {currentStepIndex === steps.length - 1 ? 'Terminer' : 'Suivant'}
+                </Button>
               </div>
-            </CardFooter>
-          </Card>
-        </motion.div>
-      </div>
-    </AnimatePresence>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 

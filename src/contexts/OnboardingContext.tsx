@@ -1,8 +1,9 @@
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { OnboardingStep } from '@/types/onboarding';
-import { defaultOnboardingSteps } from '@/data/onboardingSteps';
+import { DEFAULT_ONBOARDING_STEPS, b2bAdminOnboardingSteps, b2bUserOnboardingSteps } from '@/data/onboardingSteps';
 import { useToast } from '@/hooks/use-toast';
+import { UserRole } from '@/types/user';
 
 interface OnboardingContextType {
   steps: OnboardingStep[];
@@ -25,30 +26,47 @@ interface OnboardingProviderProps {
   steps?: OnboardingStep[];
   initialStep?: number;
   onComplete?: () => void;
+  userRole?: UserRole;
 }
 
 export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
   children,
-  steps = defaultOnboardingSteps,
+  steps,
   initialStep = 0,
-  onComplete
+  onComplete,
+  userRole = 'b2c'
 }) => {
+  // Determine steps based on user role if not explicitly provided
+  const getOnboardingSteps = (): OnboardingStep[] => {
+    if (steps) return steps;
+    
+    switch (userRole) {
+      case 'b2b_admin':
+        return b2bAdminOnboardingSteps;
+      case 'b2b_user':
+        return b2bUserOnboardingSteps;
+      default:
+        return DEFAULT_ONBOARDING_STEPS;
+    }
+  };
+
+  const [onboardingSteps] = useState<OnboardingStep[]>(getOnboardingSteps());
   const [currentStepIndex, setCurrentStepIndex] = useState(initialStep);
   const [isComplete, setIsComplete] = useState(false);
   const [userResponses, setUserResponses] = useState<Record<string, any>>({});
   const { toast } = useToast();
 
-  const currentStep = steps[currentStepIndex] || null;
+  const currentStep = onboardingSteps[currentStepIndex] || null;
 
   const nextStep = () => {
-    if (currentStepIndex < steps.length - 1) {
+    if (currentStepIndex < onboardingSteps.length - 1) {
       setCurrentStepIndex(currentStepIndex + 1);
       
       // Afficher un toast d'encouragement pour certaines étapes
-      if ([1, 3, steps.length - 2].includes(currentStepIndex + 1)) {
+      if ([1, 3, onboardingSteps.length - 2].includes(currentStepIndex + 1)) {
         toast({
           title: "Bonne progression !",
-          description: `Étape ${currentStepIndex + 2}/${steps.length} - Continuez comme ça !`,
+          description: `Étape ${currentStepIndex + 2}/${onboardingSteps.length} - Continuez comme ça !`,
           variant: "success",
         });
       }
@@ -64,7 +82,7 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
   };
 
   const goToStep = (index: number) => {
-    if (index >= 0 && index < steps.length) {
+    if (index >= 0 && index < onboardingSteps.length) {
       setCurrentStepIndex(index);
     }
   };
@@ -121,7 +139,7 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({
   return (
     <OnboardingContext.Provider
       value={{
-        steps,
+        steps: onboardingSteps,
         currentStepIndex,
         isComplete,
         userResponses,

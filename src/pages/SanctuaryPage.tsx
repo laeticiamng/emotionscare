@@ -1,19 +1,43 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+import React, { useState } from 'react';
+import SanctuaryView from '@/components/synthesis/SanctuaryView';
+import SynthesisHeader from '@/components/synthesis/SynthesisHeader';
+import SynthesisOnboarding from '@/components/synthesis/SynthesisOnboarding';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { HelpCircle } from 'lucide-react';
 
 const SanctuaryPage: React.FC = () => {
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
   return (
-    <div className="container mx-auto py-6">
-      <Card className="bg-gradient-to-br from-sky-50 to-indigo-100 dark:from-sky-900/30 dark:to-indigo-900/20">
-        <CardHeader>
-          <CardTitle>Sanctuaire</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Un espace calme pour vous recentrer. Des fonctionnalités avancées seront ajoutées ultérieurement.
-          </p>
-        </CardContent>
-      </Card>
+    <div className="container mx-auto px-4 py-6">
+      <SynthesisHeader />
+      
+      <div className="mb-4 flex justify-end">
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => setShowOnboarding(true)}
+          className="gap-1 rounded-full"
+        >
+          <HelpCircle className="h-4 w-4" />
+          <span>Aide</span>
+        </Button>
+      </div>
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <SanctuaryView />
+      </motion.div>
+      
+      <SynthesisOnboarding 
+        open={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+      />
     </div>
   );
 };
