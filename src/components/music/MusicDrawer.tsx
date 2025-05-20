@@ -33,7 +33,13 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
 
   useEffect(() => {
     if (isDialogOpen) {
-      ai.musicgenV1('mood music');
+      // Only call the music generation when the drawer is open
+      // This is just to demonstrate AI integration
+      try {
+        ai.musicgenV1('mood music');
+      } catch (error) {
+        console.error('Error generating music:', error);
+      }
     }
   }, [ai, isDialogOpen]);
   

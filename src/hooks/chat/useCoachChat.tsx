@@ -1,5 +1,4 @@
 
-// Fix missing parameters in useCoachChat.tsx
 import { useState, useCallback } from 'react';
 import { useCoach } from '@/contexts/coach/CoachContextProvider';
 import { useAI } from '@/hooks/useAI';
@@ -18,6 +17,7 @@ export const useCoachChat = () => {
   const sendMessage = useCallback(async (message: string) => {
     try {
       setIsProcessing(true);
+      // Use our AI client to process the message
       const response = await ai.openaiText(message);
       
       setMessages(prevMessages => {
