@@ -40,6 +40,7 @@ Ce document présente l'analyse complète du parcours B2B d'EmotionsCare, avant 
    - Animations de transition pour les éléments
    - Retour tactile sur mobile (vibration)
    - Toasts de notification pour les actions utilisateur
+   - Redirection automatique si l'utilisateur est déjà connecté
 
 2. **Pages de connexion**
    - Design premium avec effets visuels
@@ -54,6 +55,9 @@ Ce document présente l'analyse complète du parcours B2B d'EmotionsCare, avant 
    - Cards modules avec apparition séquentielle
    - Micro-animations sur les éléments interactifs
    - Palette de couleurs cohérente en modes clair et sombre
+   - Avatar avec badge dynamique selon le rôle
+   - Boutons et liens annotés pour les lecteurs d'écran
+   - Redirection automatique depuis la page de sélection si déjà authentifié
 
 ### Accessibilité
 1. Navigation complète au clavier (focus visibles, tabindex)
