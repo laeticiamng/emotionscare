@@ -81,6 +81,7 @@ export function adaptMusicData(data: any): MusicTrack | null {
     title: data.title || data.name || data.trackName || 'Unknown Track',
     artist: data.artist || data.artistName || data.creator || 'Unknown Artist',
     duration: data.duration || 0,
+    url: data.url || data.audioUrl || data.src || data.track_url || '',
     audioUrl: data.audioUrl || data.url || data.src || data.track_url || '',
   };
   

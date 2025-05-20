@@ -11,6 +11,10 @@ export interface Badge {
   unlocked?: boolean;
   earned?: boolean;
   achieved?: boolean;
+  icon?: string;
+  points?: number;
+  prerequisites?: string[];
+  user_id?: string;
   rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   tier?: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
   progress?: number;
