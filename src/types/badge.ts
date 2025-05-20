@@ -6,11 +6,21 @@ export interface Badge {
   name: string;
   description: string;
   image: string;
+  imageUrl?: string;
+  image_url?: string;
   unlocked?: boolean;
+  earned?: boolean;
+  achieved?: boolean;
   rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   tier?: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
   progress?: number;
   goal?: number;
+  category?: string;
+  date_earned?: string;
+  dateAwarded?: string;
+  unlockedAt?: string;
+  unlocked_at?: string;
+  timestamp?: string;
 }
 
 export interface Challenge {
@@ -26,16 +36,23 @@ export interface Challenge {
   unlocked?: boolean;
   totalSteps?: number;
   name?: string;
+  completed?: boolean;
+  total?: number;
+  completions?: number;
+  difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+  deadline?: string;
 }
 
 export interface LeaderboardEntry {
   id: string;
   userId: string;
   name: string;
+  username?: string;
   points: number;
   rank: number;
   avatar?: string;
   badges?: Badge[];
+  score?: number;
 }
 
 export interface GamificationStats {
@@ -44,6 +61,6 @@ export interface GamificationStats {
   badges: Badge[];
   challenges: Challenge[];
   streakDays: number;
-  progressToNextLevel?: number;
   nextLevelPoints: number;
+  progressToNextLevel?: number;
 }

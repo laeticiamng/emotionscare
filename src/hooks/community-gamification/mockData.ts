@@ -1,123 +1,138 @@
 
 import { Badge, Challenge, LeaderboardEntry } from '@/types/badge';
 
-// Mock challenges data
-export const mockChallenges: Challenge[] = [
+// Mock data for community badges
+export const mockCommunityBadges: Badge[] = [
   {
-    id: "challenge-1",
-    title: "Streak héroïque",
-    description: "Maintenez une utilisation quotidienne pendant 7 jours",
-    points: 150,
-    reward: "Écusson de persévérance",
-    progress: 5,
-    goal: 7,
-    status: "active",
-    category: "engagement",
+    id: "comm-badge-1",
+    name: "Community Builder",
+    description: "Awarded for creating an active community group",
+    image: "/images/badges/community-builder.svg",
+    imageUrl: "/images/badges/community-builder.svg",
+    rarity: "rare",
     unlocked: true,
-    totalSteps: 7,
-    name: "Streak héroïque"
+    earned: true
   },
   {
-    id: "challenge-2",
-    title: "Explorateur émotionnel",
-    description: "Identifiez 5 émotions différentes dans un délai de 3 jours",
-    points: 200,
-    reward: "Badge d'intelligence émotionnelle",
+    id: "comm-badge-2",
+    name: "Conversation Starter",
+    description: "Started 10 engaging discussions",
+    image: "/images/badges/conversation-starter.svg",
+    imageUrl: "/images/badges/conversation-starter.svg",
+    rarity: "uncommon",
+    unlocked: true,
+    earned: true
+  },
+  {
+    id: "comm-badge-3",
+    name: "Support Network",
+    description: "Helped 5 members with their emotional challenges",
+    image: "/images/badges/support-network.svg",
+    imageUrl: "/images/badges/support-network.svg",
+    rarity: "rare",
+    unlocked: false
+  },
+  {
+    id: "comm-badge-4",
+    name: "Wellness Champion",
+    description: "Completed all community wellness challenges",
+    image: "/images/badges/wellness-champion.svg",
+    imageUrl: "/images/badges/wellness-champion.svg",
+    rarity: "legendary",
+    unlocked: false
+  }
+];
+
+// Mock data for community challenges
+export const mockCommunityChallenges: Challenge[] = [
+  {
+    id: "comm-challenge-1",
+    title: "Group Meditation",
+    description: "Participate in a group meditation session",
+    points: 100,
+    reward: "Meditation Master Badge",
     progress: 3,
     goal: 5,
     status: "active",
-    category: "émotion",
-    unlocked: true,
-    totalSteps: 5,
-    name: "Explorateur émotionnel"
+    category: "wellness",
+    difficulty: "easy"
   },
   {
-    id: "challenge-3",
-    title: "Journaliste assidu",
-    description: "Complétez 10 entrées de journal en utilisant des émojis expressifs",
-    points: 300,
-    reward: "Badge de réflexion profonde",
-    progress: 2,
-    goal: 10,
+    id: "comm-challenge-2",
+    title: "Emotional Support Network",
+    description: "Help 3 community members with their emotional challenges",
+    points: 150,
+    reward: "Support Network Badge",
+    progress: 1,
+    goal: 3,
     status: "active",
-    category: "journal",
-    unlocked: true,
-    totalSteps: 10,
-    name: "Journaliste assidu"
+    category: "social",
+    difficulty: "medium"
+  },
+  {
+    id: "comm-challenge-3",
+    title: "Wellness Workshop",
+    description: "Host or attend a community wellness workshop",
+    points: 200,
+    reward: "Workshop Facilitator Badge",
+    progress: 0,
+    goal: 1,
+    status: "locked",
+    category: "education",
+    difficulty: "hard"
   }
 ];
 
-// Mock badges data
-export const mockBadges: Badge[] = [
-  {
-    id: "badge-1",
-    name: "Premier pas",
-    description: "Première connexion à l'application",
-    image: "/images/badges/first-step.png",
-    unlocked: true,
-    rarity: "common",
-    tier: "bronze"
-  },
-  {
-    id: "badge-2",
-    name: "Observateur attentif",
-    description: "Identifiez 3 émotions différentes",
-    image: "/images/badges/observer.png",
-    unlocked: true,
-    rarity: "uncommon",
-    tier: "silver"
-  },
-  {
-    id: "badge-3",
-    name: "Maître zen",
-    description: "Complétez 5 séances de méditation",
-    image: "/images/badges/zen-master.png",
-    unlocked: false,
-    progress: 3,
-    rarity: "rare",
-    tier: "gold"
-  }
-];
-
-// Mock leaderboard data
-export const mockLeaderboard: LeaderboardEntry[] = [
+// Mock data for community leaderboard
+export const mockCommunityLeaderboard: LeaderboardEntry[] = [
   {
     id: "user-1",
     userId: "user-1",
-    name: "Marie L.",
-    points: 1250,
+    name: "Marie Laurent",
+    username: "marie.laurent",
+    points: 850,
     rank: 1,
-    avatar: "/images/avatars/user-1.jpg",
-    badges: mockBadges.slice(0, 2)
+    avatar: "/images/avatars/avatar-1.jpg",
+    score: 850
   },
   {
     id: "user-2",
     userId: "user-2",
-    name: "Thomas R.",
-    points: 980,
+    name: "Thomas Dubois",
+    username: "thomas.dubois",
+    points: 720,
     rank: 2,
-    avatar: "/images/avatars/user-2.jpg",
-    badges: mockBadges.slice(0, 1)
+    avatar: "/images/avatars/avatar-2.jpg",
+    score: 720
   },
   {
     id: "user-3",
     userId: "user-3",
-    name: "Sophie G.",
-    points: 870,
+    name: "Sophie Moreau",
+    username: "sophie.m",
+    points: 685,
     rank: 3,
-    avatar: "/images/avatars/user-3.jpg",
-    badges: mockBadges.slice(1, 2)
+    avatar: "/images/avatars/avatar-3.jpg",
+    score: 685
   },
   {
     id: "user-4",
     userId: "user-4",
-    name: "Vous",
-    points: 750,
+    name: "Jean Petit",
+    username: "jean.petit",
+    points: 590,
     rank: 4,
-    avatar: "/images/avatars/default.jpg",
-    badges: mockBadges.slice(0, 1)
+    avatar: "/images/avatars/avatar-4.jpg",
+    score: 590
+  },
+  {
+    id: "user-5",
+    userId: "user-5",
+    name: "Clara Blanc",
+    username: "clara.b",
+    points: 520,
+    rank: 5,
+    avatar: "/images/avatars/avatar-5.jpg",
+    score: 520
   }
 ];
-
-export const mockCommunityBadges = mockBadges;
-export const mockCommunityChallenges = mockChallenges;

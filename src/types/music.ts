@@ -15,18 +15,22 @@ export interface MusicTrack {
   mood?: string;
   category?: string | string[];
   tags?: string[];
+  intensity?: number;
+  album?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
+  title?: string;
   tracks: MusicTrack[];
   emotion?: string;
   mood?: string;
   description?: string;
   coverUrl?: string;
-  title?: string;
   category?: string | string[];
+  coverImage?: string;
+  creator?: string;
 }
 
 export interface MusicCategory {
@@ -86,6 +90,7 @@ export interface MusicContextType {
   error?: string | null;
   setEmotion?: (emotion: string) => void;
   setCurrentTrack?: (track: MusicTrack) => void;
+  openDrawer?: boolean;
 }
 
 export interface MusicDrawerProps {

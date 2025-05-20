@@ -1,5 +1,5 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
 
 /**
  * Helper function to get track title with fallback
@@ -50,13 +50,14 @@ export const normalizeTrack = (track: any): MusicTrack => {
     ...(track.emotion && { emotion: track.emotion }),
     ...(track.mood && { mood: track.mood }),
     ...(track.category && { category: track.category }),
+    ...(track.intensity && { intensity: track.intensity }),
   };
 };
 
 /**
  * Create music parameters for emotion-based recommendations
  */
-export const createMusicParams = (emotion: string, intensity: number = 0.5) => {
+export const createMusicParams = (emotion: string, intensity: number = 0.5): EmotionMusicParams => {
   return {
     emotion,
     intensity,

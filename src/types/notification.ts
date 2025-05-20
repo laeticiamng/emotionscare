@@ -10,6 +10,13 @@ export interface NotificationTypes {
   invitations: string;
   messages: string;
   updates: string;
+  news: string;
+  alerts: string;
+  emotions: string;
+  insights: string;
+  achievement?: string;
+  reminder?: string;
+  urgent?: string;
 }
 
 export type NotificationType = keyof NotificationTypes | string;
