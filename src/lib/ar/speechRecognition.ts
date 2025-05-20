@@ -1,44 +1,24 @@
 
-// Create polyfill for SpeechRecognition
+// Polyfill utilities for SpeechRecognition
+import type {
+  SpeechRecognitionConstructor,
+  SpeechRecognition,
+  SpeechRecognitionEvent,
+} from '@/types/voice';
 
-interface SpeechRecognitionEvent extends Event {
-  resultIndex: number;
-  results: {
-    [index: number]: {
-      [index: number]: {
-        transcript: string;
-        confidence: number;
-      };
-    };
-    isFinal: boolean;
-    length: number;
-  };
-}
-
-interface SimpleSpeechRecognition extends EventTarget {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  maxAlternatives: number;
-  start: () => void;
-  stop: () => void;
-  abort: () => void;
-  onresult: ((event: SpeechRecognitionEvent) => void) | null;
-  onerror: ((event: Event) => void) | null;
-  onend: ((event: Event) => void) | null;
-  onstart: ((event: Event) => void) | null;
-}
+interface SimpleSpeechRecognition extends SpeechRecognition {}
 
 interface SimpleSpeechRecognitionConstructor {
   new (): SimpleSpeechRecognition;
 }
 
+
 declare global {
   interface Window {
-    SpeechRecognition: SimpleSpeechRecognitionConstructor | undefined;
-    webkitSpeechRecognition: SimpleSpeechRecognitionConstructor | undefined;
-    mozSpeechRecognition: SimpleSpeechRecognitionConstructor | undefined;
-    msSpeechRecognition: SimpleSpeechRecognitionConstructor | undefined;
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+    mozSpeechRecognition?: SpeechRecognitionConstructor;
+    msSpeechRecognition?: SpeechRecognitionConstructor;
   }
 }
 

@@ -46,5 +46,3 @@ export const Analytics = {
     provider.trackEvent(category, action, label);
   },
 };
-
-export type { AnalyticsProvider };

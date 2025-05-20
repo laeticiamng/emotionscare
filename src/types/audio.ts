@@ -2,7 +2,7 @@ export interface AudioTrack {
   id: string;
   title: string;
   artist?: string;
-  url: string;
+  url?: string;
   audioUrl?: string;
   description?: string;
   summary?: string;
@@ -11,6 +11,8 @@ export interface AudioTrack {
   duration: number;
   coverUrl?: string;
   waveform?: number[];
+  tags?: string[];
+  source?: string;
 }
 
 export interface AudioPlaylist {
@@ -20,6 +22,7 @@ export interface AudioPlaylist {
   description?: string;
   tracks: AudioTrack[];
   coverUrl?: string;
+  emotion?: string;
 }
 
 export interface MoodData {

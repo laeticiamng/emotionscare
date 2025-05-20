@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
-import { Notification } from '@/types/notification';
+import { NotificationSettings } from '@/types/notification';
 
 export function useNotifications(userId?: string) {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<NotificationSettings[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -42,7 +42,7 @@ export function useNotifications(userId?: string) {
         ];
 
         // Convert to proper Notification objects
-        const formattedNotifications: Notification[] = mockNotifications.map(n => ({
+        const formattedNotifications: NotificationSettings[] = mockNotifications.map(n => ({
           id: n.id,
           userId: n.user_id,
           title: n.title,
