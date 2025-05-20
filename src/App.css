@@ -1,18 +1,13 @@
 
-/* Import premium styles */
-@import './styles/premium.css';
-@import './styles/glass.css';
-@import './styles/auth-animations.css';
-
 /* Import tailwind directives first */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* utilitaire utilisé dans le code */
-.app-glass-dark {
-  @apply backdrop-blur-lg bg-glass-dark;
-}
+/* Now import other CSS files that might use @layer directives */
+@import './styles/premium.css';
+@import './styles/glass.css';
+@import './styles/auth-animations.css';
 
 /* App-specific styles */
 #root {
@@ -35,6 +30,11 @@
 /* Make app content fill the screen */
 html, body, #root {
   height: 100%;
+}
+
+/* utilitaire utilisé dans le code */
+.app-glass-dark {
+  @apply backdrop-blur-lg bg-glass-dark;
 }
 
 @layer components {

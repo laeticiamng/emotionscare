@@ -1,12 +1,16 @@
 
-@import './styles/premium.css';
-
-/* Importing Inter font for premium typography */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
+/* Import tailwind directives first */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Then import other style files */
+@import './styles/premium.css';
+@import './styles/glass.css';
+@import './styles/animations.css';
+
+/* Importing Inter font for premium typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 @layer base {
   * {
