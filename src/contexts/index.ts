@@ -7,3 +7,5 @@ export { UserModeProvider, useUserMode } from './UserModeContext';
 export { MusicProvider, useMusic } from './MusicContext';
 export { SidebarProvider, useSidebar } from './SidebarContext';
 export { SupportProvider, useSupport } from './SupportContext';
+export { OnboardingProvider, useOnboarding } from './OnboardingContext';
+

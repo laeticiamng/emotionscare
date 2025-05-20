@@ -1,239 +1,265 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsList, TabsContent, TabsTrigger } from '@/components/ui/tabs';
-import { motion } from 'framer-motion';
-import { Badge } from '@/components/ui/badge';
-import { Building, ChevronDown, Users, PieChart, Bell, LayoutDashboard } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import StatsCard from '@/components/dashboard/admin/StatsCard';
-import GlobalOverviewTab from '@/components/dashboard/admin/tabs/overview/GlobalOverviewTab';
-import { useSegment } from '@/contexts/SegmentContext';
-import AccessLogsTable from '@/components/dashboard/admin/AccessLogsTable';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      type: 'spring',
-      stiffness: 100,
-      damping: 15,
-    }
-  }
-};
+import KpiCardsGrid from './KpiCardsGrid';
+import DashboardAnimatedChart from './DashboardAnimatedChart';
+import EmotionalWeatherWidget from '../widgets/EmotionalWeatherWidget';
+import TeamActivitySummary from '../widgets/TeamActivitySummary';
+import NotificationsPanel from './NotificationsPanel';
+import UserActivityChart from '@/components/admin/UserActivityChart';
+import OrganizationStats from '@/components/admin/OrganizationStats';
+import { useUser } from '@/hooks/useUser';
+import { motion } from 'framer-motion';
+import OnboardingButton from '@/components/admin/OnboardingButton';
+import { OnboardingProvider } from '@/contexts/OnboardingContext';
+import { b2bAdminOnboardingSteps } from '@/data/onboardingSteps';
+import { CommandMenu } from '@/components/ui/command-menu';
+import { AnimatePresence } from 'framer-motion';
 
 const EnhancedAdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const { selectedSegment } = useSegment();
-
+  const { user } = useUser();
+  const [isCommandOpen, setIsCommandOpen] = useState(false);
+  
   return (
-    <motion.div 
-      className="pb-10"
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-    >
-      {/* Dashboard Header */}
-      <motion.div variants={itemVariants} className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight mb-1">
-            <span className="inline-flex items-center">
-              <LayoutDashboard className="mr-2 h-8 w-8 text-primary" />
-              Supervision d'équipe
-            </span>
-          </h1>
-          <p className="text-muted-foreground">
-            Accédez aux données anonymisées et synthétisées de l'ensemble du personnel
-          </p>
+    <OnboardingProvider steps={b2bAdminOnboardingSteps}>
+      <div className="container mx-auto py-6 space-y-8">
+        <motion.div 
+          className="flex flex-col space-y-2 md:flex-row md:items-center md:justify-between"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Tableau de bord {user?.name ? `de ${user.name}` : 'Admin'}
+            </h1>
+            <p className="text-muted-foreground">
+              Bienvenue sur votre espace administrateur EmotionsCare
+            </p>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <OnboardingButton />
+            <button 
+              className="text-sm px-3 py-1.5 rounded-full border bg-background hover:bg-accent transition-colors duration-200 flex items-center gap-1.5"
+              onClick={() => setIsCommandOpen(true)}
+            >
+              <span>⌘</span>
+              <span>K</span>
+            </button>
+          </div>
+        </motion.div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`weather-widget`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="col-span-1"
+            >
+              <EmotionalWeatherWidget />
+            </motion.div>
+          </AnimatePresence>
+          
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`org-stats`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="col-span-1 md:col-span-2"
+            >
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle>Organisation</CardTitle>
+                  <CardDescription>
+                    Vue d'ensemble des statistiques d'utilisation
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <OrganizationStats />
+                </CardContent>
+              </Card>
+            </motion.div>
+          </AnimatePresence>
         </div>
         
-        {selectedSegment && (
-          <Badge variant="outline" className="px-4 py-2 text-sm flex items-center">
-            <Building className="h-4 w-4 mr-2" />
-            <span>Filtré par segment: {selectedSegment}</span>
-            <ChevronDown className="ml-2 h-4 w-4" />
-          </Badge>
-        )}
-      </motion.div>
-      
-      {/* Quick Stats Row */}
-      <motion.div 
-        variants={itemVariants}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
-      >
-        <StatsCard 
-          title="Personnel actif" 
-          value="132" 
-          description="Membres connectés cette semaine"
-          trend={{ direction: 'up', value: 12 }}
-          icon={<Users className="h-5 w-5" />}
-        />
-        
-        <StatsCard 
-          title="Bien-être moyen" 
-          value="75%" 
-          description="Sur l'ensemble des équipes"
-          trend={{ direction: 'up', value: 4 }}
-          icon={<PieChart className="h-5 w-5" />}
-        />
-        
-        <StatsCard 
-          title="Équipes" 
-          value="8" 
-          description="Réparties sur 3 sites"
-          trend={{ direction: 'stable', value: 0 }}
-          icon={<Building className="h-5 w-5" />}
-        />
-        
-        <StatsCard 
-          title="Alertes actives" 
-          value="3" 
-          description="Nécessitant attention"
-          trend={{ direction: 'down', value: 2 }}
-          icon={<Bell className="h-5 w-5" />}
-        />
-      </motion.div>
-      
-      {/* Main Content Tabs */}
-      <motion.div variants={itemVariants}>
-        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-4 md:grid-cols-4 lg:grid-cols-5 h-auto">
-            <TabsTrigger value="overview" className="py-2">
-              <LayoutDashboard className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Vue d'ensemble</span>
-            </TabsTrigger>
-            <TabsTrigger value="teams" className="py-2">
-              <Users className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Équipes</span>
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="py-2">
-              <PieChart className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Analytics</span>
-            </TabsTrigger>
-            <TabsTrigger value="alerts" className="py-2">
-              <Bell className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Alertes</span>
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="py-2 hidden lg:flex">
-              <Bell className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Paramètres</span>
-            </TabsTrigger>
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-5 h-auto gap-4">
+            <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+            <TabsTrigger value="teams">Équipes</TabsTrigger>
+            <TabsTrigger value="analytics">Analytiques</TabsTrigger>
+            <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+            <TabsTrigger value="settings">Paramètres</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="overview" className="space-y-6">
-            <GlobalOverviewTab />
-          </TabsContent>
-          
-          <TabsContent value="teams" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Équipes</CardTitle>
-                <CardDescription>
-                  Vue d'ensemble des équipes et de leur état émotionnel.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Contenu des équipes à venir prochainement.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="analytics" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Analytics</CardTitle>
-                <CardDescription>
-                  Analyses approfondies des données émotionnelles.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Contenu des analytics à venir prochainement.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="alerts" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Alertes</CardTitle>
-                <CardDescription>
-                  Alertes et notifications importantes.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Contenu des alertes à venir prochainement.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="settings" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Paramètres</CardTitle>
-                <CardDescription>
-                  Configuration de la supervision d'équipe.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Contenu des paramètres à venir prochainement.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <TabsContent value="overview" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <Card className="md:col-span-2">
+                    <CardHeader>
+                      <CardTitle>Activité utilisateur</CardTitle>
+                      <CardDescription>Interactions quotidiennes sur la plateforme</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <UserActivityChart />
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Notifications</CardTitle>
+                      <CardDescription>Dernières mises à jour</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <NotificationsPanel />
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Tendances émotionnelles</CardTitle>
+                    <CardDescription>
+                      Évolution du bien-être émotionnel sur les 30 derniers jours
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-80">
+                      <DashboardAnimatedChart />
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Activité des équipes</CardTitle>
+                      <CardDescription>Résumé des interactions par équipe</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <TeamActivitySummary />
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Objectifs collectifs</CardTitle>
+                      <CardDescription>Progression vers les objectifs de bien-être</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-sm font-medium">Engagement hebdomadaire</span>
+                            <span className="text-sm text-muted-foreground">75%</span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-primary rounded-full" style={{ width: '75%' }}></div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-sm font-medium">Satisfaction globale</span>
+                            <span className="text-sm text-muted-foreground">82%</span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-green-500 rounded-full" style={{ width: '82%' }}></div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-sm font-medium">Réduction du stress</span>
+                            <span className="text-sm text-muted-foreground">43%</span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-orange-500 rounded-full" style={{ width: '43%' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="teams" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Gestion des équipes</CardTitle>
+                    <CardDescription>Visualisez et gérez les équipes de votre organisation</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p>Contenu de l'onglet Teams...</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="analytics" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Analytiques avancées</CardTitle>
+                    <CardDescription>Explorez les données détaillées de votre organisation</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p>Contenu de l'onglet Analytics...</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="users" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Gestion des utilisateurs</CardTitle>
+                    <CardDescription>Administrez les comptes utilisateurs</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p>Contenu de l'onglet Users...</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="settings" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Paramètres administrateur</CardTitle>
+                    <CardDescription>Configurez les options administrateur</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p>Contenu de l'onglet Settings...</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </motion.div>
+          </AnimatePresence>
         </Tabs>
-      </motion.div>
+      </div>
       
-      {/* Access Logs Card */}
-      <motion.div 
-        variants={itemVariants} 
-        className="mt-8"
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl flex items-center">
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5 mr-2" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              >
-                <path d="M16 2v5h5"></path>
-                <path d="M21 6v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12l5 3Z"></path>
-              </svg>
-              Logs d'accès
-            </CardTitle>
-            <CardDescription>
-              Journal des dernières actions effectuées par les administrateurs
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AccessLogsTable />
-          </CardContent>
-        </Card>
-      </motion.div>
-    </motion.div>
+      <CommandMenu 
+        open={isCommandOpen} 
+        onOpenChange={setIsCommandOpen}
+        commands={[
+          { category: "Navigation", command: "Aller au tableau de bord", shortcut: "G D" },
+          { category: "Navigation", command: "Aller aux paramètres", shortcut: "G S" },
+          { category: "Navigation", command: "Aller aux équipes", shortcut: "G T" },
+          { category: "Actions", command: "Exporter les données", shortcut: "E D" },
+          { category: "Actions", command: "Créer un rapport", shortcut: "C R" },
+          { category: "Actions", command: "Lancer la formation", shortcut: "L F" },
+        ]}
+      />
+    </OnboardingProvider>
   );
 };
 
