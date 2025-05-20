@@ -123,19 +123,20 @@ export const getModeDashboardPath = (mode: UserModeType | string): string => {
 /**
  * Get display name for a user mode
  */
+// Display names for each mode. Can be overridden for i18n.
+let displayNames: Record<string, string> = {
+  b2c: 'Particulier',
+  b2b_admin: 'Administrateur B2B',
+  b2b_user: 'Collaborateur B2B',
+  admin: 'Administrateur',
+  default: 'Utilisateur',
+};
+
+export const setUserModeDisplayNames = (names: Partial<typeof displayNames>) => {
+  displayNames = { ...displayNames, ...names };
+};
+
 export const getUserModeDisplayName = (mode: string): string => {
   const normalizedMode = normalizeUserMode(mode);
-  
-  switch(normalizedMode) {
-    case 'b2c':
-      return 'Particulier';
-    case 'b2b_admin':
-      return 'Administrateur B2B';
-    case 'b2b_user':
-      return 'Collaborateur B2B';
-    case 'admin':
-      return 'Administrateur';
-    default:
-      return 'Utilisateur';
-  }
+  return displayNames[normalizedMode as keyof typeof displayNames] || displayNames.default;
 };
