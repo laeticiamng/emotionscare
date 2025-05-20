@@ -6,10 +6,12 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import ConfirmationModal from '@/components/ui/confirmation-modal';
 import { ROUTES } from '@/types/navigation';
+import { useUserMode } from '@/contexts/UserModeContext';
 
 const B2BAdminNavBar: React.FC = () => {
   const location = useLocation();
   const { logout } = useAuth();
+  const { clearUserMode } = useUserMode();
   const [showConfirm, setShowConfirm] = useState(false);
   
   const isActive = (path: string) => {
@@ -18,6 +20,7 @@ const B2BAdminNavBar: React.FC = () => {
   
   const handleLogout = async () => {
     await logout();
+    clearUserMode();
     setShowConfirm(false);
     window.location.href = ROUTES.b2bAdmin.login;
   };

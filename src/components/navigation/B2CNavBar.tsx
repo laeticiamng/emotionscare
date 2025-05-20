@@ -19,6 +19,7 @@ import {
   ShoppingCart
 } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { useToast } from "@/hooks/use-toast";
 import { ROUTES } from "@/types/navigation";
 
@@ -27,10 +28,12 @@ const B2CNavBar: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { logout } = useAuth();
+  const { clearUserMode } = useUserMode();
   
   const handleLogout = () => {
     localStorage.removeItem("auth_session");
     localStorage.removeItem("user_role");
+    clearUserMode();
     
     logout();
     

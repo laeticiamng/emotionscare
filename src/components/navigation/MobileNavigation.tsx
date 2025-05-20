@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTr
 import { X, Menu, Home, Settings, Bell, User, Moon, Sun, Users, BookOpen, Music, MessageCircle, LayoutDashboard } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { cn } from '@/lib/utils';
 
@@ -16,12 +17,14 @@ interface MobileNavigationProps {
 const MobileNavigation: React.FC<MobileNavigationProps> = ({ className = "" }) => {
   const [open, setOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { clearUserMode } = useUserMode();
   const { theme, setTheme } = useTheme();
   const location = useLocation();
 
   const handleLogout = async () => {
     if (logout) {
       await logout();
+      clearUserMode();
       setOpen(false);
     }
   };

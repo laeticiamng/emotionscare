@@ -47,11 +47,12 @@ import OptimizationPage from '@/pages/OptimizationPage';
 import ExtensionsPage from '@/pages/ExtensionsPage';
 import ImmersiveHome from '@/pages/ImmersiveHome';
 import Home from '@/pages/Home';
-import LoginPage from '@/pages/common/Login';
-import RegisterPage from '@/pages/common/Register';
+import UnifiedSettingsPage from '@/pages/UnifiedSettingsPage';
 import B2CLogin from '@/pages/b2c/Login';
 import B2CRegister from '@/pages/b2c/Register';
-import UnifiedSettingsPage from '@/pages/UnifiedSettingsPage';
+import OnboardingModePage from '@/pages/OnboardingModePage';
+import OnboardingPage from '@/pages/OnboardingPage';
+import OnboardingExperiencePage from '@/pages/OnboardingExperiencePage';
 
 
 // Define the application routes without creating a router instance

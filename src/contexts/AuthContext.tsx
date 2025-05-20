@@ -112,6 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       setUser(null);
       setIsAuthenticated(false);
+      localStorage.removeItem('userMode');
     } catch (error) {
       console.error('Logout error:', error);
       setError('Erreur lors de la déconnexion');

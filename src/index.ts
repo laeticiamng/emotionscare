@@ -131,30 +131,11 @@ async function humeBatchJobStatus(id: string) {
 }
 
 // -------------- Exports ----------------
-// Fix for browser environment: directly create a dummy client or use a factory function pattern
-const humeClient = HUME_API_KEY === 'test' ? null : (() => {
-  try {
-    // Try to use direct instantiation if available
-    if (typeof Hume.HumeClient === 'function') {
-      return new (Hume.HumeClient as any)(HUME_API_KEY);
-    }
-    // If not, try to use any available factory function
-    if (typeof Hume.create === 'function') {
-      return Hume.create(HUME_API_KEY);
-    }
-    // Fallback: return mock client with same interface
-    return {
-      // Mock implementation of Hume client methods
-      languageModels: { generate: async () => ({ results: [{ text: "Mock Hume response" }] }) },
-      prosodyModels: { evaluate: async () => ({ results: [{ emotions: { joy: 0.8 } }] }) },
-      faceModels: { evaluate: async () => ({ results: [{ emotions: { joy: 0.8 } }] }) },
-    };
-  } catch (e) {
-    console.error("Failed to create Hume client:", e);
-    // Return null or a mock implementation so the app can continue
-    return null;
-  }
-})();
+// Create a client instance using the Hume library's API
+// Fix for browser environment: use the createHumeClient function instead of HumeClient constructor
+const humeClient = typeof (Hume as any).createClient === 'function'
+  ? (Hume as any).createClient(HUME_API_KEY)
+  : null;
 
 export {
   openaiText,
