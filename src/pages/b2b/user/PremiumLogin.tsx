@@ -1,221 +1,216 @@
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card } from '@/components/ui/card';
-import { ArrowRight, AtSign, Lock, Eye, EyeOff, Building } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import AnimatedFormField from '@/components/auth/AnimatedFormField';
+import B2BPremiumAuthLayout from '@/components/auth/B2BPremiumAuthLayout';
+import PostLoginTransition from '@/components/auth/PostLoginTransition';
+import { Mail, Lock, Building, ArrowRight } from 'lucide-react';
 import { trackEvent } from '@/utils/analytics';
-import { toast } from 'sonner';
 
 const B2BUserPremiumLogin: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [timeOfDay, setTimeOfDay] = useState('day');
+  const [loading, setLoading] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
+  const [errors, setErrors] = useState<{email?: string; password?: string}>({});
+  
   const navigate = useNavigate();
+  const { login, user } = useAuth();
+  const { toast } = useToast();
   
-  // Set time of day for theming
-  useEffect(() => {
-    const hours = new Date().getHours();
-    if (hours >= 5 && hours < 12) setTimeOfDay('morning');
-    else if (hours >= 12 && hours < 18) setTimeOfDay('afternoon');
-    else if (hours >= 18 && hours < 22) setTimeOfDay('evening');
-    else setTimeOfDay('night');
-  }, []);
-  
-  useEffect(() => {
-    trackEvent('View B2B User Login', { properties: { variant: 'premium' } });
-  }, []);
-  
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const validateForm = () => {
+    const newErrors: {email?: string; password?: string} = {};
+    let isValid = true;
     
-    // Haptic feedback on mobile
-    if ('vibrate' in navigator) {
-      navigator.vibrate(50);
+    if (!email) {
+      newErrors.email = "L'email est requis";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Format d'email professionnel invalide";
+      isValid = false;
     }
+    
+    if (!password) {
+      newErrors.password = "Le mot de passe est requis";
+      isValid = false;
+    }
+    
+    setErrors(newErrors);
+    return isValid;
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+    
+    setLoading(true);
     
     try {
-      // Mock login - in a real app, this would call your authentication service
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await login(email, password, rememberMe);
       
-      toast.success("Connexion réussie ! Redirection vers votre tableau de bord.");
-      
-      trackEvent('User Login Success', {
-        properties: {
+      // Track login event
+      trackEvent('B2B User Login', { 
+        properties: { 
           method: 'password',
           userType: 'b2b_user'
-        }
+        } 
       });
       
-      setTimeout(() => {
-        navigate('/b2b/user/dashboard');
-      }, 800);
+      toast({
+        title: "Connexion réussie",
+        description: "Bienvenue dans votre espace collaborateur",
+      });
       
-    } catch (error) {
-      toast.error("Échec de la connexion. Veuillez vérifier vos identifiants.");
+      // Trigger the transition animation
+      setShowTransition(true);
+    } catch (error: any) {
+      console.error('Login error:', error);
       
-      trackEvent('User Login Failed', {
-        properties: {
-          reason: 'invalid_credentials',
-          userType: 'b2b_user'
-        }
+      trackEvent('Login Failed', { 
+        properties: { 
+          method: 'password',
+          userType: 'b2b_user',
+          reason: error.message || 'Unknown error'
+        } 
+      });
+      
+      toast({
+        title: "Erreur de connexion",
+        description: error.message || "Vérifiez vos identifiants et réessayez",
+        variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
-
+  
+  const handleTransitionComplete = () => {
+    setShowTransition(false);
+    navigate('/b2b/user/dashboard');
+  };
+  
   return (
-    <div className={`min-h-screen flex flex-col items-center justify-center p-6 bg-${timeOfDay}`}>
-      {/* Ambient background elements */}
-      <div className="fixed inset-0 overflow-hidden -z-10">
-        <div className="absolute top-0 right-0 w-2/3 h-2/3 rounded-full bg-blue-500/10 blur-3xl transform translate-x-1/3 -translate-y-1/3"></div>
-        <div className="absolute bottom-0 left-0 w-2/3 h-2/3 rounded-full bg-indigo-500/10 blur-3xl transform -translate-x-1/3 translate-y-1/3"></div>
-      </div>
-      
-      <div className="w-full max-w-md">
-        {/* Logo & Back Button */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex justify-center mb-8"
-        >
-          <div className="flex flex-col items-center">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center mb-2">
-              <Building className="h-8 w-8 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-              Espace Collaborateur
-            </h1>
-          </div>
-        </motion.div>
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.8 }}
-        >
-          <Card className="glass-card p-8">
-            <form onSubmit={handleLogin} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">
-                  Email professionnel
-                </Label>
-                <div className="relative">
-                  <AtSign className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="prenom.nom@entreprise.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">
-                  Mot de passe
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2.5"
+    <>
+      <B2BPremiumAuthLayout
+        title="Espace Collaborateur"
+        subtitle="Connectez-vous à votre espace collaborateur"
+        isAdmin={false}
+      >
+        <Card className="border-none shadow-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <form onSubmit={handleSubmit}>
+              <CardContent className="space-y-6 pt-6">
+                <AnimatedFormField
+                  id="email"
+                  label="Email professionnel"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoFocus
+                  icon={<Mail className="h-4 w-4" />}
+                  error={errors.email}
+                />
+                
+                <AnimatedFormField
+                  id="password"
+                  label="Mot de passe"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  icon={<Lock className="h-4 w-4" />}
+                  error={errors.password}
+                />
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="remember" 
+                      checked={rememberMe} 
+                      onCheckedChange={(checked) => setRememberMe(checked === true)}
+                    />
+                    <Label 
+                      htmlFor="remember" 
+                      className="text-sm font-medium leading-none"
+                    >
+                      Se souvenir de moi
+                    </Label>
+                  </div>
+                  
+                  <Link
+                    to="/b2b/forgot-password"
+                    className="text-sm text-primary hover:underline"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5 text-muted-foreground" />
-                    ) : (
-                      <Eye className="h-5 w-5 text-muted-foreground" />
-                    )}
-                  </button>
+                    Mot de passe oublié ?
+                  </Link>
                 </div>
-              </div>
+              </CardContent>
               
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="remember" 
-                    checked={rememberMe}
-                    onCheckedChange={(checked) => setRememberMe(checked === true)}
-                  />
-                  <label
-                    htmlFor="remember"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              <CardFooter className="flex flex-col gap-4">
+                <Button 
+                  type="submit" 
+                  className="w-full group relative overflow-hidden bg-blue-600 hover:bg-blue-700" 
+                  disabled={loading}
+                >
+                  {loading && (
+                    <span className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-blue-600/10">
+                      <svg className="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Connexion en cours...
+                    </span>
+                  )}
+                  <span className={loading ? "opacity-0" : "opacity-100 flex items-center justify-center"}>
+                    Se connecter
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Button>
+                
+                <div className="text-sm text-center mt-2 text-muted-foreground">
+                  Vous n'avez pas de compte ?{" "}
+                  <Link 
+                    to="/b2b/user/register"
+                    className="text-blue-600 dark:text-blue-400 hover:underline font-medium transition-colors"
                   >
-                    Se souvenir de moi
-                  </label>
+                    Créer un compte
+                  </Link>
                 </div>
                 
-                <a href="#" className="text-sm font-medium text-primary hover:underline">
-                  Mot de passe oublié ?
-                </a>
-              </div>
-              
-              <Button
-                type="submit"
-                className="w-full button-premium bg-gradient-to-r from-blue-600 to-green-600 text-white"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                    <span>Connexion en cours...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center">
-                    <span>Se connecter</span>
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </div>
-                )}
-              </Button>
-              
-              <div className="text-center text-sm text-muted-foreground">
-                <a href="#" className="font-medium text-primary hover:underline">
-                  Besoin d'aide pour vous connecter ?
-                </a>
-              </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="mt-2"
+                  onClick={() => navigate('/b2b/selection')}
+                >
+                  Retour à la sélection
+                </Button>
+              </CardFooter>
             </form>
-          </Card>
-        </motion.div>
-        
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-8 text-center"
-        >
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/')}
-            className="text-muted-foreground"
-          >
-            Retour à l'accueil
-          </Button>
-        </motion.div>
-      </div>
-    </div>
+          </motion.div>
+        </Card>
+      </B2BPremiumAuthLayout>
+      
+      <PostLoginTransition 
+        show={showTransition} 
+        onComplete={handleTransitionComplete}
+        userName={user?.name}
+      />
+    </>
   );
 };
 

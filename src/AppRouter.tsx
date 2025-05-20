@@ -13,6 +13,10 @@ import { useUserMode } from './contexts/UserModeContext';
 import B2BUserPremiumLogin from './pages/b2b/user/PremiumLogin';
 import B2BAdminPremiumLogin from './pages/b2b/admin/PremiumLogin';
 import B2BUserPremiumDashboard from './pages/b2b/user/PremiumDashboard';
+import B2CLoginPage from './pages/b2c/Login';
+import B2CRegisterPage from './pages/b2c/Register';
+import B2CForgotPasswordPage from './pages/b2c/ForgotPasswordPage';
+import PostLoginTransition from './components/auth/PostLoginTransition';
 
 const AppRouter: React.FC = () => {
   const { userMode, isLoading } = useUserMode();
@@ -40,6 +44,11 @@ const AppRouter: React.FC = () => {
         <Route path="/b2c" element={<B2CPage />} />
         <Route path="/b2b/selection" element={<B2BSelectionPremium />} />
         <Route path="/choose-mode" element={<ChooseMode />} />
+        
+        {/* Pages B2C */}
+        <Route path="/b2c/login" element={<B2CLoginPage />} />
+        <Route path="/b2c/register" element={<B2CRegisterPage />} />
+        <Route path="/b2c/forgot-password" element={<B2CForgotPasswordPage />} />
         
         {/* Pages B2B avec design premium */}
         <Route path="/b2b/user/login" element={<B2BUserPremiumLogin />} />
