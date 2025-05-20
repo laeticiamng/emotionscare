@@ -1,38 +1,28 @@
 
+export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin';
+
 export interface User {
   id: string;
+  name: string;
   email: string;
-  name?: string;
-  firstName?: string; // For compatibility
-  lastName?: string;
-  avatar?: string;
-  avatar_url?: string; // For backward compatibility
-  avatarUrl?: string; // For backward compatibility
-  role?: string;
-  status?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  created_at?: string; // For backward compatibility
-  updated_at?: string; // For backward compatibility
-  joined_at?: string; // For backward compatibility
-  position?: string; // Add position field
-  department?: string; // Add department field
-  job_title?: string; // Add job_title field for backward compatibility
-  displayName?: string; // Add displayName field for backward compatibility
-  preferences?: Record<string, any>; // Add preferences field
-  emotional_score?: number; // For backward compatibility
-}
-
-export type UserRole = 'admin' | 'manager' | 'user' | 'guest' | 'b2c' | 'b2b_user' | 'b2b_admin';
-
-export interface AuthUser extends User {
-  token?: string;
-  isAuthenticated?: boolean;
-  name: string; // Make name required in AuthUser
+  role: UserRole;
+  avatar_url?: string;
+  avatarUrl?: string;
+  department?: string;
+  job_title?: string;
+  preferences?: Record<string, any>;
+  emotional_score?: number;
+  onboarded?: boolean; // Adding this to fix the type error
 }
 
 export interface UserWithStatus extends User {
-  status: 'online' | 'offline' | 'away' | 'busy';
+  status: 'online' | 'away' | 'offline';
   lastActive?: string;
-  firstName?: string; // For compatibility
+}
+
+export interface InvitationVerificationResult {
+  valid: boolean;
+  message?: string;
+  email?: string;
+  role?: string;
 }

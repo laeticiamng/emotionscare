@@ -11,7 +11,7 @@ class EnhancedAnalyzeService {
    * @param text The text to analyze
    * @returns Emotion analysis result
    */
-  async analyzeEmotion(text: string): Promise<EmotionResult> {
+  async analyzeTextEmotion(text: string): Promise<EmotionResult> {
     // In a real implementation, this would call an AI API
     // This is a mock implementation for demonstration
     
@@ -39,7 +39,7 @@ class EnhancedAnalyzeService {
    * @param audioBlob Audio data to analyze
    * @returns Emotion analysis result
    */
-  async analyzeAudioEmotion(audioBlob: Blob): Promise<EmotionResult> {
+  async analyzeVoiceEmotion(audioBlob: Blob): Promise<EmotionResult> {
     // In real implementation, this would send the audio to an emotion analysis API
     // For demonstration, we'll return a mock result
     
@@ -84,6 +84,14 @@ class EnhancedAnalyzeService {
       score: randomScore,
       text: "Facial emotion analysis"
     };
+  }
+
+  /**
+   * Generic method to analyze emotion from any text input
+   * This is for backward compatibility with code that expects this method
+   */
+  async analyzeEmotion(text: string): Promise<EmotionResult> {
+    return this.analyzeTextEmotion(text);
   }
 }
 

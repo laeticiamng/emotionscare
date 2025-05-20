@@ -1,3 +1,4 @@
+
 import type { SpeechRecognitionConstructor } from './voice';
 
 declare global {
