@@ -42,6 +42,11 @@ export const HUME_API_KEY =
   import.meta.env.VITE_HUME_API_KEY || 
   '';
 
+export const MUSICGEN_API_KEY = 
+  import.meta.env.NEXT_PUBLIC_MUSICGEN_API_KEY || 
+  import.meta.env.VITE_MUSICGEN_API_KEY || 
+  '';
+
 // Firebase configuration
 export const FIREBASE_CONFIG = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
