@@ -1,13 +1,18 @@
 
+/* Import premium styles */
+@import './styles/premium.css';
+@import './styles/glass.css';
+@import './styles/auth-animations.css';
+
 /* Import tailwind directives first */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Import premium styles */
-@import './styles/premium.css';
-@import './styles/glass.css';
-@import './styles/auth-animations.css';
+/* utilitaire utilisé dans le code */
+.app-glass-dark {
+  @apply backdrop-blur-lg bg-glass-dark;
+}
 
 /* App-specific styles */
 #root {
@@ -39,7 +44,7 @@ html, body, #root {
   }
 
   .theme-dark .premium-card {
-    @apply bg-gray-900/90 shadow-lg border-gray-800;
+    @apply backdrop-blur-lg bg-glass-dark shadow-lg border-gray-800;
   }
 
   .theme-pastel .premium-card {

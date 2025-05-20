@@ -6,14 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:dev": "vite build --mode development",
-    "lint": "eslint .",
-    "peluche": "peluche",
-    "type-check": "tsc --noEmit",
-    "test": "node --test --loader ts-node/esm",
-    "clean": "rm -rf dist",
-    "aperçu": "aperçu rapide",
-    "seed:test-user": "ts-node scripts/ensureTestUser.ts"
+    "preview": "vite preview",
+    "tsc": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

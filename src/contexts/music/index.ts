@@ -1,5 +1,5 @@
 
-import { useMusic } from '../MusicContext';
+import { useMusic, MusicProvider } from '../MusicContext';
 
-export { useMusic };
+export { useMusic, MusicProvider };
 export default useMusic;
