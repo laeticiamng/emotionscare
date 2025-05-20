@@ -1,7 +1,2 @@
-
-// Re-export the elements from the coach context
-import { CoachContext, CoachProvider } from './CoachContext';
-export { CoachContext, CoachProvider };
-
-// Export the CoachContextType properly with 'export type'
+export { CoachContext, CoachContextProvider, CoachProvider, useCoach } from './CoachContextProvider';
 export type { CoachContextType } from './types';

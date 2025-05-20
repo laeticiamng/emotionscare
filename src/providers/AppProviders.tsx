@@ -11,6 +11,12 @@ import { ExtensionsProvider } from '@/providers/ExtensionsProvider';
 import { OrchestrationProvider } from '@/contexts/OrchestrationContext';
 import { OnboardingProvider } from '@/contexts/OnboardingContext';
 import { SupportProvider } from '@/providers/SupportProvider';
+import { CoachContextProvider } from '@/contexts/coach';
+import {
+  sendMessageHandler,
+  analyzeEmotionHandler,
+  getRecommendationsHandler
+} from '@/services/coach/defaultCoachHandlers';
 import { DEFAULT_ONBOARDING_STEPS } from '@/data/onboardingSteps';
 import { LayoutProviderProps } from '@/types/layout';
 import { Toaster } from '@/components/ui/toaster';
@@ -31,8 +37,16 @@ const AppProviders: React.FC<LayoutProviderProps> = ({ children }) => (
                   <OrchestrationProvider>
                     <OnboardingProvider steps={DEFAULT_ONBOARDING_STEPS}>
                       <SupportProvider>
-                        {children}
-                        <Toaster />
+                        <CoachContextProvider
+                          handlers={{
+                            sendMessageHandler,
+                            analyzeEmotionHandler,
+                            getRecommendationsHandler
+                          }}
+                        >
+                          {children}
+                          <Toaster />
+                        </CoachContextProvider>
                       </SupportProvider>
                     </OnboardingProvider>
                   </OrchestrationProvider>
