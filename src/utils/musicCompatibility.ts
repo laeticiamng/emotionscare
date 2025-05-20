@@ -10,9 +10,15 @@ export const mapAudioUrlToUrl = (track: MusicTrack): MusicTrack => {
   };
 };
 
+// Helper to ensure value is an array
+export const ensureArray = <T>(value: T | T[] | undefined): T[] => {
+  if (value === undefined) return [];
+  return Array.isArray(value) ? value : [value];
+};
+
 // Find tracks by mood
-export const findTracksByMood = (mood: string): MusicTrack[] => {
-  return mockTracks.filter(track => 
+export const findTracksByMood = (tracks: MusicTrack[], mood: string): MusicTrack[] => {
+  return tracks.filter(track => 
     track.mood === mood || 
     track.emotion === mood || 
     (track.tags && (typeof track.tags === 'string' 
@@ -81,4 +87,3 @@ export const normalizePlaylist = (playlist: any): MusicPlaylist => {
     creator: playlist.creator || undefined
   };
 };
-

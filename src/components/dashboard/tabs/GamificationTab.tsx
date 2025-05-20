@@ -46,7 +46,7 @@ const GamificationTab: React.FC<GamificationTabProps> = ({ className }) => {
                   <span className="font-bold">{entry.rank}</span>
                   <span>{entry.username}</span>
                 </div>
-                <span className="font-medium">{entry.points} pts</span>
+                <span className="font-medium">{entry.score} pts</span>
               </div>
             ))}
           </div>

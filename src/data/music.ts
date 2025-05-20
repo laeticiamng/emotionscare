@@ -1,3 +1,4 @@
+
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 export const musicTracks: MusicTrack[] = [
@@ -10,8 +11,8 @@ export const musicTracks: MusicTrack[] = [
     audioUrl: "/music/tracks/serenity-flow.mp3",
     duration: 240,
     emotion: "calm",
-    tags: "calm,ambient,peaceful",
-    category: "relax"
+    tags: ["calm", "ambient", "peaceful"],
+    category: ["relax"]
   },
   {
     id: "track-2",
@@ -22,8 +23,8 @@ export const musicTracks: MusicTrack[] = [
     audioUrl: "/music/tracks/rhythmic-drive.mp3",
     duration: 210,
     emotion: "energetic",
-    tags: "electronic,dance,high-energy",
-    category: "energy"
+    tags: ["electronic", "dance", "high-energy"],
+    category: ["energy"]
   },
   {
     id: "track-3",
@@ -34,8 +35,8 @@ export const musicTracks: MusicTrack[] = [
     audioUrl: "/music/tracks/mellow-sunrise.mp3",
     duration: 270,
     emotion: "happy",
-    tags: "acoustic,folk,upbeat",
-    category: "mood"
+    tags: ["acoustic", "folk", "upbeat"],
+    category: ["mood"]
   },
   {
     id: "track-4",
@@ -46,8 +47,8 @@ export const musicTracks: MusicTrack[] = [
     audioUrl: "/music/tracks/deep-focus.mp3",
     duration: 300,
     emotion: "focused",
-    tags: "ambient,instrumental,concentration",
-    category: "focus"
+    tags: ["ambient", "instrumental", "concentration"],
+    category: ["focus"]
   },
   {
     id: "track-5",
@@ -58,8 +59,8 @@ export const musicTracks: MusicTrack[] = [
     audioUrl: "/music/tracks/dream-weaver.mp3",
     duration: 330,
     emotion: "sleepy",
-    tags: "ambient,soothing,night",
-    category: "sleep"
+    tags: ["ambient", "soothing", "night"],
+    category: ["sleep"]
   },
   {
     id: "track-6",
@@ -70,8 +71,8 @@ export const musicTracks: MusicTrack[] = [
     audioUrl: "/music/tracks/mindful-meditation.mp3",
     duration: 360,
     emotion: "meditative",
-    tags: "instrumental,spiritual,calm",
-    category: "meditation"
+    tags: ["instrumental", "spiritual", "calm"],
+    category: ["meditation"]
   }
 ];
 
@@ -82,7 +83,6 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: "Gentle tracks to help you unwind and find peace",
     coverUrl: "/music/playlists/calm.jpg",
     tracks: [],
-    mood: "calm",
     category: "relax"
   },
   {
@@ -91,7 +91,6 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: "Uplifting music to energize your day",
     coverUrl: "/music/playlists/energy.jpg",
     tracks: [],
-    mood: "energetic",
     category: "energy"
   },
   {
@@ -100,7 +99,6 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: "Feel-good tunes to brighten your mood",
     coverUrl: "/music/playlists/happy.jpg",
     tracks: [],
-    mood: "happy",
     category: "mood"
   },
   {
@@ -109,7 +107,6 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: "Instrumental tracks for enhanced concentration",
     coverUrl: "/music/playlists/focus.jpg",
     tracks: [],
-    mood: "focused",
     category: "focus"
   },
   {
@@ -118,7 +115,6 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: "Soothing sounds to guide you into a peaceful sleep",
     coverUrl: "/music/playlists/sleep.jpg",
     tracks: [],
-    mood: "sleepy",
     category: "sleep"
   },
   {
@@ -127,12 +123,14 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: "Ambient soundscapes for mindful meditation",
     coverUrl: "/music/playlists/meditation.jpg",
     tracks: [],
-    mood: "meditative",
     category: "meditation"
   }
 ];
 
 // Fix the getPlaylistByMood function
 export const getPlaylistByMood = (mood: string): MusicPlaylist | undefined => {
-  return musicPlaylists.find(playlist => playlist.mood === mood);
+  return musicPlaylists.find(playlist => 
+    playlist.emotion === mood || 
+    playlist.mood === mood
+  );
 };

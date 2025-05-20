@@ -48,6 +48,13 @@ export interface MusicPlaylist {
 
 export type MusicCategory = 'relax' | 'focus' | 'energy' | 'sleep' | 'meditation' | 'mood' | 'custom';
 
+export interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
+  duration?: number;
+  tempo?: number;
+}
+
 export interface MusicContextType {
   currentTrack: MusicTrack | null;
   currentPlaylist: MusicPlaylist | null;
@@ -82,7 +89,7 @@ export interface MusicContextType {
   setOpenDrawer?: (isOpen: boolean) => void;
   
   // Music management
-  loadPlaylistForEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
+  loadPlaylistForEmotion?: (params: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
   getRecommendationByEmotion?: (emotion: string) => Promise<MusicTrack | null>;
   setEmotion?: (emotion: string) => void;
   generateMusic?: (params: any) => Promise<MusicTrack | null>;

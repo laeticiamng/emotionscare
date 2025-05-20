@@ -15,7 +15,7 @@ export const mockTracks: MusicTrack[] = [
     mood: 'relaxed',
     intensity: 0.3,
     tags: ['nature', 'meditation', 'sleep'],
-    category: 'relax'
+    category: ['relax']
   },
   {
     id: 'track-2',
@@ -29,7 +29,7 @@ export const mockTracks: MusicTrack[] = [
     mood: 'concentrated',
     intensity: 0.5,
     tags: ['focus', 'work', 'study'],
-    category: 'focus'
+    category: ['focus']
   },
   {
     id: 'track-3',
@@ -43,7 +43,7 @@ export const mockTracks: MusicTrack[] = [
     mood: 'motivated',
     intensity: 0.8,
     tags: ['workout', 'energy', 'motivation'],
-    category: 'energy'
+    category: ['energy']
   },
   {
     id: 'track-4',
@@ -57,7 +57,7 @@ export const mockTracks: MusicTrack[] = [
     mood: 'calm',
     intensity: 0.2,
     tags: ['meditation', 'relax', 'mindfulness'],
-    category: 'meditation'
+    category: ['meditation']
   },
   {
     id: 'track-5',
@@ -71,7 +71,7 @@ export const mockTracks: MusicTrack[] = [
     mood: 'joyful',
     intensity: 0.7,
     tags: ['happy', 'joyful', 'uplifting'],
-    category: 'mood'
+    category: ['mood']
   },
   {
     id: 'track-6',
@@ -85,7 +85,7 @@ export const mockTracks: MusicTrack[] = [
     mood: 'reflective',
     intensity: 0.4,
     tags: ['emotional', 'reflective', 'cathartic'],
-    category: 'mood'
+    category: ['mood']
   },
   {
     id: 'track-7',
@@ -99,7 +99,7 @@ export const mockTracks: MusicTrack[] = [
     mood: 'calm',
     intensity: 0.3,
     tags: ['stress', 'anxiety', 'relief'],
-    category: 'relax'
+    category: ['relax']
   },
   {
     id: 'track-8',
@@ -113,7 +113,7 @@ export const mockTracks: MusicTrack[] = [
     mood: 'drowsy',
     intensity: 0.1,
     tags: ['sleep', 'dreams', 'night'],
-    category: 'sleep'
+    category: ['sleep']
   }
 ];
 
@@ -127,14 +127,14 @@ export const mockPlaylists: MusicPlaylist[] = [
     coverUrl: '/images/covers/relaxation.jpg',
     coverImage: '/images/covers/relaxation.jpg',
     tracks: mockTracks.filter(track => 
-      track.category === 'relax' || 
+      (track.category && Array.isArray(track.category) && track.category.includes('relax')) || 
       track.emotion === 'calm' || 
       track.emotion === 'peaceful'
     ),
     emotion: 'calm',
     mood: 'relaxed',
     tags: ['relax', 'calm', 'peace'],
-    category: 'relax'
+    category: ['relax']
   },
   {
     id: 'playlist-2',
@@ -144,13 +144,13 @@ export const mockPlaylists: MusicPlaylist[] = [
     coverUrl: '/images/covers/focus.jpg',
     coverImage: '/images/covers/focus.jpg',
     tracks: mockTracks.filter(track => 
-      track.category === 'focus' || 
+      (track.category && Array.isArray(track.category) && track.category.includes('focus')) || 
       track.emotion === 'focused'
     ),
     emotion: 'focused',
     mood: 'concentrated',
     tags: ['focus', 'work', 'study'],
-    category: 'focus'
+    category: ['focus']
   },
   {
     id: 'playlist-3',
@@ -160,14 +160,14 @@ export const mockPlaylists: MusicPlaylist[] = [
     coverUrl: '/images/covers/energy.jpg',
     coverImage: '/images/covers/energy.jpg',
     tracks: mockTracks.filter(track => 
-      track.category === 'energy' || 
+      (track.category && Array.isArray(track.category) && track.category.includes('energy')) || 
       track.emotion === 'energetic' ||
       track.emotion === 'happy'
     ),
     emotion: 'energetic',
     mood: 'motivated',
     tags: ['energy', 'motivation', 'workout'],
-    category: 'energy'
+    category: ['energy']
   },
   {
     id: 'playlist-4',
@@ -177,12 +177,12 @@ export const mockPlaylists: MusicPlaylist[] = [
     coverUrl: '/images/covers/sleep.jpg',
     coverImage: '/images/covers/sleep.jpg',
     tracks: mockTracks.filter(track => 
-      track.category === 'sleep' || 
+      (track.category && Array.isArray(track.category) && track.category.includes('sleep')) || 
       track.emotion === 'sleepy'
     ),
     emotion: 'sleepy',
     mood: 'drowsy',
     tags: ['sleep', 'night', 'dreams'],
-    category: 'sleep'
+    category: ['sleep']
   }
 ];

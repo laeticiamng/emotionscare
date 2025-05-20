@@ -28,9 +28,7 @@ export function useMusicRecommendation() {
     setIsLoading(true);
     try {
       const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
-      const result = await music.loadPlaylistForEmotion({
-        emotion: musicType
-      });
+      const result = await music.loadPlaylistForEmotion?.(musicType);
       
       if (result && result.tracks && result.tracks.length > 0) {
         // Set recommended tracks from the playlist
@@ -64,9 +62,7 @@ export function useMusicRecommendation() {
   const handlePlayMusic = useCallback(async (emotion: string) => {
     const musicType = EMOTION_TO_MUSIC[emotion.toLowerCase()] || 'focus';
     if (music.loadPlaylistForEmotion) {
-      const playlist = await music.loadPlaylistForEmotion({
-        emotion: musicType
-      });
+      const playlist = await music.loadPlaylistForEmotion(musicType);
       
       if (playlist && playlist.tracks.length > 0 && music.playTrack) {
         music.playTrack(playlist.tracks[0]);

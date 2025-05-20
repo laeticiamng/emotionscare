@@ -1,176 +1,211 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useAuth } from './AuthContext';
+import { MoodEvent, Prediction, PredictionRecommendation, EmotionalLocation, SanctuaryWidget } from '@/types/orchestration';
+import { EmotionResult } from '@/types/emotion';
+import { MoodData } from '@/types/audio';
 
-// Import from types instead of redeclaring
-import { 
-  EmotionResult,
-  EmotionalData
-} from '@/types/emotion';
-
-import {
-  MoodEvent,
-  Prediction,
-  PredictionRecommendation,
-  EmotionalLocation,
-  SanctuaryWidget,
-  EmotionalSynthesis,
-  OrchestrationEvent as OrcEvent,
-  OrchestrationContextType as OrcContextType
-} from '@/types/orchestration';
-
-// Create types for context state
-interface OrchestrationState {
-  currentEmotionResult: EmotionResult | null;
-  emotionHistory: EmotionResult[];
-  moodEvents: MoodEvent[];
-  predictions: Prediction[];
-  recommendations: PredictionRecommendation[];
-  sanctuaryWidgets: SanctuaryWidget[];
-  emotionalLocations: EmotionalLocation[];
-  synthesis: EmotionalSynthesis | null;
-  events: OrcEvent[];
+// Define the type for OrchestrationEvent
+interface OrchestrationEventData {
+  id: string;
+  type: string;
+  timestamp: string;
+  mood: string;
+  source: string;
+  data?: any;
 }
 
-// Create the context with a default value
-const OrchestrationContext = createContext<OrcContextType | undefined>(undefined);
+// Define the context type
+interface OrchestrationContextData {
+  events: OrchestrationEventData[];
+  predictions: Prediction[];
+  recommendations: PredictionRecommendation[];
+  addEvent: (event: Omit<OrchestrationEventData, 'id' | 'timestamp'>) => void;
+  getLastMoodEvent: () => MoodEvent | null;
+  generatePredictions: () => Prediction[];
+  getRecommendations: () => PredictionRecommendation[];
+  sanctuaryWidgets: SanctuaryWidget[];
+  emotionalLocations: EmotionalLocation[];
+}
 
-// Provider component
-export const OrchestrationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // State initialization
-  const [state, setState] = useState<OrchestrationState>({
-    currentEmotionResult: null,
-    emotionHistory: [],
-    moodEvents: [],
-    predictions: [],
-    recommendations: [],
-    sanctuaryWidgets: [],
-    emotionalLocations: [],
-    synthesis: null,
-    events: []
-  });
+// Create the context
+const OrchestrationContext = createContext<OrchestrationContextData | undefined>(undefined);
 
-  // Function to set current emotion result
-  const setCurrentEmotionResult = (result: EmotionResult) => {
-    setState(prev => ({ ...prev, currentEmotionResult: result }));
-  };
+interface OrchestrationProviderProps {
+  children: ReactNode;
+}
 
-  // Function to add emotion result to history
-  const addEmotionResult = (result: EmotionResult) => {
-    setState(prev => ({
-      ...prev,
-      emotionHistory: [...prev.emotionHistory, result]
-    }));
-  };
+export const OrchestrationProvider: React.FC<OrchestrationProviderProps> = ({ children }) => {
+  const { user } = useAuth();
+  const [events, setEvents] = useState<OrchestrationEventData[]>([]);
+  const [predictions, setPredictions] = useState<Prediction[]>([]);
+  const [recommendations, setRecommendations] = useState<PredictionRecommendation[]>([]);
+  const [sanctuaryWidgets, setSanctuaryWidgets] = useState<SanctuaryWidget[]>([]);
+  const [emotionalLocations, setEmotionalLocations] = useState<EmotionalLocation[]>([]);
 
-  // Function to add event
-  const addEvent = (type: string, data: any) => {
-    const event: OrcEvent = {
-      id: uuidv4(),
-      type,
-      timestamp: new Date(),
-      data,
-      processed: false
+  // Add a new event
+  const addEvent = (event: Omit<OrchestrationEventData, 'id' | 'timestamp'>) => {
+    const newEvent = {
+      ...event,
+      id: `event-${Date.now()}`,
+      timestamp: new Date().toISOString(),
     };
-    setState(prev => ({
-      ...prev,
-      events: [...prev.events, event]
-    }));
+    setEvents(prev => [newEvent, ...prev]);
   };
 
-  // Function to process emotion result
-  const processEmotionResult = (result: EmotionResult) => {
-    // Add to history
-    addEmotionResult(result);
+  // Get the last mood event
+  const getLastMoodEvent = (): MoodEvent | null => {
+    const lastEvent = events.find(event => event.type === 'mood');
+    if (!lastEvent) return null;
     
-    // Set as current
-    setCurrentEmotionResult(result);
-    
-    // Create event
-    addEvent('emotion_detected', result);
-    
-    // Process for predictions (in a real app, this would be more complex)
-    generatePredictions();
+    return {
+      id: lastEvent.id,
+      mood: lastEvent.mood,
+      timestamp: lastEvent.timestamp,
+      source: lastEvent.source,
+      userId: user?.id || 'anonymous',
+      intensity: lastEvent.data?.intensity || 0.5,
+    };
   };
 
-  // Function to generate predictions
-  const generatePredictions = () => {
-    // In a real app, this would use complex logic
-    // For now, just create a simple prediction
-    if (state.currentEmotionResult) {
-      const prediction: Prediction = {
-        id: uuidv4(),
-        timestamp: new Date(),
-        emotion: state.currentEmotionResult.emotion,
-        confidence: state.currentEmotionResult.score,
-        prediction: 'Your emotion may continue for the next hour',
-        recommendations: []
-      };
-      
-      setState(prev => ({
-        ...prev,
-        predictions: [...prev.predictions, prediction]
-      }));
-    }
+  // Generate mood predictions based on past events
+  const generatePredictions = (): Prediction[] => {
+    // Implementation would use actual algorithms, this is a placeholder
+    const mockPredictions: Prediction[] = [
+      {
+        id: 'pred-1',
+        predictedMood: 'calm',
+        confidence: 0.85,
+        timeframe: 'morning',
+        date: new Date().toISOString(),
+        userId: user?.id || 'anonymous',
+      },
+      {
+        id: 'pred-2',
+        predictedMood: 'focused',
+        confidence: 0.75,
+        timeframe: 'afternoon',
+        date: new Date().toISOString(),
+        userId: user?.id || 'anonymous',
+      }
+    ];
+    
+    setPredictions(mockPredictions);
+    return mockPredictions;
   };
 
-  // Function to get recommendations
+  // Get recommendations based on current state
   const getRecommendations = (): PredictionRecommendation[] => {
-    return state.recommendations;
+    // Implementation would use actual algorithms, this is a placeholder
+    const mockRecommendations: PredictionRecommendation[] = [
+      {
+        id: 'rec-1',
+        type: 'activity',
+        title: 'Morning Meditation',
+        description: 'Start your day with a 10-minute meditation session',
+        mood: 'calm',
+        effectiveness: 0.9,
+      },
+      {
+        id: 'rec-2',
+        type: 'music',
+        title: 'Focus Playlist',
+        description: 'Listen to concentration-enhancing music',
+        mood: 'focused',
+        effectiveness: 0.85,
+      }
+    ];
+    
+    setRecommendations(mockRecommendations);
+    return mockRecommendations;
   };
 
-  // Function to clear history
-  const clearHistory = () => {
-    setState(prev => ({
-      ...prev,
-      emotionHistory: [],
-      moodEvents: [],
-      predictions: [],
-      events: []
-    }));
-  };
-
-  // Function to refresh synthesis
-  const refreshSynthesis = () => {
-    if (state.emotionHistory.length > 0) {
-      const dominantEmotion = state.emotionHistory
-        .sort((a, b) => b.score - a.score)[0].emotion;
+  // Initialize data on mount
+  useEffect(() => {
+    // This would fetch from API in a real app
+    if (user) {
+      // Load historical events from API or storage
+      // For now, use mock data
+      setEvents([
+        {
+          id: 'event-1',
+          type: 'mood',
+          timestamp: new Date(Date.now() - 3600000).toISOString(),
+          mood: 'happy',
+          source: 'text-analysis',
+          data: { intensity: 0.7 }
+        },
+        {
+          id: 'event-2',
+          type: 'mood',
+          timestamp: new Date(Date.now() - 7200000).toISOString(),
+          mood: 'focused',
+          source: 'voice-analysis',
+          data: { intensity: 0.8 }
+        }
+      ]);
       
-      const synthesis: EmotionalSynthesis = {
-        id: uuidv4(),
-        timestamp: new Date(),
-        dominantEmotion,
-        emotionHistory: state.emotionHistory.map(e => e.emotion),
-        summary: `Your dominant emotion has been ${dominantEmotion}`,
-        recommendations: []
-      };
+      // Initialize other data
+      generatePredictions();
+      getRecommendations();
       
-      setState(prev => ({ ...prev, synthesis }));
+      // Set up sanctuary widgets
+      setSanctuaryWidgets([
+        {
+          id: 'widget-1',
+          title: 'Breathe',
+          type: 'breathing',
+          description: 'Guided breathing exercise',
+          emotion: 'stress',
+          priority: 1
+        },
+        {
+          id: 'widget-2',
+          title: 'Meditate',
+          type: 'meditation',
+          description: '5-minute meditation',
+          emotion: 'calm',
+          priority: 2
+        }
+      ]);
+      
+      // Set up emotional locations
+      setEmotionalLocations([
+        {
+          id: 'loc-1',
+          name: 'Home Office',
+          moodData: {
+            primary: 'focused',
+            secondary: 'calm',
+            intensity: 0.7
+          },
+          coordinates: { lat: 48.8584, lng: 2.2945 },
+          userId: user.id
+        }
+      ]);
     }
-  };
+  }, [user]);
 
-  // Context value
-  const contextValue: OrcContextType = {
-    ...state,
-    setCurrentEmotionResult,
-    addEmotionResult,
+  const value = {
+    events,
+    predictions,
+    recommendations,
     addEvent,
-    processEmotionResult,
+    getLastMoodEvent,
     generatePredictions,
     getRecommendations,
-    clearHistory,
-    refreshSynthesis
+    sanctuaryWidgets,
+    emotionalLocations
   };
 
   return (
-    <OrchestrationContext.Provider value={contextValue}>
+    <OrchestrationContext.Provider value={value}>
       {children}
     </OrchestrationContext.Provider>
   );
 };
 
-// Hook for using the context
-export const useOrchestration = (): OrcContextType => {
+export const useOrchestration = () => {
   const context = useContext(OrchestrationContext);
   if (context === undefined) {
     throw new Error('useOrchestration must be used within an OrchestrationProvider');
