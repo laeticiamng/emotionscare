@@ -17,6 +17,9 @@ import LoginPage from '@/pages/common/Login';
 
 // Pages B2C
 import B2CDashboard from '@/pages/b2c/DashboardPage';
+import B2CLoginPage from '@/pages/b2c/Login';
+import B2CRegisterPage from '@/pages/b2c/Register';
+import B2COnboardingPage from '@/pages/b2c/OnboardingPage';
 
 // Pages B2B User
 import B2BUserDashboard from '@/pages/b2b/user/Dashboard';
@@ -33,9 +36,11 @@ const AppRoutes: React.FC = () => {
       
       {/* Routes d'authentification */}
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/b2c/login" element={<LoginPage />} />
+      <Route path="/b2c/login" element={<B2CLoginPage />} />
+      <Route path="/b2c/register" element={<B2CRegisterPage />} />
       <Route path="/b2b/user/login" element={<LoginPage />} />
       <Route path="/b2b/admin/login" element={<LoginPage />} />
+      <Route path="/onboarding" element={<B2COnboardingPage />} />
       
       {/* Routes B2C */}
       <Route path="/b2c" element={<B2CLayout />}>

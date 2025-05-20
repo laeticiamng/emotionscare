@@ -1,355 +1,372 @@
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserPreferences } from '@/contexts/UserPreferencesContext';
-import { Brain, Calendar, FileText, Music, Activity, MessageSquare, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import MusicPlayer from '@/components/music/MusicPlayer';
-import RecommendedPresets from '@/components/music/RecommendedPresets';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useMusic } from '@/hooks/useMusic';
-import { motion } from 'framer-motion';
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import { TrendingUp } from 'lucide-react';
+import { ModeToggle } from '@/components/theme/ModeToggle';
+import { CardContent, Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Smile, Meh, Frown, MusicIcon, ArrowRight, Calendar, BookOpen, Settings, User } from 'lucide-react';
+import { useUserModeHelpers } from '@/hooks/useUserModeHelpers';
 
-// Composant pour le widget de journal rapide
-const QuickJournalWidget = () => {
-  const navigate = useNavigate();
-  
-  return (
-    <Card className="premium-card interactive-card">
-      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-        <CardTitle className="text-lg flex items-center">
-          <FileText className="h-5 w-5 mr-2 text-blue-500" />
-          Journal émotionnel
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <p className="text-sm text-muted-foreground mb-4">
-          Comment vous sentez-vous aujourd'hui ? Prenez un moment pour noter vos émotions et réflexions.
-        </p>
-        <Button 
-          onClick={() => navigate('/b2c/journal')}
-          className="w-full"
-        >
-          Ouvrir mon journal
-        </Button>
-      </CardContent>
-    </Card>
-  );
+// Dummy data for the dashboard
+const QUOTES = [
+  "La sérénité commence lorsque vous arrêtez de vivre dans le passé ou le futur et commencez à vivre dans le présent.",
+  "Chaque émotion est un message. Écoutez ce message avec bienveillance.",
+  "Le bonheur n'est pas l'absence de problèmes, mais la capacité à les surmonter.",
+  "Être heureux ne signifie pas que tout est parfait. Cela signifie que vous avez décidé de regarder au-delà des imperfections.",
+];
+
+const MOOD_COLORS = {
+  happy: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  neutral: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  sad: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
 };
 
-// Composant pour le widget de météo émotionnelle
-const EmotionalWeatherWidget = () => {
-  const emotions = {
-    main: "Calme",
-    secondary: "Concentré",
-    intensity: 75,
-    trend: "stable"
-  };
-  
-  const getEmotionColor = () => {
-    switch(emotions.main.toLowerCase()) {
-      case "calme": return "bg-blue-100 text-blue-700";
-      case "joyeux": return "bg-yellow-100 text-yellow-700";
-      case "énergique": return "bg-green-100 text-green-700";
-      case "fatigué": return "bg-purple-100 text-purple-700";
-      case "stressé": return "bg-red-100 text-red-700";
-      default: return "bg-gray-100 text-gray-700";
-    }
-  };
-  
-  return (
-    <Card className="premium-card interactive-card">
-      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-        <CardTitle className="text-lg flex items-center">
-          <Brain className="h-5 w-5 mr-2 text-blue-500" />
-          Météo émotionnelle
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <div className="flex flex-col items-center">
-          <div className={`px-4 py-2 rounded-full mb-2 ${getEmotionColor()}`}>
-            {emotions.main}
-          </div>
-          <div className="text-sm text-muted-foreground mb-2">
-            avec une touche de {emotions.secondary}
-          </div>
-          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-1">
-            <div 
-              className="h-full bg-blue-500 rounded-full"
-              style={{ width: `${emotions.intensity}%` }}
-            ></div>
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Tendance: {emotions.trend}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
+const PLAYLIST_MOODS = [
+  { id: 1, title: "Énergie matinale", tracks: 12, duration: "42 min", color: "from-orange-500 to-yellow-500" },
+  { id: 2, title: "Calme et concentration", tracks: 8, duration: "35 min", color: "from-blue-500 to-cyan-500" },
+  { id: 3, title: "Détente du soir", tracks: 10, duration: "50 min", color: "from-purple-500 to-pink-500" }
+];
 
-// Composant pour le widget musical
-const MusicWidget = () => {
-  const { currentTrack, isPlaying } = useMusic();
-  
-  return (
-    <Card className="premium-card interactive-card">
-      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-        <CardTitle className="text-lg flex items-center">
-          <Music className="h-5 w-5 mr-2 text-blue-500" />
-          Musique adaptative
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-4">
-        {currentTrack ? (
-          <div className="mb-4">
-            <MusicPlayer />
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground mb-4">
-            Découvrez des playlists adaptées à votre humeur du moment.
-          </p>
-        )}
-        <RecommendedPresets />
-      </CardContent>
-    </Card>
-  );
-};
+const UPCOMING_ACTIVITIES = [
+  { id: 1, title: "Séance de méditation guidée", date: "Aujourd'hui, 18:00", type: "Bien-être" },
+  { id: 2, title: "Analyse de journal émotionnel", date: "Demain, 10:00", type: "Journal" },
+  { id: 3, title: "Session avec coach IA", date: "12 mai, 14:00", type: "Coaching" }
+];
 
-// Composant pour le widget SocialCocon
-const SocialCoconWidget = () => {
-  const navigate = useNavigate();
-  
-  return (
-    <Card className="premium-card interactive-card">
-      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-        <CardTitle className="text-lg flex items-center">
-          <Users className="h-5 w-5 mr-2 text-blue-500" />
-          SocialCocon
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <p className="text-sm text-muted-foreground mb-4">
-          Rejoignez votre communauté bienveillante et partagez vos expériences.
-        </p>
-        <Button 
-          onClick={() => navigate('/b2c/social-cocon')}
-          className="w-full"
-          variant="outline"
-        >
-          Accéder au SocialCocon
-        </Button>
-      </CardContent>
-    </Card>
-  );
-};
-
-// Composant pour le widget de coach IA
-const AICoachWidget = () => {
-  const navigate = useNavigate();
-  
-  return (
-    <Card className="premium-card interactive-card">
-      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-        <CardTitle className="text-lg flex items-center">
-          <MessageSquare className="h-5 w-5 mr-2 text-blue-500" />
-          Coach IA
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <p className="text-sm text-muted-foreground mb-4">
-          Obtenez des conseils personnalisés et des exercices adaptés à votre état émotionnel.
-        </p>
-        <Button 
-          onClick={() => navigate('/b2c/coach')}
-          className="w-full"
-        >
-          Discuter avec mon coach
-        </Button>
-      </CardContent>
-    </Card>
-  );
-};
-
-const OptimizationWidget = () => {
-  const navigate = useNavigate();
-
-  return (
-    <Card className="premium-card interactive-card">
-      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-        <CardTitle className="text-lg flex items-center">
-          <TrendingUp className="h-5 w-5 mr-2 text-blue-500" />
-          Amélioration continue
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <p className="text-sm text-muted-foreground mb-4">
-          Consultez vos statistiques d'usage et recevez des suggestions personnalisées.
-        </p>
-        <Button onClick={() => navigate('/optimisation')} className="w-full" variant="outline">
-          Voir mon reporting
-        </Button>
-      </CardContent>
-    </Card>
-  );
-};
-
-// Composant pour le widget timeline
-const TimelineWidget = () => {
-  const navigate = useNavigate();
-  
-  return (
-    <Card className="premium-card interactive-card">
-      <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-        <CardTitle className="text-lg flex items-center">
-          <Activity className="h-5 w-5 mr-2 text-blue-500" />
-          Timeline émotionnelle
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <p className="text-sm text-muted-foreground mb-4">
-          Visualisez l'évolution de vos émotions et identifiez les tendances.
-        </p>
-        <Button 
-          onClick={() => navigate('/b2c/timeline')}
-          className="w-full"
-          variant="outline"
-        >
-          Voir ma timeline
-        </Button>
-      </CardContent>
-    </Card>
-  );
-};
-
-// Page principale
 const B2CDashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const { preferences } = useUserPreferences();
-  const navigate = useNavigate();
+  const [currentMood, setCurrentMood] = useState<'happy' | 'neutral' | 'sad'>('neutral');
+  const [quote, setQuote] = useState("");
+  const [showMoodSelector, setShowMoodSelector] = useState(true);
+  const { normalizedMode } = useUserModeHelpers();
   
-  // Message de bienvenue dynamique
-  const getWelcomeMessage = () => {
-    const currentHour = new Date().getHours();
-    let timeBasedGreeting = "Bonjour";
-    
-    if (currentHour < 5) timeBasedGreeting = "Bonne nuit";
-    else if (currentHour < 12) timeBasedGreeting = "Bonjour";
-    else if (currentHour < 18) timeBasedGreeting = "Bon après-midi";
-    else timeBasedGreeting = "Bonsoir";
-    
-    return `${timeBasedGreeting}, ${user?.displayName || preferences.displayName || 'utilisateur'}`;
+  // Set a random inspirational quote on load
+  useEffect(() => {
+    setQuote(QUOTES[Math.floor(Math.random() * QUOTES.length)]);
+  }, []);
+  
+  const handleMoodSelect = (mood: 'happy' | 'neutral' | 'sad') => {
+    setCurrentMood(mood);
+    setShowMoodSelector(false);
   };
   
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl space-y-8">
-      <div className="relative overflow-hidden rounded-3xl premium-gradient shadow-soft-blue">
-        <img
-          src="/images/vr-banner-bg.jpg"
-          alt="Bienvenue"
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
-        />
-        <div className="relative p-8">
-          <DashboardHeader user={user} />
-          <p className="text-muted-foreground mt-2">
-            {getWelcomeMessage()}
-          </p>
+    <div className="min-h-screen bg-background pb-16">
+      {/* Header with greeting and user info */}
+      <header className="relative bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/5">
+        <div className="absolute inset-0 bg-grid-white/10 dark:bg-grid-white/5"></div>
+        <div className="container mx-auto px-4 py-8 relative">
+          <div className="flex justify-between items-center">
+            <div>
+              <motion.h1 
+                className="text-3xl font-bold"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                Bonjour, {user?.name?.split(' ')[0] || 'Bienvenue'}
+              </motion.h1>
+              <motion.p 
+                className="text-muted-foreground mt-1"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+              >
+                Mode {normalizedMode === 'b2c' ? 'Particulier' : 'Professionnel'}
+              </motion.p>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <ModeToggle />
+              <Button size="sm" variant="ghost" className="rounded-full">
+                <User className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+          
+          {/* Quote of the day */}
+          <motion.div 
+            className="mt-6 max-w-2xl"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+          >
+            <blockquote className="italic text-lg">
+              "{quote}"
+            </blockquote>
+          </motion.div>
         </div>
-      </div>
+      </header>
       
-      <Tabs defaultValue="dashboard" className="mb-8">
-        <TabsList>
-          <TabsTrigger value="dashboard">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="emotions">Émotions</TabsTrigger>
-          <TabsTrigger value="activities">Activités</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="dashboard" className="mt-4">
-          <motion.div
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            <EmotionalWeatherWidget />
-            <QuickJournalWidget />
-            <MusicWidget />
-            <SocialCoconWidget />
-            <AICoachWidget />
-            <TimelineWidget />
-            <OptimizationWidget />
-          </motion.div>
-        </TabsContent>
-        
-        <TabsContent value="emotions" className="mt-4">
-          <motion.div
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            <EmotionalWeatherWidget />
-            <TimelineWidget />
-            <div className="md:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Carte des émotions</CardTitle>
-                </CardHeader>
-                <CardContent className="h-64 bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
-                  <Button onClick={() => navigate('/b2c/world')}>
-                    Explorer la carte des émotions
+      <main className="container mx-auto px-4 py-8">
+        {/* Mood selection or current mood display */}
+        <section className="mb-8">
+          <AnimatePresence mode="wait">
+            {showMoodSelector ? (
+              <motion.div
+                key="mood-selector"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-8"
+              >
+                <h2 className="text-xl font-medium mb-4">Comment vous sentez-vous aujourd'hui ?</h2>
+                <div className="flex gap-4 flex-wrap">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 h-auto py-6 hover:bg-green-50 dark:hover:bg-green-900/20"
+                    onClick={() => handleMoodSelect('happy')}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <Smile className="h-8 w-8 text-green-500" />
+                      <span className="text-green-700 dark:text-green-300">Bien</span>
+                    </div>
                   </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </motion.div>
-        </TabsContent>
-        
-        <TabsContent value="activities" className="mt-4">
-          <motion.div
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-           <QuickJournalWidget />
-           <AICoachWidget />
-           <SocialCoconWidget />
-            <OptimizationWidget />
-           <div>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Calendar className="h-5 w-5 mr-2" />
-                    Sessions à venir
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Vous n'avez pas de sessions planifiées. Organisez votre première session !
-                  </p>
-                  <Button className="mt-4 w-full" variant="outline">
-                    Planifier une session
+                  
+                  <Button 
+                    variant="outline"
+                    className="flex-1 h-auto py-6 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                    onClick={() => handleMoodSelect('neutral')}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <Meh className="h-8 w-8 text-blue-500" />
+                      <span className="text-blue-700 dark:text-blue-300">Neutre</span>
+                    </div>
                   </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </motion.div>
-        </TabsContent>
-      </Tabs>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 h-auto py-6 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                    onClick={() => handleMoodSelect('sad')}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <Frown className="h-8 w-8 text-purple-500" />
+                      <span className="text-purple-700 dark:text-purple-300">Pas bien</span>
+                    </div>
+                  </Button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="current-mood"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-8"
+              >
+                <div className={`inline-flex items-center px-4 py-2 rounded-full ${MOOD_COLORS[currentMood]}`}>
+                  {currentMood === 'happy' && <Smile className="h-5 w-5 mr-2" />}
+                  {currentMood === 'neutral' && <Meh className="h-5 w-5 mr-2" />}
+                  {currentMood === 'sad' && <Frown className="h-5 w-5 mr-2" />}
+                  <span>
+                    {currentMood === 'happy' ? 'Vous vous sentez bien aujourd\'hui' : 
+                     currentMood === 'neutral' ? 'Votre humeur est neutre aujourd\'hui' : 
+                     'Vous ne vous sentez pas bien aujourd\'hui'}
+                  </span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="ml-2 h-6 rounded-full"
+                    onClick={() => setShowMoodSelector(true)}
+                  >
+                    Modifier
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            {/* Tab sections */}
+            <Tabs defaultValue="recommended" className="w-full">
+              <TabsList className="w-full justify-start mb-6">
+                <TabsTrigger value="recommended">Recommandé</TabsTrigger>
+                <TabsTrigger value="activity">Activités</TabsTrigger>
+                <TabsTrigger value="favorites">Favoris</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="recommended" className="space-y-6">
+                {/* Music playlists */}
+                <section>
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-medium">Playlists musicales</h2>
+                    <Button variant="ghost" size="sm" className="gap-1">
+                      Voir tout <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {PLAYLIST_MOODS.map((playlist) => (
+                      <motion.div 
+                        key={playlist.id}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Card className="overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow">
+                          <div className={`h-2 bg-gradient-to-r ${playlist.color}`}></div>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <h3 className="font-medium">{playlist.title}</h3>
+                                <p className="text-sm text-muted-foreground">
+                                  {playlist.tracks} pistes · {playlist.duration}
+                                </p>
+                              </div>
+                              <Button size="sm" variant="ghost" className="rounded-full p-0 w-8 h-8">
+                                <MusicIcon className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    ))}
+                  </div>
+                </section>
+                
+                {/* Quick access */}
+                <section>
+                  <h2 className="text-xl font-medium mb-4">Accès rapide</h2>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {[
+                      { icon: <BookOpen className="h-6 w-6" />, label: "Journal" },
+                      { icon: <MusicIcon className="h-6 w-6" />, label: "Musique" },
+                      { icon: <Calendar className="h-6 w-6" />, label: "Agenda" },
+                      { icon: <Settings className="h-6 w-6" />, label: "Réglages" }
+                    ].map((item, i) => (
+                      <motion.div
+                        key={i}
+                        whileHover={{ y: -5 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Button 
+                          variant="outline" 
+                          className="w-full h-auto flex-col gap-2 py-6 hover:bg-primary/5"
+                        >
+                          <div className="rounded-full bg-primary/10 p-3">
+                            {item.icon}
+                          </div>
+                          <span>{item.label}</span>
+                        </Button>
+                      </motion.div>
+                    ))}
+                  </div>
+                </section>
+              </TabsContent>
+              
+              <TabsContent value="activity">
+                <div className="space-y-6">
+                  <h2 className="text-xl font-medium mb-4">Activités à venir</h2>
+                  
+                  <div className="space-y-4">
+                    {UPCOMING_ACTIVITIES.map((activity) => (
+                      <Card key={activity.id} className="overflow-hidden">
+                        <CardContent className="p-4 flex justify-between items-center">
+                          <div>
+                            <h3 className="font-medium">{activity.title}</h3>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-sm text-muted-foreground">{activity.date}</span>
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                                {activity.type}
+                              </span>
+                            </div>
+                          </div>
+                          <Button size="sm" variant="outline">
+                            Détails
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="favorites">
+                <div className="flex flex-col items-center justify-center h-64">
+                  <p className="text-muted-foreground">Vous n'avez pas encore de favoris.</p>
+                  <Button variant="outline" className="mt-4">
+                    Explorer le contenu
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+          
+          {/* Sidebar */}
+          <div>
+            <Card className="sticky top-4">
+              <CardHeader>
+                <CardTitle>Prochaines sessions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Calendar className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Méditation guidée</h3>
+                      <p className="text-sm text-muted-foreground">Aujourd'hui, 18:00</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <BookOpen className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Analyse de journal</h3>
+                      <p className="text-sm text-muted-foreground">Demain, 10:00</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <Button variant="outline" className="w-full">
+                  Voir l'agenda complet
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </main>
       
-      <div className="mt-8 text-center text-sm text-muted-foreground">
-        <p>
-          "La plus grande découverte de ma génération est que les êtres humains peuvent modifier leur vie en modifiant leur état d'esprit." - William James
-        </p>
-      </div>
+      {/* Sticky music player */}
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 1, duration: 0.5 }}
+        className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-10"
+      >
+        <div className="bg-card shadow-xl rounded-full px-4 py-3 flex items-center gap-3 border">
+          <Button variant="outline" size="icon" className="rounded-full h-8 w-8">
+            <MusicIcon className="h-4 w-4" />
+          </Button>
+          <div className="text-sm">
+            <p className="font-medium">Lecture musicale</p>
+            <p className="text-xs text-muted-foreground">Calme et concentration</p>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button size="icon" variant="ghost" className="rounded-full h-8 w-8">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 8-9.04 4.52a.5.5 0 0 0 0 .91L12 18"></path><path d="m15 6-3 1.5v9l3 1.5"></path><path d="M18 8c2 .5 3 1.5 3 3s-1 2.5-3 3"></path></svg>
+            </Button>
+            <Button size="icon" variant="ghost" className="rounded-full h-8 w-8">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 19 2 12 11 5 11 19"></polygon><polygon points="22 19 13 12 22 5 22 19"></polygon></svg>
+            </Button>
+            <Button size="icon" className="rounded-full h-8 w-8">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+            </Button>
+            <Button size="icon" variant="ghost" className="rounded-full h-8 w-8">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 19 22 12 13 5 13 19"></polygon><polygon points="2 19 11 12 2 5 2 19"></polygon></svg>
+            </Button>
+            <Button size="icon" variant="ghost" className="rounded-full h-8 w-8">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 8 9.04 4.52a.5.5 0 0 1 0 .91L12 18"></path><path d="m9 6 3 1.5v9l-3 1.5"></path><path d="M6 8c-2 .5-3 1.5-3 3s1 2.5 3 3"></path></svg>
+            </Button>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };

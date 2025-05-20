@@ -12,6 +12,7 @@ import { OnboardingProvider } from '@/contexts/OnboardingContext';
 import { SupportProvider } from '@/providers/SupportProvider';
 import { DEFAULT_ONBOARDING_STEPS } from '@/data/onboardingSteps';
 import { LayoutProviderProps } from '@/types/layout';
+import { Toaster } from '@/components/ui/toaster';
 
 /**
  * Aggregates all global providers used by the application.
@@ -29,6 +30,7 @@ const AppProviders: React.FC<LayoutProviderProps> = ({ children }) => (
                   <OnboardingProvider steps={DEFAULT_ONBOARDING_STEPS}>
                     <SupportProvider>
                       {children}
+                      <Toaster />
                     </SupportProvider>
                   </OnboardingProvider>
                 </OrchestrationProvider>
