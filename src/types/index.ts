@@ -10,7 +10,7 @@ export * from './notifications';
 export * from './emotion';
 export * from './vr';
 export * from './layout';
-export * from './widget'; // Add if this exists
+export * from './widgets';
 export * from './music';
 export * from './onboarding';
 export * from '@types/orchestration';
