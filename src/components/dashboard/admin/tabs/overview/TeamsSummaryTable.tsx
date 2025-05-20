@@ -2,7 +2,7 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { TeamSummary } from '@/types/dashboard';
+import { TeamSummary } from '@types/dashboard';
 import { ChevronRight, TrendingUp, TrendingDown, ChevronsRight } from 'lucide-react';
 
 const mockTeams: TeamSummary[] = [

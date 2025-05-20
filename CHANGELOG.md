@@ -2,13 +2,15 @@
 # Changelog
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
-## [1.1.11] - 2025-05-29
+## [1.1.11] - 2025-05-30
+
+### Ajouté
+- Rapport technique `docs/dashboard-rh-tech-report.md` décrivant la supervision RH.
 
 ### Modifié
-- Centralisation du chat via `CoachContextProvider` dans `AppProviders`.
-- Suppression des anciens contextes `coach.tsx` et `coach/index.tsx`.
-- Nouveaux handlers défaut pour le coach IA (`defaultCoachHandlers.ts`).
-- Documentation `docs/coach-chat-audit-v2.md` récapitulant l'audit.
+- Centralisation des types du dashboard et des analytics dans `types/`.
+- Services et composants importent désormais ces types via l'alias `@types/*`.
+
 
 ## [1.1.10] - 2025-05-28
 

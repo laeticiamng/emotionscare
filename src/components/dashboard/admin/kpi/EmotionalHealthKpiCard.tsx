@@ -2,7 +2,7 @@
 import React from 'react';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart } from 'lucide-react';
-import { DashboardWidgetConfig } from '@/types/dashboard';
+import { DashboardWidgetConfig } from '@types/dashboard';
 
 interface EmotionalHealthKpiCardProps {
   widget: DashboardWidgetConfig;
