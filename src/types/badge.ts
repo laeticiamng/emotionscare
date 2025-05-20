@@ -1,32 +1,16 @@
 
-// Badge and gamification related types
-
 export interface Badge {
   id: string;
   name: string;
   description: string;
-  image: string;
-  imageUrl?: string;
-  image_url?: string;
-  unlocked?: boolean;
-  earned?: boolean;
-  achieved?: boolean;
-  icon?: string;
-  points?: number;
-  prerequisites?: string[];
-  user_id?: string;
-  rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-  tier?: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
+  icon: string;
+  level?: number;
   progress?: number;
-  goal?: number;
+  image?: string;
   category?: string;
-  date_earned?: string;
-  dateAwarded?: string;
-  unlockedAt?: string;
-  unlocked_at?: string;
-  timestamp?: string;
-  threshold?: number;
-  completed?: boolean; // Added to resolve type errors
+  dateEarned?: string;
+  isNew?: boolean;
+  criteria?: string;
 }
 
 export interface Challenge {
@@ -34,39 +18,10 @@ export interface Challenge {
   title: string;
   description: string;
   points: number;
-  reward: string;
-  progress: number;
-  goal?: number;
-  status: 'active' | 'completed' | 'failed' | 'locked';
-  category: string;
-  unlocked?: boolean;
-  totalSteps?: number;
-  name?: string;
-  completed?: boolean;
-  total?: number;
-  completions?: number;
-  difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+  icon: string;
+  completed: boolean;
+  progress?: number;
   deadline?: string;
-}
-
-export interface LeaderboardEntry {
-  id: string;
-  userId: string;
-  name: string;
-  username?: string;
-  points: number;
-  rank: number;
-  avatar?: string;
-  badges?: Badge[];
-  score?: number;
-}
-
-export interface GamificationStats {
-  points: number;
-  level: number;
-  badges: Badge[];
-  challenges: Challenge[];
-  streakDays: number;
-  nextLevelPoints: number;
-  progressToNextLevel?: number;
+  category?: string;
+  difficulty?: string; // Adding this to fix the type error
 }
