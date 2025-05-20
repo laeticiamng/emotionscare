@@ -1,7 +1,6 @@
-
 import { OnboardingStep } from '@/types/onboarding';
 
-export const defaultOnboardingSteps: OnboardingStep[] = [
+export const DEFAULT_ONBOARDING_STEPS: OnboardingStep[] = [
   {
     id: 'welcome',
     title: 'Bienvenue sur le Dashboard RH',
@@ -92,8 +91,11 @@ export const defaultOnboardingSteps: OnboardingStep[] = [
   },
 ];
 
+// To maintain backward compatibility, export the same array under the old name
+export const defaultOnboardingSteps = DEFAULT_ONBOARDING_STEPS;
+
 export const b2bAdminOnboardingSteps: OnboardingStep[] = [
-  ...defaultOnboardingSteps,
+  ...DEFAULT_ONBOARDING_STEPS,
   {
     id: 'admin-features',
     title: 'Fonctionnalités administrateur',
@@ -105,6 +107,6 @@ export const b2bAdminOnboardingSteps: OnboardingStep[] = [
   },
 ];
 
-export const b2bUserOnboardingSteps: OnboardingStep[] = defaultOnboardingSteps.filter(
+export const b2bUserOnboardingSteps: OnboardingStep[] = DEFAULT_ONBOARDING_STEPS.filter(
   step => !['team-management', 'reports'].includes(step.id)
 );
