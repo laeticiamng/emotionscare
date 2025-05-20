@@ -1,187 +1,127 @@
 
-/**
- * MOCK DATA
- * Ce fichier respecte strictement les types officiels VRSession et VRSessionTemplate
- * Toute modification doit être propagée dans le type officiel ET dans tous les composants consommateurs.
- */
+import { VRSession, VRSessionTemplate, VREnvironment } from '@/types/vr';
 
-import { VRSession, VRSessionTemplate, VRSessionFeedback } from '@/types/vr';
-
-// Mock VR templates
-const vrTemplates: VRSessionTemplate[] = [
-  {
-    id: '1',
-    title: 'Méditation en forêt',
-    description: 'Une méditation immersive au cœur d\'une forêt paisible',
-    duration: 600, // 10 minutes
-    difficulty: 'beginner', // Corrigé de "débutant"
-    thumbnailUrl: '/images/vr/forest-meditation.jpg',
-    environment: 'forest',
-    category: 'meditation',
-    tags: ['nature', 'relaxation', 'méditation'],
-    immersionLevel: 'medium',
-    goalType: 'meditation',
-    audioTrack: '/audio/forest-meditation.mp3',
-    interactive: false,
-    recommendedMood: 'relaxation'
-  },
-  {
-    id: '2',
-    title: 'Plage tropicale',
-    description: 'Échappez-vous sur une plage tropicale idyllique',
-    duration: 900, // 15 minutes
-    difficulty: 'intermediate', // Corrigé de "intermédiaire"
-    thumbnailUrl: '/images/vr/tropical-beach.jpg',
-    environment: 'beach',
-    category: 'relaxation',
-    tags: ['plage', 'mer', 'soleil'],
-    immersionLevel: 'high',
-    goalType: 'relaxation',
-    audioTrack: '/audio/tropical-beach.mp4',
-    interactive: false,
-    recommendedMood: 'relaxation'
-  }
-];
-
-// Mock VR sessions
-const vrSessions: VRSession[] = [
-  {
-    id: '101',
-    templateId: '1',
-    userId: 'user123',
-    startedAt: new Date().toISOString(),
-    endedAt: new Date(Date.now() + 10 * 60000).toISOString(),
-    duration: 600,
-    completed: true,
-    progress: 100,
-    feedback: {
-      rating: 4,
-      emotionBefore: 'stressed',
-      emotionAfter: 'calm',
-      comment: 'Très relaxant, j\'ai beaucoup aimé'
-    } as VRSessionFeedback
-  },
-  {
-    id: '102',
-    templateId: '2',
-    userId: 'user123',
-    startedAt: new Date(Date.now() - 86400000).toISOString(), // Yesterday
-    endedAt: new Date(Date.now() - 86400000 + 15 * 60000).toISOString(),
-    duration: 900,
-    completed: true,
-    progress: 100,
-    feedback: {
-      rating: 5,
-      emotionBefore: 'anxious',
-      emotionAfter: 'relaxed',
-      comment: 'Parfait pour se détendre'
-    } as VRSessionFeedback
-  }
-];
-
-// VR service functions
-export const fetchVRTemplates = async (): Promise<VRSessionTemplate[]> => {
-  // Simulate API call delay
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(vrTemplates), 500);
-  });
-};
-
-export const fetchVRTemplate = async (templateId: string): Promise<VRSessionTemplate | null> => {
-  // Simulate API call delay
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const template = vrTemplates.find(t => t.id === templateId) || null;
-      resolve(template);
-    }, 300);
-  });
-};
-
-export const fetchVRSessionHistory = async (userId: string): Promise<VRSession[]> => {
-  // Simulate API call delay
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const userSessions = vrSessions.filter(s => s.userId === userId);
-      resolve(userSessions);
-    }, 500);
-  });
-};
-
-export const createVRSession = async (sessionData: Partial<VRSession>): Promise<VRSession> => {
-  // Simulate API call delay
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const newSession: VRSession = {
-        id: Math.random().toString(36).substr(2, 9),
-        templateId: sessionData.templateId || '',
-        userId: sessionData.userId || '',
-        startedAt: new Date().toISOString(),
-        duration: sessionData.duration || 0,
-        completed: false,
-        progress: 0,
-        ...sessionData
-      };
-      vrSessions.push(newSession);
-      resolve(newSession);
-    }, 300);
-  });
-};
-
-export const completeVRSession = async (sessionId: string, sessionData: Partial<VRSession>): Promise<VRSession> => {
-  // Simulate API call delay
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const sessionIndex = vrSessions.findIndex(s => s.id === sessionId);
-      if (sessionIndex === -1) {
-        reject(new Error('Session not found'));
-        return;
+// Simulated VR service
+const VRService = {
+  // Get available VR session templates
+  getTemplates: async (): Promise<VRSessionTemplate[]> => {
+    // This would fetch from an API in a real implementation
+    const mockTemplates: VRSessionTemplate[] = [
+      {
+        id: 'template-1',
+        name: 'Calm Beach',
+        title: 'Calm Beach Meditation',
+        description: 'Relax on a serene beach with gentle waves and soothing sounds',
+        duration: 600, // 10 minutes
+        thumbnailUrl: '/images/vr/beach-thumb.jpg',
+        environmentId: 'env-beach',
+        category: 'relaxation',
+        intensity: 2,
+        difficulty: 'easy',
+        immersionLevel: 'medium',
+        goalType: 'relaxation',
+        interactive: false,
+        tags: ['calm', 'beach', 'nature'],
+        recommendedMood: 'calm'
+      },
+      {
+        id: 'template-2',
+        name: 'Forest Adventure',
+        title: 'Forest Adventure',
+        description: 'Explore a lush forest with ambient sounds and wildlife',
+        duration: 900, // 15 minutes
+        thumbnailUrl: '/images/vr/forest-thumb.jpg',
+        environmentId: 'env-forest',
+        category: 'exploration',
+        intensity: 4,
+        difficulty: 'medium',
+        immersionLevel: 'high',
+        goalType: 'mindfulness',
+        interactive: true,
+        tags: ['forest', 'nature', 'adventure'],
+        recommendedMood: 'curious'
       }
-      
-      const updatedSession: VRSession = {
-        ...vrSessions[sessionIndex],
-        ...sessionData,
-        endedAt: new Date().toISOString(),
+    ];
+    
+    return mockTemplates;
+  },
+  
+  // Get user's VR session history
+  getUserSessions: async (userId: string): Promise<VRSession[]> => {
+    // This would fetch from an API in a real implementation
+    const mockSessions: VRSession[] = [
+      {
+        id: 'session-1',
+        templateId: 'template-1',
+        userId: userId,
+        startTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+        endTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 600000).toISOString(),
+        duration: 600,
         completed: true,
-        progress: 100
-      };
-      
-      vrSessions[sessionIndex] = updatedSession;
-      resolve(updatedSession);
-    }, 300);
-  });
+        progress: 1,
+        feedback: {
+          id: 'feedback-1',
+          sessionId: 'session-1',
+          userId: userId,
+          timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 600000).toISOString(),
+          rating: 4,
+          emotionBefore: 'stressed',
+          emotionAfter: 'calm',
+          comment: 'Very relaxing experience'
+        },
+        metrics: {
+          heartRate: [72, 70, 68, 65, 64],
+          stressLevel: 0.3,
+          focusLevel: 0.8
+        }
+      }
+    ];
+    
+    return mockSessions;
+  },
+  
+  // Start a new VR session
+  startSession: async (userId: string, templateId: string): Promise<VRSession> => {
+    // This would call an API to start a session in a real implementation
+    const newSession: VRSession = {
+      id: `session-${Date.now()}`,
+      templateId: templateId,
+      userId: userId,
+      startTime: new Date().toISOString(),
+      duration: 0,
+      completed: false,
+      progress: 0
+    };
+    
+    return newSession;
+  },
+  
+  // End an active VR session
+  endSession: async (sessionId: string, feedback?: any): Promise<VRSession> => {
+    // This would call an API to end a session in a real implementation
+    const mockSession: VRSession = {
+      id: sessionId,
+      templateId: 'template-1',
+      userId: 'user-1',
+      startTime: new Date(Date.now() - 600000).toISOString(),
+      endTime: new Date().toISOString(),
+      duration: 600,
+      completed: true,
+      progress: 1,
+      feedback: feedback ? {
+        id: `feedback-${Date.now()}`,
+        sessionId: sessionId,
+        userId: 'user-1',
+        timestamp: new Date().toISOString(),
+        rating: feedback.rating || 5,
+        emotionBefore: feedback.emotionBefore || 'neutral',
+        emotionAfter: feedback.emotionAfter || 'calm',
+        comment: feedback.comment || ''
+      } : undefined
+    };
+    
+    return mockSession;
+  }
 };
 
-export const fetchSessionById = async (sessionId: string): Promise<VRSession | null> => {
-  // Simulate API call delay
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const session = vrSessions.find(s => s.id === sessionId) || null;
-      resolve(session);
-    }, 300);
-  });
-};
-
-export const fetchTemplateById = async (templateId: string): Promise<VRSessionTemplate | null> => {
-  // Simulate API call delay
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const template = vrTemplates.find(t => t.id === templateId) || null;
-      resolve(template);
-    }, 300);
-  });
-};
-
-export const getRecommendedTemplates = async (emotion: string): Promise<VRSessionTemplate[]> => {
-  // Simulate API call delay
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Filter templates that are recommended for this emotion
-      const recommended = vrTemplates.filter(t =>
-        t.recommendedMood === emotion ||
-        (emotion === 'stressed' && t.goalType === 'relaxation') ||
-        (emotion === 'sad' && t.goalType === 'energizing')
-      );
-      resolve(recommended.length ? recommended : vrTemplates);
-    }, 500);
-  });
-};
+export default VRService;

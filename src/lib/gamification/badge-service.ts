@@ -1,52 +1,50 @@
 
-// For fixing imports conflicts, we'll rename the imported Badge type
-import { Badge as BadgeType } from '@/types/badge';
+import { Badge } from '@/types/gamification';
 
-// In-memory storage for badges
-let badges: BadgeType[] = [];
+// Example badge service for handling badges
+export const BadgeService = {
+  getBadgesForUser: async (userId: string): Promise<Badge[]> => {
+    // This would typically fetch from an API
+    return [
+      {
+        id: 'badge-1',
+        name: 'First Login',
+        description: 'You logged in for the first time',
+        category: 'general',
+        image: '/badges/first-login.png',
+        unlocked: true,
+        unlockedAt: new Date().toISOString(),
+        user_id: userId
+      },
+      {
+        id: 'badge-2',
+        name: 'Emotion Explorer',
+        description: 'You discovered 5 different emotions',
+        category: 'emotion',
+        image: '/badges/emotion-explorer.png',
+        unlocked: false,
+        progress: 3,
+        threshold: 5,
+        user_id: userId
+      }
+    ];
+  },
 
-// Add a badge
-export function addBadge(badge: Omit<BadgeType, 'id'>): BadgeType {
-  const newBadge: BadgeType = {
-    id: `badge-${Date.now()}`,
-    ...badge as any
-  };
-  
-  badges.push(newBadge);
-  return newBadge;
-}
+  unlockBadge: async (userId: string, badgeId: string): Promise<Badge> => {
+    // This would typically call an API
+    return {
+      id: badgeId,
+      name: 'Newly Unlocked Badge',
+      description: 'This badge was just unlocked',
+      category: 'achievement',
+      image: '/badges/achievement.png',
+      unlocked: true,
+      unlockedAt: new Date().toISOString(),
+      user_id: userId
+    };
+  },
 
-// Get all badges
-export function getAllBadges(): BadgeType[] {
-  return [...badges];
-}
-
-// Get badges by user
-export function getBadgesByUser(userId: string): BadgeType[] {
-  return badges.filter(badge => badge.user_id === userId);
-}
-
-// Get badges by category
-export function getBadgesByCategory(category: string): BadgeType[] {
-  return badges.filter(badge => badge.category === category);
-}
-
-// Get badge by ID
-export function getBadgeById(id: string): BadgeType | undefined {
-  return badges.find(badge => badge.id === id);
-}
-
-// Export getBadges for compatibility
-export const getBadges = getAllBadges;
-
-// Badge service object
-const badgeService = {
-  addBadge,
-  getAllBadges,
-  getBadgesByUser,
-  getBadgesByCategory,
-  getBadgeById,
-  getBadges
+  // Additional badge-related functions
 };
 
-export default badgeService;
+export default BadgeService;

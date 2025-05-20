@@ -1,62 +1,26 @@
 
-import { format, subDays } from 'date-fns';
-import { MoodData } from '@/types';
+import { MoodData } from '@/types/emotion';
 
-// Generate mock mood data for the given number of days
-export const generateMoodData = (days: number = 30): MoodData[] => {
-  const result: MoodData[] = [];
+// Update the generator to use the correct properties
+export const generateMockMoodData = (days = 30): MoodData[] => {
+  const data: MoodData[] = [];
+  const emotions = ['happy', 'sad', 'neutral', 'angry', 'surprised', 'fearful'];
   
-  for (let i = days; i >= 0; i--) {
-    const date = subDays(new Date(), i);
-    const formattedDate = format(date, 'dd/MM');
+  const now = new Date();
+  
+  for (let i = 0; i < days; i++) {
+    const date = new Date(now);
+    date.setDate(now.getDate() - (days - i));
     
-    result.push({
-      date: formattedDate,
-      originalDate: date.toISOString(),
-      value: Math.floor(Math.random() * 100),
-      sentiment: Math.floor(Math.random() * 100),
-      anxiety: Math.floor(Math.random() * 100),
-      energy: Math.floor(Math.random() * 100),
-      mood: getMoodFromValue(Math.floor(Math.random() * 100))
+    data.push({
+      id: `mood-${i}`,
+      emotion: emotions[Math.floor(Math.random() * emotions.length)],
+      intensity: Math.random() * 0.6 + 0.2, // Between 0.2 and 0.8
+      timestamp: date.toISOString(), // Use timestamp instead of date
+      userId: 'user-1',
+      source: 'daily-check-in'
     });
   }
   
-  return result;
-};
-
-// Helper function to get mood string from value
-function getMoodFromValue(value: number): string {
-  if (value < 20) return 'very_sad';
-  if (value < 40) return 'sad';
-  if (value < 60) return 'neutral';
-  if (value < 80) return 'happy';
-  return 'very_happy';
-}
-
-// Generate mock alerts data
-export const generateAlerts = (count: number = 5) => {
-  const alertTypes = ['danger', 'warning', 'info', 'success'];
-  const alertMessages = [
-    'Anomalie détectée dans les tendances émotionnelles',
-    'Rappel de consultation programmée',
-    'Nouvelle fonctionnalité disponible',
-    'Progrès significatif observé',
-    'Modification des habitudes détectée'
-  ];
-  
-  const alerts = [];
-  
-  for (let i = 0; i < count; i++) {
-    const typeIndex = Math.floor(Math.random() * alertTypes.length);
-    const messageIndex = Math.floor(Math.random() * alertMessages.length);
-    
-    alerts.push({
-      id: `alert-${i}`,
-      type: alertTypes[typeIndex],
-      message: alertMessages[messageIndex],
-      date: subDays(new Date(), Math.floor(Math.random() * 7)).toISOString()
-    });
-  }
-  
-  return alerts;
+  return data;
 };

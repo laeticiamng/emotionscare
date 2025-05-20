@@ -1,104 +1,160 @@
 
-import { Badge, Challenge } from '@/types/badge';
+import { Badge, Challenge, GamificationStats } from '@/types/gamification';
 
-// Fonction pour récupérer tous les défis de l'utilisateur
-export const fetchUserChallenges = async (userId: string): Promise<Challenge[]> => {
-  // C'est juste une implémentation simulée
-  return [
-    {
-      id: '1',
-      title: 'Apprenti émotionnel',
-      description: 'Enregistrer 5 émotions différentes',
-      points: 50,
-      status: 'active',
-      category: 'emotions',
-      progress: 3,
-      goal: 5,
-      unlocked: true,
-      reward: {
+// Mock service for gamification features
+const GamificationService = {
+  // Get user badges
+  getUserBadges: async (userId: string): Promise<Badge[]> => {
+    // This would fetch from an API in a real implementation
+    const mockBadges: Badge[] = [
+      {
         id: 'badge1',
-        name: 'Explorateur émotionnel',
-        description: 'A enregistré 5 émotions différentes',
-        imageUrl: '/badges/emotional-explorer.png'
-      } as Badge
-    },
-    {
-      id: '2',
-      title: 'Explorateur de conscience',
-      description: 'Compléter 3 sessions de méditation guidée',
-      points: 100,
-      status: 'active',
-      category: 'meditation',
-      progress: 1,
-      goal: 3,
-      unlocked: true,
-      reward: {
+        name: 'First Step',
+        description: 'Completed your first session',
+        category: 'achievement',
+        image: '/badges/first-step.png',
+        unlocked: true,
+        unlockedAt: new Date().toISOString()
+      },
+      {
         id: 'badge2',
-        name: 'Méditant novice',
-        description: 'A complété 3 sessions de méditation guidée',
-        imageUrl: '/badges/meditation-novice.png'
-      } as Badge
-    },
-    {
-      id: '3',
-      title: 'Journal intime',
-      description: 'Écrire dans votre journal 7 jours consécutifs',
-      points: 150,
-      status: 'locked',
-      category: 'journal',
-      progress: 0,
-      goal: 7,
-      unlocked: false,
-      reward: {
+        name: 'Emotion Explorer',
+        description: 'Discovered 5 different emotions',
+        category: 'emotion',
+        image: '/badges/emotion-explorer.png',
+        unlocked: true,
+        unlockedAt: new Date().toISOString()
+      },
+      {
         id: 'badge3',
-        name: 'Journal régulier',
-        description: 'A écrit dans son journal pendant 7 jours consécutifs',
-        imageUrl: '/badges/consistent-journaler.png'
-      } as Badge
-    }
-  ];
-};
-
-// Fonction pour récupérer les badges utilisateur
-export const fetchUserBadges = async (userId: string): Promise<Badge[]> => {
-  // Implémentation simulée
-  return [
-    {
-      id: 'badge1',
-      name: 'Premier pas',
-      description: 'Première connexion à l\'application',
-      imageUrl: '/badges/first-login.png',
-      unlocked: true,
-      category: 'system'
-    },
-    {
-      id: 'badge2',
-      name: 'Explorateur émotionnel',
-      description: 'Explorer 5 émotions différentes',
-      imageUrl: '/badges/emotion-explorer.png',
-      progress: 3,
-      threshold: 5,
-      unlocked: false,
-      category: 'emotions'
-    }
-  ];
-};
-
-// Fonction pour compléter un défi
-export const completeChallenge = async (
-  challengeId: string
-): Promise<{ success: boolean; badge?: Badge }> => {
-  console.log(`Completing challenge ${challengeId}`);
+        name: 'Consistency King',
+        description: 'Logged in for 7 consecutive days',
+        category: 'streak',
+        image: '/badges/consistency-king.png',
+        progress: 5,
+        threshold: 7,
+        unlocked: false
+      }
+    ];
+    
+    return mockBadges;
+  },
   
-  return {
-    success: true,
-    badge: {
-      id: 'new-badge',
-      name: 'Champion du défi',
-      description: 'Un défi relevé avec succès',
-      imageUrl: '/badges/challenge-completed.png',
+  // Get user challenges
+  getUserChallenges: async (userId: string): Promise<Challenge[]> => {
+    const mockBadges: Badge[] = [
+      {
+        id: 'badge4',
+        name: 'Meditation Master',
+        description: 'Complete 10 meditation sessions',
+        category: 'meditation',
+        image: '/badges/meditation-master.png',
+        unlocked: false,
+        progress: 7,
+        threshold: 10
+      },
+      {
+        id: 'badge5',
+        name: 'Mood Tracker',
+        description: 'Track your mood for 14 days',
+        category: 'tracking',
+        image: '/badges/mood-tracker.png',
+        unlocked: false,
+        progress: 10,
+        threshold: 14
+      }
+    ];
+    
+    // This would fetch from an API in a real implementation
+    const mockChallenges: Challenge[] = [
+      {
+        id: 'challenge1',
+        title: 'Daily Check-in',
+        name: 'Daily Check-in',
+        description: 'Check in every day for a week',
+        type: 'streak',
+        targetValue: 7,
+        currentValue: 5,
+        completed: false,
+        difficulty: 'easy',
+        category: 'daily',
+        reward: mockBadges[0],
+        deadline: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: 'challenge2',
+        title: 'Emotion Diversity',
+        name: 'Emotion Diversity',
+        description: 'Identify 10 different emotions',
+        type: 'collection',
+        targetValue: 10,
+        currentValue: 6,
+        completed: false,
+        difficulty: 'medium',
+        category: 'emotion',
+        reward: mockBadges[1]
+      }
+    ];
+    
+    return mockChallenges;
+  },
+  
+  // Get user gamification stats
+  getUserStats: async (userId: string): Promise<GamificationStats> => {
+    // This would fetch from an API in a real implementation
+    const badges = await GamificationService.getUserBadges(userId);
+    
+    const mockStats: GamificationStats = {
+      level: 4,
+      xp: 850,
+      xpToNextLevel: 1000,
+      consecutiveLogins: 5,
+      totalSessions: 23,
+      totalMoodEntries: 42,
+      totalMeditationMinutes: 180,
+      badges: badges,
+      achievements: ['first_login', 'first_scan', 'three_day_streak'],
+      streakDays: 5,
+      progressToNextLevel: 0.85
+    };
+    
+    return mockStats;
+  },
+  
+  // Award a badge to a user
+  awardBadge: async (userId: string, badgeType: string): Promise<Badge> => {
+    // This would call an API to award the badge in a real implementation
+    const newBadge: Badge = {
+      id: `badge-${Date.now()}`,
+      name: 'New Achievement',
+      description: 'You earned a new achievement',
+      imageUrl: '/badges/new-achievement.png',
       unlocked: true,
-      category: 'achievements'
-    }
-  };
+      category: 'achievement',
+      image: '/badges/new-achievement.png'
+    };
+    
+    return newBadge;
+  },
+  
+  // Update challenge progress
+  updateChallengeProgress: async (userId: string, challengeId: string, progress: number): Promise<Challenge> => {
+    // This would call an API to update progress in a real implementation
+    const updatedChallenge: Challenge = {
+      id: challengeId,
+      title: 'Updated Challenge',
+      name: 'Updated Challenge',
+      description: 'This challenge was updated',
+      type: 'progress',
+      targetValue: 10,
+      currentValue: progress,
+      completed: progress >= 10,
+      difficulty: 'medium',
+      category: 'progress'
+    };
+    
+    return updatedChallenge;
+  }
 };
+
+export default GamificationService;

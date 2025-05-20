@@ -1,79 +1,62 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Music, Play } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import { EmotionMusicParams } from '@/types/music';
-import { motion } from 'framer-motion';
+import { MusicPlaylist } from '@/types/music';
+import { Button } from '@/components/ui/button';
+import { Play } from 'lucide-react';
 
 interface MusicRecommendationProps {
   emotion: string;
-  intensity?: number;
-  onActivated?: () => void;
+  autoPlay?: boolean;
 }
 
-const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ 
+export const MusicRecommendation: React.FC<MusicRecommendationProps> = ({
   emotion,
-  intensity = 0.5,
-  onActivated
+  autoPlay = false
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
+  const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
+  const { playEmotion, isLoading, getEmotionMusicDescription } = useMusicEmotionIntegration();
   
-  const handleActivateMusic = async () => {
-    setIsLoading(true);
-    try {
-      const params: EmotionMusicParams = { emotion, intensity };
-      const result = await activateMusicForEmotion(params);
-      
-      if (result && onActivated) {
-        onActivated();
+  useEffect(() => {
+    if (autoPlay && emotion) {
+      handlePlay();
+    }
+  }, [emotion, autoPlay]);
+  
+  const handlePlay = async () => {
+    if (emotion) {
+      try {
+        const result = await playEmotion(emotion);
+        if (result) {
+          setPlaylist(result);
+        }
+      } catch (error) {
+        console.error('Error playing emotion music:', error);
       }
-    } finally {
-      setIsLoading(false);
     }
   };
-
+  
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 5 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <Card className="overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50/30 dark:from-blue-900/10 dark:to-indigo-900/20 border-blue-100 dark:border-blue-700/20 hover:shadow-md transition-shadow">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center text-base">
-            <Music className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
-            Musique adaptée
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm mb-3 text-gray-600 dark:text-gray-300">
-            {getEmotionMusicDescription(emotion)}
-          </p>
-          
-          <Button 
-            onClick={handleActivateMusic} 
-            disabled={isLoading}
-            className="w-full"
-            size="sm"
-          >
-            {isLoading ? (
-              <span className="flex items-center gap-2">
-                <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                Chargement...
-              </span>
-            ) : (
-              <>
-                <Play className="mr-2 h-4 w-4" />
-                Écouter maintenant
-              </>
-            )}
-          </Button>
-        </CardContent>
-      </Card>
-    </motion.div>
+    <div className="music-recommendation p-4 border rounded-lg bg-card">
+      <h3 className="text-lg font-semibold mb-2">Recommandation musicale</h3>
+      <p className="text-muted-foreground mb-4">{getEmotionMusicDescription(emotion)}</p>
+      
+      <Button 
+        onClick={handlePlay} 
+        disabled={isLoading} 
+        className="w-full"
+      >
+        <Play className="mr-2 h-4 w-4" />
+        {isLoading ? 'Chargement...' : 'Écouter la playlist adaptée'}
+      </Button>
+      
+      {playlist && (
+        <div className="mt-4">
+          <p className="text-sm font-medium">{playlist.name || 'Playlist personnalisée'}</p>
+          <p className="text-xs text-muted-foreground">{playlist.tracks.length} morceaux</p>
+        </div>
+      )}
+    </div>
   );
 };
 

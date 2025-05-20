@@ -1,27 +1,40 @@
 
 /**
- * Polyfill pour Array.prototype.findLast
- * Notez que cela n'est pas nécessaire en ES2023 et versions ultérieures
+ * This file contains polyfills for browser APIs that may be missing
  */
+
+// Polyfill for Array.findLast if not available
 if (!Array.prototype.findLast) {
-  Object.defineProperty(Array.prototype, 'findLast', {
-    value: function<T>(
-      predicate: (value: T, index: number, obj: T[]) => boolean,
-      thisArg?: any
-    ): T | undefined {
-      for (let i = this.length - 1; i >= 0; i--) {
-        if (predicate.call(thisArg, this[i], i, this as any)) {
-          return this[i];
-        }
+  Array.prototype.findLast = function<T>(
+    predicate: (value: T, index: number, array: T[]) => boolean,
+    thisArg?: any
+  ): T | undefined {
+    if (this == null) {
+      throw new TypeError('Array.prototype.findLast called on null or undefined');
+    }
+    if (typeof predicate !== 'function') {
+      throw new TypeError('predicate must be a function');
+    }
+
+    const array = Object(this);
+    const length = array.length >>> 0;
+    
+    for (let i = length - 1; i >= 0; i--) {
+      const value = array[i];
+      if (predicate.call(thisArg, value, i, array)) {
+        return value;
       }
-      return undefined;
-    },
-    configurable: true,
-    enumerable: false,
-    writable: true
-  });
+    }
+    
+    return undefined;
+  };
 }
 
-/**
- * Autres polyfills pour la rétro-compatibilité peuvent être ajoutés ici
- */
+export {};
+
+// Add type definition to make TypeScript happy
+declare global {
+  interface Array<T> {
+    findLast(predicate: (value: T, index: number, obj: T[]) => boolean, thisArg?: any): T | undefined;
+  }
+}

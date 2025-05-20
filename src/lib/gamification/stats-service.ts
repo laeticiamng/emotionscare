@@ -1,33 +1,36 @@
 
-import { GamificationStats } from '@/types/gamification';
+import { GamificationStats, Badge } from '@/types/gamification';
 
-export const getGamificationStats = async (userId: string): Promise<GamificationStats> => {
-  // This would normally fetch data from an API
-  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
-  
-  return {
-    points: 530,
-    level: 5,
-    rank: "Emotional Explorer",
-    badges: [], // This would typically contain badge objects
-    streak: 7,
-    completedChallenges: 12,
-    totalChallenges: 15, // Ajout de la propriété manquante
-    activeChallenges: 3,
-    streakDays: 7,
-    nextLevelPoints: 1000,
-    progressToNextLevel: 53,
-    totalPoints: 530,
-    badgesCount: 8,
-    challenges: [],
-    recentAchievements: [],
-    nextLevel: {
-      points: 1000,
-      rewards: ["New Badge", "Meditation Access"]
-    },
-    achievements: [],
-    currentLevel: 5,
-    pointsToNextLevel: 470,
-    lastActivityDate: new Date().toISOString()
-  };
+// Example stats service
+export const StatsService = {
+  getStatsForUser: async (userId: string): Promise<GamificationStats> => {
+    // This would typically fetch from an API
+    const mockBadges: Badge[] = [
+      {
+        id: 'badge-1',
+        name: 'First Login',
+        description: 'You logged in for the first time',
+        category: 'general',
+        image: '/badges/first-login.png',
+        unlocked: true,
+        unlockedAt: new Date().toISOString()
+      }
+    ];
+    
+    return {
+      level: 3,
+      xp: 350,
+      xpToNextLevel: 500,
+      consecutiveLogins: 5,
+      totalSessions: 12,
+      totalMoodEntries: 28,
+      totalMeditationMinutes: 120,
+      badges: mockBadges,
+      achievements: ['first_login', 'mood_streak_3'],
+      streakDays: 5,
+      progressToNextLevel: 0.7 // Progress percentage to next level
+    };
+  }
 };
+
+export default StatsService;

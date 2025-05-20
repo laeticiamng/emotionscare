@@ -2,33 +2,49 @@
 import { AudioTrack } from '@/types/audio';
 
 /**
- * Obtenir l'URL audio d'une piste
+ * Get the URL for an audio track
  */
-export const getAudioUrl = (track?: AudioTrack | null): string => {
-  if (!track) return '';
-  return track.audioUrl || track.url || '';
+export const getAudioUrl = (track: AudioTrack): string => {
+  return track.url || '';
 };
 
 /**
- * Obtenir la description d'une piste audio
+ * Get a display description for an audio track
  */
-export const getAudioDescription = (track?: AudioTrack | null): string => {
+export const getAudioDescription = (track: AudioTrack): string => {
   if (!track) return '';
-  return track.description || track.summary || '';
+  return track.description || track.title || '';
 };
 
 /**
- * Formater la durée d'une piste audio en mm:ss
+ * Format seconds as mm:ss
  */
-export const formatAudioDuration = (seconds: number): string => {
+export const formatDuration = (seconds: number): string => {
+  if (!seconds || isNaN(seconds)) return '00:00';
+  
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  
+  return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
 };
 
 /**
- * Vérifier si une piste est en cours de lecture
+ * Normalize an audio track to ensure it has all required fields
  */
-export const isTrackPlaying = (currentTrackId: string | null, track: AudioTrack): boolean => {
-  return currentTrackId === track.id;
+export const normalizeAudioTrack = (track: Partial<AudioTrack>): AudioTrack => {
+  return {
+    id: track.id || `track-${Date.now()}`,
+    title: track.title || 'Unknown Track',
+    artist: track.artist || 'Unknown Artist',
+    url: track.url || '',
+    duration: track.duration || 0,
+    coverUrl: track.coverUrl || '/images/default-audio-cover.jpg'
+  };
+};
+
+export default {
+  getAudioUrl,
+  getAudioDescription,
+  formatDuration,
+  normalizeAudioTrack
 };

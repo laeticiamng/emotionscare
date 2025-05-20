@@ -1,143 +1,70 @@
-
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Music, Play, Pause, RotateCw } from 'lucide-react';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import { EmotionMusicParams, MusicPlaylist } from '@/types/music';
-import { motion } from 'framer-motion';
+import { EmotionResult } from '@/types/emotion';
+import { MusicPlaylist } from '@/types/music';
+import { useToast } from '@/components/ui/use-toast';
 
 interface MusicEmotionSyncProps {
-  detectedEmotion: string;
-  intensity?: number;
-  onMusicActivated?: () => void;
+  emotionResult?: EmotionResult | null;
+  autoSync?: boolean;
+  onPlaylistLoaded?: (playlist: MusicPlaylist | null) => void;
 }
 
 export const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({
-  detectedEmotion,
-  intensity = 0.5,
-  onMusicActivated
+  emotionResult,
+  autoSync = true,
+  onPlaylistLoaded
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
   const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
-  const { activateMusicForEmotion, getEmotionMusicDescription, isLoading: hookLoading } = useMusicEmotionIntegration();
+  const { getMusicRecommendationForEmotion, isLoading } = useMusicEmotionIntegration();
+  const { toast } = useToast();
 
-  // Load music recommendations when emotion changes
   useEffect(() => {
-    const syncWithEmotion = async () => {
-      if (!detectedEmotion) return;
-      
-      setIsLoading(true);
-      try {
-        const params: EmotionMusicParams = {
-          emotion: detectedEmotion,
-          intensity: intensity
-        };
-        const result = await activateMusicForEmotion(params);
-        if (result) {
-          setPlaylist(result);
-          if (onMusicActivated) onMusicActivated();
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    syncWithEmotion();
-  }, [detectedEmotion, intensity, activateMusicForEmotion, onMusicActivated]);
+    if (autoSync && emotionResult) {
+      syncMusic(emotionResult);
+    }
+  }, [emotionResult, autoSync]);
 
-  // Manual refresh
-  const handleRefresh = async () => {
-    setIsLoading(true);
+  const syncMusic = async (result: EmotionResult) => {
+    if (!result || !result.dominantEmotion) {
+      return;
+    }
+
     try {
-      const params: EmotionMusicParams = {
-        emotion: detectedEmotion,
-        intensity: intensity
-      };
-      const result = await activateMusicForEmotion(params);
-      if (result) {
-        setPlaylist(result);
+      const recommendedPlaylist = await getMusicRecommendationForEmotion(result);
+      if (recommendedPlaylist) {
+        setPlaylist(recommendedPlaylist);
+        
+        if (onPlaylistLoaded) {
+          onPlaylistLoaded(recommendedPlaylist);
+        }
+        
+        toast({
+          title: "Musique synchronisée",
+          description: `Une playlist adaptée à votre humeur ${result.dominantEmotion} est prête.`,
+          duration: 3000
+        });
       }
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      console.error('Error syncing music with emotion:', error);
+      toast({
+        title: "Erreur de synchronisation",
+        description: "Impossible de charger la musique adaptée à votre humeur.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const manualSync = async () => {
+    if (emotionResult) {
+      await syncMusic(emotionResult);
     }
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <Card className="overflow-hidden border border-blue-100 dark:border-blue-800/30">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 pb-3">
-          <CardTitle className="flex items-center gap-2">
-            <Music className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            Musique adaptée
-          </CardTitle>
-          <CardDescription>
-            {detectedEmotion ? getEmotionMusicDescription(detectedEmotion) : "En attente de détection d'émotion..."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <div className="space-y-4">
-            {detectedEmotion ? (
-              <div className="flex items-center justify-between bg-blue-50/50 dark:bg-blue-900/20 p-3 rounded-lg">
-                <div>
-                  <p className="text-sm font-medium">Émotion détectée</p>
-                  <p className="text-xs text-muted-foreground capitalize">{detectedEmotion}</p>
-                </div>
-                <Button 
-                  size="sm" 
-                  variant="ghost"
-                  onClick={handleRefresh}
-                  disabled={isLoading}
-                  className="h-8 w-8 p-0"
-                >
-                  <RotateCw className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              <div className="bg-muted p-3 rounded-lg">
-                <p className="text-sm">Aucune émotion détectée pour le moment</p>
-              </div>
-            )}
-            
-            {playlist && (
-              <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm">
-                <p className="text-sm font-medium">{playlist.title || playlist.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {playlist.tracks.length} pistes musicales disponibles
-                </p>
-              </div>
-            )}
-            
-            <Button
-              className="w-full"
-              disabled={isLoading || hookLoading || !detectedEmotion}
-              onClick={handleRefresh}
-            >
-              {isLoading || hookLoading ? (
-                <span className="flex items-center gap-2">
-                  <div className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                  Chargement...
-                </span>
-              ) : playlist ? (
-                <>
-                  <Play className="mr-2 h-4 w-4" />
-                  Jouer la musique
-                </>
-              ) : (
-                <>
-                  <RotateCw className="mr-2 h-4 w-4" />
-                  Rafraîchir
-                </>
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+    <div className="music-emotion-sync">
+      {/* Component rendering can be added if needed */}
+    </div>
   );
 };
 

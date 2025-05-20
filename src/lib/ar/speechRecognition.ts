@@ -1,108 +1,80 @@
 
-// Type definitions for Web Speech API
+// Create polyfill for SpeechRecognition
+
 interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResultList;
   resultIndex: number;
-  interpretation?: any;
+  results: {
+    [index: number]: {
+      [index: number]: {
+        transcript: string;
+        confidence: number;
+      };
+    };
+    isFinal: boolean;
+    length: number;
+  };
 }
 
-interface SpeechRecognitionResultList {
-  length: number;
-  item(index: number): SpeechRecognitionResult;
-  [index: number]: SpeechRecognitionResult;
-}
-
-interface SpeechRecognitionResult {
-  length: number;
-  item(index: number): SpeechRecognitionAlternative;
-  [index: number]: SpeechRecognitionAlternative;
-  isFinal: boolean;
-}
-
-interface SpeechRecognitionAlternative {
-  transcript: string;
-  confidence: number;
-}
-
-interface SpeechGrammar {
-  src: string;
-  weight: number;
-}
-
-interface SpeechGrammarList {
-  length: number;
-  item(index: number): SpeechGrammar;
-  [index: number]: SpeechGrammar;
-  addFromURI(src: string, weight?: number): void;
-  addFromString(string: string, weight?: number): void;
-}
-
-interface SpeechRecognitionConstructor {
-  new (): SpeechRecognition;
-  prototype: SpeechRecognition;
-}
-
-interface SpeechRecognition extends EventTarget {
-  grammars: SpeechGrammarList;
+interface SimpleSpeechRecognition extends EventTarget {
   lang: string;
   continuous: boolean;
   interimResults: boolean;
   maxAlternatives: number;
-  serviceURI: string;
-
-  // Event handlers
-  onaudiostart: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onaudioend: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onend: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onerror: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onnomatch: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => any) | null;
-  onsoundstart: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onsoundend: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onspeechstart: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onspeechend: ((this: SpeechRecognition, ev: Event) => any) | null;
-  onstart: ((this: SpeechRecognition, ev: Event) => any) | null;
-
-  // Methods
-  abort(): void;
-  start(): void;
-  stop(): void;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: Event) => void) | null;
+  onend: ((event: Event) => void) | null;
+  onstart: ((event: Event) => void) | null;
 }
 
-interface Window {
-  SpeechRecognition?: SpeechRecognitionConstructor;
-  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+interface SimpleSpeechRecognitionConstructor {
+  new (): SimpleSpeechRecognition;
 }
 
-// Function to get the SpeechRecognition constructor
-export function getSpeechRecognition(): SpeechRecognitionConstructor | null {
-  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+declare global {
+  interface Window {
+    SpeechRecognition: SimpleSpeechRecognitionConstructor | undefined;
+    webkitSpeechRecognition: SimpleSpeechRecognitionConstructor | undefined;
+    mozSpeechRecognition: SimpleSpeechRecognitionConstructor | undefined;
+    msSpeechRecognition: SimpleSpeechRecognitionConstructor | undefined;
+  }
 }
 
-// Create a speech recognition instance
-export function createSpeechRecognition(options?: {
-  lang?: string;
-  continuous?: boolean;
-  interimResults?: boolean;
-}): SpeechRecognition | null {
-  const SpeechRecognition = getSpeechRecognition();
-  
-  if (!SpeechRecognition) {
-    console.error('Speech recognition not supported by this browser');
+// Get the appropriate constructor for SpeechRecognition
+export const getSpeechRecognition = (): SimpleSpeechRecognitionConstructor | null => {
+  if (typeof window === 'undefined') {
     return null;
   }
   
-  const recognition = new SpeechRecognition();
-  
-  // Set default options
-  recognition.lang = options?.lang || 'fr-FR';
-  recognition.continuous = options?.continuous ?? false;
-  recognition.interimResults = options?.interimResults ?? true;
-  
-  return recognition;
-}
+  return window.SpeechRecognition || 
+         window.webkitSpeechRecognition ||
+         window.mozSpeechRecognition ||
+         window.msSpeechRecognition || 
+         null;
+};
 
 // Check if speech recognition is supported
-export function isSpeechRecognitionSupported(): boolean {
-  return (window.SpeechRecognition || window.webkitSpeechRecognition) !== undefined;
-}
+export const isSpeechRecognitionSupported = (): boolean => {
+  return getSpeechRecognition() !== null;
+};
+
+// Create a new speech recognition instance
+export const createSpeechRecognition = (): SimpleSpeechRecognition | null => {
+  const SpeechRecognition = getSpeechRecognition();
+  
+  if (!SpeechRecognition) {
+    console.warn('SpeechRecognition is not supported in this browser');
+    return null;
+  }
+  
+  return new SpeechRecognition();
+};
+
+// Export default as a utility object
+export default {
+  getSpeechRecognition,
+  isSpeechRecognitionSupported,
+  createSpeechRecognition
+};

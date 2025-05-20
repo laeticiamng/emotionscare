@@ -36,7 +36,9 @@ export const useMusicRecommendation = (options: UseMusicRecommendationOptions = 
       };
       
       const result = await activateMusicForEmotion(params);
-      setPlaylist(result);
+      if (result) {
+        setPlaylist(result);
+      }
       return result;
     } finally {
       setIsLoading(false);
@@ -47,7 +49,7 @@ export const useMusicRecommendation = (options: UseMusicRecommendationOptions = 
   const updateEmotion = async (emotion: string, activate = false) => {
     setCurrentEmotion(emotion);
     if (activate) {
-      return loadMusicForEmotion(emotion);
+      return await loadMusicForEmotion(emotion);
     }
     return null;
   };
