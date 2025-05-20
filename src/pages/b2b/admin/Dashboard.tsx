@@ -3,17 +3,20 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  Users, 
-  TrendingUp, 
-  FileBarChart, 
-  Calendar, 
-  Bell, 
+import {
+  Users,
+  TrendingUp,
+  FileBarChart,
+  Calendar,
+  Bell,
   BarChart3,
   Settings,
   ShieldAlert,
   HeartHandshake
 } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { getUserAvatar, getUserFirstName } from '@/utils/userHelpers';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -95,15 +98,15 @@ const B2BAdminDashboard = () => {
             Administration EmotionsCare
           </h1>
           <p className="text-muted-foreground mt-1">
-            Pilotez le bien-être de vos équipes
+            Bonjour {getUserFirstName(user)}, pilotage émotionnel de vos équipes
           </p>
         </motion.div>
         
-        <motion.div 
+        <motion.div
           variants={itemVariants}
-          className="flex flex-wrap gap-2"
+          className="flex flex-wrap items-center gap-2"
         >
-          <Button 
+          <Button
             variant="outline"
             size="sm"
             onClick={() => {
@@ -113,6 +116,7 @@ const B2BAdminDashboard = () => {
               });
             }}
             className="flex items-center gap-1 border-purple-200 dark:border-purple-800"
+            aria-label="Voir les alertes"
           >
             <ShieldAlert className="h-4 w-4 text-purple-600" />
             <span className="hidden sm:inline">Alertes</span>
@@ -123,21 +127,33 @@ const B2BAdminDashboard = () => {
             )}
           </Button>
           
-          <Button 
+          <div className="relative">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={getUserAvatar(user)} alt={user?.name} />
+              <AvatarFallback>{getUserFirstName(user).substring(0,2)}</AvatarFallback>
+            </Avatar>
+            <Badge className="absolute -bottom-1 -right-1" variant="info">
+              {user?.role === 'b2b_admin' ? 'Admin' : 'User'}
+            </Badge>
+          </div>
+
+          <Button
             variant="outline"
             size="sm"
             onClick={() => navigate('/b2b/admin/settings')}
             className="flex items-center gap-1 border-purple-200 dark:border-purple-800"
+            aria-label="Paramètres"
           >
             <Settings className="h-4 w-4 text-purple-600" />
             <span className="hidden sm:inline">Paramètres</span>
           </Button>
           
-          <Button 
+          <Button
             variant="default"
             size="sm"
             onClick={handleLogout}
             className="bg-purple-600 hover:bg-purple-700"
+            aria-label="Se déconnecter"
           >
             Déconnexion
           </Button>

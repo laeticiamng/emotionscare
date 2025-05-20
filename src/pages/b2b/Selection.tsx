@@ -1,17 +1,35 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Users, ShieldCheck } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
 
 const B2BSelectionPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user?.role === 'b2b_user') {
+      navigate('/b2b/user/dashboard');
+    } else if (user?.role === 'b2b_admin') {
+      navigate('/b2b/admin/dashboard');
+    }
+  }, [user, navigate]);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted p-4">
       <h1 className="text-3xl font-bold mb-8">Sélectionnez votre profil</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
-        <Card className="hover:shadow-lg transition-shadow">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <Card className="hover:shadow-lg transition-shadow">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-primary" />
@@ -29,9 +47,15 @@ const B2BSelectionPage: React.FC = () => {
               </Link>
             </Button>
           </CardContent>
-        </Card>
-        
-        <Card className="hover:shadow-lg transition-shadow">
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+        >
+          <Card className="hover:shadow-lg transition-shadow">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShieldCheck className="h-5 w-5 text-primary" />
@@ -49,7 +73,8 @@ const B2BSelectionPage: React.FC = () => {
               </Link>
             </Button>
           </CardContent>
-        </Card>
+          </Card>
+        </motion.div>
       </div>
       
       <Button variant="ghost" className="mt-8" asChild>

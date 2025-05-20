@@ -161,10 +161,11 @@ const B2BAdminPremiumLogin: React.FC = () => {
               </CardContent>
               
               <CardFooter className="flex flex-col gap-4">
-                <Button 
-                  type="submit" 
-                  className="w-full group relative overflow-hidden bg-purple-600 hover:bg-purple-700" 
+                <Button
+                  type="submit"
+                  className="w-full group relative overflow-hidden bg-purple-600 hover:bg-purple-700"
                   disabled={loading}
+                  aria-label="Se connecter en tant qu'administrateur"
                 >
                   {loading && (
                     <span className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-purple-600/10">
@@ -186,6 +187,7 @@ const B2BAdminPremiumLogin: React.FC = () => {
                   variant="ghost"
                   className="mt-2"
                   onClick={() => navigate('/b2b/selection')}
+                  aria-label="Retour à la sélection"
                 >
                   Retour à la sélection
                 </Button>
