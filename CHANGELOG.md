@@ -2,14 +2,11 @@
 # Changelog
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
 
-## [1.1.11] - 2025-05-30
+## [1.1.11] - 2025-05-29
 
 ### Ajouté
-- Rapport technique `docs/dashboard-rh-tech-report.md` décrivant la supervision RH.
-
-### Modifié
-- Centralisation des types du dashboard et des analytics dans `types/`.
-- Services et composants importent désormais ces types via l'alias `@types/*`.
+- Rapport d'audit `docs/user-preferences-point7-audit.md` détaillant le mapping du `UserPreferencesContext` et les pistes premium.
+- Référence vers ce document ajoutée dans le README.
 
 
 ## [1.1.10] - 2025-05-28
