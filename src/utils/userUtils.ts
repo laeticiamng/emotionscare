@@ -31,6 +31,6 @@ export function harmonizeUserType(user: any): User {
     department: user.department || '',
     job_title: user.jobTitle || user.job_title || '',
     preferences: user.preferences || {},
-    emotionalScore: user.emotionalScore || user.emotional_score || 0
+    emotional_score: user.emotionalScore || user.emotional_score || 0
   };
 }

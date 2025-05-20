@@ -33,12 +33,14 @@ interface SimpleSpeechRecognitionConstructor {
   new (): SimpleSpeechRecognition;
 }
 
+import type { SpeechRecognitionConstructor } from '@/types/voice';
+
 declare global {
   interface Window {
-    SpeechRecognition: SimpleSpeechRecognitionConstructor | undefined;
-    webkitSpeechRecognition: SimpleSpeechRecognitionConstructor | undefined;
-    mozSpeechRecognition: SimpleSpeechRecognitionConstructor | undefined;
-    msSpeechRecognition: SimpleSpeechRecognitionConstructor | undefined;
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+    mozSpeechRecognition?: SpeechRecognitionConstructor;
+    msSpeechRecognition?: SpeechRecognitionConstructor;
   }
 }
 

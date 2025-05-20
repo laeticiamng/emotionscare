@@ -29,6 +29,12 @@ export interface VRSessionTemplate {
   thumbnail?: string;
   theme?: string;
   recommendedMood?: string;
+  recommended_mood?: string;
+  completionRate?: number;
+  completion_rate?: number;
+  emotionTarget?: string;
+  emotion_target?: string;
+  emotion?: string;
 }
 
 export interface VRSession {
