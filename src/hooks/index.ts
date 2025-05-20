@@ -37,3 +37,7 @@ export { useChat } from './useChat';
 
 // Voice commands exports
 export { useVoiceCommands } from './useVoiceCommands';
+
+// Privacy and feature flag hooks
+export { useAnalyticsConsent } from './useAnalyticsConsent';
+export { useFeatureFlags } from './useFeatureFlags';

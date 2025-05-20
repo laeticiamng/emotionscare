@@ -1,29 +1,50 @@
 
 /**
- * Analytics utility module
- * Handles tracking and reporting user interactions in the application
+ * Analytics utility module.
+ * Provides a pluggable provider system so different analytics backends
+ * can be used (Amplitude, Segment, Matomo, ...).
  */
 
-export class Analytics {
-  /**
-   * Initialize analytics tracking
-   */
-  static initialize() {
-    console.log("Analytics initialized");
-    // Actual implementation would connect to an analytics service
+export interface AnalyticsProvider {
+  trackPageView(path: string): void;
+  trackEvent(category: string, action: string, label?: string): void;
+}
+
+/**
+ * Default analytics provider that simply logs to the console.
+ * This keeps analytics fully anonymous while no provider is configured.
+ */
+class ConsoleAnalyticsProvider implements AnalyticsProvider {
+  trackPageView(path: string) {
+    console.log(`[analytics] page: ${path}`);
   }
 
-  /**
-   * Track a page view
-   */
-  static trackPageView(path: string) {
-    console.log(`Page viewed: ${path}`);
-  }
-
-  /**
-   * Track a user event
-   */
-  static trackEvent(category: string, action: string, label?: string) {
-    console.log(`Event tracked: ${category} - ${action} ${label ? '- ' + label : ''}`);
+  trackEvent(category: string, action: string, label?: string) {
+    console.log(`[analytics] event: ${category}/${action}${label ? ' - ' + label : ''}`);
   }
 }
+
+// Current provider instance. Starts with the console provider.
+let provider: AnalyticsProvider = new ConsoleAnalyticsProvider();
+
+export const Analytics = {
+  /**
+   * Replace the analytics provider. This enables plug & play integrations
+   * with any analytics API.
+   */
+  setProvider(newProvider: AnalyticsProvider) {
+    provider = newProvider;
+  },
+
+  /** Track a page view. */
+  trackPageView(path: string) {
+    provider.trackPageView(path);
+  },
+
+  /** Track a user event. */
+  trackEvent(category: string, action: string, label?: string) {
+    provider.trackEvent(category, action, label);
+  },
+};
+
+export type { AnalyticsProvider };

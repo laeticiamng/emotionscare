@@ -15,6 +15,7 @@ EmotionsCare est une plateforme SaaS innovante dédiée au bien-être émotionne
 - **Gamification** : Défis, badges et récompenses pour encourager l'engagement
 - **Réalité Virtuelle** : Sessions de relaxation immersives en VR
 - **Cocoon social** : Communauté bienveillante pour partager et progresser ensemble
+- **Traçabilité** : Journalisation anonymisée des sélections de mode avec intégration d'APIs d'analytics
 
 ## Architecture technique
 

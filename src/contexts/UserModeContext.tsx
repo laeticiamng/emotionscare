@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserModeType } from '@/types/userMode';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
+import { logModeSelection } from '@/utils/modeSelectionLogger';
 
 interface UserModeContextValue {
   userMode: UserModeType;
@@ -40,6 +41,7 @@ export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) 
     const normalizedMode = normalizeUserMode(mode) as UserModeType;
     setUserModeState(normalizedMode);
     localStorage.setItem('userMode', normalizedMode);
+    logModeSelection(normalizedMode);
   };
   
   const clearUserMode = () => {
