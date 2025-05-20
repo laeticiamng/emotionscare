@@ -318,6 +318,7 @@ Vous trouverez dans le dossier `src/docs` plusieurs guides détaillés :
 - `RoutingFlow.md` : schéma du flux d'accès (accueil → login → dashboard)
 - `unified-access-adaptive-audit.md` : logique d'accès centralisée et expérience adaptative
 - `onboarding-training-audit.md` : structure du module d'onboarding
+- `onboarding-formation-point14-audit.md` : audit détaillé du point 14 (onboarding et formation)
 
 Des audits complémentaires sont disponibles dans le dossier `docs` :
 - `scalability-innovation-audit.md` : évolutivité et innovation continue
