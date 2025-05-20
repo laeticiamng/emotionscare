@@ -75,7 +75,7 @@ export interface EmotionPrediction {
 // Add EnhancedEmotionResult interface
 export interface EnhancedEmotionResult extends EmotionResult {
   emotions: Record<string, number>;
-  dominantEmotion: {
+  dominantEmotionObj?: {
     name: string;
     score: number;
   };

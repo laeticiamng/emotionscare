@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { Notification, NotificationType } from '@/types/notification';
+import { NotificationSettings, NotificationCategory } from '@/types/notification';
 
 /**
  * Service for managing notifications using Supabase
@@ -9,7 +9,7 @@ export const notificationService = {
   /**
    * Get all notifications for the current user
    */
-  async getUserNotifications(userId: string): Promise<{ notifications: Notification[]; error: Error | null }> {
+  async getUserNotifications(userId: string): Promise<{ notifications: NotificationSettings[]; error: Error | null }> {
     try {
       const { data, error } = await supabase
         .from('notifications')
@@ -29,7 +29,7 @@ export const notificationService = {
   /**
    * Create a new notification
    */
-  async createNotification(notification: Omit<Notification, 'id' | 'created_at'>): Promise<{ notification: Notification | null; error: Error | null }> {
+  async createNotification(notification: Omit<NotificationSettings, 'id' | 'created_at'>): Promise<{ notification: NotificationSettings | null; error: Error | null }> {
     try {
       const { data, error } = await supabase
         .from('notifications')
@@ -132,7 +132,7 @@ export const notificationService = {
     filter: string = 'all',
     page: number = 1,
     pageSize: number = 10
-  ): Promise<{ notifications: Notification[]; error: Error | null; total: number }> {
+  ): Promise<{ notifications: NotificationSettings[]; error: Error | null; total: number }> {
     try {
       let query = supabase
         .from('notifications')

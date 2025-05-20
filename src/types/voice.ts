@@ -11,6 +11,19 @@ export interface SpeechRecognitionResultList {
   [index: number]: SpeechRecognitionResult;
 }
 
+export interface SpeechGrammar {
+  src: string;
+  weight?: number;
+}
+
+export interface SpeechGrammarList {
+  length: number;
+  [index: number]: SpeechGrammar;
+  item(index: number): SpeechGrammar;
+  addFromURI(src: string, weight?: number): void;
+  addFromString(grammar: string, weight?: number): void;
+}
+
 export interface SpeechRecognitionResult {
   length: number;
   item(index: number): SpeechRecognitionAlternative;
@@ -68,7 +81,7 @@ export interface UseVoiceCommandsOptions {
 
 declare global {
   interface Window {
-    SpeechRecognition: SpeechRecognitionConstructor;
-    webkitSpeechRecognition: SpeechRecognitionConstructor;
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
   }
 }

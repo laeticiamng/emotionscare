@@ -22,5 +22,6 @@
     },
     "jsx": "react-jsx"
   },
-  "include": ["src", "types"]
+  "include": ["src/types.ts", "src/types/**/*", "types"],
+  "exclude": ["src/**/*"]
 }

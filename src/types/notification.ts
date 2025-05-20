@@ -19,13 +19,13 @@ export interface NotificationTypes {
   urgent?: string;
 }
 
-export type NotificationType = keyof NotificationTypes | string;
+export type NotificationCategory = keyof NotificationTypes | string;
 
-export interface Notification {
+export interface NotificationSettings {
   id: string;
   title: string;
   message: string;
-  type: NotificationType;
+  type: NotificationCategory;
   createdAt: string;
   read?: boolean; // For backward compatibility
   isRead?: boolean;
@@ -47,7 +47,7 @@ export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'none' | '
 export type NotificationTone = 'standard' | 'gentle' | 'focused' | 'none' | 'friendly';
 
 export interface NotificationPreference {
-  type: NotificationType;
+  type: NotificationCategory;
   enabled: boolean;
   frequency: NotificationFrequency;
   tone: NotificationTone;

@@ -1,5 +1,10 @@
 
-// Create polyfill for SpeechRecognition
+// Polyfill utilities for SpeechRecognition
+import type {
+  SpeechRecognitionConstructor,
+  SpeechRecognition,
+  SpeechRecognitionEvent,
+} from '@/types/voice';
 
 type SpeechRecognitionResult = {
   isFinal: boolean;
@@ -34,6 +39,7 @@ interface SpeechRecognition extends EventTarget {
 interface SpeechRecognitionConstructor {
   new (): SpeechRecognition;
 }
+
 
 declare global {
   interface Window {

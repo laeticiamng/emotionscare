@@ -35,10 +35,11 @@ export const normalizeUserMode = (mode: string | null | undefined): string => {
  * Convert user role to user mode
  */
 export const userRoleToMode = (role: UserRole): string => {
-  if (role.includes('admin') || role === 'b2b_admin' || role === 'b2b-admin') {
+  const roleStr = role as string;
+  if (roleStr.includes('admin') || roleStr === 'b2b_admin' || roleStr === 'b2b-admin') {
     return 'b2b_admin';
   }
-  if (role.includes('b2b') || role === 'b2b_user' || role === 'b2b-user' || role === 'b2b-collaborator') {
+  if (roleStr.includes('b2b') || roleStr === 'b2b_user' || roleStr === 'b2b-user' || roleStr === 'b2b-collaborator') {
     return 'b2b_user';
   }
   return 'b2c';

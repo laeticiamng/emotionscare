@@ -1,5 +1,5 @@
 
-import { EmotionSource } from './orchestration';
+import { EmotionSource } from './emotion';
 
 export interface EmotionalData {
   id: string;

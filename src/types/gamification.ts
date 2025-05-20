@@ -39,8 +39,9 @@ export interface Challenge {
   id: string;
   title: string;
   description: string;
-  progress: number;
-  threshold: number;
+  points?: number;
+  progress?: number;
+  threshold?: number;
   completed: boolean;
   category: string;
   type?: string;
@@ -53,6 +54,14 @@ export interface Challenge {
   goal?: string;
   targetValue?: number;
   currentValue?: number;
+  completions?: number;
+  total?: number;
+  totalSteps?: number;
+  difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+  isCompleted?: boolean;
+  unlocked?: boolean;
+  icon?: string | null;
+  deadline?: string | null;
 }
 
 export interface LeaderboardEntry {

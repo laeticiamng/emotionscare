@@ -5,12 +5,15 @@ export interface MusicTrack {
   id: string;
   title: string;
   artist: string;
-  url: string;
+  url?: string;
   cover?: string;
   coverUrl?: string;
+  cover_url?: string;
   coverImage?: string;
+  artworkUrl?: string;
   duration: number;
   audioUrl?: string;
+  audio_url?: string;
   src?: string;
   track_url?: string;
   emotion?: string;
