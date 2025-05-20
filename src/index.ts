@@ -1,3 +1,4 @@
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -5,7 +6,7 @@ if (!process.env.OPENAI_API_KEY) process.env.OPENAI_API_KEY = "test";
 if (!process.env.MUSICGEN_API_KEY) process.env.MUSICGEN_API_KEY = "test";
 if (!process.env.HUME_API_KEY) process.env.HUME_API_KEY = "test";
 
-import { HumeClient } from "hume";
+import * as Hume from "hume"; // Changed from importing HumeClient
 import OpenAI from "openai";
 
 // ------- OPENAI GPT-4 -----------
@@ -125,7 +126,8 @@ async function humeBatchJobStatus(id: string) {
 }
 
 // -------------- Exports ----------------
-const hume = new HumeClient({ apiKey: process.env.HUME_API_KEY! });
+// Create Hume client properly using the API from the hume package
+const hume = Hume.createClient({ apiKey: process.env.HUME_API_KEY! }); // Changed from new HumeClient
 
 export {
   openaiText,
