@@ -1,88 +1,76 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Bell, AlertTriangle, Info, CheckCircle, Shield } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Bell, ShieldCheck, AlertTriangle, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-// Sample alerts - this would come from the backend in a real app
-const sampleAlerts = [
+// Sample data - in a real app this would come from an API
+const alerts = [
   {
     id: '1',
-    severity: 'info',
-    title: 'Mise à jour de sécurité',
-    description: 'Nous avons mis à jour nos protocoles de sécurité pour mieux protéger vos données.',
-    date: '2025-05-15T10:30:00Z',
+    severity: 'warning',
+    title: 'Tentative de connexion inhabituelle',
+    description: 'Une tentative de connexion a été détectée depuis une nouvelle localisation.',
+    date: '2025-05-18T10:45:22',
     isNew: true,
+    actionRequired: true,
+    actionText: 'Vérifier'
   },
   {
     id: '2',
-    severity: 'warning',
-    title: 'Nouvelle connexion détectée',
-    description: 'Connexion depuis un nouvel appareil le 18/05/2025 à 15:42. Si ce n\'était pas vous, veuillez sécuriser votre compte.',
-    date: '2025-05-18T15:45:00Z',
-    isNew: true,
+    severity: 'info',
+    title: 'Mise à jour de la politique de confidentialité',
+    description: 'Notre politique de confidentialité a été mise à jour. Veuillez la consulter.',
+    date: '2025-05-15T14:30:10',
+    isNew: false,
+    actionRequired: false
+  },
+  {
+    id: '3',
+    severity: 'critical',
+    title: 'Changement de mot de passe recommandé',
+    description: 'Pour votre sécurité, nous vous recommandons de changer votre mot de passe régulièrement.',
+    date: '2025-05-10T09:15:43',
+    isNew: false,
     actionRequired: true,
-    actionText: 'Vérifier la connexion',
+    actionText: 'Changer'
   }
 ];
 
 const SecurityAlerts: React.FC = () => {
-  const [alerts, setAlerts] = useState(sampleAlerts);
-
-  const markAsRead = (id: string) => {
-    setAlerts(alerts.map(alert => 
-      alert.id === id ? { ...alert, isNew: false } : alert
-    ));
-  };
-
-  const getSeverityIcon = (severity: string) => {
+  const getSeverityBadge = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return <AlertTriangle className="h-5 w-5 text-red-500" />;
+        return <Badge variant="destructive" className="flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Critique</Badge>;
       case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+        return <Badge variant="warning" className="flex items-center gap-1 bg-yellow-500 text-white"><AlertTriangle className="h-3 w-3" /> Attention</Badge>;
       case 'info':
       default:
-        return <Info className="h-5 w-5 text-blue-500" />;
+        return <Badge variant="secondary" className="flex items-center gap-1"><Info className="h-3 w-3" /> Information</Badge>;
     }
   };
 
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
+      return date.toLocaleDateString('fr-FR', { 
+        day: 'numeric', 
+        month: 'short', 
+        hour: '2-digit', 
+        minute: '2-digit' 
       });
     } catch (error) {
       return dateString;
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
-
   return (
     <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       className="space-y-4"
     >
       <Card>
@@ -91,63 +79,54 @@ const SecurityAlerts: React.FC = () => {
             <Bell className="h-5 w-5 text-primary" />
             Alertes de sécurité
           </CardTitle>
-          <CardDescription className="flex justify-between items-center">
-            <span>Restez informé des événements importants concernant votre compte</span>
-            {alerts.some(alert => alert.isNew) && (
-              <Badge variant="success" className="animate-pulse">
-                Nouvelles alertes
-              </Badge>
-            )}
+          <CardDescription>
+            Soyez informé des événements importants concernant votre compte et vos données
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent>
           {alerts.length === 0 ? (
-            <div className="text-center py-6">
-              <Shield className="mx-auto h-12 w-12 text-muted-foreground opacity-50" />
-              <p className="mt-2 text-muted-foreground">Aucune alerte de sécurité pour le moment</p>
+            <div className="text-center py-8">
+              <ShieldCheck className="mx-auto h-12 w-12 text-green-500 opacity-50" />
+              <p className="mt-2 text-muted-foreground">Aucune alerte de sécurité active</p>
             </div>
           ) : (
-            <motion.div className="space-y-4" variants={containerVariants}>
+            <ul className="space-y-4">
               {alerts.map((alert) => (
-                <motion.div key={alert.id} variants={itemVariants}>
-                  <Alert className={`${alert.isNew ? 'border-l-4 border-l-blue-500' : ''}`}>
-                    <div className="flex items-start gap-3">
-                      {getSeverityIcon(alert.severity)}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <AlertTitle>{alert.title}</AlertTitle>
-                          {alert.isNew && <Badge variant="new" size="sm">Nouveau</Badge>}
-                        </div>
-                        <AlertDescription className="mt-1">
-                          {alert.description}
-                          <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-                            <span>{formatDate(alert.date)}</span>
-                          </div>
-                        </AlertDescription>
-                        {(alert.actionRequired || alert.isNew) && (
-                          <div className="mt-2 flex gap-2">
-                            {alert.actionRequired && (
-                              <Button variant="outline" size="sm">
-                                {alert.actionText || 'Action requise'}
-                              </Button>
-                            )}
-                            {alert.isNew && (
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={() => markAsRead(alert.id)}
-                              >
-                                <CheckCircle className="h-3 w-3 mr-1" /> Marquer comme lu
-                              </Button>
-                            )}
-                          </div>
+                <motion.li
+                  key={alert.id}
+                  initial={alert.isNew ? { backgroundColor: 'rgba(59, 130, 246, 0.1)' } : {}}
+                  animate={{ backgroundColor: 'transparent' }}
+                  transition={{ duration: 5 }}
+                  className={`
+                    p-4 rounded-lg border 
+                    ${alert.severity === 'critical' ? 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-900/10' : 
+                      alert.severity === 'warning' ? 'border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-900/10' : 
+                      'border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-900/10'}
+                  `}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        {getSeverityBadge(alert.severity)}
+                        {alert.isNew && (
+                          <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/30">
+                            Nouveau
+                          </Badge>
                         )}
                       </div>
+                      <h4 className="font-medium">{alert.title}</h4>
+                      <p className="text-sm text-muted-foreground">{alert.description}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{formatDate(alert.date)}</p>
                     </div>
-                  </Alert>
-                </motion.div>
+                    {alert.actionRequired && (
+                      <Button size="sm" className={alert.severity === 'critical' ? 'bg-red-500 hover:bg-red-600' : ''}>
+                        {alert.actionText || 'Voir'}
+                      </Button>
+                    )}
+                  </div>
+                </motion.li>
               ))}
-            </motion.div>
+            </ul>
           )}
         </CardContent>
       </Card>

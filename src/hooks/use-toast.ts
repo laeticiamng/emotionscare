@@ -1,18 +1,21 @@
 
-// This file is the main implementation of the toast functionality
-import { toast as sonnerToast } from "sonner";
 import * as React from "react";
-import { Toast, ToastOptions } from "@/types/toast";
 
-type ToasterToast = Toast & {
+import type {
+  ToastActionElement,
+  ToastProps,
+  ToastOptions,
+} from "@/types/toast";
+
+const TOAST_LIMIT = 10;
+const TOAST_REMOVE_DELAY = 1000;
+
+type ToasterToast = ToastProps & {
   id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
-  action?: React.ReactNode;
+  action?: ToastActionElement;
 };
-
-const TOAST_LIMIT = 5;
-const TOAST_REMOVE_DELAY = 1000000;
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
@@ -109,7 +112,6 @@ export const reducer = (state: State, action: Action): State => {
         ),
       };
     }
-
     case "REMOVE_TOAST":
       if (action.toastId === undefined) {
         return {
@@ -135,36 +137,38 @@ function dispatch(action: Action) {
   });
 }
 
-// Correctly typed toast function
-export function toast(props: ToastOptions) {
-  const { title = "", description, action, duration, variant } = props;
-  
-  return sonnerToast(title, {
-    description,
-    action,
-    duration,
-    ...(variant ? { variant } : {})
+type Toast = Omit<ToasterToast, "id">;
+
+function toast({ ...props }: ToastOptions) {
+  const id = genId();
+
+  const update = (props: ToastOptions) =>
+    dispatch({
+      type: "UPDATE_TOAST",
+      toast: { ...props, id },
+    });
+  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
+
+  dispatch({
+    type: "ADD_TOAST",
+    toast: {
+      ...props,
+      id,
+      open: true,
+      onOpenChange: (open) => {
+        if (!open) dismiss();
+      },
+    },
   });
+
+  return {
+    id: id,
+    dismiss,
+    update,
+  };
 }
 
-// Helper toast methods for common variants
-export function error(props: Omit<ToastOptions, 'variant'>) {
-  return toast({ ...props, variant: 'destructive' });
-}
-
-export function success(props: Omit<ToastOptions, 'variant'>) {
-  return toast({ ...props, variant: 'success' });
-}
-
-export function warning(props: Omit<ToastOptions, 'variant'>) {
-  return toast({ ...props, variant: 'warning' });
-}
-
-export function info(props: Omit<ToastOptions, 'variant'>) {
-  return toast({ ...props, variant: 'info' });
-}
-
-export function useToast() {
+function useToast() {
   const [state, setState] = React.useState<State>(memoryState);
 
   React.useEffect(() => {
@@ -178,17 +182,10 @@ export function useToast() {
   }, [state]);
 
   return {
+    ...state,
     toast,
-    error,
-    success,
-    warning,
-    info,
-    toasts: state.toasts,
-    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId })
+    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
   };
 }
 
-export { Toaster } from "@/components/ui/sonner";
-
-// Re-export toast types
-export type { Toast, ToastProps, ToastActionElement, ToastOptions } from "@/types/toast";
+export { toast, useToast };

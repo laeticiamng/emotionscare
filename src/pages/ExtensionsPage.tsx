@@ -1,243 +1,189 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { useExtensions } from '@/providers/ExtensionsProvider';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Search, Star, Filter, Package, Bell } from 'lucide-react';
-import { motion } from 'framer-motion';
 import Shell from '@/Shell';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useExtensions } from '@/contexts/ExtensionsContext';
+import { Download, Search, Check, Star, ArrowUpRight, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import StatusIndicator from '@/components/ui/status/StatusIndicator';
+import ExtensionsList from '@/components/extensions/ExtensionsList';
+import FeaturedExtensions from '@/components/extensions/FeaturedExtensions';
+import TopExtensions from '@/components/extensions/TopExtensions';
+import { ExtensionMeta } from '@/types/extensions';
+import { Confetti } from '@/components/ui/confetti';
 
 const ExtensionsPage: React.FC = () => {
   const { available, installed, toggleExtension } = useExtensions();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [category, setCategory] = useState('all');
-  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredExtensions, setFilteredExtensions] = useState<ExtensionMeta[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const navigate = useNavigate();
   const { toast } = useToast();
-  
-  // Simulate loading state
+
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    let filtered = [...available];
     
-    return () => clearTimeout(timer);
-  }, []);
+    // Filter by search query
+    if (searchQuery) {
+      filtered = filtered.filter(ext => 
+        ext.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        ext.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Filter by category
+    if (activeCategory) {
+      filtered = filtered.filter(ext => ext.category === activeCategory);
+    }
+    
+    setFilteredExtensions(filtered);
+  }, [searchQuery, available, activeCategory]);
 
-  const filteredExtensions = available.filter(ext => {
-    const matchesSearch = ext.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         ext.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = category === 'all' || ext.category === category;
-    return matchesSearch && matchesCategory;
-  });
-  
-  const handleInstallToggle = (extId: string, isInstalled: boolean) => {
-    toggleExtension(extId);
-    toast({
-      title: isInstalled ? "Extension désinstallée" : "Extension installée",
-      description: isInstalled ? 
-        "L'extension a été retirée avec succès." : 
-        "L'extension a été ajoutée à votre espace. Rafraîchissez pour voir les nouvelles fonctionnalités.",
-      variant: isInstalled ? "info" : "success",
-    });
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
+  const handleToggleExtension = (extension: ExtensionMeta) => {
+    toggleExtension(extension.id);
+    
+    if (!installed.includes(extension.id)) {
+      toast({
+        title: "Extension activée",
+        description: `${extension.name} est maintenant disponible dans votre espace`,
+        variant: "success",
+      });
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
+    } else {
+      toast({
+        title: "Extension désactivée",
+        description: `${extension.name} a été retirée de votre espace`,
+      });
     }
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+  const handleViewDetails = (extension: ExtensionMeta) => {
+    navigate(`/extensions/${extension.id}`);
   };
+
+  // Extract unique categories
+  const categories = Array.from(new Set(available.map(ext => ext.category).filter(Boolean)));
 
   return (
     <Shell>
-      <div className="container mx-auto py-6 space-y-6">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-2">
-                <Package className="h-8 w-8 text-primary" />
-                Marketplace d'extensions
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Découvrez et intégrez de nouvelles fonctionnalités pour personnaliser votre expérience
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="beta" className="text-sm">
-                <Star className="h-3 w-3 mr-1" />
-                Early Access
-              </Badge>
-            </div>
+      {showConfetti && <Confetti />}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="container mx-auto py-6 space-y-6"
+      >
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Sparkles className="h-6 w-6 text-primary" />
+              Extensions & Innovations
+            </h1>
+            <p className="text-muted-foreground">
+              Découvrez et activez les nouveaux modules pour améliorer votre expérience
+            </p>
           </div>
-
-          {loading ? (
-            <StatusIndicator 
-              type="loading" 
-              title="Chargement des extensions" 
-              message="Veuillez patienter pendant que nous récupérons les dernières extensions disponibles..." 
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Input
+            placeholder="Rechercher une extension..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="max-w-md"
+            startIcon={<Search className="h-4 w-4 text-muted-foreground" />}
+          />
+          <div className="flex gap-2 overflow-auto pb-2 no-scrollbar">
+            <Button 
+              variant={activeCategory === null ? "default" : "outline"} 
+              size="sm"
+              onClick={() => setActiveCategory(null)}
+              className="rounded-full whitespace-nowrap"
+            >
+              Toutes
+            </Button>
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={activeCategory === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => setActiveCategory(category === activeCategory ? null : category)}
+                className="rounded-full whitespace-nowrap"
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+        </div>
+        
+        <Tabs defaultValue="all">
+          <TabsList>
+            <TabsTrigger value="all">Toutes</TabsTrigger>
+            <TabsTrigger value="installed">Installées ({installed.length})</TabsTrigger>
+            <TabsTrigger value="new">
+              Nouvelles <Badge variant="outline" className="ml-2">3</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="popular">Populaires</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="all" className="space-y-6">
+            <FeaturedExtensions />
+            <ExtensionsList 
+              extensions={filteredExtensions} 
+              installed={installed} 
+              onToggle={handleToggleExtension}
+              onViewDetails={handleViewDetails}
             />
-          ) : (
-            <>
-              <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    placeholder="Rechercher une extension..."
-                    className="pl-10"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <Button variant="outline" className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  Filtrer
-                </Button>
-              </div>
-
-              <Tabs defaultValue="all" className="space-y-4">
-                <TabsList>
-                  <TabsTrigger value="all" onClick={() => setCategory('all')}>Toutes</TabsTrigger>
-                  <TabsTrigger value="installed" onClick={() => setCategory('all')}>Installées</TabsTrigger>
-                  <TabsTrigger value="new" onClick={() => setCategory('all')}>Nouveautés</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="all">
-                  <motion.div 
-                    className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                  >
-                    {filteredExtensions.map((ext) => (
-                      <ExtensionCard 
-                        key={ext.id}
-                        extension={ext}
-                        isInstalled={installed.includes(ext.id)}
-                        onToggle={handleInstallToggle}
-                      />
-                    ))}
-                  </motion.div>
-                </TabsContent>
-                
-                <TabsContent value="installed">
-                  <motion.div 
-                    className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                  >
-                    {filteredExtensions
-                      .filter(ext => installed.includes(ext.id))
-                      .map((ext) => (
-                        <ExtensionCard 
-                          key={ext.id}
-                          extension={ext}
-                          isInstalled={true}
-                          onToggle={handleInstallToggle}
-                        />
-                      ))
-                    }
-                  </motion.div>
-                </TabsContent>
-                
-                <TabsContent value="new">
-                  <motion.div 
-                    className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                  >
-                    {filteredExtensions
-                      .filter(ext => ext.isNew)
-                      .map((ext) => (
-                        <ExtensionCard 
-                          key={ext.id}
-                          extension={ext}
-                          isInstalled={installed.includes(ext.id)}
-                          onToggle={handleInstallToggle}
-                        />
-                      ))
-                    }
-                  </motion.div>
-                </TabsContent>
-              </Tabs>
-            </>
-          )}
-        </motion.div>
-      </div>
+          </TabsContent>
+          
+          <TabsContent value="installed">
+            <ExtensionsList 
+              extensions={available.filter(ext => installed.includes(ext.id))} 
+              installed={installed} 
+              onToggle={handleToggleExtension}
+              onViewDetails={handleViewDetails} 
+            />
+          </TabsContent>
+          
+          <TabsContent value="new">
+            <ExtensionsList 
+              extensions={filteredExtensions.filter(ext => ext.isNew)} 
+              installed={installed} 
+              onToggle={handleToggleExtension}
+              onViewDetails={handleViewDetails} 
+            />
+          </TabsContent>
+          
+          <TabsContent value="popular">
+            <TopExtensions />
+          </TabsContent>
+        </Tabs>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Soumettre une idée d'extension</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              Vous avez une idée pour améliorer l'application ? Soumettez votre proposition et participez à l'évolution d'EmotionsCare !
+            </p>
+          </CardContent>
+          <CardFooter>
+            <Button variant="outline">
+              <ArrowUpRight className="mr-2 h-4 w-4" />
+              Proposer une idée
+            </Button>
+          </CardFooter>
+        </Card>
+      </motion.div>
     </Shell>
-  );
-};
-
-interface ExtensionCardProps {
-  extension: any;
-  isInstalled: boolean;
-  onToggle: (id: string, isInstalled: boolean) => void;
-}
-
-const ExtensionCard: React.FC<ExtensionCardProps> = ({ extension, isInstalled, onToggle }) => {
-  return (
-    <motion.div variants={itemVariants}>
-      <Card className="overflow-hidden transition-all hover:shadow-md">
-        {extension.thumbnail && (
-          <div className="h-40 w-full overflow-hidden bg-muted">
-            <img 
-              src={extension.thumbnail} 
-              alt={extension.name} 
-              className="h-full w-full object-cover transition-transform hover:scale-105" 
-            />
-          </div>
-        )}
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">{extension.name}</CardTitle>
-            <div className="flex gap-1">
-              {extension.isNew && <Badge variant="new">Nouveau</Badge>}
-              {extension.isBeta && <Badge variant="beta">Beta</Badge>}
-            </div>
-          </div>
-          <CardDescription className="line-clamp-2">{extension.description}</CardDescription>
-        </CardHeader>
-        <CardContent className="pb-2">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            {extension.version && <span>v{extension.version}</span>}
-            {extension.rating && (
-              <div className="flex items-center">
-                <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400 mr-1" />
-                <span>{extension.rating}/5</span>
-              </div>
-            )}
-            {extension.usageCount && <span>{extension.usageCount} utilisations</span>}
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button
-            onClick={() => onToggle(extension.id, isInstalled)}
-            variant={isInstalled ? "secondary" : "default"}
-            className="w-full"
-          >
-            {isInstalled ? 'Désinstaller' : 'Installer'}
-          </Button>
-        </CardFooter>
-      </Card>
-    </motion.div>
   );
 };
 
