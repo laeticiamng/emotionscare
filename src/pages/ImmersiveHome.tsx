@@ -176,16 +176,16 @@ const ImmersiveHome: React.FC = () => {
       logModeSelection(mode);
     }
     
-    // Navigate based on selected mode
+    // Navigate to the dedicated login page
     switch(mode) {
       case 'b2b-admin':
-        navigate('/b2b/admin/dashboard');
+        navigate('/b2b/admin/login');
         break;
       case 'b2b-user':
-        navigate('/b2b/user/dashboard');
+        navigate('/b2b/user/login');
         break;
       default:
-        navigate('/b2c/dashboard');
+        navigate('/b2c/login');
         break;
     }
   };

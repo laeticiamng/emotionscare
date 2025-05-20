@@ -22,11 +22,11 @@ const B2BSelectionImmersive: React.FC = () => {
       logModeSelection(mode);
     }
     
-    // Navigate based on mode
+    // Navigate to the appropriate login page
     if (mode === 'b2b-admin') {
-      navigate('/b2b/admin/dashboard');
+      navigate('/b2b/admin/login');
     } else {
-      navigate('/b2b/user/dashboard');
+      navigate('/b2b/user/login');
     }
   };
 

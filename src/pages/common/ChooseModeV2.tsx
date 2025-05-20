@@ -40,13 +40,13 @@ const ChooseModeV2: React.FC = () => {
       // Redirection vers la bonne page selon le mode
       switch(mode) {
         case 'b2b_admin':
-          navigate('/b2b/admin/dashboard');
+          navigate('/b2b/admin/login');
           break;
         case 'b2b_user':
-          navigate('/b2b/user/dashboard');
+          navigate('/b2b/user/login');
           break;
         default:
-          navigate('/b2c/dashboard');
+          navigate('/b2c/login');
           break;
       }
     }, 300);
