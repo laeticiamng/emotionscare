@@ -22,18 +22,10 @@ const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = ({ title
   const handleGenerateMusic = async () => {
     setIsLoading(true);
     try {
-      const success = await activateMusicForEmotion({
+      await activateMusicForEmotion({
         emotion: emotion,
         intensity: intensity / 100
       });
-      
-      if (!success) {
-        toast({
-          title: "Aucun morceau trouvé",
-          description: "Essayez avec une autre émotion ou un autre niveau d'intensité",
-          variant: "destructive"
-        });
-      }
     } catch (error) {
       console.error('Error generating music:', error);
       toast({

@@ -16,7 +16,7 @@ const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({ className, lastEmot
   // Sync music with emotion when enabled and emotion changes
   useEffect(() => {
     if (isSynced && lastEmotion) {
-      activateMusicForEmotion(lastEmotion);
+      activateMusicForEmotion({ emotion: lastEmotion });
     }
   }, [isSynced, lastEmotion, activateMusicForEmotion]);
   
@@ -25,7 +25,7 @@ const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({ className, lastEmot
     
     if (checked && lastEmotion) {
       // Immediately sync when enabling
-      activateMusicForEmotion(lastEmotion);
+      activateMusicForEmotion({ emotion: lastEmotion });
     }
   };
   

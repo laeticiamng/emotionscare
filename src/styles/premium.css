@@ -1,21 +1,16 @@
 
-/* Premium UI styling */
-
-@import './glass.css';
-@import './auth-animations.css';
-
 @layer components {
   /* Premium theme-specific styling */
   .theme-light .premium-card {
-    @apply bg-white shadow-premium-light border border-gray-100;
+    @apply bg-white shadow-md border border-gray-100;
   }
 
   .theme-dark .premium-card {
-    @apply glass-dark shadow-premium-dark border-gray-800;
+    @apply bg-gray-900/90 shadow-lg border-gray-800;
   }
 
   .theme-pastel .premium-card {
-    @apply glass-pastel shadow-premium-pastel border border-blue-100;
+    @apply bg-blue-50/90 shadow-md border border-blue-100;
   }
 
   /* Button enhancements */
@@ -30,152 +25,145 @@
   .theme-pastel .button-premium {
     @apply shadow-sm hover:shadow-md transition-all duration-300;
   }
-}
 
-/* Premium layout containers */
-.container-premium {
-  @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-}
-
-.grid-premium {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
-}
-
-/* Premium typography */
-.heading-premium {
-  @apply font-medium tracking-tight;
-  letter-spacing: -0.015em;
-}
-
-.title-premium {
-  @apply text-3xl lg:text-4xl font-bold tracking-tight;
-  letter-spacing: -0.02em;
-}
-
-.subtitle-premium {
-  @apply text-lg text-muted-foreground mt-2;
-}
-
-/* Premium interactive elements */
-.interactive-hover {
-  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
-}
-
-.premium-blur {
-  backdrop-filter: blur(8px);
-}
-
-/* Premium card variations */
-.card-premium {
-  @apply rounded-xl overflow-hidden transition-all duration-300;
-}
-
-.card-premium-hover {
-  @apply hover:shadow-lg hover:-translate-y-1 transition-all duration-300;
-}
-
-/* Premium form elements */
-.input-premium {
-  @apply rounded-lg border border-gray-200 px-4 py-2 transition-all duration-300 
-  focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary;
-}
-
-.button-premium {
-  @apply rounded-lg px-4 py-2 font-medium transition-all duration-300;
-}
-
-/* Premium section styling */
-.section-premium {
-  @apply py-12 md:py-16 lg:py-24;
-}
-
-/* Premium status indicators */
-.badge-premium {
-  @apply px-2 py-1 rounded-full text-xs font-medium;
-}
-
-.badge-premium.success {
-  @apply bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400;
-}
-
-.badge-premium.warning {
-  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400;
-}
-
-.badge-premium.error {
-  @apply bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400;
-}
-
-.badge-premium.info {
-  @apply bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400;
-}
-
-/* Premium icon styling */
-.icon-premium {
-  @apply w-5 h-5 text-muted-foreground transition-colors duration-300 group-hover:text-primary;
-}
-
-.icon-premium.active {
-  @apply text-primary;
-}
-
-/* Premium navigation elements */
-.nav-premium {
-  @apply flex items-center space-x-1 text-sm;
-}
-
-.nav-premium-item {
-  @apply px-3 py-2 rounded-md transition-colors duration-300;
-}
-
-.nav-premium-item:hover {
-  @apply bg-muted/80;
-}
-
-.nav-premium-item.active {
-  @apply bg-muted text-primary font-medium;
-}
-
-/* Loading state styling */
-.loading-premium {
-  @apply flex items-center justify-center space-x-2;
-}
-
-.loading-premium-dot {
-  @apply w-2 h-2 bg-current rounded-full opacity-70;
-  animation: bounce 1.4s infinite ease-in-out both;
-}
-
-.loading-premium-dot:nth-child(1) {
-  animation-delay: -0.32s;
-}
-
-.loading-premium-dot:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-@keyframes bounce {
-  0%, 80%, 100% {
-    transform: scale(0);
+  /* Premium shadow effects */
+  .shadow-premium {
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
   }
-  40% {
-    transform: scale(1);
+  
+  .dark .shadow-premium {
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
   }
+
+  /* Glass morphism effects */
+  .glass-effect {
+    @apply backdrop-blur-md border;
+  }
+  
+  .light .glass-effect {
+    @apply bg-white/80 border-white/20;
+  }
+  
+  .dark .glass-effect {
+    @apply bg-black/20 border-white/10;
+  }
+  
+  .pastel .glass-effect {
+    @apply bg-blue-50/80 border-blue-100/30;
+  }
+}
+
+/* Premium UI animations */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Transition for theme changes */
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover lift effect for clickable elements */
+.hover-lift {
+  @apply transition-transform duration-300;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
 }
 
 /* Premium gradients for backgrounds */
-.gradient-premium-blue {
-  background: linear-gradient(135deg, #e0f2fe, #dbeafe);
+.premium-gradient {
+  @apply bg-gradient-to-br;
 }
 
-.dark .gradient-premium-blue {
-  background: linear-gradient(135deg, #0c4a6e80, #1e3a8a80);
+.light .premium-gradient {
+  @apply from-white to-blue-50;
 }
 
-.gradient-premium-purple {
-  background: linear-gradient(135deg, #ede9fe, #e0e7ff);
+.dark .premium-gradient {
+  @apply from-gray-900 to-blue-950;
 }
 
-.dark .gradient-premium-purple {
-  background: linear-gradient(135deg, #4c1d9580, #1e3a8a80);
+.pastel .premium-gradient {
+  @apply from-blue-50 to-blue-100;
+}
+
+/* Animation for page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Sparkle animation for premium elements */
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+}
+
+.sparkle-element::before,
+.sparkle-element::after {
+  content: "";
+  position: absolute;
+  background: radial-gradient(white, transparent);
+  border-radius: 50%;
+  animation: sparkle 3s infinite;
+}
+
+.sparkle-element::before {
+  width: 8px;
+  height: 8px;
+  top: -4px;
+  left: -4px;
+}
+
+.sparkle-element::after {
+  width: 10px;
+  height: 10px;
+  bottom: -5px;
+  right: -5px;
+  animation-delay: 0.3s;
+}
+
+/* Micro interactions */
+.micro-bounce:active {
+  transform: scale(0.97);
+  transition: transform 0.1s;
+}
+
+.micro-press:active {
+  transform: translateY(2px);
+  transition: transform 0.1s;
 }

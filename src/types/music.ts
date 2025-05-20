@@ -18,7 +18,7 @@ export interface MusicTrack {
   intensity?: number;
   album?: string;
   year?: number;
-  genre?: string; // Added to fix errors
+  genre?: string;
 }
 
 export interface MusicPlaylist {
@@ -34,7 +34,7 @@ export interface MusicPlaylist {
   coverImage?: string;
   creator?: string;
   tags?: string[];
-  cover?: string; // Added to fix errors
+  cover?: string;
 }
 
 export interface MusicCategory {

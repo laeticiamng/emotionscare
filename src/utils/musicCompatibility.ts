@@ -57,9 +57,55 @@ export const normalizePlaylist = (playlist: any): MusicPlaylist => {
   };
 };
 
+/**
+ * Helper function to ensure value is an array
+ */
+export const ensureArray = <T>(value: T | T[] | undefined | null): T[] => {
+  if (Array.isArray(value)) return value;
+  if (value === undefined || value === null) return [];
+  return [value];
+};
+
+/**
+ * Get track title with fallback
+ */
+export const getTrackTitle = (track: MusicTrack | null | undefined): string => {
+  if (!track) return "Unknown Track";
+  return track.title || track.name || "Unknown Track";
+};
+
+/**
+ * Get track artist with fallback
+ */
+export const getTrackArtist = (track: MusicTrack | null | undefined): string => {
+  if (!track) return "Unknown Artist";
+  return track.artist || "Unknown Artist";
+};
+
+/**
+ * Get track cover image with fallback
+ */
+export const getTrackCover = (track: MusicTrack | null | undefined): string => {
+  if (!track) return "";
+  return track.cover || track.coverUrl || track.coverImage || "";
+};
+
+/**
+ * Get track URL with fallback
+ */
+export const getTrackUrl = (track: MusicTrack | null | undefined): string => {
+  if (!track) return "";
+  return track.url || track.audioUrl || track.src || track.track_url || "";
+};
+
 export default {
   findTracksByMood,
   findPlaylistsByMood,
   normalizeTrack,
-  normalizePlaylist
+  normalizePlaylist,
+  getTrackTitle,
+  getTrackArtist,
+  getTrackCover,
+  getTrackUrl,
+  ensureArray
 };

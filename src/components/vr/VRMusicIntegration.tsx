@@ -29,12 +29,12 @@ const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
       setIsLoading(true);
       
       try {
-        const success = await activateMusicForEmotion({
+        await activateMusicForEmotion({
           emotion: emotionTarget,
           intensity: 0.7
         });
         
-        if (success && onMusicReady) {
+        if (onMusicReady) {
           onMusicReady();
         }
         

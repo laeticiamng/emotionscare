@@ -1,7 +1,7 @@
 
 import { useCallback } from 'react';
 import { useMusic } from '@/hooks/useMusic';
-import { EmotionMusicParams } from '@/types/music';
+import { EmotionMusicParams, MusicContextType } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
 
 export const useMusicEmotionIntegration = () => {
@@ -23,26 +23,33 @@ export const useMusicEmotionIntegration = () => {
     return descriptions[emotion.toLowerCase()] || 'Musique adaptée à votre humeur';
   }, []);
 
-  const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams): Promise<boolean> => {
+  const activateMusicForEmotion = useCallback(async (params: EmotionMusicParams | string): Promise<void> => {
     try {
-      // Set the emotion in the music context
-      setEmotion(params.emotion);
+      // Normalize params to object form
+      const emotionParams: EmotionMusicParams = typeof params === 'string' 
+        ? { emotion: params } 
+        : params;
       
-      // Load playlist for this emotion
-      await loadPlaylistForEmotion(params);
+      // Set the emotion in the music context if available
+      if (setEmotion) {
+        setEmotion(emotionParams.emotion);
+      }
       
-      // Open the music drawer
-      if (!openDrawer) {
+      // Load playlist for this emotion if function is available
+      if (loadPlaylistForEmotion) {
+        await loadPlaylistForEmotion(emotionParams);
+      }
+      
+      // Open the music drawer if not already open
+      if (setOpenDrawer && !openDrawer) {
         setOpenDrawer(true);
         
         // Show toast notification
         toast({
           title: 'Musique émotionnelle activée',
-          description: getEmotionMusicDescription(params.emotion)
+          description: getEmotionMusicDescription(emotionParams.emotion)
         });
       }
-      
-      return true;
     } catch (error) {
       console.error('Error activating music for emotion:', error);
       
@@ -51,8 +58,6 @@ export const useMusicEmotionIntegration = () => {
         description: 'Impossible de charger la musique. Veuillez réessayer.',
         variant: 'destructive',
       });
-      
-      return false;
     }
   }, [openDrawer, setOpenDrawer, setEmotion, loadPlaylistForEmotion, toast, getEmotionMusicDescription]);
 

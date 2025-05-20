@@ -18,17 +18,10 @@ const MusicRecommendation: React.FC<MusicRecommendationProps> = ({ emotion, inte
   const handlePlayMusic = async () => {
     try {
       if (emotion) {
-        const result = await activateMusicForEmotion({
+        await activateMusicForEmotion({
           emotion: emotion,
           intensity: intensity
         });
-        
-        if (!result) {
-          toast({
-            title: "Musique non disponible",
-            description: "Aucune playlist n'est disponible pour cette émotion pour le moment."
-          });
-        }
       }
     } catch (error) {
       console.error("Erreur lors du chargement de la musique:", error);

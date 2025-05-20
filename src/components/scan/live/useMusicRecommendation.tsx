@@ -31,14 +31,17 @@ export function useMusicRecommendation() {
       const params: EmotionMusicParams = {
         emotion: musicType
       };
-      const result = await music.loadPlaylistForEmotion?.(params);
       
-      if (result && result.tracks && result.tracks.length > 0) {
-        // Set recommended tracks from the playlist
-        setRecommendedTracks(result.tracks);
-      } else {
-        // If no tracks found, create empty array
-        setRecommendedTracks([]);
+      if (music.loadPlaylistForEmotion) {
+        const result = await music.loadPlaylistForEmotion(params);
+        
+        if (result && result.tracks && result.tracks.length > 0) {
+          // Set recommended tracks from the playlist
+          setRecommendedTracks(result.tracks);
+        } else {
+          // If no tracks found, create empty array
+          setRecommendedTracks([]);
+        }
       }
     } catch (error) {
       console.error('Error loading music recommendations:', error);
