@@ -7,3 +7,4 @@ export * from '@/lib/ai/gdpr-service';
 export * from './analytics';
 export * from './modeChangeEmitter';
 export * from './modeSelectionLogger';
+export * from './security';

@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { User, UserRole } from '@/types/user';
 import { UserPreferences } from '@/types/preferences';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
+import { isLoginLocked, recordLoginAttempt } from '@/utils/security';
+import { AuthError, AuthErrorCode } from '@/utils/authErrors';
 
 export interface SignUpData {
   email: string;
@@ -79,16 +81,33 @@ export const authService = {
    */
   async signIn({ email, password }: SignInData): Promise<AuthResponse> {
     try {
+      if (isLoginLocked(email)) {
+        return {
+          user: null,
+          error: new AuthError(
+            AuthErrorCode.TOO_MANY_ATTEMPTS,
+            'Trop de tentatives de connexion. Veuillez réessayer plus tard.'
+          )
+        };
+      }
+
       // Connexion avec Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
-      if (error) throw error;
+      if (error) {
+        recordLoginAttempt(email, false);
+        throw new AuthError(AuthErrorCode.INVALID_CREDENTIALS, error.message);
+      }
       
       if (!data.user) {
-        return { user: null, error: new Error('No user data returned') };
+        recordLoginAttempt(email, false);
+        return {
+          user: null,
+          error: new AuthError(AuthErrorCode.UNKNOWN, 'No user data returned')
+        };
       }
       
       // Récupérer le profil complet depuis la table profiles
@@ -112,6 +131,7 @@ export const authService = {
         }
       };
       
+      recordLoginAttempt(email, true);
       return { user, error: null };
     } catch (error: any) {
       console.error('Error signing in:', error);
