@@ -1,4 +1,7 @@
 
+/* Since we've moved the Tailwind directives to App.css, we can remove the layer directive from here 
+   and convert these to regular CSS classes */
+
 /* Premium theme-specific styling */
 .theme-light .premium-card {
   @apply bg-white shadow-md border border-gray-100;

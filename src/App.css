@@ -1,4 +1,9 @@
 
+/* Import tailwind directives first */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Import premium styles */
 @import './styles/premium.css';
 @import './styles/glass.css';
