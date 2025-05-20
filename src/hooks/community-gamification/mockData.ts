@@ -6,6 +6,7 @@ export const mockChallenges: Challenge[] = [
   {
     id: 'c1',
     title: 'Première méditation',
+    name: 'Première méditation',
     description: 'Complétez votre première session de méditation',
     status: 'completed',
     type: 'achievement',
@@ -13,11 +14,13 @@ export const mockChallenges: Challenge[] = [
     progress: 1,
     goal: 1,
     unlocked: true,
+    category: 'wellness',
     reward: { id: 'b1', name: 'Novice en méditation', description: 'Badge de méditation', unlocked: true }
   },
   {
     id: 'c2',
     title: 'Semaine de pleine conscience',
+    name: 'Semaine de pleine conscience',
     description: 'Complétez 5 sessions de méditation en une semaine',
     status: 'active',
     type: 'streak',
@@ -25,11 +28,13 @@ export const mockChallenges: Challenge[] = [
     progress: 3,
     goal: 5,
     unlocked: true,
+    category: 'wellness',
     reward: { id: 'b2', name: 'Maître de la méditation', description: 'Badge de maîtrise', unlocked: false }
   },
   {
     id: 'c3',
     title: 'Explorer les émotions',
+    name: 'Explorer les émotions',
     description: 'Enregistrez 10 entrées dans votre journal émotionnel',
     status: 'active',
     type: 'ongoing',
@@ -37,6 +42,7 @@ export const mockChallenges: Challenge[] = [
     progress: 7,
     goal: 10,
     unlocked: true,
+    category: 'emotional',
     reward: { id: 'b3', name: 'Explorateur émotionnel', description: 'Badge d\'exploration', unlocked: false }
   }
 ];

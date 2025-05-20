@@ -58,3 +58,58 @@ export const findTracksByMood = (tracks: MusicTrack[], mood: string): MusicTrack
     (Array.isArray(track.category) && track.category.includes(mood))
   );
 };
+
+/**
+ * Gets the title of a track with fallbacks
+ */
+export const getTrackTitle = (track: MusicTrack): string => {
+  return track.title || track.name || 'Unknown Track';
+};
+
+/**
+ * Gets the artist of a track with fallbacks
+ */
+export const getTrackArtist = (track: MusicTrack): string => {
+  return track.artist || 'Unknown Artist';
+};
+
+/**
+ * Gets the cover image URL of a track with fallbacks
+ */
+export const getTrackCover = (track: MusicTrack): string => {
+  return track.coverUrl || track.cover || track.coverImage || '';
+};
+
+/**
+ * Gets the audio URL of a track with fallbacks
+ */
+export const getTrackUrl = (track: MusicTrack): string => {
+  return track.audioUrl || track.url || track.src || track.track_url || '';
+};
+
+/**
+ * Normalizes track data
+ */
+export const normalizeTrack = (track: MusicTrack): MusicTrack => {
+  if (!track) return track;
+  
+  return {
+    ...track,
+    title: getTrackTitle(track),
+    artist: getTrackArtist(track),
+    coverUrl: getTrackCover(track),
+    audioUrl: getTrackUrl(track),
+  };
+};
+
+export default {
+  ensureArray,
+  ensureTrack,
+  ensurePlaylist,
+  findTracksByMood,
+  getTrackTitle,
+  getTrackArtist,
+  getTrackCover,
+  getTrackUrl,
+  normalizeTrack
+};

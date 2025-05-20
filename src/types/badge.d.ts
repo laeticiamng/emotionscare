@@ -41,6 +41,7 @@ export interface Challenge {
   totalSteps?: number;
   isCompleted?: boolean;
   icon?: string;
+  rarity?: string; // Added to fix mock data
 }
 
 export interface LeaderboardEntry {
