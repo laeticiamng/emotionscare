@@ -1,101 +1,46 @@
 
-export type NotificationType = 'emotion' | 'journal' | 'coaching' | 'community' | 'system' | 'achievement' | 'badge' | 'challenge' | 'reminder' | 'info' | 'warning' | 'error' | 'success' | 'streak' | 'urgent';
-export type NotificationFrequency = 'immediate' | 'daily' | 'weekly' | 'never' | 'realtime';
-export type NotificationChannel = 'email' | 'push' | 'in-app';
-export type NotificationTone = 'formal' | 'friendly' | 'motivational' | 'minimal';
+// Notification Types Definition
 
-export interface NotificationPreference {
-  id: string;
-  userId: string;
-  category: string;
-  frequency: NotificationFrequency;
-  type?: NotificationType;
-  types?: {
-    system?: boolean;
-    emotion?: boolean;
-    coach?: boolean;
-    journal?: boolean;
-    community?: boolean;
-    achievement?: boolean;
-    badge?: boolean;
-    challenge?: boolean;
-    reminder?: boolean;
-    info?: boolean;
-    warning?: boolean;
-    error?: boolean;
-    success?: boolean;
-    streak?: boolean;
-    urgent?: boolean;
-  };
-  enabled?: boolean;
-  emailEnabled?: boolean;
-  pushEnabled?: boolean;
-  inAppEnabled?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-  channels?: {
-    email: boolean;
-    push: boolean;
-    inApp: boolean;
-  };
-  tone?: NotificationTone;
+export interface NotificationTypes {
+  system: string;
+  achievements: string;
+  reminders: string;
+  wellness: string;
+  community: string;
+  invitations: string;
+  messages: string;
+  updates: string;
 }
 
-export interface NotificationSettings {
-  preferences: NotificationPreference[];
-  globalEnabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled: boolean;
-}
-
-export interface NotificationMessage {
-  id: string;
-  userId: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  isRead: boolean;
-  createdAt: string;
-  link?: string;
-  priority?: 'low' | 'medium' | 'high';
-}
+export type NotificationType = keyof NotificationTypes | string;
 
 export interface Notification {
   id: string;
   title: string;
-  /** Main text content of the notification */
-  message?: string;
-  /** Optional alternative content field */
-  content?: string;
-  type: string;
-  userId: string;
-  read: boolean;
-  /** Some hooks also use the `isRead` property */
-  isRead?: boolean;
+  message: string;
+  type: NotificationType;
   createdAt: string;
-  timestamp?: string;
-  /** Alternative date field for older components */
-  date?: string;
-  action_text?: string;
-  action_link?: string;
-  linkTo?: string;
+  read: boolean; // For backward compatibility
+  isRead?: boolean;
+  isArchived?: boolean;
+  userId?: string;
   metadata?: Record<string, any>;
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  icon?: string;
   image?: string;
-  icon?: string;
-  priority?: string;
+  actionUrl?: string;
+  actionText?: string;
+  timestamp?: string;
+  imageUrl?: string;
 }
 
-export interface NotificationState {
-  notifications: Notification[];
-  unreadCount: number;
-  isLoading: boolean;
-  hasError: boolean;
-}
+export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'none';
 
-export interface NotificationAction {
-  type: string;
-  label: string;
-  icon?: string;
-  url?: string;
-  action?: () => void;
+export type NotificationTone = 'standard' | 'gentle' | 'focused' | 'none';
+
+export interface NotificationPreference {
+  type: NotificationType;
+  enabled: boolean;
+  frequency: NotificationFrequency;
+  tone: NotificationTone;
 }

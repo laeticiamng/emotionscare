@@ -134,3 +134,7 @@ export const mockLeaderboard: LeaderboardEntry[] = [
     score: 750
   }
 ];
+
+// Add exports for compatibility with other files
+export const mockCommunityBadges = mockBadges;
+export const mockCommunityChallenges = mockChallenges;

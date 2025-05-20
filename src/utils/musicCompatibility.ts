@@ -1,5 +1,5 @@
 
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
 
 /**
  * Ensures the input is an array, converting single items to arrays if needed
@@ -19,6 +19,7 @@ export const ensureTrack = (track: Partial<MusicTrack>): MusicTrack => {
     id: track.id || `track-${Date.now()}`,
     title: track.title || track.name || 'Unknown Title',
     artist: track.artist || 'Unknown Artist',
+    url: track.url || track.audioUrl || track.src || track.track_url || '',
     audioUrl: track.audioUrl || track.url || track.src || track.track_url || '',
     duration: track.duration || 0,
     coverUrl: track.coverUrl || track.cover || track.coverImage || '',
@@ -27,7 +28,7 @@ export const ensureTrack = (track: Partial<MusicTrack>): MusicTrack => {
     mood: track.mood || undefined,
     intensity: track.intensity || undefined,
     tags: ensureArray(track.tags || []),
-    category: ensureArray(track.category || []),
+    category: track.category || [],
   } as MusicTrack;
 };
 
@@ -43,8 +44,32 @@ export const ensurePlaylist = (playlist: Partial<MusicPlaylist>): MusicPlaylist 
     tracks: (playlist.tracks || []).map(ensureTrack),
     emotion: playlist.emotion || undefined,
     mood: playlist.mood || undefined,
-    category: ensureArray(playlist.category || []),
+    category: playlist.category || [],
   } as MusicPlaylist;
+};
+
+/**
+ * Create music params object from emotion string or object
+ */
+export const createMusicParams = (params: string | EmotionMusicParams): EmotionMusicParams => {
+  if (typeof params === 'string') {
+    return { emotion: params };
+  }
+  return params;
+};
+
+/**
+ * Convert a track to a simple playlist
+ */
+export const convertToPlaylist = (track: MusicTrack): MusicPlaylist => {
+  return {
+    id: `playlist-from-track-${track.id}`,
+    title: `${track.title} Playlist`,
+    tracks: [track],
+    emotion: track.emotion,
+    mood: track.mood,
+    category: track.category
+  };
 };
 
 /**
@@ -90,15 +115,18 @@ export const getTrackUrl = (track: MusicTrack): string => {
 /**
  * Normalizes track data
  */
-export const normalizeTrack = (track: MusicTrack): MusicTrack => {
+export const normalizeTrack = (track: any): MusicTrack => {
   if (!track) return track;
   
   return {
     ...track,
+    id: track.id || `track-${Date.now()}`,
     title: getTrackTitle(track),
     artist: getTrackArtist(track),
     coverUrl: getTrackCover(track),
     audioUrl: getTrackUrl(track),
+    url: getTrackUrl(track),
+    duration: track.duration || 0,
   };
 };
 
@@ -111,5 +139,7 @@ export default {
   getTrackArtist,
   getTrackCover,
   getTrackUrl,
-  normalizeTrack
+  normalizeTrack,
+  createMusicParams,
+  convertToPlaylist
 };

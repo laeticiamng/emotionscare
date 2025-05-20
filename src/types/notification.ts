@@ -1,61 +1,46 @@
 
-export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'never' | 'immediate';
+// Notification Types Definition
 
 export interface NotificationTypes {
-  system?: boolean;
-  emotions?: boolean;
-  reports?: boolean;
-  messages?: boolean;
-  insights?: boolean;
-  reminders?: boolean;
-  achievements?: boolean;
-  recommendations?: boolean;
-  sessions?: boolean;
-  community?: boolean;
-  challenges?: boolean;
-  events?: boolean;
-  updates?: boolean;
-  urgent?: boolean;
+  system: string;
+  achievements: string;
+  reminders: string;
+  wellness: string;
+  community: string;
+  invitations: string;
+  messages: string;
+  updates: string;
 }
 
-export interface NotificationPreference {
-  id: string;
-  userId: string;
-  category: string;
-  enabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled: boolean;
-  inAppEnabled: boolean;
-  types: NotificationTypes;
-  frequency: NotificationFrequency;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface NotificationSettings {
-  preferences: NotificationPreference[];
-  globalEnabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled: boolean;
-  inAppEnabled: boolean;
-}
+export type NotificationType = keyof NotificationTypes | string;
 
 export interface Notification {
   id: string;
-  userId: string;
   title: string;
   message: string;
-  type: keyof NotificationTypes;
-  isRead: boolean;
-  isArchived: boolean;
-  link?: string;
+  type: NotificationType;
   createdAt: string;
-  expiresAt?: string;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
+  read: boolean; // For backward compatibility
+  isRead?: boolean;
+  isArchived?: boolean;
+  userId?: string;
   metadata?: Record<string, any>;
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  icon?: string;
+  image?: string;
+  actionUrl?: string;
+  actionText?: string;
+  timestamp?: string;
+  imageUrl?: string;
 }
 
-export interface NotificationGroup {
-  date: string;
-  notifications: Notification[];
+export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'none';
+
+export type NotificationTone = 'standard' | 'gentle' | 'focused' | 'none';
+
+export interface NotificationPreference {
+  type: NotificationType;
+  enabled: boolean;
+  frequency: NotificationFrequency;
+  tone: NotificationTone;
 }

@@ -27,31 +27,31 @@ export const useNotifications = () => {
       const mockNotifications: Notification[] = [
         {
           id: '1',
-          type: 'achievement',
+          type: 'achievements',
           title: 'Badge débloqué!',
           message: 'Vous avez débloqué le badge "Premier pas"',
           read: false,
-          createdAt: new Date(Date.now() - 3600000),
+          createdAt: new Date().toISOString(),
           actionUrl: '/profile/badges',
           imageUrl: '/badges/first-step.png',
-          priority: 'normal'
+          priority: 'medium'
         },
         {
           id: '2',
-          type: 'reminder',
+          type: 'reminders',
           title: 'Rappel de méditation',
           message: 'Votre séance de méditation quotidienne vous attend',
           read: true,
-          createdAt: new Date(Date.now() - 86400000),
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
           actionUrl: '/meditation'
         },
         {
           id: '3',
-          type: 'invitation' as NotificationType,
+          type: 'invitations',
           title: 'Invitation à rejoindre un groupe',
           message: 'Marie vous invite à rejoindre "Méditation matinale"',
           read: false,
-          createdAt: new Date(Date.now() - 172800000),
+          createdAt: new Date(Date.now() - 172800000).toISOString(),
           actionUrl: '/groups/invites'
         }
       ];
@@ -71,7 +71,7 @@ export const useNotifications = () => {
       // In a real app, we'd call an API
       setNotifications(prev => 
         prev.map(n => 
-          n.id === notificationId ? { ...n, read: true } : n
+          n.id === notificationId ? { ...n, read: true, isRead: true } : n
         )
       );
       
@@ -86,7 +86,7 @@ export const useNotifications = () => {
   const markAllAsRead = useCallback(async () => {
     try {
       // In a real app, we'd call an API
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      setNotifications(prev => prev.map(n => ({ ...n, read: true, isRead: true })));
       setUnreadCount(0);
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
@@ -114,7 +114,7 @@ export const useNotifications = () => {
   const addNotification = useCallback((notification: Omit<Notification, 'id' | 'createdAt' | 'read'>) => {
     const newNotification: Notification = {
       id: `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
       read: false,
       ...notification
     };

@@ -1,5 +1,5 @@
 
-// Types liés aux badges et gamification
+// Types for badges and gamification
 
 export interface Badge {
   id: string;
@@ -41,7 +41,7 @@ export interface Challenge {
   totalSteps?: number;
   isCompleted?: boolean;
   icon?: string;
-  rarity?: string; // Added to fix mock data
+  rarity?: string;
 }
 
 export interface LeaderboardEntry {

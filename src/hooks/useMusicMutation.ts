@@ -1,81 +1,117 @@
 
-import { useCallback } from 'react';
+import { useState } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
-import { ensurePlaylist, ensureTrack } from '@/utils/musicCompatibility';
 
-/**
- * Hook for music mutations that provides a unified interface
- * for various music state mutations across different implementations
- */
 export const useMusicMutation = () => {
   const music = useMusic();
   const { toast } = useToast();
-  
-  // Handle playing a track
-  const playTrack = useCallback((track: MusicTrack) => {
-    const normalizedTrack = ensureTrack(track);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const createPlaylist = async (name: string, description?: string, tracks: MusicTrack[] = []) => {
+    setIsLoading(true);
+    setError(null);
     
     try {
-      if (music.playTrack) {
-        music.playTrack(normalizedTrack);
-      } else if (music.play) {
-        music.play(normalizedTrack);
-      } else {
-        console.error('No play method available in music context');
+      if (music.createPlaylist) {
+        music.createPlaylist(name, tracks);
+        
+        toast({
+          title: "Playlist créée",
+          description: `Votre playlist "${name}" a été créée avec succès.`,
+          variant: "success",
+        });
+        
+        return true;
       }
-    } catch (error) {
-      console.error('Error playing track:', error);
+      return false;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to create playlist'));
+      
       toast({
-        title: 'Erreur',
-        description: 'Impossible de lancer la lecture du morceau',
-        variant: 'destructive',
+        title: "Erreur",
+        description: "Impossible de créer la playlist. Veuillez réessayer.",
+        variant: "destructive",
       });
+      
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-  }, [music, toast]);
-  
-  // Handle playing a playlist
-  const playPlaylist = useCallback((playlist: MusicPlaylist) => {
-    if (!playlist || !playlist.tracks || playlist.tracks.length === 0) {
-      toast({
-        title: 'Playlist vide',
-        description: 'Cette playlist ne contient aucun morceau',
-        variant: 'destructive',
-      });
-      return;
-    }
+  };
+
+  const addToPlaylist = async (trackId: string, playlistId: string) => {
+    setIsLoading(true);
+    setError(null);
     
     try {
-      const normalizedPlaylist = ensurePlaylist(playlist);
-      
-      if (music.setPlaylist) {
-        music.setPlaylist(normalizedPlaylist);
+      if (music.addToPlaylist) {
+        music.addToPlaylist(trackId, playlistId);
+        
+        toast({
+          title: "Piste ajoutée",
+          description: "La piste a été ajoutée à votre playlist.",
+          variant: "success",
+        });
+        
+        return true;
       }
+      return false;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to add track to playlist'));
       
-      if (normalizedPlaylist.tracks.length > 0) {
-        playTrack(normalizedPlaylist.tracks[0]);
-      }
-      
-      // Open music drawer if available
-      if (music.setOpenDrawer) {
-        music.setOpenDrawer(true);
-      } else if (music.toggleDrawer) {
-        music.toggleDrawer();
-      }
-    } catch (error) {
-      console.error('Error playing playlist:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de lancer la lecture de la playlist',
-        variant: 'destructive',
+        title: "Erreur",
+        description: "Impossible d'ajouter la piste à la playlist. Veuillez réessayer.",
+        variant: "destructive",
       });
+      
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-  }, [music, toast, playTrack]);
-  
+  };
+
+  const removeFromPlaylist = async (trackId: string, playlistId: string) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      if (music.removeFromPlaylist) {
+        music.removeFromPlaylist(trackId, playlistId);
+        
+        toast({
+          title: "Piste retirée",
+          description: "La piste a été retirée de votre playlist.",
+          variant: "success",
+        });
+        
+        return true;
+      }
+      return false;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Failed to remove track from playlist'));
+      
+      toast({
+        title: "Erreur",
+        description: "Impossible de retirer la piste de la playlist. Veuillez réessayer.",
+        variant: "destructive",
+      });
+      
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
-    playTrack,
-    playPlaylist,
+    createPlaylist,
+    addToPlaylist,
+    removeFromPlaylist,
+    isLoading,
+    error
   };
 };
 

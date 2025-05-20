@@ -20,24 +20,21 @@ const MusicCreator = () => {
     setIsGenerating(true);
     
     try {
-      // Si generateMusic n'est pas disponible, simuler la création de musique
+      // If generateMusic isn't available, simulate music creation
       let generatedTrack: MusicTrack;
       
       if (music.generateMusic) {
         const result = await music.generateMusic(prompt);
-        generatedTrack = normalizeTrack(result);
+        if (result && result.tracks && result.tracks.length > 0) {
+          // Get the first track from the playlist
+          generatedTrack = normalizeTrack(result.tracks[0]);
+        } else {
+          // Fallback if no tracks were generated
+          generatedTrack = createFallbackTrack(prompt);
+        }
       } else {
-        // Simulation de génération
-        generatedTrack = {
-          id: `generated-${Date.now()}`,
-          title: `Musique basée sur: ${prompt.substring(0, 20)}...`,
-          artist: 'IA Music Generator',
-          audioUrl: '/audio/generated-sample.mp3',
-          url: '/audio/generated-sample.mp3',
-          cover: '/images/covers/generated.jpg',
-          coverUrl: '/images/covers/generated.jpg',
-          duration: 180,
-        };
+        // Simulation of generation
+        generatedTrack = createFallbackTrack(prompt);
       }
       
       if (music.playTrack) {
@@ -50,6 +47,20 @@ const MusicCreator = () => {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  // Helper function to create a fallback track
+  const createFallbackTrack = (promptText: string): MusicTrack => {
+    return {
+      id: `generated-${Date.now()}`,
+      title: `Musique basée sur: ${promptText.substring(0, 20)}...`,
+      artist: 'IA Music Generator',
+      audioUrl: '/audio/generated-sample.mp3',
+      url: '/audio/generated-sample.mp3',
+      cover: '/images/covers/generated.jpg',
+      coverUrl: '/images/covers/generated.jpg',
+      duration: 180,
+    };
   };
 
   return (
