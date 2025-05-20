@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { User, LogOut, Settings, UserCircle } from 'lucide-react';
@@ -23,6 +24,7 @@ interface UserMenuProps {
 
 const UserMenu: React.FC<UserMenuProps> = ({ mobile = false, onClose }) => {
   const { user, logout } = useAuth();
+  const { clearUserMode } = useUserMode();
   const navigate = useNavigate();
 
   const handleItemClick = (path: string) => {
@@ -38,6 +40,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ mobile = false, onClose }) => {
     }
     try {
       await logout();
+      clearUserMode();
       navigate('/');
     } catch (error) {
       console.error("Erreur lors de la déconnexion", error);

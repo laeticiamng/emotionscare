@@ -3,7 +3,7 @@ import React from 'react';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserPreferencesProvider } from '@/contexts/UserPreferencesContext';
-import { UserModeProvider } from '@/contexts/UserModeProvider';
+import { UserModeProvider } from '@/contexts/UserModeContext';
 import { MusicProvider } from '@/contexts/music/index';
 import { OptimizationProvider } from '@/providers/OptimizationProvider';
 import { ExtensionsProvider } from '@/providers/ExtensionsProvider';

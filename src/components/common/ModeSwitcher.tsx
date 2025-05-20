@@ -34,10 +34,9 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
   const { toast } = useToast();
   const { user, updateUser } = useAuth();
   
-  // Add debug logging
+  // Sync logs were used during development; remove in production
   useEffect(() => {
-    console.log('[ModeSwitcher] Current user mode:', userMode);
-    console.log('[ModeSwitcher] Current user role:', user?.role);
+    // placeholder effect to keep dependency check
   }, [userMode, user?.role]);
   
   const handleSwitchMode = async (mode: string) => {
@@ -95,8 +94,6 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
       
       // Reset transitioning state after navigation
       setTimeout(() => setIsTransitioning(false), 300);
-      
-      console.log('[ModeSwitcher] Mode switched:', normalizedMode);
     }, 100);
   };
   

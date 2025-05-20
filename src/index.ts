@@ -133,7 +133,9 @@ async function humeBatchJobStatus(id: string) {
 // -------------- Exports ----------------
 // Create a client instance using the Hume library's API
 // Fix for browser environment: use the createHumeClient function instead of HumeClient constructor
-const humeClient = Hume.createClient(HUME_API_KEY);
+const humeClient = typeof (Hume as any).createClient === 'function'
+  ? (Hume as any).createClient(HUME_API_KEY)
+  : null;
 
 export {
   openaiText,

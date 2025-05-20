@@ -16,19 +16,10 @@ export function useUserModeHelpers() {
       const normalizedRole = normalizeUserMode(user.role);
       const normalizedMode = normalizeUserMode(userMode);
       
-      // If role and mode don't match, log a warning
+      // If role and mode don't match, synchronize userMode with the user role
       if (normalizedRole !== normalizedMode) {
-        console.warn('[useUserModeHelpers] User role and mode mismatch:', {
-          role: user.role,
-          normalizedRole,
-          userMode,
-          normalizedMode
-        });
-        
-        // Synchronize by setting userMode to match the user role
         setUserMode(normalizedRole);
         localStorage.setItem('userMode', normalizedRole);
-        console.log('[useUserModeHelpers] Synchronized mode with role:', normalizedRole);
       }
     }
   }, [user?.role, userMode, setUserMode]);
