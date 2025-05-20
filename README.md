@@ -175,6 +175,7 @@ Le `ThemeContext` expose également des préférences d'accessibilité comme `so
 - **UserModeContext** - Mode utilisateur (B2B/B2C)
 - **LayoutContext** - Mise en page et navigation (sidebar, plein écran)
 - **MusicContext** - Lecture et gestion de la musique (source unique via `useMusic`)
+- **SocialCoconContext** - Gestion des posts, commentaires et réactions du cocon social
 L'ordre d'injection de ces contextes est géré par le composant `AppProviders`. La hiérarchie complète (avec `LayoutProvider`) est détaillée dans `docs/layout-shell-audit.md` et `docs/shell-navigation-premium-audit.md`.
 
 ## Préférences utilisateur par défaut
