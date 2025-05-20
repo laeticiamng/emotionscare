@@ -20,7 +20,7 @@ export interface Notification {
   message: string;
   type: NotificationType;
   createdAt: string;
-  read: boolean; // For backward compatibility
+  read?: boolean; // For backward compatibility
   isRead?: boolean;
   isArchived?: boolean;
   userId?: string;
@@ -32,6 +32,7 @@ export interface Notification {
   actionText?: string;
   timestamp?: string;
   imageUrl?: string;
+  label?: string;
 }
 
 export type NotificationFrequency = 'realtime' | 'daily' | 'weekly' | 'none' | 'immediate';

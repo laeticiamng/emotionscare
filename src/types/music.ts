@@ -12,6 +12,9 @@ export interface MusicTrack {
   audioUrl?: string;
   emotion?: string;
   name?: string;
+  mood?: string;
+  category?: string | string[];
+  tags?: string[];
 }
 
 export interface MusicPlaylist {
@@ -22,6 +25,8 @@ export interface MusicPlaylist {
   mood?: string;
   description?: string;
   coverUrl?: string;
+  title?: string;
+  category?: string | string[];
 }
 
 export interface MusicCategory {
@@ -51,6 +56,7 @@ export interface MusicContextType {
   resumeTrack: () => void;
   nextTrack: () => void;
   prevTrack: () => void;
+  previousTrack?: () => void;
   setVolume: (volume: number) => void;
   setCurrentTime: (time: number) => void;
   togglePlayPause: () => void;
@@ -60,7 +66,7 @@ export interface MusicContextType {
   repeat: () => void;
   isLoading?: boolean;
   getCurrentTrack?: () => MusicTrack | null;
-  loadPlaylistForEmotion?: (params: EmotionMusicParams) => Promise<MusicPlaylist | null>;
+  loadPlaylistForEmotion?: (params: EmotionMusicParams | string) => Promise<MusicPlaylist | null>;
   getRecommendationByEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
   playEmotion?: (emotion: string) => void;
   addToPlaylist?: (trackId: string, playlistId: string) => void;
@@ -69,6 +75,17 @@ export interface MusicContextType {
   generateMusic?: (prompt: string) => Promise<{ tracks: MusicTrack[] }>;
   pause?: () => void;
   resume?: () => void;
+  muted?: boolean;
+  toggleMute?: () => void;
+  togglePlay?: () => void;
+  previous?: () => void;
+  next?: () => void;
+  playlist?: MusicPlaylist | null;
+  setOpenDrawer?: (isOpen: boolean) => void;
+  isInitialized?: boolean;
+  error?: string | null;
+  setEmotion?: (emotion: string) => void;
+  setCurrentTrack?: (track: MusicTrack) => void;
 }
 
 export interface MusicDrawerProps {

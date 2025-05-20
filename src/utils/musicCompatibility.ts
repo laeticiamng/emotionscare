@@ -48,6 +48,8 @@ export const normalizeTrack = (track: any): MusicTrack => {
     // Include other optional properties if they exist
     ...(track.audioUrl && { audioUrl: track.audioUrl }),
     ...(track.emotion && { emotion: track.emotion }),
+    ...(track.mood && { mood: track.mood }),
+    ...(track.category && { category: track.category }),
   };
 };
 
@@ -68,8 +70,26 @@ export const convertToPlaylist = (tracks: MusicTrack[], name: string = 'Generate
   return {
     id: `playlist-${Date.now()}`,
     name,
+    title: name,
     tracks,
   };
+};
+
+/**
+ * Find tracks by mood
+ */
+export const findTracksByMood = (tracks: MusicTrack[], mood: string): MusicTrack[] => {
+  if (!tracks || !Array.isArray(tracks)) return [];
+  
+  return tracks.filter(track => {
+    if (!track) return false;
+    
+    const trackMood = track.mood?.toLowerCase();
+    const trackEmotion = track.emotion?.toLowerCase();
+    const searchMood = mood.toLowerCase();
+    
+    return trackMood === searchMood || trackEmotion === searchMood;
+  });
 };
 
 /**
@@ -90,5 +110,6 @@ export default {
   normalizeTrack,
   createMusicParams,
   convertToPlaylist,
-  ensureArray
+  ensureArray,
+  findTracksByMood
 };
