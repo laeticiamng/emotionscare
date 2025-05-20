@@ -12,6 +12,13 @@ export interface Badge {
   timestamp?: string;
   icon?: string;
   tier?: 'bronze' | 'silver' | 'gold' | 'platinum';
+  rarity?: string;
+  imageUrl?: string;
+  earned?: boolean;
+  earnedAt?: string;
+  level?: number;
+  threshold?: number;
+  completed?: boolean;
 }
 
 export interface Challenge {
@@ -26,6 +33,14 @@ export interface Challenge {
   category?: string;
   unlocked: boolean;
   type?: string;
+  name?: string;
+  difficulty?: string;
+  completions?: number;
+  total?: number;
+  deadline?: string;
+  totalSteps?: number;
+  isCompleted?: boolean;
+  icon?: string;
 }
 
 export interface LeaderboardEntry {
@@ -38,6 +53,8 @@ export interface LeaderboardEntry {
   avatar?: string;
   badges: Badge[];
   progress?: number;
+  score?: number;
+  position?: number;
 }
 
 export interface GamificationStats {

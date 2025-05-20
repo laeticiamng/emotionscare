@@ -83,7 +83,8 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: "Gentle tracks to help you unwind and find peace",
     coverUrl: "/music/playlists/calm.jpg",
     tracks: [],
-    category: "relax"
+    category: "relax",
+    mood: "calm"
   },
   {
     id: "playlist-2",
@@ -91,7 +92,8 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: "Uplifting music to energize your day",
     coverUrl: "/music/playlists/energy.jpg",
     tracks: [],
-    category: "energy"
+    category: "energy",
+    mood: "energetic"
   },
   {
     id: "playlist-3",
@@ -99,7 +101,8 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: "Feel-good tunes to brighten your mood",
     coverUrl: "/music/playlists/happy.jpg",
     tracks: [],
-    category: "mood"
+    category: "mood",
+    mood: "happy"
   },
   {
     id: "playlist-4",
@@ -107,7 +110,8 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: "Instrumental tracks for enhanced concentration",
     coverUrl: "/music/playlists/focus.jpg",
     tracks: [],
-    category: "focus"
+    category: "focus",
+    mood: "focused"
   },
   {
     id: "playlist-5",
@@ -115,7 +119,8 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: "Soothing sounds to guide you into a peaceful sleep",
     coverUrl: "/music/playlists/sleep.jpg",
     tracks: [],
-    category: "sleep"
+    category: "sleep",
+    mood: "sleepy"
   },
   {
     id: "playlist-6",
@@ -123,7 +128,8 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: "Ambient soundscapes for mindful meditation",
     coverUrl: "/music/playlists/meditation.jpg",
     tracks: [],
-    category: "meditation"
+    category: "meditation",
+    mood: "meditative"
   }
 ];
 

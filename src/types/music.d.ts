@@ -90,9 +90,9 @@ export interface MusicContextType {
   
   // Music management
   loadPlaylistForEmotion?: (params: string | EmotionMusicParams) => Promise<MusicPlaylist | null>;
-  getRecommendationByEmotion?: (emotion: string) => Promise<MusicTrack | null>;
+  getRecommendationByEmotion?: (emotion: string) => Promise<MusicPlaylist | null>;
   setEmotion?: (emotion: string) => void;
-  generateMusic?: (params: any) => Promise<MusicTrack | null>;
+  generateMusic?: (params: any) => Promise<MusicPlaylist | null>;
   setPlaylist?: (playlist: MusicPlaylist) => void;
   setCurrentTrack?: (track: MusicTrack) => void;
   playPlaylist?: (playlist: MusicPlaylist) => void;

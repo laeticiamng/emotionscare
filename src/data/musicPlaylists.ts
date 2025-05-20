@@ -9,7 +9,6 @@ export const sampleTracks: MusicTrack[] = [
     artist: 'Nature Sounds',
     url: '/sounds/ambient-calm.mp3',
     duration: 180,
-    src: '/sounds/ambient-calm.mp3',
     audioUrl: '/sounds/ambient-calm.mp3',
     emotion: 'calm',
     genre: 'ambient'
@@ -20,7 +19,6 @@ export const sampleTracks: MusicTrack[] = [
     artist: 'Meditation Masters',
     url: '/sounds/welcome.mp3',
     duration: 240,
-    src: '/sounds/welcome.mp3',
     audioUrl: '/sounds/welcome.mp3',
     emotion: 'relaxed',
     genre: 'meditation'

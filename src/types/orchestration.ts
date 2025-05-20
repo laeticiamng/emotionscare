@@ -1,84 +1,72 @@
 
-import { EmotionResult } from './emotion';
+import { MoodData } from '@/types/audio';
 
 export interface MoodEvent {
   id: string;
-  timestamp: Date;
-  emotion: string;
-  confidence: number;
+  mood: string;
+  timestamp: string;
   source: string;
-  context: Record<string, any>;
+  userId: string;
+  intensity?: number;
 }
 
 export interface Prediction {
   id: string;
-  timestamp: Date;
-  emotion: string;
+  predictedMood?: string;
+  predictedEmotion?: string;
   confidence: number;
-  prediction: string;
-  recommendations: string[]; // Array of recommendation IDs
+  timeframe: string;
+  date: string;
+  userId: string;
+  mood?: string; // For compatibility
 }
 
 export interface PredictionRecommendation {
   id: string;
-  type: 'vr_session' | 'music' | 'coaching' | 'activity';
-  emotion: string;
+  type: string;
   title: string;
   description: string;
-  priority: 'low' | 'medium' | 'high';
+  effectiveness: number;
+  mood?: string; // For compatibility
 }
 
 export interface EmotionalLocation {
   id: string;
   name: string;
-  coordinates?: { x: number; y: number };
-  emotion: string;
-  intensity: number;
-  timestamp: Date;
+  moodData: {
+    primary: string;
+    secondary: string;
+    intensity: number;
+  };
+  coordinates: { lat: number; lng: number } | { x: number; y: number };
+  userId: string;
 }
 
 export interface SanctuaryWidget {
   id: string;
-  type: string;
   title: string;
-  content: string;
-  position: 'top' | 'bottom' | 'left' | 'right' | 'center';
-  emotion?: string;
+  type: string;
+  emotion: string;
+  priority: number;
+  description?: string; // For compatibility
 }
 
 export interface EmotionalSynthesis {
   id: string;
-  timestamp: Date;
-  dominantEmotion: string;
-  emotionHistory: string[];
-  summary: string;
-  recommendations: string[];
+  userId: string;
+  timestamp: string;
+  emotionSummary: string;
+  recommendations: PredictionRecommendation[];
+  metrics: {
+    dominantEmotion: string;
+    emotionalStability: number;
+    emotionalVariability: number;
+  };
 }
 
 export interface OrchestrationEvent {
   id: string;
   type: string;
-  timestamp: Date;
+  timestamp: string;
   data: any;
-  processed: boolean;
-}
-
-export interface OrchestrationContextType {
-  currentEmotionResult: EmotionResult | null;
-  emotionHistory: EmotionResult[];
-  moodEvents: MoodEvent[];
-  predictions: Prediction[];
-  recommendations: PredictionRecommendation[];
-  sanctuaryWidgets: SanctuaryWidget[];
-  emotionalLocations: EmotionalLocation[];
-  synthesis: EmotionalSynthesis | null;
-  events: OrchestrationEvent[];
-  setCurrentEmotionResult: (result: EmotionResult) => void;
-  addEmotionResult: (result: EmotionResult) => void;
-  addEvent: (type: string, data: any) => void;
-  processEmotionResult: (result: EmotionResult) => void;
-  generatePredictions: () => void;
-  getRecommendations: () => PredictionRecommendation[];
-  clearHistory: () => void;
-  refreshSynthesis: () => void;
 }
