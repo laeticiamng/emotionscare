@@ -18,8 +18,10 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "paths": {
+      "@/*": ["./src/*"],
       "@types/*": ["./types/*"]
-    }
+    },
+    "jsx": "react-jsx"
   },
   "include": ["vite.config.ts", "types"]
 }
