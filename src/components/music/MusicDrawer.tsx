@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import { useAI } from '@/hooks/useAI';
 
 export interface MusicDrawerProps {
   children?: React.ReactNode;
@@ -28,6 +29,13 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
 }) => {
   // Use open or isOpen, prioritizing open if both are provided
   const isDialogOpen = open || isOpen;
+  const ai = useAI();
+
+  useEffect(() => {
+    if (isDialogOpen) {
+      ai.musicgenV1('mood music');
+    }
+  }, [ai, isDialogOpen]);
   
   // Handle close function to work with either callback
   const handleOpenChange = (newOpen: boolean) => {

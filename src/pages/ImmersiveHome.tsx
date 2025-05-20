@@ -7,6 +7,7 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { logModeSelection } from '@/utils/modeSelectionLogger';
 import { useAnalyticsConsent } from '@/hooks/useAnalyticsConsent';
+import { useAI } from '@/hooks/useAI';
 import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import '../styles/immersive-home.css';
 
@@ -19,6 +20,11 @@ const ImmersiveHome: React.FC = () => {
   const [isMuted, setIsMuted] = useState(true);
   const [hasIntersected, setHasIntersected] = useState(false);
   const analyticsConsent = useAnalyticsConsent();
+  const ai = useAI();
+
+  useEffect(() => {
+    ai.musicgenV1('calm background music');
+  }, [ai]);
 
   // Animation variants
   const containerVariants = {

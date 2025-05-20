@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Music, Wand2, Mic, Clock, Loader2 } from 'lucide-react';
+import { useAI } from '@/hooks/useAI';
 
 const B2CMusicCreate: React.FC = () => {
   const [creationMethod, setCreationMethod] = useState<'prompt' | 'parameters'>('prompt');
@@ -18,6 +19,7 @@ const B2CMusicCreate: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedTrack, setGeneratedTrack] = useState<any>(null);
   const { toast } = useToast();
+  const ai = useAI();
   
   // Parameters for advanced generation
   const [parameters, setParameters] = useState({
@@ -50,24 +52,11 @@ const B2CMusicCreate: React.FC = () => {
   
   const handleGenerateMusic = async () => {
     setIsGenerating(true);
-    
+
     try {
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // Mock generated track
-      const mockTrack = {
-        id: 'gen-' + Date.now(),
-        title: creationMethod === 'prompt' 
-          ? 'Composition basée sur votre prompt' 
-          : `${parameters.emotion.charAt(0).toUpperCase() + parameters.emotion.slice(1)} Melody`,
-        artist: 'IA Composer',
-        duration: parameters.duration,
-        cover_url: 'https://via.placeholder.com/300',
-      };
-      
-      setGeneratedTrack(mockTrack);
-      
+      const result = await ai.musicgenV1(prompt);
+      setGeneratedTrack(result);
+
       toast({
         title: 'Musique générée avec succès',
         description: 'Votre nouvelle composition est prête à être écoutée.',
