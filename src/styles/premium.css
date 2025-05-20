@@ -1,169 +1,52 @@
 
-@layer components {
-  /* Premium theme-specific styling */
-  .theme-light .premium-card {
-    @apply bg-white shadow-md border border-gray-100;
-  }
-
-  .theme-dark .premium-card {
-    @apply bg-gray-900/90 shadow-lg border-gray-800;
-  }
-
-  .theme-pastel .premium-card {
-    @apply bg-blue-50/90 shadow-md border border-blue-100;
-  }
-
-  /* Button enhancements */
-  .theme-light .button-premium {
-    @apply shadow-sm hover:shadow-md transition-all duration-300;
-  }
-
-  .theme-dark .button-premium {
-    @apply shadow-none hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] transition-all duration-300;
-  }
-
-  .theme-pastel .button-premium {
-    @apply shadow-sm hover:shadow-md transition-all duration-300;
-  }
-
-  /* Premium shadow effects */
-  .shadow-premium {
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .dark .shadow-premium {
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
-  }
-
-  /* Glass morphism effects */
-  .glass-effect {
-    @apply backdrop-blur-md border;
-  }
-  
-  .light .glass-effect {
-    @apply bg-white/80 border-white/20;
-  }
-  
-  .dark .glass-effect {
-    @apply bg-black/20 border-white/10;
-  }
-  
-  .pastel .glass-effect {
-    @apply bg-blue-50/80 border-blue-100/30;
-  }
+/* Premium theme-specific styling */
+.theme-light .premium-card {
+  @apply bg-white shadow-md border border-gray-100;
 }
 
-/* Premium UI animations */
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+.theme-dark .premium-card {
+  @apply bg-gray-900/90 shadow-lg border-gray-800;
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+.theme-pastel .premium-card {
+  @apply bg-blue-50/90 shadow-md border border-blue-100;
 }
 
-/* Transition for theme changes */
-.theme-transition {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+/* Button enhancements */
+.theme-light .button-premium {
+  @apply shadow-sm hover:shadow-md transition-all duration-300;
 }
 
-/* Hover lift effect for clickable elements */
-.hover-lift {
-  @apply transition-transform duration-300;
+.theme-dark .button-premium {
+  @apply shadow-none hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] transition-all duration-300;
 }
 
-.hover-lift:hover {
-  transform: translateY(-2px);
+.theme-pastel .button-premium {
+  @apply shadow-sm hover:shadow-md transition-all duration-300;
 }
 
-/* Premium gradients for backgrounds */
-.premium-gradient {
-  @apply bg-gradient-to-br;
+/* Premium shadow effects */
+.shadow-premium {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
 }
 
-.light .premium-gradient {
-  @apply from-white to-blue-50;
+.dark .shadow-premium {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
 }
 
-.dark .premium-gradient {
-  @apply from-gray-900 to-blue-950;
+/* Glass morphism effects */
+.glass-effect {
+  @apply backdrop-blur-md border;
 }
 
-.pastel .premium-gradient {
-  @apply from-blue-50 to-blue-100;
+.light .glass-effect {
+  @apply bg-white/80 border-white/20;
 }
 
-/* Animation for page transitions */
-.page-enter {
-  opacity: 0;
-  transform: translateY(10px);
+.dark .glass-effect {
+  @apply bg-black/20 border-white/10;
 }
 
-.page-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 300ms, transform 300ms;
-}
-
-.page-exit {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.page-exit-active {
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: opacity 300ms, transform 300ms;
-}
-
-/* Sparkle animation for premium elements */
-@keyframes sparkle {
-  0%, 100% {
-    opacity: 0.2;
-    transform: scale(0.8);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.2);
-  }
-}
-
-.sparkle-element::before,
-.sparkle-element::after {
-  content: "";
-  position: absolute;
-  background: radial-gradient(white, transparent);
-  border-radius: 50%;
-  animation: sparkle 3s infinite;
-}
-
-.sparkle-element::before {
-  width: 8px;
-  height: 8px;
-  top: -4px;
-  left: -4px;
-}
-
-.sparkle-element::after {
-  width: 10px;
-  height: 10px;
-  bottom: -5px;
-  right: -5px;
-  animation-delay: 0.3s;
-}
-
-/* Micro interactions */
-.micro-bounce:active {
-  transform: scale(0.97);
-  transition: transform 0.1s;
-}
-
-.micro-press:active {
-  transform: translateY(2px);
-  transition: transform 0.1s;
+.pastel .glass-effect {
+  @apply bg-blue-50/80 border-blue-100/30;
 }

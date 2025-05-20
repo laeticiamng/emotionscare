@@ -9,7 +9,10 @@ export interface Badge {
   unlockedAt?: string;
   progress?: number;
   threshold?: number;
-  user_id?: string; // Added this property
+  user_id?: string;
+  imageUrl?: string;
+  earned?: boolean;
+  achieved?: boolean;
 }
 
 export interface GamificationStats {
@@ -23,7 +26,13 @@ export interface GamificationStats {
   badges: Badge[];
   achievements: string[];
   streakDays: number;
-  progressToNextLevel?: number; // Added this property
+  progressToNextLevel?: number;
+  points?: number;
+  longestStreak?: number;
+  completedChallenges?: number;
+  totalChallenges?: number;
+  unlockedBadges?: number;
+  totalBadges?: number;
 }
 
 export interface Challenge {
@@ -34,11 +43,24 @@ export interface Challenge {
   threshold: number;
   completed: boolean;
   category: string;
-  type?: string; // Added this property
-  name?: string; // Added this property for backward compatibility
+  type?: string;
+  name?: string;
   userId?: string;
   reward?: any;
   startDate?: string;
   endDate?: string;
   imageUrl?: string;
+  goal?: string;
+  targetValue?: number;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  userId: string;
+  username: string;
+  avatarUrl?: string;
+  score: number;
+  rank: number;
+  progress?: number;
+  level?: number;
 }

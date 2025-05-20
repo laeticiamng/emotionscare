@@ -65,7 +65,7 @@ const VRSessionWithMusic: React.FC<VRSessionWithMusicProps> = ({
         <div>
           <VRMusicIntegration
             template={activeTemplate}
-            emotionTarget={environment || activeTemplate.environment}
+            emotionTarget={environment || activeTemplate.environment || ''}
             onMusicReady={handleMusicReady}
           />
         </div>

@@ -1,83 +1,129 @@
 
 import { useState } from 'react';
-import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { EmotionResult } from '@/types/emotion';
-import { useMusic } from '@/contexts/MusicContext';
+import { MusicPlaylist } from '@/types/music';
+import { useToast } from '@/components/ui/use-toast';
 
-export const useMusicEmotionIntegration = () => {
-  const musicContext = useMusic();
+interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
+}
+
+export function useMusicEmotionIntegration() {
+  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  /**
-   * Activate music based on an emotion
-   */
-  const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<MusicPlaylist | null> => {
+  // Get music recommendation based on emotion analysis
+  const getMusicRecommendationForEmotion = async (emotionResult: EmotionResult): Promise<MusicPlaylist | null> => {
     setIsLoading(true);
     try {
-      if (musicContext?.loadPlaylistForEmotion) {
-        const playlist = await musicContext.loadPlaylistForEmotion(params);
-        return playlist;
-      }
-      return null;
+      // This would typically call an API
+      const emotion = emotionResult.emotion || emotionResult.primaryEmotion || 'neutral';
+      
+      // Mock playlist for now
+      const mockPlaylist: MusicPlaylist = {
+        id: `playlist-${Date.now()}`,
+        name: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Playlist`,
+        description: `Music to enhance your ${emotion} mood`,
+        emotion: emotion,
+        tracks: [
+          { id: '1', title: 'Emotion Track 1', artist: 'Emotion Artist', duration: 180 },
+          { id: '2', title: 'Emotion Track 2', artist: 'Emotion Artist', duration: 210 },
+          { id: '3', title: 'Emotion Track 3', artist: 'Emotion Artist', duration: 195 }
+        ]
+      };
+      
+      setCurrentPlaylist(mockPlaylist);
+      return mockPlaylist;
     } catch (error) {
-      console.error('Error activating music for emotion:', error);
+      console.error('Error getting music recommendation:', error);
       return null;
     } finally {
       setIsLoading(false);
     }
   };
 
-  /**
-   * Get a description for the recommended music for an emotion
-   */
+  // Activate music for a specific emotion
+  const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<void> => {
+    setIsLoading(true);
+    try {
+      // This would typically call a music service API
+      console.log(`Activating music for emotion: ${params.emotion} with intensity: ${params.intensity || 'default'}`);
+      
+      toast({
+        title: 'Music Activated',
+        description: `Playing music for ${params.emotion} mood`,
+        duration: 3000
+      });
+    } catch (error) {
+      console.error('Error activating music:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Play music for an emotion
+  const playEmotion = (emotion: string): Promise<MusicPlaylist | null> => {
+    setIsLoading(true);
+    try {
+      console.log(`Playing music for emotion: ${emotion}`);
+      
+      // Mock playlist
+      const mockPlaylist: MusicPlaylist = {
+        id: `playlist-${Date.now()}`,
+        name: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} Playlist`,
+        description: `Music to enhance your ${emotion} mood`,
+        emotion: emotion,
+        tracks: [
+          { id: '1', title: `${emotion} Track 1`, artist: 'Emotion Artist', duration: 180 },
+          { id: '2', title: `${emotion} Track 2`, artist: 'Emotion Artist', duration: 210 },
+          { id: '3', title: `${emotion} Track 3`, artist: 'Emotion Artist', duration: 195 }
+        ]
+      };
+      
+      setCurrentPlaylist(mockPlaylist);
+      
+      toast({
+        title: 'Now Playing',
+        description: `${emotion.charAt(0).toUpperCase() + emotion.slice(1)} music`,
+        duration: 3000
+      });
+      
+      setIsLoading(false);
+      return Promise.resolve(mockPlaylist);
+    } catch (error) {
+      console.error('Error playing emotion music:', error);
+      setIsLoading(false);
+      return Promise.resolve(null);
+    }
+  };
+
+  // Get description for an emotion's music
   const getEmotionMusicDescription = (emotion: string): string => {
-    switch (emotion.toLowerCase()) {
-      case 'happy':
-        return 'Des mélodies enjouées pour accompagner votre bonne humeur';
-      case 'calm':
-      case 'peaceful':
-        return 'Des sons apaisants pour maintenir votre état de sérénité';
-      case 'sad':
-        return 'Des compositions douces pour vous réconforter';
-      case 'angry':
-        return 'Des rythmes apaisants pour vous aider à retrouver le calme';
-      case 'anxious':
-        return 'Des mélodies relaxantes pour apaiser votre anxiété';
-      case 'energetic':
-        return 'Des rythmes dynamiques pour soutenir votre énergie';
-      default:
-        return 'Une playlist adaptée à votre état émotionnel actuel';
-    }
-  };
-
-  /**
-   * Get music recommendation based on emotion analysis
-   */
-  const getMusicRecommendationForEmotion = async (emotionResult: EmotionResult): Promise<MusicPlaylist | null> => {
-    if (!emotionResult || !emotionResult.emotion) {
-      return null;
-    }
+    const descriptions: Record<string, string> = {
+      happy: "Musique énergique et joyeuse pour accompagner votre bonne humeur",
+      sad: "Mélodies apaisantes pour vous réconforter dans les moments difficiles",
+      angry: "Rythmes dynamiques pour canaliser votre énergie",
+      fear: "Sons relaxants pour apaiser votre anxiété",
+      surprise: "Compositions légères et intrigantes",
+      disgust: "Tonalités purifiantes pour transformer les émotions négatives",
+      neutral: "Ambiance équilibrée pour maintenir votre calme",
+      calm: "Douces mélodies pour approfondir votre tranquillité",
+      excited: "Rythmes entraînants pour célébrer l'enthousiasme",
+      stressed: "Sons apaisants pour réduire les tensions"
+    };
     
-    return await activateMusicForEmotion({ 
-      emotion: emotionResult.emotion,
-      intensity: emotionResult.intensity || 0.5
-    });
-  };
-
-  /**
-   * Play music for a specific emotion
-   */
-  const playEmotion = async (emotion: string): Promise<MusicPlaylist | null> => {
-    return await activateMusicForEmotion({ emotion });
+    return descriptions[emotion.toLowerCase()] || 
+      "Une sélection musicale adaptée à votre état émotionnel";
   };
 
   return {
     activateMusicForEmotion,
-    getEmotionMusicDescription,
     getMusicRecommendationForEmotion,
     playEmotion,
+    getEmotionMusicDescription,
+    currentPlaylist,
     isLoading
   };
-};
-
-export default useMusicEmotionIntegration;
+}

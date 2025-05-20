@@ -1,5 +1,5 @@
 
-import { Badge } from '@/types/badge';
+import { Badge } from '@/types/gamification';
 import { Challenge, LeaderboardEntry } from '@/types/gamification';
 
 export interface GamificationStats {
@@ -13,6 +13,6 @@ export interface GamificationStats {
   recentAchievements?: Badge[];
 }
 
-// Export types avec "export type" pour corriger l'erreur isolatedModules
+// Export types with "export type" to fix the isolatedModules error
 export type { Badge };
 export type { Challenge, LeaderboardEntry };

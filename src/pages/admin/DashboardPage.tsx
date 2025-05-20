@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import EnhancedAdminDashboard from '@/components/dashboard/admin/EnhancedAdminDashboard';
 import { SegmentProvider } from '@/contexts/SegmentContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 
 const AdminDashboardPage: React.FC = () => {
   const { setUserMode } = useUserMode();

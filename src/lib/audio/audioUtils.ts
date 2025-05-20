@@ -1,50 +1,52 @@
 
-import { AudioTrack } from '@/types/audio';
+import { AudioTrack, AudioPlaylist } from '@/types/audio';
 
-/**
- * Get the URL for an audio track
- */
-export const getAudioUrl = (track: AudioTrack): string => {
-  return track.url || '';
-};
-
-/**
- * Get a display description for an audio track
- */
-export const getAudioDescription = (track: AudioTrack): string => {
-  if (!track) return '';
-  return track.description || track.title || '';
-};
-
-/**
- * Format seconds as mm:ss
- */
+// Format duration from seconds to mm:ss
 export const formatDuration = (seconds: number): string => {
-  if (!seconds || isNaN(seconds)) return '00:00';
-  
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = Math.floor(seconds % 60);
-  
-  return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
-/**
- * Normalize an audio track to ensure it has all required fields
- */
-export const normalizeAudioTrack = (track: Partial<AudioTrack>): AudioTrack => {
+// Get audio URL from track
+export const getAudioUrl = (track: AudioTrack): string => {
+  return track.audioUrl || track.url;
+};
+
+// Get track description with fallbacks
+export const getTrackDescription = (track: AudioTrack): string => {
+  return track.description || track.summary || `${track.artist} - ${track.title}`;
+};
+
+// Filter tracks by mood/category
+export const filterTracksByMood = (
+  tracks: AudioTrack[],
+  mood: string
+): AudioTrack[] => {
+  return tracks.filter(track => 
+    track.mood?.toLowerCase() === mood.toLowerCase() ||
+    track.category?.toLowerCase() === mood.toLowerCase()
+  );
+};
+
+// Create a playlist from tracks
+export const createPlaylist = (
+  tracks: AudioTrack[],
+  mood: string
+): AudioPlaylist => {
   return {
-    id: track.id || `track-${Date.now()}`,
-    title: track.title || 'Unknown Track',
-    artist: track.artist || 'Unknown Artist',
-    url: track.url || '',
-    duration: track.duration || 0,
-    coverUrl: track.coverUrl || '/images/default-audio-cover.jpg'
+    id: `playlist-${Date.now()}`,
+    name: `${mood.charAt(0).toUpperCase() + mood.slice(1)} Playlist`,
+    tracks,
+    emotion: mood,
+    description: `A playlist designed for your ${mood} mood`
   };
 };
 
 export default {
-  getAudioUrl,
-  getAudioDescription,
   formatDuration,
-  normalizeAudioTrack
+  getAudioUrl,
+  getTrackDescription,
+  filterTracksByMood,
+  createPlaylist
 };

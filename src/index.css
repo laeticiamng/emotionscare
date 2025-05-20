@@ -1,7 +1,7 @@
 
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 @import './styles/premium.css';
 
 /* Importing Inter font for premium typography */

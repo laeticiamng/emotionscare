@@ -1,93 +1,99 @@
 
 import React, { useEffect, useState } from 'react';
-import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import { MusicPlaylist } from '@/types/music';
 import { VRSessionTemplate } from '@/types/vr';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
+import { Button } from '@/components/ui/button';
+import { Music, Pause } from 'lucide-react';
 
 interface VRMusicIntegrationProps {
-  template?: VRSessionTemplate;
-  autoPlay?: boolean;
-  sessionId?: string;
-  emotionTarget?: string;
+  template: VRSessionTemplate;
+  emotionTarget: string;
   onMusicReady?: () => void;
 }
 
-export const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
+const VRMusicIntegration: React.FC<VRMusicIntegrationProps> = ({
   template,
-  autoPlay = true,
-  sessionId,
   emotionTarget,
   onMusicReady
 }) => {
-  const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
-  const { activateMusicForEmotion, isLoading } = useMusicEmotionIntegration();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMusicLoaded, setIsMusicLoaded] = useState(false);
+  const { getMusicRecommendationForEmotion, playEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
   
-  // Determine the emotional mood from the template
-  const getMoodFromTemplate = (): string => {
-    if (emotionTarget) {
-      return emotionTarget;
-    }
-    
-    if (template?.recommendedMood) {
-      return template.recommendedMood;
-    }
-    
-    // Fall back to categories or tags if no mood is set
-    if (template?.category === 'relaxation' || (template?.tags && template.tags.includes('calm'))) {
-      return 'calm';
-    } else if (template?.category === 'energy' || (template?.tags && template.tags.includes('energize'))) {
-      return 'energetic';
-    } else if (template?.category === 'focus' || (template?.tags && template.tags.includes('focus'))) {
-      return 'focused';
-    }
-    
-    return 'calm'; // Default mood if nothing matches
-  };
+  const recommendedMood = template.recommendedMood || emotionTarget || 'calm';
   
   useEffect(() => {
-    if (autoPlay) {
-      loadTemplateMusic();
+    // Auto-play background music if available
+    if (recommendedMood && !isMusicLoaded) {
+      loadMusicForEmotion();
     }
-  }, [template, autoPlay]);
+  }, [recommendedMood]);
   
-  const loadTemplateMusic = async () => {
-    const mood = getMoodFromTemplate();
-    
+  const loadMusicForEmotion = async () => {
     try {
-      let intensityValue = 0.5; // Default intensity
-      
-      // Check if template has intensity and convert it to a number between 0-1
-      if (template && template.intensity) {
-        const intensity = typeof template.intensity === 'number' 
-          ? template.intensity 
-          : parseFloat(template.intensity);
+      if (playEmotion) {
+        playEmotion(recommendedMood);
+        setIsPlaying(true);
+        setIsMusicLoaded(true);
         
-        if (!isNaN(intensity)) {
-          // Normalize intensity to 0-1 range if it's on a different scale
-          intensityValue = intensity > 10 ? intensity / 100 : intensity / 10;
-        }
-      }
-      
-      const result = await activateMusicForEmotion({ 
-        emotion: mood,
-        intensity: intensityValue
-      });
-      
-      if (result) {
-        setPlaylist(result);
         if (onMusicReady) {
           onMusicReady();
         }
       }
     } catch (error) {
-      console.error('Error loading VR template music:', error);
+      console.error('Error loading VR music:', error);
+    }
+  };
+  
+  const toggleMusic = () => {
+    if (isPlaying) {
+      // Logic to pause music would go here
+      setIsPlaying(false);
+    } else {
+      loadMusicForEmotion();
     }
   };
   
   return (
-    <div className="vr-music-integration">
-      {isLoading && <p>Chargement de l'ambiance musicale...</p>}
-      {playlist && <p>Ambiance musicale activée: {playlist.name}</p>}
+    <div className="bg-card rounded-lg p-4 space-y-4">
+      <h3 className="text-lg font-medium">Ambiance sonore</h3>
+      <p className="text-sm text-muted-foreground">{getEmotionMusicDescription(recommendedMood)}</p>
+      
+      <div className="flex justify-between items-center">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={toggleMusic}
+          className="flex items-center gap-2"
+        >
+          {isPlaying ? (
+            <>
+              <Pause className="h-4 w-4" />
+              <span>Pause</span>
+            </>
+          ) : (
+            <>
+              <Music className="h-4 w-4" />
+              <span>Écouter</span>
+            </>
+          )}
+        </Button>
+        
+        {isPlaying && (
+          <div className="flex space-x-1">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="w-1 h-4 bg-primary animate-pulse"
+                style={{
+                  animationDelay: `${i * 0.15}s`,
+                  animationDuration: '0.8s'
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

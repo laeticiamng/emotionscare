@@ -32,7 +32,7 @@ export const useChallengeManagement = () => {
       const result = await completeChallenge(challengeId);
       
       if (result.success && result.badge) {
-        setLastBadgeEarned(result.badge);
+        setLastBadgeEarned(result.badge as unknown as Badge);
       }
       
       return result.success;

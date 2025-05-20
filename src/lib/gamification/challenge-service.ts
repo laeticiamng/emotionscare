@@ -74,4 +74,8 @@ export const ChallengeService = {
   }
 };
 
-export default ChallengeService;
+export default {
+  updateChallenge,
+  completeChallenge,
+  ChallengeService
+};
