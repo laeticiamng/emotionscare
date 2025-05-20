@@ -2,7 +2,7 @@
 import { useState, useCallback } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { MusicTrack, EmotionMusicParams } from '@/types/music';
-import { findTracksByMood, ensureArray } from '@/utils/musicCompatibility';
+import { findTracksByMood } from '@/utils/musicCompatibility';
 
 // Mapping of emotions to music types
 export const EMOTION_TO_MUSIC: Record<string, string> = {
@@ -90,6 +90,13 @@ export function useMusicRecommendation() {
     return [] as MusicTrack[];
   }, [music.currentPlaylist]);
   
+  // Helper function to ensure value is an array
+  const ensureArray = <T>(value: T | T[] | undefined | null): T[] => {
+    if (Array.isArray(value)) return value;
+    if (value === undefined || value === null) return [];
+    return [value];
+  };
+  
   return {
     recommendedTracks,
     isLoading,
@@ -98,6 +105,7 @@ export function useMusicRecommendation() {
     handlePlayMusic,
     loadRecommendations,
     findTracksByMood: findTracksByMoodWrapper,
+    ensureArray,
     EMOTION_TO_MUSIC
   };
 }

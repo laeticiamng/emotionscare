@@ -201,6 +201,7 @@ export const defaultPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-1',
     title: 'Relaxation Ultime',
+    name: 'Relaxation Ultime',
     description: 'Détendez-vous avec cette sélection de morceaux apaisants.',
     cover: '/images/playlists/relax-playlist.jpg',
     tracks: relaxationTracks,
@@ -210,6 +211,7 @@ export const defaultPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-2',
     title: 'Concentration Maximale',
+    name: 'Concentration Maximale',
     description: 'Améliorez votre concentration avec ces pistes spécialement conçues.',
     cover: '/images/playlists/focus-playlist.jpg',
     tracks: focusTracks,
@@ -219,6 +221,7 @@ export const defaultPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-3',
     title: 'Énergie Positive',
+    name: 'Énergie Positive',
     description: 'Dynamisez votre journée avec ces morceaux énergisants.',
     cover: '/images/playlists/energy-playlist.jpg',
     tracks: energyTracks,
@@ -228,6 +231,7 @@ export const defaultPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-4',
     title: 'Sommeil Profond',
+    name: 'Sommeil Profond',
     description: 'Endormez-vous paisiblement avec ces mélodies douces.',
     cover: '/images/playlists/sleep-playlist.jpg',
     tracks: sleepTracks,
@@ -237,6 +241,7 @@ export const defaultPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-5',
     title: 'Méditation Guidée',
+    name: 'Méditation Guidée',
     description: 'Trouvez votre centre avec ces pistes de méditation.',
     cover: '/images/playlists/meditation-playlist.jpg',
     tracks: meditationTracks,

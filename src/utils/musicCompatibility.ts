@@ -98,6 +98,7 @@ export const getTrackUrl = (track: MusicTrack | null | undefined): string => {
   return track.url || track.audioUrl || track.src || track.track_url || "";
 };
 
+// Export all utility functions as a default export as well for backward compatibility
 export default {
   findTracksByMood,
   findPlaylistsByMood,

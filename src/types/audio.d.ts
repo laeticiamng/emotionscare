@@ -2,72 +2,86 @@
 export interface AudioTrack {
   id: string;
   title: string;
-  artist: string;
-  description?: string;
-  duration: number;
   url: string;
-  audioUrl: string;
+  duration: number;
+  artist?: string;
+  album?: string;
+  genre?: string;
   coverUrl?: string;
-  category?: string;
-  mood?: string;
-  tags?: string[];
-  source?: string;
+  // Added properties for compatibility
+  audioUrl?: string;
+  description?: string;
+  summary?: string;
+  metadata?: Record<string, any>;
+  isPlaying?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  userId?: string;
 }
 
 export interface AudioPlaylist {
   id: string;
   name: string;
-  tracks: AudioTrack[];
   description?: string;
+  tracks: AudioTrack[];
   coverUrl?: string;
-  emotion?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  userId?: string;
+  isPublic?: boolean;
+}
+
+export interface AudioQueueItem {
+  id: string;
+  track: AudioTrack;
+  addedAt: string;
+}
+
+export type AudioRepeatMode = 'off' | 'all' | 'one';
+
+export interface AudioVisualizationOptions {
+  type: 'waveform' | 'bars' | 'circular';
+  color: string;
+  backgroundColor?: string;
+  sensitive?: boolean;
+  height?: number;
+  width?: number;
+}
+
+export interface AudioPlayerOptions {
+  autoPlay?: boolean;
+  showVisualizer?: boolean;
+  visualizerOptions?: AudioVisualizationOptions;
+  showPlaylist?: boolean;
+  allowShuffle?: boolean;
+  allowRepeat?: boolean;
+  showProgress?: boolean;
+  showVolume?: boolean;
+  compact?: boolean;
+}
+
+export interface AudioRecorderOptions {
+  maxDuration?: number;
+  autoStart?: boolean;
+  format?: 'mp3' | 'wav' | 'ogg';
+  quality?: 'low' | 'medium' | 'high';
+  echoCancellation?: boolean;
+  noiseSuppression?: boolean;
+  sampleRate?: number;
 }
 
 export interface AudioPlayerState {
-  isPlaying: boolean;
   currentTrack: AudioTrack | null;
   playlist: AudioPlaylist | null;
-  volume: number;
-  muted: boolean;
-  currentTime: number;
-  duration: number;
-  loading: boolean;
-  shuffleMode: boolean;
-  repeatMode: 'off' | 'one' | 'all';
-}
-
-export interface AudioContextValue {
-  // État du lecteur
+  queue: AudioQueueItem[];
   isPlaying: boolean;
-  currentTrack: AudioTrack | null;
-  playlist: AudioPlaylist | null;
+  isMuted: boolean;
   volume: number;
-  muted: boolean;
   currentTime: number;
   duration: number;
-  loading: boolean;
-  shuffleMode: boolean;
-  repeatMode: 'off' | 'one' | 'all';
-  
-  // Méthodes
-  playTrack: (track: AudioTrack) => void;
-  pauseTrack: () => void;
-  togglePlay: () => void;
-  nextTrack: () => void;
-  prevTrack: () => void;
-  setVolume: (volume: number) => void;
-  toggleMute: () => void;
-  seekTo: (time: number) => void;
-  loadPlaylist: (playlist: AudioPlaylist) => void;
-  loadPlaylistForEmotion: (params: EmotionMusicParams) => Promise<AudioPlaylist | null>;
-  setOpenDrawer: (open: boolean) => void;
-  openDrawer: boolean;
-  setEmotion: (emotion: string) => void;
-  isInitialized?: boolean;
-  error?: Error | null;
-}
-
-export interface EmotionMusicParams {
-  emotion: string;
-  intensity?: number;
+  buffered: number;
+  repeat: AudioRepeatMode;
+  shuffle: boolean;
+  isLoading: boolean;
+  error: Error | null;
 }

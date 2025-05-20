@@ -1,4 +1,3 @@
-
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 export const musicTracks: MusicTrack[] = [
@@ -92,6 +91,7 @@ export const musicPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-1',
     title: 'Relaxation Collection',
+    name: 'Relaxation Collection',
     description: 'Soothing sounds to help you relax and unwind',
     coverUrl: '/images/covers/relaxation.jpg',
     tracks: musicTracks.filter(track => 
@@ -106,6 +106,7 @@ export const musicPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-2',
     title: 'Focus & Productivity',
+    name: 'Focus & Productivity',
     description: 'Music designed to enhance concentration and productivity',
     coverUrl: '/images/covers/focus.jpg',
     tracks: musicTracks.filter(track => 
@@ -119,6 +120,7 @@ export const musicPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-3',
     title: 'Energy & Motivation',
+    name: 'Energy & Motivation',
     description: 'Boost your energy and find motivation',
     coverUrl: '/images/covers/energy.jpg',
     tracks: musicTracks.filter(track => 
@@ -132,6 +134,7 @@ export const musicPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-4',
     title: 'Sleep & Dreams',
+    name: 'Sleep & Dreams',
     description: 'Gentle sounds to help you fall asleep',
     coverUrl: '/images/covers/sleep.jpg',
     tracks: musicTracks.filter(track => 
@@ -145,6 +148,7 @@ export const musicPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-5',
     title: 'Happy Mood',
+    name: 'Happy Mood',
     description: 'Music to lift your spirits',
     coverUrl: '/images/covers/happy.jpg',
     tracks: musicTracks.filter(track => track.emotion === 'happy'),
@@ -155,6 +159,7 @@ export const musicPlaylists: MusicPlaylist[] = [
   {
     id: 'playlist-6',
     title: 'Emotional Journey',
+    name: 'Emotional Journey',
     description: 'Music for emotional release',
     coverUrl: '/images/covers/emotional.jpg',
     tracks: musicTracks.filter(track => track.emotion === 'sad'),

@@ -54,7 +54,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   }, [emotion]);
 
   const handlePlayMusic = async () => {
-    await activateMusicForEmotion(recommendedEmotion);
+    await activateMusicForEmotion({ emotion: recommendedEmotion });
   };
 
   return (
