@@ -1,101 +1,111 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
 import { EmotionResult } from '@/types';
-import TextEmotionScanner from './TextEmotionScanner';
-import EmojiEmotionScanner from './EmojiEmotionScanner';
-import VoiceEmotionScanner from './VoiceEmotionScanner';
-import FacialEmotionScanner from './FacialEmotionScanner';
+import { enhancedAnalyzeService } from '@/lib/scan';
 
-export interface EmotionScanFormProps {
+interface EmotionScanFormProps {
   onComplete: (result: EmotionResult) => void;
-  onEmotionDetected?: (result: EmotionResult) => void;
-  onClose?: () => void;
   onScanSaved?: () => void;
-  userId?: string;
-  defaultTab?: string;
+  onClose: () => void;
 }
 
 const EmotionScanForm: React.FC<EmotionScanFormProps> = ({
   onComplete,
-  onEmotionDetected,
-  onClose,
   onScanSaved,
-  userId,
-  defaultTab = 'text'
+  onClose
 }) => {
-  const [activeTab, setActiveTab] = useState(defaultTab);
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const handleScanComplete = (result: EmotionResult) => {
-    // Add user ID to the result if provided
-    const completeResult = userId ? { ...result, userId } : result;
+  const { toast } = useToast();
+  const [scanType, setScanType] = useState<'text' | 'voice' | 'face'>('text');
+  const [textInput, setTextInput] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  
+  const handleTextAnalysis = async () => {
+    if (!textInput.trim()) {
+      toast({
+        title: "Texte manquant",
+        description: "Veuillez saisir un texte pour l'analyse émotionnelle.",
+        variant: "destructive"
+      });
+      return;
+    }
     
-    // Notify parent component
-    onComplete(completeResult);
+    setIsAnalyzing(true);
     
-    // Indicate that scan is saved
-    if (onScanSaved) onScanSaved();
+    try {
+      const result = await enhancedAnalyzeService.analyzeEmotion(textInput);
+      
+      toast({
+        title: "Analyse complétée",
+        description: "Votre analyse émotionnelle est prête.",
+        variant: "default"
+      });
+      
+      onComplete(result);
+      
+      if (onScanSaved) {
+        onScanSaved();
+      }
+    } catch (error) {
+      console.error("Erreur d'analyse émotionnelle:", error);
+      toast({
+        title: "Erreur d'analyse",
+        description: "Une erreur s'est produite lors de l'analyse émotionnelle.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
-
+  
   return (
-    <div className="rounded-lg border bg-card shadow-sm animate-in fade-in-0 slide-in-from-bottom-5">
-      <div className="p-4 border-b">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-medium">Scanner votre émotion</h3>
-          {onClose && (
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              Fermer
-            </Button>
-          )}
-        </div>
-        <p className="text-sm text-muted-foreground mt-1">
-          Choisissez une méthode pour analyser votre état émotionnel actuel
-        </p>
-      </div>
-
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="p-4"
-      >
-        <TabsList className="grid grid-cols-4 mb-4">
-          <TabsTrigger value="text">Texte</TabsTrigger>
-          <TabsTrigger value="emoji">Emoji</TabsTrigger>
-          <TabsTrigger value="voice">Voix</TabsTrigger>
-          <TabsTrigger value="facial">Visage</TabsTrigger>
+    <Card className="p-6">
+      <h3 className="text-xl font-bold mb-4">Nouvelle analyse émotionnelle</h3>
+      
+      <Tabs defaultValue="text" className="mt-4">
+        <TabsList className="grid grid-cols-3 mb-4">
+          <TabsTrigger value="text" onClick={() => setScanType('text')}>Texte</TabsTrigger>
+          <TabsTrigger value="voice" onClick={() => setScanType('voice')}>Voix</TabsTrigger>
+          <TabsTrigger value="face" onClick={() => setScanType('face')}>Visage</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="text" className="space-y-4">
-          <TextEmotionScanner 
-            onScanComplete={handleScanComplete}
-            isProcessing={isProcessing} 
-            setIsProcessing={setIsProcessing}
+        
+        <TabsContent value="text">
+          <textarea 
+            className="w-full p-3 border rounded-md mb-4 h-32"
+            placeholder="Comment vous sentez-vous aujourd'hui ?"
+            value={textInput}
+            onChange={(e) => setTextInput(e.target.value)}
           />
+          
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={onClose}>Annuler</Button>
+            <Button 
+              onClick={handleTextAnalysis}
+              disabled={isAnalyzing || !textInput.trim()}
+            >
+              {isAnalyzing ? "Analyse en cours..." : "Analyser"}
+            </Button>
+          </div>
         </TabsContent>
-
-        <TabsContent value="emoji" className="space-y-4">
-          <EmojiEmotionScanner 
-            onScanComplete={handleScanComplete}
-            isProcessing={isProcessing} 
-            setIsProcessing={setIsProcessing}
-          />
+        
+        <TabsContent value="voice">
+          <div className="text-center py-8">
+            <p className="mb-4">La fonctionnalité d'analyse vocale sera bientôt disponible.</p>
+            <Button variant="outline" onClick={onClose}>Retour</Button>
+          </div>
         </TabsContent>
-
-        <TabsContent value="voice" className="space-y-4">
-          <VoiceEmotionScanner 
-            onEmotionDetected={handleScanComplete}
-          />
-        </TabsContent>
-
-        <TabsContent value="facial" className="space-y-4">
-          <FacialEmotionScanner 
-            onScanComplete={handleScanComplete}
-          />
+        
+        <TabsContent value="face">
+          <div className="text-center py-8">
+            <p className="mb-4">La fonctionnalité d'analyse faciale sera bientôt disponible.</p>
+            <Button variant="outline" onClick={onClose}>Retour</Button>
+          </div>
         </TabsContent>
       </Tabs>
-    </div>
+    </Card>
   );
 };
 

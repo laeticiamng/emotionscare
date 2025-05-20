@@ -1,53 +1,43 @@
 
-import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import EmotionScanner from './EmotionScanner';
-import { EmotionResult } from '@/types/emotion';
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { EmotionResult } from '@/types';
 import EmotionScanForm from './EmotionScanForm';
+import UnifiedEmotionCheckin from './UnifiedEmotionCheckin';
 
 interface ScanTabContentProps {
-  onEmotionDetected?: () => void;
-  onClose?: () => void;
+  showScanForm: boolean;
+  setShowScanForm: (show: boolean) => void;
+  onScanComplete: (result: EmotionResult) => void;
 }
 
 const ScanTabContent: React.FC<ScanTabContentProps> = ({
-  onEmotionDetected,
-  onClose
+  showScanForm,
+  setShowScanForm,
+  onScanComplete
 }) => {
-  const [showScanner, setShowScanner] = useState(false);
-  const [emotion, setEmotion] = useState<EmotionResult | null>(null);
-  
-  const handleStartScan = () => {
-    setShowScanner(true);
-  };
-  
-  const handleScanComplete = (result: EmotionResult) => {
-    setEmotion(result);
-    setShowScanner(false);
-    
-    if (onEmotionDetected) {
-      onEmotionDetected();
-    }
-  };
-  
-  const handleScanCancel = () => {
-    setShowScanner(false);
-  };
-  
   return (
-    <Card className="rounded-lg p-6">
-      {showScanner ? (
-        <EmotionScanner 
-          onScanComplete={handleScanComplete}
-          onCancel={handleScanCancel}
+    <div className="space-y-6">
+      {!showScanForm && (
+        <div className="flex justify-end mb-4">
+          <Button 
+            onClick={() => setShowScanForm(true)}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Nouvelle analyse
+          </Button>
+        </div>
+      )}
+      
+      {showScanForm ? (
+        <EmotionScanForm 
+          onComplete={onScanComplete} 
+          onClose={() => setShowScanForm(false)} 
         />
       ) : (
-        <EmotionScanForm 
-          onScanComplete={handleScanComplete}
-          onClose={onClose}
-        />
+        <UnifiedEmotionCheckin />
       )}
-    </Card>
+    </div>
   );
 };
 

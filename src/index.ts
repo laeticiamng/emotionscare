@@ -1,4 +1,3 @@
-
 // In browser environments, we use import.meta.env instead of dotenv
 // This works with Vite's environment variable handling
 
@@ -11,7 +10,10 @@ import * as Hume from "hume";
 import OpenAI from "openai";
 
 // ------- OPENAI GPT-4 -----------
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+const openai = new OpenAI({ 
+  apiKey: OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true // Allow browser usage with understanding of security risks
+});
 
 async function openaiText(prompt: string) {
   const resp = await openai.chat.completions.create({
@@ -129,7 +131,7 @@ async function humeBatchJobStatus(id: string) {
 
 // -------------- Exports ----------------
 // Create a client instance using the Hume library's API
-const humeClient = new Hume.HumeAIClient(HUME_API_KEY);
+const humeClient = new Hume.HumeClient(HUME_API_KEY);
 
 export {
   openaiText,
