@@ -8,8 +8,11 @@ export interface MusicTrack {
   url: string;
   cover?: string;
   coverUrl?: string;
+  coverImage?: string;
   duration: number;
   audioUrl?: string;
+  src?: string;
+  track_url?: string;
   emotion?: string;
   name?: string;
   mood?: string;

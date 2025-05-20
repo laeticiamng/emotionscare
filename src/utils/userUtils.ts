@@ -29,7 +29,7 @@ export function harmonizeUserType(user: any): User {
     avatar_url: user.avatar_url || user.avatarUrl || '',
     avatarUrl: user.avatar_url || user.avatarUrl || '',
     department: user.department || '',
-    jobTitle: user.jobTitle || user.job_title || '',
+    job_title: user.jobTitle || user.job_title || '',
     preferences: user.preferences || {},
     emotionalScore: user.emotionalScore || user.emotional_score || 0
   };

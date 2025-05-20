@@ -44,3 +44,6 @@ export function getDifficultyClass(difficulty: string): string {
       return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
   }
 }
+
+// Re-export normalizeDifficulty for legacy imports
+export { normalizeDifficulty } from '@/utils/vrUtils';

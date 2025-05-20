@@ -158,3 +158,15 @@ const GamificationService = {
 };
 
 export default GamificationService;
+
+export const fetchGamificationStats = async (userId: string): Promise<GamificationStats> => {
+  return GamificationService.getUserStats(userId);
+};
+
+export const fetchChallenges = async (userId: string): Promise<Challenge[]> => {
+  return GamificationService.getUserChallenges(userId);
+};
+
+export const fetchUserBadges = async (userId: string): Promise<Badge[]> => {
+  return GamificationService.getUserBadges(userId);
+};

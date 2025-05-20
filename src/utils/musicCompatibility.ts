@@ -68,10 +68,10 @@ export function normalizeTrack(data: any): MusicTrack {
  */
 export function findTracksByMood(tracks: MusicTrack[], mood: string): MusicTrack[] {
   const normalizedMood = mood.toLowerCase();
-  return tracks.filter(track => 
-    (track.mood?.toLowerCase() === normalizedMood) || 
+  return tracks.filter(track =>
+    (track.mood?.toLowerCase() === normalizedMood) ||
     (track.emotion?.toLowerCase() === normalizedMood) ||
-    (track.category?.toLowerCase() === normalizedMood) ||
+    (typeof track.category === 'string' && track.category.toLowerCase() === normalizedMood) ||
     (track.tags?.some(tag => tag.toLowerCase().includes(normalizedMood)))
   );
 }
