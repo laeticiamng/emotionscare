@@ -59,6 +59,39 @@ not ok 2 - src/tests/global.test.js
 5. **Gestion des droits** : définir des niveaux d'accès (user, admin, RH) pour chaque route de synthèse et appliquer l'anonymisation des données collectives.
 6. **Tests automatisés** : ajouter des tests unitaires pour `OrchestrationContext` et `PredictiveAnalyticsContext`, ainsi qu'une intégration vérifiant la propagation des événements via l'EventBus.
 
+## 8. Schéma d'orchestration globale
+
+```mermaid
+flowchart TD
+    AppProviders --> OrchestrationProvider
+    AppProviders --> PredictiveAnalyticsProvider
+    OrchestrationProvider --> EventBus
+    PredictiveAnalyticsProvider --> EventBus
+    EventBus --> TimelinePage
+    EventBus --> WorldPage
+    EventBus --> SanctuaryPage
+    EventBus --> MusicContext
+    EventBus --> WeatherContext
+    EventBus --> CoachContext
+```
+
+Ce schéma illustre la distribution centralisée des événements émotionnels et des prédictions vers tous les modules clés de l'application.
+
+### Mapping inter‑modules
+
+- **TimelinePage** : affiche les `MoodEvent` reçus via l'EventBus.
+- **WorldPage** : exploite `EmotionalLocation` pour représenter les lieux chargés dans le contexte.
+- **SanctuaryPage** : affiche la liste typée `SanctuaryWidget` afin de proposer des exercices adaptés.
+- **MusicContext**, **WeatherContext** et **CoachContext** réagissent aux mises à jour pour adapter respectivement la musique, la météo émotionnelle et les conseils IA.
+
+### Typage unifié
+
+Les entités suivantes sont définies dans `src/types/orchestration.ts` et réexportées par `src/types/index.ts` :
+
+- `MoodEvent`, `Prediction`, `PredictionRecommendation`
+- `EmotionalLocation`, `SanctuaryWidget`, `EmotionalSynthesis`
+- `OrchestrationEvent` pour le bus d'événements
+
 ---
 
 Ce rapport constitue le **point 9** de l'audit complet. Les recommandations précédentes se trouvent dans `docs/audit-modules-1-8-summary.md`.

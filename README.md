@@ -175,6 +175,7 @@ Le `ThemeContext` expose également des préférences d'accessibilité comme `so
 - **UserModeContext** - Mode utilisateur (B2B/B2C)
 - **LayoutContext** - Mise en page et navigation (sidebar, plein écran)
 - **MusicContext** - Lecture et gestion de la musique (source unique via `useMusic`)
+- **SocialCoconContext** - Gestion des posts, commentaires et réactions du cocon social
 L'ordre d'injection de ces contextes est géré par le composant `AppProviders`. La hiérarchie complète (avec `LayoutProvider`) est détaillée dans `docs/layout-shell-audit.md` et `docs/shell-navigation-premium-audit.md`.
 
 ## Préférences utilisateur par défaut
@@ -325,6 +326,7 @@ Des audits complémentaires sont disponibles dans le dossier `docs` :
 - `scan-audio-type-fixes.md` : corrections de typage pour les modules scan/audio
 - `ui-polish-restoration.md` : rétablissement de l'apparence initiale
 - `shell-layout-point4-audit.md` : synthèse du Shell et de la navigation (point 4)
+- `user-preferences-point7-audit.md` : état actuel des préférences utilisateur et recommandations premium
 
 
 ## Équipe et contribution
