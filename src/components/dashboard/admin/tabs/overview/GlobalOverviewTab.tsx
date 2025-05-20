@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import KpiCardsGrid from '@/components/dashboard/admin/KpiCardsGrid';
-import { GlobalOverviewTabProps, KpiCardProps } from '@/types/dashboard';
-import { KpiCardStatus } from '@/types/dashboard';
+import { GlobalOverviewTabProps, KpiCardProps } from '@types/dashboard';
+import { KpiCardStatus } from '@types/dashboard';
 
 const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({
   data,

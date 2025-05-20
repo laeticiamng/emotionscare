@@ -43,7 +43,7 @@ export type {
   KpiCardsGridProps,
   TeamSummary,
   AdminAccessLog
-} from './types/dashboard';
+} from '@types/dashboard';
 
 export type { SidebarContextType } from './types/sidebar';
 
@@ -131,7 +131,7 @@ export type {
   AnonymizedEmotion,
   TeamAnalytics,
   KpiMetric
-} from './types/analytics';
+} from '@types/analytics';
 
 export type {
   ScanType,

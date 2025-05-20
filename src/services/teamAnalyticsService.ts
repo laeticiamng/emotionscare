@@ -1,10 +1,4 @@
-export interface TeamAnalytics {
-  teamId: string;
-  emotionalTrend: Array<{ date: string; value: number }>;
-  averageScore: number;
-  topMood: string;
-  activeMembers: number;
-}
+import { TeamAnalytics } from '@types/analytics';
 
 /**
  * Fetches aggregated emotional analytics for a team.
@@ -15,16 +9,20 @@ export async function fetchTeamAnalytics(teamId: string): Promise<TeamAnalytics>
   await new Promise(resolve => setTimeout(resolve, 500));
 
   // Sample data. Real implementation should query Supabase.
-  const emotionalTrend = Array.from({ length: 7 }, (_, i) => ({
-    date: new Date(Date.now() - (6 - i) * 86400000).toISOString().split('T')[0],
-    value: 60 + Math.round(Math.random() * 20)
-  }));
+  const emotionalTrend = Array.from({ length: 7 }, (_, i) => 60 + Math.round(Math.random() * 20));
+
+  const topEmotions = [
+    { emotion: 'calm', count: 12 },
+    { emotion: 'joy', count: 8 }
+  ];
 
   return {
     teamId,
+    teamName: `Team ${teamId}`,
+    memberCount: 12,
+    averageScore: emotionalTrend.reduce((acc, v) => acc + v, 0) / emotionalTrend.length,
+    topEmotions,
     emotionalTrend,
-    averageScore: emotionalTrend.reduce((acc, v) => acc + v.value, 0) / emotionalTrend.length,
-    topMood: 'calm',
-    activeMembers: 12
+    engagementRate: 0.75
   };
 }
