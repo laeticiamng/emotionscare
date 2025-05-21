@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Timeline, Globe, Sun } from 'lucide-react';
+import { BarChart, Globe, Sun } from 'lucide-react';
 
 interface SynthesisOnboardingProps {
   open: boolean;
@@ -27,7 +27,7 @@ const SynthesisOnboarding: React.FC<SynthesisOnboardingProps> = ({ open, onClose
       image: (
         <div className="bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg p-8 flex items-center justify-center">
           <div className="flex items-center gap-6">
-            <Timeline className="h-12 w-12 text-blue-500" />
+            <BarChart className="h-12 w-12 text-blue-500" />
             <Globe className="h-12 w-12 text-indigo-500" />
             <Sun className="h-12 w-12 text-purple-500" />
           </div>
@@ -39,7 +39,7 @@ const SynthesisOnboarding: React.FC<SynthesisOnboardingProps> = ({ open, onClose
       description: "Visualisez vos émotions au fil du temps, identifiez les moments clés et les tendances de votre parcours.",
       image: (
         <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-6 flex items-center justify-center">
-          <Timeline className="h-16 w-16 text-blue-500" />
+          <BarChart className="h-16 w-16 text-blue-500" />
         </div>
       )
     },
