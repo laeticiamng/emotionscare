@@ -14,7 +14,7 @@ const AuthTransition: React.FC<AuthTransitionProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // On détecte si l'utilisateur vient de se connecter
+  // Detect when user has just logged in
   useEffect(() => {
     const justLoggedIn = sessionStorage.getItem('just_logged_in');
     
