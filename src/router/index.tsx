@@ -35,6 +35,7 @@ const PrivacyPage = lazy(() => import('../pages/PrivacyPage'));
 const TermsPage = lazy(() => import('../pages/TermsPage'));
 const NotFoundPage = lazy(() => import('../pages/error/NotFoundPage'));
 const ServerErrorPage = lazy(() => import('../pages/error/ServerErrorPage'));
+const ForbiddenPage = lazy(() => import('../pages/error/ForbiddenPage')); // Nouvelle page d'erreur 403
 const HumPage = lazy(() => import('../pages/HumPage'));
 const DocFlamePage = lazy(() => import('../pages/DocFlamePage'));
 const OnboardingPage = lazy(() => import('../pages/OnboardingPage'));
@@ -212,6 +213,10 @@ const routes: RouteObject[] = [
   {
     path: '/error',
     element: <ServerErrorPage />
+  },
+  {
+    path: '/forbidden',
+    element: <ForbiddenPage />
   },
   {
     path: '*',

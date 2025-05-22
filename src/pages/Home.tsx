@@ -7,6 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import AccessSection from '@/components/home/AccessSection';
 import HeroSection from '@/components/home/HeroSection';
 import CtaSection from '@/components/home/CtaSection';
+import ActionButtons from '@/components/home/ActionButtons';
+import NotificationBell from '@/components/notifications/NotificationBell';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 
@@ -28,9 +30,26 @@ const Home = () => {
   return (
     <Shell>
       <div className="container px-4 py-8 mx-auto">
+        <div className="flex justify-end mb-4">
+          <NotificationBell />
+        </div>
+        
         <HeroSection />
         
-        {/* Connection Options - Highlighted with prominent styling */}
+        {/* Quick Access Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="max-w-4xl mx-auto mb-12"
+        >
+          <h2 className="text-3xl font-bold mb-6 text-center">
+            Accédez à vos fonctionnalités
+          </h2>
+          <ActionButtons />
+        </motion.div>
+        
+        {/* Connection Options */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -80,7 +99,7 @@ const Home = () => {
         <AccessSection />
         <CtaSection />
 
-        {/* Test accounts section - For presentation purposes */}
+        {/* Test accounts section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
