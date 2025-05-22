@@ -1,79 +1,95 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Music, Headphones, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { BookOpen, Music, Headphones, MessageCircle, LineChart, Medal, Glasses, Heart } from 'lucide-react';
+
+interface QuickAccessItem {
+  icon: React.ReactNode;
+  label: string;
+  path: string;
+  color: string;
+}
 
 const QuickAccessMenu: React.FC = () => {
   const navigate = useNavigate();
-  
-  const quickAccess = [
+
+  const items: QuickAccessItem[] = [
     {
-      id: 'journal',
-      name: 'Journal',
+      icon: <BookOpen className="h-6 w-6" />,
+      label: 'Journal',
       path: '/journal',
-      icon: <BookOpen className="h-5 w-5" />,
-      description: 'Notez vos pensées et émotions'
+      color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
     },
     {
-      id: 'music',
-      name: 'Musique',
+      icon: <Music className="h-6 w-6" />,
+      label: 'Musique',
       path: '/music',
-      icon: <Music className="h-5 w-5" />,
-      description: 'Écoutez nos playlists thérapeutiques'
+      color: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
     },
     {
-      id: 'audio',
-      name: 'Audio',
+      icon: <Headphones className="h-6 w-6" />,
+      label: 'Audio',
       path: '/audio',
-      icon: <Headphones className="h-5 w-5" />,
-      description: 'Méditations et exercices guidés'
+      color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
     },
     {
-      id: 'coach',
-      name: 'Coach',
+      icon: <MessageCircle className="h-6 w-6" />,
+      label: 'Coach',
       path: '/coach',
-      icon: <MessageCircle className="h-5 w-5" />,
-      description: 'Discutez avec votre coach AI'
+      color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+    },
+    {
+      icon: <LineChart className="h-6 w-6" />,
+      label: 'Progression',
+      path: '/progress',
+      color: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'
+    },
+    {
+      icon: <Medal className="h-6 w-6" />,
+      label: 'Défis',
+      path: '/gamification',
+      color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400'
+    },
+    {
+      icon: <Glasses className="h-6 w-6" />,
+      label: 'VR',
+      path: '/vr',
+      color: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400'
+    },
+    {
+      icon: <Heart className="h-6 w-6" />,
+      label: 'Social',
+      path: '/social',
+      color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400'
     }
   ];
-  
+
   return (
-    <Card className="w-full">
-      <CardHeader className="pb-3">
-        <CardTitle>Accès rapide</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {quickAccess.map((item, index) => (
-            <motion.div 
-              key={item.id}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.3 }}
-            >
-              <Button
-                variant="outline"
-                className="w-full h-auto flex flex-col items-center justify-center p-4 gap-2 text-center"
-                onClick={() => navigate(item.path)}
-              >
-                <div className="bg-primary/10 p-2 rounded-full">
-                  {item.icon}
-                </div>
-                <span className="font-medium">{item.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  {item.description}
-                </span>
-              </Button>
-            </motion.div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <motion.div
+      className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ staggerChildren: 0.05 }}
+    >
+      {items.map((item, index) => (
+        <motion.div
+          key={item.path}
+          className="cursor-pointer"
+          onClick={() => navigate(item.path)}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.05 }}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <div className={`flex flex-col items-center justify-center p-4 rounded-lg ${item.color}`}>
+            <div className="mb-2">{item.icon}</div>
+            <span className="text-sm font-medium">{item.label}</span>
+          </div>
+        </motion.div>
+      ))}
+    </motion.div>
   );
 };
 

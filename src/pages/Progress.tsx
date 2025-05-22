@@ -2,13 +2,13 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { getModeVRPath } from '@/utils/userModeHelpers';
+import { getModeProgressPath } from '@/utils/userModeHelpers';
 
-const VR: React.FC = () => {
+const Progress: React.FC = () => {
   const { userMode } = useUserMode();
-  const redirectPath = getModeVRPath(userMode);
+  const redirectPath = getModeProgressPath(userMode);
   
   return <Navigate to={redirectPath} replace />;
 };
 
-export default VR;
+export default Progress;

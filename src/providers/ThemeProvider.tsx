@@ -1,23 +1,19 @@
 
-import { ThemeProvider as ThemeContextProvider } from '@/contexts/ThemeContext';
-import React, { ReactNode } from 'react';
-
-type ThemeProviderProps = {
-  children: ReactNode;
-  defaultTheme?: 'dark' | 'light' | 'system';
-  storageKey?: string;
-};
+import { ThemeProvider as ActualThemeProvider } from '@/contexts/ThemeContext';
 
 export function ThemeProvider({
   children,
   defaultTheme = 'system',
-  storageKey = 'emotions-care-theme',
-}: ThemeProviderProps) {
+  storageKey = 'theme',
+  ...props
+}) {
   return (
-    <ThemeContextProvider defaultTheme={defaultTheme} storageKey={storageKey}>
+    <ActualThemeProvider
+      defaultTheme={defaultTheme}
+      storageKey={storageKey}
+      {...props}
+    >
       {children}
-    </ThemeContextProvider>
+    </ActualThemeProvider>
   );
 }
-
-export default ThemeProvider;

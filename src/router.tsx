@@ -32,12 +32,29 @@ import B2CAudioPage from '@/pages/b2c/Audio';
 import B2CMusicPage from '@/pages/b2c/Music';
 import B2CCoachPage from '@/pages/b2c/Coach';
 import B2CEmotionProgressPage from '@/pages/b2c/EmotionProgressPage';
+import B2CVR from '@/pages/b2c/VR';
+import B2CGamification from '@/pages/b2c/Gamification';
+import B2CSocial from '@/pages/b2c/Social';
+
+// B2B User Feature Pages
+import B2BUserGamification from '@/pages/b2b/user/Gamification';
+import B2BUserPreferences from '@/pages/b2b/user/Preferences';
+import B2BUserMusicCreate from '@/pages/b2b/user/MusicCreate';
+import B2BUserMusicPreferences from '@/pages/b2b/user/MusicPreferences';
+
+// B2B Admin Feature Pages
+import B2BAdminEvents from '@/pages/b2b/admin/Events';
+import B2BAdminSocialCocon from '@/pages/b2b/admin/SocialCocon';
 
 // Redirect Components
 import Journal from '@/pages/Journal';
 import Audio from '@/pages/Audio';
 import Music from '@/pages/Music';
 import Coach from '@/pages/Coach';
+import Progress from '@/pages/Progress';
+import VR from '@/pages/VR';
+import Social from '@/pages/Social';
+import Gamification from '@/pages/Gamification';
 
 const routes = [
   {
@@ -78,6 +95,7 @@ const routes = [
       {
         element: <UnifiedLayout />,
         children: [
+          // Dashboards
           {
             path: '/dashboard',
             element: <DashboardRedirect />
@@ -94,13 +112,10 @@ const routes = [
             path: '/b2b/admin/dashboard',
             element: <B2BAdminDashboardPage />
           },
+          // Common features
           {
             path: '/settings',
             element: <UnifiedSettingsPage />
-          },
-          {
-            path: '/progress',
-            element: <B2CEmotionProgressPage />
           },
           // Feature redirect pages
           {
@@ -119,7 +134,23 @@ const routes = [
             path: '/coach',
             element: <Coach />
           },
-          // Mode-specific feature pages
+          {
+            path: '/progress',
+            element: <Progress />
+          },
+          {
+            path: '/vr',
+            element: <VR />
+          },
+          {
+            path: '/social',
+            element: <Social />
+          },
+          {
+            path: '/gamification',
+            element: <Gamification />
+          },
+          // B2C specific feature pages
           {
             path: '/b2c/journal',
             element: <B2CJournalPage />
@@ -140,27 +171,72 @@ const routes = [
             path: '/b2c/progress',
             element: <B2CEmotionProgressPage />
           },
-          // B2B user feature pages will be similar to B2C pages but with team features
+          {
+            path: '/b2c/vr',
+            element: <B2CVR />
+          },
+          {
+            path: '/b2c/gamification',
+            element: <B2CGamification />
+          },
+          {
+            path: '/b2c/social',
+            element: <B2CSocial />
+          },
+          // B2B user feature pages
           {
             path: '/b2b/user/journal',
-            element: <B2CJournalPage />
+            element: <B2CJournalPage /> // Réutilisation du composant B2C avec une future adaptation
           },
           {
             path: '/b2b/user/audio',
-            element: <B2CAudioPage />
+            element: <B2CAudioPage /> // Réutilisation du composant B2C avec une future adaptation
           },
           {
             path: '/b2b/user/music',
-            element: <B2CMusicPage />
+            element: <B2CMusicPage /> // Réutilisation du composant B2C avec une future adaptation
+          },
+          {
+            path: '/b2b/user/music/create',
+            element: <B2BUserMusicCreate />
+          },
+          {
+            path: '/b2b/user/music/preferences',
+            element: <B2BUserMusicPreferences />
           },
           {
             path: '/b2b/user/coach',
-            element: <B2CCoachPage />
+            element: <B2CCoachPage /> // Réutilisation du composant B2C avec une future adaptation
           },
           {
             path: '/b2b/user/progress',
-            element: <B2CEmotionProgressPage />
+            element: <B2CEmotionProgressPage /> // Réutilisation du composant B2C avec une future adaptation
           },
+          {
+            path: '/b2b/user/vr',
+            element: <B2CVR /> // Réutilisation du composant B2C avec une future adaptation
+          },
+          {
+            path: '/b2b/user/gamification',
+            element: <B2BUserGamification />
+          },
+          {
+            path: '/b2b/user/social',
+            element: <B2CSocial /> // Réutilisation du composant B2C avec une future adaptation
+          },
+          {
+            path: '/b2b/user/preferences',
+            element: <B2BUserPreferences />
+          },
+          // B2B Admin feature pages
+          {
+            path: '/b2b/admin/events',
+            element: <B2BAdminEvents />
+          },
+          {
+            path: '/b2b/admin/social',
+            element: <B2BAdminSocialCocon />
+          }
         ]
       }
     ]

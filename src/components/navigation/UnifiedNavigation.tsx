@@ -3,7 +3,8 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { 
   Home, BookOpen, Music, Headphones, 
-  MessageCircle, Settings, User, LayoutDashboard
+  MessageCircle, Settings, User, LayoutDashboard,
+  LineChart, Medal, Heart, Glasses
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import NavItem from './NavItem';
@@ -22,6 +23,17 @@ const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ onItemClick }) =>
   const isActive = (path: string) => {
     return location.pathname === path || 
            (path !== '/' && path.length > 1 && location.pathname.startsWith(path));
+  };
+
+  const getModePath = (basePath: string) => {
+    if (userMode === 'b2c') {
+      return `/b2c${basePath}`;
+    } else if (userMode === 'b2b_user') {
+      return `/b2b/user${basePath}`;
+    } else if (userMode === 'b2b_admin') {
+      return `/b2b/admin${basePath}`;
+    }
+    return basePath;
   };
 
   const commonLinks = [
@@ -62,6 +74,30 @@ const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ onItemClick }) =>
       label: 'Coach', 
       icon: <MessageCircle className="h-5 w-5" />, 
       requiresAuth: true 
+    },
+    { 
+      path: '/progress', 
+      label: 'Progression', 
+      icon: <LineChart className="h-5 w-5" />, 
+      requiresAuth: true 
+    },
+    { 
+      path: '/gamification', 
+      label: 'Défis', 
+      icon: <Medal className="h-5 w-5" />,
+      requiresAuth: true
+    },
+    { 
+      path: '/vr', 
+      label: 'Réalité virtuelle', 
+      icon: <Glasses className="h-5 w-5" />,
+      requiresAuth: true
+    },
+    { 
+      path: '/social', 
+      label: 'Social Cocoon', 
+      icon: <Heart className="h-5 w-5" />,
+      requiresAuth: true
     }
   ];
 
