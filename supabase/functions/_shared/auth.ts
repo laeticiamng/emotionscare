@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { logAccess } from './logging.ts';
 
 // Centralised Supabase client for edge functions
 
@@ -22,6 +23,15 @@ export async function logUnauthorizedAccess(
       route,
       reason,
       ip_address: ip,
+    });
+    await logAccess({
+      user_id: userId,
+      role: null,
+      route,
+      action: 'access',
+      result: 'denied',
+      ip_address: ip,
+      details: reason,
     });
   } catch (logError) {
     console.error('Failed to log auth attempt:', logError);
@@ -84,6 +94,17 @@ export async function authorizeRole(
     await logUnauthorizedAccess(pathname, 'forbidden_role', user.id, ip);
     return { user: null, status: 403 } as const;
   }
+
+  const userAgent = req.headers.get('user-agent') || null;
+  await logAccess({
+    user_id: user.id,
+    role: userRole,
+    route: pathname,
+    action: 'access',
+    result: 'success',
+    ip_address: ip,
+    user_agent: userAgent,
+  });
 
   return { user, status: 200 } as const;
 }
