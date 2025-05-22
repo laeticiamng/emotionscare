@@ -16,12 +16,12 @@ const NotFoundPage: React.FC = () => {
           La page que vous recherchez n'existe pas ou a été déplacée.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button onClick={() => navigate('/')}>
-            <HomeIcon className="mr-2 h-4 w-4" />
+          <Button onClick={() => navigate('/')} className="flex items-center gap-2">
+            <HomeIcon className="h-4 w-4" />
             Accueil
           </Button>
-          <Button variant="outline" onClick={() => navigate(-1)}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
+          <Button variant="outline" onClick={() => navigate(-1)} className="flex items-center gap-2">
+            <ArrowLeft className="h-4 w-4" />
             Retour
           </Button>
         </div>

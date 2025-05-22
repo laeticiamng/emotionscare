@@ -106,7 +106,7 @@ const ImmersiveHome: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="h-full">
+              <Card className="h-full hover:shadow-md transition-shadow">
                 <CardHeader>
                   <div className={`w-14 h-14 rounded-lg flex items-center justify-center mb-4 ${feature.color}`}>
                     {feature.icon}
@@ -117,7 +117,7 @@ const ImmersiveHome: React.FC = () => {
                 <CardFooter>
                   <Button 
                     variant="ghost" 
-                    className="gap-2"
+                    className="gap-2 hover:bg-primary/10 w-full justify-center"
                     onClick={() => navigate(feature.path)}
                   >
                     Explorer
