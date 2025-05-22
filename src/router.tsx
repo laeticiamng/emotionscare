@@ -11,6 +11,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Journal = lazy(() => import('./pages/Journal'));
 const Music = lazy(() => import('./pages/Music'));
 const Audio = lazy(() => import('./pages/Audio'));
+const Coach = lazy(() => import('./pages/Coach'));
 const Login = lazy(() => import('./pages/common/Login'));
 const Register = lazy(() => import('./pages/common/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
@@ -25,6 +26,7 @@ const B2CDashboard = lazy(() => import('./pages/b2c/Dashboard'));
 const B2CJournal = lazy(() => import('./pages/b2c/Journal'));
 const B2CMusic = lazy(() => import('./pages/b2c/Music'));
 const B2CAudio = lazy(() => import('./pages/b2c/Audio'));
+const B2CCoach = lazy(() => import('./pages/b2c/Coach'));
 const B2COnboarding = lazy(() => import('./pages/b2c/Onboarding'));
 
 // B2B User Pages
@@ -32,6 +34,7 @@ const B2BUserDashboard = lazy(() => import('./pages/b2b/user/Dashboard'));
 const B2BUserJournal = lazy(() => import('./pages/b2b/user/Journal'));
 const B2BUserMusic = lazy(() => import('./pages/b2b/user/Music'));
 const B2BUserAudio = lazy(() => import('./pages/b2b/user/Audio'));
+const B2BUserCoach = lazy(() => import('./pages/b2b/user/Coach'));
 
 // B2B Admin Pages
 const B2BAdminDashboard = lazy(() => import('./pages/b2b/admin/Dashboard'));
@@ -84,6 +87,10 @@ const routes: RouteObject[] = [
         element: <Shell><B2CAudio /></Shell>,
       },
       {
+        path: 'coach',
+        element: <Shell><B2CCoach /></Shell>,
+      },
+      {
         path: 'onboarding',
         element: <Shell><B2COnboarding /></Shell>,
       },
@@ -124,6 +131,10 @@ const routes: RouteObject[] = [
       {
         path: 'audio',
         element: <Shell><B2BUserAudio /></Shell>,
+      },
+      {
+        path: 'coach',
+        element: <Shell><B2BUserCoach /></Shell>,
       },
     ],
   },
@@ -180,10 +191,26 @@ const routes: RouteObject[] = [
     element: <ModeSwitcher />,
   },
   
-  // Generic Dashboard redirect
+  // Generic redirects
   {
     path: 'dashboard',
-    element: <DashboardRedirect />,
+    element: <Dashboard />,
+  },
+  {
+    path: 'journal',
+    element: <Journal />,
+  },
+  {
+    path: 'music',
+    element: <Music />,
+  },
+  {
+    path: 'audio',
+    element: <Audio />,
+  },
+  {
+    path: 'coach',
+    element: <Coach />,
   },
   
   // Legacy routes - redirections

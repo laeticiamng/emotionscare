@@ -1,195 +1,223 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { Check } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Shell from '@/Shell';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle2, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
-const Pricing: React.FC = () => {
+const PricingPage: React.FC = () => {
   const navigate = useNavigate();
-
-  const b2cFeatures = [
-    "Accès illimité au scan émotionnel",
+  const { isAuthenticated } = useAuth();
+  
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+  
+  const personalFeatures = [
+    "Coach émotionnel IA illimité",
     "Journal émotionnel personnalisé",
-    "Musicothérapie et audio guidé",
-    "Coach IA personnalisé",
-    "Accès à la réalité virtuelle",
-    "Suivi des progrès et statistiques",
-    "Exercices de bien-être quotidiens",
-    "Support communautaire"
+    "Musicothérapie adaptative",
+    "Exercices audio guidés",
+    "Analyse émotionnelle approfondie",
+    "Suivi des progrès",
+    "Support par email",
+    "5 jours d'essai gratuit"
   ];
-
-  const b2bFeatures = [
-    "Tableau de bord RH d'analyse d'équipe",
-    "Scan émotionnel pour chaque collaborateur",
-    "Rapports hebdomadaires par équipe",
-    "Alertes préventives sur le stress",
-    "Statistiques d'amélioration du bien-être",
-    "Espace collaborateur personnalisé",
-    "Ressources et formations",
-    "Support dédié 24/7"
+  
+  const businessFeatures = [
+    "Toutes les fonctionnalités Particulier",
+    "Tableau de bord analytique d'équipe",
+    "Ateliers collectifs mensuels",
+    "Accès à des spécialistes qualifiés",
+    "Rapports de bien-être anonymisés",
+    "Coaching en leadership",
+    "Support dédié",
+    "5 jours d'essai gratuit"
   ];
-
+  
+  const enterpriseFeatures = [
+    "Toutes les fonctionnalités Business",
+    "Intégration personnalisée",
+    "Formations sur mesure",
+    "Accompagnement stratégique",
+    "API dédiée",
+    "Assistance premium 24/7",
+    "Gestionnaire de compte dédié"
+  ];
+  
   return (
-    <Shell>
-      <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <motion.h1 
-            className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl mb-6"
-            initial={{ opacity: 0, y: -20 }}
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 py-16 px-4">
+      <div className="max-w-7xl mx-auto">
+        <motion.div 
+          className="text-center mb-16"
+          initial="hidden"
+          animate="visible"
+          variants={fadeIn}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
+            Des tarifs simples pour prendre soin de vous
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Choisissez l'offre qui correspond à vos besoins, avec 5 jours d'essai gratuit pour découvrir tous les bénéfices.
+          </p>
+        </motion.div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Offre Particulier */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Investissez dans votre <span className="text-primary">bien-être émotionnel</span>
-          </motion.h1>
-          <motion.p 
-            className="max-w-2xl mx-auto text-xl text-muted-foreground"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            <Card className="h-full flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-2xl">Particulier</CardTitle>
+                <CardDescription>Pour votre bien-être personnel</CardDescription>
+                <div className="mt-4 flex items-baseline">
+                  <span className="text-4xl font-bold">15€</span>
+                  <span className="ml-1 text-muted-foreground">/mois</span>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <ul className="space-y-3">
+                  {personalFeatures.map((feature, index) => (
+                    <li key={index} className="flex items-center">
+                      <CheckCircle2 className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  className="w-full group" 
+                  onClick={() => navigate(isAuthenticated ? '/b2c/dashboard' : '/b2c/register')}
+                >
+                  <span>{isAuthenticated ? 'Accéder à mon espace' : 'Commencer l\'essai gratuit'}</span>
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </CardFooter>
+            </Card>
+          </motion.div>
+          
+          {/* Offre Entreprise */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            Des solutions adaptées à vos besoins, avec 5 jours d'essai gratuits pour tous nos plans.
-          </motion.p>
-        </div>
-
-        {/* Pricing Plans */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-          {/* B2C Plan */}
-          <motion.div 
-            className="rounded-2xl border bg-card shadow-sm overflow-hidden"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            <Card className="h-full flex flex-col border-primary">
+              <div className="absolute top-0 right-0 transform translate-x-2 -translate-y-2">
+                <span className="bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full">
+                  Populaire
+                </span>
+              </div>
+              <CardHeader>
+                <CardTitle className="text-2xl">Entreprise</CardTitle>
+                <CardDescription>Pour les équipes et collaborateurs</CardDescription>
+                <div className="mt-4 flex items-baseline">
+                  <span className="text-4xl font-bold">10€</span>
+                  <span className="ml-1 text-muted-foreground">/utilisateur/mois HT</span>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <ul className="space-y-3">
+                  {businessFeatures.map((feature, index) => (
+                    <li key={index} className="flex items-center">
+                      <CheckCircle2 className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  className="w-full group" 
+                  variant="default"
+                  onClick={() => navigate('/b2b/selection')}
+                >
+                  <span>Démarrer avec votre équipe</span>
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </CardFooter>
+            </Card>
+          </motion.div>
+          
+          {/* Offre Personnalisée */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <div className="p-6 md:p-8">
-              <h3 className="text-2xl font-bold">Particuliers</h3>
-              <div className="mt-4 flex items-baseline">
-                <span className="text-4xl font-extrabold">15€</span>
-                <span className="ml-1 text-muted-foreground">/mois</span>
-              </div>
-              <p className="mt-4 text-muted-foreground">
-                La solution complète pour votre bien-être émotionnel quotidien
-              </p>
-              <div className="mt-6">
+            <Card className="h-full flex flex-col bg-muted/50">
+              <CardHeader>
+                <CardTitle className="text-2xl">Enterprise</CardTitle>
+                <CardDescription>Solutions sur mesure pour grandes organisations</CardDescription>
+                <div className="mt-4 flex items-baseline">
+                  <span className="text-4xl font-bold">Sur mesure</span>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <ul className="space-y-3">
+                  {enterpriseFeatures.map((feature, index) => (
+                    <li key={index} className="flex items-center">
+                      <CheckCircle2 className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+              <CardFooter>
                 <Button 
-                  onClick={() => navigate('/b2c/register')} 
-                  className="w-full"
-                  size="lg"
+                  className="w-full group" 
+                  variant="outline"
+                  onClick={() => navigate('/support')}
                 >
-                  Commencer l'essai gratuit
+                  <span>Contactez-nous</span>
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
-              </div>
-              <p className="mt-3 text-xs text-center text-muted-foreground">
-                5 jours d'essai gratuit, sans engagement
-              </p>
-            </div>
-            <div className="p-6 md:p-8 bg-muted/50">
-              <h4 className="text-sm font-medium mb-4">Ce qui est inclus :</h4>
-              <ul className="space-y-3">
-                {b2cFeatures.map((feature) => (
-                  <li key={feature} className="flex">
-                    <Check className="h-5 w-5 text-primary flex-shrink-0 mr-3" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+              </CardFooter>
+            </Card>
           </motion.div>
-
-          {/* B2B Plan */}
-          <motion.div 
-            className="rounded-2xl border bg-card shadow-sm overflow-hidden"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+        </div>
+        
+        <motion.div 
+          className="mt-16 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <h2 className="text-2xl font-bold mb-4">Des questions ?</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
+            Notre équipe est disponible pour répondre à toutes vos questions et vous aider à choisir l'offre qui vous convient le mieux.
+          </p>
+          <Button 
+            variant="outline"
+            size="lg"
+            onClick={() => navigate('/support')}
           >
-            <div className="p-6 md:p-8">
-              <h3 className="text-2xl font-bold">Entreprises</h3>
-              <div className="mt-4 flex items-baseline">
-                <span className="text-4xl font-extrabold">10€ HT</span>
-                <span className="ml-1 text-muted-foreground">/collaborateur/mois</span>
-              </div>
-              <p className="mt-4 text-muted-foreground">
-                La solution idéale pour le bien-être de vos équipes
-              </p>
-              <div className="mt-6">
-                <Button 
-                  onClick={() => navigate('/b2b/selection')} 
-                  className="w-full"
-                  size="lg"
-                >
-                  Découvrir nos solutions B2B
-                </Button>
-              </div>
-              <p className="mt-3 text-xs text-center text-muted-foreground">
-                5 jours d'essai gratuit, facturation mensuelle
-              </p>
-            </div>
-            <div className="p-6 md:p-8 bg-muted/50">
-              <h4 className="text-sm font-medium mb-4">Ce qui est inclus :</h4>
-              <ul className="space-y-3">
-                {b2bFeatures.map((feature) => (
-                  <li key={feature} className="flex">
-                    <Check className="h-5 w-5 text-primary flex-shrink-0 mr-3" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* FAQ Section */}
-        <div className="mt-20 max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-10">Questions fréquentes</h2>
-          <div className="space-y-6">
-            <div className="border-b pb-6">
-              <h3 className="text-lg font-medium mb-2">Comment fonctionne l'essai gratuit ?</h3>
-              <p className="text-muted-foreground">
-                Tous nos plans incluent 5 jours d'essai gratuit. Vous pouvez explorer toutes les fonctionnalités sans engagement. Vous ne serez facturé qu'après la période d'essai si vous décidez de continuer.
-              </p>
-            </div>
-            <div className="border-b pb-6">
-              <h3 className="text-lg font-medium mb-2">Puis-je annuler à tout moment ?</h3>
-              <p className="text-muted-foreground">
-                Oui, vous pouvez annuler votre abonnement à tout moment. Vous aurez accès aux fonctionnalités jusqu'à la fin de votre période de facturation.
-              </p>
-            </div>
-            <div className="border-b pb-6">
-              <h3 className="text-lg font-medium mb-2">Comment est facturé le plan Entreprise ?</h3>
-              <p className="text-muted-foreground">
-                Le plan Entreprise est facturé à 10€ HT par collaborateur et par mois. Vous ne payez que pour les utilisateurs actifs, et pouvez ajuster le nombre de licences à tout moment.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Call to Action */}
-        <div className="mt-20 text-center">
-          <h2 className="text-3xl font-bold mb-6">Prêt à améliorer votre bien-être émotionnel ?</h2>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              onClick={() => navigate('/b2c/register')} 
-              size="lg"
-              className="px-8"
-            >
-              Essai gratuit Particulier
-            </Button>
-            <Button 
-              onClick={() => navigate('/b2b/selection')} 
-              variant="outline"
-              size="lg"
-              className="px-8"
-            >
-              Solutions Entreprise
-            </Button>
-          </div>
-        </div>
+            Contactez-nous
+          </Button>
+        </motion.div>
+        
+        <motion.div 
+          className="mt-20 text-center text-sm text-muted-foreground"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+        >
+          <p>Les prix sont affichés en euros. TVA applicable en sus pour les offres Entreprise.</p>
+          <p className="mt-1">
+            Essai gratuit de 5 jours sans engagement. Annulation possible à tout moment.
+          </p>
+        </motion.div>
       </div>
-    </Shell>
+    </div>
   );
 };
 
-export default Pricing;
+export default PricingPage;
