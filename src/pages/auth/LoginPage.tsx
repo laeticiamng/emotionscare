@@ -121,7 +121,7 @@ const LoginPage: React.FC = () => {
                 Vous n'avez pas de compte ?{' '}
                 <a
                   className="text-primary underline-offset-4 hover:underline cursor-pointer"
-                  onClick={() => navigate('/b2c/register')}
+                  onClick={() => navigate('/register')}
                 >
                   Créer un compte
                 </a>

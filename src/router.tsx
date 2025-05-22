@@ -6,9 +6,9 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 // Import pages
 const Home = React.lazy(() => import('./pages/Index'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-const NotFoundPage = React.lazy(() => import('./pages/error/NotFoundPage'));
-const ForbiddenPage = React.lazy(() => import('./pages/error/ForbiddenPage'));
-const ServerErrorPage = React.lazy(() => import('./pages/error/ServerErrorPage'));
+const NotFoundPage = React.lazy(() => import('./pages/errors/NotFoundPage'));
+const ForbiddenPage = React.lazy(() => import('./pages/errors/ForbiddenPage'));
+const ServerErrorPage = React.lazy(() => import('./pages/errors/ServerErrorPage'));
 const Legal = React.lazy(() => import('./pages/Legal'));
 const ContactPage = React.lazy(() => import('./pages/ContactPage'));
 const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy'));
@@ -24,10 +24,12 @@ const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
 const VRAnalyticsPage = React.lazy(() => import('./pages/VRAnalyticsPage'));
 const VRSessionPage = React.lazy(() => import('./pages/VRSessionPage'));
 const CommunityAdminPage = React.lazy(() => import('./pages/CommunityAdminPage'));
-const LoginPage = React.lazy(() => import('./pages/LoginPage'));
+const LoginPage = React.lazy(() => import('./pages/auth/LoginPage'));
 const RegisterPage = React.lazy(() => import('./pages/RegisterPage'));
 const ForgotPasswordPage = React.lazy(() => import('./pages/ForgotPasswordPage'));
 const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
+const AdminLoginPage = React.lazy(() => import('./pages/AdminLoginPage'));
+const CollaboratorLoginPage = React.lazy(() => import('./pages/b2b/user/Login'));
 
 // Journal pages
 const NewJournalEntryPage = React.lazy(() => import('./pages/journal/NewJournalEntryPage'));
@@ -150,6 +152,14 @@ const routes = [
   {
     path: '/login',
     element: <LoginPage />
+  },
+  {
+    path: '/admin/login',
+    element: <AdminLoginPage />
+  },
+  {
+    path: '/b2b/user/login',
+    element: <CollaboratorLoginPage />
   },
   {
     path: '/register',

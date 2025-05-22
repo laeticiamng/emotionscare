@@ -1,223 +1,204 @@
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from 'sonner';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import { Mail, Lock, User, UserPlus } from 'lucide-react';
 import Shell from '@/Shell';
-
-const registerSchema = z
-  .object({
-    name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
-    email: z.string().email('Email invalide'),
-    password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
-    confirmPassword: z.string(),
-    acceptTerms: z.boolean().refine((val) => val === true, {
-      message: 'Vous devez accepter les conditions d\'utilisation',
-    }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Les mots de passe ne correspondent pas',
-    path: ['confirmPassword'],
-  });
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
+import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { toast } = useToast();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const form = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      acceptTerms: false,
-    },
-  });
-
-  const onSubmit = async (data: RegisterFormValues) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    
+    if (password !== confirmPassword) {
+      setError('Les mots de passe ne correspondent pas.');
+      return;
+    }
+    
+    if (!agreeTerms) {
+      setError('Vous devez accepter les conditions d\'utilisation.');
+      return;
+    }
+    
+    setIsLoading(true);
+    
     try {
-      setIsLoading(true);
-      // Simuler l'inscription
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      const success = await register({
-        name: data.name,
-        email: data.email
+      await register({
+        name,
+        email,
+        password
       });
       
-      if (success) {
-        toast.success('Compte créé avec succès !');
-        navigate('/login');
-      } else {
-        toast.error('Erreur lors de la création du compte');
-      }
-    } catch (error) {
-      console.error('Erreur d\'inscription:', error);
-      toast.error('Une erreur est survenue lors de l\'inscription');
+      toast({
+        title: "Inscription réussie",
+        description: "Votre compte a été créé avec succès"
+      });
+      
+      navigate('/login');
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      setError('Une erreur est survenue lors de l\'inscription.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Shell hideNav hideFooter>
-      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+    <Shell>
+      <div className="flex items-center justify-center min-h-screen bg-background p-4">
         <motion.div
-          className="w-full max-w-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="w-full max-w-md"
         >
-          <div className="text-center mb-6">
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-            >
-              <h1 className="text-3xl font-bold">Créer un compte</h1>
-              <p className="text-muted-foreground mt-2">
-                Rejoignez-nous pour vivre une expérience émotionnelle unique
-              </p>
-            </motion.div>
-          </div>
-
-          <motion.div
-            className="bg-card border rounded-xl shadow-sm p-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          >
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nom complet</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Jean Dupont" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="email@exemple.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Mot de passe</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirmer le mot de passe</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="acceptTerms"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 py-1">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="text-xs">
-                          J'accepte les{' '}
-                          <Link to="/terms" className="text-primary hover:underline">
-                            conditions d'utilisation
-                          </Link>{' '}
-                          et la{' '}
-                          <Link to="/privacy" className="text-primary hover:underline">
-                            politique de confidentialité
-                          </Link>
-                        </FormLabel>
-                        <FormMessage />
+          <Card>
+            <CardHeader>
+              <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <UserPlus className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle className="text-2xl text-center">Créer un compte</CardTitle>
+              <CardDescription className="text-center">
+                Rejoignez notre communauté dès aujourd'hui
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nom complet</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="Votre nom"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="vous@exemple.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="terms" 
+                    checked={agreeTerms}
+                    onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
+                  />
+                  <label
+                    htmlFor="terms"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    J'accepte les <span className="text-primary underline cursor-pointer">conditions d'utilisation</span>
+                  </label>
+                </div>
+                
+                {error && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-sm text-destructive p-2 bg-destructive/10 rounded-md"
+                  >
+                    {error}
+                  </motion.div>
+                )}
+                
+                <Button 
+                  type="submit" 
+                  className="w-full relative" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <span>Inscription en cours...</span>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       </div>
-                    </FormItem>
-                  )}
-                />
-
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? 'Création en cours...' : 'Créer un compte'}
+                    </>
+                  ) : "S'inscrire"}
                 </Button>
               </form>
-            </Form>
-
-            <div className="mt-6 text-center text-sm">
-              <p>
+            </CardContent>
+            <CardFooter className="flex flex-col items-center gap-2">
+              <div className="text-sm text-muted-foreground">
                 Vous avez déjà un compte ?{' '}
-                <Link to="/login" className="font-medium text-primary hover:underline">
+                <a
+                  className="text-primary underline-offset-4 hover:underline cursor-pointer"
+                  onClick={() => navigate('/login')}
+                >
                   Se connecter
-                </Link>
-              </p>
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="mt-8 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-          >
-            <Link to="/" className="text-sm text-muted-foreground hover:underline">
-              Retour à l'accueil
-            </Link>
-          </motion.div>
+                </a>
+              </div>
+              <Button variant="ghost" className="mt-2" onClick={() => navigate('/')}>
+                Retour à l'accueil
+              </Button>
+            </CardFooter>
+          </Card>
         </motion.div>
       </div>
     </Shell>
