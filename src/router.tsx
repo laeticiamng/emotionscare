@@ -31,6 +31,9 @@ const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
 const AdminLoginPage = React.lazy(() => import('./pages/AdminLoginPage'));
 const CollaboratorLoginPage = React.lazy(() => import('./pages/b2b/user/Login'));
 const ScanPage = React.lazy(() => import('./pages/ScanPage'));
+const FeatureHub = React.lazy(() => import('./pages/FeatureHub'));
+const ChooseMode = React.lazy(() => import('./pages/common/ChooseMode'));
+const ModeSwitcher = React.lazy(() => import('./pages/common/ModeSwitcher'));
 
 // Journal pages
 const NewJournalEntryPage = React.lazy(() => import('./pages/journal/NewJournalEntryPage'));
@@ -46,6 +49,10 @@ const routes = [
   {
     path: '/',
     element: <Home />
+  },
+  {
+    path: '/features',
+    element: <FeatureHub />
   },
   {
     path: '/dashboard',
@@ -127,10 +134,22 @@ const routes = [
     path: '/coming-soon',
     element: <NotImplementedPage />
   },
+  {
+    path: '/choose-mode',
+    element: <ProtectedRoute><ChooseMode /></ProtectedRoute>
+  },
+  {
+    path: '/mode-switcher',
+    element: <ProtectedRoute><ModeSwitcher /></ProtectedRoute>
+  },
   // New Scan page
   {
     path: '/scan',
     element: <ProtectedRoute><ScanPage /></ProtectedRoute>
+  },
+  {
+    path: '/vr',
+    element: <ProtectedRoute><VRAnalyticsPage /></ProtectedRoute>
   },
   // Journal routes
   {
