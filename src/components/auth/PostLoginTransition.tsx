@@ -19,7 +19,7 @@ const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({
   useEffect(() => {
     if (!show) return;
     
-    // Séquence d'animation en plusieurs étapes
+    // Animation sequence in multiple steps
     const successTimer = setTimeout(() => {
       setStage('welcome');
       
@@ -63,8 +63,8 @@ const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({
                 <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Check className="h-8 w-8 text-primary" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2">Connexion réussie</h2>
-                <p className="text-muted-foreground">Vous êtes bien connecté à votre compte</p>
+                <h2 className="text-xl font-semibold mb-2">Login successful</h2>
+                <p className="text-muted-foreground">You are now connected to your account</p>
               </motion.div>
             )}
             
@@ -85,9 +85,9 @@ const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({
                   />
                 </div>
                 <h2 className="text-xl font-semibold mb-2">
-                  Bienvenue {userName ? userName : 'sur EmotionsCare'}
+                  Welcome {userName ? userName : 'to EmotionsCare'}
                 </h2>
-                <p className="text-muted-foreground">Nous préparons votre espace personnel</p>
+                <p className="text-muted-foreground">We're preparing your personal space</p>
               </motion.div>
             )}
             
@@ -108,9 +108,9 @@ const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({
                   />
                   <Loader2 className="h-16 w-16 text-primary animate-spin" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2">Chargement de votre espace</h2>
+                <h2 className="text-xl font-semibold mb-2">Loading your dashboard</h2>
                 <p className="text-muted-foreground">
-                  Préparation de vos modules personnalisés...
+                  Preparing your personalized modules...
                 </p>
               </motion.div>
             )}

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from 'next-themes';
 import PostLoginTransition from './PostLoginTransition';
 
 interface AuthTransitionProps {
@@ -10,23 +10,28 @@ interface AuthTransitionProps {
 
 const AuthTransition: React.FC<AuthTransitionProps> = ({ children }) => {
   const [showTransition, setShowTransition] = useState(false);
-  const { isAuthenticated, user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const { theme } = useTheme();
   
   // Detect when user has just logged in
   useEffect(() => {
     const justLoggedIn = sessionStorage.getItem('just_logged_in');
     
-    if (justLoggedIn && isAuthenticated && !location.pathname.includes('/dashboard')) {
+    if (justLoggedIn && !location.pathname.includes('/dashboard')) {
       setShowTransition(true);
       sessionStorage.removeItem('just_logged_in');
     }
-  }, [isAuthenticated, location.pathname]);
+  }, [location.pathname]);
   
   const handleTransitionComplete = () => {
     setShowTransition(false);
     navigate('/dashboard');
+  };
+
+  // This is a mock user for demonstration
+  const mockUser = {
+    name: 'User'
   };
   
   return (
@@ -36,7 +41,7 @@ const AuthTransition: React.FC<AuthTransitionProps> = ({ children }) => {
         <PostLoginTransition 
           show={showTransition} 
           onComplete={handleTransitionComplete}
-          userName={user?.name}
+          userName={mockUser?.name}
         />
       )}
     </>

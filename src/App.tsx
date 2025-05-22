@@ -1,21 +1,23 @@
 
 import { BrowserRouter } from 'react-router-dom';
 import { Suspense } from 'react';
-import { AppProviders } from './providers/AppProviders';
+import { ThemeProvider } from './providers/ThemeProvider';
 import { Toaster } from '@/components/ui/toaster';
-import PageLoader from '@/components/PageLoader';
 import AppRouter from './AppRouter';
+import AuthTransition from './components/auth/AuthTransition';
 
 function App() {
   return (
-    <AppProviders>
+    <ThemeProvider>
       <BrowserRouter>
-        <Suspense fallback={<PageLoader />}>
-          <AppRouter />
-        </Suspense>
+        <AuthTransition>
+          <Suspense fallback={<div>Loading...</div>}>
+            <AppRouter />
+          </Suspense>
+        </AuthTransition>
       </BrowserRouter>
       <Toaster />
-    </AppProviders>
+    </ThemeProvider>
   );
 }
 
