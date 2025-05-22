@@ -34,10 +34,10 @@ const ChooseModeV2: React.FC = () => {
     setTimeout(() => {
       switch(mode) {
         case 'b2b_admin':
-          navigate('/b2b/admin/login');
+          navigate('/login-admin');
           break;
         case 'b2b_user':
-          navigate('/b2b/user/login');
+          navigate('/login-collaborateur');
           break;
         default:
           navigate('/b2c/login');

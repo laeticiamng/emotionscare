@@ -50,7 +50,7 @@ const B2BSelectionPage = () => {
       description: "Redirection vers la connexion collaborateur",
       duration: 2000,
     });
-    navigate('/b2b/user/login');
+    navigate('/login-collaborateur');
   };
 
   const handleAdminAccess = () => {
@@ -65,7 +65,7 @@ const B2BSelectionPage = () => {
       description: "Redirection vers la connexion administrateur",
       duration: 2000,
     });
-    navigate('/b2b/admin/login');
+    navigate('/login-admin');
   };
 
   // Variants d'animation

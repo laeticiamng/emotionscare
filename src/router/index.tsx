@@ -133,6 +133,14 @@ export const routes: RouteObject[] = [
     path: 'b2b/admin/login',
     element: <B2BAdminLogin />
   },
+  {
+    path: 'login-collaborateur',
+    element: <Navigate to="/b2b/user/login" replace />
+  },
+  {
+    path: 'login-admin',
+    element: <Navigate to="/b2b/admin/login" replace />
+  },
   // B2C Protected Routes
   {
     path: 'b2c',
@@ -309,6 +317,14 @@ export const routes: RouteObject[] = [
         element: <B2BAdminSettingsPage />
       }
     ]
+  },
+  {
+    path: 'dashboard-collaborateur',
+    element: <Navigate to="/b2b/user/dashboard" replace />
+  },
+  {
+    path: 'dashboard-admin',
+    element: <Navigate to="/b2b/admin/dashboard" replace />
   },
   {
     path: '*',

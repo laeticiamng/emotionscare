@@ -14,12 +14,12 @@ const B2BSelectionPremium: React.FC = () => {
   
   const handleUserSelect = () => {
     setUserMode('b2b_user');
-    navigate('/b2b/user/login');
+    navigate('/login-collaborateur');
   };
   
   const handleAdminSelect = () => {
     setUserMode('b2b_admin');
-    navigate('/b2b/admin/login');
+    navigate('/login-admin');
   };
   
   // Animation variants

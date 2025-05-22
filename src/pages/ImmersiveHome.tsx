@@ -176,10 +176,10 @@ const ImmersiveHome: React.FC = () => {
     setTimeout(() => {
       switch(mode) {
         case 'b2b-admin':
-          navigate('/b2b/admin/login');
+          navigate('/login-admin');
           break;
         case 'b2b-user':
-          navigate('/b2b/user/login');
+          navigate('/login-collaborateur');
           break;
         case 'b2c':
           navigate('/b2c');

@@ -68,8 +68,8 @@ const B2BSelection: React.FC = () => {
                   <li>• Suivi de votre bien-être</li>
                 </ul>
                 
-                <Button 
-                  onClick={() => navigate('/b2b/user/login')} 
+                <Button
+                  onClick={() => navigate('/login-collaborateur')}
                   size="lg" 
                   variant="default"
                   className="w-full"
@@ -99,8 +99,8 @@ const B2BSelection: React.FC = () => {
                   <li>• Rapports et tendances</li>
                 </ul>
                 
-                <Button 
-                  onClick={() => navigate('/b2b/admin/login')} 
+                <Button
+                  onClick={() => navigate('/login-admin')}
                   variant="outline"
                   size="lg"
                   className="w-full border-2 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30"

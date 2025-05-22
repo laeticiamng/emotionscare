@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { useToast } from '@/hooks/use-toast';
 
 const B2BAdminLogin = () => {
@@ -16,7 +17,14 @@ const B2BAdminLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login, error, clearError } = useAuth();
+  const { setUserMode, userMode } = useUserMode();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (userMode && userMode !== 'b2b_admin') {
+      navigate('/b2b/selection');
+    }
+  }, [userMode, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,8 +55,10 @@ const B2BAdminLogin = () => {
         description: "Bienvenue dans l'espace d'administration EmotionsCare."
       });
 
+      setUserMode('b2b_admin');
+
       // Small delay to show the success message before redirecting
-      setTimeout(() => navigate('/b2b/admin/dashboard'), 800);
+      setTimeout(() => navigate('/dashboard-admin'), 800);
     } catch (error: any) {
       console.error('Erreur de connexion:', error);
       toast({
