@@ -1,46 +1,54 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 
-export interface QuickModule {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  href: string;
-  color: string;
-}
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Activity, Music, Calendar, MessageCircle, FileText, LineChart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface QuickAccessGridProps {
-  modules: QuickModule[];
+  className?: string;
 }
 
-const QuickAccessGrid: React.FC<QuickAccessGridProps> = ({ modules }) => {
+const QuickAccessGrid: React.FC<QuickAccessGridProps> = ({ className = '' }) => {
   const navigate = useNavigate();
+  
+  const quickAccess = [
+    { title: 'Scan', icon: Activity, path: '/scan', color: 'bg-blue-500' },
+    { title: 'Musique', icon: Music, path: '/music', color: 'bg-purple-500' },
+    { title: 'Sessions', icon: Calendar, path: '/sessions', color: 'bg-green-500' },
+    { title: 'Coach', icon: MessageCircle, path: '/coach', color: 'bg-indigo-500' },
+    { title: 'Journal', icon: FileText, path: '/journal', color: 'bg-amber-500' },
+    { title: 'Statistiques', icon: LineChart, path: '/analytics', color: 'bg-red-500' }
+  ];
+  
+  const handleNavigate = (path: string) => {
+    if (path === '/scan' || path === '/music' || path === '/coach') {
+      navigate(path);
+    } else {
+      toast(`La fonctionnalité "${path}" sera bientôt disponible`);
+    }
+  };
+
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-      {modules.map((module, i) => (
-        <motion.div
-          key={module.title}
-          className="cursor-pointer"
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => navigate(module.href)}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 * i }}
-        >
-          <div className="flex flex-col items-center p-4 rounded-xl bg-white/80 dark:bg-gray-800/50 border hover:shadow-lg transition-all">
-            <div className={`p-3 rounded-full ${module.color} mb-3`}>
-              {module.icon}
+    <Card className={className}>
+      <CardContent className="p-6">
+        <h3 className="font-medium text-lg mb-4">Accès rapide</h3>
+        <div className="grid grid-cols-3 gap-4">
+          {quickAccess.map((item, index) => (
+            <div 
+              key={index}
+              className="flex flex-col items-center justify-center p-4 bg-muted rounded-md cursor-pointer hover:bg-accent transition-colors"
+              onClick={() => handleNavigate(item.path)}
+            >
+              <div className={`${item.color} p-2 rounded-full mb-2 text-white`}>
+                <item.icon className="h-5 w-5" />
+              </div>
+              <span className="text-sm">{item.title}</span>
             </div>
-            <h3 className="font-medium">{module.title}</h3>
-            <p className="text-xs text-muted-foreground mt-1 text-center">
-              {module.description}
-            </p>
-          </div>
-        </motion.div>
-      ))}
-    </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -1,50 +1,71 @@
+
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Heart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Cloud, CloudRain, Sun, CloudSun } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export interface CurrentEmotion {
-  score: number;
-  label: string;
-  suggestion: string;
-}
-
 interface EmotionalWeatherCardProps {
-  currentEmotion: CurrentEmotion;
+  className?: string;
 }
 
-const EmotionalWeatherCard: React.FC<EmotionalWeatherCardProps> = ({ currentEmotion }) => (
-  <Card className="overflow-hidden bg-gradient-to-br from-blue-50/80 to-purple-50/80 dark:from-blue-900/10 dark:to-purple-900/20 border-blue-100 dark:border-blue-900/50">
-    <CardHeader>
-      <CardTitle className="flex items-center">
-        <Heart className="h-6 w-6 mr-2 text-blue-500" />
-        Météo émotionnelle
-      </CardTitle>
-      <CardDescription>Votre état émotionnel du jour</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <div className="flex items-center mb-4">
-        <div className="relative h-24 w-24 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-          <span className="text-3xl font-bold text-blue-600 dark:text-blue-300">{currentEmotion.score}</span>
-          <motion.div
-            className="absolute inset-0 rounded-full border-4 border-blue-400"
-            initial={{ opacity: 0.5, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
-          />
+const EmotionalWeatherCard: React.FC<EmotionalWeatherCardProps> = ({ className = '' }) => {
+  // Simuler l'état émotionnel actuel (ceci serait normalement récupéré depuis une API)
+  const currentMood = {
+    main: 'Calme',
+    description: 'Vous semblez détendu aujourd\'hui',
+    icon: 'cloud-sun',
+    color: 'text-blue-500'
+  };
+
+  const renderIcon = () => {
+    switch (currentMood.icon) {
+      case 'sun':
+        return <Sun className="h-16 w-16 text-yellow-500" />;
+      case 'cloud':
+        return <Cloud className="h-16 w-16 text-gray-500" />;
+      case 'cloud-rain':
+        return <CloudRain className="h-16 w-16 text-blue-700" />;
+      case 'cloud-sun':
+      default:
+        return <CloudSun className="h-16 w-16 text-blue-500" />;
+    }
+  };
+
+  return (
+    <Card className={className}>
+      <CardHeader>
+        <CardTitle>Votre météo émotionnelle</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col items-center text-center">
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0 }} 
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+            className="mb-4"
+          >
+            {renderIcon()}
+          </motion.div>
+          <h3 className="text-2xl font-bold mb-2">{currentMood.main}</h3>
+          <p className="text-muted-foreground">{currentMood.description}</p>
+          
+          <div className="grid grid-cols-4 gap-2 mt-6 w-full">
+            {['Hier', 'Aujourd\'hui', 'Demain', 'Après-demain'].map((day, index) => (
+              <div key={index} className="flex flex-col items-center">
+                <span className="text-sm text-muted-foreground mb-1">{day}</span>
+                <div className="bg-muted p-2 rounded-full">
+                  {index === 0 && <Cloud className="h-5 w-5 text-gray-500" />}
+                  {index === 1 && <CloudSun className="h-5 w-5 text-blue-500" />}
+                  {index === 2 && <Sun className="h-5 w-5 text-yellow-500" />}
+                  {index === 3 && <Sun className="h-5 w-5 text-yellow-500" />}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="ml-6">
-          <h3 className="text-xl font-medium text-blue-700 dark:text-blue-300">{currentEmotion.label}</h3>
-          <p className="text-sm text-muted-foreground mt-1">Niveau positif</p>
-          <Button variant="link" className="p-0 h-auto text-blue-600 dark:text-blue-400 mt-2">
-            Scanner maintenant
-          </Button>
-        </div>
-      </div>
-      <p className="text-sm">{currentEmotion.suggestion}</p>
-    </CardContent>
-  </Card>
-);
+      </CardContent>
+    </Card>
+  );
+};
 
 export default EmotionalWeatherCard;

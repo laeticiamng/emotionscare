@@ -1,41 +1,44 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, AuthContextType } from '@/types/user';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Create the auth context with default values
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'b2c' | 'b2b_user' | 'b2b_admin';
+  avatar?: string;
+}
+
+interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  signup: (email: string, password: string, name: string) => Promise<void>;
+}
+
 const AuthContext = createContext<AuthContextType>({
-  isAuthenticated: false,
   user: null,
+  isAuthenticated: false,
   isLoading: true,
   login: async () => {},
   logout: async () => {},
-  register: async () => {},
-  updateUser: async () => {},
+  signup: async () => {},
 });
 
-// Custom hook to use the auth context
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Check for stored auth on mount
+  // Simuler un chargement initial
   useEffect(() => {
     const checkAuth = async () => {
+      // Simuler une vérification d'authentification
       try {
-        // For development purposes, check if we have a user in localStorage
-        const storedUser = localStorage.getItem('auth_user');
+        // Vérifier si l'utilisateur a des informations stockées localement
+        const storedUser = localStorage.getItem('emotionscare_user');
+        
         if (storedUser) {
           setUser(JSON.parse(storedUser));
         }
@@ -49,32 +52,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  // Login function
   const login = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      
-      // For development purposes, simulate authentication
+      // Simuler une connexion
       const mockUser: User = {
-        id: 'user-123',
-        email,
-        name: 'Demo User',
+        id: 'user123',
+        name: 'John Doe',
+        email: email,
         role: 'b2c',
-        preferences: {
-          theme: 'system',
-          language: 'fr',
-          notifications_enabled: true,
-          email_notifications: true,
-        }
       };
       
-      // Store in localStorage for now (will be replaced with Supabase auth)
-      localStorage.setItem('auth_user', JSON.stringify(mockUser));
-      localStorage.setItem('auth_token', 'mock-token-12345');
-      
-      // Mark that we just logged in for transition effects
-      sessionStorage.setItem('just_logged_in', 'true');
-      
+      // Stocker l'utilisateur
+      localStorage.setItem('emotionscare_user', JSON.stringify(mockUser));
       setUser(mockUser);
     } catch (error) {
       console.error('Login error:', error);
@@ -84,15 +74,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Logout function
   const logout = async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      
-      // Remove stored auth data
-      localStorage.removeItem('auth_user');
-      localStorage.removeItem('auth_token');
-      
+      // Supprimer les informations utilisateur
+      localStorage.removeItem('emotionscare_user');
       setUser(null);
     } catch (error) {
       console.error('Logout error:', error);
@@ -102,57 +88,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Register function
-  const register = async (email: string, password: string, name?: string) => {
+  const signup = async (email: string, password: string, name: string) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      
-      // For development purposes, simulate registration
+      // Simuler une inscription
       const mockUser: User = {
-        id: 'user-' + Math.random().toString(36).substr(2, 9),
-        email,
-        name: name || email.split('@')[0],
+        id: 'user' + Math.floor(Math.random() * 1000),
+        name: name,
+        email: email,
         role: 'b2c',
-        preferences: {
-          theme: 'system',
-          language: 'fr',
-          notifications_enabled: true,
-          email_notifications: true,
-        }
       };
       
-      // Store in localStorage for now (will be replaced with Supabase auth)
-      localStorage.setItem('auth_user', JSON.stringify(mockUser));
-      localStorage.setItem('auth_token', 'mock-token-' + Math.random().toString(36).substr(2, 9));
-      
-      // Mark that we just registered/logged in for transition effects
-      sessionStorage.setItem('just_logged_in', 'true');
-      
+      // Stocker l'utilisateur
+      localStorage.setItem('emotionscare_user', JSON.stringify(mockUser));
       setUser(mockUser);
     } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Update user function
-  const updateUser = async (updates: Partial<User>) => {
-    try {
-      setIsLoading(true);
-      
-      if (!user) throw new Error('No user logged in');
-      
-      // Update user with new data
-      const updatedUser = { ...user, ...updates };
-      
-      // Update localStorage
-      localStorage.setItem('auth_user', JSON.stringify(updatedUser));
-      
-      setUser(updatedUser);
-    } catch (error) {
-      console.error('Update user error:', error);
+      console.error('Signup error:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -162,13 +113,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated: !!user,
         user,
+        isAuthenticated: !!user,
         isLoading,
         login,
         logout,
-        register,
-        updateUser,
+        signup
       }}
     >
       {children}
@@ -176,4 +126,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-export default AuthContext;
+export const useAuth = () => useContext(AuthContext);

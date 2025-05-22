@@ -1,31 +1,45 @@
+
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { BookOpen } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
-const CoachCard: React.FC = () => {
+interface CoachCardProps {
+  className?: string;
+}
+
+const CoachCard: React.FC<CoachCardProps> = ({ className = '' }) => {
   const navigate = useNavigate();
+
+  const handleChatWithCoach = () => {
+    navigate('/coach');
+  };
+
   return (
-    <Card className="overflow-hidden bg-gradient-to-br from-amber-50/80 to-orange-50/80 dark:from-amber-900/10 dark:to-orange-900/20 border-amber-100 dark:border-amber-900/50">
+    <Card className={className}>
       <CardHeader>
-        <CardTitle className="flex items-center">
-          <BookOpen className="h-6 w-6 mr-2 text-amber-500" />
-          Coach IA personnel
-        </CardTitle>
-        <CardDescription>Suggestion personnalisée du jour</CardDescription>
+        <CardTitle>Votre coach</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="mb-4 p-4 border border-amber-200 dark:border-amber-800/50 rounded-lg bg-white/60 dark:bg-black/20">
-          <h4 className="font-medium text-amber-700 dark:text-amber-300 mb-2">Respiration guidée</h4>
-          <p className="text-sm">Une séance de 5 minutes pour vous aider à conserver votre calme et rester concentré.</p>
-          <Button variant="link" className="p-0 h-auto text-amber-600 dark:text-amber-400 mt-1" onClick={() => navigate('/b2c/coach')}>
-            Commencer maintenant →
+        <div className="flex flex-col items-center">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 mb-4 flex items-center justify-center">
+            <MessageCircle className="h-10 w-10 text-white" />
+          </div>
+          
+          <h3 className="text-lg font-medium mb-2">Emma est disponible</h3>
+          <p className="text-sm text-muted-foreground text-center mb-4">
+            Discutez avec votre coach pour des conseils personnalisés
+          </p>
+          
+          <Button
+            className="w-full"
+            onClick={handleChatWithCoach}
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            Discuter maintenant
           </Button>
         </div>
-        <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white border-none" onClick={() => navigate('/b2c/coach-chat')}>
-          Parler à mon coach
-        </Button>
       </CardContent>
     </Card>
   );

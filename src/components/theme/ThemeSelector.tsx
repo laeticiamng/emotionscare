@@ -1,95 +1,65 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { ThemeName } from '@/types/theme';
+import { Moon, Sun, Monitor } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
+
+type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeSelectorProps {
-  currentTheme: ThemeName;
-  onChange: (theme: ThemeName) => void;
+  currentTheme: Theme;
+  onChange: (theme: Theme) => void;
   minimal?: boolean;
   className?: string;
 }
 
-const ThemeSelector: React.FC<ThemeSelectorProps> = ({ 
-  currentTheme, 
+const ThemeSelector: React.FC<ThemeSelectorProps> = ({
+  currentTheme,
   onChange,
   minimal = false,
-  className = ""
+  className = '',
 }) => {
-  const handleThemeChange = (value: string) => {
-    // Validate that the value is a valid ThemeName before passing it to onChange
-    if (value === 'light' || value === 'dark' || value === 'system' || value === 'pastel') {
-      onChange(value as ThemeName);
-    }
-  };
-  
-  if (minimal) {
-    return (
-      <div className={`flex items-center space-x-2 ${className}`}>
-        <RadioGroup
-          value={currentTheme}
-          onValueChange={handleThemeChange}
-          className="flex items-center space-x-1"
-        >
-          <div className="flex items-center space-x-1">
-            <RadioGroupItem value="light" id="light-min" className="sr-only" />
-            <Label 
-              htmlFor="light-min" 
-              className={`px-2 py-1 rounded-md cursor-pointer text-xs ${
-                currentTheme === 'light' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'
-              }`}
-            >
-              Clair
-            </Label>
-          </div>
-          <div className="flex items-center space-x-1">
-            <RadioGroupItem value="dark" id="dark-min" className="sr-only" />
-            <Label 
-              htmlFor="dark-min" 
-              className={`px-2 py-1 rounded-md cursor-pointer text-xs ${
-                currentTheme === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'
-              }`}
-            >
-              Sombre
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
-    );
-  }
-  
   return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle className="text-lg">Thème</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <RadioGroup
-          value={currentTheme}
-          onValueChange={handleThemeChange}
-          className="grid grid-cols-2 gap-4"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="light" id="light" />
-            <Label htmlFor="light">Clair</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="dark" id="dark" />
-            <Label htmlFor="dark">Sombre</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="system" id="system" />
-            <Label htmlFor="system">Système</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="pastel" id="pastel" />
-            <Label htmlFor="pastel">Pastel</Label>
-          </div>
-        </RadioGroup>
-      </CardContent>
-    </Card>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size={minimal ? 'icon' : 'default'} className={cn("", className)}>
+          {currentTheme === 'light' && <Sun className="h-[1.2rem] w-[1.2rem]" />}
+          {currentTheme === 'dark' && <Moon className="h-[1.2rem] w-[1.2rem]" />}
+          {currentTheme === 'system' && <Monitor className="h-[1.2rem] w-[1.2rem]" />}
+          {!minimal && <span className="ml-2">Thème</span>}
+          <span className="sr-only">Changer le thème</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onChange('light')}>
+          <Sun className="mr-2 h-4 w-4" />
+          <span>Clair</span>
+          {currentTheme === 'light' && (
+            <span className="ml-auto text-xs font-medium text-primary">✓</span>
+          )}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onChange('dark')}>
+          <Moon className="mr-2 h-4 w-4" />
+          <span>Sombre</span>
+          {currentTheme === 'dark' && (
+            <span className="ml-auto text-xs font-medium text-primary">✓</span>
+          )}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onChange('system')}>
+          <Monitor className="mr-2 h-4 w-4" />
+          <span>Système</span>
+          {currentTheme === 'system' && (
+            <span className="ml-auto text-xs font-medium text-primary">✓</span>
+          )}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

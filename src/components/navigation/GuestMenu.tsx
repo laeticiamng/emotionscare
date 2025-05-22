@@ -1,50 +1,43 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogIn, UserPlus } from 'lucide-react';
+import { LogIn, User } from 'lucide-react';
+import { toast } from 'sonner';
 
 const GuestMenu: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    toast.info('Navigation vers la page de connexion');
+    navigate('/login');
+  };
+
+  const handleSignUp = () => {
+    toast.info('Navigation vers la page d\'inscription');
+    navigate('/register');
+  };
+
   return (
     <div className="flex items-center space-x-2">
-      <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0, x: 5 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Link to="/login">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="flex items-center"
-            >
-              <LogIn className="mr-1 h-4 w-4" />
-              Connexion
-            </Button>
-          </Link>
-        </motion.div>
-      </AnimatePresence>
-      
-      <AnimatePresence>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.2, delay: 0.1 }}
-        >
-          <Link to="/register">
-            <Button 
-              variant="default"
-              size="sm"
-              className="flex items-center"
-            >
-              <UserPlus className="mr-1 h-4 w-4" />
-              Inscription
-            </Button>
-          </Link>
-        </motion.div>
-      </AnimatePresence>
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        onClick={handleLogin}
+        className="hidden sm:flex"
+      >
+        <LogIn className="h-4 w-4 mr-2" />
+        Connexion
+      </Button>
+      <Button 
+        onClick={handleSignUp}
+        size="sm"
+        className="bg-gradient-to-r from-primary to-primary/80"
+      >
+        <User className="h-4 w-4 mr-2" />
+        <span className="hidden sm:inline">S'inscrire</span>
+        <span className="sm:hidden">Inscription</span>
+      </Button>
     </div>
   );
 };

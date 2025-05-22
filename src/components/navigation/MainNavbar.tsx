@@ -1,7 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-// Fix incorrect import
 import ThemeSelector from '@/components/theme/ThemeSelector';
 import { useTheme } from '@/contexts/ThemeContext';
 import AudioControls from '@/components/audio/AudioControls';
@@ -10,23 +10,22 @@ import GuestMenu from './GuestMenu';
 import MobileNavigation from './MobileNavigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { Home, Music, MessageCircle, Users, LayoutDashboard, Settings } from 'lucide-react';
+import { Home, Music, MessageCircle, Users, LayoutDashboard, Settings, Heart, Calendar } from 'lucide-react';
 
 const MainNavbar: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  // Fix the theme type in the component
   const { theme, setTheme } = useTheme();
 
   // Menu items with icons
   const navigationItems = [
     { to: "/dashboard", icon: <LayoutDashboard className="h-4 w-4 mr-2" />, label: "Dashboard" },
-    { to: "/emotions", icon: <Home className="h-4 w-4 mr-2" />, label: "Émotions" },
-    { to: "/music", icon: <Music className="h-4 w-4 mr-2" />, label: "Music" },
+    { to: "/emotions", icon: <Heart className="h-4 w-4 mr-2" />, label: "Émotions" },
+    { to: "/music", icon: <Music className="h-4 w-4 mr-2" />, label: "Musique" },
     { to: "/coach", icon: <MessageCircle className="h-4 w-4 mr-2" />, label: "Coach" },
-    { to: "/community", icon: <Users className="h-4 w-4 mr-2" />, label: "Communauté" },
-    { to: "/settings", icon: <Settings className="h-4 w-4 mr-2" />, label: "Paramètres" }
+    { to: "/social", icon: <Users className="h-4 w-4 mr-2" />, label: "Communauté" },
+    { to: "/sessions", icon: <Calendar className="h-4 w-4 mr-2" />, label: "Sessions" }
   ];
 
   useEffect(() => {
@@ -125,7 +124,7 @@ const MainNavbar: React.FC = () => {
           
           {/* Mobile Navigation */}
           <div className="md:hidden">
-            <MobileNavigation />
+            <MobileNavigation items={navigationItems} />
           </div>
         </div>
       </div>

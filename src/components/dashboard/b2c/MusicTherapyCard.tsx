@@ -1,34 +1,56 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Music } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 
-const MusicTherapyCard: React.FC = () => {
-  const navigate = useNavigate();
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Play, SkipForward, Volume2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+
+interface MusicTherapyCardProps {
+  className?: string;
+}
+
+const MusicTherapyCard: React.FC<MusicTherapyCardProps> = ({ className = '' }) => {
+  const handlePlay = () => {
+    toast('Lancement de la thérapie musicale');
+  };
+
   return (
-    <Card className="overflow-hidden bg-gradient-to-br from-purple-50/80 to-pink-50/80 dark:from-purple-900/10 dark:to-pink-900/20 border-purple-100 dark:border-purple-900/50">
+    <Card className={className}>
       <CardHeader>
-        <CardTitle className="flex items-center">
-          <Music className="h-6 w-6 mr-2 text-purple-500" />
-          Musicothérapie
-        </CardTitle>
-        <CardDescription>Sons adaptés à votre état émotionnel</CardDescription>
+        <CardTitle>Thérapie musicale</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="mb-4 rounded-lg bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/20 p-4">
-          <h3 className="font-medium text-purple-700 dark:text-purple-300">Playlist recommandée</h3>
-          <p className="text-sm text-muted-foreground mt-1">Calme et Confiance</p>
-          <div className="flex justify-between items-center mt-3">
-            <span className="text-sm">14 morceaux · 48 min</span>
-            <Button size="sm" variant="secondary" className="bg-white/80 dark:bg-purple-900/50">
-              Écouter
-            </Button>
+        <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-md p-4 mb-4 flex items-center">
+          <div className="bg-primary/10 p-3 rounded-full mr-4">
+            <Volume2 className="h-8 w-8 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-medium">Méditation guidée</h3>
+            <p className="text-sm text-muted-foreground">12 minutes</p>
           </div>
         </div>
-        <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white border-none" onClick={() => navigate('/b2c/music')}>
-          Explorer la musicothérapie
-        </Button>
+        
+        <div className="flex justify-center space-x-4 mt-4">
+          <Button variant="outline" size="icon" className="rounded-full h-10 w-10">
+            <SkipForward className="h-4 w-4" />
+          </Button>
+          <Button 
+            size="icon" 
+            className="rounded-full h-12 w-12 bg-primary"
+            onClick={handlePlay}
+          >
+            <Play className="h-6 w-6 text-primary-foreground" />
+          </Button>
+          <Button variant="outline" size="icon" className="rounded-full h-10 w-10">
+            <SkipForward className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        <div className="mt-4">
+          <p className="text-sm text-muted-foreground text-center">
+            Musique adaptée à votre état émotionnel actuel
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

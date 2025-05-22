@@ -1,146 +1,192 @@
 
-import React from 'react';
-import Shell from '@/Shell';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Calendar, MessageCircle, Music, LineChart, Activity, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarIcon, ClockIcon, LineChart, Activity, Music, BookOpen } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+import EmotionalWeatherCard from '@/components/dashboard/b2c/EmotionalWeatherCard';
+import MusicTherapyCard from '@/components/dashboard/b2c/MusicTherapyCard';
+import CoachCard from '@/components/dashboard/b2c/CoachCard';
+import QuickAccessGrid from '@/components/dashboard/b2c/QuickAccessGrid';
+import InspirationalQuoteCard from '@/components/dashboard/b2c/InspirationalQuoteCard';
+import RecentActivitiesCard from '@/components/dashboard/b2c/RecentActivitiesCard';
 
-const DashboardPage: React.FC = () => {
-  const { user } = useAuth();
-  
+const B2CDashboardPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simuler le chargement des données
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleAction = (action: string) => {
+    toast(`Action "${action}" initiée`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[70vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
-    <Shell>
-      <div className="container mx-auto py-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="space-y-6"
-        >
-          {/* Header with welcome message */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-3xl font-bold mb-1">Bonjour, {user?.name || 'Utilisateur'}</h1>
-              <p className="text-muted-foreground">
-                Voici votre tableau de bord personnel
-              </p>
-            </div>
-            
-            <div className="mt-4 md:mt-0 flex items-center gap-2 bg-accent/50 p-2 rounded-md">
-              <CalendarIcon className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
-              </span>
-            </div>
-          </div>
-          
-          {/* Quick stats */}
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h1 className="text-3xl font-bold">Mon tableau de bord</h1>
+          <p className="text-muted-foreground">Bienvenue sur votre espace personnel EmotionsCare</p>
+        </div>
+        <div className="mt-4 md:mt-0 space-x-2">
+          <Button 
+            size="sm" 
+            onClick={() => handleAction('scan')}
+            className="bg-gradient-to-r from-primary to-primary/80"
+          >
+            <Activity className="h-4 w-4 mr-2" />
+            Scan émotionnel
+          </Button>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={() => handleAction('journal')}
+          >
+            <Calendar className="h-4 w-4 mr-2" />
+            Journal
+          </Button>
+        </div>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+          <TabsTrigger value="analytics">Analyse</TabsTrigger>
+          <TabsTrigger value="journal">Journal</TabsTrigger>
+          <TabsTrigger value="sessions">Sessions</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-primary" />
-                  Humeur moyenne
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">76/100</div>
-                <p className="text-xs text-muted-foreground mt-1">+5% par rapport à la semaine dernière</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-primary" />
-                  Entrées de journal
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">12</div>
-                <p className="text-xs text-muted-foreground mt-1">3 cette semaine</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <ClockIcon className="h-4 w-4 text-primary" />
-                  Temps de méditation
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">45 min</div>
-                <p className="text-xs text-muted-foreground mt-1">Cette semaine</p>
-              </CardContent>
-            </Card>
+            <EmotionalWeatherCard className="md:col-span-2" />
+            <MusicTherapyCard />
+            <CoachCard />
+            <QuickAccessGrid className="md:col-span-2" />
           </div>
           
-          {/* Mood chart */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InspirationalQuoteCard />
+            <RecentActivitiesCard />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Évolution de votre humeur</CardTitle>
-              <CardDescription>Tendance des 30 derniers jours</CardDescription>
+              <CardTitle>Évolution émotionnelle</CardTitle>
+              <CardDescription>Suivi de votre état émotionnel au fil du temps</CardDescription>
             </CardHeader>
             <CardContent className="h-80">
-              <div className="h-full w-full flex items-center justify-center border-2 border-dashed border-muted rounded-md">
-                <LineChart className="h-8 w-8 text-muted-foreground" />
-                <span className="ml-2 text-muted-foreground">Graphique en cours de chargement</span>
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                <LineChart className="h-8 w-8 mr-2" />
+                <span>Graphique d'évolution émotionnelle à venir</span>
               </div>
             </CardContent>
           </Card>
           
-          {/* Recommendations section */}
-          <h2 className="text-2xl font-semibold mt-8">Recommandations pour vous</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Music className="h-5 w-5 text-primary" />
-                  Musique
-                </CardTitle>
-                <CardDescription>Basé sur votre humeur actuelle</CardDescription>
+                <CardTitle>Tendances</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Playlist relaxante pour améliorer votre concentration</p>
-                <div className="mt-4 text-sm text-primary">Écouter maintenant →</div>
+                <div className="flex flex-col space-y-2">
+                  <div className="flex justify-between">
+                    <span>Calme</span>
+                    <span className="text-green-500">+12%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Anxiété</span>
+                    <span className="text-red-500">-5%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Concentration</span>
+                    <span className="text-green-500">+8%</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
             
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-primary" />
-                  Journal
-                </CardTitle>
-                <CardDescription>Suggestion d'entrée</CardDescription>
+                <CardTitle>Énergie</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Prenez un moment pour réfléchir à vos accomplissements de la semaine</p>
-                <div className="mt-4 text-sm text-primary">Commencer à écrire →</div>
+                <div className="flex items-center justify-center h-24">
+                  <div className="relative h-20 w-20 rounded-full bg-muted flex items-center justify-center">
+                    <div className="absolute inset-1 rounded-full bg-background"></div>
+                    <span className="text-xl font-bold">75%</span>
+                  </div>
+                </div>
               </CardContent>
             </Card>
             
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-primary" />
-                  Exercice
-                </CardTitle>
-                <CardDescription>Activité recommandée</CardDescription>
+                <CardTitle>Bien-être</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Méditation guidée de 10 minutes pour réduire votre niveau de stress</p>
-                <div className="mt-4 text-sm text-primary">Commencer l'exercice →</div>
+                <div className="flex items-center justify-center h-24">
+                  <Heart className="h-10 w-10 text-primary mr-3" />
+                  <span className="text-2xl font-bold">8.2/10</span>
+                </div>
               </CardContent>
             </Card>
           </div>
-        </motion.div>
-      </div>
-    </Shell>
+        </TabsContent>
+
+        <TabsContent value="journal" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Journal émotionnel</CardTitle>
+              <CardDescription>Enregistrez vos pensées et émotions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-4">Aucune entrée de journal récente</p>
+                <Button onClick={() => handleAction('nouvelle entrée')}>
+                  Nouvelle entrée
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="sessions" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Mes sessions</CardTitle>
+              <CardDescription>Sessions de thérapie et activités programmées</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-4">Aucune session programmée</p>
+                <Button onClick={() => handleAction('programmer une session')}>
+                  Programmer une session
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
-export default DashboardPage;
+export default B2CDashboardPage;

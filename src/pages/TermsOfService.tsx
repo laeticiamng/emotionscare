@@ -15,100 +15,98 @@ const TermsOfService: React.FC = () => {
         >
           <h1 className="text-4xl font-bold mb-8">Conditions d'utilisation</h1>
           
-          <section className="mb-8">
-            <p className="text-muted-foreground">
-              Dernière mise à jour : 22 mai 2025
-            </p>
-          </section>
-          
           <section className="mb-12">
             <h2 className="text-2xl font-semibold mb-4">1. Acceptation des conditions</h2>
             <p>
-              En accédant ou en utilisant le service EmotionsCare, vous acceptez d'être lié par ces Conditions. Si vous n'êtes pas d'accord avec une partie des conditions, vous ne pouvez pas accéder au service.
+              En accédant à ce site et en utilisant nos services, vous acceptez d'être lié par ces conditions d'utilisation, 
+              toutes les lois et réglementations applicables, et vous acceptez que vous êtes responsable du respect de toutes 
+              les lois locales applicables. Si vous n'acceptez pas l'une de ces conditions, vous n'êtes pas autorisé à utiliser 
+              ou à accéder à ce site. Les documents contenus dans ce site sont protégés par les lois applicables en matière de 
+              droits d'auteur et de marques commerciales.
             </p>
           </section>
           
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">2. Modifications des conditions</h2>
+            <h2 className="text-2xl font-semibold mb-4">2. Licence d'utilisation</h2>
             <p>
-              Nous nous réservons le droit, à notre seule discrétion, de modifier ou de remplacer ces Conditions à tout moment. Si une révision est importante, nous fournirons un préavis d'au moins 30 jours avant l'entrée en vigueur de nouvelles conditions. Ce qui constitue un changement important sera déterminé à notre seule discrétion.
+              Une autorisation est accordée pour télécharger temporairement une copie des documents (informations ou logiciels) 
+              sur le site d'EmotionsCare pour un visionnage transitoire personnel et non commercial uniquement. Il s'agit de 
+              l'octroi d'une licence, et non d'un transfert de titre, et sous cette licence, vous ne pouvez pas:
+            </p>
+            <ul className="list-disc pl-6 mt-4 mb-4">
+              <li>Modifier ou copier les documents;</li>
+              <li>Utiliser les documents à des fins commerciales ou pour toute présentation publique;</li>
+              <li>Tenter de décompiler ou de désosser tout logiciel contenu sur le site d'EmotionsCare;</li>
+              <li>Supprimer tout droit d'auteur ou autres annotations de propriété des documents; ou</li>
+              <li>Transférer les documents à une autre personne ou "mettre en miroir" les documents sur un autre serveur.</li>
+            </ul>
+            <p>
+              Cette licence sera automatiquement résiliée si vous violez l'une de ces restrictions et peut être résiliée par 
+              EmotionsCare à tout moment. À la résiliation de votre visionnage de ces documents ou à la résiliation de cette 
+              licence, vous devez détruire tous les documents téléchargés en votre possession, qu'ils soient sous format 
+              électronique ou imprimé.
+            </p>
+          </section>
+          
+          <section className="mb-12">
+            <h2 className="text-2xl font-semibold mb-4">3. Clause de non-responsabilité</h2>
+            <p>
+              Les documents sur le site d'EmotionsCare sont fournis "tels quels". EmotionsCare ne donne aucune garantie, 
+              expresse ou implicite, et décline et nie par la présente toutes les autres garanties, y compris, sans limitation, 
+              les garanties implicites ou les conditions de qualité marchande, d'adéquation à un usage particulier, ou de non-violation 
+              de la propriété intellectuelle ou autre violation des droits.
             </p>
             <p className="mt-4">
-              En continuant à accéder ou à utiliser notre Service après que ces révisions deviennent effectives, vous acceptez d'être lié par les conditions révisées. Si vous n'acceptez pas les nouvelles conditions, veuillez cesser d'utiliser le Service.
+              En outre, EmotionsCare ne garantit ni ne fait aucune déclaration concernant l'exactitude, les résultats probables, 
+              ou la fiabilité de l'utilisation des documents sur son site ou autrement liés à ces documents ou sur tout site lié 
+              à ce site.
             </p>
           </section>
           
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">3. Comptes utilisateurs</h2>
+            <h2 className="text-2xl font-semibold mb-4">4. Limitations</h2>
             <p>
-              Lorsque vous créez un compte avec nous, vous garantissez que vous avez plus de 18 ans et que les informations que vous fournissez sont exactes, complètes et à jour à tout moment. Des informations inexactes, incomplètes ou obsolètes peuvent entraîner la résiliation immédiate de votre compte sur le Service.
-            </p>
-            <p className="mt-4">
-              Vous êtes responsable du maintien de la confidentialité de votre compte et de votre mot de passe, y compris, mais sans s'y limiter, de la restriction de l'accès à votre ordinateur et/ou compte. Vous acceptez d'assumer la responsabilité de toutes les activités ou actions qui se produisent sous votre compte et/ou mot de passe, que votre mot de passe soit avec notre Service ou un service tiers.
+              En aucun cas, EmotionsCare ou ses fournisseurs ne seront responsables de tout dommage (y compris, sans limitation, 
+              les dommages pour perte de données ou de profit, ou en raison d'une interruption d'activité) découlant de l'utilisation 
+              ou de l'incapacité d'utiliser les documents sur le site d'EmotionsCare, même si EmotionsCare ou un représentant autorisé 
+              d'EmotionsCare a été informé oralement ou par écrit de la possibilité de tels dommages. Comme certaines juridictions 
+              n'autorisent pas les limitations sur les garanties implicites, ou les limitations de responsabilité pour les dommages 
+              consécutifs ou accessoires, ces limitations peuvent ne pas s'appliquer à vous.
             </p>
           </section>
           
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">4. Contenu utilisateur</h2>
+            <h2 className="text-2xl font-semibold mb-4">5. Révisions et errata</h2>
             <p>
-              Notre Service vous permet de publier, de lier, de stocker, de partager et de mettre à disposition certaines informations, textes, graphiques, vidéos ou autres contenus ("Contenu"). Vous êtes responsable du Contenu que vous publiez sur ou via le Service, y compris de sa légalité, fiabilité et pertinence.
-            </p>
-            <p className="mt-4">
-              En publiant du Contenu sur ou via le Service, vous déclarez et garantissez que : (i) le Contenu vous appartient (vous en êtes le propriétaire) et/ou vous avez le droit de l'utiliser et le droit de nous accorder les droits et la licence comme prévu dans ces Conditions, et (ii) que la publication de votre Contenu sur ou via le Service ne viole pas les droits à la vie privée, les droits de publicité, les droits d'auteur, les droits contractuels ou tout autre droit de toute personne ou entité.
+              Les documents apparaissant sur le site d'EmotionsCare pourraient inclure des erreurs techniques, typographiques ou 
+              photographiques. EmotionsCare ne garantit pas que l'un des documents sur son site est exact, complet ou à jour. 
+              EmotionsCare peut apporter des modifications aux documents contenus sur son site à tout moment sans préavis. 
+              EmotionsCare ne s'engage toutefois pas à mettre à jour les documents.
             </p>
           </section>
           
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">5. Propriété intellectuelle</h2>
+            <h2 className="text-2xl font-semibold mb-4">6. Liens</h2>
             <p>
-              Le Service et son contenu original, fonctionnalités et fonctionnalités sont et resteront la propriété exclusive d'EmotionsCare et de ses concédants. Le Service est protégé par le droit d'auteur, les marques déposées et d'autres lois de France et d'autres pays. Nos marques commerciales et notre habillage commercial ne peuvent pas être utilisés en relation avec un produit ou un service sans le consentement écrit préalable d'EmotionsCare.
+              EmotionsCare n'a pas examiné tous les sites liés à son site et n'est pas responsable du contenu de ces sites liés. 
+              L'inclusion de tout lien n'implique pas l'approbation par EmotionsCare du site. L'utilisation d'un tel site lié est 
+              aux risques et périls de l'utilisateur.
             </p>
           </section>
           
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">6. Liens vers d'autres sites web</h2>
+            <h2 className="text-2xl font-semibold mb-4">7. Modifications des conditions d'utilisation</h2>
             <p>
-              Notre Service peut contenir des liens vers des sites web ou services tiers qui ne sont pas détenus ou contrôlés par EmotionsCare.
-            </p>
-            <p className="mt-4">
-              EmotionsCare n'a aucun contrôle sur et n'assume aucune responsabilité pour le contenu, les politiques de confidentialité ou les pratiques de tout site web ou service tiers. Vous reconnaissez et acceptez en outre que EmotionsCare ne sera pas responsable, directement ou indirectement, de tout dommage ou perte causé ou présumé avoir été causé par ou en relation avec l'utilisation ou la confiance accordée à un tel contenu, biens ou services disponibles sur ou par l'intermédiaire de ces sites web ou services.
-            </p>
-          </section>
-          
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">7. Résiliation</h2>
-            <p>
-              Nous pouvons résilier ou suspendre votre compte immédiatement, sans préavis ni responsabilité, pour quelque raison que ce soit, y compris, sans limitation, si vous violez les Conditions.
-            </p>
-            <p className="mt-4">
-              En cas de résiliation, votre droit d'utiliser le Service cessera immédiatement. Si vous souhaitez résilier votre compte, vous pouvez simplement cesser d'utiliser le Service.
-            </p>
-          </section>
-          
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">8. Limitation de responsabilité</h2>
-            <p>
-              En aucun cas EmotionsCare, ni ses administrateurs, employés, partenaires, agents, fournisseurs ou affiliés, ne seront responsables de tout dommage indirect, accessoire, spécial, consécutif ou punitif, y compris, sans s'y limiter, la perte de profits, de données, d'usage, de clientèle, ou d'autres pertes intangibles, résultant de (i) votre accès ou utilisation ou incapacité à accéder ou utiliser le Service ; (ii) tout comportement ou contenu d'un tiers sur le Service ; (iii) tout contenu obtenu à partir du Service ; et (iv) l'accès non autorisé, l'utilisation ou l'altération de vos transmissions ou contenu, que ce soit sur la base d'une garantie, d'un contrat, d'un délit (y compris la négligence) ou de toute autre théorie légale, que nous ayons été informés ou non de la possibilité de tels dommages.
-            </p>
-          </section>
-          
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">9. Clause de non-responsabilité</h2>
-            <p>
-              Votre utilisation du Service est à vos propres risques. Le Service est fourni "tel quel" et "tel que disponible". Le Service est fourni sans garantie d'aucune sorte, expresse ou implicite, y compris, mais sans s'y limiter, les garanties implicites de qualité marchande, d'adéquation à un usage particulier, de non-contrefaçon ou de performance.
-            </p>
-            <p className="mt-4">
-              EmotionsCare ne garantit pas que a) le Service répondra à vos exigences spécifiques, b) le Service sera ininterrompu, opportun, sécurisé ou sans erreur, c) les résultats qui peuvent être obtenus de l'utilisation du Service seront précis ou fiables, d) la qualité de tout produit, service, information ou autre matériel acheté ou obtenu par vous par l'intermédiaire du Service répondra à vos attentes, ou e) toute erreur dans le Service sera corrigée.
+              EmotionsCare peut réviser ces conditions d'utilisation de son site à tout moment sans préavis. En utilisant ce site, 
+              vous acceptez d'être lié par la version alors actuelle de ces conditions d'utilisation.
             </p>
           </section>
           
           <section>
-            <h2 className="text-2xl font-semibold mb-4">10. Loi applicable</h2>
+            <h2 className="text-2xl font-semibold mb-4">8. Loi applicable</h2>
             <p>
-              Ces Conditions seront régies et interprétées conformément aux lois de France, sans égard à ses dispositions en matière de conflit de lois.
-            </p>
-            <p className="mt-4">
-              Notre incapacité à faire respecter un droit ou une disposition de ces Conditions ne sera pas considérée comme une renonciation à ces droits. Si une disposition de ces Conditions est jugée invalide ou inapplicable par un tribunal, les dispositions restantes de ces Conditions resteront en vigueur.
+              Toutes les réclamations relatives à notre site web et à nos services sont régies par les lois de la France, 
+              sans égard aux dispositions relatives aux conflits de lois.
             </p>
           </section>
         </motion.div>

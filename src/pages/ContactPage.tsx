@@ -5,167 +5,252 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { 
+  Mail, 
+  Phone, 
+  MapPin, 
+  MessageSquare,
+  Send,
+  Loader2
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { Mail, MapPin, Phone } from 'lucide-react';
 
 const ContactPage: React.FC = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    toast.success("Votre message a été envoyé avec succès");
-    
-    // Reset form
-    setName('');
-    setEmail('');
-    setSubject('');
-    setMessage('');
-    setIsSubmitting(false);
+    // Simuler l'envoi du formulaire
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast.success('Votre message a bien été envoyé');
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+    }, 1500);
   };
+
+  const contactMethods = [
+    {
+      icon: <Mail className="h-6 w-6 text-primary" />,
+      title: 'Email',
+      value: 'contact@emotionscare.fr',
+      description: 'Notre équipe vous répondra sous 24h'
+    },
+    {
+      icon: <Phone className="h-6 w-6 text-primary" />,
+      title: 'Téléphone',
+      value: '+33 1 23 45 67 89',
+      description: 'Lun-Ven de 9h à 18h'
+    },
+    {
+      icon: <MapPin className="h-6 w-6 text-primary" />,
+      title: 'Adresse',
+      value: '123 Avenue de la Paix, 75001 Paris',
+      description: 'Siège social'
+    },
+    {
+      icon: <MessageSquare className="h-6 w-6 text-primary" />,
+      title: 'Support Live',
+      value: 'Discuter maintenant',
+      description: 'Disponible 24/7',
+      isButton: true
+    }
+  ];
 
   return (
     <Shell>
-      <div className="container mx-auto px-4 py-12 max-w-6xl">
+      <div className="container mx-auto px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="max-w-5xl mx-auto"
         >
-          <h1 className="text-4xl font-bold mb-2 text-center">Contactez-nous</h1>
-          <p className="text-muted-foreground mb-12 text-center max-w-2xl mx-auto">
-            Vous avez des questions ou besoin d'aide ? Notre équipe est là pour vous accompagner.
-          </p>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4">Contactez-nous</h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Notre équipe est à votre disposition pour répondre à toutes vos questions sur EmotionsCare.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="bg-card p-8 rounded-xl shadow-sm"
             >
-              <h2 className="text-2xl font-bold mb-6">Envoyez-nous un message</h2>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nom complet</Label>
-                  <Input 
-                    id="name"
-                    placeholder="Votre nom"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input 
-                    id="email"
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="subject">Sujet</Label>
-                  <Input 
-                    id="subject"
-                    placeholder="Sujet de votre message"
-                    value={subject}
-                    onChange={(e) => setSubject(e.target.value)}
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea 
-                    id="message"
-                    placeholder="Votre message"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    rows={5}
-                    required
-                  />
-                </div>
-                
-                <Button 
-                  type="submit"
-                  className="w-full"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Envoi en cours..." : "Envoyer le message"}
-                </Button>
-              </form>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Envoyez-nous un message</CardTitle>
+                  <CardDescription>
+                    Remplissez le formulaire ci-dessous et nous vous répondrons dans les meilleurs délais.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="space-y-2">
+                      <label htmlFor="name" className="block text-sm font-medium">
+                        Nom complet
+                      </label>
+                      <Input
+                        id="name"
+                        name="name"
+                        placeholder="Votre nom"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label htmlFor="email" className="block text-sm font-medium">
+                        Adresse email
+                      </label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="votre@email.com"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label htmlFor="subject" className="block text-sm font-medium">
+                        Sujet
+                      </label>
+                      <Input
+                        id="subject"
+                        name="subject"
+                        placeholder="Comment pouvons-nous vous aider ?"
+                        value={formData.subject}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label htmlFor="message" className="block text-sm font-medium">
+                        Message
+                      </label>
+                      <Textarea
+                        id="message"
+                        name="message"
+                        placeholder="Détaillez votre demande ici..."
+                        rows={4}
+                        value={formData.message}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Envoi en cours...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="mr-2 h-4 w-4" />
+                          Envoyer le message
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
             </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-            >
-              <h2 className="text-2xl font-bold mb-6">Nos coordonnées</h2>
-              
-              <div className="space-y-8">
-                <div className="flex items-start">
-                  <div className="bg-primary/10 p-3 rounded-full mr-4">
-                    <MapPin className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Adresse</h3>
-                    <p className="text-muted-foreground mt-1">
-                      123 Avenue de la Paix<br />
-                      75001 Paris, France
-                    </p>
-                  </div>
+
+            <div className="space-y-6">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+              >
+                <h2 className="text-2xl font-bold mb-4">Nos coordonnées</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {contactMethods.map((method, index) => (
+                    <Card key={index} className="h-full">
+                      <CardContent className="p-6">
+                        <div className="mb-4">{method.icon}</div>
+                        <h3 className="font-semibold mb-1">{method.title}</h3>
+                        {method.isButton ? (
+                          <Button 
+                            variant="link" 
+                            className="p-0 h-auto font-normal justify-start"
+                            onClick={() => toast.info('La fonctionnalité de chat en direct sera bientôt disponible')}
+                          >
+                            {method.value}
+                          </Button>
+                        ) : (
+                          <p className="font-medium">{method.value}</p>
+                        )}
+                        <p className="text-sm text-muted-foreground mt-1">{method.description}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-                
-                <div className="flex items-start">
-                  <div className="bg-primary/10 p-3 rounded-full mr-4">
-                    <Mail className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Email</h3>
-                    <p className="text-muted-foreground mt-1">
-                      contact@emotionscare.fr<br />
-                      support@emotionscare.fr
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="bg-primary/10 p-3 rounded-full mr-4">
-                    <Phone className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Téléphone</h3>
-                    <p className="text-muted-foreground mt-1">
-                      +33 1 23 45 67 89<br />
-                      Du lundi au vendredi, 9h - 18h
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="mt-12 rounded-xl overflow-hidden h-64 border">
-                  <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <p className="text-muted-foreground">Carte interactive</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+              >
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Horaires d'ouverture</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>Lundi - Vendredi</span>
+                        <span>9h - 18h</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Samedi</span>
+                        <span>10h - 16h</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Dimanche</span>
+                        <span>Fermé</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
           </div>
         </motion.div>
       </div>

@@ -12,6 +12,13 @@ const Legal = React.lazy(() => import('./pages/Legal'));
 const ContactPage = React.lazy(() => import('./pages/ContactPage'));
 const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy'));
 const TermsOfService = React.lazy(() => import('./pages/TermsOfService'));
+const CookiesPage = React.lazy(() => import('./pages/CookiesPage'));
+const SocialCocoonPage = React.lazy(() => import('./pages/SocialCocoonPage'));
+const TeamPage = React.lazy(() => import('./pages/TeamPage'));
+const Support = React.lazy(() => import('./pages/Support'));
+const NotImplementedPage = React.lazy(() => import('./pages/NotImplementedPage'));
+const B2CDashboardPage = React.lazy(() => import('./pages/b2c/DashboardPage'));
+const SessionsPage = React.lazy(() => import('./pages/SessionsPage'));
 
 // Define routes
 const routes = [
@@ -24,6 +31,10 @@ const routes = [
     element: <Dashboard />
   },
   {
+    path: '/b2c/dashboard',
+    element: <B2CDashboardPage />
+  },
+  {
     path: '/legal',
     element: <Legal />
   },
@@ -34,6 +45,10 @@ const routes = [
   {
     path: '/terms',
     element: <TermsOfService />
+  },
+  {
+    path: '/cookies',
+    element: <CookiesPage />
   },
   {
     path: '/contact',
@@ -50,6 +65,26 @@ const routes = [
   {
     path: '/500',
     element: <ServerErrorPage />
+  },
+  {
+    path: '/social',
+    element: <SocialCocoonPage />
+  },
+  {
+    path: '/team',
+    element: <TeamPage />
+  },
+  {
+    path: '/support',
+    element: <Support />
+  },
+  {
+    path: '/sessions',
+    element: <SessionsPage />
+  },
+  {
+    path: '/coming-soon',
+    element: <NotImplementedPage />
   },
   {
     path: '*',

@@ -15,129 +15,125 @@ const PrivacyPolicy: React.FC = () => {
         >
           <h1 className="text-4xl font-bold mb-8">Politique de confidentialité</h1>
           
-          <section className="mb-8">
-            <p className="text-muted-foreground">
-              Dernière mise à jour : 22 mai 2025
+          <section className="mb-12">
+            <p className="lead mb-6">
+              Chez EmotionsCare, la confidentialité de vos données personnelles est une priorité absolue. 
+              Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons vos informations.
             </p>
           </section>
           
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Introduction</h2>
-            <p>
-              La présente Politique de confidentialité décrit comment EmotionsCare collecte, utilise et partage vos informations personnelles lorsque vous utilisez notre service.
-              Nous utilisons vos données personnelles pour fournir et améliorer le service. En utilisant le service, vous acceptez la collecte et l'utilisation d'informations conformément à cette politique.
-            </p>
-          </section>
-          
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Collecte et utilisation des données</h2>
-            <p>
-              Nous collectons plusieurs types d'informations à différentes fins pour fournir et améliorer notre service.
-            </p>
-            
-            <h3 className="text-xl font-medium my-4">Types de données collectées</h3>
-            
-            <h4 className="text-lg font-medium my-2">Données personnelles</h4>
-            <p>
-              Lors de l'utilisation de notre service, nous pouvons vous demander de nous fournir certaines informations personnellement identifiables qui peuvent être utilisées pour vous contacter ou vous identifier (« Données personnelles »). Les informations personnellement identifiables peuvent inclure, sans s'y limiter :
-            </p>
-            <ul className="list-disc pl-6 my-4">
-              <li>Adresse e-mail</li>
-              <li>Prénom et nom</li>
-              <li>Données d'utilisation</li>
-              <li>Données émotionnelles et de bien-être</li>
-            </ul>
-            
-            <h4 className="text-lg font-medium my-2">Données d'utilisation</h4>
-            <p>
-              Nous pouvons également collecter des informations sur la façon dont le service est accédé et utilisé (« Données d'utilisation »). Ces données peuvent inclure des informations telles que l'adresse de protocole Internet de votre ordinateur (par exemple, l'adresse IP), le type de navigateur, la version du navigateur, les pages de notre service que vous visitez, l'heure et la date de votre visite, le temps passé sur ces pages, les identifiants uniques des appareils et d'autres données de diagnostic.
-            </p>
-            
-            <h4 className="text-lg font-medium my-2">Données émotionnelles</h4>
-            <p>
-              Notre service collecte des données sur votre état émotionnel et de bien-être. Ces données sont traitées avec le plus haut niveau de confidentialité et sont utilisées uniquement pour vous fournir des services personnalisés et améliorer votre expérience sur notre plateforme.
-            </p>
-          </section>
-          
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Utilisation des données</h2>
-            <p>
-              EmotionsCare utilise les données collectées à diverses fins :
-            </p>
-            <ul className="list-disc pl-6 my-4">
-              <li>Pour fournir et maintenir notre service</li>
-              <li>Pour vous informer des changements apportés à notre service</li>
-              <li>Pour vous permettre de participer aux fonctionnalités interactives de notre service</li>
-              <li>Pour fournir un service client</li>
-              <li>Pour recueillir des analyses ou des informations précieuses afin d'améliorer notre service</li>
-              <li>Pour surveiller l'utilisation de notre service</li>
-              <li>Pour détecter, prévenir et résoudre les problèmes techniques</li>
-              <li>Pour vous fournir des conseils et des recommandations personnalisés basés sur votre état émotionnel</li>
+            <h2 className="text-2xl font-semibold mb-4">1. Informations que nous collectons</h2>
+            <p>Nous pouvons collecter les types d'informations suivants :</p>
+            <ul className="list-disc pl-6 mt-4 mb-4">
+              <li><strong>Informations personnelles</strong> : nom, adresse email, numéro de téléphone, et autres coordonnées similaires.</li>
+              <li><strong>Informations de profil</strong> : vos préférences, centres d'intérêt, et paramètres personnalisés.</li>
+              <li><strong>Données d'utilisation</strong> : comment vous utilisez notre application, y compris la fréquence d'utilisation et les fonctionnalités auxquelles vous accédez.</li>
+              <li><strong>Données émotionnelles</strong> : informations sur votre état émotionnel, recueillies via les fonctionnalités de scan émotionnel ou journaux.</li>
+              <li><strong>Données de l'appareil</strong> : informations techniques sur l'appareil que vous utilisez pour accéder à nos services.</li>
             </ul>
           </section>
           
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Conservation des données</h2>
-            <p>
-              EmotionsCare conservera vos Données personnelles uniquement pendant la durée nécessaire aux fins énoncées dans cette Politique de confidentialité. Nous conserverons et utiliserons vos Données personnelles dans la mesure nécessaire pour nous conformer à nos obligations légales, résoudre des litiges et appliquer nos politiques.
-            </p>
-          </section>
-          
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Transfert des données</h2>
-            <p>
-              Vos informations, y compris les Données personnelles, peuvent être transférées vers — et maintenues sur — des ordinateurs situés en dehors de votre état, province, pays ou autre juridiction gouvernementale où les lois sur la protection des données peuvent différer de celles de votre juridiction.
-            </p>
-            <p className="mt-4">
-              Votre consentement à cette Politique de confidentialité, suivi de votre soumission de telles informations, représente votre accord à ce transfert.
-            </p>
-          </section>
-          
-          <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Divulgation des données</h2>
-            <h3 className="text-xl font-medium my-4">Exigences légales</h3>
-            <p>
-              EmotionsCare peut divulguer vos Données personnelles en croyant de bonne foi qu'une telle action est nécessaire pour :
-            </p>
-            <ul className="list-disc pl-6 my-4">
-              <li>Se conformer à une obligation légale</li>
-              <li>Protéger et défendre les droits ou la propriété d'EmotionsCare</li>
-              <li>Prévenir ou enquêter sur d'éventuels actes répréhensibles en rapport avec le service</li>
-              <li>Protéger la sécurité personnelle des utilisateurs du service ou du public</li>
-              <li>Se protéger contre la responsabilité légale</li>
+            <h2 className="text-2xl font-semibold mb-4">2. Comment nous utilisons vos informations</h2>
+            <p>Nous utilisons vos informations pour :</p>
+            <ul className="list-disc pl-6 mt-4 mb-4">
+              <li>Fournir, maintenir et améliorer nos services</li>
+              <li>Personnaliser votre expérience utilisateur</li>
+              <li>Vous envoyer des notifications relatives à votre compte</li>
+              <li>Vous informer sur les mises à jour et nouvelles fonctionnalités</li>
+              <li>Développer de nouvelles fonctionnalités basées sur l'utilisation collective</li>
+              <li>Analyser l'efficacité de nos services et comprendre comment ils sont utilisés</li>
+              <li>Détecter et prévenir les fraudes et abus</li>
             </ul>
           </section>
           
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Sécurité des données</h2>
+            <h2 className="text-2xl font-semibold mb-4">3. Protection de vos informations émotionnelles</h2>
             <p>
-              La sécurité de vos données est importante pour nous, mais n'oubliez pas qu'aucune méthode de transmission sur Internet ou méthode de stockage électronique n'est sûre à 100%. Bien que nous nous efforcions d'utiliser des moyens commercialement acceptables pour protéger vos Données personnelles, nous ne pouvons garantir leur sécurité absolue.
+              Les données émotionnelles que nous collectons sont particulièrement sensibles. Nous mettons en place des mesures 
+              de protection renforcées pour ces données :
+            </p>
+            <ul className="list-disc pl-6 mt-4 mb-4">
+              <li>Chiffrement de bout en bout pour toutes les données émotionnelles</li>
+              <li>Anonymisation des données utilisées pour la recherche et l'amélioration des services</li>
+              <li>Accès strictement limité même au sein de notre organisation</li>
+              <li>Politique de suppression automatique selon les préférences utilisateur</li>
+              <li>Aucun partage avec des tiers sans consentement explicite</li>
+            </ul>
+          </section>
+          
+          <section className="mb-12">
+            <h2 className="text-2xl font-semibold mb-4">4. Partage d'informations</h2>
+            <p>
+              Nous ne vendons jamais vos données personnelles à des tiers. Nous pouvons partager vos informations dans les 
+              circonstances suivantes :
+            </p>
+            <ul className="list-disc pl-6 mt-4 mb-4">
+              <li>Avec votre consentement explicite</li>
+              <li>Avec nos fournisseurs de services qui nous aident à fournir nos services</li>
+              <li>Pour respecter les obligations légales</li>
+              <li>En cas de fusion, acquisition ou vente d'actifs (vos droits de confidentialité seront préservés)</li>
+              <li>Sous forme agrégée et anonymisée pour l'analyse et la recherche</li>
+            </ul>
+          </section>
+          
+          <section className="mb-12">
+            <h2 className="text-2xl font-semibold mb-4">5. Conservation des données</h2>
+            <p>
+              Nous conservons vos données personnelles aussi longtemps que nécessaire pour fournir nos services et 
+              respecter nos obligations légales. Si vous supprimez votre compte, nous supprimerons vos données personnelles 
+              dans un délai de 30 jours, sauf si la loi nous oblige à les conserver plus longtemps.
             </p>
           </section>
           
           <section className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Vos droits de protection des données</h2>
-            <p>
-              En vertu du Règlement général sur la protection des données (RGPD), vous disposez de certains droits concernant vos Données personnelles :
-            </p>
-            <ul className="list-disc pl-6 my-4">
-              <li><strong>Le droit d'accès</strong> - Vous avez le droit de demander des copies de vos Données personnelles.</li>
-              <li><strong>Le droit de rectification</strong> - Vous avez le droit de demander que nous corrigions toute information que vous jugez inexacte. Vous avez également le droit de demander que nous complétions les informations que vous jugez incomplètes.</li>
-              <li><strong>Le droit à l'effacement</strong> - Vous avez le droit de demander que nous effacions vos Données personnelles, sous certaines conditions.</li>
-              <li><strong>Le droit de restreindre le traitement</strong> - Vous avez le droit de demander que nous restreignions le traitement de vos Données personnelles, sous certaines conditions.</li>
-              <li><strong>Le droit à la portabilité des données</strong> - Vous avez le droit de demander que nous transférions les données que nous avons collectées à une autre organisation, ou directement à vous, sous certaines conditions.</li>
+            <h2 className="text-2xl font-semibold mb-4">6. Vos droits</h2>
+            <p>Selon votre localisation, vous pouvez avoir certains droits concernant vos données personnelles, notamment :</p>
+            <ul className="list-disc pl-6 mt-4 mb-4">
+              <li>Accéder à vos données personnelles</li>
+              <li>Rectifier des données inexactes</li>
+              <li>Supprimer vos données</li>
+              <li>Limiter ou vous opposer au traitement de vos données</li>
+              <li>Exporter vos données dans un format portable</li>
+              <li>Retirer votre consentement à tout moment</li>
             </ul>
+            <p>
+              Pour exercer ces droits, contactez-nous à privacy@emotionscare.fr.
+            </p>
+          </section>
+          
+          <section className="mb-12">
+            <h2 className="text-2xl font-semibold mb-4">7. Sécurité des données</h2>
+            <p>
+              Nous prenons la sécurité de vos données très au sérieux et mettons en œuvre des mesures techniques et 
+              organisationnelles appropriées pour protéger vos données personnelles contre la perte, l'accès non autorisé, 
+              la divulgation, l'altération et la destruction.
+            </p>
+          </section>
+          
+          <section className="mb-12">
+            <h2 className="text-2xl font-semibold mb-4">8. Modifications de cette politique</h2>
+            <p>
+              Nous pouvons mettre à jour cette politique de confidentialité de temps à autre. Nous vous informerons de tout 
+              changement significatif par email ou par une notification dans notre application. Nous vous encourageons à 
+              consulter régulièrement cette politique pour rester informé de la façon dont nous protégeons vos informations.
+            </p>
           </section>
           
           <section>
-            <h2 className="text-2xl font-semibold mb-4">Nous contacter</h2>
+            <h2 className="text-2xl font-semibold mb-4">9. Nous contacter</h2>
             <p>
-              Si vous avez des questions concernant cette Politique de confidentialité, veuillez nous contacter :
+              Si vous avez des questions concernant cette politique de confidentialité ou nos pratiques en matière de 
+              protection des données, veuillez nous contacter à :
             </p>
-            <ul className="list-disc pl-6 my-4">
-              <li>Par email : privacy@emotionscare.fr</li>
-              <li>Par courrier : EmotionsCare, Service Confidentialité, 123 Avenue de la Paix, 75001 Paris, France</li>
-            </ul>
+            <p className="mt-4">
+              EmotionsCare<br />
+              Service Protection des Données<br />
+              123 Avenue de la Paix, 75001 Paris, France<br />
+              privacy@emotionscare.fr<br />
+              +33 1 23 45 67 89
+            </p>
           </section>
         </motion.div>
       </div>
