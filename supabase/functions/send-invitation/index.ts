@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { requireAuth } from "../_shared/auth.ts";
+import { requireRole } from "../_shared/auth.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 // Configuration
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
@@ -116,7 +116,7 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   
-  const user = await requireAuth(req);
+  const user = await requireRole(req, ['b2b_admin', 'admin']);
   if (!user) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   // Only allow POST for security
