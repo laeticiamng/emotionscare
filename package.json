@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "tsc": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
+    "test:e2e": "vitest run --dir src/e2e --reporter=json --outputFile=reports/e2e-report.json",
     "build:dev": "vite build --mode development",
     "type-check": "tsc --noEmit"
   },
@@ -73,7 +74,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "cross-env": "^7.0.3",
-    "cypress": "^14.3.3",
+    "cypress": "^14.4.0",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
     "dotenv": "^16.5.0",
@@ -124,13 +125,13 @@
     "vitest": "^3.1.4",
     "xlsx": "^0.18.5",
     "zod": "^3.23.8",
-    "zustand": "^5.0.4"
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
     "@tailwindcss/typography": "^0.5.15",
-    "@types/node": "^22.15.20",
-    "@types/react": "^18.3.21",
+    "@types/node": "^22.15.21",
+    "@types/react": "^18.3.22",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.21",
