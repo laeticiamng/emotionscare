@@ -1,55 +1,53 @@
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Construction, ArrowLeft } from 'lucide-react';
 import Shell from '@/Shell';
-import { Clock, Construction, ArrowLeft } from 'lucide-react';
 
 const NotImplementedPage: React.FC = () => {
   const navigate = useNavigate();
-
+  
   return (
     <Shell>
-      <div className="container mx-auto py-16 px-4">
+      <div className="container mx-auto px-4 py-16 min-h-[calc(100vh-64px)] flex items-center justify-center">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="max-w-2xl mx-auto text-center"
+          className="max-w-lg text-center"
         >
-          <div className="mb-8 flex justify-center">
-            <div className="p-5 rounded-full bg-amber-100 dark:bg-amber-900/30">
-              <Construction className="h-16 w-16 text-amber-600 dark:text-amber-400" />
-            </div>
-          </div>
+          <motion.div 
+            className="mx-auto w-24 h-24 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center mb-6"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <Construction className="h-12 w-12 text-orange-500" />
+          </motion.div>
           
-          <h1 className="text-4xl font-bold mb-4">Fonctionnalité à venir</h1>
-          
-          <p className="text-muted-foreground text-lg mb-8">
+          <h1 className="text-3xl font-bold mb-4">Page en construction</h1>
+          <p className="text-muted-foreground mb-8">
             Cette fonctionnalité est actuellement en cours de développement et sera disponible prochainement.
+            Merci de votre compréhension.
           </p>
           
-          <div className="flex items-center justify-center space-x-2 mb-12">
-            <Clock className="h-5 w-5 text-muted-foreground" />
-            <span className="text-muted-foreground">En construction</span>
-          </div>
-          
-          <div className="space-x-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
-              onClick={() => navigate(-1)}
               variant="outline"
-              className="px-6"
+              className="flex items-center gap-2"
+              onClick={() => navigate(-1)}
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft size={16} />
               Retour
             </Button>
             
             <Button
               onClick={() => navigate('/')}
-              className="px-6"
+              className="flex items-center gap-2"
             >
-              Accueil
+              Retour à l'accueil
             </Button>
           </div>
         </motion.div>

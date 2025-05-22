@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { isAdminRole } from '@/utils/roleUtils';
+import { motion } from 'framer-motion';
 
 interface NavItemProps {
   href?: string;
@@ -15,6 +16,7 @@ interface NavItemProps {
   onClick?: () => void;
   requiresAuth?: boolean;
   adminOnly?: boolean;
+  highlight?: boolean;
 }
 
 const NavItem: React.FC<NavItemProps> = ({
@@ -27,6 +29,7 @@ const NavItem: React.FC<NavItemProps> = ({
   onClick,
   requiresAuth = false,
   adminOnly = false,
+  highlight = false,
 }) => {
   const { user, isAuthenticated } = useAuth();
   const finalHref = to || href || '#';
@@ -39,20 +42,26 @@ const NavItem: React.FC<NavItemProps> = ({
   if (adminOnly && (!user || !isAdminRole(user.role))) return null;
   
   return (
-    <Link
-      to={finalHref}
-      onClick={onClick}
-      className={cn(
-        "flex items-center px-4 py-2 text-sm font-medium transition-colors",
-        finalIsActive 
-          ? "bg-primary text-primary-foreground" 
-          : "hover:bg-accent hover:text-accent-foreground",
-        "rounded-md"
-      )}
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
     >
-      {icon && <span className="mr-2">{icon}</span>}
-      {label}
-    </Link>
+      <Link
+        to={finalHref}
+        onClick={onClick}
+        className={cn(
+          "flex items-center px-4 py-2 text-sm font-medium transition-colors",
+          finalIsActive 
+            ? "bg-primary text-primary-foreground" 
+            : "hover:bg-accent hover:text-accent-foreground",
+          highlight ? "ring-2 ring-primary ring-offset-1" : "",
+          "rounded-md"
+        )}
+      >
+        {icon && <span className="mr-2">{icon}</span>}
+        {label}
+      </Link>
+    </motion.div>
   );
 };
 
