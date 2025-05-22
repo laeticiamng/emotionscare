@@ -1,10 +1,8 @@
-
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { normalizeUserMode } from '@/utils/userModeHelpers';
+import { normalizeUserMode, getModeDashboardPath, getUserModeDisplayName } from '@/utils/userModeHelpers';
 import { useEffect } from 'react';
 import { UserRole } from '@/types/user';
-import { UserModeType } from '@/types/userMode';
 
 export function useUserModeHelpers() {
   const { userMode, setUserMode } = useUserMode();
@@ -33,22 +31,10 @@ export function useUserModeHelpers() {
     normalizedMode,
     
     // Helper method to get a human-readable name for the current mode
-    getModeName: () => {
-      switch (normalizedMode) {
-        case 'b2b_admin': return 'Administrateur';
-        case 'b2b_user': return 'Collaborateur';
-        case 'b2c': default: return 'Particulier';
-      }
-    },
+    getModeName: () => getUserModeDisplayName(normalizedMode),
     
     // Helper to get the home path for the current mode
-    getHomePathForCurrentMode: () => {
-      switch (normalizedMode) {
-        case 'b2b_admin': return '/b2b/admin/dashboard';
-        case 'b2b_user': return '/b2b/user/dashboard';
-        case 'b2c': default: return '/b2c/dashboard';
-      }
-    },
+    getHomePathForCurrentMode: () => getModeDashboardPath(normalizedMode),
     
     // Helper to check if the current mode matches a given role
     matchesRole: (role: UserRole | string) => {

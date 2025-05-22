@@ -1,4 +1,6 @@
 
+import { normalizeUserMode, getModeDashboardPath } from './userModeHelpers';
+
 /**
  * Check if the current path matches a given route
  * Supports exact matching and prefix matching

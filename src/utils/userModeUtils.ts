@@ -1,35 +1,6 @@
 
-import { UserRole } from '@/types/auth';
-
-/**
- * Normalize user mode string to a consistent format
- * This handles different formats like b2b-admin, b2b_admin, etc.
- */
-export const normalizeUserMode = (mode: string | null | undefined): string => {
-  if (!mode) return 'b2c';
-  
-  // Convert to lowercase
-  const lowerMode = mode.toLowerCase();
-  
-  // Normalize B2B Admin variations
-  if (lowerMode === 'b2b-admin' || lowerMode === 'b2b_admin' || lowerMode === 'b2badmin') {
-    return 'b2b_admin';
-  }
-  
-  // Normalize B2B User variations
-  if (lowerMode === 'b2b-user' || lowerMode === 'b2b_user' || lowerMode === 'b2buser' || 
-      lowerMode === 'b2b-collaborator' || lowerMode === 'b2bcollaborator') {
-    return 'b2b_user';
-  }
-  
-  // Normalize B2C variations
-  if (lowerMode === 'b2c' || lowerMode === 'individual' || lowerMode === 'user') {
-    return 'b2c';
-  }
-  
-  // Default if no match
-  return 'b2c';
-};
+import { UserRole } from '@/types/user';
+import { normalizeUserMode } from './userModeHelpers';
 
 /**
  * Convert user role to user mode
