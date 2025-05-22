@@ -113,6 +113,7 @@ NEXT_PUBLIC_WEB_URL=http://localhost:3000
 
 > **Note**
 > L'ancienne variable `SKIP_AUTH_CHECK` utilisée pour désactiver l'authentification en développement a été supprimée. Les tableaux de bord sont désormais toujours protégés.
+> Toutes les fonctions backend vérifient désormais la session via `requireAuth` dans `supabase/functions/_shared/auth.ts`. Chaque tentative d'accès non authentifiée est enregistrée dans la table `auth_attempts` pour audit.
 
 ### Utilisateurs de test
 
