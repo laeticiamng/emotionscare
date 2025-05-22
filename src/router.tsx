@@ -1,245 +1,161 @@
 
-import React, { lazy } from 'react';
-import { Navigate, RouteObject } from 'react-router-dom';
-import Shell from './Shell';
-import ProtectedRoute from './components/ProtectedRoute';
+import React from 'react';
 
-// Pages à chargement différé pour optimiser le temps de chargement
-const LandingPage = lazy(() => import('./pages/LandingPage'));
-const ImmersiveHome = lazy(() => import('./pages/ImmersiveHome'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Journal = lazy(() => import('./pages/Journal'));
-const Music = lazy(() => import('./pages/Music'));
-const Audio = lazy(() => import('./pages/Audio'));
-const Coach = lazy(() => import('./pages/Coach'));
-const Login = lazy(() => import('./pages/common/Login'));
-const Register = lazy(() => import('./pages/common/Register'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const Support = lazy(() => import('./pages/Support'));
-const B2BSelection = lazy(() => import('./pages/b2b/Selection'));
-const Pricing = lazy(() => import('./pages/Pricing'));
-const DashboardRedirect = lazy(() => import('./pages/DashboardRedirect'));
-const ModeSwitcher = lazy(() => import('./pages/common/ModeSwitcher'));
+// Layouts
+import ProtectedLayout from '@/components/ProtectedLayout';
+import Layout from '@/components/Layout';
+import UnifiedLayout from '@/components/unified/UnifiedLayout';
 
-// B2C Pages
-const B2CDashboard = lazy(() => import('./pages/b2c/Dashboard'));
-const B2CJournal = lazy(() => import('./pages/b2c/Journal'));
-const B2CMusic = lazy(() => import('./pages/b2c/Music'));
-const B2CAudio = lazy(() => import('./pages/b2c/Audio'));
-const B2CCoach = lazy(() => import('./pages/b2c/Coach'));
-const B2COnboarding = lazy(() => import('./pages/b2c/Onboarding'));
+// Public Pages
+import HomePage from '@/pages/HomePage';
+import LandingPage from '@/pages/LandingPage';
+import ModeSwitcher from '@/pages/common/ModeSwitcher';
+import B2BSelection from '@/pages/b2b/Selection';
+import NotFoundPage from '@/pages/NotFoundPage';
 
-// B2B User Pages
-const B2BUserDashboard = lazy(() => import('./pages/b2b/user/Dashboard'));
-const B2BUserJournal = lazy(() => import('./pages/b2b/user/Journal'));
-const B2BUserMusic = lazy(() => import('./pages/b2b/user/Music'));
-const B2BUserAudio = lazy(() => import('./pages/b2b/user/Audio'));
-const B2BUserCoach = lazy(() => import('./pages/b2b/user/Coach'));
+// Auth Pages
+import B2CLogin from '@/pages/b2c/Login';
+import B2BUserLogin from '@/pages/b2b/user/Login';
+import B2BAdminLogin from '@/pages/b2b/admin/Login';
 
-// B2B Admin Pages
-const B2BAdminDashboard = lazy(() => import('./pages/b2b/admin/Dashboard'));
-const B2BAdminUsers = lazy(() => import('./pages/b2b/admin/Users'));
-const B2BAdminReports = lazy(() => import('./pages/b2b/admin/Reports'));
+// Dashboard Pages
+import DashboardRedirect from '@/pages/DashboardRedirect';
+import Dashboard from '@/pages/Dashboard';
+import B2CDashboardPage from '@/pages/b2c/DashboardPage';
+import B2BUserDashboardPage from '@/pages/b2b/user/DashboardPage';
+import B2BAdminDashboardPage from '@/pages/b2b/admin/DashboardPage';
 
-const routes: RouteObject[] = [
-  // Landing page
+// Feature Pages
+import UnifiedSettingsPage from '@/pages/UnifiedSettingsPage';
+import B2CJournalPage from '@/pages/b2c/Journal';
+import B2CAudioPage from '@/pages/b2c/Audio';
+import B2CMusicPage from '@/pages/b2c/Music';
+import B2CCoachPage from '@/pages/b2c/Coach';
+
+// Redirect Components
+import Journal from '@/pages/Journal';
+import Audio from '@/pages/Audio';
+import Music from '@/pages/Music';
+import Coach from '@/pages/Coach';
+
+const routes = [
   {
-    path: '/',
-    element: <ImmersiveHome />,
-    index: true,
-  },
-  
-  // Pricing page
-  {
-    path: '/pricing',
-    element: <Pricing />,
-  },
-  
-  // Support page
-  {
-    path: '/support',
-    element: <Support />,
-  },
-  
-  // B2C Routes
-  {
-    path: 'b2c',
-    element: <ProtectedRoute requiredRole="b2c" />,
+    element: <ProtectedLayout />,
     children: [
       {
-        path: '',
-        element: <Navigate to="/b2c/dashboard" replace />,
+        path: '/',
+        element: <HomePage />
       },
       {
-        path: 'dashboard',
-        element: <Shell><B2CDashboard /></Shell>,
+        path: '/home',
+        element: <HomePage />
       },
       {
-        path: 'journal',
-        element: <Shell><B2CJournal /></Shell>,
+        path: '/landing',
+        element: <LandingPage />
       },
       {
-        path: 'music',
-        element: <Shell><B2CMusic /></Shell>,
+        path: '/choose-mode',
+        element: <ModeSwitcher />
       },
       {
-        path: 'audio',
-        element: <Shell><B2CAudio /></Shell>,
+        path: '/b2b/selection',
+        element: <B2BSelection />
       },
       {
-        path: 'coach',
-        element: <Shell><B2CCoach /></Shell>,
+        path: '/b2c/login',
+        element: <B2CLogin />
       },
       {
-        path: 'onboarding',
-        element: <Shell><B2COnboarding /></Shell>,
-      },
-    ],
-  },
-  
-  // B2C Auth Routes (not protected)
-  {
-    path: 'b2c/login',
-    element: <Login mode="b2c" />,
-  },
-  {
-    path: 'b2c/register',
-    element: <Register mode="b2c" />,
-  },
-  
-  // B2B User Routes
-  {
-    path: 'b2b/user',
-    element: <ProtectedRoute requiredRole="b2b_user" />,
-    children: [
-      {
-        path: '',
-        element: <Navigate to="/b2b/user/dashboard" replace />,
+        path: '/b2b/user/login',
+        element: <B2BUserLogin />
       },
       {
-        path: 'dashboard',
-        element: <Shell><B2BUserDashboard /></Shell>,
+        path: '/b2b/admin/login',
+        element: <B2BAdminLogin />
       },
       {
-        path: 'journal',
-        element: <Shell><B2BUserJournal /></Shell>,
-      },
-      {
-        path: 'music',
-        element: <Shell><B2BUserMusic /></Shell>,
-      },
-      {
-        path: 'audio',
-        element: <Shell><B2BUserAudio /></Shell>,
-      },
-      {
-        path: 'coach',
-        element: <Shell><B2BUserCoach /></Shell>,
-      },
-    ],
-  },
-  
-  // B2B User Auth Routes (not protected)
-  {
-    path: 'b2b/user/login',
-    element: <Login mode="b2b_user" />,
-  },
-  {
-    path: 'b2b/user/register',
-    element: <Register mode="b2b_user" />,
-  },
-  
-  // B2B Admin Routes
-  {
-    path: 'b2b/admin',
-    element: <ProtectedRoute requiredRole="b2b_admin" />,
-    children: [
-      {
-        path: '',
-        element: <Navigate to="/b2b/admin/dashboard" replace />,
-      },
-      {
-        path: 'dashboard',
-        element: <Shell><B2BAdminDashboard /></Shell>,
-      },
-      {
-        path: 'users',
-        element: <Shell><B2BAdminUsers /></Shell>,
-      },
-      {
-        path: 'reports',
-        element: <Shell><B2BAdminReports /></Shell>,
-      },
-    ],
-  },
-  
-  // B2B Admin Auth Routes (not protected)
-  {
-    path: 'b2b/admin/login',
-    element: <Login mode="b2b_admin" />,
-  },
-  
-  // B2B Role Selection
-  {
-    path: 'b2b/selection',
-    element: <B2BSelection />,
-  },
-  
-  // User Mode Selection
-  {
-    path: 'choose-mode',
-    element: <ModeSwitcher />,
-  },
-  
-  // Generic redirects
-  {
-    path: 'dashboard',
-    element: <Dashboard />,
-  },
-  {
-    path: 'journal',
-    element: <Journal />,
-  },
-  {
-    path: 'music',
-    element: <Music />,
-  },
-  {
-    path: 'audio',
-    element: <Audio />,
-  },
-  {
-    path: 'coach',
-    element: <Coach />,
-  },
-  
-  // Legacy routes - redirections
-  {
-    path: '/login-collaborateur',
-    element: <Navigate to="/b2b/user/login" replace />,
-  },
-  {
-    path: '/login-admin',
-    element: <Navigate to="/b2b/admin/login" replace />,
-  },
-  {
-    path: '/login',
-    element: <Navigate to="/b2c/login" replace />,
-  },
-  {
-    path: '/register',
-    element: <Navigate to="/b2c/register" replace />,
-  },
-  
-  // Catch-all route for 404
-  {
-    path: '404',
-    element: <NotFound />,
+        element: <UnifiedLayout />,
+        children: [
+          {
+            path: '/dashboard',
+            element: <DashboardRedirect />
+          },
+          {
+            path: '/b2c/dashboard',
+            element: <B2CDashboardPage />
+          },
+          {
+            path: '/b2b/user/dashboard',
+            element: <B2BUserDashboardPage />
+          },
+          {
+            path: '/b2b/admin/dashboard',
+            element: <B2BAdminDashboardPage />
+          },
+          {
+            path: '/settings',
+            element: <UnifiedSettingsPage />
+          },
+          // Feature redirect pages
+          {
+            path: '/journal',
+            element: <Journal />
+          },
+          {
+            path: '/audio',
+            element: <Audio />
+          },
+          {
+            path: '/music',
+            element: <Music />
+          },
+          {
+            path: '/coach',
+            element: <Coach />
+          },
+          // Mode-specific feature pages
+          {
+            path: '/b2c/journal',
+            element: <B2CJournalPage />
+          },
+          {
+            path: '/b2c/audio',
+            element: <B2CAudioPage />
+          },
+          {
+            path: '/b2c/music',
+            element: <B2CMusicPage />
+          },
+          {
+            path: '/b2c/coach',
+            element: <B2CCoachPage />
+          },
+          // B2B user feature pages will be similar to B2C pages but with team features
+          {
+            path: '/b2b/user/journal',
+            element: <B2CJournalPage />
+          },
+          {
+            path: '/b2b/user/audio',
+            element: <B2CAudioPage />
+          },
+          {
+            path: '/b2b/user/music',
+            element: <B2CMusicPage />
+          },
+          {
+            path: '/b2b/user/coach',
+            element: <B2CCoachPage />
+          },
+        ]
+      }
+    ]
   },
   {
     path: '*',
-    element: <Navigate to="/404" replace />,
-  },
+    element: <NotFoundPage />
+  }
 ];
 
 export default routes;

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import QuickAccessMenu from '@/components/dashboard/QuickAccessMenu';
 import { useAuth } from '@/contexts/AuthContext';
 
-const B2CDashboardPage: React.FC = () => {
+const B2BUserDashboardPage: React.FC = () => {
   const { user } = useAuth();
   
   return (
@@ -16,10 +16,10 @@ const B2CDashboardPage: React.FC = () => {
         transition={{ duration: 0.5 }}
       >
         <h1 className="text-3xl font-bold tracking-tight mb-2">
-          Bienvenue, {user?.name || 'Utilisateur'}
+          Bienvenue, {user?.name || 'Collaborateur'}
         </h1>
         <p className="text-muted-foreground">
-          Votre espace personnel de bien-être émotionnel.
+          Votre espace collaborateur de bien-être émotionnel.
         </p>
       </motion.div>
       
@@ -39,11 +39,11 @@ const B2CDashboardPage: React.FC = () => {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Suivi émotionnel</CardTitle>
+              <CardTitle>Tableau de bord d'équipe</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Visualisez l'évolution de votre bien-être émotionnel au fil du temps.
+                Visualisez les indicateurs de bien-être de votre équipe.
               </p>
             </CardContent>
           </Card>
@@ -56,11 +56,11 @@ const B2CDashboardPage: React.FC = () => {
         >
           <Card>
             <CardHeader>
-              <CardTitle>Recommandations</CardTitle>
+              <CardTitle>Prochaines sessions</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Découvrez des recommandations personnalisées pour améliorer votre bien-être.
+                Consultez vos prochaines sessions de coaching et d'activités.
               </p>
             </CardContent>
           </Card>
@@ -70,4 +70,4 @@ const B2CDashboardPage: React.FC = () => {
   );
 };
 
-export default B2CDashboardPage;
+export default B2BUserDashboardPage;
