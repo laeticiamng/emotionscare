@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Building, ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { useToast } from '@/hooks/use-toast';
 import B2BModeGuard from '@/components/B2BModeGuard';
 
@@ -17,7 +18,14 @@ const B2BUserLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login, error, clearError } = useAuth();
+  const { setUserMode, userMode } = useUserMode();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (userMode && userMode !== 'b2b_user') {
+      navigate('/b2b/selection');
+    }
+  }, [userMode, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,8 +56,10 @@ const B2BUserLogin = () => {
         description: `Bienvenue ${user?.name || ''} dans votre espace collaborateur EmotionsCare.`
       });
 
+      setUserMode('b2b_user');
+
       // Small delay to show the success message before redirecting
-      setTimeout(() => navigate('/b2b/user/dashboard'), 800);
+      setTimeout(() => navigate('/dashboard-collaborateur'), 800);
     } catch (error: any) {
       console.error('Erreur de connexion:', error);
       toast({

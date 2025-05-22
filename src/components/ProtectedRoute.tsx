@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { UserRole } from '@/types/user';
 import { normalizeUserMode, getModeLoginPath, getModeDashboardPath } from '@/utils/userModeHelpers';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -114,6 +115,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         )}
       </AnimatePresence>
     );
+  }
+
+  // Ensure the selected mode matches the protected role
+  if (requiredRole) {
+    const normalizedRequiredRole = normalizeUserMode(requiredRole);
+    const normalizedMode = normalizeUserMode(userMode);
+    if (normalizedMode !== normalizedRequiredRole) {
+      return <Navigate to={getModeLoginPath(normalizedRequiredRole)} state={{ from: location }} />;
+    }
   }
 
   // If a specific role is required and the user doesn't have it, redirect

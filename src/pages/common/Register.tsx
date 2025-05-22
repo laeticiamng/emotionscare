@@ -74,8 +74,8 @@ const Register: React.FC<RegisterProps> = ({ role = 'b2c' }) => {
   
   const getLoginPath = () => {
     switch(role) {
-      case 'b2b_admin': return '/b2b/admin/login';
-      case 'b2b_user': return '/b2b/user/login';
+      case 'b2b_admin': return '/login-admin';
+      case 'b2b_user': return '/login-collaborateur';
       case 'b2c': default: return '/b2c/login';
     }
   };

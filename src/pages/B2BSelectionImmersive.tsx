@@ -24,9 +24,9 @@ const B2BSelectionImmersive: React.FC = () => {
     
     // Navigate to the appropriate login page
     if (mode === 'b2b-admin') {
-      navigate('/b2b/admin/login');
+      navigate('/login-admin');
     } else {
-      navigate('/b2b/user/login');
+      navigate('/login-collaborateur');
     }
   };
 

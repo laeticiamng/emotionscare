@@ -101,6 +101,25 @@ export const getModeDashboardPath = (mode: string | UserModeType): string => {
 };
 
 /**
+ * Gets the appropriate login path for a given user mode
+ * @param mode The user mode
+ * @returns Login path for the mode
+ */
+export const getModeLoginPath = (mode: string | UserModeType): string => {
+  const normalizedMode = normalizeUserMode(mode);
+
+  switch (normalizedMode) {
+    case 'b2b_user':
+      return '/login-collaborateur';
+    case 'b2b_admin':
+      return '/login-admin';
+    case 'b2c':
+    default:
+      return '/b2c/login';
+  }
+};
+
+/**
  * Gets the appropriate settings path for a given user mode
  * @param mode The user mode
  * @returns Settings path for the mode

@@ -134,30 +134,13 @@ export const routes: RouteObject[] = [
     path: 'b2b/admin/login',
     element: <B2BAdminLogin />
   },
-  // Generic dashboard redirect
   {
-    path: 'dashboard',
-    element: (
-      <ProtectedRoute>
-        <DashboardRedirect />
-      </ProtectedRoute>
-    )
+    path: 'login-collaborateur',
+    element: <Navigate to="/b2b/user/login" replace />
   },
   {
-    path: 'dashboard-collaborateur',
-    element: (
-      <ProtectedRoute requiredRole="b2b_user">
-        <Navigate to="/b2b/user/dashboard" replace />
-      </ProtectedRoute>
-    )
-  },
-  {
-    path: 'dashboard-admin',
-    element: (
-      <ProtectedRoute requiredRole="b2b_admin">
-        <Navigate to="/b2b/admin/dashboard" replace />
-      </ProtectedRoute>
-    )
+    path: 'login-admin',
+    element: <Navigate to="/b2b/admin/login" replace />
   },
   // B2C Protected Routes
   {
@@ -335,6 +318,14 @@ export const routes: RouteObject[] = [
         element: <B2BAdminSettingsPage />
       }
     ]
+  },
+  {
+    path: 'dashboard-collaborateur',
+    element: <Navigate to="/b2b/user/dashboard" replace />
+  },
+  {
+    path: 'dashboard-admin',
+    element: <Navigate to="/b2b/admin/dashboard" replace />
   },
   {
     path: '*',

@@ -12,7 +12,7 @@ const B2BUserRegister = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Add registration logic here
-    navigate('/b2b/user/login'); 
+    navigate('/login-collaborateur');
   };
 
   return (
@@ -51,7 +51,7 @@ const B2BUserRegister = () => {
           </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button variant="ghost" className="w-full" type="button" onClick={() => navigate('/b2b/user/login')}>
+          <Button variant="ghost" className="w-full" type="button" onClick={() => navigate('/login-collaborateur')}>
             J'ai déjà un compte
           </Button>
           <Button variant="ghost" className="w-full" type="button" onClick={() => navigate('/')}>

@@ -13,7 +13,7 @@ const BusinessPage = () => {
       <h1 className="text-4xl font-bold mb-12 text-center">Accès Espace Entreprise</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full">
-        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/b2b/user/login')}>
+        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/login-collaborateur')}>
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
               <Building className="h-8 w-8 text-blue-600" />
@@ -26,7 +26,7 @@ const BusinessPage = () => {
           </div>
         </Card>
 
-        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/b2b/admin/login')}>
+        <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/login-admin')}>
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
               <Shield className="h-8 w-8 text-blue-600" />
