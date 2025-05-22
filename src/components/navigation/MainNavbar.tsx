@@ -10,7 +10,7 @@ import GuestMenu from './GuestMenu';
 import MobileNavigation from './MobileNavigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { Home, Music, MessageCircle, Users, LayoutDashboard, Settings, Heart, Calendar } from 'lucide-react';
+import { Home, Music, MessageCircle, Users, LayoutDashboard, Settings, Heart, Calendar, FileText } from 'lucide-react';
 
 const MainNavbar: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -18,15 +18,25 @@ const MainNavbar: React.FC = () => {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
 
-  // Menu items with icons
-  const navigationItems = [
+  // Menu items with icons - define navigation items that should be visible when logged in
+  const authenticatedItems = [
     { to: "/dashboard", icon: <LayoutDashboard className="h-4 w-4 mr-2" />, label: "Dashboard" },
-    { to: "/emotions", icon: <Heart className="h-4 w-4 mr-2" />, label: "Émotions" },
+    { to: "/journal", icon: <FileText className="h-4 w-4 mr-2" />, label: "Journal" },
     { to: "/music", icon: <Music className="h-4 w-4 mr-2" />, label: "Musique" },
-    { to: "/coach", icon: <MessageCircle className="h-4 w-4 mr-2" />, label: "Coach" },
+    { to: "/emotions", icon: <Heart className="h-4 w-4 mr-2" />, label: "Émotions" },
     { to: "/social", icon: <Users className="h-4 w-4 mr-2" />, label: "Communauté" },
     { to: "/sessions", icon: <Calendar className="h-4 w-4 mr-2" />, label: "Sessions" }
   ];
+
+  // Menu items for guests
+  const guestItems = [
+    { to: "/", icon: <Home className="h-4 w-4 mr-2" />, label: "Accueil" },
+    { to: "/team", icon: <Users className="h-4 w-4 mr-2" />, label: "Notre équipe" },
+    { to: "/contact", icon: <MessageCircle className="h-4 w-4 mr-2" />, label: "Contact" },
+  ];
+
+  // Determine which navigation items to display based on authentication status
+  const navigationItems = isAuthenticated ? authenticatedItems : guestItems;
 
   useEffect(() => {
     const handleScroll = () => {

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,116 +13,127 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
-import {
-  User,
-  Settings,
-  LifeBuoy,
-  LogOut,
-  BarChart,
+import { 
+  User, 
+  Settings, 
+  LogOut, 
+  Bell, 
+  BarChart2, 
+  FileText, 
+  Heart, 
+  Music, 
   Shield,
-  UserPlus,
-  Bell,
-  BadgeCheck
+  HelpCircle
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const UserMenu: React.FC = () => {
-  const navigate = useNavigate();
   const { user, logout } = useAuth();
-  
-  // Dans un vrai scénario, cela serait récupéré du contexte ou d'une requête API
-  const hasNotifications = true;
-  const isPremium = false;
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      // Simuler un logout
-      setTimeout(() => {
-        toast.success('Déconnexion réussie');
-        navigate('/');
-      }, 500);
+      await logout();
+      toast.success('Vous avez été déconnecté avec succès');
+      navigate('/');
     } catch (error) {
-      toast.error('Erreur lors de la déconnexion');
+      console.error('Logout error:', error);
+      toast.error('Une erreur est survenue lors de la déconnexion');
     }
   };
+
+  const getInitials = (name: string = 'Utilisateur') => {
+    return name
+      .split(' ')
+      .map(part => part.charAt(0))
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  const isAdmin = user?.role === 'admin';
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-9 w-9">
-            <AvatarImage src="/avatars/user.png" alt="User" />
-            <AvatarFallback className="bg-primary/10 text-primary">
-              {user?.name?.charAt(0) || 'U'}
-            </AvatarFallback>
+        <Button variant="ghost" className="relative flex items-center gap-2 p-1 rounded-full">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={user?.avatar} alt={user?.name || 'Utilisateur'} />
+            <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
           </Avatar>
-          {hasNotifications && (
-            <span className="absolute -top-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-            </span>
-          )}
+          <span className="hidden sm:inline text-sm font-medium">
+            {user?.name ? user.name.split(' ')[0] : 'Utilisateur'}
+          </span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user?.name || 'Utilisateur'}</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {user?.email || 'utilisateur@example.com'}
-            </p>
-          </div>
-        </DropdownMenuLabel>
+      
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={() => navigate('/profile')}>
             <User className="mr-2 h-4 w-4" />
             <span>Profil</span>
           </DropdownMenuItem>
+          
           <DropdownMenuItem onClick={() => navigate('/dashboard')}>
-            <BarChart className="mr-2 h-4 w-4" />
+            <BarChart2 className="mr-2 h-4 w-4" />
             <span>Tableau de bord</span>
           </DropdownMenuItem>
+          
           <DropdownMenuItem onClick={() => navigate('/settings')}>
             <Settings className="mr-2 h-4 w-4" />
             <span>Paramètres</span>
           </DropdownMenuItem>
+          
           <DropdownMenuItem onClick={() => navigate('/notifications')}>
             <Bell className="mr-2 h-4 w-4" />
             <span>Notifications</span>
-            {hasNotifications && (
-              <span className="ml-auto flex h-2 w-2 rounded-full bg-primary"></span>
-            )}
           </DropdownMenuItem>
         </DropdownMenuGroup>
+        
         <DropdownMenuSeparator />
+        
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => navigate('/team')}>
-            <UserPlus className="mr-2 h-4 w-4" />
-            <span>Inviter un collègue</span>
+          <DropdownMenuItem onClick={() => navigate('/journal')}>
+            <FileText className="mr-2 h-4 w-4" />
+            <span>Journal</span>
           </DropdownMenuItem>
-          {isPremium ? (
-            <DropdownMenuItem onClick={() => navigate('/account')}>
-              <BadgeCheck className="mr-2 h-4 w-4 text-primary" />
-              <span>Compte Premium</span>
-            </DropdownMenuItem>
-          ) : (
-            <DropdownMenuItem onClick={() => navigate('/premium')}>
-              <Shield className="mr-2 h-4 w-4" />
-              <span>Passer à Premium</span>
-            </DropdownMenuItem>
-          )}
+          
+          <DropdownMenuItem onClick={() => navigate('/music')}>
+            <Music className="mr-2 h-4 w-4" />
+            <span>Musicothérapie</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem onClick={() => navigate('/emotions')}>
+            <Heart className="mr-2 h-4 w-4" />
+            <span>Scan émotionnel</span>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
+        
+        {isAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={() => navigate('/community-admin')}>
+                <Shield className="mr-2 h-4 w-4" />
+                <span>Administration</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </>
+        )}
+        
         <DropdownMenuSeparator />
+        
         <DropdownMenuItem onClick={() => navigate('/support')}>
-          <LifeBuoy className="mr-2 h-4 w-4" />
+          <HelpCircle className="mr-2 h-4 w-4" />
           <span>Support</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
+        
         <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Se déconnecter</span>
+          <span>Déconnexion</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

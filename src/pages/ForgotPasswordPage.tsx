@@ -1,156 +1,145 @@
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { toast } from 'sonner';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { Mail, ArrowLeft } from 'lucide-react';
 import Shell from '@/Shell';
-
-const forgotPasswordSchema = z.object({
-  email: z.string().email('Veuillez entrer une adresse e-mail valide'),
-});
-
-type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
+import { useToast } from '@/hooks/use-toast';
 
 const ForgotPasswordPage: React.FC = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const form = useForm<ForgotPasswordFormValues>({
-    resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: {
-      email: '',
-    },
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
 
-  const onSubmit = async (data: ForgotPasswordFormValues) => {
     try {
-      setIsLoading(true);
-      // Simuler l'envoi d'un e-mail
+      // Simulate API call for password reset
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
       setIsSubmitted(true);
-      toast.success('Instructions envoyées. Vérifiez votre boîte de réception.');
-    } catch (error) {
-      console.error('Erreur de réinitialisation:', error);
-      toast.error('Une erreur est survenue. Veuillez réessayer.');
+      toast({
+        title: "Email envoyé",
+        description: "Veuillez consulter votre boîte de réception pour réinitialiser votre mot de passe"
+      });
+    } catch (err: any) {
+      console.error('Password reset error:', err);
+      setError('Impossible d\'envoyer l\'email de réinitialisation. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Shell hideNav hideFooter>
-      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+    <Shell>
+      <div className="flex items-center justify-center min-h-screen bg-background p-4">
         <motion.div
-          className="w-full max-w-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="w-full max-w-md"
         >
-          <div className="text-center mb-6">
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-            >
-              <h1 className="text-3xl font-bold">Mot de passe oublié</h1>
-              <p className="text-muted-foreground mt-2">
-                {!isSubmitted 
-                  ? "Entrez votre adresse e-mail pour réinitialiser votre mot de passe" 
-                  : "Veuillez vérifier votre boîte de réception pour les instructions"
+          <Card>
+            <CardHeader>
+              <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Mail className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle className="text-2xl text-center">
+                {isSubmitted ? "Email envoyé" : "Mot de passe oublié"}
+              </CardTitle>
+              <CardDescription className="text-center">
+                {isSubmitted 
+                  ? "Veuillez vérifier votre boîte de réception pour les instructions de réinitialisation"
+                  : "Entrez votre email pour recevoir un lien de réinitialisation"
                 }
-              </p>
-            </motion.div>
-          </div>
-
-          <motion.div
-            className="bg-card border rounded-xl shadow-sm p-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-          >
-            {!isSubmitted ? (
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="email@exemple.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Envoi en cours...' : 'Envoyer les instructions'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!isSubmitted ? (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="vous@exemple.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  {error && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-sm text-destructive p-2 bg-destructive/10 rounded-md"
+                    >
+                      {error}
+                    </motion.div>
+                  )}
+                  <Button 
+                    type="submit" 
+                    className="w-full relative" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <span>Envoi en cours...</span>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      </>
+                    ) : "Envoyer le lien de réinitialisation"}
                   </Button>
                 </form>
-              </Form>
-            ) : (
-              <motion.div 
-                className="text-center py-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary h-8 w-8"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+              ) : (
+                <div className="text-center p-4">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="mb-4 text-primary"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </motion.div>
+                  <p className="mb-4 text-muted-foreground">
+                    Un email avec les instructions pour réinitialiser votre mot de passe a été envoyé à <strong>{email}</strong>.
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    N'oubliez pas de vérifier votre dossier de spam si vous ne voyez pas l'email.
+                  </p>
                 </div>
-                <h3 className="text-lg font-medium mb-2">E-mail envoyé</h3>
-                <p className="text-muted-foreground mb-4">
-                  Si un compte est associé à cette adresse, vous recevrez un e-mail contenant les instructions pour réinitialiser votre mot de passe.
-                </p>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => navigate('/login')}
+              )}
+            </CardContent>
+            <CardFooter className="flex flex-col items-center gap-2">
+              <div className="text-sm text-muted-foreground">
+                <Link
+                  to="/login"
+                  className="text-primary underline-offset-4 hover:underline cursor-pointer"
                 >
-                  Retourner à la page de connexion
-                </Button>
-              </motion.div>
-            )}
-
-            <div className="mt-6 text-center text-sm">
-              <Link 
-                to="/login" 
-                className="inline-flex items-center text-primary hover:underline font-medium"
-              >
-                <ArrowLeft className="h-4 w-4 mr-1" />
-                Retour à la connexion
-              </Link>
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="mt-8 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-          >
-            <Link to="/" className="text-sm text-muted-foreground hover:underline">
-              Retour à l'accueil
-            </Link>
-          </motion.div>
+                  Retour à la page de connexion
+                </Link>
+              </div>
+              <Button variant="ghost" className="mt-2 flex items-center gap-2" onClick={() => navigate('/')}>
+                <ArrowLeft size={16} />
+                Retour à l'accueil
+              </Button>
+            </CardFooter>
+          </Card>
         </motion.div>
       </div>
     </Shell>

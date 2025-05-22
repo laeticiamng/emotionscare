@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User } from 'lucide-react';
+import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import Shell from '@/Shell';
 import { useToast } from '@/hooks/use-toast';
@@ -28,7 +28,7 @@ const LoginPage: React.FC = () => {
     try {
       await login(email, password);
       sessionStorage.setItem('just_logged_in', 'true');
-      navigate('/b2c/dashboard');
+      navigate('/dashboard');
       toast({
         title: "Connexion réussie",
         description: "Bienvenue sur votre espace personnel"
@@ -119,14 +119,23 @@ const LoginPage: React.FC = () => {
             <CardFooter className="flex flex-col items-center gap-2">
               <div className="text-sm text-muted-foreground">
                 Vous n'avez pas de compte ?{' '}
-                <a
+                <Link
+                  to="/register"
                   className="text-primary underline-offset-4 hover:underline cursor-pointer"
-                  onClick={() => navigate('/register')}
                 >
                   Créer un compte
-                </a>
+                </Link>
               </div>
-              <Button variant="ghost" className="mt-2" onClick={() => navigate('/')}>
+              <div className="text-sm text-muted-foreground mt-1">
+                <Link
+                  to="/forgot-password"
+                  className="text-primary underline-offset-4 hover:underline cursor-pointer"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
+              <Button variant="ghost" className="mt-2 flex items-center gap-2" onClick={() => navigate('/')}>
+                <ArrowLeft size={16} />
                 Retour à l'accueil
               </Button>
             </CardFooter>
