@@ -106,8 +106,8 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ onMenuClick }) => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button variant="primary" size="sm" onClick={() => navigate('/login')}>
-              Connexion
+            <Button variant="default" size="sm" onClick={() => navigate('/login')}>
+              Se connecter
             </Button>
           )}
         </div>
