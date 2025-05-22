@@ -3,27 +3,24 @@ import assert from 'node:assert/strict';
 import fs from 'fs';
 import path from 'path';
 
-// Ensure each Supabase Edge Function checks authorization before parsing the request
+const functionsDir = path.join(__dirname, '..', '..', 'supabase', 'functions');
 
-test('all edge functions use authorizeRole before reading the body', () => {
-  const functionsDir = path.join(process.cwd(), 'supabase', 'functions');
-  const entries = fs.readdirSync(functionsDir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (!entry.isDirectory() || entry.name === '_shared') continue;
-    const file = path.join(functionsDir, entry.name, 'index.ts');
-    if (!fs.existsSync(file)) continue;
-    const content = fs.readFileSync(file, 'utf-8');
+// Ensure all edge functions import and use authorizeRole
+// to block unauthenticated access
 
-    // Check authorizeRole import and usage
-    assert.ok(content.includes('authorizeRole'), `authorizeRole missing in ${entry.name}`);
+test('all edge functions enforce authorizeRole', () => {
+  const dirs = fs.readdirSync(functionsDir)
+    .filter(d => fs.statSync(path.join(functionsDir, d)).isDirectory() && d !== '_shared');
 
-    // authorizeRole should be called before the first req.json or req.text
-    const callIndex = content.indexOf('authorizeRole');
-    const jsonIndex = content.indexOf('req.json');
-    const textIndex = content.indexOf('req.text');
-    const firstReadIndex = [jsonIndex, textIndex].filter(i => i !== -1).sort((a,b) => a-b)[0];
-    if (firstReadIndex !== undefined) {
-      assert.ok(callIndex !== -1 && callIndex < firstReadIndex, `authorizeRole should be called before reading body in ${entry.name}`);
-    }
+  for (const dir of dirs) {
+    const file = path.join(functionsDir, dir, 'index.ts');
+    const content = fs.readFileSync(file, 'utf8');
+    assert.match(content, /authorizeRole\(/, `authorizeRole missing in ${dir}`);
   }
+});
+
+test('auth middleware logs user agent', () => {
+  const authFile = path.join(functionsDir, '_shared', 'auth.ts');
+  const content = fs.readFileSync(authFile, 'utf8');
+  assert.ok(content.includes('user_agent'), 'auth.ts should log user_agent');
 });

@@ -12,7 +12,7 @@ import { authorizeRole } from '../_shared/auth.ts';
 - Toutes les tentatives refusées sont enregistrées via `logUnauthorizedAccess`.
 
 ## Fonction `logUnauthorizedAccess`
-- Insère un log contenant l'IP, la route et le motif du refus.
+- Insère un log contenant l'IP, la route, le user-agent et le motif du refus.
 - Permet un audit simple des accès non autorisés.
 
 Toutes les fonctions du répertoire `supabase/functions/` utilisent `authorizeRole` afin de bloquer systématiquement les accès non autorisés.

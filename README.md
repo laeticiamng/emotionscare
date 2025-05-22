@@ -113,7 +113,7 @@ NEXT_PUBLIC_WEB_URL=http://localhost:3000
 
 > **Note**
 > L'ancienne variable `SKIP_AUTH_CHECK` utilisée pour désactiver l'authentification en développement a été supprimée. Les tableaux de bord sont désormais toujours protégés.
-> Toutes les fonctions backend passent désormais par `authorizeRole` dans `supabase/functions/_shared/auth.ts` pour vérifier l'authentification **et** le rôle. Chaque tentative d'accès refusée est enregistrée dans la table `auth_attempts`.
+> Toutes les fonctions backend passent désormais par `authorizeRole` dans `supabase/functions/_shared/auth.ts` pour vérifier l'authentification **et** le rôle. Chaque tentative d'accès refusée est enregistrée dans la table `auth_attempts` avec l'adresse IP et le `user-agent`.
 
 ### Utilisateurs de test
 
