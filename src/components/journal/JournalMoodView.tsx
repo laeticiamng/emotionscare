@@ -2,281 +2,291 @@
 import React, { useMemo } from 'react';
 import { JournalEntry } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { getEmotionIcon, getEmotionColor } from '@/lib/emotionUtils';
-import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
+import { format, subDays, isWithinInterval } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface JournalMoodViewProps {
   entries: JournalEntry[];
 }
 
-interface EmotionCount {
-  name: string;
-  count: number;
-  color: string;
-}
-
 const JournalMoodView: React.FC<JournalMoodViewProps> = ({ entries }) => {
-  // Calculate emotion statistics
+  // Statistiques des émotions
   const emotionStats = useMemo(() => {
-    // Count emotions
-    const counts: Record<string, number> = {};
+    if (!entries.length) return [];
+    
+    const stats: Record<string, number> = {};
+    
     entries.forEach(entry => {
       const emotion = entry.mood || entry.emotion || 'neutral';
-      counts[emotion] = (counts[emotion] || 0) + 1;
+      stats[emotion] = (stats[emotion] || 0) + 1;
     });
     
-    // Transform into chart data
-    const chartData: EmotionCount[] = Object.keys(counts).map(emotion => {
-      // Get color based on the emotion
-      let colorHex = '#64748b'; // Default color
-      
-      switch (emotion) {
-        case 'joy':
-        case 'happy':
-          colorHex = '#22c55e';
-          break;
-        case 'excited':
-        case 'proud':
-          colorHex = '#f59e0b';
-          break;
-        case 'calm':
-        case 'relaxed':
-          colorHex = '#3b82f6';
-          break;
-        case 'sad':
-          colorHex = '#6366f1';
-          break;
-        case 'angry':
-          colorHex = '#ef4444';
-          break;
-        case 'stressed':
-        case 'anxious':
-          colorHex = '#f97316';
-          break;
-        case 'tired':
-          colorHex = '#8b5cf6';
-          break;
-      }
-      
-      return {
-        name: emotion,
-        count: counts[emotion],
-        color: colorHex
-      };
-    });
-    
-    // Sort by count (descending)
-    return chartData.sort((a, b) => b.count - a.count);
+    return Object.entries(stats).map(([name, value]) => ({
+      name,
+      value,
+      icon: getEmotionIcon(name),
+      color: getEmotionColor(name).split(' ')[0].replace('bg-', '') // Extraire la couleur principale
+    }));
   }, [entries]);
-  
-  // Calculate mood over time
-  const moodOverTime = useMemo(() => {
-    // Group by date
-    const entriesByDate: Record<string, JournalEntry[]> = {};
-    entries.forEach(entry => {
-      const dateStr = new Date(entry.date).toISOString().split('T')[0];
-      if (!entriesByDate[dateStr]) {
-        entriesByDate[dateStr] = [];
-      }
-      entriesByDate[dateStr].push(entry);
-    });
+
+  // Données pour le graphique des tendances des 7 derniers jours
+  const weeklyTrendData = useMemo(() => {
+    if (!entries.length) return [];
     
-    // Sort dates
-    const sortedDates = Object.keys(entriesByDate).sort();
+    const today = new Date();
+    const days = Array.from({ length: 7 }, (_, i) => subDays(today, 6 - i));
     
-    // Calculate average mood score for each date
-    return sortedDates.map(dateStr => {
-      const dateEntries = entriesByDate[dateStr];
-      // Use mood_score if available, otherwise assign a default score based on emotion
-      const moodScores = dateEntries.map(entry => {
-        if (entry.mood_score !== undefined) {
-          return entry.mood_score;
-        }
-        
-        // Assign scores based on common emotions (very simplified)
-        const emotion = entry.mood || entry.emotion || 'neutral';
-        switch (emotion.toLowerCase()) {
-          case 'happy':
-          case 'joy':
-          case 'excited':
-            return 80;
-          case 'calm':
-          case 'relaxed':
-            return 70;
-          case 'neutral':
-            return 50;
-          case 'sad':
-          case 'tired':
-            return 30;
-          case 'angry':
-          case 'stressed':
-          case 'anxious':
-            return 20;
-          default:
-            return 50;
-        }
+    const dayData = days.map(day => {
+      const dayStr = format(day, 'yyyy-MM-dd');
+      const dayName = format(day, 'E', { locale: fr });
+      
+      // Trouver les entrées pour ce jour
+      const dayEntries = entries.filter(entry => {
+        const entryDate = new Date(entry.date);
+        return format(entryDate, 'yyyy-MM-dd') === dayStr;
       });
       
-      // Calculate average
-      const avgScore = moodScores.reduce((sum, score) => sum + score, 0) / moodScores.length;
-      
-      // Format date to be more readable
-      const date = new Date(dateStr);
-      const formattedDate = `${date.getDate()}/${date.getMonth() + 1}`;
+      // Calculer le score moyen d'humeur pour ce jour
+      let avgScore = 0;
+      if (dayEntries.length) {
+        avgScore = dayEntries.reduce((sum, entry) => sum + (entry.mood_score || 50), 0) / dayEntries.length;
+      }
       
       return {
-        date: formattedDate,
-        score: Math.round(avgScore),
-        count: dateEntries.length
+        day: dayName,
+        date: dayStr,
+        score: avgScore,
+        count: dayEntries.length
       };
     });
+    
+    return dayData;
   }, [entries]);
   
-  if (!entries || entries.length === 0) {
-    return (
-      <div className="text-center p-8 border rounded-md">
-        <p className="text-muted-foreground">Aucune donnée à afficher. Commencez à journaliser vos émotions.</p>
-      </div>
-    );
-  }
+  // Statistiques par période
+  const getTimePeriodStats = (days: number) => {
+    const today = new Date();
+    const startDate = subDays(today, days);
+    
+    const periodEntries = entries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return isWithinInterval(entryDate, { start: startDate, end: today });
+    });
+    
+    const totalEntries = periodEntries.length;
+    const avgScore = totalEntries ? 
+      periodEntries.reduce((sum, entry) => sum + (entry.mood_score || 50), 0) / totalEntries : 0;
+    
+    // Émotion dominante
+    const emotionCount: Record<string, number> = {};
+    periodEntries.forEach(entry => {
+      const emotion = entry.mood || entry.emotion || 'neutral';
+      emotionCount[emotion] = (emotionCount[emotion] || 0) + 1;
+    });
+    
+    let dominantEmotion = 'neutral';
+    let maxCount = 0;
+    
+    Object.entries(emotionCount).forEach(([emotion, count]) => {
+      if (count > maxCount) {
+        maxCount = count;
+        dominantEmotion = emotion;
+      }
+    });
+    
+    return {
+      totalEntries,
+      avgScore: Math.round(avgScore),
+      dominantEmotion,
+      dominantEmotionIcon: getEmotionIcon(dominantEmotion)
+    };
+  };
   
+  const weekStats = getTimePeriodStats(7);
+  const monthStats = getTimePeriodStats(30);
+
+  // Couleurs pour le graphique en camembert
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28BDA', '#FF6B6B', '#4ECDC4', '#F8EDEB'];
+
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Emotion Distribution */}
+      {/* Statistiques résumées */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Distribution des émotions</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total des entrées</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={emotionStats}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  paddingAngle={5}
-                  dataKey="count"
-                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                >
-                  {emotionStats.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  formatter={(value, name) => [`${value} entrée${value > 1 ? 's' : ''}`, name]}
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      const data = payload[0].payload;
-                      return (
-                        <div className="rounded-lg border bg-background p-2 shadow-sm">
-                          <div className="flex items-center">
-                            <span className="mr-2">{getEmotionIcon(data.name)}</span>
-                            <span className="font-semibold">{data.name}</span>
-                          </div>
-                          <p className="text-sm">{data.count} entrée{data.count > 1 ? 's' : ''}</p>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+          <CardContent>
+            <div className="text-2xl font-bold">{entries.length}</div>
           </CardContent>
         </Card>
         
-        {/* Mood Over Time */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Évolution de l'humeur</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Émotion dominante</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={moodOverTime}>
-                <XAxis dataKey="date" />
-                <Tooltip
-                  formatter={(value) => [`${value}/100`, 'Score d\'humeur']}
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      const data = payload[0].payload;
-                      let moodDescription = 'Neutre';
-                      let moodColor = 'text-gray-500';
-                      
-                      if (data.score >= 80) {
-                        moodDescription = 'Excellent';
-                        moodColor = 'text-green-500';
-                      } else if (data.score >= 65) {
-                        moodDescription = 'Bien';
-                        moodColor = 'text-blue-500';
-                      } else if (data.score >= 45) {
-                        moodDescription = 'Moyen';
-                        moodColor = 'text-amber-500';
-                      } else if (data.score >= 25) {
-                        moodDescription = 'Pas très bien';
-                        moodColor = 'text-orange-500';
-                      } else {
-                        moodDescription = 'Mauvais';
-                        moodColor = 'text-red-500';
-                      }
-                      
-                      return (
-                        <div className="rounded-lg border bg-background p-2 shadow-sm">
-                          <p className="font-semibold">{data.date}</p>
-                          <p className={`text-sm ${moodColor}`}>
-                            Humeur: {moodDescription} ({data.score}/100)
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {data.count} entrée{data.count > 1 ? 's' : ''}
-                          </p>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-                <Bar dataKey="score" radius={[4, 4, 0, 0]}>
-                  {moodOverTime.map((entry, index) => {
-                    let barColor = '#64748b'; // Default
-                    
-                    if (entry.score >= 80) barColor = '#22c55e';
-                    else if (entry.score >= 65) barColor = '#3b82f6';
-                    else if (entry.score >= 45) barColor = '#f59e0b';
-                    else if (entry.score >= 25) barColor = '#f97316';
-                    else barColor = '#ef4444';
-                    
-                    return <Cell key={`cell-${index}`} fill={barColor} />;
-                  })}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+          <CardContent>
+            <div className="text-2xl font-bold flex items-center gap-2">
+              {monthStats.dominantEmotionIcon} {monthStats.dominantEmotion}
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Cette semaine</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{weekStats.totalEntries} entrées</div>
+            <p className="text-xs text-muted-foreground">Score moyen: {weekStats.avgScore}/100</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Ce mois</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{monthStats.totalEntries} entrées</div>
+            <p className="text-xs text-muted-foreground">Score moyen: {monthStats.avgScore}/100</p>
           </CardContent>
         </Card>
       </div>
       
-      {/* Emotion Legend */}
+      {/* Graphiques d'analyse */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Distribution des émotions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Distribution des émotions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {emotionStats.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={emotionStats}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    nameKey="name"
+                    label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {emotionStats.map((entry, index) => (
+                      <Cell 
+                        key={`cell-${index}`} 
+                        fill={entry.color ? `var(--${entry.color}-500)` : COLORS[index % COLORS.length]} 
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value) => [`${value} entrées`, 'Fréquence']}
+                    labelFormatter={(name) => `Émotion: ${name}`} 
+                  />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground text-center py-12">
+                Pas assez de données pour afficher des statistiques.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+        
+        {/* Tendances des 7 derniers jours */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Tendances des 7 derniers jours</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {weeklyTrendData.some(day => day.count > 0) ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={weeklyTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="day" />
+                  <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
+                  <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
+                  <Tooltip 
+                    formatter={(value, name) => {
+                      if (name === 'score') return [`${value}/100`, 'Score moyen'];
+                      return [`${value}`, 'Nombre d\'entrées'];
+                    }}
+                    labelFormatter={(day) => `Jour: ${day}`}
+                  />
+                  <Legend />
+                  <Bar yAxisId="left" dataKey="score" name="Score d'humeur" fill="#8884d8" />
+                  <Bar yAxisId="right" dataKey="count" name="Nombre d'entrées" fill="#82ca9d" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground text-center py-12">
+                Pas assez de données pour afficher des tendances.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Conseils basés sur les données */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Légende des émotions</CardTitle>
+          <CardTitle>Conseils personnalisés</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-            {emotionStats.map((emotion) => (
-              <div
-                key={emotion.name}
-                className={`flex items-center gap-2 p-2 rounded-md ${getEmotionColor(emotion.name)}`}
-              >
-                <span className="text-xl">{getEmotionIcon(emotion.name)}</span>
-                <div>
-                  <p className="font-medium capitalize">{emotion.name}</p>
-                  <p className="text-xs">{emotion.count} entrée{emotion.count > 1 ? 's' : ''}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          {entries.length > 0 ? (
+            <div className="prose dark:prose-invert max-w-none">
+              <p>
+                Basé sur vos {entries.length} entrées de journal, voici quelques observations et conseils :
+              </p>
+              
+              <ul className="space-y-2">
+                {weekStats.avgScore < 40 && (
+                  <li>
+                    Votre score moyen d'humeur cette semaine est assez bas ({weekStats.avgScore}/100). 
+                    Pensez à pratiquer des activités qui vous apportent de la joie.
+                  </li>
+                )}
+                
+                {weekStats.avgScore >= 40 && weekStats.avgScore < 70 && (
+                  <li>
+                    Votre score moyen d'humeur cette semaine est modéré ({weekStats.avgScore}/100). 
+                    Continuez vos efforts tout en accordant du temps à votre bien-être.
+                  </li>
+                )}
+                
+                {weekStats.avgScore >= 70 && (
+                  <li>
+                    Votre score moyen d'humeur cette semaine est excellent ({weekStats.avgScore}/100)! 
+                    Continuez vos habitudes positives.
+                  </li>
+                )}
+                
+                {weekStats.dominantEmotion === 'stressed' || weekStats.dominantEmotion === 'anxious' && (
+                  <li>
+                    L'émotion {weekStats.dominantEmotion} est prédominante cette semaine. 
+                    Essayez des techniques de respiration ou de méditation pour réduire le stress.
+                  </li>
+                )}
+                
+                {weekStats.totalEntries < 3 && (
+                  <li>
+                    Vous avez enregistré peu d'entrées cette semaine ({weekStats.totalEntries}). 
+                    Essayez de noter régulièrement vos émotions pour un meilleur suivi.
+                  </li>
+                )}
+              </ul>
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-center">
+              Commencez à enregistrer vos émotions pour obtenir des conseils personnalisés.
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

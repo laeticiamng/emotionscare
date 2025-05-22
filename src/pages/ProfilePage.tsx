@@ -1,242 +1,290 @@
 
 import React, { useState } from 'react';
+import Shell from '@/Shell';
 import { useAuth } from '@/contexts/AuthContext';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Textarea } from '@/components/ui/textarea';
-import { SaveIcon } from 'lucide-react';
+import { Save, User, Settings, Bell, Shield } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    bio: '',
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // États du formulaire
+  const [profileData, setProfileData] = useState({
+    firstName: user?.firstName || 'Utilisateur',
+    lastName: user?.lastName || '',
+    email: user?.email || 'utilisateur@example.com',
     phone: '',
-    department: user?.department || '',
-    position: user?.position || '',
+    bio: '',
   });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  
+  // Gérer les changements de champs
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setProfileData(prev => ({
       ...prev,
       [name]: value
     }));
   };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  
+  // Simuler la sauvegarde des modifications
+  const handleSaveProfile = () => {
+    setIsLoading(true);
     
-    // Simulating update profile
+    // Simuler une requête API
     setTimeout(() => {
+      setIsLoading(false);
       toast.success('Profil mis à jour avec succès');
-      setIsEditing(false);
-    }, 500);
+    }, 1000);
   };
   
-  if (!user) {
-    return (
-      <div className="container mx-auto py-10 px-4">
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center">Veuillez vous connecter pour voir votre profil</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-  
   return (
-    <div className="container max-w-4xl mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold mb-6">Profil</h1>
-      
-      <Tabs defaultValue="info">
-        <TabsList className="mb-6">
-          <TabsTrigger value="info">Informations</TabsTrigger>
-          <TabsTrigger value="preferences">Préférences</TabsTrigger>
-          <TabsTrigger value="activity">Activité</TabsTrigger>
-        </TabsList>
+    <Shell>
+      <div className="container py-10 max-w-4xl">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Mon profil</h1>
+            <p className="text-muted-foreground">
+              Gérez vos informations personnelles et préférences
+            </p>
+          </div>
+        </div>
         
-        <TabsContent value="info">
-          <Card>
-            <CardHeader className="pb-0">
-              <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-                <div className="flex items-center gap-4">
-                  <Avatar className="w-16 h-16">
-                    <AvatarImage src={user.avatar} />
-                    <AvatarFallback>
-                      {user.name?.charAt(0) || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <CardTitle className="text-2xl">{user.name}</CardTitle>
-                    <CardDescription>{user.email}</CardDescription>
-                    <div className="flex gap-2 mt-1">
-                      <Badge variant="outline">{user.role}</Badge>
-                      {user.department && <Badge variant="secondary">{user.department}</Badge>}
-                    </div>
-                  </div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {/* Carte de profil */}
+          <Card className="md:col-span-1">
+            <CardHeader>
+              <div className="flex justify-center">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src="/avatar.png" alt="Avatar" />
+                  <AvatarFallback>
+                    <User className="h-12 w-12 text-muted-foreground" />
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+              <CardTitle className="text-center mt-4">{profileData.firstName} {profileData.lastName}</CardTitle>
+              <CardDescription className="text-center">{profileData.email}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col space-y-2 text-sm text-muted-foreground">
+                <div className="flex justify-between">
+                  <span>Membre depuis</span>
+                  <span>Juin 2023</span>
                 </div>
-                <div>
-                  <Button onClick={() => setIsEditing(!isEditing)}>
-                    {isEditing ? 'Annuler' : 'Modifier le profil'}
-                  </Button>
+                <div className="flex justify-between">
+                  <span>Dernière connexion</span>
+                  <span>Aujourd'hui</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Type de compte</span>
+                  <span className="font-medium text-primary">Premium</span>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent className="pt-6">
-              {isEditing ? (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name">Nom</Label>
-                      <Input 
-                        id="name" 
-                        name="name"
-                        value={formData.name} 
-                        onChange={handleChange}
-                      />
+            </CardContent>
+          </Card>
+          
+          {/* Formulaires */}
+          <div className="md:col-span-2">
+            <Tabs defaultValue="general" className="w-full">
+              <TabsList className="grid grid-cols-3 mb-8">
+                <TabsTrigger value="general" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>Général</span>
+                </TabsTrigger>
+                <TabsTrigger value="notifications" className="flex items-center gap-2">
+                  <Bell className="h-4 w-4" />
+                  <span>Notifications</span>
+                </TabsTrigger>
+                <TabsTrigger value="security" className="flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  <span>Sécurité</span>
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="general">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Informations générales</CardTitle>
+                    <CardDescription>
+                      Mettez à jour vos informations personnelles
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName">Prénom</Label>
+                        <Input
+                          id="firstName"
+                          name="firstName"
+                          value={profileData.firstName}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName">Nom</Label>
+                        <Input
+                          id="lastName"
+                          name="lastName"
+                          value={profileData.lastName}
+                          onChange={handleInputChange}
+                        />
+                      </div>
                     </div>
-                    <div>
+                    
+                    <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
-                      <Input 
+                      <Input
                         id="email"
-                        name="email" 
-                        type="email" 
-                        value={formData.email} 
-                        onChange={handleChange}
-                        disabled
+                        name="email"
+                        type="email"
+                        value={profileData.email}
+                        onChange={handleInputChange}
                       />
                     </div>
-                    <div>
+                    
+                    <div className="space-y-2">
                       <Label htmlFor="phone">Téléphone</Label>
-                      <Input 
-                        id="phone" 
+                      <Input
+                        id="phone"
                         name="phone"
-                        value={formData.phone} 
-                        onChange={handleChange}
+                        type="tel"
+                        value={profileData.phone}
+                        onChange={handleInputChange}
+                        placeholder="(Optionnel)"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="position">Poste</Label>
-                      <Input 
-                        id="position" 
-                        name="position"
-                        value={formData.position} 
-                        onChange={handleChange}
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="bio">Bio</Label>
+                      <Input
+                        id="bio"
+                        name="bio"
+                        value={profileData.bio}
+                        onChange={handleInputChange}
+                        placeholder="Parlez-nous de vous..."
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="department">Département</Label>
-                      <Input 
-                        id="department" 
-                        name="department"
-                        value={formData.department} 
-                        onChange={handleChange}
-                      />
+                  </CardContent>
+                  <CardFooter>
+                    <Button 
+                      onClick={handleSaveProfile} 
+                      disabled={isLoading}
+                      className="ml-auto"
+                    >
+                      {isLoading ? (
+                        <div className="flex items-center">
+                          <div className="w-4 h-4 mr-2 border-2 border-background border-t-transparent rounded-full animate-spin"></div>
+                          Sauvegarde...
+                        </div>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Enregistrer
+                        </>
+                      )}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="notifications">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Préférences de notifications</CardTitle>
+                    <CardDescription>
+                      Configurez comment vous souhaitez être notifié
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Notifications par email</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Recevez des mises à jour sur votre activité
+                          </p>
+                        </div>
+                        <div className="space-x-2">
+                          <Button variant="outline" size="sm">Désactiver</Button>
+                          <Button size="sm" variant="default">Activer</Button>
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Rappels quotidiens</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Recevez des rappels pour vos activités quotidiennes
+                          </p>
+                        </div>
+                        <div className="space-x-2">
+                          <Button variant="outline" size="sm">Désactiver</Button>
+                          <Button size="sm">Activer</Button>
+                        </div>
+                      </div>
+                      
+                      <Separator />
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium">Notifications de nouveaux contenus</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Soyez informé lorsque de nouveaux contenus sont disponibles
+                          </p>
+                        </div>
+                        <div className="space-x-2">
+                          <Button variant="outline" size="sm">Désactiver</Button>
+                          <Button size="sm">Activer</Button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="bio">Biographie</Label>
-                    <Textarea 
-                      id="bio" 
-                      name="bio"
-                      value={formData.bio} 
-                      onChange={handleChange} 
-                      rows={4}
-                    />
-                  </div>
-                </form>
-              ) : (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
-                    <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
-                      <p>{user.email}</p>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="security">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Paramètres de sécurité</CardTitle>
+                    <CardDescription>
+                      Gérez les paramètres de sécurité de votre compte
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="current-password">Mot de passe actuel</Label>
+                      <Input id="current-password" type="password" />
                     </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Rôle</h3>
-                      <p className="capitalize">{user.role}</p>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="new-password">Nouveau mot de passe</Label>
+                      <Input id="new-password" type="password" />
                     </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Département</h3>
-                      <p>{user.department || '–'}</p>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+                      <Input id="confirm-password" type="password" />
                     </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Poste</h3>
-                      <p>{user.position || '–'}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Dernière connexion</h3>
-                      <p>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Jamais'}</p>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-muted-foreground">Membre depuis</h3>
-                      <p>{new Date(user.createdAt).toLocaleDateString()}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-            {isEditing && (
-              <CardFooter className="flex justify-end">
-                <Button type="submit" onClick={handleSubmit}>
-                  <SaveIcon className="w-4 h-4 mr-2" />
-                  Enregistrer les modifications
-                </Button>
-              </CardFooter>
-            )}
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="preferences">
-          <Card>
-            <CardHeader>
-              <CardTitle>Préférences</CardTitle>
-              <CardDescription>
-                Personnalisez votre expérience dans l'application
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Les préférences seront disponibles bientôt.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="activity">
-          <Card>
-            <CardHeader>
-              <CardTitle>Activité récente</CardTitle>
-              <CardDescription>
-                Historique de vos interactions avec l'application
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                L'historique d'activité sera disponible prochainement.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button className="ml-auto">Mettre à jour le mot de passe</Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      </div>
+    </Shell>
   );
 };
 

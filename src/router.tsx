@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -5,7 +6,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 // Import pages
 const Home = React.lazy(() => import('./Home'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-const NotFoundPage = React.lazy(() => import('./pages/error/NotFoundPage'));
+const NotFoundPage = React.lazy(() => import('./pages/errors/NotFoundPage'));
 const ForbiddenPage = React.lazy(() => import('./pages/error/ForbiddenPage'));
 const ServerErrorPage = React.lazy(() => import('./pages/error/ServerErrorPage'));
 const Legal = React.lazy(() => import('./pages/Legal'));
