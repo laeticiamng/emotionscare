@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { UserIcon, Building, BuildingCog } from 'lucide-react';
+import { UserIcon, Building, ShieldCheck } from 'lucide-react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { getUserModeDisplayName } from '@/utils/userModeHelpers';
 import { UserMode } from '@/types/auth';
@@ -32,7 +32,7 @@ export function UserModeSelector({
       case 'b2b_user':
         return <Building className="h-4 w-4" />;
       case 'b2b_admin':
-        return <BuildingCog className="h-4 w-4" />;
+        return <ShieldCheck className="h-4 w-4" />;
       default:
         return <UserIcon className="h-4 w-4" />;
     }
@@ -62,7 +62,7 @@ export function UserModeSelector({
           <span>Collaborateur</span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => changeUserMode('b2b_admin')}>
-          <BuildingCog className="mr-2 h-4 w-4" />
+          <ShieldCheck className="mr-2 h-4 w-4" />
           <span>Administration</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
