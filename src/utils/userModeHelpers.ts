@@ -3,7 +3,6 @@ import { UserMode } from '@/types/auth';
 
 /**
  * Normalizes user mode strings to ensure consistent format
- * This is important when comparing modes across different parts of the app
  */
 export const normalizeUserMode = (mode?: string): UserMode => {
   if (!mode) return 'b2c'; // Default to b2c
