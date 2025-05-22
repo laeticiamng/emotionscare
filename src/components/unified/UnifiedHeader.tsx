@@ -52,6 +52,14 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ onMenuClick }) => {
                 </span>
               </Button>
               <UserModeButton />
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => navigate('/mode-switcher')}
+                className="text-xs hidden md:block"
+              >
+                Changer de mode
+              </Button>
             </>
           )}
           

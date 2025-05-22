@@ -124,9 +124,9 @@ export const getModeLoginPath = (userMode: string | null): string => {
   
   switch (normalizedMode) {
     case 'b2b_admin':
-      return '/b2b/admin/login';
+      return '/login-admin';
     case 'b2b_user':
-      return '/b2b/user/login';
+      return '/login-collaborateur';
     case 'b2c':
     default:
       return '/b2c/login';

@@ -24,6 +24,7 @@ const MusicPage = lazy(() => import('../pages/MusicPage'));
 const SettingsPage = lazy(() => import('../pages/SettingsPage'));
 const B2BUserDashboard = lazy(() => import('../pages/b2b/user/Dashboard'));
 const B2BAdminDashboard = lazy(() => import('../pages/b2b/admin/Dashboard'));
+const ModeSwitcher = lazy(() => import('../pages/common/ModeSwitcher'));
 
 // Define routes
 const routes: RouteObject[] = [
@@ -45,6 +46,10 @@ const routes: RouteObject[] = [
   {
     path: '/choose-mode',
     element: <ChooseMode />
+  },
+  {
+    path: '/mode-switcher',
+    element: <ModeSwitcher />
   },
   {
     path: '/b2b/selection',
@@ -124,3 +129,4 @@ const routes: RouteObject[] = [
 ];
 
 export default routes;
+export { routes };

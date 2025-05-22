@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { normalizeUserMode } from '@/utils/userModeHelpers';
+import { normalizeUserMode, getModeLoginPath } from '@/utils/userModeHelpers';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserModeType } from '@/types/userMode';
 
@@ -57,7 +57,8 @@ const ProtectedRouteWithMode: React.FC<ProtectedRouteWithModeProps> = ({
   // If not authenticated, redirect to login
   if (!isAuthenticated) {
     console.log('[ProtectedRouteWithMode] Redirecting to login: user not authenticated');
-    return <Navigate to="/login" state={{ from: location }} />;
+    const loginPath = getModeLoginPath(requiredMode);
+    return <Navigate to={loginPath} state={{ from: location }} />;
   }
 
   // If user is authenticated but doesn't have the required mode, redirect to the specified page
