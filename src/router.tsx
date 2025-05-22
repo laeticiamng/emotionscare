@@ -16,7 +16,7 @@ const TermsOfService = React.lazy(() => import('./pages/TermsOfService'));
 const CookiesPage = React.lazy(() => import('./pages/CookiesPage'));
 const SocialCocoonPage = React.lazy(() => import('./pages/SocialCocoonPage'));
 const TeamPage = React.lazy(() => import('./pages/TeamPage'));
-const Support = React.lazy(() => import('./pages/SupportPage'));
+const Support = React.lazy(() => import('./pages/Support'));
 const NotImplementedPage = React.lazy(() => import('./pages/NotImplementedPage'));
 const B2CDashboardPage = React.lazy(() => import('./pages/b2c/DashboardPage'));
 const SessionsPage = React.lazy(() => import('./pages/SessionsPage'));

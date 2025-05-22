@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { Search, ArrowLeft, Home } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Home } from 'lucide-react';
 import Shell from '@/Shell';
 
 const NotFoundPage: React.FC = () => {
@@ -24,7 +24,7 @@ const NotFoundPage: React.FC = () => {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <Search className="h-12 w-12 text-muted-foreground" />
+            <AlertCircle className="h-12 w-12 text-primary" />
           </motion.div>
           
           <motion.div
@@ -35,7 +35,7 @@ const NotFoundPage: React.FC = () => {
             <h1 className="text-6xl font-bold mb-4">404</h1>
             <h2 className="text-2xl font-semibold mb-4">Page non trouvée</h2>
             <p className="text-muted-foreground mb-8">
-              La page que vous cherchez n'existe pas ou a été déplacée.
+              Désolé, la page que vous recherchez n'existe pas ou a été déplacée.
             </p>
           </motion.div>
           
@@ -69,11 +69,11 @@ const NotFoundPage: React.FC = () => {
             transition={{ delay: 0.7, duration: 0.5 }}
           >
             <p className="text-sm text-muted-foreground">
-              Vous pouvez également consulter notre 
+              Si vous pensez qu'il s'agit d'une erreur, veuillez contacter 
               <Link to="/support" className="text-primary hover:underline mx-1">
-                page de support
+                notre support
               </Link>
-              si vous avez besoin d'aide.
+              pour obtenir de l'aide.
             </p>
           </motion.div>
         </motion.div>
