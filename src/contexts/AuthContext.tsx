@@ -1,187 +1,163 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { AuthContextType, User } from '@/types/user';
+import { User, AuthState } from '@/types/auth';
 
-// Create the context
-const AuthContext = createContext<AuthContextType>({
+interface AuthContextProps {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: Error | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  register: (userData: any) => Promise<void>;
+}
+
+const defaultState: AuthState = {
   user: null,
-  session: null,
   isAuthenticated: false,
   isLoading: true,
-  login: async () => ({}),
-  register: async () => ({}),
-  logout: async () => {},
-  resetPassword: async () => ({}),
-  updateUser: async () => ({})
+  error: null,
+};
+
+const AuthContext = createContext<AuthContextProps>({
+  ...defaultState,
+  login: async () => {},
+  logout: () => {},
+  register: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
-// Mock user data for testing
-const MOCK_USER: User = {
-  id: 'user-123',
-  email: 'user@example.com',
-  name: 'Test User',
-  role: 'b2c',
-  avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix'
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [authState, setAuthState] = useState<AuthState>(defaultState);
 
   useEffect(() => {
-    // Check if there's a stored user session
+    // Check if user is already logged in (in local storage)
     const checkAuth = async () => {
       try {
         const storedUser = localStorage.getItem('user');
-        const storedSession = localStorage.getItem('session');
-        
-        if (storedUser && storedSession) {
-          setUser(JSON.parse(storedUser));
-          setSession(JSON.parse(storedSession));
+        if (storedUser) {
+          const user = JSON.parse(storedUser);
+          setAuthState({
+            user,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
         } else {
-          // For demo purposes, auto-login with mock user
-          // In a real app, you would check with Supabase or other auth provider
-          // setUser(MOCK_USER);  // Uncomment for automatic login
-          // setSession({ token: 'mock-session-token' });  // Uncomment for automatic login
+          setAuthState(prev => ({ ...prev, isLoading: false }));
         }
       } catch (error) {
-        console.error('Error checking authentication:', error);
-      } finally {
-        setIsLoading(false);
+        setAuthState({
+          user: null,
+          isAuthenticated: false,
+          isLoading: false,
+          error: error as Error,
+        });
       }
     };
 
     checkAuth();
   }, []);
 
-  // Login function
+  // Mock login function
   const login = async (email: string, password: string) => {
     try {
-      setIsLoading(true);
+      // Simulating API call
+      setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
       
-      // Mock login - replace with real auth in production
-      const mockUser = { ...MOCK_USER, email };
-      const mockSession = { token: 'mock-session-token', expiresAt: Date.now() + 3600000 };
+      // Mock successful login after delay
+      await new Promise(resolve => setTimeout(resolve, 800));
       
-      setUser(mockUser);
-      setSession(mockSession);
-      
-      // Store in localStorage
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      localStorage.setItem('session', JSON.stringify(mockSession));
-      
-      return { user: mockUser, session: mockSession };
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Register function
-  const register = async (email: string, password: string, data: any = {}) => {
-    try {
-      setIsLoading(true);
-      
-      // Mock registration - replace with real auth in production
-      const mockUser = { 
-        ...MOCK_USER, 
+      // Create mock user data
+      const user: User = {
+        id: '123',
         email,
-        name: data.name || 'New User',
-        role: data.role || 'b2c'
+        name: email.split('@')[0], // Use part of email as name
+        role: email.includes('admin') ? 'b2b_admin' : 
+              email.includes('b2b') ? 'b2b_user' : 'b2c',
       };
-      const mockSession = { token: 'mock-session-token', expiresAt: Date.now() + 3600000 };
-      
-      setUser(mockUser);
-      setSession(mockSession);
       
       // Store in localStorage
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      localStorage.setItem('session', JSON.stringify(mockSession));
+      localStorage.setItem('user', JSON.stringify(user));
       
-      return { user: mockUser, session: mockSession };
+      // Update state
+      setAuthState({
+        user,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      });
+      
     } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
+      setAuthState({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: error as Error,
+      });
     }
   };
 
-  // Logout function
-  const logout = async () => {
+  const logout = () => {
+    // Clear localStorage
+    localStorage.removeItem('user');
+    
+    // Reset auth state
+    setAuthState({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      error: null,
+    });
+  };
+
+  const register = async (userData: any) => {
     try {
-      setIsLoading(true);
+      // Simulating API call
+      setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
       
-      // Clear user data
-      setUser(null);
-      setSession(null);
+      // Mock successful registration after delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Remove from localStorage
-      localStorage.removeItem('user');
-      localStorage.removeItem('session');
-      localStorage.removeItem('user-mode'); // Also clear user mode
+      // Create user
+      const user: User = {
+        id: `user_${Date.now()}`,
+        email: userData.email,
+        name: userData.name || userData.email.split('@')[0],
+        role: userData.role || 'b2c',
+      };
+      
+      // Store in localStorage
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      // Update state
+      setAuthState({
+        user,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      });
+      
     } catch (error) {
-      console.error('Logout error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
+      setAuthState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: error as Error,
+      }));
     }
   };
-
-  // Reset password function
-  const resetPassword = async (email: string) => {
-    try {
-      // Mock password reset - replace with real implementation
-      console.log('Password reset requested for:', email);
-      return { success: true };
-    } catch (error) {
-      console.error('Password reset error:', error);
-      throw error;
-    }
-  };
-
-  // Update user function
-  const updateUser = async (data: Partial<User>) => {
-    try {
-      if (!user) throw new Error('No user to update');
-      
-      // Update user
-      const updatedUser = { ...user, ...data };
-      setUser(updatedUser);
-      
-      // Update localStorage
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      
-      return { user: updatedUser };
-    } catch (error) {
-      console.error('Update user error:', error);
-      throw error;
-    }
-  };
-
-  // Compute isAuthenticated based on user and session
-  const isAuthenticated = !!user && !!session;
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        session,
-        isAuthenticated,
-        isLoading,
-        login,
-        register,
-        logout,
-        resetPassword,
-        updateUser
-      }}
-    >
+    <AuthContext.Provider value={{ 
+      ...authState, 
+      login, 
+      logout,
+      register,
+    }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export default AuthProvider;

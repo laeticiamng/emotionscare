@@ -1,88 +1,145 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Building, Shield, ArrowLeft } from 'lucide-react';
+import { Building, BuildingCog, UserCircle2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import Shell from '@/Shell';
-import { useUserMode } from '@/contexts/UserModeContext';
 
 const B2BSelection: React.FC = () => {
   const navigate = useNavigate();
-  const { setUserMode } = useUserMode();
-  
-  const handleUserChoice = () => {
-    setUserMode('b2b_user');
-    navigate('/login-collaborateur');
-  };
-  
-  const handleAdminChoice = () => {
-    setUserMode('b2b_admin');
-    navigate('/login-admin');
-  };
   
   return (
     <Shell>
-      <div className="container mx-auto flex items-center justify-center min-h-[calc(100vh-120px)] p-4">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-4xl w-full"
-        >
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">Espace Entreprise</h1>
-            <p className="text-muted-foreground">
-              Sélectionnez le type d'accès dont vous avez besoin
+      <div className="container mx-auto py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-12"
+          >
+            <h1 className="text-3xl font-bold mb-4">Choisissez votre espace entreprise</h1>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Sélectionnez le type d'accès dont vous avez besoin pour votre espace professionnel.
             </p>
-          </div>
+          </motion.div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={handleUserChoice}>
-              <CardHeader className="text-center">
-                <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                  <Building className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                </div>
-                <CardTitle className="text-2xl">Espace Collaborateur</CardTitle>
-                <CardDescription>Accès aux outils de bien-être émotionnel</CardDescription>
-              </CardHeader>
-              <CardContent className="text-center text-muted-foreground">
-                <p>Utilisez cet espace pour accéder à vos ressources personnalisées</p>
-              </CardContent>
-              <CardFooter className="flex justify-center pt-2">
-                <Button variant="outline">Accéder</Button>
-              </CardFooter>
-            </Card>
+          <div className="grid md:grid-cols-2 gap-8 mt-8">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+            >
+              <Card className="h-full transition-all hover:shadow-md">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Building className="mr-2 h-5 w-5 text-primary" />
+                    Espace Collaborateur
+                  </CardTitle>
+                  <CardDescription>
+                    Accès aux fonctionnalités de bien-être et aux ressources partagées
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-center">
+                      <span className="h-2 w-2 rounded-full bg-primary mr-2"></span>
+                      Journal émotionnel personnel
+                    </li>
+                    <li className="flex items-center">
+                      <span className="h-2 w-2 rounded-full bg-primary mr-2"></span>
+                      Accès aux ressources de l'entreprise
+                    </li>
+                    <li className="flex items-center">
+                      <span className="h-2 w-2 rounded-full bg-primary mr-2"></span>
+                      Séances de relaxation et méditation
+                    </li>
+                    <li className="flex items-center">
+                      <span className="h-2 w-2 rounded-full bg-primary mr-2"></span>
+                      Tableau de bord personnel
+                    </li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    onClick={() => navigate('/b2b/user/login')}
+                    className="w-full"
+                  >
+                    Accéder à l'espace collaborateur
+                  </Button>
+                </CardFooter>
+              </Card>
+            </motion.div>
             
-            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={handleAdminChoice}>
-              <CardHeader className="text-center">
-                <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                  <Shield className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-                </div>
-                <CardTitle className="text-2xl">Espace Administrateur</CardTitle>
-                <CardDescription>Gestion des équipes et des ressources</CardDescription>
-              </CardHeader>
-              <CardContent className="text-center text-muted-foreground">
-                <p>Gérez les utilisateurs, suivez les métriques et configurez la plateforme</p>
-              </CardContent>
-              <CardFooter className="flex justify-center pt-2">
-                <Button variant="outline">Accéder</Button>
-              </CardFooter>
-            </Card>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <Card className="h-full transition-all hover:shadow-md border-primary/30">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <BuildingCog className="mr-2 h-5 w-5 text-primary" />
+                    Espace Administration
+                  </CardTitle>
+                  <CardDescription>
+                    Gérez votre entreprise et suivez le bien-être de vos équipes
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-center">
+                      <span className="h-2 w-2 rounded-full bg-primary mr-2"></span>
+                      Gestion des utilisateurs
+                    </li>
+                    <li className="flex items-center">
+                      <span className="h-2 w-2 rounded-full bg-primary mr-2"></span>
+                      Tableau de bord analytique
+                    </li>
+                    <li className="flex items-center">
+                      <span className="h-2 w-2 rounded-full bg-primary mr-2"></span>
+                      Statistiques et rapports
+                    </li>
+                    <li className="flex items-center">
+                      <span className="h-2 w-2 rounded-full bg-primary mr-2"></span>
+                      Configuration des ressources
+                    </li>
+                  </ul>
+                </CardContent>
+                <CardFooter>
+                  <Button 
+                    onClick={() => navigate('/b2b/admin/login')}
+                    variant="outline"
+                    className="w-full border-primary/30 hover:bg-primary/10"
+                  >
+                    Accéder à l'administration
+                  </Button>
+                </CardFooter>
+              </Card>
+            </motion.div>
           </div>
           
-          <div className="mt-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="mt-12 text-center"
+          >
+            <p className="mb-4 text-muted-foreground">
+              Vous êtes un particulier ? Accédez à votre espace personnel
+            </p>
             <Button 
-              variant="ghost" 
-              onClick={() => navigate('/')}
+              variant="link" 
+              onClick={() => navigate('/b2c/login')}
               className="flex items-center gap-2"
             >
-              <ArrowLeft className="h-4 w-4" />
-              Retour à l'accueil
+              <UserCircle2 className="h-4 w-4" />
+              Espace particulier
             </Button>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </Shell>
   );
