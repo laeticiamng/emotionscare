@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -87,17 +86,9 @@ const SynthesisOnboarding: React.FC<SynthesisOnboardingProps> = ({ open, onClose
           <DialogDescription>{steps[currentStep].description}</DialogDescription>
         </DialogHeader>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="py-4"
-          >
-            {steps[currentStep].image}
-          </motion.div>
-        </AnimatePresence>
+        <div className="py-4">
+          {steps[currentStep].image}
+        </div>
         
         <Progress 
           value={((currentStep + 1) / steps.length) * 100} 
