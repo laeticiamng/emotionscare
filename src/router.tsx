@@ -4,11 +4,11 @@ import { Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Import pages
-const Home = React.lazy(() => import('./Home'));
+const Home = React.lazy(() => import('./pages/Index'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-const NotFoundPage = React.lazy(() => import('./pages/errors/NotFoundPage'));
-const ForbiddenPage = React.lazy(() => import('./pages/errors/ForbiddenPage'));
-const ServerErrorPage = React.lazy(() => import('./pages/errors/ServerErrorPage'));
+const NotFoundPage = React.lazy(() => import('./pages/error/NotFoundPage'));
+const ForbiddenPage = React.lazy(() => import('./pages/error/ForbiddenPage'));
+const ServerErrorPage = React.lazy(() => import('./pages/error/ServerErrorPage'));
 const Legal = React.lazy(() => import('./pages/Legal'));
 const ContactPage = React.lazy(() => import('./pages/ContactPage'));
 const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy'));
@@ -32,6 +32,11 @@ const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
 // Journal pages
 const NewJournalEntryPage = React.lazy(() => import('./pages/journal/NewJournalEntryPage'));
 const JournalEntryPage = React.lazy(() => import('./pages/journal/JournalEntryPage'));
+const JournalPage = React.lazy(() => import('./pages/journal/JournalPage'));
+
+// Music pages
+const MusicPage = React.lazy(() => import('./pages/music/MusicPage'));
+const MusicPlayerPage = React.lazy(() => import('./pages/music/MusicPlayerPage'));
 
 // Define routes
 const routes = [
@@ -121,12 +126,25 @@ const routes = [
   },
   // Journal routes
   {
+    path: '/journal',
+    element: <ProtectedRoute><JournalPage /></ProtectedRoute>
+  },
+  {
     path: '/journal/new',
     element: <ProtectedRoute><NewJournalEntryPage /></ProtectedRoute>
   },
   {
     path: '/journal/:id',
     element: <ProtectedRoute><JournalEntryPage /></ProtectedRoute>
+  },
+  // Music routes
+  {
+    path: '/music',
+    element: <ProtectedRoute><MusicPage /></ProtectedRoute>
+  },
+  {
+    path: '/music/player/:id',
+    element: <ProtectedRoute><MusicPlayerPage /></ProtectedRoute>
   },
   // Auth routes
   {

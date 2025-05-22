@@ -4,15 +4,13 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import Shell from '@/Shell';
 import { useAuth } from '@/contexts/AuthContext';
-import AccessSection from '@/components/home/AccessSection';
-import HeroSection from '@/components/home/HeroSection';
-import CtaSection from '@/components/home/CtaSection';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import { ArrowRight, Book, Heart, HeartPulse, Music, Shield, Sparkles, Users } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   
   const handleDashboardClick = () => {
     if (isAuthenticated) {
@@ -22,15 +20,86 @@ const Index = () => {
       navigate('/login');
     }
   };
-  
-  console.log("Rendering Index page, isAuthenticated:", isAuthenticated, "user:", user?.name);
 
   return (
     <Shell>
       <div className="container px-4 py-8 mx-auto">
-        <HeroSection />
+        {/* Hero Section */}
+        <section className="py-12 md:py-24 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl mx-auto"
+          >
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Prenez soin de votre bien-être émotionnel
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground mb-8">
+              EmotionsCare vous accompagne dans votre parcours vers l'équilibre émotionnel avec des outils innovants et personnalisés.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button onClick={handleDashboardClick} size="lg" className="group">
+                <span>Commencer maintenant</span>
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+              <Button variant="outline" size="lg" onClick={() => navigate('/contact')}>
+                En savoir plus
+              </Button>
+            </div>
+          </motion.div>
+        </section>
         
-        {/* Connection Options - Highlighted with prominent styling */}
+        {/* Features Section */}
+        <section className="py-16 bg-muted/30 rounded-3xl px-8 my-16">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Nos fonctionnalités principales</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Découvrez comment EmotionsCare peut vous aider à gérer vos émotions et améliorer votre bien-être quotidien.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <FeatureCard 
+              icon={<Music />}
+              title="Thérapie musicale"
+              description="Des compositions musicales spécialement conçues pour influencer positivement vos émotions."
+              delay={0.1}
+            />
+            <FeatureCard 
+              icon={<Book />}
+              title="Journal émotionnel"
+              description="Suivez et analysez vos émotions grâce à un journal interactif avec des insights personnalisés."
+              delay={0.2}
+            />
+            <FeatureCard 
+              icon={<HeartPulse />}
+              title="Suivi du bien-être"
+              description="Visualisez l'évolution de votre bien-être émotionnel avec des analyses détaillées."
+              delay={0.3}
+            />
+            <FeatureCard 
+              icon={<Shield />}
+              title="Sécurité et confidentialité"
+              description="Vos données émotionnelles sont protégées avec les plus hauts standards de sécurité."
+              delay={0.4}
+            />
+            <FeatureCard 
+              icon={<Users />}
+              title="Social Cocoon"
+              description="Rejoignez une communauté bienveillante et partagez vos expériences en toute sécurité."
+              delay={0.5}
+            />
+            <FeatureCard 
+              icon={<Sparkles />}
+              title="Coaching personnalisé"
+              description="Recevez des recommandations adaptées à vos besoins émotionnels spécifiques."
+              delay={0.6}
+            />
+          </div>
+        </section>
+        
+        {/* Connection Options */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -66,7 +135,7 @@ const Index = () => {
               <h3 className="text-2xl font-bold mb-4 text-blue-500 dark:text-blue-300">Entreprise</h3>
               <p className="mb-6 text-lg text-muted-foreground">Solutions pour votre organisation</p>
               <Button 
-                onClick={() => navigate('/b2b/selection')}
+                onClick={() => navigate('/coming-soon')}
                 variant="secondary"
                 size="lg" 
                 className="w-full text-lg py-6 bg-blue-100 hover:bg-blue-200 text-blue-700 border border-blue-200"
@@ -77,8 +146,55 @@ const Index = () => {
           </div>
         </motion.div>
         
-        <AccessSection />
-        <CtaSection />
+        {/* Testimonials */}
+        <section className="py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Ce que disent nos utilisateurs</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Découvrez comment EmotionsCare transforme le quotidien de nos utilisateurs.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <TestimonialCard 
+              quote="EmotionsCare a changé ma façon de gérer mon anxiété. La thérapie musicale est particulièrement efficace."
+              author="Marie L."
+              role="Utilisatrice depuis 6 mois"
+              delay={0.1}
+            />
+            <TestimonialCard 
+              quote="Le journal émotionnel m'a aidé à identifier mes déclencheurs de stress et à développer de meilleures stratégies de gestion."
+              author="Thomas D."
+              role="Utilisateur depuis 1 an"
+              delay={0.2}
+            />
+            <TestimonialCard 
+              quote="La communauté Social Cocoon est incroyablement bienveillante et m'a permis de me sentir moins seule dans mes défis émotionnels."
+              author="Sophie M."
+              role="Utilisatrice depuis 3 mois"
+              delay={0.3}
+            />
+          </div>
+        </section>
+        
+        {/* CTA Section */}
+        <section className="py-16 bg-gradient-to-r from-indigo-500/10 to-blue-500/10 rounded-3xl my-16 px-8">
+          <div className="text-center max-w-2xl mx-auto">
+            <Heart className="h-16 w-16 text-primary mx-auto mb-6" />
+            <h2 className="text-3xl font-bold mb-4">Prêt à prendre soin de votre bien-être émotionnel ?</h2>
+            <p className="text-muted-foreground mb-8">
+              Rejoignez des milliers d'utilisateurs qui améliorent leur équilibre émotionnel chaque jour avec EmotionsCare.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button onClick={() => navigate('/login')} size="lg">
+                S'inscrire gratuitement
+              </Button>
+              <Button variant="outline" size="lg" onClick={() => navigate('/coming-soon')}>
+                Explorer les plans Premium
+              </Button>
+            </div>
+          </div>
+        </section>
 
         {/* Test accounts section - For presentation purposes */}
         <motion.div
@@ -113,6 +229,63 @@ const Index = () => {
         </motion.div>
       </div>
     </Shell>
+  );
+};
+
+// Composant de carte de fonctionnalité
+const FeatureCard = ({ 
+  icon, 
+  title, 
+  description,
+  delay = 0
+}: { 
+  icon: React.ReactNode; 
+  title: string; 
+  description: string;
+  delay?: number;
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay }}
+      className="bg-card border rounded-lg p-6 hover:shadow-md transition-shadow"
+    >
+      <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mb-4 text-primary">
+        {icon}
+      </div>
+      <h3 className="text-xl font-semibold mb-3">{title}</h3>
+      <p className="text-muted-foreground">{description}</p>
+    </motion.div>
+  );
+};
+
+// Composant de témoignage
+const TestimonialCard = ({ 
+  quote, 
+  author, 
+  role,
+  delay = 0
+}: { 
+  quote: string; 
+  author: string; 
+  role: string;
+  delay?: number;
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay }}
+      className="bg-card border rounded-lg p-6 hover:shadow-md transition-shadow"
+    >
+      <div className="mb-4 text-3xl text-primary">"</div>
+      <p className="text-muted-foreground mb-6 italic">{quote}</p>
+      <div>
+        <p className="font-medium">{author}</p>
+        <p className="text-sm text-muted-foreground">{role}</p>
+      </div>
+    </motion.div>
   );
 };
 

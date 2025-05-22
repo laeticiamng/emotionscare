@@ -2,235 +2,193 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { toast } from 'sonner';
-import { ArrowLeft, Save, Trash2, PlusCircle } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowLeft, Save, Plus, X } from 'lucide-react';
 import Shell from '@/Shell';
-import { addJournalEntry } from '@/lib/journalService';
-import { JournalEntry } from '@/types';
-import { useAuth } from '@/contexts/AuthContext';
-import EmotionSelector from '@/components/journal/EmotionSelector';
-import { Slider } from '@/components/ui/slider';
-import { getEmotionIcon, getEmotionColor, getEmotionIntensityDescription } from '@/lib/emotionUtils';
+import { motion } from 'framer-motion';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+
+const moodOptions = [
+  'Heureux',
+  'Triste',
+  'En colère',
+  'Excité',
+  'Anxieux',
+  'Calme',
+  'Fatigué',
+  'Stressé',
+  'Reconnaissant',
+  'Inspiré',
+  'Déçu',
+  'Confus'
+];
 
 const NewJournalEntryPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [isSaving, setIsSaving] = useState(false);
-  
-  // États du formulaire
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [selectedEmotion, setSelectedEmotion] = useState('');
-  const [moodScore, setMoodScore] = useState(50);
+  const [mood, setMood] = useState('');
+  const [tag, setTag] = useState('');
   const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState('');
-  
-  const handleSave = async () => {
-    // Validation de base
+  const [isSaving, setIsSaving] = useState(false);
+
+  const addTag = () => {
+    if (tag.trim() && !tags.includes(tag.trim())) {
+      setTags([...tags, tag.trim()]);
+      setTag('');
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(t => t !== tagToRemove));
+  };
+
+  const handleSave = () => {
     if (!title.trim()) {
-      toast.error("Veuillez ajouter un titre");
+      toast.error("Veuillez ajouter un titre à votre entrée");
       return;
     }
-    
-    if (!selectedEmotion) {
-      toast.error("Veuillez sélectionner une émotion");
-      return;
-    }
-    
+
     if (!content.trim()) {
-      toast.error("Veuillez ajouter du contenu");
+      toast.error("Veuillez ajouter du contenu à votre entrée");
       return;
     }
+
+    if (!mood) {
+      toast.error("Veuillez sélectionner une humeur");
+      return;
+    }
+
+    setIsSaving(true);
     
-    try {
-      setIsSaving(true);
-      
-      const newEntry: Omit<JournalEntry, 'id'> = {
-        title,
-        content,
-        emotion: selectedEmotion,
-        mood: selectedEmotion, // Pour compatibilité
-        mood_score: moodScore,
-        tags,
-        date: new Date().toISOString(),
-        user_id: user?.id || 'user1' // Utiliser un ID par défaut pour les tests
-      };
-      
-      const createdEntry = await addJournalEntry(newEntry);
-      toast.success("Entrée de journal créée avec succès");
-      navigate(`/journal/${createdEntry.id}`);
-    } catch (error) {
-      console.error("Erreur lors de la création:", error);
-      toast.error("Échec de la création de l'entrée");
-    } finally {
+    // Simulation d'une sauvegarde
+    setTimeout(() => {
       setIsSaving(false);
+      toast.success("Entrée de journal enregistrée avec succès");
+      navigate('/journal');
+    }, 1000);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && tag) {
+      e.preventDefault();
+      addTag();
     }
   };
-  
-  const handleAddTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      setTags([...tags, newTag.trim()]);
-      setNewTag('');
-    }
-  };
-  
-  const handleRemoveTag = (tag: string) => {
-    setTags(tags.filter(t => t !== tag));
-  };
-  
+
   return (
     <Shell>
-      <div className="container py-8 max-w-4xl">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate(-1)} 
-          className="mb-4 flex items-center gap-2"
+      <div className="container mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
         >
-          <ArrowLeft size={16} />
-          Retour
-        </Button>
-        
-        <Card className="shadow-md">
-          <CardHeader className="bg-muted/50">
-            <CardTitle>Nouvelle entrée de journal</CardTitle>
-          </CardHeader>
-          
-          <CardContent className="space-y-6 pt-6">
-            <div className="space-y-2">
-              <Label htmlFor="title">Titre</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Titre de l'entrée"
-              />
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <Label className="mb-2 block">Comment vous sentez-vous aujourd'hui ?</Label>
-                <EmotionSelector
-                  selectedEmotion={selectedEmotion}
-                  onSelectEmotion={setSelectedEmotion}
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/journal')} 
+            className="mb-6 flex items-center gap-2"
+          >
+            <ArrowLeft size={16} />
+            Retour au journal
+          </Button>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Nouvelle entrée de journal</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="title">Titre</Label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Titre de votre entrée..."
                 />
               </div>
               
-              {selectedEmotion && (
-                <div className="space-y-4 mt-2">
-                  <Label htmlFor="mood-intensity" className="flex justify-between">
-                    <span>Intensité de l'émotion</span>
-                    <span className="text-primary">{moodScore}/100</span>
-                  </Label>
-                  <Slider
-                    id="mood-intensity"
-                    defaultValue={[50]}
-                    max={100}
-                    step={1}
-                    value={[moodScore]}
-                    onValueChange={(values) => setMoodScore(values[0])}
-                    className="py-4"
+              <div className="space-y-2">
+                <Label htmlFor="content">Contenu</Label>
+                <Textarea
+                  id="content"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Partagez vos pensées, émotions et expériences..."
+                  className="min-h-[200px]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="mood">Comment vous sentez-vous ?</Label>
+                <Select value={mood} onValueChange={setMood}>
+                  <SelectTrigger id="mood">
+                    <SelectValue placeholder="Sélectionnez une humeur" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {moodOptions.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tags">Tags</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="tags"
+                    value={tag}
+                    onChange={(e) => setTag(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ajouter un tag..."
+                    className="flex-1"
                   />
-                  
-                  <div className="p-4 rounded-lg bg-muted flex items-start gap-3">
-                    <div className={`text-4xl ${getEmotionColor(selectedEmotion)}`}>
-                      {getEmotionIcon(selectedEmotion)}
-                    </div>
-                    <div>
-                      <p className="font-medium">
-                        Vous vous sentez {selectedEmotion}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Intensité: {getEmotionIntensityDescription(selectedEmotion, Math.round(moodScore/20))}
-                      </p>
-                    </div>
-                  </div>
+                  <Button type="button" onClick={addTag} variant="outline">
+                    <Plus size={16} />
+                  </Button>
                 </div>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="content">Contenu</Label>
-              <Textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Décrivez votre journée et vos émotions..."
-                className="min-h-[200px]"
-              />
-            </div>
-            
-            <Separator />
-            
-            <div className="space-y-4">
-              <Label>Tags</Label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {tags.map((tag) => (
-                  <Badge key={tag} className="flex items-center gap-1">
-                    {tag}
-                    <button
-                      className="ml-1 rounded-full hover:bg-primary/20 p-0.5"
-                      onClick={() => handleRemoveTag(tag)}
-                    >
-                      <span className="sr-only">Supprimer</span>
-                      <Trash2 size={14} />
-                    </button>
-                  </Badge>
-                ))}
-                {tags.length === 0 && (
-                  <span className="text-sm text-muted-foreground">Ajoutez des tags pour mieux organiser vos entrées</span>
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {tags.map((t) => (
+                      <Badge key={t} variant="secondary" className="flex items-center gap-1">
+                        {t}
+                        <X
+                          size={14}
+                          className="cursor-pointer"
+                          onClick={() => removeTag(t)}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
                 )}
               </div>
-              
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Ajouter un tag..."
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
-                  className="flex-1"
-                />
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={handleAddTag}
-                  className="flex items-center gap-2"
-                >
-                  <PlusCircle size={16} />
-                  Ajouter
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-          
-          <CardFooter className="border-t bg-muted/30 p-4">
-            <div className="w-full flex justify-end">
+            </CardContent>
+            <CardFooter className="flex justify-between border-t pt-6">
               <Button
-                onClick={handleSave}
+                variant="outline"
+                onClick={() => navigate('/journal')}
+              >
+                Annuler
+              </Button>
+              <Button 
+                onClick={handleSave} 
                 disabled={isSaving}
                 className="flex items-center gap-2"
-                size="lg"
               >
-                {isSaving ? (
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Sauvegarde en cours...
-                  </div>
-                ) : (
-                  <>
-                    <Save size={16} />
-                    Enregistrer l'entrée
-                  </>
-                )}
+                <Save size={16} />
+                {isSaving ? 'Enregistrement...' : 'Enregistrer'}
               </Button>
-            </div>
-          </CardFooter>
-        </Card>
+            </CardFooter>
+          </Card>
+        </motion.div>
       </div>
     </Shell>
   );

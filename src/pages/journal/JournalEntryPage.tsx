@@ -1,288 +1,160 @@
 
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { toast } from 'sonner';
-import { ArrowLeft, Save, Trash2 } from 'lucide-react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft, Calendar, Edit, Trash2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import Shell from '@/Shell';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { getJournalEntryById, updateJournalEntry, deleteJournalEntry } from '@/lib/journalService';
-import { JournalEntry } from '@/types';
-import EmotionSelector from '@/components/journal/EmotionSelector';
-import { getEmotionIcon, getEmotionColor, getEmotionIntensityDescription } from '@/lib/emotionUtils';
+import { Badge } from '@/components/ui/badge';
+
+// Données simulées pour l'entrée de journal
+const journalEntries = {
+  '1': {
+    id: '1',
+    title: 'Journée productive',
+    content: `Aujourd'hui a été une journée exceptionnellement productive. J'ai commencé tôt le matin avec une séance de méditation qui m'a permis de me concentrer sur mes objectifs pour la journée.
+
+J'ai ensuite travaillé sur mon projet principal et j'ai accompli beaucoup plus que prévu. La clarté mentale que j'ai ressentie tout au long de la journée était remarquable.
+
+Je pense que les nouvelles habitudes que j'ai mises en place commencent vraiment à porter leurs fruits. Il est important pour moi de continuer sur cette lancée et de maintenir cette discipline quotidienne.`,
+    date: '2025-05-20',
+    mood: 'Heureux',
+    tags: ['travail', 'accomplissement', 'méditation'],
+    emotionalScore: 85
+  },
+  '2': {
+    id: '2',
+    title: 'Rencontre inspirante',
+    content: `J'ai eu une conversation fascinante avec un mentor aujourd'hui. Ses conseils sur la gestion de carrière et le développement personnel ont vraiment résonné en moi.
+
+Ce qui m'a le plus marqué, c'est sa perspective sur la façon dont les défis que nous rencontrons sont en réalité des opportunités de croissance déguisées. Je dois garder cela à l'esprit lors des moments difficiles.
+
+J'ai pris plusieurs notes pendant notre conversation que je dois revoir et intégrer dans mon plan de développement personnel.`,
+    date: '2025-05-18',
+    mood: 'Inspiré',
+    tags: ['développement personnel', 'motivation', 'mentorat'],
+    emotionalScore: 92
+  },
+  '3': {
+    id: '3',
+    title: 'Journée difficile',
+    content: `Aujourd'hui a été rempli de défis. J'ai rencontré plusieurs obstacles dans mon projet principal, et à un moment donné, j'ai sérieusement envisagé d'abandonner.
+
+Cependant, après avoir pris un peu de recul et réfléchi à la situation, j'ai trouvé une nouvelle approche qui pourrait fonctionner. C'est un bon rappel que parfois, nous devons simplement persévérer et continuer à essayer différentes solutions.
+
+Je suis fatigué, mais je me sens également résilient. Ces expériences renforcent ma détermination et ma capacité à faire face à l'adversité.`,
+    date: '2025-05-15',
+    mood: 'Fatigué',
+    tags: ['défis', 'persévérance', 'résilience'],
+    emotionalScore: 65
+  }
+};
 
 const JournalEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [entry, setEntry] = useState<JournalEntry | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  
-  // États de modification
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [selectedEmotion, setSelectedEmotion] = useState('');
-  const [moodScore, setMoodScore] = useState(50);
-  const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState('');
-  
-  useEffect(() => {
-    const loadEntry = async () => {
-      if (!id) return;
-      
-      try {
-        setIsLoading(true);
-        const data = await getJournalEntryById(id);
-        
-        if (data) {
-          setEntry(data);
-          setTitle(data.title);
-          setContent(data.content);
-          setSelectedEmotion(data.emotion || data.mood || 'neutral');
-          setMoodScore(data.mood_score || 50);
-          setTags(data.tags || []);
-        } else {
-          toast.error("Cette entrée de journal n'existe pas");
-          navigate('/journal');
-        }
-      } catch (error) {
-        console.error("Erreur lors du chargement de l'entrée:", error);
-        toast.error("Impossible de charger cette entrée");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadEntry();
-  }, [id, navigate]);
-  
-  const handleSave = async () => {
-    if (!entry) return;
-    
-    try {
-      setIsSaving(true);
-      
-      const updatedEntry: JournalEntry = {
-        ...entry,
-        title,
-        content,
-        emotion: selectedEmotion,
-        mood: selectedEmotion, // Pour compatibilité
-        mood_score: moodScore,
-        tags
-      };
-      
-      await updateJournalEntry(updatedEntry);
-      toast.success("Entrée de journal mise à jour");
-    } catch (error) {
-      console.error("Erreur lors de la sauvegarde:", error);
-      toast.error("Échec de la mise à jour");
-    } finally {
-      setIsSaving(false);
-    }
-  };
-  
-  const handleDelete = async () => {
-    if (!entry || !window.confirm('Êtes-vous sûr de vouloir supprimer cette entrée ?')) return;
-    
-    try {
-      setIsDeleting(true);
-      await deleteJournalEntry(entry.id);
-      toast.success("Entrée de journal supprimée");
-      navigate('/dashboard');
-    } catch (error) {
-      console.error("Erreur lors de la suppression:", error);
-      toast.error("Échec de la suppression");
-      setIsDeleting(false);
-    }
-  };
-  
-  const handleAddTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      setTags([...tags, newTag.trim()]);
-      setNewTag('');
-    }
-  };
-  
-  const handleRemoveTag = (tag: string) => {
-    setTags(tags.filter(t => t !== tag));
-  };
-  
-  if (isLoading) {
-    return (
-      <Shell>
-        <div className="container py-8 flex justify-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      </Shell>
-    );
-  }
-  
+  const entry = id ? journalEntries[id] : null;
+
   if (!entry) {
     return (
       <Shell>
-        <div className="container py-8">
-          <div className="text-center p-8 border rounded-md border-dashed bg-muted/20">
-            <p className="text-muted-foreground">Entrée de journal non trouvée</p>
-            <Button onClick={() => navigate('/dashboard')} className="mt-4">
-              Retour au tableau de bord
-            </Button>
-          </div>
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h2 className="text-2xl font-bold mb-4">Entrée non trouvée</h2>
+          <p className="mb-8 text-muted-foreground">
+            L'entrée de journal que vous recherchez n'existe pas ou a été supprimée.
+          </p>
+          <Button asChild>
+            <Link to="/journal">Retour au journal</Link>
+          </Button>
         </div>
       </Shell>
     );
   }
-  
+
   return (
     <Shell>
-      <div className="container py-8 max-w-4xl">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate(-1)} 
-          className="mb-4 flex items-center gap-2"
+      <div className="container mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
         >
-          <ArrowLeft size={16} />
-          Retour
-        </Button>
-        
-        <Card className="shadow-md">
-          <CardHeader className="bg-muted/50">
-            <div className="flex justify-between items-center">
-              <CardTitle>Modifier l'entrée du journal</CardTitle>
-              <div className="text-sm text-muted-foreground">
-                {format(new Date(entry.date), 'PPP', { locale: fr })}
-              </div>
-            </div>
-          </CardHeader>
-          
-          <CardContent className="space-y-6 pt-6">
-            <div className="space-y-2">
-              <Label htmlFor="title">Titre</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Titre de l'entrée"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Émotion ressentie</Label>
-              <div className="bg-accent/50 p-4 rounded-lg">
-                <EmotionSelector
-                  selectedEmotion={selectedEmotion}
-                  onSelectEmotion={setSelectedEmotion}
-                />
-              </div>
-              
-              {selectedEmotion && (
-                <div className="flex items-center mt-4 p-3 bg-muted rounded-lg">
-                  <div className={`text-4xl ${getEmotionColor(selectedEmotion)}`}>
-                    {getEmotionIcon(selectedEmotion)}
-                  </div>
-                  <div className="ml-3">
-                    <p className="font-medium">Vous vous sentez {selectedEmotion}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Intensité: {getEmotionIntensityDescription(selectedEmotion, Math.round(moodScore/20))}
-                    </p>
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/journal')} 
+            className="mb-6 flex items-center gap-2"
+          >
+            <ArrowLeft size={16} />
+            Retour au journal
+          </Button>
+
+          <Card className="mb-6">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                <div>
+                  <CardTitle className="text-2xl">{entry.title}</CardTitle>
+                  <div className="flex items-center text-sm text-muted-foreground mt-2">
+                    <Calendar className="mr-2 h-4 w-4" />
+                    {new Date(entry.date).toLocaleDateString('fr-FR', { 
+                      weekday: 'long',
+                      day: 'numeric', 
+                      month: 'long', 
+                      year: 'numeric' 
+                    })}
                   </div>
                 </div>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="content">Contenu</Label>
-              <Textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Décrivez votre journée et vos émotions..."
-                className="min-h-[200px]"
-              />
-            </div>
-            
-            <Separator />
-            
-            <div className="space-y-4">
-              <Label>Tags</Label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {tags.map((tag) => (
-                  <Badge key={tag} className="flex items-center gap-1">
+                <Badge className="w-fit text-sm py-1 px-3" variant="outline">
+                  {entry.mood}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="prose dark:prose-invert max-w-none">
+                {entry.content.split('\n\n').map((paragraph, idx) => (
+                  <p key={idx} className="mb-4">{paragraph}</p>
+                ))}
+              </div>
+              
+              <div className="mt-6 flex flex-wrap gap-2">
+                {entry.tags.map((tag, idx) => (
+                  <Badge key={idx} variant="secondary">
                     {tag}
-                    <button
-                      className="ml-1 rounded-full hover:bg-primary/20 p-0.5"
-                      onClick={() => handleRemoveTag(tag)}
-                    >
-                      <span className="sr-only">Supprimer</span>
-                      <Trash2 size={14} />
-                    </button>
                   </Badge>
                 ))}
-                {tags.length === 0 && (
-                  <span className="text-sm text-muted-foreground">Aucun tag ajouté</span>
-                )}
               </div>
               
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Ajouter un tag..."
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
-                  className="flex-1"
-                />
-                <Button type="button" variant="outline" onClick={handleAddTag}>
-                  Ajouter
-                </Button>
+              <div className="mt-8 border-t pt-6">
+                <h3 className="text-lg font-medium mb-4">Analyse émotionnelle</h3>
+                <div className="bg-muted p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">Score émotionnel</span>
+                    <span className="text-sm font-bold">{entry.emotionalScore}/100</span>
+                  </div>
+                  <div className="w-full bg-muted-foreground/20 rounded-full h-2.5">
+                    <div 
+                      className="bg-primary h-2.5 rounded-full" 
+                      style={{ width: `${entry.emotionalScore}%` }}
+                    ></div>
+                  </div>
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Cette entrée reflète un état émotionnel {entry.emotionalScore > 80 ? 'très positif' : entry.emotionalScore > 60 ? 'positif' : 'neutre'}.
+                  </p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-          
-          <CardFooter className="flex justify-between border-t bg-muted/30 p-4">
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting || isSaving}
-            >
-              {isDeleting ? (
-                <div className="flex items-center">
-                  <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Suppression...
-                </div>
-              ) : (
-                <>
-                  <Trash2 size={16} className="mr-2" />
-                  Supprimer
-                </>
-              )}
-            </Button>
-            
-            <Button
-              onClick={handleSave}
-              disabled={isSaving || isDeleting}
-            >
-              {isSaving ? (
-                <div className="flex items-center">
-                  <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Sauvegarde...
-                </div>
-              ) : (
-                <>
-                  <Save size={16} className="mr-2" />
-                  Enregistrer
-                </>
-              )}
-            </Button>
-          </CardFooter>
-        </Card>
+            </CardContent>
+            <CardFooter className="flex justify-between border-t pt-6">
+              <Button variant="outline" onClick={() => navigate(`/journal/edit/${entry.id}`)} className="flex items-center gap-2">
+                <Edit size={16} />
+                Modifier
+              </Button>
+              <Button variant="destructive" className="flex items-center gap-2">
+                <Trash2 size={16} />
+                Supprimer
+              </Button>
+            </CardFooter>
+          </Card>
+        </motion.div>
       </div>
     </Shell>
   );
