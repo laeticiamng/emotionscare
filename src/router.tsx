@@ -11,7 +11,6 @@ import Home from './Home';
 import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import NotFoundPage from './pages/NotFoundPage';
-
 // Page components
 import ImmersiveHome from './pages/ImmersiveHome';
 import ChooseModeFlow from './pages/auth/ChooseModeFlow';
@@ -53,127 +52,551 @@ import Gamification from './pages/Gamification';
 
 export const routes: RouteObject[] = [
   // Public routes
-  { path: '/', element: <ImmersiveHome /> },
-  { path: '/home', element: <HomePage /> },
-  { path: '/landing', element: <LandingPage /> },
-  { path: '/welcome', element: <Home /> },
-  { path: '/choose-mode', element: <ChooseModeFlow /> },
-  { path: '/b2b/selection', element: <B2BSelectionPage /> },
-  { path: '/unauthorized', element: <UnauthorizedPage /> },
+  {
+    path: '/',
+    element: <ImmersiveHome />
+  },
+  {
+    path: '/home',
+    element: <HomePage />
+  },
+  {
+    path: '/landing',
+    element: <LandingPage />
+  },
+  {
+    path: '/welcome',
+    element: <Home />
+  },
+  {
+    path: '/choose-mode',
+    element: <ChooseModeFlow />
+  },
+  {
+    path: '/b2b/selection',
+    element: <B2BSelectionPage />
+  },
+  {
+    path: '/unauthorized',
+    element: <UnauthorizedPage />
+  },
   
   // Generic mode redirect routes
-  { path: '/dashboard', element: <Dashboard /> },
-  { path: '/journal', element: <Journal /> },
-  { path: '/music', element: <Music /> },
-  { path: '/audio', element: <Audio /> },
-  { path: '/coach', element: <Coach /> },
-  { path: '/progress', element: <Progress /> },
-  { path: '/vr', element: <VR /> },
-  { path: '/social', element: <Social /> },
-  { path: '/gamification', element: <Gamification /> },
-  
+  {
+    path: '/dashboard',
+    element: <Dashboard />
+  },
+  {
+    path: '/journal',
+    element: <Journal />
+  },
+  {
+    path: '/music',
+    element: <Music />
+  },
+  {
+    path: '/audio',
+    element: <Audio />
+  },
+  {
+    path: '/coach',
+    element: <Coach />
+  },
+  {
+    path: '/progress',
+    element: <Progress />
+  },
+  {
+    path: '/vr',
+    element: <VR />
+  },
+  {
+    path: '/social',
+    element: <Social />
+  },
+  {
+    path: '/gamification',
+    element: <Gamification />
+  },
+
   // Auth routes
   {
     path: '/',
     element: <AuthLayout />,
     children: [
       // B2C Auth
-      { path: 'b2c/login', element: <LoginPage mode="b2c" /> },
-      { path: 'b2c/register', element: <RegisterPage mode="b2c" /> },
-      { path: 'b2c/forgot-password', element: <ForgotPasswordPage mode="b2c" /> },
-      { path: 'b2c/reset-password', element: <ResetPasswordPage mode="b2c" /> },
-      
+      {
+        path: 'b2c/login',
+        element: <LoginPage mode="b2c" />
+      },
+      {
+        path: 'b2c/register',
+        element: <RegisterPage mode="b2c" />
+      },
+      {
+        path: 'b2c/forgot-password',
+        element: <ForgotPasswordPage mode="b2c" />
+      },
+      {
+        path: 'b2c/reset-password',
+        element: <ResetPasswordPage mode="b2c" />
+      },
       // B2B User Auth
-      { path: 'b2b/user/login', element: <LoginPage mode="b2b_user" /> },
-      { path: 'b2b/user/register', element: <RegisterPage mode="b2b_user" /> },
-      { path: 'b2b/user/forgot-password', element: <ForgotPasswordPage mode="b2b_user" /> },
-      { path: 'b2b/user/reset-password', element: <ResetPasswordPage mode="b2b_user" /> },
-      
+      {
+        path: 'b2b/user/login',
+        element: <LoginPage mode="b2b_user" />
+      },
+      {
+        path: 'b2b/user/register',
+        element: <RegisterPage mode="b2b_user" />
+      },
+      {
+        path: 'b2b/user/forgot-password',
+        element: <ForgotPasswordPage mode="b2b_user" />
+      },
+      {
+        path: 'b2b/user/reset-password',
+        element: <ResetPasswordPage mode="b2b_user" />
+      },
       // B2B Admin Auth
-      { path: 'b2b/admin/login', element: <LoginPage mode="b2b_admin" /> },
-      { path: 'b2b/admin/register', element: <RegisterPage mode="b2b_admin" /> },
-      { path: 'b2b/admin/forgot-password', element: <ForgotPasswordPage mode="b2b_admin" /> },
-      { path: 'b2b/admin/reset-password', element: <ResetPasswordPage mode="b2b_admin" /> },
-    ],
+      {
+        path: 'b2b/admin/login',
+        element: <LoginPage mode="b2b_admin" />
+      },
+      {
+        path: 'b2b/admin/register',
+        element: <RegisterPage mode="b2b_admin" />
+      },
+      {
+        path: 'b2b/admin/forgot-password',
+        element: <ForgotPasswordPage mode="b2b_admin" />
+      },
+      {
+        path: 'b2b/admin/reset-password',
+        element: <ResetPasswordPage mode="b2b_admin" />
+      }
+    ]
   },
-  
-  // B2C Routes
+
+  // App routes - B2C
   {
-    path: 'b2c',
+    path: 'b2c/',
     element: <B2CLayout />,
     children: [
-      { path: '', element: <ProtectedRouteWithMode requiredMode="b2c" children={<DashboardPage />} /> },
-      { path: 'dashboard', element: <ProtectedRouteWithMode requiredMode="b2c" children={<DashboardPage />} /> },
-      { path: 'scan', element: <ProtectedRouteWithMode requiredMode="b2c" children={<ScanPage />} /> },
-      { path: 'journal', element: <ProtectedRouteWithMode requiredMode="b2c" children={<JournalPage />} /> },
-      { path: 'music', element: <ProtectedRouteWithMode requiredMode="b2c" children={<MusicPage />} /> },
-      { path: 'audio', element: <ProtectedRouteWithMode requiredMode="b2c" children={<AudioPage />} /> },
-      { path: 'coach', element: <ProtectedRouteWithMode requiredMode="b2c" children={<CoachPage />} /> },
-      { path: 'settings', element: <ProtectedRouteWithMode requiredMode="b2c" children={<SettingsPage />} /> },
-      { path: 'profile', element: <ProtectedRouteWithMode requiredMode="b2c" children={<ProfilePage />} /> },
-      { path: 'notifications', element: <ProtectedRouteWithMode requiredMode="b2c" children={<NotificationsPage />} /> },
-      { path: 'preferences', element: <ProtectedRouteWithMode requiredMode="b2c" children={<PreferencesPage />} /> },
-      { path: 'onboarding', element: <ProtectedRouteWithMode requiredMode="b2c" children={<OnboardingPage />} /> },
-      { path: 'vr', element: <ProtectedRouteWithMode requiredMode="b2c" children={<VRPage />} /> },
-      { path: 'social', element: <ProtectedRouteWithMode requiredMode="b2c" children={<SocialPage />} /> },
-      { path: 'progress', element: <ProtectedRouteWithMode requiredMode="b2c" children={<ProgressPage />} /> },
-      { path: 'gamification', element: <ProtectedRouteWithMode requiredMode="b2c" children={<GamificationPage />} /> },
-    ],
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <DashboardPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'scan',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <ScanPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'journal',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <JournalPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'music',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <MusicPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'audio',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <AudioPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'coach',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <CoachPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'progress',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <ProgressPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+       {
+        path: 'gamification',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <GamificationPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'vr',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <VRPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'social',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <SocialPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'settings',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <SettingsPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'profile',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <ProfilePage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'notifications',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <NotificationsPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'preferences',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <PreferencesPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'onboarding',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c">
+            <OnboardingPage />
+          </ProtectedRouteWithMode>
+        )
+      }
+    ]
   },
-  
-  // B2B User Routes
+
+  // App routes - B2B User
   {
-    path: 'b2b/user',
+    path: 'b2b/user/',
     element: <B2BUserLayout />,
     children: [
-      { path: '', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<DashboardPage />} /> },
-      { path: 'dashboard', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<DashboardPage />} /> },
-      { path: 'scan', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<ScanPage />} /> },
-      { path: 'journal', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<JournalPage />} /> },
-      { path: 'music', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<MusicPage />} /> },
-      { path: 'audio', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<AudioPage />} /> },
-      { path: 'coach', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<CoachPage />} /> },
-      { path: 'settings', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<SettingsPage />} /> },
-      { path: 'profile', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<ProfilePage />} /> },
-      { path: 'notifications', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<NotificationsPage />} /> },
-      { path: 'preferences', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<PreferencesPage />} /> },
-      { path: 'onboarding', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<OnboardingPage />} /> },
-      { path: 'vr', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<VRPage />} /> },
-      { path: 'social', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<SocialPage />} /> },
-      { path: 'progress', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<ProgressPage />} /> },
-      { path: 'gamification', element: <ProtectedRouteWithMode requiredMode="b2b_user" children={<GamificationPage />} /> },
-    ],
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <DashboardPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'scan',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <ScanPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+       {
+        path: 'journal',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <JournalPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'music',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <MusicPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'audio',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <AudioPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'coach',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <CoachPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'progress',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <ProgressPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'gamification',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <GamificationPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'vr',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <VRPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'social',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <SocialPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'teams',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <TeamsPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'events',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <EventsPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'settings',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <SettingsPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'profile',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <ProfilePage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'notifications',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <NotificationsPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'preferences',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <PreferencesPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'onboarding',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user">
+            <OnboardingPage />
+          </ProtectedRouteWithMode>
+        )
+      }
+    ]
   },
-  
-  // B2B Admin Routes
+
+  // App routes - B2B Admin
   {
-    path: 'b2b/admin',
+    path: 'b2b/admin/',
     element: <B2BAdminLayout />,
     children: [
-      { path: '', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<DashboardPage />} /> },
-      { path: 'dashboard', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<DashboardPage />} /> },
-      { path: 'scan', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<ScanPage />} /> },
-      { path: 'journal', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<JournalPage />} /> },
-      { path: 'music', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<MusicPage />} /> },
-      { path: 'audio', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<AudioPage />} /> },
-      { path: 'coach', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<CoachPage />} /> },
-      { path: 'teams', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<TeamsPage />} /> },
-      { path: 'reports', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<ReportsPage />} /> },
-      { path: 'events', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<EventsPage />} /> },
-      { path: 'settings', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<SettingsPage />} /> },
-      { path: 'profile', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<ProfilePage />} /> },
-      { path: 'notifications', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<NotificationsPage />} /> },
-      { path: 'preferences', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<PreferencesPage />} /> },
-      { path: 'onboarding', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<OnboardingPage />} /> },
-      { path: 'vr', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<VRPage />} /> },
-      { path: 'social', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<SocialPage />} /> },
-      { path: 'progress', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<ProgressPage />} /> },
-      { path: 'gamification', element: <ProtectedRouteWithMode requiredMode="b2b_admin" children={<GamificationPage />} /> },
-    ],
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <DashboardPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'scan',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <ScanPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'journal',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <JournalPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'music',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <MusicPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'audio',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <AudioPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'coach',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <CoachPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'progress',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <ProgressPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'gamification',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <GamificationPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'vr',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <VRPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'social',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <SocialPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'teams',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <TeamsPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'events',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <EventsPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'settings',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <SettingsPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'profile',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <ProfilePage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'notifications',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <NotificationsPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'preferences',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <PreferencesPage />
+          </ProtectedRouteWithMode>
+        )
+      },
+      {
+        path: 'onboarding',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin">
+            <OnboardingPage />
+          </ProtectedRouteWithMode>
+        )
+      }
+    ]
   },
-  
-  // 404 - Not Found
-  { path: '*', element: <NotFoundPage /> },
-];
 
-export default routes;
+  // Not found route
+  {
+    path: '*',
+    element: <NotFoundPage />
+  }
+];
