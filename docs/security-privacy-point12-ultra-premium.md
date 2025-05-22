@@ -14,7 +14,7 @@ les points à renforcer et propose une feuille de route pour atteindre un niveau
   `ProtectedRoute` (`src/components/ProtectedRoute.tsx`).
 - `UserModeContext` permet de distinguer `b2c`, `b2b_user` et `b2b_admin` afin de
   rediriger vers les bons tableaux de bord.
-- Les fonctions Supabase utilisent `requireAuth` (`supabase/functions/_shared/auth.ts`).
+  - Les fonctions Supabase utilisent `authorizeRole` (`supabase/functions/_shared/auth.ts`).
 
 **Recommandation** : centraliser tous les providers d'accès au plus haut niveau
 (Shell) et prévoir un stockage sécurisé des sessions via cookie `httpOnly` en

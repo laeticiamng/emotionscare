@@ -11,7 +11,7 @@ Ce document détaille l'audit technique de la plateforme **EmotionsCare** pour l
 ## 2. Modules et services observés
 
 - `AuthProvider` et `ProtectedRoute` assurent l'authentification et la restriction par rôle (`b2c`, `b2b_user`, `b2b_admin`).
-- Les fonctions Supabase (`supabase/functions/*`) utilisent `requireAuth` pour contrôler l'accès.
+- Les fonctions Supabase (`supabase/functions/*`) utilisent `authorizeRole` pour contrôler l'accès.
 - `NotificationService` et `AuditLog` ne sont pas encore centralisés dans un service unique.
 
 ## 3. Gestion proactive des risques

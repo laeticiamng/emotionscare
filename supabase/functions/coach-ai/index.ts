@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { requireRole } from '../_shared/auth.ts';
+import { authorizeRole } from '../_shared/auth.ts';
 import OpenAI from "https://esm.sh/openai@4.0.0";
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const corsHeaders = {
@@ -13,10 +13,10 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
-  const user = await requireRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
+  const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
   if (!user) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
+      status,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   try {
