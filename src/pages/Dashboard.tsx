@@ -1,101 +1,40 @@
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Music, BookOpen, Activity, Settings } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { getModeDashboardPath } from '@/utils/userModeHelpers';
+import Shell from '@/Shell';
 
 const Dashboard: React.FC = () => {
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const { userMode } = useUserMode();
 
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/b2c/login');
+      return;
+    }
+
+    if (userMode) {
+      // Redirect to the appropriate dashboard based on user mode
+      navigate(getModeDashboardPath(userMode));
+    }
+  }, [isAuthenticated, userMode, navigate]);
 
   return (
-    <div className="container mx-auto p-6">
-      <motion.h1 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-3xl font-bold mb-6"
-      >
-        Tableau de bord
-      </motion.h1>
-      
-      <motion.div 
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-      >
-        <motion.div variants={item}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Music className="h-5 w-5" />
-                Musique
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Accédez à votre bibliothèque musicale pour améliorer votre bien-être.
-              </p>
-              <Button variant="default" className="w-full">
-                Explorer
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-        
-        <motion.div variants={item}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                Journal
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Consultez votre journal émotionnel et suivez votre bien-être.
-              </p>
-              <Button variant="default" className="w-full">
-                Accéder au journal
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-        
-        <motion.div variants={item}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5" />
-                Activités
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground mb-4">
-                Découvrez des activités recommandées pour votre bien-être.
-              </p>
-              <Button variant="default" className="w-full">
-                Explorer les activités
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </motion.div>
-    </div>
+    <Shell>
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <h2 className="text-2xl font-semibold mb-2">Chargement de votre tableau de bord...</h2>
+            <p className="text-muted-foreground">Veuillez patienter un instant.</p>
+          </div>
+        </div>
+      </div>
+    </Shell>
   );
 };
 

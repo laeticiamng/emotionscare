@@ -1,39 +1,27 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LoadingIllustration } from '@/components/ui/loading-illustration';
-import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { getModeDashboardPath } from '@/utils/userModeHelpers';
 
 const DashboardRedirect: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { userMode } = useUserMode();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (isAuthenticated) {
-        navigate('/b2c/dashboard', { replace: true });
-      } else {
-        navigate('/b2c/login', { replace: true });
-      }
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [navigate, isAuthenticated]);
+    if (userMode) {
+      navigate(getModeDashboardPath(userMode));
+    } else {
+      navigate('/choose-mode');
+    }
+  }, [userMode, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
-      <LoadingIllustration />
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="text-center mt-4"
-      >
-        <p className="text-sm text-muted-foreground">
-          Redirection en cours...
-        </p>
-      </motion.div>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <h2 className="text-2xl font-semibold mb-4">Redirection en cours...</h2>
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+      </div>
     </div>
   );
 };
