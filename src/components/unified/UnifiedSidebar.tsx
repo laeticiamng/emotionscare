@@ -3,8 +3,9 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import UnifiedNavigation from '@/components/navigation/UnifiedNavigation';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Sun, Moon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/hooks/use-theme';
 
 interface UnifiedSidebarProps {
   className?: string;
@@ -18,6 +19,7 @@ const UnifiedSidebar: React.FC<UnifiedSidebarProps> = ({
   onClose,
 }) => {
   const { logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   
   const handleLogout = async () => {
     try {
@@ -25,6 +27,10 @@ const UnifiedSidebar: React.FC<UnifiedSidebarProps> = ({
     } catch (error) {
       console.error('Erreur lors de la déconnexion', error);
     }
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
   
   return (
@@ -51,7 +57,17 @@ const UnifiedSidebar: React.FC<UnifiedSidebarProps> = ({
         <UnifiedNavigation />
       </div>
       
-      <div className="p-4 border-t">
+      <div className="p-4 border-t space-y-2">
+        <Button 
+          variant="outline"
+          size="icon"
+          className="w-full flex justify-between items-center mb-2"
+          onClick={toggleTheme}
+        >
+          <span>Thème {theme === 'dark' ? 'Clair' : 'Sombre'}</span>
+          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </Button>
+        
         <Button 
           variant="outline"
           className="w-full"

@@ -8,21 +8,33 @@ interface ThemeContextType {
   setTheme: (theme: Theme) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType>({
+export const ThemeContext = createContext<ThemeContextType>({
   theme: 'system',
   setTheme: () => {},
 });
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ThemeProvider: React.FC<{ children: React.ReactNode; defaultTheme?: Theme; storageKey?: string; }> = ({ 
+  children,
+  defaultTheme = 'system',
+  storageKey = 'emotionscare-theme'
+}) => {
   const [theme, setTheme] = useState<Theme>(() => {
     // Récupérer le thème depuis le localStorage
-    const savedTheme = localStorage.getItem('emotionscare-theme') as Theme;
-    return savedTheme || 'system';
+    try {
+      const savedTheme = localStorage.getItem(storageKey) as Theme;
+      return savedTheme || defaultTheme;
+    } catch (e) {
+      return defaultTheme;
+    }
   });
 
   useEffect(() => {
     // Sauvegarder le thème dans le localStorage
-    localStorage.setItem('emotionscare-theme', theme);
+    try {
+      localStorage.setItem(storageKey, theme);
+    } catch (e) {
+      console.error('Failed to save theme to localStorage:', e);
+    }
 
     // Appliquer le thème au document
     const root = window.document.documentElement;
@@ -36,7 +48,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } else {
       root.classList.add(theme);
     }
-  }, [theme]);
+  }, [theme, storageKey]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
@@ -45,4 +57,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  
+  return context;
+};
