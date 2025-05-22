@@ -1,63 +1,49 @@
 
 import React from 'react';
-import DashboardLayout from '@/components/DashboardLayout';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Headphones, Mic } from 'lucide-react';
-import AudioPlayerSection from '@/components/audio/AudioPlayerSection';
-import AudioRecorderSection from '@/components/audio/AudioRecorderSection';
-import { useAudio } from '@/contexts/AudioContext';
+import Shell from '@/Shell';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const AudioPage: React.FC = () => {
-  const [activeTab, setActiveTab] = React.useState('listen');
-  const { currentTrack } = useAudio();
-
   return (
-    <DashboardLayout>
-      <div className="container mx-auto py-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">Thérapie Audio</h1>
-          {currentTrack && (
-            <div className="text-sm text-muted-foreground">
-              En cours: {currentTrack.title}
-            </div>
-          )}
+    <Shell>
+      <div className="container mx-auto py-6">
+        <h1 className="text-3xl font-bold mb-6">Thérapie Audio</h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Enregistrements Audio</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Enregistrez votre voix pour analyser votre état émotionnel.
+              </p>
+              <div className="h-40 flex items-center justify-center border-2 border-dashed rounded-md">
+                <p className="text-center text-muted-foreground">
+                  L'interface d'enregistrement audio sera affichée ici.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Analyse Émotionnelle Vocale</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground mb-4">
+                Visualisez les émotions détectées dans votre voix.
+              </p>
+              <div className="h-40 flex items-center justify-center border-2 border-dashed rounded-md">
+                <p className="text-center text-muted-foreground">
+                  Les résultats d'analyse s'afficheront ici après un enregistrement.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-
-        <Tabs 
-          value={activeTab} 
-          onValueChange={setActiveTab}
-          className="w-full"
-        >
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
-            <TabsTrigger value="listen" className="flex items-center gap-2">
-              <Headphones className="h-4 w-4" />
-              Écouter
-            </TabsTrigger>
-            <TabsTrigger value="record" className="flex items-center gap-2">
-              <Mic className="h-4 w-4" />
-              Enregistrer
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="listen">
-            <Card>
-              <CardContent className="pt-6">
-                <AudioPlayerSection />
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="record">
-            <Card>
-              <CardContent className="pt-6">
-                <AudioRecorderSection />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
       </div>
-    </DashboardLayout>
+    </Shell>
   );
 };
 
