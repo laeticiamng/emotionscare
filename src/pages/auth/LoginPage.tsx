@@ -7,9 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { Mail, Lock } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -21,13 +23,7 @@ const LoginPage: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Simulate login success
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Set flag for post-login transition
-      sessionStorage.setItem('just_logged_in', 'true');
-      
-      // Navigate to dashboard (will be intercepted by the transition)
+      await login(email, password);
       navigate('/b2c/dashboard');
     } catch (err: any) {
       console.error('Login error:', err);

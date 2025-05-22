@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import PostLoginTransition from './PostLoginTransition';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AuthTransitionProps {
   children: React.ReactNode;
@@ -10,6 +11,7 @@ interface AuthTransitionProps {
 const AuthTransition: React.FC<AuthTransitionProps> = ({ children }) => {
   const [showTransition, setShowTransition] = useState(false);
   const location = useLocation();
+  const { user } = useAuth();
   
   // Detect when user has just logged in
   useEffect(() => {
@@ -24,11 +26,6 @@ const AuthTransition: React.FC<AuthTransitionProps> = ({ children }) => {
   const handleTransitionComplete = () => {
     setShowTransition(false);
   };
-
-  // This is a mock user for demonstration
-  const mockUser = {
-    name: 'Utilisateur'
-  };
   
   return (
     <>
@@ -37,7 +34,6 @@ const AuthTransition: React.FC<AuthTransitionProps> = ({ children }) => {
         <PostLoginTransition 
           show={showTransition} 
           onComplete={handleTransitionComplete}
-          userName={mockUser?.name}
         />
       )}
     </>

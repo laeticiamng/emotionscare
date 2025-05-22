@@ -1,44 +1,28 @@
-
-import React, { useState } from 'react';
-import WorldMapView from '@/components/synthesis/WorldMapView';
-import SynthesisHeader from '@/components/synthesis/SynthesisHeader';
-import SynthesisOnboarding from '@/components/synthesis/SynthesisOnboarding';
+import React from 'react';
+import Shell from '@/Shell';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { HelpCircle } from 'lucide-react';
 
 const WorldPage: React.FC = () => {
-  const [showOnboarding, setShowOnboarding] = useState(false);
-
   return (
-    <div className="container mx-auto px-4 py-6">
-      <SynthesisHeader />
-      
-      <div className="mb-4 flex justify-end">
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => setShowOnboarding(true)}
-          className="gap-1 rounded-full"
+    <Shell>
+      <div className="container mx-auto py-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          <HelpCircle className="h-4 w-4" />
-          <span>Aide</span>
-        </Button>
+          <h1 className="text-3xl font-bold mb-4">Monde</h1>
+          <p className="text-muted-foreground mb-6">
+            Explorez le monde des émotions et découvrez comment les autres interagissent avec leurs sentiments
+          </p>
+          
+          {/* World content will go here */}
+          <div className="p-12 border rounded-lg text-center text-muted-foreground">
+            Contenu du monde en cours de développement
+          </div>
+        </motion.div>
       </div>
-      
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <WorldMapView />
-      </motion.div>
-      
-      <SynthesisOnboarding 
-        open={showOnboarding}
-        onClose={() => setShowOnboarding(false)}
-      />
-    </div>
+    </Shell>
   );
 };
 

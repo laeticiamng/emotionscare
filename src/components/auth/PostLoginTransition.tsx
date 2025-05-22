@@ -3,19 +3,20 @@ import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Check, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PostLoginTransitionProps {
   show: boolean;
   onComplete: () => void;
-  userName?: string;
 }
 
 const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({ 
   show, 
   onComplete,
-  userName
 }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const userName = user?.name || 'chez EmotionsCare';
 
   useEffect(() => {
     if (!show) return;
@@ -23,7 +24,7 @@ const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({
     const timer = setTimeout(() => {
       navigate('/b2c/dashboard');
       onComplete();
-    }, 3500);
+    }, 3000);
     
     return () => clearTimeout(timer);
   }, [show, navigate, onComplete]);
@@ -49,9 +50,9 @@ const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({
               <Check className="h-8 w-8 text-primary" />
             </div>
             <h2 className="text-xl font-semibold mb-2">Connexion réussie</h2>
-            <p className="text-muted-foreground mb-4">Bienvenue {userName || 'chez EmotionsCare'}</p>
+            <p className="text-muted-foreground mb-4">Bienvenue {userName}</p>
             
-            <div className="mt-4">
+            <div className="mt-4 w-full">
               <motion.div
                 className="w-full h-1 bg-primary/20 overflow-hidden rounded-full"
               >

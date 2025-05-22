@@ -1,23 +1,25 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { LoadingIllustration } from '@/components/ui/loading-illustration';
+import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
 
-/**
- * Redirection simple vers la page B2C de connexion
- * Cette page fait office de page d'accueil temporaire
- */
 const DashboardRedirect: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate('/b2c/login', { replace: true });
-    }, 1500);
+      if (isAuthenticated) {
+        navigate('/b2c/dashboard', { replace: true });
+      } else {
+        navigate('/b2c/login', { replace: true });
+      }
+    }, 1000);
 
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, isAuthenticated]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
@@ -25,11 +27,11 @@ const DashboardRedirect: React.FC = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.3 }}
         className="text-center mt-4"
       >
         <p className="text-sm text-muted-foreground">
-          Redirection vers la page d'accueil...
+          Redirection en cours...
         </p>
       </motion.div>
     </div>
