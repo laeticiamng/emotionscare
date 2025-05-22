@@ -1,62 +1,96 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Play, Pause, VolumeX, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Volume2, VolumeX } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
+import { cn } from '@/lib/utils';
 
 interface AudioControlsProps {
-  minimal?: boolean;
   className?: string;
+  minimal?: boolean;
 }
 
-const AudioControls: React.FC<AudioControlsProps> = ({ minimal = false, className = '' }) => {
-  const { soundEnabled, setSoundEnabled } = useTheme();
-  const [volume, setVolume] = React.useState(0.5);
+const AudioControls: React.FC<AudioControlsProps> = ({ className, minimal = false }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(70);
+  const [isMuted, setIsMuted] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState<string | null>(null);
 
-  const handleVolumeChange = (value: number[]) => {
-    setVolume(value[0]);
+  // Toggle play/pause
+  const togglePlayback = () => {
+    setIsPlaying(!isPlaying);
+    // In a real app, this would trigger actual audio playback
   };
 
+  // Toggle mute
   const toggleMute = () => {
-    if (setSoundEnabled) {
-      setSoundEnabled(!soundEnabled);
+    setIsMuted(!isMuted);
+    // In a real app, this would mute/unmute actual audio
+  };
+
+  // Handle volume change
+  const handleVolumeChange = (value: number[]) => {
+    const newVolume = value[0];
+    setVolume(newVolume);
+    
+    if (newVolume === 0) {
+      setIsMuted(true);
+    } else if (isMuted) {
+      setIsMuted(false);
     }
   };
 
   if (minimal) {
     return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className={`rounded-full bg-background/80 backdrop-blur-sm ${className}`}
-        onClick={toggleMute}
-      >
-        {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-      </Button>
+      <div className={cn("flex items-center space-x-1", className)}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-8 w-8 rounded-full"
+          onClick={togglePlayback}
+        >
+          {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+        </Button>
+        
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-8 w-8 rounded-full"
+          onClick={toggleMute}
+        >
+          {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+        </Button>
+      </div>
     );
   }
 
   return (
-    <div className={`flex items-center space-x-2 bg-background/80 backdrop-blur-sm p-2 rounded-full ${className}`}>
-      <Button
-        variant="ghost"
-        size="icon"
+    <div className={cn("flex items-center space-x-2", className)}>
+      <Button 
+        variant="ghost" 
+        size="icon" 
         className="rounded-full"
-        onClick={toggleMute}
+        onClick={togglePlayback}
       >
-        {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+        {isPlaying ? <Pause size={18} /> : <Play size={18} />}
       </Button>
       
-      {soundEnabled && (
-        <Slider
-          className="w-24"
-          value={[volume]}
-          max={1}
-          step={0.01}
-          onValueChange={handleVolumeChange}
-        />
-      )}
+      <Button 
+        variant="ghost" 
+        size="icon"
+        onClick={toggleMute}
+      >
+        {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+      </Button>
+      
+      <Slider
+        min={0}
+        max={100}
+        step={1}
+        value={[isMuted ? 0 : volume]}
+        onValueChange={handleVolumeChange}
+        className="w-24"
+      />
     </div>
   );
 };
