@@ -1,256 +1,255 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Shell from '@/Shell';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Radio, RadioGroup } from '@/components/ui/radio-group';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { getUserModeDisplayName } from '@/utils/userModeHelpers';
+import { useToast } from '@/hooks/use-toast';
 
 const OnboardingPage = () => {
   const navigate = useNavigate();
-  const { userMode } = useUserMode();
+  const { toast } = useToast();
   const [step, setStep] = useState(1);
-  const [progress, setProgress] = useState(25);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    goal: '',
+    frequency: '',
+    notifications: true,
+    preferences: [] as string[]
+  });
   
   const totalSteps = 4;
+  const progress = (step / totalSteps) * 100;
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+  
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData({ ...formData, [name]: value });
+  };
+  
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData({ ...formData, [name]: checked });
+  };
+  
+  const handleMultiCheckboxChange = (value: string) => {
+    const preferences = [...formData.preferences];
+    const index = preferences.indexOf(value);
+    
+    if (index === -1) {
+      preferences.push(value);
+    } else {
+      preferences.splice(index, 1);
+    }
+    
+    setFormData({ ...formData, preferences });
+  };
   
   const handleNext = () => {
     if (step < totalSteps) {
       setStep(step + 1);
-      setProgress(((step + 1) / totalSteps) * 100);
     } else {
-      // Redirect based on user mode
-      if (userMode === 'b2c') {
-        navigate('/b2c/dashboard');
-      } else if (userMode === 'b2b_user') {
-        navigate('/b2b/user/dashboard');
-      } else if (userMode === 'b2b_admin') {
-        navigate('/b2b/admin/dashboard');
-      } else {
-        navigate('/dashboard');
-      }
+      completeOnboarding();
     }
   };
   
   const handleBack = () => {
     if (step > 1) {
       setStep(step - 1);
-      setProgress(((step - 1) / totalSteps) * 100);
     }
   };
   
+  const completeOnboarding = () => {
+    // Save onboarding data
+    console.log('Onboarding completed with data:', formData);
+    
+    toast({
+      title: "Onboarding terminé !",
+      description: "Bienvenue sur EmotionsCare. Votre profil est configuré.",
+    });
+    
+    // Redirect to dashboard
+    navigate('/dashboard');
+  };
+  
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
-      <Card className="w-full max-w-3xl">
-        <CardHeader>
-          <CardTitle className="text-2xl">Bienvenue sur EmotionsCare</CardTitle>
-          <CardDescription>
-            Configurons votre compte {userMode && getUserModeDisplayName(userMode)}
-          </CardDescription>
-          <Progress value={progress} className="mt-4" />
-        </CardHeader>
-        
-        <CardContent className="py-6">
-          {step === 1 && (
-            <div className="space-y-6">
-              <h2 className="text-lg font-medium">Vos informations personnelles</h2>
+    <Shell>
+      <div className="container max-w-3xl py-10">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">Bienvenue sur EmotionsCare</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <Progress value={progress} className="mb-4" />
+            
+            {step === 1 && (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Prénom</Label>
-                    <Input id="firstName" placeholder="Votre prénom" />
+                <h2 className="text-xl font-semibold">Vos informations</h2>
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="name">Nom complet</Label>
+                    <Input 
+                      id="name" 
+                      name="name" 
+                      value={formData.name} 
+                      onChange={handleInputChange} 
+                      placeholder="Votre nom" 
+                      className="mt-1"
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Nom</Label>
-                    <Input id="lastName" placeholder="Votre nom" />
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input 
+                      id="email" 
+                      name="email" 
+                      type="email" 
+                      value={formData.email} 
+                      onChange={handleInputChange} 
+                      placeholder="votre@email.com" 
+                      className="mt-1"
+                    />
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="birthdate">Date de naissance</Label>
-                  <Input id="birthdate" type="date" />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Genre</Label>
-                  <RadioGroup defaultValue="autre">
-                    <div className="flex flex-wrap gap-6">
-                      <div className="flex items-center space-x-2">
-                        <Radio value="homme" id="homme" />
-                        <Label htmlFor="homme">Homme</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Radio value="femme" id="femme" />
-                        <Label htmlFor="femme">Femme</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Radio value="autre" id="autre" />
-                        <Label htmlFor="autre">Autre / Préfère ne pas préciser</Label>
-                      </div>
-                    </div>
-                  </RadioGroup>
                 </div>
               </div>
-            </div>
-          )}
-          
-          {step === 2 && (
-            <div className="space-y-6">
-              <h2 className="text-lg font-medium">Vos préférences</h2>
+            )}
+            
+            {step === 2 && (
               <div className="space-y-4">
-                {userMode === 'b2c' && (
-                  <div className="space-y-2">
-                    <Label>Qu'espérez-vous améliorer avec EmotionsCare ?</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {['Gestion du stress', 'Qualité du sommeil', 'Concentration', 'Énergie', 'Humeur', 'Créativité'].map((item) => (
-                        <div key={item} className="flex items-center space-x-2">
-                          <Checkbox id={item} />
-                          <Label htmlFor={item}>{item}</Label>
-                        </div>
-                      ))}
-                    </div>
+                <h2 className="text-xl font-semibold">Vos objectifs</h2>
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="goal">Quel est votre objectif principal ?</Label>
+                    <Select 
+                      value={formData.goal} 
+                      onValueChange={(value) => handleSelectChange('goal', value)}
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Sélectionnez un objectif" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="stress-reduction">Réduction du stress</SelectItem>
+                        <SelectItem value="emotional-balance">Équilibre émotionnel</SelectItem>
+                        <SelectItem value="mindfulness">Pleine conscience</SelectItem>
+                        <SelectItem value="better-sleep">Amélioration du sommeil</SelectItem>
+                        <SelectItem value="productivity">Productivité</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                )}
-                
-                {(userMode === 'b2b_user' || userMode === 'b2b_admin') && (
-                  <div className="space-y-2">
-                    <Label>Quels aspects du bien-être au travail vous intéressent ?</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {['Réduction du stress', 'Équilibre vie pro/perso', 'Productivité', 'Cohésion d\'équipe', 'Prévention burnout', 'Motivation'].map((item) => (
-                        <div key={item} className="flex items-center space-x-2">
-                          <Checkbox id={item} />
-                          <Label htmlFor={item}>{item}</Label>
-                        </div>
-                      ))}
-                    </div>
+                  
+                  <div>
+                    <Label htmlFor="frequency">À quelle fréquence souhaitez-vous utiliser l'application ?</Label>
+                    <RadioGroup 
+                      value={formData.frequency} 
+                      onValueChange={(value) => handleSelectChange('frequency', value)}
+                      className="mt-2 space-y-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="daily" id="frequency-daily" />
+                        <Label htmlFor="frequency-daily">Quotidiennement</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="weekly" id="frequency-weekly" />
+                        <Label htmlFor="frequency-weekly">Hebdomadairement</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="occasional" id="frequency-occasional" />
+                        <Label htmlFor="frequency-occasional">Occasionnellement</Label>
+                      </div>
+                    </RadioGroup>
                   </div>
-                )}
-                
-                <div className="space-y-2">
-                  <Label htmlFor="musicPreference">Préférences musicales</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionnez vos préférences musicales" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="classique">Classique</SelectItem>
-                      <SelectItem value="jazz">Jazz</SelectItem>
-                      <SelectItem value="ambiant">Ambiant / Électronique</SelectItem>
-                      <SelectItem value="nature">Sons de la nature</SelectItem>
-                      <SelectItem value="tout">Tous styles</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </div>
-            </div>
-          )}
-          
-          {step === 3 && (
-            <div className="space-y-6">
-              <h2 className="text-lg font-medium">Vos objectifs</h2>
+            )}
+            
+            {step === 3 && (
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>À quelle fréquence souhaitez-vous utiliser l'application ?</Label>
-                  <RadioGroup defaultValue="quotidien">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h2 className="text-xl font-semibold">Vos préférences</h2>
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-base">Quelles fonctionnalités vous intéressent ?</Label>
+                    <div className="mt-2 space-y-2">
                       <div className="flex items-center space-x-2">
-                        <Radio value="quotidien" id="quotidien" />
-                        <Label htmlFor="quotidien">Quotidiennement</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Radio value="hebdomadaire" id="hebdomadaire" />
-                        <Label htmlFor="hebdomadaire">Plusieurs fois par semaine</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Radio value="occasionnel" id="occasionnel" />
-                        <Label htmlFor="occasionnel">Occasionnellement</Label>
+                        <Checkbox 
+                          id="music-therapy" 
+                          checked={formData.preferences.includes('music-therapy')} 
+                          onCheckedChange={() => handleMultiCheckboxChange('music-therapy')}
+                        />
+                        <Label htmlFor="music-therapy">Musicothérapie</Label>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Radio value="besoin" id="besoin" />
-                        <Label htmlFor="besoin">Selon les besoins</Label>
+                        <Checkbox 
+                          id="emotion-tracking" 
+                          checked={formData.preferences.includes('emotion-tracking')} 
+                          onCheckedChange={() => handleMultiCheckboxChange('emotion-tracking')}
+                        />
+                        <Label htmlFor="emotion-tracking">Suivi émotionnel</Label>
                       </div>
-                    </div>
-                  </RadioGroup>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="goal">Quel est votre objectif principal ?</Label>
-                  <Select>
-                    <SelectTrigger id="goal">
-                      <SelectValue placeholder="Sélectionnez un objectif" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="stress">Réduire mon stress</SelectItem>
-                      <SelectItem value="sommeil">Améliorer mon sommeil</SelectItem>
-                      <SelectItem value="productivite">Augmenter ma productivité</SelectItem>
-                      <SelectItem value="creativite">Stimuler ma créativité</SelectItem>
-                      <SelectItem value="humeur">Stabiliser mon humeur</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
-          )}
-          
-          {step === 4 && (
-            <div className="space-y-6">
-              <h2 className="text-lg font-medium">Notifications et préférences</h2>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Quand souhaitez-vous recevoir des rappels ?</Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {['Matin', 'Midi', 'Après-midi', 'Soir', 'Week-end', 'Jamais'].map((time) => (
-                      <div key={time} className="flex items-center space-x-2">
-                        <Checkbox id={time} />
-                        <Label htmlFor={time}>{time}</Label>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="ai-coach" 
+                          checked={formData.preferences.includes('ai-coach')} 
+                          onCheckedChange={() => handleMultiCheckboxChange('ai-coach')}
+                        />
+                        <Label htmlFor="ai-coach">Coach IA</Label>
                       </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Types de notifications</Label>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="reminder" defaultChecked />
-                      <Label htmlFor="reminder">Rappels de session</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="insights" defaultChecked />
-                      <Label htmlFor="insights">Insights et recommandations</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="updates" />
-                      <Label htmlFor="updates">Mises à jour et nouvelles fonctionnalités</Label>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="vr-sessions" 
+                          checked={formData.preferences.includes('vr-sessions')} 
+                          onCheckedChange={() => handleMultiCheckboxChange('vr-sessions')}
+                        />
+                        <Label htmlFor="vr-sessions">Sessions immersives</Label>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+            )}
+            
+            {step === 4 && (
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Configuration terminée</h2>
+                <p>Merci d'avoir complété le processus d'onboarding. Votre profil est prêt à être utilisé.</p>
+                <div className="flex items-center space-x-2 pt-2">
+                  <Checkbox 
+                    id="notifications" 
+                    name="notifications" 
+                    checked={formData.notifications} 
+                    onCheckedChange={(checked) => 
+                      setFormData({ ...formData, notifications: checked as boolean })
+                    }
+                  />
+                  <Label htmlFor="notifications">Je souhaite recevoir des notifications</Label>
+                </div>
+              </div>
+            )}
+            
+            <div className="flex justify-between pt-4">
+              <Button 
+                variant="outline" 
+                onClick={handleBack}
+                disabled={step === 1}
+              >
+                Retour
+              </Button>
+              <Button onClick={handleNext}>
+                {step === totalSteps ? 'Terminer' : 'Suivant'}
+              </Button>
             </div>
-          )}
-        </CardContent>
-        
-        <CardFooter className="flex justify-between">
-          <Button 
-            variant="outline" 
-            onClick={handleBack}
-            disabled={step === 1}
-          >
-            Retour
-          </Button>
-          <Button onClick={handleNext}>
-            {step < totalSteps ? "Continuer" : "Terminer"}
-          </Button>
-        </CardFooter>
-      </Card>
-    </div>
+          </CardContent>
+        </Card>
+      </div>
+    </Shell>
   );
 };
 
