@@ -18,7 +18,7 @@ const UnifiedShell: React.FC<UnifiedShellProps> = ({ children }) => {
     <div className="min-h-screen bg-background">
       <UnifiedHeader onMenuClick={toggleSidebar} />
       <div className="pt-16 flex">
-        <UnifiedSidebar />
+        <UnifiedSidebar isOpen={sidebarOpen} onToggle={toggleSidebar} />
         <main className="flex-1 ml-0 md:ml-64 p-4">
           {children}
         </main>

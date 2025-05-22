@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import ImmersiveHome from '@/pages/ImmersiveHome';
@@ -19,6 +18,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import UnifiedLayout from '@/components/unified/UnifiedLayout';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
+import EventsPage from '@/pages/EventsPage';
 
 // Define routes
 export const routes: RouteObject[] = [
@@ -49,6 +49,10 @@ export const routes: RouteObject[] = [
   {
     path: '/b2b/selection',
     element: <B2BSelectionPage />,
+  },
+  {
+    path: '/events',
+    element: <EventsPage />,
   },
   {
     path: '/b2c',

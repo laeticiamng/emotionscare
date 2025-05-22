@@ -9,7 +9,12 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-const UnifiedSidebar: React.FC = () => {
+interface UnifiedSidebarProps {
+  isOpen?: boolean;
+  onToggle?: () => void;
+}
+
+const UnifiedSidebar: React.FC<UnifiedSidebarProps> = ({ isOpen, onToggle }) => {
   const { userMode } = useUserMode();
   const [collapsed, setCollapsed] = useState(false);
   const isMobile = useIsMobile();
@@ -24,7 +29,7 @@ const UnifiedSidebar: React.FC = () => {
         "bg-background border-r border-border",
         "flex flex-col transition-all duration-300",
         collapsed ? "w-20" : "w-64",
-        isMobile && "transform -translate-x-full"
+        isMobile && !isOpen ? "transform -translate-x-full" : ""
       )}
     >
       <div className="py-4 px-4 flex-1 overflow-y-auto">
