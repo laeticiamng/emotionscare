@@ -79,24 +79,24 @@ const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ collapsed, onItem
   const modeSpecificItems = {
     b2c: [
       { href: '/scan', label: 'Scan', icon: <ScanLine size={18} />, comingSoon: true },
-      { href: '/music', label: 'Musique', icon: <Music size={18} />, comingSoon: true },
+      { href: '/music', label: 'Musique', icon: <Music size={18} />, comingSoon: false },
       { href: '/coach', label: 'Coach', icon: <MessageSquare size={18} /> },
       { href: '/social-cocoon', label: 'Social', icon: <HeartHandshake size={18} /> },
     ],
     b2b_user: [
       { href: '/scan', label: 'Scan', icon: <ScanLine size={18} />, comingSoon: true },
-      { href: '/music', label: 'Musique', icon: <Music size={18} />, comingSoon: true },
+      { href: '/music', label: 'Musique', icon: <Music size={18} />, comingSoon: false },
       { href: '/coach', label: 'Coach', icon: <MessageSquare size={18} /> },
       { href: '/teams', label: 'Équipe', icon: <Users size={18} /> },
       { href: '/social-cocoon', label: 'Social', icon: <HeartHandshake size={18} /> },
-      { href: '/gamification', label: 'Défis', icon: <Goal size={18} />, comingSoon: true },
+      { href: '/gamification', label: 'Défis', icon: <Goal size={18} />, comingSoon: false },
     ],
     b2b_admin: [
-      { href: '/reports', label: 'Rapports', icon: <BarChart2 size={18} />, comingSoon: true },
+      { href: '/reports', label: 'Rapports', icon: <BarChart2 size={18} />, comingSoon: false },
       { href: '/teams', label: 'Équipes', icon: <Users size={18} /> },
       { href: '/optimization', label: 'Optimisation', icon: <Lightbulb size={18} /> },
       { href: '/social-cocoon', label: 'Social', icon: <HeartHandshake size={18} /> },
-      { href: '/organization', label: 'Organisation', icon: <Building2 size={18} />, comingSoon: true },
+      { href: '/organization', label: 'Organisation', icon: <Building2 size={18} />, comingSoon: false },
     ]
   };
   
@@ -110,6 +110,8 @@ const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ collapsed, onItem
       ...navigationItems,
       { href: '/coach', label: 'Coach', icon: <MessageSquare size={18} /> },
       { href: '/social-cocoon', label: 'Social', icon: <HeartHandshake size={18} /> },
+      { href: '/music', label: 'Musique', icon: <Music size={18} /> },
+      { href: '/teams', label: 'Équipes', icon: <Users size={18} /> },
     ];
   }
   
@@ -118,7 +120,7 @@ const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ collapsed, onItem
     href: '/settings', 
     label: 'Paramètres', 
     icon: <Settings size={18} />,
-    comingSoon: true 
+    comingSoon: false 
   });
   
   return (

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import ImmersiveHome from '@/pages/ImmersiveHome';
@@ -23,6 +24,12 @@ import RegisterPage from '@/pages/auth/RegisterPage';
 import EventsPage from '@/pages/EventsPage';
 import Social from '@/pages/Social';
 import SocialCocoonPage from '@/pages/SocialCocoonPage';
+import MusicPage from '@/pages/MusicPage';
+import ReportsPage from '@/pages/ReportsPage';
+import OrganizationPage from '@/pages/OrganizationPage';
+import GamificationPage from '@/pages/GamificationPage';
+import NotFound from '@/pages/NotFound';
+import SettingsPage from '@/pages/SettingsPage';
 
 // Define routes
 export const routes: RouteObject[] = [
@@ -73,6 +80,26 @@ export const routes: RouteObject[] = [
   {
     path: '/coach',
     element: <UnifiedLayout><CoachPage /></UnifiedLayout>,
+  },
+  {
+    path: '/music',
+    element: <UnifiedLayout><MusicPage /></UnifiedLayout>,
+  },
+  {
+    path: '/reports',
+    element: <UnifiedLayout><ReportsPage /></UnifiedLayout>,
+  },
+  {
+    path: '/organization',
+    element: <UnifiedLayout><OrganizationPage /></UnifiedLayout>,
+  },
+  {
+    path: '/gamification',
+    element: <UnifiedLayout><GamificationPage /></UnifiedLayout>,
+  },
+  {
+    path: '/settings',
+    element: <UnifiedLayout><SettingsPage /></UnifiedLayout>,
   },
   {
     path: '/social',
@@ -167,6 +194,10 @@ export const routes: RouteObject[] = [
         element: <CoachPage />,
       },
     ],
+  },
+  {
+    path: '/404',
+    element: <NotFoundPage />,
   },
   {
     path: '*',

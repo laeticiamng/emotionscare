@@ -47,7 +47,7 @@ export const getModeLoginPath = (mode?: UserMode): string => {
     case 'b2b_admin':
       return '/b2b/admin/login';
     default:
-      return '/login';
+      return '/b2c/login';
   }
 };
 
