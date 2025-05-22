@@ -1,207 +1,192 @@
 
 import React from 'react';
-import Shell from '@/Shell';
-import { motion } from 'framer-motion';
-import { UserIcon, Users, Activity, Calendar, ChevronRight, Building2 } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useNavigate } from 'react-router-dom';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { Building2, Users, UserCircle2, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import UnifiedLayout from '@/components/unified/UnifiedLayout';
 
-const TeamsPage = () => {
-  const navigate = useNavigate();
-  const { userMode } = useUserMode();
+// Mock data
+const teams = [
+  { 
+    id: '1', 
+    name: 'Développement', 
+    members: 8, 
+    wellbeingScore: 78,
+    description: 'Équipe en charge du développement logiciel',
+    leader: 'Jean Dupont',
+    activeUsers: 6
+  },
+  { 
+    id: '2', 
+    name: 'Marketing', 
+    members: 6, 
+    wellbeingScore: 82,
+    description: 'Équipe en charge du marketing et de la communication',
+    leader: 'Marie Martin',
+    activeUsers: 5
+  },
+  { 
+    id: '3', 
+    name: 'Design', 
+    members: 4, 
+    wellbeingScore: 75,
+    description: 'Équipe en charge du design et de l'UX/UI',
+    leader: 'Sophie Petit',
+    activeUsers: 4
+  }
+];
 
-  const isAdmin = userMode === 'b2b_admin';
+const members = [
+  { id: '1', name: 'Jean Dupont', role: 'Chef de projet', team: 'Développement', lastActive: '3h' },
+  { id: '2', name: 'Marie Martin', role: 'Marketing manager', team: 'Marketing', lastActive: '1j' },
+  { id: '3', name: 'Paul Bernard', role: 'Développeur', team: 'Développement', lastActive: '2h' },
+  { id: '4', name: 'Sophie Petit', role: 'Designer', team: 'Design', lastActive: '5h' },
+  { id: '5', name: 'Thomas Roux', role: 'Développeur', team: 'Développement', lastActive: '1h' },
+  { id: '6', name: 'Claire Dubois', role: 'Marketeur digital', team: 'Marketing', lastActive: '30m' },
+];
 
+const TeamsPage: React.FC = () => {
   return (
-    <Shell>
-      <div className="container mx-auto py-6 px-4">
-        <div className="flex justify-between items-center mb-6">
+    <UnifiedLayout>
+      <div className="container px-4 py-8">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Équipes</h1>
-            <p className="text-muted-foreground">Gérez votre équipe et suivez leur performance</p>
+            <h1 className="text-3xl font-bold mb-2">Équipes</h1>
+            <p className="text-muted-foreground">
+              Gérez vos équipes et suivez leur bien-être émotionnel
+            </p>
           </div>
-          
-          {isAdmin && (
-            <div className="flex gap-2">
-              <Button onClick={() => navigate('/b2b/admin/teams')}>
-                Gérer les équipes
-              </Button>
-            </div>
-          )}
+          <Button>
+            <Users className="mr-2 h-4 w-4" />
+            Nouvelle équipe
+          </Button>
         </div>
         
-        <Tabs defaultValue="overview" className="w-full">
+        <Tabs defaultValue="teams">
           <TabsList className="mb-6">
-            <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-            <TabsTrigger value="members">Membres</TabsTrigger>
-            <TabsTrigger value="performance">Performance</TabsTrigger>
-            <TabsTrigger value="activities">Activités</TabsTrigger>
+            <TabsTrigger value="teams" className="flex items-center">
+              <Building2 className="mr-2 h-4 w-4" />
+              Équipes
+            </TabsTrigger>
+            <TabsTrigger value="members" className="flex items-center">
+              <UserCircle2 className="mr-2 h-4 w-4" />
+              Membres
+            </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="overview">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Score émotionnel d'équipe</CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">78%</div>
-                  <p className="text-xs text-muted-foreground">+2.5% par rapport à la semaine dernière</p>
-                  <div className="mt-4 h-2 w-full bg-secondary rounded-full">
-                    <div className="h-2 bg-primary rounded-full" style={{ width: '78%' }}></div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Activité hebdomadaire</CardTitle>
-                  <Activity className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">23 sessions</div>
-                  <p className="text-xs text-muted-foreground">+5 par rapport à la semaine précédente</p>
-                  <div className="mt-4 grid grid-cols-7 gap-1">
-                    {[30, 45, 25, 60, 75, 40, 20].map((height, i) => (
-                      <div key={i} className="bg-muted-foreground/20 rounded-t-sm">
-                        <div
-                          className="bg-primary rounded-t-sm w-full"
-                          style={{ height: `${height}%` }}
-                        ></div>
+          <TabsContent value="teams">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {teams.map((team, index) => (
+                <motion.div
+                  key={team.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                >
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg font-medium">{team.name}</CardTitle>
+                          <CardDescription>{team.description}</CardDescription>
+                        </div>
+                        <Badge variant="outline" className="ml-2">
+                          {team.members} membres
+                        </Badge>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Score de bien-être</span>
+                          <span className="font-medium">{team.wellbeingScore}%</span>
+                        </div>
+                        
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full ${team.wellbeingScore >= 80 ? 'bg-green-500' : team.wellbeingScore >= 70 ? 'bg-amber-500' : 'bg-red-500'}`}
+                            style={{ width: `${team.wellbeingScore}%` }}
+                          />
+                        </div>
+                        
+                        <div className="flex justify-between items-center pt-2">
+                          <div className="text-sm text-muted-foreground">
+                            <span className="font-medium text-foreground">{team.activeUsers}</span>/{team.members} actifs
+                          </div>
+                          <Button size="sm" variant="ghost">
+                            Détails <ChevronRight className="ml-1 h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
               
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">Prochaine réunion</CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">Vendredi</div>
-                  <p className="text-xs text-muted-foreground">14h00 - Bilan hebdomadaire</p>
-                  <Button variant="outline" size="sm" className="w-full mt-4">
-                    Voir le calendrier
-                  </Button>
-                </CardContent>
-              </Card>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: teams.length * 0.1 }}
+              >
+                <Card className="border-dashed flex items-center justify-center h-full">
+                  <CardContent className="flex flex-col items-center justify-center py-8">
+                    <Building2 className="h-10 w-10 text-muted-foreground mb-4" />
+                    <Button variant="secondary">
+                      Ajouter une équipe
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Activités récentes</CardTitle>
-                <CardDescription>Dernières actions de l'équipe</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center">
-                    <Avatar className="h-9 w-9 mr-3">
-                      <AvatarImage src={`https://i.pravatar.cc/150?img=${20 + i}`} />
-                      <AvatarFallback>
-                        {['SM', 'JD', 'AS'][i - 1]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="space-y-1 flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">
-                          {['Sophie Martin', 'Jean Dupont', 'Alice Simon'][i - 1]} 
-                          <span className="text-muted-foreground font-normal ml-1">
-                            {['a terminé une session de méditation', 
-                              'a ajouté une entrée de journal',
-                              'a partagé un article avec l\'équipe'][i - 1]}
-                          </span>
-                        </p>
-                        <span className="text-xs text-muted-foreground">
-                          {['il y a 20 min', 'il y a 1h', 'il y a 3h'][i - 1]}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <Button variant="ghost" size="sm" className="w-full">
-                  Voir toutes les activités
-                </Button>
-              </CardContent>
-            </Card>
           </TabsContent>
           
           <TabsContent value="members">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Card key={i}>
-                  <CardContent className="pt-6">
-                    <div className="flex items-center space-x-4">
-                      <Avatar className="h-12 w-12">
-                        <AvatarImage src={`https://i.pravatar.cc/150?img=${i + 20}`} />
-                        <AvatarFallback>UN</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-lg font-medium">
-                          {['Sophie Martin', 'Thomas Bernard', 'Claire Dubois', 'Marc Lambert', 'Julie Petit'][i - 1]}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {['Responsable RH', 'Lead Developer', 'UX Designer', 'Marketing', 'Support Client'][i - 1]}
-                        </p>
+            <Card>
+              <CardHeader>
+                <CardTitle>Membres de l'organisation</CardTitle>
+                <CardDescription>
+                  {members.length} membres répartis dans différentes équipes
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {members.map((member, index) => (
+                    <motion.div
+                      key={member.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.05 }}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
+                      <div className="flex items-center">
+                        <Avatar className="h-10 w-10 mr-4">
+                          <AvatarImage src="" />
+                          <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h4 className="font-medium">{member.name}</h4>
+                          <p className="text-sm text-muted-foreground">{member.role}</p>
+                        </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      <Badge variant="outline">
-                        {['Leadership', 'Technique', 'Créativité', 'Analyse', 'Communication'][i - 1]}
-                      </Badge>
-                      <Badge variant="outline">
-                        {['Gestion', 'Développement', 'Design', 'Stratégie', 'Relationnel'][i - 1]}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex justify-between mt-6">
-                      <Button variant="outline" size="sm">Voir profil</Button>
-                      <Button variant="ghost" size="sm">Message</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="performance">
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance de l'équipe</CardTitle>
-                <CardDescription>Statistiques et mesures de performance</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-center py-12 text-muted-foreground">
-                  Les données de performance seront disponibles prochainement.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="activities">
-            <Card>
-              <CardHeader>
-                <CardTitle>Activités d'équipe</CardTitle>
-                <CardDescription>Suivi des activités et participation</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-center py-12 text-muted-foreground">
-                  Les données d'activités seront disponibles prochainement.
-                </p>
+                      <div className="flex items-center">
+                        <Badge variant="outline" className="mr-4">{member.team}</Badge>
+                        <div className="text-sm text-muted-foreground">
+                          Actif il y a <span className="font-medium">{member.lastActive}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
       </div>
-    </Shell>
+    </UnifiedLayout>
   );
 };
 

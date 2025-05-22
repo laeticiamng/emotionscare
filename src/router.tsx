@@ -6,6 +6,19 @@ import B2BSelectionPage from '@/pages/auth/B2BSelectionPage';
 import OptimizationPage from '@/pages/OptimizationPage';
 import TeamsPage from '@/pages/TeamsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+import DashboardRedirect from '@/pages/DashboardRedirect';
+import ChooseModeFlow from '@/pages/auth/ChooseModeFlow';
+import ModeSwitcher from '@/pages/common/ModeSwitcher';
+import HomePage from '@/pages/HomePage';
+import LandingPage from '@/pages/LandingPage';
+import B2CDashboard from '@/pages/dashboards/B2CDashboard';
+import B2BUserDashboard from '@/pages/dashboards/B2BUserDashboard';
+import B2BAdminDashboard from '@/pages/dashboards/B2BAdminDashboard';
+import ProtectedRouteWithMode from '@/components/ProtectedRouteWithMode';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import UnifiedLayout from '@/components/unified/UnifiedLayout';
+import LoginPage from '@/pages/auth/LoginPage';
+import RegisterPage from '@/pages/auth/RegisterPage';
 
 // Define routes
 export const routes: RouteObject[] = [
@@ -14,8 +27,90 @@ export const routes: RouteObject[] = [
     element: <ImmersiveHome />,
   },
   {
+    path: '/home',
+    element: <HomePage />,
+  },
+  {
+    path: '/landing',
+    element: <LandingPage />,
+  },
+  {
+    path: '/choose-mode',
+    element: <ChooseModeFlow />,
+  },
+  {
+    path: '/mode-switcher',
+    element: <ModeSwitcher />,
+  },
+  {
+    path: '/dashboard',
+    element: <DashboardRedirect />,
+  },
+  {
     path: '/b2b/selection',
     element: <B2BSelectionPage />,
+  },
+  {
+    path: '/b2c',
+    element: <UnifiedLayout />,
+    children: [
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2c" redirectTo="/choose-mode">
+            <B2CDashboard />
+          </ProtectedRouteWithMode>
+        ),
+      },
+      {
+        path: 'login',
+        element: <LoginPage mode="b2c" />,
+      },
+      {
+        path: 'register',
+        element: <RegisterPage mode="b2c" />,
+      },
+    ],
+  },
+  {
+    path: '/b2b/user',
+    element: <UnifiedLayout />,
+    children: [
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_user" redirectTo="/choose-mode">
+            <B2BUserDashboard />
+          </ProtectedRouteWithMode>
+        ),
+      },
+      {
+        path: 'login',
+        element: <LoginPage mode="b2b_user" />,
+      },
+      {
+        path: 'register',
+        element: <RegisterPage mode="b2b_user" />,
+      },
+    ],
+  },
+  {
+    path: '/b2b/admin',
+    element: <UnifiedLayout />,
+    children: [
+      {
+        path: 'dashboard',
+        element: (
+          <ProtectedRouteWithMode requiredMode="b2b_admin" redirectTo="/choose-mode">
+            <B2BAdminDashboard />
+          </ProtectedRouteWithMode>
+        ),
+      },
+      {
+        path: 'login',
+        element: <LoginPage mode="b2b_admin" />,
+      },
+    ],
   },
   {
     path: '/teams',

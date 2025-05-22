@@ -1,30 +1,40 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Shell from '@/Shell';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
   
   return (
-    <Shell>
-      <div className="container mx-auto py-12 flex flex-col items-center justify-center min-h-[60vh]">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl mb-8 text-muted-foreground">Page non trouvée</p>
-        <p className="mb-8 text-center max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted/30 p-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center max-w-md"
+      >
+        <h1 className="text-9xl font-bold text-primary">404</h1>
+        <h2 className="text-2xl font-bold mb-4">Page introuvable</h2>
+        <p className="text-muted-foreground mb-8">
           La page que vous recherchez n'existe pas ou a été déplacée.
         </p>
-        <Button 
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft size={16} />
-          Retour à l'accueil
-        </Button>
-      </div>
-    </Shell>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Button 
+            onClick={() => navigate(-1)}
+            variant="outline"
+          >
+            Retour
+          </Button>
+          <Button 
+            onClick={() => navigate('/')}
+          >
+            Retour à l'accueil
+          </Button>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 

@@ -1,82 +1,39 @@
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import UnifiedNavigation from '@/components/navigation/UnifiedNavigation';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, Sun, Moon } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/hooks/use-theme';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { getUserModeDisplayName } from '@/utils/userModeHelpers';
 
-interface UnifiedSidebarProps {
-  className?: string;
-  isMobile?: boolean;
-  onClose?: () => void;
-}
-
-const UnifiedSidebar: React.FC<UnifiedSidebarProps> = ({
-  className,
-  isMobile = false,
-  onClose,
-}) => {
-  const { logout } = useAuth();
-  const { theme, setTheme } = useTheme();
-  
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Erreur lors de la déconnexion', error);
-    }
-  };
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
+const UnifiedSidebar: React.FC = () => {
+  const { userMode } = useUserMode();
   
   return (
-    <aside className={cn(
-      "flex flex-col h-full w-64 border-r bg-background",
-      isMobile ? "pt-4" : "pt-16",
-      className
-    )}>
-      {isMobile && (
-        <div className="flex justify-between items-center px-4 mb-4">
-          <h2 className="font-semibold text-lg">EmotionsCare</h2>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onClose}
-          >
-            <ChevronLeft className="h-5 w-5" />
-            <span className="sr-only">Fermer</span>
-          </Button>
-        </div>
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3 }}
+      className={cn(
+        "fixed top-16 left-0 bottom-0 w-64",
+        "bg-background border-r border-border z-30",
+        "flex flex-col"
       )}
-      
-      <div className="flex-1 overflow-auto p-2">
+    >
+      <div className="py-4 px-4">
+        <div className="px-3 py-2 mb-2">
+          <h2 className="text-xl font-semibold flex items-center">
+            EmotionsCare
+          </h2>
+          {userMode && (
+            <div className="mt-1 text-xs text-muted-foreground">
+              Mode {getUserModeDisplayName(userMode)}
+            </div>
+          )}
+        </div>
         <UnifiedNavigation />
       </div>
-      
-      <div className="p-4 border-t space-y-2">
-        <Button 
-          variant="outline"
-          size="icon"
-          className="w-full flex justify-between items-center mb-2"
-          onClick={toggleTheme}
-        >
-          <span>Thème {theme === 'dark' ? 'Clair' : 'Sombre'}</span>
-          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
-        
-        <Button 
-          variant="outline"
-          className="w-full"
-          onClick={handleLogout}
-        >
-          Déconnexion
-        </Button>
-      </div>
-    </aside>
+    </motion.div>
   );
 };
 

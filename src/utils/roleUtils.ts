@@ -1,46 +1,43 @@
 
 import { UserRole } from '@/types/user';
-import { normalizeUserMode } from '@/utils/userModeHelpers';
 
 /**
- * Check if a user role is an admin role
+ * Check if a role is considered an admin role
  */
-export const isAdminRole = (role: UserRole | string | undefined): boolean => {
+export const isAdminRole = (role?: UserRole | string): boolean => {
   if (!role) return false;
   
-  const normalizedRole = normalizeUserMode(role);
+  const normalizedRole = role.toLowerCase();
   return normalizedRole === 'b2b_admin' || normalizedRole === 'admin';
 };
 
 /**
- * Check if a user role is a B2B user role
+ * Check if a role is considered a B2B role
  */
-export const isB2BUserRole = (role: UserRole | string | undefined): boolean => {
+export const isB2BRole = (role?: UserRole | string): boolean => {
   if (!role) return false;
   
-  const normalizedRole = normalizeUserMode(role);
-  return normalizedRole === 'b2b_user';
+  const normalizedRole = role.toLowerCase();
+  return normalizedRole === 'b2b_user' || normalizedRole === 'b2b_admin';
 };
 
 /**
- * Check if a user role is a B2C role
+ * Check if a role is a B2C role
  */
-export const isB2CRole = (role: UserRole | string | undefined): boolean => {
+export const isB2CRole = (role?: UserRole | string): boolean => {
   if (!role) return false;
   
-  const normalizedRole = normalizeUserMode(role);
+  const normalizedRole = role.toLowerCase();
   return normalizedRole === 'b2c';
 };
 
 /**
- * Get a formatted display name for a user role
+ * Get a human-readable label for a role
  */
-export const getRoleDisplayName = (role: UserRole | string | undefined): string => {
+export const getRoleLabel = (role?: UserRole | string): string => {
   if (!role) return 'Utilisateur';
   
-  const normalizedRole = normalizeUserMode(role);
-  
-  switch (normalizedRole) {
+  switch (role.toLowerCase()) {
     case 'b2c':
       return 'Particulier';
     case 'b2b_user':
@@ -55,28 +52,26 @@ export const getRoleDisplayName = (role: UserRole | string | undefined): string 
 };
 
 /**
- * Check if a user has a specific permission
- * This is a basic implementation - expand as needed
+ * Normalize a role string to a valid UserRole type
  */
-export const hasPermission = (
-  role: UserRole | string | undefined,
-  permission: string
-): boolean => {
-  if (!role) return false;
+export const normalizeRole = (role?: string): UserRole => {
+  if (!role) return 'b2c';
   
-  // Admin has all permissions
-  if (isAdminRole(role)) return true;
+  const normalizedRole = role.toLowerCase();
   
-  // Example permission structure - expand based on your needs
-  const permissionsByRole: Record<string, string[]> = {
-    'b2c': ['read:own', 'write:own'],
-    'b2b_user': ['read:own', 'write:own', 'read:team'],
-    'b2b_admin': ['read:own', 'write:own', 'read:team', 'write:team', 'admin:team'],
-    'admin': ['read:all', 'write:all', 'admin:all']
-  };
-  
-  const normalizedRole = normalizeUserMode(role);
-  const rolePermissions = permissionsByRole[normalizedRole] || [];
-  
-  return rolePermissions.includes(permission);
+  if (normalizedRole === 'b2b_admin' || normalizedRole === 'admin') {
+    return 'b2b_admin';
+  } else if (normalizedRole === 'b2b_user' || normalizedRole === 'b2b') {
+    return 'b2b_user';
+  } else {
+    return 'b2c';
+  }
+};
+
+export default {
+  isAdminRole,
+  isB2BRole,
+  isB2CRole,
+  getRoleLabel,
+  normalizeRole
 };

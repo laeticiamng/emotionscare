@@ -4,9 +4,8 @@ export interface SidebarContextType {
   toggleCollapsed: () => void;
   setCollapsed: (collapsed: boolean) => void;
   open?: boolean;
-  setOpen?: (open: boolean) => void;
-  expanded?: boolean;
   isOpen?: boolean;
+  expanded?: boolean;
+  setOpen?: (open: boolean) => void;
   toggle?: () => void;
-  onCollapseChange?: (collapsed: boolean) => void;
 }

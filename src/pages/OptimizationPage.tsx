@@ -1,201 +1,202 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import Shell from '@/Shell';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LineChart, BarChart, DollarSign, TrendingUp, Battery, Settings, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { BarChart, LineChart, PieChart } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import UnifiedLayout from '@/components/unified/UnifiedLayout';
 
 const OptimizationPage: React.FC = () => {
-  const navigate = useNavigate();
+  // Mock data for charts and metrics
+  const performanceData = [
+    { month: 'Jan', engagement: 65, wellbeing: 72 },
+    { month: 'Fév', engagement: 68, wellbeing: 74 },
+    { month: 'Mar', engagement: 72, wellbeing: 78 },
+    { month: 'Avr', engagement: 70, wellbeing: 76 },
+    { month: 'Mai', engagement: 74, wellbeing: 80 },
+    { month: 'Jun', engagement: 78, wellbeing: 82 }
+  ];
   
+  const suggestions = [
+    {
+      id: '1',
+      title: 'Séances de méditation',
+      description: 'Ajoutez des séances de méditation hebdomadaires pour améliorer la concentration',
+      impact: 'Impact élevé',
+      roi: '23%',
+      difficulty: 'Facile'
+    },
+    {
+      id: '2',
+      title: 'Réduction des réunions',
+      description: 'Optimisez le temps des réunions pour libérer du temps productif',
+      impact: 'Impact moyen',
+      roi: '15%',
+      difficulty: 'Moyen'
+    },
+    {
+      id: '3',
+      title: 'Sessions d\'exercice',
+      description: 'Intégrez de courtes pauses actives pour améliorer l\'énergie',
+      impact: 'Impact élevé',
+      roi: '18%',
+      difficulty: 'Facile'
+    }
+  ];
+
   return (
-    <Shell>
-      <div className="container mx-auto py-8 px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-3xl font-bold mb-2">Optimisation & Analytiques</h1>
-          <p className="text-muted-foreground mb-6">
-            Analysez les données pour optimiser l'expérience bien-être de votre organisation
-          </p>
-        </motion.div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <BarChart className="h-5 w-5 mr-2 text-primary" />
-                  Engagement
-                </CardTitle>
-                <CardDescription>
-                  Mesures d'utilisation et d'engagement
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary" style={{ width: '67%' }}></div>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Sessions hebdomadaires:</span>
-                    <span className="font-semibold">67%</span>
-                  </div>
-                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary" style={{ width: '81%' }}></div>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Utilisation des fonctionnalités:</span>
-                    <span className="font-semibold">81%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <LineChart className="h-5 w-5 mr-2 text-primary" />
-                  Tendances
-                </CardTitle>
-                <CardDescription>
-                  Évolution du bien-être sur la durée
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-end h-32">
-                    <div className="w-1/7 h-[30%] bg-primary/30 rounded-sm mx-0.5"></div>
-                    <div className="w-1/7 h-[45%] bg-primary/40 rounded-sm mx-0.5"></div>
-                    <div className="w-1/7 h-[40%] bg-primary/50 rounded-sm mx-0.5"></div>
-                    <div className="w-1/7 h-[60%] bg-primary/60 rounded-sm mx-0.5"></div>
-                    <div className="w-1/7 h-[75%] bg-primary/70 rounded-sm mx-0.5"></div>
-                    <div className="w-1/7 h-[65%] bg-primary/80 rounded-sm mx-0.5"></div>
-                    <div className="w-1/7 h-[80%] bg-primary/90 rounded-sm mx-0.5"></div>
-                    <div className="w-1/7 h-[85%] bg-primary rounded-sm mx-0.5"></div>
-                  </div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Jan</span>
-                    <span>Fév</span>
-                    <span>Mar</span>
-                    <span>Avr</span>
-                    <span>Mai</span>
-                    <span>Juin</span>
-                    <span>Juil</span>
-                    <span>Août</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <PieChart className="h-5 w-5 mr-2 text-primary" />
-                  Répartition
-                </CardTitle>
-                <CardDescription>
-                  Utilisation par département
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
-                      <div className="bg-blue-500 h-full" style={{ width: '35%' }}></div>
-                    </div>
-                    <span className="ml-2 min-w-[40px] text-sm">35%</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
-                      <div className="bg-green-500 h-full" style={{ width: '28%' }}></div>
-                    </div>
-                    <span className="ml-2 min-w-[40px] text-sm">28%</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
-                      <div className="bg-purple-500 h-full" style={{ width: '22%' }}></div>
-                    </div>
-                    <span className="ml-2 min-w-[40px] text-sm">22%</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
-                      <div className="bg-amber-500 h-full" style={{ width: '15%' }}></div>
-                    </div>
-                    <span className="ml-2 min-w-[40px] text-sm">15%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+    <UnifiedLayout>
+      <div className="container px-4 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Optimisation</h1>
+            <p className="text-muted-foreground">
+              Améliorez le bien-être et la productivité de votre organisation
+            </p>
+          </div>
+          <Button>
+            <Settings className="mr-2 h-4 w-4" />
+            Configurer
+          </Button>
         </div>
         
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Rapport d'optimisation</CardTitle>
-              <CardDescription>
-                Recommandations pour améliorer le bien-être de votre équipe
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Points forts</h3>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Forte adoption des sessions de méditation (+22% ce mois)</li>
-                    <li>Amélioration globale du bien-être dans les départements techniques</li>
-                    <li>Utilisation accrue des ressources audio durant les pauses</li>
-                  </ul>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {[
+            { 
+              title: 'Indice de bien-être',
+              value: '78/100',
+              change: '+5%',
+              icon: <Battery className="h-5 w-5 text-green-500" />,
+              color: 'bg-green-500/10'
+            },
+            { 
+              title: 'Productivité',
+              value: '82%',
+              change: '+3%',
+              icon: <TrendingUp className="h-5 w-5 text-blue-500" />,
+              color: 'bg-blue-500/10'
+            },
+            { 
+              title: 'Retour sur investissement',
+              value: '22%',
+              change: '+8%',
+              icon: <DollarSign className="h-5 w-5 text-purple-500" />,
+              color: 'bg-purple-500/10'
+            },
+            { 
+              title: 'Engagement',
+              value: '73%',
+              change: '+6%',
+              icon: <Zap className="h-5 w-5 text-amber-500" />,
+              color: 'bg-amber-500/10'
+            }
+          ].map((metric, index) => (
+            <motion.div
+              key={metric.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.1 }}
+            >
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className={`p-2 rounded-full ${metric.color}`}>
+                      {metric.icon}
+                    </div>
+                    <div className="text-xs font-medium text-green-600">
+                      {metric.change}
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <div className="text-sm font-medium text-muted-foreground">
+                      {metric.title}
+                    </div>
+                    <div className="text-2xl font-bold mt-1">
+                      {metric.value}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+        
+        <Tabs defaultValue="analytics" className="mt-8">
+          <TabsList className="mb-6">
+            <TabsTrigger value="analytics" className="flex items-center">
+              <LineChart className="mr-2 h-4 w-4" />
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger value="suggestions" className="flex items-center">
+              <BarChart className="mr-2 h-4 w-4" />
+              Suggestions
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="analytics">
+            <Card>
+              <CardHeader>
+                <CardTitle>Performance et bien-être</CardTitle>
+                <CardDescription>
+                  Évolution du bien-être et de l'engagement au cours des 6 derniers mois
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-80 flex items-center justify-center">
+                  <div className="text-center">
+                    <LineChart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">
+                      Graphique d'analyse des tendances de performance
+                    </p>
+                    <Button className="mt-4" variant="outline">
+                      Afficher le rapport complet
+                    </Button>
+                  </div>
                 </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Opportunités d'amélioration</h3>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Adoption limitée dans le département marketing (-12%)</li>
-                    <li>Faible utilisation des sessions VR malgré leur efficacité prouvée</li>
-                    <li>Engagement réduit le vendredi après-midi</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Recommandations</h3>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Organiser un atelier d'introduction pour l'équipe marketing</li>
-                    <li>Programmer des sessions VR guidées pour augmenter l'adoption</li>
-                    <li>Mettre en place des rappels de bien-être le vendredi après-midi</li>
-                    <li>Développer des contenus spécifiques pour les périodes de forte charge</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="suggestions">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {suggestions.map((suggestion, index) => (
+                <motion.div
+                  key={suggestion.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                >
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">{suggestion.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-muted-foreground text-sm">{suggestion.description}</p>
+                      <div className="grid grid-cols-3 gap-2 text-center text-sm">
+                        <div>
+                          <div className="font-medium">{suggestion.impact}</div>
+                          <div className="text-xs text-muted-foreground">Impact</div>
+                        </div>
+                        <div>
+                          <div className="font-medium text-green-600">{suggestion.roi}</div>
+                          <div className="text-xs text-muted-foreground">ROI</div>
+                        </div>
+                        <div>
+                          <div className="font-medium">{suggestion.difficulty}</div>
+                          <div className="text-xs text-muted-foreground">Difficulté</div>
+                        </div>
+                      </div>
+                      <Button className="w-full">Mettre en œuvre</Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
-    </Shell>
+    </UnifiedLayout>
   );
 };
 

@@ -1,16 +1,18 @@
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from 'sonner';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
+import { motion } from 'framer-motion';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { UserMode } from '@/types/auth';
+import { getModeDashboardPath, getUserModeDisplayName } from '@/utils/userModeHelpers';
+import { toast } from 'sonner';
 
 interface RegisterPageProps {
-  mode?: 'b2c' | 'b2b_user' | 'b2b_admin';
+  mode?: UserMode;
 }
 
 const RegisterPage: React.FC<RegisterPageProps> = ({ mode = 'b2c' }) => {
@@ -18,162 +20,133 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ mode = 'b2c' }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
+  const { changeUserMode } = useUserMode();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!name || !email || !password || !confirmPassword) {
-      toast.error("Veuillez remplir tous les champs");
-      return;
-    }
-    
+    setIsLoading(true);
+
     if (password !== confirmPassword) {
       toast.error("Les mots de passe ne correspondent pas");
+      setIsLoading(false);
       return;
     }
-    
-    if (!acceptTerms) {
-      toast.error("Vous devez accepter les conditions d'utilisation");
-      return;
-    }
-    
-    if (password.length < 8) {
-      toast.error("Le mot de passe doit contenir au moins 8 caractères");
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
+
     try {
-      const userData = {
+      await register({
         name,
-        role: mode,
-      };
-      
-      await register(email, password, userData);
-      
-      // Show success message and redirect to dashboard
-      toast.success("Inscription réussie", {
-        description: "Votre compte a été créé avec succès."
+        email,
+        password,
+        role: mode
       });
-      
-      if (mode === 'b2c') {
-        navigate('/dashboard');
-      } else if (mode === 'b2b_user') {
-        navigate('/dashboard');
-      }
+      changeUserMode(mode);
+      toast.success("Compte créé avec succès");
+      navigate(getModeDashboardPath(mode));
     } catch (error) {
-      console.error("Registration error:", error);
-      toast.error("Échec de l'inscription", {
-        description: "Une erreur s'est produite. Veuillez réessayer."
+      console.error('Registration error:', error);
+      toast.error("Erreur lors de l'inscription", {
+        description: "Veuillez réessayer ultérieurement."
       });
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
+  };
+
+  const getModeName = () => {
+    return getUserModeDisplayName(mode);
   };
 
   const getLoginPath = () => {
     if (mode === 'b2c') return '/b2c/login';
     if (mode === 'b2b_user') return '/b2b/user/login';
-    return '/b2b/admin/login';
-  };
-
-  const getTitle = () => {
-    if (mode === 'b2c') return 'Créer un compte Particulier';
-    if (mode === 'b2b_user') return 'Créer un compte Collaborateur';
-    return 'Créer un compte Administrateur';
+    if (mode === 'b2b_admin') return '/b2b/admin/login';
+    return '/login';
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-muted/30 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{getTitle()}</CardTitle>
-          <CardDescription>
-            Inscrivez-vous pour accéder à tous nos services
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nom complet</Label>
-              <Input 
-                id="name" 
-                type="text" 
-                placeholder="Jean Dupont" 
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="exemple@email.com" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-              <Input 
-                id="confirmPassword" 
-                type="password" 
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="acceptTerms" 
-                checked={acceptTerms} 
-                onCheckedChange={(checked) => setAcceptTerms(checked === true)}
-                required
-              />
-              <label
-                htmlFor="acceptTerms"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                J'accepte les conditions d'utilisation et la politique de confidentialité
-              </label>
-            </div>
+    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] p-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <Card className="border shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-2xl text-center">Créer un compte</CardTitle>
+            <CardDescription className="text-center">
+              Mode {getModeName()}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-sm font-medium">Nom</label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Votre nom"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium">Email</label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="votre@email.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-sm font-medium">Mot de passe</label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="confirmPassword" className="text-sm font-medium">Confirmer le mot de passe</label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="••••••••"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Inscription en cours..." : "S'inscrire"}
+              </Button>
+            </form>
           </CardContent>
-          <CardFooter className="flex flex-col">
-            <Button type="submit" className="w-full mb-4" disabled={isSubmitting}>
-              {isSubmitting ? "Inscription en cours..." : "S'inscrire"}
-            </Button>
-            <p className="text-sm text-center">
+          <CardFooter className="justify-center flex-col space-y-4">
+            <div className="text-center text-sm">
               Déjà un compte?{" "}
               <Link to={getLoginPath()} className="text-primary hover:underline">
                 Se connecter
               </Link>
-            </p>
+            </div>
+            <div className="text-center">
+              <Button variant="ghost" onClick={() => navigate('/')}>
+                Retour à l'accueil
+              </Button>
+            </div>
           </CardFooter>
-        </form>
-      </Card>
+        </Card>
+      </motion.div>
     </div>
   );
 };
