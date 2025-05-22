@@ -1,112 +1,133 @@
-
-import { UserModeType } from '@/types/userMode';
-import { UserRole } from '@/types/user';
-
 /**
- * Maps from route paths to user modes
+ * Check if the current path matches a given route
+ * Supports exact matching and prefix matching
  */
-export const pathToUserMode = (path: string): UserModeType | null => {
-  const pathLower = path.toLowerCase();
-  
-  if (pathLower.includes('/b2c')) {
-    return 'b2c';
-  } else if (pathLower.includes('/b2b/admin') || pathLower.includes('/admin')) {
-    return 'b2b_admin';
-  } else if (pathLower.includes('/b2b/user') || pathLower.includes('/collaborator')) {
-    return 'b2b_user';
+export const isRouteActive = (
+  currentPath: string,
+  routePath: string,
+  exact: boolean = false
+): boolean => {
+  if (!currentPath || !routePath) {
+    return false;
   }
   
-  return null;
+  // Normalize paths to ensure consistent comparison
+  const normalizedCurrentPath = currentPath.toLowerCase();
+  const normalizedRoutePath = routePath.toLowerCase();
+  
+  // Handle exact matching
+  if (exact) {
+    return normalizedCurrentPath === normalizedRoutePath;
+  }
+  
+  // Special case for root path
+  if (normalizedRoutePath === '/') {
+    return normalizedCurrentPath === '/';
+  }
+  
+  // Handle prefix matching for nested routes
+  return normalizedCurrentPath.startsWith(normalizedRoutePath);
 };
 
 /**
- * Get the dashboard path for a specific user mode
+ * Get active class name based on whether a route is active
  */
-export const getModeDashboardPath = (userMode: UserModeType | null): string => {
-  if (!userMode) return '/choose-mode';
+export const getActiveClassName = (
+  currentPath: string,
+  routePath: string,
+  activeClass: string = 'active',
+  inactiveClass: string = '',
+  exact: boolean = false
+): string => {
+  return isRouteActive(currentPath, routePath, exact) ? activeClass : inactiveClass;
+};
+
+/**
+ * Normalize route paths to ensure consistent comparison
+ */
+export const normalizeRoutePath = (path: string): string => {
+  // Remove trailing slash except for root path
+  return path === '/' ? path : path.replace(/\/+$/, '');
+};
+
+/**
+ * Get breadcrumb items for the current path
+ */
+export const getBreadcrumbs = (currentPath: string) => {
+  if (currentPath === '/') {
+    return [{ label: 'Accueil', path: '/' }];
+  }
   
-  switch (normalizeUserMode(userMode)) {
-    case 'b2c':
-      return '/b2c/dashboard';
-    case 'b2b_user':
-      return '/b2b/user/dashboard';
+  const pathSegments = currentPath.split('/').filter(Boolean);
+  
+  // Create breadcrumb items
+  const breadcrumbs = [{ label: 'Accueil', path: '/' }];
+  
+  let currentPathBuilder = '';
+  
+  pathSegments.forEach((segment, index) => {
+    currentPathBuilder += `/${segment}`;
+    
+    // Map segments to user-friendly names
+    let label = '';
+    
+    switch (segment) {
+      case 'b2c':
+        label = 'Espace Personnel';
+        break;
+      case 'b2b':
+        label = 'Espace Entreprise';
+        break;
+      case 'user':
+        label = 'Collaborateur';
+        break;
+      case 'admin':
+        label = 'Administrateur';
+        break;
+      case 'dashboard':
+        label = 'Tableau de bord';
+        break;
+      case 'settings':
+        label = 'Paramètres';
+        break;
+      case 'journal':
+        label = 'Journal';
+        break;
+      case 'music':
+        label = 'Musique';
+        break;
+      default:
+        // Capitalize first letter
+        label = segment.charAt(0).toUpperCase() + segment.slice(1);
+    }
+    
+    breadcrumbs.push({
+      label,
+      path: currentPathBuilder
+    });
+  });
+  
+  return breadcrumbs;
+};
+
+/**
+ * Get login path for a specific user mode
+ * Used to redirect users to the appropriate login page
+ */
+export const getModeLoginPath = (userMode: string | null): string => {
+  if (!userMode) {
+    return '/b2c/login';
+  }
+  
+  const normalizedMode = normalizeUserMode(userMode);
+  
+  switch (normalizedMode) {
     case 'b2b_admin':
-      return '/b2b/admin/dashboard';
-    default:
-      return '/dashboard';
-  }
-};
-
-/**
- * Get display name for a user mode
- */
-export const getUserModeDisplayName = (userMode: UserModeType | null): string => {
-  if (!userMode) return 'Visiteur';
-  
-  switch (normalizeUserMode(userMode)) {
-    case 'b2c':
-      return 'Particulier';
+      return '/b2b/admin/login';
     case 'b2b_user':
-      return 'Collaborateur';
-    case 'b2b_admin':
-      return 'Administrateur';
+      return '/b2b/user/login';
+    case 'b2c':
     default:
-      return 'Utilisateur';
+      return '/b2c/login';
   }
-};
-
-/**
- * Normalize user mode/role to consistent format (handles different formats)
- */
-export const normalizeUserMode = (mode?: UserModeType | UserRole | string | null): UserModeType => {
-  if (!mode) return 'b2c';
-  
-  const normalizedMode = mode.toLowerCase().replace('-', '_');
-  
-  if (normalizedMode.includes('admin')) {
-    return 'b2b_admin';
-  }
-  
-  if (normalizedMode.includes('user') || normalizedMode.includes('collaborat')) {
-    return 'b2b_user';
-  }
-  
-  if (normalizedMode.includes('b2c') || normalizedMode.includes('particulier')) {
-    return 'b2c';
-  }
-  
-  return 'b2c'; // Default user mode
-};
-
-/**
- * Check if a user has admin privileges
- */
-export const isAdmin = (userMode: UserModeType | string | null): boolean => {
-  if (!userMode) return false;
-  return normalizeUserMode(userMode) === 'b2b_admin';
-};
-
-/**
- * Check if a user is a B2B user (collaborator)
- */
-export const isB2BUser = (userMode: UserModeType | string | null): boolean => {
-  if (!userMode) return false;
-  return normalizeUserMode(userMode) === 'b2b_user';
-};
-
-/**
- * Check if a user is a B2C user (individual)
- */
-export const isB2C = (userMode: UserModeType | string | null): boolean => {
-  if (!userMode) return false;
-  return normalizeUserMode(userMode) === 'b2c';
-};
-
-/**
- * Check if a user is any type of B2B user (admin or normal user)
- */
-export const isAnyB2B = (userMode: UserModeType | string | null): boolean => {
-  if (!userMode) return false;
-  const mode = normalizeUserMode(userMode);
-  return mode === 'b2b_admin' || mode === 'b2b_user';
 };
