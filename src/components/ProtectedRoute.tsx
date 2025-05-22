@@ -8,6 +8,7 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useActivity } from '@/hooks/useActivity';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -24,6 +25,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { userMode } = useUserMode();
   const location = useLocation();
   const { toast } = useToast();
+  const { logActivity } = useActivity({ anonymize: true });
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [accessDenied, setAccessDenied] = useState(false);
 
@@ -90,6 +92,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       loginPath = getModeLoginPath('b2b_user');
     }
     
+    // Log blocked access attempt for monitoring purposes
+    logActivity('unauthorized_access', {
+      path: location.pathname,
+      timestamp: new Date().toISOString(),
+    });
+
     return (
       <AnimatePresence mode="wait">
         {isTransitioning ? (
