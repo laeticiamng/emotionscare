@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { normalizeUserMode } from '@/utils/userModeHelpers';
 import AnimatedFormField from '@/components/auth/AnimatedFormField';
 import B2CAuthLayout from '@/components/auth/B2CAuthLayout';
 import MagicLinkAuth from '@/components/auth/MagicLinkAuth';
@@ -60,15 +61,22 @@ const B2CLoginPage: React.FC = () => {
     setLoading(true);
     
     try {
-      await login(email, password, rememberMe);
-      
-      // Trigger the transition animation
-      setShowTransition(true);
-      
-      // Store a flag in sessionStorage to show transition on page reload if needed
-      sessionStorage.setItem('just_logged_in', 'true');
-      
-      // The navigation will happen after the transition completes
+      const loggedIn = await login(email, password, rememberMe);
+
+      if (loggedIn && normalizeUserMode(loggedIn.role) === 'b2c') {
+        // Trigger the transition animation
+        setShowTransition(true);
+
+        // Store a flag in sessionStorage to show transition on page reload if needed
+        sessionStorage.setItem('just_logged_in', 'true');
+      } else {
+        toast({
+          title: 'Accès non autorisé',
+          description: "Ce compte n'est pas de type particulier",
+          variant: 'destructive'
+        });
+        return;
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       
