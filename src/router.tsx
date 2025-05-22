@@ -7,47 +7,47 @@ import ProtectedRouteWithMode from '@/components/ProtectedRouteWithMode';
 
 // Public pages
 import Home from './Home';
-import LandingPage from '@/pages/LandingPage';
-import HomePage from '@/pages/HomePage';
-import NotFoundPage from '@/pages/NotFoundPage';
+import LandingPage from './pages/LandingPage';
+import HomePage from './pages/HomePage';
+import NotFoundPage from './pages/NotFoundPage';
 
 // Page components
-import ImmersiveHome from '@/pages/ImmersiveHome';
+import ImmersiveHome from './pages/ImmersiveHome';
 import ChooseModeFlow from '@/pages/auth/ChooseModeFlow';
-import B2BSelectionPage from '@/pages/B2BSelectionPage';
+import B2BSelectionPage from './pages/B2BSelectionPage';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
 import UnauthorizedPage from '@/pages/auth/UnauthorizedPage';
-import DashboardPage from '@/pages/DashboardPage';
-import ScanPage from '@/pages/ScanPage';
-import JournalPage from '@/pages/JournalPage';
-import MusicPage from '@/pages/MusicPage';
-import AudioPage from '@/pages/AudioPage';
-import CoachPage from '@/pages/CoachPage';
-import SettingsPage from '@/pages/SettingsPage';
-import TeamsPage from '@/pages/TeamsPage';
-import EventsPage from '@/pages/EventsPage';
-import ProfilePage from '@/pages/ProfilePage';
-import NotificationsPage from '@/pages/NotificationsPage';
-import PreferencesPage from '@/pages/PreferencesPage';
-import OnboardingPage from '@/pages/OnboardingPage';
-import VRPage from '@/pages/VRPage';
-import SocialPage from '@/pages/SocialPage';
-import ProgressPage from '@/pages/ProgressPage';
-import GamificationPage from '@/pages/GamificationPage';
+import DashboardPage from './pages/DashboardPage';
+import ScanPage from './pages/ScanPage';
+import JournalPage from './pages/JournalPage';
+import MusicPage from './pages/MusicPage';
+import AudioPage from './pages/AudioPage';
+import CoachPage from './pages/CoachPage';
+import SettingsPage from './pages/SettingsPage';
+import TeamsPage from './pages/TeamsPage';
+import EventsPage from './pages/EventsPage';
+import ProfilePage from './pages/ProfilePage';
+import NotificationsPage from './pages/NotificationsPage';
+import PreferencesPage from './pages/PreferencesPage';
+import OnboardingPage from './pages/OnboardingPage';
+import VRPage from './pages/VRPage';
+import SocialPage from './pages/SocialPage';
+import ProgressPage from './pages/ProgressPage';
+import GamificationPage from './pages/GamificationPage';
 
 // These pages redirect to the appropriate page based on user mode
-import Dashboard from '@/pages/Dashboard';
-import Journal from '@/pages/Journal';
-import Music from '@/pages/Music';
-import Audio from '@/pages/Audio';
-import Coach from '@/pages/Coach';
-import Progress from '@/pages/Progress';
-import Social from '@/pages/Social';
-import VR from '@/pages/VR';
-import Gamification from '@/pages/Gamification';
+import Dashboard from './pages/Dashboard';
+import Journal from './pages/Journal';
+import Music from './pages/Music';
+import Audio from './pages/Audio';
+import Coach from './pages/Coach';
+import Progress from './pages/Progress';
+import Social from './pages/Social';
+import VR from './pages/VR';
+import Gamification from './pages/Gamification';
 
 export const routes: RouteObject[] = [
   // Public routes
