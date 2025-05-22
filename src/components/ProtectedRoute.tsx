@@ -4,6 +4,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/types/user';
 import { normalizeUserMode, getModeLoginPath, getModeDashboardPath } from '@/utils/userModeHelpers';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -20,6 +21,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   redirectTo
 }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const { userMode } = useUserMode();
   const location = useLocation();
   const { toast } = useToast();
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -163,6 +165,20 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           )}
         </AnimatePresence>
       );
+    }
+  }
+
+  // Ensure a B2B mode has been explicitly selected before accessing B2B routes
+  if (isAuthenticated && (location.pathname.startsWith('/b2b/admin') || location.pathname.startsWith('/b2b/user'))) {
+    const expectedMode = location.pathname.startsWith('/b2b/admin') ? 'b2b_admin' : 'b2b_user';
+    const normalizedMode = normalizeUserMode(userMode);
+    if (normalizedMode !== expectedMode) {
+      console.warn('[ProtectedRoute] B2B access without proper mode selection', {
+        path: location.pathname,
+        userMode,
+        expectedMode
+      });
+      return <Navigate to="/b2b/selection" replace />;
     }
   }
 
