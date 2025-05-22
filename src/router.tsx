@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import ImmersiveHome from '@/pages/ImmersiveHome';
@@ -23,6 +22,7 @@ import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import EventsPage from '@/pages/EventsPage';
 import Social from '@/pages/Social';
+import SocialCocoonPage from '@/pages/SocialCocoonPage';
 
 // Define routes
 export const routes: RouteObject[] = [
@@ -77,6 +77,10 @@ export const routes: RouteObject[] = [
   {
     path: '/social',
     element: <Social />,
+  },
+  {
+    path: '/social-cocoon',
+    element: <UnifiedLayout><SocialCocoonPage /></UnifiedLayout>,
   },
   {
     path: '/b2c',

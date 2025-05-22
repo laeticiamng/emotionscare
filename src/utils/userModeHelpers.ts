@@ -81,3 +81,19 @@ export const getUserModeDisplayName = (mode: string): string => {
   const normalized = normalizeUserMode(mode);
   return getUserModeLabel(normalized);
 };
+
+/**
+ * Returns the appropriate social path based on user mode
+ */
+export const getModeSocialPath = (userMode?: UserMode): string => {
+  switch (userMode) {
+    case 'b2c':
+      return '/b2c/social';
+    case 'b2b_user':
+      return '/b2b/user/social';
+    case 'b2b_admin':
+      return '/b2b/admin/social';
+    default:
+      return '/social-cocoon';
+  }
+};
