@@ -77,6 +77,8 @@ const SynthesisOnboarding: React.FC<SynthesisOnboardingProps> = ({ open, onClose
     }
   };
   
+  if (!open) return null;
+  
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
