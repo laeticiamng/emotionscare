@@ -5,11 +5,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { UserRole } from '@/types/user';
 import { normalizeUserMode, getModeLoginPath, getModeDashboardPath } from '@/utils/userModeHelpers';
-import { useUserMode } from '@/contexts/UserModeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useActivity } from '@/hooks/useActivity';
+import { logSessionRedirect } from '@/utils/securityLogs';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -98,6 +98,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       path: location.pathname,
       timestamp: new Date().toISOString(),
     });
+    logSessionRedirect(null, location.pathname, 'no_session');
 
     return (
       <AnimatePresence mode="wait">

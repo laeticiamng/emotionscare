@@ -65,20 +65,6 @@ export const areModesEquivalent = (mode1: string | UserModeType, mode2: string |
  * @param mode The user mode
  * @returns Login path for the mode
  */
-export const getModeLoginPath = (mode: string | UserModeType): string => {
-  const normalizedMode = normalizeUserMode(mode);
-
-  switch (normalizedMode) {
-    case 'b2c':
-      return '/b2c/login';
-    case 'b2b_user':
-      return '/b2b/user/login';
-    case 'b2b_admin':
-      return '/b2b/admin/login';
-    default:
-      return '/b2c/login'; // Default fallback
-  }
-};
 
 /**
  * Gets the appropriate dashboard path for a given user mode

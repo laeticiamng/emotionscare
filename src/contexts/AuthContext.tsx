@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@/types/user';
 import authService from '@/services/auth-service';
 import { AuthErrorCode } from '@/utils/authErrors';
+import { supabase } from '@/integrations/supabase/client';
+import { logSessionRedirect } from '@/utils/securityLogs';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -45,6 +47,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     checkAuthStatus();
+
+    const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!session) {
+        setUser(null);
+        setIsAuthenticated(false);
+        if (typeof window !== 'undefined') {
+          logSessionRedirect(null, window.location.pathname, 'session_lost');
+        }
+      } else {
+        const { user } = await authService.getCurrentUser();
+        if (user) {
+          setUser(user);
+          setIsAuthenticated(true);
+        }
+      }
+    });
+
+    return () => {
+      data.subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string, remember = true): Promise<User | null> => {
