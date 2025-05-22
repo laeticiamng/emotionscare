@@ -15,6 +15,21 @@ export const normalizeUserMode = (mode: string | null | undefined): string => {
   return '';
 };
 
+export const getUserModeDisplayName = (mode: string | null | undefined): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  switch(normalizedMode) {
+    case 'b2c':
+      return 'Particulier';
+    case 'b2b_admin':
+      return 'Administrateur B2B';
+    case 'b2b_user':
+      return 'Collaborateur B2B';
+    default:
+      return 'Utilisateur';
+  }
+};
+
 export const getModeLoginPath = (mode: string | null | undefined): string => {
   const normalizedMode = normalizeUserMode(mode);
   
