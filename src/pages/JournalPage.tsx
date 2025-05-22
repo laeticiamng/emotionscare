@@ -1,158 +1,166 @@
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, Plus, Clock, Calendar, Star } from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { BookOpen, Plus, Calendar, List, BarChart2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface JournalEntry {
-  id: string;
+  id: number;
+  date: string;
   title: string;
   content: string;
-  date: Date;
-  mood: 'happy' | 'neutral' | 'sad';
+  emotions: string[];
 }
 
 const JournalPage: React.FC = () => {
-  const [entries, setEntries] = React.useState<JournalEntry[]>([
+  // Données de démo
+  const [entries, setEntries] = useState<JournalEntry[]>([
     {
-      id: '1',
+      id: 1,
+      date: '2025-05-22',
       title: 'Une journée productive',
-      content: 'Aujourd\'hui j\'ai réussi à accomplir toutes mes tâches et je me sens très bien.',
-      date: new Date(2025, 4, 20),
-      mood: 'happy'
+      content: 'Aujourd\'hui j\'ai réussi à accomplir toutes mes tâches et je me sens très satisfait.',
+      emotions: ['Satisfait', 'Fier', 'Énergique']
     },
     {
-      id: '2',
-      title: 'Réflexions sur mon travail',
-      content: 'Je me pose des questions sur la direction de ma carrière, je dois prendre du temps pour y réfléchir.',
-      date: new Date(2025, 4, 18),
-      mood: 'neutral'
+      id: 2,
+      date: '2025-05-21',
+      title: 'Réunion stressante',
+      content: 'La réunion d\'équipe a été plus difficile que prévu, mais j\'ai réussi à défendre mon point de vue.',
+      emotions: ['Stressé', 'Tendu', 'Soulagé']
     },
     {
-      id: '3',
-      title: 'Journée difficile',
-      content: 'J\'ai eu des difficultés à me concentrer aujourd\'hui, je me sens un peu déprimé.',
-      date: new Date(2025, 4, 15),
-      mood: 'sad'
+      id: 3,
+      date: '2025-05-20',
+      title: 'Moment de détente',
+      content: 'J\'ai pris du temps pour moi aujourd\'hui et j\'ai pratiqué la méditation pendant 30 minutes.',
+      emotions: ['Calme', 'Serein', 'Détendu']
     }
   ]);
-  
-  const getMoodEmoji = (mood: string) => {
-    switch (mood) {
-      case 'happy': return '😊';
-      case 'neutral': return '😐';
-      case 'sad': return '😔';
-      default: return '';
+
+  // Fonction pour formater la date
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    };
+    return new Date(dateString).toLocaleDateString('fr-FR', options);
+  };
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
     }
   };
-  
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex justify-between items-center mb-6"
-      >
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <BookOpen className="h-6 w-6" />
-            Journal émotionnel
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Suivez vos émotions et vos pensées au quotidien
-          </p>
-        </div>
-        <Button className="flex items-center gap-2">
-          <Plus size={16} />
+    <div className="container mx-auto py-8 space-y-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold flex items-center gap-2">
+          <BookOpen className="h-7 w-7" />
+          Journal émotionnel
+        </h1>
+        <Button className="bg-primary hover:bg-primary/90 text-white">
+          <Plus className="mr-2 h-4 w-4" />
           Nouvelle entrée
         </Button>
-      </motion.div>
-      
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="all">Toutes les entrées</TabsTrigger>
-          <TabsTrigger value="recent">Récentes</TabsTrigger>
-          <TabsTrigger value="favorites">Favoris</TabsTrigger>
+      </div>
+
+      <Tabs defaultValue="entries" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="entries" className="flex items-center gap-2">
+            <List className="h-4 w-4" />
+            Entrées
+          </TabsTrigger>
+          <TabsTrigger value="calendar" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Calendrier
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <BarChart2 className="h-4 w-4" />
+            Analyse
+          </TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="all" className="space-y-4">
-          {entries.map((entry, index) => (
-            <motion.div
-              key={entry.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-            >
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-xl flex items-center gap-2">
-                      {entry.title}
-                      <span className="text-2xl">{getMoodEmoji(entry.mood)}</span>
-                    </CardTitle>
-                    <Button variant="ghost" size="icon">
-                      <Star className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <CardDescription className="flex items-center gap-2">
-                    <Calendar className="h-3 w-3" />
-                    {format(entry.date, 'PP', { locale: fr })}
-                    <Clock className="h-3 w-3 ml-2" />
-                    {format(entry.date, 'p', { locale: fr })}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="line-clamp-2">{entry.content}</p>
-                </CardContent>
-                <CardFooter className="pt-0">
-                  <Button variant="link" className="px-0">Lire plus</Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          ))}
+
+        <TabsContent value="entries">
+          <motion.div 
+            className="space-y-4"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {entries.map(entry => (
+              <motion.div key={entry.id} variants={itemVariants}>
+                <Card>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle>{entry.title}</CardTitle>
+                        <CardDescription>{formatDate(entry.date)}</CardDescription>
+                      </div>
+                      <div className="flex gap-2">
+                        {entry.emotions.map((emotion, index) => (
+                          <span 
+                            key={index}
+                            className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs"
+                          >
+                            {emotion}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p>{entry.content}</p>
+                    <div className="flex justify-end mt-4 gap-2">
+                      <Button variant="outline" size="sm">Modifier</Button>
+                      <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                        Supprimer
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
         </TabsContent>
-        
-        <TabsContent value="recent">
+
+        <TabsContent value="calendar">
           <Card>
             <CardHeader>
-              <CardTitle>Entrées récentes</CardTitle>
-              <CardDescription>
-                Vos entrées des 7 derniers jours
-              </CardDescription>
+              <CardTitle>Calendrier des entrées</CardTitle>
+              <CardDescription>Visualisez vos entrées de journal sur un calendrier</CardDescription>
             </CardHeader>
-            <CardContent>
-              {entries.slice(0, 2).map(entry => (
-                <div key={entry.id} className="mb-4 last:mb-0">
-                  <h3 className="font-medium flex items-center gap-2">
-                    {entry.title}
-                    <span>{getMoodEmoji(entry.mood)}</span>
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {format(entry.date, 'PPP', { locale: fr })}
-                  </p>
-                </div>
-              ))}
+            <CardContent className="h-96 flex items-center justify-center bg-muted/20 rounded-md">
+              <p className="text-muted-foreground">Calendrier des entrées du journal (à implémenter)</p>
             </CardContent>
           </Card>
         </TabsContent>
-        
-        <TabsContent value="favorites">
+
+        <TabsContent value="analytics">
           <Card>
             <CardHeader>
-              <CardTitle>Entrées favorites</CardTitle>
-              <CardDescription>
-                Les entrées que vous avez marquées comme favorites
-              </CardDescription>
+              <CardTitle>Analyse des émotions</CardTitle>
+              <CardDescription>Analysez l'évolution de vos émotions au fil du temps</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-center py-8 text-muted-foreground">
-                Vous n'avez pas encore d'entrées favorites
-              </p>
+            <CardContent className="h-96 flex items-center justify-center bg-muted/20 rounded-md">
+              <p className="text-muted-foreground">Graphiques d'analyse émotionnelle (à implémenter)</p>
             </CardContent>
           </Card>
         </TabsContent>

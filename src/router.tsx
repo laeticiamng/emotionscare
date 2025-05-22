@@ -1,9 +1,12 @@
+
 import React from 'react';
 import { RouteObject } from 'react-router-dom';
 import ImmersiveHome from '@/pages/ImmersiveHome';
 import B2BSelectionPage from '@/pages/auth/B2BSelectionPage';
 import OptimizationPage from '@/pages/OptimizationPage';
 import TeamsPage from '@/pages/TeamsPage';
+import JournalPage from '@/pages/JournalPage';
+import CoachPage from '@/pages/CoachPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import DashboardRedirect from '@/pages/DashboardRedirect';
 import ChooseModeFlow from '@/pages/auth/ChooseModeFlow';
@@ -19,6 +22,7 @@ import UnifiedLayout from '@/components/unified/UnifiedLayout';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import EventsPage from '@/pages/EventsPage';
+import Social from '@/pages/Social';
 
 // Define routes
 export const routes: RouteObject[] = [
@@ -52,7 +56,27 @@ export const routes: RouteObject[] = [
   },
   {
     path: '/events',
-    element: <EventsPage />,
+    element: <UnifiedLayout><EventsPage /></UnifiedLayout>,
+  },
+  {
+    path: '/teams',
+    element: <UnifiedLayout><TeamsPage /></UnifiedLayout>,
+  },
+  {
+    path: '/journal',
+    element: <UnifiedLayout><JournalPage /></UnifiedLayout>,
+  },
+  {
+    path: '/optimization',
+    element: <UnifiedLayout><OptimizationPage /></UnifiedLayout>,
+  },
+  {
+    path: '/coach',
+    element: <UnifiedLayout><CoachPage /></UnifiedLayout>,
+  },
+  {
+    path: '/social',
+    element: <Social />,
   },
   {
     path: '/b2c',
@@ -73,6 +97,14 @@ export const routes: RouteObject[] = [
       {
         path: 'register',
         element: <RegisterPage mode="b2c" />,
+      },
+      {
+        path: 'journal',
+        element: <JournalPage />,
+      },
+      {
+        path: 'coach',
+        element: <CoachPage />,
       },
     ],
   },
@@ -96,6 +128,14 @@ export const routes: RouteObject[] = [
         path: 'register',
         element: <RegisterPage mode="b2b_user" />,
       },
+      {
+        path: 'journal',
+        element: <JournalPage />,
+      },
+      {
+        path: 'coach',
+        element: <CoachPage />,
+      },
     ],
   },
   {
@@ -114,15 +154,15 @@ export const routes: RouteObject[] = [
         path: 'login',
         element: <LoginPage mode="b2b_admin" />,
       },
+      {
+        path: 'events',
+        element: <EventsPage />,
+      },
+      {
+        path: 'coach',
+        element: <CoachPage />,
+      },
     ],
-  },
-  {
-    path: '/teams',
-    element: <TeamsPage />,
-  },
-  {
-    path: '/optimization',
-    element: <OptimizationPage />,
   },
   {
     path: '*',

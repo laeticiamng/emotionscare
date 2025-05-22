@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Link } from 'react-router-dom';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { ROUTES } from '@/types/navigation';
 import {
@@ -49,27 +48,33 @@ const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ collapsed }) => {
       label: 'Événements', 
       icon: <Calendar size={18} /> 
     },
+    { 
+      href: '/journal', 
+      label: 'Journal', 
+      icon: <FileText size={18} /> 
+    },
   ];
   
   // Define mode-specific navigation items
   const modeSpecificItems = {
     b2c: [
-      { href: '/b2c/journal', label: 'Journal', icon: <FileText size={18} /> },
-      { href: '/b2c/scan', label: 'Scan', icon: <ScanLine size={18} /> },
-      { href: '/b2c/music', label: 'Musique', icon: <Music size={18} /> },
-      { href: '/b2c/coach', label: 'Coach', icon: <MessageSquare size={18} /> },
+      { href: '/scan', label: 'Scan', icon: <ScanLine size={18} /> },
+      { href: '/music', label: 'Musique', icon: <Music size={18} /> },
+      { href: '/coach', label: 'Coach', icon: <MessageSquare size={18} /> },
+      { href: '/social', label: 'Social', icon: <HeartHandshake size={18} /> },
     ],
     b2b_user: [
-      { href: '/b2b/user/journal', label: 'Journal', icon: <FileText size={18} /> },
-      { href: '/b2b/user/scan', label: 'Scan', icon: <ScanLine size={18} /> },
-      { href: '/b2b/user/music', label: 'Musique', icon: <Music size={18} /> },
-      { href: '/b2b/user/coach', label: 'Coach', icon: <MessageSquare size={18} /> },
+      { href: '/scan', label: 'Scan', icon: <ScanLine size={18} /> },
+      { href: '/music', label: 'Musique', icon: <Music size={18} /> },
+      { href: '/coach', label: 'Coach', icon: <MessageSquare size={18} /> },
       { href: '/teams', label: 'Équipe', icon: <Users size={18} /> },
+      { href: '/social', label: 'Social', icon: <HeartHandshake size={18} /> },
     ],
     b2b_admin: [
-      { href: '/b2b/admin/reports', label: 'Rapports', icon: <BarChart2 size={18} /> },
+      { href: '/reports', label: 'Rapports', icon: <BarChart2 size={18} /> },
       { href: '/teams', label: 'Équipes', icon: <Users size={18} /> },
       { href: '/optimization', label: 'Optimisation', icon: <Lightbulb size={18} /> },
+      { href: '/social', label: 'Social', icon: <HeartHandshake size={18} /> },
     ]
   };
   
@@ -81,7 +86,7 @@ const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ collapsed }) => {
   
   // Always add settings at the end
   navigationItems.push({ 
-    href: userMode ? `/${userMode}/settings` : '/settings', 
+    href: '/settings', 
     label: 'Paramètres', 
     icon: <Settings size={18} /> 
   });
@@ -103,7 +108,7 @@ const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ collapsed }) => {
               collapsed && "justify-center px-0"
             )}
           >
-            <span className="mr-3">{item.icon}</span>
+            <span className={cn("mr-3", collapsed && "mr-0")}>{item.icon}</span>
             {!collapsed && <span>{item.label}</span>}
           </Link>
         );
