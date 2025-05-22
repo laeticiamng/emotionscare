@@ -1,15 +1,17 @@
-
 import React from 'react';
+import { RouteObject } from 'react-router-dom';
 import AuthLayout from '@/layouts/AuthLayout';
 import B2CLayout from '@/layouts/B2CLayout';
 import B2BUserLayout from '@/layouts/B2BUserLayout';
 import B2BAdminLayout from '@/layouts/B2BAdminLayout';
 import ProtectedRouteWithMode from '@/components/ProtectedRouteWithMode';
+
 // Public pages
 import Home from './Home';
 import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import NotFoundPage from './pages/NotFoundPage';
+
 // Page components
 import ImmersiveHome from './pages/ImmersiveHome';
 import ChooseModeFlow from '@/pages/auth/ChooseModeFlow';
@@ -23,8 +25,8 @@ import DashboardPage from './pages/DashboardPage';
 import ScanPage from './pages/ScanPage';
 import JournalPage from './pages/JournalPage';
 import MusicPage from './pages/MusicPage';
-import AudioPage from './pages/AudioPage';
-import CoachPage from './pages/CoachPage';
+import AudioPage from './pages/Audio';
+import CoachPage from './pages/Coach';
 import SettingsPage from './pages/SettingsPage';
 import TeamsPage from './pages/TeamsPage';
 import EventsPage from './pages/EventsPage';
@@ -32,10 +34,11 @@ import ProfilePage from './pages/ProfilePage';
 import NotificationsPage from './pages/NotificationsPage';
 import PreferencesPage from './pages/PreferencesPage';
 import OnboardingPage from './pages/OnboardingPage';
-import VRPage from './pages/VRPage';
-import SocialPage from './pages/SocialPage';
-import ProgressPage from './pages/ProgressPage';
-import GamificationPage from './pages/GamificationPage';
+import VRPage from './pages/VR';
+import SocialPage from './pages/Social';
+import ProgressPage from './pages/Progress';
+import GamificationPage from './pages/Gamification';
+
 // These pages redirect to the appropriate page based on user mode
 import Dashboard from './pages/Dashboard';
 import Journal from './pages/Journal';
@@ -47,8 +50,8 @@ import Social from './pages/Social';
 import VR from './pages/VR';
 import Gamification from './pages/Gamification';
 
-// Change from a named export to a default export
-const routes = [
+// Export the routes array as default so it can be imported correctly in AppRouter.tsx
+const routes: RouteObject[] = [
   // Public routes
   {
     path: '/',
@@ -160,19 +163,23 @@ const routes = [
         element: <LoginPage mode="b2b_admin" />
       },
       {
+        path: 'b2b/admin/register',
+        element: <RegisterPage mode="b2b_admin" />
+      },
+      {
         path: 'b2b/admin/forgot-password',
         element: <ForgotPasswordPage mode="b2b_admin" />
       },
       {
         path: 'b2b/admin/reset-password',
         element: <ResetPasswordPage mode="b2b_admin" />
-      }
+      },
     ]
   },
-  // B2C Routes
+  // B2C protected routes
   {
-    path: '/b2c',
-    element: <B2CLayout />,
+    path: 'b2c',
+    element: <ProtectedRouteWithMode mode="b2c"><B2CLayout /></ProtectedRouteWithMode>,
     children: [
       {
         path: 'dashboard',
@@ -191,28 +198,8 @@ const routes = [
         element: <MusicPage />
       },
       {
-        path: 'audio',
-        element: <AudioPage />
-      },
-      {
         path: 'coach',
         element: <CoachPage />
-      },
-      {
-        path: 'vr',
-        element: <VRPage />
-      },
-      {
-        path: 'social',
-        element: <SocialPage />
-      },
-      {
-        path: 'progress',
-        element: <ProgressPage />
-      },
-      {
-        path: 'gamification',
-        element: <GamificationPage />
       },
       {
         path: 'settings',
@@ -221,116 +208,6 @@ const routes = [
       {
         path: 'preferences',
         element: <PreferencesPage />
-      },
-      {
-        path: 'onboarding',
-        element: <OnboardingPage />
-      }
-    ]
-  },
-  // B2B User Routes
-  {
-    path: '/b2b/user',
-    element: <B2BUserLayout />,
-    children: [
-      {
-        path: 'dashboard',
-        element: <DashboardPage />
-      },
-      {
-        path: 'scan',
-        element: <ScanPage />
-      },
-      {
-        path: 'journal',
-        element: <JournalPage />
-      },
-      {
-        path: 'music',
-        element: <MusicPage />
-      },
-      {
-        path: 'audio',
-        element: <AudioPage />
-      },
-      {
-        path: 'coach',
-        element: <CoachPage />
-      },
-      {
-        path: 'vr',
-        element: <VRPage />
-      },
-      {
-        path: 'social',
-        element: <SocialPage />
-      },
-      {
-        path: 'progress',
-        element: <ProgressPage />
-      },
-      {
-        path: 'gamification',
-        element: <GamificationPage />
-      },
-      {
-        path: 'teams',
-        element: <TeamsPage />
-      },
-      {
-        path: 'settings',
-        element: <SettingsPage />
-      },
-      {
-        path: 'preferences',
-        element: <PreferencesPage />
-      },
-      {
-        path: 'onboarding',
-        element: <OnboardingPage />
-      },
-      {
-        path: 'notifications',
-        element: <NotificationsPage />
-      },
-      {
-        path: 'profile',
-        element: <ProfilePage />
-      }
-    ]
-  },
-  // B2B Admin Routes
-  {
-    path: '/b2b/admin',
-    element: <B2BAdminLayout />,
-    children: [
-      {
-        path: 'dashboard',
-        element: <DashboardPage />
-      },
-      {
-        path: 'scan',
-        element: <ScanPage />
-      },
-      {
-        path: 'journal',
-        element: <JournalPage />
-      },
-      {
-        path: 'music',
-        element: <MusicPage />
-      },
-      {
-        path: 'audio',
-        element: <AudioPage />
-      },
-      {
-        path: 'coach',
-        element: <CoachPage />
-      },
-      {
-        path: 'vr',
-        element: <VRPage />
       },
       {
         path: 'teams',
@@ -341,32 +218,66 @@ const routes = [
         element: <EventsPage />
       },
       {
-        path: 'settings',
-        element: <SettingsPage />
-      },
-      {
-        path: 'preferences',
-        element: <PreferencesPage />
-      },
-      {
-        path: 'onboarding',
-        element: <OnboardingPage />
+        path: 'profile',
+        element: <ProfilePage />
       },
       {
         path: 'notifications',
         element: <NotificationsPage />
       },
       {
-        path: 'profile',
-        element: <ProfilePage />
-      }
+        path: 'onboarding',
+        element: <OnboardingPage />
+      },
+      {
+        path: 'vr',
+        element: <VRPage />
+      },
+      {
+        path: 'social',
+        element: <SocialPage />
+      },
+      {
+        path: 'progress',
+        element: <ProgressPage />
+      },
+      {
+        path: 'gamification',
+        element: <GamificationPage />
+      },
     ]
   },
-  // Catch-all route (404)
+  // B2B User protected routes
+  {
+    path: 'b2b/user',
+    element: <ProtectedRouteWithMode mode="b2b_user"><B2BUserLayout /></ProtectedRouteWithMode>,
+    children: [
+      {
+        path: 'dashboard',
+        element: <DashboardPage />
+      },
+      // ... other B2B user routes
+    ]
+  },
+  // B2B Admin protected routes
+  {
+    path: 'b2b/admin',
+    element: <ProtectedRouteWithMode mode="b2b_admin"><B2BAdminLayout /></ProtectedRouteWithMode>,
+    children: [
+      {
+        path: 'dashboard',
+        element: <DashboardPage />
+      },
+      // ... other B2B admin routes
+    ]
+  },
+  // Not found
   {
     path: '*',
     element: <NotFoundPage />
   }
 ];
 
+// Export both named and default exports
+export { routes };
 export default routes;

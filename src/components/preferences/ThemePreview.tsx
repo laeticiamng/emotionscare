@@ -3,9 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 
 // Define a Theme type if it doesn't exist in @/types/preferences
-interface Theme {
-  [key: string]: any;
-}
+type Theme = 'light' | 'dark' | 'system';
 
 interface ThemePreviewProps {
   theme: Theme;
