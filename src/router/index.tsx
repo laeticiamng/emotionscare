@@ -25,6 +25,7 @@ const SettingsPage = lazy(() => import('../pages/SettingsPage'));
 const B2BUserDashboard = lazy(() => import('../pages/b2b/user/Dashboard'));
 const B2BAdminDashboard = lazy(() => import('../pages/b2b/admin/Dashboard'));
 const ModeSwitcher = lazy(() => import('../pages/common/ModeSwitcher'));
+const LoginRedirect = lazy(() => import('../components/common/LoginRedirect'));
 
 // Define routes
 const routes: RouteObject[] = [
@@ -125,6 +126,12 @@ const routes: RouteObject[] = [
   {
     path: '/dashboard',
     element: <Dashboard />
+  },
+  
+  // Fallback login redirect
+  {
+    path: '/login',
+    element: <LoginRedirect />
   }
 ];
 

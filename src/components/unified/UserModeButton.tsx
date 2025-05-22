@@ -7,6 +7,10 @@ import { UserModeSelector } from '@/components/ui/user-mode-selector';
 const UserModeButton: React.FC = () => {
   const navigate = useNavigate();
   
+  const handleModeSwitch = () => {
+    navigate('/mode-switcher');
+  };
+  
   return (
     <UserModeSelector 
       className="mr-2"
