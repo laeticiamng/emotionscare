@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
-import { usePreferences } from '@/contexts/PreferencesContext';
+import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 
 export const useAmbientSound = () => {
-  const { preferences } = usePreferences();
+  const { preferences } = useUserPreferences();
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   

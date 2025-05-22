@@ -1,11 +1,11 @@
-import { usePreferences } from '@/contexts/PreferencesContext';
+import { useUserPreferences } from '@/contexts/UserPreferencesContext';
 
 /**
  * Hook returning whether analytics tracking is allowed according
  * to the current user privacy preferences.
  */
 export function useAnalyticsConsent(): boolean {
-  const { privacy } = usePreferences();
+  const { privacy } = useUserPreferences();
   if (!privacy) return false;
   if (typeof privacy === 'string') {
     // simple preset: "private" disables analytics
