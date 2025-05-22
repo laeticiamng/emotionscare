@@ -1,197 +1,343 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LineChart, BarChart, DollarSign, TrendingUp, Battery, Settings, Zap } from 'lucide-react';
+import { ArrowUpRight, Download, BarChart2, Clock, LineChart, Users, HelpCircle, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 import UnifiedLayout from '@/components/unified/UnifiedLayout';
 
 const OptimizationPage: React.FC = () => {
-  // Mock data for charts and metrics
-  const performanceData = [
-    { month: 'Jan', engagement: 65, wellbeing: 72 },
-    { month: 'Fév', engagement: 68, wellbeing: 74 },
-    { month: 'Mar', engagement: 72, wellbeing: 78 },
-    { month: 'Avr', engagement: 70, wellbeing: 76 },
-    { month: 'Mai', engagement: 74, wellbeing: 80 },
-    { month: 'Jun', engagement: 78, wellbeing: 82 }
-  ];
-  
-  const suggestions = [
-    {
-      id: '1',
-      title: 'Séances de méditation',
-      description: 'Ajoutez des séances de méditation hebdomadaires pour améliorer la concentration',
-      impact: 'Impact élevé',
-      roi: '23%',
-      difficulty: 'Facile'
-    },
-    {
-      id: '2',
-      title: 'Réduction des réunions',
-      description: 'Optimisez le temps des réunions pour libérer du temps productif',
-      impact: 'Impact moyen',
-      roi: '15%',
-      difficulty: 'Moyen'
-    },
-    {
-      id: '3',
-      title: 'Sessions d\'exercice',
-      description: 'Intégrez de courtes pauses actives pour améliorer l\'énergie',
-      impact: 'Impact élevé',
-      roi: '18%',
-      difficulty: 'Facile'
-    }
-  ];
-
   return (
     <UnifiedLayout>
-      <div className="container px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
+      <div className="container mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex justify-between items-center mb-8"
+        >
           <div>
-            <h1 className="text-3xl font-bold mb-2">Optimisation</h1>
-            <p className="text-muted-foreground">
-              Améliorez le bien-être et la productivité de votre organisation
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Activity className="h-6 w-6" />
+              Optimisation
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Outils d'analyse et d'optimisation du bien-être
             </p>
           </div>
-          <Button>
-            <Settings className="mr-2 h-4 w-4" />
-            Configurer
-          </Button>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {[
-            { 
-              title: 'Indice de bien-être',
-              value: '78/100',
-              change: '+5%',
-              icon: <Battery className="h-5 w-5 text-green-500" />,
-              color: 'bg-green-500/10'
-            },
-            { 
-              title: 'Productivité',
-              value: '82%',
-              change: '+3%',
-              icon: <TrendingUp className="h-5 w-5 text-blue-500" />,
-              color: 'bg-blue-500/10'
-            },
-            { 
-              title: 'Retour sur investissement',
-              value: '22%',
-              change: '+8%',
-              icon: <DollarSign className="h-5 w-5 text-purple-500" />,
-              color: 'bg-purple-500/10'
-            },
-            { 
-              title: 'Engagement',
-              value: '73%',
-              change: '+6%',
-              icon: <Zap className="h-5 w-5 text-amber-500" />,
-              color: 'bg-amber-500/10'
-            }
-          ].map((metric, index) => (
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex items-center gap-2">
+              <Download size={16} />
+              Exporter
+            </Button>
+            <Button className="flex items-center gap-2">
+              <LineChart size={16} />
+              Nouveau rapport
+            </Button>
+          </div>
+        </motion.div>
+
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+            <TabsTrigger value="teams">Équipes</TabsTrigger>
+            <TabsTrigger value="individual">Individuel</TabsTrigger>
+            <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview">
+            <div className="grid gap-6 md:grid-cols-3">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+              >
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg font-medium flex items-center gap-2">
+                      <BarChart2 className="h-5 w-5 text-primary" />
+                      Score global
+                    </CardTitle>
+                    <CardDescription>Moyenne de toutes les équipes</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-end gap-2">
+                      <span className="text-3xl font-bold">74</span>
+                      <span className="text-sm text-green-500 flex items-center">
+                        +3 <ArrowUpRight className="h-3 w-3" />
+                      </span>
+                    </div>
+                    <div className="mt-4 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-primary rounded-full" style={{ width: '74%' }}></div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="pt-0">
+                    <Button variant="link" className="px-0">Voir détails</Button>
+                  </CardFooter>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
+              >
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg font-medium flex items-center gap-2">
+                      <Users className="h-5 w-5 text-primary" />
+                      Participation
+                    </CardTitle>
+                    <CardDescription>Taux d'engagement des utilisateurs</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-end gap-2">
+                      <span className="text-3xl font-bold">86%</span>
+                      <span className="text-sm text-green-500 flex items-center">
+                        +5% <ArrowUpRight className="h-3 w-3" />
+                      </span>
+                    </div>
+                    <div className="mt-4 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-primary rounded-full" style={{ width: '86%' }}></div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="pt-0">
+                    <Button variant="link" className="px-0">Voir détails</Button>
+                  </CardFooter>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
+              >
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg font-medium flex items-center gap-2">
+                      <Clock className="h-5 w-5 text-primary" />
+                      Temps par session
+                    </CardTitle>
+                    <CardDescription>Durée moyenne d'engagement</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-end gap-2">
+                      <span className="text-3xl font-bold">12m</span>
+                      <span className="text-sm text-red-500 flex items-center">
+                        -2m <ArrowUpRight className="h-3 w-3 rotate-90" />
+                      </span>
+                    </div>
+                    <div className="mt-4 grid grid-cols-7 gap-1">
+                      {[30, 45, 60, 80, 65, 50, 70].map((value, index) => (
+                        <div key={index} className="flex flex-col items-center">
+                          <div className="h-20 w-full flex items-end">
+                            <div 
+                              className="w-full bg-primary rounded-sm" 
+                              style={{ height: `${value}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-xs text-muted-foreground mt-1">
+                            {['L', 'M', 'M', 'J', 'V', 'S', 'D'][index]}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                  <CardFooter className="pt-0">
+                    <Button variant="link" className="px-0">Voir détails</Button>
+                  </CardFooter>
+                </Card>
+              </motion.div>
+            </div>
+
             <motion.div
-              key={metric.title}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
+              transition={{ duration: 0.3, delay: 0.4 }}
+              className="mt-6"
             >
               <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className={`p-2 rounded-full ${metric.color}`}>
-                      {metric.icon}
-                    </div>
-                    <div className="text-xs font-medium text-green-600">
-                      {metric.change}
-                    </div>
-                  </div>
-                  <div className="mt-3">
-                    <div className="text-sm font-medium text-muted-foreground">
-                      {metric.title}
-                    </div>
-                    <div className="text-2xl font-bold mt-1">
-                      {metric.value}
-                    </div>
+                <CardHeader>
+                  <CardTitle>Tendances et analyses</CardTitle>
+                  <CardDescription>
+                    Évolution des indicateurs clés au cours du temps
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-80 bg-muted/50 rounded-md flex items-center justify-center">
+                    <p className="text-muted-foreground flex flex-col items-center gap-2">
+                      <LineChart className="h-8 w-8 opacity-50" />
+                      <span>Graphique d'évolution des indicateurs</span>
+                    </p>
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
-          ))}
-        </div>
-        
-        <Tabs defaultValue="analytics" className="mt-8">
-          <TabsList className="mb-6">
-            <TabsTrigger value="analytics" className="flex items-center">
-              <LineChart className="mr-2 h-4 w-4" />
-              Analytics
-            </TabsTrigger>
-            <TabsTrigger value="suggestions" className="flex items-center">
-              <BarChart className="mr-2 h-4 w-4" />
-              Suggestions
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="analytics">
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance et bien-être</CardTitle>
-                <CardDescription>
-                  Évolution du bien-être et de l'engagement au cours des 6 derniers mois
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80 flex items-center justify-center">
-                  <div className="text-center">
-                    <LineChart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">
-                      Graphique d'analyse des tendances de performance
-                    </p>
-                    <Button className="mt-4" variant="outline">
-                      Afficher le rapport complet
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
-          
-          <TabsContent value="suggestions">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {suggestions.map((suggestion, index) => (
+
+          <TabsContent value="teams">
+            <div className="grid gap-6">
+              {['Marketing', 'Développement', 'Finance', 'Support client'].map((team, index) => (
                 <motion.div
-                  key={suggestion.id}
+                  key={team}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  transition={{ duration: 0.3, delay: 0.1 * index }}
                 >
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">{suggestion.title}</CardTitle>
+                      <CardTitle>{`Équipe ${team}`}</CardTitle>
+                      <CardDescription>Analyse des performances et du bien-être</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-muted-foreground text-sm">{suggestion.description}</p>
-                      <div className="grid grid-cols-3 gap-2 text-center text-sm">
+                    <CardContent>
+                      <div className="grid md:grid-cols-3 gap-8">
                         <div>
-                          <div className="font-medium">{suggestion.impact}</div>
-                          <div className="text-xs text-muted-foreground">Impact</div>
+                          <h3 className="text-sm font-medium mb-2">Score de bien-être</h3>
+                          <div className="relative flex items-center justify-center">
+                            <div className="text-3xl font-bold">{70 + index * 5}</div>
+                            <svg className="absolute -z-10" width="120" height="120" viewBox="0 0 120 120">
+                              <circle 
+                                cx="60" cy="60" r="54" fill="none" 
+                                stroke="currentColor" 
+                                strokeWidth="12"
+                                strokeOpacity="0.1"
+                              />
+                              <circle 
+                                cx="60" cy="60" r="54" fill="none" 
+                                stroke="currentColor" 
+                                strokeWidth="12"
+                                strokeDasharray={`${(70 + index * 5) * 3.39} 339`}
+                                strokeLinecap="round"
+                                transform="rotate(-90 60 60)"
+                              />
+                            </svg>
+                          </div>
                         </div>
                         <div>
-                          <div className="font-medium text-green-600">{suggestion.roi}</div>
-                          <div className="text-xs text-muted-foreground">ROI</div>
+                          <h3 className="text-sm font-medium mb-2">Membres actifs</h3>
+                          <p className="text-3xl font-bold">{5 + index}</p>
+                          <p className="text-sm text-muted-foreground">{`sur ${8 + index} membres`}</p>
                         </div>
                         <div>
-                          <div className="font-medium">{suggestion.difficulty}</div>
-                          <div className="text-xs text-muted-foreground">Difficulté</div>
+                          <h3 className="text-sm font-medium mb-2">Sessions hebdomadaires</h3>
+                          <p className="text-3xl font-bold">{12 + index * 2}</p>
+                          <div className="flex items-center gap-1 text-sm">
+                            <span className={index % 2 === 0 ? "text-green-500" : "text-red-500"}>
+                              {index % 2 === 0 ? "+" : "-"}{index + 1}
+                            </span>
+                            <span className="text-muted-foreground">vs semaine précédente</span>
+                          </div>
                         </div>
                       </div>
-                      <Button className="w-full">Mettre en œuvre</Button>
                     </CardContent>
+                    <CardFooter>
+                      <Button variant="outline" className="flex items-center gap-2 mr-2">
+                        <Users size={16} />
+                        Voir membres
+                      </Button>
+                      <Button>Rapport détaillé</Button>
+                    </CardFooter>
                   </Card>
                 </motion.div>
               ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="individual">
+            <Card>
+              <CardHeader>
+                <CardTitle>Performances individuelles</CardTitle>
+                <CardDescription>
+                  Analysez les indicateurs personnels de bien-être
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-center py-12 text-muted-foreground flex flex-col items-center gap-3">
+                  <HelpCircle className="h-10 w-10 opacity-50" />
+                  <span>Sélectionnez un utilisateur pour voir ses analyses détaillées</span>
+                  <Button className="mt-4">Choisir un utilisateur</Button>
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="suggestions">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recommandations d'optimisation</CardTitle>
+                  <CardDescription>
+                    Suggestions basées sur les données recueillies
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-4">
+                    {[
+                      "Augmenter les sessions de méditation guidée pour l'équipe Marketing",
+                      "Proposer des pauses actives pour l'équipe Développement",
+                      "Mettre en place des ateliers de gestion du stress pour tous les collaborateurs",
+                      "Optimiser les horaires des sessions collectives pour augmenter la participation"
+                    ].map((suggestion, index) => (
+                      <motion.li
+                        key={index}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: 0.1 * index }}
+                        className="flex items-start gap-3 p-3 rounded-md bg-muted/50"
+                      >
+                        <div className="bg-primary/10 rounded-full p-2 text-primary">
+                          <LineChart className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{suggestion}</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Impact potentiel: {['Élevé', 'Moyen', 'Élevé', 'Moyen'][index]}
+                          </p>
+                        </div>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Alertes et points d'attention</CardTitle>
+                  <CardDescription>
+                    Éléments nécessitant une action rapide
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/50 rounded-md">
+                      <h3 className="font-medium text-red-700 dark:text-red-400 flex items-center gap-2">
+                        <Activity className="h-4 w-4" />
+                        Baisse de participation dans l'équipe Support
+                      </h3>
+                      <p className="text-sm text-red-600 dark:text-red-300 mt-2">
+                        Baisse de 15% des sessions de bien-être au cours des deux dernières semaines.
+                      </p>
+                      <Button size="sm" variant="outline" className="mt-3">
+                        Analyser
+                      </Button>
+                    </div>
+
+                    <div className="p-4 border border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20 dark:border-yellow-900/50 rounded-md">
+                      <h3 className="font-medium text-yellow-700 dark:text-yellow-400 flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Durée des sessions en diminution
+                      </h3>
+                      <p className="text-sm text-yellow-600 dark:text-yellow-300 mt-2">
+                        La durée moyenne des sessions a diminué de 3 minutes cette semaine.
+                      </p>
+                      <Button size="sm" variant="outline" className="mt-3">
+                        Analyser
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
         </Tabs>

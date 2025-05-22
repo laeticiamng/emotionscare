@@ -1,40 +1,27 @@
 
-import React from 'react';
-import { useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import React, { useState } from 'react';
 import UnifiedHeader from './UnifiedHeader';
 import UnifiedSidebar from './UnifiedSidebar';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface UnifiedShellProps {
   children: React.ReactNode;
 }
 
 const UnifiedShell: React.FC<UnifiedShellProps> = ({ children }) => {
-  const location = useLocation();
-  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  // Simplified way to determine if sidebar should be visible based on path
-  const isPathWithSidebar = !location.pathname.includes('/login') && 
-                            !location.pathname.includes('/register') && 
-                            location.pathname !== '/' &&
-                            location.pathname !== '/landing';
-
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+  
   return (
-    <div className="min-h-screen flex flex-col">
-      <UnifiedHeader />
-      
-      <div className="flex flex-1 w-full">
-        {isPathWithSidebar && !isMobile && (
-          <UnifiedSidebar />
-        )}
-        
-        <div className={cn(
-          "flex-1",
-          isPathWithSidebar && !isMobile ? "ml-64" : ""
-        )}>
+    <div className="min-h-screen bg-background">
+      <UnifiedHeader onMenuClick={toggleSidebar} />
+      <div className="pt-16 flex">
+        <UnifiedSidebar />
+        <main className="flex-1 ml-0 md:ml-64 p-4">
           {children}
-        </div>
+        </main>
       </div>
     </div>
   );
