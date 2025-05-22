@@ -60,3 +60,15 @@ export async function requireAuth(req: Request) {
   }
   return data.user;
 }
+
+export async function requireRole(req: Request, allowedRoles: string | string[]) {
+  const user = await requireAuth(req);
+  if (!user) return null;
+  const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+  const userRole = (user.user_metadata?.role || '').toLowerCase();
+  if (!roles.map(r => r.toLowerCase()).includes(userRole)) {
+    console.warn('Role mismatch:', { userRole, allowedRoles: roles });
+    return null;
+  }
+  return user;
+}

@@ -6,6 +6,19 @@ import { normalizeUserMode } from '@/utils/userModeHelpers';
 import { isLoginLocked, recordLoginAttempt } from '@/utils/security';
 import { AuthError, AuthErrorCode } from '@/utils/authErrors';
 
+// Helper to persist the user role in a secure cookie
+const setRoleCookie = (role: UserRole) => {
+  if (typeof document !== 'undefined') {
+    document.cookie = `user_role=${role}; path=/; secure; samesite=strict`;
+  }
+};
+
+const clearRoleCookie = () => {
+  if (typeof document !== 'undefined') {
+    document.cookie = 'user_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+  }
+};
+
 export interface SignUpData {
   email: string;
   password: string;
@@ -68,7 +81,8 @@ export const authService = {
           ...preferences,
         }
       };
-      
+      setRoleCookie(user.role);
+
       return { user, error: null };
     } catch (error: any) {
       console.error('Error signing up:', error);
@@ -130,8 +144,9 @@ export const authService = {
           ...(profileData?.preferences || data.user.user_metadata?.preferences || {}),
         }
       };
-      
+
       recordLoginAttempt(email, true);
+      setRoleCookie(user.role);
       return { user, error: null };
     } catch (error: any) {
       console.error('Error signing in:', error);
@@ -146,6 +161,7 @@ export const authService = {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      clearRoleCookie();
       return { error: null };
     } catch (error: any) {
       console.error('Error signing out:', error);
