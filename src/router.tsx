@@ -8,9 +8,9 @@ const Home = lazy(() => import('./Home'));
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
-const VR = lazy(() => import('./pages/VR'));
+const VR = lazy(() => import('./pages/VR')); // Using the correct VR component
 const Music = lazy(() => import('./pages/Music'));
-const Journal = lazy(() => import('./pages/Journal'));
+const Journal = lazy(() => import('./pages/Journal')); // Using the newly created Journal component
 const Login = lazy(() => import('./pages/Login'));
 const Team = lazy(() => import('./pages/Team'));
 const Support = lazy(() => import('./pages/Support'));
