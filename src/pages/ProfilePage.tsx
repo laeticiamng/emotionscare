@@ -1,168 +1,242 @@
 
-import React from 'react';
-import Shell from '@/Shell';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getUserInitials } from '@/utils/userHelpers';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
+import { SaveIcon } from 'lucide-react';
 
-const ProfilePage = () => {
+const ProfilePage: React.FC = () => {
   const { user } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    bio: '',
+    phone: '',
+    department: user?.department || '',
+    position: user?.position || '',
+  });
 
-  return (
-    <Shell>
-      <div className="container py-8">
-        <h1 className="text-3xl font-bold mb-6">Profil</h1>
-        
-        <Tabs defaultValue="general" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="general">Informations générales</TabsTrigger>
-            <TabsTrigger value="security">Sécurité</TabsTrigger>
-            <TabsTrigger value="preferences">Préférences</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="general">
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Informations personnelles</CardTitle>
-                  <CardDescription>Mettez à jour vos informations de profil</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="flex flex-col items-center space-y-4">
-                    <Avatar className="h-24 w-24">
-                      <AvatarImage src={user?.avatar} />
-                      <AvatarFallback className="text-xl">{getUserInitials(user)}</AvatarFallback>
-                    </Avatar>
-                    <Button variant="outline" size="sm">Changer d'avatar</Button>
-                  </div>
-                  
-                  <div className="grid gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Nom complet</Label>
-                      <Input id="name" defaultValue={user?.name || ''} />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" defaultValue={user?.email || ''} readOnly />
-                      <p className="text-xs text-muted-foreground">L'email ne peut pas être modifié</p>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Téléphone</Label>
-                      <Input id="phone" defaultValue={user?.phone || ''} />
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button>Enregistrer les modifications</Button>
-                </CardFooter>
-              </Card>
-              
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Vos badges</CardTitle>
-                    <CardDescription>Les badges que vous avez obtenus</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-3">
-                      <Badge variant="outline" className="px-3 py-1">🌟 Premier pas</Badge>
-                      <Badge variant="outline" className="px-3 py-1">🎵 Mélomane</Badge>
-                      <Badge variant="outline" className="px-3 py-1">📝 Journaliste</Badge>
-                      <Badge variant="outline" className="px-3 py-1">🧘 Zen master</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Informations du compte</CardTitle>
-                    <CardDescription>Détails sur votre compte</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <dl className="space-y-4">
-                      <div className="flex flex-col">
-                        <dt className="text-sm font-medium text-muted-foreground">Type de compte</dt>
-                        <dd>Compte {user?.role === 'b2b_admin' ? 'Administrateur' : user?.role === 'b2b_user' ? 'Collaborateur' : 'Personnel'}</dd>
-                      </div>
-                      <div className="flex flex-col">
-                        <dt className="text-sm font-medium text-muted-foreground">Date d'inscription</dt>
-                        <dd>15 janvier 2023</dd>
-                      </div>
-                      <div className="flex flex-col">
-                        <dt className="text-sm font-medium text-muted-foreground">Dernière connexion</dt>
-                        <dd>Aujourd'hui à 14:32</dd>
-                      </div>
-                    </dl>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle>Sécurité</CardTitle>
-                <CardDescription>Gérez vos paramètres de sécurité</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <h3 className="font-medium">Changer de mot de passe</h3>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="current-password">Mot de passe actuel</Label>
-                      <Input id="current-password" type="password" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="new-password">Nouveau mot de passe</Label>
-                      <Input id="new-password" type="password" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
-                      <Input id="confirm-password" type="password" />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button>Mettre à jour le mot de passe</Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="preferences">
-            <Card>
-              <CardHeader>
-                <CardTitle>Préférences</CardTitle>
-                <CardDescription>Gérez vos préférences personnelles</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="font-medium">Notifications</h3>
-                  {/* Notification preferences would go here */}
-                </div>
-                
-                <div className="space-y-4">
-                  <h3 className="font-medium">Langue et région</h3>
-                  {/* Language and region settings would go here */}
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button>Enregistrer les préférences</Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-        </Tabs>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Simulating update profile
+    setTimeout(() => {
+      toast.success('Profil mis à jour avec succès');
+      setIsEditing(false);
+    }, 500);
+  };
+  
+  if (!user) {
+    return (
+      <div className="container mx-auto py-10 px-4">
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-center">Veuillez vous connecter pour voir votre profil</p>
+          </CardContent>
+        </Card>
       </div>
-    </Shell>
+    );
+  }
+  
+  return (
+    <div className="container max-w-4xl mx-auto py-10 px-4">
+      <h1 className="text-3xl font-bold mb-6">Profil</h1>
+      
+      <Tabs defaultValue="info">
+        <TabsList className="mb-6">
+          <TabsTrigger value="info">Informations</TabsTrigger>
+          <TabsTrigger value="preferences">Préférences</TabsTrigger>
+          <TabsTrigger value="activity">Activité</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="info">
+          <Card>
+            <CardHeader className="pb-0">
+              <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                <div className="flex items-center gap-4">
+                  <Avatar className="w-16 h-16">
+                    <AvatarImage src={user.avatar} />
+                    <AvatarFallback>
+                      {user.name?.charAt(0) || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle className="text-2xl">{user.name}</CardTitle>
+                    <CardDescription>{user.email}</CardDescription>
+                    <div className="flex gap-2 mt-1">
+                      <Badge variant="outline">{user.role}</Badge>
+                      {user.department && <Badge variant="secondary">{user.department}</Badge>}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <Button onClick={() => setIsEditing(!isEditing)}>
+                    {isEditing ? 'Annuler' : 'Modifier le profil'}
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {isEditing ? (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="name">Nom</Label>
+                      <Input 
+                        id="name" 
+                        name="name"
+                        value={formData.name} 
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">Email</Label>
+                      <Input 
+                        id="email"
+                        name="email" 
+                        type="email" 
+                        value={formData.email} 
+                        onChange={handleChange}
+                        disabled
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone">Téléphone</Label>
+                      <Input 
+                        id="phone" 
+                        name="phone"
+                        value={formData.phone} 
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="position">Poste</Label>
+                      <Input 
+                        id="position" 
+                        name="position"
+                        value={formData.position} 
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="department">Département</Label>
+                      <Input 
+                        id="department" 
+                        name="department"
+                        value={formData.department} 
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="bio">Biographie</Label>
+                    <Textarea 
+                      id="bio" 
+                      name="bio"
+                      value={formData.bio} 
+                      onChange={handleChange} 
+                      rows={4}
+                    />
+                  </div>
+                </form>
+              ) : (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
+                      <p>{user.email}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Rôle</h3>
+                      <p className="capitalize">{user.role}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Département</h3>
+                      <p>{user.department || '–'}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Poste</h3>
+                      <p>{user.position || '–'}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Dernière connexion</h3>
+                      <p>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Jamais'}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-muted-foreground">Membre depuis</h3>
+                      <p>{new Date(user.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+            {isEditing && (
+              <CardFooter className="flex justify-end">
+                <Button type="submit" onClick={handleSubmit}>
+                  <SaveIcon className="w-4 h-4 mr-2" />
+                  Enregistrer les modifications
+                </Button>
+              </CardFooter>
+            )}
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="preferences">
+          <Card>
+            <CardHeader>
+              <CardTitle>Préférences</CardTitle>
+              <CardDescription>
+                Personnalisez votre expérience dans l'application
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                Les préférences seront disponibles bientôt.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="activity">
+          <Card>
+            <CardHeader>
+              <CardTitle>Activité récente</CardTitle>
+              <CardDescription>
+                Historique de vos interactions avec l'application
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                L'historique d'activité sera disponible prochainement.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

@@ -1,11 +1,13 @@
+
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { JournalEntry } from '@/types';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Trash2, FileEdit } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { getEmotionIcon, getEmotionColor } from '@/lib/emotionUtils';
 
 interface JournalListViewProps {
   entries: JournalEntry[];
@@ -13,77 +15,63 @@ interface JournalListViewProps {
 }
 
 const JournalListView: React.FC<JournalListViewProps> = ({ entries, onDeleteEntry }) => {
-  const navigate = useNavigate();
-  
-  const truncateContent = (content: string, maxLength = 150) => {
-    if (!content) return '';
-    if (content.length <= maxLength) return content;
-    return content.substring(0, maxLength) + '...';
-  };
-
-  const getEntryContent = (entry: JournalEntry) => {
-    return entry.text || entry.content || "";
-  };
-
-  if (entries.length === 0) {
-    return <EmptyJournal navigate={navigate} />;
+  if (!entries || entries.length === 0) {
+    return (
+      <div className="text-center p-8 border rounded-md">
+        <p className="text-muted-foreground">Aucune entrée dans votre journal pour l'instant.</p>
+      </div>
+    );
   }
 
+  // Tri des entrées par date (la plus récente en premier)
+  const sortedEntries = [...entries].sort((a, b) => {
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
+
   return (
-    <div className="grid gap-4 md:grid-cols-1">
-      {entries.map(entry => (
-        <Card 
-          key={entry.id} 
-          className="cursor-pointer transition-all hover:shadow-md overflow-hidden"
-          onClick={() => navigate(`/journal/${entry.id}`)}
-        >
+    <div className="space-y-6">
+      {sortedEntries.map((entry) => (
+        <Card key={entry.id} className="hover:shadow-md transition-shadow">
           <CardHeader className="pb-2">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-lg font-medium">
-                {format(new Date(entry.date), 'EEEE d MMMM yyyy', { locale: fr })}
-              </CardTitle>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="text-destructive hover:bg-destructive/10"
-                onClick={(e) => onDeleteEntry(entry.id, e)}
-              >
-                <Trash2 size={18} />
-              </Button>
-            </div>
+            <CardTitle className="flex justify-between items-start">
+              <div className="flex items-center gap-2">
+                <span>{entry.title}</span>
+                <Badge 
+                  className={`${getEmotionColor(entry.mood)} ml-2`}
+                >
+                  {getEmotionIcon(entry.mood)} {entry.mood}
+                </Badge>
+              </div>
+              <span className="text-sm font-normal text-muted-foreground">
+                {formatDistanceToNow(new Date(entry.date), { addSuffix: true, locale: fr })}
+              </span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="line-clamp-3 text-muted-foreground">{getEntryContent(entry)}</div>
-          </CardContent>
-          <CardFooter className="pt-2">
-            <div className="text-sm text-primary flex items-center gap-1">
-              <FileEdit size={16} /> Voir le détail
+            <p className="line-clamp-3">{entry.content}</p>
+            <div className="flex flex-wrap gap-1 mt-3">
+              {entry.tags?.map((tag) => (
+                <Badge key={tag} variant="outline">
+                  {tag}
+                </Badge>
+              ))}
             </div>
-            {entry.ai_feedback && (
-              <div className="ml-auto px-2 py-1 bg-cocoon-100 text-cocoon-800 rounded-full text-xs">
-                Analysé par Coach IA
-              </div>
-            )}
+          </CardContent>
+          <CardFooter className="flex justify-end pt-0">
+            <Button variant="ghost" size="icon">
+              <Edit size={18} />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={(e) => onDeleteEntry(entry.id, e)}
+              className="text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 size={18} />
+            </Button>
           </CardFooter>
         </Card>
       ))}
-    </div>
-  );
-};
-
-const EmptyJournal = ({ navigate }: { navigate: (path: string) => void }) => {
-  return (
-    <div className="text-center py-12 border-2 border-dashed rounded-xl">
-      <div className="max-w-md mx-auto">
-        <FileEdit className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-xl font-medium mb-2">Votre journal est vide</h3>
-        <p className="text-muted-foreground mb-6">
-          Le journal est un excellent moyen de suivre vos émotions et réflexions. Commencez dès aujourd'hui pour améliorer votre bien-être mental.
-        </p>
-        <Button onClick={() => navigate('/journal/new')} className="flex items-center gap-2 mx-auto">
-          <FileEdit size={18} /> Créer votre première entrée
-        </Button>
-      </div>
     </div>
   );
 };

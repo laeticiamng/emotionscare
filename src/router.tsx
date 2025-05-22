@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -27,6 +26,11 @@ const CommunityAdminPage = React.lazy(() => import('./pages/CommunityAdminPage')
 const LoginPage = React.lazy(() => import('./pages/LoginPage'));
 const RegisterPage = React.lazy(() => import('./pages/RegisterPage'));
 const ForgotPasswordPage = React.lazy(() => import('./pages/ForgotPasswordPage'));
+const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
+
+// Journal pages
+const NewJournalEntryPage = React.lazy(() => import('./pages/journal/NewJournalEntryPage'));
+const JournalEntryPage = React.lazy(() => import('./pages/journal/JournalEntryPage'));
 
 // Define routes
 const routes = [
@@ -37,6 +41,10 @@ const routes = [
   {
     path: '/dashboard',
     element: <ProtectedRoute><Dashboard /></ProtectedRoute>
+  },
+  {
+    path: '/profile',
+    element: <ProtectedRoute><ProfilePage /></ProtectedRoute>
   },
   {
     path: '/b2c/dashboard',
@@ -109,6 +117,15 @@ const routes = [
   {
     path: '/coming-soon',
     element: <NotImplementedPage />
+  },
+  // Journal routes
+  {
+    path: '/journal/new',
+    element: <ProtectedRoute><NewJournalEntryPage /></ProtectedRoute>
+  },
+  {
+    path: '/journal/:id',
+    element: <ProtectedRoute><JournalEntryPage /></ProtectedRoute>
   },
   // Auth routes
   {
