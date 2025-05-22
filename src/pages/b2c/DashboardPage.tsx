@@ -36,11 +36,19 @@ const UPCOMING_ACTIVITIES = [
 ];
 
 const B2CDashboardPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const [currentMood, setCurrentMood] = useState<'happy' | 'neutral' | 'sad'>('neutral');
   const [quote, setQuote] = useState("");
   const [showMoodSelector, setShowMoodSelector] = useState(true);
   const { normalizedMode } = useUserModeHelpers();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      // In a real app this would fetch personalized modules or stats
+      setIsDataLoading(false);
+    }
+  }, [isLoading, user]);
   
   // Set a random inspirational quote on load
   useEffect(() => {
@@ -51,7 +59,15 @@ const B2CDashboardPage: React.FC = () => {
     setCurrentMood(mood);
     setShowMoodSelector(false);
   };
-  
+
+  if (isLoading || isDataLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-muted-foreground">Chargement du profil...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background pb-16">
       {/* Header with greeting and user info */}

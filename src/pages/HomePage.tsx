@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { ROUTES } from '@/types/navigation';
 
 const HomePage: React.FC = () => {
   return (
@@ -16,7 +17,8 @@ const HomePage: React.FC = () => {
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button asChild size="lg" className="bg-primary">
-            <Link to="/b2c">Accès Particulier</Link>
+            {/* Redirect individuals to login to enforce authentication */}
+            <Link to={ROUTES.b2c.login}>Accès Particulier</Link>
           </Button>
           <Button asChild size="lg" variant="outline">
             <Link to="/b2b/selection">Accès Entreprise</Link>

@@ -53,6 +53,7 @@ import B2CRegister from '@/pages/b2c/Register';
 import OnboardingModePage from '@/pages/OnboardingModePage';
 import OnboardingPage from '@/pages/OnboardingPage';
 import OnboardingExperiencePage from '@/pages/OnboardingExperiencePage';
+import DashboardRedirect from '@/pages/DashboardRedirect';
 
 
 // Define the application routes without creating a router instance
