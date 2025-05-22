@@ -2,6 +2,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { authorizeRole } from "../_shared/auth.ts";
+import { logAccess } from "../_shared/logging.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 // Configuration
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
@@ -24,7 +25,7 @@ const generateToken = (): string => {
     .map(byte => byte.toString(16).padStart(2, '0'))
     .join('');
 // Handle invitation request
-const handleInvitation = async (req: Request) => {
+const handleInvitation = async (req: Request, user: any) => {
   try {
     const { email, role } = await req.json();
     
@@ -85,11 +86,21 @@ const handleInvitation = async (req: Request) => {
       // Si l'email échoue, on garde l'invitation mais on signale l'erreur
         JSON.stringify({ error: 'Erreur lors de l\'envoi de l\'email d\'invitation', invitation }),
     // Log activity anonymously
-    await supabase.from('user_activity_logs').insert({
-      activity_type: 'invitation_sent',
-      activity_details: { 
-        role: role 
-      },
+  await supabase.from('user_activity_logs').insert({
+    activity_type: 'invitation_sent',
+    activity_details: {
+      role: role
+    },
+  });
+  await logAccess({
+    user_id: user?.id || null,
+    role: user?.user_metadata?.role || null,
+    route: '/functions/v1/send-invitation',
+    action: 'send_invitation',
+    result: 'success',
+    ip_address: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || null,
+    user_agent: req.headers.get('user-agent') || null,
+  });
     return new Response(
       JSON.stringify({ 
         success: true, 
@@ -123,5 +134,5 @@ serve(async (req) => {
   if (req.method !== 'POST') {
       JSON.stringify({ error: 'Méthode non autorisée' }),
       { status: 405, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-  return handleInvitation(req);
+  return handleInvitation(req, user);
 });
