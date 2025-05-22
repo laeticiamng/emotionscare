@@ -330,6 +330,7 @@ Des audits complémentaires sont disponibles dans le dossier `docs` :
 - `shell-layout-point4-audit.md` : synthèse du Shell et de la navigation (point 4)
 - `user-preferences-point7-audit.md` : état actuel des préférences utilisateur et recommandations premium
 - `evaluation-improvement-point20-audit.md` : boucle de feedback et amélioration proactive (point 20)
+- `critical-access-logs-cli.md` : consultation et export des logs d'accès critiques
 
 
 ## Équipe et contribution
