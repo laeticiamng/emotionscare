@@ -10,21 +10,15 @@ interface SynthesisOnboardingProps {
   onClose: () => void;
 }
 
-interface OnboardingStep {
-  title: string;
-  description: string;
-  image: React.ReactNode;
-}
-
 const SynthesisOnboarding: React.FC<SynthesisOnboardingProps> = ({ open, onClose }) => {
   const [currentStep, setCurrentStep] = useState(0);
   
-  const steps: OnboardingStep[] = [
+  const steps = [
     {
       title: "Bienvenue dans la Synthèse 360°",
       description: "Découvrez une vision complète de votre parcours émotionnel à travers trois vues complémentaires.",
       image: (
-        <div className="bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg p-8 flex items-center justify-center">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 flex items-center justify-center">
           <div className="flex items-center gap-6">
             <BarChart className="h-12 w-12 text-blue-500" />
             <Globe className="h-12 w-12 text-indigo-500" />
@@ -37,7 +31,7 @@ const SynthesisOnboarding: React.FC<SynthesisOnboardingProps> = ({ open, onClose
       title: "Timeline Émotionnelle",
       description: "Visualisez vos émotions au fil du temps, identifiez les moments clés et les tendances de votre parcours.",
       image: (
-        <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-6 flex items-center justify-center">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 flex items-center justify-center">
           <BarChart className="h-16 w-16 text-blue-500" />
         </div>
       )
@@ -46,7 +40,7 @@ const SynthesisOnboarding: React.FC<SynthesisOnboardingProps> = ({ open, onClose
       title: "Carte du Monde Émotionnel",
       description: "Explorez la répartition géographique des émotions collectives et identifiez les tendances globales.",
       image: (
-        <div className="bg-indigo-100 dark:bg-indigo-900/30 rounded-lg p-6 flex items-center justify-center">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 flex items-center justify-center">
           <Globe className="h-16 w-16 text-indigo-500" />
         </div>
       )
@@ -55,7 +49,7 @@ const SynthesisOnboarding: React.FC<SynthesisOnboardingProps> = ({ open, onClose
       title: "Sanctuaire",
       description: "Un espace de calme et de bien-être pour vous ressourcer et pratiquer des exercices adaptés à votre état émotionnel.",
       image: (
-        <div className="bg-purple-100 dark:bg-purple-900/30 rounded-lg p-6 flex items-center justify-center">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 flex items-center justify-center">
           <Sun className="h-16 w-16 text-purple-500" />
         </div>
       )
