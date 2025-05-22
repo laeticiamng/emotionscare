@@ -3,11 +3,13 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Construction, ArrowLeft } from 'lucide-react';
+import { Construction, ArrowLeft, Home, List } from 'lucide-react';
 import Shell from '@/Shell';
+import { useAuth } from '@/contexts/AuthContext';
 
 const NotImplementedPage: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   
   return (
     <Shell>
@@ -47,9 +49,32 @@ const NotImplementedPage: React.FC = () => {
               onClick={() => navigate('/')}
               className="flex items-center gap-2"
             >
-              Retour à l'accueil
+              <Home size={16} />
+              Accueil
             </Button>
+
+            {isAuthenticated && (
+              <Button
+                variant="secondary"
+                onClick={() => navigate('/dashboard')}
+                className="flex items-center gap-2"
+              >
+                <List size={16} />
+                Tableau de bord
+              </Button>
+            )}
           </div>
+          
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="mt-8 text-sm text-muted-foreground"
+          >
+            <p className="flex items-center justify-center gap-1">
+              Vous cherchez une fonctionnalité spécifique ? Consultez notre page d'accueil pour découvrir toutes les fonctionnalités disponibles.
+            </p>
+          </motion.div>
         </motion.div>
       </div>
     </Shell>

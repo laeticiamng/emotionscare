@@ -4,13 +4,15 @@ import { motion } from 'framer-motion';
 import { Button } from '../ui/button';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CtaButton {
   label: string;
   link: string;
   text: string;
-  variant?: 'default' | 'outline';
+  variant?: 'default' | 'outline' | 'secondary';
   icon?: boolean;
+  requiresAuth?: boolean; // Ajout d'un indicateur pour les boutons nécessitant l'authentification
 }
 
 interface WelcomeHeroProps {
@@ -30,6 +32,13 @@ const WelcomeHero: React.FC<WelcomeHeroProps> = ({
   backgroundColor = "bg-muted/30", 
   textColor = "text-foreground" 
 }) => {
+  const { isAuthenticated } = useAuth();
+  
+  // Filtrer les boutons en fonction de l'état d'authentification
+  const filteredButtons = ctaButtons.filter(button => 
+    !button.requiresAuth || (button.requiresAuth && isAuthenticated)
+  );
+
   return (
     <div className={`flex flex-col md:flex-row items-center gap-8 py-12 md:py-20 px-4 rounded-xl ${backgroundColor}`}>
       <motion.div 
@@ -44,7 +53,7 @@ const WelcomeHero: React.FC<WelcomeHeroProps> = ({
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-          {ctaButtons.map((button, index) => (
+          {filteredButtons.map((button, index) => (
             <motion.div
               key={button.label}
               initial={{ opacity: 0, y: 10 }}
@@ -66,6 +75,25 @@ const WelcomeHero: React.FC<WelcomeHeroProps> = ({
               </Button>
             </motion.div>
           ))}
+
+          {!isAuthenticated && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 + filteredButtons.length * 0.1, duration: 0.5 }}
+            >
+              <Button 
+                asChild
+                variant="secondary"
+                size="lg"
+                className="w-full sm:w-auto"
+              >
+                <Link to="/login" className="flex items-center gap-2">
+                  Se connecter
+                </Link>
+              </Button>
+            </motion.div>
+          )}
         </div>
       </motion.div>
       

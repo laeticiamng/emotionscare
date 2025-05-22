@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { AlertCircle, ArrowLeft, Home, Search, HelpCircle, Heart, User, MapPin } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Home, Search, HelpCircle, Heart, User, MapPin, Music, FileText } from 'lucide-react';
 import Shell from '@/Shell';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -64,7 +64,7 @@ const NotFoundPage: React.FC = () => {
             </Button>
             
             {isAuthenticated && (
-              <Button asChild variant="outline" className="flex items-center gap-2">
+              <Button asChild variant="secondary" className="flex items-center gap-2">
                 <Link to="/dashboard">
                   <Search size={16} />
                   Tableau de bord
@@ -73,32 +73,38 @@ const NotFoundPage: React.FC = () => {
             )}
           </motion.div>
           
-          <motion.div 
-            className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-          >
-            <Link to="/support" className="block p-4 border rounded-lg hover:bg-muted transition-colors group">
-              <HelpCircle className="h-6 w-6 mx-auto mb-2 text-primary transition-transform duration-300 group-hover:scale-110" />
-              <p className="font-medium">Support</p>
-              <p className="text-sm text-muted-foreground">Contactez notre équipe</p>
-            </Link>
-            
-            {isAuthenticated ? (
+          {isAuthenticated && (
+            <motion.div 
+              className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
+            >
               <Link to="/scan" className="block p-4 border rounded-lg hover:bg-muted transition-colors group">
                 <Heart className="h-6 w-6 mx-auto mb-2 text-red-500 transition-transform duration-300 group-hover:scale-110" />
                 <p className="font-medium">Scan émotionnel</p>
                 <p className="text-sm text-muted-foreground">Analysez vos émotions</p>
               </Link>
-            ) : (
-              <Link to="/register" className="block p-4 border rounded-lg hover:bg-muted transition-colors group">
-                <User className="h-6 w-6 mx-auto mb-2 text-blue-500 transition-transform duration-300 group-hover:scale-110" />
-                <p className="font-medium">Créer un compte</p>
-                <p className="text-sm text-muted-foreground">Rejoignez-nous</p>
+              
+              <Link to="/journal" className="block p-4 border rounded-lg hover:bg-muted transition-colors group">
+                <FileText className="h-6 w-6 mx-auto mb-2 text-blue-500 transition-transform duration-300 group-hover:scale-110" />
+                <p className="font-medium">Journal</p>
+                <p className="text-sm text-muted-foreground">Notez vos émotions</p>
               </Link>
-            )}
-          </motion.div>
+              
+              <Link to="/music" className="block p-4 border rounded-lg hover:bg-muted transition-colors group">
+                <Music className="h-6 w-6 mx-auto mb-2 text-green-500 transition-transform duration-300 group-hover:scale-110" />
+                <p className="font-medium">Musicothérapie</p>
+                <p className="text-sm text-muted-foreground">Améliorez votre humeur</p>
+              </Link>
+              
+              <Link to="/profile" className="block p-4 border rounded-lg hover:bg-muted transition-colors group">
+                <User className="h-6 w-6 mx-auto mb-2 text-purple-500 transition-transform duration-300 group-hover:scale-110" />
+                <p className="font-medium">Profil</p>
+                <p className="text-sm text-muted-foreground">Gérez votre compte</p>
+              </Link>
+            </motion.div>
+          )}
           
           <motion.div
             initial={{ opacity: 0 }}
@@ -111,7 +117,7 @@ const NotFoundPage: React.FC = () => {
               Vous cherchez quelque chose en particulier ?
             </p>
             <Button variant="link" asChild size="sm">
-              <Link to="/sitemap">Consultez notre plan du site</Link>
+              <Link to="/support">Contactez notre support</Link>
             </Button>
           </motion.div>
         </motion.div>

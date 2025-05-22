@@ -17,6 +17,8 @@ interface NavItemProps {
   requiresAuth?: boolean;
   adminOnly?: boolean;
   highlight?: boolean;
+  className?: string; // Added className prop for custom styling
+  testId?: string; // Added for testing purposes
 }
 
 const NavItem: React.FC<NavItemProps> = ({
@@ -30,6 +32,8 @@ const NavItem: React.FC<NavItemProps> = ({
   requiresAuth = false,
   adminOnly = false,
   highlight = false,
+  className = '',
+  testId,
 }) => {
   const { user, isAuthenticated } = useAuth();
   const finalHref = to || href || '#';
@@ -45,6 +49,8 @@ const NavItem: React.FC<NavItemProps> = ({
     <motion.div
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
+      className={className}
+      data-testid={testId}
     >
       <Link
         to={finalHref}
@@ -57,6 +63,7 @@ const NavItem: React.FC<NavItemProps> = ({
           highlight ? "ring-2 ring-primary ring-offset-1" : "",
           "rounded-md"
         )}
+        aria-current={finalIsActive ? 'page' : undefined}
       >
         {icon && <span className="mr-2">{icon}</span>}
         {label}

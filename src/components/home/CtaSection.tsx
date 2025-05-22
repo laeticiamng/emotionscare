@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '../ui/button';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Heart, Brain, Shield, Star, Trophy, MessageCircle } from 'lucide-react';
+import { ArrowRight, Heart, Brain, Shield, Music, MessageCircle, Star } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const CtaSection: React.FC = () => {
@@ -40,7 +40,17 @@ const CtaSection: React.FC = () => {
               </div>
               <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
               <p className="text-muted-foreground mb-4">{feature.description}</p>
-              <Link to={feature.link} className="text-primary flex items-center hover:underline group-hover:font-medium">
+              
+              <Link 
+                to={feature.link} 
+                className="text-primary flex items-center hover:underline group-hover:font-medium"
+                onClick={(e) => {
+                  if (feature.requiresAuth && !isAuthenticated) {
+                    e.preventDefault();
+                    window.location.href = '/login';
+                  }
+                }}
+              >
                 {feature.linkText} <ArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
               </Link>
             </motion.div>
@@ -78,7 +88,8 @@ const features = [
     icon: <Heart className="h-6 w-6 text-red-500" />,
     iconBg: "bg-red-100 dark:bg-red-900/20",
     link: "/scan",
-    linkText: "Découvrir le scan émotionnel"
+    linkText: "Découvrir le scan émotionnel",
+    requiresAuth: true
   },
   {
     title: "Intelligence émotionnelle",
@@ -86,7 +97,8 @@ const features = [
     icon: <Brain className="h-6 w-6 text-purple-500" />,
     iconBg: "bg-purple-100 dark:bg-purple-900/20",
     link: "/journal",
-    linkText: "Explorer le journal"
+    linkText: "Explorer le journal",
+    requiresAuth: true
   },
   {
     title: "Confidentialité garantie",
@@ -94,31 +106,35 @@ const features = [
     icon: <Shield className="h-6 w-6 text-green-500" />,
     iconBg: "bg-green-100 dark:bg-green-900/20",
     link: "/privacy",
-    linkText: "Notre politique de confidentialité"
+    linkText: "Notre politique de confidentialité",
+    requiresAuth: false
   },
   {
     title: "Musicothérapie",
     description: "Découvrez des playlists adaptées à vos émotions pour améliorer votre humeur.",
-    icon: <MessageCircle className="h-6 w-6 text-blue-500" />,
+    icon: <Music className="h-6 w-6 text-blue-500" />,
     iconBg: "bg-blue-100 dark:bg-blue-900/20",
     link: "/music",
-    linkText: "Explorer les playlists"
+    linkText: "Explorer les playlists",
+    requiresAuth: true
   },
   {
     title: "Progression personnelle",
     description: "Suivez votre progression et recevez des insights personnalisés sur votre bien-être.",
-    icon: <Trophy className="h-6 w-6 text-amber-500" />,
+    icon: <Star className="h-6 w-6 text-amber-500" />,
     iconBg: "bg-amber-100 dark:bg-amber-900/20",
     link: "/profile",
-    linkText: "Voir votre profil"
+    linkText: "Voir votre profil",
+    requiresAuth: true
   },
   {
     title: "Communauté bienveillante",
     description: "Rejoignez une communauté qui partage vos préoccupations et vos succès.",
-    icon: <Star className="h-6 w-6 text-indigo-500" />,
+    icon: <MessageCircle className="h-6 w-6 text-indigo-500" />,
     iconBg: "bg-indigo-100 dark:bg-indigo-900/20",
     link: "/social",
-    linkText: "Rejoindre la communauté"
+    linkText: "Rejoindre la communauté",
+    requiresAuth: true
   }
 ];
 
