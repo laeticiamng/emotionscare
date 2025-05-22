@@ -1,11 +1,23 @@
 
-import { ThemeProvider as NextThemesProvider } from 'next-themes';
-import { type ThemeProviderProps } from 'next-themes/dist/types';
+import { ThemeProvider as ThemeContextProvider } from '@/contexts/ThemeContext';
+import React, { ReactNode } from 'react';
 
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+type ThemeProviderProps = {
+  children: ReactNode;
+  defaultTheme?: 'dark' | 'light' | 'system';
+  storageKey?: string;
+};
+
+export function ThemeProvider({
+  children,
+  defaultTheme = 'system',
+  storageKey = 'emotions-care-theme',
+}: ThemeProviderProps) {
   return (
-    <NextThemesProvider {...props}>
+    <ThemeContextProvider defaultTheme={defaultTheme} storageKey={storageKey}>
       {children}
-    </NextThemesProvider>
+    </ThemeContextProvider>
   );
 }
+
+export default ThemeProvider;
