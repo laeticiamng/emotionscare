@@ -30,6 +30,7 @@ const ForgotPasswordPage = React.lazy(() => import('./pages/ForgotPasswordPage')
 const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
 const AdminLoginPage = React.lazy(() => import('./pages/AdminLoginPage'));
 const CollaboratorLoginPage = React.lazy(() => import('./pages/b2b/user/Login'));
+const ScanPage = React.lazy(() => import('./pages/ScanPage'));
 
 // Journal pages
 const NewJournalEntryPage = React.lazy(() => import('./pages/journal/NewJournalEntryPage'));
@@ -125,6 +126,11 @@ const routes = [
   {
     path: '/coming-soon',
     element: <NotImplementedPage />
+  },
+  // New Scan page
+  {
+    path: '/scan',
+    element: <ProtectedRoute><ScanPage /></ProtectedRoute>
   },
   // Journal routes
   {

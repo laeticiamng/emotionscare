@@ -1,87 +1,74 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { Button } from '../ui/button';
 import { Link } from 'react-router-dom';
 
-interface WelcomeHeroProps {
-  title?: string;
-  subtitle?: string;
-  ctaButtons?: Array<{
-    label: string;
-    link: string;
-    text?: string; // Add the text property
-  }>;
-  imageSrc?: string;
-  imageAlt?: string;
-  className?: string;
+interface CtaButton {
+  label: string;
+  link: string;
+  text: string;
+  variant?: 'default' | 'outline';
 }
 
-const WelcomeHero: React.FC<WelcomeHeroProps> = ({
-  title = "Bienvenue sur votre application de bien-être",
-  subtitle = "Découvrez nos outils pour améliorer votre santé émotionnelle et mentale.",
-  ctaButtons = [
-    {
-      label: "Commencer",
-      link: "/explore",
-    },
-    {
-      label: "En savoir plus",
-      link: "/about",
-    }
-  ],
-  imageSrc,
-  imageAlt = "Illustration bien-être",
-  className = "",
-}) => {
-  return (
-    <div className={`py-12 md:py-20 px-6 md:px-10 flex flex-col md:flex-row items-center gap-8 md:gap-12 ${className}`}>
-      <div className="flex-1 space-y-6">
-        <div className="space-y-4">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">{title}</h1>
-          <p className="text-lg md:text-xl text-muted-foreground">{subtitle}</p>
-        </div>
+interface WelcomeHeroProps {
+  title: string;
+  subtitle: string;
+  ctaButtons: CtaButton[];
+  imageUrl?: string;
+}
 
-        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+const WelcomeHero: React.FC<WelcomeHeroProps> = ({ title, subtitle, ctaButtons, imageUrl }) => {
+  return (
+    <div className="flex flex-col md:flex-row items-center gap-8 py-8 md:py-16">
+      <motion.div 
+        className="flex-1 text-center md:text-left"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">{title}</h1>
+        <p className="text-lg text-muted-foreground mb-8 max-w-2xl">
+          {subtitle}
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
           {ctaButtons.map((button, index) => (
-            <Button
-              key={index}
-              variant={index === 0 ? "default" : "outline"}
-              asChild
-              size="lg"
-              className="px-8"
+            <motion.div
+              key={button.label}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
             >
-              <Link to={button.link}>
-                {button.text || button.label}
-              </Link>
-            </Button>
+              <Button 
+                asChild
+                variant={button.variant || 'default'}
+                size="lg"
+                className="w-full sm:w-auto"
+              >
+                <Link to={button.link}>
+                  {button.text}
+                </Link>
+              </Button>
+            </motion.div>
           ))}
         </div>
-
-        <div className="pt-4">
-          <div className="flex items-center space-x-4">
-            <div className="flex -space-x-2">
-              {/* User avatars could go here */}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Rejoignez notre communauté d'utilisateurs en croissance
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex-1 w-full max-w-md">
-        {imageSrc ? (
-          <img
-            src={imageSrc}
-            alt={imageAlt}
-            className="w-full h-auto object-cover rounded-lg shadow-lg"
+      </motion.div>
+      
+      {imageUrl && (
+        <motion.div 
+          className="flex-1 mt-8 md:mt-0"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+          <img 
+            src={imageUrl} 
+            alt="Welcome illustration" 
+            className="rounded-lg shadow-lg max-w-full h-auto"
           />
-        ) : (
-          <div className="w-full aspect-video bg-gradient-to-tr from-primary/30 to-secondary/30 rounded-lg flex items-center justify-center">
-            <p className="text-muted-foreground italic">Image illustration</p>
-          </div>
-        )}
-      </div>
+        </motion.div>
+      )}
     </div>
   );
 };

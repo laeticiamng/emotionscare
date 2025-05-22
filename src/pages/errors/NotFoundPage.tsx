@@ -3,11 +3,13 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { AlertCircle, ArrowLeft, Home } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Home, Search, HelpCircle, Heart, User } from 'lucide-react';
 import Shell from '@/Shell';
+import { useAuth } from '@/contexts/AuthContext';
 
 const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   
   return (
     <Shell hideNav hideFooter>
@@ -60,21 +62,42 @@ const NotFoundPage: React.FC = () => {
                 Page d'accueil
               </Link>
             </Button>
+            
+            {isAuthenticated && (
+              <Button asChild variant="outline" className="flex items-center gap-2">
+                <Link to="/dashboard">
+                  <Search size={16} />
+                  Tableau de bord
+                </Link>
+              </Button>
+            )}
           </motion.div>
           
           <motion.div 
-            className="mt-12"
+            className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7, duration: 0.5 }}
           >
-            <p className="text-sm text-muted-foreground">
-              Si vous pensez qu'il s'agit d'une erreur, veuillez contacter 
-              <Link to="/support" className="text-primary hover:underline mx-1">
-                notre support
+            <Link to="/support" className="block p-4 border rounded-lg hover:bg-muted transition-colors">
+              <HelpCircle className="h-6 w-6 mx-auto mb-2 text-primary" />
+              <p className="font-medium">Support</p>
+              <p className="text-sm text-muted-foreground">Contactez notre équipe</p>
+            </Link>
+            
+            {isAuthenticated ? (
+              <Link to="/scan" className="block p-4 border rounded-lg hover:bg-muted transition-colors">
+                <Heart className="h-6 w-6 mx-auto mb-2 text-red-500" />
+                <p className="font-medium">Scan émotionnel</p>
+                <p className="text-sm text-muted-foreground">Analysez vos émotions</p>
               </Link>
-              pour obtenir de l'aide.
-            </p>
+            ) : (
+              <Link to="/register" className="block p-4 border rounded-lg hover:bg-muted transition-colors">
+                <User className="h-6 w-6 mx-auto mb-2 text-blue-500" />
+                <p className="font-medium">Créer un compte</p>
+                <p className="text-sm text-muted-foreground">Rejoignez-nous</p>
+              </Link>
+            )}
           </motion.div>
         </motion.div>
       </div>
