@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { ServerCrash, ArrowLeft, Home, RefreshCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Shell from '@/Shell';
 
@@ -24,8 +24,8 @@ const ServerErrorPage = () => {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <div className="bg-destructive/10 p-5 rounded-full">
-              <AlertTriangle className="h-16 w-16 text-destructive" />
+            <div className="bg-red-500/10 p-5 rounded-full">
+              <ServerCrash className="h-16 w-16 text-red-500" />
             </div>
           </motion.div>
           
@@ -44,7 +44,7 @@ const ServerErrorPage = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.5 }}
           >
-            Désolé, une erreur s'est produite sur le serveur. Notre équipe technique a été notifiée et travaille à résoudre le problème.
+            Désolé, une erreur est survenue sur notre serveur. Nos équipes ont été informées et travaillent à résoudre le problème.
           </motion.p>
           
           <motion.div 
@@ -54,18 +54,28 @@ const ServerErrorPage = () => {
             transition={{ delay: 0.5, duration: 0.5 }}
           >
             <Button 
-              onClick={() => window.location.reload()}
+              onClick={() => navigate(-1)}
               variant="outline"
               className="flex items-center gap-2"
               size="lg"
             >
-              <RefreshCw className="h-4 w-4" />
-              Rafraîchir la page
+              <ArrowLeft className="h-4 w-4" />
+              Retour
+            </Button>
+            <Button 
+              onClick={() => window.location.reload()}
+              className="flex items-center gap-2"
+              variant="default"
+              size="lg"
+            >
+              <RefreshCcw className="h-4 w-4" />
+              Réessayer
             </Button>
             <Button 
               onClick={() => navigate('/')}
               className="flex items-center gap-2"
               size="lg"
+              variant="secondary"
             >
               <Home className="h-4 w-4" />
               Page d'accueil
