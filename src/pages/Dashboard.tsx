@@ -2,20 +2,13 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { getModeDashboardPath } from '@/utils/userModeHelpers';
 
 const Dashboard: React.FC = () => {
   const { userMode } = useUserMode();
+  const dashboardPath = getModeDashboardPath(userMode);
   
-  if (userMode === 'b2c') {
-    return <Navigate to="/b2c/dashboard" replace />;
-  } else if (userMode === 'b2b_user') {
-    return <Navigate to="/b2b/user/dashboard" replace />;
-  } else if (userMode === 'b2b_admin') {
-    return <Navigate to="/b2b/admin/dashboard" replace />;
-  }
-  
-  // Default fallback if no mode is selected
-  return <Navigate to="/choose-mode" replace />;
+  return <Navigate to={dashboardPath} replace />;
 };
 
 export default Dashboard;

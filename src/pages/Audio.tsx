@@ -10,9 +10,11 @@ const Audio: React.FC = () => {
     return <Navigate to="/b2c/audio" replace />;
   } else if (userMode === 'b2b_user') {
     return <Navigate to="/b2b/user/audio" replace />;
+  } else if (userMode === 'b2b_admin') {
+    return <Navigate to="/b2b/admin/dashboard" replace />; // Redirect admins to dashboard as they don't have audio
   }
   
-  // Default fallback if no mode is selected or if admin
+  // Default fallback if no mode is selected
   return <Navigate to="/choose-mode" replace />;
 };
 
