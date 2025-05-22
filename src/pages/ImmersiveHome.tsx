@@ -6,6 +6,7 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { trackEvent, trackPageView } from '@/utils/analytics';
 import { logModeSelection } from '@/utils/modeSelectionLogger';
 import { getModeLabel } from '@/utils/userModeHelpers';
+import { ROUTES } from '@/types/navigation';
 import { Mic, MicOff, Volume, VolumeX, Moon, Sun, Globe } from 'lucide-react';
 import '@/styles/immersive-home.css';
 import { toast } from 'sonner';
@@ -149,6 +150,8 @@ const ImmersiveHome: React.FC = () => {
   };
   
   // Handle user mode selection
+  // Always redirect users to the appropriate login page so that
+  // the dashboard cannot be reached without authentication.
   const handleModeSelect = (mode: 'b2c' | 'b2b-user' | 'b2b-admin') => {
     // Haptic feedback on mobile
     if ('vibrate' in navigator) {
@@ -173,16 +176,17 @@ const ImmersiveHome: React.FC = () => {
     );
     
     // Navigate based on mode
+    // Always redirect to the corresponding login screen
     setTimeout(() => {
-      switch(mode) {
+      switch (mode) {
         case 'b2b-admin':
-          navigate('/b2b/admin/login');
+          navigate(ROUTES.b2bAdmin.login);
           break;
         case 'b2b-user':
-          navigate('/b2b/user/login');
+          navigate(ROUTES.b2bUser.login);
           break;
         case 'b2c':
-          navigate('/b2c');
+          navigate(ROUTES.b2c.login);
           break;
       }
     }, 600);
