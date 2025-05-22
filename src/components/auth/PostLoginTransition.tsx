@@ -1,6 +1,7 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Check, Loader2 } from 'lucide-react';
 
 interface PostLoginTransitionProps {
@@ -14,30 +15,18 @@ const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({
   onComplete,
   userName
 }) => {
-  const [stage, setStage] = useState<'success' | 'welcome' | 'loading'>('success');
-  
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (!show) return;
     
-    // Animation sequence in multiple steps
-    const successTimer = setTimeout(() => {
-      setStage('welcome');
-      
-      const welcomeTimer = setTimeout(() => {
-        setStage('loading');
-        
-        const loadingTimer = setTimeout(() => {
-          onComplete();
-        }, 1800);
-        
-        return () => clearTimeout(loadingTimer);
-      }, 1500);
-      
-      return () => clearTimeout(welcomeTimer);
-    }, 1000);
+    const timer = setTimeout(() => {
+      navigate('/b2c/dashboard');
+      onComplete();
+    }, 3500);
     
-    return () => clearTimeout(successTimer);
-  }, [show, onComplete]);
+    return () => clearTimeout(timer);
+  }, [show, navigate, onComplete]);
   
   if (!show) return null;
   
@@ -50,71 +39,35 @@ const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({
         className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm"
       >
         <div className="max-w-sm w-full flex flex-col items-center text-center p-6">
-          <AnimatePresence mode="wait">
-            {stage === 'success' && (
-              <motion.div
-                key="success"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                className="flex flex-col items-center"
-              >
-                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Check className="h-8 w-8 text-primary" />
-                </div>
-                <h2 className="text-xl font-semibold mb-2">Login successful</h2>
-                <p className="text-muted-foreground">You are now connected to your account</p>
-              </motion.div>
-            )}
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 24 }}
+            className="flex flex-col items-center"
+          >
+            <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <Check className="h-8 w-8 text-primary" />
+            </div>
+            <h2 className="text-xl font-semibold mb-2">Connexion réussie</h2>
+            <p className="text-muted-foreground mb-4">Bienvenue {userName || 'chez EmotionsCare'}</p>
             
-            {stage === 'welcome' && (
+            <div className="mt-4">
               <motion.div
-                key="welcome"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                className="flex flex-col items-center"
+                className="w-full h-1 bg-primary/20 overflow-hidden rounded-full"
               >
-                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                    className="rounded-full border-4 border-primary/30 border-t-primary h-12 w-12"
-                  />
-                </div>
-                <h2 className="text-xl font-semibold mb-2">
-                  Welcome {userName ? userName : 'to EmotionsCare'}
-                </h2>
-                <p className="text-muted-foreground">We're preparing your personal space</p>
+                <motion.div
+                  className="h-full bg-primary"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 3 }}
+                />
               </motion.div>
-            )}
-            
-            {stage === 'loading' && (
-              <motion.div
-                key="loading"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                className="flex flex-col items-center"
-              >
-                <div className="relative h-16 w-16 mb-4">
-                  <motion.div 
-                    className="absolute inset-0 rounded-full border-4 border-primary/20"
-                    animate={{ opacity: [0.2, 0.5, 0.2] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                  />
-                  <Loader2 className="h-16 w-16 text-primary animate-spin" />
-                </div>
-                <h2 className="text-xl font-semibold mb-2">Loading your dashboard</h2>
-                <p className="text-muted-foreground">
-                  Preparing your personalized modules...
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              <div className="flex items-center justify-center mt-4">
+                <Loader2 className="h-5 w-5 text-primary animate-spin mr-2" />
+                <span className="text-sm text-muted-foreground">Chargement de votre espace personnel...</span>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </motion.div>
     </AnimatePresence>

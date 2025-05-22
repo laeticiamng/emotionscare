@@ -27,11 +27,12 @@ const LoginPage: React.FC = () => {
       // Set flag for post-login transition
       sessionStorage.setItem('just_logged_in', 'true');
       
-      // Navigate to dashboard
-      navigate('/dashboard');
+      // Navigate to dashboard (will be intercepted by the transition)
+      navigate('/b2c/dashboard');
     } catch (err: any) {
       console.error('Login error:', err);
-      setError('Unable to login. Please check your credentials.');
+      setError('Impossible de se connecter. Veuillez vérifier vos identifiants.');
+    } finally {
       setIsLoading(false);
     }
   };
@@ -46,9 +47,9 @@ const LoginPage: React.FC = () => {
       >
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Login</CardTitle>
+            <CardTitle className="text-2xl">Connexion</CardTitle>
             <CardDescription>
-              Enter your credentials to access your personal space
+              Entrez vos identifiants pour accéder à votre espace personnel
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -60,7 +61,7 @@ const LoginPage: React.FC = () => {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="name@example.com"
+                    placeholder="nom@exemple.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
@@ -69,7 +70,7 @@ const LoginPage: React.FC = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Mot de passe</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -99,23 +100,23 @@ const LoginPage: React.FC = () => {
               >
                 {isLoading ? (
                   <>
-                    <span>Logging in...</span>
+                    <span>Connexion en cours...</span>
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     </div>
                   </>
-                ) : "Log in"}
+                ) : "Se connecter"}
               </Button>
             </form>
           </CardContent>
           <CardFooter className="flex flex-col items-center gap-2">
             <div className="text-sm text-muted-foreground">
-              Don't have an account?{' '}
+              Vous n'avez pas de compte ?{' '}
               <a
                 className="text-primary underline-offset-4 hover:underline cursor-pointer"
                 onClick={() => navigate('/auth/register')}
               >
-                Create an account
+                Créer un compte
               </a>
             </div>
             <div className="text-sm">
@@ -123,7 +124,7 @@ const LoginPage: React.FC = () => {
                 className="text-sm text-muted-foreground hover:underline cursor-pointer"
                 onClick={() => navigate('/auth/forgot-password')}
               >
-                Forgot password?
+                Mot de passe oublié ?
               </a>
             </div>
           </CardFooter>

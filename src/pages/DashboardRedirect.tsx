@@ -1,56 +1,27 @@
 
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { getModeDashboardPath, getModeLoginPath, normalizeUserMode } from '@/utils/userModeHelpers';
-import { logDashboardAccessDenied } from '@/utils/securityLogs';
-import PageLoader from '@/components/PageLoader';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { LoadingIllustration } from '@/components/ui/loading-illustration';
 
 /**
- * Redirects the user to the correct dashboard based on their role.
- * Unauthenticated users are redirected to the appropriate login page.
+ * Redirection simple vers la page B2C de connexion
+ * Cette page fait office de page d'accueil temporaire
  */
 const DashboardRedirect: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [isLoading, setIsLoading] = useState(true);
-  const [redirectMessage, setRedirectMessage] = useState('Préparation de votre espace...');
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setRedirectMessage('Redirection vers la page de connexion...');
-      
-      const timer = setTimeout(() => {
-        logDashboardAccessDenied(null, location.pathname);
-        navigate(getModeLoginPath('b2c'), { replace: true });
-      }, 1500); // Short delay for a smoother experience
-      
-      return () => clearTimeout(timer);
-    }
+    const timer = setTimeout(() => {
+      navigate('/b2c/login', { replace: true });
+    }, 1500);
 
-    if (user) {
-      setRedirectMessage(`Chargement de votre espace personnel...`);
-      
-      const timer = setTimeout(() => {
-        const role = normalizeUserMode(user.role);
-        navigate(getModeDashboardPath(role), { replace: true });
-      }, 1800); // Short delay for a smoother experience
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isAuthenticated, user, navigate, location.pathname]);
+    return () => clearTimeout(timer);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
-      <PageLoader 
-        isLoading={true}
-        variant="premium"
-        duration={3000}
-        message={redirectMessage}
-      />
-      
+      <LoadingIllustration />
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -58,7 +29,7 @@ const DashboardRedirect: React.FC = () => {
         className="text-center mt-4"
       >
         <p className="text-sm text-muted-foreground">
-          Veuillez patienter un instant...
+          Redirection vers la page d'accueil...
         </p>
       </motion.div>
     </div>
