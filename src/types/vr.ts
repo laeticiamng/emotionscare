@@ -1,120 +1,76 @@
 
-export interface VRSessionTemplate {
-  id: string;
-  title: string;
-  name: string;
-  description: string;
-  thumbnailUrl?: string;
-  imageUrl?: string;
-  coverUrl?: string;
-  cover_url?: string;
-  preview_url?: string;
-  duration: number;
-  difficulty: string;
-  category: string;
-  audioUrl?: string;
-  audio_url?: string;
-  audioTrack?: string;
-  tags?: string[];
-  isFeatured?: boolean;
-  rating?: number;
-  features?: string[];
-  environment?: string;
-  environmentId?: string;
-  immersionLevel?: string;
-  lastUsed?: string | Date;
-  goalType?: string;
-  intensity?: number | string;
-  interactive?: boolean;
-  thumbnail?: string;
-  theme?: string;
-  recommendedMood?: string;
-  recommended_mood?: string;
-  completionRate?: number;
-  completion_rate?: number;
-  emotionTarget?: string;
-  emotion_target?: string;
-  emotion?: string;
-}
+import { EmotionName } from './emotion';
 
 export interface VRSession {
   id: string;
-  templateId: string;
   userId: string;
-  startTime: Date | string;
-  endTime?: Date | string;
-  startedAt?: Date | string;
-  endedAt?: Date | string;
-  createdAt?: Date | string;
-  duration: number;
-  completed: boolean;
-  progress?: number;
-  feedback?: VRSessionFeedback;
-  notes?: string;
-  heartRateBefore?: number;
-  heartRateAfter?: number;
-  metrics?: {
-    heartRate?: number | number[];
-    stressLevel?: number;
-    focusLevel?: number;
-    [key: string]: any;
+  templateId: string;
+  startTime: string;
+  endTime?: string;
+  duration?: number; // In seconds
+  emotions?: {
+    before?: EmotionName;
+    after?: EmotionName;
+    improvement?: number; // -100 to 100, percentage of improvement
   };
+  completionRate?: number; // 0-100
+  environment: string;
+  musicId?: string;
+  notes?: string;
+  rating?: number; // 1-5
+  feedback?: string;
 }
 
-export interface VRSessionFeedback {
+export interface VRSessionTemplate {
   id: string;
-  sessionId: string;
-  userId: string;
-  rating: number;
-  comment?: string;
-  emotionBefore?: string;
-  emotionAfter?: string;
-  improvements?: string;
-  emotions?: Record<string, number>;
-  timestamp: Date | string;
+  name: string;
+  description: string;
+  duration: number; // In minutes
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  categoryId: string;
+  environment: string;
+  targetEmotion?: EmotionName;
+  imageUrl?: string;
+  recommendedMusic?: string[];
+  voiceGuided?: boolean;
+  interactivity?: 'none' | 'low' | 'medium' | 'high';
+  premium?: boolean;
 }
 
 export interface VREnvironment {
   id: string;
   name: string;
-  description?: string;
-  thumbnailUrl?: string;
-  assetUrl?: string;
+  description: string;
+  category: 'natural' | 'urban' | 'abstract' | 'fantasy';
+  preview: string;
+  available: boolean;
+  premium?: boolean;
 }
 
-export interface VRSessionWithMusicProps {
-  template?: VRSessionTemplate;
-  session?: VRSession;
-  onComplete?: (session?: VRSession) => void;
-  onExit?: () => void;
-  musicEnabled?: boolean;
-  backgroundMusic?: string;
-  environment?: string;
-  sessionTemplate?: VRSessionTemplate;
+export interface VRCategory {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
 }
 
-export interface VRTemplateDetailProps {
-  template: VRSessionTemplate;
-  onStart?: () => void;
-  onBack?: () => void;
-  heartRate?: number;
+export interface VRAnalytics {
+  totalSessions: number;
+  totalTimeSpent: number; // In minutes
+  favoriteEnvironments: Array<{
+    environmentId: string;
+    name: string;
+    count: number;
+  }>;
+  emotionalProgress: Array<{
+    date: string;
+    before: number; // 1-10 emotional state
+    after: number; // 1-10 emotional state
+  }>;
+  improvements: {
+    anxiety?: number; // Percentage improvement
+    stress?: number;
+    mood?: number;
+    focus?: number;
+  };
 }
-
-export interface VRSessionPlayerProps {
-  session: VRSession;
-  template: VRSessionTemplate;
-  onComplete?: () => void;
-  onExit?: () => void;
-}
-
-export interface VRSessionHistoryProps {
-  sessions: VRSession[];
-  onSelect?: (session: VRSession) => void;
-  emptyMessage?: string;
-  limitDisplay?: number;
-  showHeader?: boolean;
-  className?: string;
-  onSessionSelect?: (session: VRSession) => void;
-}
-
-export type VRDifficulty = 'beginner' | 'intermediate' | 'advanced' | 'expert';

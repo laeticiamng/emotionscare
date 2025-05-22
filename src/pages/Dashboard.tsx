@@ -1,33 +1,28 @@
 
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import UserDashboard from '@/components/dashboard/UserDashboard';
 import { toast } from 'sonner';
-import UserDashboard from './UserDashboard';
-import { Loader2 } from 'lucide-react';
 
-const Dashboard = () => {
-  const navigate = useNavigate();
-  const { isAuthenticated, user, isLoading } = useAuth();
+const Dashboard: React.FC = () => {
+  const { user } = useAuth();
   
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast.error("Vous devez être connecté pour accéder à cette page");
-      navigate('/login');
-    }
-  }, [isAuthenticated, isLoading, navigate]);
-  
-  if (isLoading) {
+    // Welcome message when dashboard is loaded
+    toast.success(`Bienvenue, ${user?.name || 'utilisateur'}!`);
+  }, [user]);
+
+  if (!user) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2">Chargement...</span>
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center">
+          <p className="text-lg text-muted-foreground">Chargement du tableau de bord...</p>
+        </div>
       </div>
     );
   }
-  
-  // Si l'utilisateur est authentifié, afficher le tableau de bord
-  return isAuthenticated ? <UserDashboard /> : null;
+
+  return <UserDashboard user={user} />;
 };
 
 export default Dashboard;

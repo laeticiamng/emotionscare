@@ -1,80 +1,35 @@
 
-/**
- * Utility for logging user mode selection events
- * This helps with analytics tracking and understanding user behavior
- */
+type ModeSelectionEvent = 
+  | 'home_view'
+  | 'b2c_selected'
+  | 'b2b_selected'
+  | 'login_attempt'
+  | 'login_success'
+  | 'login_failure'
+  | 'register_attempt'
+  | 'register_success'
+  | 'register_failure'
+  | 'logout';
 
-type ModeType = 'b2c' | 'b2b_user' | 'b2b_admin' | string;
-
-/**
- * Logs a mode selection event
- * @param mode The selected user mode
- */
-export const logModeSelection = (mode: ModeType): void => {
-  try {
-    console.log(`[Mode Selection] User selected mode: ${mode}`);
-    
-    // Track the event using analytics if available
-    if (typeof window !== 'undefined' && window.analytics) {
-      window.analytics.track('Mode Selected', {
-        mode,
-        timestamp: new Date().toISOString(),
-        location: window.location.pathname
-      });
-    }
-    
-    // Store the selection in localStorage for persistence
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('userMode', mode);
-      localStorage.setItem('userModeSelectedAt', new Date().toISOString());
-    }
-  } catch (error) {
-    console.error('[Mode Selection Logger] Error:', error);
-  }
-};
-
-/**
- * Gets the history of mode selections
- * @returns Array of mode selection events
- */
-export const getModeSelectionHistory = (): { mode: string; timestamp: string }[] => {
-  try {
-    if (typeof localStorage !== 'undefined') {
-      const historyString = localStorage.getItem('userModeHistory');
-      if (historyString) {
-        return JSON.parse(historyString);
-      }
-    }
-  } catch (error) {
-    console.error('[Mode Selection Logger] Error getting history:', error);
-  }
+export const logModeSelection = (event: ModeSelectionEvent, details?: Record<string, any>): void => {
+  // In a real app, this would send analytics data
+  console.log(`Mode Selection Event: ${event}`, details || {});
   
-  return [];
-};
-
-/**
- * Checks if user has ever selected a specific mode
- * @param mode The mode to check
- * @returns True if the user has selected this mode before
- */
-export const hasSelectedMode = (mode: ModeType): boolean => {
-  try {
-    const history = getModeSelectionHistory();
-    return history.some(item => item.mode === mode);
-  } catch (error) {
-    console.error('[Mode Selection Logger] Error checking mode history:', error);
-  }
+  // You could implement more advanced logging here
+  // Such as sending to an analytics service, local storage, or backend
   
-  return false;
+  // For demo purposes, we'll just log to console
+  const timestamp = new Date().toISOString();
+  const userId = localStorage.getItem('auth_user') 
+    ? JSON.parse(localStorage.getItem('auth_user') || '{}').id 
+    : 'guest';
+  
+  const logData = {
+    event,
+    timestamp,
+    userId,
+    ...details
+  };
+  
+  console.log('Mode selection log:', logData);
 };
-
-// Add type declaration for analytics
-declare global {
-  interface Window {
-    analytics?: {
-      track: (event: string, properties?: any) => void;
-      identify: (userId: string, traits?: any) => void;
-      page: (name?: string, properties?: any) => void;
-    };
-  }
-}

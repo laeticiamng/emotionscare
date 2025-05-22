@@ -1,127 +1,135 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { EmotionResult } from '@/types/emotion';
-import LiveVoiceScanner from './LiveVoiceScanner';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { getEmotionByName, EmotionResult } from '@/types/emotion';
 
 interface UnifiedEmotionCheckinProps {
-  onResult?: (result: EmotionResult) => void;
-  onBack?: () => void;
+  className?: string;
 }
 
-const UnifiedEmotionCheckin: React.FC<UnifiedEmotionCheckinProps> = ({
-  onResult,
-  onBack
-}) => {
-  const [activeMethod, setActiveMethod] = useState<'voice' | 'text' | 'click' | null>(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanResult, setScanResult] = useState<EmotionResult | null>(null);
+const UnifiedEmotionCheckin: React.FC<UnifiedEmotionCheckinProps> = ({ className = '' }) => {
+  const [emotionHistory, setEmotionHistory] = useState<EmotionResult[]>([
+    {
+      primaryEmotion: 'calm',
+      secondaryEmotion: 'content',
+      intensity: 4,
+      source: 'emoji',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString()
+    },
+    {
+      primaryEmotion: 'anxious',
+      secondaryEmotion: 'frustrated',
+      intensity: 3,
+      source: 'text',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString()
+    },
+    {
+      primaryEmotion: 'happy',
+      intensity: 5,
+      source: 'facial',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString()
+    }
+  ]);
   
-  const handleMethodSelect = (method: 'voice' | 'text' | 'click') => {
-    setActiveMethod(method);
-    setIsScanning(method === 'voice');
-    setScanResult(null);
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    
+    // Check if it's today
+    if (date.toDateString() === today.toDateString()) {
+      return `Aujourd'hui, ${date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    
+    // Check if it's yesterday
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) {
+      return `Hier, ${date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    
+    // Otherwise return full date
+    return date.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
   
-  const handleScanResult = (result: EmotionResult) => {
-    setScanResult(result);
-    setIsScanning(false);
-    if (onResult) {
-      onResult(result);
+  const getEmotionText = (result: EmotionResult) => {
+    const primary = getEmotionByName(result.primaryEmotion);
+    const secondary = result.secondaryEmotion ? getEmotionByName(result.secondaryEmotion) : null;
+    
+    if (secondary) {
+      return `${primary.label} et ${secondary.label.toLowerCase()}`;
+    }
+    
+    return primary.label;
+  };
+  
+  const getSourceIcon = (source: string) => {
+    switch (source) {
+      case 'emoji':
+        return '😊';
+      case 'text':
+        return '📝';
+      case 'facial':
+        return '📷';
+      case 'voice':
+        return '🎤';
+      default:
+        return '📊';
     }
   };
-  
-  const handleBackToMethods = () => {
-    setActiveMethod(null);
-    setScanResult(null);
-    setIsScanning(false);
-  };
-  
-  const renderMethodSelection = () => (
-    <div className="space-y-6">
-      <p className="text-muted-foreground">
-        Select your preferred method to check in with your emotions.
-      </p>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="cursor-pointer hover:border-primary" onClick={() => handleMethodSelect('voice')}>
-          <CardContent className="p-6 text-center">
-            <div className="mb-4 flex justify-center">
-              <svg className="h-12 w-12 text-primary" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z" />
-              </svg>
-            </div>
-            <h3 className="font-semibold">Voice Analysis</h3>
-            <p className="text-sm text-muted-foreground mt-2">
-              Speak about your day and we'll analyze your emotional tone
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="cursor-pointer hover:border-primary" onClick={() => handleMethodSelect('text')}>
-          <CardContent className="p-6 text-center">
-            <div className="mb-4 flex justify-center">
-              <svg className="h-12 w-12 text-primary" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M20,16H6L4,18V4H20" />
-              </svg>
-            </div>
-            <h3 className="font-semibold">Text Analysis</h3>
-            <p className="text-sm text-muted-foreground mt-2">
-              Write about your feelings and we'll analyze your emotions
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card className="cursor-pointer hover:border-primary" onClick={() => handleMethodSelect('click')}>
-          <CardContent className="p-6 text-center">
-            <div className="mb-4 flex justify-center">
-              <svg className="h-12 w-12 text-primary" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M12,17.5C14.33,17.5 16.3,16.04 17.11,14H6.89C7.7,16.04 9.67,17.5 12,17.5M8.5,11A1.5,1.5 0 0,0 10,9.5A1.5,1.5 0 0,0 8.5,8A1.5,1.5 0 0,0 7,9.5A1.5,1.5 0 0,0 8.5,11M15.5,11A1.5,1.5 0 0,0 17,9.5A1.5,1.5 0 0,0 15.5,8A1.5,1.5 0 0,0 14,9.5A1.5,1.5 0 0,0 15.5,11M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-              </svg>
-            </div>
-            <h3 className="font-semibold">Quick Selection</h3>
-            <p className="text-sm text-muted-foreground mt-2">
-              Simply click on the emotion you're currently feeling
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-  
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl flex items-center justify-between">
-          <span>Emotional Check-In</span>
-          {activeMethod && (
-            <Button variant="ghost" size="sm" onClick={handleBackToMethods}>
-              Change Method
-            </Button>
-          )}
-        </CardTitle>
+    <Card className={className}>
+      <CardHeader className="pb-3">
+        <CardTitle>Historique émotionnel</CardTitle>
       </CardHeader>
       <CardContent>
-        {!activeMethod && renderMethodSelection()}
-        
-        {activeMethod === 'voice' && (
+        {emotionHistory.length > 0 ? (
           <div className="space-y-4">
-            {isScanning ? (
-              <LiveVoiceScanner 
-                onScanComplete={handleScanResult} 
-                autoStart={true} 
-                scanDuration={30} 
-              />
-            ) : (
-              <Button onClick={() => setIsScanning(true)}>
-                Start Voice Analysis
-              </Button>
-            )}
+            {emotionHistory.map((result, index) => {
+              const primary = getEmotionByName(result.primaryEmotion);
+              
+              return (
+                <div 
+                  key={index}
+                  className="flex items-center p-3 rounded-lg bg-accent/50"
+                >
+                  <div className="mr-3 text-2xl">
+                    {primary.emoji}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium">
+                      {getEmotionText(result)}
+                    </div>
+                    <div className="text-sm text-muted-foreground flex items-center">
+                      <span>{formatDate(result.timestamp)}</span>
+                      <span className="mx-2">•</span>
+                      <span className="flex items-center">
+                        {getSourceIcon(result.source)}
+                        <span className="ml-1 text-xs">
+                          {result.source === 'emoji' ? 'Emojis' :
+                           result.source === 'text' ? 'Texte' : 
+                           result.source === 'facial' ? 'Visage' : 
+                           result.source === 'voice' ? 'Voix' : 'Manuel'}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center rounded-full w-8 h-8 bg-background">
+                    <span className="text-sm font-medium">{result.intensity}/5</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-6 text-muted-foreground">
+            <p>Aucun historique disponible</p>
           </div>
         )}
-        
-        {/* Text and Click methods would go here */}
       </CardContent>
     </Card>
   );

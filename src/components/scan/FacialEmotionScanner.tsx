@@ -1,69 +1,75 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { EmotionResult } from '@/types/emotion';
-import { Camera, Loader, X } from 'lucide-react';
+import { Camera, X, Smile } from 'lucide-react';
+import { emotions } from '@/types/emotion';
 
 interface FacialEmotionScannerProps {
-  onScanComplete?: (result: EmotionResult) => void;
-  onCancel?: () => void;
+  onScanComplete: (result: EmotionResult) => void;
+  onCancel: () => void;
 }
 
 const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({
   onScanComplete,
-  onCancel,
+  onCancel
 }) => {
-  const [isScanning, setIsScanning] = useState(false);
-  const [countdown, setCountdown] = useState(3);
-  const [processing, setProcessing] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [permission, setPermission] = useState<'granted' | 'denied' | 'prompt'>('prompt');
+  
   useEffect(() => {
-    let timer: number;
-
-    if (isScanning && countdown > 0) {
-      timer = window.setTimeout(() => setCountdown(countdown - 1), 1000);
-    } else if (isScanning && countdown === 0) {
-      captureImage();
-    }
-
+    // Check if we already have permission
+    navigator.permissions?.query({ name: 'camera' as PermissionName })
+      .then(result => {
+        setPermission(result.state as 'granted' | 'denied' | 'prompt');
+        
+        if (result.state === 'granted') {
+          startCamera();
+        }
+      })
+      .catch(err => {
+        console.log('Permissions API not supported, assuming prompt', err);
+      });
+      
     return () => {
-      clearTimeout(timer);
-    };
-  }, [isScanning, countdown]);
-
-  useEffect(() => {
-    return () => {
-      // Clean up the media stream when component unmounts
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
+      // Clean up on unmount
+      stopCamera();
     };
   }, []);
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'user' } 
+      });
+      
+      setStream(mediaStream);
+      setIsCapturing(true);
+      setPermission('granted');
       
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
+        videoRef.current.srcObject = mediaStream;
       }
-      
-      setIsScanning(true);
-      setCountdown(3);
-    } catch (error) {
-      console.error('Error accessing camera:', error);
+    } catch (err) {
+      console.error('Error accessing camera:', err);
+      setPermission('denied');
     }
   };
-
-  const captureImage = () => {
+  
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+    }
+    setIsCapturing(false);
+  };
+  
+  const handleCapture = async () => {
     if (!videoRef.current || !canvasRef.current) return;
-    
-    setProcessing(true);
     
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -75,125 +81,124 @@ const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     
-    // Draw the current video frame to the canvas
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // Draw the current video frame to canvas
+    context.drawImage(video, 0, 0);
     
-    // Stop the video stream
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-    }
+    // Begin processing
+    setIsProcessing(true);
     
-    // Here you would normally send the image to your facial emotion API
-    // Instead, we'll simulate a response
-    
-    // Simulate API processing time
-    setTimeout(() => {
-      // Mock result
-      const result: EmotionResult = {
-        emotion: 'happy',
-        confidence: 0.85,
-        secondaryEmotions: ['neutral', 'surprised'],
-        timestamp: new Date().toISOString(),
+    try {
+      // Simulate emotion analysis
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // In a real application, we would send the image to an API for analysis
+      // For demo, we'll just pick a random emotion
+      const randomIndex = Math.floor(Math.random() * emotions.length);
+      const secondaryIndex = (randomIndex + 3) % emotions.length;
+      
+      const emotionResult: EmotionResult = {
+        primaryEmotion: emotions[randomIndex].name,
+        secondaryEmotion: emotions[secondaryIndex].name,
+        intensity: (Math.floor(Math.random() * 5) + 1) as 1 | 2 | 3 | 4 | 5,
         source: 'facial',
-        recommendations: [
-          {
-            id: 'facial-music',
-            type: 'music',
-            title: 'Playlist joyeuse',
-            description: 'Des morceaux pour maintenir votre bonne humeur',
-            icon: 'music',
-            emotion: 'happy',
-          },
-          {
-            id: 'facial-activity',
-            type: 'activity',
-            title: 'Activité créative',
-            description: 'Profitez de cette énergie positive pour créer quelque chose',
-            icon: 'activity',
-            emotion: 'happy',
-          },
-        ]
+        timestamp: new Date().toISOString()
       };
       
-      setProcessing(false);
-      
-      if (onScanComplete) {
-        onScanComplete(result);
-      }
-    }, 2000);
-  };
-
-  const handleCancelScan = () => {
-    // Stop any active stream
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-    }
-    
-    // Reset state
-    setIsScanning(false);
-    setCountdown(3);
-    setProcessing(false);
-    
-    // Call cancel callback
-    if (onCancel) {
-      onCancel();
+      stopCamera();
+      onScanComplete(emotionResult);
+    } catch (error) {
+      console.error('Error analyzing facial expression:', error);
+    } finally {
+      setIsProcessing(false);
     }
   };
   
+  const handleRequestPermission = () => {
+    startCamera();
+  };
+
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <Camera className="mr-2" />
-          <span>Analyse faciale d'émotion</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="relative aspect-video bg-muted rounded-md overflow-hidden">
-          {isScanning ? (
-            <>
-              <video 
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className="w-full h-full object-cover"
-              />
-              {countdown > 0 && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white text-6xl font-bold">
-                  {countdown}
-                </div>
-              )}
-              {processing && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white">
-                  <Loader className="animate-spin h-10 w-10 mb-2" />
-                  <p>Analyse en cours...</p>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Button onClick={startCamera}>
-                <Camera className="mr-2 h-4 w-4" />
-                Activer la caméra
+    <div className="space-y-4">
+      <div className="text-center">
+        <p className="text-muted-foreground mb-2">
+          Analysez votre expression faciale pour détecter votre état émotionnel
+        </p>
+      </div>
+      
+      <div className="relative aspect-video bg-black/10 rounded-lg overflow-hidden">
+        {permission === 'granted' && isCapturing ? (
+          <>
+            <video 
+              ref={videoRef} 
+              autoPlay 
+              playsInline 
+              className="w-full h-full object-cover"
+            />
+            <canvas ref={canvasRef} className="hidden" />
+            
+            {/* Overlay capture button */}
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+              <Button 
+                onClick={handleCapture}
+                disabled={isProcessing}
+                variant="secondary"
+                className="shadow-lg"
+                size="lg"
+              >
+                {isProcessing ? 'Analyse...' : 'Capturer mon expression'}
               </Button>
             </div>
-          )}
-          
-          {/* Hidden canvas for capturing image */}
-          <canvas 
-            ref={canvasRef} 
-            className="hidden"
-          />
-        </div>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="ghost" onClick={handleCancelScan}>
-          <X className="mr-2 h-4 w-4" />
+            
+            {/* Close camera button */}
+            <Button
+              className="absolute top-2 right-2 rounded-full p-2 h-8 w-8"
+              size="icon"
+              variant="secondary"
+              onClick={stopCamera}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full p-4">
+            <Smile className="h-12 w-12 mb-4 text-muted-foreground" />
+            <p className="text-center mb-4 text-muted-foreground">
+              {permission === 'denied'
+                ? "L'accès à la caméra a été refusé. Veuillez modifier les paramètres de votre navigateur pour autoriser l'accès."
+                : "Activez votre caméra pour analyser votre expression faciale"}
+            </p>
+            
+            <Button
+              onClick={handleRequestPermission}
+              disabled={permission === 'denied'}
+            >
+              <Camera className="mr-2 h-4 w-4" />
+              Activer la caméra
+            </Button>
+          </div>
+        )}
+      </div>
+      
+      <div className="flex justify-between gap-4">
+        <Button 
+          variant="outline"
+          onClick={onCancel}
+          disabled={isProcessing}
+          className="flex-1"
+        >
           Annuler
         </Button>
-      </CardFooter>
-    </Card>
+        
+        {(isCapturing && !isProcessing) && (
+          <Button 
+            onClick={handleCapture}
+            className="flex-1"
+          >
+            Analyser
+          </Button>
+        )}
+      </div>
+    </div>
   );
 };
 

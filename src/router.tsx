@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Import pages
 const Home = React.lazy(() => import('./Home'));
@@ -23,6 +24,9 @@ const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
 const VRAnalyticsPage = React.lazy(() => import('./pages/VRAnalyticsPage'));
 const VRSessionPage = React.lazy(() => import('./pages/VRSessionPage'));
 const CommunityAdminPage = React.lazy(() => import('./pages/CommunityAdminPage'));
+const LoginPage = React.lazy(() => import('./pages/LoginPage'));
+const RegisterPage = React.lazy(() => import('./pages/RegisterPage'));
+const ForgotPasswordPage = React.lazy(() => import('./pages/ForgotPasswordPage'));
 
 // Define routes
 const routes = [
@@ -32,11 +36,11 @@ const routes = [
   },
   {
     path: '/dashboard',
-    element: <Dashboard />
+    element: <ProtectedRoute><Dashboard /></ProtectedRoute>
   },
   {
     path: '/b2c/dashboard',
-    element: <B2CDashboardPage />
+    element: <ProtectedRoute><B2CDashboardPage /></ProtectedRoute>
   },
   {
     path: '/legal',
@@ -72,7 +76,7 @@ const routes = [
   },
   {
     path: '/social',
-    element: <SocialCocoonPage />
+    element: <ProtectedRoute><SocialCocoonPage /></ProtectedRoute>
   },
   {
     path: '/team',
@@ -84,27 +88,40 @@ const routes = [
   },
   {
     path: '/sessions',
-    element: <SessionsPage />
+    element: <ProtectedRoute><SessionsPage /></ProtectedRoute>
   },
   {
     path: '/settings',
-    element: <SettingsPage />
+    element: <ProtectedRoute><SettingsPage /></ProtectedRoute>
   },
   {
     path: '/vr-analytics',
-    element: <VRAnalyticsPage />
+    element: <ProtectedRoute><VRAnalyticsPage /></ProtectedRoute>
   },
   {
     path: '/vr-session/:id',
-    element: <VRSessionPage />
+    element: <ProtectedRoute><VRSessionPage /></ProtectedRoute>
   },
   {
     path: '/community-admin',
-    element: <CommunityAdminPage />
+    element: <ProtectedRoute allowedRoles={['admin']}><CommunityAdminPage /></ProtectedRoute>
   },
   {
     path: '/coming-soon',
     element: <NotImplementedPage />
+  },
+  // Auth routes
+  {
+    path: '/login',
+    element: <LoginPage />
+  },
+  {
+    path: '/register',
+    element: <RegisterPage />
+  },
+  {
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />
   },
   {
     path: '*',

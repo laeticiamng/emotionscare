@@ -1,113 +1,145 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { EmotionResult, EmojiEmotionScannerProps } from '@/types/emotion';
-import { Smile, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { emotions, Emotion, EmotionResult } from '@/types/emotion';
+import { motion } from 'framer-motion';
+
+interface EmojiEmotionScannerProps {
+  onScanComplete: (result: EmotionResult) => void;
+  onCancel: () => void;
+  onProcessingChange: (isProcessing: boolean) => void;
+  disablePostProcessing?: boolean;
+}
 
 const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
   onScanComplete,
   onCancel,
-  onResult,
   onProcessingChange,
-  isProcessing,
-  setIsProcessing,
+  disablePostProcessing = false
 }) => {
-  const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
+  const [selectedEmotions, setSelectedEmotions] = useState<Emotion[]>([]);
   const [processing, setProcessing] = useState(false);
-
-  // List of emojis with associated emotions
-  const emojis = [
-    { emoji: '😊', emotion: 'happy', description: 'Heureux' },
-    { emoji: '😢', emotion: 'sad', description: 'Triste' },
-    { emoji: '😡', emotion: 'angry', description: 'En colère' },
-    { emoji: '😮', emotion: 'surprised', description: 'Surpris' },
-    { emoji: '😕', emotion: 'confused', description: 'Confus' },
-    { emoji: '😨', emotion: 'anxious', description: 'Anxieux' },
-    { emoji: '😐', emotion: 'neutral', description: 'Neutre' },
-    { emoji: '🥰', emotion: 'love', description: 'Amoureux' },
-    { emoji: '🤔', emotion: 'thoughtful', description: 'Pensif' }
-  ];
-
-  const handleEmojiSelect = (emoji: string, emotion: string) => {
-    setSelectedEmoji(emoji);
-    setProcessing(true);
+  const [intensity, setIntensity] = useState<number>(3);
+  
+  const handleSelectEmotion = (emotion: Emotion) => {
+    const isSelected = selectedEmotions.some(e => e.name === emotion.name);
     
-    // Notify parent component that processing is in progress
-    if (onProcessingChange) onProcessingChange(true);
-    if (setIsProcessing) setIsProcessing(true);
-
-    // Simulate processing delay
-    setTimeout(() => {
-      const result: EmotionResult = {
-        emotion: emotion,
-        confidence: 0.8,
-        secondaryEmotions: ['neutral'],
-        timestamp: new Date().toISOString(),
-        source: 'emoji',
-        text: `Sélection emoji: ${emoji}`,
-        recommendations: [
-          {
-            id: 'music-recommendation',
-            type: 'music',
-            title: 'Écoutez de la musique apaisante',
-            description: "Nous vous recommandons d'écouter une playlist adaptée à votre émotion.",
-            icon: 'music',
-            emotion: emotion,
-          },
-          {
-            id: 'activity-recommendation',
-            type: 'activity',
-            title: 'Activité recommandée',
-            description: 'Une activité pour vous aider à maintenir ou améliorer votre état émotionnel.',
-            icon: 'activity',
-            emotion: emotion,
-          },
-        ],
-      };
-      
-      // Notify parent component that processing is complete
-      if (onProcessingChange) onProcessingChange(false);
-      if (setIsProcessing) setIsProcessing(false);
-      setProcessing(false);
-      
-      // Call callback with result
-      if (onScanComplete) onScanComplete(result);
-      if (onResult) onResult(result);
-    }, 1500);
+    if (isSelected) {
+      setSelectedEmotions(selectedEmotions.filter(e => e.name !== emotion.name));
+    } else {
+      if (selectedEmotions.length < 2) {
+        setSelectedEmotions([...selectedEmotions, emotion]);
+      } else {
+        setSelectedEmotions([selectedEmotions[1], emotion]);
+      }
+    }
   };
-
+  
+  const handleSubmit = async () => {
+    if (selectedEmotions.length === 0) {
+      return;
+    }
+    
+    setProcessing(true);
+    onProcessingChange(true);
+    
+    try {
+      if (disablePostProcessing) {
+        // Skip the processing simulation if disabled
+        completeProcess();
+        return;
+      }
+      
+      // Simulate processing time
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      completeProcess();
+    } catch (error) {
+      console.error('Error processing emotions:', error);
+      setProcessing(false);
+      onProcessingChange(false);
+    }
+  };
+  
+  const completeProcess = () => {
+    const result: EmotionResult = {
+      primaryEmotion: selectedEmotions[0].name,
+      secondaryEmotion: selectedEmotions[1]?.name,
+      intensity: intensity as 1 | 2 | 3 | 4 | 5,
+      source: 'emoji',
+      timestamp: new Date().toISOString()
+    };
+    
+    onScanComplete(result);
+    setProcessing(false);
+    onProcessingChange(false);
+  };
+  
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <Smile className="mr-2" />
-          <span>Comment vous sentez-vous ?</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-3 gap-3">
-          {emojis.map(({emoji, emotion, description}) => (
-            <Button
-              key={emotion}
-              variant={selectedEmoji === emoji ? "default" : "outline"}
-              className="h-16 text-2xl"
-              disabled={processing}
-              onClick={() => handleEmojiSelect(emoji, emotion)}
-            >
-              <span className="text-2xl mr-2">{emoji}</span>
-              <span className="text-xs text-muted-foreground">{description}</span>
-            </Button>
-          ))}
+    <div className="space-y-6">
+      <div className="text-center mb-4">
+        <p className="text-muted-foreground">
+          Sélectionnez jusqu'à deux émotions qui représentent le mieux votre état actuel
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-5 sm:grid-cols-5 md:grid-cols-10 gap-2 max-h-60 overflow-y-auto p-2">
+        {emotions.map((emotion) => (
+          <motion.button
+            key={emotion.name}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleSelectEmotion(emotion)}
+            className={cn(
+              "flex flex-col items-center justify-center p-2 rounded-md transition-all",
+              selectedEmotions.some(e => e.name === emotion.name)
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-accent"
+            )}
+            title={emotion.label}
+          >
+            <span className="text-2xl">{emotion.emoji}</span>
+            <span className="text-xs mt-1 line-clamp-1">{emotion.label}</span>
+          </motion.button>
+        ))}
+      </div>
+      
+      <div className="space-y-3">
+        <p className="text-sm text-center">Intensité: {intensity}/5</p>
+        <input 
+          type="range" 
+          min="1" 
+          max="5" 
+          step="1"
+          value={intensity}
+          onChange={(e) => setIntensity(parseInt(e.target.value))}
+          className="w-full"
+        />
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>Faible</span>
+          <span>Modérée</span>
+          <span>Forte</span>
         </div>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="ghost" onClick={onCancel}>
-          <X className="mr-2 h-4 w-4" />
+      </div>
+      
+      <div className="flex justify-between gap-4">
+        <Button 
+          variant="outline"
+          onClick={onCancel}
+          disabled={processing}
+          className="flex-1"
+        >
           Annuler
         </Button>
-      </CardFooter>
-    </Card>
+        <Button 
+          onClick={handleSubmit}
+          disabled={selectedEmotions.length === 0 || processing}
+          className="flex-1"
+        >
+          {processing ? 'Traitement...' : 'Valider'}
+        </Button>
+      </div>
+    </div>
   );
 };
 

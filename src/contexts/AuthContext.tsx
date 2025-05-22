@@ -1,115 +1,131 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'b2c' | 'b2b_user' | 'b2b_admin';
-  avatar?: string;
-}
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { User, UserRole } from '@/types/user';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  signup: (email: string, password: string, name: string) => Promise<void>;
+  register: (userData: Partial<User>) => Promise<boolean>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  login: async () => {},
-  logout: async () => {},
-  signup: async () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
-  // Simuler un chargement initial
+  // Check for stored user on initial load
   useEffect(() => {
-    const checkAuth = async () => {
-      // Simuler une vérification d'authentification
+    const checkAuth = () => {
       try {
-        // Vérifier si l'utilisateur a des informations stockées localement
-        const storedUser = localStorage.getItem('emotionscare_user');
+        const storedUser = localStorage.getItem('auth_user');
         
         if (storedUser) {
           setUser(JSON.parse(storedUser));
         }
       } catch (error) {
         console.error('Error checking authentication:', error);
+        localStorage.removeItem('auth_user');
       } finally {
         setIsLoading(false);
       }
     };
-
+    
     checkAuth();
   }, []);
-
-  const login = async (email: string, password: string) => {
+  
+  // Login function
+  const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
+    
     try {
-      // Simuler une connexion
-      const mockUser: User = {
-        id: 'user123',
-        name: 'John Doe',
-        email: email,
-        role: 'b2c',
-      };
+      // Demo login logic - in a real app, this would call an API
+      if (email === 'admin@exemple.fr' && password === 'admin') {
+        const adminUser: User = {
+          id: '1',
+          name: 'Admin',
+          email: 'admin@exemple.fr',
+          role: 'admin' as UserRole,
+          createdAt: new Date().toISOString(),
+        };
+        
+        localStorage.setItem('auth_user', JSON.stringify(adminUser));
+        setUser(adminUser);
+        sessionStorage.setItem('just_logged_in', 'true');
+        return true;
+      } 
+      else if (email === 'utilisateur@exemple.fr' && password === 'admin') {
+        const regularUser: User = {
+          id: '2',
+          name: 'Utilisateur',
+          email: 'utilisateur@exemple.fr',
+          role: 'user' as UserRole,
+          createdAt: new Date().toISOString(),
+        };
+        
+        localStorage.setItem('auth_user', JSON.stringify(regularUser));
+        setUser(regularUser);
+        sessionStorage.setItem('just_logged_in', 'true');
+        return true;
+      }
+      else if (email === 'collaborateur@exemple.fr' && password === 'admin') {
+        const collaboratorUser: User = {
+          id: '3',
+          name: 'Collaborateur',
+          email: 'collaborateur@exemple.fr',
+          role: 'collaborator' as UserRole,
+          createdAt: new Date().toISOString(),
+        };
+        
+        localStorage.setItem('auth_user', JSON.stringify(collaboratorUser));
+        setUser(collaboratorUser);
+        sessionStorage.setItem('just_logged_in', 'true');
+        return true;
+      }
       
-      // Stocker l'utilisateur
-      localStorage.setItem('emotionscare_user', JSON.stringify(mockUser));
-      setUser(mockUser);
+      // If not a demo user
+      return false;
     } catch (error) {
       console.error('Login error:', error);
-      throw error;
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
-
-  const logout = async () => {
-    setIsLoading(true);
+  
+  // Logout function
+  const logout = async (): Promise<void> => {
     try {
-      // Supprimer les informations utilisateur
-      localStorage.removeItem('emotionscare_user');
+      localStorage.removeItem('auth_user');
       setUser(null);
+      toast.info('Vous avez été déconnecté');
     } catch (error) {
       console.error('Logout error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
     }
   };
-
-  const signup = async (email: string, password: string, name: string) => {
+  
+  // Register function
+  const register = async (userData: Partial<User>): Promise<boolean> => {
     setIsLoading(true);
+    
     try {
-      // Simuler une inscription
-      const mockUser: User = {
-        id: 'user' + Math.floor(Math.random() * 1000),
-        name: name,
-        email: email,
-        role: 'b2c',
-      };
-      
-      // Stocker l'utilisateur
-      localStorage.setItem('emotionscare_user', JSON.stringify(mockUser));
-      setUser(mockUser);
+      // This would call an API in a real app
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return true;
     } catch (error) {
-      console.error('Signup error:', error);
-      throw error;
+      console.error('Registration error:', error);
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   return (
     <AuthContext.Provider
       value={{
@@ -118,7 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         logout,
-        signup
+        register
       }}
     >
       {children}
@@ -126,4 +142,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+export default AuthContext;

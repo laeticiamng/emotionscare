@@ -1,58 +1,69 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserModeType } from '@/types/userMode';
+import React, { createContext, useContext, useState } from 'react';
+import { useAuth } from './AuthContext';
+import { UserRole } from '@/types/user';
+import { isB2BRole } from '@/utils/roleUtils';
+
+type UserMode = 'b2c' | 'b2b' | 'admin';
 
 interface UserModeContextType {
-  userMode: UserModeType | null;
-  setUserMode: (mode: UserModeType | null) => void;
-  isLoading: boolean;
+  mode: UserMode;
+  setMode: (mode: UserMode) => void;
+  isB2B: boolean;
+  isB2C: boolean;
+  isAdmin: boolean;
 }
 
+// Create context with default values
 const UserModeContext = createContext<UserModeContextType>({
-  userMode: null,
-  setUserMode: () => {},
-  isLoading: true,
+  mode: 'b2c',
+  setMode: () => {},
+  isB2B: false,
+  isB2C: true,
+  isAdmin: false
 });
 
-export const useUserMode = () => useContext(UserModeContext);
-
 export const UserModeProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
-  const [userMode, setUserMode] = useState<UserModeType | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Check for stored user mode preference
-    const storedMode = localStorage.getItem('user_mode');
+  const { user } = useAuth();
+  
+  // Determine default mode based on user role
+  const getDefaultMode = (): UserMode => {
+    if (!user) return 'b2c';
     
-    if (storedMode) {
-      try {
-        setUserMode(storedMode as UserModeType);
-      } catch (error) {
-        console.error('Error parsing stored user mode:', error);
-      }
-    }
+    // Check user role
+    const role = user.role as UserRole;
     
-    setIsLoading(false);
-  }, []);
-
-  const handleSetUserMode = (mode: UserModeType | null) => {
-    if (mode) {
-      localStorage.setItem('user_mode', mode);
-      console.info('[Mode Selection] User selected mode:', mode);
-    } else {
-      localStorage.removeItem('user_mode');
-    }
+    if (role === 'admin') return 'admin';
+    if (isB2BRole(role)) return 'b2b';
     
-    setUserMode(mode);
+    return 'b2c';
   };
-
+  
+  const [mode, setModeState] = useState<UserMode>(getDefaultMode());
+  
+  // Computed properties
+  const isB2B = mode === 'b2b';
+  const isB2C = mode === 'b2c';
+  const isAdmin = mode === 'admin';
+  
+  const setMode = (newMode: UserMode) => {
+    setModeState(newMode);
+    // You could add additional logic here (analytics, etc.)
+  };
+  
   return (
-    <UserModeContext.Provider value={{
-      userMode,
-      setUserMode: handleSetUserMode,
-      isLoading,
+    <UserModeContext.Provider value={{ 
+      mode, 
+      setMode, 
+      isB2B, 
+      isB2C,
+      isAdmin
     }}>
       {children}
     </UserModeContext.Provider>
   );
 };
+
+export const useUserMode = () => useContext(UserModeContext);
+
+export default UserModeContext;

@@ -17,12 +17,10 @@ const GuestMenu: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    toast.info('Navigation vers la page de connexion');
     navigate('/login');
   };
 
   const handleSignUp = () => {
-    toast.info('Navigation vers la page d\'inscription');
     navigate('/register');
   };
 

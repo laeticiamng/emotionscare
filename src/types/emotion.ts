@@ -1,210 +1,85 @@
-export interface EmotionData {
-  emotion: string;
-  confidence: number;
-  intensity?: number;
-  valence?: number;
-  arousal?: number;
-  dominance?: number;
-  timestamp?: string;
-  tags?: string[];
-  value?: number;
+
+export type EmotionName =
+  | 'happy'
+  | 'sad'
+  | 'angry'
+  | 'fearful'
+  | 'disgusted'
+  | 'surprised'
+  | 'neutral'
+  | 'calm'
+  | 'excited'
+  | 'anxious'
+  | 'frustrated'
+  | 'content'
+  | 'nostalgic'
+  | 'proud'
+  | 'guilty'
+  | 'grateful'
+  | 'jealous'
+  | 'lonely'
+  | 'hopeful'
+  | 'overwhelmed';
+
+export type EmotionIntensity = 1 | 2 | 3 | 4 | 5;
+
+export type EmotionSource = 'emoji' | 'text' | 'facial' | 'voice' | 'manual' | 'ai';
+
+export interface EmotionResult {
+  primaryEmotion: EmotionName;
+  secondaryEmotion?: EmotionName;
+  intensity: EmotionIntensity;
+  source: EmotionSource;
+  timestamp: string;
+  userId?: string;
+  notes?: string;
+  context?: string;
+  triggers?: string[];
 }
 
 export interface EmotionRecommendation {
   id: string;
-  type: string;
+  type: 'activity' | 'music' | 'video' | 'breathing' | 'reading' | 'social';
   title: string;
   description: string;
-  emotion?: string;
-  content?: string;
-  category?: string;
-  action?: string;
-  link?: string;
-  icon?: string;
-  duration?: number;
-  intensity?: 'low' | 'medium' | 'high';
-  tags?: string[];
-  actionLink?: string;
-  actionText?: string;
-}
-
-export interface EmotionResult {
-  emotion: string;
-  dominantEmotion?: string; // Added this property
-  confidence: number;
-  intensity?: number;
-  secondaryEmotions?: string[];
-  timestamp?: string;
-  source?: EmotionSource;
-  text?: string;
-  duration?: number;
-  userId?: string;
-  sessionId?: string;
-  language?: string;
-  data?: EmotionData[];
-  tags?: string[];
-
-  // Extended fields for compatibility
-  id?: string;
-  primaryEmotion?: string;
-  score?: number;
-  feedback?: string;
-  recommendations?: EmotionRecommendation[];
-  triggers?: string[];
-  context?: object;
-  model?: string;
-  raw?: any;
-  ai_feedback?: string;
-  emojis?: string[];
-  emotions?: Record<string, number>;
-  date?: string; // Date for display
-  audioUrl?: string;
-  audio_url?: string; // Alternative name
-  transcript?: string;
-  facialExpression?: string;
-  textInput?: string;
-  user_id?: string; // Alternative name
-  isLoading?: boolean;
-}
-
-export type EmotionSource =
-  | 'text'
-  | 'voice'
-  | 'facial'
-  | 'emoji'
-  | 'system'
-  | 'ai'
-  | 'manual'
-  | 'live-voice'
-  | 'voice-analyzer'
-  | 'audio-processor'
-  | 'text-analysis';
-
-export interface EmotionHistoryItem extends EmotionResult {
-  id: string;
-}
-
-export interface EmotionAnalysisOptions {
-  includeSecondary?: boolean;
-  detailed?: boolean;
-  language?: string;
-  sensitivity?: number;
-}
-
-export interface EmotionTrend {
-  emotion: string;
-  count: number;
-  percentage: number;
-}
-
-export interface EmotionalState {
-  dominant: string;
-  secondary: string[];
-  baseline: string;
-  trends: EmotionTrend[];
-  recentHistory: EmotionHistoryItem[];
+  emotion: EmotionName;
+  intensity?: EmotionIntensity;
+  url?: string;
+  imageUrl?: string;
+  duration?: number; // in minutes
 }
 
 export interface Emotion {
-  name: string;
+  name: EmotionName;
+  label: string;
   color: string;
-  icon?: string;
-  description?: string;
-  id?: string;
-  emotion?: string;
-  emoji?: string;
-  confidence?: number;
-  intensity?: number;
-  date?: string;
-  source?: string;
-  text?: string;
-  transcript?: string;
-  audioUrl?: string;
-  feedback?: string;
-  score?: number;
-  userId?: string;
-  user_id?: string;
+  emoji: string;
+  intensity?: EmotionIntensity;
 }
 
-export interface MoodData {
-  emotion: string;
-  intensity: number;
-  date?: string;  // Added missing property
-  timestamp: string;
-  context?: string;
-  source?: string;
-  id?: string;
-  userId?: string; // Added missing property
-}
+export const emotions: Emotion[] = [
+  { name: 'happy', label: 'Heureux', color: '#FFD700', emoji: '😊' },
+  { name: 'sad', label: 'Triste', color: '#6495ED', emoji: '😔' },
+  { name: 'angry', label: 'En colère', color: '#FF6347', emoji: '😠' },
+  { name: 'fearful', label: 'Effrayé', color: '#9370DB', emoji: '😨' },
+  { name: 'disgusted', label: 'Dégoûté', color: '#90EE90', emoji: '🤢' },
+  { name: 'surprised', label: 'Surpris', color: '#FF69B4', emoji: '😲' },
+  { name: 'neutral', label: 'Neutre', color: '#A9A9A9', emoji: '😐' },
+  { name: 'calm', label: 'Calme', color: '#87CEEB', emoji: '😌' },
+  { name: 'excited', label: 'Excité', color: '#FFA500', emoji: '🤩' },
+  { name: 'anxious', label: 'Anxieux', color: '#8A2BE2', emoji: '😰' },
+  { name: 'frustrated', label: 'Frustré', color: '#DC143C', emoji: '😤' },
+  { name: 'content', label: 'Content', color: '#ADFF2F', emoji: '☺️' },
+  { name: 'nostalgic', label: 'Nostalgique', color: '#DDA0DD', emoji: '🥲' },
+  { name: 'proud', label: 'Fier', color: '#DAA520', emoji: '😌' },
+  { name: 'guilty', label: 'Coupable', color: '#4682B4', emoji: '😔' },
+  { name: 'grateful', label: 'Reconnaissant', color: '#9ACD32', emoji: '🙏' },
+  { name: 'jealous', label: 'Jaloux', color: '#228B22', emoji: '😒' },
+  { name: 'lonely', label: 'Seul', color: '#708090', emoji: '🥺' },
+  { name: 'hopeful', label: 'Plein d\'espoir', color: '#40E0D0', emoji: '🙂' },
+  { name: 'overwhelmed', label: 'Dépassé', color: '#CD5C5C', emoji: '😵' }
+];
 
-export interface EmotionPrediction {
-  emotion: string;
-  probability: number;
-  timestamp?: string;
-  source?: string;
-  score?: number;
-  triggers?: string[];
-  timeframe?: string;
-  recommendations?: string[];
-  confidence?: number;
-}
-
-export interface EmojiEmotionScannerProps {
-  onScanComplete?: (result: EmotionResult) => void;
-  onCancel?: () => void;
-  onResult?: (result: EmotionResult) => void; // Added for compatibility
-  isProcessing?: boolean; // Added for compatibility
-  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>; // Added for compatibility
-  onProcessingChange?: (isProcessing: boolean) => void; // Added for compatibility
-}
-
-export interface EmotionalTeamViewProps {
-  teamId: string;
-  period?: 'day' | 'week' | 'month';
-  anonymized?: boolean;
-  dateRange?: [Date, Date];
-  showGraph?: boolean;
-  showMembers?: boolean;
-  className?: string;
-  showDetails?: boolean;
-}
-
-export interface TextEmotionScannerProps {
-  onScanComplete?: (result: EmotionResult) => void;
-  onCancel?: () => void;
-  isProcessing?: boolean;
-  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
-  onProcessingChange?: (isProcessing: boolean) => void;
-}
-
-export interface AudioEmotionScannerProps {
-  onComplete?: (result: EmotionResult) => void;
-  onCancel?: () => void;
-  autoStart?: boolean;
-}
-
-export interface VoiceEmotionScannerProps {
-  onEmotionDetected: (result: EmotionResult) => void;
-}
-
-export interface VoiceEmotionAnalyzerProps {
-  onResult: (result: EmotionResult) => void;
-  onStartRecording?: () => void;
-}
-
-export interface LiveVoiceScannerProps {
-  onScanComplete?: (result: EmotionResult) => void;
-  onResult?: (result: EmotionResult) => void;
-  isProcessing?: boolean;
-  setIsProcessing?: React.Dispatch<React.SetStateAction<boolean>>;
-  onCancel?: () => void;
-  autoStart?: boolean;
-  scanDuration?: number;
-}
-
-export interface EmotionScanFormProps {
-  onScanComplete: (result: EmotionResult) => void;
-  onEmotionDetected?: () => void;
-  onClose?: () => void;
-  userId?: string;
-}
+export const getEmotionByName = (name: EmotionName): Emotion => {
+  return emotions.find(e => e.name === name) || emotions[6]; // Return neutral as default
+};

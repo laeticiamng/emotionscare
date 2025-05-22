@@ -1,115 +1,109 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { EmotionResult, TextEmotionScannerProps } from '@/types/emotion';
-import { MessageSquare, X, Loader } from 'lucide-react';
+import { EmotionResult } from '@/types/emotion';
+import { emotions } from '@/types/emotion';
+
+interface TextEmotionScannerProps {
+  onScanComplete: (result: EmotionResult) => void;
+  onCancel: () => void;
+  isProcessing: boolean;
+  setIsProcessing: (isProcessing: boolean) => void;
+}
 
 const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
   onScanComplete,
   onCancel,
   isProcessing,
-  setIsProcessing,
-  onProcessingChange,
+  setIsProcessing
 }) => {
   const [text, setText] = useState('');
-  const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-    if (error) setError(null);
-  };
-
-  const handleSubmit = () => {
+  
+  const handleSubmit = async () => {
     if (!text.trim()) {
-      setError('Veuillez entrer du texte pour analyser vos émotions.');
       return;
     }
-
-    setProcessing(true);
-    if (setIsProcessing) setIsProcessing(true);
-    if (onProcessingChange) onProcessingChange(true);
-
-    // Simulate API call with timeout
-    setTimeout(() => {
-      // Mock result
-      const result: EmotionResult = {
-        emotion: 'thoughtful',
-        confidence: 0.75,
-        secondaryEmotions: ['calm', 'focused'],
-        timestamp: new Date().toISOString(),
-        source: 'text',
-        text: text,
-        recommendations: [
-          {
-            id: 'music-recommendation',
-            type: 'music',
-            title: 'Playlist de réflexion',
-            description: 'Une sélection musicale pour accompagner votre réflexion.',
-            icon: 'music',
-            emotion: 'thoughtful',
-          },
-          {
-            id: 'activity-recommendation',
-            type: 'activity',
-            title: 'Journal de pensées',
-            description: 'Prenez le temps de noter vos réflexions dans un journal.',
-            icon: 'book',
-            emotion: 'thoughtful',
-          },
-        ],
-      };
-
-      setProcessing(false);
-      if (setIsProcessing) setIsProcessing(false);
-      if (onProcessingChange) onProcessingChange(false);
-
-      if (onScanComplete) {
-        onScanComplete(result);
+    
+    setIsProcessing(true);
+    
+    try {
+      // Simulated emotional analysis
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Dummy algorithm to pick an emotion from text (in real life, would be connected to NLP API)
+      // For now, just pick a random emotion weighted by text length
+      const textLength = text.length;
+      const randomIndex = Math.floor(Math.random() * emotions.length);
+      const secondaryIndex = (randomIndex + 1 + Math.floor(Math.random() * (emotions.length - 1))) % emotions.length;
+      
+      // Determine intensity based on punctuation and capitalization
+      const exclamations = (text.match(/!/g) || []).length;
+      const questions = (text.match(/\?/g) || []).length;
+      const capitals = (text.match(/[A-Z]/g) || []).length;
+      
+      // Calculate intensity - more exclamations and capitals suggest stronger emotion
+      let calculatedIntensity = 3; // Default intensity
+      if (exclamations > 2 || capitals > textLength * 0.2) {
+        calculatedIntensity = 5;
+      } else if (exclamations > 0 || capitals > textLength * 0.1) {
+        calculatedIntensity = 4;
+      } else if (questions > 2) {
+        calculatedIntensity = 2;
       }
-    }, 2000);
+      
+      const emotionResult: EmotionResult = {
+        primaryEmotion: emotions[randomIndex].name,
+        secondaryEmotion: emotions[secondaryIndex].name,
+        intensity: calculatedIntensity as 1 | 2 | 3 | 4 | 5,
+        source: 'text',
+        timestamp: new Date().toISOString(),
+        notes: text
+      };
+      
+      onScanComplete(emotionResult);
+    } catch (error) {
+      console.error('Error analyzing text:', error);
+    } finally {
+      setIsProcessing(false);
+    }
   };
-
+  
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <MessageSquare className="mr-2" />
-          <span>Analyse textuelle d'émotion</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Textarea
-          placeholder="Exprimez ce que vous ressentez actuellement..."
-          value={text}
-          onChange={handleTextChange}
-          rows={5}
-          className={error ? 'border-red-500 focus-visible:ring-red-500' : ''}
-          disabled={processing}
-        />
-        {error && (
-          <p className="text-sm text-red-500">{error}</p>
-        )}
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="ghost" onClick={onCancel} disabled={processing}>
-          <X className="mr-2 h-4 w-4" />
+    <div className="space-y-4">
+      <div className="text-center">
+        <p className="text-muted-foreground">
+          Décrivez votre état émotionnel actuel en quelques phrases
+        </p>
+      </div>
+      
+      <Textarea
+        placeholder="Comment vous sentez-vous aujourd'hui ? Qu'est-ce qui vous préoccupe ?"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={5}
+        className="w-full resize-none"
+        disabled={isProcessing}
+      />
+      
+      <div className="flex justify-between gap-4">
+        <Button 
+          variant="outline"
+          onClick={onCancel}
+          disabled={isProcessing}
+          className="flex-1"
+        >
           Annuler
         </Button>
-        <Button onClick={handleSubmit} disabled={processing || !text.trim()}>
-          {processing ? (
-            <>
-              <Loader className="mr-2 h-4 w-4 animate-spin" />
-              Analyse en cours...
-            </>
-          ) : (
-            'Analyser mes émotions'
-          )}
+        <Button 
+          onClick={handleSubmit}
+          disabled={!text.trim() || isProcessing}
+          className="flex-1"
+        >
+          {isProcessing ? 'Analyse en cours...' : 'Analyser'}
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
 

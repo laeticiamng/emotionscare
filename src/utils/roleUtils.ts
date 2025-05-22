@@ -1,56 +1,52 @@
 
 import { UserRole } from '@/types/user';
-import { UserModeType } from '@/types/userMode';
 
-/**
- * Check if a user role is an admin role
- */
-export const isAdminRole = (role?: UserRole | string | null): boolean => {
-  if (!role) return false;
-  return role.includes('admin') || role === 'b2b_admin' || role === 'b2b-admin';
+export const getRoleName = (role: UserRole): string => {
+  switch (role) {
+    case 'admin':
+      return 'Administrateur';
+    case 'user':
+      return 'Utilisateur';
+    case 'collaborator':
+      return 'Collaborateur';
+    case 'manager':
+      return 'Manager';
+    case 'b2b_user':
+      return 'Utilisateur Pro';
+    case 'b2b_admin':
+      return 'Admin Pro';
+    default:
+      return 'Utilisateur';
+  }
 };
 
-/**
- * Check if a user role is a B2B user role (collaborator)
- */
-export const isB2BUserRole = (role?: UserRole | string | null): boolean => {
-  if (!role) return false;
-  return (role.includes('b2b') && !isAdminRole(role)) || 
-         role === 'b2b_user' || 
-         role === 'b2b-user' ||
-         role === 'collaborateur';
+export const isAdminRole = (role?: UserRole): boolean => {
+  return role === 'admin' || role === 'b2b_admin';
 };
 
-/**
- * Convert user role to mode type
- */
-export const roleToMode = (role?: UserRole | string | null): UserModeType => {
-  if (!role) return 'b2c';
-  
-  if (isAdminRole(role)) {
-    return 'b2b_admin';
-  }
-  
-  if (isB2BUserRole(role)) {
-    return 'b2b_user';
-  }
-  
-  return 'b2c';
+export const isManagerRole = (role?: UserRole): boolean => {
+  return role === 'manager' || isAdminRole(role);
 };
 
-/**
- * Get display name for a role
- */
-export const getRoleDisplayName = (role?: UserRole | string | null): string => {
-  if (!role) return 'Particulier';
-  
-  if (isAdminRole(role)) {
-    return 'Administrateur';
+export const isB2BRole = (role?: UserRole): boolean => {
+  return role === 'b2b_user' || role === 'b2b_admin';
+};
+
+export const getRoleColor = (role?: UserRole): string => {
+  switch (role) {
+    case 'admin':
+      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+    case 'b2b_admin':
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+    case 'user':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+    case 'collaborator':
+      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+    case 'manager':
+      return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400';
+    case 'b2b_user':
+      return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
   }
-  
-  if (isB2BUserRole(role)) {
-    return 'Collaborateur';
-  }
-  
-  return 'Particulier';
 };

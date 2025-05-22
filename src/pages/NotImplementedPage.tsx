@@ -1,23 +1,60 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Construction } from 'lucide-react';
+import { motion } from 'framer-motion';
+import Shell from '@/Shell';
+import { Clock, Construction, ArrowLeft } from 'lucide-react';
 
-const NotImplementedPage = () => {
+const NotImplementedPage: React.FC = () => {
   const navigate = useNavigate();
-  
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-4">
-      <Construction size={64} className="text-muted-foreground mb-6" />
-      <h1 className="text-3xl font-bold mb-2">Fonctionnalité en construction</h1>
-      <p className="text-muted-foreground mb-6 max-w-md">
-        Cette partie de l'application est en cours de développement et sera disponible prochainement.
-      </p>
-      <Button onClick={() => navigate('/dashboard')}>
-        Retour au tableau de bord
-      </Button>
-    </div>
+    <Shell>
+      <div className="container mx-auto py-16 px-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-2xl mx-auto text-center"
+        >
+          <div className="mb-8 flex justify-center">
+            <div className="p-5 rounded-full bg-amber-100 dark:bg-amber-900/30">
+              <Construction className="h-16 w-16 text-amber-600 dark:text-amber-400" />
+            </div>
+          </div>
+          
+          <h1 className="text-4xl font-bold mb-4">Fonctionnalité à venir</h1>
+          
+          <p className="text-muted-foreground text-lg mb-8">
+            Cette fonctionnalité est actuellement en cours de développement et sera disponible prochainement.
+          </p>
+          
+          <div className="flex items-center justify-center space-x-2 mb-12">
+            <Clock className="h-5 w-5 text-muted-foreground" />
+            <span className="text-muted-foreground">En construction</span>
+          </div>
+          
+          <div className="space-x-4">
+            <Button
+              onClick={() => navigate(-1)}
+              variant="outline"
+              className="px-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retour
+            </Button>
+            
+            <Button
+              onClick={() => navigate('/')}
+              className="px-6"
+            >
+              Accueil
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+    </Shell>
   );
 };
 

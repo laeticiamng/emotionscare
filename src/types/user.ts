@@ -1,26 +1,47 @@
 
-export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'b2b-user' | 'b2b-admin';
+export type UserRole = 'user' | 'admin' | 'collaborator' | 'manager' | 'b2b_user' | 'b2b_admin';
 
 export interface User {
   id: string;
+  name: string;
   email: string;
-  name?: string;
-  avatar_url?: string;
-  role?: UserRole;
-  preferences?: {
-    theme?: 'light' | 'dark' | 'system';
-    language?: string;
-    notifications_enabled?: boolean;
-    email_notifications?: boolean;
-  };
+  role: UserRole;
+  avatar?: string;
+  department?: string;
+  position?: string;
+  createdAt: string;
+  lastLogin?: string;
 }
 
-export interface AuthContextType {
-  isAuthenticated: boolean;
-  user: User | null;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  register: (email: string, password: string, name?: string) => Promise<void>;
-  updateUser: (user: Partial<User>) => Promise<void>;
+export interface UserProfile extends User {
+  bio?: string;
+  phone?: string;
+  preferences?: UserPreferences;
+  stats?: UserStats;
+}
+
+export interface UserPreferences {
+  theme?: 'light' | 'dark' | 'system';
+  notifications?: {
+    email?: boolean;
+    push?: boolean;
+  };
+  privacy?: {
+    shareActivity?: boolean;
+    shareEmotionalData?: boolean;
+  };
+  language?: string;
+}
+
+export interface UserStats {
+  emotionScans?: number;
+  sessionsCompleted?: number;
+  journalEntries?: number;
+  streak?: number;
+}
+
+export interface UserAuth {
+  token: string;
+  refreshToken: string;
+  expiresAt: string;
 }
