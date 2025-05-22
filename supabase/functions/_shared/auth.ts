@@ -61,14 +61,37 @@ export async function requireAuth(req: Request) {
   return data.user;
 }
 
-export async function requireRole(req: Request, allowedRoles: string | string[]) {
+export async function authorizeRole(
+  req: Request,
+  allowedRoles: string | string[]
+) {
+  const { pathname } = new URL(req.url);
+  const ip =
+    req.headers.get('x-forwarded-for') ||
+    req.headers.get('x-real-ip') ||
+    null;
+
   const user = await requireAuth(req);
-  if (!user) return null;
+  if (!user) {
+    // requireAuth already logged the reason
+    return { user: null, status: 401 } as const;
+  }
+
   const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
   const userRole = (user.user_metadata?.role || '').toLowerCase();
   if (!roles.map(r => r.toLowerCase()).includes(userRole)) {
     console.warn('Role mismatch:', { userRole, allowedRoles: roles });
-    return null;
+    await logUnauthorizedAccess(pathname, 'forbidden_role', user.id, ip);
+    return { user: null, status: 403 } as const;
   }
-  return user;
+
+  return { user, status: 200 } as const;
+}
+
+/**
+ * @deprecated Use authorizeRole instead which returns explicit status codes.
+ */
+export async function requireRole(req: Request, allowedRoles: string | string[]) {
+  const result = await authorizeRole(req, allowedRoles);
+  return result.user;
 }

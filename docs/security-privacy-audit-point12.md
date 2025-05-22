@@ -18,7 +18,7 @@ Ce document récapitule l'état actuel observé dans le dépôt concernant la s�
 ## 3. Stockage des données et RGPD
 
 - La base de données et l'authentification reposent sur Supabase (`@supabase/supabase-js`).
-- Des fonctions Supabase telles que `gdpr-assistant` et `explain-gdpr` (dossier `supabase/functions/`) offrent une aide liée au RGPD et vérifient l'authentification via `requireAuth`.
+- Des fonctions Supabase telles que `gdpr-assistant` et `explain-gdpr` (dossier `supabase/functions/`) offrent une aide liée au RGPD et vérifient l'authentification et le rôle via `authorizeRole`.
 - Le README mentionne un tableau de bord `/b2b/admin/security` et un widget de suivi des incidents.
 - Aucune stratégie complète de logs ni de stockage chiffré n'est présente dans le code.
 
@@ -26,7 +26,7 @@ Ce document récapitule l'état actuel observé dans le dépôt concernant la s�
 
 1. **Persistance sécurisée des sessions** : prévoir un stockage en cookie `httpOnly` en production pour éviter l'accès JavaScript aux jetons. Actuellement, `localStorage` est utilisé.
 2. **Traçabilité et logs** : aucun module de journalisation centralisé n'est visible. Un service d'audit (logs d'accès, modifications sensibles) devrait être ajouté.
-3. **Règles RLS** : vérifier l'application de RLS sur toutes les tables Supabase. Les fonctions utilisent `requireAuth` mais les règles de base ne sont pas fournies.
+3. **Règles RLS** : vérifier l'application de RLS sur toutes les tables Supabase. Les fonctions utilisent `authorizeRole` mais les règles de base ne sont pas fournies.
 4. **Consentement et export RGPD** : prévoir un module de gestion du consentement et des outils d'export/suppression des données utilisateur.
 5. **MFA** : aucune implémentation de double authentification n'a été identifiée. Une structure pour activer la MFA est recommandée.
 6. **Chiffrement au repos** : la documentation ne précise pas de mécanisme de chiffrement pour les données sensibles. Un chiffrage AES‑24 bits ou supérieur est recommandé.
@@ -35,7 +35,7 @@ Ce document récapitule l'état actuel observé dans le dépôt concernant la s�
 ## 5. Références utiles
 
 - `docs/audit-modules-1-8-summary.md` contient plusieurs remarques RGPD et sécurité pour chaque module de la plateforme.
-- Les fonctions Supabase du dossier `supabase/functions/` montrent l'utilisation de `requireAuth` pour restreindre l'accès aux API.
+- Les fonctions Supabase du dossier `supabase/functions/` montrent l'utilisation de `authorizeRole` pour restreindre l'accès aux API.
 
 ---
 

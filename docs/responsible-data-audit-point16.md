@@ -18,7 +18,7 @@ Ce document analyse l’état actuel du dépôt concernant la gestion responsabl
 ## 3. Gestion actuelle des droits et des logs
 
 - Aucun module de journalisation centralisé n’est présent. Les pages admin affichent un tableau d’exemple `AccessLogsTable` avec des données simulées.
-- Les accès aux fonctions Supabase utilisent `requireAuth`, mais il n’existe pas de suivi des actions (export, suppression, etc.).
+- Les accès aux fonctions Supabase utilisent `authorizeRole`, mais il n’existe pas de suivi des actions (export, suppression, etc.).
 
 ## 4. Export, effacement et anonymisation
 
