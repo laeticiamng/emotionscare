@@ -1,201 +1,210 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import UserMenu from './UserMenu';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ModeToggle } from '@/components/ThemeToggle';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Menu, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { Menu, X, User, LogOut, Settings, Music, Book, Headphones } from 'lucide-react';
 
 const MainNavbar: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { userMode } = useUserMode();
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
   };
 
-  const closeMobileMenu = () => {
-    setMobileMenuOpen(false);
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
+
+  let navigationLinks = [];
+
+  if (isAuthenticated) {
+    if (userMode === 'b2c') {
+      navigationLinks = [
+        { name: 'Tableau de bord', href: '/b2c/dashboard' },
+        { name: 'Journal', href: '/b2c/journal' },
+        { name: 'Musicothérapie', href: '/b2c/music' },
+        { name: 'Audio', href: '/b2c/audio' }
+      ];
+    } else if (userMode === 'b2b_user') {
+      navigationLinks = [
+        { name: 'Tableau de bord', href: '/b2b/user/dashboard' },
+        { name: 'Journal', href: '/b2b/user/journal' },
+        { name: 'Musicothérapie', href: '/b2b/user/music' },
+        { name: 'Audio', href: '/b2b/user/audio' }
+      ];
+    } else if (userMode === 'b2b_admin') {
+      navigationLinks = [
+        { name: 'Tableau de bord', href: '/b2b/admin/dashboard' },
+        { name: 'Utilisateurs', href: '/b2b/admin/users' },
+        { name: 'Rapports', href: '/b2b/admin/reports' }
+      ];
+    }
+  } else {
+    navigationLinks = [
+      { name: 'Accueil', href: '/' },
+      { name: 'Tarifs', href: '/pricing' },
+      { name: 'Support', href: '/support' }
+    ];
+  }
 
   return (
-    <header className="border-b sticky top-0 bg-background z-50">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link to="/" className="font-bold text-xl flex items-center gap-2">
-            EmotionsCare
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-6 ml-6">
-            <NavLink to="/" label="Accueil" onClick={closeMobileMenu} />
-            
-            {isAuthenticated && (
-              <>
-                <NavLink to="/dashboard" label="Dashboard" onClick={closeMobileMenu} />
-                <NavDropdown 
-                  label="Modules" 
-                  items={[
-                    { to: '/scan', label: 'Scan Émotionnel' },
-                    { to: '/journal', label: 'Journal' },
-                    { to: '/music', label: 'Musicothérapie' },
-                    { to: '/social', label: 'Communauté' },
-                    { to: '/sessions', label: 'Sessions' },
-                  ]}
-                  onClick={closeMobileMenu}
-                />
-              </>
-            )}
-            
-            <NavLink to="/team" label="Notre équipe" onClick={closeMobileMenu} />
-            <NavLink to="/contact" label="Contact" onClick={closeMobileMenu} />
-          </nav>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <ModeToggle />
-          
-          {isAuthenticated ? (
-            <UserMenu />
-          ) : (
-            <div className="hidden md:flex items-center gap-2">
-              <Link to="/login">
-                <Button variant="ghost" size="sm">
-                  Se connecter
-                </Button>
-              </Link>
-              <Link to="/register">
-                <Button size="sm">
-                  S'inscrire
-                </Button>
+    <nav className="bg-background border-b">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between h-16">
+          <div className="flex">
+            <div className="flex-shrink-0 flex items-center">
+              <Link to="/" className="font-bold text-xl text-primary">
+                EmotionsCare
               </Link>
             </div>
-          )}
-          
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={toggleMobileMenu}
-          >
-            {mobileMenuOpen ? (
-              <X className="h-5 w-5" />
+            <div className="hidden md:ml-6 md:flex md:space-x-4 items-center">
+              {navigationLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="text-muted-foreground hover:text-foreground px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="hidden md:flex items-center">
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate('/profile')}
+                  title="Profil"
+                >
+                  <User className="h-5 w-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleLogout}
+                  title="Déconnexion"
+                >
+                  <LogOut className="h-5 w-5" />
+                </Button>
+              </div>
             ) : (
-              <Menu className="h-5 w-5" />
+              <div className="flex items-center space-x-3">
+                <Button
+                  variant="ghost"
+                  onClick={() => navigate('/b2c/login')}
+                >
+                  Se connecter
+                </Button>
+                <Button
+                  onClick={() => navigate('/b2c/register')}
+                >
+                  S'inscrire
+                </Button>
+              </div>
             )}
-            <span className="sr-only">Menu</span>
-          </Button>
+          </div>
+          <div className="flex md:hidden items-center">
+            <button
+              onClick={toggleMenu}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+            >
+              <span className="sr-only">Open main menu</span>
+              {isMenuOpen ? (
+                <X className="block h-6 w-6" aria-hidden="true" />
+              ) : (
+                <Menu className="block h-6 w-6" aria-hidden="true" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
-      
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t overflow-hidden"
-          >
-            <nav className="flex flex-col p-4">
-              <MobileNavLink to="/" label="Accueil" onClick={closeMobileMenu} />
-              
-              {isAuthenticated && (
-                <>
-                  <MobileNavLink to="/dashboard" label="Dashboard" onClick={closeMobileMenu} />
-                  <MobileNavLink to="/scan" label="Scan Émotionnel" onClick={closeMobileMenu} />
-                  <MobileNavLink to="/journal" label="Journal" onClick={closeMobileMenu} />
-                  <MobileNavLink to="/music" label="Musicothérapie" onClick={closeMobileMenu} />
-                  <MobileNavLink to="/social" label="Communauté" onClick={closeMobileMenu} />
-                  <MobileNavLink to="/sessions" label="Sessions" onClick={closeMobileMenu} />
-                </>
-              )}
-              
-              <MobileNavLink to="/team" label="Notre équipe" onClick={closeMobileMenu} />
-              <MobileNavLink to="/contact" label="Contact" onClick={closeMobileMenu} />
-              
-              {!isAuthenticated && (
-                <div className="flex flex-col gap-2 mt-4">
-                  <Link to="/login" onClick={closeMobileMenu}>
-                    <Button variant="outline" className="w-full">
-                      Se connecter
-                    </Button>
-                  </Link>
-                  <Link to="/register" onClick={closeMobileMenu}>
-                    <Button className="w-full">
-                      S'inscrire
-                    </Button>
-                  </Link>
+
+      {isMenuOpen && (
+        <div className="md:hidden">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            {navigationLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.href}
+                className="text-muted-foreground hover:text-foreground block px-3 py-2 rounded-md text-base font-medium"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+          <div className="pt-4 pb-3 border-t border-gray-200">
+            {isAuthenticated ? (
+              <div className="flex items-center px-5">
+                <div className="flex-shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <User className="h-5 w-5" />
+                  </div>
                 </div>
-              )}
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
-  );
-};
-
-interface NavLinkProps {
-  to: string;
-  label: string;
-  onClick?: () => void;
-}
-
-const NavLink: React.FC<NavLinkProps> = ({ to, label, onClick }) => {
-  return (
-    <Link
-      to={to}
-      className="text-sm font-medium transition-colors hover:text-primary"
-      onClick={onClick}
-    >
-      {label}
-    </Link>
-  );
-};
-
-const MobileNavLink: React.FC<NavLinkProps> = ({ to, label, onClick }) => {
-  return (
-    <Link
-      to={to}
-      className="text-sm font-medium transition-colors hover:text-primary py-3 border-b border-muted"
-      onClick={onClick}
-    >
-      {label}
-    </Link>
-  );
-};
-
-interface NavDropdownProps {
-  label: string;
-  items: { to: string; label: string }[];
-  onClick?: () => void;
-}
-
-const NavDropdown: React.FC<NavDropdownProps> = ({ label, items, onClick }) => {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button className="text-sm font-medium transition-colors hover:text-primary">
-          {label}
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
-        {items.map((item) => (
-          <DropdownMenuItem key={item.to} asChild>
-            <Link to={item.to} onClick={onClick}>
-              {item.label}
-            </Link>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+                <div className="ml-3">
+                  <div className="text-base font-medium">Utilisateur</div>
+                  <div className="text-sm text-muted-foreground">user@example.com</div>
+                </div>
+              </div>
+              <div className="mt-3 px-2 space-y-1">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate('/profile');
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  <User className="h-5 w-5 mr-2" />
+                  Profil
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    handleLogout();
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  <LogOut className="h-5 w-5 mr-2" />
+                  Déconnexion
+                </Button>
+              </div>
+            ) : (
+              <div className="mt-3 px-2 space-y-1">
+                <Button
+                  className="w-full"
+                  onClick={() => {
+                    navigate('/b2c/login');
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  Se connecter
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full mt-2"
+                  onClick={() => {
+                    navigate('/b2c/register');
+                    setIsMenuOpen(false);
+                  }}
+                >
+                  S'inscrire
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </nav>
   );
 };
 

@@ -3,10 +3,10 @@ import React, { lazy } from 'react';
 import { Navigate, RouteObject } from 'react-router-dom';
 import Shell from './Shell';
 import ProtectedRoute from './components/ProtectedRoute';
-import ProtectedRouteWithMode from './components/ProtectedRouteWithMode';
 
 // Pages à chargement différé pour optimiser le temps de chargement
 const LandingPage = lazy(() => import('./pages/LandingPage'));
+const ImmersiveHome = lazy(() => import('./pages/ImmersiveHome'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Journal = lazy(() => import('./pages/Journal'));
 const Music = lazy(() => import('./pages/Music'));
@@ -14,7 +14,7 @@ const Audio = lazy(() => import('./pages/Audio'));
 const Login = lazy(() => import('./pages/common/Login'));
 const Register = lazy(() => import('./pages/common/Register'));
 const NotFound = lazy(() => import('./pages/NotFound'));
-const Profile = lazy(() => import('./pages/Profile'));
+const Support = lazy(() => import('./pages/Support'));
 const B2BSelection = lazy(() => import('./pages/b2b/Selection'));
 const Pricing = lazy(() => import('./pages/Pricing'));
 const DashboardRedirect = lazy(() => import('./pages/DashboardRedirect'));
@@ -42,7 +42,7 @@ const routes: RouteObject[] = [
   // Landing page
   {
     path: '/',
-    element: <LandingPage />,
+    element: <ImmersiveHome />,
     index: true,
   },
   
@@ -50,6 +50,12 @@ const routes: RouteObject[] = [
   {
     path: '/pricing',
     element: <Pricing />,
+  },
+  
+  // Support page
+  {
+    path: '/support',
+    element: <Support />,
   },
   
   // B2C Routes
