@@ -4,163 +4,157 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { HeartPulse, BarChart2, Clock, CalendarCheck } from 'lucide-react';
-import Shell from '@/Shell';
-import { useAuth } from '@/contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { Heart, Clock, Activity, BarChart } from 'lucide-react';
 
-const emotions = [
-  { name: 'Joie', color: 'bg-yellow-100 dark:bg-yellow-900/20', value: 0 },
-  { name: 'Tristesse', color: 'bg-blue-100 dark:bg-blue-900/20', value: 0 },
-  { name: 'Colère', color: 'bg-red-100 dark:bg-red-900/20', value: 0 },
-  { name: 'Peur', color: 'bg-purple-100 dark:bg-purple-900/20', value: 0 },
-  { name: 'Dégoût', color: 'bg-green-100 dark:bg-green-900/20', value: 0 },
-  { name: 'Surprise', color: 'bg-orange-100 dark:bg-orange-900/20', value: 0 },
-];
-
-const ScanPage = () => {
-  const { user } = useAuth();
+const ScanPage: React.FC = () => {
   const [scanning, setScanning] = useState(false);
   const [scanComplete, setScanComplete] = useState(false);
-  const [emotionValues, setEmotionValues] = useState(emotions.map(e => ({ ...e })));
-  const [dominantEmotion, setDominantEmotion] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('quick');
 
-  const handleStartScan = () => {
+  const startScan = () => {
     setScanning(true);
-    setScanComplete(false);
-    
-    // Simulate a scan process
+    // Simulation d'un scan de 3 secondes
     setTimeout(() => {
-      const newValues = emotions.map(emotion => ({
-        ...emotion,
-        value: Math.floor(Math.random() * 100)
-      }));
-      
-      setEmotionValues(newValues);
       setScanning(false);
       setScanComplete(true);
-      
-      // Find dominant emotion
-      const dominant = [...newValues].sort((a, b) => b.value - a.value)[0];
-      setDominantEmotion(dominant.name);
     }, 3000);
   };
 
-  return (
-    <Shell>
-      <div className="container mx-auto px-4 py-8">
-        <header className="mb-8">
-          <motion.h1 
-            className="text-3xl font-bold mb-2"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            Scan Émotionnel
-          </motion.h1>
-          <motion.p 
-            className="text-muted-foreground"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            Analysez votre état émotionnel actuel pour mieux vous comprendre
-          </motion.p>
-        </header>
+  const resetScan = () => {
+    setScanComplete(false);
+  };
 
-        <Tabs defaultValue="scan" className="space-y-8">
-          <TabsList>
-            <TabsTrigger value="scan">Nouveau scan</TabsTrigger>
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Scanner émotionnel</h1>
+        
+        <Tabs defaultValue="quick" className="mb-8" onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="quick">Scan rapide</TabsTrigger>
+            <TabsTrigger value="detailed">Scan détaillé</TabsTrigger>
             <TabsTrigger value="history">Historique</TabsTrigger>
-            <TabsTrigger value="insights">Insights</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="scan" className="space-y-6">
+          <TabsContent value="quick" className="mt-4">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <HeartPulse className="mr-2 h-5 w-5 text-primary" />
-                  Analyse émotionnelle
-                </CardTitle>
+                <CardTitle>Scan rapide</CardTitle>
                 <CardDescription>
-                  Notre algorithme avancé analysera vos expressions faciales pour détecter votre état émotionnel actuel.
+                  Obtenez un aperçu rapide de votre état émotionnel actuel
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {!scanning && !scanComplete && (
-                  <div className="text-center py-12">
-                    <div className="mb-6">
-                      <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                        <HeartPulse className="h-8 w-8 text-primary" />
-                      </div>
-                    </div>
-                    <p className="mb-6">Prêt à découvrir votre état émotionnel actuel ?</p>
-                    <Button onClick={handleStartScan} size="lg">
-                      Commencer le scan
+              <CardContent className="flex flex-col items-center justify-center py-8">
+                {!scanning && !scanComplete ? (
+                  <motion.div 
+                    className="text-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Heart className="h-24 w-24 text-primary mx-auto mb-6" />
+                    <p className="mb-8 text-muted-foreground">
+                      Le scan rapide prend environ 5 secondes et vous donne un aperçu de votre niveau de stress et d'équilibre émotionnel.
+                    </p>
+                    <Button onClick={startScan} size="lg">
+                      Démarrer le scan
                     </Button>
-                  </div>
-                )}
-                
-                {scanning && (
-                  <div className="text-center py-12">
-                    <div className="mb-6">
-                      <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
-                        <HeartPulse className="h-8 w-8 text-primary" />
+                  </motion.div>
+                ) : scanning ? (
+                  <motion.div 
+                    className="flex flex-col items-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <motion.div 
+                      className="w-32 h-32 border-4 border-primary border-t-transparent rounded-full mb-6"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    />
+                    <p className="text-lg font-medium">Scan en cours...</p>
+                    <p className="text-muted-foreground">Veuillez patienter quelques instants</p>
+                  </motion.div>
+                ) : (
+                  <motion.div 
+                    className="w-full"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <h3 className="text-xl font-medium mb-6 text-center">Résultats du scan</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg flex items-center">
+                            <Activity className="h-5 w-5 mr-2 text-blue-500" />
+                            Niveau de stress
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex items-center justify-between">
+                            <span className="text-2xl font-bold">38%</span>
+                            <div className="h-2 flex-1 bg-muted rounded-full mx-4 overflow-hidden">
+                              <div className="h-full bg-blue-500 rounded-full" style={{ width: '38%' }}></div>
+                            </div>
+                            <span className="text-muted-foreground">Modéré</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg flex items-center">
+                            <Heart className="h-5 w-5 mr-2 text-red-500" />
+                            Équilibre émotionnel
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex items-center justify-between">
+                            <span className="text-2xl font-bold">72%</span>
+                            <div className="h-2 flex-1 bg-muted rounded-full mx-4 overflow-hidden">
+                              <div className="h-full bg-green-500 rounded-full" style={{ width: '72%' }}></div>
+                            </div>
+                            <span className="text-muted-foreground">Bon</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                    
+                    <div className="text-center">
+                      <p className="mb-6 text-muted-foreground">
+                        Votre niveau de stress est modéré, et votre équilibre émotionnel est bon. Nous vous recommandons une session de musique relaxante pour réduire votre niveau de stress.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <Button onClick={resetScan} variant="outline">
+                          Nouveau scan
+                        </Button>
+                        <Button>
+                          Voir recommandations
+                        </Button>
                       </div>
                     </div>
-                    <p className="mb-2">Analyse en cours...</p>
-                    <p className="text-sm text-muted-foreground">Veuillez patienter quelques instants</p>
-                  </div>
+                  </motion.div>
                 )}
-                
-                {scanComplete && (
-                  <div className="space-y-6">
-                    <div className="text-center mb-4">
-                      <p className="text-lg font-medium">Résultats de votre scan</p>
-                      {dominantEmotion && (
-                        <p className="text-sm text-muted-foreground">
-                          Émotion dominante : <span className="font-medium text-primary">{dominantEmotion}</span>
-                        </p>
-                      )}
-                    </div>
-                    
-                    <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-                      {emotionValues.map((emotion) => (
-                        <div 
-                          key={emotion.name} 
-                          className={`p-4 rounded-md ${emotion.color}`}
-                        >
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="font-medium">{emotion.name}</span>
-                            <span className="text-sm">{emotion.value}%</span>
-                          </div>
-                          <div className="w-full bg-background rounded-full h-2">
-                            <div 
-                              className="bg-primary h-2 rounded-full" 
-                              style={{ width: `${emotion.value}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center mt-4">
-                      <Button onClick={handleStartScan}>
-                        Nouveau scan
-                      </Button>
-                      <Link to="/journal/new">
-                        <Button variant="outline">
-                          Ajouter au journal
-                        </Button>
-                      </Link>
-                      <Link to="/music">
-                        <Button variant="outline">
-                          Musicothérapie recommandée
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="detailed">
+            <Card>
+              <CardHeader>
+                <CardTitle>Scan détaillé</CardTitle>
+                <CardDescription>
+                  Une analyse approfondie de votre état émotionnel, nécessitant 1-2 minutes
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="py-8 text-center">
+                <Clock className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <p className="mb-8 text-muted-foreground">
+                  Le scan détaillé analyse votre fréquence cardiaque, vos expressions faciales, votre voix et d'autres facteurs pour fournir une analyse complète de votre état émotionnel.
+                </p>
+                <Button size="lg">Démarrer le scan détaillé</Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -168,67 +162,59 @@ const ScanPage = () => {
           <TabsContent value="history">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Clock className="mr-2 h-5 w-5 text-primary" />
-                  Historique de vos scans
-                </CardTitle>
+                <CardTitle>Historique des scans</CardTitle>
                 <CardDescription>
-                  Visualisez l'évolution de vos émotions au fil du temps
+                  Visualisez et analysez vos résultats précédents
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8">
-                  <p>Vos scans émotionnels apparaîtront ici.</p>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Commencez par effectuer votre premier scan !
-                  </p>
+                <div className="space-y-4">
+                  {[
+                    { date: 'Aujourd'hui, 10:30', stress: 38, balance: 72 },
+                    { date: 'Hier, 14:15', stress: 42, balance: 68 },
+                    { date: '20 mai, 09:00', stress: 55, balance: 62 },
+                    { date: '18 mai, 19:45', stress: 30, balance: 78 },
+                  ].map((entry, i) => (
+                    <div key={i} className="border rounded-md p-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="font-medium">{entry.date}</h4>
+                        <Button variant="ghost" size="sm">Détails</Button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Niveau de stress</p>
+                          <div className="flex items-center">
+                            <span className="mr-2 font-medium">{entry.stress}%</span>
+                            <div className="h-2 flex-1 bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-blue-500 rounded-full" style={{ width: `${entry.stress}%` }}></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Équilibre émotionnel</p>
+                          <div className="flex items-center">
+                            <span className="mr-2 font-medium">{entry.balance}%</span>
+                            <div className="h-2 flex-1 bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-green-500 rounded-full" style={{ width: `${entry.balance}%` }}></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button 
-                  onClick={() => document.querySelector('[value="scan"]')?.dispatchEvent(new Event('click'))}
-                  variant="outline"
-                >
-                  Faire un scan
-                </Button>
-              </CardFooter>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="insights">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <BarChart2 className="mr-2 h-5 w-5 text-primary" />
-                  Insights émotionnels
-                </CardTitle>
-                <CardDescription>
-                  Découvrez des tendances et des insights basés sur vos scans émotionnels
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <p>
-                    Des analyses détaillées apparaîtront ici après plusieurs scans émotionnels.
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Effectuez des scans régulièrement pour obtenir des insights personnalisés.
-                  </p>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button 
-                  onClick={() => document.querySelector('[value="scan"]')?.dispatchEvent(new Event('click'))}
-                  variant="outline"
-                >
-                  Faire un scan
+              <CardFooter>
+                <Button variant="outline" className="w-full">
+                  <BarChart className="h-4 w-4 mr-2" />
+                  Voir l'analyse sur la durée
                 </Button>
               </CardFooter>
             </Card>
           </TabsContent>
         </Tabs>
       </div>
-    </Shell>
+    </div>
   );
 };
 

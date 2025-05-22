@@ -1,171 +1,70 @@
 
 import React from 'react';
-import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { useUserMode } from '@/contexts/UserModeContext';
-import {
-  BarChart2,
-  Calendar,
-  Home,
-  LayoutDashboard,
-  FileText,
-  Music,
-  Settings,
-  Users,
-  Star,
-  MessageSquare,
-  ScanLine,
-  Building2,
-  Shield,
-  User,
-  HeartHandshake,
-  Lightbulb,
-  Goal
+import { useLocation } from 'react-router-dom';
+import { 
+  Home, Scan, BookOpen, Music, Headphones, MessageSquare, 
+  Users, Activity, BarChart2, Calendar, Settings, Glasses,
+  HeartHandshake, Trophy, Building
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { useUserMode } from '@/contexts/UserModeContext';
+import NavItemButton from './NavItemButton';
+import { b2cNavItems, b2bUserNavItems, b2bAdminNavItems } from './navConfig';
 
 interface UnifiedNavigationProps {
   collapsed?: boolean;
   onItemClick?: () => void;
 }
 
-const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ collapsed, onItemClick }) => {
+const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ collapsed = false, onItemClick }) => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { userMode } = useUserMode();
-  const { toast } = useToast();
   
-  const handleNavClick = (href: string) => {
-    if (onItemClick) {
-      onItemClick();
+  // Déterminer quels éléments de navigation afficher en fonction du mode utilisateur
+  const getNavigationItems = () => {
+    switch (userMode) {
+      case 'b2b_admin':
+        return b2bAdminNavItems;
+      case 'b2b_user':
+        return b2bUserNavItems;
+      case 'b2c':
+        return b2cNavItems;
+      default:
+        // Mode par défaut avec les principales fonctionnalités
+        return [
+          { title: "Accueil", href: "/", icon: Home },
+          { title: "Scan", href: "/scan", icon: Scan },
+          { title: "Journal", href: "/journal", icon: BookOpen },
+          { title: "Musique", href: "/music", icon: Music },
+          { title: "Audio", href: "/audio", icon: Headphones },
+          { title: "Coach", href: "/coach", icon: MessageSquare },
+          { title: "VR", href: "/vr", icon: Glasses },
+          { title: "Cocon Social", href: "/social-cocoon", icon: HeartHandshake },
+          { title: "Équipes", href: "/teams", icon: Users },
+          { title: "Événements", href: "/events", icon: Calendar },
+          { title: "Gamification", href: "/gamification", icon: Trophy },
+          { title: "Organisation", href: "/organization", icon: Building },
+          { title: "Rapports", href: "/reports", icon: BarChart2 },
+          { title: "Paramètres", href: "/settings", icon: Settings },
+        ];
     }
-    navigate(href);
   };
-  
-  // Fonction pour afficher un message "Bientôt disponible"
-  const showComingSoon = (feature: string) => {
-    toast({
-      title: "Fonctionnalité à venir",
-      description: `${feature} sera disponible prochainement`,
-    });
-  };
-  
-  // Define common navigation items
-  const commonItems = [
-    { 
-      href: '/', 
-      label: 'Accueil', 
-      icon: <Home size={18} /> 
-    },
-    { 
-      href: '/dashboard', 
-      label: 'Tableau de bord', 
-      icon: <LayoutDashboard size={18} /> 
-    },
-    { 
-      href: '/events', 
-      label: 'Événements', 
-      icon: <Calendar size={18} /> 
-    },
-    { 
-      href: '/journal', 
-      label: 'Journal', 
-      icon: <FileText size={18} /> 
-    },
-  ];
-  
-  // Define mode-specific navigation items
-  const modeSpecificItems = {
-    b2c: [
-      { href: '/scan', label: 'Scan', icon: <ScanLine size={18} />, comingSoon: true },
-      { href: '/music', label: 'Musique', icon: <Music size={18} />, comingSoon: false },
-      { href: '/coach', label: 'Coach', icon: <MessageSquare size={18} /> },
-      { href: '/social-cocoon', label: 'Social', icon: <HeartHandshake size={18} /> },
-    ],
-    b2b_user: [
-      { href: '/scan', label: 'Scan', icon: <ScanLine size={18} />, comingSoon: true },
-      { href: '/music', label: 'Musique', icon: <Music size={18} />, comingSoon: false },
-      { href: '/coach', label: 'Coach', icon: <MessageSquare size={18} /> },
-      { href: '/teams', label: 'Équipe', icon: <Users size={18} /> },
-      { href: '/social-cocoon', label: 'Social', icon: <HeartHandshake size={18} /> },
-      { href: '/gamification', label: 'Défis', icon: <Goal size={18} />, comingSoon: false },
-    ],
-    b2b_admin: [
-      { href: '/reports', label: 'Rapports', icon: <BarChart2 size={18} />, comingSoon: false },
-      { href: '/teams', label: 'Équipes', icon: <Users size={18} /> },
-      { href: '/optimization', label: 'Optimisation', icon: <Lightbulb size={18} /> },
-      { href: '/social-cocoon', label: 'Social', icon: <HeartHandshake size={18} /> },
-      { href: '/organization', label: 'Organisation', icon: <Building2 size={18} />, comingSoon: false },
-    ]
-  };
-  
-  // Get the correct items based on user mode
-  let navigationItems = [...commonItems];
-  if (userMode && modeSpecificItems[userMode]) {
-    navigationItems = [...navigationItems, ...modeSpecificItems[userMode]];
-  } else {
-    // Si pas de mode utilisateur spécifique, on met les éléments de base + quelques spécifiques
-    navigationItems = [
-      ...navigationItems,
-      { href: '/coach', label: 'Coach', icon: <MessageSquare size={18} /> },
-      { href: '/social-cocoon', label: 'Social', icon: <HeartHandshake size={18} /> },
-      { href: '/music', label: 'Musique', icon: <Music size={18} /> },
-      { href: '/teams', label: 'Équipes', icon: <Users size={18} /> },
-    ];
-  }
-  
-  // Always add settings at the end
-  navigationItems.push({ 
-    href: '/settings', 
-    label: 'Paramètres', 
-    icon: <Settings size={18} />,
-    comingSoon: false 
-  });
-  
+
+  const navItems = getNavigationItems();
+
   return (
-    <nav className="space-y-1 px-2">
-      {navigationItems.map((item) => {
-        const isActive = location.pathname === item.href;
-        
-        if (item.comingSoon) {
-          return (
-            <Button
-              key={item.label}
-              variant="ghost"
-              className={cn(
-                "flex items-center w-full justify-start px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-primary",
-                collapsed && "justify-center px-0"
-              )}
-              onClick={() => showComingSoon(item.label)}
-            >
-              <span className={cn("mr-3", collapsed && "mr-0")}>{item.icon}</span>
-              {!collapsed && <span>{item.label}</span>}
-            </Button>
-          );
-        }
-        
-        return (
-          <Button
-            key={item.label}
-            variant="ghost"
-            className={cn(
-              "flex items-center w-full justify-start px-3 py-2 rounded-md text-sm font-medium transition-colors",
-              isActive
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:bg-muted hover:text-primary",
-              collapsed && "justify-center px-0"
-            )}
-            onClick={() => handleNavClick(item.href)}
-          >
-            <span className={cn("mr-3", collapsed && "mr-0")}>{item.icon}</span>
-            {!collapsed && <span>{item.label}</span>}
-          </Button>
-        );
-      })}
+    <nav className="space-y-2 py-4">
+      {navItems.map((item, index) => (
+        <NavItemButton
+          key={`${item.title}-${index}`}
+          label={item.title}
+          path={item.href}
+          icon={item.icon}
+          collapsed={collapsed}
+          onClick={() => {
+            if (onItemClick) onItemClick();
+          }}
+        />
+      ))}
     </nav>
   );
 };

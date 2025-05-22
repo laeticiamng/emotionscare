@@ -7,6 +7,8 @@ import OptimizationPage from '@/pages/OptimizationPage';
 import TeamsPage from '@/pages/TeamsPage';
 import JournalPage from '@/pages/JournalPage';
 import CoachPage from '@/pages/CoachPage';
+import ScanPage from '@/pages/ScanPage';
+import VRPage from '@/pages/VRPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import DashboardRedirect from '@/pages/DashboardRedirect';
 import ChooseModeFlow from '@/pages/auth/ChooseModeFlow';
@@ -28,7 +30,6 @@ import MusicPage from '@/pages/MusicPage';
 import ReportsPage from '@/pages/ReportsPage';
 import OrganizationPage from '@/pages/OrganizationPage';
 import GamificationPage from '@/pages/GamificationPage';
-import NotFound from '@/pages/NotFound';
 import SettingsPage from '@/pages/SettingsPage';
 
 // Define routes
@@ -60,6 +61,14 @@ export const routes: RouteObject[] = [
   {
     path: '/b2b/selection',
     element: <B2BSelectionPage />,
+  },
+  {
+    path: '/scan',
+    element: <UnifiedLayout><ScanPage /></UnifiedLayout>,
+  },
+  {
+    path: '/vr',
+    element: <UnifiedLayout><VRPage /></UnifiedLayout>,
   },
   {
     path: '/events',
@@ -110,6 +119,10 @@ export const routes: RouteObject[] = [
     element: <UnifiedLayout><SocialCocoonPage /></UnifiedLayout>,
   },
   {
+    path: '/audio',
+    element: <UnifiedLayout><div className="container mx-auto p-6"><h1 className="text-3xl font-bold mb-6">Audiothérapie</h1><p className="text-lg text-muted-foreground">Notre module d'audiothérapie est en cours de développement. Revenez bientôt pour découvrir cette fonctionnalité.</p></div></UnifiedLayout>,
+  },
+  {
     path: '/b2c',
     element: <UnifiedLayout />,
     children: [
@@ -136,6 +149,14 @@ export const routes: RouteObject[] = [
       {
         path: 'coach',
         element: <CoachPage />,
+      },
+      {
+        path: 'scan',
+        element: <ScanPage />,
+      },
+      {
+        path: 'vr',
+        element: <VRPage />,
       },
     ],
   },
@@ -167,6 +188,14 @@ export const routes: RouteObject[] = [
         path: 'coach',
         element: <CoachPage />,
       },
+      {
+        path: 'scan',
+        element: <ScanPage />,
+      },
+      {
+        path: 'vr',
+        element: <VRPage />,
+      },
     ],
   },
   {
@@ -192,6 +221,10 @@ export const routes: RouteObject[] = [
       {
         path: 'coach',
         element: <CoachPage />,
+      },
+      {
+        path: 'scan',
+        element: <ScanPage />,
       },
     ],
   },
