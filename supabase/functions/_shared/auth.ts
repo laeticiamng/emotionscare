@@ -14,7 +14,8 @@ export async function logUnauthorizedAccess(
   route: string,
   reason: string,
   userId: string | null = null,
-  ip: string | null = null
+  ip: string | null = null,
+  userAgent: string | null = null
 ) {
   try {
     await supabase.from('auth_attempts').insert({
@@ -22,6 +23,7 @@ export async function logUnauthorizedAccess(
       route,
       reason,
       ip_address: ip,
+      user_agent: userAgent,
     });
   } catch (logError) {
     console.error('Failed to log auth attempt:', logError);
@@ -38,6 +40,7 @@ export async function requireAuth(req: Request) {
     req.headers.get('x-forwarded-for') ||
     req.headers.get('x-real-ip') ||
     null;
+  const ua = req.headers.get('user-agent') || null;
 
   let token = req.headers.get('Authorization')?.replace('Bearer ', '') || '';
 
@@ -48,13 +51,13 @@ export async function requireAuth(req: Request) {
   }
 
   if (!token) {
-    await logUnauthorizedAccess(pathname, 'missing_token', null, ip);
+    await logUnauthorizedAccess(pathname, 'missing_token', null, ip, ua);
     return null;
   }
 
   const { data, error } = await supabase.auth.getUser(token);
   if (error || !data.user) {
-    await logUnauthorizedAccess(pathname, error?.message || 'invalid_token', null, ip);
+    await logUnauthorizedAccess(pathname, error?.message || 'invalid_token', null, ip, ua);
     console.warn('Authentication failed:', error);
     return null;
   }
@@ -70,6 +73,7 @@ export async function authorizeRole(
     req.headers.get('x-forwarded-for') ||
     req.headers.get('x-real-ip') ||
     null;
+  const ua = req.headers.get('user-agent') || null;
 
   const user = await requireAuth(req);
   if (!user) {
@@ -81,7 +85,7 @@ export async function authorizeRole(
   const userRole = (user.user_metadata?.role || '').toLowerCase();
   if (!roles.map(r => r.toLowerCase()).includes(userRole)) {
     console.warn('Role mismatch:', { userRole, allowedRoles: roles });
-    await logUnauthorizedAccess(pathname, 'forbidden_role', user.id, ip);
+    await logUnauthorizedAccess(pathname, 'forbidden_role', user.id, ip, ua);
     return { user: null, status: 403 } as const;
   }
 
