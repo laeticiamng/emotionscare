@@ -27,7 +27,7 @@ const LandingPage: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button 
               size="lg" 
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/b2c/login')}
               className="text-lg px-8 py-6"
             >
               Commencer maintenant
@@ -39,6 +39,16 @@ const LandingPage: React.FC = () => {
               className="text-lg px-8 py-6"
             >
               Solutions entreprise
+            </Button>
+          </div>
+
+          <div className="pt-4">
+            <Button 
+              variant="link" 
+              onClick={() => navigate('/pricing')}
+              className="text-lg"
+            >
+              Voir nos offres
             </Button>
           </div>
         </motion.div>

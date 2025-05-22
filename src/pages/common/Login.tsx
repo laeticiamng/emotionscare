@@ -1,230 +1,176 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, LogIn, User, Lock } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import '@/styles/auth-animations.css';
 
-const Login: React.FC = () => {
+interface LoginProps {
+  mode?: 'b2c' | 'b2b_user' | 'b2b_admin' | 'b2b';
+}
+
+const Login: React.FC<LoginProps> = ({ mode = 'b2c' }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
     
-    // Simulate login process
-    setTimeout(() => {
-      if (email === 'demo@example.com' && password === 'password') {
-        navigate('/dashboard');
-      } else {
-        setError('Email ou mot de passe incorrect');
-      }
-      setIsLoading(false);
-    }, 1500);
-  };
-  
-  // Card background gradient based on time of day
-  const getBackgroundGradient = () => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) {
-      return 'bg-morning'; // Morning
-    } else if (hour >= 12 && hour < 18) {
-      return 'bg-afternoon'; // Afternoon
-    } else if (hour >= 18 && hour < 22) {
-      return 'bg-evening'; // Evening
-    } else {
-      return 'bg-night'; // Night
+    // Simulate login
+    console.log('Login attempt with:', { email, password, mode });
+    
+    // Redirect based on mode
+    if (mode === 'b2c') {
+      navigate('/b2c/dashboard');
+    } else if (mode === 'b2b_user') {
+      navigate('/b2b/user/dashboard');
+    } else if (mode === 'b2b_admin') {
+      navigate('/b2b/admin/dashboard');
+    } else if (mode === 'b2b') {
+      navigate('/b2b/selection');
     }
   };
-
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 dark:from-primary/10 dark:to-primary/5"></div>
-        
-        {/* Ambient circles */}
-        <motion.div
-          className="ambient-circle primary"
-          style={{ width: '500px', height: '500px', top: '10%', left: '10%', opacity: 0.05 }}
-          animate={{ y: [0, -30, 0], x: [0, 20, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-        
-        <motion.div
-          className="ambient-circle accent"
-          style={{ width: '600px', height: '600px', bottom: '10%', right: '10%', opacity: 0.05 }}
-          animate={{ y: [0, 30, 0], x: [0, -20, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        />
-      </div>
-      
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md px-4"
-      >
-        <Card className={`shadow-xl backdrop-blur-sm bg-card/95 overflow-hidden ${getBackgroundGradient()}`}>
-          <motion.div 
-            className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-30 z-0"
-            animate={{ opacity: [0.2, 0.3, 0.2] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          />
+  
+  const renderContent = () => {
+    if (mode === 'b2b') {
+      return (
+        <div className="flex flex-col gap-4 text-center">
+          <h2 className="text-xl font-semibold">Solutions entreprise</h2>
+          <p className="text-muted-foreground">Choisissez votre profil pour accéder à l'espace dédié:</p>
           
-          <CardHeader className="relative z-10">
-            <div className="flex justify-center mb-4">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="w-16 h-16 flex items-center justify-center rounded-full bg-primary/10 text-primary"
-              >
-                <User size={30} />
-              </motion.div>
-            </div>
-            <CardTitle className="text-center text-2xl font-bold">Connexion</CardTitle>
-            <CardDescription className="text-center">
-              Accédez à votre espace personnel
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="relative z-10">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <AnimatePresence>
-                {error && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="p-3 rounded-md bg-destructive/10 text-destructive text-sm font-medium"
-                  >
-                    {error}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-                
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">
-                  Email
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="pl-10 bg-background/50 backdrop-blur-sm focus:ring-2 ring-primary/20 transition-all duration-300"
-                    placeholder="exemple@email.com"
-                  />
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                </div>
-              </div>
-                
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-sm font-medium">
-                    Mot de passe
-                  </Label>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/forgot-password')}
-                    className="text-xs text-primary hover:underline focus:outline-none"
-                  >
-                    Mot de passe oublié?
-                  </button>
-                </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="pl-10 pr-10 bg-background/50 backdrop-blur-sm focus:ring-2 ring-primary/20 transition-all duration-300"
-                    placeholder="••••••••"
-                  />
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-                
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button 
-                  type="submit" 
-                  className="w-full relative overflow-hidden group bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center">
-                      <div className="loading-dots">
-                        <div className="bg-white"></div>
-                        <div className="bg-white"></div>
-                        <div className="bg-white"></div>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <LogIn className="mr-2 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                      Se connecter
-                    </>
-                  )}
-                  
-                  <motion.span 
-                    className="absolute inset-0 bg-white opacity-0"
-                    whileHover={{ 
-                      opacity: [0, 0.1, 0],
-                      transition: { duration: 1.5, repeat: Infinity }
-                    }}
-                  />
-                </Button>
-              </motion.div>
-            </form>
-          </CardContent>
-            
-          <CardFooter className="relative z-10 flex-col space-y-4">
-            <div className="text-sm text-center">
-              Pas encore inscrit?{" "}
-              <motion.a
-                href="/register"
-                className="text-primary font-medium hover:underline"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Créer un compte
-              </motion.a>
-            </div>
-            
-            <motion.a
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              href="/"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          <div className="grid grid-cols-1 gap-4 mt-4">
+            <Button 
+              variant="outline" 
+              className="justify-start px-4 py-6 h-auto"
+              onClick={() => navigate('/b2b/user/login')}
             >
-              Retour à l'accueil
-            </motion.a>
-          </CardFooter>
-        </Card>
-      </motion.div>
+              <div className="flex flex-col items-start">
+                <span className="font-medium">Espace Collaborateur</span>
+                <span className="text-sm text-muted-foreground">Accédez à vos outils de bien-être</span>
+              </div>
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="justify-start px-4 py-6 h-auto"
+              onClick={() => navigate('/b2b/admin/login')}
+            >
+              <div className="flex flex-col items-start">
+                <span className="font-medium">Espace Administrateur</span>
+                <span className="text-sm text-muted-foreground">Gérez votre espace entreprise</span>
+              </div>
+            </Button>
+          </div>
+          
+          <div className="mt-6">
+            <Button 
+              variant="link"
+              onClick={() => navigate('/pricing')}
+              className="text-sm"
+            >
+              Découvrir nos offres entreprise
+            </Button>
+          </div>
+        </div>
+      );
+    }
+    
+    let title, description, redirectText, redirectLink, redirectLinkText;
+    
+    switch (mode) {
+      case 'b2b_admin':
+        title = "Espace Administrateur";
+        description = "Connectez-vous pour gérer votre espace entreprise";
+        redirectText = "Vous êtes un collaborateur ?";
+        redirectLink = "/b2b/user/login";
+        redirectLinkText = "Accéder à l'espace collaborateur";
+        break;
+      case 'b2b_user':
+        title = "Espace Collaborateur";
+        description = "Connectez-vous pour accéder à vos outils de bien-être";
+        redirectText = "Vous êtes administrateur ?";
+        redirectLink = "/b2b/admin/login";
+        redirectLinkText = "Accéder à l'espace administrateur";
+        break;
+      default:
+        title = "Connexion";
+        description = "Connectez-vous pour accéder à votre espace personnel";
+        redirectText = "Vous n'avez pas de compte ?";
+        redirectLink = "/b2c/register";
+        redirectLinkText = "Créer un compte";
+        break;
+    }
+    
+    return (
+      <>
+        <form onSubmit={handleLogin}>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="email@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <Label htmlFor="password">Mot de passe</Label>
+                <Button type="button" variant="link" size="sm" className="p-0 h-auto">
+                  Mot de passe oublié ?
+                </Button>
+              </div>
+              <Input 
+                id="password" 
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+          
+          <Button className="w-full mt-6" type="submit">
+            Se connecter
+          </Button>
+        </form>
+        
+        <div className="mt-4 text-center text-sm">
+          {redirectText}{" "}
+          <Button variant="link" onClick={() => navigate(redirectLink)} className="p-0">
+            {redirectLinkText}
+          </Button>
+        </div>
+      </>
+    );
+  };
+  
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 bg-muted/30">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold">{mode === 'b2b' ? 'Espace Entreprise' : 'Connexion'}</CardTitle>
+          {mode !== 'b2b' && <CardDescription>Entrez vos identifiants pour vous connecter</CardDescription>}
+        </CardHeader>
+        <CardContent>
+          {renderContent()}
+        </CardContent>
+        <CardFooter className="flex justify-center border-t pt-6">
+          <Button variant="ghost" onClick={() => navigate('/')}>
+            Retour à l'accueil
+          </Button>
+          <Button variant="link" onClick={() => navigate('/pricing')}>
+            Voir nos offres
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 };

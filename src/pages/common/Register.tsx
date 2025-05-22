@@ -1,120 +1,80 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/contexts/AuthContext';
 import { Label } from '@/components/ui/label';
-import { toast } from '@/hooks/use-toast';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface RegisterProps {
-  role?: 'b2c' | 'b2b_user' | 'b2b_admin';
+  mode?: 'b2c' | 'b2b_user';
 }
 
-const Register: React.FC<RegisterProps> = ({ role = 'b2c' }) => {
-  const [name, setName] = useState('');
+const Register: React.FC<RegisterProps> = ({ mode = 'b2c' }) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [passwordError, setPasswordError] = useState('');
   
-  const navigate = useNavigate();
-  const { register, error: authError, clearError } = useAuth();
-  
-  const getRoleName = () => {
-    switch(role) {
-      case 'b2b_admin': return 'Administrateur';
-      case 'b2b_user': return 'Collaborateur';
-      case 'b2c': default: return 'Particulier';
-    }
-  };
-  
-  const getRedirectPath = () => {
-    switch(role) {
-      case 'b2b_admin': return '/b2b/admin/dashboard';
-      case 'b2b_user': return '/b2b/user/dashboard';
-      case 'b2c': default: return '/b2c/dashboard';
-    }
-  };
-  
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     
-    setPasswordError('');
-    if (clearError) clearError();
+    // Simulate registration
+    console.log('Register attempt with:', { email, password, mode });
     
-    if (password !== confirmPassword) {
-      setPasswordError('Les mots de passe ne correspondent pas');
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    try {
-      await register(name, email, password);
-      
-      toast({
-        title: "Inscription réussie",
-        description: "Votre compte a été créé avec succès",
-      });
-      
-      navigate(getRedirectPath());
-    } catch (error: any) {
-      toast({
-        title: "Erreur d'inscription",
-        description: error.message || "Une erreur s'est produite lors de l'inscription",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+    // Redirect to onboarding or dashboard based on mode
+    if (mode === 'b2c') {
+      navigate('/b2c/onboarding');
+    } else {
+      navigate('/b2b/user/dashboard');
     }
   };
   
-  const getLoginPath = () => {
-    switch(role) {
-      case 'b2b_admin': return '/login-admin';
-      case 'b2b_user': return '/login-collaborateur';
-      case 'b2c': default: return '/b2c/login';
-    }
-  };
+  const title = mode === 'b2b_user' 
+    ? "Créer votre compte collaborateur" 
+    : "Créer votre compte";
+    
+  const description = mode === 'b2b_user'
+    ? "Inscrivez-vous pour accéder à votre espace collaborateur"
+    : "Inscrivez-vous pour commencer votre parcours de bien-être";
+    
+  const redirectLink = mode === 'b2b_user'
+    ? "/b2b/user/login"
+    : "/b2c/login";
   
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-muted/30">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Créer un compte {getRoleName()}</CardTitle>
-          <CardDescription>Rejoignez EmotionsCare en tant que {getRoleName()}</CardDescription>
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold">{title}</CardTitle>
+          <CardDescription>{description}</CardDescription>
         </CardHeader>
-        <form onSubmit={handleRegister}>
-          <CardContent className="space-y-4">
-            {authError && (
-              <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
-                {authError}
+        <CardContent>
+          <form onSubmit={handleRegister} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">Prénom</Label>
+                <Input id="firstName" placeholder="John" required />
               </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="name">Nom complet</Label>
-              <Input 
-                id="name" 
-                placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Nom</Label>
+                <Input id="lastName" placeholder="Doe" required />
+              </div>
             </div>
+            
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="email@exemple.com"
+                placeholder="email@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
+            
             <div className="space-y-2">
               <Label htmlFor="password">Mot de passe</Label>
               <Input 
@@ -125,37 +85,48 @@ const Register: React.FC<RegisterProps> = ({ role = 'b2c' }) => {
                 required
               />
             </div>
+            
             <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
               <Input 
-                id="confirm-password" 
+                id="confirmPassword" 
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
-              {passwordError && (
-                <p className="text-sm text-destructive">{passwordError}</p>
-              )}
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Inscription en cours..." : "S'inscrire"}
+            
+            <div className="flex items-center space-x-2">
+              <Checkbox id="terms" required />
+              <Label htmlFor="terms" className="text-sm">
+                J'accepte les {" "}
+                <Button variant="link" className="p-0 h-auto">conditions d'utilisation</Button>
+                {" "} et la {" "}
+                <Button variant="link" className="p-0 h-auto">politique de confidentialité</Button>
+              </Label>
+            </div>
+            
+            <Button className="w-full mt-4" type="submit">
+              Créer mon compte
             </Button>
-            <div className="text-sm text-center">
-              Vous avez déjà un compte?{' '}
-              <Link to={getLoginPath()} className="text-primary hover:underline">
-                Se connecter
-              </Link>
-            </div>
-            <div className="text-sm text-center mt-2">
-              <Link to="/" className="text-muted-foreground hover:underline">
-                Retour à la sélection du profil
-              </Link>
-            </div>
-          </CardFooter>
-        </form>
+          </form>
+          
+          <div className="mt-4 text-center text-sm">
+            Vous avez déjà un compte ?{" "}
+            <Button variant="link" onClick={() => navigate(redirectLink)} className="p-0">
+              Se connecter
+            </Button>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-center border-t pt-6">
+          <Button variant="ghost" onClick={() => navigate('/')}>
+            Retour à l'accueil
+          </Button>
+          <Button variant="link" onClick={() => navigate('/pricing')}>
+            Voir nos offres
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );

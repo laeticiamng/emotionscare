@@ -1,222 +1,128 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { useMusic } from '@/hooks/useMusic';
-import MusicLibrary from '@/components/music/page/LibraryTab';
-import MusicControls from '@/components/music/page/MusicControls';
-import MusicDrawer from '@/components/music/MusicDrawer';
-import { Music as MusicIcon, Heart, Clock, Headphones, Search, PlaySquare } from 'lucide-react';
-import { mockPlaylists } from '@/data/mockMusic';
+import { Play, Heart } from 'lucide-react';
 
 const B2CMusic: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('library');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedPlaylist, setSelectedPlaylist] = useState<MusicPlaylist | null>(null);
-  
-  const { toast } = useToast();
-  const { 
-    currentTrack, 
-    isPlaying, 
-    playTrack, 
-    pauseTrack,
-    nextTrack,
-    previousTrack,
-    volume,
-    setVolume,
-    playlists,
-    loadPlaylistForEmotion
-  } = useMusic();
-
-  useEffect(() => {
-    // Load some default content on mount
-    const loadInitialMusic = async () => {
-      try {
-        await loadPlaylistForEmotion('calm');
-      } catch (error) {
-        console.error("Failed to load initial music:", error);
-      }
-    };
-    
-    loadInitialMusic();
-  }, [loadPlaylistForEmotion]);
-
-  const handlePlaylistSelect = (playlist: MusicPlaylist) => {
-    setSelectedPlaylist(playlist);
-    setDrawerOpen(true);
-    
-    // If the playlist has tracks, play the first one
-    if (playlist.tracks && playlist.tracks.length > 0) {
-      playTrack(playlist.tracks[0]);
-    }
-  };
-
-  const handleTrackSelect = (track: MusicTrack) => {
-    playTrack(track);
-  };
-
   return (
-    <div className="container max-w-7xl mx-auto py-6 space-y-6 animate-fade-in">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="container mx-auto py-6 space-y-8">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Bibliothèque musicale</h1>
+          <h1 className="text-3xl font-bold">Musicothérapie</h1>
           <p className="text-muted-foreground">
-            Découvrez des compositions adaptées à vos émotions et besoins
+            Des playlists adaptées à vos émotions et à vos besoins
           </p>
         </div>
-        
-        <div className="flex items-center w-full md:w-auto">
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Rechercher une musique..." 
-              className="pl-8" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+        <Button>Créer une playlist</Button>
+      </div>
+
+      <div className="bg-muted/30 rounded-lg p-6">
+        <div className="flex flex-col md:flex-row gap-6 items-center">
+          <div className="aspect-square rounded-md overflow-hidden bg-primary/10 w-full max-w-[200px]">
+            <div className="w-full h-full bg-gradient-to-br from-primary/30 to-secondary/30"></div>
+          </div>
+          
+          <div className="flex-grow space-y-4">
+            <div>
+              <h3 className="text-2xl font-semibold">Playlist recommandée</h3>
+              <p className="text-muted-foreground">Basée sur votre humeur actuelle</p>
+            </div>
+            
+            <p className="text-muted-foreground">
+              Cette playlist a été spécialement conçue pour vous aider à vous détendre et à vous recentrer.
+            </p>
+            
+            <div className="flex items-center gap-4">
+              <Button size="sm" className="gap-2">
+                <Play className="h-4 w-4" /> Lecture
+              </Button>
+              <Button variant="outline" size="sm">
+                Enregistrer
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3 order-2 lg:order-1">
-          <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-4">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="library">Bibliothèque</TabsTrigger>
-              <TabsTrigger value="moods">Émotions</TabsTrigger>
-              <TabsTrigger value="favorites">Favoris</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="library" className="space-y-6">
-              <MusicLibrary 
-                playlists={mockPlaylists}
-                onSelectTrack={handleTrackSelect}
-                onSelectPlaylist={handlePlaylistSelect}
-              />
-            </TabsContent>
-            
-            <TabsContent value="moods">
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
-                {['Calme', 'Joyeux', 'Concentré', 'Énergique', 'Mélancolique', 'Motivé', 'Relaxé', 'Paisible'].map((mood) => (
-                  <Button 
-                    key={mood} 
-                    variant="outline" 
-                    className="h-auto py-6 flex flex-col gap-2"
-                    onClick={() => {
-                      toast({
-                        title: `Mode ${mood} activé`,
-                        description: `Chargement des musiques pour l'ambiance ${mood.toLowerCase()}...`,
-                      });
-                      loadPlaylistForEmotion(mood.toLowerCase());
-                    }}
-                  >
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Headphones className="h-6 w-6 text-primary" />
-                    </div>
-                    <span>{mood}</span>
+
+      <Tabs defaultValue="all">
+        <TabsList>
+          <TabsTrigger value="all">Toutes les playlists</TabsTrigger>
+          <TabsTrigger value="favorites">Favoris</TabsTrigger>
+          <TabsTrigger value="recommended">Recommandations</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="all" className="mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Relaxation profonde",
+                description: "Sons apaisants pour la méditation",
+                tracks: 8
+              },
+              {
+                title: "Concentration",
+                description: "Musique pour améliorer votre productivité",
+                tracks: 12
+              },
+              {
+                title: "Énergie positive",
+                description: "Rythmes dynamiques pour vous motiver",
+                tracks: 10
+              },
+              {
+                title: "Sommeil réparateur",
+                description: "Sons doux pour vous aider à dormir",
+                tracks: 6
+              },
+              {
+                title: "Anti-stress",
+                description: "Mélodies apaisantes pour réduire l'anxiété",
+                tracks: 9
+              }
+            ].map((playlist, index) => (
+              <Card key={index} className="overflow-hidden">
+                <div className="h-32 bg-gradient-to-r from-primary/20 to-secondary/20 flex items-center justify-center">
+                  <Button variant="secondary" size="icon" className="rounded-full h-12 w-12">
+                    <Play className="h-6 w-6" />
                   </Button>
-                ))}
-              </div>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recommandé pour votre humeur actuelle</CardTitle>
+                </div>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between">
+                    <CardTitle>{playlist.title}</CardTitle>
+                    <Button variant="ghost" size="icon">
+                      <Heart className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <CardDescription>{playlist.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {mockPlaylists[0]?.tracks.slice(0, 3).map((track) => (
-                      <div 
-                        key={track.id}
-                        className="flex items-center justify-between p-2 rounded-md hover:bg-muted cursor-pointer"
-                        onClick={() => handleTrackSelect(track)}
-                      >
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 bg-primary/10 rounded-md flex items-center justify-center mr-3">
-                            <MusicIcon className="h-5 w-5 text-primary" />
-                          </div>
-                          <div>
-                            <p className="font-medium">{track.title}</p>
-                            <p className="text-xs text-muted-foreground">{track.artist}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button size="icon" variant="ghost">
-                            <Heart className="h-4 w-4" />
-                          </Button>
-                          <Button size="icon" variant="ghost">
-                            <PlaySquare className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="text-sm text-muted-foreground">
+                    {playlist.tracks} pistes • 45 min
                   </div>
                 </CardContent>
               </Card>
-            </TabsContent>
-            
-            <TabsContent value="favorites">
-              <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto bg-muted rounded-full flex items-center justify-center mb-4">
-                  <Heart className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-xl font-medium mb-2">Pas encore de favoris</h3>
-                <p className="text-muted-foreground mb-6">
-                  Ajoutez des morceaux à vos favoris pour les retrouver ici
-                </p>
-                <Button onClick={() => setActiveTab('library')}>
-                  Parcourir la bibliothèque
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+            ))}
+          </div>
+        </TabsContent>
         
-        <div className="lg:col-span-1 order-1 lg:order-2">
-          <Card className="sticky top-20">
-            <CardHeader>
-              <CardTitle>Lecture en cours</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {currentTrack ? (
-                <MusicControls 
-                  track={currentTrack}
-                  isPlaying={isPlaying}
-                  volume={volume * 100}
-                  onPlay={() => playTrack(currentTrack)}
-                  onPause={pauseTrack}
-                  onNext={nextTrack}
-                  onPrevious={previousTrack}
-                  onVolumeChange={(value) => setVolume(value / 100)}
-                  progress={0} // This should be connected to real progress
-                  duration={currentTrack.duration || 0}
-                  currentTime={0} // This should be connected to real current time
-                  onSeek={() => {}} // This should be connected to real seek function
-                />
-              ) : (
-                <div className="text-center py-8">
-                  <MusicIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">
-                    Sélectionnez une musique pour commencer l'écoute
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-      
-      <MusicDrawer 
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        onOpenChange={(open) => setDrawerOpen(open)}
-        playlist={selectedPlaylist}
-        currentTrack={currentTrack}
-      />
+        <TabsContent value="favorites">
+          <div className="flex items-center justify-center h-40">
+            <p className="text-muted-foreground">
+              Aucune playlist favorite pour le moment
+            </p>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="recommended">
+          <div className="flex items-center justify-center h-40">
+            <p className="text-muted-foreground">
+              Les recommandations seront disponibles après plus d'utilisation
+            </p>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

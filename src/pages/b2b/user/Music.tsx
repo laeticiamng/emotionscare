@@ -1,229 +1,170 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from "lucide-react";
-import { useAuth } from '@/contexts/AuthContext';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Play, Heart } from 'lucide-react';
 
 const B2BUserMusic: React.FC = () => {
-  const { user } = useAuth();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentPlaylist, setCurrentPlaylist] = useState<'focus' | 'relaxation' | 'energy'>('focus');
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  const [volume, setVolume] = useState(70);
-  
-  const playlists = {
-    focus: [
-      { id: '1', title: 'Concentration Profonde', artist: 'Ambient Works', duration: '4:30', url: '#' },
-      { id: '2', title: 'Clarté Mentale', artist: 'Productivity Sounds', duration: '5:15', url: '#' },
-      { id: '3', title: 'Flow State', artist: 'Deep Focus', duration: '6:20', url: '#' },
-    ],
-    relaxation: [
-      { id: '4', title: 'Pause Méditative', artist: 'Calm Collective', duration: '3:45', url: '#' },
-      { id: '5', title: 'Respiration Guidée', artist: 'Mindful Moments', duration: '4:10', url: '#' },
-      { id: '6', title: 'Détente Profonde', artist: 'Relaxation Zone', duration: '7:30', url: '#' },
-    ],
-    energy: [
-      { id: '7', title: 'Réveil Énergétique', artist: 'Morning Boost', duration: '2:50', url: '#' },
-      { id: '8', title: 'Motivation Pro', artist: 'Productivity Pulse', duration: '3:20', url: '#' },
-      { id: '9', title: 'Dynamisme Mental', artist: 'Energy Waves', duration: '4:15', url: '#' },
-    ]
-  };
-  
-  const currentTracks = playlists[currentPlaylist];
-  const currentTrack = currentTracks[currentTrackIndex];
-  
-  const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
-  };
-  
-  const nextTrack = () => {
-    setCurrentTrackIndex((prevIndex) => (prevIndex + 1) % currentTracks.length);
-  };
-  
-  const prevTrack = () => {
-    setCurrentTrackIndex((prevIndex) => 
-      prevIndex === 0 ? currentTracks.length - 1 : prevIndex - 1
-    );
-  };
-  
-  useEffect(() => {
-    // Reset track index when playlist changes
-    setCurrentTrackIndex(0);
-  }, [currentPlaylist]);
-  
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold mb-6">Musique Pro</h1>
-      <p className="text-muted-foreground mb-8">
-        Améliorez votre concentration et productivité avec des playlists générées par IA, adaptées à votre environnement professionnel.
-      </p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card className="col-span-1 md:col-span-2">
-          <CardHeader className="bg-muted/20 pb-2">
-            <CardTitle className="text-xl">Lecteur Musical Adaptatif</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="flex flex-col items-center">
-              <div className="w-40 h-40 mb-6 rounded-lg bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg">
-                <span className="text-4xl text-white">♪</span>
-              </div>
-              
-              <h3 className="text-xl font-semibold">{currentTrack.title}</h3>
-              <p className="text-muted-foreground mb-6">{currentTrack.artist}</p>
-              
-              <div className="flex items-center gap-4 mb-6">
-                <Button variant="outline" size="icon" onClick={prevTrack}>
-                  <SkipBack className="h-4 w-4" />
-                </Button>
-                
-                <Button 
-                  className="h-12 w-12 rounded-full" 
-                  onClick={togglePlayPause}
-                >
-                  {isPlaying ? (
-                    <Pause className="h-5 w-5" />
-                  ) : (
-                    <Play className="h-5 w-5 ml-1" />
-                  )}
-                </Button>
-                
-                <Button variant="outline" size="icon" onClick={nextTrack}>
-                  <SkipForward className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <div className="flex items-center gap-2 w-full max-w-xs">
-                <Volume2 className="h-4 w-4" />
-                <Slider
-                  value={[volume]}
-                  max={100}
-                  step={1}
-                  onValueChange={(values) => setVolume(values[0])}
-                  className="flex-1"
-                />
-                <span className="w-8 text-right">{volume}%</span>
-              </div>
+    <div className="container mx-auto py-6 space-y-8">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Musicothérapie</h1>
+          <p className="text-muted-foreground">
+            Des playlists adaptées à vos émotions et à vos besoins
+          </p>
+        </div>
+        <Button>Créer une playlist</Button>
+      </div>
+
+      <div className="bg-muted/30 rounded-lg p-6">
+        <div className="flex flex-col md:flex-row gap-6 items-center">
+          <div className="aspect-square rounded-md overflow-hidden bg-primary/10 w-full max-w-[200px]">
+            <div className="w-full h-full bg-gradient-to-br from-primary/30 to-secondary/30"></div>
+          </div>
+          
+          <div className="flex-grow space-y-4">
+            <div>
+              <h3 className="text-2xl font-semibold">Playlist recommandée</h3>
+              <p className="text-muted-foreground">Basée sur votre humeur actuelle</p>
             </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="bg-muted/20 pb-2">
-            <CardTitle className="text-xl">Playlists Pro</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="focus" onValueChange={(value) => setCurrentPlaylist(value as any)}>
-              <TabsList className="grid w-full grid-cols-3 mb-4">
-                <TabsTrigger value="focus">Focus</TabsTrigger>
-                <TabsTrigger value="relaxation">Détente</TabsTrigger>
-                <TabsTrigger value="energy">Énergie</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="focus" className="space-y-2">
-                {playlists.focus.map((track, index) => (
-                  <div 
-                    key={track.id}
-                    className={`p-3 rounded-md cursor-pointer ${
-                      currentPlaylist === 'focus' && currentTrackIndex === index
-                        ? 'bg-primary/10'
-                        : 'hover:bg-muted'
-                    }`}
-                    onClick={() => {
-                      setCurrentPlaylist('focus');
-                      setCurrentTrackIndex(index);
-                      setIsPlaying(true);
-                    }}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">{track.title}</span>
-                      <span className="text-xs text-muted-foreground">{track.duration}</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">{track.artist}</div>
-                  </div>
-                ))}
-              </TabsContent>
-              
-              <TabsContent value="relaxation" className="space-y-2">
-                {playlists.relaxation.map((track, index) => (
-                  <div 
-                    key={track.id}
-                    className={`p-3 rounded-md cursor-pointer ${
-                      currentPlaylist === 'relaxation' && currentTrackIndex === index
-                        ? 'bg-primary/10'
-                        : 'hover:bg-muted'
-                    }`}
-                    onClick={() => {
-                      setCurrentPlaylist('relaxation');
-                      setCurrentTrackIndex(index);
-                      setIsPlaying(true);
-                    }}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">{track.title}</span>
-                      <span className="text-xs text-muted-foreground">{track.duration}</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">{track.artist}</div>
-                  </div>
-                ))}
-              </TabsContent>
-              
-              <TabsContent value="energy" className="space-y-2">
-                {playlists.energy.map((track, index) => (
-                  <div 
-                    key={track.id}
-                    className={`p-3 rounded-md cursor-pointer ${
-                      currentPlaylist === 'energy' && currentTrackIndex === index
-                        ? 'bg-primary/10'
-                        : 'hover:bg-muted'
-                    }`}
-                    onClick={() => {
-                      setCurrentPlaylist('energy');
-                      setCurrentTrackIndex(index);
-                      setIsPlaying(true);
-                    }}
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">{track.title}</span>
-                      <span className="text-xs text-muted-foreground">{track.duration}</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">{track.artist}</div>
-                  </div>
-                ))}
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Musique IA Personnalisée</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Générez une musique unique adaptée à votre humeur et vos besoins professionnels du moment.
+            
+            <p className="text-muted-foreground">
+              Cette playlist a été spécialement conçue pour vous aider à vous détendre et à vous recentrer.
             </p>
-            <Button className="w-full">Générer une musique personnalisée</Button>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Mes Créations</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">
-              Retrouvez vos musiques générées précédemment et vos playlists favorites.
-            </p>
-            <Button variant="outline" className="w-full">Voir ma bibliothèque</Button>
-          </CardContent>
-        </Card>
+            
+            <div className="flex items-center gap-4">
+              <Button size="sm" className="gap-2">
+                <Play className="h-4 w-4" /> Lecture
+              </Button>
+              <Button variant="outline" size="sm">
+                Enregistrer
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <Tabs defaultValue="all">
+        <TabsList>
+          <TabsTrigger value="all">Toutes les playlists</TabsTrigger>
+          <TabsTrigger value="favorites">Favoris</TabsTrigger>
+          <TabsTrigger value="recommended">Recommandations</TabsTrigger>
+          <TabsTrigger value="work">Spécial Travail</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="all" className="mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Relaxation profonde",
+                description: "Sons apaisants pour la méditation",
+                tracks: 8
+              },
+              {
+                title: "Concentration",
+                description: "Musique pour améliorer votre productivité",
+                tracks: 12
+              },
+              {
+                title: "Énergie positive",
+                description: "Rythmes dynamiques pour vous motiver",
+                tracks: 10
+              },
+              {
+                title: "Sommeil réparateur",
+                description: "Sons doux pour vous aider à dormir",
+                tracks: 6
+              },
+              {
+                title: "Anti-stress",
+                description: "Mélodies apaisantes pour réduire l'anxiété",
+                tracks: 9
+              }
+            ].map((playlist, index) => (
+              <Card key={index} className="overflow-hidden">
+                <div className="h-32 bg-gradient-to-r from-primary/20 to-secondary/20 flex items-center justify-center">
+                  <Button variant="secondary" size="icon" className="rounded-full h-12 w-12">
+                    <Play className="h-6 w-6" />
+                  </Button>
+                </div>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between">
+                    <CardTitle>{playlist.title}</CardTitle>
+                    <Button variant="ghost" size="icon">
+                      <Heart className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <CardDescription>{playlist.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-sm text-muted-foreground">
+                    {playlist.tracks} pistes • 45 min
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="favorites">
+          <div className="flex items-center justify-center h-40">
+            <p className="text-muted-foreground">
+              Aucune playlist favorite pour le moment
+            </p>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="recommended">
+          <div className="flex items-center justify-center h-40">
+            <p className="text-muted-foreground">
+              Les recommandations seront disponibles après plus d'utilisation
+            </p>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="work" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Playlists spécial environnement professionnel</CardTitle>
+              <CardDescription>Optimisées pour améliorer votre concentration et productivité</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="border rounded-lg p-4 flex justify-between items-center">
+                  <div>
+                    <div className="font-medium">Focus profond</div>
+                    <div className="text-sm text-muted-foreground">Pour les tâches requérant une concentration intense</div>
+                  </div>
+                  <Button size="sm" variant="outline">Écouter</Button>
+                </div>
+                <div className="border rounded-lg p-4 flex justify-between items-center">
+                  <div>
+                    <div className="font-medium">Ambiance bureau</div>
+                    <div className="text-sm text-muted-foreground">Sons ambiants pour rester dans la zone</div>
+                  </div>
+                  <Button size="sm" variant="outline">Écouter</Button>
+                </div>
+                <div className="border rounded-lg p-4 flex justify-between items-center">
+                  <div>
+                    <div className="font-medium">Pause déjeuner</div>
+                    <div className="text-sm text-muted-foreground">Mélodies relaxantes pour votre pause</div>
+                  </div>
+                  <Button size="sm" variant="outline">Écouter</Button>
+                </div>
+                <div className="border rounded-lg p-4 flex justify-between items-center">
+                  <div>
+                    <div className="font-medium">Fin de journée</div>
+                    <div className="text-sm text-muted-foreground">Transition vers la détente après le travail</div>
+                  </div>
+                  <Button size="sm" variant="outline">Écouter</Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
