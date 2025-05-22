@@ -1,3 +1,4 @@
+
 /**
  * Check if the current path matches a given route
  * Supports exact matching and prefix matching
@@ -129,5 +130,74 @@ export const getModeLoginPath = (userMode: string | null): string => {
     case 'b2c':
     default:
       return '/b2c/login';
+  }
+};
+
+/**
+ * Get dashboard path for a specific user mode
+ * Used to redirect users to the appropriate dashboard
+ */
+export const getModeDashboardPath = (userMode: string | null): string => {
+  if (!userMode) {
+    return '/b2c/dashboard';
+  }
+  
+  const normalizedMode = normalizeUserMode(userMode);
+  
+  switch (normalizedMode) {
+    case 'b2b_admin':
+      return '/b2b/admin/dashboard';
+    case 'b2b_user':
+      return '/b2b/user/dashboard';
+    case 'b2c':
+    default:
+      return '/b2c/dashboard';
+  }
+};
+
+/**
+ * Normalize user mode string to a consistent format
+ * Handles different formats like b2b-admin, b2b_admin, etc.
+ */
+export const normalizeUserMode = (mode: string | null): string => {
+  if (!mode) return 'b2c';
+  
+  // Convert to lowercase
+  const lowerMode = mode.toLowerCase();
+  
+  // Normalize B2B Admin variations
+  if (lowerMode === 'b2b-admin' || lowerMode === 'b2b_admin' || lowerMode === 'b2badmin') {
+    return 'b2b_admin';
+  }
+  
+  // Normalize B2B User variations
+  if (lowerMode === 'b2b-user' || lowerMode === 'b2b_user' || lowerMode === 'b2buser') {
+    return 'b2b_user';
+  }
+  
+  // Normalize B2C variations
+  if (lowerMode === 'b2c' || lowerMode === 'individual' || lowerMode === 'user') {
+    return 'b2c';
+  }
+  
+  // Default if no match
+  return 'b2c';
+};
+
+/**
+ * Get a user-friendly display name for a user mode
+ */
+export const getUserModeDisplayName = (mode: string | null): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  switch(normalizedMode) {
+    case 'b2b_admin':
+      return 'Administrateur';
+    case 'b2b_user':
+      return 'Collaborateur';
+    case 'b2c':
+      return 'Particulier';
+    default:
+      return 'Utilisateur';
   }
 };
