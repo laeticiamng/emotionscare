@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 // Layouts
@@ -30,7 +31,7 @@ import B2CJournalPage from '@/pages/b2c/Journal';
 import B2CAudioPage from '@/pages/b2c/Audio';
 import B2CMusicPage from '@/pages/b2c/Music';
 import B2CCoachPage from '@/pages/b2c/Coach';
-import B2CEmotionProgressPage from '@/pages/b2c/Progress';
+import B2CEmotionProgressPage from '@/pages/b2c/EmotionProgressPage';
 
 // Redirect Components
 import Journal from '@/pages/Journal';
