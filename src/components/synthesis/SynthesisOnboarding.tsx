@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { BarChart, Globe, Sun } from 'lucide-react';
+import { BarChart } from 'lucide-react';
 
 interface SynthesisOnboardingProps {
   open: boolean;
@@ -15,44 +15,20 @@ const SynthesisOnboarding: React.FC<SynthesisOnboardingProps> = ({ open, onClose
   
   const steps = [
     {
-      title: "Bienvenue dans la Synthèse 360°",
-      description: "Découvrez une vision complète de votre parcours émotionnel à travers trois vues complémentaires.",
-      image: (
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 flex items-center justify-center">
-          <div className="flex items-center gap-6">
-            <BarChart className="h-12 w-12 text-blue-500" />
-            <Globe className="h-12 w-12 text-indigo-500" />
-            <Sun className="h-12 w-12 text-purple-500" />
-          </div>
-        </div>
-      )
+      title: "Bienvenue dans la Synthèse",
+      description: "Découvrez une vision complète de votre parcours émotionnel."
     },
     {
       title: "Timeline Émotionnelle",
-      description: "Visualisez vos émotions au fil du temps, identifiez les moments clés et les tendances de votre parcours.",
-      image: (
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 flex items-center justify-center">
-          <BarChart className="h-16 w-16 text-blue-500" />
-        </div>
-      )
+      description: "Visualisez vos émotions au fil du temps."
     },
     {
       title: "Carte du Monde Émotionnel",
-      description: "Explorez la répartition géographique des émotions collectives et identifiez les tendances globales.",
-      image: (
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 flex items-center justify-center">
-          <Globe className="h-16 w-16 text-indigo-500" />
-        </div>
-      )
+      description: "Explorez la répartition géographique des émotions."
     },
     {
       title: "Sanctuaire",
-      description: "Un espace de calme et de bien-être pour vous ressourcer et pratiquer des exercices adaptés à votre état émotionnel.",
-      image: (
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 flex items-center justify-center">
-          <Sun className="h-16 w-16 text-purple-500" />
-        </div>
-      )
+      description: "Un espace de calme et de bien-être pour vous ressourcer."
     }
   ];
   
@@ -80,8 +56,8 @@ const SynthesisOnboarding: React.FC<SynthesisOnboardingProps> = ({ open, onClose
           <DialogDescription>{steps[currentStep].description}</DialogDescription>
         </DialogHeader>
 
-        <div className="py-4">
-          {steps[currentStep].image}
+        <div className="py-4 flex justify-center">
+          <BarChart className="h-12 w-12 text-blue-500" />
         </div>
         
         <Progress 
