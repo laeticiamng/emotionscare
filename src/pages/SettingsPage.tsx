@@ -1,260 +1,289 @@
 
-import React from 'react';
-import Shell from '@/Shell';
-import { motion } from 'framer-motion';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useTheme } from '@/components/theme/ThemeProvider';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
+import { Bell, CheckCircle, Eye, EyeOff, Shield, User } from 'lucide-react';
 
-const SettingsPage: React.FC = () => {
+const SettingsPage = () => {
+  const { theme, setTheme, reduceMotion, setReduceMotion } = useTheme();
   const { user, updateUser } = useAuth();
-  const { userMode } = useUserMode();
-  const { toast } = useToast();
-  
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const name = formData.get('name') as string;
-    
-    try {
-      if (updateUser) {
-        await updateUser({ name });
-        toast({
-          title: "Profil mis à jour",
-          description: "Vos informations ont été mises à jour avec succès",
-        });
-      }
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la mise à jour de votre profil",
-        variant: "destructive"
-      });
-    }
+  const [notificationEmail, setNotificationEmail] = useState(true);
+  const [notificationApp, setNotificationApp] = useState(true);
+  const [dataSharing, setDataSharing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleSaveProfile = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      toast.success("Profil mis à jour avec succès");
+    }, 1000);
   };
-  
-  const handleUpdatePreferences = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    
-    const notifications_enabled = formData.get('notifications_enabled') === 'on';
-    const email_notifications = formData.get('email_notifications') === 'on';
-    
-    try {
-      if (updateUser) {
-        await updateUser({
-          preferences: {
-            ...user?.preferences,
-            notifications_enabled,
-            email_notifications
-          }
-        });
-        toast({
-          title: "Préférences mises à jour",
-          description: "Vos préférences ont été mises à jour avec succès",
-        });
-      }
-    } catch (error) {
-      console.error('Error updating preferences:', error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la mise à jour de vos préférences",
-        variant: "destructive"
-      });
-    }
+
+  const handleChangePassword = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      toast.success("Mot de passe modifié avec succès");
+    }, 1000);
   };
-  
+
+  const handleThemeChange = (newTheme: string) => {
+    setTheme(newTheme as any);
+    toast.success(`Thème ${newTheme} appliqué`);
+  };
+
   return (
-    <Shell>
-      <div className="container mx-auto py-6 max-w-3xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-3xl font-bold mb-4">Paramètres</h1>
-          <p className="text-muted-foreground mb-6">
-            Gérez votre compte et vos préférences
-          </p>
-          
-          <Tabs defaultValue="profile">
-            <TabsList className="mb-6">
-              <TabsTrigger value="profile">Profil</TabsTrigger>
-              <TabsTrigger value="preferences">Préférences</TabsTrigger>
-              <TabsTrigger value="account">Compte</TabsTrigger>
-              {userMode === 'b2b_admin' && (
-                <TabsTrigger value="admin">Administration</TabsTrigger>
-              )}
-            </TabsList>
-            
-            <TabsContent value="profile">
-              <Card>
-                <form onSubmit={handleUpdateProfile}>
-                  <CardHeader>
-                    <CardTitle>Informations personnelles</CardTitle>
-                    <CardDescription>
-                      Mettez à jour vos informations personnelles
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Nom</Label>
-                      <Input 
-                        id="name" 
-                        name="name"
-                        defaultValue={user?.name || ''}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input 
-                        id="email" 
-                        value={user?.email || ''}
-                        disabled
-                      />
-                      <p className="text-sm text-muted-foreground">
-                        L'adresse email ne peut pas être modifiée
-                      </p>
-                    </div>
-                    {userMode?.includes('b2b') && (
-                      <div className="space-y-2">
-                        <Label htmlFor="title">Titre / Fonction</Label>
-                        <Input 
-                          id="title" 
-                          name="title"
-                          defaultValue={user?.job_title || ''}
-                        />
-                      </div>
-                    )}
-                  </CardContent>
-                  <CardFooter>
-                    <Button type="submit">Enregistrer les modifications</Button>
-                  </CardFooter>
-                </form>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="preferences">
-              <Card>
-                <form onSubmit={handleUpdatePreferences}>
-                  <CardHeader>
-                    <CardTitle>Préférences</CardTitle>
-                    <CardDescription>
-                      Personnalisez votre expérience
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="font-medium">Notifications</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Activer les notifications dans l'application
-                        </p>
-                      </div>
-                      <Switch 
-                        id="notifications_enabled" 
-                        name="notifications_enabled"
-                        defaultChecked={user?.preferences?.notifications_enabled}
-                      />
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="font-medium">Notifications par email</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Recevoir des notifications par email
-                        </p>
-                      </div>
-                      <Switch 
-                        id="email_notifications" 
-                        name="email_notifications"
-                        defaultChecked={user?.preferences?.email_notifications}
-                      />
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button type="submit">Enregistrer les préférences</Button>
-                  </CardFooter>
-                </form>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="account">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Compte</CardTitle>
-                  <CardDescription>
-                    Gérer les paramètres de votre compte
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h3 className="font-medium">Type de compte</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {userMode === 'b2c' && "Compte personnel"}
-                      {userMode === 'b2b_user' && "Compte collaborateur"}
-                      {userMode === 'b2b_admin' && "Compte administrateur"}
-                    </p>
-                  </div>
-                  
-                  <div className="pt-4">
-                    <h3 className="font-medium text-destructive">Zone de danger</h3>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Ces actions sont irréversibles
-                    </p>
-                    
-                    <Button variant="destructive">
-                      Supprimer mon compte
+    <div className="container mx-auto py-10">
+      <h1 className="text-3xl font-bold mb-8">Paramètres</h1>
+      
+      <Tabs defaultValue="profile" className="space-y-6">
+        <TabsList className="grid grid-cols-4 sm:grid-cols-4 max-w-md">
+          <TabsTrigger value="profile">Profil</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="appearance">Apparence</TabsTrigger>
+          <TabsTrigger value="security">Sécurité</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="profile" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <User className="mr-2 h-5 w-5" />
+                Informations personnelles
+              </CardTitle>
+              <CardDescription>
+                Modifiez vos informations personnelles et vos préférences de compte.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nom</Label>
+                  <Input 
+                    id="name" 
+                    defaultValue={user?.name || 'Utilisateur'} 
+                    placeholder="Votre nom"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    defaultValue={user?.email || 'utilisateur@exemple.fr'} 
+                    placeholder="votre@email.com" 
+                    disabled
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="bio">Biographie</Label>
+                <Textarea 
+                  id="bio" 
+                  placeholder="Parlez un peu de vous"
+                  defaultValue=""
+                  rows={4}
+                />
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-end">
+              <Button onClick={handleSaveProfile} disabled={loading}>
+                {loading ? 'Sauvegarde...' : 'Enregistrer les modifications'}
+              </Button>
+            </CardFooter>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="notifications" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Bell className="mr-2 h-5 w-5" />
+                Préférences de notification
+              </CardTitle>
+              <CardDescription>
+                Configurez comment et quand vous souhaitez être notifié.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Notifications par email</p>
+                  <p className="text-sm text-muted-foreground">
+                    Recevoir des mises à jour par email
+                  </p>
+                </div>
+                <Switch
+                  checked={notificationEmail}
+                  onCheckedChange={setNotificationEmail}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Notifications dans l'application</p>
+                  <p className="text-sm text-muted-foreground">
+                    Recevoir des notifications dans l'application
+                  </p>
+                </div>
+                <Switch
+                  checked={notificationApp}
+                  onCheckedChange={setNotificationApp}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Rapports hebdomadaires</p>
+                  <p className="text-sm text-muted-foreground">
+                    Recevoir un résumé hebdomadaire de vos activités
+                  </p>
+                </div>
+                <Switch defaultChecked />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="appearance" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Apparence</CardTitle>
+              <CardDescription>
+                Personnalisez l'apparence de l'application
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label>Thème</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button 
+                    variant={theme === 'light' ? 'default' : 'outline'} 
+                    onClick={() => handleThemeChange('light')}
+                    className="justify-start"
+                  >
+                    <Sun className="mr-2 h-4 w-4" />
+                    Clair
+                  </Button>
+                  <Button 
+                    variant={theme === 'dark' ? 'default' : 'outline'} 
+                    onClick={() => handleThemeChange('dark')}
+                    className="justify-start"
+                  >
+                    <Moon className="mr-2 h-4 w-4" />
+                    Sombre
+                  </Button>
+                  <Button 
+                    variant={theme === 'system' ? 'default' : 'outline'} 
+                    onClick={() => handleThemeChange('system')}
+                    className="justify-start"
+                  >
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Système
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Réduire les animations</p>
+                  <p className="text-sm text-muted-foreground">
+                    Pour les personnes sensibles au mouvement
+                  </p>
+                </div>
+                <Switch
+                  checked={reduceMotion}
+                  onCheckedChange={setReduceMotion}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="security" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Shield className="mr-2 h-5 w-5" />
+                Sécurité
+              </CardTitle>
+              <CardDescription>
+                Gérez la sécurité de votre compte et vos préférences de confidentialité.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Changer de mot de passe</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="current-password">Mot de passe actuel</Label>
+                  <div className="relative">
+                    <Input 
+                      id="current-password" 
+                      type={showPassword ? "text" : "password"} 
+                      placeholder="••••••••"
+                    />
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="absolute right-0 top-0 h-full"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            {userMode === 'b2b_admin' && (
-              <TabsContent value="admin">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Administration</CardTitle>
-                    <CardDescription>
-                      Gérer les paramètres d'administration
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h3 className="font-medium">Invitations</h3>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Gérer les invitations des collaborateurs
-                      </p>
-                      <Button variant="outline" onClick={() => window.location.href = "/b2b/admin/invitations"}>
-                        Gérer les invitations
-                      </Button>
-                    </div>
-                    
-                    <div className="pt-4">
-                      <h3 className="font-medium">Rapports</h3>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Accéder aux rapports d'utilisation et analytiques
-                      </p>
-                      <Button variant="outline" onClick={() => window.location.href = "/b2b/admin/reports"}>
-                        Voir les rapports
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            )}
-          </Tabs>
-        </motion.div>
-      </div>
-    </Shell>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">Nouveau mot de passe</Label>
+                  <Input 
+                    id="new-password" 
+                    type="password" 
+                    placeholder="••••••••"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+                  <Input 
+                    id="confirm-password" 
+                    type="password" 
+                    placeholder="••••••••"
+                  />
+                </div>
+                <Button onClick={handleChangePassword} disabled={loading}>
+                  {loading ? 'Modification...' : 'Changer le mot de passe'}
+                </Button>
+              </div>
+              
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-medium">Confidentialité des données</h3>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Partage de données anonymisées</p>
+                    <p className="text-sm text-muted-foreground">
+                      Contribuer à l'amélioration du service avec des données anonymisées
+                    </p>
+                  </div>
+                  <Switch
+                    checked={dataSharing}
+                    onCheckedChange={setDataSharing}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

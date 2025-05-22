@@ -19,6 +19,10 @@ const Support = React.lazy(() => import('./pages/Support'));
 const NotImplementedPage = React.lazy(() => import('./pages/NotImplementedPage'));
 const B2CDashboardPage = React.lazy(() => import('./pages/b2c/DashboardPage'));
 const SessionsPage = React.lazy(() => import('./pages/SessionsPage'));
+const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
+const VRAnalyticsPage = React.lazy(() => import('./pages/VRAnalyticsPage'));
+const VRSessionPage = React.lazy(() => import('./pages/VRSessionPage'));
+const CommunityAdminPage = React.lazy(() => import('./pages/CommunityAdminPage'));
 
 // Define routes
 const routes = [
@@ -81,6 +85,22 @@ const routes = [
   {
     path: '/sessions',
     element: <SessionsPage />
+  },
+  {
+    path: '/settings',
+    element: <SettingsPage />
+  },
+  {
+    path: '/vr-analytics',
+    element: <VRAnalyticsPage />
+  },
+  {
+    path: '/vr-session/:id',
+    element: <VRSessionPage />
+  },
+  {
+    path: '/community-admin',
+    element: <CommunityAdminPage />
   },
   {
     path: '/coming-soon',
