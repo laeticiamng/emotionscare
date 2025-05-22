@@ -1,225 +1,129 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Music2, Library, Headphones, RefreshCw } from 'lucide-react';
-import { MusicProvider, useMusic } from '@/providers/MusicProvider';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
-import defaultPlaylists from '@/data/musicPlaylists';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Play, Pause, SkipForward, SkipBack, Heart } from 'lucide-react';
 
-const MusicPlayerComponent: React.FC = () => {
-  const [playlists] = useState<MusicPlaylist[]>(defaultPlaylists);
-  const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
-  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  // Set initial playlist
-  useEffect(() => {
-    if (playlists.length > 0 && !currentPlaylist) {
-      setCurrentPlaylist(playlists[0]);
-    }
-  }, [playlists, currentPlaylist]);
-
-  // Play a track
-  const playTrack = (track: MusicTrack) => {
-    setCurrentTrack(track);
-    setIsPlaying(true);
-  };
-
-  // Toggle play/pause
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-  };
-
+const Music: React.FC = () => {
   return (
     <div className="container mx-auto py-6 space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Musicothérapie</h1>
           <p className="text-muted-foreground">
-            Explorez des sons et des mélodies pour améliorer votre bien-être émotionnel
+            Des playlists adaptées à vos émotions et à vos besoins
           </p>
+        </div>
+        <Button>Créer une playlist</Button>
+      </div>
+
+      <div className="bg-muted/30 rounded-lg p-6">
+        <div className="flex flex-col md:flex-row gap-6 items-center">
+          <div className="aspect-square rounded-md overflow-hidden bg-primary/10 w-full max-w-[200px]">
+            <div className="w-full h-full bg-gradient-to-br from-primary/30 to-secondary/30"></div>
+          </div>
+          
+          <div className="flex-grow space-y-4">
+            <div>
+              <h3 className="text-2xl font-semibold">Playlist recommandée</h3>
+              <p className="text-muted-foreground">Basée sur votre humeur actuelle</p>
+            </div>
+            
+            <p className="text-muted-foreground">
+              Cette playlist a été spécialement conçue pour vous aider à vous détendre et à vous recentrer.
+            </p>
+            
+            <div className="flex items-center gap-4">
+              <Button size="sm" className="gap-2">
+                <Play className="h-4 w-4" /> Lecture
+              </Button>
+              <Button variant="outline" size="sm">
+                Enregistrer
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <Tabs defaultValue="recommended">
+      <Tabs defaultValue="all">
         <TabsList>
-          <TabsTrigger value="recommended" className="flex items-center gap-2">
-            <Music2 className="h-4 w-4" /> Recommandations
-          </TabsTrigger>
-          <TabsTrigger value="library" className="flex items-center gap-2">
-            <Library className="h-4 w-4" /> Bibliothèque
-          </TabsTrigger>
-          <TabsTrigger value="mood" className="flex items-center gap-2">
-            <Headphones className="h-4 w-4" /> Par humeur
-          </TabsTrigger>
-          <TabsTrigger value="custom" className="flex items-center gap-2">
-            <RefreshCw className="h-4 w-4" /> Personnalisé
-          </TabsTrigger>
+          <TabsTrigger value="all">Toutes les playlists</TabsTrigger>
+          <TabsTrigger value="favorites">Favoris</TabsTrigger>
+          <TabsTrigger value="recommended">Recommandations</TabsTrigger>
         </TabsList>
-
-        {/* Recommended tab */}
-        <TabsContent value="recommended" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Playlists recommandées</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {playlists.map((playlist) => (
-                  <Card key={playlist.id} className="overflow-hidden">
-                    <div className="bg-gradient-to-br from-primary/20 to-muted h-32 flex items-center justify-center">
-                      <Music2 className="h-16 w-16 text-primary/50" />
-                    </div>
-                    <CardContent className="pt-4">
-                      <h3 className="text-lg font-semibold">{playlist.name}</h3>
-                      <p className="text-sm text-muted-foreground">{playlist.description}</p>
-                      <div className="mt-4 flex gap-2">
-                        <Button 
-                          size="sm" 
-                          onClick={() => setCurrentPlaylist(playlist)}
-                          className="w-full"
-                        >
-                          Écouter
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Library tab */}
-        <TabsContent value="library" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Votre bibliothèque</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-center text-muted-foreground py-8">
-                Vous n'avez pas encore de playlists dans votre bibliothèque.
-              </p>
-              <div className="flex justify-center mt-4">
-                <Button>Découvrir des playlists</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Mood tab */}
-        <TabsContent value="mood" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Musique par émotion</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                {['Calme', 'Énergique', 'Concentration', 'Méditation', 'Motivation'].map((mood) => (
-                  <Button key={mood} variant="outline" className="h-24 flex flex-col gap-2">
-                    <span>{mood}</span>
+        
+        <TabsContent value="all" className="mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Relaxation profonde",
+                description: "Sons apaisants pour la méditation",
+                tracks: 8
+              },
+              {
+                title: "Concentration",
+                description: "Musique pour améliorer votre productivité",
+                tracks: 12
+              },
+              {
+                title: "Énergie positive",
+                description: "Rythmes dynamiques pour vous motiver",
+                tracks: 10
+              },
+              {
+                title: "Sommeil réparateur",
+                description: "Sons doux pour vous aider à dormir",
+                tracks: 6
+              },
+              {
+                title: "Anti-stress",
+                description: "Mélodies apaisantes pour réduire l'anxiété",
+                tracks: 9
+              }
+            ].map((playlist, index) => (
+              <Card key={index} className="overflow-hidden">
+                <div className="h-32 bg-gradient-to-r from-primary/20 to-secondary/20 flex items-center justify-center">
+                  <Button variant="secondary" size="icon" className="rounded-full h-12 w-12">
+                    <Play className="h-6 w-6" />
                   </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between">
+                    <CardTitle>{playlist.title}</CardTitle>
+                    <Button variant="ghost" size="icon">
+                      <Heart className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <CardDescription>{playlist.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-sm text-muted-foreground">
+                    {playlist.tracks} pistes • 45 min
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </TabsContent>
-
-        {/* Custom tab */}
-        <TabsContent value="custom" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Musique personnalisée</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-center text-muted-foreground py-8">
-                Créez votre propre ambiance musicale adaptée à vos besoins émotionnels.
-              </p>
-              <div className="flex justify-center mt-4">
-                <Button>Créer une composition</Button>
-              </div>
-            </CardContent>
-          </Card>
+        
+        <TabsContent value="favorites">
+          <div className="flex items-center justify-center h-40">
+            <p className="text-muted-foreground">
+              Aucune playlist favorite pour le moment
+            </p>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="recommended">
+          <div className="flex items-center justify-center h-40">
+            <p className="text-muted-foreground">
+              Les recommandations seront disponibles après plus d'utilisation
+            </p>
+          </div>
         </TabsContent>
       </Tabs>
-
-      {currentPlaylist && (
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>{currentPlaylist.name}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {currentPlaylist.tracks.map((track, index) => (
-                <div 
-                  key={track.id}
-                  className={`flex items-center justify-between p-3 rounded-lg ${
-                    currentTrack?.id === track.id ? 'bg-primary/10' : 'hover:bg-muted'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Button 
-                      size="icon" 
-                      variant="ghost" 
-                      className="h-8 w-8"
-                      onClick={() => playTrack(track)}
-                    >
-                      {currentTrack?.id === track.id && isPlaying ? (
-                        <Pause className="h-4 w-4" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <div>
-                      <p className="font-medium">{track.title}</p>
-                      <p className="text-sm text-muted-foreground">{track.artist}</p>
-                    </div>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Simple music player control bar */}
-      {currentTrack && (
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 bg-primary/20 rounded-md flex items-center justify-center">
-              <Music2 className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <p className="font-medium">{currentTrack.title}</p>
-              <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button size="icon" variant="ghost" onClick={togglePlay}>
-              {isPlaying ? (
-                <Pause className="h-6 w-6" />
-              ) : (
-                <Play className="h-6 w-6" />
-              )}
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
-  );
-};
-
-// Wrap component with MusicProvider if needed
-const Music: React.FC = () => {
-  return (
-    <MusicProvider>
-      <MusicPlayerComponent />
-    </MusicProvider>
   );
 };
 
