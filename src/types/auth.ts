@@ -1,33 +1,44 @@
 
-export interface AuthUser {
+/**
+ * User mode determines the application context and available features
+ * - b2c: Individual user experience
+ * - b2b_user: Business user (employee) experience
+ * - b2b_admin: Business administrator experience
+ */
+export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
+
+export interface User {
   id: string;
-  name: string;
   email: string;
+  name?: string;
   role?: string;
   avatar?: string;
-  avatar_url?: string; // For backward compatibility
-  avatarUrl?: string; // For backward compatibility
-  displayName?: string; // For backward compatibility
   company?: string;
   department?: string;
   position?: string;
+  isAdmin?: boolean;
+  isSuperAdmin?: boolean;
   preferences?: Record<string, any>;
-  createdAt?: Date | string;
-  created_at?: Date | string; // For backward compatibility
-  joined_at?: Date | string; // For backward compatibility
+  createdAt?: string | Date;
+  lastLogin?: string | Date;
 }
 
-export interface AuthContextType {
-  user: AuthUser | null;
+export interface AuthState {
+  user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: Error | null;
-  login: (email: string, password: string) => Promise<AuthUser | null>;
-  register: (name: string, email: string, password: string) => Promise<AuthUser | null>;
-  logout: () => Promise<void>;
-  clearError?: () => void;
-  updateUser?: (userData: Partial<AuthUser>) => Promise<void>;
-  updatePreferences?: (preferences: any) => Promise<void>; // Added for compatibility
 }
 
-export { UserRole } from './user';
+export interface LoginCredentials {
+  email: string;
+  password: string;
+  mode?: UserMode;
+  rememberMe?: boolean;
+}
+
+export interface RegisterData extends LoginCredentials {
+  name: string;
+  confirmPassword: string;
+  acceptTerms: boolean;
+}

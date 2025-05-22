@@ -1,39 +1,27 @@
 
-import { UserModeType } from '@/types/userMode';
+import { UserMode } from '@/types/auth';
 
-export const normalizeUserMode = (mode: string | null | undefined): string => {
-  if (!mode) return '';
-  
-  if (mode === 'b2c' || mode === 'particulier') {
-    return 'b2c';
-  } else if (mode === 'b2b_user' || mode === 'collaborateur') {
-    return 'b2b_user';
-  } else if (mode === 'b2b_admin' || mode === 'administrateur') {
-    return 'b2b_admin';
-  }
-  
-  return '';
-};
-
-export const getUserModeDisplayName = (mode: string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch(normalizedMode) {
+/**
+ * Returns the appropriate dashboard path based on user mode
+ */
+export const getModeDashboardPath = (userMode?: UserMode): string => {
+  switch (userMode) {
     case 'b2c':
-      return 'Particulier';
-    case 'b2b_admin':
-      return 'Administrateur B2B';
+      return '/b2c/dashboard';
     case 'b2b_user':
-      return 'Collaborateur B2B';
+      return '/b2b/user/dashboard';
+    case 'b2b_admin':
+      return '/b2b/admin/dashboard';
     default:
-      return 'Utilisateur';
+      return '/';
   }
 };
 
-export const getModeLoginPath = (mode: string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch (normalizedMode) {
+/**
+ * Returns the login path for a specific user mode
+ */
+export const getModeLoginPath = (mode?: UserMode): string => {
+  switch (mode) {
     case 'b2c':
       return '/b2c/login';
     case 'b2b_user':
@@ -45,137 +33,25 @@ export const getModeLoginPath = (mode: string | null | undefined): string => {
   }
 };
 
-export const getModeDashboardPath = (mode: string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch (normalizedMode) {
+/**
+ * Returns the appropriate label for a user mode
+ */
+export const getUserModeLabel = (mode?: UserMode): string => {
+  switch (mode) {
     case 'b2c':
-      return '/b2c/dashboard';
+      return 'Particulier';
     case 'b2b_user':
-      return '/b2b/user/dashboard';
+      return 'Collaborateur';
     case 'b2b_admin':
-      return '/b2b/admin/dashboard';
+      return 'Administration';
     default:
-      return '/choose-mode';
+      return 'Utilisateur';
   }
 };
 
-export const getModeJournalPath = (mode: string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch (normalizedMode) {
-    case 'b2c':
-      return '/b2c/journal';
-    case 'b2b_user':
-      return '/b2b/user/journal';
-    case 'b2b_admin':
-      return '/b2b/admin/journal';
-    default:
-      return '/b2c/journal';
-  }
-};
-
-export const getModeMusicPath = (mode: string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch (normalizedMode) {
-    case 'b2c':
-      return '/b2c/music';
-    case 'b2b_user':
-      return '/b2b/user/music';
-    case 'b2b_admin':
-      return '/b2b/admin/music';
-    default:
-      return '/b2c/music';
-  }
-};
-
-export const getModeAudioPath = (mode: string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch (normalizedMode) {
-    case 'b2c':
-      return '/b2c/audio';
-    case 'b2b_user':
-      return '/b2b/user/audio';
-    case 'b2b_admin':
-      return '/b2b/admin/audio';
-    default:
-      return '/b2c/audio';
-  }
-};
-
-export const getModeCoachPath = (mode: string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch (normalizedMode) {
-    case 'b2c':
-      return '/b2c/coach';
-    case 'b2b_user':
-      return '/b2b/user/coach';
-    case 'b2b_admin':
-      return '/b2b/admin/coach';
-    default:
-      return '/b2c/coach';
-  }
-};
-
-export const getModeProgressPath = (mode: string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch (normalizedMode) {
-    case 'b2c':
-      return '/b2c/progress';
-    case 'b2b_user':
-      return '/b2b/user/progress';
-    case 'b2b_admin':
-      return '/b2b/admin/progress';
-    default:
-      return '/b2c/progress';
-  }
-};
-
-export const getModeVRPath = (mode: string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch (normalizedMode) {
-    case 'b2c':
-      return '/b2c/vr';
-    case 'b2b_user':
-      return '/b2b/user/vr';
-    case 'b2b_admin':
-      return '/b2b/admin/vr';
-    default:
-      return '/b2c/vr';
-  }
-};
-
-export const getModeSocialPath = (mode: string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch (normalizedMode) {
-    case 'b2c':
-      return '/b2c/social';
-    case 'b2b_user':
-      return '/b2b/user/social';
-    case 'b2b_admin':
-      return '/b2b/admin/social';
-    default:
-      return '/b2c/social';
-  }
-};
-
-export const getModeGamificationPath = (mode: string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch (normalizedMode) {
-    case 'b2c':
-      return '/b2c/gamification';
-    case 'b2b_user':
-      return '/b2b/user/gamification';
-    case 'b2b_admin':
-      return '/b2b/admin/gamification';
-    default:
-      return '/b2c/gamification';
-  }
+/**
+ * Create a type guard to verify if a string is a valid UserMode
+ */
+export const isValidUserMode = (mode: string): mode is UserMode => {
+  return ['b2c', 'b2b_user', 'b2b_admin'].includes(mode);
 };
