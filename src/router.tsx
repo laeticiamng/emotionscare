@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 // Layouts
@@ -31,6 +30,7 @@ import B2CJournalPage from '@/pages/b2c/Journal';
 import B2CAudioPage from '@/pages/b2c/Audio';
 import B2CMusicPage from '@/pages/b2c/Music';
 import B2CCoachPage from '@/pages/b2c/Coach';
+import B2CEmotionProgressPage from '@/pages/b2c/Progress';
 
 // Redirect Components
 import Journal from '@/pages/Journal';
@@ -97,6 +97,10 @@ const routes = [
             path: '/settings',
             element: <UnifiedSettingsPage />
           },
+          {
+            path: '/progress',
+            element: <B2CEmotionProgressPage />
+          },
           // Feature redirect pages
           {
             path: '/journal',
@@ -131,6 +135,10 @@ const routes = [
             path: '/b2c/coach',
             element: <B2CCoachPage />
           },
+          {
+            path: '/b2c/progress',
+            element: <B2CEmotionProgressPage />
+          },
           // B2B user feature pages will be similar to B2C pages but with team features
           {
             path: '/b2b/user/journal',
@@ -147,6 +155,10 @@ const routes = [
           {
             path: '/b2b/user/coach',
             element: <B2CCoachPage />
+          },
+          {
+            path: '/b2b/user/progress',
+            element: <B2CEmotionProgressPage />
           },
         ]
       }

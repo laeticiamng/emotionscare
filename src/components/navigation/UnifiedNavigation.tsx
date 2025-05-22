@@ -10,7 +10,11 @@ import NavItem from './NavItem';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 
-const UnifiedNavigation: React.FC = () => {
+interface UnifiedNavigationProps {
+  onItemClick?: () => void;
+}
+
+const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({ onItemClick }) => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const { userMode } = useUserMode();
@@ -76,6 +80,12 @@ const UnifiedNavigation: React.FC = () => {
     }
   ];
 
+  const handleItemClick = () => {
+    if (onItemClick) {
+      onItemClick();
+    }
+  };
+
   const renderNavItems = (links: any[]) => {
     return links
       .filter(link => !link.requiresAuth || isAuthenticated)
@@ -86,6 +96,7 @@ const UnifiedNavigation: React.FC = () => {
           icon={link.icon}
           label={link.label}
           active={isActive(link.path)}
+          onClick={handleItemClick}
           testId={`nav-${link.path.replace(/\//g, '-')}`}
           className={cn(
             "mb-1",
