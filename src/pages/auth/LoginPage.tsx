@@ -1,148 +1,149 @@
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { motion } from 'framer-motion';
-import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import Shell from '@/Shell';
-import { useToast } from '@/hooks/use-toast';
 
-const LoginPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { login } = useAuth();
-  const { toast } = useToast();
+interface LoginPageProps {
+  mode?: 'b2c' | 'b2b_user' | 'b2b_admin';
+}
+
+const LoginPage: React.FC<LoginPageProps> = ({ mode = 'b2c' }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
+    
+    if (!email || !password) {
+      toast.error("Veuillez remplir tous les champs");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
     try {
       await login(email, password);
-      sessionStorage.setItem('just_logged_in', 'true');
-      navigate('/dashboard');
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur votre espace personnel"
+      
+      // Redirect to dashboard after successful login
+      toast.success("Connexion réussie", {
+        description: "Bienvenue dans votre espace personnel."
       });
-    } catch (err: any) {
-      console.error('Login error:', err);
-      setError('Impossible de se connecter. Veuillez vérifier vos identifiants.');
+      
+      if (mode === 'b2c') {
+        navigate('/dashboard');
+      } else if (mode === 'b2b_user') {
+        navigate('/dashboard');
+      } else {
+        navigate('/admin/dashboard');
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Échec de la connexion", {
+        description: "Identifiants incorrects. Veuillez réessayer."
+      });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
+  const getForgotPasswordPath = () => {
+    if (mode === 'b2c') return '/b2c/forgot-password';
+    if (mode === 'b2b_user') return '/b2b/user/forgot-password';
+    return '/b2b/admin/forgot-password';
+  };
+
+  const getRegisterPath = () => {
+    if (mode === 'b2c') return '/b2c/register';
+    if (mode === 'b2b_user') return '/b2b/user/register';
+    return '/';  // Admin users typically don't self-register
+  };
+
+  const getTitle = () => {
+    if (mode === 'b2c') return 'Connexion Particulier';
+    if (mode === 'b2b_user') return 'Connexion Collaborateur';
+    return 'Connexion Administrateur';
+  };
+
   return (
-    <Shell>
-      <div className="flex items-center justify-center min-h-screen bg-background p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
-        >
-          <Card>
-            <CardHeader>
-              <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <User className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle className="text-2xl text-center">Bienvenue</CardTitle>
-              <CardDescription className="text-center">
-                Connectez-vous à votre compte personnel
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="vous@exemple.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                {error && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-sm text-destructive p-2 bg-destructive/10 rounded-md"
-                  >
-                    {error}
-                  </motion.div>
-                )}
-                <Button 
-                  type="submit" 
-                  className="w-full relative" 
-                  disabled={isLoading}
+    <div className="flex items-center justify-center min-h-screen bg-muted/30 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>{getTitle()}</CardTitle>
+          <CardDescription>
+            Connectez-vous pour accéder à votre espace personnel
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="exemple@email.com" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Mot de passe</Label>
+                <Link 
+                  to={getForgotPasswordPath()}
+                  className="text-sm text-primary hover:underline"
                 >
-                  {isLoading ? (
-                    <>
-                      <span>Connexion en cours...</span>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    </>
-                  ) : "Se connecter"}
-                </Button>
-              </form>
-            </CardContent>
-            <CardFooter className="flex flex-col items-center gap-2">
-              <div className="text-sm text-muted-foreground">
-                Vous n'avez pas de compte ?{' '}
-                <Link
-                  to="/register"
-                  className="text-primary underline-offset-4 hover:underline cursor-pointer"
-                >
-                  Créer un compte
+                  Mot de passe oublié?
                 </Link>
               </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                <Link
-                  to="/forgot-password"
-                  className="text-primary underline-offset-4 hover:underline cursor-pointer"
-                >
-                  Mot de passe oublié ?
+              <Input 
+                id="password" 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="rememberMe" 
+                checked={rememberMe} 
+                onCheckedChange={(checked) => setRememberMe(checked === true)}
+              />
+              <label
+                htmlFor="rememberMe"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Se souvenir de moi
+              </label>
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col">
+            <Button type="submit" className="w-full mb-4" disabled={isSubmitting}>
+              {isSubmitting ? "Connexion en cours..." : "Se connecter"}
+            </Button>
+            {mode !== 'b2b_admin' && (
+              <p className="text-sm text-center">
+                Pas encore de compte?{" "}
+                <Link to={getRegisterPath()} className="text-primary hover:underline">
+                  S'inscrire
                 </Link>
-              </div>
-              <Button variant="ghost" className="mt-2 flex items-center gap-2" onClick={() => navigate('/')}>
-                <ArrowLeft size={16} />
-                Retour à l'accueil
-              </Button>
-            </CardFooter>
-          </Card>
-        </motion.div>
-      </div>
-    </Shell>
+              </p>
+            )}
+          </CardFooter>
+        </form>
+      </Card>
+    </div>
   );
 };
 

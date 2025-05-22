@@ -1,5 +1,5 @@
+
 import React from 'react';
-import { RouteObject } from 'react-router-dom';
 import AuthLayout from '@/layouts/AuthLayout';
 import B2CLayout from '@/layouts/B2CLayout';
 import B2BUserLayout from '@/layouts/B2BUserLayout';
@@ -11,15 +11,16 @@ import Home from './Home';
 import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import NotFoundPage from './pages/NotFoundPage';
+
 // Page components
 import ImmersiveHome from './pages/ImmersiveHome';
-import ChooseModeFlow from './pages/auth/ChooseModeFlow';
+import ChooseModeFlow from '@/pages/auth/ChooseModeFlow';
 import B2BSelectionPage from './pages/B2BSelectionPage';
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
-import ResetPasswordPage from './pages/auth/ResetPasswordPage';
-import UnauthorizedPage from './pages/auth/UnauthorizedPage';
+import LoginPage from '@/pages/auth/LoginPage';
+import RegisterPage from '@/pages/auth/RegisterPage';
+import ForgotPasswordPage from '@/pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from '@/pages/auth/ResetPasswordPage';
+import UnauthorizedPage from '@/pages/auth/UnauthorizedPage';
 import DashboardPage from './pages/DashboardPage';
 import ScanPage from './pages/ScanPage';
 import JournalPage from './pages/JournalPage';
