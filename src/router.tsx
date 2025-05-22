@@ -1,203 +1,166 @@
 
-import React from 'react';
+import React, { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
-import ProtectedRoute from './components/auth/ProtectedRoute';
+import Shell from './Shell';
 
-// Import pages
-const Home = React.lazy(() => import('./pages/Index'));
-const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-const NotFoundPage = React.lazy(() => import('./pages/errors/NotFoundPage'));
-const ForbiddenPage = React.lazy(() => import('./pages/errors/ForbiddenPage'));
-const ServerErrorPage = React.lazy(() => import('./pages/errors/ServerErrorPage'));
-const Legal = React.lazy(() => import('./pages/Legal'));
-const ContactPage = React.lazy(() => import('./pages/ContactPage'));
-const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy'));
-const TermsOfService = React.lazy(() => import('./pages/TermsOfService'));
-const CookiesPage = React.lazy(() => import('./pages/CookiesPage'));
-const SocialCocoonPage = React.lazy(() => import('./pages/SocialCocoonPage'));
-const TeamPage = React.lazy(() => import('./pages/TeamPage'));
-const Support = React.lazy(() => import('./pages/Support'));
-const NotImplementedPage = React.lazy(() => import('./pages/NotImplementedPage'));
-const B2CDashboardPage = React.lazy(() => import('./pages/b2c/DashboardPage'));
-const SessionsPage = React.lazy(() => import('./pages/SessionsPage'));
-const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
-const VRAnalyticsPage = React.lazy(() => import('./pages/VRAnalyticsPage'));
-const VRSessionPage = React.lazy(() => import('./pages/VRSessionPage'));
-const CommunityAdminPage = React.lazy(() => import('./pages/CommunityAdminPage'));
-const LoginPage = React.lazy(() => import('./pages/auth/LoginPage'));
-const RegisterPage = React.lazy(() => import('./pages/RegisterPage'));
-const ForgotPasswordPage = React.lazy(() => import('./pages/ForgotPasswordPage'));
-const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
-const AdminLoginPage = React.lazy(() => import('./pages/AdminLoginPage'));
-const CollaboratorLoginPage = React.lazy(() => import('./pages/b2b/user/Login'));
-const ScanPage = React.lazy(() => import('./pages/ScanPage'));
-const FeatureHub = React.lazy(() => import('./pages/FeatureHub'));
-const ChooseMode = React.lazy(() => import('./pages/common/ChooseMode'));
-const ModeSwitcher = React.lazy(() => import('./pages/common/ModeSwitcher'));
+// Pages à chargement différé pour optimiser le temps de chargement
+const Home = lazy(() => import('./Home'));
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Profile = lazy(() => import('./pages/Profile'));
+const VR = lazy(() => import('./pages/VR'));
+const Music = lazy(() => import('./pages/Music'));
+const Journal = lazy(() => import('./pages/Journal'));
+const Login = lazy(() => import('./pages/Login'));
+const Team = lazy(() => import('./pages/Team'));
+const Support = lazy(() => import('./pages/Support'));
+const Settings = lazy(() => import('./pages/UnifiedSettingsPage'));
+const Session = lazy(() => import('./pages/Session'));
+const Coach = lazy(() => import('./pages/Coach'));
+const Social = lazy(() => import('./pages/Social'));
+const NotFoundPage = lazy(() => import('./pages/NotFound'));
+const FeatureHub = lazy(() => import('./pages/FeatureHub'));
+const Audio = lazy(() => import('./pages/Audio'));
 
-// Journal pages
-const NewJournalEntryPage = React.lazy(() => import('./pages/journal/NewJournalEntryPage'));
-const JournalEntryPage = React.lazy(() => import('./pages/journal/JournalEntryPage'));
-const JournalPage = React.lazy(() => import('./pages/journal/JournalPage'));
-
-// Music pages
-const MusicPage = React.lazy(() => import('./pages/music/MusicPage'));
-const MusicPlayerPage = React.lazy(() => import('./pages/music/MusicPlayerPage'));
-
-// Define routes
+// Configuration des routes
 const routes = [
   {
     path: '/',
-    element: <Home />
+    element: <LandingPage />,
+    index: true,
   },
   {
-    path: '/features',
-    element: <FeatureHub />
+    path: '/home',
+    element: (
+      <Shell>
+        <Home />
+      </Shell>
+    ),
   },
   {
     path: '/dashboard',
-    element: <ProtectedRoute><Dashboard /></ProtectedRoute>
+    element: (
+      <Shell>
+        <Dashboard />
+      </Shell>
+    ),
   },
   {
     path: '/profile',
-    element: <ProtectedRoute><ProfilePage /></ProtectedRoute>
-  },
-  {
-    path: '/b2c/dashboard',
-    element: <ProtectedRoute><B2CDashboardPage /></ProtectedRoute>
-  },
-  {
-    path: '/legal',
-    element: <Legal />
-  },
-  {
-    path: '/privacy',
-    element: <PrivacyPolicy />
-  },
-  {
-    path: '/terms',
-    element: <TermsOfService />
-  },
-  {
-    path: '/cookies',
-    element: <CookiesPage />
-  },
-  {
-    path: '/contact',
-    element: <ContactPage />
-  },
-  {
-    path: '/forbidden',
-    element: <ForbiddenPage />
-  },
-  {
-    path: '/404',
-    element: <NotFoundPage />
-  },
-  {
-    path: '/500',
-    element: <ServerErrorPage />
-  },
-  {
-    path: '/social',
-    element: <ProtectedRoute><SocialCocoonPage /></ProtectedRoute>
-  },
-  {
-    path: '/team',
-    element: <TeamPage />
-  },
-  {
-    path: '/support',
-    element: <Support />
-  },
-  {
-    path: '/sessions',
-    element: <ProtectedRoute><SessionsPage /></ProtectedRoute>
-  },
-  {
-    path: '/settings',
-    element: <ProtectedRoute><SettingsPage /></ProtectedRoute>
-  },
-  {
-    path: '/vr-analytics',
-    element: <ProtectedRoute><VRAnalyticsPage /></ProtectedRoute>
-  },
-  {
-    path: '/vr-session/:id',
-    element: <ProtectedRoute><VRSessionPage /></ProtectedRoute>
-  },
-  {
-    path: '/community-admin',
-    element: <ProtectedRoute allowedRoles={['admin']}><CommunityAdminPage /></ProtectedRoute>
-  },
-  {
-    path: '/coming-soon',
-    element: <NotImplementedPage />
-  },
-  {
-    path: '/choose-mode',
-    element: <ProtectedRoute><ChooseMode /></ProtectedRoute>
-  },
-  {
-    path: '/mode-switcher',
-    element: <ProtectedRoute><ModeSwitcher /></ProtectedRoute>
-  },
-  // New Scan page
-  {
-    path: '/scan',
-    element: <ProtectedRoute><ScanPage /></ProtectedRoute>
+    element: (
+      <Shell>
+        <Profile />
+      </Shell>
+    ),
   },
   {
     path: '/vr',
-    element: <ProtectedRoute><VRAnalyticsPage /></ProtectedRoute>
+    element: (
+      <Shell>
+        <VR />
+      </Shell>
+    ),
   },
-  // Journal routes
-  {
-    path: '/journal',
-    element: <ProtectedRoute><JournalPage /></ProtectedRoute>
-  },
-  {
-    path: '/journal/new',
-    element: <ProtectedRoute><NewJournalEntryPage /></ProtectedRoute>
-  },
-  {
-    path: '/journal/:id',
-    element: <ProtectedRoute><JournalEntryPage /></ProtectedRoute>
-  },
-  // Music routes
   {
     path: '/music',
-    element: <ProtectedRoute><MusicPage /></ProtectedRoute>
+    element: (
+      <Shell>
+        <Music />
+      </Shell>
+    ),
   },
   {
-    path: '/music/player/:id',
-    element: <ProtectedRoute><MusicPlayerPage /></ProtectedRoute>
+    path: '/journal',
+    element: (
+      <Shell>
+        <Journal />
+      </Shell>
+    ),
   },
-  // Auth routes
+  {
+    path: '/coach',
+    element: (
+      <Shell>
+        <Coach />
+      </Shell>
+    ),
+  },
+  {
+    path: '/settings',
+    element: (
+      <Shell>
+        <Settings />
+      </Shell>
+    ),
+  },
   {
     path: '/login',
-    element: <LoginPage />
+    element: <Login />,
   },
   {
-    path: '/admin/login',
-    element: <AdminLoginPage />
+    path: '/b2c/login',
+    element: <Login mode="b2c" />,
   },
   {
-    path: '/b2b/user/login',
-    element: <CollaboratorLoginPage />
+    path: '/b2b/selection',
+    element: <Login mode="b2b" />,
   },
   {
-    path: '/register',
-    element: <RegisterPage />
+    path: '/team',
+    element: (
+      <Shell>
+        <Team />
+      </Shell>
+    ),
   },
   {
-    path: '/forgot-password',
-    element: <ForgotPasswordPage />
+    path: '/support',
+    element: (
+      <Shell>
+        <Support />
+      </Shell>
+    ),
+  },
+  {
+    path: '/sessions',
+    element: (
+      <Shell>
+        <Session />
+      </Shell>
+    ),
+  },
+  {
+    path: '/social',
+    element: (
+      <Shell>
+        <Social />
+      </Shell>
+    ),
+  },
+  {
+    path: '/features',
+    element: (
+      <Shell>
+        <FeatureHub />
+      </Shell>
+    ),
+  },
+  {
+    path: '/audio',
+    element: (
+      <Shell>
+        <Audio />
+      </Shell>
+    ),
+  },
+  {
+    path: '/404',
+    element: <NotFoundPage />,
   },
   {
     path: '*',
-    element: <Navigate to="/404" replace />
-  }
+    element: <Navigate to="/404" replace />,
+  },
 ];
 
 export default routes;

@@ -3,6 +3,7 @@ import React, { Suspense, useEffect } from 'react';
 import { useRoutes, useLocation, useNavigate } from 'react-router-dom';
 import routes from './router';
 import { toast } from 'sonner';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
 const AppRouter: React.FC = () => {
   const element = useRoutes(routes);
@@ -16,8 +17,18 @@ const AppRouter: React.FC = () => {
     // Check if route exists in our routes configuration
     const routeExists = routes.some(route => {
       if (route.path === location.pathname) return true;
+      if (route.path === '*') return false; // Don't count wildcard route as match
       // Check for nested routes or routes with parameters
       if (route.path && route.path.includes(':') && location.pathname.startsWith(route.path.split(':')[0])) return true;
+      // Check for route with children
+      if (route.children) {
+        return route.children.some(childRoute => {
+          const fullPath = route.path && childRoute.path ? `${route.path}/${childRoute.path}` : (childRoute.path || '');
+          if (fullPath === location.pathname) return true;
+          if (fullPath && fullPath.includes(':') && location.pathname.startsWith(fullPath.split(':')[0])) return true;
+          return false;
+        });
+      }
       return false;
     });
     
@@ -34,8 +45,7 @@ const AppRouter: React.FC = () => {
   return (
     <Suspense fallback={
       <div className="flex h-screen items-center justify-center">
-        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="ml-4 text-lg">Chargement...</p>
+        <LoadingAnimation text="Chargement de la page..." />
       </div>
     }>
       {element}

@@ -1,523 +1,687 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, User, Building, MicIcon, Moon, Sun } from 'lucide-react';
-import Shell from '@/Shell';
-import * as THREE from 'three';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useToast } from '@/hooks/use-toast';
+import HeroSection from '@/components/home/HeroSection';
+import { Shield, Facebook, Twitter, Instagram, Linkedin, ExternalLink } from 'lucide-react';
 
-const LandingPage: React.FC = () => {
-  const navigate = useNavigate();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const particlesMeshRef = useRef<THREE.Points | null>(null);
-  const timeOfDayRef = useRef<string>(getTimeOfDay());
-  const [welcomeVisible, setWelcomeVisible] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const [onboardingStep, setOnboardingStep] = useState(0);
-  const { theme, setTheme } = useTheme();
-  const isDarkMode = theme === 'dark';
+// Types pour les bénéfices et témoignages
+interface Benefit {
+  id: string;
+  title: string;
+  description: string;
+  iconUrl: string;
+}
 
-  // Determine time of day
-  function getTimeOfDay() {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return 'morning';
-    if (hour >= 12 && hour < 18) return 'afternoon';
-    if (hour >= 18 && hour < 22) return 'evening';
-    return 'night';
-  }
+interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  company: string;
+  content: string;
+  avatarUrl: string;
+}
 
-  // Handle theme toggle
-  const toggleTheme = () => {
-    setTheme(isDarkMode ? 'light' : 'dark');
-  };
-
+// Composant pour les bénéfices
+const BenefitCard = ({ benefit, index }: { benefit: Benefit; index: number }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  
   useEffect(() => {
-    // Show welcome animation after a brief delay
-    const welcomeTimer = setTimeout(() => {
-      setWelcomeVisible(true);
-    }, 500);
-
-    // Check if it's user's first visit
-    const isFirstVisit = localStorage.getItem('emotionsCareFirstVisit') !== 'false';
-    if (isFirstVisit) {
-      setTimeout(() => {
-        setShowOnboarding(true);
-        localStorage.setItem('emotionsCareFirstVisit', 'false');
-      }, 2000);
-    }
-
-    return () => clearTimeout(welcomeTimer);
-  }, []);
-
-  useEffect(() => {
-    if (!canvasRef.current || !containerRef.current) return;
-
-    // Mouse movement tracker
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!containerRef.current) return;
-      
-      // Calculate normalized mouse position (-1 to 1)
-      mouseRef.current = {
-        x: (event.clientX / window.innerWidth) * 2 - 1,
-        y: -(event.clientY / window.innerHeight) * 2 + 1
-      };
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-
-    // Initialize Three.js scene
-    const scene = new THREE.Scene();
-    
-    // Camera with better perspective for immersiveness
-    const camera = new THREE.PerspectiveCamera(
-      75, 
-      containerRef.current.offsetWidth / containerRef.current.offsetHeight, 
-      0.1, 
-      1000
-    );
-    camera.position.z = 30;
-
-    const renderer = new THREE.WebGLRenderer({
-      canvas: canvasRef.current,
-      alpha: true,
-      antialias: true
-    });
-    renderer.setSize(containerRef.current.offsetWidth, containerRef.current.offsetHeight);
-    renderer.setClearColor(0x000000, 0);
-
-    // Create particles with color theme based on time of day
-    const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 2000; // Increased for more immersive feel
-    
-    const posArray = new Float32Array(particlesCount * 3);
-    
-    // Create a sphere distribution for more natural feel
-    for (let i = 0; i < particlesCount; i++) {
-      const radius = 25 + Math.random() * 10; // Radius of sphere
-      const theta = Math.random() * Math.PI * 2; // Random angle around Y axis
-      const phi = Math.random() * Math.PI; // Random angle from top to bottom
-      
-      const x = radius * Math.sin(phi) * Math.cos(theta);
-      const y = radius * Math.sin(phi) * Math.sin(theta);
-      const z = radius * Math.cos(phi);
-      
-      posArray[i * 3] = x;
-      posArray[i * 3 + 1] = y;
-      posArray[i * 3 + 2] = z;
-    }
-    
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    
-    // Time of day based color theme
-    let particleColor;
-    switch(timeOfDayRef.current) {
-      case 'morning':
-        particleColor = isDarkMode ? 0x6495ED : 0x94c5f8; // Morning blue
-        break;
-      case 'afternoon':
-        particleColor = isDarkMode ? 0x1E90FF : 0x42a5f5; // Afternoon bright blue
-        break;
-      case 'evening':
-        particleColor = isDarkMode ? 0x8A2BE2 : 0xb39ddb; // Evening purple
-        break;
-      case 'night':
-        particleColor = isDarkMode ? 0x191970 : 0x3949ab; // Night deep blue
-        break;
-      default:
-        particleColor = 0x3b82f6; // Default blue
-    }
-    
-    const particleTexture = new THREE.TextureLoader().load('/assets/textures/particle.png');
-    
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.3,
-      transparent: true,
-      color: particleColor,
-      blending: THREE.AdditiveBlending,
-      opacity: 0.8,
-      map: particleTexture,
-      depthWrite: false
-    });
-    
-    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-    particlesMeshRef.current = particlesMesh;
-    scene.add(particlesMesh);
-
-    // Animation
-    const animate = () => {
-      const animationId = requestAnimationFrame(animate);
-      
-      if (particlesMeshRef.current) {
-        // Slow rotation for ambient effect
-        particlesMeshRef.current.rotation.x += 0.0002;
-        particlesMeshRef.current.rotation.y += 0.0003;
-        
-        // Interactive mouse effect - particles slightly follow mouse movement
-        particlesMeshRef.current.rotation.x += mouseRef.current.y * 0.0002;
-        particlesMeshRef.current.rotation.y += mouseRef.current.x * 0.0002;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setIsVisible(true);
+        // Enregistrer l'événement analytics quand la carte est visible
+        console.debug('Analytics Event:', 'benefitViewed', { benefitId: benefit.id });
+        // Ici, on pourrait appeler une API pour enregistrer l'événement
       }
-      
-      renderer.render(scene, camera);
-      
-      // Cleanup function
-      return () => {
-        cancelAnimationFrame(animationId);
-      };
-    };
-
-    animate();
-
-    // Handle resize for responsive design
-    const handleResize = () => {
-      if (!containerRef.current) return;
-      
-      camera.aspect = containerRef.current.offsetWidth / containerRef.current.offsetHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(containerRef.current.offsetWidth, containerRef.current.offsetHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    // Play subtle welcome sound effect with error handling
-    const audio = new Audio('/sounds/welcome.mp3');
-    audio.volume = 0.2;
-    const playPromise = audio.play();
+    }, { threshold: 0.3 });
     
-    if (playPromise !== undefined) {
-      playPromise.catch(_ => {
-        console.log('Auto-play was prevented. User interaction required.');
-      });
-    }
-
+    const element = document.getElementById(`benefit-${benefit.id}`);
+    if (element) observer.observe(element);
+    
     return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (containerRef.current) {
-        scene.remove(particlesMesh);
-        particlesGeometry.dispose();
-        particlesMaterial.dispose();
-      }
+      if (element) observer.unobserve(element);
     };
-  }, [isDarkMode]);
-
-  const handleVoiceCommand = () => {
-    // Add feedback when voice is activated
-    const feedbackEl = document.getElementById('voice-feedback');
-    if (feedbackEl) {
-      feedbackEl.classList.add('pulse-animation');
-      setTimeout(() => feedbackEl.classList.remove('pulse-animation'), 2000);
-    }
-    
-    // Placeholder for voice command functionality
-    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
-      recognition.lang = 'fr-FR';
-      recognition.onresult = (event) => {
-        const command = event.results[0][0].transcript.toLowerCase();
-        if (command.includes('personnel') || command.includes('particulier')) {
-          navigate('/b2c/login');
-        } else if (command.includes('entreprise') || command.includes('professionnel')) {
-          navigate('/b2b/selection');
-        }
-      };
-      recognition.start();
-    } else {
-      console.log('Speech recognition not supported');
-    }
-  };
-
-  const onboardingSteps = [
-    {
-      title: "Bienvenue sur EmotionsCare",
-      description: "Votre espace dédié au bien-être émotionnel et à l'harmonie au quotidien.",
-      image: "/images/onboarding-1.png"
-    },
-    {
-      title: "Choisissez votre profil",
-      description: "Accédez à des fonctionnalités adaptées à votre usage personnel ou professionnel.",
-      image: "/images/onboarding-2.png"
-    }
-  ];
-
+  }, [benefit.id]);
+  
   return (
-    <Shell className="overflow-hidden" immersive>
-      <div ref={containerRef} className="relative min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50/30 to-blue-100/20 dark:from-slate-900/80 dark:to-blue-950/30">
-        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-0" />
-        
-        {/* Theme toggle button (new) */}
-        <div className="absolute top-4 right-4 z-20">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={toggleTheme}
-            className="rounded-full w-10 h-10 bg-white/10 backdrop-blur-md hover:bg-white/20 dark:bg-slate-800/30 dark:hover:bg-slate-800/50"
-          >
-            <AnimatePresence mode="wait">
-              {isDarkMode ? (
-                <motion.span 
-                  key="sun"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Sun className="h-5 w-5" />
-                </motion.span>
-              ) : (
-                <motion.span 
-                  key="moon"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Moon className="h-5 w-5" />
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </Button>
-        </div>
-        
-        <div className="z-10 px-4 max-w-6xl mx-auto text-center relative">
-          {/* Welcome message with animation */}
-          <AnimatePresence mode="wait">
-            {welcomeVisible && (
-              <motion.div 
-                className="mb-12 text-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.7, ease: "easeOut" }}
-              >
-                <motion.h1 
-                  className="text-5xl md:text-7xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-blue-500 dark:from-blue-400 dark:to-blue-300 tracking-tight"
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                >
-                  EmotionsCare
-                </motion.h1>
-                <motion.p 
-                  className="text-xl md:text-2xl text-blue-700 dark:text-blue-300 max-w-3xl mx-auto font-light"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                >
-                  Votre espace premium pour le bien-être émotionnel
-                </motion.p>
-                <motion.p
-                  className="mt-3 text-base text-blue-600/70 dark:text-blue-400/70"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8, duration: 0.5 }}
-                >
-                  {timeOfDayRef.current === 'morning' && "Bon matin ! Commencez votre journée avec sérénité"}
-                  {timeOfDayRef.current === 'afternoon' && "Bon après-midi ! Un moment idéal pour prendre soin de vous"}
-                  {timeOfDayRef.current === 'evening' && "Bonsoir ! Terminez votre journée en douceur"}
-                  {timeOfDayRef.current === 'night' && "Bonsoir ! Un moment de calme avant le repos"}
-                </motion.p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          
-          {/* Mode selection buttons with enhanced animations */}
-          <div className="flex flex-col sm:flex-row justify-center mt-12 space-y-4 sm:space-y-0 sm:space-x-6 relative">
+    <motion.div
+      id={`benefit-${benefit.id}`}
+      data-id={benefit.id}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+    >
+      <div className="flex items-center justify-center mb-4 h-16 w-16 mx-auto bg-blue-50 dark:bg-blue-900/30 rounded-full">
+        <img src={benefit.iconUrl} alt="" className="h-8 w-8" />
+      </div>
+      <h3 className="text-lg font-semibold text-center mb-2">{benefit.title}</h3>
+      <p className="text-sm text-center text-gray-600 dark:text-gray-300">{benefit.description}</p>
+    </motion.div>
+  );
+};
+
+// Carousel de témoignages
+const TestimonialsCarousel = ({ testimonials }: { testimonials: Testimonial[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+    }, 6000);
+    
+    return () => clearInterval(timer);
+  }, [testimonials.length]);
+  
+  const goToPrev = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
+  };
+  
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+  };
+  
+  if (testimonials.length === 0) return null;
+  
+  return (
+    <div className="relative max-w-4xl mx-auto">
+      <div 
+        className="overflow-hidden" 
+        aria-live="polite" 
+        aria-atomic="true"
+      >
+        <div className="flex">
+          {testimonials.map((testimonial, index) => (
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.7, duration: 0.7 }}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
+              key={testimonial.id}
+              className="w-full flex-shrink-0"
+              initial={{ opacity: 0 }}
+              animate={{ 
+                opacity: currentIndex === index ? 1 : 0,
+                x: `${(index - currentIndex) * 100}%`
+              }}
+              transition={{ duration: 0.5 }}
+              aria-hidden={currentIndex !== index}
             >
-              <Button 
-                asChild 
-                size="lg" 
-                className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 dark:from-blue-700 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-500 text-white px-8 py-6 text-lg rounded-2xl shadow-lg hover:shadow-xl transform transition-all duration-300"
-              >
-                <Link to="/b2c/login" className="flex items-center">
-                  <User className="mr-2 h-5 w-5" />
-                  Espace Personnel
-                  <motion.span 
-                    className="ml-2" 
-                    animate={{ x: [0, 5, 0] }}
-                    transition={{ repeat: Infinity, repeatDelay: 3, duration: 1.5 }}
-                  >
-                    <ArrowRight className="h-5 w-5" />
-                  </motion.span>
-                </Link>
-              </Button>
+              <blockquote className="p-8 bg-white dark:bg-gray-800 rounded-xl shadow-md">
+                <div className="flex items-center mb-6">
+                  <img 
+                    src={testimonial.avatarUrl} 
+                    alt={testimonial.name} 
+                    className="h-12 w-12 rounded-full object-cover mr-4"
+                  />
+                  <div>
+                    <p className="font-semibold">{testimonial.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {testimonial.role}, {testimonial.company}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-lg italic">{testimonial.content}</p>
+              </blockquote>
             </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.9, duration: 0.7 }}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Button 
-                asChild 
-                size="lg" 
-                variant="outline" 
-                className="w-full sm:w-auto border-blue-400 dark:border-blue-700 bg-white/80 dark:bg-blue-950/50 backdrop-blur-sm hover:bg-blue-50 dark:hover:bg-blue-900/80 text-blue-700 dark:text-blue-300 px-8 py-6 text-lg rounded-2xl shadow-md hover:shadow-lg transform transition-all duration-300"
-              >
-                <Link to="/b2b/selection" className="flex items-center">
-                  <Building className="mr-2 h-5 w-5" />
-                  Espace Entreprise
-                  <motion.span 
-                    className="ml-2" 
-                    animate={{ x: [0, 5, 0] }}
-                    transition={{ repeat: Infinity, repeatDelay: 4, duration: 1.5 }}
-                  >
-                    <ArrowRight className="h-5 w-5" />
-                  </motion.span>
-                </Link>
-              </Button>
-            </motion.div>
-          </div>
-          
-          {/* Voice command button with feedback animation */}
-          <motion.div 
-            className="mt-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.5 }}
-          >
-            <div className="relative inline-block">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-blue-600 dark:text-blue-400 hover:bg-blue-100/50 dark:hover:bg-blue-900/50 rounded-full p-3 group"
-                onClick={handleVoiceCommand}
-                title="Commande vocale"
-              >
-                <MicIcon className="h-5 w-5 group-hover:scale-110 transition-transform" />
-                <span className="sr-only">Commande vocale</span>
-              </Button>
-              <span id="voice-feedback" className="absolute inset-0 bg-blue-400/20 dark:bg-blue-600/30 rounded-full scale-0 transition-transform duration-300"></span>
-            </div>
-            <p className="text-xs text-blue-600/60 dark:text-blue-400/60 mt-2">Essayez la commande vocale</p>
-          </motion.div>
-          
-          <motion.div 
-            className="mt-24 text-blue-600/60 dark:text-blue-400/60 text-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.5, duration: 0.5 }}
-          >
-            <p>Découvrez <span className="text-blue-600 dark:text-blue-400 font-medium">SocialCocon</span> - Votre communauté dédiée au bien-être</p>
-          </motion.div>
+          ))}
         </div>
       </div>
-
-      {/* Onboarding overlay */}
-      <AnimatePresence>
-        {showOnboarding && (
-          <motion.div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+      
+      <div className="flex justify-center mt-6 space-x-2">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          onClick={goToPrev}
+          aria-label="Témoignage précédent"
+        >
+          <span className="sr-only">Précédent</span>
+          &larr;
+        </Button>
+        {testimonials.map((_, index) => (
+          <Button
+            key={index}
+            variant={currentIndex === index ? "default" : "outline"}
+            size="sm"
+            onClick={() => setCurrentIndex(index)}
+            aria-label={`Témoignage ${index + 1}`}
+            aria-current={currentIndex === index}
+            className="w-8 h-8 p-0"
           >
-            <motion.div 
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full overflow-hidden"
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              transition={{ duration: 0.3 }}
+            {index + 1}
+          </Button>
+        ))}
+        <Button 
+          variant="outline" 
+          size="icon" 
+          onClick={goToNext}
+          aria-label="Témoignage suivant"
+        >
+          <span className="sr-only">Suivant</span>
+          &rarr;
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+// TourModal pour l'onboarding
+const TourModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+  const [step, setStep] = useState(1);
+  const totalSteps = 3;
+  
+  const nextStep = () => {
+    if (step < totalSteps) {
+      setStep(step + 1);
+    } else {
+      completeTour();
+    }
+  };
+  
+  const prevStep = () => {
+    if (step > 1) {
+      setStep(step - 1);
+    }
+  };
+  
+  const completeTour = () => {
+    localStorage.setItem('tourCompleted', 'true');
+    console.debug('Analytics Event:', 'tourCompleted');
+    onClose();
+  };
+  
+  if (!isOpen) return null;
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <motion.div 
+        className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-lg w-full mx-4"
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: 0.9 }}
+      >
+        <div className="p-6">
+          <h2 className="text-2xl font-bold mb-4">Découvrez EmotionsCare</h2>
+          
+          <div className="mb-6">
+            {step === 1 && (
+              <div>
+                <h3 className="text-xl mb-3">Bienvenue dans l'expérience EmotionsCare</h3>
+                <p>Découvrez comment notre plateforme peut vous aider à mieux gérer vos émotions et améliorer votre bien-être quotidien.</p>
+                <img src="/images/tour-step1.jpg" alt="Illustration EmotionsCare" className="my-4 rounded-lg" />
+              </div>
+            )}
+            
+            {step === 2 && (
+              <div>
+                <h3 className="text-xl mb-3">Une approche personnalisée</h3>
+                <p>Notre plateforme s'adapte à vos besoins spécifiques et vous propose des solutions sur mesure pour votre situation émotionnelle.</p>
+                <img src="/images/tour-step2.jpg" alt="Solutions personnalisées" className="my-4 rounded-lg" />
+              </div>
+            )}
+            
+            {step === 3 && (
+              <div>
+                <h3 className="text-xl mb-3">Prêt à commencer ?</h3>
+                <p>Créez votre compte et commencez votre voyage vers un meilleur équilibre émotionnel dès aujourd'hui.</p>
+                <img src="/images/tour-step3.jpg" alt="Commencer votre voyage" className="my-4 rounded-lg" />
+              </div>
+            )}
+          </div>
+          
+          <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full mb-6">
+            <div 
+              className="bg-primary h-2 rounded-full" 
+              style={{ width: `${(step / totalSteps) * 100}%` }}
+            />
+          </div>
+          
+          <div className="flex justify-between">
+            <Button
+              variant="outline"
+              onClick={prevStep}
+              disabled={step === 1}
             >
-              <div className="relative h-40 bg-gradient-to-r from-blue-400 to-purple-500">
-                {onboardingStep === 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center text-white">
-                    <motion.div 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-center"
-                    >
-                      <div className="text-6xl font-bold mb-2">👋</div>
-                    </motion.div>
+              Précédent
+            </Button>
+            
+            <div className="flex space-x-1">
+              {Array.from({ length: totalSteps }).map((_, i) => (
+                <div 
+                  key={i}
+                  className={`w-2 h-2 rounded-full ${i + 1 <= step ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'}`}
+                />
+              ))}
+            </div>
+            
+            <Button
+              onClick={nextStep}
+            >
+              {step < totalSteps ? 'Suivant' : 'Terminer'}
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+// Formulaire newsletter
+const NewsletterForm = () => {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Simuler un appel API
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      console.debug('Newsletter subscription:', { email });
+      
+      // Réinitialiser le formulaire
+      setEmail('');
+      
+      toast({
+        title: "Inscription réussie",
+        description: "Vous êtes maintenant inscrit à notre newsletter",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erreur d'inscription",
+        description: "Un problème est survenu, veuillez réessayer.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  return (
+    <form onSubmit={handleSubmit} className="max-w-sm">
+      <div className="flex">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Votre adresse email"
+          className="flex-1 px-4 py-2 rounded-l-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
+          required
+        />
+        <Button 
+          type="submit"
+          disabled={isSubmitting}
+          className="rounded-l-none"
+        >
+          {isSubmitting ? "..." : "S'inscrire"}
+        </Button>
+      </div>
+    </form>
+  );
+};
+
+// Page d'accueil principale
+const LandingPage = () => {
+  const navigate = useNavigate();
+  const [benefits, setBenefits] = useState<Benefit[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [showTourModal, setShowTourModal] = useState(false);
+  const [showOnboardingTour, setShowOnboardingTour] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    // Enregistrer l'événement de vue de la page hero
+    console.debug('Analytics Event:', 'heroViewed');
+    
+    // Charger les données des bénéfices et témoignages
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        // Simuler des appels API pour les données
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Données simulées pour les bénéfices
+        const mockBenefits: Benefit[] = [
+          {
+            id: "1",
+            title: "Scan émotionnel",
+            description: "Analysez vos émotions en temps réel et suivez votre évolution au quotidien.",
+            iconUrl: "/icons/emotion-scan.svg"
+          },
+          {
+            id: "2",
+            title: "Musique adaptative",
+            description: "Des playlists générées selon votre état émotionnel pour vous aider à vous sentir mieux.",
+            iconUrl: "/icons/music-therapy.svg"
+          },
+          {
+            id: "3",
+            title: "Coach personnel",
+            description: "Un assistant IA qui vous accompagne et vous conseille pour gérer vos émotions.",
+            iconUrl: "/icons/ai-coach.svg"
+          },
+          {
+            id: "4",
+            title: "Connexion sociale",
+            description: "Rejoignez une communauté bienveillante et partagez votre parcours émotionnel.",
+            iconUrl: "/icons/social-connection.svg"
+          }
+        ];
+        
+        // Données simulées pour les témoignages
+        const mockTestimonials: Testimonial[] = [
+          {
+            id: "1",
+            name: "Sophie Martin",
+            role: "Utilisatrice",
+            company: "Freelance",
+            content: "EmotionsCare m'a aidée à mieux comprendre mes émotions et à développer des stratégies efficaces pour gérer mon stress quotidien.",
+            avatarUrl: "/avatars/user-1.jpg"
+          },
+          {
+            id: "2",
+            name: "Thomas Dubois",
+            role: "Manager",
+            company: "TechCorp",
+            content: "Grâce à la version entreprise, notre équipe a pu améliorer sa cohésion et son bien-être général, ce qui a directement impacté notre productivité.",
+            avatarUrl: "/avatars/user-2.jpg"
+          },
+          {
+            id: "3",
+            name: "Émilie Petit",
+            role: "Psychologue",
+            company: "Centre de bien-être",
+            content: "Je recommande cette plateforme à mes patients comme complément à nos séances. Les résultats sont vraiment encourageants.",
+            avatarUrl: "/avatars/user-3.jpg"
+          }
+        ];
+        
+        // Charger les feature flags
+        const showTour = localStorage.getItem('tourCompleted') !== 'true';
+        
+        setBenefits(mockBenefits);
+        setTestimonials(mockTestimonials);
+        setShowOnboardingTour(showTour);
+      } catch (error) {
+        console.error('Erreur lors du chargement des données:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+  
+  const handleB2CClick = () => {
+    console.debug('Analytics Event:', 'ctaParticulierClicked');
+    navigate('/b2c/login');
+  };
+  
+  const handleB2BClick = () => {
+    console.debug('Analytics Event:', 'ctaEntrepriseClicked');
+    navigate('/b2b/selection');
+  };
+  
+  const startTour = () => {
+    console.debug('Analytics Event:', 'tourStarted');
+    setShowTourModal(true);
+  };
+  
+  return (
+    <div className="min-h-screen">
+      <header className="relative bg-white dark:bg-gray-900 border-b">
+        <div className="container mx-auto py-4 px-6 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">EmotionsCare</h1>
+          <div className="flex space-x-4">
+            <Button variant="ghost" onClick={() => navigate('/login')}>
+              Connexion
+            </Button>
+            <Button onClick={handleB2CClick}>
+              S'inscrire
+            </Button>
+          </div>
+        </div>
+      </header>
+      
+      <main>
+        {/* Hero Section */}
+        <HeroSection />
+        
+        {/* CTA Buttons */}
+        <section className="bg-white dark:bg-gray-900 py-10">
+          <div className="container mx-auto px-6 text-center">
+            <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-6">
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ duration: 0.09, ease: [0.4, 0, 0.2, 1] }}
+              >
+                <Button 
+                  size="lg"
+                  className="w-full md:w-auto px-8 py-6 text-lg shadow-md"
+                  onClick={handleB2CClick}
+                  aria-label="Accéder à l'espace particulier"
+                  role="button"
+                >
+                  Je suis un particulier
+                </Button>
+              </motion.div>
+              
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ duration: 0.09, ease: [0.4, 0, 0.2, 1] }}
+              >
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="w-full md:w-auto px-8 py-6 text-lg border-2"
+                  onClick={handleB2BClick}
+                  aria-label="Accéder à l'espace entreprise"
+                  role="button"
+                >
+                  Je suis une entreprise
+                </Button>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+        
+        {/* Benefits Section */}
+        <section 
+          className="py-16 bg-gray-50 dark:bg-gray-800"
+          aria-labelledby="benefits-heading"
+        >
+          <div className="container mx-auto px-6">
+            <h2 
+              id="benefits-heading"
+              className="text-3xl font-bold text-center mb-12"
+            >
+              Une solution complète pour votre bien-être émotionnel
+            </h2>
+            
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow animate-pulse">
+                    <div className="flex items-center justify-center mb-4">
+                      <div className="h-16 w-16 bg-gray-200 dark:bg-gray-600 rounded-full"></div>
+                    </div>
+                    <div className="h-6 bg-gray-200 dark:bg-gray-600 rounded mb-4"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded"></div>
                   </div>
-                )}
-                {onboardingStep === 1 && (
-                  <div className="absolute inset-0 flex items-center justify-center space-x-12 text-white">
-                    <motion.div 
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="text-center"
-                    >
-                      <div className="text-6xl mb-2">👤</div>
-                      <div className="text-xs font-medium">Personnel</div>
-                    </motion.div>
-                    <motion.div 
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="text-center"
-                    >
-                      <div className="text-6xl mb-2">🏢</div>
-                      <div className="text-xs font-medium">Entreprise</div>
-                    </motion.div>
-                  </div>
-                )}
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2">
-                  {onboardingSteps[onboardingStep].title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-6">
-                  {onboardingSteps[onboardingStep].description}
-                </p>
-                <div className="flex justify-between">
-                  <Button 
-                    variant="ghost"
-                    onClick={() => setShowOnboarding(false)}
-                  >
-                    Ignorer
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      if (onboardingStep < onboardingSteps.length - 1) {
-                        setOnboardingStep(prev => prev + 1);
-                      } else {
-                        setShowOnboarding(false);
-                      }
-                    }}
-                  >
-                    {onboardingStep < onboardingSteps.length - 1 ? 'Suivant' : 'Terminer'}
-                  </Button>
-                </div>
-              </div>
-              {/* Progress dots */}
-              <div className="pb-4 flex justify-center">
-                {onboardingSteps.map((_, index) => (
-                  <div 
-                    key={index}
-                    className={`mx-1 w-2 h-2 rounded-full ${
-                      index === onboardingStep ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
-                    }`}
-                  ></div>
                 ))}
               </div>
-            </motion.div>
-          </motion.div>
+            ) : benefits.length === 0 ? (
+              <p className="text-center text-gray-500 dark:text-gray-400">Aucune donnée disponible</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {benefits.map((benefit, index) => (
+                  <BenefitCard key={benefit.id} benefit={benefit} index={index} />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+        
+        {/* Testimonials Section */}
+        <section 
+          className="py-16 bg-white dark:bg-gray-900"
+          aria-labelledby="testimonials-heading"
+        >
+          <div className="container mx-auto px-6">
+            <h2 
+              id="testimonials-heading"
+              className="text-3xl font-bold text-center mb-12"
+            >
+              Ce que nos utilisateurs disent
+            </h2>
+            
+            {isLoading ? (
+              <div className="max-w-4xl mx-auto p-8 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-md animate-pulse">
+                <div className="flex items-center mb-6">
+                  <div className="h-12 w-12 bg-gray-300 dark:bg-gray-600 rounded-full mr-4"></div>
+                  <div>
+                    <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded w-32 mb-2"></div>
+                    <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-48"></div>
+                  </div>
+                </div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-full mb-3"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-full mb-3"></div>
+                <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-4/5"></div>
+              </div>
+            ) : testimonials.length === 0 ? (
+              <p className="text-center text-gray-500 dark:text-gray-400">Aucun témoignage disponible</p>
+            ) : (
+              <TestimonialsCarousel testimonials={testimonials} />
+            )}
+          </div>
+        </section>
+        
+        {/* Onboarding Tour Section */}
+        {showOnboardingTour && (
+          <section className="py-16 bg-blue-50 dark:bg-blue-900/20">
+            <div className="container mx-auto px-6 text-center">
+              <h2 className="text-3xl font-bold mb-6">Découvrez notre plateforme</h2>
+              <p className="text-lg mb-8 max-w-2xl mx-auto">
+                Faites le tour de notre plateforme et découvrez comment nous pouvons vous aider à mieux gérer vos émotions.
+              </p>
+              
+              <Button 
+                size="lg"
+                onClick={startTour}
+                className="px-8"
+              >
+                Démarrer la visite guidée
+              </Button>
+              
+              {/* Tour Modal */}
+              <TourModal 
+                isOpen={showTourModal}
+                onClose={() => setShowTourModal(false)}
+              />
+            </div>
+          </section>
         )}
-      </AnimatePresence>
-
-      {/* Add CSS for animations */}
-      <style jsx>{`
-        @keyframes pulse {
-          0% { transform: scale(0); opacity: 1; }
-          100% { transform: scale(2); opacity: 0; }
-        }
-        .pulse-animation {
-          animation: pulse 1.5s ease-out;
-        }
-      `}</style>
-    </Shell>
+      </main>
+      
+      {/* Footer */}
+      <footer 
+        className="bg-gray-100 dark:bg-gray-800 py-12"
+        aria-labelledby="footer-heading"
+      >
+        <div className="container mx-auto px-6">
+          <h2 id="footer-heading" className="sr-only">Footer</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">EmotionsCare</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                Votre partenaire pour un meilleur équilibre émotionnel et un bien-être durable.
+              </p>
+              
+              <div className="flex space-x-4">
+                <a href="#" aria-label="Facebook" className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+                  <Facebook size={20} />
+                </a>
+                <a href="#" aria-label="Twitter" className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+                  <Twitter size={20} />
+                </a>
+                <a href="#" aria-label="Instagram" className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+                  <Instagram size={20} />
+                </a>
+                <a href="#" aria-label="LinkedIn" className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+                  <Linkedin size={20} />
+                </a>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Liens utiles</h3>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#" className="text-sm text-gray-600 dark:text-gray-300 hover:underline">Support</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-600 dark:text-gray-300 hover:underline">FAQ</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-600 dark:text-gray-300 hover:underline">CGU</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-600 dark:text-gray-300 hover:underline">Confidentialité</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-600 dark:text-gray-300 hover:underline">Cookies</a>
+                </li>
+                <li>
+                  <a href="#" className="text-sm text-gray-600 dark:text-gray-300 hover:underline">Presse</a>
+                </li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Newsletter</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                Inscrivez-vous pour recevoir nos actualités et conseils pour votre bien-être.
+              </p>
+              
+              <NewsletterForm />
+              
+              <div className="mt-6 flex items-center">
+                <div className="mr-3 flex-shrink-0 bg-blue-100 dark:bg-blue-800/30 p-2 rounded-full">
+                  <Shield size={16} className="text-blue-600 dark:text-blue-400" />
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Compte protégé par un cryptage de bout en bout
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+              &copy; {new Date().getFullYear()} EmotionsCare. Tous droits réservés.
+            </p>
+          </div>
+        </div>
+      </footer>
+      
+      {/* FullPageLoader - Serait utilisé pour les transitions de navigation */}
+      {/* Ce composant serait affiché lors des navigations longues */}
+    </div>
   );
 };
 

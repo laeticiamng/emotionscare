@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/contexts/AuthContext';
-import { Home, Settings, FileText, Music, HeadphoneIcon, MessageCircle, 
+import { Home, Settings, FileText, Music, Headphones, MessageCircle, 
   Glasses, Heart, Users, UserIcon, BookOpen, Calendar } from 'lucide-react';
 
 export const GlobalNav = () => {
@@ -30,7 +30,7 @@ export const GlobalNav = () => {
         { path: '/music', label: 'Musique', icon: <Music className="w-4 h-4" />, requireAuth: true },
         { path: '/coach', label: 'Coach', icon: <MessageCircle className="w-4 h-4" />, requireAuth: true },
         { path: '/vr', label: 'Réalité Virtuelle', icon: <Glasses className="w-4 h-4" />, requireAuth: true },
-        { path: '/audio', label: 'Audio', icon: <HeadphoneIcon className="w-4 h-4" />, requireAuth: true },
+        { path: '/audio', label: 'Audio', icon: <Headphones className="w-4 h-4" />, requireAuth: true },
         { path: '/social', label: 'Social Cocoon', icon: <Heart className="w-4 h-4" />, requireAuth: true },
         { path: '/sessions', label: 'Sessions', icon: <Calendar className="w-4 h-4" />, requireAuth: true },
       ]
