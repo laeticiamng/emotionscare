@@ -1,10 +1,10 @@
-import React, { lazy } from 'react';
+import React from 'react';
 import { RouteObject } from 'react-router-dom';
-import AuthLayout from './layouts/AuthLayout';
-import B2CLayout from './layouts/B2CLayout';
-import B2BUserLayout from './layouts/B2BUserLayout';
-import B2BAdminLayout from './layouts/B2BAdminLayout';
-import ProtectedRouteWithMode from './components/ProtectedRouteWithMode';
+import AuthLayout from '@/layouts/AuthLayout';
+import B2CLayout from '@/layouts/B2CLayout';
+import B2BUserLayout from '@/layouts/B2BUserLayout';
+import B2BAdminLayout from '@/layouts/B2BAdminLayout';
+import ProtectedRouteWithMode from '@/components/ProtectedRouteWithMode';
 
 // Public pages
 import Home from './Home';
