@@ -2,20 +2,13 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { getModeAudioPath } from '@/utils/userModeHelpers';
 
 const Audio: React.FC = () => {
   const { userMode } = useUserMode();
+  const redirectPath = getModeAudioPath(userMode);
   
-  if (userMode === 'b2c') {
-    return <Navigate to="/b2c/audio" replace />;
-  } else if (userMode === 'b2b_user') {
-    return <Navigate to="/b2b/user/audio" replace />;
-  } else if (userMode === 'b2b_admin') {
-    return <Navigate to="/b2b/admin/dashboard" replace />; // Redirect admins to dashboard as they don't have audio
-  }
-  
-  // Default fallback if no mode is selected
-  return <Navigate to="/choose-mode" replace />;
+  return <Navigate to={redirectPath} replace />;
 };
 
 export default Audio;

@@ -1,252 +1,194 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Stars, Building, User, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Check } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Shell from '@/Shell';
 
 const Pricing: React.FC = () => {
   const navigate = useNavigate();
-  
-  const features = {
-    individual: [
-      "Journal émotionnel personnel",
-      "Thérapie musicale personnalisée",
-      "Coach IA personnalisé",
-      "Sessions de relaxation audio",
-      "Analyse émotionnelle hebdomadaire",
-      "Suivi de progression personnelle",
-      "Accès à la communauté d'entraide"
-    ],
-    business: [
-      "Accès pour tous les collaborateurs",
-      "Tableau de bord analytique pour RH",
-      "Rapports de bien-être d'équipe",
-      "Support dédié 7j/7",
-      "Session de formation mensuelle",
-      "Challenges collectifs bien-être",
-      "Espace communauté privé entreprise"
-    ]
-  };
-  
+
+  const b2cFeatures = [
+    "Accès illimité au scan émotionnel",
+    "Journal émotionnel personnalisé",
+    "Musicothérapie et audio guidé",
+    "Coach IA personnalisé",
+    "Accès à la réalité virtuelle",
+    "Suivi des progrès et statistiques",
+    "Exercices de bien-être quotidiens",
+    "Support communautaire"
+  ];
+
+  const b2bFeatures = [
+    "Tableau de bord RH d'analyse d'équipe",
+    "Scan émotionnel pour chaque collaborateur",
+    "Rapports hebdomadaires par équipe",
+    "Alertes préventives sur le stress",
+    "Statistiques d'amélioration du bien-être",
+    "Espace collaborateur personnalisé",
+    "Ressources et formations",
+    "Support dédié 24/7"
+  ];
+
   return (
-    <div className="container mx-auto py-12 px-4">
-      <div className="text-center mb-12">
-        <motion.h1 
-          className="text-4xl font-bold mb-4"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          Nos offres
-        </motion.h1>
-        <motion.p 
-          className="text-muted-foreground max-w-2xl mx-auto"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          Choisissez la formule qui correspond le mieux à vos besoins en matière de bien-être émotionnel
-        </motion.p>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <Card className="h-full flex flex-col">
-            <CardHeader>
-              <div className="flex items-center justify-center mb-4">
-                <div className="p-2 rounded-full bg-primary/10">
-                  <User className="h-6 w-6 text-primary" />
-                </div>
+    <Shell>
+      <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <motion.h1 
+            className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl mb-6"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            Investissez dans votre <span className="text-primary">bien-être émotionnel</span>
+          </motion.h1>
+          <motion.p 
+            className="max-w-2xl mx-auto text-xl text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            Des solutions adaptées à vos besoins, avec 5 jours d'essai gratuits pour tous nos plans.
+          </motion.p>
+        </div>
+
+        {/* Pricing Plans */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {/* B2C Plan */}
+          <motion.div 
+            className="rounded-2xl border bg-card shadow-sm overflow-hidden"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <div className="p-6 md:p-8">
+              <h3 className="text-2xl font-bold">Particuliers</h3>
+              <div className="mt-4 flex items-baseline">
+                <span className="text-4xl font-extrabold">15€</span>
+                <span className="ml-1 text-muted-foreground">/mois</span>
               </div>
-              <CardTitle className="text-2xl text-center">Particuliers</CardTitle>
-              <CardDescription className="text-center">Pour votre bien-être personnel</CardDescription>
-              <div className="mt-4 text-center">
-                <span className="text-3xl font-bold">15€</span>
-                <span className="text-muted-foreground"> / mois</span>
-              </div>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <p className="text-muted-foreground mb-6 text-center">
-                Accédez à toutes nos fonctionnalités personnelles :
+              <p className="mt-4 text-muted-foreground">
+                La solution complète pour votre bien-être émotionnel quotidien
               </p>
-              <ul className="space-y-2">
-                {features.individual.map((feature, index) => (
-                  <li key={index} className="flex items-start">
-                    <Check className="text-green-500 mr-2 h-5 w-5 mt-0.5 flex-shrink-0" />
+              <div className="mt-6">
+                <Button 
+                  onClick={() => navigate('/b2c/register')} 
+                  className="w-full"
+                  size="lg"
+                >
+                  Commencer l'essai gratuit
+                </Button>
+              </div>
+              <p className="mt-3 text-xs text-center text-muted-foreground">
+                5 jours d'essai gratuit, sans engagement
+              </p>
+            </div>
+            <div className="p-6 md:p-8 bg-muted/50">
+              <h4 className="text-sm font-medium mb-4">Ce qui est inclus :</h4>
+              <ul className="space-y-3">
+                {b2cFeatures.map((feature) => (
+                  <li key={feature} className="flex">
+                    <Check className="h-5 w-5 text-primary flex-shrink-0 mr-3" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
-              <div className="mt-6 py-2 px-3 bg-primary/10 rounded-md text-sm">
-                <div className="flex items-center">
-                  <Stars className="h-4 w-4 text-primary mr-2" />
-                  <span className="font-medium">5 jours d'essai gratuit</span>
-                </div>
-                <p className="text-xs mt-1">Annulation possible à tout moment</p>
+            </div>
+          </motion.div>
+
+          {/* B2B Plan */}
+          <motion.div 
+            className="rounded-2xl border bg-card shadow-sm overflow-hidden"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <div className="p-6 md:p-8">
+              <h3 className="text-2xl font-bold">Entreprises</h3>
+              <div className="mt-4 flex items-baseline">
+                <span className="text-4xl font-extrabold">10€ HT</span>
+                <span className="ml-1 text-muted-foreground">/collaborateur/mois</span>
               </div>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                className="w-full"
-                onClick={() => navigate('/b2c/register')}
-              >
-                Essayer gratuitement
-              </Button>
-            </CardFooter>
-          </Card>
-        </motion.div>
-        
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <Card className="h-full flex flex-col border-primary/50">
-            <CardHeader>
-              <div className="flex items-center justify-center mb-4">
-                <div className="p-2 rounded-full bg-primary/10">
-                  <Building className="h-6 w-6 text-primary" />
-                </div>
-              </div>
-              <CardTitle className="text-2xl text-center">Entreprises</CardTitle>
-              <CardDescription className="text-center">Pour le bien-être de vos équipes</CardDescription>
-              <div className="mt-4 text-center">
-                <span className="text-3xl font-bold">10€</span>
-                <span className="text-muted-foreground"> HT / utilisateur / mois</span>
-              </div>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <p className="text-muted-foreground mb-6 text-center">
-                Une solution complète pour toute votre organisation :
+              <p className="mt-4 text-muted-foreground">
+                La solution idéale pour le bien-être de vos équipes
               </p>
-              <ul className="space-y-2">
-                {features.business.map((feature, index) => (
-                  <li key={index} className="flex items-start">
-                    <Check className="text-green-500 mr-2 h-5 w-5 mt-0.5 flex-shrink-0" />
+              <div className="mt-6">
+                <Button 
+                  onClick={() => navigate('/b2b/selection')} 
+                  className="w-full"
+                  size="lg"
+                >
+                  Découvrir nos solutions B2B
+                </Button>
+              </div>
+              <p className="mt-3 text-xs text-center text-muted-foreground">
+                5 jours d'essai gratuit, facturation mensuelle
+              </p>
+            </div>
+            <div className="p-6 md:p-8 bg-muted/50">
+              <h4 className="text-sm font-medium mb-4">Ce qui est inclus :</h4>
+              <ul className="space-y-3">
+                {b2bFeatures.map((feature) => (
+                  <li key={feature} className="flex">
+                    <Check className="h-5 w-5 text-primary flex-shrink-0 mr-3" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
-              <div className="mt-6 py-2 px-3 bg-primary/10 rounded-md text-sm">
-                <div className="flex items-center">
-                  <Stars className="h-4 w-4 text-primary mr-2" />
-                  <span className="font-medium">5 jours d'essai gratuit</span>
-                </div>
-                <p className="text-xs mt-1">Tarifs dégressifs selon le nombre d'utilisateurs</p>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button 
-                className="w-full" 
-                variant="default"
-                onClick={() => navigate('/b2b/selection')}
-              >
-                Demander une démonstration
-              </Button>
-            </CardFooter>
-          </Card>
-        </motion.div>
-      </div>
-      
-      {/* Fonctionnalités en détail */}
-      <div className="mt-20">
-        <h2 className="text-2xl font-bold mb-8 text-center">Fonctionnalités détaillées</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-10 max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="space-y-3"
-          >
-            <h3 className="text-xl font-medium flex items-center">
-              <User className="h-5 w-5 mr-2 text-primary" />
-              Journal émotionnel
-            </h3>
-            <p className="text-muted-foreground">
-              Suivez vos émotions au quotidien, identifiez les facteurs déclencheurs et visualisez 
-              vos progrès dans le temps grâce à des graphiques intuitifs.
-            </p>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="space-y-3"
-          >
-            <h3 className="text-xl font-medium flex items-center">
-              <Building className="h-5 w-5 mr-2 text-primary" />
-              Dashboard analytique RH
-            </h3>
-            <p className="text-muted-foreground">
-              Visualisez les tendances de bien-être au sein de vos équipes tout en 
-              respectant la confidentialité des données individuelles.
-            </p>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="space-y-3"
-          >
-            <h3 className="text-xl font-medium flex items-center">
-              <Shield className="h-5 w-5 mr-2 text-primary" />
-              Confidentialité garantie
-            </h3>
-            <p className="text-muted-foreground">
-              Vos données émotionnelles restent strictement confidentielles. Les entreprises n'ont 
-              accès qu'à des données anonymisées et agrégées.
-            </p>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="space-y-3"
-          >
-            <h3 className="text-xl font-medium flex items-center">
-              <Stars className="h-5 w-5 mr-2 text-primary" />
-              Support premium
-            </h3>
-            <p className="text-muted-foreground">
-              Un accompagnement personnalisé pour les utilisateurs et un support dédié 
-              pour les administrateurs d'entreprise.
-            </p>
+            </div>
           </motion.div>
         </div>
-      </div>
-      
-      <div className="mt-20 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="bg-muted/50 rounded-lg p-8 max-w-4xl mx-auto"
-        >
-          <h2 className="text-2xl font-bold mb-4">Des questions ?</h2>
-          <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Notre équipe est disponible pour vous aider à choisir la formule la plus adaptée à vos besoins.
-          </p>
+
+        {/* FAQ Section */}
+        <div className="mt-20 max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-10">Questions fréquentes</h2>
+          <div className="space-y-6">
+            <div className="border-b pb-6">
+              <h3 className="text-lg font-medium mb-2">Comment fonctionne l'essai gratuit ?</h3>
+              <p className="text-muted-foreground">
+                Tous nos plans incluent 5 jours d'essai gratuit. Vous pouvez explorer toutes les fonctionnalités sans engagement. Vous ne serez facturé qu'après la période d'essai si vous décidez de continuer.
+              </p>
+            </div>
+            <div className="border-b pb-6">
+              <h3 className="text-lg font-medium mb-2">Puis-je annuler à tout moment ?</h3>
+              <p className="text-muted-foreground">
+                Oui, vous pouvez annuler votre abonnement à tout moment. Vous aurez accès aux fonctionnalités jusqu'à la fin de votre période de facturation.
+              </p>
+            </div>
+            <div className="border-b pb-6">
+              <h3 className="text-lg font-medium mb-2">Comment est facturé le plan Entreprise ?</h3>
+              <p className="text-muted-foreground">
+                Le plan Entreprise est facturé à 10€ HT par collaborateur et par mois. Vous ne payez que pour les utilisateurs actifs, et pouvez ajuster le nombre de licences à tout moment.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Call to Action */}
+        <div className="mt-20 text-center">
+          <h2 className="text-3xl font-bold mb-6">Prêt à améliorer votre bien-être émotionnel ?</h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="outline" onClick={() => navigate('/support')}>
-              Contactez-nous
+            <Button 
+              onClick={() => navigate('/b2c/register')} 
+              size="lg"
+              className="px-8"
+            >
+              Essai gratuit Particulier
             </Button>
-            <Button onClick={() => navigate('/b2c/register')}>
-              Commencer l'essai gratuit
+            <Button 
+              onClick={() => navigate('/b2b/selection')} 
+              variant="outline"
+              size="lg"
+              className="px-8"
+            >
+              Solutions Entreprise
             </Button>
           </div>
-        </motion.div>
+        </div>
       </div>
-    </div>
+    </Shell>
   );
 };
 

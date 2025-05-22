@@ -1,151 +1,121 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useUserMode } from '@/contexts/UserModeContext';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Building, User, Shield, ArrowLeft } from 'lucide-react';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { UserIcon, Users, Building2 } from 'lucide-react';
+import { getModeDashboardPath } from '@/utils/userModeHelpers';
 import { logModeSelection } from '@/utils/modeSelectionLogger';
-import { toast } from 'sonner';
 
 const ModeSwitcher: React.FC = () => {
   const navigate = useNavigate();
-  const { userMode, setUserMode } = useUserMode();
-  const [selectedMode, setSelectedMode] = useState<string | null>(userMode);
-
+  const { setUserMode, userMode } = useUserMode();
+  
   const handleModeSelect = (mode: 'b2c' | 'b2b_user' | 'b2b_admin') => {
-    setSelectedMode(mode);
+    setUserMode(mode);
+    localStorage.setItem('user-mode', mode);
     
-    // Log the selection
+    // Log mode selection for analytics
     logModeSelection(mode);
     
-    // Update the user mode in context
-    setUserMode(mode);
-    
-    // Redirect to appropriate dashboard
-    if (mode === 'b2c') {
-      navigate('/b2c/dashboard');
-      toast.success('Mode Particulier activé');
-    } else if (mode === 'b2b_user') {
-      navigate('/b2b/user/dashboard');
-      toast.success('Mode Collaborateur activé');
-    } else if (mode === 'b2b_admin') {
-      navigate('/b2b/admin/dashboard');
-      toast.success('Mode Administrateur activé');
-    }
+    // Navigate to appropriate dashboard
+    navigate(getModeDashboardPath(mode));
   };
-
+  
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-4xl"
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted px-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md w-full bg-card p-6 rounded-lg shadow-md border"
       >
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold">Choisissez votre mode d'utilisation</h1>
-          <p className="text-muted-foreground mt-2">
-            Sélectionnez le mode qui correspond à votre utilisation de EmotionsCare
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold tracking-tight mb-2">Choisissez votre mode</h1>
+          <p className="text-muted-foreground">
+            Sélectionnez comment vous souhaitez utiliser l'application
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="space-y-4">
           <motion.div 
-            whileHover={{ y: -5 }}
-            transition={{ duration: 0.2 }}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
-            <Card 
-              className={`cursor-pointer h-full ${selectedMode === 'b2c' ? 'border-primary' : ''}`} 
+            <Button
+              variant="outline"
+              className="w-full justify-start text-left h-auto py-4 px-4"
               onClick={() => handleModeSelect('b2c')}
             >
-              <CardHeader className="text-center">
-                <div className="mx-auto bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mb-2">
-                  <User className="h-8 w-8 text-primary" />
+              <div className="flex items-center">
+                <div className="bg-primary/10 p-2 rounded-full mr-4">
+                  <UserIcon className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle>Particulier</CardTitle>
-                <CardDescription>Accès à votre espace personnel</CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p>Suivez votre bien-être émotionnel, votre journal et accédez à vos recommandations personnalisées.</p>
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button 
-                  variant={selectedMode === 'b2c' ? 'default' : 'outline'} 
-                  onClick={() => handleModeSelect('b2c')}
-                  className="w-full"
-                >
-                  Sélectionner
-                </Button>
-              </CardFooter>
-            </Card>
+                <div>
+                  <h3 className="font-medium mb-1">Particulier</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Accédez à votre espace personnel
+                  </p>
+                </div>
+              </div>
+            </Button>
           </motion.div>
           
           <motion.div 
-            whileHover={{ y: -5 }}
-            transition={{ duration: 0.2 }}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
-            <Card 
-              className={`cursor-pointer h-full ${selectedMode === 'b2b_user' ? 'border-primary' : ''}`} 
+            <Button
+              variant="outline"
+              className="w-full justify-start text-left h-auto py-4 px-4"
               onClick={() => handleModeSelect('b2b_user')}
             >
-              <CardHeader className="text-center">
-                <div className="mx-auto bg-blue-100 dark:bg-blue-900/30 rounded-full w-16 h-16 flex items-center justify-center mb-2">
-                  <Building className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              <div className="flex items-center">
+                <div className="bg-primary/10 p-2 rounded-full mr-4">
+                  <Users className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle>Collaborateur</CardTitle>
-                <CardDescription>Accès à l'espace entreprise</CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p>Suivez vos activités bien-être au sein de votre entreprise et participez aux programmes collectifs.</p>
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button 
-                  variant={selectedMode === 'b2b_user' ? 'default' : 'outline'} 
-                  onClick={() => handleModeSelect('b2b_user')}
-                  className="w-full"
-                >
-                  Sélectionner
-                </Button>
-              </CardFooter>
-            </Card>
+                <div>
+                  <h3 className="font-medium mb-1">Collaborateur</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Accédez à votre espace collaborateur
+                  </p>
+                </div>
+              </div>
+            </Button>
           </motion.div>
           
           <motion.div 
-            whileHover={{ y: -5 }}
-            transition={{ duration: 0.2 }}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
-            <Card 
-              className={`cursor-pointer h-full ${selectedMode === 'b2b_admin' ? 'border-primary' : ''}`} 
+            <Button
+              variant="outline"
+              className="w-full justify-start text-left h-auto py-4 px-4"
               onClick={() => handleModeSelect('b2b_admin')}
             >
-              <CardHeader className="text-center">
-                <div className="mx-auto bg-purple-100 dark:bg-purple-900/30 rounded-full w-16 h-16 flex items-center justify-center mb-2">
-                  <Shield className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+              <div className="flex items-center">
+                <div className="bg-primary/10 p-2 rounded-full mr-4">
+                  <Building2 className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle>Administrateur</CardTitle>
-                <CardDescription>Gestion entreprise</CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p>Gérez les utilisateurs, suivez les statistiques d'utilisation et paramétrez les fonctionnalités pour votre entreprise.</p>
-              </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button 
-                  variant={selectedMode === 'b2b_admin' ? 'default' : 'outline'} 
-                  onClick={() => handleModeSelect('b2b_admin')}
-                  className="w-full"
-                >
-                  Sélectionner
-                </Button>
-              </CardFooter>
-            </Card>
+                <div>
+                  <h3 className="font-medium mb-1">Administrateur</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Accédez à l'espace administrateur pour gérer votre organisation
+                  </p>
+                </div>
+              </div>
+            </Button>
           </motion.div>
         </div>
         
-        <div className="mt-8 text-center">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Retour
+        <div className="text-center mt-6">
+          <Button 
+            variant="ghost"
+            onClick={() => navigate('/')}
+            className="text-sm"
+          >
+            Retour à l'accueil
           </Button>
         </div>
       </motion.div>

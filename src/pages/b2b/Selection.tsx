@@ -1,152 +1,134 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Building, Shield, ArrowLeft, CheckCircle } from 'lucide-react';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { Building2, Users, ShieldCheck } from 'lucide-react';
+import { logModeSelection } from '@/utils/modeSelectionLogger';
 
 const B2BSelection: React.FC = () => {
   const navigate = useNavigate();
-
+  const { setUserMode } = useUserMode();
+  
+  const handleRoleSelect = (role: 'b2b_user' | 'b2b_admin') => {
+    setUserMode(role);
+    localStorage.setItem('user-mode', role);
+    
+    // Log mode selection for analytics
+    logModeSelection(role);
+    
+    // Redirect to appropriate login page
+    if (role === 'b2b_admin') {
+      navigate('/b2b/admin/login');
+    } else {
+      navigate('/b2b/user/login');
+    }
+  };
+  
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="container mx-auto max-w-5xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 p-4">
+      <div className="absolute top-6 left-6">
+        <Button 
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="flex items-center"
         >
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate(-1)} 
-            className="mb-8 flex items-center gap-2"
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          Retour à l'accueil
+        </Button>
+      </div>
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md w-full bg-card p-8 rounded-xl shadow-lg border"
+      >
+        <div className="text-center mb-8">
+          <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Building2 className="h-8 w-8 text-primary" />
+          </div>
+          <h1 className="text-2xl font-bold">Solutions Entreprise</h1>
+          <p className="text-muted-foreground mt-2">
+            Sélectionnez votre rôle pour accéder à la plateforme
+          </p>
+        </div>
+        
+        <div className="space-y-4">
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <ArrowLeft className="h-4 w-4" />
-            Retour
-          </Button>
-
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Solutions Entreprise</h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              EmotionsCare propose des solutions adaptées aux besoins spécifiques de votre organisation pour favoriser le bien-être au travail.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+            <Button
+              variant="outline"
+              className="w-full justify-start text-left h-auto py-4 px-4"
+              onClick={() => handleRoleSelect('b2b_user')}
             >
-              <Card className="h-full flex flex-col border-blue-200 dark:border-blue-800">
-                <CardHeader>
-                  <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                    <Building className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <CardTitle className="text-2xl text-center">Collaborateur</CardTitle>
-                  <CardDescription className="text-center">
-                    Accès à l'espace entreprise EmotionsCare
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="flex-grow">
-                  <p className="text-center mb-6">
-                    Bénéficiez de toutes les fonctionnalités d'EmotionsCare dans le cadre de votre entreprise.
+              <div className="flex items-center">
+                <div className="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full mr-4">
+                  <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="font-medium mb-1">Collaborateur</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Accédez à votre espace personnel de bien-être émotionnel
                   </p>
-                  
-                  <ul className="space-y-3">
-                    {[
-                      "Suivi émotionnel personnalisé",
-                      "Accès aux contenus bien-être",
-                      "Participation aux challenges collectifs",
-                      "Journal émotionnel professionnel",
-                      "Musique et sons adaptés au travail"
-                    ].map((feature, index) => (
-                      <li key={index} className="flex items-start">
-                        <CheckCircle className="text-blue-500 mr-2 h-5 w-5 mt-0.5 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                
-                <CardFooter>
-                  <Button 
-                    className="w-full" 
-                    onClick={() => navigate('/b2b/user/login')}
-                  >
-                    Accéder à mon espace
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+                </div>
+              </div>
+            </Button>
+          </motion.div>
+          
+          <motion.div 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Button
+              variant="outline"
+              className="w-full justify-start text-left h-auto py-4 px-4"
+              onClick={() => handleRoleSelect('b2b_admin')}
             >
-              <Card className="h-full flex flex-col border-purple-200 dark:border-purple-800">
-                <CardHeader>
-                  <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                    <Shield className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <CardTitle className="text-2xl text-center">Administrateur</CardTitle>
-                  <CardDescription className="text-center">
-                    Gestion de la solution au sein de votre entreprise
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="flex-grow">
-                  <p className="text-center mb-6">
-                    Gérez et optimisez l'utilisation d'EmotionsCare pour votre organisation.
+              <div className="flex items-center">
+                <div className="bg-purple-100 dark:bg-purple-900/50 p-3 rounded-full mr-4">
+                  <ShieldCheck className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="font-medium mb-1">Administrateur</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Gérez le bien-être de vos équipes et accédez aux analyses
                   </p>
-                  
-                  <ul className="space-y-3">
-                    {[
-                      "Tableau de bord analytique RH",
-                      "Rapports de bien-être d'équipe",
-                      "Gestion des utilisateurs",
-                      "Configuration des fonctionnalités",
-                      "Organisation d'activités collectives"
-                    ].map((feature, index) => (
-                      <li key={index} className="flex items-start">
-                        <CheckCircle className="text-purple-500 mr-2 h-5 w-5 mt-0.5 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                
-                <CardFooter>
-                  <Button 
-                    className="w-full" 
-                    onClick={() => navigate('/b2b/admin/login')}
-                    variant="default"
-                  >
-                    Accéder au dashboard
-                  </Button>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          </div>
-
-          <div className="text-center mt-12 p-6 bg-muted/50 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4">Vous n'avez pas encore de compte entreprise ?</h2>
-            <p className="text-lg mb-6">
-              Découvrez notre offre complète avec un essai gratuit de 5 jours, sans engagement.
+                </div>
+              </div>
+            </Button>
+          </motion.div>
+        </div>
+        
+        <div className="mt-8 border-t pt-6">
+          <div className="text-center space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Vous êtes un particulier ? Accédez à votre espace personnel
             </p>
             <Button 
-              size="lg" 
-              onClick={() => navigate('/pricing')}
-              variant="outline"
+              variant="secondary"
+              onClick={() => {
+                setUserMode('b2c');
+                localStorage.setItem('user-mode', 'b2c');
+                logModeSelection('b2c');
+                navigate('/b2c/login');
+              }}
+              className="w-full"
             >
-              Voir nos tarifs et demander une démo
+              Espace particulier
             </Button>
           </div>
-        </motion.div>
-      </div>
+        </div>
+        
+        <div className="mt-8 text-center text-sm text-muted-foreground">
+          <p>
+            Besoin d'aide ? <Button variant="link" className="p-0" onClick={() => navigate('/support')}>Contactez-nous</Button>
+          </p>
+        </div>
+      </motion.div>
     </div>
   );
 };
