@@ -1,7 +1,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Smile, User } from 'lucide-react';
+import { Check, Loader } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import '@/styles/auth-animations.css';
 
 interface PostLoginTransitionProps {
   show: boolean;
@@ -12,173 +14,174 @@ interface PostLoginTransitionProps {
 const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({
   show,
   onComplete,
-  userName,
+  userName
 }) => {
-  const [step, setStep] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [step, setStep] = useState<'success' | 'welcome' | 'loading'>('success');
   
+  // Manage transition steps
   useEffect(() => {
     if (!show) return;
     
-    // First step: Show success message
-    const timer1 = setTimeout(() => setStep(1), 800);
+    // First step: Success animation
+    const successTimer = setTimeout(() => {
+      setStep('welcome');
+      
+      // Second step: Welcome message
+      const welcomeTimer = setTimeout(() => {
+        setStep('loading');
+        
+        // Third step: Loading animation, then complete
+        const loadingTimer = setTimeout(() => {
+          onComplete();
+        }, 1800);
+        
+        return () => clearTimeout(loadingTimer);
+      }, 1500);
+      
+      return () => clearTimeout(welcomeTimer);
+    }, 1200);
     
-    // Second step: Welcome message
-    const timer2 = setTimeout(() => setStep(2), 1800);
-    
-    // Final step: Loading dashboard
-    const timer3 = setTimeout(() => {
-      setStep(3);
-      // Start progress bar animation
-      const interval = setInterval(() => {
-        setProgress(prev => {
-          const newProgress = prev + 2;
-          if (newProgress >= 100) {
-            clearInterval(interval);
-            setTimeout(() => onComplete(), 200);
-            return 100;
-          }
-          return newProgress;
-        });
-      }, 20);
-    }, 3000);
-    
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-    };
+    return () => clearTimeout(successTimer);
   }, [show, onComplete]);
-  
+
   if (!show) return null;
-  
+
   return (
     <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-500/95 to-purple-600/95 backdrop-blur-md"
-        >
-          <div className="text-center text-white max-w-md w-full px-6">
-            <AnimatePresence mode="wait">
-              {step === 0 && (
-                <motion.div
-                  key="success"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 1.2, opacity: 0 }}
-                  transition={{ duration: 0.4, type: "spring" }}
-                >
-                  <motion.div 
-                    className="mx-auto mb-6 h-20 w-20 rounded-full bg-white/20 flex items-center justify-center"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, ease: "easeInOut" }}
-                  >
-                    <div className="h-16 w-16 rounded-full bg-white flex items-center justify-center">
-                      <CheckCircle2 className="h-10 w-10 text-blue-600" />
-                    </div>
-                  </motion.div>
-                  <h2 className="text-2xl font-bold mb-2">Connexion réussie!</h2>
-                  <p className="text-white/80">Votre espace est en cours de préparation...</p>
-                </motion.div>
-              )}
-              
-              {step === 1 && (
-                <motion.div
-                  key="welcome"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 1.2, opacity: 0 }}
-                  transition={{ duration: 0.4, type: "spring" }}
-                >
-                  <div className="mx-auto mb-6 h-20 w-20 rounded-full bg-white/20 flex items-center justify-center">
-                    <div className="h-16 w-16 rounded-full bg-white flex items-center justify-center">
-                      {userName ? (
-                        <User className="h-10 w-10 text-blue-600" />
-                      ) : (
-                        <Smile className="h-10 w-10 text-blue-600" />
-                      )}
-                    </div>
-                  </div>
-                  <motion.h2 
-                    className="text-2xl font-bold mb-2"
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    Bienvenue{userName ? `, ${userName}` : ' dans votre espace'}
-                  </motion.h2>
-                  <motion.p 
-                    className="text-white/80"
-                    initial={{ y: 10, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                  >
-                    Nous sommes ravis de vous revoir
-                  </motion.p>
-                </motion.div>
-              )}
-              
-              {step === 2 && (
-                <motion.div
-                  key="preparation"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 1.2, opacity: 0 }}
-                  transition={{ duration: 0.4, type: "spring" }}
-                  className="flex flex-col items-center"
-                >
-                  <h2 className="text-2xl font-bold mb-6">Préparation de votre espace...</h2>
-                  
-                  <div className="w-full flex items-center mb-2 text-sm">
-                    <span className="text-white/80 mr-2">
-                      {progress < 30 && "Chargement de vos données personnelles"}
-                      {progress >= 30 && progress < 60 && "Configuration de vos modules"}
-                      {progress >= 60 && progress < 90 && "Préparation de vos recommandations"}
-                      {progress >= 90 && "Finalisation de votre tableau de bord"}
-                    </span>
-                    <span className="ml-auto text-white/80">{Math.min(progress, 100)}%</span>
-                  </div>
-                  
-                  <div className="relative w-full h-2 bg-white/30 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${progress}%` }}
-                      className="absolute top-0 left-0 h-full bg-white rounded-full"
-                    />
-                  </div>
-                </motion.div>
-              )}
-              
-              {step === 3 && (
-                <motion.div
-                  key="ready"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0, opacity: 0 }}
-                  transition={{ duration: 0.4, type: "spring" }}
-                  className="flex flex-col items-center"
-                >
-                  <h2 className="text-2xl font-bold mb-2">Votre espace est prêt!</h2>
-                  <motion.div 
-                    className="mt-4"
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ repeat: 1, duration: 0.6 }}
-                  >
-                    <div className="relative w-full h-2 bg-white/30 rounded-full overflow-hidden">
-                      <div className="absolute top-0 left-0 h-full bg-white rounded-full w-full" />
-                    </div>
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
-      )}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm"
+      >
+        <div className="max-w-md w-full px-4">
+          <AnimatePresence mode="wait">
+            {step === 'success' && (
+              <SuccessStep key="success" />
+            )}
+            
+            {step === 'welcome' && (
+              <WelcomeStep key="welcome" userName={userName} />
+            )}
+            
+            {step === 'loading' && (
+              <LoadingStep key="loading" />
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
     </AnimatePresence>
   );
 };
+
+// Step 1: Success Check Animation
+const SuccessStep = () => (
+  <motion.div 
+    className="flex flex-col items-center text-center"
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.4 }}
+  >
+    <motion.div
+      initial={{ scale: 0 }}
+      animate={{ scale: [0, 1.2, 1] }}
+      transition={{ duration: 0.5 }}
+      className="rounded-full bg-green-100 dark:bg-green-900/30 p-4 mb-4"
+    >
+      <Check className="h-12 w-12 text-green-600 dark:text-green-400" />
+    </motion.div>
+    
+    <motion.h3 
+      className="text-2xl font-medium mb-2"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2 }}
+    >
+      Connexion réussie
+    </motion.h3>
+  </motion.div>
+);
+
+// Step 2: Personalized Welcome
+const WelcomeStep = ({ userName }: { userName?: string }) => (
+  <motion.div 
+    className="flex flex-col items-center text-center"
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.4 }}
+  >
+    <motion.h3 
+      className="text-2xl font-medium mb-4"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      {userName 
+        ? `Bienvenue, ${userName}!`
+        : "Bienvenue sur EmotionsCare!"}
+    </motion.h3>
+    
+    <motion.p
+      className="text-muted-foreground"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.2 }}
+    >
+      Nous préparons votre espace personnel...
+    </motion.p>
+  </motion.div>
+);
+
+// Step 3: Loading Animation
+const LoadingStep = () => (
+  <motion.div 
+    className="flex flex-col items-center text-center"
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.4 }}
+  >
+    <motion.div
+      className="relative h-16 w-16 mb-6"
+      animate={{ rotate: 360 }}
+      transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+    >
+      <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
+      <div className="absolute inset-0 rounded-full border-4 border-t-primary border-transparent" />
+    </motion.div>
+    
+    <motion.h3 
+      className="text-xl font-medium mb-2"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      Chargement en cours
+    </motion.h3>
+    
+    <motion.div 
+      className="w-full h-2 bg-primary/20 rounded-full overflow-hidden mt-3"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.3 }}
+    >
+      <motion.div 
+        className="h-full bg-primary"
+        initial={{ width: '0%' }}
+        animate={{ width: '100%' }}
+        transition={{ duration: 1.8, ease: "easeInOut" }}
+      />
+    </motion.div>
+    
+    <motion.p
+      className="text-sm text-muted-foreground mt-3"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.5 }}
+    >
+      Préparation de votre tableau de bord personnalisé...
+    </motion.p>
+  </motion.div>
+);
 
 export default PostLoginTransition;
