@@ -1,227 +1,116 @@
-import React, { useState, useEffect } from 'react';
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Smile, Calendar, Music, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useDashboardHero } from '@/hooks/useDashboardHero';
-import { Activity, Calendar, Heart } from 'lucide-react';
-import { PageTransition } from '@/components/transitions/PageTransition';
-import { useToast } from '@/hooks/use-toast';
+import Shell from '@/Shell';
 
 const B2CDashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const { kpis, shortcuts, isLoading } = useDashboardHero(user?.id);
-  const [moduleVisibility, setModuleVisibility] = useState<Record<string, boolean>>({});
-  const { toast } = useToast();
-
-  // Staggered module appearance
-  useEffect(() => {
-    if (!isLoading) {
-      const modules = ['welcome', 'stats', 'journal', 'activities', 'recommend'];
-      let delay = 100;
-      
-      modules.forEach(module => {
-        setTimeout(() => {
-          setModuleVisibility(prev => ({ ...prev, [module]: true }));
-        }, delay);
-        delay += 150; // Increment delay for each module
-      });
-    }
-  }, [isLoading]);
-
-  // Welcome toast on first load
-  useEffect(() => {
-    if (!isLoading && user?.name) {
-      const hasSeenWelcome = sessionStorage.getItem('dashboard_welcomed');
-      
-      if (!hasSeenWelcome) {
-        setTimeout(() => {
-          toast({
-            title: `Bienvenue ${user.name}`,
-            description: "Votre espace personnel est prêt",
-            duration: 5000,
-          });
-          sessionStorage.setItem('dashboard_welcomed', 'true');
-        }, 800);
-      }
-    }
-  }, [isLoading, user, toast]);
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.15
-      }
-    }
-  };
   
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.5 }
-    }
-  };
-
   return (
-    <PageTransition>
-      <div className="container mx-auto px-4 py-6">
+    <Shell>
+      <div className="container mx-auto py-6 px-4">
         <motion.div
-          className="space-y-6"
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
         >
-          {/* Welcome message */}
-          <AnimatePresence>
-            {moduleVisibility.welcome && (
-              <motion.div
-                variants={itemVariants}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg p-6 shadow-lg"
-              >
-                <h1 className="text-2xl font-bold mb-2">
-                  Bonjour {user?.name || 'à vous'}
-                </h1>
-                <p>Comment vous sentez-vous aujourd'hui ?</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold">Bonjour, {user?.name || 'Utilisateur'}</h1>
+            <p className="text-muted-foreground">Bienvenue sur votre espace personnel EmotionsCare</p>
+          </div>
 
-          {/* Stats overview */}
-          <AnimatePresence>
-            {moduleVisibility.stats && (
-              <motion.div variants={itemVariants}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  <Card className="overflow-hidden">
-                    <CardHeader className="bg-blue-50 dark:bg-blue-900/20">
-                      <div className="flex items-center">
-                        <Heart className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
-                        <CardTitle className="text-lg">Score émotionnel</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                      <div className="text-3xl font-bold">84%</div>
-                      <p className="text-sm text-muted-foreground mt-1">+5% cette semaine</p>
-                    </CardContent>
-                  </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center">
+                  <Smile className="mr-2 h-5 w-5 text-blue-500" />
+                  État émotionnel
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">Serein</p>
+                <p className="text-sm text-muted-foreground">Basé sur vos dernières entrées</p>
+              </CardContent>
+            </Card>
 
-                  <Card className="overflow-hidden">
-                    <CardHeader className="bg-green-50 dark:bg-green-900/20">
-                      <div className="flex items-center">
-                        <Activity className="w-5 h-5 mr-2 text-green-600 dark:text-green-400" />
-                        <CardTitle className="text-lg">Activités</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                      <div className="text-3xl font-bold">12</div>
-                      <p className="text-sm text-muted-foreground mt-1">+2 depuis hier</p>
-                    </CardContent>
-                  </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center">
+                  <Calendar className="mr-2 h-5 w-5 text-green-500" />
+                  Journal
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">3</p>
+                <p className="text-sm text-muted-foreground">Entrées cette semaine</p>
+              </CardContent>
+            </Card>
 
-                  <Card className="overflow-hidden sm:col-span-2 md:col-span-1">
-                    <CardHeader className="bg-purple-50 dark:bg-purple-900/20">
-                      <div className="flex items-center">
-                        <Calendar className="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400" />
-                        <CardTitle className="text-lg">Jours consécutifs</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-6">
-                      <div className="text-3xl font-bold">7</div>
-                      <p className="text-sm text-muted-foreground mt-1">Continuez comme ça !</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center">
+                  <Music className="mr-2 h-5 w-5 text-purple-500" />
+                  Musicothérapie
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">15 min</p>
+                <p className="text-sm text-muted-foreground">De détente aujourd'hui</p>
+              </CardContent>
+            </Card>
 
-          {/* Journal section */}
-          <AnimatePresence>
-            {moduleVisibility.journal && (
-              <motion.div variants={itemVariants}>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Journal émotionnel</CardTitle>
-                    <CardDescription>
-                      Suivez et analysez vos émotions au quotidien
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p>Votre dernière entrée remonte à hier. Comment vous sentez-vous aujourd'hui ?</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center">
+                  <MessageSquare className="mr-2 h-5 w-5 text-orange-500" />
+                  Discussions IA
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">2</p>
+                <p className="text-sm text-muted-foreground">Sessions récentes</p>
+              </CardContent>
+            </Card>
+          </div>
 
-          {/* Activities */}
-          <AnimatePresence>
-            {moduleVisibility.activities && (
-              <motion.div variants={itemVariants}>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Activités recommandées</CardTitle>
-                    <CardDescription>
-                      Basées sur votre état émotionnel actuel
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      <Card className="bg-blue-50 dark:bg-blue-900/20 hover:shadow-md transition-shadow duration-300">
-                        <CardContent className="p-4">
-                          <h3 className="font-medium">Méditation guidée</h3>
-                          <p className="text-sm text-muted-foreground">10 minutes</p>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-green-50 dark:bg-green-900/20 hover:shadow-md transition-shadow duration-300">
-                        <CardContent className="p-4">
-                          <h3 className="font-medium">Exercices respiratoires</h3>
-                          <p className="text-sm text-muted-foreground">5 minutes</p>
-                        </CardContent>
-                      </Card>
-                      <Card className="bg-purple-50 dark:bg-purple-900/20 hover:shadow-md transition-shadow duration-300">
-                        <CardContent className="p-4">
-                          <h3 className="font-medium">Playlist apaisante</h3>
-                          <p className="text-sm text-muted-foreground">20 minutes</p>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          
-          {/* Recommendations */}
-          <AnimatePresence>
-            {moduleVisibility.recommend && (
-              <motion.div variants={itemVariants}>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Pour votre bien-être</CardTitle>
-                    <CardDescription>
-                      Découvrez du contenu adapté à vos besoins
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-4">
-                      Notre coach IA a préparé des ressources spécialement pour vous
-                    </p>
-                    {/* Content would be here */}
-                    <p className="text-center text-sm text-muted-foreground">
-                      Nouveau contenu disponible demain
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle>Graphique d'humeur</CardTitle>
+                <CardDescription>Évolution sur les 7 derniers jours</CardDescription>
+              </CardHeader>
+              <CardContent className="h-[200px] flex items-center justify-center bg-muted/20">
+                <p className="text-muted-foreground">Graphique en cours de chargement...</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Accès rapides</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-2">
+                <Button variant="outline" size="sm" className="justify-start">
+                  <Smile className="mr-2 h-4 w-4" />
+                  Enregistrer mon humeur
+                </Button>
+                <Button variant="outline" size="sm" className="justify-start">
+                  <Music className="mr-2 h-4 w-4" />
+                  Séance de musicothérapie
+                </Button>
+                <Button variant="outline" size="sm" className="justify-start">
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Parler à mon coach IA
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </motion.div>
       </div>
-    </PageTransition>
+    </Shell>
   );
 };
 

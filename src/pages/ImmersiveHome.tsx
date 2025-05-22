@@ -1,394 +1,150 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { trackEvent, trackPageView } from '@/utils/analytics';
-import { logModeSelection } from '@/utils/modeSelectionLogger';
-import { getModeLabel } from '@/utils/userModeHelpers';
-import { ROUTES } from '@/types/navigation';
-import { Mic, MicOff, Volume, VolumeX, Moon, Sun, Globe } from 'lucide-react';
-import '@/styles/immersive-home.css';
-import { toast } from 'sonner';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-
-// Whisper service mock (replace with actual implementation)
-const mockWhisperService = {
-  startListening: () => new Promise<string>(resolve => {
-    setTimeout(() => {
-      resolve("particulier");
-    }, 2000);
-  })
-};
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import Shell from '@/Shell';
+import { Heart, Brain, Building, User, Music } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const ImmersiveHome: React.FC = () => {
   const navigate = useNavigate();
-  const { setUserMode } = useUserMode();
-  const [greeting, setGreeting] = useState('Bienvenue sur EmotionsCare');
-  const [subGreeting, setSubGreeting] = useState('Votre espace d\'harmonie émotionnelle');
-  const [isListening, setIsListening] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const [language, setLanguage] = useState<'fr'|'en'>('fr');
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { isAuthenticated, user } = useAuth();
   
-  // Get time of day for dynamic content
-  const getTimeOfDay = () => {
-    const hours = new Date().getHours();
-    if (hours >= 5 && hours < 12) return 'morning';
-    if (hours >= 12 && hours < 18) return 'afternoon';
-    if (hours >= 18 && hours < 22) return 'evening';
-    return 'night';
+  const redirectToLogin = () => {
+    navigate('/b2c/login');
   };
-  
-  const timeOfDay = getTimeOfDay();
 
-  // Dynamic greetings based on time
-  useEffect(() => {
-    const messages = {
-      morning: {
-        fr: 'Bonjour et bienvenue sur EmotionsCare',
-        en: 'Good morning and welcome to EmotionsCare'
-      },
-      afternoon: {
-        fr: 'Bon après-midi et bienvenue sur EmotionsCare',
-        en: 'Good afternoon and welcome to EmotionsCare'
-      },
-      evening: {
-        fr: 'Bonsoir et bienvenue sur EmotionsCare',
-        en: 'Good evening and welcome to EmotionsCare'
-      },
-      night: {
-        fr: 'Bonne soirée et bienvenue sur EmotionsCare',
-        en: 'Good evening and welcome to EmotionsCare'
-      }
-    };
-    
-    const subMessages = {
-      morning: {
-        fr: 'Démarrez votre journée en douceur',
-        en: 'Start your day with calmness'
-      },
-      afternoon: {
-        fr: 'Prenez un moment pour vous ressourcer',
-        en: 'Take a moment to recharge'
-      },
-      evening: {
-        fr: 'Retrouvez votre équilibre émotionnel',
-        en: 'Find your emotional balance'
-      },
-      night: {
-        fr: 'Un espace de tranquillité avant votre repos',
-        en: 'A space of tranquility before your rest'
-      }
-    };
-    
-    setGreeting(messages[timeOfDay][language]);
-    setSubGreeting(subMessages[timeOfDay][language]);
-  }, [timeOfDay, language]);
-  
-  // Track page view
-  useEffect(() => {
-    trackPageView({ title: 'Immersive Home', path: '/' });
-  }, []);
-  
-  // Initialize ambient audio
-  useEffect(() => {
-    audioRef.current = new Audio('/sounds/ambient-calm.mp3');
-    audioRef.current.loop = true;
-    audioRef.current.volume = 0.2;
-    
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-      }
-    };
-  }, []);
-  
-  // Toggle audio
-  const toggleAudio = () => {
-    if (!audioRef.current) return;
-    
-    if (isMuted) {
-      audioRef.current.play()
-        .catch(err => {
-          console.error('Audio play error:', err);
-          toast.error('Le navigateur a bloqué l\'audio. Cliquez à nouveau pour réessayer.');
-        });
+  const handleExplore = () => {
+    if (isAuthenticated) {
+      navigate('/b2c/dashboard');
     } else {
-      audioRef.current.pause();
-    }
-    
-    setIsMuted(!isMuted);
-    
-    // Haptic feedback on mobile
-    if ('vibrate' in navigator) {
-      navigator.vibrate(50);
+      navigate('/b2c/login');
     }
   };
-  
-  // Toggle theme
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
-    
-    // Haptic feedback on mobile
-    if ('vibrate' in navigator) {
-      navigator.vibrate(50);
-    }
-  };
-  
-  // Toggle language
-  const toggleLanguage = () => {
-    setLanguage(prev => prev === 'fr' ? 'en' : 'fr');
-    
-    // Haptic feedback on mobile
-    if ('vibrate' in navigator) {
-      navigator.vibrate(50);
-    }
-  };
-  
-  // Handle user mode selection
-  // Always redirect users to the appropriate login page so that
-  // the dashboard cannot be reached without authentication.
-  const handleModeSelect = (mode: 'b2c' | 'b2b-user' | 'b2b-admin') => {
-    // Haptic feedback on mobile
-    if ('vibrate' in navigator) {
-      navigator.vibrate(100);
-    }
-    
-    // Play sound effect
-    const selectSound = new Audio('/sounds/click.mp3');
-    selectSound.volume = 0.3;
-    selectSound.play().catch(e => console.log('Could not play sound effect'));
-    
-    // Set user mode
-    setUserMode(mode);
-    logModeSelection(mode);
-    trackEvent('Mode Selected', { properties: { mode } });
-    
-    // Show success toast
-    toast.success(
-      language === 'fr' 
-        ? `Mode ${getModeLabel(mode)} sélectionné` 
-        : `${getModeLabel(mode)} mode selected`
-    );
-    
-    // Navigate based on mode
-    // Always redirect to the corresponding login screen
-    setTimeout(() => {
-      switch (mode) {
-        case 'b2b-admin':
-          navigate('/login-admin');
-          break;
-        case 'b2b-user':
-          navigate('/login-collaborateur');
-          break;
-        case 'b2c':
-          navigate(ROUTES.b2c.login);
-          break;
-      }
-    }, 600);
-  };
-  
-  // Handle voice command
-  const handleVoiceCommand = async () => {
-    setIsListening(true);
-    
-    try {
-      const transcript = await mockWhisperService.startListening();
-      
-      // Process the transcript
-      const lowerTranscript = transcript.toLowerCase();
-      
-      if (lowerTranscript.includes('particulier') || lowerTranscript.includes('personal')) {
-        handleModeSelect('b2c');
-      } else if (lowerTranscript.includes('entreprise') || lowerTranscript.includes('business') || lowerTranscript.includes('collaborateur')) {
-        handleModeSelect('b2b-user');
-      } else if (lowerTranscript.includes('admin') || lowerTranscript.includes('rh')) {
-        handleModeSelect('b2b-admin');
-      } else {
-        toast.info('Commande non reconnue. Veuillez réessayer.');
-      }
-    } catch (error) {
-      console.error('Voice command error:', error);
-      toast.error('Impossible d\'accéder au microphone. Veuillez vérifier vos permissions.');
-    } finally {
-      setIsListening(false);
-    }
+
+  const handleBusiness = () => {
+    navigate('/b2b/selection');
   };
 
   return (
-    <div className={`immersive-container ${isDarkMode ? 'dark' : ''} bg-${timeOfDay}`}>
-      {/* Animated Background */}
-      <div className="particles-container" aria-hidden="true">
-        <div className="ambient-circle primary" style={{
-          width: '40%',
-          height: '40%',
-          top: '10%',
-          left: '10%',
-          opacity: 0.3
-        }}></div>
-        <div className="ambient-circle accent" style={{
-          width: '50%',
-          height: '50%',
-          bottom: '5%',
-          right: '15%',
-          opacity: 0.2
-        }}></div>
-      </div>
-      
-      {/* Logo */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="absolute top-8 left-0 right-0 flex justify-center"
-      >
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <span className="text-white font-bold">EC</span>
-          </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-            EmotionsCare
-          </span>
-        </div>
-      </motion.div>
-      
-      {/* Controls */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 1 }}
-        className="absolute top-8 right-8 flex gap-3"
-      >
-        <button
-          onClick={toggleTheme}
-          className="control-button"
-          aria-label={isDarkMode ? "Activer le mode clair" : "Activer le mode sombre"}
-        >
-          {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
-        <button
-          onClick={toggleAudio}
-          className="control-button"
-          aria-label={isMuted ? "Activer la musique" : "Désactiver la musique"}
-        >
-          {isMuted ? <Volume size={18} /> : <VolumeX size={18} />}
-        </button>
-        <button
-          onClick={toggleLanguage}
-          className="control-button"
-          aria-label="Changer de langue"
-        >
-          <Globe size={18} />
-        </button>
-      </motion.div>
-      
-      {/* Main Content */}
-      <div className="container mx-auto px-4 flex flex-col items-center justify-center min-h-screen text-center z-10">
-        <motion.h1 
-          className="premium-title"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          {greeting}
-        </motion.h1>
-        
-        <motion.p
-          className="premium-subtitle mb-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.8 }}
-        >
-          {subGreeting}
-        </motion.p>
-        
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-xl mx-auto"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-        >
+    <Shell>
+      {/* Hero Section */}
+      <section className="relative min-h-screen">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-50/50 to-indigo-50/50 dark:from-blue-950/30 dark:to-indigo-950/30 -z-10"></div>
+        <div className="container mx-auto px-4 py-24 md:py-32 flex flex-col items-center z-10">
           <motion.div
-            whileHover={{ scale: 1.03 }}
-            transition={{ type: 'spring', stiffness: 400 }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center max-w-4xl"
           >
-            <Button 
-              onClick={() => handleModeSelect('b2c')}
-              className="premium-button primary w-full h-20 text-xl font-medium"
-            >
-              {language === 'fr' ? 'Je suis un particulier' : 'I am an individual'}
-            </Button>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
+              Prenez soin de votre bien-être émotionnel
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-8">
+              Une approche complète pour gérer vos émotions, réduire le stress et améliorer votre qualité de vie
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                onClick={handleExplore}
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 text-lg h-12"
+              >
+                {isAuthenticated ? 'Accéder à mon espace' : 'Commencer maintenant'}
+              </Button>
+              <Button
+                onClick={handleBusiness}
+                size="lg"
+                variant="outline"
+                className="px-8 text-lg h-12"
+              >
+                Espace Entreprise
+              </Button>
+            </div>
           </motion.div>
           
-          <motion.div
-            whileHover={{ scale: 1.03 }}
-            transition={{ type: 'spring', stiffness: 400 }}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 1 }}
+            className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8"
           >
-            <Button 
-              onClick={() => handleModeSelect('b2b-user')}
-              className="premium-button accent w-full h-20 text-xl font-medium"
-            >
-              {language === 'fr' ? 'Je suis une entreprise' : 'I am a business'}
-            </Button>
+            {[
+              { icon: Heart, label: "Bien-être", color: "text-red-500" },
+              { icon: Brain, label: "Mindfulness", color: "text-purple-500" },
+              { icon: Music, label: "Musicothérapie", color: "text-blue-500" },
+              { icon: User, label: "Coach IA", color: "text-green-500" }
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 + i * 0.1, duration: 0.6 }}
+                className="flex flex-col items-center p-4"
+              >
+                <div className={`w-16 h-16 rounded-full bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center mb-4 ${item.color}`}>
+                  <item.icon className="h-8 w-8" />
+                </div>
+                <p className="font-medium text-gray-800 dark:text-gray-200">{item.label}</p>
+              </motion.div>
+            ))}
           </motion.div>
-        </motion.div>
-        
-        {/* Voice Command Button */}
-        <motion.div
-          className="mt-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9, duration: 0.8 }}
-        >
-          <button
-            onClick={handleVoiceCommand}
-            disabled={isListening}
-            className={`flex items-center gap-2 premium-button secondary px-6 py-3 ${isListening ? 'voice-active' : ''}`}
-            aria-label="Commande vocale"
-          >
-            {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-            <span>{isListening 
-              ? (language === 'fr' ? 'Écoute en cours...' : 'Listening...') 
-              : (language === 'fr' ? 'Commande vocale' : 'Voice command')}
-            </span>
-          </button>
-        </motion.div>
-        
-        {/* Inspirational Quote */}
-        <motion.div
-          className="absolute bottom-8 left-0 right-0 text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
-        >
-          <p className="text-sm text-text-main opacity-80">
-            {language === 'fr' 
-              ? 'Votre bien-être émotionnel commence ici' 
-              : 'Your emotional well-being starts here'}
-          </p>
-        </motion.div>
-      </div>
-      
-      {/* Music Visualizer (only when playing) */}
-      {!isMuted && (
-        <div className="absolute bottom-4 left-4 flex items-end gap-1 h-8 w-20">
-          {[...Array(5)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="music-visualizer-bar w-2 rounded-t-sm bg-primary"
-              style={{
-                height: `${20 + Math.random() * 60}%`,
-                animationDelay: `${i * 0.1}s`
-              }}
-            />
-          ))}
         </div>
-      )}
-    </div>
+        
+        {/* Decorative circles */}
+        <div className="hidden md:block absolute top-20 left-10 w-64 h-64 bg-blue-300/10 dark:bg-blue-400/5 rounded-full blur-3xl"></div>
+        <div className="hidden md:block absolute bottom-20 right-10 w-72 h-72 bg-indigo-300/10 dark:bg-indigo-400/5 rounded-full blur-3xl"></div>
+      </section>
+      
+      <section className="py-24 bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-3xl font-bold mb-4"
+            >
+              Découvrez nos solutions
+            </motion.h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-8 shadow-md"
+            >
+              <User className="h-12 w-12 text-blue-600 dark:text-blue-400 mb-4" />
+              <h3 className="text-2xl font-bold mb-3">Particuliers</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                Accédez à des outils personnalisés pour comprendre et gérer vos émotions au quotidien.
+              </p>
+              <Button onClick={redirectToLogin}>Voir les offres</Button>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl p-8 shadow-md"
+            >
+              <Building className="h-12 w-12 text-indigo-600 dark:text-indigo-400 mb-4" />
+              <h3 className="text-2xl font-bold mb-3">Entreprises</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                Solutions complètes pour améliorer le bien-être émotionnel au sein de votre organisation.
+              </p>
+              <Button onClick={handleBusiness} variant="secondary">Découvrir</Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+    </Shell>
   );
 };
 

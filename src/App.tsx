@@ -5,15 +5,18 @@ import { Toaster } from '@/components/ui/toaster';
 import AppRouter from './AppRouter';
 import AuthTransition from './components/auth/AuthTransition';
 import { AuthProvider } from './contexts/AuthContext';
+import { UserModeProvider } from './contexts/UserModeContext';
 
 function App() {
   return (
-    <ThemeProvider>
+    <ThemeProvider defaultTheme="system" storageKey="emotions-care-theme">
       <BrowserRouter>
         <AuthProvider>
-          <AuthTransition>
-            <AppRouter />
-          </AuthTransition>
+          <UserModeProvider>
+            <AuthTransition>
+              <AppRouter />
+            </AuthTransition>
+          </UserModeProvider>
         </AuthProvider>
       </BrowserRouter>
       <Toaster />
