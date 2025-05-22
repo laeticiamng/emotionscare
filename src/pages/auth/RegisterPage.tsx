@@ -1,130 +1,71 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 
-const RegisterPage: React.FC = () => {
-  const { register } = useAuth();
-  const navigate = useNavigate();
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [confirmPassword, setConfirmPassword] = React.useState('');
-  const [firstName, setFirstName] = React.useState('');
-  const [lastName, setLastName] = React.useState('');
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
+const RegisterPage = () => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    
-    setIsLoading(true);
-
-    try {
-      await register({
-        email,
-        firstName,
-        lastName
-      });
-      navigate('/dashboard');
-    } catch (err) {
-      setError('Failed to register. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    // Handle registration logic here
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl">Register</CardTitle>
-          <CardDescription>
-            Create a new account to get started
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <div className="w-full max-w-md">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Inscription</CardTitle>
+            <CardDescription>
+              Créez votre compte personnel pour accéder à toutes nos fonctionnalités
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  required
-                />
+                <Label htmlFor="name">Nom complet</Label>
+                <Input id="name" placeholder="Entrez votre nom" required />
               </div>
+              
               <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  required
-                />
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" placeholder="votre@email.com" required />
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Creating account...' : 'Register'}
-            </Button>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password">Mot de passe</Label>
+                <Input id="password" type="password" required />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmez le mot de passe</Label>
+                <Input id="confirmPassword" type="password" required />
+              </div>
+              
+              <div className="flex items-center space-x-2 pt-2">
+                <Checkbox id="terms" />
+                <Label htmlFor="terms" className="text-sm">
+                  J'accepte les <Link to="/terms" className="text-primary hover:underline">conditions d'utilisation</Link> et la <Link to="/privacy" className="text-primary hover:underline">politique de confidentialité</Link>
+                </Label>
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col">
+              <Button type="submit" className="w-full mb-4">
+                S'inscrire
+              </Button>
+              <p className="text-sm text-center text-muted-foreground">
+                Vous avez déjà un compte?{" "}
+                <Link to="/b2c/login" className="text-primary hover:underline">
+                  Se connecter
+                </Link>
+              </p>
+            </CardFooter>
           </form>
-        </CardContent>
-        <CardFooter className="flex flex-col items-center gap-2">
-          <div className="text-sm text-muted-foreground">
-            Already have an account?{' '}
-            <a
-              className="text-primary underline-offset-4 hover:underline cursor-pointer"
-              onClick={() => navigate('/auth/login')}
-            >
-              Login
-            </a>
-          </div>
-        </CardFooter>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };

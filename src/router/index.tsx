@@ -5,6 +5,7 @@ import { RouteObject } from 'react-router-dom';
 // Lazy-loaded components
 const DashboardRedirect = lazy(() => import('../pages/DashboardRedirect'));
 const LoginPage = lazy(() => import('../pages/auth/LoginPage'));
+const RegisterPage = lazy(() => import('../pages/auth/RegisterPage'));
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const B2CLayout = lazy(() => import('../layouts/B2CLayout'));
 const TimelinePage = lazy(() => import('../pages/TimelinePage'));
@@ -26,6 +27,20 @@ const B2BUserDashboard = lazy(() => import('../pages/b2b/user/Dashboard'));
 const B2BAdminDashboard = lazy(() => import('../pages/b2b/admin/Dashboard'));
 const ModeSwitcher = lazy(() => import('../pages/common/ModeSwitcher'));
 const LoginRedirect = lazy(() => import('../components/common/LoginRedirect'));
+const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
+const SupportPage = lazy(() => import('../pages/SupportPage'));
+const ProfilePage = lazy(() => import('../pages/ProfilePage'));
+const LegalPage = lazy(() => import('../pages/LegalPage'));
+const PrivacyPage = lazy(() => import('../pages/PrivacyPage'));
+const TermsPage = lazy(() => import('../pages/TermsPage'));
+const NotFoundPage = lazy(() => import('../pages/error/NotFoundPage'));
+const ServerErrorPage = lazy(() => import('../pages/error/ServerErrorPage'));
+const HumPage = lazy(() => import('../pages/HumPage'));
+const DocFlamePage = lazy(() => import('../pages/DocFlamePage'));
+const OnboardingPage = lazy(() => import('../pages/OnboardingPage'));
+const CampaignsPage = lazy(() => import('../pages/b2b/admin/CampaignsPage'));
+const TeamManagementPage = lazy(() => import('../pages/b2b/admin/TeamManagementPage'));
+const ReportsPage = lazy(() => import('../pages/b2b/admin/ReportsPage'));
 
 // Define routes
 const routes: RouteObject[] = [
@@ -66,8 +81,16 @@ const routes: RouteObject[] = [
         element: <LoginPage />
       },
       {
+        path: 'register',
+        element: <RegisterPage />
+      },
+      {
         path: 'dashboard',
         element: <B2CDashboardPage />
+      },
+      {
+        path: 'onboarding',
+        element: <OnboardingPage />
       }
     ]
   },
@@ -92,8 +115,25 @@ const routes: RouteObject[] = [
     element: <AdminLoginPage />
   },
   {
-    path: '/b2b/admin/dashboard',
-    element: <B2BAdminDashboard />
+    path: '/b2b/admin',
+    children: [
+      {
+        path: 'dashboard',
+        element: <B2BAdminDashboard />
+      },
+      {
+        path: 'team',
+        element: <TeamManagementPage />
+      },
+      {
+        path: 'campaigns',
+        element: <CampaignsPage />
+      },
+      {
+        path: 'reports',
+        element: <ReportsPage />
+      }
+    ]
   },
   
   // Common feature pages
@@ -118,8 +158,42 @@ const routes: RouteObject[] = [
     element: <MusicPage />
   },
   {
+    path: '/hum',
+    element: <HumPage />
+  },
+  {
+    path: '/docflame',
+    element: <DocFlamePage />
+  },
+  {
     path: '/settings',
     element: <SettingsPage />
+  },
+  {
+    path: '/notifications',
+    element: <NotificationsPage />
+  },
+  {
+    path: '/support',
+    element: <SupportPage />
+  },
+  {
+    path: '/profile',
+    element: <ProfilePage />
+  },
+  
+  // Legal pages
+  {
+    path: '/legal',
+    element: <LegalPage />
+  },
+  {
+    path: '/privacy',
+    element: <PrivacyPage />
+  },
+  {
+    path: '/terms',
+    element: <TermsPage />
   },
   
   // Dashboard redirect (will direct to the appropriate dashboard based on role)
@@ -132,6 +206,16 @@ const routes: RouteObject[] = [
   {
     path: '/login',
     element: <LoginRedirect />
+  },
+  
+  // Error pages
+  {
+    path: '/error',
+    element: <ServerErrorPage />
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />
   }
 ];
 

@@ -1,68 +1,82 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
 import { useUserMode } from '@/contexts/UserModeContext';
-import { 
+import { getUserModeDisplayName } from '@/utils/userModeHelpers';
+import { Building2, User, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { UserModeType, USER_MODE_LABELS } from '@/types/userMode';
-import { getUserModeDisplayName } from '@/utils/userModeHelpers';
-import { Building2, User, Users } from 'lucide-react';
+} from '@/components/ui/dropdown-menu';
+import { useNavigate } from 'react-router-dom';
 
-export interface UserModeSelectorProps {
+interface UserModeSelectorProps {
   minimal?: boolean;
   className?: string;
 }
 
-export function UserModeSelector({ minimal = false, className = '' }: UserModeSelectorProps) {
+export const UserModeSelector: React.FC<UserModeSelectorProps> = ({ minimal = false, className = '' }) => {
   const { userMode, setUserMode } = useUserMode();
+  const navigate = useNavigate();
   
-  const handleModeChange = (mode: UserModeType) => {
+  const handleModeChange = (mode: string) => {
     setUserMode(mode);
-    // Save to localStorage to persist across refreshes
-    localStorage.setItem('userMode', mode);
+    // Navigate to mode switcher or directly to dashboard
+    navigate('/mode-switcher');
   };
   
-  const getIcon = (mode: UserModeType) => {
-    switch(mode) {
-      case 'b2c':
-        return <User className="mr-2 h-4 w-4" />;
-      case 'b2b_user':
-        return <Users className="mr-2 h-4 w-4" />;
+  const getModeIcon = () => {
+    switch (userMode) {
       case 'b2b_admin':
-        return <Building2 className="mr-2 h-4 w-4" />;
+        return <Building2 className="h-4 w-4 mr-2" />;
+      case 'b2b_user':
+        return <Users className="h-4 w-4 mr-2" />;
       default:
-        return <User className="mr-2 h-4 w-4" />;
+        return <User className="h-4 w-4 mr-2" />;
     }
   };
-
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className={className}>
-          {!minimal && (
-            <span className="mr-2">{getUserModeDisplayName(userMode)}</span>
-          )}
-          {getIcon(userMode as UserModeType)}
+          {getModeIcon()}
+          {!minimal && <span>{getUserModeDisplayName(userMode)}</span>}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {Object.entries(USER_MODE_LABELS).map(([mode, label]) => (
-          <DropdownMenuItem
-            key={mode}
-            onClick={() => handleModeChange(mode as UserModeType)}
-            className={mode === userMode ? "bg-secondary" : ""}
-          >
-            {getIcon(mode as UserModeType)}
-            <span>{label}</span>
-          </DropdownMenuItem>
-        ))}
+      <DropdownMenuContent>
+        <DropdownMenuLabel>Changer de mode</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem 
+          onClick={() => handleModeChange('b2c')}
+          className="flex items-center"
+        >
+          <User className="h-4 w-4 mr-2" />
+          <span>Particulier</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          onClick={() => handleModeChange('b2b_user')}
+          className="flex items-center"
+        >
+          <Users className="h-4 w-4 mr-2" />
+          <span>Collaborateur</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          onClick={() => handleModeChange('b2b_admin')}
+          className="flex items-center"
+        >
+          <Building2 className="h-4 w-4 mr-2" />
+          <span>Administrateur</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => navigate('/mode-switcher')}>
+          Écran de sélection complet
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
-
-export default UserModeSelector;
+};

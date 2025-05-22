@@ -1,259 +1,158 @@
 
-import React, { useState, useEffect } from 'react';
-import EnhancedSupportAssistant from '@/components/support/EnhancedSupportAssistant';
-import HelpCenter from '@/components/support/HelpCenter';
-import IncidentPortal from '@/components/support/IncidentPortal';
+import React, { useState } from 'react';
 import Shell from '@/Shell';
-import { SupportProvider } from '@/contexts/SupportContext';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { MessageSquare, LifeBuoy, Info, Clock, ArrowRight, CheckCircle } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Search, MessageCircle, Phone } from 'lucide-react';
 
-const SupportPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('assistance');
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const { toast } = useToast();
+const SupportPage = () => {
+  const [searchTerm, setSearchTerm] = useState('');
   
-  useEffect(() => {
-    // Show onboarding tooltip after 2 seconds on first visit
-    const hasSeenOnboarding = localStorage.getItem('support-onboarding-seen');
-    if (!hasSeenOnboarding) {
-      const timer = setTimeout(() => {
-        setShowOnboarding(true);
-        localStorage.setItem('support-onboarding-seen', 'true');
-      }, 2000);
-      
-      return () => clearTimeout(timer);
+  const faqs = [
+    {
+      question: "Comment fonctionne la musicothérapie ?",
+      answer: "Notre système de musicothérapie utilise une technologie d'IA pour analyser votre état émotionnel et générer des séquences musicales personnalisées pour améliorer votre bien-être. Les sessions peuvent être programmées ou lancées à la demande."
+    },
+    {
+      question: "Comment modifier mes préférences de notifications ?",
+      answer: "Vous pouvez modifier vos préférences de notifications dans la section Paramètres de votre compte. Vous pourrez y choisir quels types de notifications vous souhaitez recevoir et par quels canaux."
+    },
+    {
+      question: "Je n'arrive pas à accéder à mon compte, que faire ?",
+      answer: "Si vous rencontrez des difficultés pour accéder à votre compte, essayez de réinitialiser votre mot de passe. Si le problème persiste, contactez notre support via le formulaire de contact ou par téléphone."
+    },
+    {
+      question: "Comment exporter mes données ?",
+      answer: "Vous pouvez exporter vos données depuis la section Paramètres > Confidentialité. Plusieurs formats sont disponibles et l'exportation inclut votre historique d'utilisation et vos préférences."
+    },
+    {
+      question: "Quelles sont les fonctionnalités disponibles pour les entreprises ?",
+      answer: "Les entreprises bénéficient de fonctionnalités dédiées comme la gestion d'équipe, les campagnes de bien-être, les rapports analytiques et les tableaux de bord administratifs pour suivre le bien-être des collaborateurs."
     }
-  }, []);
+  ];
   
-  const dismissOnboarding = () => {
-    setShowOnboarding(false);
-  };
-  
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    // Show congratulations toast when reaching the last tab
-    if (value === 'resources' && activeTab !== 'resources') {
-      toast({
-        title: "Bravo !",
-        description: "Vous avez exploré toutes les options d'assistance !",
-        variant: "success"
-      });
-    }
-  };
+  const filteredFaqs = faqs.filter(faq => 
+    faq.question.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Shell>
-      <SupportProvider>
-        <div className="container mx-auto py-8 px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-8"
-          >
-            <h1 className="text-3xl font-bold mb-2">Centre d'assistance</h1>
-            <p className="text-muted-foreground max-w-2xl">
-              Nous sommes là pour vous aider ! Explorez nos ressources d'aide ou contactez directement notre équipe d'assistance.
-            </p>
-          </motion.div>
-
-          <Tabs defaultValue="assistance" value={activeTab} onValueChange={handleTabChange}>
-            <TabsList className="grid grid-cols-3 mb-8 w-full sm:w-auto">
-              <TabsTrigger value="assistance" className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4" />
-                <span className="hidden sm:inline">Assistance</span>
-              </TabsTrigger>
-              <TabsTrigger value="incidents" className="flex items-center gap-2">
-                <Info className="h-4 w-4" />
-                <span className="hidden sm:inline">Incidents</span>
-              </TabsTrigger>
-              <TabsTrigger value="resources" className="flex items-center gap-2">
-                <LifeBuoy className="h-4 w-4" />
-                <span className="hidden sm:inline">Ressources</span>
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="assistance" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                  <EnhancedSupportAssistant />
-                </div>
-
-                <div>
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle>Statut de vos demandes</CardTitle>
-                      <CardDescription>
-                        Suivez l'état de vos tickets d'assistance
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center p-2 bg-muted/50 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <CheckCircle className="text-green-500 h-5 w-5" />
-                            <div>
-                              <p className="font-medium">Problème d'affichage</p>
-                              <p className="text-xs text-muted-foreground">Créé il y a 2 jours</p>
-                            </div>
-                          </div>
-                          <Badge variant="outline" className="bg-green-500/10 text-green-600">Résolu</Badge>
-                        </div>
-                        
-                        <div className="flex justify-between items-center p-2 bg-muted/50 rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <Clock className="text-amber-500 h-5 w-5" />
-                            <div>
-                              <p className="font-medium">Question sur la confidentialité</p>
-                              <p className="text-xs text-muted-foreground">Créé hier</p>
-                            </div>
-                          </div>
-                          <Badge variant="outline" className="bg-amber-500/10 text-amber-600">En cours</Badge>
-                        </div>
-                      </div>
-                      
-                      <Button variant="outline" className="w-full mt-4 text-sm">
-                        Voir tout l'historique
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="incidents" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                  <IncidentPortal />
-                </div>
-
-                <div className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Guide de résolution</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="space-y-2">
-                        <h3 className="font-medium">1. Vérifiez votre connexion</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Assurez-vous que votre connexion internet est stable
-                        </p>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <h3 className="font-medium">2. Redémarrez l'application</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Rafraîchissez la page ou reconnectez-vous
-                        </p>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <h3 className="font-medium">3. Signalez le problème</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Utilisez le formulaire d'incident pour décrire précisément votre problème
-                        </p>
-                      </div>
-                      
-                      <Button className="w-full mt-2 flex items-center gap-2">
-                        Guide de dépannage complet
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="resources" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                  <HelpCenter />
-                </div>
-
-                <div className="space-y-6">
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle>Tutoriels vidéo</CardTitle>
-                      <CardDescription>
-                        Apprenez à utiliser toutes les fonctionnalités
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="group cursor-pointer rounded-lg overflow-hidden border relative">
-                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                            <Button size="sm" variant="secondary">Regarder</Button>
-                          </div>
-                          <div className="aspect-video bg-muted flex items-center justify-center">
-                            <Play className="h-8 w-8 text-muted-foreground/50" />
-                          </div>
-                          <div className="p-2">
-                            <h4 className="font-medium">Premiers pas</h4>
-                            <p className="text-xs text-muted-foreground">3:45 min</p>
-                          </div>
-                        </div>
-                        
-                        <div className="group cursor-pointer rounded-lg overflow-hidden border relative">
-                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                            <Button size="sm" variant="secondary">Regarder</Button>
-                          </div>
-                          <div className="aspect-video bg-muted flex items-center justify-center">
-                            <Play className="h-8 w-8 text-muted-foreground/50" />
-                          </div>
-                          <div className="p-2">
-                            <h4 className="font-medium">Analyse émotionnelle</h4>
-                            <p className="text-xs text-muted-foreground">5:12 min</p>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+      <div className="container py-8">
+        <h1 className="text-3xl font-bold mb-6">Support & FAQ</h1>
+        
+        <Tabs defaultValue="faq" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
+            <TabsTrigger value="faq">Questions fréquentes</TabsTrigger>
+            <TabsTrigger value="contact">Nous contacter</TabsTrigger>
+            <TabsTrigger value="chat">Chat support</TabsTrigger>
+          </TabsList>
           
-          <AnimatePresence>
-            {showOnboarding && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="fixed bottom-4 right-4 max-w-xs bg-card border rounded-lg shadow-lg p-4 z-50"
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-medium">Bienvenue dans l'assistance</h3>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-6 w-6 p-0" 
-                    onClick={dismissOnboarding}
-                  >
-                    ×
-                  </Button>
+          <TabsContent value="faq">
+            <Card>
+              <CardHeader>
+                <CardTitle>Questions fréquentes</CardTitle>
+                <CardDescription>Trouvez des réponses aux questions les plus courantes</CardDescription>
+                <div className="relative mt-4">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
+                  <Input 
+                    placeholder="Rechercher dans la FAQ..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Explorez les différents onglets pour découvrir nos options d'assistance
-                </p>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  <p className="text-xs">Assistance IA disponible 24/7</p>
+              </CardHeader>
+              <CardContent>
+                {filteredFaqs.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Aucun résultat pour "{searchTerm}"
+                  </div>
+                ) : (
+                  <Accordion type="single" collapsible className="w-full">
+                    {filteredFaqs.map((faq, index) => (
+                      <AccordionItem key={index} value={`item-${index}`}>
+                        <AccordionTrigger>{faq.question}</AccordionTrigger>
+                        <AccordionContent>{faq.answer}</AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="contact">
+            <Card>
+              <CardHeader>
+                <CardTitle>Nous contacter</CardTitle>
+                <CardDescription>Envoyez-nous un message et nous vous répondrons dans les plus brefs délais</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label htmlFor="name" className="text-sm font-medium">Nom complet</label>
+                      <Input id="name" placeholder="Entrez votre nom" />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="email" className="text-sm font-medium">Email</label>
+                      <Input id="email" type="email" placeholder="votre@email.com" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="subject" className="text-sm font-medium">Sujet</label>
+                    <Input id="subject" placeholder="Sujet de votre message" />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="message" className="text-sm font-medium">Message</label>
+                    <Textarea id="message" placeholder="Détaillez votre demande..." rows={6} />
+                  </div>
+                  <Button type="submit" className="w-full">Envoyer</Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="chat">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <MessageCircle className="mr-2 h-5 w-5" /> Chat avec le support
+                </CardTitle>
+                <CardDescription>Notre équipe de support est disponible pour vous aider</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[400px] border rounded-md bg-muted/30 flex flex-col items-center justify-center p-8 text-center">
+                  <MessageCircle className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-xl font-medium mb-2">Discussion instantanée</h3>
+                  <p className="text-muted-foreground mb-6">Lancez une conversation avec un de nos conseillers</p>
+                  <Button>Démarrer le chat</Button>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </SupportProvider>
+                
+                <div className="mt-6">
+                  <div className="flex items-center justify-between p-4 border rounded-md">
+                    <div className="flex items-center">
+                      <Phone className="h-5 w-5 mr-3 text-primary" />
+                      <div>
+                        <p className="font-medium">Support téléphonique</p>
+                        <p className="text-sm text-muted-foreground">Lun-Ven, 9h-18h</p>
+                      </div>
+                    </div>
+                    <Button variant="outline">+33 1 23 45 67 89</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </Shell>
   );
 };
 
 export default SupportPage;
-
-import { Badge } from '@/components/ui/badge';
-import { Play } from 'lucide-react';
