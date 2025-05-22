@@ -1,5 +1,6 @@
 
 import { ThemeProvider as ActualThemeProvider } from '@/contexts/ThemeContext';
+import { useTheme as useActualTheme } from '@/hooks/use-theme';
 
 export function ThemeProvider({
   children,
@@ -17,3 +18,5 @@ export function ThemeProvider({
     </ActualThemeProvider>
   );
 }
+
+export const useTheme = useActualTheme;
