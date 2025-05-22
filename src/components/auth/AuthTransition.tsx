@@ -32,11 +32,13 @@ const AuthTransition: React.FC<AuthTransitionProps> = ({ children }) => {
   return (
     <>
       {children}
-      <PostLoginTransition 
-        show={showTransition} 
-        onComplete={handleTransitionComplete}
-        userName={user?.name}
-      />
+      {showTransition && (
+        <PostLoginTransition 
+          show={showTransition} 
+          onComplete={handleTransitionComplete}
+          userName={user?.name}
+        />
+      )}
     </>
   );
 };

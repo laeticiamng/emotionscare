@@ -1,252 +1,201 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '@/types/user';
-import authService from '@/services/auth-service';
-import { AuthErrorCode } from '@/utils/authErrors';
-import { supabase } from '@/integrations/supabase/client';
-import { logSessionRedirect } from '@/utils/securityLogs';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { AuthUser, AuthContextType } from '@/types/auth';
+import { toast } from '@/hooks/use-toast';
+import { AuthError, AuthErrorCode } from '@/utils/authErrors';
+import { recordLoginAttempt } from '@/utils/security';
 
-interface AuthContextType {
-  isAuthenticated: boolean;
-  user: User | null;
-  loading: boolean;
-  isLoading: boolean; // Added to match usage in components
-  error: string | null;
-  login: (email: string, password: string, remember?: boolean) => Promise<User | null>;
-  register: (name: string, email: string, password: string) => Promise<User | null>;
-  logout: () => Promise<void>;
-  sendMagicLink?: (email: string) => Promise<boolean>;
-  clearError?: () => void;
-  updateUser?: (userData: Partial<User>) => Promise<User | null>; // Added to match usage in components
-  updatePreferences?: (preferences: any) => Promise<void>;
+// Contexte par défaut
+const defaultContext: AuthContextType = {
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
+  error: null,
+  login: async () => null,
+  register: async () => null,
+  logout: async () => {},
+};
+
+// Création du contexte
+const AuthContext = createContext<AuthContextType>(defaultContext);
+
+// Hook personnalisé pour utiliser le contexte
+export const useAuth = () => useContext(AuthContext);
+
+interface AuthProviderProps {
+  children: ReactNode;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+// Provider du contexte
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
 
+  // Effet pour charger l'utilisateur au démarrage
   useEffect(() => {
-    // Verify existing session on mount via Supabase
-    const checkAuthStatus = async () => {
+    const loadUser = async () => {
       try {
-        const { user } = await authService.getCurrentUser();
-
-        if (user) {
-          setUser(user);
+        // Charge l'utilisateur depuis le localStorage
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
           setIsAuthenticated(true);
         }
-      } catch (error) {
-        console.error('Error checking auth status:', error);
+      } catch (err) {
+        console.error('Error loading user:', err);
+        setError(err instanceof Error ? err : new Error('Unknown error'));
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
-    checkAuthStatus();
-
-    const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!session) {
-        setUser(null);
-        setIsAuthenticated(false);
-        if (typeof window !== 'undefined') {
-          logSessionRedirect(null, window.location.pathname, 'session_lost');
-        }
-      } else {
-        const { user } = await authService.getCurrentUser();
-        if (user) {
-          setUser(user);
-          setIsAuthenticated(true);
-        }
-      }
-    });
-
-    return () => {
-      data.subscription.unsubscribe();
-    };
+    loadUser();
   }, []);
 
-  const login = async (email: string, password: string, remember = true): Promise<User | null> => {
-    setLoading(true);
-    setError(null);
-
+  // Fonction de connexion
+  const login = async (email: string, password: string): Promise<AuthUser | null> => {
     try {
-      const { user, error } = await authService.signIn({ email, password });
+      setIsLoading(true);
+      setError(null);
 
-      if (error || !user) {
-        throw error || new Error('Invalid credentials');
-      }
+      // Pour des raisons de sécurité, simuler un délai pour empêcher le timing attack
+      await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 500));
 
-      // If the user does not want to be remembered, remove stored session after login
-      if (!remember && typeof window !== 'undefined') {
-        const storageKey = Object.keys(localStorage).find((k) => k.startsWith('sb-') && k.endsWith('-auth-token'));
-        if (storageKey) {
-          const session = localStorage.getItem(storageKey);
-          sessionStorage.setItem(storageKey, session || '');
-          localStorage.removeItem(storageKey);
+      // Simulation d'une API de connexion (à remplacer par une vraie API)
+      if (email && password) {
+        // Simulation de succès/échec
+        const succeed = email.includes('@') && password.length >= 4;
+        
+        // Enregistre la tentative de connexion
+        recordLoginAttempt(email, succeed);
+
+        if (!succeed) {
+          throw new AuthError(AuthErrorCode.INVALID_CREDENTIALS, 'Invalid credentials');
         }
+
+        // Utilisateur simulé
+        const mockUser: AuthUser = {
+          id: 'user-' + Date.now(),
+          name: email.split('@')[0],
+          email: email,
+          role: email.includes('admin') ? 'admin' : 'user',
+          createdAt: new Date().toISOString(),
+        };
+
+        // Stocke l'utilisateur dans localStorage
+        localStorage.setItem('user', JSON.stringify(mockUser));
+
+        // Met à jour l'état
+        setUser(mockUser);
+        setIsAuthenticated(true);
+        
+        toast({
+          title: "Connexion réussie",
+          description: `Bienvenue, ${mockUser.name}!`,
+        });
+
+        return mockUser;
       }
 
-      setUser(user);
-      setIsAuthenticated(true);
-      return user;
-    } catch (error: any) {
-      console.error('Login error:', error);
-      if (error.code === AuthErrorCode.TOO_MANY_ATTEMPTS) {
-        setError("Trop de tentatives de connexion. Veuillez patienter.");
-      } else {
-        setError('Identifiants invalides');
-      }
-      return null;
+      throw new AuthError(AuthErrorCode.INVALID_CREDENTIALS, 'Missing email or password');
+    } catch (err) {
+      console.error('Login error:', err);
+      const authError = err instanceof AuthError ? err : new AuthError(AuthErrorCode.UNKNOWN, 'Une erreur est survenue');
+      setError(authError);
+      throw authError;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const register = async (name: string, email: string, password: string): Promise<User | null> => {
-    setLoading(true);
-    setError(null);
-
+  // Fonction d'inscription
+  const register = async (name: string, email: string, password: string): Promise<AuthUser | null> => {
     try {
-      const { user, error } = await authService.signUp({ name, email, password, role: 'b2c' });
+      setIsLoading(true);
+      setError(null);
 
-      if (error || !user) {
-        throw error || new Error('Registration failed');
+      // Simulation d'une API d'inscription (à remplacer par une vraie API)
+      if (name && email && password) {
+        // Simulation de délai 
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Utilisateur simulé
+        const mockUser: AuthUser = {
+          id: 'user-' + Date.now(),
+          name: name,
+          email: email,
+          role: 'user',
+          createdAt: new Date().toISOString(),
+        };
+
+        // Stocke l'utilisateur dans localStorage
+        localStorage.setItem('user', JSON.stringify(mockUser));
+
+        // Met à jour l'état
+        setUser(mockUser);
+        setIsAuthenticated(true);
+        
+        toast({
+          title: "Compte créé avec succès",
+          description: `Bienvenue, ${name}!`,
+        });
+
+        return mockUser;
       }
 
-      setUser(user);
-      setIsAuthenticated(true);
-      return user;
-    } catch (error: any) {
-      console.error('Registration error:', error);
-      setError('Une erreur est survenue lors de l\'inscription');
-      return null;
+      throw new Error('Missing required fields');
+    } catch (err) {
+      console.error('Register error:', err);
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+      throw err;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
+  // Fonction de déconnexion
   const logout = async (): Promise<void> => {
-    setLoading(true);
-
     try {
-      const { error } = await authService.signOut();
+      setIsLoading(true);
 
-      if (error) throw error;
+      // Supprime l'utilisateur du localStorage
+      localStorage.removeItem('user');
 
+      // Met à jour l'état
       setUser(null);
       setIsAuthenticated(false);
-      localStorage.removeItem('userMode');
-    } catch (error) {
-      console.error('Logout error:', error);
-      setError('Erreur lors de la déconnexion');
+      
+      toast({
+        title: "Déconnexion réussie",
+        description: "À bientôt!",
+      });
+    } catch (err) {
+      console.error('Logout error:', err);
+      setError(err instanceof Error ? err : new Error('Unknown error'));
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const clearError = () => {
-    setError(null);
-  };
+  // Fonction pour effacer les erreurs
+  const clearError = () => setError(null);
 
-  // Add updateUser function
-  const updateUser = async (userData: Partial<User>): Promise<User | null> => {
-    setLoading(true);
-    try {
-      if (!user) {
-        throw new Error('No user found');
-      }
-
-      const { success, error } = await authService.updateUserProfile(user.id, userData);
-
-      if (!success || error) throw error;
-
-      const updatedUser = { ...user, ...userData };
-      setUser(updatedUser);
-
-      return updatedUser;
-    } catch (error) {
-      console.error('Update user error:', error);
-      setError('Failed to update user. Please try again.');
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Add updatePreferences function
-  const updatePreferences = async (preferences: any): Promise<void> => {
-    setLoading(true);
-    try {
-      if (!user) {
-        throw new Error('No user found');
-      }
-
-      const { success, error } = await authService.updateUserPreferences(user.id, preferences);
-
-      if (!success || error) throw error;
-
-      const updatedUser = {
-        ...user,
-        preferences: { ...user.preferences, ...preferences }
-      };
-      setUser(updatedUser);
-    } catch (error) {
-      console.error('Update preferences error:', error);
-      setError('Failed to update preferences. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const sendMagicLink = async (email: string): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const { success, error } = await authService.sendMagicLink(email);
-      if (!success || error) throw error;
-      return true;
-    } catch (error) {
-      console.error('Magic link error:', error);
-      setError('Impossible d\'envoyer le lien de connexion');
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Valeur du contexte
   const value = {
-    isAuthenticated,
     user,
-    loading,
-    isLoading: loading, // Add alias for isLoading
+    isAuthenticated,
+    isLoading,
     error,
     login,
     register,
     logout,
     clearError,
-    updateUser,
-    updatePreferences,
-    sendMagicLink
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  
-  return context;
-};
+export default AuthContext;

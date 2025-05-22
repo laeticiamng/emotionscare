@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 
 interface PostLoginTransitionProps {
   show: boolean;
@@ -9,161 +9,114 @@ interface PostLoginTransitionProps {
   userName?: string;
 }
 
-const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({
-  show,
+const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({ 
+  show, 
   onComplete,
   userName
 }) => {
-  const [step, setStep] = useState<'success' | 'welcome' | 'loading'>('success');
+  const [stage, setStage] = useState<'success' | 'welcome' | 'loading'>('success');
   
   useEffect(() => {
     if (!show) return;
     
-    // First step: Success animation
+    // Séquence d'animation en plusieurs étapes
     const successTimer = setTimeout(() => {
-      setStep('welcome');
+      setStage('welcome');
       
-      // Second step: Welcome message
       const welcomeTimer = setTimeout(() => {
-        setStep('loading');
+        setStage('loading');
         
-        // Third step: Loading animation, then complete
         const loadingTimer = setTimeout(() => {
           onComplete();
-        }, 1500);
+        }, 1800);
         
         return () => clearTimeout(loadingTimer);
-      }, 1200);
+      }, 1500);
       
       return () => clearTimeout(welcomeTimer);
     }, 1000);
     
     return () => clearTimeout(successTimer);
   }, [show, onComplete]);
-
+  
   if (!show) return null;
-
+  
   return (
     <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm"
-        >
-          <div className="max-w-md w-full px-4">
-            <AnimatePresence mode="wait">
-              {step === 'success' && (
-                <motion.div 
-                  className="flex flex-col items-center text-center"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4 }}
-                >
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm"
+      >
+        <div className="max-w-sm w-full flex flex-col items-center text-center p-6">
+          <AnimatePresence mode="wait">
+            {stage === 'success' && (
+              <motion.div
+                key="success"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 24 }}
+                className="flex flex-col items-center"
+              >
+                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <Check className="h-8 w-8 text-primary" />
+                </div>
+                <h2 className="text-xl font-semibold mb-2">Connexion réussie</h2>
+                <p className="text-muted-foreground">Vous êtes bien connecté à votre compte</p>
+              </motion.div>
+            )}
+            
+            {stage === 'welcome' && (
+              <motion.div
+                key="welcome"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 24 }}
+                className="flex flex-col items-center"
+              >
+                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: [0, 1.2, 1] }}
-                    transition={{ duration: 0.5 }}
-                    className="rounded-full bg-green-100 dark:bg-green-900/30 p-4 mb-4"
-                  >
-                    <Check className="h-12 w-12 text-green-600 dark:text-green-400" />
-                  </motion.div>
-                  
-                  <motion.h3 
-                    className="text-2xl font-medium mb-2"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    Connexion réussie
-                  </motion.h3>
-                </motion.div>
-              )}
-              
-              {step === 'welcome' && (
-                <motion.div 
-                  className="flex flex-col items-center text-center"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <motion.h3 
-                    className="text-2xl font-medium mb-4"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    {userName 
-                      ? `Bienvenue, ${userName}!`
-                      : "Bienvenue sur EmotionsCare!"}
-                  </motion.h3>
-                  
-                  <motion.p
-                    className="text-muted-foreground"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    Nous préparons votre espace personnel...
-                  </motion.p>
-                </motion.div>
-              )}
-              
-              {step === 'loading' && (
-                <motion.div 
-                  className="flex flex-col items-center text-center"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <motion.div
-                    className="relative h-16 w-16 mb-6"
                     animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                  >
-                    <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
-                    <div className="absolute inset-0 rounded-full border-4 border-t-primary border-transparent" />
-                  </motion.div>
-                  
-                  <motion.h3 
-                    className="text-xl font-medium mb-2"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    Chargement en cours
-                  </motion.h3>
-                  
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    className="rounded-full border-4 border-primary/30 border-t-primary h-12 w-12"
+                  />
+                </div>
+                <h2 className="text-xl font-semibold mb-2">
+                  Bienvenue {userName ? userName : 'sur EmotionsCare'}
+                </h2>
+                <p className="text-muted-foreground">Nous préparons votre espace personnel</p>
+              </motion.div>
+            )}
+            
+            {stage === 'loading' && (
+              <motion.div
+                key="loading"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 24 }}
+                className="flex flex-col items-center"
+              >
+                <div className="relative h-16 w-16 mb-4">
                   <motion.div 
-                    className="w-full h-2 bg-primary/20 rounded-full overflow-hidden mt-3"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <motion.div 
-                      className="h-full bg-primary"
-                      initial={{ width: '0%' }}
-                      animate={{ width: '100%' }}
-                      transition={{ duration: 1.5, ease: "easeInOut" }}
-                    />
-                  </motion.div>
-                  
-                  <motion.p
-                    className="text-sm text-muted-foreground mt-3"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    Préparation de votre tableau de bord personnalisé...
-                  </motion.p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
-      )}
+                    className="absolute inset-0 rounded-full border-4 border-primary/20"
+                    animate={{ opacity: [0.2, 0.5, 0.2] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  />
+                  <Loader2 className="h-16 w-16 text-primary animate-spin" />
+                </div>
+                <h2 className="text-xl font-semibold mb-2">Chargement de votre espace</h2>
+                <p className="text-muted-foreground">
+                  Préparation de vos modules personnalisés...
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
     </AnimatePresence>
   );
 };

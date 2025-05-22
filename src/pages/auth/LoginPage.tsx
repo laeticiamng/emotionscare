@@ -7,6 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
+import { isLoginLocked } from '@/utils/security';
+import { AuthErrorCode } from '@/utils/authErrors';
+import { Mail, Lock } from 'lucide-react';
 
 const LoginPage: React.FC = () => {
   const { login } = useAuth();
@@ -21,15 +24,31 @@ const LoginPage: React.FC = () => {
     setError('');
     setIsLoading(true);
 
+    // Vérification simple du verrouillage par tentatives excessives
+    if (isLoginLocked(email)) {
+      setError('Trop de tentatives de connexion. Veuillez réessayer plus tard.');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       await login(email, password);
       
       // Set flag for post-login transition
       sessionStorage.setItem('just_logged_in', 'true');
       
-      // Navigate is handled by AuthTransition component
-    } catch (err) {
-      setError('Impossible de vous connecter. Vérifiez vos identifiants.');
+      // Navigate is handled by AuthContext or redirect components
+    } catch (err: any) {
+      console.error('Login error:', err);
+      
+      if (err?.code === AuthErrorCode.INVALID_CREDENTIALS) {
+        setError('Identifiants incorrects. Vérifiez votre email et mot de passe.');
+      } else if (err?.code === AuthErrorCode.TOO_MANY_ATTEMPTS) {
+        setError('Trop de tentatives. Veuillez réessayer plus tard.');
+      } else {
+        setError('Impossible de vous connecter. Vérifiez vos identifiants.');
+      }
+      
       setIsLoading(false);
     }
   };
@@ -59,6 +78,7 @@ const LoginPage: React.FC = () => {
                   placeholder="nom@exemple.fr"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  startIcon={<Mail className="h-4 w-4 text-muted-foreground" />}
                   required
                   className="auth-input-focus-effect"
                 />
@@ -70,6 +90,7 @@ const LoginPage: React.FC = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  startIcon={<Lock className="h-4 w-4 text-muted-foreground" />}
                   required
                   className="auth-input-focus-effect"
                 />
@@ -78,7 +99,7 @@ const LoginPage: React.FC = () => {
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-sm text-destructive"
+                  className="text-sm text-destructive p-2 bg-destructive/10 rounded-md"
                 >
                   {error}
                 </motion.div>
