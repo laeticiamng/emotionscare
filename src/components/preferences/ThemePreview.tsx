@@ -1,13 +1,13 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Theme } from '@/types';
+import { Theme } from '@/types/preferences';
 
 interface ThemePreviewProps {
   theme: Theme;
 }
 
-const ThemePreview: React.FC<ThemePreviewProps> = ({ theme }) => {
+export const ThemePreview: React.FC<ThemePreviewProps> = ({ theme }) => {
   return (
     <div className={`theme-${theme}`}>
       <Card className="border shadow-sm">
