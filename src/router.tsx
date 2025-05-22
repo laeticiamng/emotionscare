@@ -1,16 +1,15 @@
+
 import React from 'react';
 import AuthLayout from '@/layouts/AuthLayout';
 import B2CLayout from '@/layouts/B2CLayout';
 import B2BUserLayout from '@/layouts/B2BUserLayout';
 import B2BAdminLayout from '@/layouts/B2BAdminLayout';
 import ProtectedRouteWithMode from '@/components/ProtectedRouteWithMode';
-
 // Public pages
 import Home from './Home';
 import LandingPage from './pages/LandingPage';
 import HomePage from './pages/HomePage';
 import NotFoundPage from './pages/NotFoundPage';
-
 // Page components
 import ImmersiveHome from './pages/ImmersiveHome';
 import ChooseModeFlow from '@/pages/auth/ChooseModeFlow';
@@ -37,7 +36,6 @@ import VRPage from './pages/VRPage';
 import SocialPage from './pages/SocialPage';
 import ProgressPage from './pages/ProgressPage';
 import GamificationPage from './pages/GamificationPage';
-
 // These pages redirect to the appropriate page based on user mode
 import Dashboard from './pages/Dashboard';
 import Journal from './pages/Journal';
@@ -49,7 +47,8 @@ import Social from './pages/Social';
 import VR from './pages/VR';
 import Gamification from './pages/Gamification';
 
-export const routes: RouteObject[] = [
+// Change from a named export to a default export
+const routes = [
   // Public routes
   {
     path: '/',
@@ -79,7 +78,6 @@ export const routes: RouteObject[] = [
     path: '/unauthorized',
     element: <UnauthorizedPage />
   },
-  
   // Generic mode redirect routes
   {
     path: '/dashboard',
@@ -117,7 +115,6 @@ export const routes: RouteObject[] = [
     path: '/gamification',
     element: <Gamification />
   },
-
   // Auth routes
   {
     path: '/',
@@ -163,10 +160,6 @@ export const routes: RouteObject[] = [
         element: <LoginPage mode="b2b_admin" />
       },
       {
-        path: 'b2b/admin/register',
-        element: <RegisterPage mode="b2b_admin" />
-      },
-      {
         path: 'b2b/admin/forgot-password',
         element: <ForgotPasswordPage mode="b2b_admin" />
       },
@@ -176,426 +169,204 @@ export const routes: RouteObject[] = [
       }
     ]
   },
-
-  // App routes - B2C
+  // B2C Routes
   {
-    path: 'b2c/',
+    path: '/b2c',
     element: <B2CLayout />,
     children: [
       {
         path: 'dashboard',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <DashboardPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <DashboardPage />
       },
       {
         path: 'scan',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <ScanPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <ScanPage />
       },
       {
         path: 'journal',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <JournalPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <JournalPage />
       },
       {
         path: 'music',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <MusicPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <MusicPage />
       },
       {
         path: 'audio',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <AudioPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <AudioPage />
       },
       {
         path: 'coach',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <CoachPage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'progress',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <ProgressPage />
-          </ProtectedRouteWithMode>
-        )
-      },
-       {
-        path: 'gamification',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <GamificationPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <CoachPage />
       },
       {
         path: 'vr',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <VRPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <VRPage />
       },
       {
         path: 'social',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <SocialPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <SocialPage />
+      },
+      {
+        path: 'progress',
+        element: <ProgressPage />
+      },
+      {
+        path: 'gamification',
+        element: <GamificationPage />
       },
       {
         path: 'settings',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <SettingsPage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'profile',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <ProfilePage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'notifications',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <NotificationsPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <SettingsPage />
       },
       {
         path: 'preferences',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <PreferencesPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <PreferencesPage />
       },
       {
         path: 'onboarding',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2c">
-            <OnboardingPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <OnboardingPage />
       }
     ]
   },
-
-  // App routes - B2B User
+  // B2B User Routes
   {
-    path: 'b2b/user/',
+    path: '/b2b/user',
     element: <B2BUserLayout />,
     children: [
       {
         path: 'dashboard',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <DashboardPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <DashboardPage />
       },
       {
         path: 'scan',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <ScanPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <ScanPage />
       },
-       {
+      {
         path: 'journal',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <JournalPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <JournalPage />
       },
       {
         path: 'music',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <MusicPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <MusicPage />
       },
       {
         path: 'audio',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <AudioPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <AudioPage />
       },
       {
         path: 'coach',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <CoachPage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'progress',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <ProgressPage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'gamification',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <GamificationPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <CoachPage />
       },
       {
         path: 'vr',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <VRPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <VRPage />
       },
       {
         path: 'social',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <SocialPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <SocialPage />
+      },
+      {
+        path: 'progress',
+        element: <ProgressPage />
+      },
+      {
+        path: 'gamification',
+        element: <GamificationPage />
       },
       {
         path: 'teams',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <TeamsPage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'events',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <EventsPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <TeamsPage />
       },
       {
         path: 'settings',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <SettingsPage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'profile',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <ProfilePage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'notifications',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <NotificationsPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <SettingsPage />
       },
       {
         path: 'preferences',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <PreferencesPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <PreferencesPage />
       },
       {
         path: 'onboarding',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_user">
-            <OnboardingPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <OnboardingPage />
+      },
+      {
+        path: 'notifications',
+        element: <NotificationsPage />
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />
       }
     ]
   },
-
-  // App routes - B2B Admin
+  // B2B Admin Routes
   {
-    path: 'b2b/admin/',
+    path: '/b2b/admin',
     element: <B2BAdminLayout />,
     children: [
       {
         path: 'dashboard',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <DashboardPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <DashboardPage />
       },
       {
         path: 'scan',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <ScanPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <ScanPage />
       },
       {
         path: 'journal',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <JournalPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <JournalPage />
       },
       {
         path: 'music',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <MusicPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <MusicPage />
       },
       {
         path: 'audio',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <AudioPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <AudioPage />
       },
       {
         path: 'coach',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <CoachPage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'progress',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <ProgressPage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'gamification',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <GamificationPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <CoachPage />
       },
       {
         path: 'vr',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <VRPage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'social',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <SocialPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <VRPage />
       },
       {
         path: 'teams',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <TeamsPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <TeamsPage />
       },
       {
         path: 'events',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <EventsPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <EventsPage />
       },
       {
         path: 'settings',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <SettingsPage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'profile',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <ProfilePage />
-          </ProtectedRouteWithMode>
-        )
-      },
-      {
-        path: 'notifications',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <NotificationsPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <SettingsPage />
       },
       {
         path: 'preferences',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <PreferencesPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <PreferencesPage />
       },
       {
         path: 'onboarding',
-        element: (
-          <ProtectedRouteWithMode requiredMode="b2b_admin">
-            <OnboardingPage />
-          </ProtectedRouteWithMode>
-        )
+        element: <OnboardingPage />
+      },
+      {
+        path: 'notifications',
+        element: <NotificationsPage />
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />
       }
     ]
   },
-
-  // Not found route
+  // Catch-all route (404)
   {
     path: '*',
     element: <NotFoundPage />
   }
 ];
+
+export default routes;
