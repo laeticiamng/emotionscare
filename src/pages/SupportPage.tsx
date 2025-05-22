@@ -1,155 +1,347 @@
 
 import React, { useState } from 'react';
-import Shell from '@/Shell';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Search, MessageCircle, Phone } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
+import { MessageCircle, FileText, HelpCircle, Send } from 'lucide-react';
+import Shell from '@/Shell';
 
-const SupportPage = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+const contactFormSchema = z.object({
+  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
+  email: z.string().email('Veuillez entrer une adresse e-mail valide'),
+  subject: z.string().min(5, 'Le sujet doit contenir au moins 5 caractères'),
+  message: z.string().min(10, 'Le message doit contenir au moins 10 caractères'),
+});
+
+type ContactFormValues = z.infer<typeof contactFormSchema>;
+
+const SupportPage: React.FC = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   
-  const faqs = [
-    {
-      question: "Comment fonctionne la musicothérapie ?",
-      answer: "Notre système de musicothérapie utilise une technologie d'IA pour analyser votre état émotionnel et générer des séquences musicales personnalisées pour améliorer votre bien-être. Les sessions peuvent être programmées ou lancées à la demande."
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      subject: '',
+      message: '',
     },
-    {
-      question: "Comment modifier mes préférences de notifications ?",
-      answer: "Vous pouvez modifier vos préférences de notifications dans la section Paramètres de votre compte. Vous pourrez y choisir quels types de notifications vous souhaitez recevoir et par quels canaux."
-    },
-    {
-      question: "Je n'arrive pas à accéder à mon compte, que faire ?",
-      answer: "Si vous rencontrez des difficultés pour accéder à votre compte, essayez de réinitialiser votre mot de passe. Si le problème persiste, contactez notre support via le formulaire de contact ou par téléphone."
-    },
-    {
-      question: "Comment exporter mes données ?",
-      answer: "Vous pouvez exporter vos données depuis la section Paramètres > Confidentialité. Plusieurs formats sont disponibles et l'exportation inclut votre historique d'utilisation et vos préférences."
-    },
-    {
-      question: "Quelles sont les fonctionnalités disponibles pour les entreprises ?",
-      answer: "Les entreprises bénéficient de fonctionnalités dédiées comme la gestion d'équipe, les campagnes de bien-être, les rapports analytiques et les tableaux de bord administratifs pour suivre le bien-être des collaborateurs."
+  });
+  
+  const onSubmit = async (data: ContactFormValues) => {
+    try {
+      setIsSubmitting(true);
+      // Simuler l'envoi d'un message
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log('Form data:', data);
+      setIsSubmitted(true);
+      toast.success('Message envoyé avec succès. Nous vous répondrons prochainement.');
+    } catch (error) {
+      console.error('Erreur d\'envoi:', error);
+      toast.error('Une erreur est survenue lors de l\'envoi du message');
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+  
+  const resetForm = () => {
+    setIsSubmitted(false);
+    form.reset();
+  };
+  
+  const faqItems = [
+    {
+      question: 'Comment puis-je créer un compte ?',
+      answer: 'Vous pouvez créer un compte en cliquant sur le bouton "S\'inscrire" en haut à droite de la page d\'accueil. Suivez ensuite les instructions pour compléter votre inscription.',
+    },
+    {
+      question: 'Comment fonctionne le journal émotionnel ?',
+      answer: 'Le journal émotionnel vous permet d\'enregistrer quotidiennement vos émotions et de suivre leur évolution au fil du temps. Vous pouvez ajouter des entrées, ajouter des notes et visualiser vos tendances émotionnelles via des graphiques.',
+    },
+    {
+      question: 'Est-ce que mes données sont sécurisées ?',
+      answer: 'Oui, la protection de vos données est notre priorité. Toutes les informations sont cryptées et nous ne partageons jamais vos données avec des tiers sans votre consentement explicite.',
+    },
+    {
+      question: 'Comment puis-je réinitialiser mon mot de passe ?',
+      answer: 'Vous pouvez réinitialiser votre mot de passe en cliquant sur "Mot de passe oublié ?" sur la page de connexion. Un e-mail avec les instructions de réinitialisation vous sera envoyé.',
+    },
+    {
+      question: 'Puis-je utiliser l\'application sur mobile ?',
+      answer: 'Oui, notre application est conçue de manière responsive et fonctionne sur tous les appareils, y compris les smartphones et tablettes. Une application mobile native sera également bientôt disponible.',
+    },
+    {
+      question: 'Comment puis-je supprimer mon compte ?',
+      answer: 'Pour supprimer votre compte, accédez à vos paramètres de profil et cliquez sur "Supprimer mon compte". Veuillez noter que cette action est irréversible et que toutes vos données seront définitivement supprimées.',
+    },
   ];
   
-  const filteredFaqs = faqs.filter(faq => 
-    faq.question.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return (
     <Shell>
-      <div className="container py-8">
-        <h1 className="text-3xl font-bold mb-6">Support & FAQ</h1>
-        
-        <Tabs defaultValue="faq" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8">
-            <TabsTrigger value="faq">Questions fréquentes</TabsTrigger>
-            <TabsTrigger value="contact">Nous contacter</TabsTrigger>
-            <TabsTrigger value="chat">Chat support</TabsTrigger>
-          </TabsList>
+      <div className="container py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4">Centre d'assistance</h1>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Nous sommes là pour vous aider. Consultez notre FAQ ou contactez-nous directement.
+            </p>
+          </div>
           
-          <TabsContent value="faq">
-            <Card>
-              <CardHeader>
-                <CardTitle>Questions fréquentes</CardTitle>
-                <CardDescription>Trouvez des réponses aux questions les plus courantes</CardDescription>
-                <div className="relative mt-4">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={18} />
-                  <Input 
-                    placeholder="Rechercher dans la FAQ..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </CardHeader>
-              <CardContent>
-                {filteredFaqs.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Aucun résultat pour "{searchTerm}"
-                  </div>
+          <Tabs defaultValue="contact" className="max-w-4xl mx-auto">
+            <TabsList className="grid grid-cols-3 mb-8">
+              <TabsTrigger value="contact" className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" />
+                <span>Contact</span>
+              </TabsTrigger>
+              <TabsTrigger value="faq" className="flex items-center gap-2">
+                <HelpCircle className="h-4 w-4" />
+                <span>FAQ</span>
+              </TabsTrigger>
+              <TabsTrigger value="docs" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                <span>Documentation</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="contact" className="space-y-6">
+              <div className="bg-card rounded-lg border shadow-sm p-6">
+                {!isSubmitted ? (
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Nom</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Jean Dupont" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Email</FormLabel>
+                              <FormControl>
+                                <Input placeholder="email@exemple.com" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      
+                      <FormField
+                        control={form.control}
+                        name="subject"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Sujet</FormLabel>
+                            <FormControl>
+                              <Input placeholder="En quoi pouvons-nous vous aider ?" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="message"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Message</FormLabel>
+                            <FormControl>
+                              <textarea
+                                className="flex min-h-32 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                placeholder="Décrivez votre problème ou question en détail..."
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="flex justify-end">
+                        <Button 
+                          type="submit" 
+                          disabled={isSubmitting}
+                          className="flex items-center gap-2"
+                        >
+                          {isSubmitting ? 'Envoi en cours...' : (
+                            <>
+                              <Send className="h-4 w-4" />
+                              Envoyer le message
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
                 ) : (
-                  <Accordion type="single" collapsible className="w-full">
-                    {filteredFaqs.map((faq, index) => (
-                      <AccordionItem key={index} value={`item-${index}`}>
-                        <AccordionTrigger>{faq.question}</AccordionTrigger>
-                        <AccordionContent>{faq.answer}</AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
+                  <motion.div 
+                    className="text-center py-10"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary h-8 w-8"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Message envoyé</h3>
+                    <p className="text-muted-foreground mb-6">
+                      Merci de nous avoir contactés. Nous vous répondrons dans les plus brefs délais.
+                    </p>
+                    <Button onClick={resetForm}>Envoyer un nouveau message</Button>
+                  </motion.div>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="contact">
-            <Card>
-              <CardHeader>
-                <CardTitle>Nous contacter</CardTitle>
-                <CardDescription>Envoyez-nous un message et nous vous répondrons dans les plus brefs délais</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label htmlFor="name" className="text-sm font-medium">Nom complet</label>
-                      <Input id="name" placeholder="Entrez votre nom" />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-medium">Email</label>
-                      <Input id="email" type="email" placeholder="votre@email.com" />
-                    </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-card rounded-lg border p-6 text-center">
+                  <div className="mx-auto w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 mb-4">
+                    <MessageCircle className="h-6 w-6 text-primary" />
                   </div>
-                  <div className="space-y-2">
-                    <label htmlFor="subject" className="text-sm font-medium">Sujet</label>
-                    <Input id="subject" placeholder="Sujet de votre message" />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="message" className="text-sm font-medium">Message</label>
-                    <Textarea id="message" placeholder="Détaillez votre demande..." rows={6} />
-                  </div>
-                  <Button type="submit" className="w-full">Envoyer</Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="chat">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <MessageCircle className="mr-2 h-5 w-5" /> Chat avec le support
-                </CardTitle>
-                <CardDescription>Notre équipe de support est disponible pour vous aider</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[400px] border rounded-md bg-muted/30 flex flex-col items-center justify-center p-8 text-center">
-                  <MessageCircle className="h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-xl font-medium mb-2">Discussion instantanée</h3>
-                  <p className="text-muted-foreground mb-6">Lancez une conversation avec un de nos conseillers</p>
-                  <Button>Démarrer le chat</Button>
+                  <h3 className="font-medium mb-2">Chat en direct</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Discutez avec notre équipe d'assistance en temps réel.
+                  </p>
+                  <Button variant="outline" size="sm">
+                    Démarrer le chat
+                  </Button>
                 </div>
                 
-                <div className="mt-6">
-                  <div className="flex items-center justify-between p-4 border rounded-md">
-                    <div className="flex items-center">
-                      <Phone className="h-5 w-5 mr-3 text-primary" />
-                      <div>
-                        <p className="font-medium">Support téléphonique</p>
-                        <p className="text-sm text-muted-foreground">Lun-Ven, 9h-18h</p>
-                      </div>
-                    </div>
-                    <Button variant="outline">+33 1 23 45 67 89</Button>
+                <div className="bg-card rounded-lg border p-6 text-center">
+                  <div className="mx-auto w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  </div>
+                  <h3 className="font-medium mb-2">Téléphone</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Du lundi au vendredi, de 9h à 18h.
+                  </p>
+                  <Button variant="outline" size="sm">
+                    +33 1 23 45 67 89
+                  </Button>
+                </div>
+                
+                <div className="bg-card rounded-lg border p-6 text-center">
+                  <div className="mx-auto w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  </div>
+                  <h3 className="font-medium mb-2">Email</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Nous répondons généralement sous 24h.
+                  </p>
+                  <Button variant="outline" size="sm">
+                    support@emotionscare.com
+                  </Button>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="faq">
+              <div className="bg-card rounded-lg border shadow-sm p-6">
+                <h2 className="text-2xl font-bold mb-6">Questions fréquemment posées</h2>
+                
+                <Accordion type="single" collapsible className="w-full">
+                  {faqItems.map((item, index) => (
+                    <AccordionItem key={index} value={`item-${index}`}>
+                      <AccordionTrigger>{item.question}</AccordionTrigger>
+                      <AccordionContent>
+                        <p>{item.answer}</p>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+                
+                <div className="mt-8 p-4 bg-muted rounded-lg text-center">
+                  <p className="text-muted-foreground mb-2">
+                    Vous ne trouvez pas la réponse à votre question ?
+                  </p>
+                  <Button onClick={() => document.querySelector('[data-value="contact"]')?.click()}>
+                    Contactez-nous
+                  </Button>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="docs">
+              <div className="bg-card rounded-lg border shadow-sm p-6">
+                <h2 className="text-2xl font-bold mb-6">Documentation</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                  <div className="rounded-lg border p-4 hover:bg-accent transition-colors">
+                    <h3 className="font-medium mb-2">Guide de démarrage</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Apprenez les bases de l'application et comment configurer votre compte.
+                    </p>
+                    <Button variant="link" className="p-0 h-auto">Lire le guide</Button>
+                  </div>
+                  
+                  <div className="rounded-lg border p-4 hover:bg-accent transition-colors">
+                    <h3 className="font-medium mb-2">Fonctionnalités du journal</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Découvrez comment tirer le meilleur parti de votre journal émotionnel.
+                    </p>
+                    <Button variant="link" className="p-0 h-auto">Lire le guide</Button>
+                  </div>
+                  
+                  <div className="rounded-lg border p-4 hover:bg-accent transition-colors">
+                    <h3 className="font-medium mb-2">Graphiques et analyses</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Comprendre les graphiques et suivre votre évolution émotionnelle.
+                    </p>
+                    <Button variant="link" className="p-0 h-auto">Lire le guide</Button>
+                  </div>
+                  
+                  <div className="rounded-lg border p-4 hover:bg-accent transition-colors">
+                    <h3 className="font-medium mb-2">Paramètres de confidentialité</h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Tout sur la protection de vos données et les options de confidentialité.
+                    </p>
+                    <Button variant="link" className="p-0 h-auto">Lire le guide</Button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                
+                <div className="flex justify-center">
+                  <Button variant="outline">Voir toute la documentation</Button>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </motion.div>
       </div>
     </Shell>
   );

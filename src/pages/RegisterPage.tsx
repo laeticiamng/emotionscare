@@ -1,208 +1,223 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Mail, Lock, User, AlertTriangle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
 import Shell from '@/Shell';
+
+const registerSchema = z
+  .object({
+    name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
+    email: z.string().email('Email invalide'),
+    password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
+    confirmPassword: z.string(),
+    acceptTerms: z.boolean().refine((val) => val === true, {
+      message: 'Vous devez accepter les conditions d\'utilisation',
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Les mots de passe ne correspondent pas',
+    path: ['confirmPassword'],
+  });
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(false);
+  const { register } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!fullName || !email || !password || !confirmPassword) {
-      toast.error('Veuillez remplir tous les champs');
-      return;
-    }
-    
-    if (password !== confirmPassword) {
-      toast.error('Les mots de passe ne correspondent pas');
-      return;
-    }
-    
-    if (!agreeTerms) {
-      toast.error('Vous devez accepter les conditions d\'utilisation');
-      return;
-    }
-    
-    setIsLoading(true);
-    
+
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      acceptTerms: false,
+    },
+  });
+
+  const onSubmit = async (data: RegisterFormValues) => {
     try {
-      // Simulate registration for demo
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      setIsLoading(true);
+      // Simuler l'inscription
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       
-      toast.success('Inscription réussie! Redirection...');
-      navigate('/login');
+      const success = await register({
+        name: data.name,
+        email: data.email
+      });
+      
+      if (success) {
+        toast.success('Compte créé avec succès !');
+        navigate('/login');
+      } else {
+        toast.error('Erreur lors de la création du compte');
+      }
     } catch (error) {
-      toast.error('Erreur lors de l\'inscription');
-      console.error('Registration error:', error);
+      console.error('Erreur d\'inscription:', error);
+      toast.error('Une erreur est survenue lors de l\'inscription');
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
-    <Shell>
-      <div className="flex items-center justify-center min-h-[calc(100vh-8rem)] py-12">
-        <motion.div 
+    <Shell hideNav hideFooter>
+      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+        <motion.div
+          className="w-full max-w-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
         >
-          <Card className="shadow-xl border-t-4 border-t-primary">
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold text-center">Créer un compte</CardTitle>
-              <CardDescription className="text-center">
-                Rejoignez EmotionsCare pour gérer votre bien-être émotionnel
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleRegister} className="space-y-4">
-                <div className="space-y-2">
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="text"
-                      placeholder="Nom complet"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      type="email"
-                      placeholder="Votre email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Mot de passe"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 pr-10"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-0 top-0 h-10 w-10"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                      <span className="sr-only">
-                        {showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-                      </span>
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirmer le mot de passe"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="pl-10 pr-10"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-0 top-0 h-10 w-10"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                      <span className="sr-only">
-                        {showConfirmPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-                      </span>
-                    </Button>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="terms"
-                    checked={agreeTerms}
-                    onCheckedChange={(checked) => setAgreeTerms(checked === true)}
-                  />
-                  <label
-                    htmlFor="terms"
-                    className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    J'accepte les{" "}
-                    <Link to="/terms" className="text-primary hover:underline">
-                      conditions d'utilisation
-                    </Link>{" "}
-                    et la{" "}
-                    <Link to="/privacy" className="text-primary hover:underline">
-                      politique de confidentialité
-                    </Link>
-                  </label>
-                </div>
-                
-                {!agreeTerms && (
-                  <div className="flex items-center text-amber-500 text-xs">
-                    <AlertTriangle className="h-3 w-3 mr-1" />
-                    <span>Vous devez accepter les conditions pour continuer</span>
-                  </div>
-                )}
-                
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isLoading || !agreeTerms}
-                >
-                  {isLoading ? 'Création du compte...' : 'Créer mon compte'}
+          <div className="text-center mb-6">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <h1 className="text-3xl font-bold">Créer un compte</h1>
+              <p className="text-muted-foreground mt-2">
+                Rejoignez-nous pour vivre une expérience émotionnelle unique
+              </p>
+            </motion.div>
+          </div>
+
+          <motion.div
+            className="bg-card border rounded-xl shadow-sm p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nom complet</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Jean Dupont" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="email@exemple.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mot de passe</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirmer le mot de passe</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="acceptTerms"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 py-1">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="text-xs">
+                          J'accepte les{' '}
+                          <Link to="/terms" className="text-primary hover:underline">
+                            conditions d'utilisation
+                          </Link>{' '}
+                          et la{' '}
+                          <Link to="/privacy" className="text-primary hover:underline">
+                            politique de confidentialité
+                          </Link>
+                        </FormLabel>
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Création en cours...' : 'Créer un compte'}
                 </Button>
               </form>
-            </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
-              <div className="text-center text-sm w-full">
-                <span className="text-muted-foreground">Vous avez déjà un compte? </span>
-                <Link to="/login" className="text-primary hover:underline">
+            </Form>
+
+            <div className="mt-6 text-center text-sm">
+              <p>
+                Vous avez déjà un compte ?{' '}
+                <Link to="/login" className="font-medium text-primary hover:underline">
                   Se connecter
                 </Link>
-              </div>
-            </CardFooter>
-          </Card>
+              </p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="mt-8 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.5 }}
+          >
+            <Link to="/" className="text-sm text-muted-foreground hover:underline">
+              Retour à l'accueil
+            </Link>
+          </motion.div>
         </motion.div>
       </div>
     </Shell>

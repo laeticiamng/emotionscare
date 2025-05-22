@@ -1,171 +1,210 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
 import Shell from '@/Shell';
+
+const loginSchema = z.object({
+  email: z.string().email('Email invalide'),
+  password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
+  rememberMe: z.boolean().optional(),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email || !password) {
-      toast.error('Veuillez remplir tous les champs');
-      return;
-    }
-    
-    setIsLoading(true);
-    
+
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: false,
+    },
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
     try {
-      // Simulate login for demo
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      setIsLoading(true);
+      const success = await login(data.email, data.password);
       
-      // Demo login - in production, this would be connected to a real auth system
-      if (email === 'admin@exemple.fr' && password === 'admin') {
-        toast.success('Connexion réussie! Redirection...');
-        // Set login flag in session storage
-        sessionStorage.setItem('just_logged_in', 'true');
-        localStorage.setItem('auth_user', JSON.stringify({ 
-          id: '1', 
-          email: 'admin@exemple.fr',
-          name: 'Admin',
-          role: 'admin' 
-        }));
-        navigate('/dashboard');
-      } else if (email === 'utilisateur@exemple.fr' && password === 'admin') {
-        toast.success('Connexion réussie! Redirection...');
-        // Set login flag in session storage
-        sessionStorage.setItem('just_logged_in', 'true');
-        localStorage.setItem('auth_user', JSON.stringify({ 
-          id: '2', 
-          email: 'utilisateur@exemple.fr',
-          name: 'Utilisateur',
-          role: 'user'
-        }));
-        navigate('/dashboard');
-      } else if (email === 'collaborateur@exemple.fr' && password === 'admin') {
-        toast.success('Connexion réussie! Redirection...');
-        // Set login flag in session storage
-        sessionStorage.setItem('just_logged_in', 'true');
-        localStorage.setItem('auth_user', JSON.stringify({ 
-          id: '3', 
-          email: 'collaborateur@exemple.fr',
-          name: 'Collaborateur',
-          role: 'collaborator'
-        }));
+      if (success) {
+        toast.success('Connexion réussie !');
         navigate('/dashboard');
       } else {
-        toast.error('Email ou mot de passe incorrect');
+        toast.error('Identifiants incorrects');
       }
     } catch (error) {
-      toast.error('Erreur lors de la connexion');
-      console.error('Login error:', error);
+      console.error('Erreur de connexion:', error);
+      toast.error('Une erreur est survenue lors de la connexion');
     } finally {
       setIsLoading(false);
     }
   };
-  
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-  
+
   return (
-    <Shell>
-      <div className="flex items-center justify-center min-h-[calc(100vh-8rem)] py-12">
-        <motion.div 
+    <Shell hideNav hideFooter>
+      <div className="min-h-screen flex flex-col items-center justify-center p-6">
+        <motion.div
+          className="w-full max-w-md"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
         >
-          <Card className="shadow-xl border-t-4 border-t-primary">
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold text-center">Connexion</CardTitle>
-              <CardDescription className="text-center">
-                Accédez à votre espace personnel
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      type="email"
-                      placeholder="Votre email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
+          <div className="text-center mb-6">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <h1 className="text-3xl font-bold">Bienvenue</h1>
+              <p className="text-muted-foreground mt-2">
+                Connectez-vous pour accéder à votre compte
+              </p>
+            </motion.div>
+          </div>
+
+          <motion.div
+            className="bg-card border rounded-xl shadow-sm p-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="email@exemple.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mot de passe</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex items-center justify-between">
+                  <FormField
+                    control={form.control}
+                    name="rememberMe"
+                    render={({ field }) => (
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="remember-me"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                        <label
+                          htmlFor="remember-me"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Se souvenir de moi
+                        </label>
+                      </div>
+                    )}
+                  />
+
+                  <Link
+                    to="/forgot-password"
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    Mot de passe oublié ?
+                  </Link>
                 </div>
-                <div className="space-y-2">
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Mot de passe"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 pr-10"
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-0 top-0 h-10 w-10"
-                      onClick={togglePasswordVisibility}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                      <span className="sr-only">
-                        {showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-                      </span>
-                    </Button>
-                  </div>
-                </div>
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isLoading}
-                >
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? 'Connexion en cours...' : 'Se connecter'}
                 </Button>
               </form>
-              
-              <div className="mt-4 text-center text-sm">
-                <Link to="/forgot-password" className="text-primary hover:underline">
-                  Mot de passe oublié?
-                </Link>
-              </div>
-            </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
-              <div className="text-center text-sm w-full">
-                <span className="text-muted-foreground">Pas encore de compte? </span>
-                <Link to="/register" className="text-primary hover:underline">
+            </Form>
+
+            <div className="mt-6 text-center text-sm">
+              <p>
+                Vous n'avez pas de compte ?{' '}
+                <Link to="/register" className="font-medium text-primary hover:underline">
                   S'inscrire
                 </Link>
+              </p>
+            </div>
+
+            <div className="mt-8">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Comptes de démonstration
+                  </span>
+                </div>
               </div>
-              
-              <div className="text-xs text-center text-muted-foreground w-full">
-                <p>Demo: utilisez admin@exemple.fr / admin</p>
-                <p>ou utilisateur@exemple.fr / admin</p>
+
+              <div className="mt-4 grid gap-2 text-sm">
+                <div className="rounded-lg border p-2">
+                  <p>
+                    <strong>Administrateur:</strong> admin@exemple.fr / admin
+                  </p>
+                </div>
+                <div className="rounded-lg border p-2">
+                  <p>
+                    <strong>Utilisateur:</strong> utilisateur@exemple.fr / admin
+                  </p>
+                </div>
+                <div className="rounded-lg border p-2">
+                  <p>
+                    <strong>Collaborateur:</strong> collaborateur@exemple.fr / admin
+                  </p>
+                </div>
               </div>
-            </CardFooter>
-          </Card>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="mt-8 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.5 }}
+          >
+            <Link to="/" className="text-sm text-muted-foreground hover:underline">
+              Retour à l'accueil
+            </Link>
+          </motion.div>
         </motion.div>
       </div>
     </Shell>
