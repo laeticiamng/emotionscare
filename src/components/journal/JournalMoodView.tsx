@@ -2,182 +2,281 @@
 import React, { useMemo } from 'react';
 import { JournalEntry } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { formatDistanceToNow, subDays, format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { getEmotionIcon, getEmotionColor } from '@/lib/emotionUtils';
+import { Bar, BarChart, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 
 interface JournalMoodViewProps {
   entries: JournalEntry[];
 }
 
-interface MoodDataPoint {
-  date: string;
-  rawDate: Date;
-  formattedDate: string;
-  score: number;
+interface EmotionCount {
+  name: string;
+  count: number;
+  color: string;
 }
 
 const JournalMoodView: React.FC<JournalMoodViewProps> = ({ entries }) => {
-  const moodData = useMemo(() => {
-    // Filter entries that have a mood_score
-    const entriesWithScore = entries.filter(entry => entry.mood_score !== undefined);
-    
-    // Sort entries by date
-    const sortedEntries = [...entriesWithScore].sort((a, b) => {
-      return new Date(a.date).getTime() - new Date(b.date).getTime();
+  // Calculate emotion statistics
+  const emotionStats = useMemo(() => {
+    // Count emotions
+    const counts: Record<string, number> = {};
+    entries.forEach(entry => {
+      const emotion = entry.mood || entry.emotion || 'neutral';
+      counts[emotion] = (counts[emotion] || 0) + 1;
     });
     
-    return sortedEntries.map(entry => {
-      const entryDate = new Date(entry.date);
+    // Transform into chart data
+    const chartData: EmotionCount[] = Object.keys(counts).map(emotion => {
+      // Get color based on the emotion
+      let colorHex = '#64748b'; // Default color
+      
+      switch (emotion) {
+        case 'joy':
+        case 'happy':
+          colorHex = '#22c55e';
+          break;
+        case 'excited':
+        case 'proud':
+          colorHex = '#f59e0b';
+          break;
+        case 'calm':
+        case 'relaxed':
+          colorHex = '#3b82f6';
+          break;
+        case 'sad':
+          colorHex = '#6366f1';
+          break;
+        case 'angry':
+          colorHex = '#ef4444';
+          break;
+        case 'stressed':
+        case 'anxious':
+          colorHex = '#f97316';
+          break;
+        case 'tired':
+          colorHex = '#8b5cf6';
+          break;
+      }
+      
       return {
-        date: format(entryDate, 'yyyy-MM-dd'),
-        rawDate: entryDate,
-        formattedDate: format(entryDate, 'dd MMM', { locale: fr }),
-        score: entry.mood_score || 0
+        name: emotion,
+        count: counts[emotion],
+        color: colorHex
+      };
+    });
+    
+    // Sort by count (descending)
+    return chartData.sort((a, b) => b.count - a.count);
+  }, [entries]);
+  
+  // Calculate mood over time
+  const moodOverTime = useMemo(() => {
+    // Group by date
+    const entriesByDate: Record<string, JournalEntry[]> = {};
+    entries.forEach(entry => {
+      const dateStr = new Date(entry.date).toISOString().split('T')[0];
+      if (!entriesByDate[dateStr]) {
+        entriesByDate[dateStr] = [];
+      }
+      entriesByDate[dateStr].push(entry);
+    });
+    
+    // Sort dates
+    const sortedDates = Object.keys(entriesByDate).sort();
+    
+    // Calculate average mood score for each date
+    return sortedDates.map(dateStr => {
+      const dateEntries = entriesByDate[dateStr];
+      // Use mood_score if available, otherwise assign a default score based on emotion
+      const moodScores = dateEntries.map(entry => {
+        if (entry.mood_score !== undefined) {
+          return entry.mood_score;
+        }
+        
+        // Assign scores based on common emotions (very simplified)
+        const emotion = entry.mood || entry.emotion || 'neutral';
+        switch (emotion.toLowerCase()) {
+          case 'happy':
+          case 'joy':
+          case 'excited':
+            return 80;
+          case 'calm':
+          case 'relaxed':
+            return 70;
+          case 'neutral':
+            return 50;
+          case 'sad':
+          case 'tired':
+            return 30;
+          case 'angry':
+          case 'stressed':
+          case 'anxious':
+            return 20;
+          default:
+            return 50;
+        }
+      });
+      
+      // Calculate average
+      const avgScore = moodScores.reduce((sum, score) => sum + score, 0) / moodScores.length;
+      
+      // Format date to be more readable
+      const date = new Date(dateStr);
+      const formattedDate = `${date.getDate()}/${date.getMonth() + 1}`;
+      
+      return {
+        date: formattedDate,
+        score: Math.round(avgScore),
+        count: dateEntries.length
       };
     });
   }, [entries]);
-
-  // Calculate average mood
-  const averageMood = useMemo(() => {
-    if (moodData.length === 0) return 0;
-    const sum = moodData.reduce((acc, curr) => acc + curr.score, 0);
-    return Math.round(sum / moodData.length);
-  }, [moodData]);
-
-  // Get the mood trend (up, down or stable)
-  const moodTrend = useMemo(() => {
-    if (moodData.length < 2) return 'stable';
-    const firstHalf = moodData.slice(0, Math.floor(moodData.length / 2));
-    const secondHalf = moodData.slice(Math.floor(moodData.length / 2));
-    
-    const firstHalfAvg = firstHalf.reduce((acc, curr) => acc + curr.score, 0) / firstHalf.length;
-    const secondHalfAvg = secondHalf.reduce((acc, curr) => acc + curr.score, 0) / secondHalf.length;
-    
-    if (secondHalfAvg > firstHalfAvg + 5) return 'up';
-    if (secondHalfAvg < firstHalfAvg - 5) return 'down';
-    return 'stable';
-  }, [moodData]);
-
-  // Calculate most common mood
-  const mostCommonMood = useMemo(() => {
-    const moodCounts = entries.reduce((acc, entry) => {
-      if (entry.mood) {
-        acc[entry.mood] = (acc[entry.mood] || 0) + 1;
-      }
-      return acc;
-    }, {} as Record<string, number>);
-    
-    let maxCount = 0;
-    let maxMood = '';
-    
-    Object.entries(moodCounts).forEach(([mood, count]) => {
-      if (count > maxCount) {
-        maxCount = count;
-        maxMood = mood;
-      }
-    });
-    
-    return maxMood;
-  }, [entries]);
-
-  if (entries.length === 0) {
+  
+  if (!entries || entries.length === 0) {
     return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <p className="text-muted-foreground">Aucune donnée émotionnelle à afficher pour l'instant.</p>
-        </CardContent>
-      </Card>
+      <div className="text-center p-8 border rounded-md">
+        <p className="text-muted-foreground">Aucune donnée à afficher. Commencez à journaliser vos émotions.</p>
+      </div>
     );
   }
-
+  
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Emotion Distribution */}
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Humeur moyenne
-            </CardTitle>
+          <CardHeader>
+            <CardTitle className="text-lg">Distribution des émotions</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{averageMood}/100</div>
+          <CardContent className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={emotionStats}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  paddingAngle={5}
+                  dataKey="count"
+                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                >
+                  {emotionStats.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  formatter={(value, name) => [`${value} entrée${value > 1 ? 's' : ''}`, name]}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="rounded-lg border bg-background p-2 shadow-sm">
+                          <div className="flex items-center">
+                            <span className="mr-2">{getEmotionIcon(data.name)}</span>
+                            <span className="font-semibold">{data.name}</span>
+                          </div>
+                          <p className="text-sm">{data.count} entrée{data.count > 1 ? 's' : ''}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
         
+        {/* Mood Over Time */}
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Tendance
-            </CardTitle>
+          <CardHeader>
+            <CardTitle className="text-lg">Évolution de l'humeur</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold flex items-center">
-              {moodTrend === 'up' && (
-                <>En hausse <span className="text-green-500 ml-2">↑</span></>
-              )}
-              {moodTrend === 'down' && (
-                <>En baisse <span className="text-red-500 ml-2">↓</span></>
-              )}
-              {moodTrend === 'stable' && (
-                <>Stable <span className="text-blue-500 ml-2">→</span></>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Humeur fréquente
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold capitalize">{mostCommonMood}</div>
+          <CardContent className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={moodOverTime}>
+                <XAxis dataKey="date" />
+                <Tooltip
+                  formatter={(value) => [`${value}/100`, 'Score d\'humeur']}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const data = payload[0].payload;
+                      let moodDescription = 'Neutre';
+                      let moodColor = 'text-gray-500';
+                      
+                      if (data.score >= 80) {
+                        moodDescription = 'Excellent';
+                        moodColor = 'text-green-500';
+                      } else if (data.score >= 65) {
+                        moodDescription = 'Bien';
+                        moodColor = 'text-blue-500';
+                      } else if (data.score >= 45) {
+                        moodDescription = 'Moyen';
+                        moodColor = 'text-amber-500';
+                      } else if (data.score >= 25) {
+                        moodDescription = 'Pas très bien';
+                        moodColor = 'text-orange-500';
+                      } else {
+                        moodDescription = 'Mauvais';
+                        moodColor = 'text-red-500';
+                      }
+                      
+                      return (
+                        <div className="rounded-lg border bg-background p-2 shadow-sm">
+                          <p className="font-semibold">{data.date}</p>
+                          <p className={`text-sm ${moodColor}`}>
+                            Humeur: {moodDescription} ({data.score}/100)
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {data.count} entrée{data.count > 1 ? 's' : ''}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Bar dataKey="score" radius={[4, 4, 0, 0]}>
+                  {moodOverTime.map((entry, index) => {
+                    let barColor = '#64748b'; // Default
+                    
+                    if (entry.score >= 80) barColor = '#22c55e';
+                    else if (entry.score >= 65) barColor = '#3b82f6';
+                    else if (entry.score >= 45) barColor = '#f59e0b';
+                    else if (entry.score >= 25) barColor = '#f97316';
+                    else barColor = '#ef4444';
+                    
+                    return <Cell key={`cell-${index}`} fill={barColor} />;
+                  })}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
-
+      
+      {/* Emotion Legend */}
       <Card>
         <CardHeader>
-          <CardTitle>Évolution de votre humeur</CardTitle>
+          <CardTitle className="text-lg">Légende des émotions</CardTitle>
         </CardHeader>
-        <CardContent className="h-[300px]">
-          {moodData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={moodData}
-                margin={{
-                  top: 10,
-                  right: 30,
-                  left: 0,
-                  bottom: 10,
-                }}
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+            {emotionStats.map((emotion) => (
+              <div
+                key={emotion.name}
+                className={`flex items-center gap-2 p-2 rounded-md ${getEmotionColor(emotion.name)}`}
               >
-                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                <XAxis dataKey="formattedDate" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip 
-                  formatter={(value) => [`${value}/100`, 'Humeur']}
-                  labelFormatter={(label) => `Date: ${label}`} 
-                />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="score"
-                  name="Niveau d'humeur"
-                  stroke="#6366f1"
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="h-full flex items-center justify-center text-muted-foreground">
-              Pas assez de données pour afficher un graphique.
-            </p>
-          )}
+                <span className="text-xl">{getEmotionIcon(emotion.name)}</span>
+                <div>
+                  <p className="font-medium capitalize">{emotion.name}</p>
+                  <p className="text-xs">{emotion.count} entrée{emotion.count > 1 ? 's' : ''}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>
