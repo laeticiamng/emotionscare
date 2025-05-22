@@ -9,6 +9,7 @@ import { Building, ArrowLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import B2BModeGuard from '@/components/B2BModeGuard';
 
 const B2BUserLogin = () => {
   const [email, setEmail] = useState('');
@@ -82,6 +83,7 @@ const B2BUserLogin = () => {
   };
 
   return (
+    <B2BModeGuard requiredMode="b2b_user">
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100/50 p-4 dark:from-slate-900 dark:to-blue-900/20">
       {/* Ambient background with animation */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -244,6 +246,7 @@ const B2BUserLogin = () => {
         </Card>
       </motion.div>
     </div>
+    </B2BModeGuard>
   );
 };
 
