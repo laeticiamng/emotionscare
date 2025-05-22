@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { getUserModeDisplayName } from '@/utils/userModeHelpers';
-import { Building2, User, Users, ChevronDown } from 'lucide-react';
+import { Building2, User, Users, ChevronDown, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -13,8 +13,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { toast } from 'sonner';
 
 interface UserModeSelectorProps {
   minimal?: boolean;
@@ -24,21 +25,44 @@ interface UserModeSelectorProps {
 export const UserModeSelector: React.FC<UserModeSelectorProps> = ({ minimal = false, className = '' }) => {
   const { userMode, setUserMode } = useUserMode();
   const navigate = useNavigate();
+  const [recentlyChangedMode, setRecentlyChangedMode] = useState<string | null>(null);
+  
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (recentlyChangedMode) {
+      timer = setTimeout(() => {
+        setRecentlyChangedMode(null);
+      }, 2000);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [recentlyChangedMode]);
   
   const handleModeChange = (mode: string) => {
+    if (mode === userMode) return;
+    
     setUserMode(mode);
+    setRecentlyChangedMode(mode);
+    
+    // Show toast notification for mode change
+    toast.success(`Mode changé: ${getUserModeDisplayName(mode)}`, {
+      description: "Redirection vers le tableau de bord approprié..."
+    });
+    
     // Show a success feedback animation
     const feedbackEl = document.getElementById('mode-change-feedback');
     if (feedbackEl) {
       feedbackEl.classList.add('opacity-100');
       setTimeout(() => feedbackEl.classList.remove('opacity-100'), 1500);
     }
+    
     // Navigate to mode switcher or directly to dashboard
     navigate('/mode-switcher');
   };
   
-  const getModeIcon = () => {
-    switch (userMode) {
+  const getModeIcon = (mode: string = userMode) => {
+    switch (mode) {
       case 'b2b_admin':
         return <Building2 className="h-4 w-4 mr-2" />;
       case 'b2b_user':
@@ -59,7 +83,7 @@ export const UserModeSelector: React.FC<UserModeSelectorProps> = ({ minimal = fa
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="flex items-center gap-2" 
+                    className="flex items-center gap-2 transition-all duration-300 hover:bg-accent" 
                     aria-label="Changer de mode utilisateur"
                   >
                     <motion.div
@@ -78,27 +102,32 @@ export const UserModeSelector: React.FC<UserModeSelectorProps> = ({ minimal = fa
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>Changer de mode</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onClick={() => handleModeChange('b2c')}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    <span>Particulier</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => handleModeChange('b2b_user')}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <Users className="h-4 w-4 mr-2" />
-                    <span>Collaborateur</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => handleModeChange('b2b_admin')}
-                    className="flex items-center cursor-pointer"
-                  >
-                    <Building2 className="h-4 w-4 mr-2" />
-                    <span>Administrateur</span>
-                  </DropdownMenuItem>
+                  
+                  <AnimatePresence>
+                    {['b2c', 'b2b_user', 'b2b_admin'].map((mode) => (
+                      <DropdownMenuItem 
+                        key={mode}
+                        onClick={() => handleModeChange(mode)}
+                        className="flex items-center justify-between cursor-pointer"
+                      >
+                        <span className="flex items-center">
+                          {getModeIcon(mode)}
+                          <span>{getUserModeDisplayName(mode)}</span>
+                        </span>
+                        
+                        {userMode === mode && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="text-primary"
+                          >
+                            <Check className="h-4 w-4" />
+                          </motion.div>
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </AnimatePresence>
+                  
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate('/mode-switcher')} className="cursor-pointer">
                     Écran de sélection complet
@@ -107,8 +136,9 @@ export const UserModeSelector: React.FC<UserModeSelectorProps> = ({ minimal = fa
               </DropdownMenu>
             </div>
           </TooltipTrigger>
-          <TooltipContent>
-            <p>Mode utilisateur actuel: {getUserModeDisplayName(userMode)}</p>
+          <TooltipContent side="bottom" sideOffset={5}>
+            <p className="text-sm">Mode utilisateur actuel: <span className="font-medium">{getUserModeDisplayName(userMode)}</span></p>
+            <p className="text-xs text-muted-foreground mt-1">Cliquez pour changer</p>
           </TooltipContent>
         </Tooltip>
         
@@ -130,6 +160,24 @@ export const UserModeSelector: React.FC<UserModeSelectorProps> = ({ minimal = fa
             </motion.div>
           </motion.div>
         </div>
+        
+        {/* Pulse indicator for recent changes */}
+        <AnimatePresence>
+          {recentlyChangedMode && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full"
+            >
+              <motion.div
+                animate={{ scale: [1, 1.5, 1] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+                className="w-full h-full bg-primary/50 rounded-full"
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </TooltipProvider>
   );
