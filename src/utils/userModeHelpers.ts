@@ -1,28 +1,49 @@
 
-import { UserMode } from '@/types/auth';
+import { UserModeType } from '@/types/userMode';
+import { UserRole } from '@/types/user';
 
 /**
- * Normalizes user mode strings to ensure consistent format
+ * Normalise le mode utilisateur
  */
-export const normalizeUserMode = (mode?: string): UserMode => {
-  if (!mode) return 'b2c'; // Default to b2c
+export function normalizeUserMode(mode?: string | null): UserModeType {
+  if (!mode) return 'b2c';
   
-  // Convert to lowercase and handle various formats
-  const normalized = mode.toLowerCase().replace('-', '_');
+  const normalizedMode = mode.toLowerCase().replace('-', '_');
   
-  // Handle various possible formats
-  if (normalized.includes('admin')) return 'b2b_admin';
-  if (normalized.includes('b2b') && !normalized.includes('admin')) return 'b2b_user';
-  if (normalized === 'b2c' || normalized === 'individual') return 'b2c';
-  
-  return 'b2c'; // Default fallback
-};
+  if (normalizedMode.includes('admin')) {
+    return 'b2b_admin';
+  } else if (normalizedMode.includes('user') || normalizedMode.includes('b2b')) {
+    return 'b2b_user';
+  } else {
+    return 'b2c';
+  }
+}
 
 /**
- * Returns the appropriate dashboard path based on user mode
+ * Obtient le nom d'affichage pour un mode utilisateur
  */
-export const getModeDashboardPath = (userMode?: UserMode): string => {
-  switch (userMode) {
+export function getUserModeDisplayName(mode?: string | null): string {
+  const normalized = normalizeUserMode(mode);
+  
+  switch (normalized) {
+    case 'b2c':
+      return 'Particulier';
+    case 'b2b_user':
+      return 'Collaborateur';
+    case 'b2b_admin':
+      return 'Administrateur';
+    default:
+      return 'Utilisateur';
+  }
+}
+
+/**
+ * Obtient le chemin du tableau de bord pour un mode utilisateur spécifique
+ */
+export function getModeDashboardPath(mode?: string | null): string {
+  const normalized = normalizeUserMode(mode);
+  
+  switch (normalized) {
     case 'b2c':
       return '/b2c/dashboard';
     case 'b2b_user':
@@ -30,15 +51,17 @@ export const getModeDashboardPath = (userMode?: UserMode): string => {
     case 'b2b_admin':
       return '/b2b/admin/dashboard';
     default:
-      return '/';
+      return '/choose-mode';
   }
-};
+}
 
 /**
- * Returns the login path for a specific user mode
+ * Obtient le chemin de connexion pour un mode utilisateur spécifique
  */
-export const getModeLoginPath = (mode?: UserMode): string => {
-  switch (mode) {
+export function getModeLoginPath(mode?: string | null): string {
+  const normalized = normalizeUserMode(mode);
+  
+  switch (normalized) {
     case 'b2c':
       return '/b2c/login';
     case 'b2b_user':
@@ -46,85 +69,51 @@ export const getModeLoginPath = (mode?: UserMode): string => {
     case 'b2b_admin':
       return '/b2b/admin/login';
     default:
-      return '/b2c/login';
+      return '/choose-mode';
   }
-};
+}
 
 /**
- * Returns the appropriate label for a user mode
+ * Vérifie si un mode est valide
  */
-export const getUserModeLabel = (mode?: UserMode): string => {
-  switch (mode) {
-    case 'b2c':
-      return 'Particulier';
-    case 'b2b_user':
-      return 'Collaborateur';
-    case 'b2b_admin':
-      return 'Administration';
-    default:
-      return 'Utilisateur';
-  }
-};
-
-/**
- * Create a type guard to verify if a string is a valid UserMode
- */
-export const isValidUserMode = (mode: string): mode is UserMode => {
-  return ['b2c', 'b2b_user', 'b2b_admin'].includes(mode);
-};
-
-/**
- * Returns a display name for a user mode
- */
-export const getUserModeDisplayName = (mode: string): string => {
+export function isValidUserMode(mode?: string | null): boolean {
+  if (!mode) return false;
+  
   const normalized = normalizeUserMode(mode);
-  return getUserModeLabel(normalized);
-};
+  return ['b2c', 'b2b_user', 'b2b_admin'].includes(normalized);
+}
 
 /**
- * Returns the appropriate social path based on user mode
+ * Convertit un rôle utilisateur en mode utilisateur
  */
-export const getModeSocialPath = (userMode?: UserMode): string => {
-  switch (userMode) {
-    case 'b2c':
-      return '/b2c/social';
-    case 'b2b_user':
-      return '/b2b/user/social';
-    case 'b2b_admin':
-      return '/b2b/admin/social';
-    default:
-      return '/b2c/social';
+export function roleToUserMode(role?: UserRole | string | null): UserModeType {
+  if (!role) return 'b2c';
+  
+  const roleStr = String(role).toLowerCase();
+  
+  if (roleStr.includes('admin')) {
+    return 'b2b_admin';
+  } else if (roleStr.includes('user') || roleStr.includes('b2b')) {
+    return 'b2b_user';
+  } else {
+    return 'b2c';
   }
-};
+}
 
 /**
- * Returns the appropriate VR path based on user mode
+ * Obtient le préfixe de chemin pour un mode utilisateur
  */
-export const getModeVRPath = (userMode?: UserMode): string => {
-  switch (userMode) {
+export function getUserModePathPrefix(mode?: string | null): string {
+  const normalized = normalizeUserMode(mode);
+  
+  switch (normalized) {
     case 'b2c':
-      return '/b2c/vr';
+      return '/b2c';
     case 'b2b_user':
-      return '/b2b/user/vr';
+      return '/b2b/user';
     case 'b2b_admin':
-      return '/b2b/admin/vr';
+      return '/b2b/admin';
     default:
-      return '/b2c/vr';
+      return '';
   }
-};
-
-/**
- * Returns the appropriate scan path based on user mode
- */
-export const getModeScanPath = (userMode?: UserMode): string => {
-  switch (userMode) {
-    case 'b2c':
-      return '/b2c/scan';
-    case 'b2b_user':
-      return '/b2b/user/scan';
-    case 'b2b_admin':
-      return '/b2b/admin/scan';
-    default:
-      return '/b2c/scan';
-  }
-};
+}

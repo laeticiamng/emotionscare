@@ -1,26 +1,55 @@
 
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { getModeDashboardPath } from '@/utils/userModeHelpers';
+import { normalizeUserMode } from '@/utils/userModeHelpers';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const DashboardRedirect: React.FC = () => {
   const navigate = useNavigate();
-  const { userMode, isLoading } = useUserMode();
-
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const { userMode, isLoading: userModeLoading } = useUserMode();
+  
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || userModeLoading) {
+      // Attendre que les données soient chargées
+      return;
+    }
     
-    const dashboardPath = getModeDashboardPath(userMode);
-    console.log('Redirecting to dashboard:', dashboardPath);
-    navigate(dashboardPath, { replace: true });
-  }, [navigate, userMode, isLoading]);
-
+    // Si l'utilisateur n'est pas authentifié, rediriger vers la page de choix de mode
+    if (!isAuthenticated) {
+      navigate('/choose-mode');
+      return;
+    }
+    
+    // Déterminer la destination en fonction du mode utilisateur
+    const normalizedUserMode = normalizeUserMode(userMode || (user?.role as string) || '');
+    
+    switch (normalizedUserMode) {
+      case 'b2c':
+        navigate('/b2c/dashboard');
+        break;
+      case 'b2b_user':
+        navigate('/b2b/user/dashboard');
+        break;
+      case 'b2b_admin':
+        navigate('/b2b/admin/dashboard');
+        break;
+      default:
+        // En cas de mode inconnu, rediriger vers la page de choix de mode
+        toast.warning('Veuillez choisir un mode d\'utilisation');
+        navigate('/choose-mode');
+    }
+  }, [isLoading, userModeLoading, isAuthenticated, user, userMode, navigate]);
+  
   return (
-    <div className="h-screen flex items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
-        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <h2 className="text-xl font-medium">Redirection vers votre tableau de bord...</h2>
+        <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+        <h2 className="mt-4 text-xl font-semibold">Redirection en cours...</h2>
+        <p className="mt-2 text-muted-foreground">Vous allez être redirigé vers votre tableau de bord</p>
       </div>
     </div>
   );

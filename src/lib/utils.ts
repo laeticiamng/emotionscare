@@ -2,60 +2,67 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-// Utility function to combine class names with Tailwind
+/**
+ * Combines multiple class names into a single string using clsx and tailwind-merge
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// Safe function to get initials from a name
-export function getInitials(name?: string, fallback = 'U'): string {
-  if (!name) return fallback;
-  
-  return name
-    .split(' ')
-    .map(part => part[0])
-    .join('')
-    .toUpperCase()
-    .substring(0, 2);
-}
-
-// Format date function
+/**
+ * Formats a date to a locale string
+ */
 export function formatDate(date: Date | string): string {
-  if (!date) return 'Date inconnue';
+  if (!date) return '';
   
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleDateString('fr-FR', {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  return dateObj.toLocaleDateString('fr-FR', {
     day: 'numeric',
-    month: 'short',
-    year: 'numeric'
+    month: 'numeric',
+    year: 'numeric',
   });
 }
 
-// Format time function
-export function formatTime(date: Date | string): string {
-  if (!date) return '--:--';
+/**
+ * Formats a date and time to a locale string
+ */
+export function formatDateTime(date: Date | string): string {
+  if (!date) return '';
   
-  const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleTimeString('fr-FR', {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  return dateObj.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
 }
 
-// Safely access nested properties
-export function safeAccess<T, K extends keyof T>(obj: T, key: K, fallback: T[K]): T[K] {
-  return obj && obj[key] !== undefined ? obj[key] : fallback;
+/**
+ * Truncates a string to a specified length
+ */
+export function truncateString(str: string, maxLength: number): string {
+  if (!str) return '';
+  if (str.length <= maxLength) return str;
+  
+  return `${str.slice(0, maxLength)}...`;
 }
 
-// Handle compatibility between different property names
-export function compatAccess<T>(obj: T, keys: (keyof T)[], fallback: any): any {
-  if (!obj) return fallback;
+/**
+ * Capitalizes the first letter of a string
+ */
+export function capitalizeFirstLetter(str: string): string {
+  if (!str) return '';
   
-  for (const key of keys) {
-    if (obj[key] !== undefined) {
-      return obj[key];
-    }
-  }
-  
-  return fallback;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/**
+ * Generates a random ID
+ */
+export function generateId(prefix: string = ''): string {
+  return `${prefix}${Math.random().toString(36).substring(2, 11)}`;
 }

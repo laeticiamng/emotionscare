@@ -1,172 +1,170 @@
 
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { useNavigate, Link } from 'react-router-dom';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2 } from 'lucide-react';
+import AuthLayout from '@/layouts/AuthLayout';
 import { useAuth } from '@/contexts/AuthContext';
-import { Eye, EyeOff, AlertCircle, Building } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { toast } from 'sonner';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { toast } from 'sonner';
+
+const loginSchema = z.object({
+  email: z.string().email({ message: 'Adresse e-mail invalide' }),
+  password: z.string().min(6, { message: 'Mot de passe requis (6 caractères minimum)' }),
+  companyCode: z.string().min(1, { message: 'Code entreprise requis' }),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 const B2BUserLogin: React.FC = () => {
-  const navigate = useNavigate();
   const { login } = useAuth();
-  const { changeUserMode } = useUserMode();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { setUserMode } = useUserMode();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      companyCode: '',
+    },
+  });
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: LoginFormValues) => {
+    setIsLoading(true);
     setError(null);
     
-    if (!email || !password) {
-      setError('Veuillez remplir tous les champs.');
-      return;
-    }
-    
-    setIsLoading(true);
-    
     try {
-      await login(email, password);
-      changeUserMode('b2b_user');
-      toast.success('Connexion réussie !');
+      // Vous pouvez vérifier le code entreprise ici si nécessaire
+      
+      await login(data.email, data.password);
+      setUserMode('b2b_user');
+      toast.success('Connexion réussie');
       navigate('/b2b/user/dashboard');
-    } catch (error: any) {
-      console.error('Erreur de connexion:', error);
-      setError('Identifiants incorrects. Veuillez réessayer.');
-      toast.error('Échec de la connexion', {
-        description: 'Identifiants incorrects. Veuillez réessayer.'
-      });
+    } catch (err: any) {
+      console.error('Erreur de connexion:', err);
+      setError(err.message || 'Échec de la connexion. Veuillez vérifier vos identifiants.');
+      toast.error('Échec de la connexion');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/20 p-4">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
-      >
-        <Card className="border shadow-lg">
+    <AuthLayout>
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
-            <div className="flex justify-center mb-2">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Building className="h-6 w-6 text-primary" />
-              </div>
-            </div>
-            <CardTitle className="text-2xl font-bold text-center">Connexion Collaborateur</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">EmotionsCare | Entreprise</CardTitle>
             <CardDescription className="text-center">
-              Accédez à votre espace collaborateur
+              Connectez-vous à votre espace collaborateur
             </CardDescription>
           </CardHeader>
-          <form onSubmit={handleLogin}>
-            <CardContent className="space-y-4">
-              {error && (
-                <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md flex items-center gap-2">
-                  <AlertCircle className="h-4 w-4" />
-                  {error}
-                </div>
-              )}
-              
-              <div className="space-y-2">
-                <Label htmlFor="email">Email professionnel</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="collaborateur@entreprise.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
-                  required
+          <CardContent className="space-y-4">
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email professionnel</FormLabel>
+                      <FormControl>
+                        <Input placeholder="nom@entreprise.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <Button
-                    type="button"
-                    variant="link"
-                    className="px-0 text-xs"
-                    onClick={() => navigate('/b2b/user/reset-password')}
-                  >
+                
+                <FormField
+                  control={form.control}
+                  name="companyCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Code entreprise</FormLabel>
+                      <FormControl>
+                        <Input placeholder="CODE-XXXX" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Mot de passe</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="text-right">
+                  <Link to="/b2b/reset-password" className="text-sm text-primary hover:underline">
                     Mot de passe oublié ?
-                  </Button>
+                  </Link>
                 </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                    required
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-0 top-0 h-full"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    <span className="sr-only">
-                      {showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-                    </span>
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex-col space-y-4">
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? "Connexion en cours..." : "Se connecter"}
-              </Button>
-              
-              <div className="text-center text-sm">
-                Vous n'avez pas de compte ? {" "}
-                <Button
-                  type="button"
-                  variant="link"
-                  className="p-0"
-                  onClick={() => navigate('/b2b/user/register')}
-                >
-                  Créer un compte
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Connexion...
+                    </>
+                  ) : (
+                    'Se connecter'
+                  )}
                 </Button>
-              </div>
-              
-              <div className="text-center text-sm">
-                <Link to="/b2b/selection" className="text-primary hover:underline">
-                  Changer de type d'accès
-                </Link>
-              </div>
-            </CardFooter>
-          </form>
+              </form>
+            </Form>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-2">
+            <div className="text-center text-sm">
+              Nouveau collaborateur ?{' '}
+              <Link to="/b2b/user/register" className="text-primary hover:underline">
+                S'inscrire
+              </Link>
+            </div>
+            <div className="text-center text-sm">
+              <Link to="/b2b/admin/login" className="text-muted-foreground hover:underline">
+                Accès administrateur
+              </Link>
+              {' | '}
+              <Link to="/b2c/login" className="text-muted-foreground hover:underline">
+                Accès personnel
+              </Link>
+            </div>
+          </CardFooter>
         </Card>
-        
-        <div className="text-center mt-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/')}
-          >
-            Retour à l'accueil
-          </Button>
-        </div>
-      </motion.div>
-    </div>
+      </div>
+    </AuthLayout>
   );
 };
 
