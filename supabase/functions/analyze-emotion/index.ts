@@ -2,22 +2,28 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { authorizeRole } from "../_shared/auth.ts";
+
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
   const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
   if (!user) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+  }
+
   try {
     const { emojis, text, audio_url } = await req.json();
     
@@ -28,8 +34,11 @@ serve(async (req) => {
     }
     if (text && text.length > 0) {
       prompt += `Texte: "${text}"\n\n`;
+    }
     if (audio_url) {
       prompt += `Un message audio a également été enregistré (non accessible pour analyse directe).\n\n`;
+    }
+
     // Si aucun input substantiel n'est fourni, générer un feedback par défaut
     if ((!emojis || emojis.length === 0) && (!text || text.length === 0) && !audio_url) {
       return new Response(JSON.stringify({
@@ -38,12 +47,16 @@ serve(async (req) => {
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    }
+
     prompt += "Fournir une analyse de l'état émotionnel sous ce format:\n";
     prompt += "1. Un score numérique entre 0 et 100 (0 étant un état très négatif, 100 étant excellent)\n";
     prompt += "2. Un feedback bienveillant et professionnel de 2-3 phrases, adapté aux professionnels de santé\n";
     prompt += "3. Si le score est inférieur à 40, suggérer une micro-pause VR comme solution\n\n";
     prompt += "Format de sortie: JSON avec deux champs: 'score' (nombre) et 'ai_feedback' (string)";
+
     console.log('Calling OpenAI with prompt:', prompt);
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -59,10 +72,15 @@ serve(async (req) => {
         temperature: 0.7,
         response_format: { type: "json_object" }
       }),
+    });
+
     const data = await response.json();
     console.log('OpenAI response:', data);
+
     if (!data.choices || data.choices.length === 0) {
       throw new Error('No response from OpenAI');
+    }
+
     // Parse the JSON string from the response content
     let analysisResult;
     try {
@@ -71,9 +89,15 @@ serve(async (req) => {
       console.error('Failed to parse OpenAI response:', e);
       // Fallback response
       analysisResult = {
+        score: 50,
         ai_feedback: "Notre système n'a pas pu analyser votre état émotionnel avec précision. Voici un conseil général: prenez un moment pour respirer profondément et recentrez-vous sur vos priorités."
       };
+    }
+
     return new Response(JSON.stringify(analysisResult), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
   } catch (error) {
     console.error('Error in analyze-emotion function:', error);
     return new Response(JSON.stringify({ 
@@ -82,4 +106,7 @@ serve(async (req) => {
       ai_feedback: "Désolé, une erreur est survenue lors de l'analyse. Voici un feedback par défaut: Votre état émotionnel semble mitigé aujourd'hui. Prenez le temps de vous recentrer et de respirer profondément."
     }), {
       status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
 });
