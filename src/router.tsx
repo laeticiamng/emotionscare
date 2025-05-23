@@ -1,5 +1,6 @@
 
-import { createBrowserRouter } from 'react-router-dom';
+import React from 'react';
+import { RouteObject } from 'react-router-dom';
 import ProtectedLayout from '@/components/ProtectedLayout';
 import Shell from '@/Shell';
 import AuthTransition from './components/auth/AuthTransition';
@@ -38,7 +39,7 @@ import ScanPage from '@/pages/ScanPage';
 import Coach from '@/pages/Coach';
 import Music from '@/pages/Music';
 
-const router = createBrowserRouter([
+const routes: RouteObject[] = [
   {
     path: '/',
     element: <LandingPage />,
@@ -191,6 +192,6 @@ const router = createBrowserRouter([
     path: '*',
     element: <NotFoundPage />,
   },
-]);
+];
 
-export default router;
+export default routes;

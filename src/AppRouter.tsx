@@ -4,7 +4,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import routes from './router';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
-// Create a router instance directly here
+// Create a router instance with the routes array
 const router = createBrowserRouter(routes);
 
 const AppRouter: React.FC = () => {
