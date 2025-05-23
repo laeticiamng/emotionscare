@@ -14,6 +14,7 @@ const B2CRegisterPage = lazy(() => import('@/pages/b2c/auth/B2CRegisterPage'));
 const B2CResetPasswordPage = lazy(() => import('@/pages/b2c/auth/B2CResetPasswordPage'));
 const B2COnboardingPage = lazy(() => import('@/pages/b2c/onboarding/B2COnboardingPage'));
 const B2CDashboardPage = lazy(() => import('@/pages/b2c/dashboard/B2CDashboardPage'));
+const B2CScanPage = lazy(() => import('@/pages/b2c/scan/B2CScanPage'));
 const B2CSocialPage = lazy(() => import('@/pages/b2c/social/B2CSocialPage'));
 
 // B2B Common Pages
@@ -21,16 +22,22 @@ const B2BSelectionPage = lazy(() => import('@/pages/auth/B2BSelectionPage'));
 
 // B2B User Pages
 const B2BUserLoginPage = lazy(() => import('@/pages/b2b/user/auth/B2BUserLoginPage'));
-const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/user/register/B2BUserRegisterPage'));
+const B2BUserRegisterPage = lazy(() => import('@/pages/b2b/user/auth/B2BUserRegisterPage'));
 const B2BUserDashboardPage = lazy(() => import('@/pages/b2b/user/dashboard/B2BUserDashboardPage'));
+const B2BUserScanPage = lazy(() => import('@/pages/b2b/user/scan/B2BUserScanPage'));
+const B2BUserSocialPage = lazy(() => import('@/pages/b2b/user/social/B2BUserSocialPage'));
 
 // B2B Admin Pages
 const B2BAdminLoginPage = lazy(() => import('@/pages/b2b/admin/auth/B2BAdminLoginPage'));
 const B2BAdminDashboardPage = lazy(() => import('@/pages/b2b/admin/dashboard/B2BAdminDashboardPage'));
+const B2BAdminAnalyticsPage = lazy(() => import('@/pages/b2b/admin/analytics/B2BAdminAnalyticsPage'));
+const B2BAdminUsersPage = lazy(() => import('@/pages/b2b/admin/users/B2BAdminUsersPage'));
 
 // Other Pages
 const Social = lazy(() => import('@/pages/Social'));
 const HelpPage = lazy(() => import('@/pages/common/HelpPage'));
+const ProfilePage = lazy(() => import('@/pages/common/ProfilePage'));
+const SettingsPage = lazy(() => import('@/pages/common/SettingsPage'));
 
 const routes: RouteObject[] = [
   {
@@ -56,6 +63,22 @@ const routes: RouteObject[] = [
       {
         path: 'help',
         element: <HelpPage />,
+      },
+      {
+        path: 'profile',
+        element: (
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'settings',
+        element: (
+          <ProtectedRoute>
+            <SettingsPage />
+          </ProtectedRoute>
+        ),
       },
 
       // B2C Routes
@@ -87,6 +110,14 @@ const routes: RouteObject[] = [
             element: (
               <ProtectedRoute requiredRole="b2c">
                 <B2CDashboardPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'scan',
+            element: (
+              <ProtectedRoute requiredRole="b2c">
+                <B2CScanPage />
               </ProtectedRoute>
             ),
           },
@@ -130,6 +161,22 @@ const routes: RouteObject[] = [
                   </ProtectedRoute>
                 ),
               },
+              {
+                path: 'scan',
+                element: (
+                  <ProtectedRoute requiredRole="b2b_user">
+                    <B2BUserScanPage />
+                  </ProtectedRoute>
+                ),
+              },
+              {
+                path: 'social',
+                element: (
+                  <ProtectedRoute requiredRole="b2b_user">
+                    <B2BUserSocialPage />
+                  </ProtectedRoute>
+                ),
+              },
             ],
           },
           
@@ -146,6 +193,22 @@ const routes: RouteObject[] = [
                 element: (
                   <ProtectedRoute requiredRole="b2b_admin">
                     <B2BAdminDashboardPage />
+                  </ProtectedRoute>
+                ),
+              },
+              {
+                path: 'analytics',
+                element: (
+                  <ProtectedRoute requiredRole="b2b_admin">
+                    <B2BAdminAnalyticsPage />
+                  </ProtectedRoute>
+                ),
+              },
+              {
+                path: 'users',
+                element: (
+                  <ProtectedRoute requiredRole="b2b_admin">
+                    <B2BAdminUsersPage />
                   </ProtectedRoute>
                 ),
               },

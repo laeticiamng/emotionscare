@@ -1,9 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { authorizeRole } from "../_shared/auth.ts";
-
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,102 +8,110 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-
   try {
-    const { emojis, text, audio_url } = await req.json();
-    
-    // Construct prompt based on available input
-    let prompt = "Analyse l'état émotionnel d'un professionnel de santé basé sur les éléments suivants:\n\n";
-    if (emojis && emojis.length > 0) {
-      prompt += `Emojis utilisés: ${emojis}\n\n`;
-    }
-    if (text && text.length > 0) {
-      prompt += `Texte: "${text}"\n\n`;
-    }
-    if (audio_url) {
-      prompt += `Un message audio a également été enregistré (non accessible pour analyse directe).\n\n`;
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openaiApiKey) {
+      throw new Error('OpenAI API key not configured');
     }
 
-    // Si aucun input substantiel n'est fourni, générer un feedback par défaut
-    if ((!emojis || emojis.length === 0) && (!text || text.length === 0) && !audio_url) {
-      return new Response(JSON.stringify({
-        score: 50,
-        ai_feedback: "Nous n'avons pas assez d'informations pour analyser votre état émotionnel. Essayez d'ajouter des emojis ou du texte pour obtenir un feedback personnalisé."
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    let analysisData;
+    const contentType = req.headers.get('content-type');
+
+    if (contentType?.includes('multipart/form-data')) {
+      // Audio analysis
+      const formData = await req.formData();
+      const audioFile = formData.get('audio') as File;
+      const method = formData.get('method') as string;
+
+      if (!audioFile) {
+        throw new Error('No audio file provided');
+      }
+
+      // Convert audio to text using OpenAI Whisper
+      const whisperFormData = new FormData();
+      whisperFormData.append('file', audioFile);
+      whisperFormData.append('model', 'whisper-1');
+
+      const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openaiApiKey}`,
+        },
+        body: whisperFormData,
       });
+
+      const whisperData = await whisperResponse.json();
+      const transcribedText = whisperData.text;
+
+      analysisData = { text: transcribedText, method: 'audio' };
+    } else {
+      // Text analysis
+      analysisData = await req.json();
     }
 
-    prompt += "Fournir une analyse de l'état émotionnel sous ce format:\n";
-    prompt += "1. Un score numérique entre 0 et 100 (0 étant un état très négatif, 100 étant excellent)\n";
-    prompt += "2. Un feedback bienveillant et professionnel de 2-3 phrases, adapté aux professionnels de santé\n";
-    prompt += "3. Si le score est inférieur à 40, suggérer une micro-pause VR comme solution\n\n";
-    prompt += "Format de sortie: JSON avec deux champs: 'score' (nombre) et 'ai_feedback' (string)";
-
-    console.log('Calling OpenAI with prompt:', prompt);
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Analyze emotion using OpenAI GPT
+    const emotionResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': `Bearer ${openaiApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'Tu es un assistant spécialisé en bien-être et santé mentale pour les professionnels de santé.' },
-          { role: 'user', content: prompt }
+          {
+            role: 'system',
+            content: `Tu es un psychologue expert en analyse émotionnelle. Analyse le texte suivant et retourne une réponse JSON avec:
+            - score: nombre entre 0-100 (bien-être émotionnel)
+            - primaryEmotion: émotion principale (joie, tristesse, colère, peur, surprise, dégoût, neutre)
+            - secondaryEmotions: array d'émotions secondaires
+            - stressLevel: 'low', 'medium', ou 'high'
+            - aiFeedback: analyse détaillée et bienveillante (2-3 phrases)
+            - recommendations: array de 2-3 recommandations concrètes
+            - immediateActions: array de 2 actions immédiates
+            Réponds uniquement en JSON valide, en français.`
+          },
+          {
+            role: 'user',
+            content: `Analyse ce texte: "${analysisData.text}"`
+          }
         ],
         temperature: 0.7,
-        response_format: { type: "json_object" }
       }),
     });
 
-    const data = await response.json();
-    console.log('OpenAI response:', data);
+    const emotionData = await emotionResponse.json();
+    const analysis = JSON.parse(emotionData.choices[0].message.content);
 
-    if (!data.choices || data.choices.length === 0) {
-      throw new Error('No response from OpenAI');
-    }
+    // Add metadata
+    const result = {
+      ...analysis,
+      timestamp: new Date(),
+      method: analysisData.method || 'text',
+      rawData: {
+        text: analysisData.text
+      }
+    };
 
-    // Parse the JSON string from the response content
-    let analysisResult;
-    try {
-      analysisResult = JSON.parse(data.choices[0].message.content);
-    } catch (e) {
-      console.error('Failed to parse OpenAI response:', e);
-      // Fallback response
-      analysisResult = {
-        score: 50,
-        ai_feedback: "Notre système n'a pas pu analyser votre état émotionnel avec précision. Voici un conseil général: prenez un moment pour respirer profondément et recentrez-vous sur vos priorités."
-      };
-    }
-
-    return new Response(JSON.stringify(analysisResult), {
+    return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('Error in analyze-emotion function:', error);
-    return new Response(JSON.stringify({ 
-      error: error.message,
-      score: 50, // Fallback score
-      ai_feedback: "Désolé, une erreur est survenue lors de l'analyse. Voici un feedback par défaut: Votre état émotionnel semble mitigé aujourd'hui. Prenez le temps de vous recentrer et de respirer profondément."
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    console.error('Emotion analysis error:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: 'Erreur lors de l\'analyse émotionnelle',
+        details: error.message 
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });

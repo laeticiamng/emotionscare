@@ -2,98 +2,125 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Heart, 
   TrendingUp, 
   Calendar, 
   Target, 
   Brain,
+  Music,
+  MessageCircle,
+  Camera,
+  Award,
   Smile,
-  Activity,
-  Clock,
-  Book,
-  Music
+  Frown,
+  Meh
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import EmotionScanner from '@/components/scan/EmotionScanner';
+import AICoach from '@/components/coach/AICoach';
+import MusicTherapy from '@/components/music/MusicTherapy';
 import LoadingAnimation from '@/components/ui/loading-animation';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useNavigate } from 'react-router-dom';
+
+interface DashboardStats {
+  emotionalScore: number;
+  weeklyProgress: number;
+  streakDays: number;
+  totalScans: number;
+  lastScanDate: string;
+  mood: 'positive' | 'neutral' | 'negative';
+}
+
+interface RecentActivity {
+  id: string;
+  type: 'scan' | 'chat' | 'music' | 'journal';
+  title: string;
+  timestamp: Date;
+  score?: number;
+}
 
 const B2CDashboardPage: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({
-    emotionalScore: 78,
-    weeklyCheckins: 4,
-    streak: 7,
-    totalSessions: 23,
-    lastUpdate: new Date().toLocaleDateString('fr-FR')
-  });
-
-  const [emotionData, setEmotionData] = useState([]);
-  const [recentActivities, setRecentActivities] = useState([]);
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
-    loadDashboardData();
-  }, []);
+    if (user) {
+      loadDashboardData();
+    }
+  }, [user]);
 
   const loadDashboardData = async () => {
+    if (!user) return;
+    
     try {
       setIsLoading(true);
-      
-      // Charger les données réelles des émotions de l'utilisateur
-      if (user) {
-        const { data: emotions, error } = await supabase
-          .from('emotions')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('date', { ascending: true })
-          .limit(7);
 
-        if (error) {
-          console.error('Erreur lors du chargement des émotions:', error);
-        } else if (emotions) {
-          const chartData = emotions.map((emotion, index) => ({
-            date: new Date(emotion.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
-            score: emotion.score || 50
-          }));
-          setEmotionData(chartData);
-        }
-      }
+      // Charger les statistiques depuis Supabase
+      const { data: emotions, error: emotionsError } = await supabase
+        .from('emotions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false })
+        .limit(30);
 
-      // Données factices pour les activités récentes
-      const mockActivities = [
-        { id: 1, type: 'emotion_scan', description: 'Analyse émotionnelle', time: '2h', icon: Heart },
-        { id: 2, type: 'journal', description: 'Entrée journal', time: '1j', icon: Book },
-        { id: 3, type: 'meditation', description: 'Session méditation', time: '2j', icon: Brain },
-        { id: 4, type: 'music', description: 'Thérapie musicale', time: '3j', icon: Music }
-      ];
-      setRecentActivities(mockActivities);
-      
-      setIsLoading(false);
+      if (emotionsError) throw emotionsError;
+
+      // Calculer les statistiques
+      const avgScore = emotions?.length > 0 
+        ? emotions.reduce((sum, e) => sum + (e.score || 0), 0) / emotions.length 
+        : 0;
+
+      const weeklyEmotions = emotions?.filter(e => 
+        new Date(e.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+      ) || [];
+
+      const weeklyAvg = weeklyEmotions.length > 0
+        ? weeklyEmotions.reduce((sum, e) => sum + (e.score || 0), 0) / weeklyEmotions.length
+        : 0;
+
+      const mood: 'positive' | 'neutral' | 'negative' = 
+        avgScore >= 70 ? 'positive' :
+        avgScore >= 40 ? 'neutral' : 'negative';
+
+      setStats({
+        emotionalScore: Math.round(avgScore),
+        weeklyProgress: Math.round(weeklyAvg),
+        streakDays: Math.min(emotions?.length || 0, 7),
+        totalScans: emotions?.length || 0,
+        lastScanDate: emotions?.[0]?.date || new Date().toISOString(),
+        mood
+      });
+
+      // Charger les activités récentes
+      const activities: RecentActivity[] = (emotions || []).slice(0, 5).map(emotion => ({
+        id: emotion.id,
+        type: 'scan',
+        title: 'Scan émotionnel',
+        timestamp: new Date(emotion.date),
+        score: emotion.score
+      }));
+
+      setRecentActivities(activities);
+
     } catch (error) {
-      console.error('Erreur lors du chargement:', error);
+      console.error('Dashboard data loading error:', error);
       toast({
         title: "Erreur",
         description: "Impossible de charger les données du tableau de bord",
-        variant: "error"
+        variant: "destructive"
       });
+    } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleNewScan = () => {
-    navigate('/b2c/scan');
-  };
-
-  const handleSocialAccess = () => {
-    navigate('/b2c/social');
   };
 
   if (isLoading) {
@@ -104,246 +131,254 @@ const B2CDashboardPage: React.FC = () => {
     );
   }
 
+  const getMoodIcon = (mood: string) => {
+    switch (mood) {
+      case 'positive': return <Smile className="h-5 w-5 text-green-500" />;
+      case 'negative': return <Frown className="h-5 w-5 text-red-500" />;
+      default: return <Meh className="h-5 w-5 text-yellow-500" />;
+    }
+  };
+
+  const getMoodColor = (mood: string) => {
+    switch (mood) {
+      case 'positive': return 'text-green-600 bg-green-50';
+      case 'negative': return 'text-red-600 bg-red-50';
+      default: return 'text-yellow-600 bg-yellow-50';
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
+      {/* Welcome Section */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Bonjour {user?.name || 'Utilisateur'} 👋</h1>
+          <h1 className="text-3xl font-bold">
+            Bonjour {user?.name || 'Utilisateur'} !
+          </h1>
           <p className="text-muted-foreground">
-            Comment vous sentez-vous aujourd'hui ?
+            Voici un aperçu de votre bien-être émotionnel
           </p>
         </div>
-        <Badge variant="outline" className="flex items-center gap-2">
-          <Heart className="h-4 w-4" />
-          Mode Personnel
-        </Badge>
+        <div className="flex items-center gap-2">
+          {stats && getMoodIcon(stats.mood)}
+          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getMoodColor(stats?.mood || 'neutral')}`}>
+            Humeur {stats?.mood === 'positive' ? 'positive' : stats?.mood === 'negative' ? 'difficile' : 'neutre'}
+          </span>
+        </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={handleNewScan}>
-          <CardContent className="p-6 text-center">
-            <Heart className="h-8 w-8 text-primary mx-auto mb-2" />
-            <h3 className="font-medium">Nouvelle analyse</h3>
-            <p className="text-sm text-muted-foreground">Scanner vos émotions</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={handleSocialAccess}>
-          <CardContent className="p-6 text-center">
-            <Smile className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-            <h3 className="font-medium">Espace social</h3>
-            <p className="text-sm text-muted-foreground">Rejoindre la communauté</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="cursor-pointer hover:shadow-md transition-shadow">
-          <CardContent className="p-6 text-center">
-            <Brain className="h-8 w-8 text-green-500 mx-auto mb-2" />
-            <h3 className="font-medium">Méditation</h3>
-            <p className="text-sm text-muted-foreground">Session de détente</p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Quick Stats */}
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Score Émotionnel</CardTitle>
+              <Heart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.emotionalScore}/100</div>
+              <Progress value={stats.emotionalScore} className="mt-2" />
+            </CardContent>
+          </Card>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Score émotionnel</p>
-                <p className="text-2xl font-bold">{stats.emotionalScore}/100</p>
-              </div>
-              <Heart className="h-8 w-8 text-primary" />
-            </div>
-            <div className="mt-4 flex items-center text-sm text-green-600">
-              <TrendingUp className="h-4 w-4 mr-1" />
-              +5 points cette semaine
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Progression</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">+{stats.weeklyProgress}%</div>
+              <p className="text-xs text-muted-foreground">Cette semaine</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Check-ins semaine</p>
-                <p className="text-2xl font-bold">{stats.weeklyCheckins}</p>
-              </div>
-              <Calendar className="h-8 w-8 text-blue-500" />
-            </div>
-            <div className="mt-4 flex items-center text-sm text-green-600">
-              <Target className="h-4 w-4 mr-1" />
-              Objectif atteint
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Série</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.streakDays}</div>
+              <p className="text-xs text-muted-foreground">jours consécutifs</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Série actuelle</p>
-                <p className="text-2xl font-bold">{stats.streak} jours</p>
-              </div>
-              <Activity className="h-8 w-8 text-green-500" />
-            </div>
-            <div className="mt-4 flex items-center text-sm text-green-600">
-              <TrendingUp className="h-4 w-4 mr-1" />
-              Record personnel !
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Scans</CardTitle>
+              <Brain className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalScans}</div>
+              <p className="text-xs text-muted-foreground">analyses réalisées</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Sessions totales</p>
-                <p className="text-2xl font-bold">{stats.totalSessions}</p>
-              </div>
-              <Clock className="h-8 w-8 text-orange-500" />
-            </div>
-            <div className="mt-4">
-              <Button variant="outline" size="sm" onClick={handleNewScan}>
-                Nouvelle session
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Content Tabs */}
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="emotions">Émotions</TabsTrigger>
-          <TabsTrigger value="activities">Activités</TabsTrigger>
-          <TabsTrigger value="insights">Insights</TabsTrigger>
+      {/* Main Content */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview">Aperçu</TabsTrigger>
+          <TabsTrigger value="scan">Scanner IA</TabsTrigger>
+          <TabsTrigger value="coach">Coach IA</TabsTrigger>
+          <TabsTrigger value="music">Musique</TabsTrigger>
+          <TabsTrigger value="goals">Objectifs</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Recent Activities */}
             <Card>
               <CardHeader>
-                <CardTitle>Évolution émotionnelle</CardTitle>
-                <CardDescription>Votre progression des 7 derniers jours</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {emotionData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={emotionData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="score" stroke="#8884d8" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                    <div className="text-center">
-                      <Heart className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>Aucune donnée disponible</p>
-                      <Button className="mt-4" onClick={handleNewScan}>
-                        Commencer votre première analyse
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Activités récentes</CardTitle>
-                <CardDescription>Vos dernières interactions</CardDescription>
+                <CardTitle>Activités Récentes</CardTitle>
+                <CardDescription>Vos dernières interactions avec EmotionsCare</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentActivities.map((activity) => {
-                    const IconComponent = activity.icon;
-                    return (
-                      <div key={activity.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
-                        <IconComponent className="h-8 w-8 text-primary" />
-                        <div className="flex-1">
-                          <p className="font-medium">{activity.description}</p>
-                          <p className="text-sm text-muted-foreground">Il y a {activity.time}</p>
+                  {recentActivities.length > 0 ? (
+                    recentActivities.map((activity) => (
+                      <div key={activity.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                            {activity.type === 'scan' && <Brain className="h-4 w-4 text-primary" />}
+                            {activity.type === 'chat' && <MessageCircle className="h-4 w-4 text-primary" />}
+                            {activity.type === 'music' && <Music className="h-4 w-4 text-primary" />}
+                          </div>
+                          <div>
+                            <p className="font-medium">{activity.title}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {activity.timestamp.toLocaleDateString()} à {activity.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            </p>
+                          </div>
                         </div>
+                        {activity.score && (
+                          <Badge variant="outline">
+                            Score: {activity.score}
+                          </Badge>
+                        )}
                       </div>
-                    );
-                  })}
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <Camera className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">Aucune activité récente</p>
+                      <p className="text-sm text-muted-foreground">Commencez par faire un scan émotionnel</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Actions Rapides</CardTitle>
+                <CardDescription>Accédez rapidement à vos outils favoris</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex flex-col gap-2"
+                    onClick={() => setActiveTab('scan')}
+                  >
+                    <Brain className="h-6 w-6" />
+                    Scan Émotionnel
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex flex-col gap-2"
+                    onClick={() => setActiveTab('coach')}
+                  >
+                    <MessageCircle className="h-6 w-6" />
+                    Coach IA
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex flex-col gap-2"
+                    onClick={() => setActiveTab('music')}
+                  >
+                    <Music className="h-6 w-6" />
+                    Musique Thérapie
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex flex-col gap-2"
+                    onClick={() => setActiveTab('goals')}
+                  >
+                    <Target className="h-6 w-6" />
+                    Mes Objectifs
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
 
-        <TabsContent value="emotions" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Analyses émotionnelles</CardTitle>
-              <CardDescription>Historique de vos scans émotionnels</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">Explorez vos émotions en profondeur</p>
-                <Button onClick={handleNewScan}>Commencer une analyse</Button>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="scan">
+          <EmotionScanner />
         </TabsContent>
 
-        <TabsContent value="activities" className="space-y-6">
+        <TabsContent value="coach">
+          <AICoach />
+        </TabsContent>
+
+        <TabsContent value="music">
+          <MusicTherapy />
+        </TabsContent>
+
+        <TabsContent value="goals" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Journal d'activités</CardTitle>
-              <CardDescription>Toutes vos activités EmotionsCare</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Mes Objectifs de Bien-être
+              </CardTitle>
+              <CardDescription>Suivez vos progrès vers un meilleur équilibre émotionnel</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {recentActivities.map((activity) => {
-                  const IconComponent = activity.icon;
-                  return (
-                    <div key={activity.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <IconComponent className="h-6 w-6 text-primary" />
-                        <div>
-                          <p className="font-medium">{activity.description}</p>
-                          <p className="text-sm text-muted-foreground">Il y a {activity.time}</p>
-                        </div>
-                      </div>
-                      <Button variant="outline" size="sm">Voir détails</Button>
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Réduire le stress quotidien</h4>
+                      <p className="text-sm text-muted-foreground">Objectif: Score de stress < 30</p>
                     </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                    <Badge className="bg-yellow-100 text-yellow-800">En cours</Badge>
+                  </div>
+                  <Progress value={65} className="w-full" />
+                  <p className="text-sm text-muted-foreground">65% accompli</p>
+                </div>
 
-        <TabsContent value="insights" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Insights personnalisés</CardTitle>
-              <CardDescription>Recommandations basées sur vos données</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="p-4 bg-primary/10 rounded-lg">
-                  <h3 className="font-medium text-primary mb-2">💡 Conseil du jour</h3>
-                  <p className="text-sm">Votre score émotionnel est en hausse ! Continuez vos efforts et n'hésitez pas à partager vos succès.</p>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Améliorer mon humeur</h4>
+                      <p className="text-sm text-muted-foreground">Objectif: 7 jours consécutifs positifs</p>
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-800">En cours</Badge>
+                  </div>
+                  <Progress value={43} className="w-full" />
+                  <p className="text-sm text-muted-foreground">43% accompli</p>
                 </div>
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <h3 className="font-medium text-blue-700 mb-2">🎯 Objectif de la semaine</h3>
-                  <p className="text-sm">Réalisez 5 check-ins émotionnels pour maintenir votre progression.</p>
-                </div>
-                <div className="p-4 bg-green-50 rounded-lg">
-                  <h3 className="font-medium text-green-700 mb-2">🌟 Accomplissement</h3>
-                  <p className="text-sm">Vous avez maintenu une série de 7 jours ! Félicitations pour votre régularité.</p>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Pratique régulière</h4>
+                      <p className="text-sm text-muted-foreground">Objectif: 30 scans émotionnels</p>
+                    </div>
+                    <Badge className="bg-green-100 text-green-800">
+                      <Award className="h-3 w-3 mr-1" />
+                      Accompli
+                    </Badge>
+                  </div>
+                  <Progress value={100} className="w-full" />
+                  <p className="text-sm text-muted-foreground">Félicitations ! Objectif atteint</p>
                 </div>
               </div>
             </CardContent>
