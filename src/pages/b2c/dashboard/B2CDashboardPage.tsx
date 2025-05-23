@@ -22,9 +22,6 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import EmotionScanner from '@/components/scan/EmotionScanner';
-import AICoach from '@/components/coach/AICoach';
-import MusicTherapy from '@/components/music/MusicTherapy';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
 interface DashboardStats {
@@ -64,52 +61,45 @@ const B2CDashboardPage: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // Charger les statistiques depuis Supabase
-      const { data: emotions, error: emotionsError } = await supabase
-        .from('emotions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .limit(30);
+      // Simuler le chargement des données
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      if (emotionsError) throw emotionsError;
+      // Données simulées pour la démo
+      const mockStats: DashboardStats = {
+        emotionalScore: Math.floor(Math.random() * 40) + 60,
+        weeklyProgress: Math.floor(Math.random() * 20) + 5,
+        streakDays: Math.floor(Math.random() * 10) + 1,
+        totalScans: Math.floor(Math.random() * 50) + 10,
+        lastScanDate: new Date().toISOString(),
+        mood: 'positive'
+      };
 
-      // Calculer les statistiques
-      const avgScore = emotions?.length > 0 
-        ? emotions.reduce((sum, e) => sum + (e.score || 0), 0) / emotions.length 
-        : 0;
+      setStats(mockStats);
 
-      const weeklyEmotions = emotions?.filter(e => 
-        new Date(e.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-      ) || [];
+      // Activités récentes simulées
+      const mockActivities: RecentActivity[] = [
+        {
+          id: '1',
+          type: 'scan',
+          title: 'Scan émotionnel matinal',
+          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+          score: 75
+        },
+        {
+          id: '2',
+          type: 'music',
+          title: 'Session de relaxation',
+          timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000)
+        },
+        {
+          id: '3',
+          type: 'chat',
+          title: 'Conversation avec le coach IA',
+          timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000)
+        }
+      ];
 
-      const weeklyAvg = weeklyEmotions.length > 0
-        ? weeklyEmotions.reduce((sum, e) => sum + (e.score || 0), 0) / weeklyEmotions.length
-        : 0;
-
-      const mood: 'positive' | 'neutral' | 'negative' = 
-        avgScore >= 70 ? 'positive' :
-        avgScore >= 40 ? 'neutral' : 'negative';
-
-      setStats({
-        emotionalScore: Math.round(avgScore),
-        weeklyProgress: Math.round(weeklyAvg),
-        streakDays: Math.min(emotions?.length || 0, 7),
-        totalScans: emotions?.length || 0,
-        lastScanDate: emotions?.[0]?.date || new Date().toISOString(),
-        mood
-      });
-
-      // Charger les activités récentes
-      const activities: RecentActivity[] = (emotions || []).slice(0, 5).map(emotion => ({
-        id: emotion.id,
-        type: 'scan',
-        title: 'Scan émotionnel',
-        timestamp: new Date(emotion.date),
-        score: emotion.score
-      }));
-
-      setRecentActivities(activities);
+      setRecentActivities(mockActivities);
 
     } catch (error) {
       console.error('Dashboard data loading error:', error);
@@ -320,15 +310,75 @@ const B2CDashboardPage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="scan">
-          <EmotionScanner />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="h-5 w-5" />
+                Scanner Émotionnel IA
+              </CardTitle>
+              <CardDescription>Analysez votre état émotionnel actuel</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12">
+                <Brain className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Scanner Émotionnel</h3>
+                <p className="text-muted-foreground mb-6">
+                  Utilisez notre IA avancée pour analyser votre état émotionnel
+                </p>
+                <Button>
+                  Commencer le scan
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="coach">
-          <AICoach />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5" />
+                Coach IA Personnel
+              </CardTitle>
+              <CardDescription>Obtenez des conseils personnalisés pour votre bien-être</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12">
+                <MessageCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Coach IA</h3>
+                <p className="text-muted-foreground mb-6">
+                  Discutez avec votre coach personnel pour améliorer votre bien-être
+                </p>
+                <Button>
+                  Démarrer une conversation
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="music">
-          <MusicTherapy />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Music className="h-5 w-5" />
+                Musique Thérapie
+              </CardTitle>
+              <CardDescription>Musique adaptée à votre état émotionnel</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12">
+                <Music className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Musique Thérapie</h3>
+                <p className="text-muted-foreground mb-6">
+                  Découvrez des playlists personnalisées pour votre bien-être
+                </p>
+                <Button>
+                  Explorer la musique
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="goals" className="space-y-6">
@@ -346,7 +396,7 @@ const B2CDashboardPage: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-medium">Réduire le stress quotidien</h4>
-                      <p className="text-sm text-muted-foreground">Objectif: Score de stress < 30</p>
+                      <p className="text-sm text-muted-foreground">Objectif: Score de stress {"<"} 30</p>
                     </div>
                     <Badge className="bg-yellow-100 text-yellow-800">En cours</Badge>
                   </div>
