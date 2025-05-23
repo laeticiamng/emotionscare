@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, Building, ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
+import { User, Building2, ArrowRight, ArrowLeft, Heart, Users } from 'lucide-react';
 
 const ChooseModePage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900">
       <div className="container mx-auto px-6 py-16">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -18,12 +18,17 @@ const ChooseModePage: React.FC = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <Sparkles className="h-16 w-16 text-blue-600 mx-auto mb-6" />
-          <h1 className="text-5xl font-bold mb-6 text-slate-900 dark:text-white">
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <Heart className="h-6 w-6 text-pink-500 animate-pulse" />
+            <span className="text-purple-600 font-medium">Votre parenthèse commence ici</span>
+          </div>
+          
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-slate-900 dark:text-white">
             Choisissez votre expérience
           </h1>
-          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            EmotionsCare s'adapte à vos besoins. Sélectionnez l'espace qui vous correspond.
+          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
+            Que vous souhaitiez cultiver votre bien-être personnel ou développer 
+            l'énergie collective de votre équipe, nous avons l'expérience qu'il vous faut.
           </p>
         </motion.div>
 
@@ -33,43 +38,45 @@ const ChooseModePage: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group border-2 hover:border-pink-200">
+            <Card className="h-full hover:shadow-2xl transition-all duration-500 cursor-pointer group border-2 hover:border-pink-200 bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20">
               <CardHeader className="text-center pb-4">
-                <div className="w-20 h-20 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                  <Heart className="h-10 w-10 text-pink-600" />
+                <div className="w-20 h-20 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <User className="h-10 w-10 text-white" />
                 </div>
-                <CardTitle className="text-2xl">Espace Particulier</CardTitle>
+                <CardTitle className="text-2xl text-slate-800 dark:text-white">
+                  Expérience Particulier
+                </CardTitle>
+                <p className="text-pink-600 font-medium">Ma parenthèse personnelle</p>
               </CardHeader>
               <CardContent className="text-center space-y-6">
-                <p className="text-slate-600 dark:text-slate-400">
-                  Un espace personnel dédié à votre bien-être émotionnel. 
-                  Prenez du temps pour vous avec des outils adaptés à votre rythme.
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Créez votre oasis de bien-être personnel. Prenez le temps de vous reconnecter 
+                  à vos émotions avec des outils d'accompagnement sur mesure.
                 </p>
-                <ul className="text-left space-y-2 text-sm text-slate-600 dark:text-slate-400">
-                  <li>• Scanner émotionnel personnel</li>
-                  <li>• Coach IA adaptatif</li>
-                  <li>• Musicothérapie personnalisée</li>
-                  <li>• Suivi de progression</li>
-                  <li>• Interface zen et apaisante</li>
+                <ul className="text-left space-y-3 text-sm text-slate-600 dark:text-slate-400">
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                    Scanner émotionnel IA personnalisé
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    Coach virtuel adaptatif
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                    Thérapie musicale sur mesure
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    Journal émotionnel privé
+                  </li>
                 </ul>
-                <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
-                  <p className="text-sm text-green-600 font-medium">
-                    ✨ 3 jours d'essai gratuit
-                  </p>
-                </div>
                 <Button 
-                  className="w-full group bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700" 
-                  onClick={() => navigate('/b2c/register')}
-                >
-                  Commencer gratuitement
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="w-full" 
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white group/btn" 
                   onClick={() => navigate('/b2c/login')}
                 >
-                  J'ai déjà un compte
+                  Commencer ma parenthèse
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
                 </Button>
               </CardContent>
             </Card>
@@ -80,36 +87,45 @@ const ChooseModePage: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
           >
-            <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group border-2 hover:border-blue-200">
+            <Card className="h-full hover:shadow-2xl transition-all duration-500 cursor-pointer group border-2 hover:border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20">
               <CardHeader className="text-center pb-4">
-                <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                  <Building className="h-10 w-10 text-blue-600" />
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Building2 className="h-10 w-10 text-white" />
                 </div>
-                <CardTitle className="text-2xl">Espace Entreprise</CardTitle>
+                <CardTitle className="text-2xl text-slate-800 dark:text-white">
+                  Expérience Entreprise
+                </CardTitle>
+                <p className="text-blue-600 font-medium">L'énergie partagée</p>
               </CardHeader>
               <CardContent className="text-center space-y-6">
-                <p className="text-slate-600 dark:text-slate-400">
-                  Solutions professionnelles pour le bien-être de vos équipes. 
-                  Analysez, accompagnez et améliorez le climat organisationnel.
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Cultivez le bien-être collectif de vos équipes. Transformez votre environnement 
+                  professionnel en espace d'épanouissement partagé.
                 </p>
-                <ul className="text-left space-y-2 text-sm text-slate-600 dark:text-slate-400">
-                  <li>• Tableau de bord RH avancé</li>
-                  <li>• Analytics d'équipe en temps réel</li>
-                  <li>• Outils de gestion des collaborateurs</li>
-                  <li>• Rapports de bien-être détaillés</li>
-                  <li>• Support et formation inclus</li>
+                <ul className="text-left space-y-3 text-sm text-slate-600 dark:text-slate-400">
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    Analyse du climat émotionnel
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
+                    Outils collaboratifs bien-être
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    Tableau de bord RH avancé
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-cyan-500 rounded-full"></div>
+                    Suivi d'équipe en temps réel
+                  </li>
                 </ul>
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-                  <p className="text-sm text-blue-600 font-medium">
-                    🏢 Solution complète B2B
-                  </p>
-                </div>
                 <Button 
-                  className="w-full group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" 
+                  className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white group/btn" 
                   onClick={() => navigate('/b2b/selection')}
                 >
-                  Découvrir les solutions
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  Énergiser mon équipe
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
                 </Button>
               </CardContent>
             </Card>
@@ -122,23 +138,21 @@ const ChooseModePage: React.FC = () => {
           transition={{ delay: 0.6, duration: 0.8 }}
           className="text-center mt-16"
         >
+          <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm p-6 rounded-2xl max-w-2xl mx-auto mb-8">
+            <Users className="h-8 w-8 text-purple-500 mx-auto mb-4" />
+            <p className="text-lg italic text-slate-600 dark:text-slate-400 leading-relaxed">
+              "Le temps redevient un luxe accessible, et l'essentiel se retrouve dans l'énergie partagée"
+            </p>
+          </div>
+          
           <Button 
             variant="ghost" 
             onClick={() => navigate('/')}
-            className="text-slate-600 hover:text-slate-900"
+            className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Retour à l'accueil
           </Button>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 1 }}
-          className="text-center mt-12 text-sm text-slate-400"
-        >
-          EmotionsCare - Le bien-être ne s'explique pas, il se vit
         </motion.div>
       </div>
     </div>
