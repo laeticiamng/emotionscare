@@ -32,7 +32,11 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      plugins: [],
+      // Use SWC minify for faster builds
+      swcMinify: true,
+    }),
     mode === 'development' && componentTagger(),
     mode === 'development' && debugPlugin(),
   ].filter(Boolean),
@@ -41,10 +45,18 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Configuration permettant d'afficher plus d'informations lors du build
+  // Improve build performance
   build: {
-    sourcemap: true,
-    reportCompressedSize: true,
+    sourcemap: mode === 'development',
+    reportCompressedSize: false, // Faster builds
+    chunkSizeWarningLimit: 1000, // Increase warning limit
+    minify: 'terser', // Use terser for better minification
+    terserOptions: {
+      compress: {
+        drop_console: mode === 'production', // Remove console logs in production
+        drop_debugger: mode === 'production', // Remove debugger statements in production
+      }
+    },
     rollupOptions: {
       output: {
         manualChunks: {
@@ -55,7 +67,12 @@ export default defineConfig(({ mode }) => ({
       }
     }
   },
-  // Configuration développement
+  // Performance optimizations
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'],
+    exclude: ['cypress']
+  },
+  // Define environment variables
   define: {
     '__APP_VERSION__': JSON.stringify(process.env.npm_package_version),
     '__DEBUG_MODE__': mode === 'development'

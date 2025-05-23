@@ -5,12 +5,18 @@ import './setupLogging';
 import App from './App';
 import './index.css';
 import './monitoring';
-import * as Sentry from '@sentry/react';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <Sentry.ErrorBoundary fallback={<p>Une erreur est survenue.</p>} showDialog>
+// Use createRoot API with error handling
+const container = document.getElementById('root');
+
+if (!container) {
+  console.error('Root element not found!');
+} else {
+  const root = ReactDOM.createRoot(container);
+  
+  root.render(
+    <React.StrictMode>
       <App />
-    </Sentry.ErrorBoundary>
-  </React.StrictMode>
-);
+    </React.StrictMode>
+  );
+}

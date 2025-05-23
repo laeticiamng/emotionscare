@@ -1,13 +1,12 @@
 
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import VRPage from './pages/VRPage';
 import ScanPage from './pages/ScanPage';
 import SocialCocoon from './pages/SocialCocoon';
 import Social from './pages/Social';
 import DashboardRedirect from './pages/DashboardRedirect';
-import ProtectedLayout from './components/ProtectedLayout';
 import ProtectedRouteWithMode from './components/ProtectedRouteWithMode';
 import ChooseModePage from './pages/ChooseModePage';
 
@@ -33,77 +32,63 @@ import B2BSelection from './pages/b2b/Selection';
 // Page d'erreur 404
 import NotFoundPage from './pages/NotFoundPage';
 
-const AppRouter = () => {
-  return (
-    <Routes>
-      {/* Page d'accueil principale */}
-      <Route path="/" element={<HomePage />} />
-      
-      {/* Redirection dashboard */}
-      <Route path="/dashboard" element={<DashboardRedirect />} />
-      
-      {/* Choix du mode utilisateur */}
-      <Route path="/choose-mode" element={<ChooseModePage />} />
-      
-      {/* Routes B2C */}
-      <Route path="/b2c">
-        <Route path="login" element={<B2CLogin />} />
-        <Route path="register" element={<B2CRegister />} />
-        <Route path="reset-password" element={<B2CResetPassword />} />
-        <Route path="dashboard" element={
-          <ProtectedRouteWithMode requiredMode="b2c" redirectTo="/choose-mode">
-            <B2CDashboard />
-          </ProtectedRouteWithMode>
-        } />
-        <Route path="onboarding" element={
-          <ProtectedRouteWithMode requiredMode="b2c" redirectTo="/choose-mode">
-            <B2COnboarding />
-          </ProtectedRouteWithMode>
-        } />
-        <Route path="scan" element={<ScanPage />} />
-        <Route path="vr" element={<VRPage />} />
-        <Route path="social" element={<Social />} />
-      </Route>
-      
-      {/* Routes B2B User */}
-      <Route path="/b2b/user">
-        <Route path="login" element={<B2BUserLogin />} />
-        <Route path="register" element={<B2BUserRegister />} />
-        <Route path="dashboard" element={
-          <ProtectedRouteWithMode requiredMode="b2b_user" redirectTo="/choose-mode">
-            <B2BUserDashboard />
-          </ProtectedRouteWithMode>
-        } />
-        <Route path="scan" element={<ScanPage />} />
-        <Route path="vr" element={<VRPage />} />
-        <Route path="social" element={<Social />} />
-      </Route>
-      
-      {/* Routes B2B Admin */}
-      <Route path="/b2b/admin">
-        <Route path="login" element={<B2BAdminLogin />} />
-        <Route path="dashboard" element={
-          <ProtectedRouteWithMode requiredMode="b2b_admin" redirectTo="/choose-mode">
-            <B2BAdminDashboard />
-          </ProtectedRouteWithMode>
-        } />
-        <Route path="social" element={<Social />} />
-      </Route>
-      
-      {/* Page de sélection B2B */}
-      <Route path="/b2b/selection" element={<B2BSelection />} />
-      
-      {/* Accès direct aux fonctionnalités principales */}
-      <Route path="/scan" element={<ScanPage />} />
-      <Route path="/vr" element={<VRPage />} />
-      <Route path="/social" element={<Social />} />
-      <Route path="/social-cocoon" element={<SocialCocoon />} />
-      
-      {/* Page 404 pour les routes non trouvées */}
-      <Route path="/404" element={<NotFoundPage />} />
-      <Route path="*" element={<Navigate to="/404" replace />} />
-    </Routes>
-  );
-};
+const routes = [
+  // Page d'accueil principale
+  { path: '/', element: <HomePage /> },
+  
+  // Redirection dashboard
+  { path: '/dashboard', element: <DashboardRedirect /> },
+  
+  // Choix du mode utilisateur
+  { path: '/choose-mode', element: <ChooseModePage /> },
+  
+  // Routes B2C
+  { path: '/b2c/login', element: <B2CLogin /> },
+  { path: '/b2c/register', element: <B2CRegister /> },
+  { path: '/b2c/reset-password', element: <B2CResetPassword /> },
+  { 
+    path: '/b2c/dashboard', 
+    element: <ProtectedRouteWithMode requiredMode="b2c" redirectTo="/choose-mode"><B2CDashboard /></ProtectedRouteWithMode> 
+  },
+  { 
+    path: '/b2c/onboarding', 
+    element: <ProtectedRouteWithMode requiredMode="b2c" redirectTo="/choose-mode"><B2COnboarding /></ProtectedRouteWithMode> 
+  },
+  { path: '/b2c/scan', element: <ScanPage /> },
+  { path: '/b2c/vr', element: <VRPage /> },
+  { path: '/b2c/social', element: <Social /> },
+  
+  // Routes B2B User
+  { path: '/b2b/user/login', element: <B2BUserLogin /> },
+  { path: '/b2b/user/register', element: <B2BUserRegister /> },
+  { 
+    path: '/b2b/user/dashboard', 
+    element: <ProtectedRouteWithMode requiredMode="b2b_user" redirectTo="/choose-mode"><B2BUserDashboard /></ProtectedRouteWithMode> 
+  },
+  { path: '/b2b/user/scan', element: <ScanPage /> },
+  { path: '/b2b/user/vr', element: <VRPage /> },
+  { path: '/b2b/user/social', element: <Social /> },
+  
+  // Routes B2B Admin
+  { path: '/b2b/admin/login', element: <B2BAdminLogin /> },
+  { 
+    path: '/b2b/admin/dashboard', 
+    element: <ProtectedRouteWithMode requiredMode="b2b_admin" redirectTo="/choose-mode"><B2BAdminDashboard /></ProtectedRouteWithMode> 
+  },
+  { path: '/b2b/admin/social', element: <Social /> },
+  
+  // Page de sélection B2B
+  { path: '/b2b/selection', element: <B2BSelection /> },
+  
+  // Accès direct aux fonctionnalités principales
+  { path: '/scan', element: <ScanPage /> },
+  { path: '/vr', element: <VRPage /> },
+  { path: '/social', element: <Social /> },
+  { path: '/social-cocoon', element: <SocialCocoon /> },
+  
+  // Page 404 pour les routes non trouvées
+  { path: '/404', element: <NotFoundPage /> },
+  { path: '*', element: <Navigate to="/404" replace /> }
+];
 
-export default AppRouter;
+export default routes;
