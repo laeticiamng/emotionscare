@@ -20,6 +20,7 @@ if (!fs.existsSync('.npmrc') || !fs.readFileSync('.npmrc', 'utf8').includes('cyp
 // Set environment variables
 process.env.CYPRESS_INSTALL_BINARY = '0';
 process.env.CYPRESS_SKIP_BINARY_INSTALL = '1';
+process.env.NODE_OPTIONS = '--max-old-space-size=4096';
 
 console.log('✅ Pre-build optimizations complete');
 

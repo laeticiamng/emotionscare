@@ -21,6 +21,11 @@ prefer-offline=true
 fund=false
 audit=false
 save-exact=true
+
+# Fast installation
+legacy-peer-deps=true
+auto-install-peers=true
+strict-peer-dependencies=false
 `;
   fs.writeFileSync('.npmrc', npmrcContent);
 } else {
@@ -35,6 +40,11 @@ save-exact=true
   
   if (!npmrcContent.includes('prefer-offline=true')) {
     npmrcContent += '\n# Optimize installation process\nprefer-offline=true\nfund=false\naudit=false\nsave-exact=true\n';
+    modified = true;
+  }
+
+  if (!npmrcContent.includes('legacy-peer-deps=true')) {
+    npmrcContent += '\n# Fast installation\nlegacy-peer-deps=true\nauto-install-peers=true\nstrict-peer-dependencies=false\n';
     modified = true;
   }
   
@@ -59,7 +69,7 @@ console.log('- Prefer offline packages enabled');
 // Run optimized Bun install with flags
 try {
   console.log('Running optimized Bun install...');
-  execSync('bun install --no-summary --no-progress', { stdio: 'inherit' });
+  execSync('bun install --no-summary --no-progress --no-audit --prefer-offline', { stdio: 'inherit', timeout: 120000 });
   console.log('✅ Bun installation completed successfully');
 } catch (error) {
   console.error('❌ Bun installation failed:', error.message);

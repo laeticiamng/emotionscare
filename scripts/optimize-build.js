@@ -11,11 +11,13 @@ process.env.CYPRESS_INSTALL_BINARY = '0';
 process.env.CYPRESS_SKIP_BINARY_INSTALL = '1';
 process.env.HUSKY_SKIP_INSTALL = '1';
 process.env.PUPPETEER_SKIP_DOWNLOAD = '1';
+process.env.NODE_OPTIONS = '--max-old-space-size=4096';
 
 console.log('🚀 Build optimization settings applied');
 console.log('- Cypress binary download skipped');
 console.log('- Husky install skipped');
 console.log('- Puppeteer download skipped');
+console.log('- Node memory increased to 4GB');
 
 // Exit with success
 process.exit(0);

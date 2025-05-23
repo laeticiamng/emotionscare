@@ -14,7 +14,18 @@ jobs:
       - name: Configure npm registry
         run: npm config set registry https://registry.npmmirror.com
 
+      - name: Optimize npm cache  
+        run: |
+          npm config set cache-min 9999999
+          echo "CYPRESS_INSTALL_BINARY=0" >> $GITHUB_ENV
+          echo "CYPRESS_SKIP_BINARY_INSTALL=1" >> $GITHUB_ENV
+          echo "HUSKY_SKIP_INSTALL=1" >> $GITHUB_ENV
+          echo "PUPPETEER_SKIP_DOWNLOAD=1" >> $GITHUB_ENV
+
       - name: Install deps
-        run: npm ci --prefer-offline --no-audit --no-fund
+        run: npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps
+        timeout-minutes: 5
+        
       - name: Run tests
         run: npm test
+        timeout-minutes: 5

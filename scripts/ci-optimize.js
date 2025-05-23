@@ -29,6 +29,9 @@ save-exact=true
 loglevel=error
 progress=false
 cypress_skip_binary_install=1
+legacy-peer-deps=true
+auto-install-peers=true
+strict-peer-dependencies=false
 `;
 
 fs.writeFileSync('.npmrc', npmrcContent);
@@ -54,7 +57,7 @@ if (fs.existsSync(workflowPath)) {
   if (workflow.includes('npm ci')) {
     const updatedWorkflow = workflow.replace(
       /npm ci/g,
-      'npm ci --prefer-offline --no-audit --no-fund'
+      'npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps'
     );
     fs.writeFileSync(workflowPath, updatedWorkflow);
     console.log('📝 Optimized npm commands in GitHub workflow');
@@ -84,7 +87,7 @@ jobs:
         run: npm config set registry https://registry.npmmirror.com
 
       - name: Install deps
-        run: npm ci --prefer-offline --no-audit --no-fund
+        run: npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps
       - name: Run tests
         run: npm test
 `);
