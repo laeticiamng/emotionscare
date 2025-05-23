@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Building2, Loader2 } from 'lucide-react';
+import { useUserMode } from '@/contexts/UserModeContext';
 
 const B2BUserLoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { setUserMode } = useUserMode();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +24,7 @@ const B2BUserLoginPage: React.FC = () => {
     setError(null);
 
     try {
+      setUserMode('b2b_user');
       await login(email, password);
       navigate('/b2b/user/dashboard');
     } catch (error) {
@@ -35,19 +38,26 @@ const B2BUserLoginPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <div className="bg-primary/10 p-3 rounded-full">
+              <Building2 className="h-8 w-8 text-primary" />
+            </div>
+          </div>
           <CardTitle className="text-2xl font-bold">Connexion Collaborateur</CardTitle>
           <CardDescription>Accédez à votre espace professionnel</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email professionnel</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="votre.email@entreprise.com"
                 required
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -58,6 +68,7 @@ const B2BUserLoginPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -69,17 +80,29 @@ const B2BUserLoginPage: React.FC = () => {
             )}
             
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Connexion...' : 'Se connecter'}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Connexion...
+                </>
+              ) : (
+                'Se connecter'
+              )}
             </Button>
           </form>
           
-          <div className="mt-4 text-center space-y-2">
+          <div className="mt-6 text-center space-y-2">
             <Button variant="link" onClick={() => navigate('/b2b/user/register')}>
-              Créer un compte collaborateur
+              Pas encore de compte ? S'inscrire
             </Button>
-            <Button variant="link" onClick={() => navigate('/b2b/selection')}>
-              Retour à la sélection
+            <Button variant="link" onClick={() => navigate('/reset-password')}>
+              Mot de passe oublié ?
             </Button>
+            <div className="pt-4 border-t">
+              <Button variant="ghost" onClick={() => navigate('/b2b/selection')}>
+                Retour à la sélection
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

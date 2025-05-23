@@ -1,96 +1,87 @@
 
-import { UserModeType } from '@/types/userMode';
+import { UserMode } from '@/contexts/UserModeContext';
 
-/**
- * Normalise le mode utilisateur depuis différentes sources
- */
-export function normalizeUserMode(role: string | undefined): UserModeType | null {
-  if (!role) return null;
+export const normalizeUserMode = (mode: string | UserMode | null | undefined): UserMode => {
+  if (!mode) return 'b2c';
   
-  const normalizedRole = role.toLowerCase();
+  const modeStr = String(mode).toLowerCase();
   
-  if (normalizedRole.includes('b2c') || normalizedRole === 'individual') {
-    return 'b2c';
-  }
+  // Mapping des différentes variations possibles
+  const modeMap: Record<string, UserMode> = {
+    'b2c': 'b2c',
+    'b2b_user': 'b2b_user',
+    'b2b_admin': 'b2b_admin',
+    'b2b-user': 'b2b_user',
+    'b2b-admin': 'b2b_admin',
+    'user': 'b2b_user',
+    'admin': 'b2b_admin',
+    'collaborateur': 'b2b_user',
+    'administrateur': 'b2b_admin'
+  };
   
-  if (normalizedRole.includes('admin') || normalizedRole === 'b2b_admin') {
-    return 'b2b_admin';
-  }
+  return modeMap[modeStr] || 'b2c';
+};
+
+export const getModeDashboardPath = (mode: UserMode | string | null | undefined): string => {
+  const normalizedMode = normalizeUserMode(mode);
   
-  if (normalizedRole.includes('user') || normalizedRole === 'b2b_user' || normalizedRole === 'employee') {
-    return 'b2b_user';
-  }
+  const dashboardMap: Record<UserMode, string> = {
+    'b2c': '/b2c/dashboard',
+    'b2b_user': '/b2b/user/dashboard',
+    'b2b_admin': '/b2b/admin/dashboard'
+  };
   
-  return 'b2c'; // Défaut
-}
+  return dashboardMap[normalizedMode];
+};
 
-/**
- * Obtient le nom d'affichage du mode utilisateur
- */
-export function getUserModeDisplayName(userMode: UserModeType | null): string {
-  switch (userMode) {
-    case 'b2c':
-      return 'Particulier';
-    case 'b2b_user':
-      return 'Collaborateur';
-    case 'b2b_admin':
-      return 'Administrateur';
-    default:
-      return 'Invité';
-  }
-}
+export const getModeLoginPath = (mode: UserMode | string | null | undefined): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  const loginMap: Record<UserMode, string> = {
+    'b2c': '/b2c/login',
+    'b2b_user': '/b2b/user/login',
+    'b2b_admin': '/b2b/admin/login'
+  };
+  
+  return loginMap[normalizedMode];
+};
 
-/**
- * Obtient le chemin du dashboard selon le mode utilisateur
- */
-export function getModeDashboardPath(userMode: UserModeType): string {
-  switch (userMode) {
-    case 'b2c':
-      return '/b2c/dashboard';
-    case 'b2b_user':
-      return '/b2b/user/dashboard';
-    case 'b2b_admin':
-      return '/b2b/admin/dashboard';
-    default:
-      return '/dashboard';
-  }
-}
+export const getModeSocialPath = (mode: UserMode | string | null | undefined): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  const socialMap: Record<UserMode, string> = {
+    'b2c': '/b2c/social',
+    'b2b_user': '/b2b/user/social',
+    'b2b_admin': '/b2b/admin/social-cocoon'
+  };
+  
+  return socialMap[normalizedMode];
+};
 
-/**
- * Obtient le chemin de connexion selon le mode utilisateur
- */
-export function getModeLoginPath(userMode: UserModeType): string {
-  switch (userMode) {
-    case 'b2c':
-      return '/b2c/login';
-    case 'b2b_user':
-      return '/b2b/user/login';
-    case 'b2b_admin':
-      return '/b2b/admin/login';
-    default:
-      return '/choose-mode';
-  }
-}
+export const getUserModeLabel = (mode: UserMode | string | null | undefined): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  const labelMap: Record<UserMode, string> = {
+    'b2c': 'Particulier',
+    'b2b_user': 'Collaborateur',
+    'b2b_admin': 'Administrateur'
+  };
+  
+  return labelMap[normalizedMode];
+};
 
-/**
- * Vérifie si le mode utilisateur nécessite une organisation
- */
-export function requiresOrganization(userMode: UserModeType | null): boolean {
-  return userMode === 'b2b_user' || userMode === 'b2b_admin';
-}
+export const getUserModeDisplayName = (mode: UserMode | string | null | undefined): string => {
+  return getUserModeLabel(mode);
+};
 
-/**
- * Obtient les permissions par défaut pour un mode utilisateur
- */
-export function getDefaultPermissions(userMode: UserModeType): string[] {
-  switch (userMode) {
-    case 'b2c':
-      return ['read_own_data', 'write_own_data', 'use_basic_features'];
-    case 'b2b_user':
-      return ['read_own_data', 'write_own_data', 'use_basic_features', 'view_team_stats'];
-    case 'b2b_admin':
-      return ['read_own_data', 'write_own_data', 'use_basic_features', 'view_team_stats', 'manage_users', 'view_analytics', 'export_data'];
-    default:
-      return [];
-  }
-}
+export const getModeColor = (mode: UserMode | string | null | undefined): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  
+  const colorMap: Record<UserMode, string> = {
+    'b2c': 'bg-blue-50 text-blue-600',
+    'b2b_user': 'bg-green-50 text-green-600',
+    'b2b_admin': 'bg-purple-50 text-purple-600'
+  };
+  
+  return colorMap[normalizedMode];
+};

@@ -1,152 +1,120 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-interface User {
-  id: string;
-  email?: string;
-  user_metadata?: {
-    name?: string;
-    avatar_url?: string;
-    role?: string;
-  };
-}
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  error: Error | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, userData: object) => Promise<void>;
+  register: (email: string, password: string, metadata?: any) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (updates: any) => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  error: null,
-  login: async () => {},
-  register: async () => {},
-  logout: async () => {},
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  
-  // Check if user is already authenticated
+
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // For now, we'll just simulate an auth check
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (error) {
-        console.error('Auth check error:', error);
-        setError(error instanceof Error ? error : new Error('Unknown error'));
-      } finally {
+    // Écouter les changements d'état d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
         setIsLoading(false);
       }
-    };
+    );
 
-    checkAuth();
+    // Récupérer la session actuelle
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
-  
+
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // Simulate login request
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock user data
-      const userData = {
-        id: '123456',
-        email: email,
-        user_metadata: {
-          name: email.split('@')[0],
-          avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-        },
-      };
-      
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-    } catch (error) {
-      console.error('Login error:', error);
-      setError(error instanceof Error ? error : new Error('Failed to login'));
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
       throw error;
-    } finally {
-      setIsLoading(false);
     }
+
+    toast.success('Connexion réussie !');
   };
-  
-  const register = async (email: string, password: string, userData: object) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // Simulate register request
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock user data
-      const newUser = {
-        id: '123456',
-        email: email,
-        user_metadata: {
-          name: email.split('@')[0],
-          avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-          ...userData,
-        },
-      };
-      
-      setUser(newUser);
-      localStorage.setItem('user', JSON.stringify(newUser));
-    } catch (error) {
-      console.error('Register error:', error);
-      setError(error instanceof Error ? error : new Error('Failed to register'));
+
+  const register = async (email: string, password: string, metadata: any = {}) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata,
+      },
+    });
+
+    if (error) {
       throw error;
-    } finally {
-      setIsLoading(false);
     }
+
+    toast.success('Compte créé avec succès !');
   };
-  
+
   const logout = async () => {
-    setIsLoading(true);
+    const { error } = await supabase.auth.signOut();
     
-    try {
-      // Simulate logout request
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      setUser(null);
-      localStorage.removeItem('user');
-    } catch (error) {
-      console.error('Logout error:', error);
-      setError(error instanceof Error ? error : new Error('Failed to logout'));
-    } finally {
-      setIsLoading(false);
+    if (error) {
+      throw error;
     }
+
+    setUser(null);
+    setSession(null);
+    toast.success('Déconnexion réussie');
   };
-  
+
+  const updateUser = async (updates: any) => {
+    const { error } = await supabase.auth.updateUser(updates);
+    
+    if (error) {
+      throw error;
+    }
+
+    toast.success('Profil mis à jour');
+  };
+
+  const value = {
+    user,
+    session,
+    isAuthenticated: !!user,
+    isLoading,
+    login,
+    register,
+    logout,
+    updateUser,
+  };
+
   return (
-    <AuthContext.Provider value={{
-      user,
-      isAuthenticated: !!user,
-      isLoading,
-      error,
-      login,
-      register,
-      logout,
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);
-
-export default AuthContext;
