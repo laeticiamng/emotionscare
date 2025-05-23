@@ -4,26 +4,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
-const BillingPage: React.FC = () => {
+const B2BUserScanPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted p-4">
       <div className="container mx-auto">
         <header className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Facturation</h1>
-          <Button onClick={() => navigate(-1)} variant="outline">
-            Retour
+          <h1 className="text-3xl font-bold">Scanner Collaborateur</h1>
+          <Button onClick={() => navigate('/b2b/user/dashboard')} variant="outline">
+            Retour au tableau de bord
           </Button>
         </header>
 
         <Card>
           <CardHeader>
-            <CardTitle>Gestion de la facturation</CardTitle>
-            <CardDescription>Consultez vos factures et abonnements</CardDescription>
+            <CardTitle>Bien-être au travail</CardTitle>
+            <CardDescription>Évaluez votre état émotionnel professionnel</CardDescription>
           </CardHeader>
           <CardContent>
-            <p>Page de facturation à venir.</p>
+            <p>Interface de scan pour collaborateurs à venir.</p>
           </CardContent>
         </Card>
       </div>
@@ -31,4 +31,4 @@ const BillingPage: React.FC = () => {
   );
 };
 
-export default BillingPage;
+export default B2BUserScanPage;
