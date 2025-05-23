@@ -1,70 +1,56 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const musicApiKey = Deno.env.get('MUSIC_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { prompt, emotion, duration = 30 } = await req.json()
-    const MUSIC_API_KEY = Deno.env.get('MUSIC_API_KEY')
+    const { emotion, score, prompt } = await req.json();
 
-    if (!MUSIC_API_KEY) {
-      // Retourner une piste simulée si pas de clé API
-      const tracks = [
-        'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3',
-        'https://assets.mixkit.co/music/preview/mixkit-deep-urban-623.mp3',
-        'https://assets.mixkit.co/music/preview/mixkit-synthwave-retrowave-509.mp3'
-      ]
-      
-      return new Response(
-        JSON.stringify({
-          id: `gen-${Date.now()}`,
-          title: `Musique générée: ${emotion}`,
-          artist: 'AI Composer',
-          duration: duration,
-          audioUrl: tracks[Math.floor(Math.random() * tracks.length)],
-          coverUrl: `https://source.unsplash.com/300x300/?music,${emotion}`,
-          genre: emotion === 'calm' ? 'Ambient' : 'Electronic'
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+    // Determine music style based on emotion and score
+    let musicPrompt = '';
+    if (score >= 70) {
+      musicPrompt = `Create uplifting, energetic music for positive emotions. ${prompt || 'Happy and motivational ambient music'}`;
+    } else if (score >= 40) {
+      musicPrompt = `Create calming, balanced music for neutral emotions. ${prompt || 'Peaceful and soothing ambient music'}`;
+    } else {
+      musicPrompt = `Create gentle, comforting music for difficult emotions. ${prompt || 'Soft and healing ambient music'}`;
     }
 
-    // En production, appel à MusicGen ou autre service
-    // const response = await fetch('https://api.musicgen.com/generate', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Authorization': `Bearer ${MUSIC_API_KEY}`,
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     prompt: prompt,
-    //     duration: duration
-    //   }),
-    // })
+    // For now, return a mock response since we need the actual music generation API
+    // In a real implementation, you would call a service like Suno AI or similar
+    const mockResponse = {
+      id: `music_${Date.now()}`,
+      url: `https://example.com/generated-music-${Date.now()}.mp3`,
+      prompt: musicPrompt,
+      style: score >= 70 ? 'uplifting' : score >= 40 ? 'calm' : 'comforting',
+      duration: 120, // 2 minutes
+      status: 'generated'
+    };
 
-    // const data = await response.json()
-    
-    return new Response(
-      JSON.stringify({
-        message: 'Music generation not yet implemented in production'
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    return new Response(JSON.stringify(mockResponse), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    )
+    console.error('Error in music-generation function:', error);
+    return new Response(JSON.stringify({ 
+      error: error.message,
+      id: null,
+      url: null,
+      status: 'error'
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
-})
+});

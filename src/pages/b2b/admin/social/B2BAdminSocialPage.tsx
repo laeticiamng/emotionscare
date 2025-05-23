@@ -1,311 +1,506 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
-import { Activity, Heart, MessageCircle, Users, TrendingUp, Calendar, BarChart3 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { 
+  Users, 
+  MessageCircle, 
+  Plus, 
+  Settings,
+  TrendingUp,
+  Loader2,
+  Building2,
+  Target,
+  Award,
+  Calendar
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-interface SocialActivity {
+interface Group {
   id: string;
-  user_id: string;
-  content: string;
-  reactions: number;
-  created_at: string;
-  user?: {
-    name: string;
-    email: string;
-  };
+  name: string;
+  topic: string;
+  members: string[];
 }
 
-interface EmotionData {
+interface TeamMember {
   id: string;
-  user_id: string;
-  score: number;
-  emojis: string;
-  date: string;
-  user?: {
-    name: string;
-  };
+  name: string;
+  department?: string;
+  job_title?: string;
+  emotional_score?: number;
+  role: string;
 }
 
 const B2BAdminSocialPage: React.FC = () => {
+  const { user, logout } = useAuth();
+  const { setUserMode } = useUserMode();
   const navigate = useNavigate();
-  const [socialActivities, setSocialActivities] = useState<SocialActivity[]>([]);
-  const [emotionData, setEmotionData] = useState<EmotionData[]>([]);
-  const [stats, setStats] = useState({
-    totalPosts: 0,
-    totalReactions: 0,
-    averageMood: 0,
-    activeUsers: 0
-  });
   const [isLoading, setIsLoading] = useState(true);
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [showCreateGroup, setShowCreateGroup] = useState(false);
+  const [newGroupName, setNewGroupName] = useState('');
+  const [newGroupTopic, setNewGroupTopic] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
 
   useEffect(() => {
-    loadSocialData();
-  }, []);
+    setUserMode('b2b_admin');
+    fetchData();
+  }, [setUserMode]);
 
-  const loadSocialData = async () => {
+  const fetchData = async () => {
     try {
       setIsLoading(true);
+      
+      // Fetch groups
+      const { data: groupsData, error: groupsError } = await supabase
+        .from('groups')
+        .select('*');
 
-      // Charger les posts sociaux
-      const { data: posts } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          profiles:user_id (
-            name,
-            email
-          )
-        `)
-        .order('date', { ascending: false })
-        .limit(10);
+      if (groupsError) throw groupsError;
+      setGroups(groupsData || []);
 
-      // Charger les données émotionnelles
-      const { data: emotions } = await supabase
-        .from('emotions')
-        .select(`
-          *,
-          profiles:user_id (
-            name
-          )
-        `)
-        .order('date', { ascending: false })
-        .limit(20);
+      // Fetch all team members
+      const { data: membersData, error: membersError } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('role', ['b2b_user', 'b2b_admin']);
 
-      if (posts) {
-        setSocialActivities(posts.map(post => ({
-          ...post,
-          user: post.profiles
-        })));
-      }
-
-      if (emotions) {
-        setEmotionData(emotions.map(emotion => ({
-          ...emotion,
-          user: emotion.profiles
-        })));
-      }
-
-      // Calculer les statistiques
-      const totalReactions = posts?.reduce((sum, post) => sum + (post.reactions || 0), 0) || 0;
-      const averageMood = emotions?.length 
-        ? emotions.reduce((sum, emotion) => sum + (emotion.score || 0), 0) / emotions.length 
-        : 0;
-
-      setStats({
-        totalPosts: posts?.length || 0,
-        totalReactions,
-        averageMood: Math.round(averageMood * 10) / 10,
-        activeUsers: [...new Set(posts?.map(p => p.user_id) || [])].length
-      });
+      if (membersError) throw membersError;
+      setTeamMembers(membersData || []);
 
     } catch (error) {
-      console.error('Erreur lors du chargement des données sociales:', error);
+      console.error('Error fetching data:', error);
+      toast.error('Erreur lors du chargement des données');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getMoodColor = (score: number) => {
-    if (score >= 4) return 'text-green-600 bg-green-50';
-    if (score >= 3) return 'text-yellow-600 bg-yellow-50';
-    return 'text-red-600 bg-red-50';
+  const createGroup = async () => {
+    if (!newGroupName.trim() || !newGroupTopic.trim()) {
+      toast.error('Veuillez remplir tous les champs');
+      return;
+    }
+
+    try {
+      setIsCreating(true);
+      const { error } = await supabase
+        .from('groups')
+        .insert([
+          {
+            name: newGroupName,
+            topic: newGroupTopic,
+            members: []
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast.success('Groupe créé avec succès !');
+      setNewGroupName('');
+      setNewGroupTopic('');
+      setShowCreateGroup(false);
+      fetchData();
+    } catch (error) {
+      console.error('Error creating group:', error);
+      toast.error('Erreur lors de la création du groupe');
+    } finally {
+      setIsCreating(false);
+    }
   };
 
-  const getMoodLabel = (score: number) => {
-    if (score >= 4) return 'Excellent';
-    if (score >= 3) return 'Bon';
-    if (score >= 2) return 'Moyen';
-    return 'Difficile';
+  const deleteGroup = async (groupId: string) => {
+    try {
+      const { error } = await supabase
+        .from('groups')
+        .delete()
+        .eq('id', groupId);
+
+      if (error) throw error;
+
+      toast.success('Groupe supprimé avec succès !');
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting group:', error);
+      toast.error('Erreur lors de la suppression du groupe');
+    }
   };
+
+  const getTeamStats = () => {
+    const totalMembers = teamMembers.length;
+    const collaborators = teamMembers.filter(m => m.role === 'b2b_user').length;
+    const admins = teamMembers.filter(m => m.role === 'b2b_admin').length;
+    const averageScore = teamMembers.reduce((sum, m) => sum + (m.emotional_score || 0), 0) / totalMembers || 0;
+    
+    return { totalMembers, collaborators, admins, averageScore: Math.round(averageScore) };
+  };
+
+  const stats = getTeamStats();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p>Chargement de la gestion sociale...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted p-4">
-      <div className="container mx-auto max-w-6xl">
-        <header className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Activity className="h-8 w-8 text-primary" />
-              Analyse Sociale & Émotionnelle
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Observez le bien-être et l'engagement de votre organisation
-            </p>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
+      {/* Header */}
+      <header className="border-b bg-background/95 backdrop-blur">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" onClick={() => navigate('/b2b/admin/dashboard')}>
+              ← Tableau de bord
+            </Button>
+            <h1 className="text-xl font-bold">Social Cocoon - Administration</h1>
           </div>
-          <Button onClick={() => navigate('/b2b/admin/dashboard')} variant="outline">
-            Retour au tableau de bord
-          </Button>
-        </header>
+          <div className="flex items-center space-x-4">
+            <Badge variant="outline" className="bg-purple-50 text-purple-600">
+              Administrateur
+            </Badge>
+            <Badge variant="outline">
+              {user?.user_metadata?.name || user?.email}
+            </Badge>
+            <Button onClick={handleLogout} variant="outline">
+              Déconnexion
+            </Button>
+          </div>
+        </div>
+      </header>
 
-        {/* Statistiques principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="container py-8">
+        {/* Quick Stats */}
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Posts Partagés</CardTitle>
-              <MessageCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{isLoading ? '...' : stats.totalPosts}</div>
-              <p className="text-xs text-muted-foreground">Cette semaine</p>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total Équipe</p>
+                  <p className="text-2xl font-bold">{stats.totalMembers}</p>
+                </div>
+                <Users className="h-8 w-8 text-blue-600" />
+              </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Réactions</CardTitle>
-              <Heart className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{isLoading ? '...' : stats.totalReactions}</div>
-              <p className="text-xs text-muted-foreground">Total</p>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Collaborateurs</p>
+                  <p className="text-2xl font-bold">{stats.collaborators}</p>
+                </div>
+                <Building2 className="h-8 w-8 text-green-600" />
+              </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Humeur Moyenne</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{isLoading ? '...' : `${stats.averageMood}/5`}</div>
-              <p className="text-xs text-muted-foreground">Échelle de bien-être</p>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Groupes Actifs</p>
+                  <p className="text-2xl font-bold">{groups.length}</p>
+                </div>
+                <MessageCircle className="h-8 w-8 text-purple-600" />
+              </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Utilisateurs Actifs</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{isLoading ? '...' : stats.activeUsers}</div>
-              <p className="text-xs text-muted-foreground">Participants</p>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Bien-être Moyen</p>
+                  <p className="text-2xl font-bold">{stats.averageScore}%</p>
+                </div>
+                <TrendingUp className="h-8 w-8 text-orange-600" />
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Activités sociales récentes */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageCircle className="h-5 w-5" />
-                Activités Sociales Récentes
-              </CardTitle>
-              <CardDescription>
-                Derniers posts et interactions de votre équipe
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
-                  <p className="mt-2 text-sm text-muted-foreground">Chargement...</p>
+        <Tabs defaultValue="groups" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="groups">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Groupes
+            </TabsTrigger>
+            <TabsTrigger value="team">
+              <Users className="h-4 w-4 mr-2" />
+              Équipe
+            </TabsTrigger>
+            <TabsTrigger value="wellness">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Bien-être
+            </TabsTrigger>
+            <TabsTrigger value="settings">
+              <Settings className="h-4 w-4 mr-2" />
+              Paramètres
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="groups" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Gestion des groupes</CardTitle>
+                    <CardDescription>
+                      Créez et gérez les groupes de discussion de votre organisation
+                    </CardDescription>
+                  </div>
+                  <Button onClick={() => setShowCreateGroup(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nouveau groupe
+                  </Button>
                 </div>
-              ) : socialActivities.length === 0 ? (
-                <div className="text-center py-8">
-                  <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">Aucune activité récente</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {socialActivities.map((activity) => (
-                    <div key={activity.id} className="border-b pb-4 last:border-b-0">
-                      <div className="flex items-start gap-3">
-                        <div className="h-8 w-8 bg-primary/10 rounded-full flex items-center justify-center">
-                          <span className="text-xs font-medium text-primary">
-                            {activity.user?.name?.charAt(0) || 'U'}
-                          </span>
+              </CardHeader>
+              <CardContent>
+                {showCreateGroup && (
+                  <Card className="mb-6 border-2 border-dashed">
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-4">Créer un nouveau groupe</h3>
+                      <div className="space-y-4">
+                        <Input
+                          placeholder="Nom du groupe"
+                          value={newGroupName}
+                          onChange={(e) => setNewGroupName(e.target.value)}
+                        />
+                        <Textarea
+                          placeholder="Sujet ou description du groupe"
+                          value={newGroupTopic}
+                          onChange={(e) => setNewGroupTopic(e.target.value)}
+                        />
+                        <div className="flex space-x-2">
+                          <Button 
+                            onClick={createGroup}
+                            disabled={isCreating}
+                          >
+                            {isCreating ? (
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            ) : (
+                              <Plus className="h-4 w-4 mr-2" />
+                            )}
+                            Créer
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            onClick={() => setShowCreateGroup(false)}
+                          >
+                            Annuler
+                          </Button>
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium text-sm">
-                              {activity.user?.name || 'Utilisateur anonyme'}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(activity.created_at).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {activity.content}
-                          </p>
-                          <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                              <Heart className="h-3 w-3" />
-                              {activity.reactions} réactions
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {groups.length === 0 ? (
+                  <div className="text-center py-8">
+                    <MessageCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="font-semibold mb-2">Aucun groupe créé</h3>
+                    <p className="text-muted-foreground">
+                      Créez votre premier groupe pour favoriser la collaboration
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {groups.map((group) => (
+                      <Card key={group.id} className="hover:shadow-lg transition-shadow">
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="font-semibold text-lg">{group.name}</h3>
+                              <p className="text-muted-foreground">{group.topic}</p>
+                              <Badge variant="outline" className="mt-2">
+                                {group.members?.length || 0} membres
+                              </Badge>
+                            </div>
+                            <div className="flex space-x-2">
+                              <Button variant="outline" size="sm">
+                                <Settings className="h-4 w-4 mr-2" />
+                                Gérer
+                              </Button>
+                              <Button 
+                                variant="destructive" 
+                                size="sm"
+                                onClick={() => deleteGroup(group.id)}
+                              >
+                                Supprimer
+                              </Button>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-          {/* Suivi émotionnel */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Suivi Émotionnel
-              </CardTitle>
-              <CardDescription>
-                État émotionnel récent de vos collaborateurs
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
-                  <p className="mt-2 text-sm text-muted-foreground">Chargement...</p>
-                </div>
-              ) : emotionData.length === 0 ? (
-                <div className="text-center py-8">
-                  <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">Aucune donnée émotionnelle</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {emotionData.slice(0, 8).map((emotion) => (
-                    <div key={emotion.id} className="flex items-center justify-between p-3 rounded-lg border">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 bg-primary/10 rounded-full flex items-center justify-center">
-                          <span className="text-xs font-medium text-primary">
-                            {emotion.user?.name?.charAt(0) || 'U'}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">
-                            {emotion.user?.name || 'Utilisateur anonyme'}
+          <TabsContent value="team" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Membres de l'équipe</CardTitle>
+                <CardDescription>
+                  Vue d'ensemble de tous les membres de votre organisation
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {teamMembers.map((member) => (
+                    <Card key={member.id} className="hover:shadow-lg transition-shadow">
+                      <CardContent className="p-4">
+                        <div className="text-center">
+                          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-3">
+                            {member.name?.charAt(0) || 'U'}
+                          </div>
+                          <h3 className="font-semibold">{member.name}</h3>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {member.job_title || 'Poste non défini'}
                           </p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(emotion.date).toLocaleDateString()}
-                          </p>
+                          <div className="space-y-2">
+                            <Badge 
+                              variant="outline" 
+                              className={member.role === 'b2b_admin' ? 'bg-purple-50 text-purple-600' : 'bg-green-50 text-green-600'}
+                            >
+                              {member.role === 'b2b_admin' ? 'Admin' : 'Collaborateur'}
+                            </Badge>
+                            {member.emotional_score && (
+                              <Badge variant="outline" className="text-xs">
+                                Bien-être: {member.emotional_score}%
+                              </Badge>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {emotion.emojis && (
-                          <span className="text-lg">{emotion.emojis}</span>
-                        )}
-                        <Badge 
-                          variant="outline" 
-                          className={getMoodColor(emotion.score)}
-                        >
-                          {getMoodLabel(emotion.score)}
-                        </Badge>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="wellness" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Tableau de bord bien-être</CardTitle>
+                <CardDescription>
+                  Analysez le bien-être général de votre organisation
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="font-semibold mb-4">Statistiques générales</h3>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span>Score moyen de bien-être</span>
+                        <span className="font-bold text-2xl">{stats.averageScore}%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Participation active</span>
+                        <span className="font-bold">85%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Tendance ce mois</span>
+                        <Badge className="bg-green-50 text-green-600">+5%</Badge>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-semibold mb-4">Actions recommandées</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <Award className="h-5 w-5 text-yellow-600" />
+                        <span className="text-sm">Organiser un événement team building</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Calendar className="h-5 w-5 text-blue-600" />
+                        <span className="text-sm">Planifier des sessions de formation</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <Target className="h-5 w-5 text-green-600" />
+                        <span className="text-sm">Définir des objectifs bien-être</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Paramètres de l'organisation</CardTitle>
+                <CardDescription>
+                  Configurez les paramètres sociaux de votre organisation
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold mb-2">Politique de groupes</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Définissez qui peut créer et gérer les groupes de discussion
+                    </p>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-2">
+                        <input type="checkbox" defaultChecked />
+                        <span className="text-sm">Seuls les admins peuvent créer des groupes</span>
+                      </label>
+                      <label className="flex items-center space-x-2">
+                        <input type="checkbox" />
+                        <span className="text-sm">Modération automatique des messages</span>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-semibold mb-2">Objectifs bien-être</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Définissez les objectifs de bien-être pour l'équipe
+                    </p>
+                    <Input 
+                      type="number" 
+                      placeholder="Score cible (%)" 
+                      defaultValue="75"
+                      className="max-w-xs"
+                    />
+                  </div>
+                  
+                  <Button>
+                    Sauvegarder les paramètres
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
