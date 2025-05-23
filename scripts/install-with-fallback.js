@@ -2,186 +2,157 @@
 #!/usr/bin/env node
 
 /**
- * Resilient installation script with multiple fallback strategies
- * This script attempts different package managers and installation methods
- * if the primary method fails due to timeouts or other issues
+ * Resilient installation script with fallback mechanisms
+ * - Tries bun install with longer timeout
+ * - Falls back to npm install if bun fails
+ * - Provides clear error messages and debugging info
  */
 
-const { execSync } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const fs = require('fs');
-const path = require('path');
 
-// Colors for console output
-const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-  cyan: '\x1b[36m',
-};
+console.log('🚀 Starting resilient installer...');
 
-console.log(`${colors.blue}📦 Starting resilient installation process${colors.reset}`);
+// Check for .npmrc and create optimal settings if needed
+if (!fs.existsSync('.npmrc')) {
+  console.log('📝 Creating optimized .npmrc file...');
+  const npmrcContent = `
+# Optimize installation process
+prefer-offline=true
+fund=false
+audit=false
+save-exact=true
+loglevel=error
+progress=false
 
-// Set environment variables to skip heavy downloads
+# Fast installation
+legacy-peer-deps=true
+auto-install-peers=true
+strict-peer-dependencies=false
+
+# Retry and timeout settings
+fetch-retries=5
+fetch-retry-mintimeout=20000
+fetch-retry-maxtimeout=120000
+network-timeout=300000
+`;
+  
+  fs.writeFileSync('.npmrc', npmrcContent.trim());
+  console.log('✅ Created optimized .npmrc');
+}
+
+// Set environment variables to optimize the installation
 process.env.CYPRESS_INSTALL_BINARY = '0';
 process.env.CYPRESS_SKIP_BINARY_INSTALL = '1';
 process.env.HUSKY_SKIP_INSTALL = '1';
 process.env.PUPPETEER_SKIP_DOWNLOAD = '1';
 process.env.NODE_OPTIONS = '--max-old-space-size=4096';
+console.log('📊 Set optimization environment variables');
 
-// Ensure .npmrc has proper settings
-function ensureNpmConfig() {
-  console.log(`${colors.cyan}🔧 Ensuring optimal npm configuration${colors.reset}`);
-  const npmrcPath = path.join(process.cwd(), '.npmrc');
-  
-  const requiredSettings = {
-    'cypress_skip_binary_install': '1',
-    'prefer-offline': 'true',
-    'fund': 'false',
-    'audit': 'false',
-    'loglevel': 'error',
-    'progress': 'false',
-    'legacy-peer-deps': 'true',
-    'auto-install-peers': 'true',
-    'strict-peer-dependencies': 'false',
-    'fetch-retries': '5',
-    'fetch-retry-mintimeout': '20000',
-    'fetch-retry-maxtimeout': '120000',
-    'network-timeout': '300000'
-  };
-  
-  let npmrcContent = '';
-  if (fs.existsSync(npmrcPath)) {
-    npmrcContent = fs.readFileSync(npmrcPath, 'utf8');
-  }
-  
-  let modified = false;
-  
-  // Add missing settings
-  for (const [key, value] of Object.entries(requiredSettings)) {
-    if (!npmrcContent.includes(`${key}=`)) {
-      npmrcContent += `\n${key}=${value}`;
-      modified = true;
-    }
-  }
-  
-  if (modified) {
-    fs.writeFileSync(npmrcPath, npmrcContent.trim());
-    console.log(`${colors.green}✅ Updated .npmrc with optimal settings${colors.reset}`);
-  } else {
-    console.log(`${colors.green}✓ .npmrc already has optimal settings${colors.reset}`);
-  }
-}
-
-// Installation strategies in order of preference
-const installationStrategies = [
-  {
-    name: 'Bun with chunked install',
-    command: 'bun install --no-summary --no-progress --no-audit',
-    timeout: 180000, // 3 minutes
-  },
-  {
-    name: 'Bun with frozen lockfile',
-    command: 'bun install --frozen-lockfile --no-summary --no-progress',
-    timeout: 180000,
-  },
-  {
-    name: 'NPM with minimal install',
-    command: 'npm ci --prefer-offline --no-audit --no-fund --loglevel=error',
-    timeout: 240000, // 4 minutes
-  },
-  {
-    name: 'NPM with legacy peer deps',
-    command: 'npm install --prefer-offline --no-audit --no-fund --legacy-peer-deps',
-    timeout: 300000, // 5 minutes
-  },
-  {
-    name: 'NPM with forced reinstall',
-    command: 'npm ci --force --no-audit --no-fund',
-    timeout: 360000, // 6 minutes
-  }
-];
-
-// Prepare the environment
-ensureNpmConfig();
-
-// Try installation strategies one by one until one succeeds
-async function tryInstallStrategies() {
-  for (let i = 0; i < installationStrategies.length; i++) {
-    const strategy = installationStrategies[i];
-    console.log(`\n${colors.magenta}🔄 Attempt ${i + 1}/${installationStrategies.length}: ${strategy.name}${colors.reset}`);
-    console.log(`${colors.cyan}$ ${strategy.command}${colors.reset}`);
+// Try bun install first with a longer timeout
+function tryBunInstall() {
+  return new Promise((resolve, reject) => {
+    console.log('🔄 Attempting bun install...');
     
-    try {
-      execSync(strategy.command, {
-        stdio: 'inherit',
-        timeout: strategy.timeout,
-        env: {
-          ...process.env,
-          NODE_OPTIONS: '--max-old-space-size=4096',
-        },
-      });
-      
-      console.log(`\n${colors.green}✅ Installation succeeded using ${strategy.name}${colors.reset}`);
-      return true;
-    } catch (error) {
-      console.error(`\n${colors.red}❌ Installation failed using ${strategy.name}:${colors.reset}`);
-      console.error(`${colors.yellow}${error.message}${colors.reset}`);
-      
-      if (i < installationStrategies.length - 1) {
-        console.log(`\n${colors.blue}↪ Trying next installation method...${colors.reset}`);
-      }
-    }
-  }
-  
-  console.error(`\n${colors.red}💥 All installation strategies failed!${colors.reset}`);
-  return false;
-}
-
-// Check if node_modules exists and has content
-function checkNodeModules() {
-  const nodeModulesPath = path.join(process.cwd(), 'node_modules');
-  if (fs.existsSync(nodeModulesPath)) {
-    try {
-      const dirs = fs.readdirSync(nodeModulesPath);
-      // If node_modules has content (more than just .bin and .cache directories)
-      const significantDirs = dirs.filter(dir => dir !== '.bin' && dir !== '.cache');
-      if (significantDirs.length > 0) {
-        return true;
-      }
-    } catch (e) {
-      return false;
-    }
-  }
-  return false;
-}
-
-// Main execution
-async function main() {
-  // Check if node_modules already exists with content
-  if (checkNodeModules()) {
-    console.log(`${colors.green}✅ node_modules already exists and seems to have content.${colors.reset}`);
-    console.log(`${colors.blue}📝 If you're having issues, try running with the --force flag to reinstall dependencies.${colors.reset}`);
+    const bunProcess = spawn('bun', ['install'], {
+      stdio: 'inherit',
+      env: { ...process.env }
+    });
     
-    // If we're not forced to reinstall, exit successfully
-    if (!process.argv.includes('--force')) {
-      return 0;
-    }
-    console.log(`${colors.magenta}🔄 --force flag detected, reinstalling dependencies...${colors.reset}`);
-  }
-  
-  const success = await tryInstallStrategies();
-  return success ? 0 : 1;
-}
-
-// Run the main function and exit with appropriate code
-main()
-  .then(exitCode => {
-    process.exit(exitCode);
-  })
-  .catch(error => {
-    console.error(`${colors.red}💥 Unexpected error:${colors.reset}`, error);
-    process.exit(1);
+    // Set a longer timeout (3 minutes)
+    const timeout = setTimeout(() => {
+      console.log('⚠️ bun install is taking too long, killing process...');
+      bunProcess.kill();
+      reject(new Error('bun install timed out after 3 minutes'));
+    }, 3 * 60 * 1000);
+    
+    bunProcess.on('exit', (code) => {
+      clearTimeout(timeout);
+      if (code === 0) {
+        console.log('✅ bun install completed successfully');
+        resolve();
+      } else {
+        console.log(`❌ bun install failed with code ${code}`);
+        reject(new Error(`bun install failed with code ${code}`));
+      }
+    });
+    
+    bunProcess.on('error', (err) => {
+      clearTimeout(timeout);
+      console.log(`❌ Error executing bun: ${err.message}`);
+      reject(err);
+    });
   });
+}
+
+// Fallback to npm install if bun fails
+function tryNpmInstall() {
+  return new Promise((resolve, reject) => {
+    console.log('🔄 Falling back to npm install...');
+    
+    const npmProcess = spawn('npm', ['install', '--prefer-offline', '--no-audit', '--no-fund', '--legacy-peer-deps'], {
+      stdio: 'inherit',
+      env: { ...process.env }
+    });
+    
+    // Set a longer timeout (5 minutes for npm)
+    const timeout = setTimeout(() => {
+      console.log('⚠️ npm install is taking too long, killing process...');
+      npmProcess.kill();
+      reject(new Error('npm install timed out after 5 minutes'));
+    }, 5 * 60 * 1000);
+    
+    npmProcess.on('exit', (code) => {
+      clearTimeout(timeout);
+      if (code === 0) {
+        console.log('✅ npm install completed successfully');
+        resolve();
+      } else {
+        console.log(`❌ npm install failed with code ${code}`);
+        reject(new Error(`npm install failed with code ${code}`));
+      }
+    });
+    
+    npmProcess.on('error', (err) => {
+      clearTimeout(timeout);
+      console.log(`❌ Error executing npm: ${err.message}`);
+      reject(err);
+    });
+  });
+}
+
+// Try bun install, then npm install as fallback
+async function install() {
+  try {
+    // Check if bun is available
+    try {
+      execSync('bun --version', { stdio: 'ignore' });
+      await tryBunInstall();
+    } catch (bunError) {
+      console.log('⚠️ Bun installation failed or bun is not available.');
+      await tryNpmInstall();
+    }
+    
+    console.log('🎉 Installation completed successfully!');
+    process.exit(0);
+  } catch (error) {
+    console.error('💥 All installation attempts failed!');
+    console.error(error.message);
+    
+    // Provide diagnostic information
+    console.log('\n🔍 Diagnostic information:');
+    try {
+      console.log('Node version:', process.version);
+      console.log('Platform:', process.platform);
+      console.log('Free memory:', Math.round(require('os').freemem() / 1024 / 1024) + 'MB');
+      console.log('Network connectivity:', execSync('ping -c 1 registry.npmjs.org || ping -n 1 registry.npmjs.org').toString());
+    } catch (e) {
+      console.log('Could not get all diagnostic information');
+    }
+    
+    process.exit(1);
+  }
+}
+
+// Start the installation process
+install();
