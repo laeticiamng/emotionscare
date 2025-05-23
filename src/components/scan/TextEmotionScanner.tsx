@@ -1,150 +1,133 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { EmotionResult } from '@/types/emotion';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import useOpenAI from '@/hooks/api/useOpenAI';
 import useHumeAI from '@/hooks/api/useHumeAI';
 
 interface TextEmotionScannerProps {
   onScanComplete: (result: EmotionResult) => void;
-  onCancel?: () => void;
-  isProcessing?: boolean;
-  setIsProcessing?: (isProcessing: boolean) => void;
+  onCancel: () => void;
+  isProcessing: boolean;
+  setIsProcessing: (processing: boolean) => void;
 }
 
 const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
   onScanComplete,
   onCancel,
-  isProcessing: externalProcessing,
-  setIsProcessing: setExternalProcessing = () => {},
+  isProcessing,
+  setIsProcessing
 }) => {
   const [text, setText] = useState('');
-  const [internalProcessing, setInternalProcessing] = useState(false);
+  const { analyzeTextEmotion, isAnalyzing } = useHumeAI();
   
-  const isProcessing = externalProcessing !== undefined ? externalProcessing : internalProcessing;
-  const setIsProcessing = setExternalProcessing || setInternalProcessing;
-  
-  const { analyzeEmotion } = useOpenAI();
-  const { analyzeTextEmotion } = useHumeAI();
-
-  const handleSubmit = async () => {
+  const handleAnalyze = async () => {
     if (!text.trim()) {
-      toast.error('Veuillez entrer un texte pour analyser vos émotions');
+      toast.error('Veuillez saisir du texte à analyser');
       return;
     }
-
+    
+    if (text.trim().length < 10) {
+      toast.error('Veuillez saisir au moins 10 caractères pour une analyse précise');
+      return;
+    }
+    
     setIsProcessing(true);
-
+    
     try {
-      let result: EmotionResult;
-      
-      // Try using HumeAI first
-      try {
-        const humeResult = await analyzeTextEmotion(text);
-        if (humeResult) {
-          result = humeResult;
-        } else {
-          // Fallback to OpenAI
-          const openAIResult = await analyzeEmotion(text);
-          if (!openAIResult) {
-            throw new Error('Failed to analyze emotion');
-          }
-          
-          // Convert OpenAI result to EmotionResult format
-          result = {
-            emotion: openAIResult.primaryEmotion || 'neutral',
-            intensity: openAIResult.detailedScore ? 
-              (openAIResult.detailedScore[openAIResult.primaryEmotion || 'neutral'] || 0.5) : 0.5,
-            source: 'text',
-            text: text,
-            score: Math.round((openAIResult.detailedScore ? 
-              (openAIResult.detailedScore[openAIResult.primaryEmotion || 'neutral'] || 0.5) : 0.5) * 100),
-            ai_feedback: openAIResult.suggestions ? openAIResult.suggestions.join(' ') : 
-              'Merci de partager vos émotions. Continuez à être attentif à votre bien-être émotionnel.'
-          };
-        }
-      } catch (error) {
-        console.error('Error with HumeAI and OpenAI analysis:', error);
-        
-        // Generate a mock result as final fallback
-        const sentimentScore = Math.random() * 100;
-        let emotion = 'neutral';
-        let feedback = 'Merci de partager vos émotions.';
-        
-        if (sentimentScore > 70) {
-          emotion = 'joy';
-          feedback = 'Je perçois des émotions positives dans votre texte. C\'est super de vous voir dans cet état d\'esprit!';
-        } else if (sentimentScore < 30) {
-          emotion = 'sadness';
-          feedback = 'Je perçois que vous pourriez vous sentir un peu bas. N\'hésitez pas à prendre soin de vous aujourd\'hui.';
-        } else {
-          feedback = 'Votre état émotionnel semble équilibré. Continuez à être attentif à vos émotions.';
-        }
-        
-        result = {
-          emotion: emotion,
-          intensity: sentimentScore / 100,
-          source: 'text',
-          text: text,
-          score: Math.round(sentimentScore),
-          ai_feedback: feedback
-        };
+      const result = await analyzeTextEmotion(text.trim());
+      if (result) {
+        onScanComplete(result);
+        toast.success('Analyse textuelle terminée');
       }
-      
-      onScanComplete(result);
     } catch (error) {
-      console.error('Error processing emotion:', error);
-      toast.error('Une erreur est survenue lors de l\'analyse');
+      console.error('Erreur lors de l\'analyse du texte:', error);
+      toast.error('Erreur lors de l\'analyse du texte');
     } finally {
       setIsProcessing(false);
     }
   };
-
+  
+  const suggestedPrompts = [
+    "Je me sens vraiment bien aujourd'hui, plein d'énergie pour affronter la journée.",
+    "J'ai des difficultés à me concentrer et je me sens un peu démotivé ces derniers temps.",
+    "Je suis excité par ce nouveau projet qui démarre bientôt.",
+    "Je me sens stressé par toutes ces échéances qui arrivent."
+  ];
+  
+  const handlePromptClick = (prompt: string) => {
+    setText(prompt);
+  };
+  
   return (
-    <div className="space-y-4">
-      <div className="text-center mb-2">
-        <p>
-          Décrivez comment vous vous sentez actuellement. Soyez aussi détaillé que possible.
-        </p>
-      </div>
-
-      <Textarea
-        placeholder="Je me sens..."
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        disabled={isProcessing}
-        className="min-h-[120px]"
-      />
-
-      <div className="flex justify-between pt-2">
-        {onCancel && (
+    <Card>
+      <CardHeader>
+        <CardTitle>Analyse textuelle</CardTitle>
+        <CardDescription>
+          Décrivez vos sentiments et émotions actuelles pour une analyse personnalisée
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="emotion-text">Comment vous sentez-vous ?</Label>
+          <Textarea
+            id="emotion-text"
+            placeholder="Décrivez vos émotions, votre humeur, ce que vous ressentez en ce moment..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="min-h-32"
+            disabled={isProcessing || isAnalyzing}
+          />
+          <div className="text-xs text-muted-foreground">
+            {text.length}/500 caractères • Minimum 10 caractères requis
+          </div>
+        </div>
+        
+        <div className="space-y-3">
+          <Label className="text-sm">Suggestions pour vous aider :</Label>
+          <div className="grid gap-2">
+            {suggestedPrompts.map((prompt, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                className="h-auto p-3 text-left justify-start text-wrap"
+                onClick={() => handlePromptClick(prompt)}
+                disabled={isProcessing || isAnalyzing}
+              >
+                <span className="text-sm">{prompt}</span>
+              </Button>
+            ))}
+          </div>
+        </div>
+        
+        <div className="flex justify-between pt-4">
           <Button 
             variant="outline" 
-            onClick={onCancel}
-            disabled={isProcessing}
+            onClick={onCancel} 
+            disabled={isProcessing || isAnalyzing}
           >
             Annuler
           </Button>
-        )}
-        <Button 
-          onClick={handleSubmit}
-          disabled={isProcessing || !text.trim()}
-          className="ml-auto"
-        >
-          {isProcessing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyse...
-            </>
-          ) : (
-            'Analyser'
-          )}
-        </Button>
-      </div>
-    </div>
+          <Button 
+            onClick={handleAnalyze} 
+            disabled={isProcessing || isAnalyzing || text.trim().length < 10}
+          >
+            {isProcessing || isAnalyzing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Analyse en cours...
+              </>
+            ) : (
+              'Analyser mon texte'
+            )}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

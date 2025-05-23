@@ -1,154 +1,151 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmotionResult } from '@/types/emotion';
-import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
 
 interface EmojiEmotionScannerProps {
   onScanComplete: (result: EmotionResult) => void;
-  onCancel?: () => void;
-  onProcessingChange?: (isProcessing: boolean) => void;
+  onCancel: () => void;
+  onProcessingChange: (processing: boolean) => void;
 }
 
 const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
   onScanComplete,
   onCancel,
-  onProcessingChange = () => {},
+  onProcessingChange
 }) => {
   const [selectedEmojis, setSelectedEmojis] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-
-  const emojis = [
-    { emoji: '😊', name: 'Joyeux' },
-    { emoji: '🙂', name: 'Content' },
-    { emoji: '😐', name: 'Neutre' },
-    { emoji: '😔', name: 'Triste' },
-    { emoji: '😢', name: 'Pleurs' },
-    { emoji: '😡', name: 'Colère' },
-    { emoji: '😠', name: 'Agacé' },
-    { emoji: '😤', name: 'Frustré' },
-    { emoji: '😨', name: 'Peur' },
-    { emoji: '😰', name: 'Anxieux' },
-    { emoji: '😳', name: 'Gêné' },
-    { emoji: '🤔', name: 'Pensif' },
-    { emoji: '😴', name: 'Fatigué' },
-    { emoji: '🥱', name: 'Ennuyé' },
-    { emoji: '🤗', name: 'Réconforté' },
-    { emoji: '🥰', name: 'Aimé' },
-    { emoji: '😎', name: 'Cool' },
-    { emoji: '🤯', name: 'Dépassé' },
-    { emoji: '😵', name: 'Confus' },
-    { emoji: '🙄', name: 'Exaspéré' },
+  
+  const emotionEmojis = [
+    { emoji: '😊', emotion: 'joy', label: 'Joie' },
+    { emoji: '😢', emotion: 'sadness', label: 'Tristesse' },
+    { emoji: '😠', emotion: 'anger', label: 'Colère' },
+    { emoji: '😰', emotion: 'fear', label: 'Peur' },
+    { emoji: '😲', emotion: 'surprise', label: 'Surprise' },
+    { emoji: '🤢', emotion: 'disgust', label: 'Dégoût' },
+    { emoji: '😌', emotion: 'calm', label: 'Calme' },
+    { emoji: '🤗', emotion: 'love', label: 'Amour' },
+    { emoji: '😴', emotion: 'tired', label: 'Fatigue' },
+    { emoji: '🤔', emotion: 'thinking', label: 'Réflexion' },
+    { emoji: '😎', emotion: 'confident', label: 'Confiance' },
+    { emoji: '🥳', emotion: 'celebration', label: 'Célébration' },
+    { emoji: '😤', emotion: 'frustration', label: 'Frustration' },
+    { emoji: '🙄', emotion: 'annoyance', label: 'Agacement' },
+    { emoji: '😇', emotion: 'peaceful', label: 'Paix' },
+    { emoji: '🤩', emotion: 'amazed', label: 'Émerveillement' }
   ];
-
-  const handleEmojiSelect = (emoji: string) => {
+  
+  const handleEmojiClick = (emoji: string) => {
     if (selectedEmojis.includes(emoji)) {
-      setSelectedEmojis(selectedEmojis.filter((e) => e !== emoji));
-    } else if (selectedEmojis.length < 3) {
-      setSelectedEmojis([...selectedEmojis, emoji]);
+      setSelectedEmojis(selectedEmojis.filter(e => e !== emoji));
     } else {
-      toast.info('Vous pouvez sélectionner un maximum de 3 émojis');
+      setSelectedEmojis([...selectedEmojis, emoji]);
     }
   };
-
-  const handleSubmit = async () => {
+  
+  const handleAnalyze = async () => {
     if (selectedEmojis.length === 0) {
       toast.error('Veuillez sélectionner au moins un emoji');
       return;
     }
-
+    
     setIsProcessing(true);
     onProcessingChange(true);
-
+    
     try {
-      // Simulate processing time
+      // Simuler l'analyse
       await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Calculate a mock score based on the selected emojis
-      const happyEmojis = ['😊', '🙂', '🤗', '🥰', '😎'];
-      const neutralEmojis = ['😐', '🤔', '😳', '😴', '🥱', '😵'];
-      const sadEmojis = ['😔', '😢', '😡', '😠', '😤', '😨', '😰', '🤯', '🙄'];
       
-      let emotionScore = 50; // Default neutral score
+      // Analyser les emojis sélectionnés
+      const selectedEmojiData = emotionEmojis.filter(item => 
+        selectedEmojis.includes(item.emoji)
+      );
       
-      selectedEmojis.forEach(emoji => {
-        if (happyEmojis.includes(emoji)) {
-          emotionScore += 15;
-        } else if (sadEmojis.includes(emoji)) {
-          emotionScore -= 15;
-        }
-      });
+      // Déterminer l'émotion dominante
+      const dominantEmotion = selectedEmojiData[0]?.emotion || 'neutral';
+      const intensity = selectedEmojis.length > 1 ? 0.8 : 0.6;
       
-      // Ensure score is between 0 and 100
-      emotionScore = Math.max(0, Math.min(100, emotionScore));
+      // Générer un feedback basé sur les emojis sélectionnés
+      let feedback = '';
+      if (selectedEmojis.length === 1) {
+        const emojiData = selectedEmojiData[0];
+        feedback = `Vous avez choisi ${emojiData.emoji} (${emojiData.label}). Cela reflète votre état émotionnel actuel.`;
+      } else {
+        feedback = `Vous avez sélectionné plusieurs emojis (${selectedEmojis.join(' ')}), ce qui suggère un mélange d'émotions. C'est tout à fait normal !`;
+      }
       
       const result: EmotionResult = {
-        emotion: selectedEmojis.join(''),
-        intensity: emotionScore / 100,
+        emotion: dominantEmotion,
+        intensity,
         source: 'emoji',
-        emojis: selectedEmojis.join(''),
-        score: emotionScore,
-        ai_feedback: `Je détecte que vous vous sentez ${emotionScore > 70 ? 'plutôt bien' : emotionScore < 30 ? 'assez mal' : 'modérément bien'}. Prenez un moment pour réfléchir à ce qui influence votre humeur aujourd'hui.`
+        score: Math.round(intensity * 100),
+        emojis: selectedEmojis.join(' '),
+        ai_feedback: feedback,
+        date: new Date().toISOString()
       };
       
       onScanComplete(result);
+      toast.success('Analyse des emojis terminée');
     } catch (error) {
-      console.error('Error processing emotion:', error);
-      toast.error('Une erreur est survenue lors de l\'analyse');
+      console.error('Erreur lors de l\'analyse des emojis:', error);
+      toast.error('Erreur lors de l\'analyse des emojis');
     } finally {
       setIsProcessing(false);
       onProcessingChange(false);
     }
   };
-
+  
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-4">
-        <p>Sélectionnez jusqu'à 3 émojis qui représentent le mieux votre état émotionnel actuel</p>
-      </div>
-
-      <div className="grid grid-cols-5 gap-3 sm:grid-cols-10">
-        {emojis.map(({ emoji, name }) => (
-          <Button
-            key={emoji}
-            variant={selectedEmojis.includes(emoji) ? "default" : "outline"}
-            className="h-12 text-xl sm:text-2xl"
-            onClick={() => handleEmojiSelect(emoji)}
-            disabled={isProcessing}
-            title={name}
-          >
-            {emoji}
-          </Button>
-        ))}
-      </div>
-
-      <div className="flex justify-between pt-4">
-        {onCancel && (
-          <Button 
-            variant="outline" 
-            onClick={onCancel}
-            disabled={isProcessing}
-          >
+    <Card>
+      <CardHeader>
+        <CardTitle>Sélection d'emojis</CardTitle>
+        <CardDescription>
+          Choisissez les emojis qui représentent le mieux votre état émotionnel actuel
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3">
+          {emotionEmojis.map((item) => (
+            <Button
+              key={item.emoji}
+              variant={selectedEmojis.includes(item.emoji) ? "default" : "outline"}
+              className="h-16 w-16 text-2xl p-0"
+              onClick={() => handleEmojiClick(item.emoji)}
+              title={item.label}
+            >
+              {item.emoji}
+            </Button>
+          ))}
+        </div>
+        
+        {selectedEmojis.length > 0 && (
+          <div className="p-4 bg-muted/30 rounded-md">
+            <p className="text-sm font-medium mb-2">Emojis sélectionnés :</p>
+            <div className="text-3xl">{selectedEmojis.join(' ')}</div>
+          </div>
+        )}
+        
+        <div className="flex justify-between pt-4">
+          <Button variant="outline" onClick={onCancel} disabled={isProcessing}>
             Annuler
           </Button>
-        )}
-        <Button 
-          onClick={handleSubmit}
-          disabled={isProcessing || selectedEmojis.length === 0}
-          className="ml-auto"
-        >
-          {isProcessing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyse...
-            </>
-          ) : (
-            'Analyser'
-          )}
-        </Button>
-      </div>
-    </div>
+          <Button onClick={handleAnalyze} disabled={isProcessing || selectedEmojis.length === 0}>
+            {isProcessing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Analyse...
+              </>
+            ) : (
+              'Analyser mes emojis'
+            )}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

@@ -1,238 +1,240 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmotionResult } from '@/types/emotion';
-import { Camera, Image, RefreshCw, Loader2 } from 'lucide-react';
+import { Camera, Upload, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import useHumeAI from '@/hooks/api/useHumeAI';
 
 interface FacialEmotionScannerProps {
   onScanComplete: (result: EmotionResult) => void;
-  onCancel?: () => void;
+  onCancel: () => void;
 }
 
 const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({
   onScanComplete,
-  onCancel,
+  onCancel
 }) => {
-  const [image, setImage] = useState<string | null>(null);
-  const [capturedImage, setCapturedImage] = useState<Blob | null>(null);
-  const [isCameraActive, setIsCameraActive] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const { analyzeFacialEmotion, isAnalyzing } = useHumeAI();
   
-  // Initialize camera
+  // Démarrer la caméra
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 640 }, 
+          height: { ideal: 480 },
+          facingMode: 'user'
+        } 
+      });
+      setStream(mediaStream);
+      
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        setIsCameraActive(true);
+        videoRef.current.srcObject = mediaStream;
+        await videoRef.current.play();
       }
+      
+      setIsCapturing(true);
+      toast.success('Caméra activée. Positionnez votre visage dans le cadre.');
     } catch (error) {
-      console.error('Error accessing camera:', error);
-      toast.error('Impossible d\'accéder à la caméra');
+      console.error('Erreur d\'accès à la caméra:', error);
+      toast.error('Impossible d\'accéder à la caméra. Veuillez vérifier les permissions.');
     }
   };
   
-  // Stop camera
+  // Arrêter la caméra
   const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-      tracks.forEach(track => track.stop());
-      videoRef.current.srcObject = null;
-      setIsCameraActive(false);
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
     }
+    setIsCapturing(false);
   };
   
-  // Capture image from camera
-  const captureImage = () => {
-    if (videoRef.current) {
-      const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(videoRef.current, 0, 0);
-        canvas.toBlob(blob => {
-          if (blob) {
-            setCapturedImage(blob);
-            setImage(URL.createObjectURL(blob));
-            stopCamera();
-          }
-        }, 'image/jpeg');
-      }
-    }
-  };
+  // Capturer une photo
+  const capturePhoto = useCallback(() => {
+    if (!videoRef.current || !canvasRef.current) return;
+    
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    const context = canvas.getContext('2d');
+    
+    if (!context) return;
+    
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Dessiner l'image du video sur le canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Convertir en data URL
+    const imageData = canvas.toDataURL('image/jpeg', 0.8);
+    setCapturedImage(imageData);
+    
+    // Arrêter la caméra
+    stopCamera();
+    
+    toast.success('Photo capturée avec succès');
+  }, [stream]);
   
-  // Handle file upload
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setCapturedImage(file);
-      setImage(URL.createObjectURL(file));
-    }
-  };
-  
-  // Reset captured image and restart camera
-  const resetImage = () => {
-    if (image) {
-      URL.revokeObjectURL(image);
-    }
-    setImage(null);
-    setCapturedImage(null);
-    startCamera();
-  };
-  
-  // Analyze emotion
-  const handleAnalyze = async () => {
-    if (!capturedImage) {
-      toast.error('Veuillez capturer ou télécharger une image');
+  // Gérer l'upload de fichier
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      toast.error('Veuillez sélectionner une image valide');
       return;
     }
     
-    setIsProcessing(true);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      setCapturedImage(result);
+      toast.success('Image chargée avec succès');
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  // Analyser l'image
+  const handleAnalyze = async () => {
+    if (!capturedImage) {
+      toast.error('Aucune image à analyser');
+      return;
+    }
     
     try {
       const result = await analyzeFacialEmotion(capturedImage);
       if (result) {
         onScanComplete(result);
-      } else {
-        toast.error('Erreur lors de l\'analyse de l\'image');
+        toast.success('Analyse faciale terminée');
       }
     } catch (error) {
-      console.error('Error analyzing image:', error);
-      toast.error('Erreur lors de l\'analyse de l\'image');
-    } finally {
-      setIsProcessing(false);
+      console.error('Erreur lors de l\'analyse faciale:', error);
+      toast.error('Erreur lors de l\'analyse faciale');
     }
   };
   
-  // Clean up on unmount
-  React.useEffect(() => {
-    return () => {
-      stopCamera();
-      if (image) {
-        URL.revokeObjectURL(image);
-      }
-    };
-  }, [image]);
+  // Reprendre une photo
+  const retakePhoto = () => {
+    setCapturedImage(null);
+    startCamera();
+  };
   
   return (
-    <div className="space-y-4">
-      <div className="text-center mb-2">
-        <p>
-          Prenez une photo de votre visage ou téléchargez une image pour analyser votre expression faciale.
-        </p>
-      </div>
-      
-      <div className="flex flex-col items-center space-y-4">
-        {!image ? (
-          <>
-            {!isCameraActive ? (
-              <div className="w-full max-w-sm aspect-video bg-muted rounded-lg flex flex-col items-center justify-center p-4">
-                <Button 
-                  variant="outline"
-                  className="mb-4"
-                  onClick={startCamera}
-                >
-                  <Camera className="mr-2 h-4 w-4" />
-                  Activer la caméra
-                </Button>
-                
-                <div className="flex items-center">
-                  <p className="text-sm text-muted-foreground">ou</p>
-                </div>
-                
-                <Button 
-                  variant="outline"
-                  className="mt-4"
-                  asChild
-                >
-                  <label>
-                    <Image className="mr-2 h-4 w-4" />
-                    Télécharger une image
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      className="hidden" 
-                      onChange={handleFileUpload}
-                    />
-                  </label>
-                </Button>
-              </div>
-            ) : (
-              <div className="relative w-full max-w-sm">
-                <video 
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  className="w-full rounded-lg"
-                />
-                
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                  <Button onClick={captureImage}>
-                    Prendre une photo
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={stopCamera}
-                  >
-                    Annuler
-                  </Button>
-                </div>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="relative w-full max-w-sm">
-            <img 
-              src={image} 
-              alt="Captured" 
-              className="w-full rounded-lg"
-            />
-            
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-              <Button 
-                variant="outline"
-                onClick={resetImage}
-                disabled={isProcessing || isAnalyzing}
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Recommencer
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-      
-      <div className="flex justify-between pt-4">
-        {onCancel && (
-          <Button 
-            variant="outline" 
-            onClick={onCancel}
-            disabled={isProcessing || isAnalyzing}
-          >
-            Annuler
-          </Button>
-        )}
-        <Button 
-          onClick={handleAnalyze}
-          disabled={isProcessing || isAnalyzing || !image}
-          className="ml-auto"
-        >
-          {isProcessing || isAnalyzing ? (
+    <Card>
+      <CardHeader>
+        <CardTitle>Analyse faciale</CardTitle>
+        <CardDescription>
+          Capturez votre visage pour analyser vos expressions émotionnelles
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="flex flex-col items-center space-y-4">
+          {!capturedImage ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyse...
+              {isCapturing ? (
+                <div className="relative">
+                  <video
+                    ref={videoRef}
+                    className="w-full max-w-md rounded-lg border"
+                    autoPlay
+                    playsInline
+                    muted
+                  />
+                  <div className="absolute inset-0 border-2 border-dashed border-primary rounded-lg pointer-events-none" />
+                </div>
+              ) : (
+                <div className="w-full max-w-md h-64 bg-muted/30 border-2 border-dashed border-muted-foreground/25 rounded-lg flex items-center justify-center">
+                  <div className="text-center space-y-2">
+                    <Camera className="h-12 w-12 text-muted-foreground mx-auto" />
+                    <p className="text-muted-foreground">Aucune image capturée</p>
+                  </div>
+                </div>
+              )}
+              
+              <canvas ref={canvasRef} className="hidden" />
+              
+              <div className="flex gap-2">
+                {!isCapturing ? (
+                  <>
+                    <Button onClick={startCamera}>
+                      <Camera className="mr-2 h-4 w-4" />
+                      Activer la caméra
+                    </Button>
+                    <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+                      <Upload className="mr-2 h-4 w-4" />
+                      Charger une photo
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button onClick={capturePhoto}>
+                      <Camera className="mr-2 h-4 w-4" />
+                      Capturer
+                    </Button>
+                    <Button variant="outline" onClick={stopCamera}>
+                      Annuler
+                    </Button>
+                  </>
+                )}
+              </div>
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
             </>
           ) : (
-            'Analyser'
+            <>
+              <img
+                src={capturedImage}
+                alt="Photo capturée"
+                className="w-full max-w-md rounded-lg border"
+              />
+              
+              <div className="flex gap-2">
+                <Button onClick={retakePhoto} variant="outline">
+                  Reprendre
+                </Button>
+                <Button onClick={handleAnalyze} disabled={isAnalyzing}>
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Analyse...
+                    </>
+                  ) : (
+                    'Analyser'
+                  )}
+                </Button>
+              </div>
+            </>
           )}
-        </Button>
-      </div>
-    </div>
+        </div>
+        
+        <div className="text-xs text-muted-foreground text-center">
+          <p>Assurez-vous d'être dans un environnement bien éclairé pour une meilleure analyse.</p>
+          <p>Votre image est traitée localement et n'est pas stockée.</p>
+        </div>
+        
+        <div className="flex justify-between pt-4">
+          <Button variant="outline" onClick={onCancel}>
+            Annuler
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

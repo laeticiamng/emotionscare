@@ -1,294 +1,159 @@
 
-import React, { lazy } from 'react';
-import { Navigate, RouteObject } from 'react-router-dom';
-import ProtectedLayout from '@/components/ProtectedLayout';
-import B2CLayout from '@/layouts/B2CLayout';
-import AuthLayout from '@/layouts/AuthLayout';
+import React from 'react';
+import { RouteObject } from 'react-router-dom';
 
-// Layouts
-const AppLayout = lazy(() => import('@/layouts/AppLayout'));
-const B2BAdminLayout = lazy(() => import('@/layouts/B2BAdminLayout'));
-
-// Pages communes
-const HomePage = lazy(() => import('@/pages/HomePage'));
-const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
-const B2BSelectionPage = lazy(() => import('@/pages/auth/B2BSelectionPage'));
-const DashboardRedirect = lazy(() => import('@/pages/DashboardRedirect'));
+// Pages d'authentification et communes
+const LandingPage = React.lazy(() => import('./pages/LandingPage'));
+const ChooseModePage = React.lazy(() => import('./pages/auth/ChooseModePage'));
+const B2BSelectionPage = React.lazy(() => import('./pages/common/B2BSelection'));
+const ForgotPasswordPage = React.lazy(() => import('./pages/auth/ForgotPasswordPage'));
+const ResetPasswordPage = React.lazy(() => import('./pages/auth/ResetPasswordPage'));
+const DashboardRedirect = React.lazy(() => import('./pages/DashboardRedirect'));
+const ProfilePage = React.lazy(() => import('./pages/common/ProfilePage'));
+const SettingsPage = React.lazy(() => import('./pages/common/SettingsPage'));
+const BillingPage = React.lazy(() => import('./pages/common/BillingPage'));
+const NotFoundPage = React.lazy(() => import('./pages/common/NotFoundPage'));
 
 // Pages B2C
-const B2CLogin = lazy(() => import('@/pages/b2c/Login'));
-const B2CRegister = lazy(() => import('@/pages/b2c/Register'));
-const B2CResetPassword = lazy(() => import('@/pages/b2c/ResetPassword'));
-const B2CDashboard = lazy(() => import('@/pages/dashboards/B2CDashboard'));
-const B2COnboarding = lazy(() => import('@/pages/b2c/Onboarding'));
-const ScanPage = lazy(() => import('@/pages/ScanPage'));
-const VRPage = lazy(() => import('@/pages/VRPage'));
-const JournalPage = lazy(() => import('@/pages/JournalPage'));
-const MusicPage = lazy(() => import('@/pages/MusicPage'));
-const CoachPage = lazy(() => import('@/pages/CoachPage'));
+const B2CLoginPage = React.lazy(() => import('./pages/b2c/auth/B2CLoginPage'));
+const B2CRegisterPage = React.lazy(() => import('./pages/b2c/auth/B2CRegisterPage'));
+const B2CResetPasswordPage = React.lazy(() => import('./pages/b2c/auth/B2CResetPasswordPage'));
+const B2CDashboardPage = React.lazy(() => import('./pages/b2c/dashboard/B2CDashboardPage'));
+const B2COnboardingPage = React.lazy(() => import('./pages/b2c/onboarding/B2COnboardingPage'));
+const B2CSocialPage = React.lazy(() => import('./pages/b2c/social/B2CSocialPage'));
+const B2CScanPage = React.lazy(() => import('./pages/b2c/scan/B2CScanPage'));
 
 // Pages B2B User
-const B2BUserLogin = lazy(() => import('@/pages/b2b/user/Login'));
-const B2BUserRegister = lazy(() => import('@/pages/b2b/user/Register'));
-const B2BUserDashboard = lazy(() => import('@/pages/dashboards/B2BUserDashboard'));
+const B2BUserLoginPage = React.lazy(() => import('./pages/b2b/user/auth/B2BUserLoginPage'));
+const B2BUserRegisterPage = React.lazy(() => import('./pages/b2b/user/auth/B2BUserRegisterPage'));
+const B2BUserDashboardPage = React.lazy(() => import('./pages/b2b/user/dashboard/B2BUserDashboardPage'));
+const B2BUserSocialPage = React.lazy(() => import('./pages/b2b/user/social/B2BUserSocialPage'));
+const B2BUserScanPage = React.lazy(() => import('./pages/b2b/user/scan/B2BUserScanPage'));
 
 // Pages B2B Admin
-const B2BAdminLogin = lazy(() => import('@/pages/b2b/admin/Login'));
-const B2BAdminDashboard = lazy(() => import('@/pages/dashboards/B2BAdminDashboard'));
-
-// Pages sociales
-const SocialPage = lazy(() => import('@/pages/Social'));
+const B2BAdminLoginPage = React.lazy(() => import('./pages/b2b/admin/auth/B2BAdminLoginPage'));
+const B2BAdminDashboardPage = React.lazy(() => import('./pages/b2b/admin/dashboard/B2BAdminDashboardPage'));
+const B2BAdminSocialPage = React.lazy(() => import('./pages/b2b/admin/social/B2BAdminSocialPage'));
+const B2BAdminUsersPage = React.lazy(() => import('./pages/b2b/admin/users/B2BAdminUsersPage'));
+const B2BAdminTeamsPage = React.lazy(() => import('./pages/b2b/admin/teams/B2BAdminTeamsPage'));
 
 const routes: RouteObject[] = [
-  // Routes publiques
   {
     path: '/',
-    element: <HomePage />,
+    element: <LandingPage />,
+  },
+  {
+    path: '/dashboard',
+    element: <DashboardRedirect />,
+  },
+  {
+    path: '/profile',
+    element: <ProfilePage />,
+  },
+  {
+    path: '/settings',
+    element: <SettingsPage />,
+  },
+  {
+    path: '/billing',
+    element: <BillingPage />,
   },
   {
     path: '/choose-mode',
     element: <ChooseModePage />,
   },
   {
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />,
+  },
+  {
+    path: '/reset-password',
+    element: <ResetPasswordPage />,
+  },
+  {
     path: '/b2b/selection',
     element: <B2BSelectionPage />,
   },
   
-  // Redirections
-  {
-    path: '/dashboard',
-    element: <DashboardRedirect />,
-  },
-  
   // Routes B2C
   {
-    path: '/b2c',
-    element: <ProtectedLayout />,
-    children: [
-      {
-        path: '',
-        element: <Navigate to="/b2c/dashboard" replace />
-      },
-      {
-        path: 'login',
-        element: <AuthLayout><B2CLogin /></AuthLayout>
-      },
-      {
-        path: 'register',
-        element: <AuthLayout><B2CRegister /></AuthLayout>
-      },
-      {
-        path: 'reset-password',
-        element: <AuthLayout><B2CResetPassword /></AuthLayout>
-      },
-      {
-        path: 'dashboard',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <B2CDashboard />
-          }
-        ]
-      },
-      {
-        path: 'onboarding',
-        element: <B2COnboarding />
-      },
-      {
-        path: 'scan',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <ScanPage />
-          }
-        ]
-      },
-      {
-        path: 'vr',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <VRPage />
-          }
-        ]
-      },
-      {
-        path: 'journal',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <JournalPage />
-          }
-        ]
-      },
-      {
-        path: 'music',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <MusicPage />
-          }
-        ]
-      },
-      {
-        path: 'coach',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <CoachPage />
-          }
-        ]
-      },
-      {
-        path: 'social',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <SocialPage />
-          }
-        ]
-      }
-    ]
+    path: '/b2c/login',
+    element: <B2CLoginPage />,
+  },
+  {
+    path: '/b2c/register',
+    element: <B2CRegisterPage />,
+  },
+  {
+    path: '/b2c/reset-password',
+    element: <B2CResetPasswordPage />,
+  },
+  {
+    path: '/b2c/dashboard',
+    element: <B2CDashboardPage />,
+  },
+  {
+    path: '/b2c/onboarding',
+    element: <B2COnboardingPage />,
+  },
+  {
+    path: '/b2c/social',
+    element: <B2CSocialPage />,
+  },
+  {
+    path: '/b2c/scan',
+    element: <B2CScanPage />,
   },
   
   // Routes B2B User
   {
-    path: '/b2b/user',
-    element: <ProtectedLayout />,
-    children: [
-      {
-        path: '',
-        element: <Navigate to="/b2b/user/dashboard" replace />
-      },
-      {
-        path: 'login',
-        element: <AuthLayout><B2BUserLogin /></AuthLayout>
-      },
-      {
-        path: 'register',
-        element: <AuthLayout><B2BUserRegister /></AuthLayout>
-      },
-      {
-        path: 'dashboard',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <B2BUserDashboard />
-          }
-        ]
-      },
-      {
-        path: 'scan',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <ScanPage />
-          }
-        ]
-      },
-      {
-        path: 'vr',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <VRPage />
-          }
-        ]
-      },
-      {
-        path: 'journal',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <JournalPage />
-          }
-        ]
-      },
-      {
-        path: 'music',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <MusicPage />
-          }
-        ]
-      },
-      {
-        path: 'social',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <SocialPage />
-          }
-        ]
-      },
-      {
-        path: 'cocon',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <CoachPage specialMode="cocon" />
-          }
-        ]
-      },
-      {
-        path: 'team-challenges',
-        element: <B2CLayout />,
-        children: [
-          {
-            path: '',
-            element: <SocialPage teamView={true} />
-          }
-        ]
-      }
-    ]
+    path: '/b2b/user/login',
+    element: <B2BUserLoginPage />,
+  },
+  {
+    path: '/b2b/user/register',
+    element: <B2BUserRegisterPage />,
+  },
+  {
+    path: '/b2b/user/dashboard',
+    element: <B2BUserDashboardPage />,
+  },
+  {
+    path: '/b2b/user/social',
+    element: <B2BUserSocialPage />,
+  },
+  {
+    path: '/b2b/user/scan',
+    element: <B2BUserScanPage />,
   },
   
   // Routes B2B Admin
   {
-    path: '/b2b/admin',
-    element: <ProtectedLayout />,
-    children: [
-      {
-        path: '',
-        element: <Navigate to="/b2b/admin/dashboard" replace />
-      },
-      {
-        path: 'login',
-        element: <AuthLayout><B2BAdminLogin /></AuthLayout>
-      },
-      {
-        path: 'dashboard',
-        element: <B2BAdminLayout />,
-        children: [
-          {
-            path: '',
-            element: <B2BAdminDashboard />
-          }
-        ]
-      }
-    ]
+    path: '/b2b/admin/login',
+    element: <B2BAdminLoginPage />,
+  },
+  {
+    path: '/b2b/admin/dashboard',
+    element: <B2BAdminDashboardPage />,
+  },
+  {
+    path: '/b2b/admin/social-cocoon',
+    element: <B2BAdminSocialPage />,
+  },
+  {
+    path: '/b2b/admin/users',
+    element: <B2BAdminUsersPage />,
+  },
+  {
+    path: '/b2b/admin/teams',
+    element: <B2BAdminTeamsPage />,
   },
   
-  // Route 404
+  // Not found
   {
     path: '*',
-    element: <Navigate to="/" replace />
-  }
+    element: <NotFoundPage />,
+  },
 ];
 
 export default routes;
