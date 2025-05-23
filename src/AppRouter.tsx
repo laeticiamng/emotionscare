@@ -3,6 +3,7 @@ import React, { Suspense } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import router from './router';
 import LoadingAnimation from '@/components/ui/loading-animation';
+import AuthTransition from './components/auth/AuthTransition';
 
 const AppRouter: React.FC = () => {
   return (
@@ -11,7 +12,9 @@ const AppRouter: React.FC = () => {
         <LoadingAnimation text="Chargement de la page..." />
       </div>
     }>
-      <RouterProvider router={router} />
+      <AuthTransition>
+        <RouterProvider router={router} />
+      </AuthTransition>
     </Suspense>
   );
 };
