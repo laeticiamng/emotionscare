@@ -1,80 +1,60 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { getUserModeDisplayName } from '@/utils/userModeHelpers';
-import { User, Users, ShieldCheck } from 'lucide-react';
+import { UserModeType } from '@/types/userMode';
+import { User, Users, Shield } from 'lucide-react';
 
 interface UserModeSelectorProps {
   minimal?: boolean;
+  disabled?: boolean;
 }
 
-export const UserModeSelector: React.FC<UserModeSelectorProps> = ({ minimal = false }) => {
-  const { userMode, changeUserMode } = useUserMode();
-  const [isChanging, setIsChanging] = useState(false);
+export const UserModeSelector: React.FC<UserModeSelectorProps> = ({ 
+  minimal = false, 
+  disabled = false 
+}) => {
+  const { userMode, changeUserMode, isLoading } = useUserMode();
   
-  const handleChangeMode = async (mode: 'b2c' | 'b2b_user' | 'b2b_admin') => {
-    try {
-      setIsChanging(true);
-      await changeUserMode(mode);
-    } finally {
-      setIsChanging(false);
-    }
-  };
+  const modes: { value: UserModeType; label: string; icon: React.ReactNode }[] = [
+    { value: 'b2c', label: 'Particulier', icon: <User className="h-4 w-4" /> },
+    { value: 'b2b_user', label: 'Collaborateur', icon: <Users className="h-4 w-4" /> },
+    { value: 'b2b_admin', label: 'Administrateur', icon: <Shield className="h-4 w-4" /> }
+  ];
   
-  // Get current mode icon
-  const getModeIcon = () => {
-    switch (userMode) {
-      case 'b2c':
-        return <User className="h-4 w-4" />;
-      case 'b2b_user':
-        return <Users className="h-4 w-4" />;
-      case 'b2b_admin':
-        return <ShieldCheck className="h-4 w-4" />;
-      default:
-        return <User className="h-4 w-4" />;
-    }
-  };
+  if (minimal && userMode) {
+    const currentMode = modes.find(m => m.value === userMode);
+    return (
+      <Badge variant="outline" className="flex items-center gap-2">
+        {currentMode?.icon}
+        {currentMode?.label}
+      </Badge>
+    );
+  }
   
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild disabled={isChanging}>
-        <Button variant="ghost" size={minimal ? "sm" : "default"}>
-          {getModeIcon()}
-          {!minimal && (
-            <span className="ml-2">{getUserModeDisplayName(userMode || 'b2c')}</span>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem 
-          onClick={() => handleChangeMode('b2c')}
-          disabled={userMode === 'b2c' || isChanging}
-        >
-          <User className="mr-2 h-4 w-4" />
-          <span>Particulier</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => handleChangeMode('b2b_user')}
-          disabled={userMode === 'b2b_user' || isChanging}
-        >
-          <Users className="mr-2 h-4 w-4" />
-          <span>Collaborateur</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => handleChangeMode('b2b_admin')}
-          disabled={userMode === 'b2b_admin' || isChanging}
-        >
-          <ShieldCheck className="mr-2 h-4 w-4" />
-          <span>Administrateur</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Select
+      value={userMode || ''}
+      onValueChange={(value) => changeUserMode(value as UserModeType)}
+      disabled={disabled || isLoading}
+    >
+      <SelectTrigger className="w-40">
+        <SelectValue placeholder="Choisir un mode" />
+      </SelectTrigger>
+      <SelectContent>
+        {modes.map((mode) => (
+          <SelectItem key={mode.value} value={mode.value}>
+            <div className="flex items-center gap-2">
+              {mode.icon}
+              {mode.label}
+            </div>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 };
+
+export default UserModeSelector;

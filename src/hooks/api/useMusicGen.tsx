@@ -1,49 +1,66 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { AudioTrack } from '@/types/audio';
+
+interface GeneratedTrack {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;
+  audioUrl: string;
+  coverUrl?: string;
+  genre?: string;
+}
 
 export function useMusicGen() {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedTrack, setGeneratedTrack] = useState<GeneratedTrack | null>(null);
   const [error, setError] = useState<Error | null>(null);
-  const [generatedTrack, setGeneratedTrack] = useState<AudioTrack | null>(null);
   
   /**
-   * Génère une piste musicale basée sur une description
+   * Générer une musique basée sur une émotion
    */
-  const generateMusic = async (options: any) => {
+  const generateMusicByEmotion = async (emotion: string): Promise<GeneratedTrack | null> => {
     setIsGenerating(true);
     setError(null);
     
     try {
-      // En production, appel à l'API MusicGen
-      // const response = await fetch('https://api.example.com/music-gen', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Authorization': `Bearer ${MUSIC_API_KEY}`,
-      //     'Content-Type': 'application/json'
-      //   },
-      //   body: JSON.stringify({
-      //     prompt: options.prompt,
-      //     duration: options.duration || 30
-      //   })
+      // En production, appel via Edge Function Supabase vers MusicGen
+      // const { data, error } = await supabase.functions.invoke('music-generation', {
+      //   body: { emotion, prompt: `Generate calming music for ${emotion} emotion` }
       // });
       
       // Simuler un délai pour la démo
       await new Promise(resolve => setTimeout(resolve, 3000));
       
-      // Création d'une piste audio fictive pour la démo
-      const track: AudioTrack = {
-        id: `gen-${Date.now()}`,
-        title: options.title || `Généré: ${options.prompt.substring(0, 20)}...`,
-        artist: 'AI Composer',
-        duration: options.duration || 180,
-        url: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3',
-        audioUrl: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3',
-        coverUrl: `https://source.unsplash.com/random/300x300/?music&sig=${Date.now()}`,
-        album: 'IA Generated',
-        year: new Date().getFullYear(),
-        genre: options.prompt.toLowerCase().includes('calme') ? 'Ambient' : 'Electronic',
+      // Générer une piste simulée basée sur l'émotion
+      const musicStyles = {
+        joy: { genre: 'Pop Joyeux', tempo: 'Énergique' },
+        calm: { genre: 'Ambient', tempo: 'Lent' },
+        sadness: { genre: 'Mélancolique', tempo: 'Modéré' },
+        anger: { genre: 'Rock', tempo: 'Intense' },
+        fear: { genre: 'Atmosphérique', tempo: 'Tendu' },
+        surprise: { genre: 'Électronique', tempo: 'Dynamique' },
+        love: { genre: 'Romantique', tempo: 'Doux' }
+      };
+      
+      const style = musicStyles[emotion] || musicStyles.calm;
+      
+      // URLs d'exemple de musiques libres de droits
+      const sampleTracks = [
+        'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav',
+        'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3',
+        'https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3'
+      ];
+      
+      const track: GeneratedTrack = {
+        id: `generated-${Date.now()}`,
+        title: `Musique ${style.genre} pour ${emotion}`,
+        artist: 'IA Compositeur',
+        duration: Math.floor(Math.random() * 180 + 120), // 2-5 minutes
+        audioUrl: sampleTracks[Math.floor(Math.random() * sampleTracks.length)],
+        coverUrl: `https://source.unsplash.com/300x300/?music,${emotion}`,
+        genre: style.genre
       };
       
       setGeneratedTrack(track);
@@ -51,7 +68,7 @@ export function useMusicGen() {
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Une erreur inconnue est survenue');
       setError(error);
-      toast.error(`Erreur lors de la génération de musique: ${error.message}`);
+      toast.error(`Erreur de génération musicale: ${error.message}`);
       return null;
     } finally {
       setIsGenerating(false);
@@ -59,45 +76,81 @@ export function useMusicGen() {
   };
   
   /**
-   * Génère une piste musicale basée sur une émotion
+   * Générer une musique avec un prompt personnalisé
    */
-  const generateMusicByEmotion = async (emotion: string, options: any = {}) => {
-    // Transforme l'émotion en prompt
-    let prompt = '';
-    switch (emotion.toLowerCase()) {
-      case 'joy':
-      case 'happiness':
-        prompt = 'Une mélodie joyeuse et énergique avec des tonalités positives';
-        break;
-      case 'sadness':
-        prompt = 'Une composition douce et mélancolique avec des notes apaisantes';
-        break;
-      case 'anger':
-        prompt = 'Une musique intense avec des rythmes forts et des tonalités graves';
-        break;
-      case 'fear':
-        prompt = 'Une ambiance tendue avec des notes mystérieuses et des sons ambients';
-        break;
-      case 'surprise':
-        prompt = 'Une mélodie inattendue avec des changements rythmiques surprenants';
-        break;
-      case 'disgust':
-        prompt = 'Une composition discordante avec des textures sonores inhabituelles';
-        break;
-      default:
-        prompt = 'Une musique ambient relaxante avec des sons de la nature';
-    }
+  const generateMusicByPrompt = async (prompt: string, duration: number = 30): Promise<GeneratedTrack | null> => {
+    setIsGenerating(true);
+    setError(null);
     
-    return generateMusic({
-      ...options,
-      prompt,
-      title: `Musique pour l'émotion: ${emotion}`
-    });
+    try {
+      // En production, appel via Edge Function Supabase
+      // const { data, error } = await supabase.functions.invoke('music-generation', {
+      //   body: { prompt, duration }
+      // });
+      
+      await new Promise(resolve => setTimeout(resolve, 4000));
+      
+      const track: GeneratedTrack = {
+        id: `custom-${Date.now()}`,
+        title: `Composition personnalisée`,
+        artist: 'IA Compositeur',
+        duration,
+        audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3',
+        coverUrl: 'https://source.unsplash.com/300x300/?music,composition',
+        genre: 'Personnalisé'
+      };
+      
+      setGeneratedTrack(track);
+      return track;
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Une erreur inconnue est survenue');
+      setError(error);
+      toast.error(`Erreur de génération: ${error.message}`);
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+  
+  /**
+   * Créer une playlist basée sur l'humeur
+   */
+  const generatePlaylistByMood = async (mood: string, trackCount: number = 5): Promise<GeneratedTrack[]> => {
+    setIsGenerating(true);
+    setError(null);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Générer plusieurs pistes
+      const tracks: GeneratedTrack[] = [];
+      for (let i = 0; i < trackCount; i++) {
+        tracks.push({
+          id: `playlist-${Date.now()}-${i}`,
+          title: `Piste ${i + 1} - ${mood}`,
+          artist: 'IA Compositeur',
+          duration: Math.floor(Math.random() * 180 + 120),
+          audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3',
+          coverUrl: `https://source.unsplash.com/300x300/?music,${mood}`,
+          genre: mood
+        });
+      }
+      
+      return tracks;
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error('Une erreur inconnue est survenue');
+      setError(error);
+      toast.error(`Erreur de génération de playlist: ${error.message}`);
+      return [];
+    } finally {
+      setIsGenerating(false);
+    }
   };
   
   return {
-    generateMusic,
     generateMusicByEmotion,
+    generateMusicByPrompt,
+    generatePlaylistByMood,
     generatedTrack,
     isGenerating,
     error

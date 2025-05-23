@@ -2,24 +2,49 @@
 import { UserModeType } from '@/types/userMode';
 
 /**
- * Normalizes various user role/mode formats to a consistent format
+ * Normalise le mode utilisateur depuis différentes sources
  */
-export const normalizeUserMode = (mode: string | null | undefined): UserModeType => {
-  if (!mode) return 'b2c';
+export function normalizeUserMode(role: string | undefined): UserModeType | null {
+  if (!role) return null;
   
-  const lowercaseMode = typeof mode === 'string' ? mode.toLowerCase() : '';
+  const normalizedRole = role.toLowerCase();
   
-  if (lowercaseMode.includes('admin')) return 'b2b_admin';
-  if (lowercaseMode.includes('b2b') || lowercaseMode.includes('user') || lowercaseMode.includes('collaborateur')) return 'b2b_user';
+  if (normalizedRole.includes('b2c') || normalizedRole === 'individual') {
+    return 'b2c';
+  }
   
-  return 'b2c';
-};
+  if (normalizedRole.includes('admin') || normalizedRole === 'b2b_admin') {
+    return 'b2b_admin';
+  }
+  
+  if (normalizedRole.includes('user') || normalizedRole === 'b2b_user' || normalizedRole === 'employee') {
+    return 'b2b_user';
+  }
+  
+  return 'b2c'; // Défaut
+}
 
 /**
- * Get the dashboard path for a specific user mode
+ * Obtient le nom d'affichage du mode utilisateur
  */
-export const getModeDashboardPath = (mode: UserModeType): string => {
-  switch (mode) {
+export function getUserModeDisplayName(userMode: UserModeType | null): string {
+  switch (userMode) {
+    case 'b2c':
+      return 'Particulier';
+    case 'b2b_user':
+      return 'Collaborateur';
+    case 'b2b_admin':
+      return 'Administrateur';
+    default:
+      return 'Invité';
+  }
+}
+
+/**
+ * Obtient le chemin du dashboard selon le mode utilisateur
+ */
+export function getModeDashboardPath(userMode: UserModeType): string {
+  switch (userMode) {
     case 'b2c':
       return '/b2c/dashboard';
     case 'b2b_user':
@@ -29,13 +54,13 @@ export const getModeDashboardPath = (mode: UserModeType): string => {
     default:
       return '/dashboard';
   }
-};
+}
 
 /**
- * Get the login path for a specific user mode
+ * Obtient le chemin de connexion selon le mode utilisateur
  */
-export const getModeLoginPath = (mode: UserModeType | null): string => {
-  switch (mode) {
+export function getModeLoginPath(userMode: UserModeType): string {
+  switch (userMode) {
     case 'b2c':
       return '/b2c/login';
     case 'b2b_user':
@@ -45,46 +70,27 @@ export const getModeLoginPath = (mode: UserModeType | null): string => {
     default:
       return '/choose-mode';
   }
-};
+}
 
 /**
- * Get display name for a user mode
+ * Vérifie si le mode utilisateur nécessite une organisation
  */
-export const getUserModeDisplayName = (mode: string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  switch (normalizedMode) {
-    case 'b2c':
-      return 'Particulier';
-    case 'b2b_admin':
-      return 'Administrateur';
-    case 'b2b_user':
-      return 'Collaborateur';
-    default:
-      return 'Utilisateur';
-  }
-};
+export function requiresOrganization(userMode: UserModeType | null): boolean {
+  return userMode === 'b2b_user' || userMode === 'b2b_admin';
+}
 
 /**
- * Get the social path for a specific user mode
+ * Obtient les permissions par défaut pour un mode utilisateur
  */
-export const getModeSocialPath = (mode: UserModeType | null): string => {
-  switch (mode) {
+export function getDefaultPermissions(userMode: UserModeType): string[] {
+  switch (userMode) {
     case 'b2c':
-      return '/b2c/social';
+      return ['read_own_data', 'write_own_data', 'use_basic_features'];
     case 'b2b_user':
-      return '/b2b/user/social';
+      return ['read_own_data', 'write_own_data', 'use_basic_features', 'view_team_stats'];
     case 'b2b_admin':
-      return '/b2b/admin/social-cocoon';
+      return ['read_own_data', 'write_own_data', 'use_basic_features', 'view_team_stats', 'manage_users', 'view_analytics', 'export_data'];
     default:
-      return '/social';
+      return [];
   }
-};
-
-export default {
-  normalizeUserMode,
-  getModeDashboardPath,
-  getModeLoginPath,
-  getUserModeDisplayName,
-  getModeSocialPath
-};
+}

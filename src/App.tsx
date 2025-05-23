@@ -1,28 +1,45 @@
 
-import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { UserModeProvider } from '@/contexts/UserModeContext';
-import { Toaster } from 'sonner';
-import AppRouter from './AppRouter';
-import ProtectedLayout from './components/ProtectedLayout';
+import React, { Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import Shell from './Shell';
+import routes from './router';
+import { Loader2 } from 'lucide-react';
 
-const App: React.FC = () => {
+// Créer le client React Query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1
+    }
+  }
+});
+
+const LoadingSpinner = () => (
+  <div className="flex h-screen items-center justify-center">
+    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  </div>
+);
+
+function App() {
   return (
-    <ThemeProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <UserModeProvider>
-            <ProtectedLayout>
-              <AppRouter />
-            </ProtectedLayout>
-            <Toaster position="top-right" richColors closeButton />
-          </UserModeProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            {routes.map((route, index) => (
+              <Route
+                key={index}
+                path={route.path}
+                element={route.element}
+              />
+            ))}
+          </Routes>
+        </Suspense>
+      </Router>
+    </QueryClientProvider>
   );
-};
+}
 
 export default App;
