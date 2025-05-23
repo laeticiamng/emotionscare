@@ -8,7 +8,7 @@ import Social from './pages/Social';
 import DashboardRedirect from './pages/DashboardRedirect';
 import ProtectedLayout from './components/ProtectedLayout';
 import ProtectedRouteWithMode from './components/ProtectedRouteWithMode';
-import ChooseModeFlow from './pages/auth/ChooseModeFlow';
+import ChooseModePage from './pages/ChooseModePage';
 
 // Pages B2C
 import B2CDashboard from './pages/b2c/Dashboard';
@@ -42,7 +42,7 @@ const AppRouter = () => {
       <Route path="/dashboard" element={<DashboardRedirect />} />
       
       {/* Choix du mode utilisateur */}
-      <Route path="/choose-mode" element={<ChooseModeFlow />} />
+      <Route path="/choose-mode" element={<ChooseModePage />} />
       
       {/* Routes B2C */}
       <Route path="/b2c">

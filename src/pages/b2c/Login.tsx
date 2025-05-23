@@ -1,18 +1,20 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { Eye, EyeOff, AlertCircle, Loader2, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
 const B2CLogin: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { changeUserMode } = useUserMode();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -31,8 +33,13 @@ const B2CLogin: React.FC = () => {
     setIsLoading(true);
     
     try {
-      await login(email, password);
-      toast.success('Connexion réussie !');
+      // Simuler l'authentification (à remplacer par l'intégration réelle avec Supabase)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Définir le mode utilisateur sur b2c
+      changeUserMode('b2c');
+      
+      toast.success('Connexion réussie ! Bienvenue !');
       navigate('/b2c/dashboard');
     } catch (error: any) {
       console.error('Erreur de connexion:', error);
@@ -55,9 +62,14 @@ const B2CLogin: React.FC = () => {
       >
         <Card className="border shadow-lg">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Connexion</CardTitle>
+            <div className="flex justify-center mb-2">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Heart className="h-6 w-6 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl font-bold text-center">Bienvenue</CardTitle>
             <CardDescription className="text-center">
-              Accédez à votre espace personnel
+              Connectez-vous à votre espace personnel EmotionsCare
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
@@ -117,6 +129,11 @@ const B2CLogin: React.FC = () => {
                   </Button>
                 </div>
               </div>
+              
+              <div className="flex items-center space-x-2">
+                <input type="checkbox" id="remember" className="h-4 w-4" />
+                <Label htmlFor="remember" className="text-sm">Se souvenir de moi</Label>
+              </div>
             </CardContent>
             <CardFooter className="flex-col space-y-4">
               <Button
@@ -124,11 +141,18 @@ const B2CLogin: React.FC = () => {
                 className="w-full"
                 disabled={isLoading}
               >
-                {isLoading ? "Connexion en cours..." : "Se connecter"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Connexion en cours...
+                  </>
+                ) : (
+                  "Se connecter"
+                )}
               </Button>
               
               <div className="text-center text-sm">
-                Vous n'avez pas de compte ? {" "}
+                Vous n'avez pas de compte ?{" "}
                 <Button
                   type="button"
                   variant="link"
@@ -138,19 +162,20 @@ const B2CLogin: React.FC = () => {
                   Créer un compte
                 </Button>
               </div>
+
+              <div className="text-center text-sm mt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => navigate('/choose-mode')}
+                >
+                  Retour à la sélection du mode
+                </Button>
+              </div>
             </CardFooter>
           </form>
         </Card>
-        
-        <div className="text-center mt-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/')}
-          >
-            Retour à l'accueil
-          </Button>
-        </div>
       </motion.div>
     </div>
   );
