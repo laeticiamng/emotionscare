@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import VRPage from './pages/VRPage';
 import ScanPage from './pages/ScanPage';
+import SocialCocoon from './pages/SocialCocoon';
 import Social from './pages/Social';
 import DashboardRedirect from './pages/DashboardRedirect';
 import ProtectedLayout from './components/ProtectedLayout';
@@ -96,6 +97,7 @@ const AppRouter = () => {
       <Route path="/scan" element={<ScanPage />} />
       <Route path="/vr" element={<VRPage />} />
       <Route path="/social" element={<Social />} />
+      <Route path="/social-cocoon" element={<SocialCocoon />} />
       
       {/* Page 404 pour les routes non trouvées */}
       <Route path="/404" element={<NotFoundPage />} />

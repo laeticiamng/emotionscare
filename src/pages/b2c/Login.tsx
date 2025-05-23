@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Eye, EyeOff, AlertCircle, Loader2, Heart } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -39,7 +39,7 @@ const B2CLogin: React.FC = () => {
       // Définir le mode utilisateur sur b2c
       changeUserMode('b2c');
       
-      toast.success('Connexion réussie ! Bienvenue !');
+      toast.success('Connexion réussie !');
       navigate('/b2c/dashboard');
     } catch (error: any) {
       console.error('Erreur de connexion:', error);
@@ -64,12 +64,14 @@ const B2CLogin: React.FC = () => {
           <CardHeader className="space-y-1">
             <div className="flex justify-center mb-2">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Heart className="h-6 w-6 text-primary" />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                </svg>
               </div>
             </div>
             <CardTitle className="text-2xl font-bold text-center">Bienvenue</CardTitle>
             <CardDescription className="text-center">
-              Connectez-vous à votre espace personnel EmotionsCare
+              Connectez-vous à votre compte EmotionsCare
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
@@ -100,7 +102,7 @@ const B2CLogin: React.FC = () => {
                   <Button
                     type="button"
                     variant="link"
-                    className="px-0 text-xs"
+                    className="px-0 font-normal"
                     onClick={() => navigate('/b2c/reset-password')}
                   >
                     Mot de passe oublié ?
@@ -152,30 +154,29 @@ const B2CLogin: React.FC = () => {
               </Button>
               
               <div className="text-center text-sm">
-                Vous n'avez pas de compte ?{" "}
+                Vous n'avez pas encore de compte ?{" "}
                 <Button
                   type="button"
                   variant="link"
                   className="p-0"
                   onClick={() => navigate('/b2c/register')}
                 >
-                  Créer un compte
-                </Button>
-              </div>
-
-              <div className="text-center text-sm mt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => navigate('/choose-mode')}
-                >
-                  Retour à la sélection du mode
+                  S'inscrire
                 </Button>
               </div>
             </CardFooter>
           </form>
         </Card>
+        
+        <div className="text-center mt-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/')}
+          >
+            Retour à l'accueil
+          </Button>
+        </div>
       </motion.div>
     </div>
   );
