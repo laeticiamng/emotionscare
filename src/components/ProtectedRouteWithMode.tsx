@@ -1,77 +1,53 @@
 
-import React, { useEffect } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { normalizeUserMode, getModeLoginPath } from '@/utils/userModeHelpers';
+import React from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserModeType } from '@/types/userMode';
+import { useUserMode } from '@/contexts/UserModeContext';
+import LoadingAnimation from './ui/loading-animation';
 
 interface ProtectedRouteWithModeProps {
   children: React.ReactNode;
-  requiredMode: UserModeType;
+  requiredMode: string;
   redirectTo?: string;
 }
 
-const ProtectedRouteWithMode: React.FC<ProtectedRouteWithModeProps> = ({
-  children,
+const ProtectedRouteWithMode: React.FC<ProtectedRouteWithModeProps> = ({ 
+  children, 
   requiredMode,
-  redirectTo = '/'
+  redirectTo = '/choose-mode'
 }) => {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const { userMode, isLoading: userModeLoading } = useUserMode();
-  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
-  const location = useLocation();
-
-  // Add debug logging to track dashboard access issues
-  useEffect(() => {
-    console.log('[ProtectedRouteWithMode] Current location:', location.pathname);
-    console.log('[ProtectedRouteWithMode] User authenticated:', isAuthenticated);
-    console.log('[ProtectedRouteWithMode] User role:', user?.role);
-    console.log('[ProtectedRouteWithMode] User mode:', userMode);
-    console.log('[ProtectedRouteWithMode] Required mode:', requiredMode);
-    
-    // Check if the user mode and role are consistent
-    if (user?.role) {
-      const normalizedRole = normalizeUserMode(user.role);
-      const normalizedMode = normalizeUserMode(userMode);
-      
-      if (normalizedRole !== normalizedMode) {
-        console.warn('[ProtectedRouteWithMode] User role and mode mismatch:', {
-          role: user.role,
-          normalizedRole,
-          userMode,
-          normalizedMode
-        });
-      }
-    }
-  }, [location.pathname, isAuthenticated, user?.role, userMode, requiredMode]);
-
-  // Show loading state if still loading
+  
+  // Afficher l'état de chargement pendant la vérification de l'authentification
   if (authLoading || userModeLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      <div className="flex h-screen items-center justify-center">
+        <LoadingAnimation text="Vérification de l'accès..." />
       </div>
     );
   }
-
-  // If not authenticated, redirect to login
+  
+  // Rediriger vers la page de connexion si l'utilisateur n'est pas authentifié
   if (!isAuthenticated) {
-    console.log('[ProtectedRouteWithMode] Redirecting to login: user not authenticated');
-    const loginPath = getModeLoginPath(requiredMode);
-    return <Navigate to={loginPath} state={{ from: location }} />;
+    switch (requiredMode) {
+      case 'b2c':
+        return <Navigate to="/b2c/login" replace />;
+      case 'b2b_user':
+        return <Navigate to="/b2b/user/login" replace />;
+      case 'b2b_admin':
+        return <Navigate to="/b2b/admin/login" replace />;
+      default:
+        return <Navigate to="/login" replace />;
+    }
   }
-
-  // If user is authenticated but doesn't have the required mode, redirect to the specified page
-  if (normalizeUserMode(userMode) !== normalizeUserMode(requiredMode)) {
-    console.log('[ProtectedRouteWithMode] Redirecting: incorrect user mode', {
-      userMode: normalizeUserMode(userMode),
-      requiredMode: normalizeUserMode(requiredMode),
-      redirectTo
-    });
-    return <Navigate to={redirectTo} />;
+  
+  // Rediriger vers la page de sélection de mode si le mode utilisateur ne correspond pas
+  if (userMode !== requiredMode) {
+    return <Navigate to={redirectTo} replace />;
   }
-
-  // If user is authenticated and has the required mode, proceed
+  
+  // Autoriser l'accès à la route protégée
   return <>{children}</>;
 };
 

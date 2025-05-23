@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { User, Building2, ShieldCheck } from 'lucide-react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { getUserModeDisplayName } from '@/utils/userModeHelpers';
-import { UserMode } from '@/types/auth';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +24,7 @@ export function UserModeSelector({
 }: UserModeSelectorProps) {
   const { userMode, changeUserMode } = useUserMode();
   
-  const getModeIcon = (mode: UserMode) => {
+  const getModeIcon = (mode: string) => {
     switch (mode) {
       case 'b2c':
         return <User className="h-4 w-4" />;
@@ -46,7 +45,7 @@ export function UserModeSelector({
           size={minimal ? "sm" : "default"}
           className={className}
         >
-          {getModeIcon(userMode as UserMode)}
+          {getModeIcon(userMode || 'b2c')}
           {showLabel && (
             <span className="ml-2">{getUserModeDisplayName(userMode || 'b2c')}</span>
           )}

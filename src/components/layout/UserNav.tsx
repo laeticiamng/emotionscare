@@ -1,6 +1,9 @@
 
 import React from 'react';
-import { 
+import { useNavigate } from 'react-router-dom';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -8,53 +11,40 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserModeSelector } from '@/components/ui/user-mode-selector';
-import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export function UserNav() {
-  const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Déconnexion réussie');
+      navigate('/');
+    } catch (error) {
+      console.error('Erreur de déconnexion:', error);
+      toast.error('Erreur lors de la déconnexion');
+    }
   };
-  
-  if (!isAuthenticated || !user) {
-    return (
-      <div className="flex gap-2">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => navigate('/login')}
-        >
-          Connexion
-        </Button>
-        <Button 
-          size="sm" 
-          onClick={() => navigate('/register')}
-        >
-          S'inscrire
-        </Button>
-      </div>
-    );
-  }
-  
-  const userInitials = user?.name
-    ? user.name.split(' ').map(n => n[0]).join('').toUpperCase()
-    : user.email?.substring(0, 2).toUpperCase() || 'U';
-  
+
+  const getInitials = (name?: string): string => {
+    if (!name) return 'U';
+    
+    const parts = name.split(' ');
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="" alt={user?.name || 'User'} />
-            <AvatarFallback>{userInitials}</AvatarFallback>
+        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+          <Avatar className="h-9 w-9">
+            <AvatarImage src={user?.avatarUrl} alt={user?.name || 'Utilisateur'} />
+            <AvatarFallback>{getInitials(user?.name)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
@@ -62,7 +52,9 @@ export function UserNav() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user?.name || 'Utilisateur'}</p>
-            <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {user?.email || 'utilisateur@email.com'}
+            </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -73,15 +65,17 @@ export function UserNav() {
           <DropdownMenuItem onClick={() => navigate('/settings')}>
             Paramètres
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate('/mode-switcher')}>
+          <DropdownMenuItem onClick={() => navigate('/choose-mode')}>
             Changer de mode
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
-          Déconnexion
+          Se déconnecter
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
+
+export default UserNav;

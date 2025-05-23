@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -17,7 +16,7 @@ import {
 } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Building } from 'lucide-react';
+import { Loader2, Building2 } from 'lucide-react';
 import AuthLayout from '@/layouts/AuthLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -28,9 +27,7 @@ const registerSchema = z.object({
   email: z.string().email({ message: 'Adresse e-mail professionnelle invalide' }),
   company: z.string().min(2, { message: 'Le nom de l\'entreprise est requis' }),
   password: z.string().min(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' }),
-  confirmPassword: z.string(),
-  terms: z.boolean().refine(val => val === true, { message: 'Vous devez accepter les conditions' }),
-  inviteCode: z.string().optional(),
+  confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Les mots de passe ne correspondent pas',
   path: ['confirmPassword'],
@@ -53,8 +50,6 @@ const B2BUserRegister: React.FC = () => {
       company: '',
       password: '',
       confirmPassword: '',
-      terms: false,
-      inviteCode: '',
     },
   });
 
@@ -63,15 +58,13 @@ const B2BUserRegister: React.FC = () => {
     setError(null);
     
     try {
-      await register(data.email, data.password, {
-        name: data.name,
-        role: 'b2b_user',
-        company: {
-          name: data.company
-        }
+      await register(data.email, data.password, { 
+        name: data.name, 
+        company: data.company,
+        role: 'b2b_user'
       });
       setUserMode('b2b_user');
-      toast.success('Compte créé avec succès');
+      toast.success('Inscription réussie');
       navigate('/b2b/user/dashboard');
     } catch (err: any) {
       console.error('Erreur d\'inscription:', err);
@@ -88,11 +81,11 @@ const B2BUserRegister: React.FC = () => {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
             <div className="flex justify-center">
-              <Building className="h-10 w-10 text-primary" />
+              <Building2 className="h-10 w-10 text-primary" />
             </div>
             <CardTitle className="text-2xl font-bold text-center">EmotionsCare Pro</CardTitle>
             <CardDescription className="text-center">
-              Créer votre compte collaborateur
+              Créez votre compte collaborateur
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -111,7 +104,7 @@ const B2BUserRegister: React.FC = () => {
                     <FormItem>
                       <FormLabel>Nom complet</FormLabel>
                       <FormControl>
-                        <Input placeholder="Prénom Nom" {...field} />
+                        <Input placeholder="Votre nom" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -125,7 +118,7 @@ const B2BUserRegister: React.FC = () => {
                     <FormItem>
                       <FormLabel>Email professionnel</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="nom@entreprise.com" {...field} />
+                        <Input placeholder="nom@entreprise.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -173,46 +166,11 @@ const B2BUserRegister: React.FC = () => {
                     </FormItem>
                   )}
                 />
-                
-                <FormField
-                  control={form.control}
-                  name="inviteCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Code d'invitation (optionnel)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Entrez votre code d'invitation" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="terms"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="text-sm">
-                          J'accepte les <Link to="/terms" className="text-primary hover:underline">conditions d'utilisation</Link> et la <Link to="/privacy" className="text-primary hover:underline">politique de confidentialité</Link>
-                        </FormLabel>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Création du compte...
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Inscription en cours...
                     </>
                   ) : (
                     'S\'inscrire'

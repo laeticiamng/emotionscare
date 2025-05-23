@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -17,7 +16,7 @@ import {
 } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
+import { Loader2, User } from 'lucide-react';
 import AuthLayout from '@/layouts/AuthLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -27,8 +26,7 @@ const registerSchema = z.object({
   name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères' }),
   email: z.string().email({ message: 'Adresse e-mail invalide' }),
   password: z.string().min(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' }),
-  confirmPassword: z.string(),
-  terms: z.boolean().refine(val => val === true, { message: 'Vous devez accepter les conditions' }),
+  confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {
   message: 'Les mots de passe ne correspondent pas',
   path: ['confirmPassword'],
@@ -50,7 +48,6 @@ const B2CRegister: React.FC = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      terms: false,
     },
   });
 
@@ -59,13 +56,10 @@ const B2CRegister: React.FC = () => {
     setError(null);
     
     try {
-      await register(data.email, data.password, {
-        name: data.name,
-        role: 'b2c'
-      });
+      await register(data.email, data.password, { name: data.name });
       setUserMode('b2c');
-      toast.success('Compte créé avec succès');
-      navigate('/b2c/onboarding');
+      toast.success('Inscription réussie');
+      navigate('/b2c/dashboard');
     } catch (err: any) {
       console.error('Erreur d\'inscription:', err);
       setError(err.message || 'Échec de l\'inscription. Veuillez réessayer.');
@@ -80,6 +74,9 @@ const B2CRegister: React.FC = () => {
       <div className="flex items-center justify-center min-h-screen p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
+            <div className="flex justify-center">
+              <User className="h-10 w-10 text-primary" />
+            </div>
             <CardTitle className="text-2xl font-bold text-center">EmotionsCare</CardTitle>
             <CardDescription className="text-center">
               Créez votre compte personnel
@@ -115,7 +112,7 @@ const B2CRegister: React.FC = () => {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="exemple@email.com" {...field} />
+                        <Input placeholder="exemple@email.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -149,32 +146,11 @@ const B2CRegister: React.FC = () => {
                     </FormItem>
                   )}
                 />
-                
-                <FormField
-                  control={form.control}
-                  name="terms"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel className="text-sm">
-                          J'accepte les <Link to="/terms" className="text-primary hover:underline">conditions d'utilisation</Link> et la <Link to="/privacy" className="text-primary hover:underline">politique de confidentialité</Link>
-                        </FormLabel>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Création du compte...
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Inscription en cours...
                     </>
                   ) : (
                     'S\'inscrire'

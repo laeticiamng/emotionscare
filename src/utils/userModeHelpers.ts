@@ -1,49 +1,37 @@
 
 import { UserModeType } from '@/types/userMode';
-import { UserRole } from '@/types/user';
 
 /**
- * Normalise le mode utilisateur
+ * Normalise le mode utilisateur en format standard
  */
-export function normalizeUserMode(mode?: string | null): UserModeType {
-  if (!mode) return 'b2c';
-  
-  const normalizedMode = mode.toLowerCase().replace('-', '_');
-  
-  if (normalizedMode.includes('admin')) {
-    return 'b2b_admin';
-  } else if (normalizedMode.includes('user') || normalizedMode.includes('b2b')) {
+export const normalizeUserMode = (mode: string): UserModeType => {
+  // Conversion des anciens formats de mode ou des valeurs irrégulières
+  if (mode === 'b2b-user' || mode === 'b2b_collaborator' || mode === 'b2b-collaborator') {
     return 'b2b_user';
-  } else {
+  }
+  if (mode === 'b2b-admin') {
+    return 'b2b_admin';
+  }
+  if (mode === 'b2c-user' || mode === 'personal') {
     return 'b2c';
   }
-}
-
-/**
- * Obtient le nom d'affichage pour un mode utilisateur
- */
-export function getUserModeDisplayName(mode?: string | null): string {
-  const normalized = normalizeUserMode(mode);
   
-  switch (normalized) {
-    case 'b2c':
-      return 'Particulier';
-    case 'b2b_user':
-      return 'Collaborateur';
-    case 'b2b_admin':
-      return 'Administrateur';
-    default:
-      return 'Utilisateur';
+  // Si le mode est déjà dans un format valide, le retourner
+  if (mode === 'b2c' || mode === 'b2b_user' || mode === 'b2b_admin') {
+    return mode as UserModeType;
   }
-}
+  
+  // Par défaut, retourner b2c
+  return 'b2c';
+};
 
 /**
- * Obtient le chemin du tableau de bord pour un mode utilisateur spécifique
+ * Obtenir le chemin du dashboard pour un mode utilisateur donné
  */
-export function getModeDashboardPath(mode?: string | null): string {
-  const normalized = normalizeUserMode(mode);
+export const getModeDashboardPath = (mode: string): string => {
+  const normalizedMode = normalizeUserMode(mode);
   
-  switch (normalized) {
+  switch (normalizedMode) {
     case 'b2c':
       return '/b2c/dashboard';
     case 'b2b_user':
@@ -53,85 +41,46 @@ export function getModeDashboardPath(mode?: string | null): string {
     default:
       return '/choose-mode';
   }
-}
+};
 
 /**
- * Obtient le chemin de connexion pour un mode utilisateur spécifique
+ * Obtenir le chemin de la page sociale pour un mode utilisateur donné
  */
-export function getModeLoginPath(mode?: string | null): string {
-  const normalized = normalizeUserMode(mode);
+export const getModeSocialPath = (mode: string | null): string => {
+  const normalizedMode = normalizeUserMode(mode || '');
   
-  switch (normalized) {
-    case 'b2c':
-      return '/b2c/login';
-    case 'b2b_user':
-      return '/b2b/user/login';
-    case 'b2b_admin':
-      return '/b2b/admin/login';
-    default:
-      return '/choose-mode';
-  }
-}
-
-/**
- * Obtient le chemin social pour un mode utilisateur spécifique
- */
-export function getModeSocialPath(mode?: string | null): string {
-  const normalized = normalizeUserMode(mode);
-  
-  switch (normalized) {
+  switch (normalizedMode) {
     case 'b2c':
       return '/b2c/social';
     case 'b2b_user':
       return '/b2b/user/social';
     case 'b2b_admin':
-      return '/b2b/admin/social-cocoon';
+      return '/b2b/admin/social';
     default:
-      return '/social';
+      return '/social-cocoon'; // Page sociale par défaut
   }
-}
+};
 
 /**
- * Vérifie si un mode est valide
+ * Obtenir l'étiquette d'affichage pour un mode utilisateur
  */
-export function isValidUserMode(mode?: string | null): boolean {
-  if (!mode) return false;
-  
-  const normalized = normalizeUserMode(mode);
-  return ['b2c', 'b2b_user', 'b2b_admin'].includes(normalized);
-}
-
-/**
- * Convertit un rôle utilisateur en mode utilisateur
- */
-export function roleToUserMode(role?: UserRole | string | null): UserModeType {
-  if (!role) return 'b2c';
-  
-  const roleStr = String(role).toLowerCase();
-  
-  if (roleStr.includes('admin')) {
-    return 'b2b_admin';
-  } else if (roleStr.includes('user') || roleStr.includes('b2b')) {
-    return 'b2b_user';
-  } else {
-    return 'b2c';
-  }
-}
-
-/**
- * Obtient le préfixe de chemin pour un mode utilisateur
- */
-export function getUserModePathPrefix(mode?: string | null): string {
-  const normalized = normalizeUserMode(mode);
-  
-  switch (normalized) {
+export const getUserModeLabel = (mode: UserModeType): string => {
+  switch (mode) {
     case 'b2c':
-      return '/b2c';
+      return 'Particulier';
     case 'b2b_user':
-      return '/b2b/user';
+      return 'Collaborateur';
     case 'b2b_admin':
-      return '/b2b/admin';
+      return 'Administrateur';
     default:
-      return '';
+      return 'Utilisateur';
   }
-}
+};
+
+/**
+ * Obtenir le nom complet pour un mode utilisateur (pour l'affichage)
+ */
+export const getUserModeDisplayName = (mode: string): string => {
+  const normalizedMode = normalizeUserMode(mode);
+  return getUserModeLabel(normalizedMode);
+};

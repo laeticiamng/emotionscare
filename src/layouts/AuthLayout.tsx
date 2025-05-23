@@ -1,22 +1,55 @@
 
 import React from 'react';
-import { Outlet } from 'react-router-dom';
-import { ModeToggle } from '@/components/ui/mode-toggle';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { useTheme } from '@/hooks/use-theme';
+import { Button } from '@/components/ui/button';
+import { Moon, Sun, Home } from 'lucide-react';
 
 interface AuthLayoutProps {
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
+  const { theme, setTheme } = useTheme();
+  
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+  
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <div className="absolute top-4 right-4 z-10">
-        <ModeToggle />
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 to-background flex flex-col">
+      {/* Header */}
+      <header className="container flex justify-between items-center py-4 px-4">
+        <Link to="/" className="flex items-center">
+          <span className="font-bold text-xl">EmotionsCare</span>
+        </Link>
+        <div className="flex space-x-2">
+          <Button variant="ghost" size="icon" onClick={toggleTheme}>
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+          <Button variant="ghost" size="icon" asChild>
+            <Link to="/">
+              <Home className="h-5 w-5" />
+            </Link>
+          </Button>
+        </div>
+      </header>
       
-      <main className="flex-1 flex flex-col">
-        {children || <Outlet />}
-      </main>
+      {/* Main content */}
+      <motion.main 
+        className="flex-grow flex"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        {children}
+      </motion.main>
+      
+      {/* Footer */}
+      <footer className="py-4 px-4 text-center text-sm text-muted-foreground">
+        <p>© {new Date().getFullYear()} EmotionsCare. Tous droits réservés.</p>
+      </footer>
     </div>
   );
 };
