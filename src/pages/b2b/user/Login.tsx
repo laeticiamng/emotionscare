@@ -16,16 +16,15 @@ import {
 } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Building } from 'lucide-react';
 import AuthLayout from '@/layouts/AuthLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { toast } from 'sonner';
 
 const loginSchema = z.object({
-  email: z.string().email({ message: 'Adresse e-mail invalide' }),
+  email: z.string().email({ message: 'Adresse e-mail professionnelle invalide' }),
   password: z.string().min(6, { message: 'Mot de passe requis (6 caractères minimum)' }),
-  companyCode: z.string().min(1, { message: 'Code entreprise requis' }),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -42,7 +41,6 @@ const B2BUserLogin: React.FC = () => {
     defaultValues: {
       email: '',
       password: '',
-      companyCode: '',
     },
   });
 
@@ -51,8 +49,6 @@ const B2BUserLogin: React.FC = () => {
     setError(null);
     
     try {
-      // Vous pouvez vérifier le code entreprise ici si nécessaire
-      
       await login(data.email, data.password);
       setUserMode('b2b_user');
       toast.success('Connexion réussie');
@@ -71,9 +67,12 @@ const B2BUserLogin: React.FC = () => {
       <div className="flex items-center justify-center min-h-screen p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">EmotionsCare | Entreprise</CardTitle>
+            <div className="flex justify-center">
+              <Building className="h-10 w-10 text-primary" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-center">EmotionsCare Pro</CardTitle>
             <CardDescription className="text-center">
-              Connectez-vous à votre espace collaborateur
+              Connexion à votre espace collaborateur
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -101,20 +100,6 @@ const B2BUserLogin: React.FC = () => {
                 
                 <FormField
                   control={form.control}
-                  name="companyCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Code entreprise</FormLabel>
-                      <FormControl>
-                        <Input placeholder="CODE-XXXX" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
@@ -126,12 +111,6 @@ const B2BUserLogin: React.FC = () => {
                     </FormItem>
                   )}
                 />
-                
-                <div className="text-right">
-                  <Link to="/b2b/reset-password" className="text-sm text-primary hover:underline">
-                    Mot de passe oublié ?
-                  </Link>
-                </div>
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
@@ -147,18 +126,14 @@ const B2BUserLogin: React.FC = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <div className="text-center text-sm">
-              Nouveau collaborateur ?{' '}
-              <Link to="/b2b/user/register" className="text-primary hover:underline">
-                S'inscrire
+              Besoin d'aide ? Contactez votre administrateur ou le{' '}
+              <Link to="/contact" className="text-primary hover:underline">
+                support
               </Link>
             </div>
             <div className="text-center text-sm">
-              <Link to="/b2b/admin/login" className="text-muted-foreground hover:underline">
-                Accès administrateur
-              </Link>
-              {' | '}
-              <Link to="/b2c/login" className="text-muted-foreground hover:underline">
-                Accès personnel
+              <Link to="/b2b/selection" className="text-muted-foreground hover:underline">
+                Changer de mode de connexion
               </Link>
             </div>
           </CardFooter>

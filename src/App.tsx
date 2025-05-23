@@ -1,25 +1,26 @@
 
-import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider } from './providers/ThemeProvider';
-import { Toaster } from '@/components/ui/toaster';
+import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import AppRouter from './AppRouter';
-import AuthTransition from './components/auth/AuthTransition';
-import { AuthProvider } from './contexts/AuthContext';
-import { UserModeProvider } from './contexts/UserModeContext';
+import { ThemeProvider } from '@/providers/ThemeProvider';
+import { UserModeProvider } from '@/contexts/UserModeContext';
+import { AuthProvider } from '@/contexts/AuthContext';
+import ProtectedLayout from '@/components/ProtectedLayout';
 
 function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="emotions-care-theme">
-      <BrowserRouter>
+      <Router>
         <AuthProvider>
           <UserModeProvider>
-            <AuthTransition>
+            <ProtectedLayout>
               <AppRouter />
-            </AuthTransition>
+            </ProtectedLayout>
+            <Toaster position="top-right" />
           </UserModeProvider>
         </AuthProvider>
-      </BrowserRouter>
-      <Toaster />
+      </Router>
     </ThemeProvider>
   );
 }

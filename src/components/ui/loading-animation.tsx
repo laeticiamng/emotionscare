@@ -1,24 +1,29 @@
 
 import React from 'react';
+import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LoadingAnimationProps {
   text?: string;
   className?: string;
-  iconClassName?: string;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-const LoadingAnimation: React.FC<LoadingAnimationProps> = ({ 
-  text = "Chargement...", 
+const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
+  text = 'Chargement...',
   className,
-  iconClassName
+  size = 'md'
 }) => {
+  const sizeClasses = {
+    sm: 'h-4 w-4',
+    md: 'h-8 w-8',
+    lg: 'h-12 w-12'
+  };
+
   return (
-    <div className={cn("flex flex-col items-center justify-center py-12", className)} role="status" aria-live="polite">
-      <div className="w-12 h-12 relative">
-        <div className={cn("absolute top-0 left-0 w-full h-full rounded-full border-4 border-primary/20 border-t-primary animate-spin", iconClassName)}></div>
-      </div>
-      <p className="mt-4 text-muted-foreground">{text}</p>
+    <div className={cn('flex flex-col items-center justify-center space-y-2', className)}>
+      <Loader2 className={cn('animate-spin text-primary', sizeClasses[size])} />
+      {text && <p className="text-muted-foreground text-sm">{text}</p>}
     </div>
   );
 };

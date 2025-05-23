@@ -23,12 +23,11 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { toast } from 'sonner';
 
 const loginSchema = z.object({
-  email: z.string().email({ message: 'Adresse e-mail invalide' }),
+  email: z.string().email({ message: 'Adresse e-mail professionnelle invalide' }),
   password: z.string().min(6, { message: 'Mot de passe requis (6 caractères minimum)' }),
-  adminKey: z.string().min(1, { message: 'Clé d\'administrateur requise' }),
 });
 
-type AdminLoginFormValues = z.infer<typeof loginSchema>;
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 const B2BAdminLogin: React.FC = () => {
   const { login } = useAuth();
@@ -37,30 +36,22 @@ const B2BAdminLogin: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const form = useForm<AdminLoginFormValues>({
+  const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',
-      adminKey: '',
     },
   });
 
-  const onSubmit = async (data: AdminLoginFormValues) => {
+  const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     setError(null);
     
     try {
-      // Vous pourriez vérifier la clé admin ici si nécessaire
-      const adminKeyValid = true; // À remplacer par une vérification réelle
-      
-      if (!adminKeyValid) {
-        throw new Error('Clé d\'administrateur invalide');
-      }
-      
       await login(data.email, data.password);
       setUserMode('b2b_admin');
-      toast.success('Connexion réussie');
+      toast.success('Connexion administrateur réussie');
       navigate('/b2b/admin/dashboard');
     } catch (err: any) {
       console.error('Erreur de connexion:', err);
@@ -76,14 +67,12 @@ const B2BAdminLogin: React.FC = () => {
       <div className="flex items-center justify-center min-h-screen p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
-            <div className="flex justify-center mb-2">
-              <div className="bg-primary/10 p-3 rounded-full">
-                <ShieldCheck className="h-8 w-8 text-primary" />
-              </div>
+            <div className="flex justify-center">
+              <ShieldCheck className="h-10 w-10 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold text-center">Espace Administrateur</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">EmotionsCare Admin</CardTitle>
             <CardDescription className="text-center">
-              Accédez à la gestion complète de votre plateforme
+              Espace administrateur
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -111,20 +100,6 @@ const B2BAdminLogin: React.FC = () => {
                 
                 <FormField
                   control={form.control}
-                  name="adminKey"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Clé d'administrateur</FormLabel>
-                      <FormControl>
-                        <Input placeholder="ADMIN-XXXX" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
                   name="password"
                   render={({ field }) => (
                     <FormItem>
@@ -136,12 +111,6 @@ const B2BAdminLogin: React.FC = () => {
                     </FormItem>
                   )}
                 />
-                
-                <div className="text-right">
-                  <Link to="/b2b/reset-password" className="text-sm text-primary hover:underline">
-                    Mot de passe oublié ?
-                  </Link>
-                </div>
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
@@ -157,12 +126,8 @@ const B2BAdminLogin: React.FC = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <div className="text-center text-sm">
-              <Link to="/b2b/user/login" className="text-muted-foreground hover:underline">
-                Accès collaborateur
-              </Link>
-              {' | '}
-              <Link to="/b2c/login" className="text-muted-foreground hover:underline">
-                Accès personnel
+              <Link to="/b2b/selection" className="text-muted-foreground hover:underline">
+                Changer de mode de connexion
               </Link>
             </div>
           </CardFooter>

@@ -14,7 +14,6 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -25,12 +24,14 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { toast } from 'sonner';
 
 const registerSchema = z.object({
-  name: z.string().min(2, { message: 'Le nom est requis' }),
+  name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères' }),
   email: z.string().email({ message: 'Adresse e-mail invalide' }),
   password: z.string().min(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' }),
-  acceptTerms: z.boolean().refine((val) => val === true, {
-    message: 'Vous devez accepter les conditions d\'utilisation',
-  }),
+  confirmPassword: z.string(),
+  terms: z.boolean().refine(val => val === true, { message: 'Vous devez accepter les conditions' }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Les mots de passe ne correspondent pas',
+  path: ['confirmPassword'],
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -48,7 +49,8 @@ const B2CRegister: React.FC = () => {
       name: '',
       email: '',
       password: '',
-      acceptTerms: false,
+      confirmPassword: '',
+      terms: false,
     },
   });
 
@@ -57,11 +59,12 @@ const B2CRegister: React.FC = () => {
     setError(null);
     
     try {
-      const { email, password, name } = data;
-      await register(email, password, { name, role: 'b2c' });
-      
+      await register(data.email, data.password, {
+        name: data.name,
+        role: 'b2c'
+      });
       setUserMode('b2c');
-      toast.success('Inscription réussie !');
+      toast.success('Compte créé avec succès');
       navigate('/b2c/onboarding');
     } catch (err: any) {
       console.error('Erreur d\'inscription:', err);
@@ -77,9 +80,9 @@ const B2CRegister: React.FC = () => {
       <div className="flex items-center justify-center min-h-screen p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Créer un compte</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">EmotionsCare</CardTitle>
             <CardDescription className="text-center">
-              Inscrivez-vous pour accéder à votre espace personnel
+              Créez votre compte personnel
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -96,9 +99,9 @@ const B2CRegister: React.FC = () => {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nom complet</FormLabel>
+                      <FormLabel>Nom</FormLabel>
                       <FormControl>
-                        <Input placeholder="Jean Dupont" {...field} />
+                        <Input placeholder="Votre nom" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -112,7 +115,7 @@ const B2CRegister: React.FC = () => {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="exemple@email.com" {...field} />
+                        <Input type="email" placeholder="exemple@email.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -135,9 +138,23 @@ const B2CRegister: React.FC = () => {
                 
                 <FormField
                   control={form.control}
-                  name="acceptTerms"
+                  name="confirmPassword"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 p-2">
+                    <FormItem>
+                      <FormLabel>Confirmer le mot de passe</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="••••••••" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="terms"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                       <FormControl>
                         <Checkbox
                           checked={field.value}
@@ -145,10 +162,8 @@ const B2CRegister: React.FC = () => {
                         />
                       </FormControl>
                       <div className="space-y-1 leading-none">
-                        <FormLabel>
-                          J'accepte les <Link to="/terms" className="text-primary hover:underline">conditions d'utilisation</Link>
-                          {' '}et la {' '}
-                          <Link to="/privacy" className="text-primary hover:underline">politique de confidentialité</Link>
+                        <FormLabel className="text-sm">
+                          J'accepte les <Link to="/terms" className="text-primary hover:underline">conditions d'utilisation</Link> et la <Link to="/privacy" className="text-primary hover:underline">politique de confidentialité</Link>
                         </FormLabel>
                         <FormMessage />
                       </div>
@@ -159,10 +174,10 @@ const B2CRegister: React.FC = () => {
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Inscription...
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Création du compte...
                     </>
                   ) : (
-                    'Créer un compte'
+                    'S\'inscrire'
                   )}
                 </Button>
               </form>
@@ -173,6 +188,11 @@ const B2CRegister: React.FC = () => {
               Vous avez déjà un compte ?{' '}
               <Link to="/b2c/login" className="text-primary hover:underline">
                 Se connecter
+              </Link>
+            </div>
+            <div className="text-center text-sm">
+              <Link to="/b2b/selection" className="text-muted-foreground hover:underline">
+                Accès professionnel
               </Link>
             </div>
           </CardFooter>
