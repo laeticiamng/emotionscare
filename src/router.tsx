@@ -11,19 +11,19 @@ import ProtectedRouteWithMode from './components/ProtectedRouteWithMode';
 import ChooseModePage from './pages/ChooseModePage';
 
 // Pages B2C
-import B2CDashboard from './pages/b2c/Dashboard';
+import B2CDashboard from './pages/dashboards/B2CDashboard';
 import B2CLogin from './pages/b2c/Login';
 import B2CRegister from './pages/b2c/Register';
 import B2CResetPassword from './pages/b2c/ResetPassword';
 import B2COnboarding from './pages/b2c/Onboarding';
 
 // Pages B2B User
-import B2BUserDashboard from './pages/b2b/user/DashboardPage';
+import B2BUserDashboard from './pages/dashboards/B2BUserDashboard';
 import B2BUserLogin from './pages/b2b/user/Login';
 import B2BUserRegister from './pages/b2b/user/Register';
 
 // Pages B2B Admin
-import B2BAdminDashboard from './pages/b2b/admin/DashboardPage';
+import B2BAdminDashboard from './pages/dashboards/B2BAdminDashboard';
 import B2BAdminLogin from './pages/b2b/admin/Login';
 
 // Page de sélection B2B

@@ -21,7 +21,7 @@ const ChooseMode = () => {
   }, [isAuthenticated, userMode, navigate]);
   
   const handleModeSelect = (mode: string) => {
-    setUserMode(mode);
+    setUserMode(mode as any);
     localStorage.setItem('userMode', mode);
     navigate(getModeDashboardPath(mode));
   };

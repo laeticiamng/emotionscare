@@ -32,7 +32,7 @@ const B2CResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   
   const form = useForm<ResetFormValues>({
     resolver: zodResolver(resetSchema),
@@ -44,17 +44,15 @@ const B2CResetPassword: React.FC = () => {
   const onSubmit = async (data: ResetFormValues) => {
     setIsLoading(true);
     setError(null);
-    setSuccess(null);
     
     try {
       await resetPassword(data.email);
-      setSuccess('Si un compte existe avec cet email, un lien de réinitialisation a été envoyé');
-      setTimeout(() => {
-        navigate('/b2c/login');
-      }, 5000);
+      setSuccess(true);
+      toast.success('Instructions envoyées par email');
     } catch (err: any) {
       console.error('Erreur de réinitialisation:', err);
-      setError(err.message || 'Échec de la réinitialisation. Veuillez réessayer.');
+      setError(err.message || 'Échec de l\'envoi des instructions. Veuillez réessayer.');
+      toast.error('Échec de la réinitialisation');
     } finally {
       setIsLoading(false);
     }
@@ -65,9 +63,9 @@ const B2CResetPassword: React.FC = () => {
       <div className="flex items-center justify-center min-h-screen p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">EmotionsCare</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">Réinitialiser le mot de passe</CardTitle>
             <CardDescription className="text-center">
-              Réinitialiser votre mot de passe
+              Entrez votre email pour recevoir les instructions
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -77,44 +75,49 @@ const B2CResetPassword: React.FC = () => {
               </Alert>
             )}
             
-            {success && (
-              <Alert variant="success" className="bg-green-50 text-green-800 border-green-200">
-                <AlertDescription>{success}</AlertDescription>
+            {success ? (
+              <Alert variant="success" className="bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-100">
+                <AlertDescription>
+                  Si un compte existe avec cet email, les instructions de réinitialisation ont été envoyées.
+                  Veuillez vérifier votre boîte de réception.
+                </AlertDescription>
               </Alert>
+            ) : (
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="exemple@email.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Envoi...
+                      </>
+                    ) : (
+                      'Envoyer les instructions'
+                    )}
+                  </Button>
+                </form>
+              </Form>
             )}
-            
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="exemple@email.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <Button type="submit" className="w-full" disabled={isLoading || !!success}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Envoi en cours...
-                    </>
-                  ) : (
-                    'Réinitialiser le mot de passe'
-                  )}
-                </Button>
-              </form>
-            </Form>
           </CardContent>
-          <CardFooter className="flex justify-center">
-            <Link to="/b2c/login" className="text-sm text-primary hover:underline">
-              Retour à la connexion
-            </Link>
+          <CardFooter className="flex flex-col space-y-2">
+            <div className="text-center text-sm">
+              <Link to="/b2c/login" className="text-primary hover:underline">
+                Retour à la connexion
+              </Link>
+            </div>
           </CardFooter>
         </Card>
       </div>

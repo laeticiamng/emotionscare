@@ -1,155 +1,179 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { motion } from "framer-motion";
-
-interface VRTemplate {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  duration: string;
-}
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Loader2, Headphones, Video, Tv2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 const VRPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("templates");
-  const [selectedTemplate, setSelectedTemplate] = useState<VRTemplate | null>(null);
+  const [selectedExperience, setSelectedExperience] = useState('forest');
+  const [loading, setLoading] = useState(false);
+  const [activeExperience, setActiveExperience] = useState<string | null>(null);
   
-  // Sample VR templates
-  const templates: VRTemplate[] = [
+  const experiences = [
     {
       id: 'forest',
-      title: 'Forêt apaisante',
-      description: 'Une promenade calme dans une forêt paisible avec des sons naturels',
-      image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-      duration: '15 min'
+      title: 'Forêt sereine',
+      description: 'Immersion dans une forêt apaisante avec sons de la nature',
+      duration: '15 min',
+      icon: <Tv2 className="h-8 w-8" />
     },
     {
       id: 'ocean',
-      title: 'Fonds marins',
-      description: "Plongez dans les profondeurs de l'océan pour une relaxation intense",
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-      duration: '18 min'
+      title: 'Océan calme',
+      description: 'Méditation en visualisant les vagues de l\'océan',
+      duration: '20 min',
+      icon: <Video className="h-8 w-8" />
     },
     {
-      id: 'mountain',
-      title: 'Sommet montagneux',
-      description: 'Admirez le panorama depuis un sommet montagneux serein',
-      image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-      duration: '12 min'
+      id: 'music',
+      title: 'Voyage musical',
+      description: 'Expérience sonore immersive pour la détente profonde',
+      duration: '18 min',
+      icon: <Headphones className="h-8 w-8" />
     }
   ];
   
-  const selectTemplate = (template: VRTemplate) => {
-    setSelectedTemplate(template);
-    setActiveTab("session");
+  const startExperience = async () => {
+    setLoading(true);
+    
+    try {
+      // Simuler le chargement de l'expérience VR
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      setActiveExperience(selectedExperience);
+      toast.success('Expérience VR lancée');
+      
+    } catch (error) {
+      console.error('Erreur lors du lancement de l\'expérience:', error);
+      toast.error('Impossible de lancer l\'expérience VR');
+    } finally {
+      setLoading(false);
+    }
   };
   
-  const closeSession = () => {
-    setSelectedTemplate(null);
-    setActiveTab("templates");
+  const stopExperience = () => {
+    setActiveExperience(null);
+    toast.info('Expérience VR terminée');
   };
-
+  
+  const currentExperience = experiences.find(exp => exp.id === selectedExperience);
+  
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Expériences virtuelles</h1>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="templates">Expériences</TabsTrigger>
-            <TabsTrigger value="session" disabled={!selectedTemplate}>Session active</TabsTrigger>
-            <TabsTrigger value="history">Historique</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="templates">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {templates.map((template) => (
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-muted/20">
+      <h1 className="text-3xl font-bold mb-2 text-center">Expériences immersives</h1>
+      <p className="text-muted-foreground mb-8 text-center max-w-md">
+        Explorez nos expériences de réalité virtuelle conçues pour améliorer votre bien-être émotionnel
+      </p>
+      
+      {activeExperience ? (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="w-full max-w-3xl"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>En cours : {currentExperience?.title}</CardTitle>
+              <CardDescription>
+                Laissez-vous guider par cette expérience immersive
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-primary/10 h-64 rounded-md flex items-center justify-center">
                 <motion.div
-                  key={template.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
+                  animate={{ 
+                    scale: [1, 1.05, 1],
+                    opacity: [0.7, 1, 0.7]
+                  }}
+                  transition={{ repeat: Infinity, duration: 3 }}
                 >
-                  <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => selectTemplate(template)}>
-                    <div className="h-48 overflow-hidden">
-                      <img 
-                        src={template.image} 
-                        alt={template.title} 
-                        className="w-full h-full object-cover transition-transform hover:scale-105"
-                      />
-                    </div>
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold text-lg mb-2">{template.title}</h3>
-                      <p className="text-muted-foreground text-sm mb-2">{template.description}</p>
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <span>{template.duration}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  {currentExperience?.icon}
                 </motion.div>
-              ))}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="session">
-            {selectedTemplate && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="bg-card rounded-lg overflow-hidden shadow-lg"
-              >
-                <div className="aspect-video relative">
-                  <img 
-                    src={selectedTemplate.image} 
-                    alt={selectedTemplate.title} 
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                    <button className="bg-white/90 text-black rounded-full p-4 hover:bg-white transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-2xl font-bold">{selectedTemplate.title}</h2>
-                    <span className="text-muted-foreground">{selectedTemplate.duration}</span>
-                  </div>
-                  
-                  <p className="text-muted-foreground mb-6">{selectedTemplate.description}</p>
-                  
-                  <div className="flex space-x-4">
-                    <button className="flex-1 bg-primary text-primary-foreground py-2 rounded-md hover:bg-primary/90 transition-colors">
-                      Démarrer
-                    </button>
-                    <button 
-                      onClick={closeSession}
-                      className="flex-1 bg-secondary text-secondary-foreground py-2 rounded-md hover:bg-secondary/80 transition-colors"
-                    >
-                      Retour
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="history">
-            <div className="bg-card rounded-lg p-6 shadow-sm">
-              <h2 className="text-2xl font-semibold mb-4">Historique des sessions</h2>
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Aucune session précédente trouvée.</p>
               </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+              <div className="mt-4 text-center">
+                <p>Expérience en cours... Détendez-vous et immergez-vous dans l'environnement.</p>
+                <p className="text-sm text-muted-foreground mt-2">Durée: {currentExperience?.duration}</p>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button 
+                variant="outline" 
+                onClick={stopExperience}
+                className="w-full"
+              >
+                Terminer l'expérience
+              </Button>
+            </CardFooter>
+          </Card>
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-3xl"
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Sélectionnez une expérience</CardTitle>
+              <CardDescription>
+                Choisissez parmi nos environnements immersifs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RadioGroup 
+                value={selectedExperience} 
+                onValueChange={setSelectedExperience}
+                className="space-y-4"
+              >
+                {experiences.map(exp => (
+                  <div 
+                    key={exp.id} 
+                    className={`flex items-center space-x-4 p-4 rounded-md border ${
+                      selectedExperience === exp.id ? 'border-primary bg-primary/5' : 'border-muted'
+                    } cursor-pointer hover:border-primary/50 transition-colors`}
+                    onClick={() => setSelectedExperience(exp.id)}
+                  >
+                    <RadioGroupItem value={exp.id} id={`experience-${exp.id}`} />
+                    <div className="bg-primary/10 p-3 rounded-full">
+                      {exp.icon}
+                    </div>
+                    <div className="flex-1">
+                      <Label 
+                        htmlFor={`experience-${exp.id}`}
+                        className="text-base font-medium cursor-pointer"
+                      >
+                        {exp.title}
+                      </Label>
+                      <p className="text-sm text-muted-foreground mt-1">{exp.description}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Durée: {exp.duration}</p>
+                    </div>
+                  </div>
+                ))}
+              </RadioGroup>
+            </CardContent>
+            <CardFooter>
+              <Button 
+                className="w-full" 
+                onClick={startExperience}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+                    Lancement...
+                  </>
+                ) : (
+                  'Démarrer l\'expérience'
+                )}
+              </Button>
+            </CardFooter>
+          </Card>
+        </motion.div>
+      )}
     </div>
   );
 };

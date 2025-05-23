@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,7 +30,7 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const B2CLogin: React.FC = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const { setUserMode } = useUserMode();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -43,6 +43,14 @@ const B2CLogin: React.FC = () => {
       password: '',
     },
   });
+
+  // Rediriger si l'utilisateur est déjà connecté
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setUserMode('b2c');
+      navigate('/b2c/dashboard');
+    }
+  }, [isAuthenticated, user, navigate, setUserMode]);
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);

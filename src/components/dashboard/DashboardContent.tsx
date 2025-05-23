@@ -1,70 +1,81 @@
 
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { UserRole } from '@/types/user';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useUserMode } from '@/contexts/UserModeContext';
 
-interface DashboardContentProps {
-  className?: string;
-}
-
-const DashboardContent: React.FC<DashboardContentProps> = ({ className = '' }) => {
-  const { user } = useAuth();
+const DashboardContent: React.FC = () => {
+  const { userMode } = useUserMode();
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [content, setContent] = React.useState<any[]>([]);
   
-  // Determine content based on user role
-  const renderContent = () => {
-    // Default content for all users
-    let content = <DefaultDashboard />;
-    
-    // Check user role and override content if needed
-    if (user && user.role) {
-      if (user.role === 'b2b_user') {
-        content = <B2BUserDashboard />;
-      } else if (user.role === 'b2b_admin') {
-        content = <B2BAdminDashboard />;
+  React.useEffect(() => {
+    // Simuler le chargement des données
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        // Simuler une requête API
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        
+        // Générer du contenu différent selon le mode utilisateur
+        const contentItems = Array.from({ length: 3 }, (_, i) => ({
+          id: i + 1,
+          title: `Contenu ${i + 1} pour ${userMode === 'b2c' ? 'particulier' : userMode === 'b2b_user' ? 'collaborateur' : 'administrateur'}`,
+          description: `Description du contenu adapté au mode ${userMode}.`,
+        }));
+        
+        setContent(contentItems);
+      } catch (error) {
+        console.error('Erreur lors du chargement du contenu:', error);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
     
-    return content;
-  };
+    loadData();
+  }, [userMode]);
   
   return (
-    <div className={`p-6 ${className}`}>
-      {renderContent()}
-    </div>
-  );
-};
-
-const DefaultDashboard: React.FC = () => {
-  return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Tableau de bord</h2>
-      <p className="text-muted-foreground">
-        Bienvenue sur votre tableau de bord personnel.
-      </p>
-    </div>
-  );
-};
-
-const B2BUserDashboard: React.FC = () => {
-  return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Tableau de bord Collaborateur</h2>
-      <p className="text-muted-foreground">
-        Bienvenue sur votre tableau de bord collaborateur. 
-        Vous avez accès aux fonctionnalités d'équipe.
-      </p>
-    </div>
-  );
-};
-
-const B2BAdminDashboard: React.FC = () => {
-  return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Tableau de bord Administrateur</h2>
-      <p className="text-muted-foreground">
-        Bienvenue sur votre tableau de bord administrateur. 
-        Vous avez accès à toutes les fonctionnalités d'administration.
-      </p>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {isLoading ? (
+        // Afficher des skeletons pendant le chargement
+        <>
+          {[1, 2, 3].map(i => (
+            <Card key={i} className="overflow-hidden">
+              <CardContent className="p-0">
+                <div className="h-40 bg-muted">
+                  <Skeleton className="h-full w-full" />
+                </div>
+                <div className="p-4 space-y-2">
+                  <Skeleton className="h-5 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-4/5" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </>
+      ) : content.length > 0 ? (
+        // Afficher le contenu
+        content.map(item => (
+          <Card key={item.id} className="overflow-hidden hover:shadow-md transition-shadow">
+            <CardContent className="p-0">
+              <div className="h-40 bg-gradient-to-br from-primary/10 to-primary/30 flex items-center justify-center text-primary">
+                Contenu {item.id}
+              </div>
+              <div className="p-4">
+                <h3 className="font-medium mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground">{item.description}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
+        // Afficher un message si aucun contenu
+        <div className="col-span-full text-center p-8">
+          <p className="text-muted-foreground">Aucun contenu disponible pour le moment.</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -45,10 +45,10 @@ const LandingPage: React.FC = () => {
           <div className="pt-4">
             <Button 
               variant="link" 
-              onClick={() => navigate('/pricing')}
+              onClick={() => navigate('/choose-mode')}
               className="text-lg"
             >
-              Voir nos offres
+              Choisir un mode d'utilisation
             </Button>
           </div>
         </motion.div>

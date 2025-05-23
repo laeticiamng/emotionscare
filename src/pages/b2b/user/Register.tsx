@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -23,20 +24,19 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { toast } from 'sonner';
 
 const registerSchema = z.object({
-  name: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères' }),
+  name: z.string().min(2, { message: 'Le nom doit comporter au moins 2 caractères' }),
   email: z.string().email({ message: 'Adresse e-mail professionnelle invalide' }),
   company: z.string().min(2, { message: 'Le nom de l\'entreprise est requis' }),
-  password: z.string().min(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' }),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Les mots de passe ne correspondent pas',
-  path: ['confirmPassword'],
+  password: z.string().min(6, { message: 'Le mot de passe doit comporter au moins 6 caractères' }),
+  acceptTerms: z.boolean().refine(val => val === true, {
+    message: 'Vous devez accepter les termes et conditions',
+  }),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const B2BUserRegister: React.FC = () => {
-  const { register } = useAuth();
+  const { register, isAuthenticated, user } = useAuth();
   const { setUserMode } = useUserMode();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -49,9 +49,17 @@ const B2BUserRegister: React.FC = () => {
       email: '',
       company: '',
       password: '',
-      confirmPassword: '',
+      acceptTerms: false,
     },
   });
+
+  // Rediriger si l'utilisateur est déjà connecté
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setUserMode('b2b_user');
+      navigate('/b2b/user/dashboard');
+    }
+  }, [isAuthenticated, user, navigate, setUserMode]);
 
   const onSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
@@ -60,8 +68,8 @@ const B2BUserRegister: React.FC = () => {
     try {
       await register(data.email, data.password, { 
         name: data.name, 
-        company: data.company,
-        role: 'b2b_user'
+        role: 'b2b_user',
+        company: data.company 
       });
       setUserMode('b2b_user');
       toast.success('Inscription réussie');
@@ -80,12 +88,14 @@ const B2BUserRegister: React.FC = () => {
       <div className="flex items-center justify-center min-h-screen p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
-            <div className="flex justify-center">
-              <Building2 className="h-10 w-10 text-primary" />
+            <div className="flex items-center justify-center mb-2">
+              <div className="bg-blue-100 p-3 rounded-full">
+                <Building2 className="h-6 w-6 text-blue-600" />
+              </div>
             </div>
-            <CardTitle className="text-2xl font-bold text-center">EmotionsCare Pro</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">Créer un compte collaborateur</CardTitle>
             <CardDescription className="text-center">
-              Créez votre compte collaborateur
+              Rejoignez la plateforme de bien-être émotionnel de votre entreprise
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -118,7 +128,7 @@ const B2BUserRegister: React.FC = () => {
                     <FormItem>
                       <FormLabel>Email professionnel</FormLabel>
                       <FormControl>
-                        <Input placeholder="nom@entreprise.com" {...field} />
+                        <Input placeholder="vous@entreprise.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -155,14 +165,21 @@ const B2BUserRegister: React.FC = () => {
                 
                 <FormField
                   control={form.control}
-                  name="confirmPassword"
+                  name="acceptTerms"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirmer le mot de passe</FormLabel>
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Checkbox 
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
                       </FormControl>
-                      <FormMessage />
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          J'accepte les <Link to="/terms" className="text-primary hover:underline">termes et conditions</Link>
+                        </FormLabel>
+                        <FormMessage />
+                      </div>
                     </FormItem>
                   )}
                 />
@@ -170,7 +187,7 @@ const B2BUserRegister: React.FC = () => {
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Inscription en cours...
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Inscription...
                     </>
                   ) : (
                     'S\'inscrire'
@@ -181,14 +198,9 @@ const B2BUserRegister: React.FC = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-2">
             <div className="text-center text-sm">
-              Vous avez déjà un compte ?{' '}
+              Déjà un compte ?{' '}
               <Link to="/b2b/user/login" className="text-primary hover:underline">
                 Se connecter
-              </Link>
-            </div>
-            <div className="text-center text-sm">
-              <Link to="/b2b/selection" className="text-muted-foreground hover:underline">
-                Changer de mode de connexion
               </Link>
             </div>
           </CardFooter>

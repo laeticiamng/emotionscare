@@ -96,8 +96,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: 'user-' + Date.now().toString(),
         email,
         name: userData && 'name' in userData ? String(userData.name) : email.split('@')[0],
-        role: 'b2c',
-        ...userData,
+        role: userData && 'role' in userData ? String(userData.role) : 'b2c',
+        ...(userData as any),
       };
       
       setUser(newUser);
