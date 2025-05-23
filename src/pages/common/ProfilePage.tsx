@@ -5,30 +5,25 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { User, Mail, Building, Calendar, Save, Loader2 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { User, Mail, Building, Save, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import LoadingAnimation from '@/components/ui/loading-animation';
-
-interface ProfileData {
-  name: string;
-  email: string;
-  company?: string;
-  job_title?: string;
-  department?: string;
-  avatar_url?: string;
-  preferences?: any;
-}
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
-  const { userMode } = useUserMode();
-  const [profileData, setProfileData] = useState<ProfileData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [profile, setProfile] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+    company: '',
+    job_title: '',
+    department: '',
+    bio: '',
+    notifications_enabled: true,
+    email_notifications: true
+  });
 
   useEffect(() => {
     if (user) {
@@ -40,169 +35,209 @@ const ProfilePage: React.FC = () => {
     if (!user) return;
 
     try {
-      setIsLoading(true);
-      
-      const { data: profile, error } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
+      if (error && error.code !== 'PGRST116') throw error;
+
+      if (data) {
+        setProfile({
+          name: data.name || user.name || '',
+          email: data.email || user.email || '',
+          company: data.department || '',
+          job_title: data.job_title || '',
+          department: data.department || '',
+          bio: '',
+          notifications_enabled: data.preferences?.notifications_enabled ?? true,
+          email_notifications: data.preferences?.email_notifications ?? true
+        });
       }
-
-      setProfileData({
-        name: profile?.name || user.name || '',
-        email: profile?.email || user.email || '',
-        company: profile?.job_title || '',
-        job_title: profile?.job_title || '',
-        department: profile?.department || '',
-        avatar_url: profile?.avatar_url || '',
-        preferences: profile?.preferences || {}
-      });
-
     } catch (error) {
-      console.error('Error loading profile:', error);
-      toast.error('Erreur lors du chargement du profil');
-    } finally {
-      setIsLoading(false);
+      console.error('Profile loading error:', error);
     }
   };
 
-  const saveProfile = async () => {
-    if (!user || !profileData) return;
+  const handleSave = async () => {
+    if (!user) return;
 
-    setIsSaving(true);
+    setIsLoading(true);
     try {
       const { error } = await supabase
         .from('profiles')
         .upsert({
           id: user.id,
-          name: profileData.name,
-          email: profileData.email,
-          job_title: profileData.job_title,
-          department: profileData.department,
-          avatar_url: profileData.avatar_url,
-          preferences: profileData.preferences,
-          updated_at: new Date().toISOString()
+          name: profile.name,
+          email: profile.email,
+          job_title: profile.job_title,
+          department: profile.department,
+          preferences: {
+            notifications_enabled: profile.notifications_enabled,
+            email_notifications: profile.email_notifications
+          }
         });
 
       if (error) throw error;
 
       toast.success('Profil mis à jour avec succès');
     } catch (error) {
-      console.error('Error saving profile:', error);
+      console.error('Profile save error:', error);
       toast.error('Erreur lors de la sauvegarde');
     } finally {
-      setIsSaving(false);
+      setIsLoading(false);
     }
   };
 
-  const handleInputChange = (field: keyof ProfileData, value: string) => {
-    setProfileData(prev => prev ? { ...prev, [field]: value } : null);
+  const handleInputChange = (field: string, value: string | boolean) => {
+    setProfile(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <LoadingAnimation text="Chargement du profil..." />
-      </div>
-    );
-  }
-
-  if (!profileData) {
-    return (
-      <div className="container mx-auto p-6">
-        <Card>
-          <CardContent className="text-center py-12">
-            <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">Aucune donnée de profil trouvée</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Mon Profil</h1>
-          <p className="text-muted-foreground">
-            Gérez vos informations personnelles et préférences
-          </p>
-        </div>
-        <Badge variant="outline">
-          {userMode === 'b2c' ? 'Particulier' : 
-           userMode === 'b2b_user' ? 'Collaborateur' : 
-           'Administrateur'}
-        </Badge>
+    <div className="container mx-auto p-6 max-w-4xl space-y-6">
+      <div className="flex items-center gap-2 mb-6">
+        <User className="h-6 w-6 text-primary" />
+        <h1 className="text-3xl font-bold">Mon Profil</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Informations personnelles */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Informations Personnelles
-              </CardTitle>
+              <CardTitle>Informations Personnelles</CardTitle>
               <CardDescription>
-                Vos données de base et informations de contact
+                Gérez vos informations de profil
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div>
                   <Label htmlFor="name">Nom complet</Label>
                   <Input
                     id="name"
-                    value={profileData.name}
+                    value={profile.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder="Votre nom complet"
+                    placeholder="Votre nom"
                   />
                 </div>
-
-                <div className="space-y-2">
+                
+                <div>
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     type="email"
-                    value={profileData.email}
+                    value={profile.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     placeholder="votre@email.com"
                   />
                 </div>
               </div>
 
-              {(userMode === 'b2b_user' || userMode === 'b2b_admin') && (
-                <>
-                  <div className="space-y-2">
+              {user?.role !== 'b2c' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
                     <Label htmlFor="job_title">Poste</Label>
                     <Input
                       id="job_title"
-                      value={profileData.job_title || ''}
+                      value={profile.job_title}
                       onChange={(e) => handleInputChange('job_title', e.target.value)}
-                      placeholder="Votre poste dans l'entreprise"
+                      placeholder="Votre poste"
                     />
                   </div>
-
-                  <div className="space-y-2">
+                  
+                  <div>
                     <Label htmlFor="department">Département</Label>
                     <Input
                       id="department"
-                      value={profileData.department || ''}
+                      value={profile.department}
                       onChange={(e) => handleInputChange('department', e.target.value)}
                       placeholder="Votre département"
                     />
                   </div>
-                </>
+                </div>
               )}
 
-              <Button onClick={saveProfile} disabled={isSaving} className="w-full">
-                {isSaving ? (
+              <div>
+                <Label htmlFor="bio">Bio (optionnel)</Label>
+                <Textarea
+                  id="bio"
+                  value={profile.bio}
+                  onChange={(e) => handleInputChange('bio', e.target.value)}
+                  placeholder="Parlez-nous un peu de vous..."
+                  rows={3}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Préférences */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Préférences</CardTitle>
+              <CardDescription>
+                Personnalisez votre expérience EmotionsCare
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Notifications en temps réel</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Recevoir des notifications pour les analyses et recommandations
+                  </p>
+                </div>
+                <Switch
+                  checked={profile.notifications_enabled}
+                  onCheckedChange={(checked) => handleInputChange('notifications_enabled', checked)}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Notifications par email</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Recevoir des résumés et rappels par email
+                  </p>
+                </div>
+                <Switch
+                  checked={profile.email_notifications}
+                  onCheckedChange={(checked) => handleInputChange('email_notifications', checked)}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Avatar et infos */}
+          <Card>
+            <CardContent className="pt-6 text-center">
+              <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="h-12 w-12 text-primary" />
+              </div>
+              <h3 className="font-semibold">{profile.name || 'Nom non défini'}</h3>
+              <p className="text-sm text-muted-foreground">{profile.email}</p>
+              {profile.job_title && (
+                <p className="text-sm text-muted-foreground mt-1">{profile.job_title}</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Actions */}
+          <Card>
+            <CardContent className="pt-6 space-y-4">
+              <Button 
+                onClick={handleSave} 
+                disabled={isLoading}
+                className="w-full"
+              >
+                {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Sauvegarde...
@@ -210,66 +245,25 @@ const ProfilePage: React.FC = () => {
                 ) : (
                   <>
                     <Save className="mr-2 h-4 w-4" />
-                    Sauvegarder les modifications
+                    Sauvegarder
                   </>
                 )}
               </Button>
-            </CardContent>
-          </Card>
-        </div>
 
-        {/* Statistiques du profil */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Informations du Compte
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Email vérifié</span>
-                <Badge variant="outline" className="text-green-600">
-                  ✓ Confirmé
-                </Badge>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">Type de compte</span>
-                <Badge>
-                  {userMode === 'b2c' ? 'Personnel' : 
-                   userMode === 'b2b_user' ? 'Professionnel' : 
-                   'Administrateur'}
-                </Badge>
-              </div>
-
-              {(userMode === 'b2b_user' || userMode === 'b2b_admin') && (
-                <div className="flex items-center gap-2">
-                  <Building className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">Organisation</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Préférences</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label>Notifications</Label>
-                <div className="text-sm text-muted-foreground">
-                  Gérez vos préférences de notification dans les paramètres
+              <div className="pt-4 border-t">
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    <span>Compte vérifié</span>
+                  </div>
+                  {user?.role !== 'b2c' && (
+                    <div className="flex items-center gap-2">
+                      <Building className="h-4 w-4" />
+                      <span>Compte entreprise</span>
+                    </div>
+                  )}
                 </div>
               </div>
-              
-              <Button variant="outline" onClick={() => window.location.href = '/settings'}>
-                Ouvrir les paramètres
-              </Button>
             </CardContent>
           </Card>
         </div>

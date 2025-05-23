@@ -132,6 +132,29 @@ const routes: RouteObject[] = [
               </AuthTransition>
           },
           
+          // Routes fonctionnelles
+          {
+            path: 'scan',
+            element: 
+              <AuthTransition>
+                <EmotionScanner />
+              </AuthTransition>
+          },
+          {
+            path: 'coach',
+            element: 
+              <AuthTransition>
+                <AICoach />
+              </AuthTransition>
+          },
+          {
+            path: 'music',
+            element: 
+              <AuthTransition>
+                <MusicTherapy />
+              </AuthTransition>
+          },
+          
           // Routes communes
           {
             path: 'profile',

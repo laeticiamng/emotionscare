@@ -1,40 +1,36 @@
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface NavItemButtonProps {
   label: string;
   path: string;
-  icon: React.ReactNode;
+  icon: React.ComponentType<{ className?: string }>;
   collapsed?: boolean;
+  onClick: () => void;
   active?: boolean;
-  onClick?: () => void;
 }
 
 const NavItemButton: React.FC<NavItemButtonProps> = ({
   label,
-  path,
-  icon,
+  icon: Icon,
   collapsed = false,
-  active = false,
   onClick,
+  active = false
 }) => {
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <Button
+      variant={active ? "default" : "ghost"}
       className={cn(
-        "flex items-center w-full py-2 px-3 rounded-md text-sm transition-colors",
-        active ? 
-          "bg-primary/10 text-primary font-medium" : 
-          "text-muted-foreground hover:bg-muted hover:text-foreground"
+        "w-full justify-start",
+        collapsed && "justify-center px-2"
       )}
+      onClick={onClick}
     >
-      <span className={cn("mr-3", collapsed ? "mr-0" : "")}>
-        {icon}
-      </span>
+      <Icon className={cn("h-4 w-4", !collapsed && "mr-2")} />
       {!collapsed && <span>{label}</span>}
-    </button>
+    </Button>
   );
 };
 

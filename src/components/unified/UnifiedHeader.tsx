@@ -1,12 +1,9 @@
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, User, Home, LogOut } from 'lucide-react';
+import { Menu, Bell, User, Brain } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { getUserModeDisplayName } from '@/utils/userModeHelpers';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,100 +14,70 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 interface UnifiedHeaderProps {
-  onMenuToggle: () => void;
+  onMenuClick?: () => void;
 }
 
-const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ onMenuToggle }) => {
-  const { isAuthenticated, user, logout } = useAuth();
-  const { userMode } = useUserMode();
+const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ onMenuClick }) => {
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const modeName = getUserModeDisplayName(userMode);
-
   const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+    await logout();
+    navigate('/choose-mode');
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        <Button variant="ghost" size="icon" onClick={onMenuToggle} className="mr-2 md:hidden">
+    <header className="fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={onMenuClick}
+        >
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle menu</span>
         </Button>
-        
-        <Link to="/" className="flex items-center space-x-2 mr-4">
-          <span className="font-bold text-xl">EmotionsCare</span>
-          {userMode && <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">{modeName}</span>}
-        </Link>
 
-        <div className="flex-1"></div>
+        <div className="flex items-center space-x-2 ml-4 md:ml-0">
+          <Brain className="h-6 w-6 text-primary" />
+          <span className="font-bold text-lg">EmotionsCare</span>
+        </div>
 
-        <div className="flex items-center space-x-2">
-          {isAuthenticated ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.user_metadata?.avatar_url} alt="Avatar" />
-                    <AvatarFallback>
-                      {user?.user_metadata?.name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {user?.user_metadata?.name || 'Utilisateur'}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user?.email}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {modeName}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profil</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/dashboard" className="cursor-pointer">
-                    <Home className="mr-2 h-4 w-4" />
-                    <span>Tableau de bord</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/choose-mode')} className="cursor-pointer">
-                  <span>Changer de mode</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Se déconnecter</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <>
-              <Button variant="ghost" onClick={() => navigate('/choose-mode')}>
-                Se connecter
+        <div className="flex flex-1 items-center justify-end space-x-4">
+          <Button variant="ghost" size="icon">
+            <Bell className="h-4 w-4" />
+            <span className="sr-only">Notifications</span>
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <User className="h-4 w-4" />
               </Button>
-              <Button onClick={() => navigate('/choose-mode')}>
-                Commencer
-              </Button>
-            </>
-          )}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user?.name}</p>
+                  <p className="text-xs leading-none text-muted-foreground">
+                    {user?.email}
+                  </p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/profile')}>
+                Profil
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/settings')}>
+                Paramètres
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>
+                Se déconnecter
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

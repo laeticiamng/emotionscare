@@ -2,153 +2,65 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Shield, 
+  Building, 
   Users, 
   TrendingUp, 
-  AlertTriangle, 
-  Building,
+  AlertTriangle,
   BarChart3,
   Settings,
   UserPlus,
   Activity,
-  Target,
+  Heart,
   Calendar,
-  Award
+  FileText
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import LoadingAnimation from '@/components/ui/loading-animation';
 
 interface AdminStats {
   totalUsers: number;
   activeUsers: number;
   averageWellbeing: number;
-  criticalAlerts: number;
-  departmentData: DepartmentData[];
-  recentActivity: ActivityData[];
-}
-
-interface DepartmentData {
-  name: string;
-  userCount: number;
-  averageScore: number;
-  trend: 'up' | 'down' | 'stable';
-}
-
-interface ActivityData {
-  id: string;
-  user: string;
-  action: string;
-  timestamp: Date;
-  type: 'warning' | 'success' | 'info';
+  alertsCount: number;
+  weeklyGrowth: number;
+  engagementRate: number;
 }
 
 const B2BAdminDashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const [stats, setStats] = useState<AdminStats | null>(null);
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [stats, setStats] = useState<AdminStats>({
+    totalUsers: 0,
+    activeUsers: 0,
+    averageWellbeing: 0,
+    alertsCount: 0,
+    weeklyGrowth: 0,
+    engagementRate: 0
+  });
 
   useEffect(() => {
-    if (user) {
-      loadAdminData();
-    }
-  }, [user]);
+    loadAdminData();
+  }, []);
 
   const loadAdminData = async () => {
-    if (!user) return;
+    setIsLoading(true);
     
-    try {
-      setIsLoading(true);
-
-      // Charger les données des utilisateurs B2B
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .in('role', ['b2b_user', 'b2b_admin']);
-
-      if (profilesError) throw profilesError;
-
-      // Charger les émotions récentes
-      const { data: emotions, error: emotionsError } = await supabase
-        .from('emotions')
-        .select('*, profiles!inner(role)')
-        .eq('profiles.role', 'b2b_user')
-        .gte('date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
-
-      if (emotionsError) throw emotionsError;
-
-      // Calculer les statistiques
-      const totalUsers = profiles?.filter(p => p.role === 'b2b_user').length || 0;
-      const activeUsers = Math.round(totalUsers * 0.75); // Simulation
-      
-      const avgWellbeing = emotions?.length > 0 
-        ? emotions.reduce((sum, e) => sum + (e.score || 0), 0) / emotions.length 
-        : 0;
-
-      const criticalAlerts = emotions?.filter(e => (e.score || 0) < 30).length || 0;
-
-      // Simuler les données par département
-      const departmentData: DepartmentData[] = [
-        { name: 'IT', userCount: 8, averageScore: 78, trend: 'up' },
-        { name: 'RH', userCount: 5, averageScore: 72, trend: 'stable' },
-        { name: 'Marketing', userCount: 6, averageScore: 65, trend: 'down' },
-        { name: 'Finance', userCount: 4, averageScore: 80, trend: 'up' }
-      ];
-
-      // Simuler l'activité récente
-      const recentActivity: ActivityData[] = [
-        {
-          id: '1',
-          user: 'Marie Dubois',
-          action: 'Score émotionnel critique (25/100)',
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-          type: 'warning'
-        },
-        {
-          id: '2',
-          user: 'Pierre Martin',
-          action: 'Objectif de bien-être atteint',
-          timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
-          type: 'success'
-        },
-        {
-          id: '3',
-          user: 'Sophie Laurent',
-          action: 'Nouveau compte créé',
-          timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
-          type: 'info'
-        }
-      ];
-
+    // Simuler le chargement des données admin
+    setTimeout(() => {
       setStats({
-        totalUsers,
-        activeUsers,
-        averageWellbeing: Math.round(avgWellbeing),
-        criticalAlerts,
-        departmentData,
-        recentActivity
+        totalUsers: 124,
+        activeUsers: 98,
+        averageWellbeing: 72,
+        alertsCount: 3,
+        weeklyGrowth: 12,
+        engagementRate: 84
       });
-
-    } catch (error) {
-      console.error('Admin data loading error:', error);
-      toast.error("Impossible de charger les données administrateur");
-    } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleInviteUser = () => {
-    toast.info("Fonctionnalité d'invitation en développement");
-  };
-
-  const handleExportData = () => {
-    toast.info("Export des données en développement");
+    }, 1500);
   };
 
   if (isLoading) {
@@ -159,281 +71,284 @@ const B2BAdminDashboardPage: React.FC = () => {
     );
   }
 
-  const getTrendIcon = (trend: string) => {
-    switch (trend) {
-      case 'up': return <TrendingUp className="h-4 w-4 text-green-500" />;
-      case 'down': return <TrendingUp className="h-4 w-4 text-red-500 rotate-180" />;
-      default: return <div className="h-4 w-4 bg-gray-300 rounded-full" />;
-    }
-  };
-
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'warning': return <AlertTriangle className="h-4 w-4 text-orange-500" />;
-      case 'success': return <Award className="h-4 w-4 text-green-500" />;
-      default: return <Activity className="h-4 w-4 text-blue-500" />;
-    }
-  };
-
   return (
     <div className="container mx-auto p-6 space-y-6">
-      {/* Welcome Section */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Shield className="h-8 w-8 text-primary" />
-            Administration EmotionsCare
+          <h1 className="text-3xl font-bold">
+            Administration - {user?.company || 'Votre entreprise'}
           </h1>
           <p className="text-muted-foreground">
-            Tableau de bord administrateur - Vue d'ensemble organisationnelle
+            Tableau de bord administrateur EmotionsCare
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={handleInviteUser} className="flex items-center gap-2">
-            <UserPlus className="h-4 w-4" />
-            Inviter utilisateur
-          </Button>
-          <Button variant="outline" onClick={handleExportData}>
-            Exporter données
-          </Button>
+          <Building className="h-5 w-5 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">Mode Administrateur</span>
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Alert Section */}
+      {stats.alertsCount > 0 && (
+        <Card className="border-orange-200 bg-orange-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <AlertTriangle className="h-8 w-8 text-orange-600" />
+              <div>
+                <h3 className="font-semibold text-orange-900">
+                  {stats.alertsCount} alerte{stats.alertsCount > 1 ? 's' : ''} nécessite{stats.alertsCount > 1 ? 'nt' : ''} votre attention
+                </h3>
+                <p className="text-sm text-orange-800">
+                  Des collaborateurs présentent des indicateurs de bien-être préoccupants
+                </p>
+              </div>
+              <Button variant="outline" className="ml-auto">
+                Voir les alertes
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Utilisateurs Total</CardTitle>
+            <CardTitle className="text-sm font-medium">Utilisateurs Totaux</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalUsers || 0}</div>
-            <p className="text-xs text-muted-foreground">+{stats?.activeUsers || 0} actifs</p>
+            <div className="text-2xl font-bold">{stats.totalUsers}</div>
+            <p className="text-xs text-muted-foreground">
+              +{stats.weeklyGrowth} cette semaine
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Utilisateurs Actifs</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.activeUsers}</div>
+            <p className="text-xs text-muted-foreground">
+              {Math.round((stats.activeUsers / stats.totalUsers) * 100)}% du total
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Bien-être Moyen</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            <Heart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.averageWellbeing || 0}%</div>
-            <Progress value={stats?.averageWellbeing || 0} className="mt-2" />
+            <div className="text-2xl font-bold">{stats.averageWellbeing}/100</div>
+            <p className="text-xs text-muted-foreground">
+              Score de l'entreprise
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Alertes Critiques</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-sm font-medium">Engagement</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{stats?.criticalAlerts || 0}</div>
-            <p className="text-xs text-muted-foreground">Nécessitent attention</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Taux Engagement</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">85%</div>
-            <p className="text-xs text-muted-foreground">Participation active</p>
+            <div className="text-2xl font-bold">{stats.engagementRate}%</div>
+            <p className="text-xs text-muted-foreground">
+              Taux d'engagement
+            </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Main Content */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="departments">Départements</TabsTrigger>
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview">Aperçu</TabsTrigger>
+          <TabsTrigger value="users">Utilisateurs</TabsTrigger>
           <TabsTrigger value="analytics">Analytiques</TabsTrigger>
+          <TabsTrigger value="reports">Rapports</TabsTrigger>
           <TabsTrigger value="settings">Paramètres</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Activité récente */}
+            {/* Quick Actions */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5" />
-                  Activité Récente
-                </CardTitle>
-                <CardDescription>Événements importants des dernières heures</CardDescription>
+                <CardTitle>Actions Rapides</CardTitle>
+                <CardDescription>Accédez rapidement aux fonctions d'administration</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {stats?.recentActivity.map((activity) => (
-                    <div key={activity.id} className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                      {getActivityIcon(activity.type)}
-                      <div className="flex-1">
-                        <p className="font-medium">{activity.user}</p>
-                        <p className="text-sm text-muted-foreground">{activity.action}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {activity.timestamp.toLocaleTimeString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                <div className="grid grid-cols-2 gap-4">
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex flex-col gap-2"
+                    onClick={() => navigate('/b2b/admin/users')}
+                  >
+                    <UserPlus className="h-6 w-6" />
+                    Inviter Utilisateur
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex flex-col gap-2"
+                    onClick={() => navigate('/b2b/admin/analytics')}
+                  >
+                    <BarChart3 className="h-6 w-6" />
+                    Voir Analytiques
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex flex-col gap-2"
+                  >
+                    <FileText className="h-6 w-6" />
+                    Rapport Mensuel
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="h-20 flex flex-col gap-2"
+                  >
+                    <Settings className="h-6 w-6" />
+                    Paramètres
+                  </Button>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Actions rapides */}
+            {/* Recent Activity */}
             <Card>
               <CardHeader>
-                <CardTitle>Actions Administrateur</CardTitle>
-                <CardDescription>Outils de gestion rapide</CardDescription>
+                <CardTitle>Activité Récente</CardTitle>
+                <CardDescription>Dernières actions dans votre organisation</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => setActiveTab('analytics')}
-                  >
-                    <BarChart3 className="mr-2 h-4 w-4" />
-                    Voir les analytiques détaillées
-                  </Button>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                    <div>
+                      <p className="font-medium">5 nouveaux utilisateurs inscrits</p>
+                      <p className="text-sm text-muted-foreground">Il y a 2 heures</p>
+                    </div>
+                    <UserPlus className="h-4 w-4 text-green-600" />
+                  </div>
                   
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={handleInviteUser}
-                  >
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Inviter de nouveaux utilisateurs
-                  </Button>
+                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                    <div>
+                      <p className="font-medium">Rapport hebdomadaire généré</p>
+                      <p className="text-sm text-muted-foreground">Il y a 4 heures</p>
+                    </div>
+                    <FileText className="h-4 w-4 text-blue-600" />
+                  </div>
                   
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => setActiveTab('settings')}
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    Configuration organisation
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={handleExportData}
-                  >
-                    <Calendar className="mr-2 h-4 w-4" />
-                    Planifier rapport mensuel
-                  </Button>
+                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                    <div>
+                      <p className="font-medium">Session de formation terminée</p>
+                      <p className="text-sm text-muted-foreground">Hier</p>
+                    </div>
+                    <Calendar className="h-4 w-4 text-purple-600" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
 
-        <TabsContent value="departments" className="space-y-6">
+          {/* Key Metrics */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building className="h-5 w-5" />
-                Performance par Département
-              </CardTitle>
-              <CardDescription>Analyse du bien-être par équipe</CardDescription>
+              <CardTitle>Métriques Clés</CardTitle>
+              <CardDescription>Indicateurs de performance de votre organisation</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                {stats?.departmentData.map((dept, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <h4 className="font-medium">{dept.name}</h4>
-                        {getTrendIcon(dept.trend)}
-                      </div>
-                      <Badge variant="outline">
-                        {dept.userCount} utilisateurs
-                      </Badge>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Score moyen de bien-être</span>
-                        <span className="font-medium">{dept.averageScore}%</span>
-                      </div>
-                      <Progress value={dept.averageScore} className="h-2" />
-                    </div>
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">87%</div>
+                  <div className="text-sm text-green-800">Satisfaction Utilisateurs</div>
+                </div>
+                
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">92%</div>
+                  <div className="text-sm text-blue-800">Taux de Rétention</div>
+                </div>
+                
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600">15min</div>
+                  <div className="text-sm text-purple-800">Temps Moyen par Session</div>
+                </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-6">
+        <TabsContent value="users">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Analytiques Avancées
-              </CardTitle>
-              <CardDescription>Analyses détaillées du bien-être organisationnel</CardDescription>
+              <CardTitle>Gestion des Utilisateurs</CardTitle>
+              <CardDescription>Administrez les comptes de votre organisation</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-12">
-                <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Analytiques Détaillées</h3>
-                <p className="text-muted-foreground mb-4">
-                  Visualisations et rapports approfondis en développement
-                </p>
-                <Button onClick={() => toast.info("Fonctionnalité bientôt disponible")}>
-                  Accéder aux rapports
+                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Interface de gestion des utilisateurs en développement</p>
+                <Button className="mt-4" onClick={() => navigate('/b2b/admin/users')}>
+                  Accéder à la gestion avancée
                 </Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="settings" className="space-y-6">
+        <TabsContent value="analytics">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
-                Paramètres Organisation
-              </CardTitle>
-              <CardDescription>Configuration de votre instance EmotionsCare</CardDescription>
+              <CardTitle>Analytiques Avancées</CardTitle>
+              <CardDescription>Analyses détaillées du bien-être organisationnel</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-medium mb-2">Invitations d'utilisateurs</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Gérer les invitations et les rôles des nouveaux collaborateurs
-                  </p>
-                  <Button onClick={handleInviteUser}>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Nouvelle invitation
-                  </Button>
-                </div>
+              <div className="text-center py-12">
+                <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Tableaux de bord analytiques en développement</p>
+                <Button className="mt-4" onClick={() => navigate('/b2b/admin/analytics')}>
+                  Accéder aux analytiques
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-medium mb-2">Notifications</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Configurer les alertes et notifications automatiques
-                  </p>
-                  <Button variant="outline" onClick={() => toast.info("Configuration en développement")}>
-                    Configurer notifications
-                  </Button>
-                </div>
+        <TabsContent value="reports">
+          <Card>
+            <CardHeader>
+              <CardTitle>Rapports</CardTitle>
+              <CardDescription>Générez et consultez vos rapports</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12">
+                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Système de rapports en développement</p>
+                <p className="text-sm text-muted-foreground">Bientôt disponible pour générer des rapports détaillés</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-medium mb-2">Rapports automatiques</h4>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Planifier l'envoi de rapports périodiques
-                  </p>
-                  <Button variant="outline" onClick={() => toast.info("Planification en développement")}>
-                    Planifier rapports
-                  </Button>
-                </div>
+        <TabsContent value="settings">
+          <Card>
+            <CardHeader>
+              <CardTitle>Paramètres d'Organisation</CardTitle>
+              <CardDescription>Configurez votre environnement EmotionsCare</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-12">
+                <Settings className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Interface de paramètres en développement</p>
+                <p className="text-sm text-muted-foreground">Bientôt disponible pour personnaliser votre organisation</p>
               </div>
             </CardContent>
           </Card>

@@ -1,37 +1,34 @@
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState<boolean>(() => {
-    // Check if we're in a browser environment
-    if (typeof window !== 'undefined') {
-      return window.matchMedia(query).matches;
-    }
-    return false;
-  });
+  const [matches, setMatches] = useState(false);
 
   useEffect(() => {
-    // Exit early if not in a browser environment
-    if (typeof window === 'undefined') {
-      return;
+    const media = window.matchMedia(query);
+    
+    if (media.matches !== matches) {
+      setMatches(media.matches);
     }
-
-    const mediaQuery = window.matchMedia(query);
     
-    // Update matches state when the media query changes
-    const updateMatches = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
+    const listener = () => setMatches(media.matches);
+    
+    if (typeof media.addEventListener === 'function') {
+      media.addEventListener('change', listener);
+    } else {
+      // Fallback for older browsers
+      media.addListener(listener);
+    }
+    
+    return () => {
+      if (typeof media.removeEventListener === 'function') {
+        media.removeEventListener('change', listener);
+      } else {
+        // Fallback for older browsers
+        media.removeListener(listener);
+      }
     };
-
-    // Set initial value
-    setMatches(mediaQuery.matches);
-
-    // Listen for changes
-    mediaQuery.addEventListener('change', updateMatches);
-    
-    // Clean up listener
-    return () => mediaQuery.removeEventListener('change', updateMatches);
-  }, [query]);
+  }, [matches, query]);
 
   return matches;
 }

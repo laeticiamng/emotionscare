@@ -1,43 +1,63 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { CheckCircle, User, Target, Heart, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Heart, Target, Smile, ChevronRight, CheckCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface OnboardingData {
-  fullName: string;
-  age: string;
   goals: string[];
-  experience: string;
-  notifications: boolean;
+  emotionalNeeds: string;
+  preferredActivities: string[];
+  personalInfo: {
+    age?: number;
+    occupation?: string;
+  };
 }
 
 const B2COnboardingPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<OnboardingData>({
-    fullName: user?.name || '',
-    age: '',
+  const [onboardingData, setOnboardingData] = useState<OnboardingData>({
     goals: [],
-    experience: '',
-    notifications: true
+    emotionalNeeds: '',
+    preferredActivities: [],
+    personalInfo: {}
   });
 
   const totalSteps = 4;
-  const progress = (currentStep / totalSteps) * 100;
+  const progress = ((currentStep + 1) / totalSteps) * 100;
+
+  const goals = [
+    'Réduire le stress',
+    'Améliorer mon humeur',
+    'Mieux comprendre mes émotions',
+    'Développer la résilience',
+    'Améliorer mes relations',
+    'Gérer l\'anxiété'
+  ];
+
+  const activities = [
+    'Méditation guidée',
+    'Exercices de respiration',
+    'Musicothérapie',
+    'Journal émotionnel',
+    'Coaching IA',
+    'Exercices de pleine conscience'
+  ];
 
   const handleGoalToggle = (goal: string) => {
-    setData(prev => ({
+    setOnboardingData(prev => ({
       ...prev,
       goals: prev.goals.includes(goal)
         ? prev.goals.filter(g => g !== goal)
@@ -45,92 +65,105 @@ const B2COnboardingPage: React.FC = () => {
     }));
   };
 
-  const handleNext = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(prev => prev + 1);
-    }
+  const handleActivityToggle = (activity: string) => {
+    setOnboardingData(prev => ({
+      ...prev,
+      preferredActivities: prev.preferredActivities.includes(activity)
+        ? prev.preferredActivities.filter(a => a !== activity)
+        : [...prev.preferredActivities, activity]
+    }));
   };
 
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(prev => prev - 1);
-    }
-  };
+  const completeOnboarding = async () => {
+    if (!user) return;
 
-  const handleComplete = async () => {
     setIsLoading(true);
     try {
-      if (!user) throw new Error('Utilisateur non connecté');
-
-      // Sauvegarder les données d'onboarding dans le profil
+      // Sauvegarder les données d'onboarding
       const { error } = await supabase
         .from('profiles')
         .update({
-          name: data.fullName,
           preferences: {
-            age: data.age,
-            goals: data.goals,
-            experience: data.experience,
-            notifications_enabled: data.notifications,
-            onboarding_completed: true,
-            theme: 'system',
-            language: 'fr',
-            email_notifications: true
+            ...onboardingData,
+            onboarded: true,
+            trial_end_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
           }
         })
         .eq('id', user.id);
 
       if (error) throw error;
 
-      toast.success('Profil configuré avec succès !');
+      toast.success('Onboarding terminé ! Bienvenue sur EmotionsCare');
       navigate('/b2c/dashboard');
-    } catch (error: any) {
-      console.error('Onboarding error:', error);
-      toast.error('Erreur lors de la configuration du profil');
+    } catch (error) {
+      console.error('Onboarding completion error:', error);
+      toast.error('Erreur lors de la finalisation de l\'onboarding');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const availableGoals = [
-    'Réduire le stress',
-    'Améliorer l\'humeur',
-    'Gérer l\'anxiété',
-    'Développer la confiance',
-    'Mieux dormir',
-    'Équilibre vie pro/perso'
-  ];
+  const nextStep = () => {
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      completeOnboarding();
+    }
+  };
 
-  const renderStepContent = () => {
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const renderStep = () => {
     switch (currentStep) {
+      case 0:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <Heart className="h-16 w-16 text-primary mx-auto mb-4" />
+              <h2 className="text-2xl font-bold mb-2">Bienvenue sur EmotionsCare</h2>
+              <p className="text-muted-foreground">
+                Nous allons personnaliser votre expérience en quelques étapes simples
+              </p>
+            </div>
+            
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="font-semibold text-blue-900 mb-2">🎁 Période d'essai gratuite</h3>
+              <p className="text-blue-800 text-sm">
+                Profitez de 3 jours gratuits pour découvrir toutes nos fonctionnalités premium !
+              </p>
+            </div>
+          </div>
+        );
+
       case 1:
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <User className="h-12 w-12 mx-auto mb-4 text-primary" />
-              <h2 className="text-2xl font-bold mb-2">Faisons connaissance</h2>
-              <p className="text-muted-foreground">Parlez-nous un peu de vous</p>
+              <Target className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h2 className="text-xl font-bold mb-2">Quels sont vos objectifs ?</h2>
+              <p className="text-muted-foreground">
+                Sélectionnez ce que vous aimeriez améliorer (plusieurs choix possibles)
+              </p>
             </div>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Nom complet</Label>
-                <Input
-                  id="fullName"
-                  value={data.fullName}
-                  onChange={(e) => setData(prev => ({ ...prev, fullName: e.target.value }))}
-                  placeholder="Votre nom complet"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="age">Âge (optionnel)</Label>
-                <Input
-                  id="age"
-                  type="number"
-                  value={data.age}
-                  onChange={(e) => setData(prev => ({ ...prev, age: e.target.value }))}
-                  placeholder="Votre âge"
-                />
-              </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {goals.map((goal) => (
+                <Button
+                  key={goal}
+                  variant={onboardingData.goals.includes(goal) ? "default" : "outline"}
+                  className="h-auto p-4 text-left justify-start"
+                  onClick={() => handleGoalToggle(goal)}
+                >
+                  {onboardingData.goals.includes(goal) && (
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                  )}
+                  {goal}
+                </Button>
+              ))}
             </div>
           </div>
         );
@@ -139,22 +172,25 @@ const B2COnboardingPage: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <Target className="h-12 w-12 mx-auto mb-4 text-primary" />
-              <h2 className="text-2xl font-bold mb-2">Vos objectifs</h2>
-              <p className="text-muted-foreground">Quels sont vos objectifs de bien-être ?</p>
+              <Smile className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h2 className="text-xl font-bold mb-2">Quelles activités vous intéressent ?</h2>
+              <p className="text-muted-foreground">
+                Choisissez les outils que vous aimeriez utiliser
+              </p>
             </div>
+
             <div className="grid grid-cols-1 gap-3">
-              {availableGoals.map((goal) => (
+              {activities.map((activity) => (
                 <Button
-                  key={goal}
-                  variant={data.goals.includes(goal) ? "default" : "outline"}
-                  onClick={() => handleGoalToggle(goal)}
-                  className="justify-start h-auto p-4"
+                  key={activity}
+                  variant={onboardingData.preferredActivities.includes(activity) ? "default" : "outline"}
+                  className="h-auto p-4 text-left justify-start"
+                  onClick={() => handleActivityToggle(activity)}
                 >
-                  <div className="flex items-center gap-3">
-                    {data.goals.includes(goal) && <CheckCircle className="h-5 w-5" />}
-                    <span>{goal}</span>
-                  </div>
+                  {onboardingData.preferredActivities.includes(activity) && (
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                  )}
+                  {activity}
                 </Button>
               ))}
             </div>
@@ -165,79 +201,58 @@ const B2COnboardingPage: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <Heart className="h-12 w-12 mx-auto mb-4 text-primary" />
-              <h2 className="text-2xl font-bold mb-2">Votre expérience</h2>
-              <p className="text-muted-foreground">Avez-vous déjà utilisé des outils de bien-être ?</p>
+              <h2 className="text-xl font-bold mb-2">Parlez-nous de vous</h2>
+              <p className="text-muted-foreground">
+                Ces informations nous aident à personnaliser votre expérience
+              </p>
             </div>
-            <RadioGroup
-              value={data.experience}
-              onValueChange={(value) => setData(prev => ({ ...prev, experience: value }))}
-              className="space-y-3"
-            >
-              <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                <RadioGroupItem value="beginner" id="beginner" />
-                <Label htmlFor="beginner" className="flex-1 cursor-pointer">
-                  <div>
-                    <p className="font-medium">Débutant</p>
-                    <p className="text-sm text-muted-foreground">Première fois que j'utilise ce type d'outil</p>
-                  </div>
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                <RadioGroupItem value="intermediate" id="intermediate" />
-                <Label htmlFor="intermediate" className="flex-1 cursor-pointer">
-                  <div>
-                    <p className="font-medium">Intermédiaire</p>
-                    <p className="text-sm text-muted-foreground">J'ai déjà essayé quelques applications</p>
-                  </div>
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 border rounded-lg">
-                <RadioGroupItem value="experienced" id="experienced" />
-                <Label htmlFor="experienced" className="flex-1 cursor-pointer">
-                  <div>
-                    <p className="font-medium">Expérimenté</p>
-                    <p className="text-sm text-muted-foreground">J'utilise régulièrement des outils de bien-être</p>
-                  </div>
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
-        );
 
-      case 4:
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500" />
-              <h2 className="text-2xl font-bold mb-2">Presque terminé !</h2>
-              <p className="text-muted-foreground">Configurons vos préférences finales</p>
-            </div>
             <div className="space-y-4">
-              <div className="p-4 border rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">Notifications</p>
-                    <p className="text-sm text-muted-foreground">Recevoir des rappels de bien-être</p>
-                  </div>
-                  <Button
-                    variant={data.notifications ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setData(prev => ({ ...prev, notifications: !prev.notifications }))}
-                  >
-                    {data.notifications ? 'Activé' : 'Désactivé'}
-                  </Button>
-                </div>
+              <div>
+                <Label htmlFor="age">Âge (optionnel)</Label>
+                <Input
+                  id="age"
+                  type="number"
+                  value={onboardingData.personalInfo.age || ''}
+                  onChange={(e) => setOnboardingData(prev => ({
+                    ...prev,
+                    personalInfo: {
+                      ...prev.personalInfo,
+                      age: parseInt(e.target.value) || undefined
+                    }
+                  }))}
+                  placeholder="Votre âge"
+                />
               </div>
-              
-              <div className="p-4 bg-muted rounded-lg">
-                <h3 className="font-medium mb-2">Récapitulatif</h3>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Nom: {data.fullName}</li>
-                  {data.age && <li>• Âge: {data.age} ans</li>}
-                  <li>• Objectifs: {data.goals.length} sélectionnés</li>
-                  <li>• Expérience: {data.experience || 'Non spécifiée'}</li>
-                </ul>
+
+              <div>
+                <Label htmlFor="occupation">Profession (optionnel)</Label>
+                <Input
+                  id="occupation"
+                  value={onboardingData.personalInfo.occupation || ''}
+                  onChange={(e) => setOnboardingData(prev => ({
+                    ...prev,
+                    personalInfo: {
+                      ...prev.personalInfo,
+                      occupation: e.target.value
+                    }
+                  }))}
+                  placeholder="Votre profession"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="needs">Qu'aimeriez-vous améliorer en priorité ? (optionnel)</Label>
+                <Textarea
+                  id="needs"
+                  value={onboardingData.emotionalNeeds}
+                  onChange={(e) => setOnboardingData(prev => ({
+                    ...prev,
+                    emotionalNeeds: e.target.value
+                  }))}
+                  placeholder="Décrivez vos besoins et attentes..."
+                  rows={3}
+                />
               </div>
             </div>
           </div>
@@ -248,64 +263,49 @@ const B2COnboardingPage: React.FC = () => {
     }
   };
 
-  const canProceed = () => {
-    switch (currentStep) {
-      case 1:
-        return data.fullName.trim().length > 0;
-      case 2:
-        return data.goals.length > 0;
-      case 3:
-        return data.experience.length > 0;
-      case 4:
-        return true;
-      default:
-        return false;
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
-      <Card className="w-full max-w-lg">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl">
         <CardHeader>
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <CardTitle>Configuration du profil</CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle>Configuration de votre profil</CardTitle>
               <span className="text-sm text-muted-foreground">
-                {currentStep}/{totalSteps}
+                {currentStep + 1} / {totalSteps}
               </span>
             </div>
-            <Progress value={progress} className="h-2" />
+            <Progress value={progress} className="w-full" />
           </div>
         </CardHeader>
-        <CardContent>
-          {renderStepContent()}
-          
+
+        <CardContent className="pt-6">
+          {renderStep()}
+
           <div className="flex justify-between mt-8">
             <Button
               variant="outline"
-              onClick={handlePrevious}
-              disabled={currentStep === 1}
+              onClick={prevStep}
+              disabled={currentStep === 0}
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
               Précédent
             </Button>
-            
-            {currentStep === totalSteps ? (
-              <Button 
-                onClick={handleComplete} 
-                disabled={!canProceed() || isLoading}
-              >
-                {isLoading ? 'Configuration...' : 'Terminer'}
-              </Button>
-            ) : (
-              <Button 
-                onClick={handleNext} 
-                disabled={!canProceed()}
-              >
-                Suivant
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            )}
+
+            <Button
+              onClick={nextStep}
+              disabled={isLoading}
+              className="min-w-[120px]"
+            >
+              {isLoading ? (
+                'Finalisation...'
+              ) : currentStep === totalSteps - 1 ? (
+                'Terminer'
+              ) : (
+                <>
+                  Suivant
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </>
+              )}
+            </Button>
           </div>
         </CardContent>
       </Card>
