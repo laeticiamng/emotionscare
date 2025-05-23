@@ -1,458 +1,489 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
-import { Users, MessageSquare, Heart, Share2, Search, Plus, Send } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MessageSquare, Heart, Share, Send, Users, Globe, User, BellPlus, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import LoadingAnimation from '@/components/ui/loading-animation';
+import { toast } from 'sonner';
 
 interface Post {
   id: string;
-  user_id: string;
-  content: string;
-  reactions: number;
-  image_url?: string;
-  date: string;
-  profiles: {
+  author: {
+    id: string;
     name: string;
+    avatar?: string;
   };
+  content: string;
+  likes: number;
+  comments: number;
+  timestamp: string;
+  hasLiked: boolean;
 }
 
-interface Comment {
+interface UserSuggestion {
   id: string;
-  post_id: string;
-  user_id: string;
-  content: string;
-  date: string;
-  profiles: {
-    name: string;
-  };
+  name: string;
+  bio: string;
+  avatar?: string;
 }
 
 const B2CSocialPage: React.FC = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [comments, setComments] = useState<Record<string, Comment[]>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('feed');
+  const [posts, setPosts] = useState<Post[]>([]);
   const [newPostContent, setNewPostContent] = useState('');
   const [isPosting, setIsPosting] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
-  const [newComments, setNewComments] = useState<Record<string, string>>({});
-
+  const [suggestions, setSuggestions] = useState<UserSuggestion[]>([]);
+  
+  // Simulation de chargement des données
   useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  const fetchPosts = async () => {
-    try {
+    const loadData = async () => {
       setIsLoading(true);
-      const { data, error } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          profiles (name)
-        `)
-        .order('date', { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      setPosts(data || []);
-    } catch (error: any) {
-      console.error('Error fetching posts:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les publications",
-        variant: "destructive"
-      });
-    } finally {
+      
+      // Attente simulée pour l'API
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Posts simulés
+      const mockPosts: Post[] = [
+        {
+          id: '1',
+          author: {
+            id: '2',
+            name: 'Sophie Martin',
+            avatar: undefined
+          },
+          content: "J'ai médité ce matin et je me sens tellement plus calme et concentrée aujourd'hui. Quelqu'un d'autre pratique la méditation ici?",
+          likes: 12,
+          comments: 4,
+          timestamp: '2h',
+          hasLiked: false
+        },
+        {
+          id: '2',
+          author: {
+            id: '3',
+            name: 'Thomas Dubois',
+            avatar: undefined
+          },
+          content: "J'ai eu une journée difficile aujourd'hui, mais j'ai utilisé les techniques de respiration que j'ai apprises ici et ça m'a vraiment aidé à gérer mon stress.",
+          likes: 8,
+          comments: 2,
+          timestamp: '5h',
+          hasLiked: true
+        },
+        {
+          id: '3',
+          author: {
+            id: '4',
+            name: 'Julie Petit',
+            avatar: undefined
+          },
+          content: "Petit rappel: n'oubliez pas de prendre soin de vous aujourd'hui ! Même 5 minutes de pause peuvent faire une différence dans votre bien-être émotionnel.",
+          likes: 23,
+          comments: 7,
+          timestamp: '1j',
+          hasLiked: false
+        }
+      ];
+      
+      // Suggestions d'amis simulées
+      const mockSuggestions: UserSuggestion[] = [
+        {
+          id: '5',
+          name: 'Marie Bernard',
+          bio: 'Coach en bien-être et méditation',
+          avatar: undefined
+        },
+        {
+          id: '6',
+          name: 'Pierre Lambert',
+          bio: 'Passionné de développement personnel',
+          avatar: undefined
+        },
+        {
+          id: '7',
+          name: 'Claire Moulin',
+          bio: 'Psychologue et praticienne en pleine conscience',
+          avatar: undefined
+        }
+      ];
+      
+      setPosts(mockPosts);
+      setSuggestions(mockSuggestions);
       setIsLoading(false);
-    }
+    };
+    
+    loadData();
+  }, []);
+  
+  const handlePostSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newPostContent.trim()) return;
+    
+    setIsPosting(true);
+    
+    // Simuler le temps de traitement de l'API
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const newPost: Post = {
+      id: Date.now().toString(),
+      author: {
+        id: user?.id || '0',
+        name: user?.name || 'Utilisateur',
+        avatar: undefined
+      },
+      content: newPostContent,
+      likes: 0,
+      comments: 0,
+      timestamp: 'à l\'instant',
+      hasLiked: false
+    };
+    
+    setPosts([newPost, ...posts]);
+    setNewPostContent('');
+    setIsPosting(false);
+    toast.success("Votre message a été publié!");
   };
-
-  const fetchComments = async (postId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('comments')
-        .select(`
-          *,
-          profiles (name)
-        `)
-        .eq('post_id', postId)
-        .order('date', { ascending: true });
-
-      if (error) throw error;
-      
-      setComments(prev => ({
-        ...prev,
-        [postId]: data || []
-      }));
-    } catch (error: any) {
-      console.error('Error fetching comments:', error);
-    }
-  };
-
-  const handleCreatePost = async () => {
-    if (!user || !newPostContent.trim()) return;
-
-    try {
-      setIsPosting(true);
-      const { error } = await supabase
-        .from('posts')
-        .insert([{
-          user_id: user.id,
-          content: newPostContent.trim()
-        }]);
-
-      if (error) throw error;
-
-      setNewPostContent('');
-      toast({
-        title: "Publication créée !",
-        description: "Votre message a été partagé avec la communauté.",
-        variant: "success"
-      });
-      
-      fetchPosts();
-    } catch (error: any) {
-      console.error('Error creating post:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer la publication",
-        variant: "destructive"
-      });
-    } finally {
-      setIsPosting(false);
-    }
-  };
-
-  const handleReactToPost = async (postId: string) => {
-    if (!user) return;
-
-    try {
-      const post = posts.find(p => p.id === postId);
-      if (!post) return;
-
-      const { error } = await supabase
-        .from('posts')
-        .update({ reactions: post.reactions + 1 })
-        .eq('id', postId);
-
-      if (error) throw error;
-
-      setPosts(prev => 
-        prev.map(p => 
-          p.id === postId 
-            ? { ...p, reactions: p.reactions + 1 }
-            : p
-        )
-      );
-    } catch (error: any) {
-      console.error('Error reacting to post:', error);
-    }
-  };
-
-  const handleAddComment = async (postId: string) => {
-    if (!user || !newComments[postId]?.trim()) return;
-
-    try {
-      const { error } = await supabase
-        .from('comments')
-        .insert([{
-          post_id: postId,
-          user_id: user.id,
-          content: newComments[postId].trim()
-        }]);
-
-      if (error) throw error;
-
-      setNewComments(prev => ({ ...prev, [postId]: '' }));
-      fetchComments(postId);
-      
-      toast({
-        title: "Commentaire ajouté !",
-        variant: "success"
-      });
-    } catch (error: any) {
-      console.error('Error adding comment:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'ajouter le commentaire",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const toggleComments = (postId: string) => {
-    const newExpanded = new Set(expandedPosts);
-    if (newExpanded.has(postId)) {
-      newExpanded.delete(postId);
-    } else {
-      newExpanded.add(postId);
-      if (!comments[postId]) {
-        fetchComments(postId);
+  
+  const handleLikePost = (postId: string) => {
+    setPosts(posts.map(post => {
+      if (post.id === postId) {
+        const hasLiked = !post.hasLiked;
+        return {
+          ...post,
+          hasLiked,
+          likes: hasLiked ? post.likes + 1 : post.likes - 1
+        };
       }
-    }
-    setExpandedPosts(newExpanded);
+      return post;
+    }));
   };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-
-    if (diffInHours < 1) {
-      return 'Il y a quelques minutes';
-    } else if (diffInHours < 24) {
-      return `Il y a ${Math.floor(diffInHours)} heure${Math.floor(diffInHours) > 1 ? 's' : ''}`;
-    } else {
-      return date.toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-      });
-    }
+  
+  const handleFollow = (userId: string) => {
+    toast.success("Abonnement effectué !");
+    // Logique pour suivre l'utilisateur
   };
-
-  const filteredPosts = posts.filter(post =>
-    post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    post.profiles?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  if (isLoading) {
-    return (
-      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
-        <LoadingAnimation text="Chargement de l'espace social..." />
-      </div>
-    );
-  }
-
+  
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto p-4">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Users className="h-8 w-8 text-green-600" />
-            Espace Social
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Partagez et connectez-vous avec la communauté EmotionsCare
+          <h1 className="text-3xl font-bold">Espace Social</h1>
+          <p className="text-muted-foreground">
+            Partagez votre parcours émotionnel et connectez-vous avec d'autres
           </p>
         </div>
-      </div>
-
-      <Tabs defaultValue="feed" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="feed">
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Fil d'actualité
-          </TabsTrigger>
-          <TabsTrigger value="community">
-            <Users className="h-4 w-4 mr-2" />
-            Communauté
-          </TabsTrigger>
-          <TabsTrigger value="groups">
-            <Share2 className="h-4 w-4 mr-2" />
-            Groupes
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="feed" className="space-y-6">
-          {/* Nouvelle publication */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="h-5 w-5" />
-                Partager quelque chose
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Textarea
-                placeholder="Que souhaitez-vous partager avec la communauté ?"
-                value={newPostContent}
-                onChange={(e) => setNewPostContent(e.target.value)}
-                className="min-h-[100px]"
-              />
-              <div className="flex justify-end">
-                <Button 
-                  onClick={handleCreatePost}
-                  disabled={!newPostContent.trim() || isPosting}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  {isPosting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Publication...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4 mr-2" />
-                      Publier
-                    </>
-                  )}
-                </Button>
-              </div>
+      </header>
+      
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="md:col-span-2">
+          <Card className="mb-6">
+            <CardContent className="p-4">
+              <form onSubmit={handlePostSubmit}>
+                <div className="flex gap-4">
+                  <Avatar>
+                    <AvatarFallback>
+                      {user?.name?.charAt(0) || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 space-y-2">
+                    <Input
+                      placeholder="Partagez ce que vous ressentez..."
+                      value={newPostContent}
+                      onChange={(e) => setNewPostContent(e.target.value)}
+                    />
+                    <div className="flex justify-end">
+                      <Button 
+                        type="submit" 
+                        disabled={!newPostContent.trim() || isPosting}
+                      >
+                        {isPosting ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Publication...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="mr-2 h-4 w-4" />
+                            Publier
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </form>
             </CardContent>
           </Card>
-
-          {/* Recherche */}
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Rechercher dans les publications..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          {/* Publications */}
-          <div className="space-y-4">
-            {filteredPosts.length === 0 ? (
-              <Card>
-                <CardContent className="text-center py-8">
-                  <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">
-                    {searchTerm ? 'Aucune publication trouvée' : 'Aucune publication pour le moment'}
+          
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+            <TabsList>
+              <TabsTrigger value="feed" className="flex items-center gap-2">
+                <Globe className="h-4 w-4" />
+                Fil d'actualités
+              </TabsTrigger>
+              <TabsTrigger value="community" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Communautés
+              </TabsTrigger>
+              <TabsTrigger value="personal" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Mon profil
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="feed" className="space-y-4 mt-4">
+              {isLoading ? (
+                <div className="h-60 flex items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary mr-2" />
+                  <p>Chargement du fil d'actualités...</p>
+                </div>
+              ) : posts.length === 0 ? (
+                <div className="text-center py-12">
+                  <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium">Aucune publication</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Soyez le premier à partager quelque chose !
                   </p>
-                  {!searchTerm && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Soyez le premier à partager quelque chose !
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            ) : (
-              filteredPosts.map((post) => (
-                <Card key={post.id}>
-                  <CardHeader className="pb-3">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">
-                          {post.profiles?.name || 'Utilisateur anonyme'}
-                        </CardTitle>
-                        <CardDescription>
-                          {formatDate(post.date)}
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-gray-700">{post.content}</p>
-                    
-                    <div className="flex items-center gap-4 pt-2 border-t">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleReactToPost(post.id)}
-                        className="flex items-center gap-2 text-red-600 hover:text-red-700"
-                      >
-                        <Heart className="h-4 w-4" />
-                        {post.reactions}
-                      </Button>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleComments(post.id)}
-                        className="flex items-center gap-2"
-                      >
-                        <MessageSquare className="h-4 w-4" />
-                        Commenter
-                      </Button>
-                    </div>
-
-                    {/* Commentaires */}
-                    {expandedPosts.has(post.id) && (
-                      <div className="space-y-3 pt-4 border-t bg-gray-50 rounded-lg p-4">
-                        {comments[post.id]?.map((comment) => (
-                          <div key={comment.id} className="bg-white rounded p-3">
-                            <div className="flex justify-between items-start mb-2">
-                              <span className="font-medium text-sm">
-                                {comment.profiles?.name || 'Utilisateur anonyme'}
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                {formatDate(comment.date)}
-                              </span>
-                            </div>
-                            <p className="text-sm">{comment.content}</p>
-                          </div>
-                        ))}
-                        
-                        <div className="flex gap-2">
-                          <Input
-                            placeholder="Écrire un commentaire..."
-                            value={newComments[post.id] || ''}
-                            onChange={(e) => setNewComments(prev => ({
-                              ...prev,
-                              [post.id]: e.target.value
-                            }))}
-                            onKeyPress={(e) => e.key === 'Enter' && handleAddComment(post.id)}
-                            className="flex-1"
-                          />
-                          <Button
-                            onClick={() => handleAddComment(post.id)}
-                            disabled={!newComments[post.id]?.trim()}
-                            size="sm"
-                          >
-                            <Send className="h-4 w-4" />
-                          </Button>
+                </div>
+              ) : (
+                posts.map(post => (
+                  <Card key={post.id} className="overflow-hidden">
+                    <CardContent className="p-4">
+                      <div className="flex items-center mb-4">
+                        <Avatar className="h-10 w-10 mr-3">
+                          {post.author.avatar && <AvatarImage src={post.author.avatar} />}
+                          <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{post.author.name}</p>
+                          <p className="text-xs text-muted-foreground">Il y a {post.timestamp}</p>
                         </div>
                       </div>
+                      
+                      <p className="mb-4">{post.content}</p>
+                      
+                      <div className="flex justify-between items-center border-t pt-3">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleLikePost(post.id)}
+                          className={post.hasLiked ? "text-red-500" : ""}
+                        >
+                          <Heart className={`mr-1 h-4 w-4 ${post.hasLiked ? "fill-current" : ""}`} />
+                          {post.likes}
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <MessageSquare className="mr-1 h-4 w-4" />
+                          {post.comments}
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Share className="mr-1 h-4 w-4" />
+                          Partager
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </TabsContent>
+            
+            <TabsContent value="community" className="mt-4">
+              <Card>
+                <CardContent className="p-6 text-center">
+                  <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-medium mb-2">Communautés émotionnelles</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Rejoignez des groupes partageant des défis similaires ou des objectifs communs.
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    {[
+                      { name: "Gestion du stress", members: 128, category: "Bien-être" },
+                      { name: "Méditation quotidienne", members: 94, category: "Pleine conscience" },
+                      { name: "Équilibre travail-vie", members: 203, category: "Carrière" },
+                      { name: "Pensées positives", members: 156, category: "Développement personnel" }
+                    ].map((group, index) => (
+                      <Card key={index} className="overflow-hidden">
+                        <CardContent className="p-4">
+                          <h4 className="font-medium">{group.name}</h4>
+                          <p className="text-xs text-muted-foreground">{group.category}</p>
+                          <div className="flex justify-between items-center mt-2">
+                            <p className="text-sm">{group.members} membres</p>
+                            <Button size="sm">
+                              Rejoindre
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                  
+                  <Button variant="outline">
+                    Voir toutes les communautés
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="personal" className="mt-4">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center">
+                    <Avatar className="h-20 w-20 mr-4">
+                      <AvatarFallback className="text-xl">
+                        {user?.name?.charAt(0) || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <CardTitle>{user?.name || 'Utilisateur'}</CardTitle>
+                      <CardDescription>{user?.email || ''}</CardDescription>
+                      <div className="flex gap-4 mt-2">
+                        <div>
+                          <p className="font-medium">12</p>
+                          <p className="text-xs text-muted-foreground">Publications</p>
+                        </div>
+                        <div>
+                          <p className="font-medium">48</p>
+                          <p className="text-xs text-muted-foreground">Followers</p>
+                        </div>
+                        <div>
+                          <p className="font-medium">52</p>
+                          <p className="text-xs text-muted-foreground">Following</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h3 className="font-medium mb-2">À propos</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Aucune bio renseignée. Ajoutez des informations sur vous pour vous présenter à la communauté.
+                    </p>
+                  </div>
+                  
+                  <Button variant="outline" className="w-full">
+                    Éditer le profil
+                  </Button>
+                </CardContent>
+                <CardFooter>
+                  <div className="space-y-4 w-full">
+                    <h3 className="font-medium">Vos publications récentes</h3>
+                    
+                    {posts.filter(post => post.author.id === user?.id).length === 0 ? (
+                      <div className="text-center py-6">
+                        <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground">
+                          Vous n'avez pas encore publié de contenu
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {posts
+                          .filter(post => post.author.id === user?.id)
+                          .map(post => (
+                            <Card key={post.id}>
+                              <CardContent className="p-4">
+                                <p className="text-sm">{post.content}</p>
+                                <p className="text-xs text-muted-foreground mt-2">
+                                  Il y a {post.timestamp} • {post.likes} likes • {post.comments} commentaires
+                                </p>
+                              </CardContent>
+                            </Card>
+                          ))}
+                      </div>
                     )}
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="community" className="space-y-4">
-          <Card>
+                  </div>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+        
+        <div>
+          <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Communauté EmotionsCare</CardTitle>
-              <CardDescription>Découvrez les membres de la communauté</CardDescription>
+              <CardTitle>Suggestions</CardTitle>
+              <CardDescription>Personnes susceptibles de vous intéresser</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">
-                  Fonctionnalité en cours de développement
-                </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Bientôt, vous pourrez découvrir et suivre d'autres membres
-                </p>
-              </div>
+              {isLoading ? (
+                <div className="h-40 flex items-center justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {suggestions.map(person => (
+                    <div key={person.id} className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <Avatar className="h-10 w-10 mr-3">
+                          {person.avatar && <AvatarImage src={person.avatar} />}
+                          <AvatarFallback>{person.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium text-sm">{person.name}</p>
+                          <p className="text-xs text-muted-foreground">{person.bio}</p>
+                        </div>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => handleFollow(person.id)}
+                      >
+                        Suivre
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="groups" className="space-y-4">
+          
           <Card>
             <CardHeader>
-              <CardTitle>Groupes de soutien</CardTitle>
-              <CardDescription>Rejoignez des groupes basés sur vos intérêts</CardDescription>
+              <CardTitle>Tendances</CardTitle>
+              <CardDescription>Sujets populaires aujourd'hui</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <Share2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">
-                  Fonctionnalité en cours de développement
-                </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Bientôt, vous pourrez rejoindre des groupes thématiques
-                </p>
-              </div>
+              {isLoading ? (
+                <div className="h-40 flex items-center justify-center">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {[
+                    { tag: "#BienEtreEmotionnel", posts: 342 },
+                    { tag: "#GestionDuStress", posts: 256 },
+                    { tag: "#PleinConscience", posts: 198 },
+                    { tag: "#PsychologiePositive", posts: 157 },
+                  ].map((trend, index) => (
+                    <div key={index} className="space-y-1">
+                      <p className="font-medium text-sm hover:text-primary cursor-pointer">
+                        {trend.tag}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {trend.posts} publications
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
+            <CardFooter>
+              <Button variant="ghost" size="sm" className="w-full flex justify-center items-center gap-2">
+                <BellPlus className="h-4 w-4" />
+                Activer les notifications de tendances
+              </Button>
+            </CardFooter>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,312 +1,148 @@
 
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmotionResult } from '@/types/emotion';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { BarChart, Calendar, LineChart, ListMusic } from 'lucide-react';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { Skeleton } from '@/components/ui/skeleton';
-import { LineChart as ReChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Activity, Calendar, ArrowRight } from 'lucide-react';
+
+interface Checkin {
+  id: string;
+  date: string;
+  score: number;
+  status: string;
+}
 
 const UnifiedEmotionCheckin: React.FC = () => {
-  const { user } = useAuth();
-  const [emotions, setEmotions] = useState<EmotionResult[]>([]);
+  const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [timeRange, setTimeRange] = useState<string>('week');
-
-  const getTimeRangeFilter = () => {
-    const now = new Date();
-    switch (timeRange) {
-      case 'day':
-        const yesterday = new Date(now);
-        yesterday.setDate(now.getDate() - 1);
-        return yesterday.toISOString();
-      case 'week':
-        const lastWeek = new Date(now);
-        lastWeek.setDate(now.getDate() - 7);
-        return lastWeek.toISOString();
-      case 'month':
-        const lastMonth = new Date(now);
-        lastMonth.setMonth(now.getMonth() - 1);
-        return lastMonth.toISOString();
-      case 'year':
-        const lastYear = new Date(now);
-        lastYear.setFullYear(now.getFullYear() - 1);
-        return lastYear.toISOString();
-      default:
-        return null;
-    }
-  };
-
-  const fetchEmotions = async () => {
-    if (!user) return;
-
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      let query = supabase
-        .from('emotions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false });
-
-      const timeFilter = getTimeRangeFilter();
-      if (timeFilter) {
-        query = query.gte('date', timeFilter);
-      }
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      
-      setEmotions(data || []);
-    } catch (err) {
-      console.error('Error fetching emotions:', err);
-      setError('Impossible de charger vos données émotionnelles');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  
   useEffect(() => {
-    fetchEmotions();
-  }, [user, timeRange]);
-
-  // Prepare chart data
-  const chartData = emotions.map(emotion => ({
-    date: format(new Date(emotion.date), 'dd/MM'),
-    score: emotion.score
-  })).reverse();
-
-  // Calculate emotion stats
-  const averageScore = emotions.length 
-    ? Math.round(emotions.reduce((acc, emotion) => acc + emotion.score, 0) / emotions.length) 
-    : 0;
-
-  const getScoreClass = (score: number) => {
-    if (score >= 75) return 'text-green-600';
-    if (score > 50) return 'text-blue-600';
-    if (score > 35) return 'text-orange-600';
-    return 'text-red-600';
-  };
-
-  if (!user) {
-    return (
-      <Alert>
-        <AlertTitle>Connexion requise</AlertTitle>
-        <AlertDescription>
-          Veuillez vous connecter pour voir votre historique d'émotions
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-2xl font-semibold">Historique émotionnel</h2>
-        
-        <div className="flex gap-2">
-          <Select
-            value={timeRange}
-            onValueChange={setTimeRange}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Période" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="day">Dernières 24h</SelectItem>
-              <SelectItem value="week">7 derniers jours</SelectItem>
-              <SelectItem value="month">30 derniers jours</SelectItem>
-              <SelectItem value="year">12 derniers mois</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Button variant="outline" onClick={fetchEmotions}>
-            Actualiser
-          </Button>
-        </div>
-      </div>
+    const loadCheckins = async () => {
+      setIsLoading(true);
       
-      {isLoading ? (
-        <div className="space-y-4">
-          <Skeleton className="h-[200px] w-full rounded-lg" />
-          <Skeleton className="h-[100px] w-full rounded-lg" />
-          <Skeleton className="h-[300px] w-full rounded-lg" />
-        </div>
-      ) : error ? (
-        <Alert variant="destructive">
-          <AlertTitle>Erreur</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : (
-        <>
-          {emotions.length === 0 ? (
-            <Alert>
-              <AlertTitle>Aucune donnée</AlertTitle>
-              <AlertDescription>
-                Vous n'avez pas encore d'historique d'émotions. Utilisez le scanner d'émotions pour commencer à suivre votre bien-être.
-              </AlertDescription>
-            </Alert>
+      // Simuler un chargement de données
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      
+      // Données simulées
+      const mockCheckins: Checkin[] = [
+        {
+          id: '1',
+          date: new Date(Date.now() - 86400000 * 1).toISOString(), // Hier
+          score: 85,
+          status: 'good'
+        },
+        {
+          id: '2',
+          date: new Date(Date.now() - 86400000 * 2).toISOString(), // Avant-hier
+          score: 75,
+          status: 'good'
+        },
+        {
+          id: '3',
+          date: new Date(Date.now() - 86400000 * 3).toISOString(), // Il y a 3 jours
+          score: 40,
+          status: 'low'
+        },
+        {
+          id: '4',
+          date: new Date(Date.now() - 86400000 * 5).toISOString(), // Il y a 5 jours
+          score: 60,
+          status: 'average'
+        },
+        {
+          id: '5',
+          date: new Date(Date.now() - 86400000 * 7).toISOString(), // Il y a 7 jours
+          score: 30,
+          status: 'low'
+        },
+      ];
+      
+      setCheckins(mockCheckins);
+      setIsLoading(false);
+    };
+    
+    loadCheckins();
+  }, []);
+  
+  // Formatage de la date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short'
+    });
+  };
+  
+  // Obtenir la couleur en fonction du score
+  const getScoreColorClass = (score: number) => {
+    if (score >= 80) return 'text-green-500';
+    if (score >= 60) return 'text-blue-500';
+    if (score >= 40) return 'text-yellow-500';
+    return 'text-red-500';
+  };
+  
+  return (
+    <div>
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium">Vos analyses récentes</h3>
+            <Button variant="ghost" size="sm" className="gap-1 text-sm">
+              Voir tout
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          {isLoading ? (
+            <div className="h-60 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          ) : checkins.length === 0 ? (
+            <div className="text-center py-12">
+              <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h4 className="font-medium text-lg mb-2">Aucune analyse récente</h4>
+              <p className="text-muted-foreground mb-6">
+                Commencez à analyser vos émotions pour les voir apparaître ici
+              </p>
+              <Button>Commencer une analyse</Button>
+            </div>
           ) : (
-            <Tabs defaultValue="graph">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="graph" className="flex items-center gap-2">
-                  <LineChart className="h-4 w-4" />
-                  <span className="hidden sm:inline">Graphique</span>
-                </TabsTrigger>
-                <TabsTrigger value="stats" className="flex items-center gap-2">
-                  <BarChart className="h-4 w-4" />
-                  <span className="hidden sm:inline">Statistiques</span>
-                </TabsTrigger>
-                <TabsTrigger value="list" className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <span className="hidden sm:inline">Historique</span>
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="graph" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Évolution émotionnelle</CardTitle>
-                    <CardDescription>
-                      Visualisez l'évolution de vos émotions au fil du temps
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <ReChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                        <Line type="monotone" dataKey="score" stroke="#2563eb" strokeWidth={2} dot={{ r: 4 }} />
-                        <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                        <XAxis dataKey="date" />
-                        <YAxis domain={[0, 100]} />
-                        <Tooltip 
-                          formatter={(value) => [`${value}/100`, 'Score']}
-                          labelFormatter={(label) => `Date: ${label}`}
-                        />
-                      </ReChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="stats" className="mt-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base">Score moyen</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className={`text-3xl font-bold ${getScoreClass(averageScore)}`}>
-                        {averageScore}/100
+            <div className="space-y-3">
+              {checkins.map((checkin) => (
+                <div key={checkin.id} className="flex items-center p-2 hover:bg-muted/50 rounded-md cursor-pointer">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    checkin.status === 'good' ? 'bg-green-100' :
+                    checkin.status === 'average' ? 'bg-blue-100' :
+                    'bg-red-100'
+                  }`}>
+                    <Activity className={`h-5 w-5 ${
+                      checkin.status === 'good' ? 'text-green-600' :
+                      checkin.status === 'average' ? 'text-blue-600' :
+                      'text-red-600'
+                    }`} />
+                  </div>
+                  
+                  <div className="ml-3 flex-1">
+                    <div className="flex justify-between">
+                      <p className="font-medium">{formatDate(checkin.date)}</p>
+                      <p className={`font-bold ${getScoreColorClass(checkin.score)}`}>
+                        {checkin.score}
                       </p>
-                    </CardContent>
-                  </Card>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {checkin.status === 'good' ? 'Bien-être élevé' :
+                       checkin.status === 'average' ? 'Bien-être moyen' :
+                       'Bien-être bas'}
+                    </p>
+                  </div>
                   
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base">Entrées totales</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-3xl font-bold">{emotions.length}</p>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base">Dernière analyse</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {emotions.length > 0 ? (
-                        <p className="text-lg">
-                          {format(new Date(emotions[0].date), 'dd MMMM yyyy', { locale: fr })}
-                        </p>
-                      ) : (
-                        <p>-</p>
-                      )}
-                    </CardContent>
-                  </Card>
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
                 </div>
-              </TabsContent>
-              
-              <TabsContent value="list" className="mt-6">
-                <div className="space-y-4">
-                  {emotions.map((emotion) => (
-                    <Card key={emotion.id} className="overflow-hidden">
-                      <div className="flex border-l-4 h-full" style={{
-                        borderLeftColor: emotion.score >= 75 
-                          ? '#22c55e' 
-                          : emotion.score > 50 
-                            ? '#3b82f6' 
-                            : emotion.score > 35 
-                              ? '#f97316' 
-                              : '#ef4444'
-                      }}>
-                        <div className="py-4 px-6 flex-1">
-                          <div className="flex justify-between">
-                            <div>
-                              <p className="text-sm text-gray-500">
-                                {format(new Date(emotion.date), 'dd MMMM yyyy à HH:mm', { locale: fr })}
-                              </p>
-                              
-                              {emotion.text && (
-                                <p className="mt-1 line-clamp-2">{emotion.text}</p>
-                              )}
-                              
-                              {emotion.emojis && (
-                                <p className="mt-1 text-xl">{emotion.emojis}</p>
-                              )}
-                            </div>
-                            
-                            <div className={`text-lg font-semibold ${getScoreClass(emotion.score)}`}>
-                              {emotion.score}/100
-                            </div>
-                          </div>
-                          
-                          {emotion.audio_url && (
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              className="mt-2"
-                              onClick={() => {
-                                const audio = new Audio(emotion.audio_url);
-                                audio.play();
-                              }}
-                            >
-                              <ListMusic className="h-4 w-4 mr-2" />
-                              Écouter l'audio
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </TabsContent>
-            </Tabs>
+              ))}
+            </div>
           )}
-        </>
-      )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

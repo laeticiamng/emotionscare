@@ -2,100 +2,109 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { Loader2, Send } from 'lucide-react';
-import { EmotionResult } from '@/types/emotion';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle, Loader2 } from 'lucide-react';
+import { TextEmotionScannerProps } from '@/types/emotion';
 
-interface TextEmotionScannerProps {
-  onScanComplete: (result: EmotionResult) => void;
-  onCancel: () => void;
-  isProcessing: boolean;
-  setIsProcessing: (processing: boolean) => void;
-}
-
-const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
-  onScanComplete,
+const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({ 
+  onScanComplete, 
   onCancel,
   isProcessing,
   setIsProcessing
 }) => {
   const [text, setText] = useState('');
-
-  const analyzeText = async () => {
-    if (!text.trim()) {
-      toast.error('Veuillez saisir du texte à analyser');
+  const [error, setError] = useState<string | null>(null);
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (text.trim().length < 10) {
+      setError("Veuillez saisir au moins 10 caractères pour une analyse précise.");
       return;
     }
-
+    
+    setError(null);
+    setIsProcessing(true);
+    
     try {
-      setIsProcessing(true);
+      // Simulation d'appel API
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      const { data, error } = await supabase.functions.invoke('emotion-analysis', {
-        body: { text, type: 'text' }
-      });
-
-      if (error) throw error;
-
-      const result: EmotionResult = {
-        id: crypto.randomUUID(),
-        user_id: '',
-        text: text,
-        score: data.score || 50,
-        date: new Date().toISOString(),
-        ai_feedback: data.feedback || 'Analyse complétée'
+      // Génération de résultat simulé
+      const emotionScore = Math.floor(Math.random() * 100);
+      const primaryEmotion = emotionScore > 70 ? "Joie" : 
+                             emotionScore > 50 ? "Sérénité" : 
+                             emotionScore > 30 ? "Inquiétude" : "Stress";
+      
+      // Résultat simulé
+      const result = {
+        score: emotionScore,
+        primaryEmotion,
+        text,
+        emotions: {
+          joie: Math.random(),
+          tristesse: Math.random(),
+          colère: Math.random(),
+          peur: Math.random(),
+          surprise: Math.random(),
+        }
       };
-
+      
       onScanComplete(result);
-      toast.success('Analyse textuelle terminée !');
     } catch (error) {
       console.error('Error analyzing text:', error);
-      toast.error('Erreur lors de l\'analyse textuelle');
+      setError("Une erreur s'est produite lors de l'analyse. Veuillez réessayer.");
     } finally {
       setIsProcessing(false);
     }
   };
-
+  
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      
       <div>
-        <Label htmlFor="emotion-text">
-          Décrivez votre état émotionnel ou votre journée
-        </Label>
-        <Textarea
-          id="emotion-text"
-          placeholder="Exemple: Je me sens un peu stressé aujourd'hui à cause du travail, mais j'ai passé un bon moment avec ma famille hier soir..."
+        <Textarea 
+          placeholder="Décrivez ce que vous ressentez actuellement..."
           value={text}
           onChange={(e) => setText(e.target.value)}
-          rows={6}
-          className="mt-2"
+          className="min-h-32"
           disabled={isProcessing}
         />
+        <p className="text-xs text-muted-foreground mt-1">
+          {text.length} caractères (minimum 10)
+        </p>
       </div>
       
-      <div className="text-sm text-muted-foreground">
-        <p>💡 Plus vous êtes détaillé, plus l'analyse sera précise</p>
-      </div>
-
-      <div className="flex space-x-2">
+      <div className="flex justify-end gap-2">
         <Button 
-          onClick={analyzeText}
-          disabled={!text.trim() || isProcessing}
-          className="flex-1"
+          type="button" 
+          variant="outline" 
+          onClick={onCancel}
+          disabled={isProcessing}
         >
-          {isProcessing ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Send className="h-4 w-4 mr-2" />
-          )}
-          Analyser le texte
-        </Button>
-        <Button variant="outline" onClick={onCancel} disabled={isProcessing}>
           Annuler
         </Button>
+        <Button 
+          type="submit" 
+          disabled={text.trim().length < 10 || isProcessing}
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Analyse en cours...
+            </>
+          ) : (
+            'Analyser mes émotions'
+          )}
+        </Button>
       </div>
-    </div>
+    </form>
   );
 };
 

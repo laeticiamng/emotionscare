@@ -1,18 +1,22 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { Loader2, Smile } from 'lucide-react';
-import { EmotionResult } from '@/types/emotion';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle, Loader2 } from 'lucide-react';
+import { EmojiEmotionScannerProps } from '@/types/emotion';
 
-interface EmojiEmotionScannerProps {
-  onScanComplete: (result: EmotionResult) => void;
-  onCancel: () => void;
-  isProcessing: boolean;
-  setIsProcessing: (processing: boolean) => void;
-}
+const emojis = [
+  { emoji: "😊", name: "Joie", value: 90 },
+  { emoji: "😌", name: "Sérénité", value: 75 },
+  { emoji: "😐", name: "Neutre", value: 50 },
+  { emoji: "😔", name: "Tristesse", value: 30 },
+  { emoji: "😢", name: "Peine", value: 20 },
+  { emoji: "😠", name: "Colère", value: 10 },
+  { emoji: "😰", name: "Anxiété", value: 25 },
+  { emoji: "😱", name: "Peur", value: 15 },
+  { emoji: "🤔", name: "Confusion", value: 40 },
+  { emoji: "🥱", name: "Fatigue", value: 35 }
+];
 
 const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
   onScanComplete,
@@ -21,125 +25,126 @@ const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
   setIsProcessing
 }) => {
   const [selectedEmojis, setSelectedEmojis] = useState<string[]>([]);
-
-  const emojiCategories = {
-    'Joie & Bonheur': ['😊', '😀', '😁', '😄', '🥰', '😍', '🤗', '😆', '😂', '🥳'],
-    'Tristesse & Mélancolie': ['😢', '😭', '😞', '😔', '😕', '🥺', '😪', '😌', '😴', '💔'],
-    'Colère & Frustration': ['😠', '😡', '🤬', '😤', '😾', '👿', '💢', '🔥', '😒', '🙄'],
-    'Peur & Anxiété': ['😨', '😰', '😱', '🥶', '😵', '🤯', '😖', '😓', '😷', '🤒'],
-    'Surprise & Émerveillement': ['😮', '😯', '😲', '🤩', '😍', '🤔', '🧐', '💭', '✨', '🌟'],
-    'Calme & Sérénité': ['😌', '😊', '🙂', '😇', '🧘', '🕯️', '🌸', '🍃', '💆', '🛀']
-  };
-
+  const [error, setError] = useState<string | null>(null);
+  
   const toggleEmoji = (emoji: string) => {
-    setSelectedEmojis(prev => 
-      prev.includes(emoji) 
-        ? prev.filter(e => e !== emoji)
-        : [...prev, emoji]
-    );
+    setSelectedEmojis(prev => {
+      if (prev.includes(emoji)) {
+        return prev.filter(e => e !== emoji);
+      } else if (prev.length < 3) {
+        return [...prev, emoji];
+      }
+      return prev;
+    });
   };
-
-  const analyzeEmojis = async () => {
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (selectedEmojis.length === 0) {
-      toast.error('Veuillez sélectionner au moins un emoji');
+      setError("Veuillez sélectionner au moins un emoji.");
       return;
     }
-
+    
+    setError(null);
+    setIsProcessing(true);
+    
     try {
-      setIsProcessing(true);
+      // Simulation d'appel API
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      const { data, error } = await supabase.functions.invoke('emotion-analysis', {
-        body: { emojis: selectedEmojis.join(' '), type: 'emoji' }
-      });
-
-      if (error) throw error;
-
-      const result: EmotionResult = {
-        id: crypto.randomUUID(),
-        user_id: '',
-        emojis: selectedEmojis.join(' '),
-        score: data.score || 50,
-        date: new Date().toISOString(),
-        ai_feedback: data.feedback || 'Analyse des émojis complétée'
+      // Calcul d'un score moyen basé sur les emojis sélectionnés
+      const selectedEmojisData = emojis.filter(item => selectedEmojis.includes(item.emoji));
+      const averageScore = selectedEmojisData.reduce((acc, item) => acc + item.value, 0) / selectedEmojisData.length;
+      
+      // Trouver l'emoji avec la plus grande valeur comme primaire
+      const primaryEmoji = selectedEmojisData.reduce(
+        (max, obj) => (obj.value > max.value ? obj : max),
+        selectedEmojisData[0]
+      );
+      
+      // Résultat simulé
+      const result = {
+        score: Math.round(averageScore),
+        primaryEmotion: primaryEmoji.name,
+        emotions: {
+          joie: Math.random(),
+          tristesse: Math.random(),
+          colère: Math.random(),
+          peur: Math.random(),
+          surprise: Math.random(),
+        }
       };
-
+      
       onScanComplete(result);
-      toast.success('Analyse des émojis terminée !');
     } catch (error) {
       console.error('Error analyzing emojis:', error);
-      toast.error('Erreur lors de l\'analyse des émojis');
+      setError("Une erreur s'est produite lors de l'analyse. Veuillez réessayer.");
     } finally {
       setIsProcessing(false);
     }
   };
-
+  
   return (
-    <div className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      
       <div>
-        <Label className="text-base font-semibold">
-          Sélectionnez les émojis qui représentent votre état actuel
-        </Label>
-        <p className="text-sm text-muted-foreground mt-1">
-          Vous pouvez choisir plusieurs émojis pour une analyse plus précise
+        <p className="text-sm mb-2">
+          Sélectionnez jusqu'à 3 emojis qui correspondent le mieux à ce que vous ressentez actuellement.
+        </p>
+        
+        <div className="grid grid-cols-5 gap-2">
+          {emojis.map((item) => (
+            <div 
+              key={item.emoji}
+              className={`flex flex-col items-center justify-center p-2 rounded-md cursor-pointer transition-all ${
+                selectedEmojis.includes(item.emoji) 
+                  ? 'bg-primary/20 shadow-sm border-primary/50 border' 
+                  : 'hover:bg-muted border border-transparent'
+              }`}
+              onClick={() => !isProcessing && toggleEmoji(item.emoji)}
+            >
+              <span className="text-3xl mb-1">{item.emoji}</span>
+              <span className="text-xs text-center">{item.name}</span>
+            </div>
+          ))}
+        </div>
+        
+        <p className="text-xs text-muted-foreground mt-2">
+          {selectedEmojis.length}/3 sélectionnés
         </p>
       </div>
-
-      {selectedEmojis.length > 0 && (
-        <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-          <h4 className="font-medium text-blue-900 mb-2">Émojis sélectionnés :</h4>
-          <div className="text-3xl space-x-2">
-            {selectedEmojis.map((emoji, index) => (
-              <span key={index}>{emoji}</span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="space-y-6">
-        {Object.entries(emojiCategories).map(([category, emojis]) => (
-          <div key={category}>
-            <h3 className="font-medium text-sm text-muted-foreground mb-3">
-              {category}
-            </h3>
-            <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
-              {emojis.map((emoji) => (
-                <Button
-                  key={emoji}
-                  variant={selectedEmojis.includes(emoji) ? "default" : "outline"}
-                  className={`h-12 w-12 text-2xl p-0 ${
-                    selectedEmojis.includes(emoji) 
-                      ? 'bg-blue-500 hover:bg-blue-600 scale-110' 
-                      : 'hover:scale-105'
-                  } transition-transform`}
-                  onClick={() => toggleEmoji(emoji)}
-                  disabled={isProcessing}
-                >
-                  {emoji}
-                </Button>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex space-x-2">
+      
+      <div className="flex justify-end gap-2">
         <Button 
-          onClick={analyzeEmojis}
-          disabled={selectedEmojis.length === 0 || isProcessing}
-          className="flex-1"
+          type="button" 
+          variant="outline" 
+          onClick={onCancel}
+          disabled={isProcessing}
         >
-          {isProcessing ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Smile className="h-4 w-4 mr-2" />
-          )}
-          Analyser les émojis ({selectedEmojis.length})
-        </Button>
-        <Button variant="outline" onClick={onCancel} disabled={isProcessing}>
           Annuler
         </Button>
+        <Button 
+          type="submit" 
+          disabled={selectedEmojis.length === 0 || isProcessing}
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Analyse en cours...
+            </>
+          ) : (
+            'Analyser mes émotions'
+          )}
+        </Button>
       </div>
-    </div>
+    </form>
   );
 };
 

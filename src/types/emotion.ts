@@ -1,23 +1,26 @@
 
 export interface EmotionResult {
-  id: string;
-  user_id: string;
-  emojis?: string;
+  id?: string;
+  date?: string;
+  score: number;
+  primaryEmotion?: string;
+  emotions?: Record<string, number>;
   text?: string;
-  audio_url?: string;
-  score: number;
-  date: string;
-  ai_feedback?: string;
+  audio?: string;
+  aiFeedback?: string;
 }
 
-export interface EmotionAnalysis {
-  score: number;
-  feedback: string;
-  emotions: string[];
-  confidence?: number;
+export interface EmotionScannerProps {
+  onScanComplete: (result: EmotionResult) => void;
+  onClose: () => void;
 }
 
-export interface VoiceAnalysisResult {
-  transcription: string;
-  analysis: EmotionAnalysis;
+export interface TextEmotionScannerProps {
+  onScanComplete: (result: EmotionResult) => void;
+  onCancel: () => void;
+  isProcessing: boolean;
+  setIsProcessing: (isProcessing: boolean) => void;
 }
+
+export interface AudioEmotionScannerProps extends TextEmotionScannerProps {}
+export interface EmojiEmotionScannerProps extends TextEmotionScannerProps {}

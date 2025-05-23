@@ -3,40 +3,34 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { getModeDashboardPath, normalizeUserMode } from '@/utils/userModeHelpers';
+import { getModeDashboardPath } from '@/utils/userModeHelpers';
 
 interface AuthTransitionProps {
   children: React.ReactNode;
 }
 
 const AuthTransition: React.FC<AuthTransitionProps> = ({ children }) => {
-  const { isAuthenticated, user, isLoading: authLoading } = useAuth();
-  const { userMode, isLoading: userModeLoading } = useUserMode();
+  const { isAuthenticated, user } = useAuth();
+  const { userMode } = useUserMode();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Handle authentication redirects
   useEffect(() => {
-    if (authLoading || userModeLoading) return;
-
-    const currentPath = location.pathname;
-    
-    // Define login/register paths
+    // Définissez les chemins d'authentification qui devraient rediriger vers le dashboard si l'utilisateur est déjà connecté
     const authPaths = [
-      '/login', '/register', 
-      '/b2c/login', '/b2c/register',
-      '/b2b/user/login', '/b2b/user/register',
-      '/b2b/admin/login'
+      '/login', '/register', '/b2c/login', '/b2c/register', 
+      '/b2b/user/login', '/b2b/user/register', '/b2b/admin/login'
     ];
     
-    // If user is authenticated and on a login/register page, redirect to dashboard
-    if (isAuthenticated && authPaths.some(path => currentPath === path)) {
-      // Determine which dashboard to go to based on userMode
-      const dashboardPath = getModeDashboardPath(normalizeUserMode(userMode));
-      navigate(dashboardPath);
+    // Si l'utilisateur est authentifié et se trouve sur une page d'authentification, rediriger vers le tableau de bord
+    if (isAuthenticated && authPaths.includes(location.pathname)) {
+      const dashboardPath = getModeDashboardPath(userMode);
+      navigate(dashboardPath, { replace: true });
     }
-
-  }, [isAuthenticated, authLoading, userModeLoading, navigate, location.pathname, user, userMode]);
+    
+    // Si l'utilisateur n'est pas authentifié et tente d'accéder à une page protégée
+    // Note: Cette logique est gérée par ProtectedLayout, donc nous n'avons pas besoin de la dupliquer ici
+  }, [isAuthenticated, navigate, location.pathname, user, userMode]);
 
   return <>{children}</>;
 };

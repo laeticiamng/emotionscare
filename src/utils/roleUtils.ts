@@ -1,16 +1,6 @@
 
 import { UserRole } from '@/types/user';
 
-/**
- * Vérifie si le rôle est un rôle administrateur
- */
-export const isAdminRole = (role: string): boolean => {
-  return role === 'admin' || role === 'b2b_admin';
-};
-
-/**
- * Obtient le nom lisible d'un rôle
- */
 export const getRoleName = (role: UserRole): string => {
   switch (role) {
     case 'b2c':
@@ -24,7 +14,10 @@ export const getRoleName = (role: UserRole): string => {
   }
 };
 
-export default {
-  isAdminRole,
-  getRoleName
+export const isAdminRole = (role: string): boolean => {
+  return role === 'b2b_admin' || role === 'admin';
+};
+
+export const isB2BRole = (role: string): boolean => {
+  return role === 'b2b_user' || role === 'b2b_admin';
 };

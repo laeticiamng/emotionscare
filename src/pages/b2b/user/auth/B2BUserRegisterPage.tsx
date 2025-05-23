@@ -1,256 +1,168 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle, Building2, Loader2, Eye, EyeOff } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { AlertCircle, Building2, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const B2BUserRegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
   const { setUserMode } = useUserMode();
-  const { toast } = useToast();
   
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
+    company: '',
     password: '',
     confirmPassword: '',
-    name: '',
-    company: '',
-    jobTitle: ''
   });
+  
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.email) {
-      newErrors.email = 'L\'email professionnel est requis';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Format d\'email invalide';
-    }
-
-    if (!formData.name) {
-      newErrors.name = 'Le nom est requis';
-    }
-
-    if (!formData.company) {
-      newErrors.company = 'Le nom de l\'entreprise est requis';
-    }
-
-    if (!formData.jobTitle) {
-      newErrors.jobTitle = 'Le poste est requis';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Le mot de passe est requis';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Le mot de passe doit contenir au moins 6 caractères';
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const [error, setError] = useState<string | null>(null);
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
-    if (!validateForm()) {
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError("Les mots de passe ne correspondent pas.");
       return;
     }
-
+    
+    if (formData.password.length < 6) {
+      setError("Le mot de passe doit contenir au moins 6 caractères.");
+      return;
+    }
+    
+    // Vérification de l'email professionnel
+    if (!formData.email.includes('@') || formData.email.endsWith('@gmail.com') || 
+        formData.email.endsWith('@yahoo.com') || formData.email.endsWith('@hotmail.com')) {
+      setError("Veuillez utiliser une adresse email professionnelle.");
+      return;
+    }
+    
     setIsLoading(true);
-    setErrors({});
-
+    
     try {
+      // Définir le mode utilisateur
       setUserMode('b2b_user');
-      await register(formData.email, formData.password, {
-        name: formData.name,
-        role: 'b2b_user',
-        company: formData.company,
-        job_title: formData.jobTitle
-      });
       
-      toast({
-        title: "Compte créé avec succès !",
-        description: "Bienvenue dans l'espace collaborateur.",
-        variant: "success"
-      });
+      // Enregistrer l'utilisateur avec les métadonnées supplémentaires
+      await register(formData.email, formData.password, formData.name);
       
+      toast.success("Compte professionnel créé avec succès!");
       navigate('/b2b/user/dashboard');
-    } catch (error: any) {
-      console.error('Registration error:', error);
-      setErrors({ 
-        submit: error.message || 'Erreur lors de la création du compte' 
-      });
-      
-      toast({
-        title: "Erreur",
-        description: error.message || 'Erreur lors de la création du compte',
-        variant: "destructive"
-      });
+    } catch (error) {
+      console.error("Register error:", error);
+      setError("Erreur lors de la création du compte. Veuillez réessayer.");
+      toast.error("Erreur lors de la création du compte");
     } finally {
       setIsLoading(false);
     }
   };
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  };
-
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
-      <Card className="w-full max-w-lg">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <div className="bg-primary/10 p-3 rounded-full">
               <Building2 className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Inscription Collaborateur</CardTitle>
-          <CardDescription>Créez votre compte professionnel EmotionsCare</CardDescription>
+          <CardTitle className="text-2xl font-bold">Créer un compte Collaborateur</CardTitle>
+          <CardDescription>
+            Inscrivez-vous avec votre email professionnel
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nom complet *</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="Votre nom"
-                  disabled={isLoading}
-                  className={errors.name ? 'border-red-500' : ''}
-                />
-                {errors.name && (
-                  <p className="text-sm text-red-600">{errors.name}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="jobTitle">Poste *</Label>
-                <Input
-                  id="jobTitle"
-                  type="text"
-                  value={formData.jobTitle}
-                  onChange={(e) => handleInputChange('jobTitle', e.target.value)}
-                  placeholder="Votre poste"
-                  disabled={isLoading}
-                  className={errors.jobTitle ? 'border-red-500' : ''}
-                />
-                {errors.jobTitle && (
-                  <p className="text-sm text-red-600">{errors.jobTitle}</p>
-                )}
-              </div>
-            </div>
-
             <div className="space-y-2">
-              <Label htmlFor="company">Entreprise *</Label>
+              <Label htmlFor="name">Nom complet</Label>
               <Input
-                id="company"
-                type="text"
-                value={formData.company}
-                onChange={(e) => handleInputChange('company', e.target.value)}
-                placeholder="Nom de votre entreprise"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Votre nom"
+                required
                 disabled={isLoading}
-                className={errors.company ? 'border-red-500' : ''}
               />
-              {errors.company && (
-                <p className="text-sm text-red-600">{errors.company}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">Email professionnel *</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="votre.email@entreprise.com"
-                disabled={isLoading}
-                className={errors.email ? 'border-red-500' : ''}
-              />
-              {errors.email && (
-                <p className="text-sm text-red-600">{errors.email}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe *</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
-                  placeholder="••••••••"
-                  disabled={isLoading}
-                  className={errors.password ? 'border-red-500 pr-10' : 'pr-10'}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-full px-3"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-              {errors.password && (
-                <p className="text-sm text-red-600">{errors.password}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmer le mot de passe *</Label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                  placeholder="••••••••"
-                  disabled={isLoading}
-                  className={errors.confirmPassword ? 'border-red-500 pr-10' : 'pr-10'}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-full px-3"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="text-sm text-red-600">{errors.confirmPassword}</p>
-              )}
             </div>
             
-            {errors.submit && (
+            <div className="space-y-2">
+              <Label htmlFor="email">Email professionnel</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="votre.email@entreprise.com"
+                required
+                disabled={isLoading}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="company">Entreprise</Label>
+              <Input
+                id="company"
+                name="company"
+                value={formData.company}
+                onChange={handleChange}
+                placeholder="Nom de votre entreprise"
+                required
+                disabled={isLoading}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Mot de passe</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Minimum 6 caractères"
+                required
+                disabled={isLoading}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirmer votre mot de passe"
+                required
+                disabled={isLoading}
+              />
+            </div>
+            
+            {error && (
               <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 rounded-md">
                 <AlertCircle className="h-4 w-4" />
-                {errors.submit}
+                {error}
               </div>
             )}
             
@@ -258,27 +170,29 @@ const B2BUserRegisterPage: React.FC = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Création du compte...
+                  Création en cours...
                 </>
               ) : (
-                'Créer mon compte collaborateur'
+                "Créer un compte"
               )}
             </Button>
           </form>
           
-          <div className="mt-6 text-center space-y-4">
+          <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Déjà un compte ?{' '}
-              <Link to="/b2b/user/login" className="text-primary hover:underline">
+              Vous avez déjà un compte?{" "}
+              <Button variant="link" onClick={() => navigate('/b2b/user/login')} className="p-0">
                 Se connecter
-              </Link>
+              </Button>
             </p>
             
-            <div className="pt-4 border-t">
-              <Button variant="ghost" onClick={() => navigate('/b2b/selection')}>
-                Retour à la sélection
-              </Button>
-            </div>
+            <Button 
+              variant="ghost" 
+              className="mt-4"
+              onClick={() => navigate('/b2b/selection')}
+            >
+              Retour à la sélection
+            </Button>
           </div>
         </CardContent>
       </Card>
