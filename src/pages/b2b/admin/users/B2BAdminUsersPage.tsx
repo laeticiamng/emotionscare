@@ -1,492 +1,612 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { 
-  Users, 
-  Plus, 
-  Search,
-  Filter,
-  Mail,
-  Trash2,
-  Edit,
-  UserPlus,
-  Loader2,
-  Building2,
-  TrendingUp
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { MoreHorizontal, Plus, UserPlus, Mail, Trash2, Search, MailPlus, Loader2, ArrowLeft, RefreshCw } from 'lucide-react';
+import { format, formatDistance } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface User {
   id: string;
-  name: string;
   email: string;
-  role: string;
-  department?: string;
-  job_title?: string;
-  emotional_score?: number;
   created_at: string;
+  last_sign_in_at: string | null;
+  role?: string;
+  name?: string;
+  department?: string;
+  avatar_url?: string;
 }
 
 interface Invitation {
   id: string;
   email: string;
   role: string;
-  status: string;
+  status: 'pending' | 'accepted' | 'expired';
   created_at: string;
   expires_at: string;
+  accepted_at: string | null;
 }
 
 const B2BAdminUsersPage: React.FC = () => {
-  const { user, logout } = useAuth();
-  const { setUserMode } = useUserMode();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
-  const [departmentFilter, setDepartmentFilter] = useState('all');
-  const [showInviteForm, setShowInviteForm] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRole, setInviteRole] = useState('b2b_user');
+  const [isLoading, setIsLoading] = useState(true);
   const [isInviting, setIsInviting] = useState(false);
+  const [showInviteDialog, setShowInviteDialog] = useState(false);
+  const [newInvite, setNewInvite] = useState({
+    email: '',
+    role: 'b2b_user'
+  });
+  const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    setUserMode('b2b_admin');
-    fetchData();
-  }, [setUserMode]);
+    fetchUsers();
+    fetchInvitations();
+  }, []);
 
-  const fetchData = async () => {
+  const fetchUsers = async () => {
     try {
       setIsLoading(true);
-      
-      // Fetch users
-      const { data: usersData, error: usersError } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .in('role', ['b2b_user', 'b2b_admin']);
+        .or('role.eq.b2b_user,role.eq.b2b_admin');
 
-      if (usersError) throw usersError;
-      setUsers(usersData || []);
-
-      // Fetch invitations
-      const { data: invitationsData, error: invitationsError } = await supabase
-        .from('invitations')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (invitationsError) throw invitationsError;
-      setInvitations(invitationsData || []);
-
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Erreur lors du chargement des données');
+      if (error) throw error;
+      
+      setUsers(data || []);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      toast.error('Impossible de charger la liste des utilisateurs');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const sendInvitation = async () => {
-    if (!inviteEmail.trim()) {
-      toast.error('Veuillez saisir une adresse email');
+  const fetchInvitations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('invitations')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      setInvitations(data || []);
+    } catch (err) {
+      console.error('Error fetching invitations:', err);
+      toast.error('Impossible de charger les invitations');
+    }
+  };
+
+  const handleSendInvitation = async () => {
+    if (!newInvite.email) {
+      toast.error('Veuillez entrer une adresse email');
       return;
     }
 
     try {
       setIsInviting(true);
       
-      // Generate invitation token
-      const token = crypto.randomUUID();
+      // Generate a unique token for the invitation
+      const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      
+      // Set expiration date to 7 days from now
       const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7); // Expires in 7 days
-
-      const { error } = await supabase
+      expiresAt.setDate(expiresAt.getDate() + 7);
+      
+      // Save invitation to the database
+      const { data, error } = await supabase
         .from('invitations')
-        .insert([
-          {
-            email: inviteEmail,
-            role: inviteRole,
-            token: token,
-            expires_at: expiresAt.toISOString(),
-            status: 'pending'
-          }
-        ]);
+        .insert({
+          email: newInvite.email,
+          role: newInvite.role,
+          token,
+          status: 'pending',
+          expires_at: expiresAt.toISOString()
+        })
+        .select();
 
       if (error) throw error;
-
-      toast.success('Invitation envoyée avec succès !');
-      setInviteEmail('');
-      setInviteRole('b2b_user');
-      setShowInviteForm(false);
-      fetchData();
-    } catch (error) {
-      console.error('Error sending invitation:', error);
+      
+      // In a real application, send an email to the invited user
+      // For now, just show a success message with the token
+      toast.success(`Invitation envoyée à ${newInvite.email}`);
+      
+      // Reset form and close dialog
+      setNewInvite({ email: '', role: 'b2b_user' });
+      setShowInviteDialog(false);
+      
+      // Refresh invitations list
+      fetchInvitations();
+    } catch (err) {
+      console.error('Error sending invitation:', err);
       toast.error('Erreur lors de l\'envoi de l\'invitation');
     } finally {
       setIsInviting(false);
     }
   };
 
-  const deleteUser = async (userId: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-      return;
-    }
-
+  const handleDeleteUser = async () => {
+    if (!deleteUserId) return;
+    
     try {
+      setIsDeleting(true);
+      
+      // Delete user from profiles table
       const { error } = await supabase
         .from('profiles')
         .delete()
-        .eq('id', userId);
+        .eq('id', deleteUserId);
 
       if (error) throw error;
-
+      
+      // Remove from local state
+      setUsers(users.filter(u => u.id !== deleteUserId));
+      
       toast.success('Utilisateur supprimé avec succès');
-      fetchData();
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      toast.error('Erreur lors de la suppression');
+      setDeleteUserId(null);
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      toast.error('Erreur lors de la suppression de l\'utilisateur');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
-  const cancelInvitation = async (invitationId: string) => {
+  const handleResendInvitation = async (invitationId: string) => {
+    try {
+      // In a real application, we would update the invitation and send a new email
+      toast.success('Invitation renvoyée');
+    } catch (err) {
+      console.error('Error resending invitation:', err);
+      toast.error('Erreur lors du renvoi de l\'invitation');
+    }
+  };
+
+  const handleCancelInvitation = async (invitationId: string) => {
     try {
       const { error } = await supabase
         .from('invitations')
-        .update({ status: 'cancelled' })
+        .delete()
         .eq('id', invitationId);
 
       if (error) throw error;
-
+      
+      // Remove from local state
+      setInvitations(invitations.filter(inv => inv.id !== invitationId));
+      
       toast.success('Invitation annulée');
-      fetchData();
-    } catch (error) {
-      console.error('Error cancelling invitation:', error);
-      toast.error('Erreur lors de l\'annulation');
+    } catch (err) {
+      console.error('Error cancelling invitation:', err);
+      toast.error('Erreur lors de l\'annulation de l\'invitation');
     }
   };
 
-  const filteredUsers = users.filter(u => {
-    const matchesSearch = u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         u.department?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === 'all' || u.role === roleFilter;
-    const matchesDepartment = departmentFilter === 'all' || u.department === departmentFilter;
-    
-    return matchesSearch && matchesRole && matchesDepartment;
-  });
+  const filteredUsers = users.filter(user => 
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.department?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const getUniqueValues = (field: keyof User) => {
-    return Array.from(new Set(users.map(u => u[field]).filter(Boolean)));
+  const filteredInvitations = invitations.filter(inv => 
+    inv.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const getInitials = (name: string | undefined) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase();
   };
 
-  const getStats = () => {
-    const totalUsers = users.length;
-    const admins = users.filter(u => u.role === 'b2b_admin').length;
-    const collaborators = users.filter(u => u.role === 'b2b_user').length;
-    const pendingInvitations = invitations.filter(i => i.status === 'pending').length;
-    
-    return { totalUsers, admins, collaborators, pendingInvitations };
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">En attente</Badge>;
+      case 'accepted':
+        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">Acceptée</Badge>;
+      case 'expired':
+        return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-300">Expirée</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
   };
 
-  const stats = getStats();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
+  const getRoleBadge = (role: string | undefined) => {
+    switch (role) {
+      case 'b2b_admin':
+        return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-300">Admin</Badge>;
+      case 'b2b_user':
+        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">Collaborateur</Badge>;
+      default:
+        return <Badge variant="outline">{role}</Badge>;
+    }
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>Chargement des utilisateurs...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
-      {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/b2b/admin/dashboard')}>
-              ← Tableau de bord
-            </Button>
-            <h1 className="text-xl font-bold">Gestion des utilisateurs</h1>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Badge variant="outline" className="bg-purple-50 text-purple-600">
-              Administrateur
-            </Badge>
-            <Badge variant="outline">
-              {user?.user_metadata?.name || user?.email}
-            </Badge>
-            <Button onClick={handleLogout} variant="outline">
-              Déconnexion
-            </Button>
-          </div>
+    <div className="container mx-auto p-6 max-w-7xl">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="mb-2" 
+            onClick={() => navigate('/b2b/admin/dashboard')}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour au tableau de bord
+          </Button>
+          <h1 className="text-3xl font-bold">Gestion des Utilisateurs</h1>
+          <p className="text-muted-foreground">
+            Administrez vos utilisateurs et envoyez des invitations
+          </p>
         </div>
-      </header>
-
-      <div className="container py-8">
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Utilisateurs</p>
-                  <p className="text-2xl font-bold">{stats.totalUsers}</p>
-                </div>
-                <Users className="h-8 w-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Administrateurs</p>
-                  <p className="text-2xl font-bold">{stats.admins}</p>
-                </div>
-                <Building2 className="h-8 w-8 text-purple-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Collaborateurs</p>
-                  <p className="text-2xl font-bold">{stats.collaborators}</p>
-                </div>
-                <TrendingUp className="h-8 w-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Invitations en attente</p>
-                  <p className="text-2xl font-bold">{stats.pendingInvitations}</p>
-                </div>
-                <Mail className="h-8 w-8 text-orange-600" />
-              </div>
-            </CardContent>
-          </Card>
+        
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button onClick={() => setShowInviteDialog(true)}>
+            <UserPlus className="h-4 w-4 mr-2" />
+            Inviter un utilisateur
+          </Button>
+          <Button variant="outline" onClick={() => {
+            fetchUsers();
+            fetchInvitations();
+          }}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Actualiser
+          </Button>
         </div>
-
-        {/* Actions and Filters */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-              <div className="flex flex-col sm:flex-row gap-4 items-center flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Rechercher des utilisateurs..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 w-64"
-                  />
-                </div>
-                
-                <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger className="w-40">
-                    <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tous les rôles</SelectItem>
-                    <SelectItem value="b2b_admin">Administrateurs</SelectItem>
-                    <SelectItem value="b2b_user">Collaborateurs</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Département" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tous départements</SelectItem>
-                    {getUniqueValues('department').map((dept) => (
-                      <SelectItem key={dept} value={dept as string}>
-                        {dept as string}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button onClick={() => setShowInviteForm(true)}>
-                <UserPlus className="h-4 w-4 mr-2" />
-                Inviter un utilisateur
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Invite Form */}
-        {showInviteForm && (
-          <Card className="mb-8 border-2 border-dashed">
+      </div>
+      
+      <div className="mb-6">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher par nom, email ou département..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+      
+      <Tabs defaultValue="users" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="users" className="flex items-center gap-2">
+            Utilisateurs ({users.length})
+          </TabsTrigger>
+          <TabsTrigger value="invitations" className="flex items-center gap-2">
+            Invitations ({invitations.length})
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="users">
+          <Card>
             <CardHeader>
-              <CardTitle>Inviter un nouvel utilisateur</CardTitle>
+              <CardTitle>Utilisateurs</CardTitle>
               <CardDescription>
-                Envoyez une invitation par email à un nouveau collaborateur
+                Liste des utilisateurs ayant accès à votre espace EmotionsCare
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
+              {isLoading ? (
+                <div className="flex justify-center items-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : filteredUsers.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">Aucun utilisateur trouvé</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[250px]">Utilisateur</TableHead>
+                        <TableHead>Rôle</TableHead>
+                        <TableHead>Département</TableHead>
+                        <TableHead>Ajouté le</TableHead>
+                        <TableHead>Dernière connexion</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredUsers.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={user.avatar_url} />
+                                <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <div>{user.name || 'N/A'}</div>
+                                <div className="text-sm text-muted-foreground">{user.email}</div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{getRoleBadge(user.role)}</TableCell>
+                          <TableCell>{user.department || '-'}</TableCell>
+                          <TableCell>
+                            {format(new Date(user.created_at), 'dd/MM/yyyy', { locale: fr })}
+                          </TableCell>
+                          <TableCell>
+                            {user.last_sign_in_at 
+                              ? formatDistance(new Date(user.last_sign_in_at), new Date(), { addSuffix: true, locale: fr }) 
+                              : 'Jamais connecté'}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <span className="sr-only">Actions</span>
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => {
+                                  // Handle edit user
+                                  toast.info('Édition d\'utilisateur à venir');
+                                }}>
+                                  Modifier
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => {
+                                  // Handle send email
+                                  toast.info('Envoi d\'email à venir');
+                                }}>
+                                  <Mail className="h-4 w-4 mr-2" />
+                                  Envoyer un email
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem 
+                                  className="text-red-600"
+                                  onClick={() => setDeleteUserId(user.id)}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Supprimer
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="invitations">
+          <Card>
+            <CardHeader>
+              <CardTitle>Invitations</CardTitle>
+              <CardDescription>
+                Gérez les invitations pour rejoindre votre espace EmotionsCare
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="flex justify-center items-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : filteredInvitations.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">Aucune invitation trouvée</p>
+                  <Button 
+                    variant="outline" 
+                    className="mt-4"
+                    onClick={() => setShowInviteDialog(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Créer une invitation
+                  </Button>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Rôle</TableHead>
+                        <TableHead>Statut</TableHead>
+                        <TableHead>Date d'envoi</TableHead>
+                        <TableHead>Expiration</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredInvitations.map((invitation) => (
+                        <TableRow key={invitation.id}>
+                          <TableCell className="font-medium">{invitation.email}</TableCell>
+                          <TableCell>{getRoleBadge(invitation.role)}</TableCell>
+                          <TableCell>{getStatusBadge(invitation.status)}</TableCell>
+                          <TableCell>
+                            {format(new Date(invitation.created_at), 'dd/MM/yyyy', { locale: fr })}
+                          </TableCell>
+                          <TableCell>
+                            {format(new Date(invitation.expires_at), 'dd/MM/yyyy', { locale: fr })}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <span className="sr-only">Actions</span>
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {invitation.status === 'pending' && (
+                                  <DropdownMenuItem onClick={() => handleResendInvitation(invitation.id)}>
+                                    <MailPlus className="h-4 w-4 mr-2" />
+                                    Renvoyer
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuItem 
+                                  className="text-red-600"
+                                  onClick={() => handleCancelInvitation(invitation.id)}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  {invitation.status === 'pending' ? 'Annuler' : 'Supprimer'}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      
+      {/* Invite User Dialog */}
+      <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Inviter un nouvel utilisateur</DialogTitle>
+            <DialogDescription>
+              Envoyez une invitation par email pour rejoindre votre espace EmotionsCare.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Adresse email</Label>
               <Input
+                id="email"
                 type="email"
-                placeholder="Adresse email"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
+                placeholder="collaborateur@entreprise.com"
+                value={newInvite.email}
+                onChange={(e) => setNewInvite({ ...newInvite, email: e.target.value })}
               />
-              
-              <Select value={inviteRole} onValueChange={setInviteRole}>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="role">Rôle</Label>
+              <Select
+                value={newInvite.role}
+                onValueChange={(value) => setNewInvite({ ...newInvite, role: value })}
+              >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Sélectionnez un rôle" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="b2b_user">Collaborateur</SelectItem>
                   <SelectItem value="b2b_admin">Administrateur</SelectItem>
                 </SelectContent>
               </Select>
-
-              <div className="flex space-x-2">
-                <Button 
-                  onClick={sendInvitation}
-                  disabled={isInviting}
-                >
-                  {isInviting ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Mail className="h-4 w-4 mr-2" />
-                  )}
-                  Envoyer l'invitation
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => setShowInviteForm(false)}
-                >
-                  Annuler
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Users List */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Utilisateurs actifs ({filteredUsers.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {filteredUsers.map((user) => (
-                <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
-                      {user.name?.charAt(0) || 'U'}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{user.name}</h3>
-                      <p className="text-sm text-muted-foreground">{user.email}</p>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <Badge 
-                          variant="outline"
-                          className={user.role === 'b2b_admin' ? 'bg-purple-50 text-purple-600' : 'bg-green-50 text-green-600'}
-                        >
-                          {user.role === 'b2b_admin' ? 'Admin' : 'Collaborateur'}
-                        </Badge>
-                        {user.department && (
-                          <Badge variant="outline">
-                            {user.department}
-                          </Badge>
-                        )}
-                        {user.emotional_score && (
-                          <Badge variant="outline" className="bg-blue-50 text-blue-600">
-                            Bien-être: {user.emotional_score}%
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">
-                      <Edit className="h-4 w-4 mr-2" />
-                      Modifier
-                    </Button>
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      onClick={() => deleteUser(user.id)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Supprimer
-                    </Button>
-                  </div>
-                </div>
-              ))}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Pending Invitations */}
-        {invitations.filter(i => i.status === 'pending').length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Invitations en attente</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {invitations
-                  .filter(i => i.status === 'pending')
-                  .map((invitation) => (
-                    <div key={invitation.id} className="flex items-center justify-between p-4 border rounded-lg bg-yellow-50">
-                      <div>
-                        <h3 className="font-semibold">{invitation.email}</h3>
-                        <div className="flex items-center space-x-2 mt-1">
-                          <Badge variant="outline" className="bg-yellow-100 text-yellow-600">
-                            {invitation.role === 'b2b_admin' ? 'Admin' : 'Collaborateur'}
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">
-                            Expire le {new Date(invitation.expires_at).toLocaleDateString('fr-FR')}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => cancelInvitation(invitation.id)}
-                      >
-                        Annuler
-                      </Button>
-                    </div>
-                  ))
-                }
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowInviteDialog(false)}>
+              Annuler
+            </Button>
+            <Button onClick={handleSendInvitation} disabled={isInviting}>
+              {isInviting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Envoi...
+                </>
+              ) : (
+                <>
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Envoyer l'invitation
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete User Dialog */}
+      <Dialog open={!!deleteUserId} onOpenChange={(open) => !open && setDeleteUserId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Supprimer l'utilisateur</DialogTitle>
+            <DialogDescription>
+              Cette action est irréversible. L'utilisateur sera supprimé définitivement.
+            </DialogDescription>
+          </DialogHeader>
+          <p>
+            Êtes-vous sûr de vouloir supprimer cet utilisateur ?
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteUserId(null)}>
+              Annuler
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteUser}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Suppression...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Supprimer
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

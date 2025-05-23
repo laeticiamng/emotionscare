@@ -1,295 +1,312 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { EmotionResult } from '@/types/emotion';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { BarChart, Calendar, LineChart, ListMusic } from 'lucide-react';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Calendar, TrendingUp, Heart, BarChart2, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
+import { LineChart as ReChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-// Composant pour afficher l'historique des scans récents
 const UnifiedEmotionCheckin: React.FC = () => {
-  const [recentScans, setRecentScans] = useState<any[]>([]);
-  const [weeklyStats, setWeeklyStats] = useState({
-    averageScore: 0,
-    totalScans: 0,
-    dominantEmotion: '',
-    improvement: 0
-  });
+  const { user } = useAuth();
+  const [emotions, setEmotions] = useState<EmotionResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Simuler le chargement des données
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Données simulées pour la démonstration
-        const mockScans = [
-          {
-            id: '1',
-            date: new Date(Date.now() - 86400000), // 1 jour
-            emotion: 'joy',
-            intensity: 0.8,
-            source: 'text'
-          },
-          {
-            id: '2',
-            date: new Date(Date.now() - 172800000), // 2 jours
-            emotion: 'calm',
-            intensity: 0.7,
-            source: 'emoji'
-          },
-          {
-            id: '3',
-            date: new Date(Date.now() - 259200000), // 3 jours
-            emotion: 'anxiety',
-            intensity: 0.4,
-            source: 'voice'
-          },
-          {
-            id: '4',
-            date: new Date(Date.now() - 345600000), // 4 jours
-            emotion: 'joy',
-            intensity: 0.9,
-            source: 'facial'
-          },
-          {
-            id: '5',
-            date: new Date(Date.now() - 432000000), // 5 jours
-            emotion: 'sadness',
-            intensity: 0.3,
-            source: 'text'
-          }
-        ];
-        
-        setRecentScans(mockScans);
-        
-        // Calculer les statistiques
-        const avgScore = mockScans.reduce((sum, scan) => sum + scan.intensity, 0) / mockScans.length;
-        const emotions = mockScans.map(scan => scan.emotion);
-        const emotionCounts = emotions.reduce((acc, emotion) => {
-          acc[emotion] = (acc[emotion] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>);
-        
-        const dominantEmotion = Object.keys(emotionCounts).reduce((a, b) => 
-          emotionCounts[a] > emotionCounts[b] ? a : b
-        );
-        
-        setWeeklyStats({
-          averageScore: Math.round(avgScore * 100),
-          totalScans: mockScans.length,
-          dominantEmotion,
-          improvement: 5 // +5% par rapport à la semaine précédente
-        });
-        
-      } catch (error) {
-        console.error('Erreur lors du chargement des données:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    loadData();
-  }, []);
-  
-  const getEmotionColor = (emotion: string) => {
-    const colors: Record<string, string> = {
-      joy: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
-      calm: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-      sadness: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
-      anger: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
-      anxiety: 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400',
-      fear: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
-    };
-    return colors[emotion] || 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
-  };
-  
-  const getEmotionLabel = (emotion: string) => {
-    const labels: Record<string, string> = {
-      joy: 'Joie',
-      calm: 'Calme',
-      sadness: 'Tristesse',
-      anger: 'Colère',
-      anxiety: 'Anxiété',
-      fear: 'Peur'
-    };
-    return labels[emotion] || emotion;
-  };
-  
-  const getSourceIcon = (source: string) => {
-    switch (source) {
-      case 'text': return '📝';
-      case 'emoji': return '😊';
-      case 'voice': return '🎤';
-      case 'facial': return '📷';
-      default: return '📊';
+  const [error, setError] = useState<string | null>(null);
+  const [timeRange, setTimeRange] = useState<string>('week');
+
+  const getTimeRangeFilter = () => {
+    const now = new Date();
+    switch (timeRange) {
+      case 'day':
+        const yesterday = new Date(now);
+        yesterday.setDate(now.getDate() - 1);
+        return yesterday.toISOString();
+      case 'week':
+        const lastWeek = new Date(now);
+        lastWeek.setDate(now.getDate() - 7);
+        return lastWeek.toISOString();
+      case 'month':
+        const lastMonth = new Date(now);
+        lastMonth.setMonth(now.getMonth() - 1);
+        return lastMonth.toISOString();
+      case 'year':
+        const lastYear = new Date(now);
+        lastYear.setFullYear(now.getFullYear() - 1);
+        return lastYear.toISOString();
+      default:
+        return null;
     }
   };
-  
-  if (isLoading) {
+
+  const fetchEmotions = async () => {
+    if (!user) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      let query = supabase
+        .from('emotions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false });
+
+      const timeFilter = getTimeRangeFilter();
+      if (timeFilter) {
+        query = query.gte('date', timeFilter);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      
+      setEmotions(data || []);
+    } catch (err) {
+      console.error('Error fetching emotions:', err);
+      setError('Impossible de charger vos données émotionnelles');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmotions();
+  }, [user, timeRange]);
+
+  // Prepare chart data
+  const chartData = emotions.map(emotion => ({
+    date: format(new Date(emotion.date), 'dd/MM'),
+    score: emotion.score
+  })).reverse();
+
+  // Calculate emotion stats
+  const averageScore = emotions.length 
+    ? Math.round(emotions.reduce((acc, emotion) => acc + emotion.score, 0) / emotions.length) 
+    : 0;
+
+  const getScoreClass = (score: number) => {
+    if (score >= 75) return 'text-green-600';
+    if (score > 50) return 'text-blue-600';
+    if (score > 35) return 'text-orange-600';
+    return 'text-red-600';
+  };
+
+  if (!user) {
     return (
-      <div className="space-y-6">
-        {[1, 2, 3].map(i => (
-          <Card key={i}>
-            <CardContent className="p-6">
-              <div className="animate-pulse space-y-4">
-                <div className="h-4 bg-muted rounded w-3/4"></div>
-                <div className="h-4 bg-muted rounded w-1/2"></div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <Alert>
+        <AlertTitle>Connexion requise</AlertTitle>
+        <AlertDescription>
+          Veuillez vous connecter pour voir votre historique d'émotions
+        </AlertDescription>
+      </Alert>
     );
   }
-  
+
   return (
     <div className="space-y-6">
-      {/* Statistiques hebdomadaires */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <BarChart2 className="mr-2 h-5 w-5" />
-            Votre bien-être cette semaine
-          </CardTitle>
-          <CardDescription>
-            Résumé de vos 7 derniers jours
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">{weeklyStats.averageScore}%</div>
-              <div className="text-sm text-muted-foreground">Score moyen</div>
-              {weeklyStats.improvement > 0 && (
-                <div className="flex items-center justify-center mt-1 text-green-600">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  <span className="text-xs">+{weeklyStats.improvement}%</span>
-                </div>
-              )}
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold">{weeklyStats.totalScans}</div>
-              <div className="text-sm text-muted-foreground">Scans effectués</div>
-            </div>
-            <div className="text-center">
-              <Badge className={getEmotionColor(weeklyStats.dominantEmotion)}>
-                {getEmotionLabel(weeklyStats.dominantEmotion)}
-              </Badge>
-              <div className="text-sm text-muted-foreground mt-1">Émotion dominante</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-2xl font-semibold">Historique émotionnel</h2>
+        
+        <div className="flex gap-2">
+          <Select
+            value={timeRange}
+            onValueChange={setTimeRange}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Période" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="day">Dernières 24h</SelectItem>
+              <SelectItem value="week">7 derniers jours</SelectItem>
+              <SelectItem value="month">30 derniers jours</SelectItem>
+              <SelectItem value="year">12 derniers mois</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Button variant="outline" onClick={fetchEmotions}>
+            Actualiser
+          </Button>
+        </div>
+      </div>
       
-      {/* Historique récent */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Calendar className="mr-2 h-5 w-5" />
-            Historique récent
-          </CardTitle>
-          <CardDescription>
-            Vos derniers scans émotionnels
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {recentScans.length > 0 ? (
-            <div className="space-y-4">
-              {recentScans.map((scan) => (
-                <div key={scan.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <div className="text-lg">{getSourceIcon(scan.source)}</div>
-                    <div>
-                      <div className="flex items-center space-x-2">
-                        <Badge className={getEmotionColor(scan.emotion)}>
-                          {getEmotionLabel(scan.emotion)}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {scan.date.toLocaleDateString()}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <Progress value={scan.intensity * 100} className="w-20 h-1" />
-                        <span className="text-xs text-muted-foreground">
-                          {Math.round(scan.intensity * 100)}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <Heart className={`h-4 w-4 ${scan.intensity > 0.7 ? 'text-red-500' : 'text-muted-foreground'}`} />
-                </div>
-              ))}
-            </div>
+      {isLoading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-[200px] w-full rounded-lg" />
+          <Skeleton className="h-[100px] w-full rounded-lg" />
+          <Skeleton className="h-[300px] w-full rounded-lg" />
+        </div>
+      ) : error ? (
+        <Alert variant="destructive">
+          <AlertTitle>Erreur</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      ) : (
+        <>
+          {emotions.length === 0 ? (
+            <Alert>
+              <AlertTitle>Aucune donnée</AlertTitle>
+              <AlertDescription>
+                Vous n'avez pas encore d'historique d'émotions. Utilisez le scanner d'émotions pour commencer à suivre votre bien-être.
+              </AlertDescription>
+            </Alert>
           ) : (
-            <div className="text-center py-8">
-              <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Aucun scan récent</p>
-              <p className="text-sm text-muted-foreground">Commencez par effectuer votre premier scan émotionnel</p>
-            </div>
+            <Tabs defaultValue="graph">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="graph" className="flex items-center gap-2">
+                  <LineChart className="h-4 w-4" />
+                  <span className="hidden sm:inline">Graphique</span>
+                </TabsTrigger>
+                <TabsTrigger value="stats" className="flex items-center gap-2">
+                  <BarChart className="h-4 w-4" />
+                  <span className="hidden sm:inline">Statistiques</span>
+                </TabsTrigger>
+                <TabsTrigger value="list" className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span className="hidden sm:inline">Historique</span>
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="graph" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Évolution émotionnelle</CardTitle>
+                    <CardDescription>
+                      Visualisez l'évolution de vos émotions au fil du temps
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <ReChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                        <Line type="monotone" dataKey="score" stroke="#2563eb" strokeWidth={2} dot={{ r: 4 }} />
+                        <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+                        <XAxis dataKey="date" />
+                        <YAxis domain={[0, 100]} />
+                        <Tooltip 
+                          formatter={(value) => [`${value}/100`, 'Score']}
+                          labelFormatter={(label) => `Date: ${label}`}
+                        />
+                      </ReChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="stats" className="mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base">Score moyen</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className={`text-3xl font-bold ${getScoreClass(averageScore)}`}>
+                        {averageScore}/100
+                      </p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base">Entrées totales</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-3xl font-bold">{emotions.length}</p>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-base">Dernière analyse</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {emotions.length > 0 ? (
+                        <p className="text-lg">
+                          {format(new Date(emotions[0].date), 'dd MMMM yyyy', { locale: fr })}
+                        </p>
+                      ) : (
+                        <p>-</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="list" className="mt-6">
+                <div className="space-y-4">
+                  {emotions.map((emotion) => (
+                    <Card key={emotion.id} className="overflow-hidden">
+                      <div className="flex border-l-4 h-full" style={{
+                        borderLeftColor: emotion.score >= 75 
+                          ? '#22c55e' 
+                          : emotion.score > 50 
+                            ? '#3b82f6' 
+                            : emotion.score > 35 
+                              ? '#f97316' 
+                              : '#ef4444'
+                      }}>
+                        <div className="py-4 px-6 flex-1">
+                          <div className="flex justify-between">
+                            <div>
+                              <p className="text-sm text-gray-500">
+                                {format(new Date(emotion.date), 'dd MMMM yyyy à HH:mm', { locale: fr })}
+                              </p>
+                              
+                              {emotion.text && (
+                                <p className="mt-1 line-clamp-2">{emotion.text}</p>
+                              )}
+                              
+                              {emotion.emojis && (
+                                <p className="mt-1 text-xl">{emotion.emojis}</p>
+                              )}
+                            </div>
+                            
+                            <div className={`text-lg font-semibold ${getScoreClass(emotion.score)}`}>
+                              {emotion.score}/100
+                            </div>
+                          </div>
+                          
+                          {emotion.audio_url && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="mt-2"
+                              onClick={() => {
+                                const audio = new Audio(emotion.audio_url);
+                                audio.play();
+                              }}
+                            >
+                              <ListMusic className="h-4 w-4 mr-2" />
+                              Écouter l'audio
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
           )}
-        </CardContent>
-        {recentScans.length > 0 && (
-          <CardContent className="pt-0">
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => navigate('/journal')}
-            >
-              Voir l'historique complet
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </CardContent>
-        )}
-      </Card>
-      
-      {/* Recommandations */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recommandations personnalisées</CardTitle>
-          <CardDescription>
-            Basées sur vos scans récents
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {weeklyStats.averageScore < 60 ? (
-              <>
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-                  <p className="text-sm font-medium">💙 Séance de relaxation</p>
-                  <p className="text-xs text-muted-foreground">
-                    Une session de méditation pourrait vous aider à retrouver votre équilibre
-                  </p>
-                </div>
-                <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-md">
-                  <p className="text-sm font-medium">🎵 Musicothérapie</p>
-                  <p className="text-xs text-muted-foreground">
-                    Écoutez de la musique adaptée à votre humeur pour améliorer votre bien-être
-                  </p>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
-                  <p className="text-sm font-medium">⭐ Excellent travail !</p>
-                  <p className="text-xs text-muted-foreground">
-                    Votre bien-être est en bonne voie. Continuez vos bonnes habitudes
-                  </p>
-                </div>
-                <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-md">
-                  <p className="text-sm font-medium">📈 Défis bien-être</p>
-                  <p className="text-xs text-muted-foreground">
-                    Relevez de nouveaux défis pour maintenir votre progression
-                  </p>
-                </div>
-              </>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+        </>
+      )}
     </div>
   );
 };

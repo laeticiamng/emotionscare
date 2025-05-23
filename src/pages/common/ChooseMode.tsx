@@ -1,127 +1,87 @@
 
-import React, { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Brain, Briefcase, Building, Building2 } from 'lucide-react';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { motion } from 'framer-motion';
-import { UserIcon, Users, Building2 } from 'lucide-react';
-import { getModeDashboardPath } from '@/utils/userModeHelpers';
 
-const ChooseMode = () => {
+const ChooseMode: React.FC = () => {
   const navigate = useNavigate();
-  const { setUserMode, userMode } = useUserMode();
-  const { user, isAuthenticated } = useAuth();
-  
-  useEffect(() => {
-    // If user already has a mode and is authenticated, redirect to appropriate dashboard
-    if (isAuthenticated && userMode) {
-      navigate(getModeDashboardPath(userMode));
-    }
-  }, [isAuthenticated, userMode, navigate]);
-  
-  const handleModeSelect = (mode: string) => {
-    setUserMode(mode as any);
+  const { setUserMode } = useUserMode();
+
+  const handleSelectMode = (mode: 'b2c' | 'b2b_user' | 'b2b_admin') => {
+    setUserMode(mode);
     localStorage.setItem('userMode', mode);
-    navigate(getModeDashboardPath(mode));
+    
+    if (mode === 'b2c') {
+      navigate('/b2c/login');
+    } else if (mode === 'b2b_user') {
+      navigate('/b2b/selection');
+    } else {
+      navigate('/b2b/selection');
+    }
   };
-  
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted px-4">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-md w-full bg-card p-6 rounded-lg shadow-md border"
-      >
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2">Choisissez votre mode</h1>
-          <p className="text-muted-foreground">
-            Sélectionnez comment vous souhaitez utiliser l'application
-          </p>
-        </div>
-        
-        <div className="space-y-4">
-          <motion.div 
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
+      <Card className="w-full max-w-4xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold">Bienvenue sur EmotionsCare</CardTitle>
+          <CardDescription className="text-lg mt-2">
+            Choisissez comment vous souhaitez utiliser notre plateforme
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+          <Button
+            onClick={() => handleSelectMode('b2c')}
+            variant="outline"
+            className="h-auto flex flex-col items-center gap-4 p-8 border-2 hover:border-primary hover:bg-primary/5 transition-all"
           >
-            <Button
-              variant="outline"
-              className="w-full justify-start text-left h-auto py-4 px-4"
-              onClick={() => handleModeSelect('b2c')}
-            >
-              <div className="flex items-center">
-                <div className="bg-primary/10 p-2 rounded-full mr-4">
-                  <UserIcon className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Particulier</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Accédez à votre espace personnel
-                  </p>
-                </div>
-              </div>
-            </Button>
-          </motion.div>
-          
-          <motion.div 
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-          >
-            <Button
-              variant="outline"
-              className="w-full justify-start text-left h-auto py-4 px-4"
-              onClick={() => handleModeSelect('b2b_user')}
-            >
-              <div className="flex items-center">
-                <div className="bg-primary/10 p-2 rounded-full mr-4">
-                  <Users className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Collaborateur</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Accédez à votre espace collaborateur
-                  </p>
-                </div>
-              </div>
-            </Button>
-          </motion.div>
-          
-          <motion.div 
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-          >
-            <Button
-              variant="outline"
-              className="w-full justify-start text-left h-auto py-4 px-4"
-              onClick={() => handleModeSelect('b2b_admin')}
-            >
-              <div className="flex items-center">
-                <div className="bg-primary/10 p-2 rounded-full mr-4">
-                  <Building2 className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-medium mb-1">Administrateur</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Accédez à l'espace administrateur pour gérer votre organisation
-                  </p>
-                </div>
-              </div>
-            </Button>
-          </motion.div>
-        </div>
-        
-        <div className="text-center mt-6">
-          <Button 
-            variant="ghost"
-            onClick={() => navigate('/')}
-            className="text-sm"
-          >
-            Retour à l'accueil
+            <div className="bg-primary/10 p-3 rounded-full">
+              <Brain className="h-8 w-8 text-primary" />
+            </div>
+            <div className="text-center">
+              <h3 className="text-xl font-medium mb-2">Particulier</h3>
+              <p className="text-sm text-muted-foreground">
+                Accédez à toutes les fonctionnalités personnalisables pour votre bien-être émotionnel
+              </p>
+            </div>
           </Button>
-        </div>
-      </motion.div>
+          
+          <Button
+            onClick={() => handleSelectMode('b2b_user')}
+            variant="outline"
+            className="h-auto flex flex-col items-center gap-4 p-8 border-2 hover:border-primary hover:bg-primary/5 transition-all"
+          >
+            <div className="bg-primary/10 p-3 rounded-full">
+              <Briefcase className="h-8 w-8 text-primary" />
+            </div>
+            <div className="text-center">
+              <h3 className="text-xl font-medium mb-2">Collaborateur</h3>
+              <p className="text-sm text-muted-foreground">
+                Utilisez EmotionsCare dans le cadre de votre entreprise ou organisation
+              </p>
+            </div>
+          </Button>
+          
+          <Button
+            onClick={() => handleSelectMode('b2b_admin')}
+            variant="outline"
+            className="h-auto flex flex-col items-center gap-4 p-8 border-2 hover:border-primary hover:bg-primary/5 transition-all"
+          >
+            <div className="bg-primary/10 p-3 rounded-full">
+              <Building2 className="h-8 w-8 text-primary" />
+            </div>
+            <div className="text-center">
+              <h3 className="text-xl font-medium mb-2">Administration</h3>
+              <p className="text-sm text-muted-foreground">
+                Gérez EmotionsCare pour votre entreprise et accédez aux tableaux de bord
+              </p>
+            </div>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };
