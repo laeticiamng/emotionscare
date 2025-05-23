@@ -6,4 +6,5 @@ export interface UserModeContextType {
   setUserMode: (mode: UserModeType) => void;
   isLoading: boolean;
   changeUserMode: (mode: UserModeType) => void;
+  clearUserMode?: () => void;
 }

@@ -1,209 +1,395 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Loader2, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { motion } from 'framer-motion';
+import { Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 
+const onboardingSchema = z.object({
+  age: z.string().min(1, { message: 'Veuillez sélectionner votre tranche d\'âge' }),
+  objective: z.string().min(1, { message: 'Veuillez sélectionner votre objectif principal' }),
+  interests: z.array(z.string()).min(1, { message: 'Veuillez sélectionner au moins un intérêt' }),
+  notifications: z.boolean().optional(),
+});
+
+type OnboardingFormValues = z.infer<typeof onboardingSchema>;
+
 const B2COnboarding: React.FC = () => {
-  const { user, isAuthenticated, isLoading } = useAuth();
-  const { userMode, setUserMode } = useUserMode();
+  const { user, updateUserProfile } = useAuth();
   const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   
-  const [step, setStep] = useState(0);
-  const [emotion, setEmotion] = useState<string>('');
-  const [intensity, setIntensity] = useState<number>(5);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Redirection si non authentifié ou mauvais mode
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate('/b2c/login');
-    } else if (!isLoading && userMode !== 'b2c') {
-      setUserMode('b2c');
-    }
-  }, [isLoading, isAuthenticated, userMode, navigate, setUserMode]);
-  
-  // Étapes de l'onboarding
-  const steps = [
-    {
-      title: 'Bienvenue sur EmotionsCare',
-      content: (
-        <div className="space-y-4 text-center">
-          <p className="text-lg">
-            Merci de nous rejoindre, {user?.name || 'Utilisateur'} !
-          </p>
-          <p>
-            Nous allons vous guider à travers quelques étapes pour personnaliser votre expérience.
-          </p>
-        </div>
-      )
+  const form = useForm<OnboardingFormValues>({
+    resolver: zodResolver(onboardingSchema),
+    defaultValues: {
+      age: '',
+      objective: '',
+      interests: [],
+      notifications: true,
     },
-    {
-      title: 'Comment vous sentez-vous aujourd\'hui ?',
-      content: (
-        <div className="space-y-6">
-          <RadioGroup value={emotion} onValueChange={setEmotion} className="grid grid-cols-2 gap-4">
-            {['Joyeux', 'Calme', 'Inquiet', 'Triste', 'Énergique', 'Fatigué'].map((e) => (
-              <div key={e} className="flex items-center space-x-2">
-                <RadioGroupItem value={e} id={`emotion-${e}`} />
-                <Label htmlFor={`emotion-${e}`} className="cursor-pointer">{e}</Label>
-              </div>
-            ))}
-          </RadioGroup>
-          {emotion && (
-            <div className="space-y-2 pt-4">
-              <Label>Intensité de votre {emotion.toLowerCase()}</Label>
-              <div className="flex items-center space-x-4">
-                <span>Faible</span>
-                <Slider
-                  value={[intensity]}
-                  min={1}
-                  max={10}
-                  step={1}
-                  onValueChange={(vals) => setIntensity(vals[0])}
-                  className="flex-1"
-                />
-                <span>Forte</span>
-              </div>
-              <div className="text-center text-sm text-muted-foreground">
-                {intensity}/10
-              </div>
-            </div>
-          )}
-        </div>
-      )
-    },
-    {
-      title: 'Vos préférences',
-      content: (
-        <div className="space-y-4">
-          <p className="mb-4">
-            Notre application peut vous proposer du contenu selon vos préférences. Qu'est-ce qui vous intéresse le plus ?
-          </p>
-          
-          <RadioGroup defaultValue="bien-etre" className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="bien-etre" id="pref-bien-etre" />
-              <Label htmlFor="pref-bien-etre">Bien-être quotidien</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="relaxation" id="pref-relaxation" />
-              <Label htmlFor="pref-relaxation">Relaxation et méditation</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="therapie" id="pref-therapie" />
-              <Label htmlFor="pref-therapie">Thérapie émotionnelle</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="sommeil" id="pref-sommeil" />
-              <Label htmlFor="pref-sommeil">Amélioration du sommeil</Label>
-            </div>
-          </RadioGroup>
-        </div>
-      )
-    }
+  });
+
+  const interests = [
+    { id: 'meditation', label: 'Méditation' },
+    { id: 'music_therapy', label: 'Thérapie par la musique' },
+    { id: 'vr_relaxation', label: 'Relaxation en VR' },
+    { id: 'emotional_tracking', label: 'Suivi émotionnel' },
+    { id: 'stress_management', label: 'Gestion du stress' },
+    { id: 'cognitive_exercises', label: 'Exercices cognitifs' },
+    { id: 'sleep_improvement', label: 'Amélioration du sommeil' },
+    { id: 'social_emotional', label: 'Intelligence sociale et émotionnelle' },
   ];
-  
+
   const nextStep = () => {
-    if (step === 1 && !emotion) {
-      toast.error('Veuillez sélectionner une émotion');
+    if (step === 1 && !form.getValues().age) {
+      form.setError('age', { message: 'Veuillez sélectionner votre tranche d\'âge' });
       return;
     }
-    
-    if (step < steps.length - 1) {
-      setStep(step + 1);
-    } else {
-      completeOnboarding();
+    if (step === 2 && !form.getValues().objective) {
+      form.setError('objective', { message: 'Veuillez sélectionner votre objectif principal' });
+      return;
     }
+    setStep(current => current + 1);
   };
-  
+
   const prevStep = () => {
-    if (step > 0) {
-      setStep(step - 1);
-    }
+    setStep(current => current - 1);
   };
-  
-  const completeOnboarding = async () => {
-    setIsSubmitting(true);
+
+  const onSubmit = async (values: OnboardingFormValues) => {
+    setIsLoading(true);
     
     try {
-      // Simulation d'une requête pour enregistrer les données d'onboarding
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Simuler une demande d'API avec un délai
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      toast.success('Configuration terminée !');
+      if (user) {
+        await updateUserProfile({
+          preferences: {
+            age: values.age,
+            objective: values.objective,
+            interests: values.interests,
+            notifications: values.notifications,
+          }
+        });
+      }
+      
+      toast.success('Configuration terminée avec succès');
       navigate('/b2c/dashboard');
-    } catch (error) {
-      console.error('Erreur lors de la finalisation de l\'onboarding', error);
-      toast.error('Une erreur est survenue');
+    } catch (error: any) {
+      console.error('Erreur d\'onboarding:', error);
+      toast.error('Une erreur s\'est produite. Veuillez réessayer.');
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
-  
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
-    );
-  }
-  
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-primary/5 to-background p-4">
-      <Card className="w-full max-w-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">{steps[step].title}</CardTitle>
-          <CardDescription>
-            Étape {step + 1} sur {steps.length}
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent>
+
+  const renderStepContent = () => {
+    switch (step) {
+      case 1:
+        return (
           <motion.div
-            key={step}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
           >
-            {steps[step].content}
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">Bienvenue chez EmotionsCare</CardTitle>
+              <CardDescription>
+                Commençons par quelques informations de base
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="age"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Votre tranche d'âge</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionnez votre tranche d'âge" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="18-24">18-24 ans</SelectItem>
+                        <SelectItem value="25-34">25-34 ans</SelectItem>
+                        <SelectItem value="35-44">35-44 ans</SelectItem>
+                        <SelectItem value="45-54">45-54 ans</SelectItem>
+                        <SelectItem value="55-64">55-64 ans</SelectItem>
+                        <SelectItem value="65+">65 ans et plus</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-between pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate('/b2c/dashboard')}
+                >
+                  Ignorer
+                </Button>
+                <Button onClick={nextStep}>
+                  Suivant <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
           </motion.div>
-        </CardContent>
-        
-        <CardFooter className="flex justify-between">
-          <Button 
-            variant="outline" 
-            onClick={prevStep} 
-            disabled={step === 0 || isSubmitting}
+        );
+      case 2:
+        return (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
           >
-            <ArrowLeft className="mr-2 h-4 w-4" /> Précédent
-          </Button>
-          
-          <Button 
-            onClick={nextStep} 
-            disabled={isSubmitting}
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">Votre objectif</CardTitle>
+              <CardDescription>
+                Quel est votre objectif principal sur EmotionsCare?
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="objective"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Objectif principal</FormLabel>
+                    <Select 
+                      onValueChange={field.onChange} 
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionnez votre objectif" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="stress_reduction">Réduction du stress</SelectItem>
+                        <SelectItem value="emotional_balance">Équilibre émotionnel</SelectItem>
+                        <SelectItem value="improve_sleep">Améliorer le sommeil</SelectItem>
+                        <SelectItem value="focus_concentration">Concentration et focus</SelectItem>
+                        <SelectItem value="personal_growth">Développement personnel</SelectItem>
+                        <SelectItem value="manage_anxiety">Gérer l'anxiété</SelectItem>
+                        <SelectItem value="general_wellbeing">Bien-être général</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-between pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={prevStep}
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+                </Button>
+                <Button onClick={nextStep}>
+                  Suivant <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </motion.div>
+        );
+      case 3:
+        return (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
           >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Finalisation...
-              </>
-            ) : step < steps.length - 1 ? (
-              <>
-                Suivant <ArrowRight className="ml-2 h-4 w-4" />
-              </>
-            ) : (
-              'Terminer'
-            )}
-          </Button>
-        </CardFooter>
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">Vos intérêts</CardTitle>
+              <CardDescription>
+                Sélectionnez les domaines qui vous intéressent
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="interests"
+                render={() => (
+                  <FormItem>
+                    <div className="grid grid-cols-2 gap-2">
+                      {interests.map((item) => (
+                        <FormField
+                          key={item.id}
+                          control={form.control}
+                          name="interests"
+                          render={({ field }) => {
+                            return (
+                              <FormItem
+                                key={item.id}
+                                className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-3"
+                              >
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(item.id)}
+                                    onCheckedChange={(checked) => {
+                                      return checked
+                                        ? field.onChange([...field.value, item.id])
+                                        : field.onChange(
+                                            field.value?.filter(
+                                              (value) => value !== item.id
+                                            )
+                                          )
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal cursor-pointer">
+                                  {item.label}
+                                </FormLabel>
+                              </FormItem>
+                            )
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-between pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={prevStep}
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+                </Button>
+                <Button onClick={nextStep}>
+                  Suivant <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </motion.div>
+        );
+      case 4:
+        return (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold">Dernière étape</CardTitle>
+              <CardDescription>
+                Finalisez votre configuration
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <FormField
+                control={form.control}
+                name="notifications"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="font-normal">
+                        Je souhaite recevoir des notifications et conseils personnalisés
+                      </FormLabel>
+                      <p className="text-sm text-muted-foreground">
+                        Vous pourrez modifier ce paramètre ultérieurement
+                      </p>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-between pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={prevStep}
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+                </Button>
+                <Button 
+                  onClick={form.handleSubmit(onSubmit)} 
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Finalisation...
+                    </>
+                  ) : (
+                    'Terminer'
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </motion.div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-muted/30 p-4">
+      <Card className="w-full max-w-xl">
+        <div className="relative">
+          <div className="absolute top-0 left-0 w-full p-4">
+            <div className="flex justify-between items-center">
+              <div className="flex space-x-1">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className={`h-1 w-10 rounded ${
+                      i <= step ? 'bg-primary' : 'bg-primary/20'
+                    }`}
+                  ></div>
+                ))}
+              </div>
+              <span className="text-sm text-muted-foreground">
+                Étape {step} sur 4
+              </span>
+            </div>
+          </div>
+          <div className="pt-12">
+            <Form {...form}>
+              <form>{renderStepContent()}</form>
+            </Form>
+          </div>
+        </div>
       </Card>
     </div>
   );

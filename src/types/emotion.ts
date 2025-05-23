@@ -1,38 +1,58 @@
 
-/**
- * Types pour les émotions et analyses
- */
-
-export type EmotionType = 'joy' | 'sadness' | 'anger' | 'fear' | 'surprise' | 'disgust' | 'neutral' | 'anxiety' | 'calm' | 'stress' | 'fatigue' | 'energy';
-
 export interface EmotionResult {
+  id?: string;
+  userId?: string;
   emotion: string;
-  intensity?: number;
-  confidence?: number;
-  timestamp?: string | Date;
-  source?: 'text' | 'voice' | 'facial' | 'emoji' | 'manual';
-  details?: {
-    [key: string]: any;
-  };
+  intensity: number;
+  category?: string;
+  timestamp?: string;
+  source: 'emoji' | 'text' | 'facial' | 'voice';
+  context?: string;
+  analysis?: EmotionAnalysis;
 }
 
-export interface EmotionHistory {
+export interface EmotionAnalysis {
+  primaryEmotion: string;
+  secondaryEmotions?: string[];
+  triggers?: string[];
+  suggestions?: string[];
+  detailedScore?: Record<string, number>;
+}
+
+export interface EmotionHistoryEntry {
   id: string;
-  userId: string;
-  emotion: EmotionResult;
-  createdAt: string | Date;
-  notes?: string;
-}
-
-export interface EmotionTrend {
   emotion: string;
-  values: number[];
-  dates: string[];
+  intensity: number;
+  timestamp: string;
+  source: string;
 }
 
-export interface EmotionFilter {
-  startDate?: Date;
-  endDate?: Date;
-  emotions?: EmotionType[];
-  source?: string;
+export type EmotionCategory = 
+  | 'joy' 
+  | 'sadness' 
+  | 'anger' 
+  | 'fear' 
+  | 'surprise' 
+  | 'disgust' 
+  | 'calm' 
+  | 'anxiety'
+  | 'neutral';
+
+export interface EmotionData {
+  category: EmotionCategory;
+  label: string;
+  color: string;
+  icon?: string;
 }
+
+export const emotionCategoryMap: Record<EmotionCategory, EmotionData> = {
+  joy: { category: 'joy', label: 'Joie', color: '#FFD700' },
+  sadness: { category: 'sadness', label: 'Tristesse', color: '#6495ED' },
+  anger: { category: 'anger', label: 'Colère', color: '#FF4500' },
+  fear: { category: 'fear', label: 'Peur', color: '#9932CC' },
+  surprise: { category: 'surprise', label: 'Surprise', color: '#FF8C00' },
+  disgust: { category: 'disgust', label: 'Dégoût', color: '#8FBC8F' },
+  calm: { category: 'calm', label: 'Calme', color: '#48D1CC' },
+  anxiety: { category: 'anxiety', label: 'Anxiété', color: '#B22222' },
+  neutral: { category: 'neutral', label: 'Neutre', color: '#A9A9A9' },
+};

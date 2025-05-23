@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { User, Building2, ShieldCheck } from 'lucide-react';
+import { User, Building2, ShieldCheck, ChevronDown } from 'lucide-react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { getUserModeDisplayName } from '@/utils/userModeHelpers';
 import {
@@ -10,19 +10,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface UserModeSelectorProps {
   className?: string;
   minimal?: boolean;
   showLabel?: boolean;
+  onModeChange?: (mode: string) => void;
 }
 
 export function UserModeSelector({ 
   className = '', 
   minimal = false,
-  showLabel = true 
+  showLabel = true,
+  onModeChange
 }: UserModeSelectorProps) {
   const { userMode, changeUserMode } = useUserMode();
+  const navigate = useNavigate();
   
   const getModeIcon = (mode: string) => {
     switch (mode) {
@@ -37,30 +43,67 @@ export function UserModeSelector({
     }
   };
   
+  const handleModeChange = (mode: string) => {
+    changeUserMode(mode as any);
+    toast.success(`Mode ${getUserModeDisplayName(mode)} activé`);
+    
+    if (onModeChange) {
+      onModeChange(mode);
+    } else {
+      // Rediriger vers le dashboard approprié
+      const dashboardPaths = {
+        'b2c': '/b2c/dashboard',
+        'b2b_user': '/b2b/user/dashboard',
+        'b2b_admin': '/b2b/admin/dashboard'
+      };
+      
+      navigate(dashboardPaths[mode as keyof typeof dashboardPaths] || '/dashboard');
+    }
+  };
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button 
           variant={minimal ? "ghost" : "outline"}
           size={minimal ? "sm" : "default"}
-          className={className}
+          className={cn("flex items-center gap-2", className)}
         >
           {getModeIcon(userMode || 'b2c')}
           {showLabel && (
-            <span className="ml-2">{getUserModeDisplayName(userMode || 'b2c')}</span>
+            <span className="hidden sm:inline">{getUserModeDisplayName(userMode || 'b2c')}</span>
           )}
+          <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => changeUserMode('b2c')}>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem 
+          onClick={() => handleModeChange('b2c')}
+          className={cn(
+            "flex items-center gap-2 cursor-pointer",
+            userMode === 'b2c' && "bg-primary/10"
+          )}
+        >
           <User className="mr-2 h-4 w-4" />
           <span>Particulier</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => changeUserMode('b2b_user')}>
+        <DropdownMenuItem 
+          onClick={() => handleModeChange('b2b_user')}
+          className={cn(
+            "flex items-center gap-2 cursor-pointer",
+            userMode === 'b2b_user' && "bg-primary/10"
+          )}
+        >
           <Building2 className="mr-2 h-4 w-4" />
           <span>Collaborateur</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => changeUserMode('b2b_admin')}>
+        <DropdownMenuItem 
+          onClick={() => handleModeChange('b2b_admin')}
+          className={cn(
+            "flex items-center gap-2 cursor-pointer",
+            userMode === 'b2b_admin' && "bg-primary/10"
+          )}
+        >
           <ShieldCheck className="mr-2 h-4 w-4" />
           <span>Administration</span>
         </DropdownMenuItem>
@@ -68,3 +111,5 @@ export function UserModeSelector({
     </DropdownMenu>
   );
 }
+
+export default UserModeSelector;

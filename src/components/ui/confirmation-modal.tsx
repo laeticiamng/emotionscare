@@ -1,5 +1,15 @@
 
 import React from 'react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -9,34 +19,42 @@ interface ConfirmationModalProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
+  variant?: 'default' | 'destructive';
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isOpen,
   onClose,
   onConfirm,
-  title = "Confirmation",
+  title = 'Confirmation',
   message,
-  confirmText = "Confirmer",
-  cancelText = "Annuler"
+  confirmText = 'Confirmer',
+  cancelText = 'Annuler',
+  variant = 'default',
 }) => {
-  if (!isOpen) return null;
-  
+  const handleConfirm = () => {
+    onConfirm();
+    onClose();
+  };
+
   return (
-    <div className="modal">
-      <div className="modal-content">
-        {title && <h3 className="text-lg font-semibold mb-2">{title}</h3>}
-        <p>{message}</p>
-        <div className="flex justify-center mt-4 space-x-2">
-          <button onClick={onConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+    <AlertDialog open={isOpen} onOpenChange={onClose}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{message}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{cancelText}</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirm}
+            className={variant === 'destructive' ? 'bg-destructive hover:bg-destructive/90' : ''}
+          >
             {confirmText}
-          </button>
-          <button onClick={onClose} className="bg-muted text-muted-foreground hover:bg-muted/90">
-            {cancelText}
-          </button>
-        </div>
-      </div>
-    </div>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 

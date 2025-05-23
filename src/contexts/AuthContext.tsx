@@ -1,158 +1,196 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { toast } from 'sonner';
-import { User, AuthContextType } from '@/types/user';
 
-// Valeur par défaut du contexte
-const defaultAuthContext: AuthContextType = {
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  role: 'b2c' | 'b2b_user' | 'b2b_admin';
+  preferences?: Record<string, any>;
+  metadata?: Record<string, any>;
+}
+
+interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, name: string, role?: string, metadata?: Record<string, any>) => Promise<void>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updateUserProfile: (data: Partial<User>) => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
   isLoading: true,
-  login: async () => { throw new Error('Non implémenté') },
-  register: async () => { throw new Error('Non implémenté') },
-  logout: async () => { throw new Error('Non implémenté') },
-  resetPassword: async () => { throw new Error('Non implémenté') },
-};
+  login: async () => {},
+  register: async () => {},
+  logout: async () => {},
+  resetPassword: async () => {},
+  updateUserProfile: async () => {},
+});
 
-// Création du contexte
-const AuthContext = createContext<AuthContextType>(defaultAuthContext);
-
-// Hook pour utiliser le contexte
 export const useAuth = () => useContext(AuthContext);
-
-// Clé pour le stockage local
-const AUTH_STORAGE_KEY = 'emotions-care-auth';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  // Charger l'utilisateur depuis le stockage local au montage
+  
+  // Vérifier si l'utilisateur est déjà connecté au chargement
   useEffect(() => {
-    const storedUser = localStorage.getItem(AUTH_STORAGE_KEY);
-    if (storedUser) {
+    const checkAuth = async () => {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        setIsAuthenticated(true);
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const userData = JSON.parse(storedUser);
+          setUser(userData);
+          setIsAuthenticated(true);
+        }
       } catch (error) {
-        console.error('Erreur lors du chargement de l\'utilisateur:', error);
-        localStorage.removeItem(AUTH_STORAGE_KEY);
+        console.error('Erreur de vérification d\'authentification:', error);
+        localStorage.removeItem('user');
+      } finally {
+        setIsLoading(false);
       }
-    }
-    setIsLoading(false);
+    };
+    
+    checkAuth();
   }, []);
-
-  // Fonction de connexion
-  const login = async (email: string, password: string): Promise<void> => {
-    setIsLoading(true);
+  
+  // Simuler une connexion utilisateur
+  const login = async (email: string, password: string) => {
+    // Dans une application réelle, vous appelleriez votre API d'authentification ici
     try {
-      // Simulation d'une API - à remplacer par une vraie API
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Exemple de données utilisateur simulées
+      let mockUser: User;
       
-      // Vérification simplifiée - à remplacer par une validation réelle
-      if (!email || !password) {
-        throw new Error('Email et mot de passe requis');
+      if (email.includes('admin')) {
+        mockUser = {
+          id: 'admin-123',
+          name: 'Admin User',
+          email,
+          role: 'b2b_admin',
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
+        };
+      } else if (email.includes('b2b') || email.includes('collaborateur') || email.includes('entreprise')) {
+        mockUser = {
+          id: 'b2b-user-456',
+          name: 'B2B User',
+          email,
+          role: 'b2b_user',
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=b2b',
+        };
+      } else {
+        mockUser = {
+          id: 'b2c-789',
+          name: 'B2C User',
+          email,
+          role: 'b2c',
+          avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=b2c',
+        };
       }
       
-      // Simulation d'authentification réussie
-      const userData: User = {
-        id: 'user-' + Date.now().toString(),
-        email,
-        name: email.split('@')[0],
-        role: email.includes('admin') ? 'b2b_admin' : 
-              email.includes('b2b') ? 'b2b_user' : 'b2c',
-      };
+      // Stocker l'utilisateur dans localStorage
+      localStorage.setItem('user', JSON.stringify(mockUser));
       
-      setUser(userData);
+      setUser(mockUser);
       setIsAuthenticated(true);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(userData));
-      
-      toast.success('Connexion réussie');
-      return Promise.resolve();
-    } catch (error: any) {
-      toast.error(error.message || 'Erreur lors de la connexion');
-      return Promise.reject(error);
-    } finally {
-      setIsLoading(false);
+      return mockUser;
+    } catch (error) {
+      console.error('Erreur de connexion:', error);
+      throw new Error('Email ou mot de passe incorrect');
     }
   };
-
-  // Fonction d'inscription
-  const register = async (email: string, password: string, userData: object = {}): Promise<void> => {
-    setIsLoading(true);
+  
+  // Simuler l'inscription d'un utilisateur
+  const register = async (
+    email: string, 
+    password: string, 
+    name: string, 
+    role: string = 'b2c',
+    metadata?: Record<string, any>
+  ) => {
     try {
-      // Simulation d'une API - à remplacer par une vraie API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Vérification simplifiée - à remplacer par une validation réelle
-      if (!email || !password) {
-        throw new Error('Email et mot de passe requis');
-      }
-      
-      // Simulation d'inscription réussie
+      // Dans une application réelle, vous appelleriez votre API d'inscription ici
       const newUser: User = {
-        id: 'user-' + Date.now().toString(),
+        id: `user-${Date.now()}`,
+        name,
         email,
-        name: userData && 'name' in userData ? String(userData.name) : email.split('@')[0],
-        role: userData && 'role' in userData ? String(userData.role) : 'b2c',
-        ...(userData as any),
+        role: (role as 'b2c' | 'b2b_user' | 'b2b_admin'),
+        avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
+        metadata
       };
+      
+      // Stocker l'utilisateur dans localStorage
+      localStorage.setItem('user', JSON.stringify(newUser));
       
       setUser(newUser);
       setIsAuthenticated(true);
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newUser));
-      
-      toast.success('Inscription réussie');
-      return Promise.resolve();
-    } catch (error: any) {
-      toast.error(error.message || 'Erreur lors de l\'inscription');
-      return Promise.reject(error);
-    } finally {
-      setIsLoading(false);
+      return newUser;
+    } catch (error) {
+      console.error('Erreur d\'inscription:', error);
+      throw new Error('Échec de l\'inscription. Veuillez réessayer.');
     }
   };
-
-  // Fonction de déconnexion
-  const logout = async (): Promise<void> => {
+  
+  // Simuler la déconnexion
+  const logout = async () => {
     try {
-      // Simulation d'une API - à remplacer par une vraie API
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Dans une application réelle, vous appelleriez votre API de déconnexion ici
+      localStorage.removeItem('user');
       
       setUser(null);
       setIsAuthenticated(false);
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-      
-      toast.success('Déconnexion réussie');
-      return Promise.resolve();
-    } catch (error: any) {
-      toast.error(error.message || 'Erreur lors de la déconnexion');
-      return Promise.reject(error);
+    } catch (error) {
+      console.error('Erreur de déconnexion:', error);
+      throw error;
     }
   };
-
-  // Fonction de réinitialisation de mot de passe
-  const resetPassword = async (email: string): Promise<void> => {
-    setIsLoading(true);
+  
+  // Simuler une réinitialisation de mot de passe
+  const resetPassword = async (email: string) => {
     try {
-      // Simulation d'une API - à remplacer par une vraie API
+      // Dans une application réelle, vous appelleriez votre API de réinitialisation de mot de passe ici
+      // Pour l'instant, simulons simplement un délai pour montrer que la demande est traitée
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (!email) {
-        throw new Error('Email requis');
-      }
-      
-      toast.success('Si un compte existe avec cet email, un lien de réinitialisation a été envoyé');
-      return Promise.resolve();
-    } catch (error: any) {
-      toast.error(error.message || 'Erreur lors de la réinitialisation du mot de passe');
-      return Promise.reject(error);
-    } finally {
-      setIsLoading(false);
+      // Aucune action réelle n'est prise ici dans notre simulation
+      return;
+    } catch (error) {
+      console.error('Erreur de réinitialisation de mot de passe:', error);
+      throw new Error('Échec de l\'envoi des instructions de réinitialisation.');
     }
   };
-
+  
+  // Mettre à jour le profil utilisateur
+  const updateUserProfile = async (data: Partial<User>) => {
+    try {
+      if (!user) {
+        throw new Error('Utilisateur non connecté');
+      }
+      
+      // Dans une application réelle, vous appelleriez votre API de mise à jour de profil ici
+      const updatedUser = {
+        ...user,
+        ...data
+      };
+      
+      // Mettre à jour l'utilisateur dans localStorage
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      setUser(updatedUser);
+      return updatedUser;
+    } catch (error) {
+      console.error('Erreur de mise à jour du profil:', error);
+      throw new Error('Échec de la mise à jour du profil.');
+    }
+  };
+  
   const value = {
     user,
     isAuthenticated,
@@ -161,13 +199,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     register,
     logout,
     resetPassword,
+    updateUserProfile,
   };
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export default AuthContext;

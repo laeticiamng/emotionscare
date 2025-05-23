@@ -1,218 +1,219 @@
-import { 
-  Home, 
-  BarChart2, 
-  Scan, 
-  BookOpen, 
-  Music, 
-  Headphones, 
-  Video, 
-  Settings, 
-  User, 
-  Activity, 
-  Layers, 
-  Store, 
-  Box, 
-  Users, 
-  Building,
-  MessageSquare,
-  HeartHandshake,
-  Trophy,
-  Glasses
-} from "lucide-react";
 
-export interface NavItemType {
+import { 
+  Home, BookOpen, Music, Scan, MessageSquare, Glasses, Trophy, HeartHandshake, 
+  Settings, LayoutDashboard, Users, FileBarChart, Calendar, Building, Box, 
+  LineChart, Brain 
+} from 'lucide-react';
+import { ReactNode } from 'react';
+
+interface NavItem {
   title: string;
   href: string;
   icon: any;
-  b2cOnly?: boolean;
-  b2bOnly?: boolean;
+  requiresAuth?: boolean;
+  adminOnly?: boolean;
 }
 
-// B2C User Navigation
-export const b2cNavItems: NavItemType[] = [
+// Navigation pour les utilisateurs B2C
+export const b2cNavItems: NavItem[] = [
   {
-    title: "Accueil",
-    href: "/b2c/dashboard",
+    title: 'Tableau de bord',
+    href: '/b2c/dashboard',
     icon: Home,
+    requiresAuth: true,
   },
   {
-    title: "Scan",
-    href: "/b2c/scan",
-    icon: Scan,
-  },
-  {
-    title: "Journal",
-    href: "/b2c/journal",
+    title: 'Journal émotionnel',
+    href: '/b2c/journal',
     icon: BookOpen,
+    requiresAuth: true,
   },
   {
-    title: "Musique",
-    href: "/b2c/music",
+    title: 'Thérapie musicale',
+    href: '/b2c/music',
     icon: Music,
+    requiresAuth: true,
   },
   {
-    title: "Audio",
-    href: "/b2c/audio",
-    icon: Headphones,
+    title: 'Scan émotionnel',
+    href: '/b2c/scan',
+    icon: Scan,
+    requiresAuth: true,
   },
   {
-    title: "Coach",
-    href: "/b2c/coach",
+    title: 'Coach IA',
+    href: '/b2c/coach',
     icon: MessageSquare,
+    requiresAuth: true,
   },
   {
-    title: "Réalité virtuelle",
-    href: "/b2c/vr",
+    title: 'Expériences VR',
+    href: '/b2c/vr',
     icon: Glasses,
+    requiresAuth: true,
   },
   {
-    title: "Cocon",
-    href: "/b2c/cocon",
-    icon: HeartHandshake,
-  },
-  {
-    title: "Extensions",
-    href: "/extensions",
-    icon: Box,
-  },
-  {
-    title: "Défis",
-    href: "/b2c/gamification",
+    title: 'Défis bien-être',
+    href: '/b2c/gamification',
     icon: Trophy,
+    requiresAuth: true,
   },
   {
-    title: "Paramètres",
-    href: "/b2c/preferences",
+    title: 'Cocon social',
+    href: '/b2c/social',
+    icon: HeartHandshake,
+    requiresAuth: true,
+  },
+  {
+    title: 'Préférences',
+    href: '/b2c/settings',
     icon: Settings,
-  }
+    requiresAuth: true,
+  },
 ];
 
-// B2B User Navigation
-export const b2bUserNavItems: NavItemType[] = [
+// Navigation pour les utilisateurs B2B (collaborateurs)
+export const b2bUserNavItems: NavItem[] = [
   {
-    title: "Accueil",
-    href: "/b2b/user/dashboard",
+    title: 'Tableau de bord',
+    href: '/b2b/user/dashboard',
     icon: Home,
+    requiresAuth: true,
   },
   {
-    title: "Scan",
-    href: "/b2b/user/scan",
-    icon: Scan,
-  },
-  {
-    title: "Journal",
-    href: "/b2b/user/journal",
+    title: 'Journal émotionnel',
+    href: '/b2b/user/journal',
     icon: BookOpen,
+    requiresAuth: true,
   },
   {
-    title: "Musique",
-    href: "/b2b/user/music",
+    title: 'Thérapie musicale',
+    href: '/b2b/user/music',
     icon: Music,
+    requiresAuth: true,
   },
   {
-    title: "Audio",
-    href: "/b2b/user/audio",
-    icon: Headphones,
+    title: 'Scan émotionnel',
+    href: '/b2b/user/scan',
+    icon: Scan,
+    requiresAuth: true,
   },
   {
-    title: "Coach",
-    href: "/b2b/user/coach",
+    title: 'Coach IA',
+    href: '/b2b/user/coach',
     icon: MessageSquare,
+    requiresAuth: true,
   },
   {
-    title: "Réalité virtuelle",
-    href: "/b2b/user/vr",
+    title: 'Expériences VR',
+    href: '/b2b/user/vr',
     icon: Glasses,
+    requiresAuth: true,
   },
   {
-    title: "Cocon",
-    href: "/b2b/user/cocon",
-    icon: HeartHandshake,
-  },
-  {
-    title: "Extensions",
-    href: "/extensions",
-    icon: Box,
-  },
-  {
-    title: "Défis",
-    href: "/b2b/user/gamification",
+    title: 'Défis d\'équipe',
+    href: '/b2b/user/team-challenges',
     icon: Trophy,
+    requiresAuth: true,
   },
   {
-    title: "Paramètres",
-    href: "/b2b/user/preferences",
+    title: 'Cocon social',
+    href: '/b2b/user/social',
+    icon: HeartHandshake,
+    requiresAuth: true,
+  },
+  {
+    title: 'Paramètres',
+    href: '/b2b/user/settings',
     icon: Settings,
-  }
+    requiresAuth: true,
+  },
 ];
 
-// B2B Admin Navigation
-export const b2bAdminNavItems: NavItemType[] = [
+// Navigation pour les administrateurs B2B
+export const b2bAdminNavItems: NavItem[] = [
   {
-    title: "Tableau de bord",
-    href: "/b2b/admin/dashboard",
-    icon: Home,
+    title: 'Tableau de bord',
+    href: '/b2b/admin/dashboard',
+    icon: LayoutDashboard,
+    requiresAuth: true,
+    adminOnly: true,
   },
   {
-    title: "Journal",
-    href: "/b2b/admin/journal",
-    icon: BookOpen,
-  },
-  {
-    title: "Scan",
-    href: "/b2b/admin/scan",
-    icon: Scan,
-  },
-  {
-    title: "Musique",
-    href: "/b2b/admin/music",
-    icon: Music,
-  },
-  {
-    title: "Équipes",
-    href: "/b2b/admin/teams",
+    title: 'Utilisateurs',
+    href: '/b2b/admin/users',
     icon: Users,
+    requiresAuth: true,
+    adminOnly: true,
   },
   {
-    title: "Rapports",
-    href: "/b2b/admin/reports",
-    icon: BarChart2,
+    title: 'Équipes',
+    href: '/b2b/admin/teams',
+    icon: Building,
+    requiresAuth: true,
+    adminOnly: true,
   },
   {
-    title: "Événements",
-    href: "/b2b/admin/events",
-    icon: Activity,
+    title: 'Rapports',
+    href: '/b2b/admin/reports',
+    icon: FileBarChart,
+    requiresAuth: true,
+    adminOnly: true,
   },
   {
-    title: "Extensions",
-    href: "/extensions",
+    title: 'Événements',
+    href: '/b2b/admin/events',
+    icon: Calendar,
+    requiresAuth: true,
+    adminOnly: true,
+  },
+  {
+    title: 'Statistiques',
+    href: '/b2b/admin/analytics',
+    icon: LineChart,
+    requiresAuth: true,
+    adminOnly: true,
+  },
+  {
+    title: 'Ressources',
+    href: '/b2b/admin/resources',
+    icon: Brain,
+    requiresAuth: true,
+    adminOnly: true,
+  },
+  {
+    title: 'Extensions',
+    href: '/b2b/admin/extensions',
+    icon: Box,
+    requiresAuth: true,
+    adminOnly: true,
+  },
+  {
+    title: 'Paramètres',
+    href: '/b2b/admin/settings',
+    icon: Settings,
+    requiresAuth: true,
+    adminOnly: true,
+  },
+];
+
+// Navigation pour toutes les extensions
+export const extensionsNavItems: NavItem[] = [
+  {
+    title: 'Marketplace',
+    href: '/extensions',
     icon: Box,
   },
   {
-    title: "Optimisation",
-    href: "/b2b/admin/optimisation",
-    icon: BarChart2,
+    title: 'Installées',
+    href: '/extensions/installed',
+    icon: Box,
   },
-  {
-    title: "Paramètres",
-    href: "/b2b/admin/settings",
-    icon: Settings,
-  }
 ];
 
-// Keeping sidebarItems, adminSidebarItems and footerNavItems for backward compatibility
-export const sidebarItems = b2cNavItems;
-export const adminSidebarItems = b2bAdminNavItems;
-
-export const footerNavItems: NavItemType[] = [
-  {
-    title: "Profil",
-    href: "/dashboard/profile",
-    icon: User,
-  },
-  {
-    title: "Paramètres",
-    href: "/dashboard/settings",
-    icon: Settings,
-  }
-];
+export default {
+  b2cNavItems,
+  b2bUserNavItems,
+  b2bAdminNavItems,
+  extensionsNavItems,
+};

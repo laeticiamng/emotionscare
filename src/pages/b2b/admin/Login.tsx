@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -15,154 +16,194 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, ShieldCheck } from 'lucide-react';
-import AuthLayout from '@/layouts/AuthLayout';
+import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { toast } from 'sonner';
 
 const loginSchema = z.object({
+  companyId: z.string().min(3, { message: 'L\'ID d\'entreprise est requis' }),
   email: z.string().email({ message: 'Adresse e-mail invalide' }),
-  password: z.string().min(6, { message: 'Mot de passe requis (6 caractères minimum)' }),
-  company: z.string().min(2, { message: 'Nom de l\'entreprise requis' }),
+  password: z.string().min(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' }),
+  remember: z.boolean().optional(),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const B2BAdminLogin: React.FC = () => {
-  const { login, isAuthenticated, user } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const { setUserMode } = useUserMode();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   
+  // Si déjà authentifié, rediriger vers dashboard
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/b2b/admin/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
+      companyId: '',
       email: '',
       password: '',
-      company: '',
+      remember: false,
     },
   });
 
-  // Rediriger si l'utilisateur est déjà connecté
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      setUserMode('b2b_admin');
-      navigate('/b2b/admin/dashboard');
-    }
-  }, [isAuthenticated, user, navigate, setUserMode]);
-
-  const onSubmit = async (data: LoginFormValues) => {
+  const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
-    setError(null);
     
     try {
-      // Pour les besoins de démonstration, ajoutons "admin" à l'email pour simuler un compte administrateur
-      const adminEmail = data.email.includes('admin') ? data.email : `admin-${data.email}`;
+      // Simuler une demande d'API avec un délai
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      await login(adminEmail, data.password);
+      await login(values.email, values.password);
       setUserMode('b2b_admin');
+      
       toast.success('Connexion réussie');
       navigate('/b2b/admin/dashboard');
-    } catch (err: any) {
-      console.error('Erreur de connexion:', err);
-      setError(err.message || 'Échec de la connexion. Veuillez vérifier vos identifiants.');
-      toast.error('Échec de la connexion');
+    } catch (error: any) {
+      console.error('Erreur de connexion:', error);
+      toast.error(error.message || 'Échec de la connexion. Veuillez vérifier vos identifiants.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <AuthLayout>
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
-            <div className="flex items-center justify-center mb-2">
-              <div className="bg-purple-100 p-3 rounded-full">
-                <ShieldCheck className="h-6 w-6 text-purple-600" />
-              </div>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-muted/30 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <div className="flex justify-center mb-4">
+            <div className="p-2 rounded-full bg-primary/10">
+              <ShieldCheck className="h-8 w-8 text-primary" />
             </div>
-            <CardTitle className="text-2xl font-bold text-center">Administration B2B</CardTitle>
-            <CardDescription className="text-center">
-              Connectez-vous à l'interface d'administration
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          </div>
+          <CardTitle className="text-2xl font-bold text-center">Administration</CardTitle>
+          <CardDescription className="text-center">
+            Connectez-vous pour gérer votre espace entreprise
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="companyId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>ID Entreprise</FormLabel>
+                    <FormControl>
+                      <Input placeholder="ID de votre organisation" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email administrateur</FormLabel>
+                    <FormControl>
+                      <Input placeholder="admin@entreprise.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mot de passe</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="flex items-center justify-between">
                 <FormField
                   control={form.control}
-                  name="company"
+                  name="remember"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Entreprise</FormLabel>
+                    <FormItem className="flex items-center space-x-2">
                       <FormControl>
-                        <Input placeholder="Nom de votre entreprise" {...field} />
+                        <Checkbox 
+                          checked={field.value} 
+                          onCheckedChange={field.onChange}
+                        />
                       </FormControl>
-                      <FormMessage />
+                      <label htmlFor="remember" className="text-sm">
+                        Se souvenir de moi
+                      </label>
                     </FormItem>
                   )}
                 />
                 
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email administrateur</FormLabel>
-                      <FormControl>
-                        <Input placeholder="admin@entreprise.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Mot de passe</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Connexion...
-                    </>
-                  ) : (
-                    'Se connecter'
-                  )}
+                <Button 
+                  variant="link" 
+                  className="p-0" 
+                  onClick={() => toast.info("Contactez le support pour réinitialiser votre mot de passe")}
+                >
+                  Mot de passe oublié?
                 </Button>
-              </form>
-            </Form>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-2">
-            <div className="text-center text-sm">
-              <Link to="/b2b/selection" className="text-muted-foreground hover:underline">
-                Changer de mode
-              </Link>
-            </div>
-          </CardFooter>
-        </Card>
-      </div>
-    </AuthLayout>
+              </div>
+              
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Connexion...
+                  </>
+                ) : (
+                  'Se connecter'
+                )}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <div className="text-center text-sm">
+            <span className="text-muted-foreground">Besoin d'un compte administrateur? </span>
+            <Button 
+              variant="link" 
+              className="p-0 h-auto" 
+              onClick={() => toast.info("Contactez notre équipe commerciale pour créer un compte administrateur")}
+            >
+              Contacter le service commercial
+            </Button>
+          </div>
+          
+          <div className="text-center">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/b2b/selection')}
+              className="mr-2"
+            >
+              Retour
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/')}
+            >
+              Accueil
+            </Button>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 

@@ -17,66 +17,77 @@ import {
 } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Building2 } from 'lucide-react';
-import AuthLayout from '@/layouts/AuthLayout';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { toast } from 'sonner';
 
 const registerSchema = z.object({
-  name: z.string().min(2, { message: 'Le nom doit comporter au moins 2 caractères' }),
-  email: z.string().email({ message: 'Adresse e-mail professionnelle invalide' }),
-  company: z.string().min(2, { message: 'Le nom de l\'entreprise est requis' }),
-  password: z.string().min(6, { message: 'Le mot de passe doit comporter au moins 6 caractères' }),
-  acceptTerms: z.boolean().refine(val => val === true, {
-    message: 'Vous devez accepter les termes et conditions',
+  companyCode: z.string().min(3, { message: 'Le code entreprise est requis' }),
+  name: z.string().min(2, { message: 'Le nom complet est requis' }),
+  email: z.string().email({ message: 'Adresse e-mail professionnelle invalide' })
+    .refine((email) => /@.+\..+$/.test(email), {
+      message: "Veuillez utiliser une adresse e-mail professionnelle valide",
+    }),
+  position: z.string().min(2, { message: 'Votre poste est requis' }),
+  password: z.string().min(6, { message: 'Le mot de passe doit contenir au moins 6 caractères' }),
+  confirmPassword: z.string(),
+  terms: z.literal(true, {
+    errorMap: () => ({ message: "Vous devez accepter les conditions d'utilisation" }),
   }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Les mots de passe ne correspondent pas",
+  path: ["confirmPassword"],
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const B2BUserRegister: React.FC = () => {
-  const { register, isAuthenticated, user } = useAuth();
+  const { register, isAuthenticated } = useAuth();
   const { setUserMode } = useUserMode();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
+  // Si déjà authentifié, rediriger vers dashboard
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/b2b/user/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
+
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      companyCode: '',
       name: '',
       email: '',
-      company: '',
+      position: '',
       password: '',
-      acceptTerms: false,
+      confirmPassword: '',
+      terms: false,
     },
   });
 
-  // Rediriger si l'utilisateur est déjà connecté
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      setUserMode('b2b_user');
-      navigate('/b2b/user/dashboard');
-    }
-  }, [isAuthenticated, user, navigate, setUserMode]);
-
-  const onSubmit = async (data: RegisterFormValues) => {
+  const onSubmit = async (values: RegisterFormValues) => {
     setIsLoading(true);
     setError(null);
     
     try {
-      await register(data.email, data.password, { 
-        name: data.name, 
-        role: 'b2b_user',
-        company: data.company 
+      // Simuler une demande d'API avec un délai
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      await register(values.email, values.password, values.name, 'b2b_user', {
+        companyCode: values.companyCode,
+        position: values.position
       });
       setUserMode('b2b_user');
+      
       toast.success('Inscription réussie');
       navigate('/b2b/user/dashboard');
-    } catch (err: any) {
-      console.error('Erreur d\'inscription:', err);
-      setError(err.message || 'Échec de l\'inscription. Veuillez réessayer.');
+    } catch (error: any) {
+      console.error('Erreur d\'inscription:', error);
+      setError(error.message || 'Échec de l\'inscription. Veuillez réessayer.');
       toast.error('Échec de l\'inscription');
     } finally {
       setIsLoading(false);
@@ -84,129 +95,175 @@ const B2BUserRegister: React.FC = () => {
   };
 
   return (
-    <AuthLayout>
-      <div className="flex items-center justify-center min-h-screen p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="space-y-1">
-            <div className="flex items-center justify-center mb-2">
-              <div className="bg-blue-100 p-3 rounded-full">
-                <Building2 className="h-6 w-6 text-blue-600" />
-              </div>
-            </div>
-            <CardTitle className="text-2xl font-bold text-center">Créer un compte collaborateur</CardTitle>
-            <CardDescription className="text-center">
-              Rejoignez la plateforme de bien-être émotionnel de votre entreprise
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nom complet</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Votre nom" {...field} />
-                      </FormControl>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-background to-muted/30 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">Créer un compte collaborateur</CardTitle>
+          <CardDescription className="text-center">
+            Remplissez le formulaire ci-dessous pour accéder à la plateforme d'entreprise
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="companyCode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Code entreprise</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Obtenu auprès de votre administrateur" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nom complet</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Jean Dupont" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email professionnel</FormLabel>
+                    <FormControl>
+                      <Input placeholder="jean.dupont@entreprise.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="position"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Poste / Fonction</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Responsable marketing" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mot de passe</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirmer le mot de passe</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="terms"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox 
+                        checked={field.value} 
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>
+                        J'accepte les{' '}
+                        <Link to="/terms" className="text-primary hover:underline">
+                          conditions d'utilisation
+                        </Link>{' '}
+                        et la{' '}
+                        <Link to="/privacy" className="text-primary hover:underline">
+                          politique de confidentialité
+                        </Link>
+                      </FormLabel>
                       <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email professionnel</FormLabel>
-                      <FormControl>
-                        <Input placeholder="vous@entreprise.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="company"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Entreprise</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nom de votre entreprise" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Mot de passe</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="acceptTerms"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                      <FormControl>
-                        <Checkbox 
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>
-                          J'accepte les <Link to="/terms" className="text-primary hover:underline">termes et conditions</Link>
-                        </FormLabel>
-                        <FormMessage />
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Inscription...
-                    </>
-                  ) : (
-                    'S\'inscrire'
-                  )}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-2">
-            <div className="text-center text-sm">
-              Déjà un compte ?{' '}
-              <Link to="/b2b/user/login" className="text-primary hover:underline">
-                Se connecter
-              </Link>
-            </div>
-          </CardFooter>
-        </Card>
-      </div>
-    </AuthLayout>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Inscription...
+                  </>
+                ) : (
+                  'S\'inscrire'
+                )}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <div className="text-center text-sm">
+            <span className="text-muted-foreground">Vous avez déjà un compte? </span>
+            <Link to="/b2b/user/login" className="text-primary hover:underline">
+              Se connecter
+            </Link>
+          </div>
+          
+          <div className="text-center">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/b2b/selection')}
+              className="mr-2"
+            >
+              Retour
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate('/')}
+            >
+              Accueil
+            </Button>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
 

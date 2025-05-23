@@ -1,77 +1,65 @@
 
-import { UserRole } from '@/types/user';
+import { User } from '@/types/user';
 
-/**
- * Check if a role is considered an admin role
- */
-export const isAdminRole = (role?: UserRole | string): boolean => {
+export const isAdminRole = (role: string | undefined): boolean => {
   if (!role) return false;
   
-  const normalizedRole = role.toLowerCase();
-  return normalizedRole === 'b2b_admin' || normalizedRole === 'admin';
+  return (
+    role === 'admin' ||
+    role === 'b2b_admin' ||
+    role === 'administrator' ||
+    role === 'superadmin'
+  );
 };
 
-/**
- * Check if a role is considered a B2B role
- */
-export const isB2BRole = (role?: UserRole | string): boolean => {
+export const isB2BRole = (role: string | undefined): boolean => {
   if (!role) return false;
   
-  const normalizedRole = role.toLowerCase();
-  return normalizedRole === 'b2b_user' || normalizedRole === 'b2b_admin';
+  return (
+    role === 'b2b_user' ||
+    role === 'b2b_admin' ||
+    role === 'b2b-user' ||
+    role === 'b2b-admin'
+  );
 };
 
-/**
- * Check if a role is a B2C role
- */
-export const isB2CRole = (role?: UserRole | string): boolean => {
-  if (!role) return false;
+export const getPermission = (user: User | null, permission: string): boolean => {
+  if (!user) return false;
   
-  const normalizedRole = role.toLowerCase();
-  return normalizedRole === 'b2c';
+  // Administrateurs ont toutes les permissions
+  if (isAdminRole(user.role)) return true;
+  
+  // Vérifier les permissions spécifiques
+  if (user.permissions && Array.isArray(user.permissions)) {
+    return user.permissions.includes(permission);
+  }
+  
+  return false;
 };
 
-/**
- * Get a human-readable label for a role
- */
-export const getRoleLabel = (role?: UserRole | string): string => {
+export const getUserRoleDisplay = (role: string | undefined): string => {
   if (!role) return 'Utilisateur';
   
-  switch (role.toLowerCase()) {
+  switch (role) {
     case 'b2c':
       return 'Particulier';
     case 'b2b_user':
+    case 'b2b-user':
       return 'Collaborateur';
     case 'b2b_admin':
+    case 'b2b-admin':
       return 'Administrateur';
     case 'admin':
-      return 'Super Admin';
+    case 'superadmin':
+      return 'Super Administrateur';
     default:
       return 'Utilisateur';
-  }
-};
-
-/**
- * Normalize a role string to a valid UserRole type
- */
-export const normalizeRole = (role?: string): UserRole => {
-  if (!role) return 'b2c';
-  
-  const normalizedRole = role.toLowerCase();
-  
-  if (normalizedRole === 'b2b_admin' || normalizedRole === 'admin') {
-    return 'b2b_admin';
-  } else if (normalizedRole === 'b2b_user' || normalizedRole === 'b2b') {
-    return 'b2b_user';
-  } else {
-    return 'b2c';
   }
 };
 
 export default {
   isAdminRole,
   isB2BRole,
-  isB2CRole,
-  getRoleLabel,
-  normalizeRole
+  getPermission,
+  getUserRoleDisplay,
 };
