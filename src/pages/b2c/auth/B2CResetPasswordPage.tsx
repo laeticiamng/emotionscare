@@ -18,16 +18,18 @@ const B2CResetPasswordPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!email) {
-      toast.error('Veuillez saisir votre email');
+      toast.error('Veuillez saisir votre adresse email');
       return;
     }
 
     setIsLoading(true);
     try {
       const { error } = await resetPassword(email);
+      
       if (error) {
-        toast.error('Erreur lors de l\'envoi de l\'email');
+        toast.error('Erreur lors de l\'envoi de l\'email de réinitialisation');
       } else {
         setEmailSent(true);
         toast.success('Email de réinitialisation envoyé !');
@@ -43,40 +45,33 @@ const B2CResetPasswordPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900 flex items-center justify-center p-6">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="w-full max-w-md"
         >
-          <Card className="shadow-2xl border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm text-center">
-            <CardHeader className="space-y-4">
-              <CheckCircle className="h-16 w-16 text-green-600 mx-auto" />
-              <CardTitle className="text-2xl font-bold text-green-600">
+          <Card className="shadow-2xl border-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+            <CardHeader className="text-center space-y-4">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+              </div>
+              <CardTitle className="text-2xl font-bold text-slate-900 dark:text-white">
                 Email envoyé !
               </CardTitle>
               <CardDescription>
-                Un email de réinitialisation a été envoyé à <strong>{email}</strong>
+                Nous avons envoyé un lien de réinitialisation à <strong>{email}</strong>
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-slate-600">
-                Vérifiez votre boîte de réception et suivez les instructions pour réinitialiser votre mot de passe.
+            <CardContent className="text-center space-y-4">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Vérifiez votre boîte email et cliquez sur le lien pour réinitialiser votre mot de passe.
               </p>
-              <div className="space-y-2">
-                <Button
-                  onClick={() => navigate('/b2c/login')}
-                  className="w-full"
-                >
-                  Retour à la connexion
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setEmailSent(false)}
-                  className="w-full"
-                >
-                  Envoyer à nouveau
-                </Button>
-              </div>
+              <Button
+                onClick={() => navigate('/b2c/login')}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                Retour à la connexion
+              </Button>
             </CardContent>
           </Card>
         </motion.div>
@@ -103,7 +98,7 @@ const B2CResetPasswordPage: React.FC = () => {
               Retour
             </Button>
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Réinitialiser le mot de passe
+              Mot de passe oublié
             </CardTitle>
             <CardDescription>
               Saisissez votre email pour recevoir un lien de réinitialisation
@@ -141,13 +136,12 @@ const B2CResetPasswordPage: React.FC = () => {
                 )}
               </Button>
 
-              <div className="text-center text-sm text-slate-600">
-                Vous vous souvenez de votre mot de passe ?{' '}
+              <div className="text-center">
                 <Link
                   to="/b2c/login"
-                  className="text-blue-600 hover:underline font-medium"
+                  className="text-sm text-blue-600 hover:underline"
                 >
-                  Se connecter
+                  Retour à la connexion
                 </Link>
               </div>
             </form>

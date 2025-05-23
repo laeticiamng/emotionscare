@@ -4,35 +4,39 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeft, Mail, Lock, User, Loader2, Eye, EyeOff, Gift } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 const B2CRegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
-    firstName: '',
-    lastName: ''
+    agreeTerms: false
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false);
   const navigate = useNavigate();
   const { signUp } = useAuth();
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) {
-      toast.error('Veuillez remplir tous les champs');
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+      toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
 
@@ -46,30 +50,24 @@ const B2CRegisterPage: React.FC = () => {
       return;
     }
 
-    if (!acceptTerms) {
+    if (!formData.agreeTerms) {
       toast.error('Veuillez accepter les conditions d\'utilisation');
       return;
     }
 
     setIsLoading(true);
     try {
-      const userData = {
-        name: `${formData.firstName} ${formData.lastName}`,
+      const { error } = await signUp(formData.email, formData.password, {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        role: 'b2c',
-        trial_end: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // 3 jours
-      };
+        name: `${formData.firstName} ${formData.lastName}`,
+        role: 'b2c'
+      });
 
-      const { error } = await signUp(formData.email, formData.password, userData);
       if (error) {
-        if (error.message.includes('already registered')) {
-          toast.error('Cet email est déjà utilisé');
-        } else {
-          toast.error('Erreur lors de la création du compte');
-        }
+        toast.error('Erreur lors de la création du compte: ' + error.message);
       } else {
-        toast.success('Compte créé avec succès ! Vérifiez votre email pour confirmer votre compte.');
+        toast.success('Compte créé avec succès ! Période d\'essai de 3 jours activée.');
         navigate('/b2c/onboarding');
       }
     } catch (error) {
@@ -98,13 +96,10 @@ const B2CRegisterPage: React.FC = () => {
               Retour
             </Button>
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Créer votre compte
+              Créer un compte
             </CardTitle>
             <CardDescription>
-              <div className="flex items-center justify-center space-x-2 text-green-600">
-                <Gift className="h-4 w-4" />
-                <span>3 jours d'essai gratuit inclus</span>
-              </div>
+              Commencez votre parcours bien-être avec 3 jours d'essai gratuit
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -116,9 +111,10 @@ const B2CRegisterPage: React.FC = () => {
                     <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                     <Input
                       type="text"
+                      name="firstName"
                       placeholder="Prénom"
                       value={formData.firstName}
-                      onChange={(e) => handleInputChange('firstName', e.target.value)}
+                      onChange={handleInputChange}
                       className="pl-10"
                       required
                     />
@@ -128,9 +124,10 @@ const B2CRegisterPage: React.FC = () => {
                   <label className="text-sm font-medium">Nom</label>
                   <Input
                     type="text"
+                    name="lastName"
                     placeholder="Nom"
                     value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    onChange={handleInputChange}
                     required
                   />
                 </div>
@@ -142,9 +139,10 @@ const B2CRegisterPage: React.FC = () => {
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                   <Input
                     type="email"
+                    name="email"
                     placeholder="votre@email.com"
                     value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    onChange={handleInputChange}
                     className="pl-10"
                     required
                   />
@@ -157,9 +155,10 @@ const B2CRegisterPage: React.FC = () => {
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                   <Input
                     type={showPassword ? 'text' : 'password'}
+                    name="password"
                     placeholder="••••••••"
                     value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    onChange={handleInputChange}
                     className="pl-10 pr-10"
                     required
                   />
@@ -181,9 +180,10 @@ const B2CRegisterPage: React.FC = () => {
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                   <Input
                     type={showConfirmPassword ? 'text' : 'password'}
+                    name="confirmPassword"
                     placeholder="••••••••"
                     value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    onChange={handleInputChange}
                     className="pl-10 pr-10"
                     required
                   />
@@ -200,17 +200,21 @@ const B2CRegisterPage: React.FC = () => {
               </div>
 
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="terms"
-                  checked={acceptTerms}
-                  onChange={(e) => setAcceptTerms(e.target.checked)}
-                  className="rounded"
+                <Checkbox
+                  id="agreeTerms"
+                  checked={formData.agreeTerms}
+                  onCheckedChange={(checked) => 
+                    setFormData(prev => ({ ...prev, agreeTerms: checked as boolean }))
+                  }
                 />
-                <label htmlFor="terms" className="text-sm text-slate-600">
+                <label htmlFor="agreeTerms" className="text-sm text-slate-600">
                   J'accepte les{' '}
                   <Link to="/terms" className="text-blue-600 hover:underline">
                     conditions d'utilisation
+                  </Link>{' '}
+                  et la{' '}
+                  <Link to="/privacy" className="text-blue-600 hover:underline">
+                    politique de confidentialité
                   </Link>
                 </label>
               </div>
@@ -223,21 +227,23 @@ const B2CRegisterPage: React.FC = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Création du compte...
+                    Création en cours...
                   </>
                 ) : (
                   'Créer mon compte'
                 )}
               </Button>
 
-              <div className="text-center text-sm text-slate-600">
-                Déjà un compte ?{' '}
-                <Link
-                  to="/b2c/login"
-                  className="text-blue-600 hover:underline font-medium"
-                >
-                  Se connecter
-                </Link>
+              <div className="text-center">
+                <div className="text-sm text-slate-600">
+                  Déjà un compte ?{' '}
+                  <Link
+                    to="/b2c/login"
+                    className="text-blue-600 hover:underline font-medium"
+                  >
+                    Se connecter
+                  </Link>
+                </div>
               </div>
             </form>
           </CardContent>
