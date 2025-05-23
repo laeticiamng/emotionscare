@@ -1,134 +1,129 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { Building2, Users, ShieldCheck } from 'lucide-react';
-import { logModeSelection } from '@/utils/modeSelectionLogger';
+import { useAuth } from '@/contexts/AuthContext';
+import { Briefcase, Building2, User } from 'lucide-react';
 
 const B2BSelection: React.FC = () => {
   const navigate = useNavigate();
-  const { setUserMode } = useUserMode();
-  
-  const handleRoleSelect = (role: 'b2b_user' | 'b2b_admin') => {
-    setUserMode(role);
-    localStorage.setItem('user-mode', role);
-    
-    // Log mode selection for analytics
-    logModeSelection(role);
-    
-    // Redirect to appropriate login page
-    if (role === 'b2b_admin') {
-      navigate('/b2b/admin/login');
-    } else {
-      navigate('/b2b/user/login');
-    }
+  const { isAuthenticated } = useAuth();
+
+  const handleUserSelection = () => {
+    navigate('/b2b/user/login');
   };
-  
+
+  const handleAdminSelection = () => {
+    navigate('/b2b/admin/login');
+  };
+
+  const handlePersonalSelection = () => {
+    navigate('/b2c/login');
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 p-4">
-      <div className="absolute top-6 left-6">
-        <Button 
-          variant="ghost"
-          onClick={() => navigate('/')}
-          className="flex items-center"
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted/30 p-4">
+      <div className="max-w-3xl w-full">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-8"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4"><polyline points="15 18 9 12 15 6"></polyline></svg>
-          Retour à l'accueil
-        </Button>
-      </div>
-      
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-md w-full bg-card p-8 rounded-xl shadow-lg border"
-      >
-        <div className="text-center mb-8">
-          <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Building2 className="h-8 w-8 text-primary" />
-          </div>
-          <h1 className="text-2xl font-bold">Solutions Entreprise</h1>
+          <h1 className="text-3xl font-bold">Choisissez votre type d&apos;accès</h1>
           <p className="text-muted-foreground mt-2">
-            Sélectionnez votre rôle pour accéder à la plateforme
+            Sélectionnez le type d&apos;accès qui correspond à votre profil
           </p>
-        </div>
-        
-        <div className="space-y-4">
-          <motion.div 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <Button
-              variant="outline"
-              className="w-full justify-start text-left h-auto py-4 px-4"
-              onClick={() => handleRoleSelect('b2b_user')}
-            >
-              <div className="flex items-center">
-                <div className="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full mr-4">
-                  <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <Card className="h-full hover:shadow-md transition-shadow">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <User className="h-8 w-8 text-primary" />
                 </div>
-                <div>
-                  <h3 className="font-medium mb-1">Collaborateur</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Accédez à votre espace personnel de bien-être émotionnel
-                  </p>
-                </div>
-              </div>
-            </Button>
+                <CardTitle>Particulier</CardTitle>
+                <CardDescription>
+                  Accès personnel pour les particuliers
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-sm text-muted-foreground mb-6">
+                  Idéal pour les utilisateurs individuels qui souhaitent améliorer leur bien-être émotionnel.
+                </p>
+                <Button onClick={handlePersonalSelection} className="w-full">
+                  Accéder
+                </Button>
+              </CardContent>
+            </Card>
           </motion.div>
           
-          <motion.div 
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Button
-              variant="outline"
-              className="w-full justify-start text-left h-auto py-4 px-4"
-              onClick={() => handleRoleSelect('b2b_admin')}
-            >
-              <div className="flex items-center">
-                <div className="bg-purple-100 dark:bg-purple-900/50 p-3 rounded-full mr-4">
-                  <ShieldCheck className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            <Card className="h-full hover:shadow-md transition-shadow border-primary/20">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <Briefcase className="h-8 w-8 text-primary" />
                 </div>
-                <div>
-                  <h3 className="font-medium mb-1">Administrateur</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Gérez le bien-être de vos équipes et accédez aux analyses
-                  </p>
+                <CardTitle>Collaborateur</CardTitle>
+                <CardDescription>
+                  Accès pour les membres d&apos;une entreprise
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-sm text-muted-foreground mb-6">
+                  Pour les employés qui participent au programme de bien-être émotionnel de leur entreprise.
+                </p>
+                <Button onClick={handleUserSelection} className="w-full" variant="default">
+                  Accéder
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <Card className="h-full hover:shadow-md transition-shadow">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                  <Building2 className="h-8 w-8 text-primary" />
                 </div>
-              </div>
-            </Button>
+                <CardTitle>Administrateur</CardTitle>
+                <CardDescription>
+                  Accès pour les gestionnaires RH
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-sm text-muted-foreground mb-6">
+                  Pour les responsables RH qui gèrent le bien-être des équipes et accèdent aux statistiques.
+                </p>
+                <Button onClick={handleAdminSelection} className="w-full">
+                  Accéder
+                </Button>
+              </CardContent>
+            </Card>
           </motion.div>
         </div>
         
-        <div className="mt-8 border-t pt-6">
-          <div className="text-center space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Vous êtes un particulier ? Accédez à votre espace personnel
-            </p>
-            <Button 
-              variant="secondary"
-              onClick={() => {
-                setUserMode('b2c');
-                localStorage.setItem('user-mode', 'b2c');
-                logModeSelection('b2c');
-                navigate('/b2c/login');
-              }}
-              className="w-full"
-            >
-              Espace particulier
-            </Button>
-          </div>
+        <div className="text-center mt-8">
+          <Button variant="ghost" onClick={() => navigate('/')}>
+            Retour à l&apos;accueil
+          </Button>
         </div>
-        
-        <div className="mt-8 text-center text-sm text-muted-foreground">
-          <p>
-            Besoin d'aide ? <Button variant="link" className="p-0" onClick={() => navigate('/support')}>Contactez-nous</Button>
-          </p>
-        </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

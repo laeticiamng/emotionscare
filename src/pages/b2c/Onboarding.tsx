@@ -1,131 +1,187 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+import { Check, ArrowRight, Smile, Brain, Heart } from 'lucide-react';
+
+const steps = [
+  {
+    id: 'welcome',
+    title: 'Bienvenue sur EmotionsCare',
+    description: 'Nous sommes ravis de vous accompagner dans votre parcours de bien-être émotionnel.',
+    icon: <Smile className="h-8 w-8 text-primary" />
+  },
+  {
+    id: 'objectives',
+    title: 'Vos objectifs',
+    description: 'Définissez vos objectifs de bien-être émotionnel pour une expérience personnalisée.',
+    icon: <Brain className="h-8 w-8 text-primary" />
+  },
+  {
+    id: 'complete',
+    title: 'Vous êtes prêt !',
+    description: 'Votre profil est configuré et vous pouvez maintenant explorer l\'application.',
+    icon: <Heart className="h-8 w-8 text-primary" />
+  }
+];
 
 const B2COnboarding: React.FC = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const totalSteps = 4;
-  
-  const handleNext = () => {
-    if (step < totalSteps) {
-      setStep(step + 1);
+  const { user } = useAuth();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleNextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
     } else {
-      navigate('/b2c/dashboard');
+      completeOnboarding();
     }
   };
-  
-  const handleSkip = () => {
-    navigate('/b2c/dashboard');
+
+  const handlePreviousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
   };
-  
+
+  const completeOnboarding = async () => {
+    setIsLoading(true);
+    
+    try {
+      // Simuler l'enregistrement des préférences d'onboarding
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast.success('Configuration terminée', {
+        description: 'Bienvenue dans votre espace personnel !'
+      });
+      
+      navigate('/b2c/dashboard');
+    } catch (error) {
+      console.error('Erreur lors de la finalisation de l\'onboarding:', error);
+      toast.error('Une erreur est survenue', {
+        description: 'Impossible de finaliser votre configuration.'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const currentStepData = steps[currentStep];
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl">
-        <CardContent className="pt-6">
-          <div className="mb-6">
-            <Progress value={(step / totalSteps) * 100} />
-            <div className="text-right text-sm text-muted-foreground mt-1">
-              Étape {step} sur {totalSteps}
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-muted/30 p-4">
+      <motion.div
+        key={currentStep}
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        transition={{ duration: 0.3 }}
+        className="w-full max-w-md"
+      >
+        <Card className="border shadow-lg">
+          <CardHeader className="text-center pt-8">
+            <div className="mx-auto rounded-full bg-primary/10 p-4 mb-4">
+              {currentStepData.icon}
             </div>
-          </div>
+            <CardTitle className="text-2xl font-bold">{currentStepData.title}</CardTitle>
+          </CardHeader>
           
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={step}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="min-h-[300px]"
-            >
-              {step === 1 && (
-                <div className="text-center space-y-4">
-                  <h2 className="text-2xl font-bold">Bienvenue sur EmotionsCare</h2>
-                  <p className="text-muted-foreground">
-                    Nous allons vous guider à travers quelques questions pour personnaliser votre expérience.
-                  </p>
-                  <div className="py-8">
-                    <div className="mx-auto w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center mb-4">
-                      <span className="text-3xl">👋</span>
-                    </div>
-                    <p>Prêt à commencer votre parcours de bien-être émotionnel ?</p>
-                  </div>
-                </div>
-              )}
-              
-              {step === 2 && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold">Vos objectifs</h2>
-                  <p className="text-muted-foreground mb-4">
-                    Sélectionnez ce que vous souhaitez améliorer en priorité
-                  </p>
-                  
-                  <div className="grid grid-cols-2 gap-3">
-                    {["Réduire le stress", "Améliorer le sommeil", "Augmenter la concentration", "Gérer les émotions"].map((goal) => (
-                      <div key={goal} className="border rounded-lg p-3 text-center cursor-pointer hover:bg-accent transition-colors">
-                        {goal}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {step === 3 && (
-                <div className="space-y-6">
-                  <h2 className="text-2xl font-bold">Vos préférences</h2>
-                  <p className="text-muted-foreground mb-4">
-                    Quels types de contenus préférez-vous ?
-                  </p>
-                  
-                  <div className="grid grid-cols-2 gap-3">
-                    {["Musique relaxante", "Méditation guidée", "Exercices de respiration", "Visualisations"].map((preference) => (
-                      <div key={preference} className="border rounded-lg p-3 text-center cursor-pointer hover:bg-accent transition-colors">
-                        {preference}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {step === 4 && (
-                <div className="text-center space-y-4">
-                  <h2 className="text-2xl font-bold">Prêt à démarrer !</h2>
-                  <p className="text-muted-foreground">
-                    Merci pour ces informations. Votre espace personnel est maintenant configuré.
-                  </p>
-                  <div className="py-8">
-                    <div className="mx-auto w-24 h-24 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mb-4">
-                      <span className="text-3xl">✨</span>
-                    </div>
-                    <p>Votre parcours de bien-être commence maintenant.</p>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
-          
-          <div className="flex justify-between mt-6 pt-4 border-t">
-            {step > 1 ? (
-              <Button variant="outline" onClick={() => setStep(step - 1)}>
-                Précédent
-              </Button>
-            ) : (
-              <Button variant="outline" onClick={handleSkip}>
-                Ignorer
-              </Button>
+          <CardContent className="space-y-6">
+            <div className="flex justify-center mb-6">
+              <div className="flex gap-2">
+                {steps.map((_, index) => (
+                  <div 
+                    key={index}
+                    className={`h-2 w-10 rounded-full transition-colors ${index <= currentStep ? 'bg-primary' : 'bg-muted'}`}
+                  />
+                ))}
+              </div>
+            </div>
+            
+            <p className="text-center text-muted-foreground">
+              {currentStepData.description}
+            </p>
+            
+            {currentStep === 0 && (
+              <div className="p-4 bg-muted rounded-lg">
+                <p className="font-medium mb-2">Bonjour {user?.name || 'utilisateur'} !</p>
+                <p className="text-sm text-muted-foreground">
+                  Nous allons vous guider à travers quelques étapes rapides pour personnaliser votre expérience.
+                </p>
+              </div>
             )}
             
-            <Button onClick={handleNext}>
-              {step < totalSteps ? "Suivant" : "Commencer"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            {currentStep === 1 && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 p-3 rounded-lg border hover:bg-accent cursor-pointer">
+                  <Check className="h-5 w-5 text-primary" />
+                  <span>Réduire mon stress quotidien</span>
+                </div>
+                <div className="flex items-center gap-2 p-3 rounded-lg border hover:bg-accent cursor-pointer">
+                  <Check className="h-5 w-5 text-primary" />
+                  <span>Améliorer ma gestion émotionnelle</span>
+                </div>
+                <div className="flex items-center gap-2 p-3 rounded-lg border hover:bg-accent cursor-pointer">
+                  <Check className="h-5 w-5 text-primary" />
+                  <span>Développer ma pleine conscience</span>
+                </div>
+                <div className="flex items-center gap-2 p-3 rounded-lg border hover:bg-accent cursor-pointer">
+                  <Check className="h-5 w-5 text-primary" />
+                  <span>Mieux comprendre mes émotions</span>
+                </div>
+              </div>
+            )}
+            
+            {currentStep === 2 && (
+              <div className="flex items-center justify-center py-8">
+                <div className="relative">
+                  <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary to-purple-600 animate-pulse blur-sm"></div>
+                  <div className="relative bg-background rounded-full p-4">
+                    <Check className="h-10 w-10 text-primary" />
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div className="flex justify-between pt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handlePreviousStep}
+                disabled={currentStep === 0 || isLoading}
+              >
+                Retour
+              </Button>
+              
+              <Button
+                type="button"
+                onClick={handleNextStep}
+                disabled={isLoading}
+                className="space-x-2"
+              >
+                {isLoading ? (
+                  "Chargement..."
+                ) : currentStep === steps.length - 1 ? (
+                  <>
+                    <span>Terminer</span>
+                    <Check className="h-4 w-4" />
+                  </>
+                ) : (
+                  <>
+                    <span>Suivant</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };

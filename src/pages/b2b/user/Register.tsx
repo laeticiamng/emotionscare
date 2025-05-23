@@ -1,43 +1,75 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { Eye, EyeOff, AlertCircle, CheckCircle2, Loader2, Building, Briefcase } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Mail, Building, User } from 'lucide-react';
-import Shell from '@/Shell';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
-const CollaboratorRegisterPage: React.FC = () => {
+const B2BUserRegister: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [email, setEmail] = useState('');
+  const { register } = useAuth();
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [company, setCompany] = useState('');
+  const [jobTitle, setJobTitle] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    
+    // Validation basique
+    if (!name || !email || !company || !jobTitle || !password || !confirmPassword) {
+      setError('Veuillez remplir tous les champs.');
+      return;
+    }
+    
+    if (password !== confirmPassword) {
+      setError('Les mots de passe ne correspondent pas.');
+      return;
+    }
+    
+    if (password.length < 8) {
+      setError('Le mot de passe doit contenir au moins 8 caractères.');
+      return;
+    }
+    
     setIsLoading(true);
-
-    // Simulation d'une demande d'accès
+    
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      toast({
-        title: "Demande envoyée",
-        description: "Votre demande d'accès a été enregistrée. Vous recevrez un email lorsque votre compte sera activé."
+      await register({
+        name,
+        email,
+        password,
+        role: 'b2b_user',
+        job_title: jobTitle,
+        department: company
       });
       
-      navigate('/login-collaborateur');
-    } catch (error) {
-      console.error('Registration error:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer votre demande d'accès. Veuillez réessayer plus tard.",
-        variant: "destructive"
+      setSuccessMessage('Compte créé avec succès !');
+      toast.success('Inscription réussie !', {
+        description: 'Votre compte collaborateur a été créé avec succès.'
+      });
+      
+      // Redirection après 2 secondes
+      setTimeout(() => {
+        navigate('/b2b/user/dashboard');
+      }, 2000);
+    } catch (error: any) {
+      console.error('Erreur d\'inscription:', error);
+      setError('L\'inscription a échoué. Cet email est peut-être déjà utilisé.');
+      toast.error('Échec de l\'inscription', {
+        description: 'Veuillez vérifier vos informations et réessayer.'
       });
     } finally {
       setIsLoading(false);
@@ -45,107 +77,171 @@ const CollaboratorRegisterPage: React.FC = () => {
   };
 
   return (
-    <Shell>
-      <div className="flex items-center justify-center min-h-screen bg-background p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
-        >
-          <Card className="border-blue-200 dark:border-blue-800">
-            <CardHeader>
-              <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                <Building className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+    <div className="min-h-screen flex items-center justify-center bg-muted/20 p-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <Card className="border shadow-lg">
+          <CardHeader className="space-y-1">
+            <div className="flex justify-center mb-2">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Briefcase className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle className="text-2xl text-center">Demande d'accès</CardTitle>
-              <CardDescription className="text-center">
-                Remplissez ce formulaire pour obtenir un accès collaborateur
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nom complet</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Jean Dupont"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
+            </div>
+            <CardTitle className="text-2xl font-bold text-center">Compte collaborateur</CardTitle>
+            <CardDescription className="text-center">
+              Créez votre compte professionnel
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleRegister}>
+            <CardContent className="space-y-4">
+              {error && (
+                <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" />
+                  {error}
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email professionnel</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="jean.dupont@entreprise.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
+              )}
+              
+              {successMessage && (
+                <div className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 text-sm p-3 rounded-md flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" />
+                  {successMessage}
                 </div>
+              )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="name">Nom complet</Label>
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={isLoading}
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="email">Email professionnel</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="collaborateur@entreprise.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="company">Entreprise</Label>
-                  <div className="relative">
-                    <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="company"
-                      type="text"
-                      placeholder="Nom de votre entreprise"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
+                  <Input
+                    id="company"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    disabled={isLoading}
+                    required
+                  />
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full relative" 
+                
+                <div className="space-y-2">
+                  <Label htmlFor="jobTitle">Poste</Label>
+                  <Input
+                    id="jobTitle"
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                    disabled={isLoading}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password">Mot de passe</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <span className="sr-only">
+                      {showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                    </span>
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={isLoading}
-                  variant="default"
-                >
-                  {isLoading ? (
-                    <>
-                      <span>Envoi en cours...</span>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    </>
-                  ) : "Demander un accès"}
-                </Button>
-              </form>
+                  required
+                />
+              </div>
             </CardContent>
-            <CardFooter className="flex flex-col items-center gap-2">
-              <div className="text-sm text-muted-foreground">
-                Vous avez déjà un compte ?{' '}
-                <a
-                  className="text-primary underline-offset-4 hover:underline cursor-pointer"
-                  onClick={() => navigate('/login-collaborateur')}
+            <CardFooter className="flex-col space-y-4">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Inscription en cours...
+                  </>
+                ) : "S'inscrire"}
+              </Button>
+              
+              <div className="text-center text-sm">
+                Vous avez déjà un compte ? {" "}
+                <Button
+                  type="button"
+                  variant="link"
+                  className="p-0"
+                  onClick={() => navigate('/b2b/user/login')}
+                  disabled={isLoading}
                 >
                   Se connecter
-                </a>
+                </Button>
               </div>
-              <Button variant="ghost" className="mt-2" onClick={() => navigate('/')}>
-                Retour à l'accueil
-              </Button>
             </CardFooter>
-          </Card>
-        </motion.div>
-      </div>
-    </Shell>
+          </form>
+        </Card>
+        
+        <div className="text-center mt-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/b2b/selection')}
+            disabled={isLoading}
+          >
+            Retour à la sélection
+          </Button>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 
-export default CollaboratorRegisterPage;
+export default B2BUserRegister;

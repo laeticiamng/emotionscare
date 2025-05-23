@@ -1,141 +1,173 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { motion } from 'framer-motion';
-import { Mail, Lock, Building } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import Shell from '@/Shell';
-import { useToast } from '@/hooks/use-toast';
+import { Eye, EyeOff, AlertCircle, Building } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { toast } from 'sonner';
+import { useUserMode } from '@/contexts/UserModeContext';
 
-const CollaboratorLoginPage: React.FC = () => {
+const B2BUserLogin: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { toast } = useToast();
+  const { changeUserMode } = useUserMode();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError(null);
+    
+    if (!email || !password) {
+      setError('Veuillez remplir tous les champs.');
+      return;
+    }
+    
     setIsLoading(true);
-
+    
     try {
       await login(email, password);
-      sessionStorage.setItem('just_logged_in', 'true');
-      navigate('/b2c/dashboard');
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur votre espace collaborateur"
+      changeUserMode('b2b_user');
+      toast.success('Connexion réussie !');
+      navigate('/b2b/user/dashboard');
+    } catch (error: any) {
+      console.error('Erreur de connexion:', error);
+      setError('Identifiants incorrects. Veuillez réessayer.');
+      toast.error('Échec de la connexion', {
+        description: 'Identifiants incorrects. Veuillez réessayer.'
       });
-    } catch (err: any) {
-      console.error('Login error:', err);
-      setError('Impossible de se connecter. Veuillez vérifier vos identifiants.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Shell>
-      <div className="flex items-center justify-center min-h-screen bg-background p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md"
-        >
-          <Card className="border-blue-200 dark:border-blue-800">
-            <CardHeader>
-              <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                <Building className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+    <div className="min-h-screen flex items-center justify-center bg-muted/20 p-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <Card className="border shadow-lg">
+          <CardHeader className="space-y-1">
+            <div className="flex justify-center mb-2">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Building className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle className="text-2xl text-center">Espace Collaborateur</CardTitle>
-              <CardDescription className="text-center">
-                Connectez-vous à votre espace de travail
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email professionnel</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="nom@entreprise.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
+            </div>
+            <CardTitle className="text-2xl font-bold text-center">Connexion Collaborateur</CardTitle>
+            <CardDescription className="text-center">
+              Accédez à votre espace collaborateur
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleLogin}>
+            <CardContent className="space-y-4">
+              {error && (
+                <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" />
+                  {error}
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                {error && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-sm text-destructive p-2 bg-destructive/10 rounded-md"
-                  >
-                    {error}
-                  </motion.div>
-                )}
-                <Button 
-                  type="submit" 
-                  className="w-full relative" 
+              )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="email">Email professionnel</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="collaborateur@entreprise.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
-                  variant="default"
-                >
-                  {isLoading ? (
-                    <>
-                      <span>Connexion en cours...</span>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    </>
-                  ) : "Se connecter"}
-                </Button>
-              </form>
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <Button
+                    type="button"
+                    variant="link"
+                    className="px-0 text-xs"
+                    onClick={() => navigate('/b2b/user/reset-password')}
+                  >
+                    Mot de passe oublié ?
+                  </Button>
+                </div>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <span className="sr-only">
+                      {showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                    </span>
+                  </Button>
+                </div>
+              </div>
             </CardContent>
-            <CardFooter className="flex flex-col items-center gap-2">
-              <div className="text-sm text-muted-foreground">
-                Vous n'avez pas d'identifiants ?{' '}
-                <a
-                  className="text-primary underline-offset-4 hover:underline cursor-pointer"
+            <CardFooter className="flex-col space-y-4">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? "Connexion en cours..." : "Se connecter"}
+              </Button>
+              
+              <div className="text-center text-sm">
+                Vous n'avez pas de compte ? {" "}
+                <Button
+                  type="button"
+                  variant="link"
+                  className="p-0"
                   onClick={() => navigate('/b2b/user/register')}
                 >
-                  Demander un accès
-                </a>
+                  Créer un compte
+                </Button>
               </div>
-              <Button variant="ghost" className="mt-2" onClick={() => navigate('/')}>
-                Retour à l'accueil
-              </Button>
+              
+              <div className="text-center text-sm">
+                <Link to="/b2b/selection" className="text-primary hover:underline">
+                  Changer de type d'accès
+                </Link>
+              </div>
             </CardFooter>
-          </Card>
-        </motion.div>
-      </div>
-    </Shell>
+          </form>
+        </Card>
+        
+        <div className="text-center mt-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/')}
+          >
+            Retour à l'accueil
+          </Button>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 
-export default CollaboratorLoginPage;
+export default B2BUserLogin;
