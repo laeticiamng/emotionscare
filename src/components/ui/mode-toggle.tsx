@@ -1,7 +1,6 @@
 
-import * as React from "react"
 import { Moon, Sun } from "lucide-react"
-import { useTheme } from "@/contexts/ThemeContext"
+
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -9,6 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useTheme } from "@/contexts/ThemeContext"
 
 export function ModeToggle() {
   const { setTheme } = useTheme()
@@ -36,5 +36,3 @@ export function ModeToggle() {
     </DropdownMenu>
   )
 }
-
-export default ModeToggle

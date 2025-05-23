@@ -1,26 +1,27 @@
 
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { UserModeProvider } from '@/contexts/UserModeContext';
+import { BrowserRouter as Router } from 'react-router-dom';
+import AppRouter from './AppRouter';
+import { AuthProvider } from './contexts/AuthContext';
+import { UserModeProvider } from './contexts/UserModeContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { Toaster } from 'sonner';
-import AppRouter from '@/AppRouter';
+import AuthTransition from './components/auth/AuthTransition';
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <UserModeProvider>
-          <AppRouter />
-          <Toaster 
-            position="top-right"
-            toastOptions={{
-              duration: 4000,
-            }}
-          />
-        </UserModeProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <Router>
+      <ThemeProvider>
+        <AuthProvider>
+          <UserModeProvider>
+            <AuthTransition>
+              <AppRouter />
+              <Toaster position="top-right" />
+            </AuthTransition>
+          </UserModeProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </Router>
   );
 }
 

@@ -1,91 +1,64 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart, LineChart, PieChart, UserPlus, Users, Brain, Building2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import {
-  LineChart as ReChart,
-  Line,
-  BarChart as ReBarChart,
-  Bar,
-  PieChart as RePieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
-
-// Sample data - this would normally come from your database
-const emotionData = [
-  { name: 'Lun', score: 65 },
-  { name: 'Mar', score: 59 },
-  { name: 'Mer', score: 80 },
-  { name: 'Jeu', score: 81 },
-  { name: 'Ven', score: 56 },
-  { name: 'Sam', score: 75 },
-  { name: 'Dim', score: 85 },
-];
-
-const departmentData = [
-  { name: 'RH', value: 78 },
-  { name: 'Tech', value: 62 },
-  { name: 'Marketing', value: 71 },
-  { name: 'Finance', value: 56 },
-  { name: 'Opérations', value: 68 },
-];
-
-const issuesData = [
-  { name: 'Stress', value: 35 },
-  { name: 'Conflits', value: 20 },
-  { name: 'Surcharge', value: 25 },
-  { name: 'Communication', value: 15 },
-  { name: 'Autre', value: 5 },
-];
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+import { Users, Shield, BarChart2, TrendingUp, AlertCircle, Calendar } from 'lucide-react';
+import LoadingAnimation from '@/components/ui/loading-animation';
+import { supabase } from '@/integrations/supabase/client';
 
 const B2BAdminDashboardPage: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [companyStats, setCompanyStats] = useState({
+  const [stats, setStats] = useState({
     totalUsers: 0,
     activeUsers: 0,
-    averageScore: 0,
-    scanCount: 0,
+    avgWellbeingScore: 0,
+    alertsCount: 0
   });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchCompanyStats();
-  }, []);
+    loadDashboardData();
+  }, [user]);
 
-  const fetchCompanyStats = async () => {
+  const loadDashboardData = async () => {
+    if (!user) return;
+    
     try {
       setIsLoading(true);
       
-      // In a real application, this would be a call to your backend
-      // Simulating API response with mock data
-      setTimeout(() => {
-        setCompanyStats({
-          totalUsers: 87,
-          activeUsers: 62,
-          averageScore: 72,
-          scanCount: 243,
-        });
-        setIsLoading(false);
-      }, 1000);
+      // Load organization stats
+      const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'b2b_user');
+
+      if (error) throw error;
+
+      // Calculate recent emotion results for wellbeing score
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      
+      const { data: recentScans } = await supabase
+        .from('emotion_results')
+        .select('score')
+        .gte('date', weekAgo.toISOString());
+
+      const avgScore = recentScans?.length 
+        ? recentScans.reduce((sum, scan) => sum + scan.score, 0) / recentScans.length
+        : 0;
+
+      setStats({
+        totalUsers: profiles?.length || 0,
+        activeUsers: Math.floor((profiles?.length || 0) * 0.7), // Mock active users
+        avgWellbeingScore: Math.round(avgScore * 100),
+        alertsCount: 2 // Mock alerts
+      });
     } catch (error) {
-      console.error('Error fetching stats:', error);
-      toast.error('Erreur lors du chargement des statistiques');
+      console.error('Error loading dashboard data:', error);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -95,294 +68,204 @@ const B2BAdminDashboardPage: React.FC = () => {
     navigate('/');
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingAnimation size="large" text="Chargement du tableau de bord administrateur..." />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted p-6">
-      <div className="container mx-auto">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted p-4">
+      <div className="container mx-auto max-w-7xl">
+        <header className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold">Tableau de bord Administrateur</h1>
             <p className="text-muted-foreground">
-              Bienvenue, {user?.user_metadata?.name || user?.email}
+              Gestion de l'organisation - {user?.user_metadata?.name || user?.email}
             </p>
           </div>
-          
-          <div className="flex gap-4">
-            <Button variant="outline" onClick={() => navigate('/b2b/admin/users')}>
-              <UserPlus className="mr-2 h-4 w-4" />
-              Gérer les utilisateurs
-            </Button>
-            <Button variant="outline" onClick={handleLogout}>
-              Déconnexion
-            </Button>
-          </div>
+          <Button onClick={handleLogout} variant="outline">
+            Déconnexion
+          </Button>
         </header>
 
-        <div className="grid gap-6 md:grid-cols-4 mb-6">
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Utilisateurs Total</CardTitle>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Utilisateurs totaux</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{isLoading ? '...' : companyStats.totalUsers}</div>
+              <div className="text-2xl font-bold">{stats.totalUsers}</div>
               <p className="text-xs text-muted-foreground">
-                +12% par rapport au mois dernier
+                +5 ce mois-ci
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Utilisateurs Actifs</CardTitle>
-              <UserPlus className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Utilisateurs actifs</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{isLoading ? '...' : companyStats.activeUsers}</div>
+              <div className="text-2xl font-bold">{stats.activeUsers}</div>
               <p className="text-xs text-muted-foreground">
-                {Math.round((companyStats.activeUsers / companyStats.totalUsers) * 100) || 0}% du total
+                {Math.round((stats.activeUsers / stats.totalUsers) * 100)}% du total
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Score Moyen</CardTitle>
-              <Brain className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Score bien-être moyen</CardTitle>
+              <BarChart2 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{isLoading ? '...' : companyStats.averageScore}/100</div>
+              <div className="text-2xl font-bold">{stats.avgWellbeingScore}%</div>
               <p className="text-xs text-muted-foreground">
-                +3 points en 1 semaine
+                Cette semaine
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Analyses Réalisées</CardTitle>
-              <BarChart className="h-4 w-4 text-muted-foreground" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Alertes</CardTitle>
+              <AlertCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{isLoading ? '...' : companyStats.scanCount}</div>
+              <div className="text-2xl font-bold text-red-600">{stats.alertsCount}</div>
               <p className="text-xs text-muted-foreground">
-                +18% ce mois-ci
+                Nécessitent attention
               </p>
             </CardContent>
           </Card>
         </div>
 
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <LineChart className="h-4 w-4" />
-              Aperçu
-            </TabsTrigger>
-            <TabsTrigger value="departments" className="flex items-center gap-2">
-              <Building2 className="h-4 w-4" />
-              Départements
-            </TabsTrigger>
-            <TabsTrigger value="issues" className="flex items-center gap-2">
-              <PieChart className="h-4 w-4" />
-              Problématiques
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview">
-            <div className="grid gap-6 lg:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Score émotionnel moyen</CardTitle>
-                  <CardDescription>
-                    Évolution sur les 7 derniers jours
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <ReChart data={emotionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis domain={[0, 100]} />
-                      <Tooltip />
-                      <Legend />
-                      <Line
-                        type="monotone"
-                        dataKey="score"
-                        stroke="#8884d8"
-                        activeDot={{ r: 8 }}
-                        strokeWidth={2}
-                      />
-                    </ReChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Activité utilisateurs</CardTitle>
-                  <CardDescription>
-                    Nombre d'analyses par jour
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <ReBarChart data={emotionData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="score" name="Analyses" fill="#82ca9d" />
-                    </ReBarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="departments">
-            <div className="grid gap-6 lg:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Score par département</CardTitle>
-                  <CardDescription>
-                    Bien-être moyen par service
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-2">
-                  <ResponsiveContainer width="100%" height={300}>
-                    <ReBarChart
-                      data={departmentData}
-                      layout="vertical"
-                      margin={{ top: 5, right: 30, left: 60, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" domain={[0, 100]} />
-                      <YAxis dataKey="name" type="category" />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="value" name="Score" fill="#8884d8" />
-                    </ReBarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Points d'action</CardTitle>
-                  <CardDescription>
-                    Recommandations par département
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="font-medium">RH (78/100)</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Bon niveau général. Continuer les initiatives de bien-être.
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Tech (62/100)</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Attention à la charge de travail. Suggérer des pauses plus régulières.
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Marketing (71/100)</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Niveau correct. Améliorer la communication des objectifs.
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Finance (56/100)</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Alerte - niveau bas. Organiser des sessions de gestion du stress.
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Opérations (68/100)</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Niveau moyen. Revoir l'équilibre charge/ressources.
-                      </p>
-                    </div>
+        {/* Management Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                Gestion des utilisateurs
+              </CardTitle>
+              <CardDescription>
+                Administrez les comptes et permissions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => navigate('/b2b/admin/users')} className="w-full">
+                Gérer les utilisateurs
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-primary" />
+                Équipes
+              </CardTitle>
+              <CardDescription>
+                Organisez vos équipes et départements
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => navigate('/b2b/admin/teams')} className="w-full" variant="outline">
+                Gérer les équipes
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart2 className="h-5 w-5 text-primary" />
+                Rapports
+              </CardTitle>
+              <CardDescription>
+                Analysez les données de bien-être
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => navigate('/b2b/admin/reports')} className="w-full" variant="outline">
+                Voir les rapports
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Analytics and Alerts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart2 className="h-5 w-5" />
+                Tendances bien-être
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-green-800">Équipe Marketing</p>
+                    <p className="text-sm text-green-600">Score moyen: 82%</p>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="issues">
-            <div className="grid gap-6 lg:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Problématiques identifiées</CardTitle>
-                  <CardDescription>
-                    Proportion des facteurs de stress signalés
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="pt-2 flex items-center justify-center">
-                  <div className="w-[300px] h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RePieChart>
-                        <Pie
-                          data={issuesData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={true}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        >
-                          {issuesData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend />
-                      </RePieChart>
-                    </ResponsiveContainer>
+                  <div className="text-green-600">↗️</div>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-yellow-800">Équipe Tech</p>
+                    <p className="text-sm text-yellow-600">Score moyen: 68%</p>
                   </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle>Plan d'action</CardTitle>
-                  <CardDescription>
-                    Solutions recommandées pour les problématiques principales
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-md border-l-4 border-blue-500">
-                      <h3 className="font-medium">Stress (35%)</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Mettre en place des sessions de gestion du stress et de mindfulness.
-                        Revoir l'équilibre charge de travail / ressources.
-                      </p>
-                    </div>
-                    <div className="bg-green-50 dark:bg-green-950 p-3 rounded-md border-l-4 border-green-500">
-                      <h3 className="font-medium">Surcharge de travail (25%)</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Audit de la charge de travail par équipe. Envisager des recrutements 
-                        supplémentaires ou une réallocation des tâches.
-                      </p>
-                    </div>
-                    <div className="bg-yellow-50 dark:bg-yellow-950 p-3 rounded-md border-l-4 border-yellow-500">
-                      <h3 className="font-medium">Conflits d'équipe (20%)</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Organiser des ateliers de team building et de communication non-violente.
-                        Formation des managers à la médiation.
-                      </p>
-                    </div>
-                    <Button className="w-full">Télécharger le rapport complet</Button>
+                  <div className="text-yellow-600">→</div>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-red-800">Équipe Ventes</p>
+                    <p className="text-sm text-red-600">Score moyen: 55%</p>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+                  <div className="text-red-600">↘️</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertCircle className="h-5 w-5" />
+                Alertes et notifications
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="p-3 bg-red-50 border-l-4 border-red-500 rounded">
+                  <p className="font-medium text-red-800">Attention requise</p>
+                  <p className="text-sm text-red-600">
+                    3 employés avec scores de bien-être faibles cette semaine
+                  </p>
+                  <p className="text-xs text-red-500 mt-1">Il y a 2 heures</p>
+                </div>
+                <div className="p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+                  <p className="font-medium text-yellow-800">Formation recommandée</p>
+                  <p className="text-sm text-yellow-600">
+                    Session gestion du stress suggérée pour l'équipe Ventes
+                  </p>
+                  <p className="text-xs text-yellow-500 mt-1">Il y a 4 heures</p>
+                </div>
+              </div>
+              <Button className="w-full mt-4" variant="outline">
+                Voir toutes les alertes
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

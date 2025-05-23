@@ -1,24 +1,77 @@
 
-import { toast as sonnerToast } from 'sonner';
+import { toast } from 'sonner';
 
-export interface ToastProps {
+type ToastVariant = 'default' | 'success' | 'error' | 'warning' | 'info' | 'destructive';
+
+interface ToastOptions {
   title?: string;
   description?: string;
-  variant?: 'default' | 'destructive';
+  variant?: ToastVariant;
+  duration?: number;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
 }
 
-export const toast = (props: ToastProps) => {
-  const { title, description, variant = 'default' } = props;
-  
-  const message = title ? `${title}${description ? ': ' + description : ''}` : description || '';
-  
-  if (variant === 'destructive') {
-    sonnerToast.error(message);
-  } else {
-    sonnerToast.success(message);
-  }
-};
+export function useToast() {
+  const showToast = ({
+    title,
+    description,
+    variant = 'default',
+    duration = 5000,
+    action,
+  }: ToastOptions) => {
+    if (variant === 'success') {
+      toast.success(title, {
+        description,
+        duration,
+        action: action ? {
+          label: action.label,
+          onClick: action.onClick,
+        } : undefined,
+      });
+    } else if (variant === 'error' || variant === 'destructive') {
+      toast.error(title, {
+        description,
+        duration,
+        action: action ? {
+          label: action.label,
+          onClick: action.onClick,
+        } : undefined,
+      });
+    } else if (variant === 'warning') {
+      toast.warning(title, {
+        description,
+        duration,
+        action: action ? {
+          label: action.label,
+          onClick: action.onClick,
+        } : undefined,
+      });
+    } else if (variant === 'info') {
+      toast.info(title, {
+        description,
+        duration,
+        action: action ? {
+          label: action.label,
+          onClick: action.onClick,
+        } : undefined,
+      });
+    } else {
+      toast(title, {
+        description,
+        duration,
+        action: action ? {
+          label: action.label,
+          onClick: action.onClick,
+        } : undefined,
+      });
+    }
+  };
 
-export const useToast = () => {
-  return { toast };
-};
+  return {
+    toast: showToast,
+    dismiss: toast.dismiss,
+  };
+}

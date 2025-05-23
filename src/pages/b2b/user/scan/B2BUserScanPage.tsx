@@ -1,481 +1,351 @@
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
 import EmotionScanForm from '@/components/scan/EmotionScanForm';
+import { EmotionResult } from '@/types/emotion';
+import { Heart, TrendingUp, Users, BarChart2, Target } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import LoadingAnimation from '@/components/ui/loading-animation';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { 
-  Brain, 
-  History, 
-  TrendingUp, 
-  Loader2,
-  Users,
-  Building2,
-  BarChart3,
-  Calendar,
-  Target
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-
-interface EmotionResult {
-  id: string;
-  user_id: string;
-  emojis?: string;
-  text?: string;
-  audio_url?: string;
-  score: number;
-  date: string;
-  ai_feedback?: string;
-}
 
 const B2BUserScanPage: React.FC = () => {
-  const { user, logout } = useAuth();
-  const { setUserMode } = useUserMode();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const [showScanForm, setShowScanForm] = useState(false);
-  const [emotions, setEmotions] = useState<EmotionResult[]>([]);
+  const [scanHistory, setScanHistory] = useState<EmotionResult[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [teamAverage, setTeamAverage] = useState(0);
   const [stats, setStats] = useState({
-    totalScans: 0,
-    averageScore: 0,
-    lastScan: null as string | null,
-    trend: 'stable' as 'up' | 'down' | 'stable',
-    weeklyGoal: 75
+    personalScore: 0,
+    teamAverage: 0,
+    weeklyProgress: 0,
+    totalScans: 0
   });
 
   useEffect(() => {
-    setUserMode('b2b_user');
-    fetchData();
-  }, [setUserMode]);
+    loadScanData();
+  }, [user]);
 
-  const fetchData = async () => {
+  const loadScanData = async () => {
+    if (!user) return;
+    
     try {
       setIsLoading(true);
       
-      // Fetch user profile
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
+      const { data: scans, error } = await supabase
+        .from('emotion_results')
         .select('*')
-        .eq('id', user?.id)
-        .single();
+        .eq('user_id', user.id)
+        .order('date', { ascending: false })
+        .limit(10);
 
-      if (profileError) throw profileError;
-      setUserProfile(profile);
+      if (error) throw error;
 
-      // Fetch user emotions
-      const { data: emotionsData, error: emotionsError } = await supabase
-        .from('emotions')
-        .select('*')
-        .eq('user_id', user?.id)
-        .order('date', { ascending: false });
+      const scanResults = scans || [];
+      setScanHistory(scanResults);
 
-      if (emotionsError) throw emotionsError;
-      setEmotions(emotionsData || []);
-      calculateStats(emotionsData || []);
+      // Calculate personal stats
+      if (scanResults.length > 0) {
+        const avgScore = scanResults.reduce((sum, scan) => sum + scan.score, 0) / scanResults.length;
+        
+        // Calculate weekly progress
+        const thisWeek = scanResults.filter(scan => {
+          const scanDate = new Date(scan.date);
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return scanDate >= weekAgo;
+        });
+        
+        const lastWeek = scanResults.filter(scan => {
+          const scanDate = new Date(scan.date);
+          const twoWeeksAgo = new Date();
+          twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return scanDate >= twoWeeksAgo && scanDate < weekAgo;
+        });
 
-      // Fetch team average (users in same department)
-      const { data: teamData, error: teamError } = await supabase
-        .from('emotions')
-        .select(`
-          score,
-          profiles!inner(department)
-        `)
-        .eq('profiles.department', profile?.department);
+        const thisWeekAvg = thisWeek.length > 0 ? thisWeek.reduce((sum, scan) => sum + scan.score, 0) / thisWeek.length : 0;
+        const lastWeekAvg = lastWeek.length > 0 ? lastWeek.reduce((sum, scan) => sum + scan.score, 0) / lastWeek.length : 0;
+        const progress = thisWeekAvg - lastWeekAvg;
 
-      if (teamError) throw teamError;
-      
-      if (teamData && teamData.length > 0) {
-        const avgScore = teamData.reduce((sum: number, item: any) => sum + item.score, 0) / teamData.length;
-        setTeamAverage(Math.round(avgScore));
+        setStats({
+          personalScore: avgScore,
+          teamAverage: 0.72, // Mock team average
+          weeklyProgress: progress,
+          totalScans: scanResults.length
+        });
       }
-
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error loading scan data:', error);
       toast.error('Erreur lors du chargement des données');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const calculateStats = (emotionData: EmotionResult[]) => {
-    if (emotionData.length === 0) {
-      setStats(prev => ({
-        ...prev,
-        totalScans: 0,
-        averageScore: 0,
-        lastScan: null,
-        trend: 'stable'
-      }));
-      return;
-    }
-
-    const totalScans = emotionData.length;
-    const averageScore = emotionData.reduce((sum, emotion) => sum + emotion.score, 0) / totalScans;
-    const lastScan = emotionData[0]?.date;
-
-    // Calculate trend (compare last 3 vs previous 3)
-    let trend: 'up' | 'down' | 'stable' = 'stable';
-    if (emotionData.length >= 6) {
-      const recent = emotionData.slice(0, 3);
-      const previous = emotionData.slice(3, 6);
-      const recentAvg = recent.reduce((sum, e) => sum + e.score, 0) / 3;
-      const previousAvg = previous.reduce((sum, e) => sum + e.score, 0) / 3;
-      
-      if (recentAvg > previousAvg + 5) trend = 'up';
-      else if (recentAvg < previousAvg - 5) trend = 'down';
-    }
-
-    setStats(prev => ({
-      ...prev,
-      totalScans,
-      averageScore: Math.round(averageScore),
-      lastScan,
-      trend
-    }));
+  const handleScanComplete = async (result: EmotionResult) => {
+    setScanHistory(prev => [result, ...prev]);
+    setShowScanForm(false);
+    loadScanData(); // Refresh to update stats
+    toast.success('Analyse émotionnelle terminée !');
   };
 
-  const handleScanComplete = async (result: EmotionResult) => {
-    try {
-      const { error } = await supabase
-        .from('emotions')
-        .insert([
-          {
-            user_id: user?.id,
-            emojis: result.emojis,
-            text: result.text,
-            audio_url: result.audio_url,
-            score: result.score,
-            ai_feedback: result.ai_feedback
-          }
-        ]);
-
-      if (error) throw error;
-
-      // Update profile emotional score
-      await supabase
-        .from('profiles')
-        .update({ emotional_score: result.score })
-        .eq('id', user?.id);
-
-      toast.success('Analyse enregistrée avec succès !');
-      setShowScanForm(false);
-      fetchData();
-    } catch (error) {
-      console.error('Error saving emotion:', error);
-      toast.error('Erreur lors de l\'enregistrement');
-    }
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 70) return 'text-green-600 bg-green-50';
-    if (score >= 40) return 'text-yellow-600 bg-yellow-50';
+    if (score >= 0.7) return 'text-green-600 bg-green-50';
+    if (score >= 0.4) return 'text-yellow-600 bg-yellow-50';
     return 'text-red-600 bg-red-50';
   };
 
-  const getTrendIcon = (trend: string) => {
-    switch (trend) {
-      case 'up': return <TrendingUp className="h-4 w-4 text-green-600" />;
-      case 'down': return <TrendingUp className="h-4 w-4 text-red-600 rotate-180" />;
-      default: return <BarChart3 className="h-4 w-4 text-gray-600" />;
-    }
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
+  const getProgressIcon = (progress: number) => {
+    if (progress > 0.05) return '📈';
+    if (progress < -0.05) return '📉';
+    return '➡️';
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>Chargement de vos analyses...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingAnimation size="large" text="Chargement de vos données..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
-      {/* Header */}
-      <header className="border-b bg-background/95 backdrop-blur">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/b2b/user/dashboard')}>
-              ← Tableau de bord
-            </Button>
-            <h1 className="text-xl font-bold">Analyse Bien-être Collaborateur</h1>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Badge variant="outline" className="bg-green-50 text-green-600">
-              Collaborateur
-            </Badge>
-            <Badge variant="outline">
-              {user?.user_metadata?.name || user?.email}
-            </Badge>
-            <Button onClick={handleLogout} variant="outline">
-              Déconnexion
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted p-4">
+      <div className="container mx-auto max-w-6xl">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Scanner émotionnel professionnel</h1>
+          <p className="text-muted-foreground">
+            Analysez votre bien-être au travail et comparez avec votre équipe
+          </p>
+        </header>
 
-      <div className="container py-8">
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Mes Analyses</p>
-                  <p className="text-2xl font-bold">{stats.totalScans}</p>
-                </div>
-                <Brain className="h-8 w-8 text-blue-600" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Mon score</CardTitle>
+              <Heart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {Math.round(stats.personalScore * 100)}%
               </div>
+              <p className="text-xs text-muted-foreground">
+                Score personnel moyen
+              </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Mon Score</p>
-                  <p className="text-2xl font-bold">{stats.averageScore}%</p>
-                </div>
-                <Target className="h-8 w-8 text-green-600" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Équipe</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {Math.round(stats.teamAverage * 100)}%
               </div>
+              <p className="text-xs text-muted-foreground">
+                Moyenne de l'équipe
+              </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Équipe</p>
-                  <p className="text-2xl font-bold">{teamAverage}%</p>
-                </div>
-                <Users className="h-8 w-8 text-purple-600" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Progression</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold flex items-center gap-2">
+                <span>{getProgressIcon(stats.weeklyProgress)}</span>
+                {stats.weeklyProgress > 0 ? '+' : ''}{Math.round(stats.weeklyProgress * 100)}%
               </div>
+              <p className="text-xs text-muted-foreground">
+                Cette semaine
+              </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Objectif</p>
-                  <p className="text-2xl font-bold">{stats.weeklyGoal}%</p>
-                </div>
-                <Target className="h-8 w-8 text-orange-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Tendance</p>
-                  <p className="text-lg font-bold capitalize">
-                    {stats.trend === 'up' ? 'Positive' : stats.trend === 'down' ? 'Négative' : 'Stable'}
-                  </p>
-                </div>
-                {getTrendIcon(stats.trend)}
-              </div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Analyses</CardTitle>
+              <BarChart2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalScans}</div>
+              <p className="text-xs text-muted-foreground">
+                Total effectué
+              </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Department Info */}
+        {/* Team Comparison */}
         <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Building2 className="h-8 w-8 text-blue-600" />
-                <div>
-                  <h3 className="font-semibold">Département: {userProfile?.department || 'Non défini'}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Poste: {userProfile?.job_title || 'Non défini'}
-                  </p>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Comparaison avec l'équipe
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Votre score</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-48 bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full" 
+                      style={{ width: `${stats.personalScore * 100}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-sm font-semibold w-12">
+                    {Math.round(stats.personalScore * 100)}%
+                  </span>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Comparaison avec l'équipe</p>
-                <div className="flex items-center space-x-2">
-                  <span className="text-lg font-bold">Vous: {stats.averageScore}%</span>
-                  <span className="text-muted-foreground">vs</span>
-                  <span className="text-lg font-bold">Équipe: {teamAverage}%</span>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Moyenne équipe</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-48 bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-green-600 h-2 rounded-full" 
+                      style={{ width: `${stats.teamAverage * 100}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-sm font-semibold w-12">
+                    {Math.round(stats.teamAverage * 100)}%
+                  </span>
                 </div>
               </div>
+            </div>
+            
+            <div className="mt-4 p-3 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                {stats.personalScore > stats.teamAverage 
+                  ? `🎉 Félicitations ! Votre bien-être est supérieur à la moyenne de l'équipe de ${Math.round((stats.personalScore - stats.teamAverage) * 100)}%.`
+                  : stats.personalScore === stats.teamAverage
+                  ? `👍 Votre bien-être est aligné avec la moyenne de l'équipe.`
+                  : `💪 Votre score est légèrement en dessous de la moyenne. Considérez participer aux activités bien-être proposées.`
+                }
+              </p>
             </div>
           </CardContent>
         </Card>
 
-        <Tabs defaultValue="scan" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="scan">
-              <Brain className="h-4 w-4 mr-2" />
-              Nouvelle Analyse
-            </TabsTrigger>
-            <TabsTrigger value="history">
-              <History className="h-4 w-4 mr-2" />
-              Mon Historique
-            </TabsTrigger>
-            <TabsTrigger value="wellness">
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Bien-être Équipe
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="scan" className="space-y-6">
-            {!showScanForm && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Évaluer votre bien-être</CardTitle>
-                  <CardDescription>
-                    Analysez votre état émotionnel pour contribuer au bien-être de l'équipe
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                      <h4 className="font-semibold text-blue-900">Objectif de la semaine</h4>
-                      <p className="text-blue-800">Maintenir un score de bien-être supérieur à {stats.weeklyGoal}%</p>
-                    </div>
-                    <Button 
-                      onClick={() => setShowScanForm(true)}
-                      className="w-full"
-                      size="lg"
-                    >
-                      <Brain className="h-5 w-5 mr-2" />
-                      Commencer une évaluation
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-            
-            {showScanForm && (
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Scan Form or New Scan Button */}
+          <div className="lg:col-span-2">
+            {showScanForm ? (
               <EmotionScanForm 
-                onComplete={handleScanComplete} 
-                onClose={() => setShowScanForm(false)} 
+                onComplete={handleScanComplete}
+                onClose={() => setShowScanForm(false)}
               />
-            )}
-          </TabsContent>
-
-          <TabsContent value="history" className="space-y-6">
-            {emotions.length === 0 ? (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <History className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="font-semibold mb-2">Aucune analyse disponible</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Commencez votre première évaluation bien-être
+            ) : (
+              <Card className="h-fit">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Heart className="h-6 w-6 text-primary" />
+                    Nouvelle analyse émotionnelle
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground">
+                    Comment vous sentez-vous aujourd'hui au travail ? Effectuez une analyse pour:
                   </p>
-                  <Button onClick={() => setShowScanForm(true)}>
-                    Première évaluation
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      <strong>Suivre votre évolution</strong> personnelle
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                      <strong>Contribuer aux statistiques</strong> d'équipe
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                      <strong>Recevoir des conseils</strong> personnalisés
+                    </li>
+                  </ul>
+                  <Button 
+                    onClick={() => setShowScanForm(true)}
+                    className="w-full"
+                    size="lg"
+                  >
+                    Commencer une nouvelle analyse
                   </Button>
                 </CardContent>
               </Card>
-            ) : (
-              <div className="space-y-4">
-                {emotions.map((emotion) => (
-                  <Card key={emotion.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle className="text-lg">
-                            Évaluation du {new Date(emotion.date).toLocaleDateString('fr-FR')}
-                          </CardTitle>
-                          <CardDescription>
-                            {new Date(emotion.date).toLocaleTimeString('fr-FR')}
-                          </CardDescription>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge className={getScoreColor(emotion.score)}>
-                            {emotion.score}%
-                          </Badge>
-                          {emotion.score >= stats.weeklyGoal && (
-                            <Badge variant="outline" className="bg-green-50 text-green-600">
-                              Objectif atteint
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {emotion.text && (
-                        <div>
-                          <p className="font-medium text-sm mb-2">Contexte :</p>
-                          <p className="text-sm bg-muted p-3 rounded">{emotion.text}</p>
-                        </div>
-                      )}
-                      
-                      {emotion.emojis && (
-                        <div>
-                          <p className="font-medium text-sm mb-2">Émojis :</p>
-                          <p className="text-2xl">{emotion.emojis}</p>
-                        </div>
-                      )}
-                      
-                      {emotion.ai_feedback && (
-                        <div>
-                          <p className="font-medium text-sm mb-2">Recommandations IA :</p>
-                          <p className="text-sm bg-blue-50 p-3 rounded border-l-4 border-blue-500">
-                            {emotion.ai_feedback}
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
             )}
-          </TabsContent>
+          </div>
 
-          <TabsContent value="wellness" className="space-y-6">
+          {/* Scan History */}
+          <div>
             <Card>
               <CardHeader>
-                <CardTitle>Bien-être de l'équipe</CardTitle>
-                <CardDescription>
-                  Vue d'ensemble du bien-être dans votre département
-                </CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart2 className="h-5 w-5" />
+                  Historique récent
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-blue-600 mb-2">{stats.averageScore}%</div>
-                      <p className="text-sm text-muted-foreground">Votre score moyen</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-purple-600 mb-2">{teamAverage}%</div>
-                      <p className="text-sm text-muted-foreground">Score moyen de l'équipe</p>
-                    </div>
+                {scanHistory.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">
+                      Aucune analyse pour le moment
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Commencez votre première analyse professionnelle
+                    </p>
                   </div>
-                  
-                  <div className="bg-muted p-4 rounded-lg">
-                    <h4 className="font-semibold mb-2">Recommandations pour l'équipe</h4>
-                    <ul className="text-sm space-y-1">
-                      <li>• Organisez des pauses collectives régulières</li>
-                      <li>• Participez aux activités de team building</li>
-                      <li>• Communiquez ouvertement avec vos collègues</li>
-                      <li>• Prenez soin de votre équilibre vie pro/perso</li>
-                    </ul>
+                ) : (
+                  <div className="space-y-4">
+                    {scanHistory.map((scan) => (
+                      <div key={scan.id} className="p-3 border rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`px-2 py-1 rounded text-sm font-medium ${getScoreColor(scan.score)}`}>
+                            {Math.round(scan.score * 100)}%
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {formatDate(scan.date)}
+                          </span>
+                        </div>
+                        {scan.text && (
+                          <p className="text-sm text-muted-foreground truncate">
+                            {scan.text}
+                          </p>
+                        )}
+                        {scan.emojis && (
+                          <p className="text-lg">
+                            {scan.emojis}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                    <Button variant="outline" className="w-full" size="sm">
+                      Voir tout l'historique
+                    </Button>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </div>
     </div>
   );

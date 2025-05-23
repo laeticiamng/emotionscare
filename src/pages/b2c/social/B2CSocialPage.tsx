@@ -1,627 +1,288 @@
 
-import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Send, Heart, MessageSquare, Users, UserPlus, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Heart, MessageSquare, Share2, Plus, Users, Smile } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import LoadingAnimation from '@/components/ui/loading-animation';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { useNavigate } from 'react-router-dom';
 
 interface Post {
   id: string;
-  user_id: string;
   content: string;
-  date: string;
-  reactions: number;
-  image_url?: string;
-  user?: {
+  author: {
     name: string;
-    avatar_url?: string;
+    avatar?: string;
   };
-}
-
-interface Comment {
-  id: string;
-  post_id: string;
-  user_id: string;
-  content: string;
-  date: string;
-  user?: {
-    name: string;
-    avatar_url?: string;
-  };
+  created_at: string;
+  likes: number;
+  comments: number;
+  emotion_score?: number;
 }
 
 const B2CSocialPage: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [newPost, setNewPost] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
-  const [commentsVisible, setCommentsVisible] = useState<Record<string, boolean>>({});
-  const [comments, setComments] = useState<Record<string, Comment[]>>({});
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [isPosting, setIsPosting] = useState(false);
 
   useEffect(() => {
-    fetchPosts();
+    loadPosts();
   }, []);
 
-  const fetchPosts = async () => {
+  const loadPosts = async () => {
     try {
       setIsLoading(true);
       
-      const { data, error } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          user:profiles(name, avatar_url)
-        `)
-        .order('date', { ascending: false });
-
-      if (error) throw error;
+      // Mock data for now - in real app, this would come from Supabase
+      const mockPosts: Post[] = [
+        {
+          id: '1',
+          content: "Journée formidable aujourd'hui ! J'ai réussi à méditer 20 minutes ce matin et je me sens beaucoup plus serein. 🧘‍♂️",
+          author: { name: 'Marie Dupont', avatar: '' },
+          created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+          likes: 12,
+          comments: 3,
+          emotion_score: 0.85
+        },
+        {
+          id: '2',
+          content: "Quelqu'un a des conseils pour gérer le stress au travail ? Je traverse une période difficile... 😰",
+          author: { name: 'Thomas Martin', avatar: '' },
+          created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+          likes: 8,
+          comments: 7,
+          emotion_score: 0.3
+        },
+        {
+          id: '3',
+          content: "Merci à cette communauté pour tout le soutien ! Grâce à vos conseils, j'ai retrouvé ma motivation. ❤️",
+          author: { name: 'Sophie Laurent', avatar: '' },
+          created_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+          likes: 25,
+          comments: 12,
+          emotion_score: 0.9
+        }
+      ];
       
-      setPosts(data as Post[]);
-    } catch (err) {
-      console.error('Error fetching posts:', err);
-      toast.error('Impossible de charger les publications');
+      setPosts(mockPosts);
+    } catch (error) {
+      console.error('Error loading posts:', error);
+      toast.error('Erreur lors du chargement des publications');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) {
-      setSelectedImage(null);
-      setPreviewImage(null);
-      return;
-    }
-
-    const file = e.target.files[0];
-    setSelectedImage(file);
+  const handleCreatePost = async () => {
+    if (!newPost.trim() || !user) return;
     
-    // Create a preview URL
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewImage(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const submitPost = async () => {
-    if (!user) {
-      toast.error('Vous devez être connecté pour publier');
-      return;
-    }
-
-    if (!newPost.trim() && !selectedImage) {
-      toast.error('Veuillez entrer du texte ou ajouter une image');
-      return;
-    }
-
     try {
-      setIsSubmitting(true);
+      setIsPosting(true);
       
-      let imageUrl = null;
-      
-      // Upload image if selected
-      if (selectedImage) {
-        const fileExt = selectedImage.name.split('.').pop();
-        const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-        const filePath = `${user.id}/${fileName}`;
-        
-        // Upload to storage
-        const { error: uploadError } = await supabase.storage
-          .from('post-images')
-          .upload(filePath, selectedImage);
-          
-        if (uploadError) throw uploadError;
-        
-        // Get public URL
-        const { data } = supabase.storage
-          .from('post-images')
-          .getPublicUrl(filePath);
-          
-        imageUrl = data.publicUrl;
-      }
-      
-      // Create post
-      const { data, error } = await supabase
-        .from('posts')
-        .insert({
-          user_id: user.id,
-          content: newPost,
-          date: new Date().toISOString(),
-          image_url: imageUrl,
-          reactions: 0
-        })
-        .select();
-
-      if (error) throw error;
-      
-      // Update UI
-      const newPostWithUser = {
-        ...data[0],
-        user: {
-          name: user.user_metadata?.name || 'Utilisateur',
-          avatar_url: user.user_metadata?.avatar_url
-        }
+      // In real app, this would save to Supabase
+      const newPostData: Post = {
+        id: Date.now().toString(),
+        content: newPost,
+        author: {
+          name: user.user_metadata?.name || user.email || 'Utilisateur',
+          avatar: user.user_metadata?.avatar_url
+        },
+        created_at: new Date().toISOString(),
+        likes: 0,
+        comments: 0
       };
       
-      setPosts([newPostWithUser, ...posts]);
+      setPosts(prev => [newPostData, ...prev]);
       setNewPost('');
-      setSelectedImage(null);
-      setPreviewImage(null);
-      
-      toast.success('Publication ajoutée !');
-    } catch (err) {
-      console.error('Error creating post:', err);
+      toast.success('Publication partagée !');
+    } catch (error) {
+      console.error('Error creating post:', error);
       toast.error('Erreur lors de la publication');
     } finally {
-      setIsSubmitting(false);
+      setIsPosting(false);
     }
   };
 
-  const handleReaction = async (postId: string) => {
-    if (!user) {
-      toast.error('Vous devez être connecté pour réagir');
-      return;
-    }
-
-    try {
-      // Find and update post in local state first for immediate feedback
-      const updatedPosts = posts.map(post => {
-        if (post.id === postId) {
-          return { ...post, reactions: (post.reactions || 0) + 1 };
-        }
-        return post;
-      });
-      
-      setPosts(updatedPosts);
-      
-      // Update in database
-      const { error } = await supabase
-        .from('posts')
-        .update({ reactions: updatedPosts.find(p => p.id === postId)?.reactions })
-        .eq('id', postId);
-
-      if (error) throw error;
-      
-      toast.success('Réaction ajoutée');
-    } catch (err) {
-      console.error('Error adding reaction:', err);
-      toast.error('Erreur lors de l\'ajout de la réaction');
-      // Revert on error
-      fetchPosts();
-    }
+  const handleLike = async (postId: string) => {
+    setPosts(prev => prev.map(post => 
+      post.id === postId 
+        ? { ...post, likes: post.likes + 1 }
+        : post
+    ));
+    toast.success('❤️ Publication aimée !');
   };
 
-  const toggleComments = async (postId: string) => {
-    // Toggle visibility
-    setCommentsVisible({
-      ...commentsVisible,
-      [postId]: !commentsVisible[postId]
-    });
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
     
-    // Fetch comments if becoming visible and not already fetched
-    if (!commentsVisible[postId] && !comments[postId]) {
-      try {
-        const { data, error } = await supabase
-          .from('comments')
-          .select(`
-            *,
-            user:profiles(name, avatar_url)
-          `)
-          .eq('post_id', postId)
-          .order('date', { ascending: true });
-
-        if (error) throw error;
-        
-        setComments({
-          ...comments,
-          [postId]: data
-        });
-      } catch (err) {
-        console.error('Error fetching comments:', err);
-        toast.error('Impossible de charger les commentaires');
-      }
-    }
+    if (diffInHours < 1) return 'Il y a moins d\'une heure';
+    if (diffInHours === 1) return 'Il y a 1 heure';
+    if (diffInHours < 24) return `Il y a ${diffInHours} heures`;
+    
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays === 1) return 'Il y a 1 jour';
+    return `Il y a ${diffInDays} jours`;
   };
 
-  const submitComment = async (postId: string) => {
-    if (!user) {
-      toast.error('Vous devez être connecté pour commenter');
-      return;
-    }
-
-    const commentText = commentInputs[postId];
-    if (!commentText || !commentText.trim()) {
-      toast.error('Veuillez entrer un commentaire');
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('comments')
-        .insert({
-          post_id: postId,
-          user_id: user.id,
-          content: commentText,
-          date: new Date().toISOString()
-        })
-        .select();
-
-      if (error) throw error;
-      
-      // Add user data to comment
-      const newComment = {
-        ...data[0],
-        user: {
-          name: user.user_metadata?.name || 'Utilisateur',
-          avatar_url: user.user_metadata?.avatar_url
-        }
-      };
-      
-      // Update local state
-      setComments({
-        ...comments,
-        [postId]: [...(comments[postId] || []), newComment]
-      });
-      
-      // Clear input
-      setCommentInputs({
-        ...commentInputs,
-        [postId]: ''
-      });
-      
-      toast.success('Commentaire ajouté');
-    } catch (err) {
-      console.error('Error adding comment:', err);
-      toast.error('Erreur lors de l\'ajout du commentaire');
-    }
+  const getEmotionColor = (score?: number) => {
+    if (!score) return 'text-gray-500';
+    if (score >= 0.7) return 'text-green-500';
+    if (score >= 0.4) return 'text-yellow-500';
+    return 'text-red-500';
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase();
-  };
-
-  if (!user) {
+  if (isLoading) {
     return (
-      <div className="container mx-auto p-6 max-w-5xl">
-        <Card>
-          <CardHeader>
-            <CardTitle>Connexion requise</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center py-8">
-            <p className="text-lg mb-6">
-              Vous devez être connecté pour accéder à l'espace social.
-            </p>
-            <Button onClick={() => navigate('/b2c/login')}>
-              Se connecter
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingAnimation size="large" text="Chargement de l'espace social..." />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-5xl">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Espace Social</h1>
-      </div>
-      
-      <Tabs defaultValue="feed" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="feed" className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4" />
-            Publications
-          </TabsTrigger>
-          <TabsTrigger value="community" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Communauté
-          </TabsTrigger>
-          <TabsTrigger value="buddies" className="flex items-center gap-2">
-            <UserPlus className="h-4 w-4" />
-            Buddies
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="feed" className="space-y-6">
-          {/* New Post Form */}
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted p-4">
+      <div className="container mx-auto max-w-4xl">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Espace Social</h1>
+          <p className="text-muted-foreground">
+            Partagez votre parcours bien-être avec la communauté
+          </p>
+        </header>
+
+        {/* Create Post */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Plus className="h-5 w-5" />
+              Partager votre expérience
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Textarea
+              value={newPost}
+              onChange={(e) => setNewPost(e.target.value)}
+              placeholder="Comment vous sentez-vous aujourd'hui ? Partagez votre expérience..."
+              className="min-h-[100px]"
+            />
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">
+                {newPost.length}/500 caractères
+              </p>
+              <Button 
+                onClick={handleCreatePost}
+                disabled={!newPost.trim() || isPosting}
+              >
+                {isPosting ? 'Publication...' : 'Publier'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Community Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <Avatar>
-                  <AvatarImage src={user.user_metadata?.avatar_url} />
-                  <AvatarFallback>{getInitials(user.user_metadata?.name || 'U')}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 space-y-4">
-                  <Textarea
-                    placeholder="Partagez vos pensées, expériences ou sentiments..."
-                    value={newPost}
-                    onChange={(e) => setNewPost(e.target.value)}
-                    className="resize-none"
-                    rows={3}
-                  />
-                  
-                  {previewImage && (
-                    <div className="relative">
-                      <img 
-                        src={previewImage}
-                        alt="Preview" 
-                        className="max-h-60 rounded-md object-cover"
-                      />
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="absolute top-2 right-2 h-8 w-8"
-                        onClick={() => {
-                          setSelectedImage(null);
-                          setPreviewImage(null);
-                        }}
-                      >
-                        &times;
-                      </Button>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center justify-between">
-                    <label className="cursor-pointer">
-                      <ImageIcon className="h-5 w-5 text-gray-500" />
-                      <input 
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                      />
-                    </label>
-                    
-                    <Button
-                      onClick={submitPost}
-                      disabled={isSubmitting || (!newPost.trim() && !selectedImage)}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Publication...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="mr-2 h-4 w-4" />
-                          Publier
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
+            <CardContent className="flex items-center gap-3 p-4">
+              <Users className="h-8 w-8 text-primary" />
+              <div>
+                <p className="font-semibold">1,247</p>
+                <p className="text-sm text-muted-foreground">Membres actifs</p>
               </div>
             </CardContent>
           </Card>
-          
-          {/* Posts List */}
-          {isLoading ? (
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700"></div>
-                      <div className="flex-1">
-                        <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                        <div className="h-3 w-16 bg-gray-100 dark:bg-gray-800 rounded mt-2"></div>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : posts.length === 0 ? (
-            <Card>
-              <CardContent className="p-6 text-center">
-                <MessageSquare className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Aucune publication</h3>
-                <p className="text-gray-500">
-                  Soyez le premier à partager quelque chose avec la communauté !
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {posts.map((post) => (
-                <Card key={post.id}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
-                      <Avatar>
-                        <AvatarImage src={post.user?.avatar_url} />
-                        <AvatarFallback>{getInitials(post.user?.name || 'U')}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-medium">{post.user?.name || 'Utilisateur'}</h3>
-                        <p className="text-sm text-gray-500">
-                          {format(new Date(post.date), 'dd MMMM yyyy à HH:mm', { locale: fr })}
-                        </p>
-                      </div>
+          <Card>
+            <CardContent className="flex items-center gap-3 p-4">
+              <Heart className="h-8 w-8 text-red-500" />
+              <div>
+                <p className="font-semibold">3,521</p>
+                <p className="text-sm text-muted-foreground">Likes cette semaine</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="flex items-center gap-3 p-4">
+              <MessageSquare className="h-8 w-8 text-blue-500" />
+              <div>
+                <p className="font-semibold">892</p>
+                <p className="text-sm text-muted-foreground">Messages partagés</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Posts Feed */}
+        <div className="space-y-6">
+          {posts.map((post) => (
+            <Card key={post.id} className="hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <Avatar>
+                    <AvatarImage src={post.author.avatar} />
+                    <AvatarFallback>
+                      {post.author.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-semibold">{post.author.name}</h3>
+                      {post.emotion_score && (
+                        <div className={`flex items-center gap-1 ${getEmotionColor(post.emotion_score)}`}>
+                          <Smile className="h-4 w-4" />
+                          <span className="text-sm">{Math.round(post.emotion_score * 100)}%</span>
+                        </div>
+                      )}
+                      <span className="text-sm text-muted-foreground">
+                        {formatTimeAgo(post.created_at)}
+                      </span>
                     </div>
                     
-                    <p className="mb-4 whitespace-pre-line">{post.content}</p>
+                    <p className="text-foreground mb-4 leading-relaxed">
+                      {post.content}
+                    </p>
                     
-                    {post.image_url && (
-                      <div className="mb-4">
-                        <img
-                          src={post.image_url}
-                          alt="Post image"
-                          className="rounded-md max-h-96 object-cover"
-                        />
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center gap-4 mt-4">
-                      <Button
-                        variant="ghost"
+                    <div className="flex items-center gap-6">
+                      <Button 
+                        variant="ghost" 
                         size="sm"
-                        className="flex items-center gap-2"
-                        onClick={() => handleReaction(post.id)}
+                        onClick={() => handleLike(post.id)}
+                        className="gap-2 hover:text-red-500"
                       >
                         <Heart className="h-4 w-4" />
-                        {post.reactions || 0}
+                        {post.likes}
                       </Button>
                       
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="flex items-center gap-2"
-                        onClick={() => toggleComments(post.id)}
-                      >
+                      <Button variant="ghost" size="sm" className="gap-2 hover:text-blue-500">
                         <MessageSquare className="h-4 w-4" />
-                        {comments[post.id]?.length || 0}
+                        {post.comments}
+                      </Button>
+                      
+                      <Button variant="ghost" size="sm" className="gap-2 hover:text-green-500">
+                        <Share2 className="h-4 w-4" />
+                        Partager
                       </Button>
                     </div>
-                    
-                    {commentsVisible[post.id] && (
-                      <div className="mt-4 space-y-4">
-                        <div className="border-t pt-4">
-                          <h4 className="font-medium mb-4">Commentaires</h4>
-                          
-                          {comments[post.id]?.length === 0 ? (
-                            <p className="text-gray-500 text-sm">
-                              Aucun commentaire pour le moment.
-                            </p>
-                          ) : (
-                            <div className="space-y-4">
-                              {comments[post.id]?.map((comment) => (
-                                <div key={comment.id} className="flex gap-3">
-                                  <Avatar className="h-8 w-8">
-                                    <AvatarImage src={comment.user?.avatar_url} />
-                                    <AvatarFallback>{getInitials(comment.user?.name || 'U')}</AvatarFallback>
-                                  </Avatar>
-                                  <div className="flex-1">
-                                    <div className="bg-muted p-3 rounded-md">
-                                      <p className="font-medium text-sm">{comment.user?.name || 'Utilisateur'}</p>
-                                      <p className="text-sm">{comment.content}</p>
-                                    </div>
-                                    <p className="text-xs text-gray-500 mt-1">
-                                      {format(new Date(comment.date), 'dd MMM yyyy, HH:mm', { locale: fr })}
-                                    </p>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                          
-                          <div className="flex items-center gap-2 mt-4">
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={user.user_metadata?.avatar_url} />
-                              <AvatarFallback>{getInitials(user.user_metadata?.name || 'U')}</AvatarFallback>
-                            </Avatar>
-                            <Input
-                              placeholder="Ajouter un commentaire..."
-                              value={commentInputs[post.id] || ''}
-                              onChange={(e) => setCommentInputs({
-                                ...commentInputs,
-                                [post.id]: e.target.value
-                              })}
-                              className="flex-1"
-                            />
-                            <Button
-                              size="sm"
-                              onClick={() => submitComment(post.id)}
-                              disabled={!commentInputs[post.id]}
-                            >
-                              <Send className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="community">
-          <Card>
-            <CardHeader>
-              <CardTitle>Communauté EmotionsCare</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p>
-                Rejoignez une communauté de personnes partageant les mêmes idées qui soutiennent
-                le bien-être émotionnel et le développement personnel.
-              </p>
-              
-              <div className="grid md:grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Groupes de soutien</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="mb-4">
-                      Rejoignez des groupes thématiques centrés sur différents aspects du bien-être émotionnel.
-                    </p>
-                    <Button>Explorer les groupes</Button>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Événements bien-être</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="mb-4">
-                      Participez à des webinaires, ateliers et sessions de méditation en groupe.
-                    </p>
-                    <Button>Voir le calendrier</Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="buddies">
-          <Card>
-            <CardHeader>
-              <CardTitle>Système de Buddies</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p>
-                Le système de Buddies vous permet de vous connecter avec d'autres utilisateurs 
-                pour un soutien mutuel dans votre parcours de bien-être émotionnel.
-              </p>
-              
-              <div className="bg-muted p-6 rounded-lg text-center">
-                <UserPlus className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Trouvez un Buddy</h3>
-                <p className="text-muted-foreground mb-4">
-                  Connectez-vous avec une personne qui partage des objectifs similaires
-                </p>
-                <Button>Rechercher des Buddies</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Load More */}
+        <div className="text-center mt-8">
+          <Button variant="outline" onClick={loadPosts}>
+            Charger plus de publications
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

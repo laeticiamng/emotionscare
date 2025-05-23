@@ -1,68 +1,63 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle, Loader2, User } from 'lucide-react';
+import { AlertCircle, User, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const B2CRegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
   const { setUserMode } = useUserMode();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     setError(null);
 
-    // Validation
-    if (!name.trim()) {
-      setError('Le nom est requis');
-      return;
-    }
-    
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       setError('Les mots de passe ne correspondent pas');
+      setIsLoading(false);
       return;
     }
 
-    if (password.length < 6) {
+    if (formData.password.length < 6) {
       setError('Le mot de passe doit contenir au moins 6 caractères');
+      setIsLoading(false);
       return;
     }
-
-    setIsLoading(true);
 
     try {
       setUserMode('b2c');
-      await register(email, password, {
-        name,
+      await register(formData.email, formData.password, {
+        name: formData.name,
         role: 'b2c'
       });
-      
       toast.success('Compte créé avec succès !');
       navigate('/b2c/onboarding');
     } catch (error: any) {
       console.error('Registration error:', error);
-      
-      if (error.message?.includes('already registered')) {
-        setError('Cet email est déjà utilisé');
-      } else {
-        setError('Erreur lors de l\'inscription. Veuillez réessayer.');
-      }
+      setError('Erreur lors de la création du compte. Vérifiez vos informations.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -74,7 +69,7 @@ const B2CRegisterPage: React.FC = () => {
               <User className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Créer un compte</CardTitle>
+          <CardTitle className="text-2xl font-bold">Créer un compte B2C</CardTitle>
           <CardDescription>Rejoignez EmotionsCare en tant que particulier</CardDescription>
         </CardHeader>
         <CardContent>
@@ -84,46 +79,46 @@ const B2CRegisterPage: React.FC = () => {
               <Input
                 id="name"
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Jean Dupont"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="Votre nom complet"
                 required
                 disabled={isLoading}
               />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="jean.dupont@example.com"
+                value={formData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                placeholder="votre.email@example.com"
                 required
                 disabled={isLoading}
               />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="password">Mot de passe</Label>
               <Input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={(e) => handleInputChange('password', e.target.value)}
+                placeholder="Minimum 6 caractères"
                 required
                 disabled={isLoading}
+                minLength={6}
               />
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
               <Input
-                id="confirm-password"
+                id="confirmPassword"
                 type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={formData.confirmPassword}
+                onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                placeholder="Confirmez votre mot de passe"
                 required
                 disabled={isLoading}
               />
@@ -140,25 +135,24 @@ const B2CRegisterPage: React.FC = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Inscription en cours...
+                  Création en cours...
                 </>
               ) : (
-                'S\'inscrire'
+                'Créer mon compte'
               )}
             </Button>
           </form>
           
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-muted-foreground">
-              Déjà inscrit ?{' '}
-              <Button variant="link" className="p-0" onClick={() => navigate('/b2c/login')}>
+              Déjà un compte ?{' '}
+              <Link to="/b2c/login" className="text-primary hover:underline">
                 Se connecter
-              </Button>
+              </Link>
             </p>
-            
-            <div className="pt-4 border-t mt-4">
-              <Button variant="ghost" onClick={() => navigate('/')}>
-                Retour à l'accueil
+            <div className="pt-4 border-t">
+              <Button variant="ghost" onClick={() => navigate('/choose-mode')}>
+                Retour à la sélection
               </Button>
             </div>
           </div>
