@@ -1,406 +1,373 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
+  Shield, 
   Users, 
   TrendingUp, 
-  AlertTriangle, 
-  Shield, 
-  BarChart3, 
-  Settings, 
+  AlertTriangle,
+  BarChart3,
+  Settings,
+  Download,
+  Eye,
+  UserPlus,
   Calendar,
-  MessageCircle,
-  Target,
+  Clock,
   Activity
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import LoadingAnimation from '@/components/ui/loading-animation';
+import { AbsenteeismChart } from '@/components/dashboard/charts/AbsenteeismChart';
 
 const B2BAdminDashboardPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [selectedPeriod, setSelectedPeriod] = useState('week');
+  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [organizationMetrics, setOrganizationMetrics] = useState({
+    totalEmployees: 247,
+    activeUsers: 189,
+    averageWellbeing: 73,
+    weeklyParticipation: 85,
+    criticalAlerts: 3,
+    departmentCount: 8
+  });
 
-  const organizationStats = [
-    { label: 'Collaborateurs actifs', value: '142/156', icon: Users, color: 'text-green-600', percentage: 91 },
-    { label: 'Score bien-être moyen', value: '76%', icon: TrendingUp, color: 'text-blue-600', percentage: 76 },
-    { label: 'Alertes à traiter', value: '3', icon: AlertTriangle, color: 'text-orange-600', percentage: null },
-    { label: 'Engagement équipes', value: '84%', icon: Activity, color: 'text-purple-600', percentage: 84 }
-  ];
+  useEffect(() => {
+    // Simulate loading data
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
-  const departmentData = [
-    { name: 'Marketing', members: 24, avgScore: 82, engagement: 95, alerts: 0 },
-    { name: 'IT', members: 18, avgScore: 78, engagement: 88, alerts: 1 },
-    { name: 'Ventes', members: 30, avgScore: 74, engagement: 82, alerts: 2 },
-    { name: 'RH', members: 12, avgScore: 85, engagement: 92, alerts: 0 },
-    { name: 'Finance', members: 15, avgScore: 72, engagement: 78, alerts: 0 },
-    { name: 'Production', members: 35, avgScore: 70, engagement: 75, alerts: 1 },
-    { name: 'R&D', members: 22, avgScore: 79, engagement: 89, alerts: 0 }
+  const departmentStats = [
+    { name: 'Ressources Humaines', employees: 24, wellbeing: 78, trend: 'up' },
+    { name: 'Développement', employees: 45, wellbeing: 71, trend: 'stable' },
+    { name: 'Marketing', employees: 32, wellbeing: 85, trend: 'up' },
+    { name: 'Ventes', employees: 38, wellbeing: 68, trend: 'down' },
+    { name: 'Support Client', employees: 28, wellbeing: 72, trend: 'up' },
+    { name: 'Finance', employees: 18, wellbeing: 75, trend: 'stable' }
   ];
 
   const recentAlerts = [
-    {
-      id: 1,
-      type: 'score_drop',
-      department: 'Ventes',
-      message: 'Baisse significative du score bien-être (-15% cette semaine)',
-      severity: 'high',
-      timestamp: 'Il y a 2h'
-    },
-    {
-      id: 2,
-      type: 'low_engagement',
-      department: 'Production',
-      message: 'Engagement équipe sous le seuil (75%)',
-      severity: 'medium',
-      timestamp: 'Il y a 4h'
-    },
-    {
-      id: 3,
-      type: 'support_request',
-      department: 'IT',
-      message: '3 demandes de support émotionnel non traitées',
-      severity: 'medium',
-      timestamp: 'Il y a 6h'
-    }
+    { id: 1, department: 'Ventes', type: 'wellbeing_drop', severity: 'medium', time: 'Il y a 2h' },
+    { id: 2, department: 'Support', type: 'high_stress', severity: 'high', time: 'Il y a 4h' },
+    { id: 3, department: 'Dev', type: 'low_participation', severity: 'low', time: 'Hier' }
   ];
 
-  const quickActions = [
-    {
-      title: 'Gérer les utilisateurs',
-      description: 'Inviter, supprimer ou modifier les profils',
-      icon: Users,
-      action: () => navigate('/b2b/admin/users'),
-      color: 'bg-blue-50 text-blue-600 border-blue-200'
-    },
-    {
-      title: 'Analytics détaillées',
-      description: 'Rapports et analyses approfondies',
-      icon: BarChart3,
-      action: () => navigate('/b2b/admin/analytics'),
-      color: 'bg-green-50 text-green-600 border-green-200'
-    },
-    {
-      title: 'Paramètres organisation',
-      description: 'Configuration et politiques',
-      icon: Settings,
-      action: () => console.log('Settings'),
-      color: 'bg-purple-50 text-purple-600 border-purple-200'
-    }
+  const upcomingEvents = [
+    { id: 1, title: 'Formation managers bien-être', date: 'Demain 14:00', attendees: 12 },
+    { id: 2, title: 'Session méditation collective', date: 'Jeudi 12:00', attendees: 45 },
+    { id: 3, title: 'Webinar gestion du stress', date: 'Vendredi 16:00', attendees: 67 }
   ];
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'low': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingAnimation text="Chargement de votre tableau de bord administrateur..." />
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex justify-between items-center"
-      >
-        <div>
-          <h1 className="text-3xl font-bold flex items-center">
-            <Shield className="mr-3 h-8 w-8 text-primary" />
-            Dashboard Administrateur
-          </h1>
-          <p className="text-muted-foreground">
-            Vue d'ensemble du bien-être de votre organisation
-          </p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <select 
-            value={selectedPeriod} 
-            onChange={(e) => setSelectedPeriod(e.target.value)}
-            className="px-3 py-2 border rounded-md"
-          >
-            <option value="week">Cette semaine</option>
-            <option value="month">Ce mois</option>
-            <option value="quarter">Ce trimestre</option>
-          </select>
-        </div>
-      </motion.div>
-
-      {/* Main Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {organizationStats.map((stat, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-          >
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    {stat.percentage && (
-                      <Progress value={stat.percentage} className="w-full h-2" />
-                    )}
-                  </div>
-                  <stat.icon className={`h-8 w-8 ${stat.color}`} />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Alerts & Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="space-y-6"
-        >
-          {/* Critical Alerts */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <AlertTriangle className="mr-2 h-5 w-5 text-orange-600" />
-                Alertes Importantes
-              </CardTitle>
-              <CardDescription>Situations nécessitant votre attention</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {recentAlerts.map((alert) => (
-                <div key={alert.id} className={`p-3 rounded-lg border ${getSeverityColor(alert.severity)}`}>
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">{alert.department}</p>
-                      <p className="text-xs mt-1">{alert.message}</p>
-                      <p className="text-xs opacity-75 mt-2">{alert.timestamp}</p>
-                    </div>
-                    <Badge variant="secondary" className="ml-2">
-                      {alert.severity}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-              <Button variant="outline" className="w-full" size="sm">
-                Voir toutes les alertes
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Actions Rapides</CardTitle>
-              <CardDescription>Accès direct aux fonctionnalités d'administration</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {quickActions.map((action, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  className={`w-full justify-start h-auto p-4 ${action.color}`}
-                  onClick={action.action}
-                >
-                  <div className="flex items-center">
-                    <action.icon className="h-5 w-5 mr-3" />
-                    <div className="text-left">
-                      <div className="font-medium">{action.title}</div>
-                      <div className="text-xs opacity-80">{action.description}</div>
-                    </div>
-                  </div>
-                </Button>
-              ))}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Department Overview */}
-        <motion.div
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="lg:col-span-2"
+          className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0"
         >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <BarChart3 className="mr-2 h-5 w-5 text-blue-600" />
-                Aperçu par Département
-              </CardTitle>
-              <CardDescription>Performance et bien-être par équipe</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {departmentData.map((dept) => (
-                  <div key={dept.name} className="p-4 border rounded-lg">
-                    <div className="flex justify-between items-center mb-3">
-                      <div className="flex items-center space-x-3">
-                        <h4 className="font-medium">{dept.name}</h4>
-                        <Badge variant="secondary">{dept.members} membres</Badge>
-                        {dept.alerts > 0 && (
-                          <Badge variant="destructive">{dept.alerts} alerte{dept.alerts > 1 ? 's' : ''}</Badge>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium">Score: {dept.avgScore}%</p>
-                        <p className="text-xs text-muted-foreground">Engagement: {dept.engagement}%</p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Bien-être</p>
-                        <Progress value={dept.avgScore} className="h-2" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Engagement</p>
-                        <Progress value={dept.engagement} className="h-2" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          <div>
+            <h1 className="text-3xl font-light">
+              Tableau de Bord Administrateur
+            </h1>
+            <p className="text-muted-foreground">
+              Pilotez le bien-être de votre organisation • {user?.company || 'Votre entreprise'}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Badge variant="default" className="flex items-center">
+              <Shield className="mr-1 h-3 w-3" />
+              Administrateur
+            </Badge>
+            <Button variant="outline" size="sm">
+              <Download className="mr-2 h-4 w-4" />
+              Exporter rapport
+            </Button>
+          </div>
+        </motion.div>
+
+        {/* Key Metrics */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Collaborateurs</p>
+                  <p className="text-2xl font-bold">{organizationMetrics.totalEmployees}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {organizationMetrics.activeUsers} actifs
+                  </p>
+                </div>
+                <Users className="h-8 w-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Bien-être Moyen</p>
+                  <p className="text-2xl font-bold">{organizationMetrics.averageWellbeing}%</p>
+                  <p className="text-xs text-green-600">+5% ce mois</p>
+                </div>
+                <TrendingUp className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Participation</p>
+                  <p className="text-2xl font-bold">{organizationMetrics.weeklyParticipation}%</p>
+                  <p className="text-xs text-muted-foreground">Cette semaine</p>
+                </div>
+                <Activity className="h-8 w-8 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow border-orange-200">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Alertes</p>
+                  <p className="text-2xl font-bold text-orange-600">{organizationMetrics.criticalAlerts}</p>
+                  <p className="text-xs text-muted-foreground">À traiter</p>
+                </div>
+                <AlertTriangle className="h-8 w-8 text-orange-500" />
               </div>
             </CardContent>
           </Card>
         </motion.div>
-      </div>
 
-      {/* Detailed Analytics Tabs */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle>Analytics Détaillées</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="trends" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="trends">Tendances</TabsTrigger>
-                <TabsTrigger value="engagement">Engagement</TabsTrigger>
-                <TabsTrigger value="wellness">Bien-être</TabsTrigger>
-                <TabsTrigger value="reports">Rapports</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="trends" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <h4 className="font-medium text-blue-900">Progression globale</h4>
-                    <p className="text-2xl font-bold text-blue-600">+12%</p>
-                    <p className="text-sm text-blue-700">vs mois dernier</p>
-                  </div>
-                  <div className="p-4 bg-green-50 rounded-lg">
-                    <h4 className="font-medium text-green-900">Participation active</h4>
-                    <p className="text-2xl font-bold text-green-600">91%</p>
-                    <p className="text-sm text-green-700">des collaborateurs</p>
-                  </div>
-                  <div className="p-4 bg-purple-50 rounded-lg">
-                    <h4 className="font-medium text-purple-900">Satisfaction</h4>
-                    <p className="text-2xl font-bold text-purple-600">4.6/5</p>
-                    <p className="text-sm text-purple-700">note moyenne</p>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="engagement" className="space-y-4">
-                <div className="p-4 border rounded-lg">
-                  <h4 className="font-medium mb-3">Utilisation des fonctionnalités</h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span>Analyses émotionnelles</span>
-                      <div className="flex items-center space-x-2">
-                        <Progress value={85} className="w-24 h-2" />
-                        <span className="text-sm">85%</span>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Charts & Analytics */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Department Overview */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center">
+                      <BarChart3 className="mr-2 h-5 w-5 text-blue-500" />
+                      Vue par Département
+                    </span>
+                    <Button variant="ghost" size="sm">
+                      <Eye className="mr-2 h-4 w-4" />
+                      Détails
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {departmentStats.map((dept, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                          <div>
+                            <div className="font-medium">{dept.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {dept.employees} collaborateurs
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-bold">{dept.wellbeing}%</span>
+                          <div className={`w-2 h-2 rounded-full ${
+                            dept.trend === 'up' ? 'bg-green-500' : 
+                            dept.trend === 'down' ? 'bg-red-500' : 'bg-gray-400'
+                          }`}></div>
+                        </div>
                       </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Absenteeism Chart */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <AbsenteeismChart />
+            </motion.div>
+
+            {/* Quick Actions */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>Actions Administrateur</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
+                      <UserPlus className="h-6 w-6" />
+                      <span>Inviter utilisateurs</span>
+                    </Button>
+                    
+                    <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
+                      <Calendar className="h-6 w-6" />
+                      <span>Planifier événement</span>
+                    </Button>
+                    
+                    <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
+                      <Settings className="h-6 w-6" />
+                      <span>Paramètres org.</span>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
+          {/* Right Column - Alerts & Events */}
+          <div className="space-y-6">
+            {/* Alerts */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Card className="border-orange-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <AlertTriangle className="mr-2 h-5 w-5 text-orange-500" />
+                    Alertes Récentes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {recentAlerts.map((alert) => (
+                    <div key={alert.id} className="p-3 border rounded-lg space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="font-medium text-sm">{alert.department}</div>
+                        <Badge 
+                          variant={alert.severity === 'high' ? 'destructive' : 
+                                  alert.severity === 'medium' ? 'default' : 'secondary'}
+                          className="text-xs"
+                        >
+                          {alert.severity}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {alert.type.replace('_', ' ')}
+                      </div>
+                      <div className="flex items-center text-xs text-muted-foreground">
+                        <Clock className="mr-1 h-3 w-3" />
+                        {alert.time}
+                      </div>
+                      <Button size="sm" variant="outline" className="w-full">
+                        Examiner
+                      </Button>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span>Communauté interne</span>
-                      <div className="flex items-center space-x-2">
-                        <Progress value={72} className="w-24 h-2" />
-                        <span className="text-sm">72%</span>
+                  ))}
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Upcoming Events */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Calendar className="mr-2 h-5 w-5 text-green-500" />
+                    Événements Planifiés
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {upcomingEvents.map((event) => (
+                    <div key={event.id} className="p-3 border rounded-lg space-y-2">
+                      <div className="font-medium text-sm">{event.title}</div>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Clock className="mr-1 h-3 w-3" />
+                        {event.date}
                       </div>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Users className="mr-1 h-3 w-3" />
+                        {event.attendees} inscrits
+                      </div>
+                      <Button size="sm" variant="outline" className="w-full">
+                        Gérer
+                      </Button>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span>Challenges équipe</span>
-                      <div className="flex items-center space-x-2">
-                        <Progress value={68} className="w-24 h-2" />
-                        <span className="text-sm">68%</span>
-                      </div>
-                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Quick Stats */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>Statistiques Rapides</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Nouveaux utilisateurs</span>
+                    <Badge variant="secondary">+12 cette semaine</Badge>
                   </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="wellness" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-3">Répartition des scores</h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-sm">Excellent (80-100%)</span>
-                        <span className="text-sm font-medium">45%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm">Bon (60-79%)</span>
-                        <span className="text-sm font-medium">38%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm">Moyen (40-59%)</span>
-                        <span className="text-sm font-medium">15%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm">Préoccupant (&lt;40%)</span>
-                        <span className="text-sm font-medium">2%</span>
-                      </div>
-                    </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Sessions actives</span>
+                    <Badge variant="secondary">34 en cours</Badge>
                   </div>
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-medium mb-3">Actions recommandées</h4>
-                    <ul className="space-y-2 text-sm">
-                      <li>• Organiser des sessions de team building</li>
-                      <li>• Proposer des ateliers de gestion du stress</li>
-                      <li>• Mettre en place des pauses actives</li>
-                      <li>• Renforcer la communication interne</li>
-                    </ul>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Taux de satisfaction</span>
+                    <Badge variant="secondary">94%</Badge>
                   </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="reports" className="space-y-4">
-                <div className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    Générer rapport mensuel
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
+                  
+                  <Button variant="outline" size="sm" className="w-full">
                     <BarChart3 className="mr-2 h-4 w-4" />
-                    Exporter analytics départements
+                    Rapport détaillé
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <MessageCircle className="mr-2 h-4 w-4" />
-                    Rapport d'engagement équipes
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Target className="mr-2 h-4 w-4" />
-                    Synthèse objectifs bien-être
-                  </Button>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </motion.div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

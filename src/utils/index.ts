@@ -8,3 +8,18 @@ export * from './analytics';
 export * from './modeChangeEmitter';
 export * from './modeSelectionLogger';
 export * from './security';
+export * from './userModeHelpers';
+
+// Add new utility function for user mode display
+export const getUserModeDisplayName = (mode: string | null): string => {
+  switch (mode) {
+    case 'b2c':
+      return 'Particulier';
+    case 'b2b_user':
+      return 'Collaborateur';
+    case 'b2b_admin':
+      return 'Administrateur';
+    default:
+      return 'Non défini';
+  }
+};

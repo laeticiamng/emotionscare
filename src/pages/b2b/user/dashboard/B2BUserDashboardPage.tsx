@@ -1,250 +1,414 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Brain, Users, Calendar, TrendingUp, MessageCircle, Star, Target, Clock } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Building2, 
+  Users, 
+  Heart,
+  TrendingUp, 
+  MessageCircle, 
+  BookOpen,
+  Calendar,
+  Star,
+  Play,
+  BarChart3,
+  Clock,
+  Target,
+  Award
+} from 'lucide-react';
 import { motion } from 'framer-motion';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
 const B2BUserDashboardPage: React.FC = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const [userName] = useState('Alex Martin');
-  const [emotionalScore] = useState(78);
-  const [streakDays] = useState(12);
+  const [isLoading, setIsLoading] = useState(true);
+  const [teamWellbeing, setTeamWellbeing] = useState(72);
+  const [personalScore, setPersonalScore] = useState(78);
   
-  const recentActivities = [
-    { id: 1, type: 'emotion', description: 'Analyse émotionnelle terminée', time: 'Il y a 2h', score: 82 },
-    { id: 2, type: 'social', description: 'Interaction dans la communauté', time: 'Il y a 4h', comments: 3 },
-    { id: 3, type: 'goal', description: 'Objectif de méditation atteint', time: 'Hier', progress: 100 },
-    { id: 4, type: 'scan', description: 'Scanner vocal complété', time: 'Hier', score: 75 }
-  ];
+  useEffect(() => {
+    // Simulate loading data
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const teamStats = [
-    { label: 'Équipe active', value: '24/30', icon: Users, color: 'text-green-600' },
-    { label: 'Score moyen équipe', value: '72%', icon: TrendingUp, color: 'text-blue-600' },
-    { label: 'Défis en cours', value: '3', icon: Target, color: 'text-purple-600' },
-    { label: 'Sessions cette semaine', value: '18', icon: Calendar, color: 'text-orange-600' }
+    { label: 'Équipe', value: teamWellbeing, color: 'text-blue-600' },
+    { label: 'Département', value: 68, color: 'text-green-600' },
+    { label: 'Entreprise', value: 71, color: 'text-purple-600' }
   ];
 
-  const quickActions = [
-    {
-      title: 'Analyse Émotionnelle',
-      description: 'Évaluez votre état émotionnel actuel',
-      icon: Brain,
-      action: () => navigate('/b2b/user/scan'),
-      color: 'bg-blue-50 text-blue-600 border-blue-200'
-    },
-    {
-      title: 'Communauté',
-      description: 'Participez aux discussions d\'équipe',
-      icon: MessageCircle,
-      action: () => navigate('/b2b/user/social'),
-      color: 'bg-green-50 text-green-600 border-green-200'
-    },
-    {
-      title: 'Objectifs',
-      description: 'Suivez vos objectifs de bien-être',
-      icon: Target,
-      action: () => console.log('Objectives'),
-      color: 'bg-purple-50 text-purple-600 border-purple-200'
-    }
+  const recentActivities = [
+    { id: 1, type: 'team_session', title: 'Session d\'équipe', time: 'Il y a 1h', participants: 8 },
+    { id: 2, type: 'wellness_check', title: 'Check-in bien-être', time: 'Ce matin', score: 85 },
+    { id: 3, type: 'peer_support', title: 'Support entre pairs', time: 'Hier', status: 'completed' }
   ];
+
+  const upcomingEvents = [
+    { id: 1, title: 'Méditation en équipe', time: '14:00', type: 'wellness' },
+    { id: 2, title: 'Atelier gestion du stress', time: '16:30', type: 'workshop' },
+    { id: 3, title: 'Check-in hebdomadaire', time: 'Demain 9:00', type: 'checkin' }
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingAnimation text="Chargement de votre espace collaborateur..." />
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Welcome Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex justify-between items-center"
-      >
-        <div>
-          <h1 className="text-3xl font-bold">Bonjour, {userName} 👋</h1>
-          <p className="text-muted-foreground">
-            Voici un aperçu de votre bien-être au travail
-          </p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Badge variant="secondary" className="px-3 py-1">
-            <Star className="w-4 h-4 mr-1" />
-            {streakDays} jours consécutifs
-          </Badge>
-        </div>
-      </motion.div>
-
-      {/* Main Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {teamStats.map((stat, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-          >
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                  </div>
-                  <stat.icon className={`h-8 w-8 ${stat.color}`} />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Emotional Score */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Brain className="mr-2 h-5 w-5 text-blue-600" />
-                Score Émotionnel
-              </CardTitle>
-              <CardDescription>Votre bien-être émotionnel actuel</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-blue-600 mb-2">{emotionalScore}%</div>
-                <Progress value={emotionalScore} className="w-full" />
-              </div>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="text-center p-2 bg-green-50 rounded">
-                  <div className="font-semibold text-green-700">Positif</div>
-                  <div className="text-green-600">65%</div>
-                </div>
-                <div className="text-center p-2 bg-blue-50 rounded">
-                  <div className="font-semibold text-blue-700">Neutre</div>
-                  <div className="text-blue-600">35%</div>
-                </div>
-              </div>
-              <Button className="w-full" onClick={() => navigate('/b2b/user/scan')}>
-                Nouvelle analyse
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Quick Actions */}
-        <motion.div
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0"
         >
-          <Card>
-            <CardHeader>
-              <CardTitle>Actions Rapides</CardTitle>
-              <CardDescription>Accès direct aux fonctionnalités principales</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {quickActions.map((action, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  className={`w-full justify-start h-auto p-4 ${action.color}`}
-                  onClick={action.action}
-                >
-                  <div className="flex items-center">
-                    <action.icon className="h-5 w-5 mr-3" />
-                    <div className="text-left">
-                      <div className="font-medium">{action.title}</div>
-                      <div className="text-xs opacity-80">{action.description}</div>
-                    </div>
-                  </div>
-                </Button>
-              ))}
-            </CardContent>
-          </Card>
+          <div>
+            <h1 className="text-3xl font-light">
+              Espace Collaborateur
+            </h1>
+            <p className="text-muted-foreground">
+              Bienvenue {user?.name} • {user?.company || 'Votre entreprise'}
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Badge variant="secondary" className="flex items-center">
+              <Building2 className="mr-1 h-3 w-3" />
+              Collaborateur
+            </Badge>
+          </div>
         </motion.div>
 
-        {/* Recent Activities */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+        {/* Personal vs Team Overview */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
         >
+          <Card className="border-2 border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Heart className="mr-2 h-5 w-5 text-red-500" />
+                Mon Bien-être
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center space-y-4">
+                <div className="text-4xl font-bold text-primary">{personalScore}%</div>
+                <Progress value={personalScore} className="h-3" />
+                <Button 
+                  onClick={() => navigate('/b2b/user/emotion-check')}
+                  className="w-full"
+                >
+                  <Heart className="mr-2 h-4 w-4" />
+                  Nouvelle analyse
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Clock className="mr-2 h-5 w-5" />
-                Activités Récentes
+                <Users className="mr-2 h-5 w-5 text-blue-500" />
+                Bien-être Collectif
               </CardTitle>
-              <CardDescription>Vos dernières interactions</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{activity.description}</p>
-                    <p className="text-xs text-muted-foreground">{activity.time}</p>
+            <CardContent>
+              <div className="space-y-4">
+                {teamStats.map((stat, index) => (
+                  <div key={index} className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{stat.label}</span>
+                    <div className="flex items-center space-x-2">
+                      <Progress value={stat.value} className="w-20 h-2" />
+                      <span className={`text-sm font-bold ${stat.color}`}>{stat.value}%</span>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    {activity.score && (
-                      <Badge variant="secondary">{activity.score}%</Badge>
-                    )}
-                    {activity.comments && (
-                      <Badge variant="outline">{activity.comments} 💬</Badge>
-                    )}
-                    {activity.progress && (
-                      <Badge variant="default">✅</Badge>
-                    )}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </CardContent>
           </Card>
         </motion.div>
-      </div>
 
-      {/* Team Challenges */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Target className="mr-2 h-5 w-5 text-purple-600" />
-              Défis d'Équipe
-            </CardTitle>
-            <CardDescription>Participez aux challenges de bien-être de votre équipe</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 border rounded-lg">
-                <h4 className="font-medium mb-2">Challenge Méditation</h4>
-                <p className="text-sm text-muted-foreground mb-3">10 minutes par jour pendant 7 jours</p>
-                <Progress value={70} className="mb-2" />
-                <p className="text-xs text-muted-foreground">5/7 jours complétés</p>
-              </div>
-              <div className="p-4 border rounded-lg">
-                <h4 className="font-medium mb-2">Gratitude Quotidienne</h4>
-                <p className="text-sm text-muted-foreground mb-3">Partager 3 points positifs par jour</p>
-                <Progress value={90} className="mb-2" />
-                <p className="text-xs text-muted-foreground">9/10 participants actifs</p>
-              </div>
-              <div className="p-4 border rounded-lg">
-                <h4 className="font-medium mb-2">Pause Active</h4>
-                <p className="text-sm text-muted-foreground mb-3">Prendre 3 pauses conscientes</p>
-                <Progress value={40} className="mb-2" />
-                <p className="text-xs text-muted-foreground">Commence demain</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Activities & Stats */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Quick Actions */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>Actions Rapides</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Button 
+                      variant="outline"
+                      onClick={() => navigate('/b2b/user/emotion-check')}
+                      className="h-auto p-4 flex flex-col items-center space-y-2"
+                    >
+                      <Heart className="h-6 w-6 text-red-500" />
+                      <span>Check-in émotionnel</span>
+                    </Button>
+                    
+                    <Button 
+                      variant="outline"
+                      onClick={() => navigate('/b2b/user/team-activities')}
+                      className="h-auto p-4 flex flex-col items-center space-y-2"
+                    >
+                      <Users className="h-6 w-6 text-blue-500" />
+                      <span>Activités d'équipe</span>
+                    </Button>
+                    
+                    <Button 
+                      variant="outline"
+                      onClick={() => navigate('/b2b/user/peer-support')}
+                      className="h-auto p-4 flex flex-col items-center space-y-2"
+                    >
+                      <MessageCircle className="h-6 w-6 text-green-500" />
+                      <span>Support entre pairs</span>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Recent Activities */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center">
+                      <BarChart3 className="mr-2 h-5 w-5 text-purple-500" />
+                      Activités Récentes
+                    </span>
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/b2b/user/history')}>
+                      Voir tout
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {recentActivities.map((activity) => (
+                      <div key={activity.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-2 h-2 rounded-full bg-primary"></div>
+                          <div>
+                            <div className="font-medium">{activity.title}</div>
+                            <div className="text-sm text-muted-foreground">{activity.time}</div>
+                          </div>
+                        </div>
+                        {activity.participants && (
+                          <Badge variant="secondary">{activity.participants} participants</Badge>
+                        )}
+                        {activity.score && (
+                          <Badge variant="secondary">{activity.score}%</Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Team Insights */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <TrendingUp className="mr-2 h-5 w-5 text-green-500" />
+                    Insights Équipe
+                  </CardTitle>
+                  <CardDescription>
+                    Tendances et observations anonymisées
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-green-50 rounded-lg">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <TrendingUp className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium">Tendance positive</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        L'équipe montre une amélioration de 15% cette semaine
+                      </p>
+                    </div>
+                    
+                    <div className="p-4 bg-blue-50 rounded-lg">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-medium">Cohésion d'équipe</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        85% de participation aux activités collectives
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
+          {/* Right Column - Calendar & Events */}
+          <div className="space-y-6">
+            {/* Upcoming Events */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Calendar className="mr-2 h-5 w-5 text-orange-500" />
+                    Événements
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {upcomingEvents.map((event) => (
+                    <div key={event.id} className="p-3 border rounded-lg space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium text-sm">{event.title}</h4>
+                        <Badge variant="outline" className="text-xs">
+                          {event.type}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Clock className="mr-1 h-3 w-3" />
+                        {event.time}
+                      </div>
+                      <Button size="sm" variant="outline" className="w-full">
+                        Participer
+                      </Button>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Personal Goals */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Target className="mr-2 h-5 w-5 text-purple-500" />
+                    Objectifs Personnels
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Check-ins hebdomadaires</span>
+                        <span>5/7</span>
+                      </div>
+                      <Progress value={71} />
+                    </div>
+                    
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Activités bien-être</span>
+                        <span>3/5</span>
+                      </div>
+                      <Progress value={60} />
+                    </div>
+                    
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Sessions d'équipe</span>
+                        <span>2/3</span>
+                      </div>
+                      <Progress value={67} />
+                    </div>
+                  </div>
+                  
+                  <Button variant="outline" size="sm" className="w-full">
+                    <Award className="mr-2 h-4 w-4" />
+                    Voir mes récompenses
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Resources */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <BookOpen className="mr-2 h-5 w-5 text-indigo-500" />
+                    Ressources
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full justify-start"
+                    onClick={() => navigate('/b2b/user/resources')}
+                  >
+                    <Play className="mr-2 h-4 w-4" />
+                    Exercices guidés
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full justify-start"
+                    onClick={() => navigate('/b2b/user/wellness-library')}
+                  >
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    Bibliothèque bien-être
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full justify-start"
+                    onClick={() => navigate('/b2b/user/support')}
+                  >
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Support & aide
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
