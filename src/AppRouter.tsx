@@ -1,9 +1,11 @@
 
 import React, { Suspense } from 'react';
-import { RouterProvider } from 'react-router-dom';
-import router from './router';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import routes from './router';
 import LoadingAnimation from '@/components/ui/loading-animation';
-import AuthTransition from './components/auth/AuthTransition';
+
+// Create a router instance directly here
+const router = createBrowserRouter(routes);
 
 const AppRouter: React.FC = () => {
   return (
@@ -12,9 +14,7 @@ const AppRouter: React.FC = () => {
         <LoadingAnimation text="Chargement de la page..." />
       </div>
     }>
-      <AuthTransition>
-        <RouterProvider router={router} />
-      </AuthTransition>
+      <RouterProvider router={router} />
     </Suspense>
   );
 };

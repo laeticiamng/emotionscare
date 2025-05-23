@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, RouteObject } from 'react-router-dom';
 import ProtectedLayout from '@/components/ProtectedLayout';
 import Shell from '@/Shell';
+import AuthTransition from './components/auth/AuthTransition';
 
 // Pages publiques
 import LandingPage from '@/pages/LandingPage';
@@ -37,7 +38,7 @@ import ProfilePage from '@/pages/common/ProfilePage';
 import SettingsPage from '@/pages/common/SettingsPage';
 import HelpPage from '@/pages/common/HelpPage';
 
-const router = createBrowserRouter([
+const routes: RouteObject[] = [
   {
     path: '/',
     element: <LandingPage />,
@@ -97,57 +98,93 @@ const router = createBrowserRouter([
           // Routes B2C protégées
           {
             path: 'b2c/dashboard',
-            element: <B2CDashboardPage />,
+            element: 
+              <AuthTransition>
+                <B2CDashboardPage />
+              </AuthTransition>
           },
           {
             path: 'b2c/scan',
-            element: <B2CScanPage />,
+            element: 
+              <AuthTransition>
+                <B2CScanPage />
+              </AuthTransition>
           },
           {
             path: 'b2c/social',
-            element: <B2CSocialPage />,
+            element: 
+              <AuthTransition>
+                <B2CSocialPage />
+              </AuthTransition>
           },
           
           // Routes B2B User protégées
           {
             path: 'b2b/user/dashboard',
-            element: <B2BUserDashboardPage />,
+            element: 
+              <AuthTransition>
+                <B2BUserDashboardPage />
+              </AuthTransition>
           },
           {
             path: 'b2b/user/scan',
-            element: <B2BUserScanPage />,
+            element: 
+              <AuthTransition>
+                <B2BUserScanPage />
+              </AuthTransition>
           },
           {
             path: 'b2b/user/social',
-            element: <B2BUserSocialPage />,
+            element: 
+              <AuthTransition>
+                <B2BUserSocialPage />
+              </AuthTransition>
           },
           
           // Routes B2B Admin protégées
           {
             path: 'b2b/admin/dashboard',
-            element: <B2BAdminDashboardPage />,
+            element: 
+              <AuthTransition>
+                <B2BAdminDashboardPage />
+              </AuthTransition>
           },
           {
             path: 'b2b/admin/analytics',
-            element: <B2BAdminAnalyticsPage />,
+            element: 
+              <AuthTransition>
+                <B2BAdminAnalyticsPage />
+              </AuthTransition>
           },
           {
             path: 'b2b/admin/users',
-            element: <B2BAdminUsersPage />,
+            element: 
+              <AuthTransition>
+                <B2BAdminUsersPage />
+              </AuthTransition>
           },
           
           // Routes communes
           {
             path: 'profile',
-            element: <ProfilePage />,
+            element: 
+              <AuthTransition>
+                <ProfilePage />
+              </AuthTransition>
           },
           {
             path: 'settings',
-            element: <SettingsPage />,
+            element: 
+              <AuthTransition>
+                <SettingsPage />
+              </AuthTransition>
           },
           {
             path: 'help',
-            element: <HelpPage />,
+            element: 
+              <AuthTransition>
+                <HelpPage />
+              </AuthTransition>
           },
         ],
       },
@@ -159,6 +196,6 @@ const router = createBrowserRouter([
     path: '*',
     element: <NotFoundPage />,
   },
-]);
+];
 
-export default router;
+export default routes;
