@@ -1,160 +1,133 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { User, Building, ArrowLeft, Brain, Heart, Users } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Building2, User, ArrowLeft, Brain } from 'lucide-react';
 
 const ChooseModePage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
-      <div className="w-full max-w-4xl space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900 flex items-center justify-center p-6">
+      <div className="w-full max-w-6xl">
         {/* Header */}
-        <div className="text-center space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
           <div className="flex items-center justify-center space-x-2 mb-6">
-            <Brain className="h-8 w-8 text-primary" />
+            <Brain className="h-8 w-8 text-blue-600" />
             <span className="text-2xl font-bold">EmotionsCare</span>
           </div>
           
-          <h1 className="text-4xl font-bold">Choisissez votre mode d'accès</h1>
-          <p className="text-muted-foreground text-lg">
-            Sélectionnez le mode qui correspond le mieux à vos besoins
+          <h1 className="text-4xl md:text-5xl font-light tracking-tight text-slate-900 dark:text-white mb-6">
+            Choisissez votre mode d'accès
+          </h1>
+          <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+            Découvrez l'expérience qui vous correspond le mieux
           </p>
-        </div>
+        </motion.div>
 
         {/* Selection Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* B2C Card */}
-          <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-colors cursor-pointer group">
-            <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-blue-100 group-hover:bg-blue-200 transition-colors">
-                <User className="h-10 w-10 text-blue-600" />
-              </div>
-              <CardTitle className="text-2xl">Particulier</CardTitle>
-              <CardDescription className="text-base">
-                Accès personnel pour améliorer votre bien-être émotionnel
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <h4 className="font-semibold flex items-center gap-2">
-                  <Heart className="h-4 w-4 text-red-500" />
-                  Fonctionnalités incluses :
-                </h4>
-                <ul className="text-sm text-muted-foreground space-y-2 ml-6">
-                  <li>• Scanner émotionnel personnel</li>
-                  <li>• Coach IA 24h/24</li>
-                  <li>• Musicothérapie adaptée</li>
-                  <li>• Journal de bord émotionnel</li>
-                  <li>• Suivi de progression</li>
-                  <li>• Objectifs personnalisés</li>
-                </ul>
-              </div>
-              
-              <div className="pt-4 space-y-3">
-                <Button 
-                  className="w-full text-lg py-6" 
-                  onClick={() => navigate('/b2c/login')}
-                >
-                  Se connecter
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full text-lg py-6"
-                  onClick={() => navigate('/b2c/register')}
-                >
-                  Créer un compte
-                </Button>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          {/* Particuliers Card */}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          >
+            <Card className="h-full border-2 hover:border-blue-300 transition-all duration-300 hover:shadow-xl group cursor-pointer">
+              <CardHeader className="text-center pb-6">
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                  <User className="h-10 w-10 text-blue-600" />
+                </div>
+                <CardTitle className="text-2xl">Particuliers</CardTitle>
+                <CardDescription className="text-lg">
+                  Une parenthèse pour vous. Le luxe de prendre le temps.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-lg">🌱 Votre espace bien-être :</h4>
+                  <ul className="space-y-2 text-slate-600 dark:text-slate-400">
+                    <li>• Moments pour ralentir et vous reconnecter</li>
+                    <li>• Expérience sensorielle élégante et apaisante</li>
+                    <li>• Modules guidés et parcours personnalisés</li>
+                    <li>• Interface sobre, sons doux, lumière choisie</li>
+                    <li>• Cocon digital discret et précieux</li>
+                  </ul>
+                </div>
+                
+                <div className="pt-4">
+                  <Button 
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg"
+                    onClick={() => navigate('/b2c/login')}
+                  >
+                    Commencer mon expérience
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <p className="text-sm font-medium text-green-800">
-                  🎉 3 jours d'essai gratuit
-                </p>
-                <p className="text-xs text-green-600">
-                  Aucune carte de crédit requise
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* B2B Card */}
-          <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-colors cursor-pointer group">
-            <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors">
-                <Building className="h-10 w-10 text-purple-600" />
-              </div>
-              <CardTitle className="text-2xl">Entreprise</CardTitle>
-              <CardDescription className="text-base">
-                Solutions professionnelles pour organisations et équipes
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <h4 className="font-semibold flex items-center gap-2">
-                  <Users className="h-4 w-4 text-purple-500" />
-                  Fonctionnalités avancées :
-                </h4>
-                <ul className="text-sm text-muted-foreground space-y-2 ml-6">
-                  <li>• Gestion d'équipes</li>
-                  <li>• Tableau de bord RH</li>
-                  <li>• Analytics organisationnels</li>
-                  <li>• Rapports de bien-être</li>
-                  <li>• Prévention du burnout</li>
-                  <li>• Support premium</li>
-                </ul>
-              </div>
-              
-              <div className="pt-4">
-                <Button 
-                  className="w-full text-lg py-6" 
-                  onClick={() => navigate('/b2b/selection')}
-                >
-                  Accès Entreprise
-                </Button>
-              </div>
-
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <p className="text-sm font-medium text-purple-800">
-                  💼 Démo personnalisée
-                </p>
-                <p className="text-xs text-purple-600">
-                  Contactez notre équipe commerciale
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Entreprises Card */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+          >
+            <Card className="h-full border-2 hover:border-purple-300 transition-all duration-300 hover:shadow-xl group cursor-pointer">
+              <CardHeader className="text-center pb-6">
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors">
+                  <Building2 className="h-10 w-10 text-purple-600" />
+                </div>
+                <CardTitle className="text-2xl">Entreprises</CardTitle>
+                <CardDescription className="text-lg">
+                  L'énergie partagée au service de l'excellence collective.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-lg">🏢 Solutions professionnelles :</h4>
+                  <ul className="space-y-2 text-slate-600 dark:text-slate-400">
+                    <li>• Élan de se dépasser, envie de s'engager</li>
+                    <li>• Sérénité face à la fatigue et la routine</li>
+                    <li>• Relations humaines vivantes et authentiques</li>
+                    <li>• Accompagnement sur-mesure évolutif</li>
+                    <li>• Énergie collective durable et contagieuse</li>
+                  </ul>
+                </div>
+                
+                <div className="pt-4">
+                  <Button 
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white py-6 text-lg"
+                    onClick={() => navigate('/b2b/selection')}
+                  >
+                    Découvrir nos solutions
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
 
-        {/* Features Comparison */}
-        <div className="bg-muted p-6 rounded-lg">
-          <h3 className="text-lg font-semibold mb-4 text-center">
-            Toutes nos solutions incluent
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <Brain className="h-4 w-4 text-primary" />
-              <span>IA avancée</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Heart className="h-4 w-4 text-red-500" />
-              <span>Données sécurisées</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-blue-500" />
-              <span>Support 24/7</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Building className="h-4 w-4 text-purple-500" />
-              <span>Mises à jour</span>
-            </div>
+        {/* Footer */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 1 }}
+          className="text-center space-y-4"
+        >
+          <div className="bg-slate-100 dark:bg-slate-800 p-6 rounded-xl">
+            <p className="text-sm text-slate-600 dark:text-slate-400 italic">
+              "Le bien-être ne s'explique pas, il se vit. Rejoignez-nous pour explorer une nouvelle vision du bien-être : simple, essentielle, humaine, élégante."
+            </p>
           </div>
-        </div>
-        
-        {/* Back Button */}
-        <div className="text-center">
+          
           <Button 
             variant="ghost" 
             onClick={() => navigate('/')}
@@ -163,7 +136,11 @@ const ChooseModePage: React.FC = () => {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Retour à l'accueil
           </Button>
-        </div>
+          
+          <p className="text-sm text-slate-400 dark:text-slate-500">
+            🌟 Découvrez, vivez, partagez l'expérience émotionnelle. EmotionsCare SASU.
+          </p>
+        </motion.div>
       </div>
     </div>
   );

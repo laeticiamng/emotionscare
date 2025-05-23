@@ -1,20 +1,17 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'b2c' | 'b2b_user' | 'b2b_admin';
-}
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  session: Session | null;
+  loading: boolean;
+  signUp: (email: string, password: string, userData?: any) => Promise<any>;
+  signIn: (email: string, password: string) => Promise<any>;
+  signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<any>;
+  updateProfile: (userData: any) => Promise<any>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,92 +24,95 @@ export const useAuth = () => {
   return context;
 };
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simuler la vérification de l'authentification
-    const checkAuth = async () => {
-      try {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (error) {
-        console.error('Error checking auth:', error);
-      } finally {
-        setIsLoading(false);
-      }
+    // Simulate auth state for demo
+    // TODO: Replace with actual Supabase implementation
+    const initAuth = async () => {
+      setLoading(false);
     };
 
-    checkAuth();
+    initAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      // Simulation d'une connexion
-      const mockUser: User = {
-        id: '1',
+  const signUp = async (email: string, password: string, userData?: any) => {
+    // TODO: Implement Supabase signup with email confirmation and 3-day trial
+    console.log('SignUp:', { email, userData });
+    
+    // Simulate demo account creation
+    if (email.endsWith('@exemple.fr')) {
+      const demoUser = {
+        id: 'demo-user',
         email,
-        name: email.split('@')[0],
-        role: email.includes('admin') ? 'b2b_admin' : email.includes('b2b') ? 'b2b_user' : 'b2c'
+        user_metadata: { ...userData, demo: true }
       };
-      
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
+      setUser(demoUser as User);
+      return { user: demoUser, error: null };
     }
+    
+    // For real accounts, this would integrate with Supabase
+    const newUser = {
+      id: 'real-user-' + Date.now(),
+      email,
+      user_metadata: { ...userData, trial_end: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) }
+    };
+    setUser(newUser as User);
+    return { user: newUser, error: null };
   };
 
-  const register = async (email: string, password: string, name: string) => {
-    setIsLoading(true);
-    try {
-      // Simulation d'une inscription
-      const mockUser: User = {
-        id: Date.now().toString(),
-        email,
-        name,
-        role: 'b2c'
-      };
-      
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-    } catch (error) {
-      console.error('Register error:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+  const signIn = async (email: string, password: string) => {
+    // TODO: Implement Supabase signin
+    console.log('SignIn:', { email });
+    
+    const mockUser = {
+      id: email.endsWith('@exemple.fr') ? 'demo-user' : 'real-user-' + Date.now(),
+      email,
+      user_metadata: { demo: email.endsWith('@exemple.fr') }
+    };
+    setUser(mockUser as User);
+    return { user: mockUser, error: null };
   };
 
-  const logout = () => {
+  const signOut = async () => {
+    // TODO: Implement Supabase signout
     setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('userMode');
+    setSession(null);
   };
 
-  const value: AuthContextType = {
+  const logout = async () => {
+    await signOut();
+  };
+
+  const resetPassword = async (email: string) => {
+    // TODO: Implement Supabase password reset
+    console.log('Reset password for:', email);
+    return { error: null };
+  };
+
+  const updateProfile = async (userData: any) => {
+    // TODO: Implement Supabase profile update
+    console.log('Update profile:', userData);
+    if (user) {
+      setUser({ ...user, user_metadata: { ...user.user_metadata, ...userData } });
+    }
+    return { error: null };
+  };
+
+  const value = {
     user,
-    isAuthenticated: !!user,
-    isLoading,
-    login,
-    logout,
-    register
+    session,
+    loading,
+    signUp,
+    signIn,
+    signOut,
+    resetPassword,
+    updateProfile,
+    logout
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

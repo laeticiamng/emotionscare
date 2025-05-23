@@ -1,273 +1,162 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { User, Mail, Building, Save, Loader2 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { User, Mail, Phone, MapPin, Calendar } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
-  const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
-  const [profile, setProfile] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    company: '',
-    job_title: '',
-    department: '',
-    bio: '',
-    notifications_enabled: true,
-    email_notifications: true
-  });
-
-  useEffect(() => {
-    if (user) {
-      loadProfile();
-    }
-  }, [user]);
-
-  const loadProfile = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') throw error;
-
-      if (data) {
-        setProfile({
-          name: data.name || user.name || '',
-          email: data.email || user.email || '',
-          company: data.department || '',
-          job_title: data.job_title || '',
-          department: data.department || '',
-          bio: '',
-          notifications_enabled: data.preferences?.notifications_enabled ?? true,
-          email_notifications: data.preferences?.email_notifications ?? true
-        });
-      }
-    } catch (error) {
-      console.error('Profile loading error:', error);
-    }
-  };
-
-  const handleSave = async () => {
-    if (!user) return;
-
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          name: profile.name,
-          email: profile.email,
-          job_title: profile.job_title,
-          department: profile.department,
-          preferences: {
-            notifications_enabled: profile.notifications_enabled,
-            email_notifications: profile.email_notifications
-          }
-        });
-
-      if (error) throw error;
-
-      toast.success('Profil mis à jour avec succès');
-    } catch (error) {
-      console.error('Profile save error:', error);
-      toast.error('Erreur lors de la sauvegarde');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setProfile(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
   return (
-    <div className="container mx-auto p-6 max-w-4xl space-y-6">
-      <div className="flex items-center gap-2 mb-6">
-        <User className="h-6 w-6 text-primary" />
-        <h1 className="text-3xl font-bold">Mon Profil</h1>
-      </div>
+    <div className="container mx-auto px-6 py-8">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="max-w-4xl mx-auto"
+      >
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-4">Mon Profil</h1>
+          <p className="text-slate-600 dark:text-slate-400">
+            Gérez vos informations personnelles et préférences
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Informations personnelles */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Informations Personnelles</CardTitle>
-              <CardDescription>
-                Gérez vos informations de profil
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Nom complet</Label>
-                  <Input
-                    id="name"
-                    value={profile.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder="Votre nom"
-                  />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Profile Picture & Basic Info */}
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader className="text-center">
+                <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                  JD
                 </div>
-                
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={profile.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="votre@email.com"
-                  />
+                <CardTitle>John Doe</CardTitle>
+                <CardDescription>john.doe@example.com</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full mb-4">
+                  Changer la photo
+                </Button>
+                <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Membre depuis mars 2024
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Paris, France
+                  </div>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
+          </div>
 
-              {user?.role !== 'b2c' && (
+          {/* Profile Form */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Informations personnelles</CardTitle>
+                <CardDescription>
+                  Mettez à jour vos informations de profil
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="job_title">Poste</Label>
-                    <Input
-                      id="job_title"
-                      value={profile.job_title}
-                      onChange={(e) => handleInputChange('job_title', e.target.value)}
-                      placeholder="Votre poste"
-                    />
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">Prénom</Label>
+                    <Input id="firstName" defaultValue="John" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Nom</Label>
+                    <Input id="lastName" defaultValue="Doe" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" defaultValue="john.doe@example.com" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Téléphone</Label>
+                  <Input id="phone" type="tel" defaultValue="+33 1 23 45 67 89" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="location">Localisation</Label>
+                  <Input id="location" defaultValue="Paris, France" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bio">Biographie</Label>
+                  <textarea
+                    id="bio"
+                    className="w-full p-3 border border-slate-300 dark:border-slate-600 rounded-md bg-white dark:bg-slate-800"
+                    rows={4}
+                    placeholder="Parlez-nous de vous..."
+                    defaultValue="Passionné par le bien-être et le développement personnel."
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-4">
+                  <Button variant="outline">Annuler</Button>
+                  <Button>Sauvegarder</Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Preferences */}
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>Préférences</CardTitle>
+                <CardDescription>
+                  Personnalisez votre expérience EmotionsCare
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Notifications email</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        Recevoir des notifications par email
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      Configurer
+                    </Button>
                   </div>
                   
-                  <div>
-                    <Label htmlFor="department">Département</Label>
-                    <Input
-                      id="department"
-                      value={profile.department}
-                      onChange={(e) => handleInputChange('department', e.target.value)}
-                      placeholder="Votre département"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div>
-                <Label htmlFor="bio">Bio (optionnel)</Label>
-                <Textarea
-                  id="bio"
-                  value={profile.bio}
-                  onChange={(e) => handleInputChange('bio', e.target.value)}
-                  placeholder="Parlez-nous un peu de vous..."
-                  rows={3}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Préférences */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Préférences</CardTitle>
-              <CardDescription>
-                Personnalisez votre expérience EmotionsCare
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label>Notifications en temps réel</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Recevoir des notifications pour les analyses et recommandations
-                  </p>
-                </div>
-                <Switch
-                  checked={profile.notifications_enabled}
-                  onCheckedChange={(checked) => handleInputChange('notifications_enabled', checked)}
-                />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label>Notifications par email</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Recevoir des résumés et rappels par email
-                  </p>
-                </div>
-                <Switch
-                  checked={profile.email_notifications}
-                  onCheckedChange={(checked) => handleInputChange('email_notifications', checked)}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Avatar et infos */}
-          <Card>
-            <CardContent className="pt-6 text-center">
-              <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="h-12 w-12 text-primary" />
-              </div>
-              <h3 className="font-semibold">{profile.name || 'Nom non défini'}</h3>
-              <p className="text-sm text-muted-foreground">{profile.email}</p>
-              {profile.job_title && (
-                <p className="text-sm text-muted-foreground mt-1">{profile.job_title}</p>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <Card>
-            <CardContent className="pt-6 space-y-4">
-              <Button 
-                onClick={handleSave} 
-                disabled={isLoading}
-                className="w-full"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Sauvegarde...
-                  </>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Sauvegarder
-                  </>
-                )}
-              </Button>
-
-              <div className="pt-4 border-t">
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    <span>Compte vérifié</span>
-                  </div>
-                  {user?.role !== 'b2c' && (
-                    <div className="flex items-center gap-2">
-                      <Building className="h-4 w-4" />
-                      <span>Compte entreprise</span>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Rappels de bien-être</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        Notifications pour vos sessions
+                      </p>
                     </div>
-                  )}
+                    <Button variant="outline" size="sm">
+                      Configurer
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Partage de données</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        Autoriser l'amélioration des services
+                      </p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      Gérer
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

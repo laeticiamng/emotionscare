@@ -1,440 +1,170 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Heart, 
-  TrendingUp, 
-  Calendar, 
-  Target, 
-  Brain,
-  Music,
-  MessageCircle,
-  Camera,
-  Award,
-  Smile,
-  Frown,
-  Meh
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import LoadingAnimation from '@/components/ui/loading-animation';
-
-interface DashboardStats {
-  emotionalScore: number;
-  weeklyProgress: number;
-  streakDays: number;
-  totalScans: number;
-  lastScanDate: string;
-  mood: 'positive' | 'neutral' | 'negative';
-}
-
-interface RecentActivity {
-  id: string;
-  type: 'scan' | 'chat' | 'music' | 'journal';
-  title: string;
-  timestamp: Date;
-  score?: number;
-}
+import { useNavigate } from 'react-router-dom';
+import { Brain, Music, Scan, MessageSquare, FileText, Target, Calendar, Heart } from 'lucide-react';
 
 const B2CDashboardPage: React.FC = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (user) {
-      loadDashboardData();
+  const modules = [
+    {
+      title: 'Scanner émotions',
+      description: 'Analysez vos émotions en temps réel',
+      icon: Scan,
+      path: '/scan',
+      color: 'bg-blue-500'
+    },
+    {
+      title: 'Coach IA',
+      description: 'Votre accompagnement personnalisé',
+      icon: MessageSquare,
+      path: '/coach',
+      color: 'bg-green-500'
+    },
+    {
+      title: 'Musicothérapie',
+      description: 'Musiques adaptées à vos émotions',
+      icon: Music,
+      path: '/music',
+      color: 'bg-purple-500'
+    },
+    {
+      title: 'Journal',
+      description: 'Vos réflexions et évolutions',
+      icon: FileText,
+      path: '/journal',
+      color: 'bg-orange-500'
     }
-  }, [user]);
-
-  const loadDashboardData = async () => {
-    if (!user) return;
-    
-    try {
-      setIsLoading(true);
-
-      // Simuler le chargement des données
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Données simulées pour la démo
-      const mockStats: DashboardStats = {
-        emotionalScore: Math.floor(Math.random() * 40) + 60,
-        weeklyProgress: Math.floor(Math.random() * 20) + 5,
-        streakDays: Math.floor(Math.random() * 10) + 1,
-        totalScans: Math.floor(Math.random() * 50) + 10,
-        lastScanDate: new Date().toISOString(),
-        mood: 'positive'
-      };
-
-      setStats(mockStats);
-
-      // Activités récentes simulées
-      const mockActivities: RecentActivity[] = [
-        {
-          id: '1',
-          type: 'scan',
-          title: 'Scan émotionnel matinal',
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-          score: 75
-        },
-        {
-          id: '2',
-          type: 'music',
-          title: 'Session de relaxation',
-          timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000)
-        },
-        {
-          id: '3',
-          type: 'chat',
-          title: 'Conversation avec le coach IA',
-          timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000)
-        }
-      ];
-
-      setRecentActivities(mockActivities);
-
-    } catch (error) {
-      console.error('Dashboard data loading error:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les données du tableau de bord",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <LoadingAnimation text="Chargement de votre tableau de bord..." />
-      </div>
-    );
-  }
-
-  const getMoodIcon = (mood: string) => {
-    switch (mood) {
-      case 'positive': return <Smile className="h-5 w-5 text-green-500" />;
-      case 'negative': return <Frown className="h-5 w-5 text-red-500" />;
-      default: return <Meh className="h-5 w-5 text-yellow-500" />;
-    }
-  };
-
-  const getMoodColor = (mood: string) => {
-    switch (mood) {
-      case 'positive': return 'text-green-600 bg-green-50';
-      case 'negative': return 'text-red-600 bg-red-50';
-      default: return 'text-yellow-600 bg-yellow-50';
-    }
-  };
+  ];
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Welcome Section */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">
-            Bonjour {user?.name || 'Utilisateur'} !
-          </h1>
-          <p className="text-muted-foreground">
-            Voici un aperçu de votre bien-être émotionnel
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {stats && getMoodIcon(stats.mood)}
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getMoodColor(stats?.mood || 'neutral')}`}>
-            Humeur {stats?.mood === 'positive' ? 'positive' : stats?.mood === 'negative' ? 'difficile' : 'neutre'}
-          </span>
-        </div>
-      </div>
-
-      {/* Quick Stats */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Score Émotionnel</CardTitle>
-              <Heart className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.emotionalScore}/100</div>
-              <Progress value={stats.emotionalScore} className="mt-2" />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Progression</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">+{stats.weeklyProgress}%</div>
-              <p className="text-xs text-muted-foreground">Cette semaine</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Série</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.streakDays}</div>
-              <p className="text-xs text-muted-foreground">jours consécutifs</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Scans</CardTitle>
-              <Brain className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalScans}</div>
-              <p className="text-xs text-muted-foreground">analyses réalisées</p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Main Content */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview">Aperçu</TabsTrigger>
-          <TabsTrigger value="scan">Scanner IA</TabsTrigger>
-          <TabsTrigger value="coach">Coach IA</TabsTrigger>
-          <TabsTrigger value="music">Musique</TabsTrigger>
-          <TabsTrigger value="goals">Objectifs</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Recent Activities */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Activités Récentes</CardTitle>
-                <CardDescription>Vos dernières interactions avec EmotionsCare</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentActivities.length > 0 ? (
-                    recentActivities.map((activity) => (
-                      <div key={activity.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                            {activity.type === 'scan' && <Brain className="h-4 w-4 text-primary" />}
-                            {activity.type === 'chat' && <MessageCircle className="h-4 w-4 text-primary" />}
-                            {activity.type === 'music' && <Music className="h-4 w-4 text-primary" />}
-                          </div>
-                          <div>
-                            <p className="font-medium">{activity.title}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {activity.timestamp.toLocaleDateString()} à {activity.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                            </p>
-                          </div>
-                        </div>
-                        {activity.score && (
-                          <Badge variant="outline">
-                            Score: {activity.score}
-                          </Badge>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-8">
-                      <Camera className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground">Aucune activité récente</p>
-                      <p className="text-sm text-muted-foreground">Commencez par faire un scan émotionnel</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Actions Rapides</CardTitle>
-                <CardDescription>Accédez rapidement à vos outils favoris</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <Button 
-                    variant="outline" 
-                    className="h-20 flex flex-col gap-2"
-                    onClick={() => setActiveTab('scan')}
-                  >
-                    <Brain className="h-6 w-6" />
-                    Scan Émotionnel
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="h-20 flex flex-col gap-2"
-                    onClick={() => setActiveTab('coach')}
-                  >
-                    <MessageCircle className="h-6 w-6" />
-                    Coach IA
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="h-20 flex flex-col gap-2"
-                    onClick={() => setActiveTab('music')}
-                  >
-                    <Music className="h-6 w-6" />
-                    Musique Thérapie
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="h-20 flex flex-col gap-2"
-                    onClick={() => setActiveTab('goals')}
-                  >
-                    <Target className="h-6 w-6" />
-                    Mes Objectifs
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900">
+      <div className="container mx-auto px-6 py-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <div className="flex items-center justify-center space-x-2 mb-6">
+            <Brain className="h-8 w-8 text-blue-600" />
+            <span className="text-2xl font-bold">EmotionsCare</span>
           </div>
-        </TabsContent>
+          
+          <h1 className="text-4xl font-light tracking-tight text-slate-900 dark:text-white mb-4">
+            Bienvenue dans votre espace bien-être
+          </h1>
+          <p className="text-xl text-slate-600 dark:text-slate-300">
+            Une parenthèse pour vous. Le luxe de prendre le temps.
+          </p>
+        </motion.div>
 
-        <TabsContent value="scan">
+        {/* Quick Stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12"
+        >
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Brain className="h-5 w-5" />
-                Scanner Émotionnel IA
-              </CardTitle>
-              <CardDescription>Analysez votre état émotionnel actuel</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <Brain className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Scanner Émotionnel</h3>
-                <p className="text-muted-foreground mb-6">
-                  Utilisez notre IA avancée pour analyser votre état émotionnel
-                </p>
-                <Button>
-                  Commencer le scan
-                </Button>
+            <CardContent className="flex items-center p-6">
+              <Heart className="h-8 w-8 text-red-500 mr-4" />
+              <div>
+                <p className="text-2xl font-bold">8.2/10</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Bien-être moyen</p>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="coach">
+          
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageCircle className="h-5 w-5" />
-                Coach IA Personnel
-              </CardTitle>
-              <CardDescription>Obtenez des conseils personnalisés pour votre bien-être</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <MessageCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Coach IA</h3>
-                <p className="text-muted-foreground mb-6">
-                  Discutez avec votre coach personnel pour améliorer votre bien-être
-                </p>
-                <Button>
-                  Démarrer une conversation
-                </Button>
+            <CardContent className="flex items-center p-6">
+              <Target className="h-8 w-8 text-green-500 mr-4" />
+              <div>
+                <p className="text-2xl font-bold">12</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Sessions cette semaine</p>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="music">
+          
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Music className="h-5 w-5" />
-                Musique Thérapie
-              </CardTitle>
-              <CardDescription>Musique adaptée à votre état émotionnel</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <Music className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Musique Thérapie</h3>
-                <p className="text-muted-foreground mb-6">
-                  Découvrez des playlists personnalisées pour votre bien-être
-                </p>
-                <Button>
-                  Explorer la musique
-                </Button>
+            <CardContent className="flex items-center p-6">
+              <Calendar className="h-8 w-8 text-blue-500 mr-4" />
+              <div>
+                <p className="text-2xl font-bold">7</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Jours consécutifs</p>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="goals" className="space-y-6">
+          
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5" />
-                Mes Objectifs de Bien-être
-              </CardTitle>
-              <CardDescription>Suivez vos progrès vers un meilleur équilibre émotionnel</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Réduire le stress quotidien</h4>
-                      <p className="text-sm text-muted-foreground">Objectif: Score de stress {"<"} 30</p>
-                    </div>
-                    <Badge className="bg-yellow-100 text-yellow-800">En cours</Badge>
+            <CardContent className="flex items-center p-6">
+              <Music className="h-8 w-8 text-purple-500 mr-4" />
+              <div>
+                <p className="text-2xl font-bold">45min</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Musicothérapie</p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Modules Grid */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
+        >
+          {modules.map((module, index) => (
+            <motion.div
+              key={module.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 + index * 0.1, duration: 0.8 }}
+            >
+              <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                <CardHeader>
+                  <div className={`w-12 h-12 ${module.color} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <module.icon className="h-6 w-6 text-white" />
                   </div>
-                  <Progress value={65} className="w-full" />
-                  <p className="text-sm text-muted-foreground">65% accompli</p>
-                </div>
+                  <CardTitle className="text-xl">{module.title}</CardTitle>
+                  <CardDescription>{module.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    className="w-full"
+                    onClick={() => navigate(module.path)}
+                  >
+                    Commencer
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Améliorer mon humeur</h4>
-                      <p className="text-sm text-muted-foreground">Objectif: 7 jours consécutifs positifs</p>
-                    </div>
-                    <Badge className="bg-blue-100 text-blue-800">En cours</Badge>
-                  </div>
-                  <Progress value={43} className="w-full" />
-                  <p className="text-sm text-muted-foreground">43% accompli</p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Pratique régulière</h4>
-                      <p className="text-sm text-muted-foreground">Objectif: 30 scans émotionnels</p>
-                    </div>
-                    <Badge className="bg-green-100 text-green-800">
-                      <Award className="h-3 w-3 mr-1" />
-                      Accompli
-                    </Badge>
-                  </div>
-                  <Progress value={100} className="w-full" />
-                  <p className="text-sm text-muted-foreground">Félicitations ! Objectif atteint</p>
-                </div>
-              </div>
+        {/* Daily Inspiration */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1, duration: 0.8 }}
+        >
+          <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-0">
+            <CardContent className="p-8 text-center">
+              <h3 className="text-xl font-semibold mb-4">Inspiration du jour</h3>
+              <p className="text-lg italic text-slate-700 dark:text-slate-300 mb-6">
+                "Le bien-être ne s'explique pas, il se vit. Chaque respiration compte."
+              </p>
+              <Button variant="outline" onClick={() => navigate('/coach')}>
+                Découvrir plus d'inspirations
+              </Button>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </motion.div>
+      </div>
     </div>
   );
 };

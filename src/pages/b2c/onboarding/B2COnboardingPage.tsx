@@ -1,314 +1,148 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Heart, Target, Smile, ChevronRight, CheckCircle } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-
-interface OnboardingData {
-  goals: string[];
-  emotionalNeeds: string;
-  preferredActivities: string[];
-  personalInfo: {
-    age?: number;
-    occupation?: string;
-  };
-}
+import { Brain, Heart, Music, Target, CheckCircle } from 'lucide-react';
 
 const B2COnboardingPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [onboardingData, setOnboardingData] = useState<OnboardingData>({
-    goals: [],
-    emotionalNeeds: '',
-    preferredActivities: [],
-    personalInfo: {}
-  });
-
+  const [step, setStep] = useState(1);
   const totalSteps = 4;
-  const progress = ((currentStep + 1) / totalSteps) * 100;
-
-  const goals = [
-    'Réduire le stress',
-    'Améliorer mon humeur',
-    'Mieux comprendre mes émotions',
-    'Développer la résilience',
-    'Améliorer mes relations',
-    'Gérer l\'anxiété'
-  ];
-
-  const activities = [
-    'Méditation guidée',
-    'Exercices de respiration',
-    'Musicothérapie',
-    'Journal émotionnel',
-    'Coaching IA',
-    'Exercices de pleine conscience'
-  ];
-
-  const handleGoalToggle = (goal: string) => {
-    setOnboardingData(prev => ({
-      ...prev,
-      goals: prev.goals.includes(goal)
-        ? prev.goals.filter(g => g !== goal)
-        : [...prev.goals, goal]
-    }));
-  };
-
-  const handleActivityToggle = (activity: string) => {
-    setOnboardingData(prev => ({
-      ...prev,
-      preferredActivities: prev.preferredActivities.includes(activity)
-        ? prev.preferredActivities.filter(a => a !== activity)
-        : [...prev.preferredActivities, activity]
-    }));
-  };
-
-  const completeOnboarding = async () => {
-    if (!user) return;
-
-    setIsLoading(true);
-    try {
-      // Sauvegarder les données d'onboarding
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          preferences: {
-            ...onboardingData,
-            onboarded: true,
-            trial_end_date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
-          }
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      toast.success('Onboarding terminé ! Bienvenue sur EmotionsCare');
-      navigate('/b2c/dashboard');
-    } catch (error) {
-      console.error('Onboarding completion error:', error);
-      toast.error('Erreur lors de la finalisation de l\'onboarding');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const nextStep = () => {
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep(currentStep + 1);
+    if (step < totalSteps) {
+      setStep(step + 1);
     } else {
-      completeOnboarding();
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+      navigate('/b2c/dashboard');
     }
   };
 
   const renderStep = () => {
-    switch (currentStep) {
-      case 0:
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <Heart className="h-16 w-16 text-primary mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Bienvenue sur EmotionsCare</h2>
-              <p className="text-muted-foreground">
-                Nous allons personnaliser votre expérience en quelques étapes simples
-              </p>
-            </div>
-            
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h3 className="font-semibold text-blue-900 mb-2">🎁 Période d'essai gratuite</h3>
-              <p className="text-blue-800 text-sm">
-                Profitez de 3 jours gratuits pour découvrir toutes nos fonctionnalités premium !
-              </p>
-            </div>
-          </div>
-        );
-
+    switch (step) {
       case 1:
         return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <Target className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h2 className="text-xl font-bold mb-2">Quels sont vos objectifs ?</h2>
-              <p className="text-muted-foreground">
-                Sélectionnez ce que vous aimeriez améliorer (plusieurs choix possibles)
-              </p>
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-center space-y-6"
+          >
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-blue-100">
+              <Brain className="h-10 w-10 text-blue-600" />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {goals.map((goal) => (
-                <Button
-                  key={goal}
-                  variant={onboardingData.goals.includes(goal) ? "default" : "outline"}
-                  className="h-auto p-4 text-left justify-start"
-                  onClick={() => handleGoalToggle(goal)}
-                >
-                  {onboardingData.goals.includes(goal) && (
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                  )}
-                  {goal}
-                </Button>
-              ))}
-            </div>
-          </div>
+            <h2 className="text-2xl font-bold">Bienvenue sur EmotionsCare</h2>
+            <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+              Votre parcours bien-être commence ici. Nous allons personnaliser votre expérience 
+              pour qu'elle corresponde parfaitement à vos besoins.
+            </p>
+          </motion.div>
         );
-
+      
       case 2:
         return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <Smile className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h2 className="text-xl font-bold mb-2">Quelles activités vous intéressent ?</h2>
-              <p className="text-muted-foreground">
-                Choisissez les outils que vous aimeriez utiliser
-              </p>
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-center space-y-6"
+          >
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
+              <Heart className="h-10 w-10 text-green-600" />
             </div>
-
-            <div className="grid grid-cols-1 gap-3">
-              {activities.map((activity) => (
-                <Button
-                  key={activity}
-                  variant={onboardingData.preferredActivities.includes(activity) ? "default" : "outline"}
-                  className="h-auto p-4 text-left justify-start"
-                  onClick={() => handleActivityToggle(activity)}
-                >
-                  {onboardingData.preferredActivities.includes(activity) && (
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                  )}
-                  {activity}
-                </Button>
-              ))}
-            </div>
-          </div>
+            <h2 className="text-2xl font-bold">Votre état émotionnel</h2>
+            <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+              Comment vous sentez-vous généralement ? Cette information nous aide 
+              à adapter nos recommandations à votre profil émotionnel.
+            </p>
+          </motion.div>
         );
-
+      
       case 3:
         return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-xl font-bold mb-2">Parlez-nous de vous</h2>
-              <p className="text-muted-foreground">
-                Ces informations nous aident à personnaliser votre expérience
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-center space-y-6"
+          >
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-purple-100">
+              <Music className="h-10 w-10 text-purple-600" />
+            </div>
+            <h2 className="text-2xl font-bold">Vos préférences</h2>
+            <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+              Quels types d'activités de bien-être vous intéressent le plus ? 
+              Musique, méditation, coaching, journal personnel...
+            </p>
+          </motion.div>
+        );
+      
+      case 4:
+        return (
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-center space-y-6"
+          >
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
+              <CheckCircle className="h-10 w-10 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold">Tout est prêt !</h2>
+            <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+              Votre profil est configuré. Vous pouvez maintenant accéder à votre 
+              espace personnel et commencer votre parcours bien-être.
+            </p>
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                🎉 Vous bénéficiez de 3 jours d'essai gratuit pour découvrir toutes nos fonctionnalités !
               </p>
             </div>
-
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="age">Âge (optionnel)</Label>
-                <Input
-                  id="age"
-                  type="number"
-                  value={onboardingData.personalInfo.age || ''}
-                  onChange={(e) => setOnboardingData(prev => ({
-                    ...prev,
-                    personalInfo: {
-                      ...prev.personalInfo,
-                      age: parseInt(e.target.value) || undefined
-                    }
-                  }))}
-                  placeholder="Votre âge"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="occupation">Profession (optionnel)</Label>
-                <Input
-                  id="occupation"
-                  value={onboardingData.personalInfo.occupation || ''}
-                  onChange={(e) => setOnboardingData(prev => ({
-                    ...prev,
-                    personalInfo: {
-                      ...prev.personalInfo,
-                      occupation: e.target.value
-                    }
-                  }))}
-                  placeholder="Votre profession"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="needs">Qu'aimeriez-vous améliorer en priorité ? (optionnel)</Label>
-                <Textarea
-                  id="needs"
-                  value={onboardingData.emotionalNeeds}
-                  onChange={(e) => setOnboardingData(prev => ({
-                    ...prev,
-                    emotionalNeeds: e.target.value
-                  }))}
-                  placeholder="Décrivez vos besoins et attentes..."
-                  rows={3}
-                />
-              </div>
-            </div>
-          </div>
+          </motion.div>
         );
-
+      
       default:
         return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <CardTitle>Configuration de votre profil</CardTitle>
-              <span className="text-sm text-muted-foreground">
-                {currentStep + 1} / {totalSteps}
-              </span>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900 flex items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="w-full max-w-2xl"
+      >
+        <Card className="shadow-xl border-0">
+          <CardHeader className="text-center space-y-4">
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <Brain className="h-8 w-8 text-blue-600" />
+              <span className="text-2xl font-bold">EmotionsCare</span>
             </div>
-            <Progress value={progress} className="w-full" />
-          </div>
-        </CardHeader>
-
-        <CardContent className="pt-6">
-          {renderStep()}
-
-          <div className="flex justify-between mt-8">
-            <Button
-              variant="outline"
-              onClick={prevStep}
-              disabled={currentStep === 0}
-            >
-              Précédent
-            </Button>
-
-            <Button
-              onClick={nextStep}
-              disabled={isLoading}
-              className="min-w-[120px]"
-            >
-              {isLoading ? (
-                'Finalisation...'
-              ) : currentStep === totalSteps - 1 ? (
-                'Terminer'
-              ) : (
-                <>
-                  Suivant
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </>
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="space-y-2">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Étape {step} sur {totalSteps}
+              </p>
+              <Progress value={(step / totalSteps) * 100} className="w-full" />
+            </div>
+          </CardHeader>
+          <CardContent className="px-8 pb-8">
+            {renderStep()}
+            
+            <div className="flex justify-between mt-8">
+              <Button 
+                variant="outline" 
+                onClick={() => setStep(Math.max(1, step - 1))}
+                disabled={step === 1}
+              >
+                Précédent
+              </Button>
+              <Button onClick={nextStep}>
+                {step === totalSteps ? 'Commencer' : 'Suivant'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };

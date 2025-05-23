@@ -1,129 +1,102 @@
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Camera, CheckCircle2 } from 'lucide-react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { toast } from 'sonner';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Scan, Mic, Type, Camera } from 'lucide-react';
 
 const ScanPage: React.FC = () => {
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanComplete, setScanComplete] = useState(false);
-  const [scanResult, setScanResult] = useState<string | null>(null);
-  
-  const startScan = async () => {
-    setIsScanning(true);
-    setScanComplete(false);
-    setScanResult(null);
-    
-    try {
-      // Simuler un processus de scan
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      // Génération d'un résultat aléatoire
-      const emotions = ['Calme', 'Joie', 'Sérénité', 'Fatigue', 'Stress léger', 'Optimisme'];
-      const randomEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      
-      setScanResult(randomEmotion);
-      setScanComplete(true);
-      toast.success('Scan émotionnel terminé');
-      
-    } catch (error) {
-      console.error('Erreur lors du scan:', error);
-      toast.error('Erreur lors du scan émotionnel');
-    } finally {
-      setIsScanning(false);
+  const scanMethods = [
+    {
+      title: 'Scan vocal',
+      description: 'Analysez vos émotions par la voix',
+      icon: Mic,
+      color: 'bg-blue-500'
+    },
+    {
+      title: 'Scan textuel',
+      description: 'Exprimez vos ressentis par écrit',
+      icon: Type,
+      color: 'bg-green-500'
+    },
+    {
+      title: 'Scan visuel',
+      description: 'Expression faciale et gestuelle',
+      icon: Camera,
+      color: 'bg-purple-500'
     }
-  };
-  
-  const resetScan = () => {
-    setScanComplete(false);
-    setScanResult(null);
-  };
-  
+  ];
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-background to-muted/20">
-      <h1 className="text-3xl font-bold mb-8 text-center">Scan émotionnel</h1>
-      
-      <Card className="max-w-md w-full overflow-hidden">
-        <CardContent className="p-0">
-          <div className="bg-primary/10 h-64 flex items-center justify-center">
-            {isScanning ? (
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-                className="text-primary"
-              >
-                <Loader2 className="h-16 w-16 animate-spin" />
-              </motion.div>
-            ) : scanComplete ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center"
-              >
-                <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-4" />
-                <h2 className="text-2xl font-medium">Résultat du scan</h2>
-                <p className="text-lg mt-2">État émotionnel détecté: <strong>{scanResult}</strong></p>
-              </motion.div>
-            ) : (
-              <div className="text-center p-6">
-                <Camera className="h-16 w-16 text-primary mx-auto mb-4" />
-                <p className="text-muted-foreground">
-                  Prêt à analyser votre état émotionnel actuel. Cliquez sur le bouton ci-dessous pour commencer le scan.
-                </p>
+    <div className="container mx-auto px-6 py-8">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-center mb-12"
+      >
+        <Scan className="h-16 w-16 text-blue-600 mx-auto mb-6" />
+        <h1 className="text-4xl font-bold mb-4">Scanner émotionnel</h1>
+        <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+          Analysez vos émotions en temps réel avec notre IA avancée
+        </p>
+      </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        {scanMethods.map((method, index) => (
+          <motion.div
+            key={method.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + index * 0.1, duration: 0.8 }}
+          >
+            <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group">
+              <CardHeader className="text-center">
+                <div className={`w-16 h-16 ${method.color} rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}>
+                  <method.icon className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle>{method.title}</CardTitle>
+                <CardDescription>{method.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full">
+                  Commencer le scan
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.8 }}
+      >
+        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-0">
+          <CardContent className="p-8 text-center">
+            <h3 className="text-xl font-semibold mb-4">Comment ça marche ?</h3>
+            <p className="text-slate-700 dark:text-slate-300 mb-6">
+              Notre IA analyse vos expressions, votre voix ou vos mots pour identifier vos émotions 
+              et vous proposer des recommandations personnalisées pour améliorer votre bien-être.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="p-4 bg-white dark:bg-slate-800 rounded-lg">
+                <span className="font-semibold">1. Scan</span><br />
+                Choisissez votre méthode préférée
               </div>
-            )}
-          </div>
-          
-          <div className="p-6">
-            {scanComplete ? (
-              <Button 
-                className="w-full" 
-                onClick={resetScan}
-              >
-                Nouveau scan
-              </Button>
-            ) : (
-              <Button 
-                className="w-full" 
-                onClick={startScan}
-                disabled={isScanning}
-              >
-                {isScanning ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
-                    Scan en cours...
-                  </>
-                ) : (
-                  'Démarrer le scan'
-                )}
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-      
-      {scanComplete && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-6 text-center max-w-md"
-        >
-          <p className="text-muted-foreground mb-4">
-            Basé sur votre état émotionnel actuel, nous vous recommandons:
-          </p>
-          <div className="bg-card p-4 rounded-lg border shadow-sm">
-            {scanResult === 'Stress léger' || scanResult === 'Fatigue' ? (
-              <p>Une session de méditation guidée de 10 minutes pour vous aider à vous recentrer.</p>
-            ) : scanResult === 'Joie' || scanResult === 'Optimisme' ? (
-              <p>Maintenir cette énergie positive avec une playlist musicale adaptée à votre humeur.</p>
-            ) : (
-              <p>Une session de respiration profonde pour maintenir votre équilibre émotionnel.</p>
-            )}
-          </div>
-        </motion.div>
-      )}
+              <div className="p-4 bg-white dark:bg-slate-800 rounded-lg">
+                <span className="font-semibold">2. Analyse</span><br />
+                L'IA traite vos données en temps réel
+              </div>
+              <div className="p-4 bg-white dark:bg-slate-800 rounded-lg">
+                <span className="font-semibold">3. Recommandations</span><br />
+                Recevez des conseils personnalisés
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };

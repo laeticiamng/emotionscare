@@ -1,393 +1,201 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Building, 
-  Users, 
-  Activity, 
-  TrendingUp, 
-  Calendar,
-  Brain,
-  MessageSquare,
-  Music,
-  Target,
-  Heart
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import LoadingAnimation from '@/components/ui/loading-animation';
-
-interface TeamStats {
-  teamSize: number;
-  activeMembers: number;
-  teamMoodAverage: number;
-  myPosition: number;
-}
+import { Building2, Users, Brain, MessageSquare, Music, Calendar, Target, TrendingUp } from 'lucide-react';
 
 const B2BUserDashboardPage: React.FC = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
-  const [teamStats, setTeamStats] = useState<TeamStats | null>(null);
-  const [personalStats, setPersonalStats] = useState({
-    emotionalScore: 0,
-    weeklyProgress: 0,
-    totalScans: 0,
-    streak: 0
-  });
 
-  useEffect(() => {
-    if (user) {
-      loadDashboardData();
+  const teamModules = [
+    {
+      title: 'Scanner émotions',
+      description: 'Votre état émotionnel en temps réel',
+      icon: Brain,
+      path: '/scan',
+      color: 'bg-blue-500'
+    },
+    {
+      title: 'Coach IA',
+      description: 'Accompagnement professionnel personnalisé',
+      icon: MessageSquare,
+      path: '/coach',
+      color: 'bg-green-500'
+    },
+    {
+      title: 'Musicothérapie',
+      description: 'Détente et concentration au travail',
+      icon: Music,
+      path: '/music',
+      color: 'bg-purple-500'
+    },
+    {
+      title: 'Sessions équipe',
+      description: 'Activités collectives de bien-être',
+      icon: Users,
+      path: '/sessions',
+      color: 'bg-orange-500'
     }
-  }, [user]);
-
-  const loadDashboardData = async () => {
-    if (!user) return;
-
-    try {
-      setIsLoading(true);
-
-      // Charger les données personnelles
-      const { data: emotions, error: emotionsError } = await supabase
-        .from('emotions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('date', { ascending: false })
-        .limit(30);
-
-      if (emotionsError) throw emotionsError;
-
-      const avgScore = emotions?.length > 0 
-        ? emotions.reduce((sum, e) => sum + (e.score || 0), 0) / emotions.length 
-        : 0;
-
-      const weeklyEmotions = emotions?.filter(e => 
-        new Date(e.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-      ) || [];
-
-      const weeklyAvg = weeklyEmotions.length > 0
-        ? weeklyEmotions.reduce((sum, e) => sum + (e.score || 0), 0) / weeklyEmotions.length
-        : 0;
-
-      setPersonalStats({
-        emotionalScore: Math.round(avgScore),
-        weeklyProgress: Math.round(weeklyAvg),
-        totalScans: emotions?.length || 0,
-        streak: Math.min(emotions?.length || 0, 7)
-      });
-
-      // Simuler les statistiques d'équipe (à remplacer par de vraies données)
-      setTeamStats({
-        teamSize: 12,
-        activeMembers: 8,
-        teamMoodAverage: 72,
-        myPosition: 3
-      });
-
-    } catch (error) {
-      console.error('Dashboard data loading error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <LoadingAnimation text="Chargement de votre tableau de bord..." />
-      </div>
-    );
-  }
+  ];
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Welcome Section */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">
-            Bonjour {user?.name} !
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-purple-900">
+      <div className="container mx-auto px-6 py-8">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <div className="flex items-center justify-center space-x-2 mb-6">
+            <Building2 className="h-8 w-8 text-purple-600" />
+            <span className="text-2xl font-bold">EmotionsCare</span>
+          </div>
+          
+          <h1 className="text-4xl font-light tracking-tight text-slate-900 dark:text-white mb-4">
+            Votre espace collaborateur
           </h1>
-          <p className="text-muted-foreground">
-            Tableau de bord collaborateur - {user?.company || 'Votre entreprise'}
+          <p className="text-xl text-slate-600 dark:text-slate-300">
+            L'énergie partagée au service de l'excellence collective
           </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Building className="h-5 w-5 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Mode Collaborateur</span>
-        </div>
-      </div>
+        </motion.div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Mon Score</CardTitle>
-            <Heart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{personalStats.emotionalScore}/100</div>
-            <Progress value={personalStats.emotionalScore} className="mt-2" />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Équipe Active</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {teamStats?.activeMembers}/{teamStats?.teamSize}
-            </div>
-            <p className="text-xs text-muted-foreground">membres connectés</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Humeur Équipe</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{teamStats?.teamMoodAverage}/100</div>
-            <p className="text-xs text-muted-foreground">moyenne de l'équipe</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ma Position</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">#{teamStats?.myPosition}</div>
-            <p className="text-xs text-muted-foreground">dans l'équipe</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Content */}
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Aperçu</TabsTrigger>
-          <TabsTrigger value="team">Équipe</TabsTrigger>
-          <TabsTrigger value="wellness">Bien-être</TabsTrigger>
-          <TabsTrigger value="goals">Objectifs</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Actions Rapides</CardTitle>
-                <CardDescription>Accédez rapidement à vos outils</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <Button 
-                    variant="outline" 
-                    className="h-20 flex flex-col gap-2"
-                    onClick={() => navigate('/scan')}
-                  >
-                    <Brain className="h-6 w-6" />
-                    Scan Émotionnel
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="h-20 flex flex-col gap-2"
-                    onClick={() => navigate('/coach')}
-                  >
-                    <MessageSquare className="h-6 w-6" />
-                    Coach IA
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="h-20 flex flex-col gap-2"
-                    onClick={() => navigate('/music')}
-                  >
-                    <Music className="h-6 w-6" />
-                    Musicothérapie
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="h-20 flex flex-col gap-2"
-                    onClick={() => navigate('/team')}
-                  >
-                    <Users className="h-6 w-6" />
-                    Mon Équipe
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Team Activity */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Activité de l'Équipe</CardTitle>
-                <CardDescription>Dernières activités de vos collègues</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div>
-                      <p className="font-medium">Session de groupe terminée</p>
-                      <p className="text-sm text-muted-foreground">Il y a 2 heures</p>
-                    </div>
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div>
-                      <p className="font-medium">Nouveau défi d'équipe</p>
-                      <p className="text-sm text-muted-foreground">Il y a 4 heures</p>
-                    </div>
-                    <Target className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div>
-                      <p className="font-medium">Rapport hebdomadaire disponible</p>
-                      <p className="text-sm text-muted-foreground">Hier</p>
-                    </div>
-                    <Activity className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="team">
+        {/* Team Stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12"
+        >
           <Card>
-            <CardHeader>
-              <CardTitle>Mon Équipe</CardTitle>
-              <CardDescription>Statut et bien-être de l'équipe</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Fonctionnalité équipe en développement</p>
-                <p className="text-sm text-muted-foreground">Bientôt disponible pour collaborer avec vos collègues</p>
+            <CardContent className="flex items-center p-6">
+              <TrendingUp className="h-8 w-8 text-green-500 mr-4" />
+              <div>
+                <p className="text-2xl font-bold">87%</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Engagement équipe</p>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+          
+          <Card>
+            <CardContent className="flex items-center p-6">
+              <Users className="h-8 w-8 text-blue-500 mr-4" />
+              <div>
+                <p className="text-2xl font-bold">24</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Collaborateurs actifs</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="flex items-center p-6">
+              <Calendar className="h-8 w-8 text-purple-500 mr-4" />
+              <div>
+                <p className="text-2xl font-bold">3</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Sessions cette semaine</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="flex items-center p-6">
+              <Target className="h-8 w-8 text-orange-500 mr-4" />
+              <div>
+                <p className="text-2xl font-bold">92%</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Objectifs atteints</p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <TabsContent value="wellness">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Mon Bien-être</CardTitle>
-                <CardDescription>Suivi de votre évolution personnelle</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium">Score émotionnel</span>
-                      <span className="text-sm">{personalStats.emotionalScore}/100</span>
-                    </div>
-                    <Progress value={personalStats.emotionalScore} />
+        {/* Modules Grid */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12"
+        >
+          {teamModules.map((module, index) => (
+            <motion.div
+              key={module.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 + index * 0.1, duration: 0.8 }}
+            >
+              <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                <CardHeader>
+                  <div className={`w-12 h-12 ${module.color} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <module.icon className="h-6 w-6 text-white" />
                   </div>
-                  
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium">Progression cette semaine</span>
-                      <span className="text-sm">+{personalStats.weeklyProgress}%</span>
-                    </div>
-                    <Progress value={personalStats.weeklyProgress} />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 pt-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold">{personalStats.totalScans}</div>
-                      <div className="text-sm text-muted-foreground">Scans réalisés</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold">{personalStats.streak}</div>
-                      <div className="text-sm text-muted-foreground">Jours consécutifs</div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  <CardTitle className="text-xl">{module.title}</CardTitle>
+                  <CardDescription>{module.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    className="w-full"
+                    onClick={() => navigate(module.path)}
+                  >
+                    Accéder
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Recommandations</CardTitle>
-                <CardDescription>Suggestions personnalisées</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <h4 className="font-medium text-blue-900">💆‍♀️ Pause détente</h4>
-                    <p className="text-sm text-blue-800 mt-1">
-                      Prenez 10 minutes pour une session de musicothérapie
-                    </p>
-                  </div>
-                  
-                  <div className="p-4 bg-green-50 rounded-lg">
-                    <h4 className="font-medium text-green-900">🎯 Objectif du jour</h4>
-                    <p className="text-sm text-green-800 mt-1">
-                      Complétez votre scan émotionnel quotidien
-                    </p>
-                  </div>
-                  
-                  <div className="p-4 bg-purple-50 rounded-lg">
-                    <h4 className="font-medium text-purple-900">👥 Équipe</h4>
-                    <p className="text-sm text-purple-800 mt-1">
-                      Participez à la session de groupe de demain
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="goals">
+        {/* Team Insights */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1, duration: 0.8 }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        >
           <Card>
             <CardHeader>
-              <CardTitle>Mes Objectifs</CardTitle>
-              <CardDescription>Suivi de vos objectifs de bien-être</CardDescription>
+              <CardTitle>Climat émotionnel équipe</CardTitle>
+              <CardDescription>Température collective cette semaine</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Améliorer l'équilibre vie pro/perso</h4>
-                      <p className="text-sm text-muted-foreground">Objectif: Réduire le stress de 20%</p>
-                    </div>
-                    <span className="text-sm text-yellow-600 bg-yellow-100 px-2 py-1 rounded">En cours</span>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span>Motivation</span>
+                  <div className="w-32 bg-slate-200 rounded-full h-2">
+                    <div className="bg-green-500 h-2 rounded-full" style={{ width: '85%' }}></div>
                   </div>
-                  <Progress value={65} className="w-full" />
-                  <p className="text-sm text-muted-foreground">65% accompli</p>
                 </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">Participation équipe</h4>
-                      <p className="text-sm text-muted-foreground">Objectif: 80% de participation aux sessions</p>
-                    </div>
-                    <span className="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded">En cours</span>
+                <div className="flex items-center justify-between">
+                  <span>Sérénité</span>
+                  <div className="w-32 bg-slate-200 rounded-full h-2">
+                    <div className="bg-blue-500 h-2 rounded-full" style={{ width: '78%' }}></div>
                   </div>
-                  <Progress value={75} className="w-full" />
-                  <p className="text-sm text-muted-foreground">75% accompli</p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Énergie</span>
+                  <div className="w-32 bg-slate-200 rounded-full h-2">
+                    <div className="bg-orange-500 h-2 rounded-full" style={{ width: '92%' }}></div>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+          
+          <Card className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border-0">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Message de votre RH</h3>
+              <p className="text-slate-700 dark:text-slate-300 mb-4">
+                "Excellents résultats d'équipe cette semaine ! Votre engagement dans le bien-être 
+                collectif contribue à créer un environnement de travail exceptionnel."
+              </p>
+              <Button variant="outline" size="sm">
+                Voir tous les messages
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
     </div>
   );
 };

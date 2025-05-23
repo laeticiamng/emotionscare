@@ -1,135 +1,134 @@
 
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle, Loader2, Building, ArrowLeft } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Building2, ArrowLeft, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const B2BUserLoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
-  const { setUserMode } = useUserMode();
   const { toast } = useToast();
-  
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
+    setLoading(true);
 
     try {
-      setUserMode('b2b_user');
-      await login(email, password);
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
         title: "Connexion réussie",
-        description: "Bienvenue dans votre espace collaborateur",
-        variant: "success"
+        description: "Bienvenue dans votre espace collaborateur"
       });
-      
       navigate('/b2b/user/dashboard');
-    } catch (error: any) {
-      console.error('Login error:', error);
-      setError('Erreur de connexion. Vérifiez vos identifiants.');
+    } catch (error) {
       toast({
         title: "Erreur de connexion",
-        description: "Vérifiez vos identifiants et réessayez",
-        variant: "error"
+        description: "Vérifiez vos identifiants",
+        variant: "destructive"
       });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <Building className="h-6 w-6 text-primary" />
-          </div>
-          <CardTitle className="text-2xl font-bold">Connexion Collaborateur</CardTitle>
-          <CardDescription>
-            Accédez à votre espace collaborateur EmotionsCare
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email professionnel</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="votre.email@entreprise.com"
-                required
-                disabled={isLoading}
-              />
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-purple-900 flex items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="w-full max-w-md"
+      >
+        <Card className="shadow-xl border-0">
+          <CardHeader className="text-center space-y-4">
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <Building2 className="h-8 w-8 text-purple-600" />
+              <span className="text-2xl font-bold">EmotionsCare</span>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isLoading}
-              />
-            </div>
-            
-            {error && (
-              <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 rounded-md">
-                <AlertCircle className="h-4 w-4" />
-                {error}
+            <CardTitle className="text-2xl">Connexion Collaborateur</CardTitle>
+            <CardDescription>
+              Accédez à votre espace professionnel de bien-être
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email professionnel</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="votre@entreprise.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  required
+                />
               </div>
-            )}
-            
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Connexion...
-                </>
-              ) : (
-                'Se connecter'
-              )}
-            </Button>
-          </form>
-          
-          <div className="mt-6 space-y-4">
-            <div className="text-center">
-              <Link 
-                to="/b2b/user/register"
-                className="text-sm text-primary hover:underline"
-              >
-                Pas encore de compte ? Créer un compte collaborateur
-              </Link>
-            </div>
-            
-            <div className="flex items-center justify-center">
+              
+              <div className="space-y-2">
+                <Label htmlFor="password">Mot de passe</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  required
+                />
+              </div>
+              
               <Button 
-                variant="ghost" 
-                onClick={() => navigate('/b2b/selection')}
-                className="flex items-center gap-2 text-sm"
+                type="submit" 
+                className="w-full bg-purple-600 hover:bg-purple-700 py-6 text-lg"
+                disabled={loading}
               >
-                <ArrowLeft className="h-4 w-4" />
-                Retour à la sélection
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Connexion...
+                  </>
+                ) : (
+                  'Se connecter'
+                )}
               </Button>
+            </form>
+            
+            <div className="mt-6 space-y-4">
+              <div className="text-center">
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Pas encore de compte ?{' '}
+                  <Button
+                    variant="link"
+                    onClick={() => navigate('/b2b/user/register')}
+                    className="p-0 h-auto font-semibold"
+                  >
+                    Demander un accès
+                  </Button>
+                </p>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+        
+        <div className="mt-6 text-center">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/b2b/selection')}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Retour à la sélection
+          </Button>
+        </div>
+      </motion.div>
     </div>
   );
 };
