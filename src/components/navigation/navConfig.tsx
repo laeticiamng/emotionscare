@@ -12,7 +12,8 @@ import {
   Calendar,
   Target,
   Camera,
-  HeartHandshake
+  HeartHandshake,
+  Shield
 } from 'lucide-react';
 
 export interface NavItem {
@@ -54,9 +55,10 @@ export const b2cNavItems: NavItem[] = [
   }
 ];
 
+// Navigation limitée pour les collaborateurs B2B - uniquement données personnelles
 export const b2bUserNavItems: NavItem[] = [
   {
-    title: 'Tableau de bord',
+    title: 'Mon tableau de bord',
     href: '/b2b/user/dashboard',
     icon: Home
   },
@@ -76,40 +78,47 @@ export const b2bUserNavItems: NavItem[] = [
     icon: Music
   },
   {
-    title: 'Mon équipe',
-    href: '/team',
-    icon: Users
+    title: 'Mon journal',
+    href: '/journal',
+    icon: FileText
   },
   {
-    title: 'Sessions',
-    href: '/sessions',
-    icon: Calendar
+    title: 'Mes objectifs',
+    href: '/goals',
+    icon: Target
   }
+  // Suppression de l'accès aux données d'équipe
 ];
 
+// Navigation pour les RH - données agrégées et anonymisées uniquement
 export const b2bAdminNavItems: NavItem[] = [
   {
-    title: 'Tableau de bord',
+    title: 'Tableau de bord RH',
     href: '/b2b/admin/dashboard',
     icon: Home
   },
   {
-    title: 'Analytiques',
+    title: 'Statistiques agrégées',
     href: '/b2b/admin/analytics',
     icon: BarChart3
   },
   {
-    title: 'Utilisateurs',
-    href: '/b2b/admin/users',
-    icon: Users
+    title: 'Bien-être collectif',
+    href: '/b2b/admin/team-wellness',
+    icon: HeartHandshake
   },
   {
-    title: 'Rapports',
+    title: 'Rapports anonymisés',
     href: '/reports',
     icon: FileText
   },
   {
-    title: 'Paramètres',
+    title: 'Gestion des accès',
+    href: '/b2b/admin/access-management',
+    icon: Shield
+  },
+  {
+    title: 'Paramètres RH',
     href: '/admin/settings',
     icon: Settings
   }
