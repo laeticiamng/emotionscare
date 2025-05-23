@@ -1,61 +1,59 @@
 
-export const normalizeUserMode = (mode: string | null): string => {
-  if (!mode) return '';
-  return mode;
-};
-
-export const getModeDashboardPath = (mode: string | null): string => {
-  switch (mode) {
-    case 'b2c':
-      return '/b2c/dashboard';
-    case 'b2b_user':
-      return '/b2b/user/dashboard';
-    case 'b2b_admin':
-      return '/b2b/admin/dashboard';
-    default:
-      return '/choose-mode';
+export const normalizeUserMode = (mode: string): string => {
+  if (!mode) return 'b2c';
+  
+  const modeStr = mode.toLowerCase().replace(/-/g, '_');
+  
+  if (modeStr.includes('admin') || modeStr === 'b2b_admin') {
+    return 'b2b_admin';
   }
+  if (modeStr.includes('b2b') || modeStr === 'b2b_user' || modeStr === 'b2b_collaborator') {
+    return 'b2b_user';
+  }
+  return 'b2c';
 };
 
-export const getUserModeDisplayName = (mode: string | null): string => {
-  switch (mode) {
+export const getUserModeLabel = (mode: string): string => {
+  const normalized = normalizeUserMode(mode);
+  
+  switch (normalized) {
     case 'b2c':
       return 'Particulier';
-    case 'b2b_user':
-      return 'Collaborateur B2B';
     case 'b2b_admin':
-      return 'Administrateur B2B';
+      return 'Administrateur';
+    case 'b2b_user':
+      return 'Collaborateur';
     default:
       return 'Utilisateur';
   }
 };
 
-export const getModeLoginPath = (mode: string | null): string => {
-  switch (mode) {
+export const getModeDashboardPath = (mode: string): string => {
+  const normalized = normalizeUserMode(mode);
+  
+  switch (normalized) {
     case 'b2c':
-      return '/b2c/login';
-    case 'b2b_user':
-      return '/b2b/user/login';
+      return '/b2c/dashboard';
     case 'b2b_admin':
-      return '/b2b/admin/login';
+      return '/b2b/admin/dashboard';
+    case 'b2b_user':
+      return '/b2b/user/dashboard';
     default:
-      return '/b2c/login';
+      return '/choose-mode';
   }
 };
 
-export const getModeSocialPath = (mode: string | null): string => {
-  switch (mode) {
+export const getModeSocialPath = (mode: string): string => {
+  const normalized = normalizeUserMode(mode);
+  
+  switch (normalized) {
     case 'b2c':
       return '/b2c/social';
     case 'b2b_user':
       return '/b2b/user/social';
     case 'b2b_admin':
-      return '/b2b/admin/social';
+      return '/b2b/admin/dashboard'; // Admin doesn't have social
     default:
-      return '/b2c/social';
+      return '/choose-mode';
   }
-};
-
-export const getUserModeLabel = (mode: string | null): string => {
-  return getUserModeDisplayName(mode);
 };

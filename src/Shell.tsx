@@ -1,187 +1,194 @@
 
 import React from 'react';
-import { Outlet } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { 
-  Home, 
   Brain, 
+  Home, 
+  MessageCircle, 
   Users, 
   Settings, 
-  User, 
   HelpCircle, 
+  User,
   LogOut,
-  BarChart3,
-  Shield,
   Menu,
-  X
+  X,
+  Bell,
+  Search,
+  BarChart3
 } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { getModeDashboardPath } from '@/utils/userModeHelpers';
-import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { toast } from 'sonner';
+import { getUserModeLabel } from '@/utils/userModeHelpers';
 
 const Shell: React.FC = () => {
-  const { user, logout } = useAuth();
-  const { userMode } = useUserMode();
   const navigate = useNavigate();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const { userMode } = useUserMode();
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Déconnexion réussie");
+      navigate('/choose-mode');
+    } catch (error) {
+      toast.error("Erreur lors de la déconnexion");
+    }
   };
 
   const getNavigationItems = () => {
-    const dashboardPath = getModeDashboardPath(userMode);
-    
     const baseItems = [
-      { path: dashboardPath, icon: Home, label: 'Tableau de bord' },
+      { 
+        label: 'Tableau de bord', 
+        icon: Home, 
+        path: userMode === 'b2c' ? '/b2c/dashboard' : 
+              userMode === 'b2b_user' ? '/b2b/user/dashboard' : 
+              '/b2b/admin/dashboard' 
+      },
+      { 
+        label: 'Analyse émotionnelle', 
+        icon: Brain, 
+        path: userMode === 'b2c' ? '/b2c/scan' : '/b2b/user/scan',
+        hidden: userMode === 'b2b_admin'
+      },
+      { 
+        label: 'Communauté', 
+        icon: MessageCircle, 
+        path: userMode === 'b2c' ? '/b2c/social' : '/b2b/user/social',
+        hidden: userMode === 'b2b_admin'
+      }
     ];
 
-    switch (userMode) {
-      case 'b2c':
-        return [
-          ...baseItems,
-          { path: '/b2c/scan', icon: Brain, label: 'Analyser' },
-          { path: '/b2c/social', icon: Users, label: 'Communauté' },
-        ];
-      case 'b2b_user':
-        return [
-          ...baseItems,
-          { path: '/b2b/user/scan', icon: Brain, label: 'Analyser' },
-          { path: '/b2b/user/social', icon: Users, label: 'Équipe' },
-        ];
-      case 'b2b_admin':
-        return [
-          ...baseItems,
-          { path: '/b2b/admin/analytics', icon: BarChart3, label: 'Analytics' },
-          { path: '/b2b/admin/users', icon: Shield, label: 'Utilisateurs' },
-        ];
-      default:
-        return baseItems;
+    if (userMode === 'b2b_admin') {
+      baseItems.push(
+        { label: 'Analytics', icon: BarChart3, path: '/b2b/admin/analytics' },
+        { label: 'Utilisateurs', icon: Users, path: '/b2b/admin/users' }
+      );
     }
+
+    baseItems.push(
+      { label: 'Profil', icon: User, path: '/profile' },
+      { label: 'Paramètres', icon: Settings, path: '/settings' },
+      { label: 'Aide', icon: HelpCircle, path: '/help' }
+    );
+
+    return baseItems.filter(item => !item.hidden);
   };
 
   const navigationItems = getNavigationItems();
 
-  const commonItems = [
-    { path: '/profile', icon: User, label: 'Profil' },
-    { path: '/settings', icon: Settings, label: 'Paramètres' },
-    { path: '/help', icon: HelpCircle, label: 'Aide' },
-  ];
-
-  const isActivePath = (path: string) => location.pathname === path;
-
-  const NavItem = ({ item, onClick }: { item: any; onClick?: () => void }) => (
-    <Button
-      key={item.path}
-      variant={isActivePath(item.path) ? "default" : "ghost"}
-      className="w-full justify-start"
-      onClick={() => {
-        navigate(item.path);
-        onClick?.();
-      }}
-    >
-      <item.icon className="mr-3 h-4 w-4" />
-      {item.label}
-    </Button>
-  );
+  const isActivePath = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(path + '/');
+  };
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Mobile menu button */}
-      <div className="md:hidden fixed top-4 left-4 z-50">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-        >
-          {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-        </Button>
-      </div>
-
-      {/* Sidebar Overlay (Mobile) */}
-      {sidebarOpen && (
-        <div 
-          className="md:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <div className={`
-        fixed md:static inset-y-0 left-0 z-50 w-64 bg-card border-r border-border
-        transform transition-transform duration-300 ease-in-out
-        md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="p-4 border-b border-border">
-            <div className="flex items-center space-x-2">
-              <Brain className="h-6 w-6 text-primary" />
-              <span className="text-lg font-semibold">EmotionsCare</span>
-            </div>
-            <div className="mt-2 text-xs text-muted-foreground">
-              {user?.name} • {userMode === 'b2c' ? 'Particulier' : 
-                              userMode === 'b2b_user' ? 'Collaborateur' : 
-                              'Administrateur'}
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <div className="flex-1 p-4 space-y-2 overflow-y-auto">
-            <div className="space-y-1">
-              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                Principal
-              </div>
-              {navigationItems.map((item) => (
-                <NavItem 
-                  key={item.path} 
-                  item={item} 
-                  onClick={() => setSidebarOpen(false)} 
-                />
-              ))}
-            </div>
-
-            <div className="pt-4 space-y-1">
-              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                Compte
-              </div>
-              {commonItems.map((item) => (
-                <NavItem 
-                  key={item.path} 
-                  item={item} 
-                  onClick={() => setSidebarOpen(false)} 
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="p-4 border-t border-border">
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="flex h-16 items-center px-4">
+          <div className="flex items-center space-x-4">
             <Button
               variant="ghost"
-              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={handleLogout}
+              size="icon"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="md:hidden"
             >
-              <LogOut className="mr-3 h-4 w-4" />
-              Se déconnecter
+              {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
+            
+            <div className="flex items-center space-x-2">
+              <Brain className="h-8 w-8 text-primary" />
+              <span className="text-xl font-bold">EmotionsCare</span>
+            </div>
+          </div>
+
+          <div className="flex-1 flex justify-center">
+            <div className="relative max-w-sm w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                placeholder="Rechercher..."
+                className="w-full pl-10 pr-4 py-2 border rounded-md bg-muted/50 focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="icon">
+              <Bell className="h-5 w-5" />
+            </Button>
+            
+            <div className="flex items-center space-x-2">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-medium">{user?.name || 'Utilisateur'}</p>
+                <Badge variant="secondary" className="text-xs">
+                  {getUserModeLabel(userMode)}
+                </Badge>
+              </div>
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                {user?.name?.charAt(0).toUpperCase() || 'U'}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden md:ml-0">
-        {/* Top bar for mobile */}
-        <div className="md:hidden h-16 bg-card border-b border-border flex items-center justify-center">
-          <span className="font-semibold">EmotionsCare</span>
-        </div>
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className={`
+          fixed inset-y-0 left-0 z-40 w-64 bg-background border-r transform transition-transform duration-200 ease-in-out
+          md:relative md:translate-x-0 md:z-0
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}>
+          <div className="flex flex-col h-full pt-16 md:pt-0">
+            <nav className="flex-1 px-4 py-4 space-y-2">
+              {navigationItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = isActivePath(item.path);
+                
+                return (
+                  <Button
+                    key={item.path}
+                    variant={isActive ? "default" : "ghost"}
+                    className="w-full justify-start"
+                    onClick={() => {
+                      navigate(item.path);
+                      setSidebarOpen(false);
+                    }}
+                  >
+                    <Icon className="mr-3 h-4 w-4" />
+                    {item.label}
+                  </Button>
+                );
+              })}
+            </nav>
+            
+            <div className="p-4 border-t">
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+                onClick={handleLogout}
+              >
+                <LogOut className="mr-3 h-4 w-4" />
+                Se déconnecter
+              </Button>
+            </div>
+          </div>
+        </aside>
 
-        {/* Content */}
-        <main className="flex-1 overflow-y-auto">
+        {/* Overlay for mobile */}
+        {sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Main Content */}
+        <main className="flex-1 min-h-[calc(100vh-4rem)]">
           <Outlet />
         </main>
       </div>

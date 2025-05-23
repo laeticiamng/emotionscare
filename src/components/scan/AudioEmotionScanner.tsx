@@ -2,7 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Loader2, Mic, MicOff, Play, Square } from 'lucide-react';
+import { AlertCircle, Loader2, Mic, Square, Play, Pause } from 'lucide-react';
 import { AudioEmotionScannerProps } from '@/types/emotion';
 
 const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
@@ -15,23 +15,26 @@ const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const startRecording = async () => {
     try {
-      setError(null);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
       
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       
       const chunks: BlobPart[] = [];
       
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunks.push(event.data);
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunks.push(e.data);
         }
       };
       
@@ -43,9 +46,10 @@ const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
       
       mediaRecorder.start();
       setIsRecording(true);
+      setError(null);
       setRecordingTime(0);
       
-      // Timer pour l'enregistrement
+      // Start timer
       timerRef.current = setInterval(() => {
         setRecordingTime(prev => prev + 1);
       }, 1000);
@@ -70,35 +74,53 @@ const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
 
   const playRecording = () => {
     if (audioBlob) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      
       const audio = new Audio(URL.createObjectURL(audioBlob));
+      audioRef.current = audio;
+      
+      audio.onplay = () => setIsPlaying(true);
+      audio.onpause = () => setIsPlaying(false);
+      audio.onended = () => setIsPlaying(false);
+      
       audio.play();
+    }
+  };
+
+  const pauseRecording = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
     }
   };
 
   const handleSubmit = async () => {
     if (!audioBlob) {
-      setError("Veuillez enregistrer un message vocal.");
+      setError("Veuillez enregistrer un message audio.");
       return;
     }
-
+    
     if (recordingTime < 3) {
       setError("L'enregistrement doit durer au moins 3 secondes.");
       return;
     }
-
+    
     setError(null);
     setIsProcessing(true);
-
+    
     try {
       // Simulation d'appel API
       await new Promise(resolve => setTimeout(resolve, 3000));
-
+      
       // Génération de résultat simulé basé sur la durée
-      const emotionScore = Math.min(Math.max(Math.floor(Math.random() * 100), 20), 95);
-      const primaryEmotion = emotionScore > 70 ? "Confiance" : 
-                             emotionScore > 50 ? "Sérénité" : 
-                             emotionScore > 30 ? "Préoccupation" : "Fatigue";
-
+      const emotionScore = Math.min(Math.floor(50 + (recordingTime * 2) + Math.random() * 30), 100);
+      const primaryEmotion = emotionScore > 75 ? "Enthousiasme" : 
+                             emotionScore > 60 ? "Calme" : 
+                             emotionScore > 45 ? "Réflexion" : "Inquiétude";
+      
       const result = {
         score: emotionScore,
         primaryEmotion,
@@ -111,7 +133,7 @@ const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
           surprise: Math.random(),
         }
       };
-
+      
       onScanComplete(result);
     } catch (error) {
       console.error('Error analyzing audio:', error);
@@ -128,96 +150,106 @@ const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-
+      
       <div className="text-center space-y-4">
         <p className="text-sm text-muted-foreground">
           Enregistrez un message vocal de 10 à 60 secondes décrivant comment vous vous sentez.
         </p>
-
-        <div className="flex flex-col items-center space-y-4">
+        
+        {/* Recording Controls */}
+        <div className="bg-muted/30 rounded-lg p-6 space-y-4">
+          <div className="text-2xl font-mono">
+            {formatTime(recordingTime)}
+          </div>
+          
           {!isRecording && !audioBlob && (
             <Button 
               onClick={startRecording}
-              disabled={isProcessing}
               className="w-20 h-20 rounded-full bg-red-500 hover:bg-red-600"
+              disabled={isProcessing}
             >
-              <Mic className="h-8 w-8 text-white" />
+              <Mic className="h-8 w-8" />
             </Button>
           )}
-
+          
           {isRecording && (
-            <div className="flex flex-col items-center space-y-2">
-              <Button 
-                onClick={stopRecording}
-                className="w-20 h-20 rounded-full bg-red-600 hover:bg-red-700 animate-pulse"
-              >
-                <Square className="h-8 w-8 text-white" />
-              </Button>
-              <div className="text-lg font-mono text-red-600">
-                {formatTime(recordingTime)}
+            <Button 
+              onClick={stopRecording}
+              className="w-20 h-20 rounded-full bg-red-600 hover:bg-red-700 animate-pulse"
+            >
+              <Square className="h-8 w-8" />
+            </Button>
+          )}
+          
+          {audioBlob && !isRecording && (
+            <div className="space-y-3">
+              <div className="flex justify-center space-x-3">
+                {!isPlaying ? (
+                  <Button 
+                    onClick={playRecording}
+                    variant="outline"
+                    className="rounded-full"
+                  >
+                    <Play className="h-5 w-5" />
+                  </Button>
+                ) : (
+                  <Button 
+                    onClick={pauseRecording}
+                    variant="outline"
+                    className="rounded-full"
+                  >
+                    <Pause className="h-5 w-5" />
+                  </Button>
+                )}
+                <Button 
+                  onClick={() => {
+                    setAudioBlob(null);
+                    setRecordingTime(0);
+                    if (audioRef.current) {
+                      audioRef.current.pause();
+                      setIsPlaying(false);
+                    }
+                  }}
+                  variant="outline"
+                  disabled={isProcessing}
+                >
+                  Recommencer
+                </Button>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Cliquez pour arrêter l'enregistrement
+              <p className="text-xs text-muted-foreground">
+                Durée: {formatTime(recordingTime)} - Cliquez sur lecture pour écouter
               </p>
             </div>
           )}
-
-          {audioBlob && !isRecording && (
-            <div className="flex flex-col items-center space-y-4">
-              <div className="flex items-center space-x-4">
-                <Button 
-                  onClick={playRecording}
-                  variant="outline"
-                  className="w-16 h-16 rounded-full"
-                >
-                  <Play className="h-6 w-6" />
-                </Button>
-                <div>
-                  <p className="font-medium">Enregistrement terminé</p>
-                  <p className="text-sm text-muted-foreground">
-                    Durée: {formatTime(recordingTime)}
-                  </p>
-                </div>
-              </div>
-              
-              <Button 
-                onClick={startRecording}
-                variant="outline"
-                size="sm"
-              >
-                <MicOff className="mr-2 h-4 w-4" />
-                Enregistrer à nouveau
-              </Button>
-            </div>
-          )}
         </div>
-
+        
+        {/* Instructions */}
         <div className="text-xs text-muted-foreground space-y-1">
           <p>• Parlez clairement et naturellement</p>
-          <p>• Décrivez vos émotions et votre état d'esprit</p>
-          <p>• L'analyse vocale détecte les nuances émotionnelles</p>
+          <p>• Décrivez vos émotions et ressentis</p>
+          <p>• L'analyse se base sur votre ton et votre débit</p>
         </div>
       </div>
-
+      
       <div className="flex justify-end gap-2">
         <Button 
           type="button" 
           variant="outline" 
           onClick={onCancel}
-          disabled={isProcessing || isRecording}
+          disabled={isProcessing}
         >
           Annuler
         </Button>
         <Button 
-          onClick={handleSubmit}
-          disabled={!audioBlob || isProcessing || isRecording}
+          onClick={handleSubmit} 
+          disabled={!audioBlob || isProcessing}
         >
           {isProcessing ? (
             <>
@@ -225,7 +257,7 @@ const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
               Analyse en cours...
             </>
           ) : (
-            'Analyser l\'enregistrement'
+            'Analyser mon message'
           )}
         </Button>
       </div>

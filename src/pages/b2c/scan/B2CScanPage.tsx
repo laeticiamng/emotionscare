@@ -5,32 +5,48 @@ import { Button } from '@/components/ui/button';
 import { EmotionResult } from '@/types/emotion';
 import EmotionScanForm from '@/components/scan/EmotionScanForm';
 import UnifiedEmotionCheckin from '@/components/scan/UnifiedEmotionCheckin';
-import { Brain, ArrowLeft, Lightbulb } from 'lucide-react';
+import { Brain, ArrowLeft, Sparkles, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 const B2CScanPage: React.FC = () => {
   const navigate = useNavigate();
   const [showScanForm, setShowScanForm] = useState(false);
+  const [lastResult, setLastResult] = useState<EmotionResult | null>(null);
 
   const handleScanComplete = (result: EmotionResult) => {
     console.log('Scan completed:', result);
+    setLastResult(result);
     toast.success("Analyse émotionnelle terminée avec succès!");
     setShowScanForm(false);
   };
 
-  const tips = [
-    {
-      title: "Préparez-vous mentalement",
-      content: "Prenez quelques instants pour vous centrer avant l'analyse. Une respiration profonde peut aider."
+  const previousScans = [
+    { date: "Aujourd'hui 14:30", score: 82, emotion: "Joie", type: "text" },
+    { date: "Hier 16:45", score: 75, emotion: "Sérénité", type: "audio" },
+    { date: "Hier 09:15", score: 68, emotion: "Motivation", type: "emoji" },
+    { date: "Avant-hier 19:20", score: 90, emotion: "Gratitude", type: "text" }
+  ];
+
+  const insights = [
+    { 
+      title: "Tendance positive", 
+      description: "Votre bien-être s'améliore de 15% cette semaine",
+      icon: TrendingUp,
+      color: "text-green-600" 
     },
-    {
-      title: "Soyez authentique",
-      content: "Exprimez vos vraies émotions sans filtre. L'authenticité améliore la précision de l'analyse."
+    { 
+      title: "Meilleur moment", 
+      description: "Vous êtes plus épanoui(e) en fin d'après-midi",
+      icon: Sparkles,
+      color: "text-blue-600" 
     },
-    {
-      title: "Contexte temporel",
-      content: "Pensez à ce qui s'est passé récemment dans votre journée pour une analyse plus précise."
+    { 
+      title: "Recommandation", 
+      description: "Essayez la méditation guidée pour maintenir ce niveau",
+      icon: Brain,
+      color: "text-purple-600" 
     }
   ];
 
@@ -44,132 +60,204 @@ const B2CScanPage: React.FC = () => {
           <div>
             <h1 className="text-3xl font-bold">Analyse Émotionnelle</h1>
             <p className="text-muted-foreground">
-              Découvrez et analysez votre état émotionnel du moment
+              Comprenez et suivez votre état émotionnel
             </p>
           </div>
         </div>
         {!showScanForm && (
           <Button onClick={() => setShowScanForm(true)}>
             <Brain className="mr-2 h-4 w-4" />
-            Commencer une analyse
+            Nouvelle analyse
           </Button>
         )}
       </div>
 
       {showScanForm ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>Scanner vos émotions</CardTitle>
-            <CardDescription>
-              Choisissez votre méthode d'analyse préférée
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <EmotionScanForm 
-              onComplete={handleScanComplete}
-              onClose={() => setShowScanForm(false)}
-            />
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Scanner vos émotions</CardTitle>
+              <CardDescription>
+                Choisissez votre méthode d'analyse préférée
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EmotionScanForm 
+                onComplete={handleScanComplete}
+                onClose={() => setShowScanForm(false)}
+              />
+            </CardContent>
+          </Card>
+        </motion.div>
       ) : (
         <div className="space-y-6">
-          {/* Tips and Guidelines */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Lightbulb className="mr-2 h-5 w-5" />
-                Conseils pour une meilleure analyse
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {tips.map((tip, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <h3 className="font-medium mb-2">{tip.title}</h3>
-                    <p className="text-sm text-muted-foreground">{tip.content}</p>
+          {/* Last Result */}
+          {lastResult && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-semibold text-blue-900">Dernière Analyse</h3>
+                      <div className="flex items-center space-x-4">
+                        <div className="text-4xl font-bold text-blue-600">{lastResult.score}%</div>
+                        <div>
+                          <p className="font-medium text-blue-800">{lastResult.primaryEmotion}</p>
+                          <p className="text-sm text-blue-600">Il y a quelques instants</p>
+                        </div>
+                      </div>
+                      {lastResult.aiFeedback && (
+                        <p className="text-sm text-blue-700 italic max-w-md">
+                          "{lastResult.aiFeedback}"
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-6xl opacity-30">😊</div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
 
-          {/* Analysis Methods */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Méthodes d'analyse disponibles</CardTitle>
-              <CardDescription>
-                Choisissez la méthode qui vous convient le mieux
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center p-6 border-2 border-dashed border-blue-200 rounded-lg">
-                  <Brain className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                  <h3 className="font-medium mb-2">Analyse textuelle</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Décrivez vos ressentis en quelques phrases pour une analyse approfondie de vos émotions.
-                  </p>
-                  <div className="text-xs text-blue-600 font-medium">Recommandé pour les introspections</div>
-                </div>
-
-                <div className="text-center p-6 border-2 border-dashed border-green-200 rounded-lg">
-                  <Brain className="h-12 w-12 text-green-600 mx-auto mb-4" />
-                  <h3 className="font-medium mb-2">Analyse vocale</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Enregistrez un message vocal pour capturer les nuances émotionnelles de votre voix.
-                  </p>
-                  <div className="text-xs text-green-600 font-medium">Analyse des intonations</div>
-                </div>
-
-                <div className="text-center p-6 border-2 border-dashed border-purple-200 rounded-lg">
-                  <Brain className="h-12 w-12 text-purple-600 mx-auto mb-4" />
-                  <h3 className="font-medium mb-2">Sélection d'émojis</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Choisissez les émojis qui représentent le mieux votre état émotionnel actuel.
-                  </p>
-                  <div className="text-xs text-purple-600 font-medium">Rapide et intuitif</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Analyses */}
-          <UnifiedEmotionCheckin />
-
-          {/* Emotional Journey */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Votre parcours émotionnel</CardTitle>
-              <CardDescription>
-                Suivi de votre évolution émotionnelle
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="font-medium">Analyses effectuées ce mois</p>
-                    <p className="text-2xl font-bold text-blue-600">23</p>
+          {/* Analysis Methods Guide */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle>Méthodes d'Analyse</CardTitle>
+                <CardDescription>Découvrez les différentes façons d'analyser vos émotions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="p-4 border rounded-lg hover:bg-blue-50 transition-colors">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        📝
+                      </div>
+                      <h4 className="font-medium">Analyse Textuelle</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Décrivez vos ressentis en quelques phrases. Notre IA analysera vos mots pour comprendre votre état émotionnel.
+                    </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Objectif mensuel</p>
-                    <p className="text-sm font-medium">30 analyses</p>
+                  
+                  <div className="p-4 border rounded-lg hover:bg-green-50 transition-colors">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        🎤
+                      </div>
+                      <h4 className="font-medium">Analyse Vocale</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Enregistrez un message vocal. Nous analyserons le ton, le rythme et les nuances de votre voix.
+                    </p>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg hover:bg-purple-50 transition-colors">
+                    <div className="flex items-center space-x-3 mb-3">
+                      <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                        😀
+                      </div>
+                      <h4 className="font-medium">Sélection d'Émojis</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Choisissez les émojis qui représentent le mieux votre état actuel. Simple et intuitif.
+                    </p>
                   </div>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <p className="text-2xl font-bold text-green-600">78%</p>
-                    <p className="text-sm text-muted-foreground">Score bien-être moyen</p>
-                  </div>
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <p className="text-2xl font-bold text-blue-600">Joie</p>
-                    <p className="text-sm text-muted-foreground">Émotion dominante</p>
-                  </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Insights */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle>Insights Personnalisés</CardTitle>
+                <CardDescription>Découvertes basées sur vos analyses précédentes</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {insights.map((insight, index) => (
+                    <div key={index} className="p-4 bg-muted/30 rounded-lg">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <insight.icon className={`h-5 w-5 ${insight.color}`} />
+                        <h4 className="font-medium">{insight.title}</h4>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{insight.description}</p>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Previous Scans */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle>Historique des Analyses</CardTitle>
+                <CardDescription>Vos dernières évaluations émotionnelles</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {previousScans.map((scan, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs ${
+                          scan.score >= 80 ? 'bg-green-100 text-green-700' :
+                          scan.score >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {scan.score}
+                        </div>
+                        <div>
+                          <p className="font-medium">{scan.emotion}</p>
+                          <p className="text-sm text-muted-foreground">{scan.date}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs px-2 py-1 bg-muted rounded">
+                          {scan.type === 'text' ? '📝' : scan.type === 'audio' ? '🎤' : '😀'}
+                        </span>
+                        <Button variant="ghost" size="sm">
+                          Voir détails
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Quick Check-in */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <UnifiedEmotionCheckin />
+          </motion.div>
         </div>
       )}
     </div>

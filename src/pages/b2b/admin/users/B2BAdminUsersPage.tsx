@@ -5,23 +5,39 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Users, 
-  Search, 
-  Plus, 
-  MoreVertical, 
-  Filter,
-  Download,
-  UserPlus,
-  Mail,
-  Phone,
-  MapPin
-} from 'lucide-react';
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
 import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from '@/components/ui/dialog';
+import { 
+  Users, 
+  UserPlus, 
+  Search, 
+  Filter, 
+  MoreHorizontal, 
+  Mail,
+  Edit,
+  Trash2,
+  AlertTriangle
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 interface User {
@@ -31,298 +47,404 @@ interface User {
   department: string;
   role: string;
   status: 'active' | 'inactive' | 'pending';
-  wellbeingScore: number;
   lastActivity: string;
+  wellbeingScore: number;
+  joinDate: string;
 }
 
 const B2BAdminUsersPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
-  const [showInviteForm, setShowInviteForm] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('all');
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteDepartment, setInviteDepartment] = useState('');
+  const [inviteRole, setInviteRole] = useState('user');
 
   const [users] = useState<User[]>([
     {
       id: '1',
-      name: 'Marie Dubois',
-      email: 'marie.dubois@entreprise.com',
+      name: 'Sophie Martin',
+      email: 'sophie.martin@entreprise.com',
       department: 'Marketing',
-      role: 'Manager',
+      role: 'user',
       status: 'active',
-      wellbeingScore: 85,
-      lastActivity: 'Il y a 2h'
+      lastActivity: 'Il y a 2h',
+      wellbeingScore: 82,
+      joinDate: '2024-01-15'
     },
     {
       id: '2',
-      name: 'Pierre Martin',
-      email: 'pierre.martin@entreprise.com',
+      name: 'Thomas Dubois',
+      email: 'thomas.dubois@entreprise.com',
       department: 'IT',
-      role: 'Développeur',
+      role: 'admin',
       status: 'active',
-      wellbeingScore: 92,
-      lastActivity: 'Il y a 1h'
+      lastActivity: 'Il y a 1h',
+      wellbeingScore: 78,
+      joinDate: '2023-11-20'
     },
     {
       id: '3',
-      name: 'Sophie Laurent',
-      email: 'sophie.laurent@entreprise.com',
+      name: 'Marie Rousseau',
+      email: 'marie.rousseau@entreprise.com',
       department: 'RH',
-      role: 'Responsable RH',
+      role: 'manager',
       status: 'active',
-      wellbeingScore: 78,
-      lastActivity: 'Il y a 30min'
+      lastActivity: 'Il y a 30min',
+      wellbeingScore: 85,
+      joinDate: '2023-09-10'
     },
     {
       id: '4',
-      name: 'Thomas Rousseau',
-      email: 'thomas.rousseau@entreprise.com',
-      department: 'Finance',
-      role: 'Comptable',
+      name: 'Pierre Lefèvre',
+      email: 'pierre.lefevre@entreprise.com',
+      department: 'Ventes',
+      role: 'user',
       status: 'inactive',
+      lastActivity: 'Il y a 3 jours',
       wellbeingScore: 65,
-      lastActivity: 'Il y a 2 jours'
+      joinDate: '2024-02-01'
     },
     {
       id: '5',
-      name: 'Julie Moreau',
-      email: 'julie.moreau@entreprise.com',
-      department: 'Commercial',
-      role: 'Commerciale',
+      name: 'Julie Bernard',
+      email: 'julie.bernard@entreprise.com',
+      department: 'Finance',
+      role: 'user',
       status: 'pending',
+      lastActivity: 'Jamais',
       wellbeingScore: 0,
-      lastActivity: 'Jamais'
+      joinDate: '2024-03-15'
     }
   ]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'inactive': return 'bg-gray-100 text-gray-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-red-600';
-  };
-
-  const handleUserAction = (action: string, userId: string) => {
-    switch (action) {
-      case 'edit':
-        toast.info(`Édition de l'utilisateur ${userId}`);
-        break;
-      case 'deactivate':
-        toast.success(`Utilisateur ${userId} désactivé`);
-        break;
-      case 'resend':
-        toast.success(`Invitation renvoyée à l'utilisateur ${userId}`);
-        break;
-      default:
-        console.log(action, userId);
-    }
-  };
-
-  const handleInviteUser = () => {
-    toast.success("Invitation envoyée avec succès!");
-    setShowInviteForm(false);
-  };
+  const departments = ['Marketing', 'IT', 'RH', 'Ventes', 'Finance', 'Production', 'R&D'];
+  const roles = [
+    { value: 'user', label: 'Collaborateur' },
+    { value: 'manager', label: 'Manager' },
+    { value: 'admin', label: 'Administrateur' }
+  ];
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDepartment = selectedDepartment === 'all' || user.department === selectedDepartment;
-    return matchesSearch && matchesDepartment;
+    const matchesRole = selectedRole === 'all' || user.role === selectedRole;
+    
+    return matchesSearch && matchesDepartment && matchesRole;
   });
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return <Badge variant="default" className="bg-green-100 text-green-800">Actif</Badge>;
+      case 'inactive':
+        return <Badge variant="secondary" className="bg-gray-100 text-gray-800">Inactif</Badge>;
+      case 'pending':
+        return <Badge variant="outline" className="bg-orange-100 text-orange-800">En attente</Badge>;
+      default:
+        return <Badge variant="secondary">Inconnu</Badge>;
+    }
+  };
+
+  const getRoleBadge = (role: string) => {
+    const roleConfig = {
+      admin: { label: 'Admin', class: 'bg-purple-100 text-purple-800' },
+      manager: { label: 'Manager', class: 'bg-blue-100 text-blue-800' },
+      user: { label: 'Collaborateur', class: 'bg-gray-100 text-gray-800' }
+    };
+    
+    const config = roleConfig[role as keyof typeof roleConfig] || roleConfig.user;
+    return <Badge variant="secondary" className={config.class}>{config.label}</Badge>;
+  };
+
+  const handleInviteUser = () => {
+    if (!inviteEmail || !inviteDepartment) {
+      toast.error("Veuillez remplir tous les champs obligatoires");
+      return;
+    }
+    
+    // Simulate sending invitation
+    toast.success(`Invitation envoyée à ${inviteEmail}`);
+    setShowInviteModal(false);
+    setInviteEmail('');
+    setInviteDepartment('');
+    setInviteRole('user');
+  };
+
+  const handleDeleteUser = (userId: string, userName: string) => {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer ${userName} ?`)) {
+      toast.success(`Utilisateur ${userName} supprimé`);
+    }
+  };
+
+  const handleEditUser = (userId: string) => {
+    toast.info("Fonctionnalité d'édition en développement");
+  };
+
+  const handleResendInvite = (userEmail: string) => {
+    toast.success(`Invitation renvoyée à ${userEmail}`);
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Gestion des Utilisateurs</h1>
+          <h1 className="text-3xl font-bold flex items-center">
+            <Users className="mr-3 h-8 w-8 text-primary" />
+            Gestion des Utilisateurs
+          </h1>
           <p className="text-muted-foreground">
-            Administrer les comptes et permissions des collaborateurs
+            Gérez les collaborateurs et leurs accès à la plateforme
           </p>
         </div>
-        <div className="flex space-x-2">
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Exporter
-          </Button>
-          <Button onClick={() => setShowInviteForm(true)}>
-            <UserPlus className="mr-2 h-4 w-4" />
-            Inviter un utilisateur
-          </Button>
-        </div>
+        <Dialog open={showInviteModal} onOpenChange={setShowInviteModal}>
+          <DialogTrigger asChild>
+            <Button>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Inviter un collaborateur
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Inviter un nouveau collaborateur</DialogTitle>
+              <DialogDescription>
+                Envoyez une invitation pour rejoindre la plateforme EmotionsCare
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Email *</label>
+                <Input
+                  type="email"
+                  placeholder="collaborateur@entreprise.com"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Département *</label>
+                <Select value={inviteDepartment} onValueChange={setInviteDepartment}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner un département" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departments.map((dept) => (
+                      <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Rôle</label>
+                <Select value={inviteRole} onValueChange={setInviteRole}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {roles.map((role) => (
+                      <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex space-x-2 pt-4">
+                <Button variant="outline" onClick={() => setShowInviteModal(false)}>
+                  Annuler
+                </Button>
+                <Button onClick={handleInviteUser}>
+                  Envoyer l'invitation
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      {/* Search and Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Rechercher par nom ou email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Button variant="outline">
-              <Filter className="mr-2 h-4 w-4" />
-              Filtres avancés
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Invite Form */}
-      {showInviteForm && (
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Inviter un nouvel utilisateur</CardTitle>
-            <CardDescription>
-              Envoyez une invitation par email à un nouveau collaborateur
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Email</label>
-                <Input placeholder="utilisateur@entreprise.com" />
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Utilisateurs</p>
+                <p className="text-2xl font-bold">{users.length}</p>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Nom complet</label>
-                <Input placeholder="Nom Prénom" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Département</label>
-                <Input placeholder="Marketing, IT, RH..." />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Rôle</label>
-                <Input placeholder="Manager, Développeur..." />
-              </div>
-            </div>
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setShowInviteForm(false)}>
-                Annuler
-              </Button>
-              <Button onClick={handleInviteUser}>
-                <Mail className="mr-2 h-4 w-4" />
-                Envoyer l'invitation
-              </Button>
+              <Users className="h-8 w-8 text-blue-600" />
             </div>
           </CardContent>
         </Card>
-      )}
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Utilisateurs Actifs</p>
+                <p className="text-2xl font-bold">{users.filter(u => u.status === 'active').length}</p>
+              </div>
+              <div className="w-2 h-8 bg-green-600 rounded"></div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">En Attente</p>
+                <p className="text-2xl font-bold">{users.filter(u => u.status === 'pending').length}</p>
+              </div>
+              <div className="w-2 h-8 bg-orange-600 rounded"></div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Score Moyen</p>
+                <p className="text-2xl font-bold">
+                  {Math.round(users.reduce((acc, u) => acc + u.wellbeingScore, 0) / users.length)}%
+                </p>
+              </div>
+              <div className="w-2 h-8 bg-purple-600 rounded"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters and Search */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher par nom ou email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Département" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les départements</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={selectedRole} onValueChange={setSelectedRole}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Rôle" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les rôles</SelectItem>
+                {roles.map((role) => (
+                  <SelectItem key={role.value} value={role.value}>{role.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Users Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Users className="mr-2 h-5 w-5" />
-            Utilisateurs ({filteredUsers.length})
-          </CardTitle>
+          <CardTitle>Liste des Collaborateurs</CardTitle>
+          <CardDescription>
+            {filteredUsers.length} utilisateur{filteredUsers.length > 1 ? 's' : ''} trouvé{filteredUsers.length > 1 ? 's' : ''}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {filteredUsers.map((user) => (
-              <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    <span className="font-medium text-primary">
-                      {user.name.split(' ').map(n => n[0]).join('')}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-medium">{user.name}</h3>
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                      <span className="flex items-center">
-                        <Mail className="mr-1 h-3 w-3" />
-                        {user.email}
-                      </span>
-                      <span className="flex items-center">
-                        <MapPin className="mr-1 h-3 w-3" />
-                        {user.department}
-                      </span>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Utilisateur</TableHead>
+                <TableHead>Département</TableHead>
+                <TableHead>Rôle</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Score Bien-être</TableHead>
+                <TableHead>Dernière activité</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>
+                    <div>
+                      <p className="font-medium">{user.name}</p>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">{user.role}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-4">
-                  <div className="text-right">
-                    <div className="flex items-center space-x-2">
-                      <Badge className={getStatusColor(user.status)}>
-                        {user.status === 'active' ? 'Actif' : 
-                         user.status === 'inactive' ? 'Inactif' : 'En attente'}
-                      </Badge>
-                    </div>
-                    {user.status === 'active' && (
-                      <p className={`text-sm font-medium ${getScoreColor(user.wellbeingScore)}`}>
-                        Score: {user.wellbeingScore}/100
-                      </p>
+                  </TableCell>
+                  <TableCell>{user.department}</TableCell>
+                  <TableCell>{getRoleBadge(user.role)}</TableCell>
+                  <TableCell>{getStatusBadge(user.status)}</TableCell>
+                  <TableCell>
+                    {user.wellbeingScore > 0 ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-16 bg-gray-200 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full ${
+                              user.wellbeingScore >= 80 ? 'bg-green-600' :
+                              user.wellbeingScore >= 60 ? 'bg-yellow-600' : 'bg-red-600'
+                            }`}
+                            style={{ width: `${user.wellbeingScore}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-sm">{user.wellbeingScore}%</span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">N/A</span>
                     )}
-                    <p className="text-xs text-muted-foreground">{user.lastActivity}</p>
-                  </div>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleUserAction('edit', user.id)}>
-                        Éditer
-                      </DropdownMenuItem>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {user.lastActivity}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
                       {user.status === 'pending' && (
-                        <DropdownMenuItem onClick={() => handleUserAction('resend', user.id)}>
-                          Renvoyer l'invitation
-                        </DropdownMenuItem>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleResendInvite(user.email)}
+                        >
+                          <Mail className="h-4 w-4" />
+                        </Button>
                       )}
-                      <DropdownMenuItem onClick={() => handleUserAction('deactivate', user.id)}>
-                        {user.status === 'active' ? 'Désactiver' : 'Activer'}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-            ))}
-          </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleEditUser(user.id)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleDeleteUser(user.id, user.name)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardContent className="p-6 text-center">
-            <div className="text-2xl font-bold text-green-600">
-              {users.filter(u => u.status === 'active').length}
-            </div>
-            <p className="text-sm text-muted-foreground">Utilisateurs actifs</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6 text-center">
-            <div className="text-2xl font-bold text-yellow-600">
-              {users.filter(u => u.status === 'pending').length}
-            </div>
-            <p className="text-sm text-muted-foreground">Invitations en attente</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6 text-center">
-            <div className="text-2xl font-bold text-blue-600">
-              {Math.round(users.filter(u => u.status === 'active').reduce((acc, u) => acc + u.wellbeingScore, 0) / users.filter(u => u.status === 'active').length) || 0}
-            </div>
-            <p className="text-sm text-muted-foreground">Score moyen bien-être</p>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 };

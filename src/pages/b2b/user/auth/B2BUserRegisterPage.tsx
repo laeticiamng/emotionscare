@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { AlertCircle, Building2, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, Building2 } from 'lucide-react';
 
 const B2BUserRegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,6 +21,7 @@ const B2BUserRegisterPage: React.FC = () => {
     password: '',
     confirmPassword: '',
     company: '',
+    jobTitle: '',
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +38,7 @@ const B2BUserRegisterPage: React.FC = () => {
     e.preventDefault();
     setError(null);
     
+    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError("Les mots de passe ne correspondent pas.");
       return;
@@ -50,10 +52,13 @@ const B2BUserRegisterPage: React.FC = () => {
     setIsLoading(true);
     
     try {
+      // Définir le mode utilisateur
       setUserMode('b2b_user');
+      
+      // Enregistrer l'utilisateur
       await register(formData.email, formData.password, formData.name);
       
-      toast.success("Compte créé avec succès!");
+      toast.success("Compte collaborateur créé avec succès!");
       navigate('/b2b/user/dashboard');
     } catch (error) {
       console.error("Register error:", error);
@@ -73,19 +78,47 @@ const B2BUserRegisterPage: React.FC = () => {
               <Building2 className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Inscription Collaborateur</CardTitle>
-          <CardDescription>Créez votre compte professionnel</CardDescription>
+          <CardTitle className="text-2xl font-bold">Créer un compte collaborateur</CardTitle>
+          <CardDescription>
+            Rejoignez votre organisation sur EmotionsCare
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nom complet</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Votre nom"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle">Poste</Label>
+                <Input
+                  id="jobTitle"
+                  name="jobTitle"
+                  value={formData.jobTitle}
+                  onChange={handleChange}
+                  placeholder="Votre fonction"
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+            
             <div className="space-y-2">
-              <Label htmlFor="name">Nom complet</Label>
+              <Label htmlFor="company">Entreprise</Label>
               <Input
-                id="name"
-                name="name"
-                value={formData.name}
+                id="company"
+                name="company"
+                value={formData.company}
                 onChange={handleChange}
-                placeholder="Votre nom"
+                placeholder="Nom de votre entreprise"
                 required
                 disabled={isLoading}
               />
@@ -100,19 +133,6 @@ const B2BUserRegisterPage: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="votre.email@entreprise.com"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="company">Entreprise</Label>
-              <Input
-                id="company"
-                name="company"
-                value={formData.company}
-                onChange={handleChange}
-                placeholder="Nom de votre entreprise"
                 required
                 disabled={isLoading}
               />

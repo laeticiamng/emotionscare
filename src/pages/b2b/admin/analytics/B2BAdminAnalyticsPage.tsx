@@ -3,295 +3,395 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   BarChart3, 
   TrendingUp, 
-  Users, 
-  Calendar, 
   Download, 
-  Filter,
+  Calendar,
+  Users,
+  Target,
   Activity,
-  AlertTriangle,
-  Target
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 const B2BAdminAnalyticsPage: React.FC = () => {
-  const navigate = useNavigate();
-  const [timeRange, setTimeRange] = useState('30d');
-  const [department, setDepartment] = useState('all');
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [selectedPeriod, setSelectedPeriod] = useState('month');
 
   const analyticsData = {
-    summary: [
-      {
-        title: "Score moyen général",
-        value: "78.5",
-        change: "+5.2%",
-        trend: "up",
-        icon: Activity
-      },
-      {
-        title: "Participation",
-        value: "84%",
-        change: "+12%",
-        trend: "up", 
-        icon: Users
-      },
-      {
-        title: "Risques détectés",
-        value: "7",
-        change: "-3",
-        trend: "down",
-        icon: AlertTriangle
-      },
-      {
-        title: "Objectifs atteints",
-        value: "92%",
-        change: "+8%",
-        trend: "up",
-        icon: Target
-      }
-    ],
+    overall: {
+      avgWellbeing: 76,
+      change: +5.2,
+      totalUsers: 156,
+      activeUsers: 142,
+      engagementRate: 84,
+      completionRate: 78
+    },
     departments: [
-      { name: 'IT', score: 85, participation: 95, risk: 'low' },
-      { name: 'Marketing', score: 78, participation: 88, risk: 'medium' },
-      { name: 'RH', score: 82, participation: 92, risk: 'low' },
-      { name: 'Finance', score: 72, participation: 76, risk: 'high' },
-      { name: 'Commercial', score: 80, participation: 84, risk: 'medium' }
+      { name: 'Marketing', score: 82, users: 24, trend: 'up', change: +3.1 },
+      { name: 'IT', score: 78, users: 18, trend: 'up', change: +1.8 },
+      { name: 'Ventes', score: 74, users: 30, trend: 'down', change: -2.4 },
+      { name: 'RH', score: 85, users: 12, trend: 'up', change: +4.2 },
+      { name: 'Finance', score: 72, users: 15, trend: 'stable', change: +0.3 },
+      { name: 'Production', score: 70, users: 35, trend: 'down', change: -1.2 },
+      { name: 'R&D', score: 79, users: 22, trend: 'up', change: +2.7 }
     ],
-    trends: [
-      { week: 'S1', score: 72 },
-      { week: 'S2', score: 74 },
-      { week: 'S3', score: 76 },
-      { week: 'S4', score: 78 }
-    ]
+    trends: {
+      weekly: [65, 68, 72, 74, 76, 78, 76],
+      monthly: [70, 72, 74, 76],
+      engagement: [78, 80, 82, 84]
+    },
+    features: {
+      emotionalScan: { usage: 85, satisfaction: 4.2 },
+      socialNetwork: { usage: 72, satisfaction: 4.0 },
+      challenges: { usage: 68, satisfaction: 4.3 },
+      support: { usage: 45, satisfaction: 4.5 }
+    }
   };
 
-  const exportData = () => {
-    console.log('Exporting analytics data...');
+  const exportData = (type: string) => {
+    console.log(`Exporting ${type} data...`);
+    // Simulate export functionality
   };
 
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case 'low': return 'bg-green-100 text-green-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'high': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const getTrendIcon = (trend: string) => {
+    switch (trend) {
+      case 'up': return <ArrowUp className="h-4 w-4 text-green-600" />;
+      case 'down': return <ArrowDown className="h-4 w-4 text-red-600" />;
+      default: return <div className="h-4 w-4" />;
+    }
+  };
+
+  const getTrendColor = (trend: string) => {
+    switch (trend) {
+      case 'up': return 'text-green-600';
+      case 'down': return 'text-red-600';
+      default: return 'text-gray-600';
     }
   };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Analytics Avancées</h1>
+          <h1 className="text-3xl font-bold flex items-center">
+            <BarChart3 className="mr-3 h-8 w-8 text-primary" />
+            Analytics Avancées
+          </h1>
           <p className="text-muted-foreground">
             Analyses détaillées du bien-être organisationnel
           </p>
         </div>
-        <div className="flex space-x-2">
-          <Button variant="outline" onClick={exportData}>
-            <Download className="mr-2 h-4 w-4" />
-            Exporter
-          </Button>
-          <Button variant="outline">
-            <Filter className="mr-2 h-4 w-4" />
-            Filtres
-          </Button>
+        <div className="flex items-center space-x-4">
+          <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Sélectionner département" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les départements</SelectItem>
+              <SelectItem value="marketing">Marketing</SelectItem>
+              <SelectItem value="it">IT</SelectItem>
+              <SelectItem value="sales">Ventes</SelectItem>
+              <SelectItem value="hr">RH</SelectItem>
+              <SelectItem value="finance">Finance</SelectItem>
+              <SelectItem value="production">Production</SelectItem>
+              <SelectItem value="rd">R&D</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Période" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="week">Cette semaine</SelectItem>
+              <SelectItem value="month">Ce mois</SelectItem>
+              <SelectItem value="quarter">Ce trimestre</SelectItem>
+              <SelectItem value="year">Cette année</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-wrap gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Période</label>
-              <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="7d">7 derniers jours</SelectItem>
-                  <SelectItem value="30d">30 derniers jours</SelectItem>
-                  <SelectItem value="90d">3 derniers mois</SelectItem>
-                  <SelectItem value="1y">1 an</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Département</label>
-              <Select value={department} onValueChange={setDepartment}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="it">IT</SelectItem>
-                  <SelectItem value="marketing">Marketing</SelectItem>
-                  <SelectItem value="hr">RH</SelectItem>
-                  <SelectItem value="finance">Finance</SelectItem>
-                  <SelectItem value="sales">Commercial</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Summary Stats */}
+      {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {analyticsData.summary.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={index}>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">
-                      {stat.title}
-                    </p>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    <div className="flex items-center mt-1">
-                      <Badge variant={stat.trend === 'up' ? 'default' : 'secondary'} className="text-xs">
-                        {stat.change}
-                      </Badge>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Score Bien-être Moyen</p>
+                <p className="text-3xl font-bold">{analyticsData.overall.avgWellbeing}%</p>
+                <div className="flex items-center mt-1">
+                  <ArrowUp className="h-4 w-4 text-green-600 mr-1" />
+                  <span className="text-sm text-green-600">+{analyticsData.overall.change}%</span>
+                </div>
+              </div>
+              <Activity className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Utilisateurs Actifs</p>
+                <p className="text-3xl font-bold">{analyticsData.overall.activeUsers}</p>
+                <p className="text-sm text-muted-foreground">sur {analyticsData.overall.totalUsers}</p>
+              </div>
+              <Users className="h-8 w-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Taux d'Engagement</p>
+                <p className="text-3xl font-bold">{analyticsData.overall.engagementRate}%</p>
+                <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                  <div 
+                    className="bg-purple-600 h-2 rounded-full" 
+                    style={{ width: `${analyticsData.overall.engagementRate}%` }}
+                  ></div>
+                </div>
+              </div>
+              <TrendingUp className="h-8 w-8 text-purple-600" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Taux de Complétion</p>
+                <p className="text-3xl font-bold">{analyticsData.overall.completionRate}%</p>
+                <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                  <div 
+                    className="bg-orange-600 h-2 rounded-full" 
+                    style={{ width: `${analyticsData.overall.completionRate}%` }}
+                  ></div>
+                </div>
+              </div>
+              <Target className="h-8 w-8 text-orange-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Detailed Analytics */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Analyses Détaillées</CardTitle>
+          <CardDescription>Vue approfondie des métriques organisationnelles</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="departments" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="departments">Départements</TabsTrigger>
+              <TabsTrigger value="trends">Tendances</TabsTrigger>
+              <TabsTrigger value="features">Fonctionnalités</TabsTrigger>
+              <TabsTrigger value="reports">Rapports</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="departments" className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Performance par Département</h3>
+                <Button variant="outline" size="sm" onClick={() => exportData('departments')}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Exporter
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {analyticsData.departments.map((dept) => (
+                  <Card key={dept.name} className="relative">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h4 className="font-medium">{dept.name}</h4>
+                          <p className="text-sm text-muted-foreground">{dept.users} membres</p>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          {getTrendIcon(dept.trend)}
+                          <span className={`text-sm ${getTrendColor(dept.trend)}`}>
+                            {dept.change > 0 ? '+' : ''}{dept.change}%
+                          </span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Score bien-être</span>
+                          <span className="font-semibold">{dept.score}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className="bg-blue-600 h-2 rounded-full" 
+                            style={{ width: `${dept.score}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="trends" className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Évolution Temporelle</h3>
+                <Button variant="outline" size="sm" onClick={() => exportData('trends')}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Exporter
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Bien-être Hebdomadaire</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {analyticsData.trends.weekly.map((value, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <span className="text-sm">Semaine {index + 1}</span>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-24 bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-blue-600 h-2 rounded-full" 
+                                style={{ width: `${value}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-sm font-medium">{value}%</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                  <div className="p-3 rounded-full bg-primary/10">
-                    <Icon className="h-6 w-6 text-primary" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Trends Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <TrendingUp className="mr-2 h-5 w-5" />
-            Évolution du bien-être
-          </CardTitle>
-          <CardDescription>
-            Tendance du score moyen sur les 4 dernières semaines
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64 flex items-center justify-center bg-muted/20 rounded-lg">
-            <div className="text-center">
-              <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <p className="text-lg font-medium">Graphique de tendances</p>
-              <p className="text-sm text-muted-foreground">
-                Intégration Recharts en cours de développement
-              </p>
-            </div>
-          </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Engagement Mensuel</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {analyticsData.trends.engagement.map((value, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <span className="text-sm">Mois {index + 1}</span>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-24 bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-green-600 h-2 rounded-full" 
+                                style={{ width: `${value}%` }}
+                              ></div>
+                            </div>
+                            <span className="text-sm font-medium">{value}%</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="features" className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Utilisation des Fonctionnalités</h3>
+                <Button variant="outline" size="sm" onClick={() => exportData('features')}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Exporter
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(analyticsData.features).map(([key, data]) => (
+                  <Card key={key}>
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        <h4 className="font-medium capitalize">
+                          {key === 'emotionalScan' ? 'Analyse Émotionnelle' :
+                           key === 'socialNetwork' ? 'Réseau Social' :
+                           key === 'challenges' ? 'Défis' : 'Support'}
+                        </h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm">Utilisation</span>
+                            <span className="font-semibold">{data.usage}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-purple-600 h-2 rounded-full" 
+                              style={{ width: `${data.usage}%` }}
+                            ></div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm">Satisfaction</span>
+                            <Badge variant="secondary">{data.satisfaction}/5</Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="reports" className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-semibold">Génération de Rapports</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Rapports Automatiques</CardTitle>
+                    <CardDescription>Génération programmée</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button variant="outline" className="w-full justify-start">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      Rapport hebdomadaire - Vendredi 17h
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      Rapport mensuel - 1er du mois
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      Rapport trimestriel - Fin de trimestre
+                    </Button>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Rapports Personnalisés</CardTitle>
+                    <CardDescription>Génération à la demande</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button className="w-full" onClick={() => exportData('custom-wellness')}>
+                      Rapport Bien-être Global
+                    </Button>
+                    <Button className="w-full" onClick={() => exportData('custom-department')}>
+                      Analyse par Département
+                    </Button>
+                    <Button className="w-full" onClick={() => exportData('custom-trends')}>
+                      Rapport de Tendances
+                    </Button>
+                    <Button className="w-full" onClick={() => exportData('custom-recommendations')}>
+                      Recommandations Stratégiques
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
-
-      {/* Department Analysis */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Users className="mr-2 h-5 w-5" />
-            Analyse par département
-          </CardTitle>
-          <CardDescription>
-            Performance et risques par équipe
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {analyticsData.departments.map((dept, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <span className="font-medium text-primary">{dept.name}</span>
-                  </div>
-                  <div>
-                    <p className="font-medium">{dept.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Participation: {dept.participation}%
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="text-right">
-                    <p className="text-2xl font-bold">{dept.score}</p>
-                    <p className="text-sm text-muted-foreground">Score moyen</p>
-                  </div>
-                  <Badge className={getRiskColor(dept.risk)}>
-                    {dept.risk === 'low' ? 'Faible' : 
-                     dept.risk === 'medium' ? 'Moyen' : 'Élevé'} risque
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Detailed Reports */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Recommandations IA</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <h4 className="font-medium text-blue-900">Action prioritaire</h4>
-              <p className="text-sm text-blue-700 mt-1">
-                Organiser une session de team building pour l'équipe Finance
-              </p>
-            </div>
-            <div className="p-4 bg-green-50 rounded-lg">
-              <h4 className="font-medium text-green-900">Succès à reproduire</h4>
-              <p className="text-sm text-green-700 mt-1">
-                Les pratiques de l'équipe IT montrent d'excellents résultats
-              </p>
-            </div>
-            <div className="p-4 bg-orange-50 rounded-lg">
-              <h4 className="font-medium text-orange-900">Point d'attention</h4>
-              <p className="text-sm text-orange-700 mt-1">
-                Baisse de participation dans le département Marketing
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Prochaines actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-              <div>
-                <p className="text-sm font-medium">Intervention d'urgence - Équipe Finance</p>
-                <p className="text-xs text-muted-foreground">Dans 2 jours</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-              <div>
-                <p className="text-sm font-medium">Rapport mensuel de direction</p>
-                <p className="text-xs text-muted-foreground">Dans 1 semaine</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <div>
-                <p className="text-sm font-medium">Session de formation managers</p>
-                <p className="text-xs text-muted-foreground">Dans 2 semaines</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 };
