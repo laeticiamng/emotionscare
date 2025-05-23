@@ -29,7 +29,7 @@ const ScanPage: React.FC = () => {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Scanner émotionnel</h1>
         
-        <Tabs defaultValue="quick" className="mb-8" onValueChange={setActiveTab}>
+        <Tabs defaultValue="quick" className="mb-8" onValueChange={(value) => setActiveTab(value)}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="quick">Scan rapide</TabsTrigger>
             <TabsTrigger value="detailed">Scan détaillé</TabsTrigger>
