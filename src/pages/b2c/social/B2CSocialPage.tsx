@@ -5,66 +5,79 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Users, MessageCircle, Heart, Share2, Plus, Search, Globe } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft, Users, MessageSquare, Share2, Heart, MessageCircle, Plus, Globe, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-
-interface Post {
-  id: string;
-  author: string;
-  content: string;
-  timestamp: string;
-  likes: number;
-  comments: number;
-  tags: string[];
-  isAnonymous?: boolean;
-}
+import { useSocialCocon } from '@/contexts/SocialCoconContext';
 
 const B2CSocialPage: React.FC = () => {
   const navigate = useNavigate();
+  const { posts, addPost, likePost, addComment } = useSocialCocon();
   const [newPost, setNewPost] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showNewPost, setShowNewPost] = useState(false);
-  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<string | null>(null);
 
-  const [posts] = useState<Post[]>([
+  const handleCreatePost = () => {
+    if (newPost.trim()) {
+      addPost(newPost, 'current-user');
+      setNewPost('');
+      setIsPostDialogOpen(false);
+      toast.success('Publication partagée avec succès !');
+    }
+  };
+
+  const handleLike = (postId: string) => {
+    likePost(postId, 'current-user');
+    toast.success('Publication aimée !');
+  };
+
+  const handleComment = (postId: string) => {
+    if (newComment.trim()) {
+      addComment(postId, newComment, 'current-user');
+      setNewComment('');
+      toast.success('Commentaire ajouté !');
+    }
+  };
+
+  const mockPosts = [
     {
       id: '1',
-      author: 'Alex M.',
-      content: 'Magnifique session de méditation ce matin au lever du soleil. Je commence la journée avec une énergie positive incroyable ! 🌅✨',
-      timestamp: 'Il y a 1 heure',
+      userId: 'user1',
+      userName: 'Marie L.',
+      userAvatar: '/placeholder.svg',
+      content: "Aujourd'hui, j'ai pris 10 minutes pour méditer et cela a complètement changé ma journée. Petit pas mais grand impact ! 🧘‍♀️",
+      createdAt: '2024-01-20T10:30:00Z',
       likes: 12,
-      comments: 4,
-      tags: ['meditation', 'morning', 'positive'],
+      comments: 3,
+      tags: ['méditation', 'bien-être', 'mindfulness'],
       isAnonymous: false
     },
     {
       id: '2',
-      author: 'Utilisateur anonyme',
-      content: 'Quelqu\'un d\'autre a des difficultés à gérer le stress ces derniers temps ? J\'ai l\'impression d\'être submergé par tout ce qui se passe...',
-      timestamp: 'Il y a 3 heures',
-      likes: 8,
+      userId: 'user2',
+      userName: 'Utilisateur Anonyme',
+      userAvatar: '/placeholder.svg',
+      content: "Je traverse une période difficile mais je voulais partager que parler à quelqu'un m'aide vraiment. N'hésitez pas à tendre la main si vous en avez besoin.",
+      createdAt: '2024-01-20T08:15:00Z',
+      likes: 28,
       comments: 7,
-      tags: ['stress', 'support', 'help'],
+      tags: ['soutien', 'entraide', 'courage'],
       isAnonymous: true
     },
     {
       id: '3',
-      author: 'Marie L.',
-      content: 'Partage du jour : j\'ai découvert que 10 minutes de marche en pleine conscience changent complètement ma perspective. Merci à cette communauté pour l\'inspiration ! 🚶‍♀️💚',
-      timestamp: 'Il y a 5 heures',
-      likes: 20,
-      comments: 6,
-      tags: ['walking', 'mindfulness', 'gratitude'],
-      isAnonymous: false
-    },
-    {
-      id: '4',
-      author: 'Sam R.',
-      content: 'Challenge de la semaine : noter 3 choses positives chaque soir avant de dormir. Qui se joint à moi ? 📝💫',
-      timestamp: 'Il y a 1 jour',
-      likes: 15,
-      comments: 9,
+      userId: 'user3',
+      userName: 'Thomas K.',
+      userAvatar: '/placeholder.svg',
+      content: "Défi du jour : noter 3 choses positives qui me sont arrivées aujourd'hui. Qui se joint à moi ? 📝✨",
+      createdAt: '2024-01-19T18:45:00Z',
+      likes: 45,
+      comments: 12,
       tags: ['challenge', 'positivity', 'gratitude'],
       isAnonymous: false
     }
@@ -72,229 +85,255 @@ const B2CSocialPage: React.FC = () => {
 
   const communities = [
     { name: 'Méditation & Pleine Conscience', members: 1247, description: 'Pratiques et partages autour de la méditation' },
-    { name: 'Gestion du Stress', members: 892, description: 'Techniques et soutien pour gérer le stress quotidien' },
-    { name: 'Sport & Bien-être', members: 756, description: 'Motivation et conseils pour une vie active' },
-    { name: 'Nutrition Consciente', members: 634, description: 'Alimentation saine et équilibrée' }
+    { name: 'Gestion du Stress', members: 892, description: 'Techniques et conseils pour mieux gérer le stress' },
+    { name: 'Sommeil Réparateur', members: 634, description: 'Améliorer la qualité de son sommeil' },
+    { name: 'Parents Bienveillants', members: 456, description: 'Soutien entre parents pour une parentalité épanouie' }
   ];
 
-  const handleSubmitPost = () => {
-    if (!newPost.trim()) return;
-    
-    toast.success("Publication partagée avec succès!");
-    setNewPost('');
-    setShowNewPost(false);
-    setIsAnonymous(false);
-  };
-
-  const handleLike = (postId: string) => {
-    toast.success("Vous avez aimé cette publication");
-  };
-
-  const handleComment = (postId: string) => {
-    toast.info("Fonctionnalité de commentaire en développement");
-  };
+  const challenges = [
+    { title: '7 jours de gratitude', participants: 234, description: 'Noter chaque jour 3 choses pour lesquelles vous êtes reconnaissant' },
+    { title: 'Méditation quotidienne', participants: 189, description: '10 minutes de méditation chaque jour pendant une semaine' },
+    { title: 'Actes de bienveillance', participants: 156, description: 'Un acte de bienveillance par jour pendant 5 jours' }
+  ];
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Communauté Bien-être</h1>
-          <p className="text-muted-foreground">
-            Partagez votre parcours et soutenez-vous mutuellement
-          </p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/b2c/dashboard')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold">Social Cocoon</h1>
+            <p className="text-muted-foreground">
+              Connectez-vous avec une communauté bienveillante
+            </p>
+          </div>
         </div>
-        <Button onClick={() => setShowNewPost(!showNewPost)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Partager
-        </Button>
-      </div>
-
-      {/* Search and Communities */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3 space-y-6">
-          {/* Search Bar */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Rechercher des publications, des hashtags..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* New Post Form */}
-          {showNewPost && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Partager avec la communauté</CardTitle>
-                <CardDescription>
-                  Votre expérience peut inspirer et aider d'autres personnes
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+        <Dialog open={isPostDialogOpen} onOpenChange={setIsPostDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Nouvelle publication
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Partager avec la communauté</DialogTitle>
+              <DialogDescription>
+                Partagez vos pensées, expériences ou encouragements avec la communauté.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="post-content">Votre message</Label>
                 <Textarea
+                  id="post-content"
                   placeholder="Que souhaitez-vous partager aujourd'hui ?"
                   value={newPost}
                   onChange={(e) => setNewPost(e.target.value)}
                   className="min-h-24"
                 />
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-4">
-                    <label className="flex items-center space-x-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={isAnonymous}
-                        onChange={(e) => setIsAnonymous(e.target.checked)}
-                        className="rounded"
-                      />
-                      <span>Publier anonymement</span>
-                    </label>
-                    <div className="text-sm text-muted-foreground">
-                      Utilisez # pour ajouter des hashtags
-                    </div>
-                  </div>
-                  <div className="space-x-2">
-                    <Button variant="outline" onClick={() => setShowNewPost(false)}>
-                      Annuler
-                    </Button>
-                    <Button onClick={handleSubmitPost} disabled={!newPost.trim()}>
-                      Publier
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+              <div className="flex items-center space-x-2">
+                <Globe className="h-4 w-4" />
+                <span className="text-sm text-muted-foreground">Publication publique</span>
+              </div>
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsPostDialogOpen(false)}>
+                  Annuler
+                </Button>
+                <Button onClick={handleCreatePost}>
+                  Publier
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
 
-          {/* Posts Feed */}
-          <div className="space-y-4">
-            {posts.map((post) => (
+      <Tabs defaultValue="feed" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="feed">Fil d'actualité</TabsTrigger>
+          <TabsTrigger value="communities">Communautés</TabsTrigger>
+          <TabsTrigger value="challenges">Défis</TabsTrigger>
+          <TabsTrigger value="support">Soutien</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="feed" className="space-y-6">
+          <div className="grid gap-6">
+            {mockPosts.map((post) => (
               <Card key={post.id}>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          post.isAnonymous ? 'bg-gray-100' : 'bg-primary/10'
-                        }`}>
-                          {post.isAnonymous ? (
-                            <Globe className="h-5 w-5 text-gray-600" />
-                          ) : (
-                            <Users className="h-5 w-5 text-primary" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium">{post.author}</p>
-                          <p className="text-sm text-muted-foreground">{post.timestamp}</p>
-                        </div>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Avatar>
+                        <AvatarImage src={post.userAvatar} />
+                        <AvatarFallback>
+                          {post.isAnonymous ? '?' : post.userName.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">{post.userName}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(post.createdAt).toLocaleDateString('fr-FR')}
+                        </p>
                       </div>
-                      <Button variant="ghost" size="sm">
-                        <Share2 className="h-4 w-4" />
+                    </div>
+                    {post.isAnonymous && (
+                      <Badge variant="secondary">
+                        <Lock className="mr-1 h-3 w-3" />
+                        Anonyme
+                      </Badge>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p>{post.content}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {post.tags.map((tag) => (
+                      <Badge key={tag} variant="outline">#{tag}</Badge>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between pt-4 border-t">
+                    <div className="flex items-center space-x-4">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleLike(post.id)}
+                        className="text-muted-foreground hover:text-red-500"
+                      >
+                        <Heart className="mr-2 h-4 w-4" />
+                        {post.likes}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedPost(selectedPost === post.id ? null : post.id)}
+                        className="text-muted-foreground"
+                      >
+                        <MessageCircle className="mr-2 h-4 w-4" />
+                        {post.comments}
                       </Button>
                     </div>
-
-                    <p className="text-sm leading-relaxed">{post.content}</p>
-
-                    <div className="flex flex-wrap gap-2">
-                      {post.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
-                          #{tag}
-                        </Badge>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4 border-t">
-                      <div className="flex items-center space-x-4">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleLike(post.id)}
-                          className="text-muted-foreground hover:text-red-500"
-                        >
-                          <Heart className="h-4 w-4 mr-1" />
-                          {post.likes}
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleComment(post.id)}
-                          className="text-muted-foreground hover:text-blue-500"
-                        >
-                          <MessageCircle className="h-4 w-4 mr-1" />
-                          {post.comments}
+                    <Button variant="ghost" size="sm">
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {selectedPost === post.id && (
+                    <div className="space-y-3 pt-4 border-t">
+                      <div className="flex space-x-3">
+                        <Input
+                          placeholder="Ajouter un commentaire..."
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                        />
+                        <Button onClick={() => handleComment(post.id)}>
+                          Envoyer
                         </Button>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
+        </TabsContent>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Community Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Votre impact</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <p className="text-2xl font-bold text-blue-600">12</p>
-                <p className="text-sm text-muted-foreground">Publications partagées</p>
-              </div>
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <p className="text-2xl font-bold text-green-600">47</p>
-                <p className="text-sm text-muted-foreground">Personnes aidées</p>
-              </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <p className="text-2xl font-bold text-purple-600">156</p>
-                <p className="text-sm text-muted-foreground">Interactions positives</p>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="communities" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {communities.map((community, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    {community.name}
+                    <Badge variant="secondary">
+                      <Users className="mr-1 h-3 w-3" />
+                      {community.members}
+                    </Badge>
+                  </CardTitle>
+                  <CardDescription>{community.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button className="w-full">Rejoindre la communauté</Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
 
-          {/* Communities */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Communautés populaires</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {communities.map((community, index) => (
-                <div key={index} className="p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
-                  <h4 className="font-medium text-sm">{community.name}</h4>
-                  <p className="text-xs text-muted-foreground">{community.description}</p>
-                  <p className="text-xs text-blue-600 mt-1">{community.members} membres</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+        <TabsContent value="challenges" className="space-y-6">
+          <div className="grid gap-6">
+            {challenges.map((challenge, index) => (
+              <Card key={index}>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    {challenge.title}
+                    <Badge variant="outline">
+                      {challenge.participants} participants
+                    </Badge>
+                  </CardTitle>
+                  <CardDescription>{challenge.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button>Participer au défi</Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
 
-          {/* Daily Challenge */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Défi du jour</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
-                <h4 className="font-medium mb-2">Gratitude Express</h4>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Partagez une chose pour laquelle vous êtes reconnaissant aujourd'hui
-                </p>
-                <Button size="sm" className="w-full">
-                  Participer
+        <TabsContent value="support" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Chat de soutien 24/7</CardTitle>
+                <CardDescription>
+                  Discutez avec des personnes bienveillantes à tout moment
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full">
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Rejoindre le chat
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Buddy System</CardTitle>
+                <CardDescription>
+                  Trouvez un partenaire de soutien pour votre parcours
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full">
+                  <Users className="mr-2 h-4 w-4" />
+                  Trouver un buddy
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle>Ressources d'aide professionnelle</CardTitle>
+                <CardDescription>
+                  Accédez à des ressources et contacts professionnels
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button variant="outline">Lignes d'écoute</Button>
+                  <Button variant="outline">Professionnels près de chez vous</Button>
+                  <Button variant="outline">Ressources en ligne</Button>
+                  <Button variant="outline">Guides d'auto-aide</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
