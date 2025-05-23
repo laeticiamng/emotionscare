@@ -4,7 +4,7 @@ import { RouteObject } from 'react-router-dom';
 
 // Pages d'authentification et communes
 const LandingPage = React.lazy(() => import('./pages/LandingPage'));
-const ChooseModePage = React.lazy(() => import('./pages/auth/ChooseModePage'));
+const ChooseModePage = React.lazy(() => import('./pages/ChooseModePage'));
 const B2BSelectionPage = React.lazy(() => import('./pages/common/B2BSelection'));
 const ForgotPasswordPage = React.lazy(() => import('./pages/auth/ForgotPasswordPage'));
 const ResetPasswordPage = React.lazy(() => import('./pages/auth/ResetPasswordPage'));

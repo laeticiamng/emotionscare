@@ -1,95 +1,95 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
-import { useAuth } from '@/contexts/AuthContext';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 
-interface ForgotPasswordPageProps {
-  mode?: 'b2c' | 'b2b_user' | 'b2b_admin';
-}
-
-const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({ mode = 'b2c' }) => {
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const ForgotPasswordPage: React.FC = () => {
   const navigate = useNavigate();
-  const { resetPassword } = useAuth();
+  const [email, setEmail] = React.useState('');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [success, setSuccess] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    if (!email) {
-      toast.error("Veuillez saisir votre adresse email");
-      return;
-    }
-    
     setIsSubmitting(true);
+    setError(null);
     
     try {
-      await resetPassword(email);
-      toast.success("Instructions de réinitialisation envoyées", {
-        description: "Veuillez consulter votre boîte mail pour la suite des instructions."
-      });
-      
-      // After success, navigate to the login page
-      setTimeout(() => {
-        const loginPath = mode === 'b2c' ? '/b2c/login' : 
-                         mode === 'b2b_user' ? '/b2b/user/login' :
-                         '/b2b/admin/login';
-        navigate(loginPath);
-      }, 2000);
+      // Replace with actual reset password logic
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSuccess(true);
     } catch (error) {
-      console.error("Password reset error:", error);
-      toast.error("Erreur lors de l'envoi", {
-        description: "Une erreur s'est produite. Veuillez réessayer plus tard."
-      });
+      setError('Une erreur s\'est produite. Veuillez réessayer.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const getLoginPath = () => {
-    if (mode === 'b2c') return '/b2c/login';
-    if (mode === 'b2b_user') return '/b2b/user/login';
-    return '/b2b/admin/login';
-  };
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-muted/30 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Mot de passe oublié</CardTitle>
-          <CardDescription>
-            Entrez votre adresse email pour recevoir un lien de réinitialisation
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="exemple@email.com" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
+      <div className="w-full max-w-md">
+        <Card className="w-full">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center">Mot de passe oublié</CardTitle>
+            <CardDescription className="text-center">
+              Entrez votre email pour recevoir un lien de réinitialisation
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent>
+            {success ? (
+              <div className="text-center space-y-4">
+                <div className="p-3 rounded-full bg-green-100 inline-flex">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-sm">
+                  Si un compte existe avec cet email, nous vous avons envoyé un lien de réinitialisation.
+                  Veuillez vérifier votre boîte de réception.
+                </p>
+                <Button className="w-full" onClick={() => navigate('/login')}>
+                  Retour à la connexion
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="votre@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                {error && (
+                  <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+                    {error}
+                  </div>
+                )}
+                
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? 'Envoi en cours...' : 'Envoyer le lien'}
+                </Button>
+              </form>
+            )}
           </CardContent>
-          <CardFooter className="flex flex-col">
-            <Button type="submit" className="w-full mb-4" disabled={isSubmitting}>
-              {isSubmitting ? "Envoi en cours..." : "Envoyer le lien de réinitialisation"}
-            </Button>
-            <Button variant="ghost" className="w-full" onClick={() => navigate(getLoginPath())}>
-              Retour à la connexion
+          
+          <CardFooter className="flex justify-center">
+            <Button variant="link" onClick={() => navigate('/choose-mode')}>
+              Retour à l'accueil
             </Button>
           </CardFooter>
-        </form>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };

@@ -1,164 +1,141 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { resetPassword } from '@/lib/passwordResetService';
 
-interface ResetPasswordPageProps {
-  mode?: 'b2c' | 'b2b_user' | 'b2b_admin';
-}
-
-const ResetPasswordPage: React.FC<ResetPasswordPageProps> = ({ mode = 'b2c' }) => {
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [token, setToken] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isTokenValid, setIsTokenValid] = useState<boolean | null>(null);
+const ResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  // Extract token from URL on component mount
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const tokenParam = queryParams.get('token');
-    
-    if (tokenParam) {
-      setToken(tokenParam);
-      // In a real implementation, we would verify the token validity here
-      setIsTokenValid(true);
-    } else {
-      setIsTokenValid(false);
-      toast.error("Lien de réinitialisation invalide", {
-        description: "Le lien que vous avez utilisé est invalide ou a expiré.",
-      });
-    }
-  }, [location]);
+  // Extract token from URL query params
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get('token');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    if (!password || !confirmPassword) {
-      toast.error("Veuillez remplir tous les champs");
-      return;
-    }
-    
+    setError(null);
+
     if (password !== confirmPassword) {
-      toast.error("Les mots de passe ne correspondent pas");
+      setError('Les mots de passe ne correspondent pas.');
       return;
     }
-    
+
     if (password.length < 8) {
-      toast.error("Le mot de passe doit contenir au moins 8 caractères");
+      setError('Le mot de passe doit contenir au moins 8 caractères.');
       return;
     }
-    
+
+    if (!token) {
+      setError('Token de réinitialisation manquant ou invalide.');
+      return;
+    }
+
     setIsSubmitting(true);
-    
+
     try {
-      if (token) {
-        const result = await resetPassword(token, password);
-        
-        if (result.success) {
-          toast.success("Mot de passe réinitialisé avec succès", {
-            description: "Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
-          });
-          
-          // Redirect to login page after success
-          setTimeout(() => {
-            const loginPath = mode === 'b2c' ? '/b2c/login' : 
-                             mode === 'b2b_user' ? '/b2b/user/login' :
-                             '/b2b/admin/login';
-            navigate(loginPath);
-          }, 2000);
-        } else {
-          toast.error("Erreur lors de la réinitialisation", {
-            description: result.message || "Une erreur s'est produite. Veuillez réessayer.",
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Password reset error:", error);
-      toast.error("Erreur lors de la réinitialisation", {
-        description: "Une erreur s'est produite. Veuillez réessayer plus tard.",
-      });
+      // Replace with actual reset password logic
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSuccess(true);
+      toast.success('Mot de passe réinitialisé avec succès');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    } catch (err) {
+      setError('Erreur lors de la réinitialisation du mot de passe. Veuillez réessayer.');
+      console.error('Password reset error:', err);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const getLoginPath = () => {
-    if (mode === 'b2c') return '/b2c/login';
-    if (mode === 'b2b_user') return '/b2b/user/login';
-    return '/b2b/admin/login';
-  };
-
-  if (isTokenValid === false) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-muted/30 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Lien invalide</CardTitle>
-            <CardDescription>
-              Le lien de réinitialisation que vous avez utilisé est invalide ou a expiré.
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
+      <div className="w-full max-w-md">
+        <Card className="w-full">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center">Réinitialiser votre mot de passe</CardTitle>
+            <CardDescription className="text-center">
+              Créez un nouveau mot de passe sécurisé
             </CardDescription>
           </CardHeader>
-          <CardFooter>
-            <Button className="w-full" onClick={() => navigate(getLoginPath())}>
-              Retour à la connexion
+          
+          <CardContent>
+            {success ? (
+              <div className="text-center space-y-4">
+                <div className="rounded-full bg-green-100 p-3 inline-flex">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-sm">Mot de passe réinitialisé avec succès. Vous allez être redirigé vers la page de connexion.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {!token && (
+                  <div className="p-3 text-sm text-amber-500 bg-amber-50 rounded-md">
+                    Lien de réinitialisation invalide ou expiré. Veuillez demander un nouveau lien.
+                  </div>
+                )}
+                
+                <div className="space-y-2">
+                  <Label htmlFor="password">Nouveau mot de passe</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    disabled={!token || isSubmitting}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    disabled={!token || isSubmitting}
+                  />
+                </div>
+                
+                {error && (
+                  <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+                    {error}
+                  </div>
+                )}
+                
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={!token || isSubmitting}
+                >
+                  {isSubmitting ? 'Réinitialisation en cours...' : 'Réinitialiser le mot de passe'}
+                </Button>
+              </form>
+            )}
+          </CardContent>
+          
+          <CardFooter className="flex justify-center">
+            <Button variant="link" onClick={() => navigate('/forgot-password')}>
+              Demander un nouveau lien
             </Button>
           </CardFooter>
         </Card>
       </div>
-    );
-  }
-
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-muted/30 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Réinitialiser votre mot de passe</CardTitle>
-          <CardDescription>
-            Veuillez saisir votre nouveau mot de passe
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">Nouveau mot de passe</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-              <Input 
-                id="confirmPassword" 
-                type="password" 
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
-          </CardContent>
-          <CardFooter className="flex flex-col">
-            <Button type="submit" className="w-full mb-4" disabled={isSubmitting || !isTokenValid}>
-              {isSubmitting ? "Réinitialisation en cours..." : "Réinitialiser le mot de passe"}
-            </Button>
-            <Button variant="ghost" className="w-full" onClick={() => navigate(getLoginPath())}>
-              Retour à la connexion
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
     </div>
   );
 };

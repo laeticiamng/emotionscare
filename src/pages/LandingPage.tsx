@@ -1,106 +1,121 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowRight, BarChart, Music, Brain } from 'lucide-react';
-import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Heart, Users, Shield, ArrowRight } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleNavigate = (path: string) => {
-    navigate(path);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
-      <div className="container mx-auto px-4 py-16 md:py-24">
-        <motion.div 
-          className="text-center max-w-4xl mx-auto space-y-8"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-            Prenez soin de votre <span className="text-primary">bien-être émotionnel</span>
-          </h1>
-          
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Découvrez des outils personnalisés pour améliorer votre bien-être quotidien et renforcer votre résilience émotionnelle.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button 
-              size="lg" 
-              onClick={() => handleNavigate('/b2c/login')}
-              className="text-lg px-8 py-6"
-            >
-              Commencer maintenant <ArrowRight className="ml-2 h-5 w-5" />
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
+      {/* Header */}
+      <header className="border-b">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-primary">EmotionsCare</h1>
+          <div className="space-x-2">
+            <Button variant="ghost" onClick={() => navigate('/choose-mode')}>
+              Se connecter
             </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              onClick={() => handleNavigate('/b2b/selection')}
-              className="text-lg px-8 py-6"
-            >
-              Solutions entreprise
+            <Button onClick={() => navigate('/choose-mode')}>
+              Commencer
             </Button>
           </div>
-
-          <div className="pt-4">
-            <Button 
-              variant="link" 
-              onClick={() => handleNavigate('/choose-mode')}
-              className="text-lg"
-            >
-              Choisir un mode d'utilisation
-            </Button>
-          </div>
-        </motion.div>
-        
-        <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              title: 'Analysez vos émotions',
-              description: 'Suivez votre bien-être grâce à des outils d\'analyse émotionnelle avancés',
-              icon: <BarChart className="h-12 w-12 text-primary mb-4" />,
-              action: () => handleNavigate('/scan')
-            },
-            {
-              title: 'Thérapie musicale',
-              description: 'Découvrez des playlists adaptées à votre humeur et à vos besoins',
-              icon: <Music className="h-12 w-12 text-primary mb-4" />,
-              action: () => {
-                toast.info("Module de thérapie musicale à venir très prochainement");
-                setTimeout(() => handleNavigate('/choose-mode'), 1500);
-              }
-            },
-            {
-              title: 'Expériences immersives',
-              description: 'Vivez des sessions de réalité virtuelle pour la relaxation et la méditation',
-              icon: <Brain className="h-12 w-12 text-primary mb-4" />,
-              action: () => handleNavigate('/vr')
-            }
-          ].map((item, index) => (
-            <motion.div 
-              key={index}
-              className="bg-card p-6 rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
-              onClick={item.action}
-              whileHover={{ scale: 1.03 }}
-            >
-              <div className="flex flex-col items-center">
-                {item.icon}
-                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
-                <p className="text-muted-foreground">{item.description}</p>
-              </div>
-            </motion.div>
-          ))}
         </div>
-      </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="container mx-auto px-4 py-20 text-center">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            Prenez soin de votre bien-être émotionnel
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8">
+            Une plateforme complète pour analyser, comprendre et améliorer votre santé émotionnelle, 
+            que vous soyez particulier ou professionnel.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Button size="lg" onClick={() => navigate('/choose-mode')} className="gap-2">
+              Commencer maintenant <ArrowRight className="h-4 w-4" />
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => navigate('/b2b/selection')}>
+              Espace professionnel
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h3 className="text-3xl font-bold mb-4">Pour qui ?</h3>
+          <p className="text-muted-foreground">Adapté à tous vos besoins</p>
+        </div>
+        
+        <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <Card className="text-center hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <Heart className="h-12 w-12 text-primary mx-auto mb-4" />
+              <CardTitle>Particuliers</CardTitle>
+              <CardDescription>
+                Analysez vos émotions au quotidien
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Outils personnalisés pour comprendre et gérer vos émotions
+              </p>
+              <Button variant="outline" onClick={() => navigate('/b2c/login')}>
+                Accéder à l'espace personnel
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <Users className="h-12 w-12 text-primary mx-auto mb-4" />
+              <CardTitle>Collaborateurs</CardTitle>
+              <CardDescription>
+                Bien-être en entreprise
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Participez aux initiatives de bien-être de votre organisation
+              </p>
+              <Button variant="outline" onClick={() => navigate('/b2b/user/login')}>
+                Espace collaborateur
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <Shield className="h-12 w-12 text-primary mx-auto mb-4" />
+              <CardTitle>Administrateurs RH</CardTitle>
+              <CardDescription>
+                Gestion et analytics
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Tableau de bord complet pour le suivi du bien-être de vos équipes
+              </p>
+              <Button variant="outline" onClick={() => navigate('/b2b/admin/login')}>
+                Dashboard administrateur
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t mt-20">
+        <div className="container mx-auto px-4 py-8 text-center text-muted-foreground">
+          <p>&copy; 2024 EmotionsCare. Tous droits réservés.</p>
+        </div>
+      </footer>
     </div>
   );
 };
