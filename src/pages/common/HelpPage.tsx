@@ -403,15 +403,15 @@ const HelpPage: React.FC = () => {
                 <CardContent className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Questions générales</span>
-                    <Badge variant="secondary">< 24h</Badge>
+                    <Badge variant="secondary">{'<'} 24h</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Problèmes techniques</span>
-                    <Badge variant="secondary">< 12h</Badge>
+                    <Badge variant="secondary">{'<'} 12h</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Urgences</span>
-                    <Badge variant="default">< 4h</Badge>
+                    <Badge variant="secondary">{'<'} 2h</Badge>
                   </div>
                 </CardContent>
               </Card>
@@ -425,9 +425,9 @@ const HelpPage: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-yellow-600">4.8/5</div>
+                    <div className="text-3xl font-bold text-green-600 mb-2">98%</div>
                     <p className="text-sm text-muted-foreground">
-                      Basé sur 1,247 avis clients
+                      de nos utilisateurs sont satisfaits de notre support
                     </p>
                   </div>
                 </CardContent>
