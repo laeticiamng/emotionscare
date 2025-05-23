@@ -50,7 +50,7 @@ export default defineConfig(({ mode }) => ({
     sourcemap: mode === 'development',
     reportCompressedSize: false, // Faster builds
     chunkSizeWarningLimit: 1000, // Increase warning limit
-    minify: mode === 'production' ? 'terser' : 'esbuild', // Use esbuild for dev builds for speed
+    minify: 'esbuild', // Always use esbuild for faster builds
     terserOptions: {
       compress: {
         drop_console: mode === 'production', // Remove console logs in production
