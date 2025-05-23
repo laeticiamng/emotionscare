@@ -1,244 +1,385 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useRef, useCallback } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Brain, Mic, Camera, FileText, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Camera, Mic, Type, Upload, Play, Square, Loader2 } from 'lucide-react';
+import { useEmotionAnalysis } from '@/hooks/useEmotionAnalysis';
+import { EmotionResult } from '@/types/emotion';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
+import { useToast } from '@/hooks/use-toast';
 
-interface EmotionResult {
-  score: number;
-  emotions: string[];
-  analysis: string;
-  recommendations: string[];
+interface EmotionScannerProps {
+  onEmotionDetected?: (result: EmotionResult) => void;
+  onScanComplete?: (result: EmotionResult) => void;
 }
 
-const EmotionScanner: React.FC = () => {
-  const { user } = useAuth();
-  const [inputText, setInputText] = useState('');
-  const [isScanning, setIsScanning] = useState(false);
-  const [result, setResult] = useState<EmotionResult | null>(null);
-  const [scanMethod, setScanMethod] = useState<'text' | 'audio' | 'video'>('text');
+const EmotionScanner: React.FC<EmotionScannerProps> = ({
+  onEmotionDetected,
+  onScanComplete
+}) => {
+  const [text, setText] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [activeTab, setActiveTab] = useState('text');
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  
+  const { toast } = useToast();
+  const { 
+    analyzeText, 
+    analyzeFacial, 
+    analyzeVoice,
+    isAnalyzing, 
+    error, 
+    lastResult,
+    resetAnalysis 
+  } = useEmotionAnalysis();
+  
+  const { activateMusicForEmotion } = useMusicEmotionIntegration();
 
-  const performTextScan = async () => {
-    if (!user || !inputText.trim()) return;
+  const handleEmotionResult = useCallback((result: EmotionResult) => {
+    if (onEmotionDetected) {
+      onEmotionDetected(result);
+    }
+    if (onScanComplete) {
+      onScanComplete(result);
+    }
+    
+    // Auto-activate music for detected emotion
+    activateMusicForEmotion({
+      emotion: result.emotion,
+      intensity: result.confidence
+    }).catch(console.error);
+    
+    toast({
+      title: "Analyse terminée",
+      description: `Émotion détectée : ${result.emotion} (${Math.round(result.confidence * 100)}%)`,
+    });
+  }, [onEmotionDetected, onScanComplete, activateMusicForEmotion, toast]);
 
-    setIsScanning(true);
-    try {
-      // Simulation d'analyse émotionnelle avancée
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Analyse basique des mots-clés
-      const keywords = {
-        positive: ['heureux', 'joie', 'content', 'bien', 'super', 'génial', 'optimiste'],
-        negative: ['triste', 'mal', 'déprimé', 'anxieux', 'stress', 'fatigue', 'peur'],
-        neutral: ['ok', 'normal', 'correct', 'moyen']
-      };
-
-      const text = inputText.toLowerCase();
-      let score = 50;
-      const detectedEmotions = [];
-
-      for (const word of keywords.positive) {
-        if (text.includes(word)) {
-          score += 10;
-          detectedEmotions.push('Positif');
-        }
-      }
-
-      for (const word of keywords.negative) {
-        if (text.includes(word)) {
-          score -= 10;
-          detectedEmotions.push('Négatif');
-        }
-      }
-
-      score = Math.max(0, Math.min(100, score));
-
-      const mockResult: EmotionResult = {
-        score,
-        emotions: [...new Set(detectedEmotions)],
-        analysis: `Votre état émotionnel actuel reflète un score de ${score}/100. L'analyse de votre message révèle plusieurs indicateurs importants pour votre bien-être.`,
-        recommendations: [
-          score > 70 ? 'Continuez sur cette voie positive !' : 'Prenez un moment pour vous détendre',
-          'Pratiquez la respiration profonde',
-          'Écoutez de la musique apaisante'
-        ]
-      };
-
-      setResult(mockResult);
-
-      // Sauvegarder dans Supabase
-      const { error } = await supabase
-        .from('emotions')
-        .insert({
-          user_id: user.id,
-          text: inputText,
-          score: score,
-          ai_feedback: mockResult.analysis
-        });
-
-      if (error) throw error;
-
-      toast.success('Scan émotionnel terminé !');
-
-    } catch (error) {
-      console.error('Emotion scan error:', error);
-      toast.error('Erreur lors du scan émotionnel');
-    } finally {
-      setIsScanning(false);
+  const handleTextAnalysis = async () => {
+    if (!text.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez saisir du texte à analyser",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const result = await analyzeText(text);
+    if (result) {
+      handleEmotionResult(result);
     }
   };
 
-  const resetScan = () => {
-    setResult(null);
-    setInputText('');
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { width: 640, height: 480 },
+        audio: false 
+      });
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        streamRef.current = stream;
+      }
+    } catch (err) {
+      console.error('Error accessing camera:', err);
+      toast({
+        title: "Erreur caméra",
+        description: "Impossible d'accéder à la caméra",
+        variant: "destructive"
+      });
+    }
   };
 
-  if (result) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-primary" />
-            Résultat de votre Scan Émotionnel
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Score principal */}
-          <div className="text-center space-y-4">
-            <div className="text-4xl font-bold text-primary">{result.score}/100</div>
-            <Progress value={result.score} className="w-full" />
-            <p className="text-muted-foreground">Score de bien-être émotionnel</p>
-          </div>
+  const capturePhoto = async () => {
+    if (!videoRef.current || !streamRef.current) return;
+    
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    
+    if (context) {
+      context.drawImage(videoRef.current, 0, 0);
+      
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          const result = await analyzeFacial(blob);
+          if (result) {
+            handleEmotionResult(result);
+          }
+        }
+      }, 'image/jpeg', 0.8);
+    }
+  };
 
-          {/* Émotions détectées */}
-          {result.emotions.length > 0 && (
-            <div>
-              <h3 className="font-semibold mb-2">Émotions détectées :</h3>
-              <div className="flex flex-wrap gap-2">
-                {result.emotions.map((emotion, index) => (
-                  <Badge key={index} variant="secondary">{emotion}</Badge>
-                ))}
-              </div>
-            </div>
-          )}
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner une image valide",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setSelectedImage(file);
+    const result = await analyzeFacial(file);
+    if (result) {
+      handleEmotionResult(result);
+    }
+  };
 
-          {/* Analyse */}
-          <div>
-            <h3 className="font-semibold mb-2">Analyse :</h3>
-            <p className="text-muted-foreground">{result.analysis}</p>
-          </div>
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+      
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+      
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const result = await analyzeVoice(audioBlob);
+        if (result) {
+          handleEmotionResult(result);
+        }
+      };
+      
+      mediaRecorder.start();
+      setIsRecording(true);
+      
+      toast({
+        title: "Enregistrement démarré",
+        description: "Parlez maintenant...",
+      });
+    } catch (err) {
+      console.error('Error accessing microphone:', err);
+      toast({
+        title: "Erreur microphone",
+        description: "Impossible d'accéder au microphone",
+        variant: "destructive"
+      });
+    }
+  };
 
-          {/* Recommandations */}
-          <div>
-            <h3 className="font-semibold mb-2">Recommandations :</h3>
-            <ul className="space-y-1">
-              {result.recommendations.map((rec, index) => (
-                <li key={index} className="text-sm text-muted-foreground">• {rec}</li>
-              ))}
-            </ul>
-          </div>
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      toast({
+        title: "Enregistrement terminé",
+        description: "Analyse en cours...",
+      });
+    }
+  };
 
-          <Button onClick={resetScan} className="w-full">
-            Nouveau Scan
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
+  React.useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   return (
-    <Card>
+    <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Brain className="h-5 w-5 text-primary" />
-          Scanner vos Émotions
+          <Camera className="h-6 w-6" />
+          Scanner Émotionnel
         </CardTitle>
-        <CardDescription>
-          Analysez votre état émotionnel avec notre IA avancée
-        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Méthodes de scan */}
-        <div className="grid grid-cols-3 gap-4">
-          <Button
-            variant={scanMethod === 'text' ? 'default' : 'outline'}
-            onClick={() => setScanMethod('text')}
-            className="flex flex-col gap-2 h-16"
-          >
-            <FileText className="h-5 w-5" />
-            Texte
-          </Button>
-          <Button
-            variant={scanMethod === 'audio' ? 'default' : 'outline'}
-            onClick={() => setScanMethod('audio')}
-            className="flex flex-col gap-2 h-16"
-            disabled
-          >
-            <Mic className="h-5 w-5" />
-            Audio
-            <span className="text-xs">Bientôt</span>
-          </Button>
-          <Button
-            variant={scanMethod === 'video' ? 'default' : 'outline'}
-            onClick={() => setScanMethod('video')}
-            className="flex flex-col gap-2 h-16"
-            disabled
-          >
-            <Camera className="h-5 w-5" />
-            Vidéo
-            <span className="text-xs">Bientôt</span>
-          </Button>
-        </div>
+      <CardContent>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="text" className="flex items-center gap-2">
+              <Type className="h-4 w-4" />
+              Texte
+            </TabsTrigger>
+            <TabsTrigger value="facial" className="flex items-center gap-2">
+              <Camera className="h-4 w-4" />
+              Visuel
+            </TabsTrigger>
+            <TabsTrigger value="voice" className="flex items-center gap-2">
+              <Mic className="h-4 w-4" />
+              Vocal
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Interface de scan par texte */}
-        {scanMethod === 'text' && (
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                Comment vous sentez-vous aujourd'hui ?
-              </label>
-              <Textarea
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder="Décrivez votre état émotionnel, vos sentiments, votre journée..."
-                rows={4}
-                disabled={isScanning}
-              />
-            </div>
-
+          <TabsContent value="text" className="space-y-4">
+            <Textarea
+              placeholder="Décrivez votre état émotionnel ou vos pensées..."
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={4}
+            />
             <Button 
-              onClick={performTextScan}
-              disabled={!inputText.trim() || isScanning}
+              onClick={handleTextAnalysis}
+              disabled={isAnalyzing || !text.trim()}
               className="w-full"
             >
-              {isScanning ? (
+              {isAnalyzing ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Analyse en cours...
                 </>
               ) : (
-                <>
-                  <Brain className="mr-2 h-4 w-4" />
-                  Analyser mes émotions
-                </>
+                'Analyser le texte'
               )}
+            </Button>
+          </TabsContent>
+
+          <TabsContent value="facial" className="space-y-4">
+            <div className="space-y-4">
+              <div className="border rounded-lg p-4">
+                <video 
+                  ref={videoRef}
+                  autoPlay
+                  muted
+                  className="w-full max-w-md mx-auto rounded-lg"
+                  style={{ display: streamRef.current ? 'block' : 'none' }}
+                />
+                {!streamRef.current && (
+                  <div className="text-center py-8">
+                    <Camera className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-muted-foreground">Caméra non activée</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex gap-2">
+                <Button 
+                  onClick={startCamera}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Activer la caméra
+                </Button>
+                <Button 
+                  onClick={capturePhoto}
+                  disabled={!streamRef.current || isAnalyzing}
+                  className="flex-1"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Analyse...
+                    </>
+                  ) : (
+                    'Capturer et analyser'
+                  )}
+                </Button>
+              </div>
+              
+              <div className="border-t pt-4">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <Button 
+                  onClick={() => fileInputRef.current?.click()}
+                  variant="outline"
+                  className="w-full"
+                  disabled={isAnalyzing}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Télécharger une image
+                </Button>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="voice" className="space-y-4">
+            <div className="text-center space-y-4">
+              <div className="border rounded-lg p-8">
+                <Mic className={`h-16 w-16 mx-auto mb-4 ${isRecording ? 'text-red-500 animate-pulse' : 'text-muted-foreground'}`} />
+                <p className="text-muted-foreground">
+                  {isRecording ? 'Enregistrement en cours...' : 'Prêt à enregistrer'}
+                </p>
+              </div>
+              
+              <Button 
+                onClick={isRecording ? stopRecording : startRecording}
+                disabled={isAnalyzing}
+                className={`w-full ${isRecording ? 'bg-red-500 hover:bg-red-600' : ''}`}
+              >
+                {isAnalyzing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Analyse en cours...
+                  </>
+                ) : isRecording ? (
+                  <>
+                    <Square className="h-4 w-4 mr-2" />
+                    Arrêter l'enregistrement
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4 mr-2" />
+                    Commencer l'enregistrement
+                  </>
+                )}
+              </Button>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={resetAnalysis}
+              className="mt-2"
+            >
+              Réessayer
             </Button>
           </div>
         )}
 
-        {/* Info sur l'IA */}
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <h4 className="font-semibold text-blue-900 mb-2">🧠 Intelligence Artificielle</h4>
-          <p className="text-blue-800 text-sm">
-            Notre IA analyse votre langage naturel pour identifier vos émotions et vous proposer des recommandations personnalisées.
-          </p>
-        </div>
+        {lastResult && (
+          <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+            <h4 className="font-medium text-green-800 dark:text-green-200 mb-2">
+              Résultat de l'analyse
+            </h4>
+            <div className="space-y-1 text-sm">
+              <p><span className="font-medium">Émotion :</span> {lastResult.emotion}</p>
+              <p><span className="font-medium">Confiance :</span> {Math.round(lastResult.confidence * 100)}%</p>
+              <p><span className="font-medium">Source :</span> {lastResult.source}</p>
+              {lastResult.transcription && (
+                <p><span className="font-medium">Transcription :</span> {lastResult.transcription}</p>
+              )}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

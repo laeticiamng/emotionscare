@@ -7,27 +7,44 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface HumeAnalysisRequest {
+  type: 'facial' | 'voice' | 'text';
+  image?: string; // base64
+  audio?: string; // base64
+  text?: string;
+  options?: {
+    language?: string;
+    returnFaceDetails?: boolean;
+    includeProsody?: boolean;
+  };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const { text, audio, emojis, type } = await req.json();
-    
-    // Mock Hume AI analysis since we don't have the actual API key
-    // In production, you would use the real Hume AI API
-    
+    const body: HumeAnalysisRequest = await req.json();
+    const { type, image, audio, text, options = {} } = body;
+
+    console.log(`Processing ${type} analysis request`);
+
+    // Mock Hume AI analysis - in production, this would call the real Hume API
     let analysisResult;
-    
-    if (type === 'text' && text) {
-      analysisResult = analyzeTextEmotions(text);
-    } else if (type === 'audio' && audio) {
-      analysisResult = analyzeAudioEmotions(text); // text from transcription
-    } else if (type === 'emoji' && emojis) {
-      analysisResult = analyzeEmojiEmotions(emojis);
-    } else {
-      throw new Error('Invalid analysis type or missing data');
+
+    switch (type) {
+      case 'facial':
+        analysisResult = await mockFacialAnalysis(image, options);
+        break;
+      case 'voice':
+        analysisResult = await mockVoiceAnalysis(audio, text, options);
+        break;
+      case 'text':
+        analysisResult = await mockTextAnalysis(text, options);
+        break;
+      default:
+        throw new Error(`Unsupported analysis type: ${type}`);
     }
 
     return new Response(
@@ -38,179 +55,157 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in hume-analysis:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
+      JSON.stringify({ 
+        error: error.message,
+        dominantEmotion: 'neutral',
+        confidence: 0.5,
+        emotions: { neutral: 0.5 }
+      }),
+      {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
   }
 });
 
-function analyzeTextEmotions(text: string) {
-  // Simulate emotion analysis based on text content
-  const positiveWords = ['heureux', 'joyeux', 'content', 'génial', 'parfait', 'excellent', 'merveilleux', 'fantastique'];
-  const negativeWords = ['triste', 'déprimé', 'difficile', 'problème', 'stress', 'fatigue', 'mal', 'peur'];
-  const neutralWords = ['travail', 'journée', 'temps', 'moment', 'situation', 'normal'];
-  
-  const lowerText = text.toLowerCase();
-  
-  let positiveCount = 0;
-  let negativeCount = 0;
-  let neutralCount = 0;
-  
-  positiveWords.forEach(word => {
-    if (lowerText.includes(word)) positiveCount++;
-  });
-  
-  negativeWords.forEach(word => {
-    if (lowerText.includes(word)) negativeCount++;
-  });
-  
-  neutralWords.forEach(word => {
-    if (lowerText.includes(word)) neutralCount++;
-  });
-  
-  let primaryEmotion = 'neutral';
-  let averageScore = 50;
-  let emotions = { neutral: 0.5, joy: 0.25, sadness: 0.25 };
-  
-  if (positiveCount > negativeCount) {
-    primaryEmotion = 'joy';
-    averageScore = 70 + Math.min(positiveCount * 5, 25);
-    emotions = { joy: 0.6, excitement: 0.2, contentment: 0.1, neutral: 0.1 };
-  } else if (negativeCount > positiveCount) {
-    primaryEmotion = 'sadness';
-    averageScore = 40 - Math.min(negativeCount * 3, 20);
-    emotions = { sadness: 0.5, stress: 0.2, fatigue: 0.2, neutral: 0.1 };
-  } else {
-    averageScore = 55 + Math.random() * 20;
-    emotions = { neutral: 0.4, calm: 0.3, contemplation: 0.2, balance: 0.1 };
-  }
-  
-  const feedback = generateFeedback(primaryEmotion, averageScore);
-  
-  return {
-    averageScore: Math.round(averageScore),
-    topEmotion: primaryEmotion,
-    emotions,
-    feedback
-  };
-}
+async function mockFacialAnalysis(imageBase64?: string, options: any = {}) {
+  // Simulate processing delay
+  await new Promise(resolve => setTimeout(resolve, 1000));
 
-function analyzeAudioEmotions(transcribedText: string) {
-  // For audio, we can analyze the transcribed text
-  // In production, you would also analyze voice characteristics
-  const textAnalysis = analyzeTextEmotions(transcribedText);
-  
-  // Simulate voice characteristic analysis
-  const voiceStress = Math.random() * 0.3; // Simulate stress detection in voice
-  
-  // Adjust score based on simulated voice analysis
-  textAnalysis.averageScore = Math.max(0, textAnalysis.averageScore - (voiceStress * 20));
-  
-  if (voiceStress > 0.2) {
-    textAnalysis.emotions = {
-      ...textAnalysis.emotions,
-      stress: Math.min(0.4, textAnalysis.emotions.stress || 0 + voiceStress)
+  const emotions = {
+    joy: Math.random() * 0.4 + 0.3,
+    sadness: Math.random() * 0.3 + 0.1,
+    anger: Math.random() * 0.2 + 0.05,
+    fear: Math.random() * 0.15 + 0.05,
+    surprise: Math.random() * 0.25 + 0.1,
+    neutral: Math.random() * 0.4 + 0.2
+  };
+
+  // Normalize emotions
+  const total = Object.values(emotions).reduce((sum, val) => sum + val, 0);
+  Object.keys(emotions).forEach(key => {
+    emotions[key] = emotions[key] / total;
+  });
+
+  const dominantEmotion = Object.entries(emotions).reduce((a, b) => 
+    emotions[a[0]] > emotions[b[0]] ? a : b
+  )[0];
+
+  const result = {
+    dominantEmotion,
+    confidence: emotions[dominantEmotion],
+    emotions,
+    sentiment: emotions.joy > 0.4 ? 'positive' : emotions.sadness > 0.4 ? 'negative' : 'neutral',
+    analysisType: 'facial'
+  };
+
+  if (options.returnFaceDetails) {
+    result.facialFeatures = {
+      eyeOpenness: Math.random() * 0.3 + 0.7,
+      smileIntensity: emotions.joy,
+      attentionFocus: Math.random() * 0.4 + 0.6,
+      facePosition: {
+        x: Math.random() * 0.2 + 0.4,
+        y: Math.random() * 0.2 + 0.4
+      }
     };
   }
-  
-  textAnalysis.feedback += ' L\'analyse vocale révèle des nuances supplémentaires dans votre expression émotionnelle.';
-  
-  return textAnalysis;
+
+  return result;
 }
 
-function analyzeEmojiEmotions(emojis: string[]) {
-  const emojiMap: Record<string, { emotion: string, score: number }> = {
-    '😊': { emotion: 'joy', score: 80 },
-    '😔': { emotion: 'sadness', score: 30 },
-    '😤': { emotion: 'anger', score: 25 },
-    '😰': { emotion: 'anxiety', score: 35 },
-    '😍': { emotion: 'love', score: 90 },
-    '🤔': { emotion: 'contemplation', score: 60 },
-    '😴': { emotion: 'fatigue', score: 45 },
-    '😎': { emotion: 'confidence', score: 85 },
-    '🥳': { emotion: 'excitement', score: 95 },
-    '😢': { emotion: 'sadness', score: 20 },
-    '😡': { emotion: 'anger', score: 15 },
-    '😌': { emotion: 'calm', score: 75 },
-    '🤗': { emotion: 'affection', score: 85 },
-    '😱': { emotion: 'fear', score: 25 },
-    '🙄': { emotion: 'annoyance', score: 40 },
-    '😇': { emotion: 'peace', score: 80 }
+async function mockVoiceAnalysis(audioBase64?: string, text?: string, options: any = {}) {
+  // Simulate processing delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
+
+  const emotions = {
+    calm: Math.random() * 0.4 + 0.2,
+    excited: Math.random() * 0.3 + 0.1,
+    stressed: Math.random() * 0.2 + 0.1,
+    sad: Math.random() * 0.25 + 0.1,
+    happy: Math.random() * 0.35 + 0.15,
+    neutral: Math.random() * 0.3 + 0.2
   };
-  
-  let totalScore = 0;
-  const emotionCounts: Record<string, number> = {};
-  
-  emojis.forEach(emoji => {
-    const emojiData = emojiMap[emoji];
-    if (emojiData) {
-      totalScore += emojiData.score;
-      emotionCounts[emojiData.emotion] = (emotionCounts[emojiData.emotion] || 0) + 1;
-    }
+
+  // Normalize emotions
+  const total = Object.values(emotions).reduce((sum, val) => sum + val, 0);
+  Object.keys(emotions).forEach(key => {
+    emotions[key] = emotions[key] / total;
   });
-  
-  const averageScore = emojis.length > 0 ? totalScore / emojis.length : 50;
-  
-  // Find dominant emotion
-  const dominantEmotion = Object.entries(emotionCounts)
-    .sort(([,a], [,b]) => b - a)[0]?.[0] || 'neutral';
-  
-  // Create emotion distribution
-  const emotions: Record<string, number> = {};
-  Object.entries(emotionCounts).forEach(([emotion, count]) => {
-    emotions[emotion] = count / emojis.length;
-  });
-  
-  const feedback = generateFeedback(dominantEmotion, averageScore);
-  
-  return {
-    averageScore: Math.round(averageScore),
-    topEmotion: dominantEmotion,
+
+  const dominantEmotion = Object.entries(emotions).reduce((a, b) => 
+    emotions[a[0]] > emotions[b[0]] ? a : b
+  )[0];
+
+  const result = {
+    dominantEmotion,
+    confidence: emotions[dominantEmotion],
     emotions,
-    feedback
+    sentiment: emotions.happy > 0.3 ? 'positive' : emotions.sad > 0.3 ? 'negative' : 'neutral',
+    analysisType: 'voice'
   };
+
+  if (options.includeProsody) {
+    result.prosody = {
+      pace: ['slow', 'moderate', 'fast'][Math.floor(Math.random() * 3)],
+      pitch: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)],
+      variation: ['monotone', 'dynamic', 'varied'][Math.floor(Math.random() * 3)],
+      volume: Math.random() * 0.4 + 0.3
+    };
+  }
+
+  return result;
 }
 
-function generateFeedback(emotion: string, score: number): string {
-  const feedbackMap: Record<string, string[]> = {
-    joy: [
-      "Votre état émotionnel reflète une belle énergie positive ! Continuez à cultiver cette joie.",
-      "C'est merveilleux de voir cette émotion positive ressortir de votre expression.",
-      "Votre joie transparaît clairement. Profitez de ces moments de bonheur."
-    ],
-    sadness: [
-      "Je perçois une certaine mélancolie. Prenez soin de vous et n'hésitez pas à chercher du soutien.",
-      "Ces émotions difficiles sont normales. Accordez-vous de la bienveillance.",
-      "Il est important de reconnaître ces sentiments. Vous n'êtes pas seul(e)."
-    ],
-    neutral: [
-      "Votre état émotionnel semble équilibré. C'est un bon point de départ pour la journée.",
-      "Une humeur stable est précieuse. Profitez de cette sérénité.",
-      "Cet équilibre émotionnel est sain. Vous semblez en harmonie."
-    ],
-    stress: [
-      "Je détecte des signes de stress. Prenez quelques respirations profondes.",
-      "Le stress fait partie de la vie, mais il est important de le gérer. Pensez à une pause.",
-      "Votre tension est perceptible. Des exercices de relaxation pourraient vous aider."
-    ]
-  };
-  
-  const messages = feedbackMap[emotion] || feedbackMap.neutral;
-  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-  
-  let scoreComment = '';
-  if (score >= 80) {
-    scoreComment = ' Votre score de bien-être est excellent !';
-  } else if (score >= 60) {
-    scoreComment = ' Votre niveau de bien-être est bon.';
-  } else if (score >= 40) {
-    scoreComment = ' Votre bien-être pourrait bénéficier d\'attention.';
-  } else {
-    scoreComment = ' Il semble important de prendre soin de votre bien-être actuellement.';
+async function mockTextAnalysis(text?: string, options: any = {}) {
+  if (!text) {
+    throw new Error('Text is required for text analysis');
   }
-  
-  return randomMessage + scoreComment;
+
+  // Simulate processing delay
+  await new Promise(resolve => setTimeout(resolve, 800));
+
+  // Simple sentiment analysis based on keywords
+  const positiveWords = ['happy', 'joy', 'great', 'excellent', 'good', 'love', 'amazing', 'wonderful'];
+  const negativeWords = ['sad', 'angry', 'bad', 'terrible', 'hate', 'awful', 'horrible', 'depressed'];
+  const stressWords = ['stress', 'anxiety', 'worried', 'nervous', 'pressure', 'overwhelmed'];
+
+  const textLower = text.toLowerCase();
+  const positiveCount = positiveWords.filter(word => textLower.includes(word)).length;
+  const negativeCount = negativeWords.filter(word => textLower.includes(word)).length;
+  const stressCount = stressWords.filter(word => textLower.includes(word)).length;
+
+  let emotions = {
+    happy: Math.max(0.1, positiveCount * 0.3 + Math.random() * 0.2),
+    sad: Math.max(0.1, negativeCount * 0.3 + Math.random() * 0.2),
+    angry: Math.max(0.05, negativeCount * 0.2 + Math.random() * 0.15),
+    anxious: Math.max(0.05, stressCount * 0.4 + Math.random() * 0.2),
+    calm: Math.max(0.1, (1 - stressCount * 0.2) * 0.4 + Math.random() * 0.2),
+    neutral: Math.random() * 0.3 + 0.2
+  };
+
+  // Normalize emotions
+  const total = Object.values(emotions).reduce((sum, val) => sum + val, 0);
+  Object.keys(emotions).forEach(key => {
+    emotions[key] = emotions[key] / total;
+  });
+
+  const dominantEmotion = Object.entries(emotions).reduce((a, b) => 
+    emotions[a[0]] > emotions[b[0]] ? a : b
+  )[0];
+
+  return {
+    dominantEmotion,
+    confidence: emotions[dominantEmotion],
+    emotions,
+    sentiment: emotions.happy > 0.3 ? 'positive' : emotions.sad > 0.3 ? 'negative' : 'neutral',
+    analysisType: 'text',
+    textLength: text.length,
+    keywordMatches: {
+      positive: positiveCount,
+      negative: negativeCount,
+      stress: stressCount
+    }
+  };
 }
