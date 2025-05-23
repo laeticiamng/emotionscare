@@ -1,12 +1,11 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
+type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
 
 interface UserModeContextType {
-  userMode: UserMode | null;
+  userMode: UserMode;
   setUserMode: (mode: UserMode) => void;
-  changeUserMode: (mode: UserMode) => void;
   isLoading: boolean;
 }
 
@@ -14,40 +13,42 @@ const UserModeContext = createContext<UserModeContextType | undefined>(undefined
 
 export const useUserMode = () => {
   const context = useContext(UserModeContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useUserMode must be used within a UserModeProvider');
   }
   return context;
 };
 
-export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [userMode, setUserModeState] = useState<UserMode | null>(null);
+interface UserModeProviderProps {
+  children: ReactNode;
+}
+
+export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
+  const [userMode, setUserModeState] = useState<UserMode>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Récupérer le mode utilisateur depuis le localStorage
-    const savedMode = localStorage.getItem('userMode') as UserMode;
-    if (savedMode && ['b2c', 'b2b_user', 'b2b_admin'].includes(savedMode)) {
-      setUserModeState(savedMode);
+    const storedMode = localStorage.getItem('userMode') as UserMode;
+    if (storedMode) {
+      setUserModeState(storedMode);
     }
     setIsLoading(false);
   }, []);
 
   const setUserMode = (mode: UserMode) => {
     setUserModeState(mode);
-    localStorage.setItem('userMode', mode);
+    if (mode) {
+      localStorage.setItem('userMode', mode);
+    } else {
+      localStorage.removeItem('userMode');
+    }
   };
 
-  const changeUserMode = (mode: UserMode) => {
-    setUserMode(mode);
-    // Vous pouvez ajouter ici une logique de redirection si nécessaire
-  };
-
-  const value = {
+  const value: UserModeContextType = {
     userMode,
     setUserMode,
-    changeUserMode,
-    isLoading,
+    isLoading
   };
 
   return (

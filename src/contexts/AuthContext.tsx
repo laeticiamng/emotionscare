@@ -1,115 +1,113 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: 'b2c' | 'b2b_user' | 'b2b_admin';
+}
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, metadata?: any) => Promise<void>;
-  logout: () => Promise<void>;
-  updateUser: (updates: any) => Promise<void>;
+  logout: () => void;
+  register: (email: string, password: string, name: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Écouter les changements d'état d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+    // Simuler la vérification de l'authentification
+    const checkAuth = async () => {
+      try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
+      } finally {
         setIsLoading(false);
       }
-    );
+    };
 
-    // Récupérer la session actuelle
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    checkAuth();
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
+    setIsLoading(true);
+    try {
+      // Simulation d'une connexion
+      const mockUser: User = {
+        id: '1',
+        email,
+        name: email.split('@')[0],
+        role: email.includes('admin') ? 'b2b_admin' : email.includes('b2b') ? 'b2b_user' : 'b2c'
+      };
+      
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+    } catch (error) {
+      console.error('Login error:', error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
-
-    toast.success('Connexion réussie !');
   };
 
-  const register = async (email: string, password: string, metadata: any = {}) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: metadata,
-      },
-    });
-
-    if (error) {
+  const register = async (email: string, password: string, name: string) => {
+    setIsLoading(true);
+    try {
+      // Simulation d'une inscription
+      const mockUser: User = {
+        id: Date.now().toString(),
+        email,
+        name,
+        role: 'b2c'
+      };
+      
+      setUser(mockUser);
+      localStorage.setItem('user', JSON.stringify(mockUser));
+    } catch (error) {
+      console.error('Register error:', error);
       throw error;
+    } finally {
+      setIsLoading(false);
     }
-
-    toast.success('Compte créé avec succès !');
   };
 
-  const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    
-    if (error) {
-      throw error;
-    }
-
+  const logout = () => {
     setUser(null);
-    setSession(null);
-    toast.success('Déconnexion réussie');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userMode');
   };
 
-  const updateUser = async (updates: any) => {
-    const { error } = await supabase.auth.updateUser(updates);
-    
-    if (error) {
-      throw error;
-    }
-
-    toast.success('Profil mis à jour');
-  };
-
-  const value = {
+  const value: AuthContextType = {
     user,
-    session,
     isAuthenticated: !!user,
     isLoading,
     login,
-    register,
     logout,
-    updateUser,
+    register
   };
 
   return (
