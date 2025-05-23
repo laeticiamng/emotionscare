@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 
 type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
 
@@ -19,33 +20,22 @@ export const useUserMode = () => {
   return context;
 };
 
-interface UserModeProviderProps {
-  children: ReactNode;
-}
-
-export const UserModeProvider: React.FC<UserModeProviderProps> = ({ children }) => {
-  const [userMode, setUserModeState] = useState<UserMode>(null);
+export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [userMode, setUserMode] = useState<UserMode>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { user, session } = useAuth();
 
   useEffect(() => {
-    // Récupérer le mode utilisateur depuis le localStorage
-    const storedMode = localStorage.getItem('userMode') as UserMode;
-    if (storedMode) {
-      setUserModeState(storedMode);
+    if (user) {
+      const role = user.user_metadata?.role || 'b2c';
+      setUserMode(role as UserMode);
+    } else {
+      setUserMode(null);
     }
     setIsLoading(false);
-  }, []);
+  }, [user, session]);
 
-  const setUserMode = (mode: UserMode) => {
-    setUserModeState(mode);
-    if (mode) {
-      localStorage.setItem('userMode', mode);
-    } else {
-      localStorage.removeItem('userMode');
-    }
-  };
-
-  const value: UserModeContextType = {
+  const value = {
     userMode,
     setUserMode,
     isLoading

@@ -1,11 +1,14 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isAuthenticated: boolean;
+  isLoading: boolean;
   signUp: (email: string, password: string, userData?: any) => Promise<any>;
   signIn: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<void>;
@@ -30,57 +33,107 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate auth state for demo
-    // TODO: Replace with actual Supabase implementation
-    const initAuth = async () => {
-      setLoading(false);
-    };
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('Auth state changed:', event, session);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
 
-    initAuth();
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const signUp = async (email: string, password: string, userData?: any) => {
-    // TODO: Implement Supabase signup with email confirmation and 3-day trial
-    console.log('SignUp:', { email, userData });
-    
-    // Simulate demo account creation
-    if (email.endsWith('@exemple.fr')) {
-      const demoUser = {
-        id: 'demo-user',
+    try {
+      // Check if demo account
+      if (email.endsWith('@exemple.fr')) {
+        // Demo account - simulate signup
+        const demoUser = {
+          id: 'demo-user-' + Date.now(),
+          email,
+          user_metadata: { 
+            ...userData, 
+            demo: true,
+            trial_end: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+          }
+        };
+        setUser(demoUser as User);
+        return { user: demoUser, error: null };
+      }
+
+      // Real account with Supabase
+      const { data, error } = await supabase.auth.signUp({
         email,
-        user_metadata: { ...userData, demo: true }
-      };
-      setUser(demoUser as User);
-      return { user: demoUser, error: null };
+        password,
+        options: {
+          data: {
+            ...userData,
+            trial_end: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
+          }
+        }
+      });
+
+      return { user: data.user, error };
+    } catch (error) {
+      console.error('SignUp error:', error);
+      return { user: null, error };
     }
-    
-    // For real accounts, this would integrate with Supabase
-    const newUser = {
-      id: 'real-user-' + Date.now(),
-      email,
-      user_metadata: { ...userData, trial_end: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) }
-    };
-    setUser(newUser as User);
-    return { user: newUser, error: null };
   };
 
   const signIn = async (email: string, password: string) => {
-    // TODO: Implement Supabase signin
-    console.log('SignIn:', { email });
-    
-    const mockUser = {
-      id: email.endsWith('@exemple.fr') ? 'demo-user' : 'real-user-' + Date.now(),
-      email,
-      user_metadata: { demo: email.endsWith('@exemple.fr') }
-    };
-    setUser(mockUser as User);
-    return { user: mockUser, error: null };
+    try {
+      // Check if demo account
+      if (email.endsWith('@exemple.fr')) {
+        // Demo account - simulate signin
+        const demoUser = {
+          id: 'demo-user-' + Date.now(),
+          email,
+          user_metadata: { 
+            demo: true,
+            firstName: 'Demo',
+            lastName: 'User',
+            role: email.includes('admin') ? 'b2b_admin' : email.includes('user') ? 'b2b_user' : 'b2c'
+          }
+        };
+        setUser(demoUser as User);
+        return { user: demoUser, error: null };
+      }
+
+      // Real account with Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      return { user: data.user, error };
+    } catch (error) {
+      console.error('SignIn error:', error);
+      return { user: null, error };
+    }
   };
 
   const signOut = async () => {
-    // TODO: Implement Supabase signout
-    setUser(null);
-    setSession(null);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (!error) {
+        setUser(null);
+        setSession(null);
+      }
+      return { error };
+    } catch (error) {
+      console.error('SignOut error:', error);
+      return { error };
+    }
   };
 
   const logout = async () => {
@@ -88,24 +141,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const resetPassword = async (email: string) => {
-    // TODO: Implement Supabase password reset
-    console.log('Reset password for:', email);
-    return { error: null };
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      return { error };
+    } catch (error) {
+      console.error('Reset password error:', error);
+      return { error };
+    }
   };
 
   const updateProfile = async (userData: any) => {
-    // TODO: Implement Supabase profile update
-    console.log('Update profile:', userData);
-    if (user) {
-      setUser({ ...user, user_metadata: { ...user.user_metadata, ...userData } });
+    try {
+      if (user?.user_metadata?.demo) {
+        // Demo account - simulate update
+        setUser({ 
+          ...user, 
+          user_metadata: { ...user.user_metadata, ...userData } 
+        } as User);
+        return { error: null };
+      }
+
+      // Real account with Supabase
+      const { error } = await supabase.auth.updateUser({
+        data: userData
+      });
+      return { error };
+    } catch (error) {
+      console.error('Update profile error:', error);
+      return { error };
     }
-    return { error: null };
   };
 
   const value = {
     user,
     session,
     loading,
+    isAuthenticated: !!user,
+    isLoading: loading,
     signUp,
     signIn,
     signOut,

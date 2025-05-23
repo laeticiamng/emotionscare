@@ -3,237 +3,282 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Sparkles, Building2, Heart, Brain, Users, Target, Music } from 'lucide-react';
+import { ArrowRight, Building2, Heart, Sparkles, Users } from 'lucide-react';
 
 const PremiumHeroSection: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl"
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.4, 0.6, 0.4],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900">
+      {/* Hero Principal */}
+      <section className="relative overflow-hidden pt-16 pb-20">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+          <div className="absolute top-40 right-10 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-300"></div>
+          <div className="absolute bottom-20 left-1/2 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse delay-700"></div>
+        </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-        {/* Main Hero Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="text-center mb-16"
-        >
-          <motion.div
-            className="inline-flex items-center justify-center mb-8"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-          >
-            <Sparkles className="h-8 w-8 text-blue-600 mr-3" />
-            <span className="text-sm font-medium tracking-wider text-blue-600 uppercase">
-              ✨ Bienvenue sur EmotionsCare
-            </span>
-          </motion.div>
-          
-          <motion.h1
-            className="text-4xl md:text-6xl lg:text-7xl font-light tracking-tight text-slate-900 dark:text-white mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 1 }}
-          >
-            Le bien-être ne s'explique pas,{' '}
-            <motion.span
-              className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1, duration: 1 }}
-            >
-              il se vit
-            </motion.span>
-          </motion.h1>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 1 }}
-            className="max-w-4xl mx-auto mb-12"
-          >
-            <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300 font-light leading-relaxed mb-8">
-              Notre ambition : offrir à chacun une parenthèse pour soi, 
-              à chaque équipe une énergie partagée.
-            </p>
-            <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 font-light leading-relaxed">
-              Ici, le temps redevient un luxe accessible, et l'essentiel se retrouve 
-              dans l'énergie partagée. Rejoignez-nous pour explorer une nouvelle vision 
-              du bien-être : <em className="italic text-blue-600">simple, essentielle, humaine, élégante.</em>
-            </p>
-          </motion.div>
-
+        <div className="relative z-10 container mx-auto px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
+            transition={{ duration: 1 }}
+            className="max-w-4xl mx-auto"
           >
-            <Button
-              onClick={() => navigate('/choose-mode')}
-              size="lg"
-              className="group px-8 py-6 text-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-xl hover:shadow-2xl transition-all duration-300"
+            <div className="mb-8">
+              <Sparkles className="h-16 w-16 text-blue-600 mx-auto mb-6 animate-pulse" />
+              <h1 className="text-5xl md:text-7xl font-bold mb-8 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                EmotionsCare
+              </h1>
+              <p className="text-2xl md:text-3xl text-slate-700 dark:text-slate-300 mb-6 leading-relaxed">
+                Le bien-être ne s'explique pas, il se vit.
+              </p>
+              <p className="text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
+                Notre ambition : offrir à chacun une parenthèse pour soi, à chaque équipe une énergie partagée. 
+                Ici, le temps redevient un luxe accessible, et l'essentiel se retrouve dans l'énergie partagée.
+              </p>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="flex flex-col sm:flex-row gap-6 justify-center items-center"
             >
-              Découvrir EmotionsCare
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Button>
+              <Button
+                onClick={() => navigate('/choose-mode')}
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+              >
+                Découvrir l'expérience
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </motion.div>
           </motion.div>
-        </motion.div>
+        </div>
+      </section>
 
-        {/* Two-column layout for Particuliers and Entreprises */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.4, duration: 0.8 }}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16"
-        >
-          {/* Particuliers Section */}
-          <div className="space-y-8">
-            <div className="text-center lg:text-left">
-              <div className="flex items-center justify-center lg:justify-start mb-4">
-                <Heart className="h-8 w-8 text-blue-600 mr-3" />
-                <h2 className="text-3xl font-bold text-slate-900 dark:text-white">🌱 Particuliers</h2>
-              </div>
-              <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
-                Ouvrez une parenthèse. Un instant pour vous. Le luxe, c'est de prendre le temps.
-                Transformez chaque journée en petite respiration. Simplement.
-              </p>
-            </div>
-
-            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
-              <h3 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white">
-                Avec EmotionsCare, vous retrouvez :
-              </h3>
-              <ul className="space-y-4 text-slate-700 dark:text-slate-300">
-                <li className="flex items-start">
-                  <Sparkles className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" />
-                  <span>Une expérience sensorielle, élégante, apaisante avec une interface sobre et des sons doux</span>
-                </li>
-                <li className="flex items-start">
-                  <Brain className="h-5 w-5 text-purple-500 mr-3 mt-1 flex-shrink-0" />
-                  <span>Des ressources conçues pour vous accompagner : calme, énergie, confiance, inspiration</span>
-                </li>
-                <li className="flex items-start">
-                  <Music className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                  <span>Modules guidés, rituels courts, parcours personnalisés pour chaque pause</span>
-                </li>
-                <li className="flex items-start">
-                  <Heart className="h-5 w-5 text-red-500 mr-3 mt-1 flex-shrink-0" />
-                  <span>Le plaisir d'un bien-être sur-mesure, sans pression, sans objectif à atteindre</span>
-                </li>
-              </ul>
-              
-              <div className="mt-8">
-                <Button
-                  onClick={() => navigate('/b2c/login')}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3"
-                >
-                  Commencer mon expérience
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Entreprises Section */}
-          <div className="space-y-8">
-            <div className="text-center lg:text-left">
-              <div className="flex items-center justify-center lg:justify-start mb-4">
-                <Building2 className="h-8 w-8 text-purple-600 mr-3" />
-                <h2 className="text-3xl font-bold text-slate-900 dark:text-white">🏢 Entreprises</h2>
-              </div>
-              <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
+      {/* Section Entreprises */}
+      <section className="py-20 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Building2 className="h-12 w-12 text-blue-600 mx-auto mb-6" />
+            <h2 className="text-4xl font-bold mb-8 text-slate-900 dark:text-white">
+              🏢 Entreprises
+            </h2>
+            <div className="max-w-4xl mx-auto space-y-6 text-left">
+              <p className="text-lg text-slate-700 dark:text-slate-300 leading-relaxed">
                 Votre structure est unique. Votre équipe a son histoire. Vos collaborateurs sont précieux. 
-                Leurs émotions comptent et nourrissent chaque jour la motivation, la créativité, la confiance et l'énergie.
+                Vos soignants sont indispensables. Leurs émotions comptent. Elles nourrissent chaque jour 
+                la motivation, la créativité, la confiance et l'énergie.
+              </p>
+              <p className="text-xl font-semibold text-blue-600 dark:text-blue-400">
+                EmotionsCare, bien plus qu'une plateforme : c'est l'alliance de la technologie et du ressenti, 
+                au service de l'énergie et de l'excellence collective.
               </p>
             </div>
+          </motion.div>
 
-            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
-              <h3 className="text-xl font-semibold mb-4 text-slate-900 dark:text-white">
+          <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="space-y-6"
+            >
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
                 Avec EmotionsCare, vous offrez à vos équipes :
               </h3>
-              <ul className="space-y-4 text-slate-700 dark:text-slate-300">
-                <li className="flex items-start">
-                  <Target className="h-5 w-5 text-orange-500 mr-3 mt-1 flex-shrink-0" />
-                  <span>L'élan de se dépasser, l'envie de s'engager - l'énergie circule, l'enthousiasme renaît</span>
-                </li>
-                <li className="flex items-start">
-                  <Brain className="h-5 w-5 text-blue-500 mr-3 mt-1 flex-shrink-0" />
-                  <span>La sérénité face à la fatigue, la puissance face à la routine</span>
-                </li>
-                <li className="flex items-start">
-                  <Users className="h-5 w-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                  <span>Des relations humaines vivantes, authentiques avec reconnaissance et écoute</span>
-                </li>
-                <li className="flex items-start">
-                  <Sparkles className="h-5 w-5 text-purple-500 mr-3 mt-1 flex-shrink-0" />
-                  <span>Un accompagnement sur-mesure qui évolue avec vous pour une énergie durable</span>
-                </li>
-              </ul>
-              
-              <div className="mt-8">
-                <Button
-                  onClick={() => navigate('/b2b/selection')}
-                  className="w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white py-3"
-                >
-                  Découvrir nos solutions
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-slate-700 dark:text-slate-300">
+                    <strong>L'élan de se dépasser, l'envie de s'engager.</strong> L'énergie circule, 
+                    l'enthousiasme renaît, la fierté d'appartenir à un collectif vivant s'installe.
+                  </p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-purple-600 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-slate-700 dark:text-slate-300">
+                    <strong>La sérénité face à la fatigue.</strong> Chacun retrouve ce souffle dont il a besoin, 
+                    même quand la pression monte ou que la lassitude s'installe.
+                  </p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-green-600 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-slate-700 dark:text-slate-300">
+                    <strong>Des relations humaines vivantes, authentiques.</strong> La reconnaissance et l'écoute 
+                    réactivent l'énergie du groupe, la cohésion.
+                  </p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-orange-600 rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-slate-700 dark:text-slate-300">
+                    <strong>Un accompagnement sur-mesure.</strong> EmotionsCare s'adapte à vos défis, 
+                    maintient cette énergie vivante, durable, contagieuse.
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
-        </motion.div>
+            </motion.div>
 
-        {/* Bottom Message */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.8, duration: 1 }}
-          className="text-center"
-        >
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-8 rounded-2xl max-w-4xl mx-auto">
-            <p className="text-lg font-light text-slate-700 dark:text-slate-300 italic mb-4">
-              "Le luxe, c'est de prendre le temps. L'essentiel, retrouver une énergie partagée."
-            </p>
-            <p className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Révélez l'humain grâce aux émotions.
-            </p>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-8 rounded-2xl"
+            >
+              <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
+                Pourquoi EmotionsCare ?
+              </h4>
+              <p className="text-slate-700 dark:text-slate-300 mb-6 leading-relaxed">
+                Ce qui fait la différence, c'est l'énergie qui relie, qui donne envie, qui fait durer vos réussites. 
+                Avec EmotionsCare, votre organisation retrouve ce souffle collectif essentiel.
+              </p>
+              <Button
+                onClick={() => navigate('/b2b/selection')}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                Découvrir l'espace entreprise
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </motion.div>
           </div>
-          
-          <p className="text-sm text-slate-400 dark:text-slate-500 font-light tracking-wider mt-8">
-            🌟 Découvrez, vivez, partagez l'expérience émotionnelle. EmotionsCare SASU.
-          </p>
-        </motion.div>
-      </div>
+        </div>
+      </section>
+
+      {/* Section Particuliers */}
+      <section className="py-20">
+        <div className="container mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Heart className="h-12 w-12 text-pink-600 mx-auto mb-6" />
+            <h2 className="text-4xl font-bold mb-8 text-slate-900 dark:text-white">
+              🌱 Particuliers
+            </h2>
+            <div className="max-w-4xl mx-auto">
+              <p className="text-2xl text-slate-700 dark:text-slate-300 mb-6 leading-relaxed">
+                Ouvrez une parenthèse. Un instant pour vous. Le luxe, c'est de prendre le temps.
+              </p>
+              <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+                Transformez chaque journée en petite respiration. Simplement. Des moments pour ralentir 
+                et vous reconnecter. Retrouvez le plaisir d'être là. Vraiment.
+              </p>
+            </div>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 p-6 rounded-2xl text-center"
+            >
+              <div className="w-16 h-16 bg-pink-100 dark:bg-pink-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="h-8 w-8 text-pink-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">
+                Expérience sensorielle
+              </h3>
+              <p className="text-slate-700 dark:text-slate-300">
+                Une interface sobre, la douceur des sons, une lumière choisie. 
+                Une invitation à la détente, à la clarté.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 p-6 rounded-2xl text-center"
+            >
+              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">
+                Ressources adaptées
+              </h3>
+              <p className="text-slate-700 dark:text-slate-300">
+                Modules guidés, rituels courts, parcours personnalisés. 
+                Chaque pause devient un vrai moment d'être mieux.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-6 rounded-2xl text-center"
+            >
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">
+                Bien-être sur-mesure
+              </h3>
+              <p className="text-slate-700 dark:text-slate-300">
+                Sans pression, sans objectif à atteindre. 
+                Le plaisir de se retrouver, de s'accorder du temps.
+              </p>
+            </motion.div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <Button
+              onClick={() => navigate('/b2c/register')}
+              size="lg"
+              className="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white px-8 py-4 text-lg font-semibold"
+            >
+              Commencer votre voyage
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer Premium */}
+      <footer className="bg-slate-900 text-white py-16">
+        <div className="container mx-auto px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <Sparkles className="h-12 w-12 text-blue-400 mx-auto mb-6" />
+            <h3 className="text-3xl font-bold mb-4">
+              🌟 Découvrez, vivez, partagez l'expérience émotionnelle
+            </h3>
+            <p className="text-xl text-slate-300 mb-6">
+              EmotionsCare. Le bien-être, tout simplement. Le luxe, c'est de prendre le temps.
+            </p>
+            <p className="text-slate-400">
+              EmotionsCare SASU - Révélez l'humain grâce aux émotions
+            </p>
+          </motion.div>
+        </div>
+      </footer>
     </div>
   );
 };
