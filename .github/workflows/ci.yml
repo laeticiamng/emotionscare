@@ -6,25 +6,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: 'npm'
+          
       - name: Configure npm registry
         run: npm config set registry https://registry.npmmirror.com
 
-      - name: Optimize npm cache  
+      - name: Setup optimal caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+            ~/.npm
+            ~/.bun
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json', '**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-modules-
+            
+      - name: Optimize npm environment  
         run: |
           npm config set cache-min 9999999
           echo "CYPRESS_INSTALL_BINARY=0" >> $GITHUB_ENV
           echo "CYPRESS_SKIP_BINARY_INSTALL=1" >> $GITHUB_ENV
           echo "HUSKY_SKIP_INSTALL=1" >> $GITHUB_ENV
           echo "PUPPETEER_SKIP_DOWNLOAD=1" >> $GITHUB_ENV
+          echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
 
-      - name: Install deps
-        run: npm ci --prefer-offline --no-audit --no-fund --legacy-peer-deps
-        timeout-minutes: 5
+      - name: Install dependencies with resilient installer
+        run: node scripts/install-with-fallback.js
+        timeout-minutes: 10
         
       - name: Run tests
         run: npm test
