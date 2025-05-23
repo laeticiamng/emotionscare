@@ -34,6 +34,11 @@ import ProfilePage from '@/pages/common/ProfilePage';
 import SettingsPage from '@/pages/common/SettingsPage';
 import HelpPage from '@/pages/common/HelpPage';
 
+// Pages fonctionnelles
+import ScanPage from '@/pages/ScanPage';
+import Coach from '@/pages/Coach';
+import Music from '@/pages/Music';
+
 const routes: RouteObject[] = [
   {
     path: '/',
@@ -137,21 +142,21 @@ const routes: RouteObject[] = [
             path: 'scan',
             element: 
               <AuthTransition>
-                <EmotionScanner />
+                <ScanPage />
               </AuthTransition>
           },
           {
             path: 'coach',
             element: 
               <AuthTransition>
-                <AICoach />
+                <Coach />
               </AuthTransition>
           },
           {
             path: 'music',
             element: 
               <AuthTransition>
-                <MusicTherapy />
+                <Music />
               </AuthTransition>
           },
           

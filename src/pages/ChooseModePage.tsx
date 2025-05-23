@@ -3,21 +3,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, Building, ArrowLeft, Brain, Users } from 'lucide-react';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { User, Building, ArrowLeft, Brain, Heart, Users } from 'lucide-react';
 
 const ChooseModePage: React.FC = () => {
   const navigate = useNavigate();
-  const { setUserMode } = useUserMode();
-
-  const selectB2C = () => {
-    setUserMode('b2c');
-    navigate('/b2c/login');
-  };
-
-  const selectB2B = () => {
-    navigate('/b2b/selection');
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
@@ -29,101 +18,143 @@ const ChooseModePage: React.FC = () => {
             <span className="text-2xl font-bold">EmotionsCare</span>
           </div>
           
-          <h1 className="text-3xl font-bold">Comment souhaitez-vous utiliser EmotionsCare ?</h1>
+          <h1 className="text-4xl font-bold">Choisissez votre mode d'accès</h1>
           <p className="text-muted-foreground text-lg">
-            Choisissez le mode qui correspond à vos besoins
+            Sélectionnez le mode qui correspond le mieux à vos besoins
           </p>
         </div>
 
-        {/* Mode Selection Cards */}
+        {/* Selection Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* B2C Card */}
           <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-colors cursor-pointer group">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-pink-100 group-hover:bg-pink-200 transition-colors">
-                <Heart className="h-8 w-8 text-pink-600" />
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                <User className="h-10 w-10 text-blue-600" />
               </div>
-              <CardTitle className="text-xl">Usage Personnel</CardTitle>
-              <CardDescription>
-                Pour votre bien-être émotionnel personnel
+              <CardTitle className="text-2xl">Particulier</CardTitle>
+              <CardDescription className="text-base">
+                Accès personnel pour améliorer votre bien-être émotionnel
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <h4 className="font-semibold text-sm">Idéal pour :</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Gestion du stress et de l'anxiété</li>
-                  <li>• Amélioration de l'humeur</li>
-                  <li>• Développement personnel</li>
-                  <li>• Suivi émotionnel quotidien</li>
-                  <li>• Coaching IA personnalisé</li>
+            <CardContent className="space-y-6">
+              <div className="space-y-3">
+                <h4 className="font-semibold flex items-center gap-2">
+                  <Heart className="h-4 w-4 text-red-500" />
+                  Fonctionnalités incluses :
+                </h4>
+                <ul className="text-sm text-muted-foreground space-y-2 ml-6">
+                  <li>• Scanner émotionnel personnel</li>
+                  <li>• Coach IA 24h/24</li>
+                  <li>• Musicothérapie adaptée</li>
+                  <li>• Journal de bord émotionnel</li>
+                  <li>• Suivi de progression</li>
+                  <li>• Objectifs personnalisés</li>
                 </ul>
               </div>
               
-              <div className="bg-pink-50 p-3 rounded-lg">
-                <p className="text-pink-800 text-xs font-medium">
-                  🎁 3 jours d'essai gratuit inclus
+              <div className="pt-4 space-y-3">
+                <Button 
+                  className="w-full text-lg py-6" 
+                  onClick={() => navigate('/b2c/login')}
+                >
+                  Se connecter
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full text-lg py-6"
+                  onClick={() => navigate('/b2c/register')}
+                >
+                  Créer un compte
+                </Button>
+              </div>
+
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <p className="text-sm font-medium text-green-800">
+                  🎉 3 jours d'essai gratuit
+                </p>
+                <p className="text-xs text-green-600">
+                  Aucune carte de crédit requise
                 </p>
               </div>
-              
-              <Button 
-                className="w-full" 
-                onClick={selectB2C}
-              >
-                Commencer mon parcours personnel
-              </Button>
             </CardContent>
           </Card>
 
           {/* B2B Card */}
           <Card className="relative overflow-hidden border-2 hover:border-primary/50 transition-colors cursor-pointer group">
             <CardHeader className="text-center pb-4">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 group-hover:bg-blue-200 transition-colors">
-                <Building className="h-8 w-8 text-blue-600" />
+              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors">
+                <Building className="h-10 w-10 text-purple-600" />
               </div>
-              <CardTitle className="text-xl">Usage Professionnel</CardTitle>
-              <CardDescription>
-                Pour votre entreprise et vos équipes
+              <CardTitle className="text-2xl">Entreprise</CardTitle>
+              <CardDescription className="text-base">
+                Solutions professionnelles pour organisations et équipes
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <h4 className="font-semibold text-sm">Idéal pour :</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Bien-être des équipes</li>
-                  <li>• Prévention du burn-out</li>
-                  <li>• Amélioration de la productivité</li>
-                  <li>• Tableaux de bord RH</li>
-                  <li>• Analyses organisationnelles</li>
+            <CardContent className="space-y-6">
+              <div className="space-y-3">
+                <h4 className="font-semibold flex items-center gap-2">
+                  <Users className="h-4 w-4 text-purple-500" />
+                  Fonctionnalités avancées :
+                </h4>
+                <ul className="text-sm text-muted-foreground space-y-2 ml-6">
+                  <li>• Gestion d'équipes</li>
+                  <li>• Tableau de bord RH</li>
+                  <li>• Analytics organisationnels</li>
+                  <li>• Rapports de bien-être</li>
+                  <li>• Prévention du burnout</li>
+                  <li>• Support premium</li>
                 </ul>
               </div>
               
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <p className="text-blue-800 text-xs font-medium">
-                  🏢 Solutions personnalisées sur mesure
+              <div className="pt-4">
+                <Button 
+                  className="w-full text-lg py-6" 
+                  onClick={() => navigate('/b2b/selection')}
+                >
+                  Accès Entreprise
+                </Button>
+              </div>
+
+              <div className="text-center p-4 bg-purple-50 rounded-lg">
+                <p className="text-sm font-medium text-purple-800">
+                  💼 Démo personnalisée
+                </p>
+                <p className="text-xs text-purple-600">
+                  Contactez notre équipe commerciale
                 </p>
               </div>
-              
-              <Button 
-                variant="outline"
-                className="w-full" 
-                onClick={selectB2B}
-              >
-                Explorer les solutions entreprise
-              </Button>
             </CardContent>
           </Card>
         </div>
 
-        {/* Additional Info */}
-        <div className="text-center space-y-4">
-          <div className="bg-muted p-4 rounded-lg">
-            <Users className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">
-              Vous hésitez ? Nos conseillers sont là pour vous guider vers la meilleure solution.
-            </p>
+        {/* Features Comparison */}
+        <div className="bg-muted p-6 rounded-lg">
+          <h3 className="text-lg font-semibold mb-4 text-center">
+            Toutes nos solutions incluent
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <Brain className="h-4 w-4 text-primary" />
+              <span>IA avancée</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Heart className="h-4 w-4 text-red-500" />
+              <span>Données sécurisées</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-blue-500" />
+              <span>Support 24/7</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Building className="h-4 w-4 text-purple-500" />
+              <span>Mises à jour</span>
+            </div>
           </div>
-          
+        </div>
+        
+        {/* Back Button */}
+        <div className="text-center">
           <Button 
             variant="ghost" 
             onClick={() => navigate('/')}
