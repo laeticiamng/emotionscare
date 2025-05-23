@@ -1,394 +1,321 @@
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import SocialCocoonTab from '@/components/dashboard/admin/tabs/SocialCocoonTab';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { 
+  Shield, 
   Users, 
-  TrendingUp, 
+  BarChart3, 
+  Settings, 
   Activity, 
   AlertTriangle,
-  BarChart3,
-  Shield,
-  Settings,
-  Download,
-  Calendar,
-  MessageSquare,
-  Heart,
+  TrendingUp,
   Building,
-  UserCheck,
-  Clock
+  Clock,
+  UserCheck
 } from 'lucide-react';
-
-interface AdminStats {
-  totalUsers: number;
-  activeUsers: number;
-  emotionScans: number;
-  alertsCount: number;
-  wellnessAverage: number;
-  engagementRate: number;
-}
+import LoadingAnimation from '@/components/ui/loading-animation';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const B2BAdminDashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const [adminStats, setAdminStats] = useState<AdminStats>({
-    totalUsers: 0,
-    activeUsers: 0,
-    emotionScans: 0,
-    alertsCount: 0,
-    wellnessAverage: 0,
-    engagementRate: 0
-  });
-  
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [socialCocoonData, setSocialCocoonData] = useState({
-    totalPosts: 0,
-    moderationRate: 0,
-    topHashtags: []
+  const [adminStats, setAdminStats] = useState({
+    totalUsers: 45,
+    activeUsers: 38,
+    avgWellbeingScore: 72,
+    alertsCount: 3,
+    lastUpdate: new Date().toLocaleDateString('fr-FR')
   });
+
+  const [organizationData, setOrganizationData] = useState([]);
+  const [departmentData, setDepartmentData] = useState([]);
+  const [alertsData, setAlertsData] = useState([]);
 
   useEffect(() => {
-    const loadAdminDashboard = async () => {
-      setIsLoading(true);
-      try {
-        // Charger les statistiques d'administration
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('*')
-          .in('role', ['b2b_user', 'b2b_admin']);
-
-        const { data: emotions, error: emotionsError } = await supabase
-          .from('emotions')
-          .select('*');
-
-        const { data: posts, error: postsError } = await supabase
-          .from('posts')
-          .select('*');
-
-        if (profilesError) throw profilesError;
-
-        // Calculer les statistiques
-        const totalUsers = profiles?.length || 0;
-        const activeUsers = profiles?.filter(p => {
-          const lastActive = new Date(p.updated_at);
-          const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-          return lastActive > weekAgo;
-        }).length || 0;
-
-        const emotionScans = emotions?.length || 0;
-        const wellnessAverage = emotions?.reduce((acc, emotion) => acc + (emotion.score || 50), 0) / (emotions?.length || 1);
-
-        setAdminStats({
-          totalUsers,
-          activeUsers,
-          emotionScans,
-          alertsCount: Math.floor(Math.random() * 5), // Simulation
-          wellnessAverage: Math.round(wellnessAverage),
-          engagementRate: totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100) : 0
-        });
-
-        // Données Social Cocoon
-        setSocialCocoonData({
-          totalPosts: posts?.length || 0,
-          moderationRate: Math.floor(Math.random() * 10),
-          topHashtags: [
-            { tag: '#bienetre', count: 42 },
-            { tag: '#entraide', count: 36 },
-            { tag: '#motivation', count: 31 },
-            { tag: '#equilibre', count: 28 },
-            { tag: '#equipe', count: 24 }
-          ]
-        });
-
-        toast.success('Tableau de bord administrateur chargé');
-      } catch (error) {
-        console.error('Erreur chargement dashboard admin:', error);
-        toast.error('Erreur lors du chargement des données');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadAdminDashboard();
+    loadAdminData();
   }, []);
+
+  const loadAdminData = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Simuler le chargement des données admin
+      setTimeout(() => {
+        const mockOrgData = [
+          { date: '01/12', users: 42, active: 35, wellbeing: 68 },
+          { date: '02/12', users: 43, active: 36, wellbeing: 70 },
+          { date: '03/12', users: 44, active: 37, wellbeing: 69 },
+          { date: '04/12', users: 45, active: 38, wellbeing: 72 },
+          { date: '05/12', users: 45, active: 39, wellbeing: 74 },
+          { date: '06/12', users: 46, active: 38, wellbeing: 71 },
+          { date: '07/12', users: 45, active: 38, wellbeing: 72 }
+        ];
+
+        const mockDeptData = [
+          { name: 'Marketing', value: 12, color: '#8884d8' },
+          { name: 'Tech', value: 18, color: '#82ca9d' },
+          { name: 'Sales', value: 8, color: '#ffc658' },
+          { name: 'Support', value: 7, color: '#ff7300' }
+        ];
+
+        const mockAlerts = [
+          { id: 1, user: 'Marie D.', department: 'Marketing', level: 'medium', message: 'Score en baisse cette semaine' },
+          { id: 2, user: 'Thomas L.', department: 'Tech', level: 'high', message: 'Stress élevé détecté' },
+          { id: 3, user: 'Sarah M.', department: 'Sales', level: 'low', message: 'Absence prolongée' }
+        ];
+
+        setOrganizationData(mockOrgData);
+        setDepartmentData(mockDeptData);
+        setAlertsData(mockAlerts);
+        setIsLoading(false);
+      }, 1000);
+
+    } catch (error) {
+      console.error('Erreur lors du chargement admin:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les données d'administration",
+        variant: "error"
+      });
+      setIsLoading(false);
+    }
+  };
+
+  const getAlertColor = (level: string) => {
+    switch (level) {
+      case 'high': return 'text-red-600 bg-red-50';
+      case 'medium': return 'text-orange-600 bg-orange-50';
+      case 'low': return 'text-blue-600 bg-blue-50';
+      default: return 'text-gray-600 bg-gray-50';
+    }
+  };
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-muted rounded w-1/3"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-32 bg-muted rounded"></div>
-            ))}
-          </div>
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        <LoadingAnimation text="Chargement du tableau de bord administrateur..." />
       </div>
     );
   }
 
-  const quickActions = [
-    {
-      icon: Users,
-      label: 'Gestion utilisateurs',
-      description: 'Gérer les comptes et accès',
-      action: () => window.location.href = '/b2b/admin/users'
-    },
-    {
-      icon: BarChart3,
-      label: 'Analytics avancées',
-      description: 'Rapports détaillés',
-      action: () => window.location.href = '/b2b/admin/analytics'
-    },
-    {
-      icon: MessageSquare,
-      label: 'Modération contenu',
-      description: 'Social Cocoon',
-      action: () => window.location.href = '/b2b/admin/social-cocon'
-    },
-    {
-      icon: Settings,
-      label: 'Configuration',
-      description: 'Paramètres organisation',
-      action: () => toast.info('Configuration en cours de développement')
-    }
-  ];
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* En-tête */}
-      <div className="flex justify-between items-start mb-8">
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Admin Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">
-            Administration B2B
-          </h1>
+          <h1 className="text-3xl font-bold">Administration EmotionsCare</h1>
           <p className="text-muted-foreground">
-            Gérez le bien-être de votre organisation
+            Tableau de bord administrateur - {user?.name || 'Administrateur'}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Exporter données
-          </Button>
-          <Button size="sm">
-            <Calendar className="h-4 w-4 mr-2" />
-            Planifier rapport
-          </Button>
-        </div>
+        <Badge variant="default" className="flex items-center gap-2">
+          <Shield className="h-4 w-4" />
+          Administrateur
+        </Badge>
       </div>
 
-      {/* Alertes importantes */}
-      {adminStats.alertsCount > 0 && (
-        <Card className="mb-8 border-orange-200 bg-orange-50">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-3">
-              <AlertTriangle className="h-5 w-5 text-orange-600" />
+      {/* Admin Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-orange-800">
-                  {adminStats.alertsCount} alerte{adminStats.alertsCount > 1 ? 's' : ''} nécessite{adminStats.alertsCount > 1 ? 'nt' : ''} votre attention
-                </p>
-                <p className="text-sm text-orange-600">
-                  Collaborateurs avec indicateurs de bien-être préoccupants
-                </p>
+                <p className="text-sm font-medium text-muted-foreground">Total utilisateurs</p>
+                <p className="text-2xl font-bold">{adminStats.totalUsers}</p>
               </div>
-              <Button variant="outline" size="sm" className="ml-auto">
+              <Users className="h-8 w-8 text-blue-500" />
+            </div>
+            <div className="mt-4 flex items-center text-sm text-green-600">
+              <TrendingUp className="h-4 w-4 mr-1" />
+              +3 nouveaux ce mois
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Utilisateurs actifs</p>
+                <p className="text-2xl font-bold">{adminStats.activeUsers}</p>
+              </div>
+              <UserCheck className="h-8 w-8 text-green-500" />
+            </div>
+            <div className="mt-4 flex items-center text-sm text-muted-foreground">
+              <Activity className="h-4 w-4 mr-1" />
+              {Math.round((adminStats.activeUsers / adminStats.totalUsers) * 100)}% taux d'activité
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Score moyen</p>
+                <p className="text-2xl font-bold">{adminStats.avgWellbeingScore}/100</p>
+              </div>
+              <BarChart3 className="h-8 w-8 text-primary" />
+            </div>
+            <div className="mt-4 flex items-center text-sm text-green-600">
+              <TrendingUp className="h-4 w-4 mr-1" />
+              +4 points ce mois
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Alertes actives</p>
+                <p className="text-2xl font-bold">{adminStats.alertsCount}</p>
+              </div>
+              <AlertTriangle className="h-8 w-8 text-orange-500" />
+            </div>
+            <div className="mt-4">
+              <Button variant="outline" size="sm">
                 Voir les alertes
               </Button>
             </div>
           </CardContent>
         </Card>
-      )}
-
-      {/* Métriques principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Users className="h-4 w-4 mr-2 text-blue-500" />
-              Utilisateurs
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{adminStats.totalUsers}</div>
-            <div className="flex items-center mt-2">
-              <Badge variant="secondary" className="text-xs">
-                {adminStats.activeUsers} actifs
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Heart className="h-4 w-4 mr-2 text-red-500" />
-              Bien-être moyen
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{adminStats.wellnessAverage}%</div>
-            <Progress value={adminStats.wellnessAverage} className="mt-2" />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Activity className="h-4 w-4 mr-2 text-green-500" />
-              Engagement
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{adminStats.engagementRate}%</div>
-            <p className="text-xs text-muted-foreground">Participation active</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <TrendingUp className="h-4 w-4 mr-2 text-purple-500" />
-              Scans émotionnels
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{adminStats.emotionScans}</div>
-            <p className="text-xs text-muted-foreground">Ce mois-ci</p>
-          </CardContent>
-        </Card>
       </div>
 
-      {/* Actions rapides */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Actions rapides</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {quickActions.map((action, index) => (
-            <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardContent className="p-4" onClick={action.action}>
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 rounded bg-primary/10">
-                    <action.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-sm">{action.label}</h3>
-                    <p className="text-xs text-muted-foreground">{action.description}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Contenu principal avec onglets */}
+      {/* Admin Tabs */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="users">Utilisateurs</TabsTrigger>
-          <TabsTrigger value="social">Social Cocoon</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="analytics">Analytiques</TabsTrigger>
+          <TabsTrigger value="alerts">Alertes</TabsTrigger>
+          <TabsTrigger value="settings">Paramètres</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Tendances récentes</CardTitle>
+                <CardTitle>Évolution de l'organisation</CardTitle>
+                <CardDescription>Utilisateurs actifs et score de bien-être</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Nouvelles inscriptions</span>
-                    <Badge>+{Math.floor(Math.random() * 10) + 1} cette semaine</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Taux de participation</span>
-                    <Badge variant="secondary">{adminStats.engagementRate}%</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Score bien-être général</span>
-                    <Badge variant={adminStats.wellnessAverage > 70 ? "default" : "destructive"}>
-                      {adminStats.wellnessAverage}%
-                    </Badge>
-                  </div>
-                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={organizationData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="active" stroke="#8884d8" name="Utilisateurs actifs" />
+                    <Line type="monotone" dataKey="wellbeing" stroke="#82ca9d" name="Score bien-être" />
+                  </LineChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Actions requises</CardTitle>
+                <CardTitle>Répartition par département</CardTitle>
+                <CardDescription>Distribution des utilisateurs</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {adminStats.alertsCount > 0 && (
-                    <div className="flex items-center justify-between p-3 bg-orange-50 rounded">
-                      <div className="flex items-center space-x-2">
-                        <AlertTriangle className="h-4 w-4 text-orange-600" />
-                        <span className="text-sm">Alertes bien-être</span>
-                      </div>
-                      <Badge variant="destructive">{adminStats.alertsCount}</Badge>
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded">
-                    <div className="flex items-center space-x-2">
-                      <Clock className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm">Rapports à valider</span>
-                    </div>
-                    <Badge>2</Badge>
-                  </div>
-                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={departmentData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: ${value}`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {departmentData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
 
-        <TabsContent value="users">
+        <TabsContent value="users" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Gestion des utilisateurs</CardTitle>
-              <CardDescription>
-                Administrez les comptes et droits d'accès de votre organisation
-              </CardDescription>
+              <CardDescription>Administrer les comptes et permissions</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
-                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">Interface de gestion des utilisateurs</p>
-                <Button onClick={() => window.location.href = '/b2b/admin/users'}>
-                  Accéder à la gestion
-                </Button>
+                <Button>Gérer les utilisateurs</Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="social">
-          <SocialCocoonTab socialCocoonData={socialCocoonData} />
-        </TabsContent>
-
-        <TabsContent value="analytics">
+        <TabsContent value="analytics" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Analyses avancées</CardTitle>
-              <CardDescription>
-                Rapports détaillés sur l'utilisation et le bien-être
-              </CardDescription>
+              <CardDescription>Rapports détaillés et insights</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
-                <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">Module d'analytics en développement</p>
-                <Button onClick={() => window.location.href = '/b2b/admin/analytics'}>
-                  Voir les analyses
-                </Button>
+                <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4">Analyses et rapports détaillés</p>
+                <Button>Générer un rapport</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="alerts" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Alertes et notifications</CardTitle>
+              <CardDescription>Surveillance du bien-être des équipes</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {alertsData.map((alert) => (
+                  <div key={alert.id} className={`p-4 rounded-lg border ${getAlertColor(alert.level)}`}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{alert.user} - {alert.department}</p>
+                        <p className="text-sm">{alert.message}</p>
+                      </div>
+                      <Badge variant="outline">{alert.level}</Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Paramètres d'administration</CardTitle>
+              <CardDescription>Configuration et préférences système</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8">
+                <Settings className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground mb-4">Paramètres et configuration</p>
+                <Button>Accéder aux paramètres</Button>
               </div>
             </CardContent>
           </Card>

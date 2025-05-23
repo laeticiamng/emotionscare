@@ -1,372 +1,288 @@
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useEmotionalGamification } from '@/hooks/useEmotionalGamification';
-import { useDashboardState } from '@/hooks/useDashboardState';
+import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 import { 
+  BarChart3, 
+  Users, 
   Heart, 
   TrendingUp, 
-  Users, 
   Calendar, 
-  Target, 
-  Award,
-  Activity,
-  BookOpen,
-  MessageCircle,
-  Settings,
-  BarChart3,
-  ChevronRight,
-  Plus
+  MessageSquare, 
+  Target,
+  Clock,
+  Building,
+  Activity
 } from 'lucide-react';
-
-interface DashboardStats {
-  emotionScans: number;
-  teamConnections: number;
-  completedSessions: number;
-  wellnessScore: number;
-  streak: number;
-  nextGoal: string;
-}
+import LoadingAnimation from '@/components/ui/loading-animation';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 const B2BUserDashboardPage: React.FC = () => {
   const { user } = useAuth();
-  const { stats, isLoading: gamificationLoading } = useEmotionalGamification();
-  const { minimalView, toggleMinimalView } = useDashboardState();
-  
-  const [dashboardStats, setDashboardStats] = useState<DashboardStats>({
-    emotionScans: 0,
-    teamConnections: 0,
-    completedSessions: 0,
-    wellnessScore: 75,
-    streak: 0,
-    nextGoal: 'Compléter 5 scans émotionnels'
-  });
-  
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [recentActivities, setRecentActivities] = useState([]);
+  const [stats, setStats] = useState({
+    emotionalScore: 75,
+    teamAverage: 68,
+    weeklyCheckins: 5,
+    totalTeamMembers: 12,
+    lastUpdate: new Date().toLocaleDateString('fr-FR')
+  });
+
+  const [emotionData, setEmotionData] = useState([]);
+  const [teamData, setTeamData] = useState([]);
 
   useEffect(() => {
-    const loadDashboardData = async () => {
-      if (!user) return;
-      
-      setIsLoading(true);
-      try {
-        // Charger les statistiques utilisateur
-        const { data: emotions } = await supabase
-          .from('emotions')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('date', { ascending: false });
-
-        const { data: buddies } = await supabase
-          .from('buddies')
-          .select('*')
-          .eq('user_id', user.id);
-
-        setDashboardStats(prev => ({
-          ...prev,
-          emotionScans: emotions?.length || 0,
-          teamConnections: buddies?.length || 0,
-          streak: stats.streakDays,
-          completedSessions: Math.floor(Math.random() * 20) + 5, // Simulation pour l'exemple
-        }));
-
-        toast.success('Tableau de bord chargé');
-      } catch (error) {
-        console.error('Erreur chargement dashboard:', error);
-        toast.error('Erreur lors du chargement des données');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadDashboardData();
-  }, [user, stats]);
+  }, []);
 
-  const quickActions = [
-    {
-      icon: Heart,
-      label: 'Scanner mes émotions',
-      description: 'Analyser mon état émotionnel actuel',
-      action: () => window.location.href = '/b2b/user/scan',
-      color: 'bg-red-500'
-    },
-    {
-      icon: Users,
-      label: 'Espace social',
-      description: 'Rejoindre la communauté',
-      action: () => window.location.href = '/b2b/user/social',
-      color: 'bg-blue-500'
-    },
-    {
-      icon: BookOpen,
-      label: 'Ressources',
-      description: 'Accéder aux contenus bien-être',
-      action: () => toast.info('Redirection vers les ressources'),
-      color: 'bg-green-500'
-    },
-    {
-      icon: Target,
-      label: 'Mes objectifs',
-      description: 'Définir et suivre mes objectifs',
-      action: () => toast.info('Gestion des objectifs'),
-      color: 'bg-purple-500'
+  const loadDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Simuler le chargement des données
+      setTimeout(() => {
+        const mockEmotionData = [
+          { date: '01/12', score: 65, team: 60 },
+          { date: '02/12', score: 72, team: 65 },
+          { date: '03/12', score: 68, team: 63 },
+          { date: '04/12', score: 75, team: 68 },
+          { date: '05/12', score: 78, team: 70 },
+          { date: '06/12', score: 73, team: 67 },
+          { date: '07/12', score: 80, team: 72 }
+        ];
+
+        const mockTeamData = [
+          { name: 'Marketing', score: 78, members: 5 },
+          { name: 'Développement', score: 72, members: 8 },
+          { name: 'Commercial', score: 65, members: 4 },
+          { name: 'Support', score: 82, members: 3 }
+        ];
+
+        setEmotionData(mockEmotionData);
+        setTeamData(mockTeamData);
+        setIsLoading(false);
+      }, 1000);
+
+    } catch (error) {
+      console.error('Erreur lors du chargement:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les données du tableau de bord",
+        variant: "error"
+      });
+      setIsLoading(false);
     }
-  ];
+  };
 
-  if (isLoading || gamificationLoading) {
+  if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-muted rounded w-1/3"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-32 bg-muted rounded"></div>
-            ))}
-          </div>
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        <LoadingAnimation text="Chargement de votre tableau de bord..." />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* En-tête */}
-      <div className="flex justify-between items-start mb-8">
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">
-            Bonjour {user?.user_metadata?.name || 'Collaborateur'} 👋
-          </h1>
+          <h1 className="text-3xl font-bold">Tableau de bord collaborateur</h1>
           <p className="text-muted-foreground">
-            Votre espace bien-être professionnel
+            Bonjour {user?.name || 'Collaborateur'}, voici votre vue d'ensemble
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={toggleMinimalView}>
-            {minimalView ? 'Vue complète' : 'Vue simplifiée'}
-          </Button>
-          <Button size="sm">
-            <Settings className="h-4 w-4 mr-2" />
-            Paramètres
-          </Button>
-        </div>
+        <Badge variant="outline" className="flex items-center gap-2">
+          <Building className="h-4 w-4" />
+          Mode Collaborateur
+        </Badge>
       </div>
 
-      {/* Statistiques principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Heart className="h-4 w-4 mr-2 text-red-500" />
-              Scans émotionnels
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.emotionScans}</div>
-            <p className="text-xs text-muted-foreground">Ce mois-ci</p>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Score émotionnel</p>
+                <p className="text-2xl font-bold">{stats.emotionalScore}/100</p>
+              </div>
+              <Heart className="h-8 w-8 text-primary" />
+            </div>
+            <div className="mt-4 flex items-center text-sm text-green-600">
+              <TrendingUp className="h-4 w-4 mr-1" />
+              +5 points cette semaine
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <TrendingUp className="h-4 w-4 mr-2 text-green-500" />
-              Score bien-être
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.wellnessScore}%</div>
-            <Progress value={dashboardStats.wellnessScore} className="mt-2" />
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Moyenne équipe</p>
+                <p className="text-2xl font-bold">{stats.teamAverage}/100</p>
+              </div>
+              <Users className="h-8 w-8 text-blue-500" />
+            </div>
+            <div className="mt-4 flex items-center text-sm text-muted-foreground">
+              <Activity className="h-4 w-4 mr-1" />
+              {stats.totalTeamMembers} membres
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Users className="h-4 w-4 mr-2 text-blue-500" />
-              Connexions équipe
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.teamConnections}</div>
-            <p className="text-xs text-muted-foreground">Collègues connectés</p>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Check-ins semaine</p>
+                <p className="text-2xl font-bold">{stats.weeklyCheckins}</p>
+              </div>
+              <Calendar className="h-8 w-8 text-green-500" />
+            </div>
+            <div className="mt-4 flex items-center text-sm text-green-600">
+              <Target className="h-4 w-4 mr-1" />
+              Objectif atteint
+            </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Award className="h-4 w-4 mr-2 text-purple-500" />
-              Série actuelle
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.streak}</div>
-            <p className="text-xs text-muted-foreground">Jours consécutifs</p>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Dernière activité</p>
+                <p className="text-sm font-bold">{stats.lastUpdate}</p>
+              </div>
+              <Clock className="h-8 w-8 text-orange-500" />
+            </div>
+            <div className="mt-4">
+              <Button variant="outline" size="sm">
+                Nouveau scan
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Actions rapides */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4">Actions rapides</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {quickActions.map((action, index) => (
-            <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow">
-              <CardContent className="p-4" onClick={action.action}>
-                <div className="flex items-start space-x-3">
-                  <div className={`p-2 rounded ${action.color} text-white`}>
-                    <action.icon className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-sm">{action.label}</h3>
-                    <p className="text-xs text-muted-foreground mt-1">{action.description}</p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Contenu principal */}
+      {/* Main Content Tabs */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="emotions">Émotions</TabsTrigger>
           <TabsTrigger value="team">Équipe</TabsTrigger>
-          <TabsTrigger value="goals">Objectifs</TabsTrigger>
+          <TabsTrigger value="activities">Activités</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Progression personnelle */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Target className="h-5 w-5 mr-2" />
-                  Ma progression
-                </CardTitle>
+                <CardTitle>Évolution émotionnelle</CardTitle>
+                <CardDescription>Votre progression vs moyenne équipe</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium">Objectif en cours</span>
-                    <Badge variant="outline">En cours</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-2">{dashboardStats.nextGoal}</p>
-                  <Progress value={60} />
-                  <p className="text-xs text-muted-foreground mt-1">3/5 complétés</p>
-                </div>
-                
-                <div className="pt-4 border-t">
-                  <Button variant="outline" size="sm" className="w-full">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Définir un nouvel objectif
-                  </Button>
-                </div>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={emotionData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="score" stroke="#8884d8" name="Votre score" />
+                    <Line type="monotone" dataKey="team" stroke="#82ca9d" name="Moyenne équipe" />
+                  </LineChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
 
-            {/* Activité récente */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Activity className="h-5 w-5 mr-2" />
-                  Activité récente
-                </CardTitle>
+                <CardTitle>Performance par équipe</CardTitle>
+                <CardDescription>Scores de bien-être par département</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3 text-sm">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>Scan émotionnel complété</span>
-                    <span className="text-muted-foreground text-xs ml-auto">Il y a 2h</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    <span>Connexion avec un collègue</span>
-                    <span className="text-muted-foreground text-xs ml-auto">Hier</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-sm">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                    <span>Objectif atteint: 7 jours consécutifs</span>
-                    <span className="text-muted-foreground text-xs ml-auto">Il y a 3j</span>
-                  </div>
-                </div>
-                
-                <Button variant="ghost" size="sm" className="w-full mt-4">
-                  Voir toute l'activité
-                </Button>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={teamData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="score" fill="#8884d8" />
+                  </BarChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
 
-        <TabsContent value="emotions">
+        <TabsContent value="emotions" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Analyse émotionnelle</CardTitle>
-              <CardDescription>
-                Suivez l'évolution de votre bien-être émotionnel
-              </CardDescription>
+              <CardTitle>Analyse émotionnelle détaillée</CardTitle>
+              <CardDescription>Vos dernières analyses et recommandations</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">Aucune donnée émotionnelle récente</p>
-                <Button onClick={() => window.location.href = '/b2b/user/scan'}>
-                  Commencer un scan
-                </Button>
+              <div className="space-y-4">
+                <div className="text-center py-8">
+                  <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">Aucune analyse récente</p>
+                  <Button className="mt-4">Faire une nouvelle analyse</Button>
+                </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="team">
+        <TabsContent value="team" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Votre équipe</CardTitle>
-              <CardDescription>
-                Connectez-vous avec vos collègues pour un soutien mutuel
-              </CardDescription>
+              <CardTitle>Vue équipe</CardTitle>
+              <CardDescription>Données agrégées de votre équipe</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">Aucune connexion d'équipe pour le moment</p>
-                <Button onClick={() => window.location.href = '/b2b/user/social'}>
-                  Rejoindre l'espace social
-                </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {teamData.map((team) => (
+                  <div key={team.name} className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium">{team.name}</h3>
+                      <Badge variant="outline">{team.members} membres</Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-muted rounded-full h-2">
+                        <div 
+                          className="bg-primary h-2 rounded-full" 
+                          style={{ width: `${team.score}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-medium">{team.score}%</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="goals">
+        <TabsContent value="activities" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Mes objectifs bien-être</CardTitle>
-              <CardDescription>
-                Définissez et suivez vos objectifs de développement personnel
-              </CardDescription>
+              <CardTitle>Activités récentes</CardTitle>
+              <CardDescription>Vos dernières interactions avec EmotionsCare</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">Définissez votre premier objectif</p>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Créer un objectif
-                </Button>
+              <div className="space-y-4">
+                <div className="text-center py-8">
+                  <MessageSquare className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">Aucune activité récente</p>
+                  <Button variant="outline" className="mt-4">Voir toutes les activités</Button>
+                </div>
               </div>
             </CardContent>
           </Card>

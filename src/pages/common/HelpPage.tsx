@@ -4,435 +4,392 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { 
   HelpCircle, 
   Search, 
-  MessageCircle, 
   Book, 
-  Video,
-  Mail,
+  MessageCircle, 
+  Mail, 
   Phone,
-  Send,
-  ExternalLink,
-  Star
+  ChevronDown,
+  ChevronRight,
+  Heart,
+  Users,
+  Settings,
+  Shield
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 const HelpPage: React.FC = () => {
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
   const [contactForm, setContactForm] = useState({
     name: '',
     email: '',
     subject: '',
-    message: '',
-    category: 'general'
+    message: ''
   });
 
-  const faqItems = [
+  const faqCategories = [
     {
-      question: "Comment fonctionne l'analyse émotionnelle ?",
-      answer: "Notre système d'intelligence artificielle analyse vos textes, enregistrements vocaux ou sélections d'émojis pour évaluer votre état émotionnel. L'algorithme prend en compte plusieurs facteurs comme le choix des mots, le ton de la voix, et les patterns émotionnels pour vous fournir un score de bien-être précis."
+      id: 'getting-started',
+      title: 'Premiers pas',
+      icon: Heart,
+      questions: [
+        {
+          id: '1',
+          question: 'Comment créer mon premier scan émotionnel ?',
+          answer: 'Rendez-vous sur votre tableau de bord et cliquez sur "Nouvelle analyse". Choisissez votre méthode préférée (texte, audio, ou émojis) et suivez les instructions.'
+        },
+        {
+          id: '2',
+          question: 'Que signifie mon score émotionnel ?',
+          answer: 'Votre score émotionnel est calculé sur 100 points. Il reflète votre état de bien-être général basé sur vos réponses et analyses. Plus le score est élevé, meilleur est votre état émotionnel.'
+        },
+        {
+          id: '3',
+          question: 'À quelle fréquence dois-je faire des scans ?',
+          answer: 'Nous recommandons de faire au moins un scan par jour pour un suivi optimal. Vous pouvez en faire plus selon vos besoins et votre emploi du temps.'
+        }
+      ]
     },
     {
-      question: "Mes données sont-elles sécurisées ?",
-      answer: "Oui, absolument. Toutes vos données sont chiffrées et stockées de manière sécurisée. Nous respectons le RGPD et ne partageons jamais vos informations personnelles sans votre consentement explicite. Vous pouvez consulter notre politique de confidentialité pour plus de détails."
+      id: 'features',
+      title: 'Fonctionnalités',
+      icon: Settings,
+      questions: [
+        {
+          id: '4',
+          question: 'Comment fonctionne l\'analyse par IA ?',
+          answer: 'Notre IA analyse vos expressions textuelles, vocales ou émotionnelles pour comprendre votre état émotionnel. Elle utilise des modèles avancés de traitement du langage naturel et d\'analyse émotionnelle.'
+        },
+        {
+          id: '5',
+          question: 'Puis-je partager mes résultats ?',
+          answer: 'Oui, vous pouvez choisir de partager vos insights dans l\'espace social, mais toujours de manière anonymisée et selon vos préférences de confidentialité.'
+        },
+        {
+          id: '6',
+          question: 'Comment rejoindre une communauté ?',
+          answer: 'Allez dans l\'espace social, parcourez les communautés disponibles et cliquez sur "Rejoindre" pour celles qui vous intéressent.'
+        }
+      ]
     },
     {
-      question: "Comment rejoindre la communauté ?",
-      answer: "La communauté est accessible directement depuis votre tableau de bord. Vous pouvez partager vos expériences, poser des questions et soutenir d'autres membres. Vous avez le contrôle total sur votre niveau de participation et pouvez choisir de rester anonyme."
+      id: 'privacy',
+      title: 'Confidentialité',
+      icon: Shield,
+      questions: [
+        {
+          id: '7',
+          question: 'Mes données sont-elles sécurisées ?',
+          answer: 'Absolument. Toutes vos données sont chiffrées et stockées de manière sécurisée. Nous respectons le RGPD et ne partageons jamais vos informations personnelles sans votre consentement.'
+        },
+        {
+          id: '8',
+          question: 'Qui peut voir mes analyses émotionnelles ?',
+          answer: 'Seul vous avez accès à vos analyses détaillées. Les administrateurs B2B peuvent voir des données agrégées et anonymisées pour les rapports d\'équipe.'
+        },
+        {
+          id: '9',
+          question: 'Puis-je supprimer mes données ?',
+          answer: 'Oui, vous pouvez demander la suppression de toutes vos données à tout moment depuis les paramètres de votre compte ou en nous contactant directement.'
+        }
+      ]
     },
     {
-      question: "Que faire si mon score émotionnel est bas ?",
-      answer: "Un score bas n'est pas alarmant - c'est une information utile. L'application vous proposera des recommandations personnalisées comme des exercices de respiration, de la méditation guidée, ou des ressources de bien-être. N'hésitez pas à consulter un professionnel si vous ressentez le besoin d'un accompagnement."
-    },
-    {
-      question: "Comment fonctionne le mode B2B ?",
-      answer: "Le mode B2B permet aux entreprises de suivre le bien-être de leurs équipes tout en respectant l'anonymat. Les administrateurs ont accès à des statistiques globales et peuvent identifier les départements nécessitant plus d'attention, sans voir les données individuelles."
-    },
-    {
-      question: "Puis-je utiliser l'application hors ligne ?",
-      answer: "Certaines fonctionnalités sont disponibles hors ligne, comme la consultation de votre historique et les exercices de bien-être téléchargés. Cependant, l'analyse émotionnelle nécessite une connexion internet pour fonctionner."
-    }
-  ];
-
-  const tutorials = [
-    {
-      title: "Première analyse émotionnelle",
-      description: "Découvrez comment effectuer votre première analyse",
-      duration: "3 min",
-      level: "Débutant",
-      type: "video"
-    },
-    {
-      title: "Naviguer dans la communauté",
-      description: "Apprenez à interagir avec les autres membres",
-      duration: "5 min",
-      level: "Débutant",
-      type: "guide"
-    },
-    {
-      title: "Interpréter vos résultats",
-      description: "Comprenez vos scores et recommandations",
-      duration: "4 min",
-      level: "Intermédiaire",
-      type: "video"
-    },
-    {
-      title: "Paramètres de confidentialité",
-      description: "Configurez vos préférences de vie privée",
-      duration: "6 min",
-      level: "Avancé",
-      type: "guide"
-    }
-  ];
-
-  const resources = [
-    {
-      title: "Guide de l'utilisateur",
-      description: "Documentation complète de l'application",
-      type: "PDF",
-      url: "#"
-    },
-    {
-      title: "API Documentation",
-      description: "Pour les développeurs et intégrations",
-      type: "Web",
-      url: "#"
-    },
-    {
-      title: "Ressources de bien-être",
-      description: "Articles et conseils d'experts",
-      type: "Blog",
-      url: "#"
-    },
-    {
-      title: "Webinaires",
-      description: "Sessions en direct avec nos experts",
-      type: "Video",
-      url: "#"
+      id: 'b2b',
+      title: 'Solutions entreprise',
+      icon: Users,
+      questions: [
+        {
+          id: '10',
+          question: 'Comment fonctionne la version entreprise ?',
+          answer: 'La version B2B permet aux organisations de suivre le bien-être de leurs équipes avec des tableaux de bord administrateurs, des rapports agrégés et des outils de gestion des utilisateurs.'
+        },
+        {
+          id: '11',
+          question: 'Comment inviter des collaborateurs ?',
+          answer: 'Les administrateurs peuvent envoyer des invitations par email depuis l\'interface d\'administration. Les collaborateurs recevront un lien pour créer leur compte.'
+        },
+        {
+          id: '12',
+          question: 'Quels rapports sont disponibles ?',
+          answer: 'Les administrateurs ont accès à des rapports sur les tendances d\'équipe, les alertes de bien-être, et des analytics détaillés tout en respectant la confidentialité individuelle.'
+        }
+      ]
     }
   ];
 
   const handleContactSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!contactForm.name || !contactForm.email || !contactForm.message) {
-      toast.error("Veuillez remplir tous les champs obligatoires");
-      return;
-    }
     
-    // Simulate sending message
-    toast.success("Message envoyé avec succès ! Nous vous répondrons sous 24h.");
+    // Simuler l'envoi du message
+    toast({
+      title: "Message envoyé !",
+      description: "Nous vous répondrons dans les plus brefs délais.",
+      variant: "success"
+    });
+
+    // Reset form
     setContactForm({
       name: '',
       email: '',
       subject: '',
-      message: '',
-      category: 'general'
+      message: ''
     });
   };
 
-  const filteredFAQ = faqItems.filter(item => 
-    item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.answer.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const toggleFaq = (id: string) => {
+    setExpandedFaq(expandedFaq === id ? null : id);
+  };
+
+  const filteredFaqs = faqCategories.map(category => ({
+    ...category,
+    questions: category.questions.filter(
+      q => 
+        q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        q.answer.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  })).filter(category => category.questions.length > 0);
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-8">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold flex items-center justify-center">
-          <HelpCircle className="mr-3 h-10 w-10 text-primary" />
-          Centre d'Aide
-        </h1>
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+          <HelpCircle className="h-8 w-8 text-primary" />
+        </div>
+        <h1 className="text-3xl font-bold">Centre d'aide EmotionsCare</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Trouvez des réponses à vos questions et apprenez à tirer le meilleur parti d'EmotionsCare
+          Trouvez des réponses à vos questions et obtenez de l'aide pour utiliser EmotionsCare
         </p>
       </div>
 
-      {/* Search */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="relative max-w-md mx-auto">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Rechercher dans l'aide..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </CardContent>
-      </Card>
+      {/* Recherche */}
+      <div className="max-w-2xl mx-auto">
+        <div className="relative">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher dans l'aide..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
 
-      <Tabs defaultValue="faq" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="faq">FAQ</TabsTrigger>
-          <TabsTrigger value="tutorials">Tutoriels</TabsTrigger>
-          <TabsTrigger value="resources">Ressources</TabsTrigger>
-          <TabsTrigger value="contact">Contact</TabsTrigger>
+      {/* Main Content */}
+      <Tabs defaultValue="faq" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="faq">
+            <Book className="h-4 w-4 mr-2" />
+            FAQ
+          </TabsTrigger>
+          <TabsTrigger value="contact">
+            <MessageCircle className="h-4 w-4 mr-2" />
+            Nous contacter
+          </TabsTrigger>
+          <TabsTrigger value="resources">
+            <Heart className="h-4 w-4 mr-2" />
+            Ressources
+          </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="faq" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Book className="mr-2 h-5 w-5" />
-                Questions Fréquentes
-              </CardTitle>
-              <CardDescription>
-                Trouvez rapidement des réponses aux questions les plus courantes
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Accordion type="single" collapsible className="w-full">
-                {filteredFAQ.map((item, index) => (
-                  <AccordionItem key={index} value={`item-${index}`}>
-                    <AccordionTrigger className="text-left">
-                      {item.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground">
-                      {item.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-              
-              {filteredFAQ.length === 0 && searchTerm && (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">
-                    Aucune question trouvée pour "{searchTerm}"
-                  </p>
-                  <Button variant="outline" className="mt-4">
-                    Poser une nouvelle question
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="tutorials" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Video className="mr-2 h-5 w-5" />
-                Tutoriels et Guides
-              </CardTitle>
-              <CardDescription>
-                Apprenez à utiliser toutes les fonctionnalités d'EmotionsCare
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {tutorials.map((tutorial, index) => (
-                  <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center space-x-2">
-                          {tutorial.type === 'video' ? (
-                            <Video className="h-5 w-5 text-blue-600" />
-                          ) : (
-                            <Book className="h-5 w-5 text-green-600" />
-                          )}
-                          <Badge variant="secondary">{tutorial.level}</Badge>
+          {filteredFaqs.length > 0 ? (
+            filteredFaqs.map((category) => (
+              <Card key={category.id}>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <category.icon className="h-5 w-5" />
+                    {category.title}
+                    <Badge variant="outline">{category.questions.length}</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {category.questions.map((faq) => (
+                    <div key={faq.id} className="border rounded-lg">
+                      <button
+                        onClick={() => toggleFaq(faq.id)}
+                        className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-muted/50"
+                      >
+                        <span className="font-medium">{faq.question}</span>
+                        {expandedFaq === faq.id ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
+                      </button>
+                      {expandedFaq === faq.id && (
+                        <div className="px-4 pb-3 text-muted-foreground">
+                          {faq.answer}
                         </div>
-                        <span className="text-sm text-muted-foreground">{tutorial.duration}</span>
-                      </div>
-                      <h3 className="font-semibold mb-2">{tutorial.title}</h3>
-                      <p className="text-sm text-muted-foreground mb-4">{tutorial.description}</p>
-                      <Button variant="outline" size="sm" className="w-full">
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        Voir le tutoriel
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="resources" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Book className="mr-2 h-5 w-5" />
-                Ressources et Documentation
-              </CardTitle>
-              <CardDescription>
-                Accédez à toute la documentation et aux ressources utiles
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {resources.map((resource, index) => (
-                  <div key={index} className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-medium">{resource.title}</h4>
-                        <p className="text-sm text-muted-foreground">{resource.description}</p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="outline">{resource.type}</Badge>
-                        <Button variant="ghost" size="sm">
-                          <ExternalLink className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <Card>
+              <CardContent className="text-center py-8">
+                <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">
+                  {searchTerm ? 'Aucun résultat trouvé pour votre recherche.' : 'Utilisez la barre de recherche pour trouver des réponses.'}
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
-        
+
         <TabsContent value="contact" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Contact Form */}
+            {/* Formulaire de contact */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <MessageCircle className="mr-2 h-5 w-5" />
-                  Nous Contacter
-                </CardTitle>
+                <CardTitle>Envoyez-nous un message</CardTitle>
                 <CardDescription>
-                  Envoyez-nous un message, nous vous répondrons rapidement
+                  Notre équipe vous répondra dans les plus brefs délais
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleContactSubmit} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium">Nom *</label>
                       <Input
-                        value={contactForm.name}
-                        onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
                         placeholder="Votre nom"
+                        value={contactForm.name}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
                         required
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium">Email *</label>
                       <Input
                         type="email"
+                        placeholder="Votre email"
                         value={contactForm.email}
-                        onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
-                        placeholder="votre@email.com"
+                        onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
                         required
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium">Catégorie</label>
-                    <select
-                      value={contactForm.category}
-                      onChange={(e) => setContactForm({...contactForm, category: e.target.value})}
-                      className="w-full p-2 border rounded-md"
-                    >
-                      <option value="general">Question générale</option>
-                      <option value="technical">Problème technique</option>
-                      <option value="billing">Facturation</option>
-                      <option value="feature">Demande de fonctionnalité</option>
-                      <option value="bug">Rapport de bug</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Sujet</label>
-                    <Input
-                      value={contactForm.subject}
-                      onChange={(e) => setContactForm({...contactForm, subject: e.target.value})}
-                      placeholder="Résumé de votre demande"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Message *</label>
-                    <Textarea
-                      value={contactForm.message}
-                      onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
-                      placeholder="Décrivez votre question ou problème en détail..."
-                      className="min-h-32"
-                      required
-                    />
-                  </div>
+                  <Input
+                    placeholder="Sujet de votre message"
+                    value={contactForm.subject}
+                    onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
+                    required
+                  />
+                  <Textarea
+                    placeholder="Votre message..."
+                    value={contactForm.message}
+                    onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                    rows={5}
+                    required
+                  />
                   <Button type="submit" className="w-full">
-                    <Send className="mr-2 h-4 w-4" />
                     Envoyer le message
                   </Button>
                 </form>
               </CardContent>
             </Card>
 
-            {/* Contact Information */}
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Autres Moyens de Contact</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-3 p-3 border rounded-lg">
-                    <Mail className="h-5 w-5 text-blue-600" />
-                    <div>
-                      <p className="font-medium">Email</p>
-                      <p className="text-sm text-muted-foreground">support@emotionscare.fr</p>
-                    </div>
+            {/* Informations de contact */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Autres moyens de nous contacter</CardTitle>
+                <CardDescription>
+                  Choisissez le canal qui vous convient le mieux
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/50">
+                  <Mail className="h-6 w-6 text-primary" />
+                  <div>
+                    <p className="font-medium">Email</p>
+                    <p className="text-sm text-muted-foreground">support@emotionscare.fr</p>
                   </div>
-                  <div className="flex items-center space-x-3 p-3 border rounded-lg">
-                    <Phone className="h-5 w-5 text-green-600" />
-                    <div>
-                      <p className="font-medium">Téléphone</p>
-                      <p className="text-sm text-muted-foreground">+33 1 23 45 67 89</p>
-                    </div>
+                </div>
+                
+                <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/50">
+                  <Phone className="h-6 w-6 text-primary" />
+                  <div>
+                    <p className="font-medium">Téléphone</p>
+                    <p className="text-sm text-muted-foreground">+33 1 23 45 67 89</p>
+                    <p className="text-xs text-muted-foreground">Lun-Ven 9h-18h</p>
                   </div>
-                  <div className="flex items-center space-x-3 p-3 border rounded-lg">
-                    <MessageCircle className="h-5 w-5 text-purple-600" />
-                    <div>
-                      <p className="font-medium">Chat en direct</p>
-                      <p className="text-sm text-muted-foreground">Lun-Ven 9h-18h</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Temps de Réponse</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Questions générales</span>
-                    <Badge variant="secondary">{'<'} 24h</Badge>
+                <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/50">
+                  <MessageCircle className="h-6 w-6 text-primary" />
+                  <div>
+                    <p className="font-medium">Chat en direct</p>
+                    <p className="text-sm text-muted-foreground">Disponible depuis votre tableau de bord</p>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Problèmes techniques</span>
-                    <Badge variant="secondary">{'<'} 12h</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Urgences</span>
-                    <Badge variant="secondary">{'<'} 2h</Badge>
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Star className="mr-2 h-5 w-5 text-yellow-500" />
-                    Satisfaction Client
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600 mb-2">98%</div>
-                    <p className="text-sm text-muted-foreground">
-                      de nos utilisateurs sont satisfaits de notre support
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                <div className="pt-4 border-t">
+                  <h4 className="font-medium mb-2">Temps de réponse moyens</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Email : 2-4 heures</li>
+                    <li>• Téléphone : Immédiat</li>
+                    <li>• Chat : 1-2 minutes</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="resources" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Guide de démarrage</CardTitle>
+                <CardDescription>Premiers pas avec EmotionsCare</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Apprenez les bases pour tirer le meilleur parti de votre expérience.
+                </p>
+                <Button variant="outline" className="w-full">
+                  Consulter le guide
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Bonnes pratiques</CardTitle>
+                <CardDescription>Optimisez votre bien-être</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Découvrez les meilleures techniques pour améliorer votre santé mentale.
+                </p>
+                <Button variant="outline" className="w-full">
+                  Lire les conseils
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Documentation API</CardTitle>
+                <CardDescription>Pour les développeurs</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Intégrez EmotionsCare dans vos applications.
+                </p>
+                <Button variant="outline" className="w-full">
+                  Voir l'API
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
       </Tabs>
