@@ -1,87 +1,94 @@
 
-import { UserMode } from '@/contexts/UserModeContext';
+/**
+ * Helper functions for user mode related operations
+ */
 
-export const normalizeUserMode = (mode: string | UserMode | null | undefined): UserMode => {
-  if (!mode) return 'b2c';
-  
-  const modeStr = String(mode).toLowerCase();
-  
-  // Mapping des différentes variations possibles
-  const modeMap: Record<string, UserMode> = {
-    'b2c': 'b2c',
-    'b2b_user': 'b2b_user',
-    'b2b_admin': 'b2b_admin',
-    'b2b-user': 'b2b_user',
-    'b2b-admin': 'b2b_admin',
-    'user': 'b2b_user',
-    'admin': 'b2b_admin',
-    'collaborateur': 'b2b_user',
-    'administrateur': 'b2b_admin'
-  };
-  
-  return modeMap[modeStr] || 'b2c';
-};
+export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
 
-export const getModeDashboardPath = (mode: UserMode | string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  const dashboardMap: Record<UserMode, string> = {
-    'b2c': '/b2c/dashboard',
-    'b2b_user': '/b2b/user/dashboard',
-    'b2b_admin': '/b2b/admin/dashboard'
-  };
-  
-  return dashboardMap[normalizedMode];
-};
+/**
+ * Normalizes the user mode value to ensure it's a valid option
+ */
+export function normalizeUserMode(userMode: UserMode): UserMode {
+  if (userMode === 'b2c' || userMode === 'b2b_user' || userMode === 'b2b_admin') {
+    return userMode;
+  }
+  return null;
+}
 
-export const getModeLoginPath = (mode: UserMode | string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  const loginMap: Record<UserMode, string> = {
-    'b2c': '/b2c/login',
-    'b2b_user': '/b2b/user/login',
-    'b2b_admin': '/b2b/admin/login'
-  };
-  
-  return loginMap[normalizedMode];
-};
+/**
+ * Returns the display name for a user mode
+ */
+export function getUserModeDisplayName(userMode: UserMode): string {
+  switch (userMode) {
+    case 'b2c':
+      return 'Particulier';
+    case 'b2b_user':
+      return 'Collaborateur';
+    case 'b2b_admin':
+      return 'Administrateur';
+    default:
+      return 'Utilisateur';
+  }
+}
 
-export const getModeSocialPath = (mode: UserMode | string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  const socialMap: Record<UserMode, string> = {
-    'b2c': '/b2c/social',
-    'b2b_user': '/b2b/user/social',
-    'b2b_admin': '/b2b/admin/social-cocoon'
-  };
-  
-  return socialMap[normalizedMode];
-};
+/**
+ * Returns the appropriate dashboard path based on the user mode
+ */
+export function getModeDashboardPath(userMode: UserMode): string {
+  switch (userMode) {
+    case 'b2c':
+      return '/b2c/dashboard';
+    case 'b2b_user':
+      return '/b2b/user/dashboard';
+    case 'b2b_admin':
+      return '/b2b/admin/dashboard';
+    default:
+      return '/choose-mode';
+  }
+}
 
-export const getUserModeLabel = (mode: UserMode | string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  const labelMap: Record<UserMode, string> = {
-    'b2c': 'Particulier',
-    'b2b_user': 'Collaborateur',
-    'b2b_admin': 'Administrateur'
-  };
-  
-  return labelMap[normalizedMode];
-};
+/**
+ * Returns the appropriate scan path based on the user mode
+ */
+export function getModeScanPath(userMode: UserMode): string {
+  switch (userMode) {
+    case 'b2c':
+      return '/b2c/scan';
+    case 'b2b_user':
+      return '/b2b/user/scan';
+    case 'b2b_admin':
+      return '/b2b/admin/dashboard'; // Admins don't have a scan page, redirect to dashboard
+    default:
+      return '/choose-mode';
+  }
+}
 
-export const getUserModeDisplayName = (mode: UserMode | string | null | undefined): string => {
-  return getUserModeLabel(mode);
-};
+/**
+ * Returns the appropriate social path based on the user mode
+ */
+export function getModeSocialPath(userMode: UserMode): string {
+  switch (userMode) {
+    case 'b2c':
+      return '/b2c/social';
+    case 'b2b_user':
+      return '/b2b/user/social';
+    case 'b2b_admin':
+      return '/b2b/admin/social-cocoon';
+    default:
+      return '/choose-mode';
+  }
+}
 
-export const getModeColor = (mode: UserMode | string | null | undefined): string => {
-  const normalizedMode = normalizeUserMode(mode);
-  
-  const colorMap: Record<UserMode, string> = {
-    'b2c': 'bg-blue-50 text-blue-600',
-    'b2b_user': 'bg-green-50 text-green-600',
-    'b2b_admin': 'bg-purple-50 text-purple-600'
-  };
-  
-  return colorMap[normalizedMode];
-};
+/**
+ * Returns whether the user is an administrator
+ */
+export function isAdminMode(userMode: UserMode): boolean {
+  return userMode === 'b2b_admin';
+}
+
+/**
+ * Returns whether the user is a B2B user (either admin or normal user)
+ */
+export function isB2BMode(userMode: UserMode): boolean {
+  return userMode === 'b2b_admin' || userMode === 'b2b_user';
+}

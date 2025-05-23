@@ -3,12 +3,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, Briefcase, Building, Building2 } from 'lucide-react';
+import { Brain, Briefcase, Building2 } from 'lucide-react';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { Separator } from '@/components/ui/separator';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
 const ChooseMode: React.FC = () => {
   const navigate = useNavigate();
-  const { setUserMode } = useUserMode();
+  const { setUserMode, isLoading } = useUserMode();
 
   const handleSelectMode = (mode: 'b2c' | 'b2b_user' | 'b2b_admin') => {
     setUserMode(mode);
@@ -22,6 +24,14 @@ const ChooseMode: React.FC = () => {
       navigate('/b2b/selection');
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingAnimation text="Chargement..." />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
@@ -80,6 +90,14 @@ const ChooseMode: React.FC = () => {
               </p>
             </div>
           </Button>
+
+          <Separator className="col-span-full my-4" />
+          
+          <div className="col-span-full text-center">
+            <Button variant="ghost" onClick={() => navigate('/')} className="mt-4">
+              Retour à l'accueil
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
