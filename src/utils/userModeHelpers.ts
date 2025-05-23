@@ -74,6 +74,24 @@ export function getModeLoginPath(mode?: string | null): string {
 }
 
 /**
+ * Obtient le chemin social pour un mode utilisateur spécifique
+ */
+export function getModeSocialPath(mode?: string | null): string {
+  const normalized = normalizeUserMode(mode);
+  
+  switch (normalized) {
+    case 'b2c':
+      return '/b2c/social';
+    case 'b2b_user':
+      return '/b2b/user/social';
+    case 'b2b_admin':
+      return '/b2b/admin/social-cocoon';
+    default:
+      return '/social';
+  }
+}
+
+/**
  * Vérifie si un mode est valide
  */
 export function isValidUserMode(mode?: string | null): boolean {
