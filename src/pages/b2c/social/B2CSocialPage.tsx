@@ -6,340 +6,317 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import { 
   Heart, 
   MessageCircle, 
   Share2, 
-  Users,
-  PlusCircle,
-  Smile,
-  Camera,
-  Send,
-  ThumbsUp,
-  Filter
+  Plus, 
+  Users, 
+  TrendingUp,
+  Loader2,
+  Send
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import LoadingAnimation from '@/components/ui/loading-animation';
-import { toast } from 'sonner';
+
+interface Post {
+  id: string;
+  content: string;
+  user_id: string;
+  date: string;
+  reactions: number;
+  image_url?: string;
+  user_name?: string;
+}
 
 const B2CSocialPage: React.FC = () => {
   const { user } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [newPost, setNewPost] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const [isPosting, setIsPosting] = useState(false);
-  
+
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    
-    return () => clearTimeout(timer);
+    loadPosts();
   }, []);
 
-  const posts = [
-    {
-      id: 1,
-      author: 'Marie L.',
-      avatar: '',
-      time: 'Il y a 2h',
-      content: 'Excellente session de méditation ce matin ! Je me sens tellement plus sereine. Merci à la communauté pour vos encouragements hier 🧘‍♀️',
-      likes: 12,
-      comments: 3,
-      mood: 'peaceful',
-      hasLiked: false
-    },
-    {
-      id: 2,
-      author: 'Thomas K.',
-      avatar: '',
-      time: 'Il y a 4h',
-      content: 'Jour difficile au travail, mais les exercices de respiration m\'ont vraiment aidé à garder mon calme. Parfois les petites victoires comptent le plus 💪',
-      likes: 8,
-      comments: 5,
-      mood: 'determined',
-      hasLiked: true
-    },
-    {
-      id: 3,
-      author: 'Sophie M.',
-      avatar: '',
-      time: 'Hier',
-      content: 'Je voulais partager cette citation qui m\'a marquée aujourd\'hui : "Le bonheur n\'est pas une destination, c\'est un voyage." Qu\'est-ce qui vous rend heureux en ce moment ?',
-      likes: 15,
-      comments: 8,
-      mood: 'inspired',
-      hasLiked: false
+  const loadPosts = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          profiles(name)
+        `)
+        .order('date', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+
+      const postsWithUserNames = data.map(post => ({
+        ...post,
+        user_name: post.profiles?.name || 'Utilisateur anonyme'
+      }));
+
+      setPosts(postsWithUserNames);
+    } catch (error) {
+      console.error('Erreur chargement posts:', error);
+      toast.error('Erreur lors du chargement des posts');
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
 
-  const moodCategories = [
-    { emoji: '😊', label: 'Joyeux', count: 23 },
-    { emoji: '😌', label: 'Serein', count: 18 },
-    { emoji: '💪', label: 'Motivé', count: 15 },
-    { emoji: '🤔', label: 'Réfléchi', count: 12 },
-    { emoji: '😴', label: 'Fatigué', count: 9 }
-  ];
+  const handleCreatePost = async () => {
+    if (!user || !newPost.trim()) return;
 
-  const handlePost = async () => {
-    if (!newPost.trim()) return;
-    
     setIsPosting(true);
-    
-    // Simulate posting
-    setTimeout(() => {
-      setIsPosting(false);
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .insert({
+          user_id: user.id,
+          content: newPost.trim(),
+          reactions: 0
+        });
+
+      if (error) throw error;
+
       setNewPost('');
-      toast.success('Votre message a été partagé avec la communauté !');
-    }, 1000);
+      toast.success('Post publié !');
+      loadPosts(); // Recharger les posts
+    } catch (error) {
+      console.error('Erreur création post:', error);
+      toast.error('Erreur lors de la publication');
+    } finally {
+      setIsPosting(false);
+    }
+  };
+
+  const handleLikePost = async (postId: string, currentReactions: number) => {
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .update({ reactions: currentReactions + 1 })
+        .eq('id', postId);
+
+      if (error) throw error;
+
+      // Mettre à jour localement
+      setPosts(prev => prev.map(post => 
+        post.id === postId 
+          ? { ...post, reactions: post.reactions + 1 }
+          : post
+      ));
+    } catch (error) {
+      console.error('Erreur like post:', error);
+      toast.error('Erreur lors de la réaction');
+    }
   };
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <LoadingAnimation text="Chargement de la communauté..." />
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <div className="animate-pulse">
+            <div className="h-8 bg-muted rounded w-1/3 mb-4"></div>
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-muted rounded-lg h-32 mb-4"></div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-4"
-        >
-          <h1 className="text-3xl font-light">
-            Communauté <span className="text-primary">EmotionsCare</span>
-          </h1>
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-2xl mx-auto">
+        {/* En-tête */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Social Cocoon</h1>
           <p className="text-muted-foreground">
-            Partagez votre parcours bien-être avec une communauté bienveillante
+            Partagez et connectez-vous avec la communauté EmotionsCare
           </p>
-        </motion.div>
+        </div>
 
-        {/* Community Stats */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-5 gap-4"
-        >
-          {moodCategories.map((mood, index) => (
-            <Card key={index} className="text-center p-4 hover:shadow-lg transition-shadow cursor-pointer">
-              <div className="text-2xl mb-2">{mood.emoji}</div>
-              <div className="text-sm font-medium">{mood.label}</div>
-              <div className="text-xs text-muted-foreground">{mood.count} personnes</div>
+        {/* Statistiques communauté */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          <Card>
+            <CardContent className="p-4 text-center">
+              <Users className="h-6 w-6 mx-auto mb-2 text-blue-500" />
+              <p className="text-sm text-muted-foreground">Membres</p>
+              <p className="text-xl font-bold">1,234</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4 text-center">
+              <MessageCircle className="h-6 w-6 mx-auto mb-2 text-green-500" />
+              <p className="text-sm text-muted-foreground">Posts</p>
+              <p className="text-xl font-bold">{posts.length}</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4 text-center">
+              <TrendingUp className="h-6 w-6 mx-auto mb-2 text-purple-500" />
+              <p className="text-sm text-muted-foreground">Interactions</p>
+              <p className="text-xl font-bold">
+                {posts.reduce((sum, post) => sum + post.reactions, 0)}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Créer un nouveau post */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Plus className="h-5 w-5 mr-2" />
+              Partager avec la communauté
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Textarea
+              placeholder="Partagez votre expérience, vos réflexions ou demandez conseil à la communauté..."
+              value={newPost}
+              onChange={(e) => setNewPost(e.target.value)}
+              rows={3}
+            />
+            <div className="flex justify-between items-center">
+              <p className="text-xs text-muted-foreground">
+                Restez bienveillant et respectueux 💙
+              </p>
+              <Button 
+                onClick={handleCreatePost}
+                disabled={!newPost.trim() || isPosting}
+              >
+                {isPosting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Publication...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4 mr-2" />
+                    Publier
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Feed des posts */}
+        <div className="space-y-6">
+          {posts.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-12">
+                <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Aucun post pour le moment</h3>
+                <p className="text-muted-foreground mb-4">
+                  Soyez le premier à partager avec la communauté !
+                </p>
+              </CardContent>
             </Card>
-          ))}
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Main Feed */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Create Post */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <PlusCircle className="mr-2 h-5 w-5 text-primary" />
-                    Partager avec la communauté
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-start space-x-3">
+          ) : (
+            posts.map((post) => (
+              <Card key={post.id}>
+                <CardContent className="p-6">
+                  {/* En-tête du post */}
+                  <div className="flex items-start space-x-3 mb-4">
                     <Avatar>
-                      <AvatarImage src={user?.avatar_url} />
-                      <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
+                      <AvatarFallback>
+                        {post.user_name?.charAt(0)?.toUpperCase() || 'U'}
+                      </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1 space-y-3">
-                      <Textarea
-                        placeholder="Comment vous sentez-vous aujourd'hui ? Partagez votre expérience..."
-                        value={newPost}
-                        onChange={(e) => setNewPost(e.target.value)}
-                        className="min-h-20"
-                      />
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Button variant="ghost" size="sm">
-                            <Smile className="h-4 w-4 mr-1" />
-                            Humeur
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <Camera className="h-4 w-4 mr-1" />
-                            Photo
-                          </Button>
-                        </div>
-                        <Button 
-                          onClick={handlePost}
-                          disabled={!newPost.trim() || isPosting}
-                        >
-                          {isPosting ? (
-                            <LoadingAnimation size="small" />
-                          ) : (
-                            <>
-                              <Send className="h-4 w-4 mr-1" />
-                              Partager
-                            </>
-                          )}
-                        </Button>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2">
+                        <h4 className="font-medium">{post.user_name}</h4>
+                        <Badge variant="secondary" className="text-xs">
+                          Membre
+                        </Badge>
                       </div>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(post.date).toLocaleDateString('fr-FR', {
+                          day: 'numeric',
+                          month: 'long',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            </motion.div>
 
-            {/* Posts Feed */}
-            <div className="space-y-6">
-              {posts.map((post, index) => (
-                <motion.div
-                  key={post.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 + index * 0.1 }}
-                >
-                  <Card className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start space-x-3">
-                        <Avatar>
-                          <AvatarImage src={post.avatar} />
-                          <AvatarFallback>{post.author.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 space-y-3">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium">{post.author}</div>
-                              <div className="text-sm text-muted-foreground">{post.time}</div>
-                            </div>
-                            <Badge variant="outline" className="flex items-center">
-                              {post.mood === 'peaceful' && '😌'}
-                              {post.mood === 'determined' && '💪'}
-                              {post.mood === 'inspired' && '✨'}
-                              <span className="ml-1 capitalize">{post.mood}</span>
-                            </Badge>
-                          </div>
-                          
-                          <p className="text-sm leading-relaxed">{post.content}</p>
-                          
-                          <div className="flex items-center space-x-4 pt-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              className={post.hasLiked ? 'text-red-500' : ''}
-                            >
-                              <Heart className={`h-4 w-4 mr-1 ${post.hasLiked ? 'fill-current' : ''}`} />
-                              {post.likes}
-                            </Button>
-                            
-                            <Button variant="ghost" size="sm">
-                              <MessageCircle className="h-4 w-4 mr-1" />
-                              {post.comments}
-                            </Button>
-                            
-                            <Button variant="ghost" size="sm">
-                              <Share2 className="h-4 w-4 mr-1" />
-                              Partager
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
+                  {/* Contenu du post */}
+                  <div className="mb-4">
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                      {post.content}
+                    </p>
+                  </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Community Guidelines */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Users className="mr-2 h-5 w-5 text-blue-500" />
-                    Notre Communauté
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span>Membres actifs</span>
-                    <Badge variant="secondary">1,247</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Messages aujourd'hui</span>
-                    <Badge variant="secondary">89</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Nouveau cette semaine</span>
-                    <Badge variant="secondary">23</Badge>
+                  {/* Actions du post */}
+                  <div className="flex items-center space-x-4 pt-4 border-t">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleLikePost(post.id, post.reactions)}
+                      className="text-muted-foreground hover:text-red-500"
+                    >
+                      <Heart className="h-4 w-4 mr-1" />
+                      {post.reactions}
+                    </Button>
+                    
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground"
+                      onClick={() => toast.info('Fonctionnalité commentaires en développement')}
+                    >
+                      <MessageCircle className="h-4 w-4 mr-1" />
+                      Répondre
+                    </Button>
+                    
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground"
+                      onClick={() => toast.info('Fonctionnalité partage en développement')}
+                    >
+                      <Share2 className="h-4 w-4 mr-1" />
+                      Partager
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
-
-            {/* Guidelines */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Règles de Bienveillance</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm">
-                  <div className="flex items-start space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
-                    <p>Soyez respectueux et bienveillants</p>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
-                    <p>Partagez vos expériences authentiques</p>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
-                    <p>Encouragez et soutenez les autres</p>
-                  </div>
-                  <div className="flex items-start space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
-                    <p>Respectez la confidentialité</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Trending Topics */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.8 }}
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Sujets Populaires</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {['#méditation', '#gratitude', '#motivation', '#équilibre', '#bienêtre'].map((tag, index) => (
-                    <Badge key={index} variant="outline" className="mr-2 mb-2 cursor-pointer hover:bg-primary hover:text-primary-foreground">
-                      {tag}
-                    </Badge>
-                  ))}
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
+            ))
+          )}
         </div>
+
+        {/* Conseils communauté */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle>Conseils pour une belle communauté</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-center space-x-2">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                <span>Soyez bienveillant et respectueux dans vos échanges</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                <span>Partagez vos expériences pour aider les autres</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                <span>N'hésitez pas à demander de l'aide quand vous en avez besoin</span>
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

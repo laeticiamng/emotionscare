@@ -1,178 +1,262 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Smile, Meh, Frown, Heart, Clock, TrendingUp } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { Heart, TrendingUp, Calendar, Target, Award } from 'lucide-react';
+
+interface EmotionStats {
+  totalScans: number;
+  averageScore: number;
+  streak: number;
+  lastScan: string | null;
+  weeklyTrend: number;
+}
 
 const UnifiedEmotionCheckin: React.FC = () => {
-  const [selectedMood, setSelectedMood] = useState<string | null>(null);
-  const [selectedIntensity, setSelectedIntensity] = useState<number | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
+  const [stats, setStats] = useState<EmotionStats>({
+    totalScans: 0,
+    averageScore: 0,
+    streak: 0,
+    lastScan: null,
+    weeklyTrend: 0
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [recentEmotions, setRecentEmotions] = useState([]);
 
-  const moods = [
-    { id: 'great', emoji: '😊', label: 'Excellent', color: 'text-green-600', score: 90 },
-    { id: 'good', emoji: '🙂', label: 'Bien', color: 'text-blue-600', score: 75 },
-    { id: 'okay', emoji: '😐', label: 'Correct', color: 'text-yellow-600', score: 60 },
-    { id: 'bad', emoji: '😔', label: 'Difficile', color: 'text-orange-600', score: 40 },
-    { id: 'terrible', emoji: '😢', label: 'Très dur', color: 'text-red-600', score: 20 }
-  ];
-
-  const intensities = [1, 2, 3, 4, 5];
-
-  const recentCheckins = [
-    { time: 'Il y a 2h', mood: '😊', score: 85, note: 'Excellente réunion équipe' },
-    { time: 'Hier', mood: '😐', score: 65, note: 'Journée chargée mais productive' },
-    { time: 'Avant-hier', mood: '🙂', score: 78, note: 'Bonne séance de sport le matin' }
-  ];
-
-  const handleQuickCheckin = async () => {
-    if (!selectedMood) {
-      toast.error("Veuillez sélectionner votre humeur");
-      return;
+  useEffect(() => {
+    if (user) {
+      loadEmotionStats();
     }
+  }, [user]);
 
-    setIsSubmitting(true);
-    
+  const loadEmotionStats = async () => {
+    if (!user) return;
+
+    setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const selectedMoodData = moods.find(m => m.id === selectedMood);
-      const finalScore = selectedMoodData ? selectedMoodData.score + (selectedIntensity ? (selectedIntensity - 3) * 5 : 0) : 60;
-      
-      toast.success(`Check-in enregistré ! Score: ${finalScore}%`);
-      setSelectedMood(null);
-      setSelectedIntensity(null);
+      const { data: emotions, error } = await supabase
+        .from('emotions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+
+      if (emotions && emotions.length > 0) {
+        const totalScans = emotions.length;
+        const averageScore = Math.round(
+          emotions.reduce((acc, emotion) => acc + (emotion.score || 50), 0) / totalScans
+        );
+        
+        // Calculer la série
+        let streak = 0;
+        const today = new Date();
+        const oneDay = 24 * 60 * 60 * 1000;
+        
+        for (let i = 0; i < emotions.length; i++) {
+          const emotionDate = new Date(emotions[i].date);
+          const daysDiff = Math.floor((today.getTime() - emotionDate.getTime()) / oneDay);
+          
+          if (daysDiff === i) {
+            streak++;
+          } else {
+            break;
+          }
+        }
+
+        // Calculer la tendance hebdomadaire
+        const lastWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const weekEmotions = emotions.filter(e => new Date(e.date) > lastWeek);
+        const weeklyAverage = weekEmotions.length > 0 
+          ? weekEmotions.reduce((acc, e) => acc + (e.score || 50), 0) / weekEmotions.length
+          : averageScore;
+        
+        const weeklyTrend = Math.round(weeklyAverage - averageScore);
+
+        setStats({
+          totalScans,
+          averageScore,
+          streak,
+          lastScan: emotions[0].date,
+          weeklyTrend
+        });
+
+        setRecentEmotions(emotions.slice(0, 5));
+      }
     } catch (error) {
-      toast.error("Erreur lors de l'enregistrement");
+      console.error('Erreur chargement stats émotions:', error);
+      toast.error('Erreur lors du chargement des statistiques');
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="animate-pulse">
+          <div className="h-32 bg-muted rounded-lg mb-4"></div>
+          <div className="h-24 bg-muted rounded-lg"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {/* Quick Check-in */}
+      {/* Vue d'ensemble */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
-            <Heart className="mr-2 h-5 w-5 text-red-500" />
-            Check-in Rapide
+            <Heart className="h-6 w-6 mr-2 text-red-500" />
+            Votre bien-être émotionnel
           </CardTitle>
           <CardDescription>
-            Comment vous sentez-vous maintenant ? Une évaluation rapide en quelques clics.
+            Suivez votre évolution et vos progrès
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <p className="text-sm font-medium mb-3">Comment vous sentez-vous ?</p>
-            <div className="flex flex-wrap gap-3">
-              {moods.map((mood) => (
-                <Button
-                  key={mood.id}
-                  variant={selectedMood === mood.id ? "default" : "outline"}
-                  className={`flex flex-col items-center p-4 h-auto ${selectedMood === mood.id ? '' : 'hover:bg-muted'}`}
-                  onClick={() => setSelectedMood(mood.id)}
-                >
-                  <span className="text-2xl mb-1">{mood.emoji}</span>
-                  <span className="text-xs">{mood.label}</span>
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {selectedMood && (
-            <div className="space-y-3">
-              <p className="text-sm font-medium">Intensité (optionnel)</p>
-              <div className="flex gap-2">
-                {intensities.map((intensity) => (
-                  <Button
-                    key={intensity}
-                    variant={selectedIntensity === intensity ? "default" : "outline"}
-                    size="sm"
-                    className="w-10 h-10 p-0"
-                    onClick={() => setSelectedIntensity(intensity)}
-                  >
-                    {intensity}
-                  </Button>
-                ))}
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Score global */}
+            <div className="text-center">
+              <div className="relative inline-flex items-center justify-center w-24 h-24 mb-4">
+                <Progress 
+                  value={stats.averageScore} 
+                  className="w-20 h-20 rounded-full"
+                />
+                <span className="absolute text-xl font-bold">
+                  {stats.averageScore}%
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                1 = Léger, 5 = Très intense
+              <h3 className="font-semibold mb-1">Score global</h3>
+              <p className="text-sm text-muted-foreground">
+                Basé sur {stats.totalScans} scan{stats.totalScans > 1 ? 's' : ''}
               </p>
             </div>
-          )}
 
-          <Button 
-            onClick={handleQuickCheckin}
-            disabled={!selectedMood || isSubmitting}
-            className="w-full"
-          >
-            {isSubmitting ? 'Enregistrement...' : 'Enregistrer mon état'}
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Recent Check-ins */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Clock className="mr-2 h-5 w-5" />
-            Check-ins Récents
-          </CardTitle>
-          <CardDescription>
-            Historique de vos derniers check-ins rapides
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {recentCheckins.map((checkin, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <span className="text-2xl">{checkin.mood}</span>
-                  <div>
-                    <p className="text-sm font-medium">{checkin.note}</p>
-                    <p className="text-xs text-muted-foreground">{checkin.time}</p>
-                  </div>
-                </div>
-                <Badge variant="secondary">{checkin.score}%</Badge>
+            {/* Série */}
+            <div className="text-center">
+              <div className="flex items-center justify-center w-24 h-24 mx-auto mb-4 bg-orange-100 rounded-full">
+                <Award className="h-8 w-8 text-orange-600" />
               </div>
-            ))}
+              <h3 className="font-semibold mb-1">Série actuelle</h3>
+              <p className="text-2xl font-bold text-orange-600">{stats.streak}</p>
+              <p className="text-sm text-muted-foreground">jour{stats.streak > 1 ? 's' : ''}</p>
+            </div>
+
+            {/* Tendance */}
+            <div className="text-center">
+              <div className="flex items-center justify-center w-24 h-24 mx-auto mb-4 bg-blue-100 rounded-full">
+                <TrendingUp className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="font-semibold mb-1">Tendance hebdo</h3>
+              <div className="flex items-center justify-center space-x-1">
+                <span className={`text-2xl font-bold ${stats.weeklyTrend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {stats.weeklyTrend >= 0 ? '+' : ''}{stats.weeklyTrend}%
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground">vs moyenne</p>
+            </div>
           </div>
+
+          {stats.lastScan && (
+            <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">Dernier scan :</span>
+                  <span className="text-sm font-medium">
+                    {new Date(stats.lastScan).toLocaleDateString('fr-FR', {
+                      day: 'numeric',
+                      month: 'long',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+                <Badge variant="outline">
+                  {Math.floor((Date.now() - new Date(stats.lastScan).getTime()) / (1000 * 60 * 60))}h
+                </Badge>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Weekly Trend */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <TrendingUp className="mr-2 h-5 w-5 text-green-600" />
-            Tendance de la Semaine
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div className="p-3 bg-green-50 rounded-lg">
-              <p className="text-2xl font-bold text-green-600">78%</p>
-              <p className="text-xs text-muted-foreground">Score moyen</p>
+      {/* Historique récent */}
+      {recentEmotions.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Scans récents</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {recentEmotions.map((emotion: any) => (
+                <div key={emotion.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-2xl">{emotion.emojis || '😐'}</span>
+                    <div>
+                      <p className="font-medium">Score: {emotion.score}%</p>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(emotion.date).toLocaleDateString('fr-FR')}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {emotion.text && (
+                    <div className="max-w-xs">
+                      <p className="text-sm truncate">{emotion.text}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600">12</p>
-              <p className="text-xs text-muted-foreground">Check-ins</p>
-            </div>
-            <div className="p-3 bg-purple-50 rounded-lg">
-              <p className="text-2xl font-bold text-purple-600">+5%</p>
-              <p className="text-xs text-muted-foreground">Amélioration</p>
-            </div>
-            <div className="p-3 bg-orange-50 rounded-lg">
-              <p className="text-2xl font-bold text-orange-600">3</p>
-              <p className="text-xs text-muted-foreground">Jours consécutifs</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Objectifs et conseils */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Target className="h-5 w-5 mr-2" />
+              Objectif du jour
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-3">
+              Effectuez votre scan quotidien pour maintenir votre série
+            </p>
+            <Progress value={(stats.streak % 7) * 14.3} className="mb-2" />
+            <p className="text-xs text-muted-foreground">
+              {stats.streak % 7}/7 jours cette semaine
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Conseil personnalisé</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm">
+              {stats.averageScore > 70 
+                ? "Excellent ! Continuez sur cette lancée et n'hésitez pas à partager vos astuces bien-être." 
+                : stats.averageScore > 50
+                ? "Votre bien-être s'améliore. Pensez à prendre des pauses régulières dans votre journée."
+                : "Prenez soin de vous. N'hésitez pas à parler à quelqu'un si vous en ressentez le besoin."
+              }
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

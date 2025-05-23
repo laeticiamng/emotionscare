@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { AlertCircle, Loader2, Building2 } from 'lucide-react';
 
@@ -21,6 +22,7 @@ const B2BUserRegisterPage: React.FC = () => {
     password: '',
     confirmPassword: '',
     company: '',
+    department: '',
     jobTitle: '',
   });
   
@@ -55,8 +57,13 @@ const B2BUserRegisterPage: React.FC = () => {
       // Définir le mode utilisateur
       setUserMode('b2b_user');
       
-      // Enregistrer l'utilisateur
-      await register(formData.email, formData.password, formData.name);
+      // Enregistrer l'utilisateur avec les métadonnées B2B
+      await register(formData.email, formData.password, formData.name, {
+        role: 'b2b_user',
+        company: formData.company,
+        department: formData.department,
+        job_title: formData.jobTitle,
+      });
       
       toast.success("Compte collaborateur créé avec succès!");
       navigate('/b2b/user/dashboard');
@@ -78,16 +85,16 @@ const B2BUserRegisterPage: React.FC = () => {
               <Building2 className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Créer un compte collaborateur</CardTitle>
+          <CardTitle className="text-2xl font-bold">Inscription Collaborateur</CardTitle>
           <CardDescription>
-            Rejoignez votre organisation sur EmotionsCare
+            Créez votre compte professionnel EmotionsCare
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Nom complet</Label>
+                <Label htmlFor="name">Nom complet *</Label>
                 <Input
                   id="name"
                   name="name"
@@ -98,6 +105,48 @@ const B2BUserRegisterPage: React.FC = () => {
                   disabled={isLoading}
                 />
               </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="email">Email professionnel *</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="nom@entreprise.com"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="company">Entreprise *</Label>
+              <Input
+                id="company"
+                name="company"
+                value={formData.company}
+                onChange={handleChange}
+                placeholder="Nom de votre entreprise"
+                required
+                disabled={isLoading}
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="department">Département</Label>
+                <Input
+                  id="department"
+                  name="department"
+                  value={formData.department}
+                  onChange={handleChange}
+                  placeholder="RH, IT, Marketing..."
+                  disabled={isLoading}
+                />
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="jobTitle">Poste</Label>
                 <Input
@@ -111,59 +160,34 @@ const B2BUserRegisterPage: React.FC = () => {
               </div>
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="company">Entreprise</Label>
-              <Input
-                id="company"
-                name="company"
-                value={formData.company}
-                onChange={handleChange}
-                placeholder="Nom de votre entreprise"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="email">Email professionnel</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="votre.email@entreprise.com"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Minimum 6 caractères"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-              <Input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirmer votre mot de passe"
-                required
-                disabled={isLoading}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">Mot de passe *</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Minimum 6 caractères"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmer *</Label>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Répéter le mot de passe"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
             </div>
             
             {error && (
@@ -180,7 +204,7 @@ const B2BUserRegisterPage: React.FC = () => {
                   Création en cours...
                 </>
               ) : (
-                "Créer un compte"
+                "Créer le compte collaborateur"
               )}
             </Button>
           </form>
