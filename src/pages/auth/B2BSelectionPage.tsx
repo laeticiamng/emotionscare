@@ -3,175 +3,124 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, Shield, Users, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Users, Shield, ArrowLeft, Building } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const B2BSelectionPage: React.FC = () => {
   const navigate = useNavigate();
-
-  const features = {
-    user: [
-      "Analyse émotionnelle personnalisée",
-      "Outils de bien-être au travail",
-      "Suivi de votre progression",
-      "Accès à la communauté d'entreprise",
-      "Ressources de développement personnel"
-    ],
-    admin: [
-      "Tableau de bord analytique complet",
-      "Gestion des équipes et départements",
-      "Métriques de bien-être organisationnel",
-      "Rapports et insights avancés",
-      "Configuration des paramètres entreprise"
-    ]
-  };
-
+  
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted p-4">
-      <div className="container mx-auto max-w-4xl py-8">
-        {/* Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm mb-6">
-            <Building className="h-4 w-4" />
-            Espace Professionnel
-          </div>
-          <h1 className="text-4xl font-bold mb-4">
-            Choisissez votre type d'accès
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            EmotionsCare s'adapte à votre rôle dans l'organisation pour vous offrir 
-            l'expérience la plus pertinente
-          </p>
-        </motion.div>
-
-        {/* Selection Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
-          {/* Collaborateur Card */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Card className="h-full hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50">
-              <CardHeader className="text-center pb-4">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-                  <Users className="h-8 w-8 text-blue-600" />
-                </div>
-                <CardTitle className="text-2xl">Collaborateur</CardTitle>
-                <CardDescription className="text-base">
-                  Accès individuel pour améliorer votre bien-être au travail
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-3">
-                  {features.user.map((feature, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="space-y-3 pt-4">
-                  <Button 
-                    className="w-full" 
-                    onClick={() => navigate('/b2b/user/login')}
-                  >
-                    Se connecter en tant que collaborateur
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => navigate('/b2b/user/register')}
-                  >
-                    Créer un compte collaborateur
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Administrateur Card */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <Card className="h-full hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50">
-              <CardHeader className="text-center pb-4">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
-                  <Shield className="h-8 w-8 text-purple-600" />
-                </div>
-                <CardTitle className="text-2xl">Administrateur</CardTitle>
-                <CardDescription className="text-base">
-                  Gestion et supervision du bien-être organisationnel
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-3">
-                  {features.admin.map((feature, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="space-y-3 pt-4">
-                  <Button 
-                    className="w-full" 
-                    onClick={() => navigate('/b2b/admin/login')}
-                  >
-                    Accès administrateur
-                  </Button>
-                  <p className="text-xs text-muted-foreground text-center">
-                    Accès réservé aux administrateurs autorisés
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Info Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-center"
-        >
-          <Card className="bg-muted/50 border-dashed">
-            <CardContent className="p-8">
-              <h3 className="text-lg font-semibold mb-4">
-                Vous ne savez pas quel accès choisir ?
-              </h3>
-              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Si vous êtes un employé souhaitant utiliser EmotionsCare pour votre développement personnel, 
-                choisissez <strong>Collaborateur</strong>. Si vous gérez une équipe ou souhaitez superviser 
-                le bien-être organisationnel, choisissez <strong>Administrateur</strong>.
-              </p>
-              <div className="flex items-center justify-center gap-4">
-                <Button 
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted px-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-2xl w-full"
+      >
+        <Card className="border-2">
+          <CardHeader className="text-center pb-6">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+              <Building className="h-8 w-8 text-primary" />
+            </div>
+            <CardTitle className="text-3xl font-bold">
+              Accès Professionnel EmotionsCare
+            </CardTitle>
+            <CardDescription className="text-lg">
+              Choisissez votre type de compte professionnel
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <motion.div 
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+              >
+                <Button
                   variant="outline"
-                  onClick={() => navigate('/choose-mode')}
-                  className="flex items-center gap-2"
+                  className="w-full h-auto p-6 flex flex-col gap-4 border-2 hover:border-primary hover:bg-primary/5"
+                  onClick={() => navigate('/b2b/user/login')}
                 >
-                  <ArrowLeft className="h-4 w-4" />
-                  Retour à la sélection de mode
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="bg-blue-100 p-3 rounded-full">
+                      <Users className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-xl font-semibold mb-2">Collaborateur</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Accédez à votre espace personnel de bien-être professionnel
+                      </p>
+                    </div>
+                  </div>
                 </Button>
-                <Button variant="ghost">
-                  Contacter le support
+              </motion.div>
+              
+              <motion.div 
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+              >
+                <Button
+                  variant="outline"
+                  className="w-full h-auto p-6 flex flex-col gap-4 border-2 hover:border-primary hover:bg-primary/5"
+                  onClick={() => navigate('/b2b/admin/login')}
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="bg-purple-100 p-3 rounded-full">
+                      <Shield className="h-8 w-8 text-purple-600" />
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-xl font-semibold mb-2">Administrateur</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Gérez le bien-être de votre organisation et vos équipes
+                      </p>
+                    </div>
+                  </div>
                 </Button>
+              </motion.div>
+            </div>
+            
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <h4 className="font-medium mb-2 text-center">Fonctionnalités B2B EmotionsCare</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <span>Analyse émotionnelle d'équipe</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <span>Tableaux de bord administrateur</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <span>Outils de bien-être collaboratif</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <span>Rapports et analytiques</span>
+                </div>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+            </div>
+            
+            <div className="text-center pt-4">
+              <p className="text-sm text-muted-foreground mb-4">
+                Pas encore de compte ? Contactez votre administrateur ou{' '}
+                <Button variant="link" className="p-0 h-auto" onClick={() => navigate('/b2b/user/register')}>
+                  créez un compte collaborateur
+                </Button>
+              </p>
+              
+              <Button 
+                variant="ghost" 
+                onClick={() => navigate('/choose-mode')}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Retour à la sélection de mode
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };

@@ -1,13 +1,14 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Mic, MicOff, Camera, FileText, Loader2, Heart } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { Progress } from '@/components/ui/progress';
+import { Camera, Mic, MicOff, Send, Brain, Heart, Smile, Frown, Meh, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface EmotionResult {
   score: number;
@@ -16,184 +17,136 @@ interface EmotionResult {
   stressLevel: 'low' | 'medium' | 'high';
   aiFeedback: string;
   recommendations: string[];
-  timestamp: Date;
-  method: 'text' | 'audio' | 'emoji' | 'facial';
+  immediateActions: string[];
 }
 
 const EmotionScanner: React.FC = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const [activeMethod, setActiveMethod] = useState<string>('text');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [textInput, setTextInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
+  const [textInput, setTextInput] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<EmotionResult | null>(null);
+  const [analysisMethod, setAnalysisMethod] = useState<'text' | 'audio'>('text');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
-  const analyzeText = async () => {
-    if (!textInput.trim()) return;
-    
-    setIsAnalyzing(true);
-    try {
-      const response = await fetch('/api/analyze-emotion', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: textInput, method: 'text' })
-      });
-      
-      const result = await response.json();
-      setResult(result);
-      
-      // Sauvegarder en base
-      if (user) {
-        await supabase.from('emotions').insert({
-          user_id: user.id,
-          text: textInput,
-          score: result.score,
-          ai_feedback: result.aiFeedback
-        });
-      }
-      
-      toast({
-        title: "Analyse terminée",
-        description: "Votre état émotionnel a été analysé",
-        variant: "default"
-      });
-    } catch (error) {
-      console.error('Text analysis error:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'analyser le texte",
-        variant: "destructive"
-      });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  const startAudioRecording = async () => {
+  const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
-      
-      const chunks: BlobPart[] = [];
+      audioChunksRef.current = [];
+
       mediaRecorder.ondataavailable = (event) => {
-        chunks.push(event.data);
+        audioChunksRef.current.push(event.data);
       };
-      
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(chunks, { type: 'audio/wav' });
-        await analyzeAudio(audioBlob);
+
+      mediaRecorder.onstop = () => {
+        analyzeAudio();
       };
-      
+
       mediaRecorder.start();
       setIsRecording(true);
-      
-      toast({
-        title: "Enregistrement démarré",
-        description: "Parlez maintenant, nous analysons vos émotions",
-        variant: "default"
-      });
+      toast.success('Enregistrement commencé');
     } catch (error) {
-      console.error('Audio recording error:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'accéder au microphone",
-        variant: "destructive"
-      });
+      console.error('Error starting recording:', error);
+      toast.error('Impossible d\'accéder au microphone');
     }
   };
 
-  const stopAudioRecording = () => {
-    if (mediaRecorderRef.current) {
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      toast.info('Enregistrement terminé, analyse en cours...');
     }
   };
 
-  const analyzeAudio = async (audioBlob: Blob) => {
+  const analyzeAudio = async () => {
     setIsAnalyzing(true);
     try {
+      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
       const formData = new FormData();
       formData.append('audio', audioBlob);
       formData.append('method', 'audio');
-      
-      const response = await fetch('/api/analyze-emotion', {
-        method: 'POST',
+
+      const { data, error } = await supabase.functions.invoke('analyze-emotion', {
         body: formData
       });
+
+      if (error) throw error;
       
-      const result = await response.json();
-      setResult(result);
-      
-      if (user) {
-        await supabase.from('emotions').insert({
-          user_id: user.id,
-          audio_url: result.audioUrl,
-          score: result.score,
-          ai_feedback: result.aiFeedback
-        });
-      }
-      
-      toast({
-        title: "Analyse vocale terminée",
-        description: "Votre état émotionnel vocal a été analysé",
-        variant: "default"
-      });
+      handleAnalysisResult(data);
     } catch (error) {
       console.error('Audio analysis error:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'analyser l'audio",
-        variant: "destructive"
-      });
+      toast.error('Erreur lors de l\'analyse audio');
     } finally {
       setIsAnalyzing(false);
     }
   };
 
-  const startFacialAnalysis = async () => {
+  const analyzeText = async () => {
+    if (!textInput.trim()) {
+      toast.error('Veuillez saisir du texte à analyser');
+      return;
+    }
+
     setIsAnalyzing(true);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      }
-      
-      // Simuler l'analyse faciale (à implémenter avec une vraie API)
-      setTimeout(() => {
-        const mockResult: EmotionResult = {
-          score: Math.floor(Math.random() * 100),
-          primaryEmotion: ['joie', 'tristesse', 'colère', 'surprise'][Math.floor(Math.random() * 4)],
-          secondaryEmotions: ['calme', 'anxiété'],
-          stressLevel: 'medium',
-          aiFeedback: "Analyse faciale terminée. Votre expression reflète un état émotionnel modéré.",
-          recommendations: ["Prenez quelques respirations profondes", "Essayez une courte méditation"],
-          timestamp: new Date(),
-          method: 'facial'
-        };
-        
-        setResult(mockResult);
-        stream.getTracks().forEach(track => track.stop());
-        setIsAnalyzing(false);
-        
-        toast({
-          title: "Analyse faciale terminée",
-          description: "Votre expression a été analysée",
-          variant: "default"
-        });
-      }, 3000);
-    } catch (error) {
-      console.error('Facial analysis error:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'accéder à la caméra",
-        variant: "destructive"
+      const { data, error } = await supabase.functions.invoke('analyze-emotion', {
+        body: {
+          text: textInput,
+          method: 'text'
+        }
       });
+
+      if (error) throw error;
+      
+      handleAnalysisResult(data);
+    } catch (error) {
+      console.error('Text analysis error:', error);
+      toast.error('Erreur lors de l\'analyse textuelle');
+    } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleAnalysisResult = async (analysisData: any) => {
+    try {
+      // Sauvegarder le résultat dans la base de données
+      if (user) {
+        const { error } = await supabase
+          .from('emotions')
+          .insert({
+            user_id: user.id,
+            text: analysisMethod === 'text' ? textInput : analysisData.rawData?.text || '',
+            score: analysisData.score,
+            ai_feedback: analysisData.aiFeedback,
+            emojis: analysisData.primaryEmotion
+          });
+
+        if (error) throw error;
+      }
+
+      setResult(analysisData);
+      toast.success('Analyse terminée !');
+      
+      // Réinitialiser les inputs
+      setTextInput('');
+    } catch (error) {
+      console.error('Error saving result:', error);
+      toast.error('Erreur lors de la sauvegarde');
+    }
+  };
+
+  const getEmotionIcon = (emotion: string) => {
+    const emotionLower = emotion.toLowerCase();
+    if (emotionLower.includes('joie') || emotionLower.includes('bonheur')) {
+      return <Smile className="h-6 w-6 text-green-500" />;
+    } else if (emotionLower.includes('tristesse') || emotionLower.includes('colère')) {
+      return <Frown className="h-6 w-6 text-red-500" />;
+    } else {
+      return <Meh className="h-6 w-6 text-yellow-500" />;
     }
   };
 
@@ -206,123 +159,66 @@ const EmotionScanner: React.FC = () => {
     }
   };
 
+  const getStressLabel = (level: string) => {
+    switch (level) {
+      case 'low': return 'Faible';
+      case 'medium': return 'Modéré';
+      case 'high': return 'Élevé';
+      default: return 'Inconnu';
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {/* Method Selection */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Heart className="h-5 w-5" />
-            Scanner Émotionnel IA
+            <Brain className="h-6 w-6 text-primary" />
+            Scanner d'Émotions IA
           </CardTitle>
+          <CardDescription>
+            Analysez votre état émotionnel par texte ou par voix
+          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <CardContent className="space-y-6">
+          {/* Mode Selection */}
+          <div className="flex gap-2">
             <Button
-              variant={activeMethod === 'text' ? 'default' : 'outline'}
-              onClick={() => setActiveMethod('text')}
-              className="h-auto p-4 flex flex-col items-center gap-2"
+              variant={analysisMethod === 'text' ? 'default' : 'outline'}
+              onClick={() => setAnalysisMethod('text')}
+              className="flex-1"
             >
-              <FileText className="h-8 w-8" />
-              <div className="text-center">
-                <div className="font-medium">Analyse textuelle</div>
-                <div className="text-xs text-muted-foreground">Décrivez vos émotions</div>
-              </div>
+              <Send className="mr-2 h-4 w-4" />
+              Analyse Textuelle
             </Button>
-            
             <Button
-              variant={activeMethod === 'audio' ? 'default' : 'outline'}
-              onClick={() => setActiveMethod('audio')}
-              className="h-auto p-4 flex flex-col items-center gap-2"
+              variant={analysisMethod === 'audio' ? 'default' : 'outline'}
+              onClick={() => setAnalysisMethod('audio')}
+              className="flex-1"
             >
-              <Mic className="h-8 w-8" />
-              <div className="text-center">
-                <div className="font-medium">Analyse vocale</div>
-                <div className="text-xs text-muted-foreground">Parlez naturellement</div>
-              </div>
-            </Button>
-            
-            <Button
-              variant={activeMethod === 'facial' ? 'default' : 'outline'}
-              onClick={() => setActiveMethod('facial')}
-              className="h-auto p-4 flex flex-col items-center gap-2"
-            >
-              <Camera className="h-8 w-8" />
-              <div className="text-center">
-                <div className="font-medium">Analyse faciale</div>
-                <div className="text-xs text-muted-foreground">Expression du visage</div>
-              </div>
+              <Mic className="mr-2 h-4 w-4" />
+              Analyse Vocale
             </Button>
           </div>
 
-          {/* Text Input */}
-          {activeMethod === 'text' && (
+          {/* Text Analysis */}
+          {analysisMethod === 'text' && (
             <div className="space-y-4">
-              <Textarea
-                value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-                placeholder="Décrivez comment vous vous sentez en ce moment..."
-                rows={4}
-              />
-              <Button 
-                onClick={analyzeText} 
-                disabled={!textInput.trim() || isAnalyzing}
-                className="w-full"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Analyse en cours...
-                  </>
-                ) : (
-                  'Analyser mes émotions'
-                )}
-              </Button>
-            </div>
-          )}
-
-          {/* Audio Recording */}
-          {activeMethod === 'audio' && (
-            <div className="space-y-4 text-center">
-              <p className="text-muted-foreground">
-                Parlez naturellement pendant 10-30 secondes pour une analyse optimale
-              </p>
-              {!isRecording ? (
-                <Button 
-                  onClick={startAudioRecording}
+              <div>
+                <label className="text-sm font-medium mb-2 block">
+                  Comment vous sentez-vous aujourd'hui ?
+                </label>
+                <Textarea
+                  placeholder="Décrivez votre humeur, vos émotions, votre journée..."
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                  className="min-h-[120px]"
                   disabled={isAnalyzing}
-                  className="w-full"
-                >
-                  <Mic className="mr-2 h-4 w-4" />
-                  Commencer l'enregistrement
-                </Button>
-              ) : (
-                <Button 
-                  onClick={stopAudioRecording}
-                  variant="destructive"
-                  className="w-full"
-                >
-                  <MicOff className="mr-2 h-4 w-4" />
-                  Arrêter l'enregistrement
-                </Button>
-              )}
-            </div>
-          )}
-
-          {/* Facial Analysis */}
-          {activeMethod === 'facial' && (
-            <div className="space-y-4 text-center">
-              <video
-                ref={videoRef}
-                className="w-full max-w-md mx-auto rounded-lg"
-                style={{ display: isAnalyzing ? 'block' : 'none' }}
-              />
-              <p className="text-muted-foreground">
-                Regardez la caméra avec une expression naturelle
-              </p>
+                />
+              </div>
               <Button 
-                onClick={startFacialAnalysis}
-                disabled={isAnalyzing}
+                onClick={analyzeText}
+                disabled={isAnalyzing || !textInput.trim()}
                 className="w-full"
               >
                 {isAnalyzing ? (
@@ -332,11 +228,52 @@ const EmotionScanner: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <Camera className="mr-2 h-4 w-4" />
-                    Analyser mon expression
+                    <Brain className="mr-2 h-4 w-4" />
+                    Analyser mes émotions
                   </>
                 )}
               </Button>
+            </div>
+          )}
+
+          {/* Audio Analysis */}
+          {analysisMethod === 'audio' && (
+            <div className="space-y-4">
+              <div className="text-center py-8">
+                <div className="mb-4">
+                  {isRecording ? (
+                    <div className="animate-pulse">
+                      <Mic className="h-16 w-16 text-red-500 mx-auto" />
+                    </div>
+                  ) : (
+                    <MicOff className="h-16 w-16 text-muted-foreground mx-auto" />
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {isRecording 
+                    ? 'Enregistrement en cours... Parlez naturellement'
+                    : 'Cliquez pour commencer l\'enregistrement vocal'
+                  }
+                </p>
+                <Button
+                  onClick={isRecording ? stopRecording : startRecording}
+                  disabled={isAnalyzing}
+                  variant={isRecording ? 'destructive' : 'default'}
+                  className="w-full max-w-sm"
+                >
+                  {isRecording ? (
+                    <>
+                      <MicOff className="mr-2 h-4 w-4" />
+                      Arrêter l'enregistrement
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="mr-2 h-4 w-4" />
+                      Commencer l'enregistrement
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
@@ -346,67 +283,88 @@ const EmotionScanner: React.FC = () => {
       {result && (
         <Card>
           <CardHeader>
-            <CardTitle>Résultats de l'analyse</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Heart className="h-6 w-6 text-red-500" />
+              Résultats de l'Analyse
+            </CardTitle>
+            <CardDescription>
+              Votre profil émotionnel du moment
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-1">
-                  {result.score}/100
+          <CardContent className="space-y-6">
+            {/* Score global */}
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2">{result.score}/100</div>
+              <p className="text-muted-foreground">Score de bien-être émotionnel</p>
+              <Progress value={result.score} className="mt-4" />
+            </div>
+
+            {/* Émotions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 border rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  {getEmotionIcon(result.primaryEmotion)}
+                  <h4 className="font-medium">Émotion Principale</h4>
                 </div>
-                <div className="text-sm text-muted-foreground">Score de bien-être</div>
+                <p className="text-lg font-semibold">{result.primaryEmotion}</p>
               </div>
-              
-              <div className="text-center">
-                <div className="text-lg font-semibold mb-1 capitalize">
-                  {result.primaryEmotion}
-                </div>
-                <div className="text-sm text-muted-foreground">Émotion principale</div>
-              </div>
-              
-              <div className="text-center">
+
+              <div className="p-4 border rounded-lg">
+                <h4 className="font-medium mb-2">Niveau de Stress</h4>
                 <Badge className={getStressColor(result.stressLevel)}>
-                  Stress {result.stressLevel === 'low' ? 'faible' : 
-                         result.stressLevel === 'medium' ? 'modéré' : 'élevé'}
+                  {getStressLabel(result.stressLevel)}
                 </Badge>
               </div>
             </div>
 
-            <div className="space-y-4">
+            {/* Émotions secondaires */}
+            {result.secondaryEmotions && result.secondaryEmotions.length > 0 && (
               <div>
-                <h4 className="font-medium mb-2">Analyse IA :</h4>
-                <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
-                  {result.aiFeedback}
-                </p>
+                <h4 className="font-medium mb-2">Émotions Secondaires</h4>
+                <div className="flex flex-wrap gap-2">
+                  {result.secondaryEmotions.map((emotion, index) => (
+                    <Badge key={index} variant="outline">
+                      {emotion}
+                    </Badge>
+                  ))}
+                </div>
               </div>
+            )}
 
-              {result.recommendations.length > 0 && (
-                <div>
-                  <h4 className="font-medium mb-2">Recommandations :</h4>
-                  <ul className="space-y-1">
-                    {result.recommendations.map((rec, index) => (
-                      <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                        <span className="text-primary">•</span>
-                        {rec}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {result.secondaryEmotions.length > 0 && (
-                <div>
-                  <h4 className="font-medium mb-2">Émotions secondaires :</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {result.secondaryEmotions.map((emotion, index) => (
-                      <Badge key={index} variant="outline" className="capitalize">
-                        {emotion}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
+            {/* Feedback IA */}
+            <div className="p-4 bg-muted rounded-lg">
+              <h4 className="font-medium mb-2">Analyse IA</h4>
+              <p className="text-sm">{result.aiFeedback}</p>
             </div>
+
+            {/* Recommandations */}
+            {result.recommendations && result.recommendations.length > 0 && (
+              <div>
+                <h4 className="font-medium mb-2">Recommandations</h4>
+                <ul className="space-y-2">
+                  {result.recommendations.map((rec, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm">
+                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                      <span>{rec}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Actions immédiates */}
+            {result.immediateActions && result.immediateActions.length > 0 && (
+              <div>
+                <h4 className="font-medium mb-2">Actions Immédiates</h4>
+                <div className="grid gap-2">
+                  {result.immediateActions.map((action, index) => (
+                    <Button key={index} variant="outline" size="sm" className="justify-start">
+                      {action}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

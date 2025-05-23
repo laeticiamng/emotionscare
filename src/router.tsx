@@ -16,15 +16,11 @@ import B2CRegisterPage from '@/pages/b2c/auth/B2CRegisterPage';
 import B2CResetPasswordPage from '@/pages/b2c/auth/B2CResetPasswordPage';
 import B2CDashboardPage from '@/pages/b2c/dashboard/B2CDashboardPage';
 import B2COnboardingPage from '@/pages/b2c/onboarding/B2COnboardingPage';
-import B2CScanPage from '@/pages/b2c/scan/B2CScanPage';
-import B2CSocialPage from '@/pages/b2c/social/B2CSocialPage';
 
 // Pages B2B User
 import B2BUserLoginPage from '@/pages/b2b/user/auth/B2BUserLoginPage';
 import B2BUserRegisterPage from '@/pages/b2b/user/auth/B2BUserRegisterPage';
 import B2BUserDashboardPage from '@/pages/b2b/user/dashboard/B2BUserDashboardPage';
-import B2BUserScanPage from '@/pages/b2b/user/scan/B2BUserScanPage';
-import B2BUserSocialPage from '@/pages/b2b/user/social/B2BUserSocialPage';
 
 // Pages B2B Admin
 import B2BAdminLoginPage from '@/pages/b2b/admin/auth/B2BAdminLoginPage';
@@ -103,20 +99,6 @@ const routes: RouteObject[] = [
                 <B2CDashboardPage />
               </AuthTransition>
           },
-          {
-            path: 'b2c/scan',
-            element: 
-              <AuthTransition>
-                <B2CScanPage />
-              </AuthTransition>
-          },
-          {
-            path: 'b2c/social',
-            element: 
-              <AuthTransition>
-                <B2CSocialPage />
-              </AuthTransition>
-          },
           
           // Routes B2B User protégées
           {
@@ -124,20 +106,6 @@ const routes: RouteObject[] = [
             element: 
               <AuthTransition>
                 <B2BUserDashboardPage />
-              </AuthTransition>
-          },
-          {
-            path: 'b2b/user/scan',
-            element: 
-              <AuthTransition>
-                <B2BUserScanPage />
-              </AuthTransition>
-          },
-          {
-            path: 'b2b/user/social',
-            element: 
-              <AuthTransition>
-                <B2BUserSocialPage />
               </AuthTransition>
           },
           

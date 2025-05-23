@@ -1,142 +1,77 @@
 
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle, Loader2, Mail, ArrowLeft, CheckCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { AlertCircle, Loader2, Mail, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const B2CResetPasswordPage: React.FC = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [searchParams] = useSearchParams();
-  const isUpdateMode = searchParams.get('type') === 'recovery';
-  
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [emailSent, setEmailSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleResetRequest = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/b2c/reset-password?type=recovery`,
+        redirectTo: `${window.location.origin}/b2c/reset-password-confirm`
       });
 
       if (error) {
-        setError(error.message);
-        toast({
-          title: "Erreur",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        setEmailSent(true);
-        toast({
-          title: "Email envoyé",
-          description: "Vérifiez votre boîte mail pour réinitialiser votre mot de passe",
-          variant: "default"
-        });
+        throw error;
       }
+
+      setEmailSent(true);
+      toast.success('Email de réinitialisation envoyé !');
     } catch (error: any) {
       console.error('Reset password error:', error);
-      setError('Une erreur est survenue. Veuillez réessayer.');
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
-        variant: "destructive"
-      });
+      setError(error.message || 'Erreur lors de l\'envoi de l\'email');
+      toast.error('Erreur lors de l\'envoi de l\'email');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handlePasswordUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    if (password !== confirmPassword) {
-      setError('Les mots de passe ne correspondent pas');
-      setIsLoading(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Le mot de passe doit contenir au moins 6 caractères');
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: password
-      });
-
-      if (error) {
-        setError(error.message);
-        toast({
-          title: "Erreur",
-          description: error.message,
-          variant: "destructive"
-        });
-      } else {
-        toast({
-          title: "Mot de passe mis à jour",
-          description: "Votre mot de passe a été mis à jour avec succès",
-          variant: "default"
-        });
-        navigate('/b2c/login');
-      }
-    } catch (error: any) {
-      console.error('Update password error:', error);
-      setError('Une erreur est survenue. Veuillez réessayer.');
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (emailSent && !isUpdateMode) {
+  if (emailSent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-              <CheckCircle className="h-6 w-6 text-green-600" />
+              <Mail className="h-6 w-6 text-green-600" />
             </div>
-            <CardTitle className="text-2xl font-bold">Email envoyé</CardTitle>
+            <CardTitle className="text-2xl font-bold">Email envoyé !</CardTitle>
             <CardDescription>
               Vérifiez votre boîte mail pour réinitialiser votre mot de passe
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="text-center space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Un lien de réinitialisation a été envoyé à <strong>{email}</strong>
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Vérifiez également votre dossier spam si vous ne trouvez pas l'email
-              </p>
+          <CardContent className="text-center space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Nous avons envoyé un lien de réinitialisation à <strong>{email}</strong>
+            </p>
+            <div className="space-y-2">
               <Button 
                 variant="outline" 
+                onClick={() => setEmailSent(false)}
+                className="w-full"
+              >
+                Renvoyer l'email
+              </Button>
+              <Button 
+                variant="ghost" 
                 onClick={() => navigate('/b2c/login')}
                 className="w-full"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Retour à la connexion
               </Button>
             </div>
@@ -150,62 +85,25 @@ const B2CResetPasswordPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-            <Mail className="h-6 w-6 text-primary" />
-          </div>
-          <CardTitle className="text-2xl font-bold">
-            {isUpdateMode ? 'Nouveau mot de passe' : 'Réinitialiser le mot de passe'}
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold">Mot de passe oublié</CardTitle>
           <CardDescription>
-            {isUpdateMode 
-              ? 'Saisissez votre nouveau mot de passe' 
-              : 'Entrez votre email pour recevoir un lien de réinitialisation'
-            }
+            Saisissez votre email pour recevoir un lien de réinitialisation
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={isUpdateMode ? handlePasswordUpdate : handleResetRequest} className="space-y-4">
-            {!isUpdateMode ? (
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="votre@email.com"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-            ) : (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Nouveau mot de passe</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Minimum 6 caractères"
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirmer votre mot de passe"
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-              </>
-            )}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Adresse email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="votre@email.com"
+                required
+                disabled={isLoading}
+              />
+            </div>
             
             {error && (
               <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 rounded-md">
@@ -218,23 +116,22 @@ const B2CResetPasswordPage: React.FC = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isUpdateMode ? 'Mise à jour...' : 'Envoi en cours...'}
+                  Envoi en cours...
                 </>
               ) : (
-                isUpdateMode ? 'Mettre à jour le mot de passe' : 'Envoyer le lien'
+                'Envoyer le lien de réinitialisation'
               )}
             </Button>
           </form>
           
           <div className="mt-6 text-center">
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/b2c/login')}
-              className="text-sm"
+            <Link 
+              to="/b2c/login"
+              className="text-sm text-primary hover:underline flex items-center justify-center gap-2"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4" />
               Retour à la connexion
-            </Button>
+            </Link>
           </div>
         </CardContent>
       </Card>

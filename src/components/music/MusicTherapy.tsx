@@ -1,206 +1,208 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause, SkipForward, SkipBack, Volume2, Music, Loader2, Shuffle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { 
+  Music, 
+  Play, 
+  Pause, 
+  Volume2, 
+  VolumeX,
+  SkipBack,
+  SkipForward,
+  Shuffle,
+  Repeat,
+  Heart,
+  Loader2
+} from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Track {
   id: string;
   title: string;
-  category: string;
-  mood: string;
+  artist: string;
   duration: number;
   url: string;
-  description: string;
+  mood: string;
+  category: string;
 }
 
 const MusicTherapy: React.FC = () => {
-  const { toast } = useToast();
-  const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [volume, setVolume] = useState([0.7]);
+  const [volume, setVolume] = useState(70);
+  const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [selectedMood, setSelectedMood] = useState('relaxation');
+  const [generationPrompt, setGenerationPrompt] = useState('');
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Predefined tracks (à remplacer par de vraies générations IA)
-  const predefinedTracks: Track[] = [
+  // Playlist de base
+  const [playlist] = useState<Track[]>([
     {
       id: '1',
       title: 'Sérénité Matinale',
-      category: 'Relaxation',
-      mood: 'relaxation',
-      duration: 300,
-      url: '/audio/relaxation-1.mp3',
-      description: 'Douce mélodie pour commencer la journée en paix'
+      artist: 'Thérapie Sonore',
+      duration: 180,
+      url: '/audio/serenity-morning.mp3',
+      mood: 'calme',
+      category: 'méditation'
     },
     {
       id: '2',
-      title: 'Focus Profond',
-      category: 'Concentration',
-      mood: 'focus',
-      duration: 480,
-      url: '/audio/focus-1.mp3',
-      description: 'Ambiance sonore pour améliorer la concentration'
+      title: 'Énergie Positive',
+      artist: 'Bien-être Musical',
+      duration: 210,
+      url: '/audio/positive-energy.mp3',
+      mood: 'énergique',
+      category: 'motivation'
     },
     {
       id: '3',
-      title: 'Énergie Positive',
-      category: 'Motivation',
-      mood: 'energetic',
-      duration: 240,
-      url: '/audio/energetic-1.mp3',
-      description: 'Musique dynamisante pour booster votre moral'
+      title: 'Relaxation Profonde',
+      artist: 'Sons de la Nature',
+      duration: 300,
+      url: '/audio/deep-relaxation.mp3',
+      mood: 'détendu',
+      category: 'relaxation'
     },
     {
       id: '4',
-      title: 'Sommeil Réparateur',
-      category: 'Sommeil',
-      mood: 'sleep',
-      duration: 600,
-      url: '/audio/sleep-1.mp3',
-      description: 'Sons apaisants pour faciliter l\'endormissement'
+      title: 'Focus et Concentration',
+      artist: 'Productivité Zen',
+      duration: 240,
+      url: '/audio/focus-concentration.mp3',
+      mood: 'concentré',
+      category: 'travail'
     }
-  ];
-
-  const [playlist, setPlaylist] = useState<Track[]>(predefinedTracks);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-
-  const moods = [
-    { value: 'relaxation', label: 'Relaxation', color: 'bg-blue-100 text-blue-800' },
-    { value: 'focus', label: 'Concentration', color: 'bg-purple-100 text-purple-800' },
-    { value: 'energetic', label: 'Énergisant', color: 'bg-orange-100 text-orange-800' },
-    { value: 'sleep', label: 'Sommeil', color: 'bg-indigo-100 text-indigo-800' },
-    { value: 'meditation', label: 'Méditation', color: 'bg-green-100 text-green-800' },
-    { value: 'anxiety', label: 'Anti-stress', color: 'bg-red-100 text-red-800' }
-  ];
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const updateProgress = () => {
-      setProgress(audio.currentTime);
-    };
-
-    const updateDuration = () => {
-      setDuration(audio.duration);
-    };
-
-    const handleEnded = () => {
-      playNext();
-    };
-
-    audio.addEventListener('timeupdate', updateProgress);
-    audio.addEventListener('loadedmetadata', updateDuration);
-    audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('timeupdate', updateProgress);
-      audio.removeEventListener('loadedmetadata', updateDuration);
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, [currentTrack]);
+  ]);
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = volume[0];
+      audioRef.current.volume = volume / 100;
     }
   }, [volume]);
 
-  const generateMusic = async () => {
-    setIsGenerating(true);
-    try {
-      // Simuler la génération de musique avec IA
-      // À remplacer par un vrai appel à l'API MusicGen
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
-      const newTrack: Track = {
-        id: Date.now().toString(),
-        title: `Musique Générée - ${selectedMood}`,
-        category: 'IA Générée',
-        mood: selectedMood,
-        duration: 300,
-        url: `/audio/generated-${selectedMood}-${Date.now()}.mp3`,
-        description: 'Musique personnalisée générée par IA selon votre humeur'
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      const updateProgress = () => {
+        if (audio.duration) {
+          setProgress((audio.currentTime / audio.duration) * 100);
+        }
       };
 
-      setPlaylist(prev => [newTrack, ...prev]);
-      setCurrentTrack(newTrack);
-      setCurrentTrackIndex(0);
+      const handleEnded = () => {
+        setIsPlaying(false);
+        playNext();
+      };
 
-      toast({
-        title: "Musique générée !",
-        description: "Votre musique personnalisée est prête",
-        variant: "default"
-      });
-    } catch (error) {
-      console.error('Music generation error:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de générer la musique",
-        variant: "destructive"
-      });
-    } finally {
-      setIsGenerating(false);
+      audio.addEventListener('timeupdate', updateProgress);
+      audio.addEventListener('ended', handleEnded);
+
+      return () => {
+        audio.removeEventListener('timeupdate', updateProgress);
+        audio.removeEventListener('ended', handleEnded);
+      };
     }
-  };
+  }, [currentTrack]);
 
-  const togglePlayPause = () => {
-    if (!currentTrack && playlist.length > 0) {
-      setCurrentTrack(playlist[0]);
-      setCurrentTrackIndex(0);
+  const playTrack = (track: Track) => {
+    if (currentTrack?.id === track.id && isPlaying) {
+      pauseTrack();
       return;
     }
 
-    if (!audioRef.current) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const playTrack = (track: Track, index: number) => {
     setCurrentTrack(track);
-    setCurrentTrackIndex(index);
-    setIsPlaying(true);
     
     if (audioRef.current) {
       audioRef.current.src = track.url;
-      audioRef.current.play();
+      audioRef.current.play().then(() => {
+        setIsPlaying(true);
+        toast.success(`Lecture: ${track.title}`);
+      }).catch(() => {
+        // Fallback: simuler la lecture pour la démo
+        setIsPlaying(true);
+        toast.success(`Lecture simulée: ${track.title}`);
+        
+        // Simuler la progression
+        const interval = setInterval(() => {
+          setProgress(prev => {
+            if (prev >= 100) {
+              clearInterval(interval);
+              setIsPlaying(false);
+              return 0;
+            }
+            return prev + 1;
+          });
+        }, track.duration * 10); // Progression accélérée pour la démo
+      });
     }
+  };
+
+  const pauseTrack = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    setIsPlaying(false);
   };
 
   const playNext = () => {
-    if (currentTrackIndex < playlist.length - 1) {
-      const nextIndex = currentTrackIndex + 1;
-      playTrack(playlist[nextIndex], nextIndex);
-    }
+    if (!currentTrack) return;
+    
+    const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
+    const nextIndex = (currentIndex + 1) % playlist.length;
+    playTrack(playlist[nextIndex]);
   };
 
   const playPrevious = () => {
-    if (currentTrackIndex > 0) {
-      const prevIndex = currentTrackIndex - 1;
-      playTrack(playlist[prevIndex], prevIndex);
+    if (!currentTrack) return;
+    
+    const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
+    const prevIndex = currentIndex === 0 ? playlist.length - 1 : currentIndex - 1;
+    playTrack(playlist[prevIndex]);
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
     }
   };
 
-  const shufflePlaylist = () => {
-    const shuffled = [...playlist].sort(() => Math.random() - 0.5);
-    setPlaylist(shuffled);
-    toast({
-      title: "Playlist mélangée",
-      description: "L'ordre des morceaux a été aléatoirement modifié",
-      variant: "default"
-    });
+  const generateMusic = async () => {
+    if (!generationPrompt.trim()) {
+      toast.error('Veuillez décrire l\'ambiance musicale souhaitée');
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      // Simulation de génération musicale
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      const generatedTrack: Track = {
+        id: `generated-${Date.now()}`,
+        title: `Musique générée: ${generationPrompt.slice(0, 20)}...`,
+        artist: 'IA Compositeur',
+        duration: 180,
+        url: '/audio/generated-music.mp3',
+        mood: 'personnalisé',
+        category: 'génération-ia'
+      };
+
+      toast.success('Musique générée avec succès !');
+      playTrack(generatedTrack);
+      setGenerationPrompt('');
+    } catch (error) {
+      console.error('Music generation error:', error);
+      toast.error('Erreur lors de la génération musicale');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -209,189 +211,187 @@ const MusicTherapy: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const seekTo = (value: number[]) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = value[0];
-      setProgress(value[0]);
+  const getMoodColor = (mood: string) => {
+    switch (mood) {
+      case 'calme': return 'bg-blue-100 text-blue-800';
+      case 'énergique': return 'bg-orange-100 text-orange-800';
+      case 'détendu': return 'bg-green-100 text-green-800';
+      case 'concentré': return 'bg-purple-100 text-purple-800';
+      case 'personnalisé': return 'bg-pink-100 text-pink-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Music Generator */}
+      {/* Génération de musique IA */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Music className="h-5 w-5" />
-            Générateur de Musique Thérapeutique IA
+            <Music className="h-6 w-6 text-primary" />
+            Génération Musicale IA
           </CardTitle>
+          <CardDescription>
+            Créez de la musique personnalisée selon votre humeur
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Générez une musique personnalisée adaptée à votre état émotionnel actuel
-            </p>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
-              {moods.map((mood) => (
-                <Button
-                  key={mood.value}
-                  variant={selectedMood === mood.value ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedMood(mood.value)}
-                  className="h-auto p-2 text-xs"
-                >
-                  {mood.label}
-                </Button>
-              ))}
-            </div>
-
-            <Button 
-              onClick={generateMusic} 
+          <div className="flex gap-2">
+            <Input
+              placeholder="Décrivez l'ambiance souhaitée (ex: musique apaisante pour méditation, sons de la nature...)"
+              value={generationPrompt}
+              onChange={(e) => setGenerationPrompt(e.target.value)}
               disabled={isGenerating}
-              className="w-full"
+              className="flex-1"
+            />
+            <Button 
+              onClick={generateMusic}
+              disabled={isGenerating || !generationPrompt.trim()}
             >
               {isGenerating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Génération en cours...
+                  Génération...
                 </>
               ) : (
-                'Générer ma musique personnalisée'
+                'Générer'
               )}
             </Button>
           </div>
+          <p className="text-sm text-muted-foreground">
+            L'IA va composer une musique unique adaptée à votre demande
+          </p>
         </CardContent>
       </Card>
 
-      {/* Music Player */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Lecteur Musical</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {currentTrack && (
-            <div className="text-center space-y-2">
-              <h3 className="font-medium">{currentTrack.title}</h3>
-              <div className="flex items-center justify-center gap-2">
-                <Badge className={moods.find(m => m.value === currentTrack.mood)?.color}>
-                  {currentTrack.category}
+      {/* Lecteur actuel */}
+      {currentTrack && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-red-500" />
+              En cours de lecture
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary/20 to-primary/40 rounded-lg flex items-center justify-center">
+                <Music className="h-8 w-8 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold">{currentTrack.title}</h3>
+                <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
+                <Badge className={getMoodColor(currentTrack.mood)}>
+                  {currentTrack.mood}
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {currentTrack.description}
-              </p>
             </div>
-          )}
 
-          {/* Progress Bar */}
-          {currentTrack && (
+            {/* Barre de progression */}
             <div className="space-y-2">
-              <Slider
-                value={[progress]}
-                max={duration || 100}
-                step={1}
-                onValueChange={seekTo}
-                className="w-full"
-              />
+              <div className="w-full bg-muted rounded-full h-2">
+                <div 
+                  className="bg-primary h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{formatTime(progress)}</span>
-                <span>{formatTime(duration)}</span>
+                <span>{formatTime((progress / 100) * currentTrack.duration)}</span>
+                <span>{formatTime(currentTrack.duration)}</span>
               </div>
             </div>
-          )}
 
-          {/* Controls */}
-          <div className="flex items-center justify-center gap-4">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={playPrevious}
-              disabled={currentTrackIndex === 0}
-            >
-              <SkipBack className="h-4 w-4" />
-            </Button>
-            
-            <Button
-              size="icon"
-              onClick={togglePlayPause}
-              className="h-12 w-12"
-            >
-              {isPlaying ? (
-                <Pause className="h-6 w-6" />
-              ) : (
-                <Play className="h-6 w-6" />
-              )}
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={playNext}
-              disabled={currentTrackIndex === playlist.length - 1}
-            >
-              <SkipForward className="h-4 w-4" />
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={shufflePlaylist}
-            >
-              <Shuffle className="h-4 w-4" />
-            </Button>
-          </div>
+            {/* Contrôles */}
+            <div className="flex items-center justify-center gap-4">
+              <Button variant="outline" size="icon" onClick={playPrevious}>
+                <SkipBack className="h-4 w-4" />
+              </Button>
+              
+              <Button 
+                size="icon" 
+                onClick={() => isPlaying ? pauseTrack() : playTrack(currentTrack)}
+                className="h-12 w-12"
+              >
+                {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+              </Button>
+              
+              <Button variant="outline" size="icon" onClick={playNext}>
+                <SkipForward className="h-4 w-4" />
+              </Button>
+            </div>
 
-          {/* Volume Control */}
-          <div className="flex items-center gap-2">
-            <Volume2 className="h-4 w-4" />
-            <Slider
-              value={volume}
-              max={1}
-              step={0.1}
-              onValueChange={setVolume}
-              className="flex-1"
-            />
-          </div>
-
-          <audio ref={audioRef} />
-        </CardContent>
-      </Card>
+            {/* Volume */}
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" onClick={toggleMute}>
+                {isMuted || volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              </Button>
+              <Slider
+                value={[isMuted ? 0 : volume]}
+                onValueChange={([value]) => {
+                  setVolume(value);
+                  setIsMuted(value === 0);
+                }}
+                max={100}
+                step={1}
+                className="flex-1"
+              />
+              <span className="text-sm text-muted-foreground w-8">{isMuted ? 0 : volume}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Playlist */}
       <Card>
         <CardHeader>
-          <CardTitle>Ma Playlist Thérapeutique</CardTitle>
+          <CardTitle>Playlist Thérapeutique</CardTitle>
+          <CardDescription>
+            Musiques sélectionnées pour le bien-être émotionnel
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            {playlist.map((track, index) => (
+          <div className="space-y-3">
+            {playlist.map((track) => (
               <div
                 key={track.id}
-                className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
-                  currentTrack?.id === track.id 
-                    ? 'bg-primary/10 border border-primary/20' 
-                    : 'hover:bg-muted'
+                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors hover:bg-muted ${
+                  currentTrack?.id === track.id ? 'bg-primary/5 border-primary' : ''
                 }`}
-                onClick={() => playTrack(track, index)}
+                onClick={() => playTrack(track)}
               >
-                <div className="flex-1">
-                  <div className="font-medium">{track.title}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {track.category} • {formatTime(track.duration)}
-                  </div>
-                </div>
-                <Badge 
-                  className={moods.find(m => m.value === track.mood)?.color}
-                  variant="outline"
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 flex-shrink-0"
                 >
-                  {moods.find(m => m.value === track.mood)?.label}
-                </Badge>
+                  {currentTrack?.id === track.id && isPlaying ? (
+                    <Pause className="h-4 w-4" />
+                  ) : (
+                    <Play className="h-4 w-4" />
+                  )}
+                </Button>
+                
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium truncate">{track.title}</h4>
+                  <p className="text-sm text-muted-foreground truncate">{track.artist}</p>
+                </div>
+                
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <Badge variant="outline" className={getMoodColor(track.mood)}>
+                    {track.mood}
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    {formatTime(track.duration)}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
+
+      {/* Audio element */}
+      <audio ref={audioRef} />
     </div>
   );
 };
