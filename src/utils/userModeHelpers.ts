@@ -93,6 +93,38 @@ export const getModeSocialPath = (userMode?: UserMode): string => {
     case 'b2b_admin':
       return '/b2b/admin/social';
     default:
-      return '/social-cocoon';
+      return '/b2c/social';
+  }
+};
+
+/**
+ * Returns the appropriate VR path based on user mode
+ */
+export const getModeVRPath = (userMode?: UserMode): string => {
+  switch (userMode) {
+    case 'b2c':
+      return '/b2c/vr';
+    case 'b2b_user':
+      return '/b2b/user/vr';
+    case 'b2b_admin':
+      return '/b2b/admin/vr';
+    default:
+      return '/b2c/vr';
+  }
+};
+
+/**
+ * Returns the appropriate scan path based on user mode
+ */
+export const getModeScanPath = (userMode?: UserMode): string => {
+  switch (userMode) {
+    case 'b2c':
+      return '/b2c/scan';
+    case 'b2b_user':
+      return '/b2b/user/scan';
+    case 'b2b_admin':
+      return '/b2b/admin/scan';
+    default:
+      return '/b2c/scan';
   }
 };
