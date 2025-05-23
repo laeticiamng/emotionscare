@@ -1,130 +1,306 @@
 
-import React, { useEffect, useState } from 'react';
-import { useCoach } from '@/contexts/coach/CoachContextProvider';
-import { ChatMessage } from '@/types/chat';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Input } from '@/components/ui/input';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Send, Mic, MicOff } from 'lucide-react';
-import CoachMessage from './CoachMessage';
-import QuickSuggestions from '@/components/dashboard/coach/QuickSuggestions';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent } from '@/components/ui/card';
+import { Send, Mic, MicOff, StopCircle, User, Bot, Image as ImageIcon, Wand2, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+import useOpenAI from '@/hooks/api/useOpenAI';
+import useWhisper from '@/hooks/api/useWhisper';
+
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
 
 interface EnhancedCoachChatProps {
   initialMessage?: string;
-  showHeader?: boolean;
   showCharacter?: boolean;
-  characterSize?: 'sm' | 'md' | 'lg';
-  className?: string;
-  maxHeight?: string;
+  showHeader?: boolean;
 }
 
 const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
-  initialMessage,
-  showHeader = true,
+  initialMessage = "Bonjour, je suis votre coach émotionnel. Comment puis-je vous aider aujourd'hui?",
   showCharacter = false,
-  characterSize = 'md',
-  className = '',
-  maxHeight = '600px'
+  showHeader = false
 }) => {
-  const [input, setInput] = useState('');
-  const [recording, setRecording] = useState(false);
-  const coach = useCoach();
+  const { user } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { generateText } = useOpenAI();
+  const { transcript, isRecording, startRecordingAndTranscribe, stopRecording } = useWhisper();
   
-  // Quick suggestions based on emotional state
-  const suggestions = [
-    "Comment puis-je gérer mon stress ?",
-    "Conseils pour mieux dormir",
-    "Je me sens démotivé",
-    "Exercices de respiration"
-  ];
-  
-  // Add initial message if it exists
   useEffect(() => {
-    if (initialMessage && coach.messages && coach.messages.length === 0) {
-      coach.sendMessage(initialMessage, 'coach');
+    // Add initial message
+    if (initialMessage) {
+      setMessages([
+        {
+          id: 'initial',
+          role: 'assistant',
+          content: initialMessage,
+          timestamp: new Date()
+        }
+      ]);
     }
-  }, [initialMessage, coach]);
+  }, [initialMessage]);
   
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (input.trim() && !coach.isProcessing) {
-      coach.sendMessage(input, 'user');
-      setInput('');
+  useEffect(() => {
+    // Scroll to bottom whenever messages change
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+  
+  useEffect(() => {
+    // Add transcribed text to input
+    if (transcript) {
+      setInputMessage(prev => prev + transcript);
+    }
+  }, [transcript]);
+  
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim()) return;
+    
+    const newUserMessage: Message = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: inputMessage,
+      timestamp: new Date()
+    };
+    
+    setMessages(prev => [...prev, newUserMessage]);
+    setInputMessage('');
+    setIsLoading(true);
+    
+    try {
+      const userFirstName = user?.user_metadata?.name?.split(' ')[0] || 'utilisateur';
+      const prompt = `Tu es un coach émotionnel bienveillant. Tu t'adresses à ${userFirstName}. Réponds de manière empathique, positive et encourageante à ce message: "${inputMessage}"`;
+      
+      const response = await generateText(prompt);
+      
+      if (response) {
+        const newAssistantMessage: Message = {
+          id: `assistant-${Date.now()}`,
+          role: 'assistant',
+          content: response,
+          timestamp: new Date()
+        };
+        
+        setMessages(prev => [...prev, newAssistantMessage]);
+      }
+    } catch (error) {
+      console.error('Error generating response:', error);
+      toast.error("Désolé, je n'ai pas pu générer de réponse. Veuillez réessayer.");
+    } finally {
+      setIsLoading(false);
     }
   };
   
-  const toggleRecording = () => {
-    setRecording(!recording);
-    // Implement actual voice recording logic here
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
   
+  const handleStartRecording = async () => {
+    try {
+      await startRecordingAndTranscribe();
+      toast.info("Enregistrement en cours... Parlez maintenant.");
+    } catch (error) {
+      console.error('Error starting recording:', error);
+      toast.error("Impossible d'accéder au microphone.");
+    }
+  };
+  
+  const handleStopRecording = () => {
+    stopRecording();
+    toast.success("Enregistrement terminé.");
+  };
+  
+  const formatTimestamp = (date: Date) => {
+    return date.toLocaleTimeString(undefined, { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
+
   return (
-    <div className={`flex flex-col h-full ${className}`}>
+    <div className="flex flex-col h-full">
       {showHeader && (
-        <div className="px-4 py-3 border-b bg-muted/30">
-          <h3 className="font-medium">
-            Coach IA
-          </h3>
-          <p className="text-xs text-muted-foreground">Votre coach personnel</p>
+        <div className="p-4 border-b">
+          <div className="flex items-center space-x-4">
+            <Avatar>
+              <AvatarImage src="/coach-avatar.png" />
+              <AvatarFallback>
+                <Bot className="h-6 w-6" />
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h2 className="text-lg font-medium">Coach EmotionsCare</h2>
+              <p className="text-sm text-muted-foreground">Disponible 24/7 pour vous accompagner</p>
+            </div>
+          </div>
         </div>
       )}
       
-      <ScrollArea className="flex-1 p-4" style={{ maxHeight }}>
-        <div className="space-y-6">
-          {coach.messages && coach.messages.map((message, index) => (
-            <CoachMessage
-              key={message.id || index}
-              message={message}
-              isLast={index === coach.messages.length - 1}
-            />
-          ))}
-          
-          {coach.isProcessing && (
-            <CoachMessage
-              message={{
-                id: 'loading',
-                sender: 'coach',
-                content: 'En train de réfléchir...',
-                timestamp: new Date().toISOString(),
-                isLoading: true
-              }}
-            />
-          )}
+      <div className="flex flex-1 overflow-hidden">
+        {showCharacter && (
+          <div className="hidden md:block w-1/4 border-r p-4 bg-muted/20">
+            <div className="flex flex-col items-center space-y-4">
+              <Avatar className="h-24 w-24">
+                <AvatarImage src="/coach-avatar.png" />
+                <AvatarFallback className="bg-primary/20">
+                  <Bot className="h-12 w-12 text-primary" />
+                </AvatarFallback>
+              </Avatar>
+              <div className="text-center">
+                <h3 className="font-medium">Emma</h3>
+                <p className="text-sm text-muted-foreground">Coach en bien-être émotionnel</p>
+              </div>
+              
+              <Card className="w-full mt-4">
+                <CardContent className="p-3 text-sm">
+                  <p className="font-medium mb-1">Spécialités:</p>
+                  <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                    <li>Gestion du stress</li>
+                    <li>Pleine conscience</li>
+                    <li>Intelligence émotionnelle</li>
+                    <li>Équilibre vie pro/perso</li>
+                  </ul>
+                </CardContent>
+              </Card>
+              
+              <Button variant="outline" className="w-full" onClick={() => toast.info("Fonctionnalité à venir")}>
+                <Wand2 className="h-4 w-4 mr-2" />
+                Paramètres IA
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <div className={`flex flex-col flex-1 ${showCharacter ? 'md:w-3/4' : 'w-full'}`}>
+          {/* Messages container */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                }`}
+              >
+                <div
+                  className={`flex items-start space-x-2 max-w-[80%] ${
+                    message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''
+                  }`}
+                >
+                  <Avatar className="mt-0.5">
+                    {message.role === 'user' ? (
+                      <>
+                        <AvatarImage src={user?.user_metadata?.avatar_url} />
+                        <AvatarFallback>
+                          <User className="h-4 w-4" />
+                        </AvatarFallback>
+                      </>
+                    ) : (
+                      <>
+                        <AvatarImage src="/coach-avatar.png" />
+                        <AvatarFallback>
+                          <Bot className="h-4 w-4" />
+                        </AvatarFallback>
+                      </>
+                    )}
+                  </Avatar>
+                  <div>
+                    <div
+                      className={`rounded-lg p-3 ${
+                        message.role === 'user'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted'
+                      }`}
+                    >
+                      <p className="whitespace-pre-wrap">{message.content}</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {formatTimestamp(message.timestamp)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="flex items-start space-x-2 max-w-[80%]">
+                  <Avatar className="mt-0.5">
+                    <AvatarImage src="/coach-avatar.png" />
+                    <AvatarFallback>
+                      <Bot className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="rounded-lg p-3 bg-muted">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input area */}
+          <div className="p-4 border-t">
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                size="icon"
+                type="button"
+                onClick={() => toast.info("Fonctionnalité à venir")}
+              >
+                <ImageIcon className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                type="button"
+                onClick={isRecording ? handleStopRecording : handleStartRecording}
+              >
+                {isRecording ? (
+                  <StopCircle className="h-4 w-4 text-red-500" />
+                ) : (
+                  <Mic className="h-4 w-4" />
+                )}
+              </Button>
+              <Input
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Écrivez un message..."
+                disabled={isLoading}
+                className="flex-1"
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={!inputMessage.trim() || isLoading}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+            {isRecording && (
+              <div className="flex items-center mt-2 text-xs text-red-500 animate-pulse">
+                <MicOff className="h-3 w-3 mr-1" />
+                Enregistrement en cours... Cliquez sur le bouton pour arrêter.
+              </div>
+            )}
+          </div>
         </div>
-      </ScrollArea>
-      
-      <QuickSuggestions 
-        suggestions={suggestions} 
-      />
-      
-      <form onSubmit={handleSendMessage} className="p-3 border-t flex items-center gap-2">
-        <Button
-          type="button"
-          size="icon"
-          variant="ghost"
-          onClick={toggleRecording}
-          className="flex-shrink-0"
-        >
-          {recording ? <MicOff className="h-5 w-5 text-destructive" /> : <Mic className="h-5 w-5" />}
-        </Button>
-        
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Écrivez votre message..."
-          className="flex-1"
-          disabled={coach.isProcessing}
-        />
-        
-        <Button 
-          type="submit" 
-          size="icon" 
-          disabled={!input.trim() || coach.isProcessing}
-          className="flex-shrink-0"
-        >
-          <Send className="h-4 w-4" />
-        </Button>
-      </form>
+      </div>
     </div>
   );
 };

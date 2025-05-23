@@ -1,94 +1,368 @@
 
-import React from 'react';
-import { Route, Navigate } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import VRPage from './pages/VRPage';
-import ScanPage from './pages/ScanPage';
-import SocialCocoon from './pages/SocialCocoon';
-import Social from './pages/Social';
-import DashboardRedirect from './pages/DashboardRedirect';
-import ProtectedRouteWithMode from './components/ProtectedRouteWithMode';
-import ChooseModePage from './pages/ChooseModePage';
+import React, { lazy, Suspense } from 'react';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import LoadingAnimation from '@/components/ui/loading-animation';
+import AppRouter from './AppRouter';
 
-// Pages B2C
-import B2CDashboard from './pages/dashboards/B2CDashboard';
-import B2CLogin from './pages/b2c/Login';
-import B2CRegister from './pages/b2c/Register';
-import B2CResetPassword from './pages/b2c/ResetPassword';
-import B2COnboarding from './pages/b2c/Onboarding';
+// Layouts
+import B2CLayout from '@/layouts/B2CLayout';
+import AppLayout from '@/layouts/AppLayout';
+import AuthLayout from '@/layouts/AuthLayout';
+import B2BAdminLayout from '@/layouts/B2BAdminLayout';
+import ProtectedLayout from '@/components/ProtectedLayout';
 
-// Pages B2B User
-import B2BUserDashboard from './pages/dashboards/B2BUserDashboard';
-import B2BUserLogin from './pages/b2b/user/Login';
-import B2BUserRegister from './pages/b2b/user/Register';
+// Common pages
+const LandingPage = lazy(() => import('@/pages/LandingPage'));
+const ChooseMode = lazy(() => import('@/pages/common/ChooseMode'));
+const B2BSelection = lazy(() => import('@/pages/b2b/Selection'));
+const Unauthorized = lazy(() => import('@/pages/common/Unauthorized'));
+const NotFoundPage = lazy(() => import('@/pages/error/NotFoundPage'));
+const ForbiddenPage = lazy(() => import('@/pages/error/ForbiddenPage'));
+const ServerErrorPage = lazy(() => import('@/pages/errors/ServerErrorPage'));
 
-// Pages B2B Admin
-import B2BAdminDashboard from './pages/dashboards/B2BAdminDashboard';
-import B2BAdminLogin from './pages/b2b/admin/Login';
+// B2C pages
+const B2CLogin = lazy(() => import('@/pages/b2c/Login'));
+const B2CRegister = lazy(() => import('@/pages/b2c/Register'));
+const B2CResetPassword = lazy(() => import('@/pages/b2c/ResetPassword'));
+const B2CDashboard = lazy(() => import('@/pages/dashboards/B2CDashboard'));
+const B2COnboarding = lazy(() => import('@/pages/b2c/Onboarding'));
+const B2CJournal = lazy(() => import('@/pages/b2c/Journal'));
+const B2CMusic = lazy(() => import('@/pages/b2c/Music'));
+const B2CScan = lazy(() => import('@/pages/ScanPage'));
+const B2CVRS = lazy(() => import('@/pages/VRPage'));
+const B2CSocial = lazy(() => import('@/pages/Social'));
+const CoachChat = lazy(() => import('@/pages/b2c/CoachChat'));
+const B2CGamification = lazy(() => import('@/pages/b2c/Gamification'));
 
-// Page de sélection B2B
-import B2BSelection from './pages/b2b/Selection';
+// B2B User pages
+const B2BUserLogin = lazy(() => import('@/pages/b2b/user/Login'));
+const B2BUserRegister = lazy(() => import('@/pages/b2b/user/Register'));
+const B2BUserDashboard = lazy(() => import('@/pages/dashboards/B2BUserDashboard'));
 
-// Page d'erreur 404
-import NotFoundPage from './pages/NotFoundPage';
+// B2B Admin pages
+const B2BAdminLogin = lazy(() => import('@/pages/b2b/admin/Login'));
+const B2BAdminDashboard = lazy(() => import('@/pages/dashboards/B2BAdminDashboard'));
+
+// Settings
+const UserSettings = lazy(() => import('@/components/settings/UserSettings'));
+
+const LoadingPage = () => (
+  <div className="flex h-screen items-center justify-center">
+    <LoadingAnimation text="Chargement de la page..." />
+  </div>
+);
 
 const routes = [
-  // Page d'accueil principale
-  { path: '/', element: <HomePage /> },
-  
-  // Redirection dashboard
-  { path: '/dashboard', element: <DashboardRedirect /> },
-  
-  // Choix du mode utilisateur
-  { path: '/choose-mode', element: <ChooseModePage /> },
-  
-  // Routes B2C
-  { path: '/b2c/login', element: <B2CLogin /> },
-  { path: '/b2c/register', element: <B2CRegister /> },
-  { path: '/b2c/reset-password', element: <B2CResetPassword /> },
-  { 
-    path: '/b2c/dashboard', 
-    element: <ProtectedRouteWithMode requiredMode="b2c" redirectTo="/choose-mode"><B2CDashboard /></ProtectedRouteWithMode> 
+  // Public routes (no auth required)
+  {
+    path: "/",
+    element: (
+      <Suspense fallback={<LoadingPage />}>
+        <LandingPage />
+      </Suspense>
+    ),
   },
-  { 
-    path: '/b2c/onboarding', 
-    element: <ProtectedRouteWithMode requiredMode="b2c" redirectTo="/choose-mode"><B2COnboarding /></ProtectedRouteWithMode> 
+  {
+    path: "/choose-mode",
+    element: (
+      <Suspense fallback={<LoadingPage />}>
+        <ChooseMode />
+      </Suspense>
+    ),
   },
-  { path: '/b2c/scan', element: <ScanPage /> },
-  { path: '/b2c/vr', element: <VRPage /> },
-  { path: '/b2c/social', element: <Social /> },
-  
-  // Routes B2B User
-  { path: '/b2b/user/login', element: <B2BUserLogin /> },
-  { path: '/b2b/user/register', element: <B2BUserRegister /> },
-  { 
-    path: '/b2b/user/dashboard', 
-    element: <ProtectedRouteWithMode requiredMode="b2b_user" redirectTo="/choose-mode"><B2BUserDashboard /></ProtectedRouteWithMode> 
+  {
+    path: "/b2b/selection",
+    element: (
+      <Suspense fallback={<LoadingPage />}>
+        <B2BSelection />
+      </Suspense>
+    ),
   },
-  { path: '/b2b/user/scan', element: <ScanPage /> },
-  { path: '/b2b/user/vr', element: <VRPage /> },
-  { path: '/b2b/user/social', element: <Social /> },
-  
-  // Routes B2B Admin
-  { path: '/b2b/admin/login', element: <B2BAdminLogin /> },
-  { 
-    path: '/b2b/admin/dashboard', 
-    element: <ProtectedRouteWithMode requiredMode="b2b_admin" redirectTo="/choose-mode"><B2BAdminDashboard /></ProtectedRouteWithMode> 
+
+  // Auth routes
+  {
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "/b2c/login",
+        element: (
+          <Suspense fallback={<LoadingPage />}>
+            <B2CLogin />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/b2c/register",
+        element: (
+          <Suspense fallback={<LoadingPage />}>
+            <B2CRegister />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/b2c/reset-password",
+        element: (
+          <Suspense fallback={<LoadingPage />}>
+            <B2CResetPassword />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/b2b/user/login",
+        element: (
+          <Suspense fallback={<LoadingPage />}>
+            <B2BUserLogin />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/b2b/user/register",
+        element: (
+          <Suspense fallback={<LoadingPage />}>
+            <B2BUserRegister />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/b2b/admin/login",
+        element: (
+          <Suspense fallback={<LoadingPage />}>
+            <B2BAdminLogin />
+          </Suspense>
+        ),
+      },
+    ],
   },
-  { path: '/b2b/admin/social', element: <Social /> },
+
+  // Protected routes
+  {
+    element: <ProtectedLayout />,
+    children: [
+      // B2C routes
+      {
+        path: "/b2c",
+        element: <B2CLayout />,
+        children: [
+          {
+            path: "dashboard",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2CDashboard />
+              </Suspense>
+            ),
+          },
+          {
+            path: "onboarding",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2COnboarding />
+              </Suspense>
+            ),
+          },
+          {
+            path: "journal",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2CJournal />
+              </Suspense>
+            ),
+          },
+          {
+            path: "music",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2CMusic />
+              </Suspense>
+            ),
+          },
+          {
+            path: "scan",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2CScan />
+              </Suspense>
+            ),
+          },
+          {
+            path: "vr",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2CVRS />
+              </Suspense>
+            ),
+          },
+          {
+            path: "coach",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <CoachChat />
+              </Suspense>
+            ),
+          },
+          {
+            path: "social",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2CSocial />
+              </Suspense>
+            ),
+          },
+          {
+            path: "gamification",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2CGamification />
+              </Suspense>
+            ),
+          },
+          {
+            path: "settings",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <UserSettings />
+              </Suspense>
+            ),
+          },
+          { 
+            index: true, 
+            element: <Navigate to="/b2c/dashboard" replace /> 
+          },
+        ],
+      },
+
+      // B2B User routes
+      {
+        path: "/b2b/user",
+        element: <B2CLayout />,
+        children: [
+          {
+            path: "dashboard",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2BUserDashboard />
+              </Suspense>
+            ),
+          },
+          {
+            path: "journal",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2CJournal />
+              </Suspense>
+            ),
+          },
+          {
+            path: "music",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2CMusic />
+              </Suspense>
+            ),
+          },
+          {
+            path: "scan",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2CScan />
+              </Suspense>
+            ),
+          },
+          {
+            path: "vr",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2CVRS />
+              </Suspense>
+            ),
+          },
+          {
+            path: "coach",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <CoachChat />
+              </Suspense>
+            ),
+          },
+          {
+            path: "social",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2CSocial />
+              </Suspense>
+            ),
+          },
+          {
+            path: "settings",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <UserSettings />
+              </Suspense>
+            ),
+          },
+          { 
+            index: true, 
+            element: <Navigate to="/b2b/user/dashboard" replace /> 
+          },
+        ],
+      },
+
+      // B2B Admin routes
+      {
+        path: "/b2b/admin",
+        element: <B2BAdminLayout />,
+        children: [
+          {
+            path: "dashboard",
+            element: (
+              <Suspense fallback={<LoadingPage />}>
+                <B2BAdminDashboard />
+              </Suspense>
+            ),
+          },
+          { 
+            index: true, 
+            element: <Navigate to="/b2b/admin/dashboard" replace /> 
+          },
+        ],
+      },
+    ],
+  },
+
+  // Error pages
+  {
+    path: "/unauthorized",
+    element: (
+      <Suspense fallback={<LoadingPage />}>
+        <Unauthorized />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/forbidden",
+    element: (
+      <Suspense fallback={<LoadingPage />}>
+        <ForbiddenPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/server-error",
+    element: (
+      <Suspense fallback={<LoadingPage />}>
+        <ServerErrorPage />
+      </Suspense>
+    ),
+  },
   
-  // Page de sélection B2B
-  { path: '/b2b/selection', element: <B2BSelection /> },
-  
-  // Accès direct aux fonctionnalités principales
-  { path: '/scan', element: <ScanPage /> },
-  { path: '/vr', element: <VRPage /> },
-  { path: '/social', element: <Social /> },
-  { path: '/social-cocoon', element: <SocialCocoon /> },
-  
-  // Page 404 pour les routes non trouvées
-  { path: '/404', element: <NotFoundPage /> },
-  { path: '*', element: <Navigate to="/404" replace /> }
+  // Fallback/404 route
+  {
+    path: "*",
+    element: (
+      <Suspense fallback={<LoadingPage />}>
+        <NotFoundPage />
+      </Suspense>
+    ),
+  },
 ];
 
 export default routes;

@@ -1,28 +1,25 @@
 
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { UserModeProvider } from '@/contexts/UserModeContext';
 import { Toaster } from 'sonner';
 import AppRouter from './AppRouter';
-import { ThemeProvider } from '@/providers/ThemeProvider';
-import { UserModeProvider } from '@/contexts/UserModeContext';
-import { AuthProvider } from '@/contexts/AuthContext';
-import ProtectedLayout from '@/components/ProtectedLayout';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <ThemeProvider defaultTheme="system" storageKey="emotions-care-theme">
-      <Router>
+    <ThemeProvider>
+      <BrowserRouter>
         <AuthProvider>
           <UserModeProvider>
-            <ProtectedLayout>
-              <AppRouter />
-            </ProtectedLayout>
-            <Toaster position="top-right" />
+            <AppRouter />
+            <Toaster position="top-right" richColors closeButton />
           </UserModeProvider>
         </AuthProvider>
-      </Router>
+      </BrowserRouter>
     </ThemeProvider>
   );
-}
+};
 
 export default App;

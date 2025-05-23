@@ -1,135 +1,193 @@
-import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { getEmotionByName, EmotionResult } from '@/types/emotion';
 
-interface UnifiedEmotionCheckinProps {
-  className?: string;
-}
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { BarChart, Calendar } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { EmotionResult } from '@/types/emotion';
+import { toast } from 'sonner';
 
-const UnifiedEmotionCheckin: React.FC<UnifiedEmotionCheckinProps> = ({ className = '' }) => {
-  const [emotionHistory, setEmotionHistory] = useState<EmotionResult[]>([
-    {
-      primaryEmotion: 'calm',
-      secondaryEmotion: 'content',
-      intensity: 4,
-      source: 'emoji',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString()
-    },
-    {
-      primaryEmotion: 'anxious',
-      secondaryEmotion: 'frustrated',
-      intensity: 3,
-      source: 'text',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString()
-    },
-    {
-      primaryEmotion: 'happy',
-      intensity: 5,
-      source: 'facial',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString()
-    }
-  ]);
-  
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const today = new Date();
+const UnifiedEmotionCheckin: React.FC = () => {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [emotionHistory, setEmotionHistory] = useState<EmotionResult[]>([]);
+  const [latestEmotion, setLatestEmotion] = useState<EmotionResult | null>(null);
+
+  useEffect(() => {
+    const fetchEmotionData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        
+        // Fetch user's emotion data
+        const { data, error } = await supabase
+          .from('emotions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('date', { ascending: false })
+          .limit(10);
+          
+        if (error) throw error;
+        
+        setEmotionHistory(data || []);
+        if (data && data.length > 0) {
+          setLatestEmotion(data[0]);
+        }
+      } catch (error) {
+        console.error('Error fetching emotion data:', error);
+        toast.error('Erreur lors du chargement des données émotionnelles');
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    // Check if it's today
-    if (date.toDateString() === today.toDateString()) {
-      return `Aujourd'hui, ${date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
-    }
-    
-    // Check if it's yesterday
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-    if (date.toDateString() === yesterday.toDateString()) {
-      return `Hier, ${date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
-    }
-    
-    // Otherwise return full date
-    return date.toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    fetchEmotionData();
+  }, [user]);
+
+  // Process emotion data for chart
+  const chartData = emotionHistory
+    .map(entry => ({
+      date: new Date(entry.date!).toLocaleDateString('fr-FR', { 
+        day: '2-digit', 
+        month: '2-digit' 
+      }),
+      score: entry.score || 50
+    }))
+    .reverse();
+
+  const getScoreColor = (score: number | null | undefined) => {
+    if (score === null || score === undefined) return 'text-muted-foreground';
+    if (score >= 80) return 'text-green-500';
+    if (score >= 60) return 'text-lime-500';
+    if (score >= 40) return 'text-amber-500';
+    if (score >= 20) return 'text-orange-500';
+    return 'text-red-500';
   };
-  
-  const getEmotionText = (result: EmotionResult) => {
-    const primary = getEmotionByName(result.primaryEmotion);
-    const secondary = result.secondaryEmotion ? getEmotionByName(result.secondaryEmotion) : null;
-    
-    if (secondary) {
-      return `${primary.label} et ${secondary.label.toLowerCase()}`;
-    }
-    
-    return primary.label;
-  };
-  
-  const getSourceIcon = (source: string) => {
-    switch (source) {
-      case 'emoji':
-        return '😊';
-      case 'text':
-        return '📝';
-      case 'facial':
-        return '📷';
-      case 'voice':
-        return '🎤';
-      default:
-        return '📊';
-    }
-  };
+
+  if (!user) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center">
+          <p className="text-muted-foreground">
+            Connectez-vous pour voir votre suivi émotionnel
+          </p>
+          <Button className="mt-4">Se connecter</Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <Card className={className}>
-      <CardHeader className="pb-3">
-        <CardTitle>Historique émotionnel</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {emotionHistory.length > 0 ? (
-          <div className="space-y-4">
-            {emotionHistory.map((result, index) => {
-              const primary = getEmotionByName(result.primaryEmotion);
-              
-              return (
-                <div 
-                  key={index}
-                  className="flex items-center p-3 rounded-lg bg-accent/50"
-                >
-                  <div className="mr-3 text-2xl">
-                    {primary.emoji}
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium">
-                      {getEmotionText(result)}
+    <Card>
+      <CardContent className="p-6">
+        <h3 className="text-lg font-semibold mb-4">
+          Votre suivi émotionnel
+        </h3>
+        
+        <Tabs defaultValue="today">
+          <TabsList className="mb-4">
+            <TabsTrigger value="today">Aujourd'hui</TabsTrigger>
+            <TabsTrigger value="history">Historique</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="today" className="space-y-4">
+            {loading ? (
+              <div className="space-y-4">
+                <Skeleton className="h-20 w-full" />
+                <Skeleton className="h-40 w-full" />
+              </div>
+            ) : latestEmotion ? (
+              <>
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div>
+                    <div className="text-sm text-muted-foreground">
+                      Dernière analyse
                     </div>
-                    <div className="text-sm text-muted-foreground flex items-center">
-                      <span>{formatDate(result.timestamp)}</span>
-                      <span className="mx-2">•</span>
-                      <span className="flex items-center">
-                        {getSourceIcon(result.source)}
-                        <span className="ml-1 text-xs">
-                          {result.source === 'emoji' ? 'Emojis' :
-                           result.source === 'text' ? 'Texte' : 
-                           result.source === 'facial' ? 'Visage' : 
-                           result.source === 'voice' ? 'Voix' : 'Manuel'}
-                        </span>
-                      </span>
+                    <div className="text-lg mt-1">
+                      {new Date(latestEmotion.date!).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
                     </div>
                   </div>
-                  <div className="flex items-center justify-center rounded-full w-8 h-8 bg-background">
-                    <span className="text-sm font-medium">{result.intensity}/5</span>
+                  <div className="text-center">
+                    <div className="text-sm text-muted-foreground">
+                      Score émotionnel
+                    </div>
+                    <div className={`text-2xl font-bold ${getScoreColor(latestEmotion.score)}`}>
+                      {latestEmotion.score}/100
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">
+                      Émotion
+                    </div>
+                    <div className="text-lg mt-1">
+                      {latestEmotion.emojis || "Non spécifié"}
+                    </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="text-center py-6 text-muted-foreground">
-            <p>Aucun historique disponible</p>
-          </div>
-        )}
+                
+                {latestEmotion.ai_feedback && (
+                  <div className="p-4 border rounded-lg bg-muted/10">
+                    <div className="text-sm font-medium mb-2">Feedback IA</div>
+                    <p className="text-sm">{latestEmotion.ai_feedback}</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-10">
+                <Calendar className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-medium">Aucune analyse aujourd'hui</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Commencez par analyser vos émotions
+                </p>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="history" className="space-y-4">
+            {loading ? (
+              <Skeleton className="h-[250px] w-full" />
+            ) : chartData.length > 0 ? (
+              <div className="h-[250px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="date" />
+                    <YAxis domain={[0, 100]} />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="score"
+                      stroke="#8884d8"
+                      strokeWidth={2}
+                      activeDot={{ r: 8 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="text-center py-10">
+                <BarChart className="mx-auto h-12 w-12 text-muted-foreground" />
+                <h3 className="mt-4 text-lg font-medium">Pas encore d'historique</h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Effectuez plusieurs analyses pour voir votre évolution
+                </p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );

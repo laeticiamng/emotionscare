@@ -1,9 +1,11 @@
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { UserModeType, UserModeContextType } from '@/types/userMode';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './AuthContext';
 import { toast } from 'sonner';
+import { getUserModeDisplayName } from '@/utils/userModeHelpers';
 
-// Création du contexte avec une valeur par défaut
 const UserModeContext = createContext<UserModeContextType>({
   userMode: null,
   setUserMode: () => {},
@@ -11,51 +13,113 @@ const UserModeContext = createContext<UserModeContextType>({
   changeUserMode: () => {},
 });
 
-// Clé utilisée pour stocker le mode utilisateur dans localStorage
-const USER_MODE_STORAGE_KEY = 'emotions-care-user-mode';
-
-// Hook pour utiliser le contexte de mode utilisateur
-export const useUserMode = () => useContext(UserModeContext);
-
-// Fournisseur du contexte de mode utilisateur
 export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [userMode, setUserMode] = useState<UserModeType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Charger le mode utilisateur depuis le stockage local lors du montage du composant
+  const { user, isLoading: authLoading } = useAuth();
+
+  // Load user mode from local storage or user metadata
   useEffect(() => {
-    const storedMode = localStorage.getItem(USER_MODE_STORAGE_KEY) as UserModeType | null;
-    if (storedMode) {
-      setUserMode(storedMode);
+    // Skip if still loading auth data
+    if (authLoading) {
+      return;
     }
-    setIsLoading(false);
-  }, []);
-  
-  // Enregistrer le mode utilisateur dans le stockage local lorsqu'il change
-  useEffect(() => {
-    if (userMode) {
-      localStorage.setItem(USER_MODE_STORAGE_KEY, userMode);
+
+    const initUserMode = async () => {
+      setIsLoading(true);
+      
+      try {
+        // First check local storage for remembered mode
+        const storedMode = localStorage.getItem('userMode') as UserModeType | null;
+        
+        // If user is logged in, get mode from user metadata
+        if (user) {
+          const userRole = user.user_metadata?.role;
+          
+          if (userRole) {
+            // Normalize role to user mode
+            let modeFromRole: UserModeType = 'b2c';
+            
+            if (userRole === 'b2b_admin' || userRole === 'admin') {
+              modeFromRole = 'b2b_admin';
+            } else if (userRole === 'b2b_user' || userRole === 'b2b-user') {
+              modeFromRole = 'b2b_user';
+            }
+            
+            setUserMode(modeFromRole);
+            localStorage.setItem('userMode', modeFromRole);
+            setIsLoading(false);
+            return;
+          }
+        }
+        
+        // If no user or no role, use stored mode or default to b2c
+        if (storedMode) {
+          setUserMode(storedMode);
+        } else {
+          setUserMode('b2c');
+          localStorage.setItem('userMode', 'b2c');
+        }
+      } catch (error) {
+        console.error('Error initializing user mode:', error);
+        setUserMode('b2c');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    initUserMode();
+  }, [user, authLoading]);
+
+  // Function to change user mode and update user metadata if logged in
+  const changeUserMode = async (mode: UserModeType) => {
+    setIsLoading(true);
+    
+    try {
+      // Update local storage
+      localStorage.setItem('userMode', mode);
+      
+      // Update user metadata if logged in
+      if (user) {
+        // Map user mode to role
+        let role = mode;
+        
+        // Update user metadata
+        const { error } = await supabase.auth.updateUser({
+          data: { role }
+        });
+        
+        if (error) {
+          throw error;
+        }
+      }
+      
+      // Update state
+      setUserMode(mode);
+      toast.success(`Mode ${getUserModeDisplayName(mode)} activé`);
+    } catch (error) {
+      console.error('Error changing user mode:', error);
+      toast.error('Erreur lors du changement de mode');
+    } finally {
+      setIsLoading(false);
     }
-  }, [userMode]);
-  
-  // Fonction pour changer de mode utilisateur
-  const changeUserMode = (newMode: UserModeType) => {
-    setUserMode(newMode);
-    toast.success(`Mode ${newMode === 'b2c' ? 'personnel' : newMode === 'b2b_user' ? 'collaborateur' : 'administrateur'} activé`);
   };
   
-  const value = {
-    userMode,
-    setUserMode,
-    isLoading,
-    changeUserMode,
+  // Clear user mode
+  const clearUserMode = () => {
+    localStorage.removeItem('userMode');
+    setUserMode(null);
   };
   
   return (
-    <UserModeContext.Provider value={value}>
+    <UserModeContext.Provider
+      value={{ userMode, setUserMode, isLoading, changeUserMode, clearUserMode }}
+    >
       {children}
     </UserModeContext.Provider>
   );
 };
+
+export const useUserMode = () => useContext(UserModeContext);
 
 export default UserModeContext;

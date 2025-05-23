@@ -1,22 +1,34 @@
 
 import React from 'react';
-import { Outlet } from 'react-router-dom';
-import UnifiedShell from './UnifiedShell';
-import { useAuth } from '@/contexts/AuthContext';
+import UnifiedHeader from './UnifiedHeader';
+import UnifiedSidebar from './UnifiedSidebar';
 
 interface UnifiedLayoutProps {
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }
 
 const UnifiedLayout: React.FC<UnifiedLayoutProps> = ({ children }) => {
-  const { user } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
   
   return (
-    <UnifiedShell>
-      <div className="container px-4 py-6 mx-auto">
-        {children || <Outlet />}
+    <div className="flex min-h-screen flex-col">
+      <UnifiedHeader onMenuToggle={toggleSidebar} />
+      
+      <div className="flex flex-1">
+        <UnifiedSidebar 
+          isOpen={sidebarOpen} 
+          onToggle={toggleSidebar} 
+        />
+        
+        <main className="flex-1 md:pl-64 pt-16">
+          {children}
+        </main>
       </div>
-    </UnifiedShell>
+    </div>
   );
 };
 
