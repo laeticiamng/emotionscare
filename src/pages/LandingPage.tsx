@@ -1,143 +1,204 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { getModeDashboardPath } from '@/utils/userModeHelpers';
-import ModeToggle from '@/components/theme/ModeToggle';
-import { motion } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
+import { Brain, Users, Shield, TrendingUp, Heart, Zap } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-  const { userMode } = useUserMode();
-  
-  const handleGetStarted = () => {
-    if (isAuthenticated) {
-      navigate(getModeDashboardPath(userMode));
-    } else {
-      navigate('/choose-mode');
+
+  const features = [
+    {
+      icon: Brain,
+      title: "Analyse Émotionnelle IA",
+      description: "Analysez vos émotions en temps réel grâce à notre IA avancée utilisant texte, voix et émojis."
+    },
+    {
+      icon: Users,
+      title: "Communauté Bienveillante",
+      description: "Rejoignez une communauté supportive pour partager votre parcours bien-être."
+    },
+    {
+      icon: Shield,
+      title: "Confidentialité Totale",
+      description: "Vos données sont protégées avec le plus haut niveau de sécurité et de confidentialité."
+    },
+    {
+      icon: TrendingUp,
+      title: "Suivi Personnalisé",
+      description: "Suivez votre progression avec des insights personnalisés et des recommandations adaptées."
     }
-  };
-  
+  ];
+
+  const useCases = [
+    {
+      title: "Pour les Particuliers",
+      description: "Prenez soin de votre bien-être mental avec des outils personnalisés.",
+      icon: Heart,
+      color: "bg-pink-100 text-pink-600",
+      action: () => navigate('/choose-mode')
+    },
+    {
+      title: "Pour les Entreprises",
+      description: "Améliorez le bien-être de vos équipes avec notre solution B2B.",
+      icon: Zap,
+      color: "bg-blue-100 text-blue-600",
+      action: () => navigate('/choose-mode')
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
       {/* Header */}
-      <header className="container mx-auto p-4 flex justify-between items-center">
-        <div className="text-2xl font-bold">EmotionsCare</div>
-        <div className="flex items-center gap-4">
-          <ModeToggle />
-          {isAuthenticated ? (
-            <Button onClick={() => navigate(getModeDashboardPath(userMode))}>
-              Mon Tableau de Bord
-            </Button>
-          ) : (
-            <Button variant="outline" onClick={() => navigate('/choose-mode')}>
+      <header className="container mx-auto px-6 py-4">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <Brain className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-bold">EmotionsCare</span>
+          </div>
+          <div className="space-x-4">
+            <Button variant="ghost" onClick={() => navigate('/choose-mode')}>
               Se connecter
             </Button>
-          )}
-        </div>
-      </header>
-      
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 flex flex-col md:flex-row items-center">
-        <motion.div 
-          className="flex-1 space-y-6"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
-            Prenez soin de votre bien-être émotionnel
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Une solution complète pour gérer vos émotions, que vous soyez un particulier
-            ou un professionnel.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Button size="lg" onClick={handleGetStarted}>
+            <Button onClick={() => navigate('/choose-mode')}>
               Commencer
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/b2c/login')}>
-              Espace Personnel
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="container mx-auto px-6 py-20 text-center">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+            Votre bien-être mental, notre priorité
+          </h1>
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Découvrez une plateforme révolutionnaire qui analyse vos émotions en temps réel 
+            et vous accompagne vers un meilleur équilibre mental, que vous soyez un particulier ou une entreprise.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" onClick={() => navigate('/choose-mode')} className="text-lg px-8 py-3">
+              Commencer gratuitement
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => navigate('/choose-mode')} className="text-lg px-8 py-3">
+              Découvrir les fonctionnalités
             </Button>
           </div>
-        </motion.div>
-        
-        <motion.div 
-          className="flex-1 mt-10 md:mt-0"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          <div className="bg-primary/10 p-8 rounded-lg aspect-square max-w-md mx-auto flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-6xl mb-4">🧠</div>
-              <div className="text-xl font-medium">Votre bien-être, notre priorité</div>
-            </div>
-          </div>
-        </motion.div>
-      </section>
-      
-      {/* Features Section */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-10">Nos fonctionnalités</h2>
-        
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            {
-              title: "Analyse d'émotions",
-              description: "Suivez vos émotions quotidiennes et identifiez des tendances",
-              icon: "🔍"
-            },
-            {
-              title: "Espace social",
-              description: "Connectez-vous avec d'autres utilisateurs et partagez votre parcours",
-              icon: "👥"
-            },
-            {
-              title: "Dashboard personnel",
-              description: "Visualisez vos données et suivez votre progression",
-              icon: "📊"
-            }
-          ].map((feature, index) => (
-            <motion.div 
-              key={index}
-              className="bg-card border rounded-lg p-6 text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.1 * index }}
-              whileHover={{ y: -5 }}
-            >
-              <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-medium mb-2">{feature.title}</h3>
-              <p className="text-muted-foreground">{feature.description}</p>
-            </motion.div>
-          ))}
         </div>
       </section>
-      
-      {/* CTA Section */}
-      <section className="bg-primary/10 py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Prêt à commencer?</h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur bien-être émotionnel
-            grâce à notre plateforme.
+
+      {/* Features Section */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Pourquoi choisir EmotionsCare ?
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Notre plateforme combine intelligence artificielle avancée et approche humaine 
+            pour vous offrir une expérience unique de gestion du bien-être.
           </p>
-          <Button size="lg" onClick={handleGetStarted}>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {features.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <Card key={index} className="text-center p-6 hover:shadow-lg transition-shadow">
+                <CardContent className="pt-6">
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Icon className="h-8 w-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Use Cases Section */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Une solution pour tous
+          </h2>
+          <p className="text-lg text-muted-foreground">
+            Que vous soyez un individu ou une organisation, nous avons la solution adaptée.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {useCases.map((useCase, index) => {
+            const Icon = useCase.icon;
+            return (
+              <Card key={index} className="p-8 hover:shadow-lg transition-shadow cursor-pointer" onClick={useCase.action}>
+                <CardContent className="text-center">
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${useCase.color}`}>
+                    <Icon className="h-10 w-10" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4">{useCase.title}</h3>
+                  <p className="text-muted-foreground mb-6">{useCase.description}</p>
+                  <Button className="w-full">
+                    En savoir plus
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="bg-primary/5 py-20">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <div className="text-4xl md:text-5xl font-bold text-primary mb-2">10K+</div>
+              <div className="text-lg text-muted-foreground">Utilisateurs actifs</div>
+            </div>
+            <div>
+              <div className="text-4xl md:text-5xl font-bold text-primary mb-2">95%</div>
+              <div className="text-lg text-muted-foreground">Satisfaction client</div>
+            </div>
+            <div>
+              <div className="text-4xl md:text-5xl font-bold text-primary mb-2">500+</div>
+              <div className="text-lg text-muted-foreground">Entreprises partenaires</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="container mx-auto px-6 py-20 text-center">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Prêt à transformer votre bien-être ?
+          </h2>
+          <p className="text-lg text-muted-foreground mb-8">
+            Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur qualité de vie 
+            grâce à EmotionsCare. Commencez votre parcours dès aujourd'hui.
+          </p>
+          <Button size="lg" onClick={() => navigate('/choose-mode')} className="text-lg px-8 py-3">
             Commencer maintenant
           </Button>
         </div>
       </section>
-      
+
       {/* Footer */}
-      <footer className="bg-background py-8 border-t">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-muted-foreground">
-            © {new Date().getFullYear()} EmotionsCare. Tous droits réservés.
-          </p>
+      <footer className="bg-muted/50 py-12">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center space-x-2 mb-4 md:mb-0">
+              <Brain className="h-6 w-6 text-primary" />
+              <span className="text-lg font-semibold">EmotionsCare</span>
+            </div>
+            <div className="text-sm text-muted-foreground">
+              © 2024 EmotionsCare. Tous droits réservés.
+            </div>
+          </div>
         </div>
       </footer>
     </div>

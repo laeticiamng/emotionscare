@@ -1,15 +1,28 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { 
+  Users, 
+  Search, 
+  Plus, 
+  MoreVertical, 
+  Filter,
+  Download,
+  UserPlus,
+  Mail,
+  Phone,
+  MapPin
+} from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
-import { Filter, Search, PlusCircle, MoreHorizontal, Mail, Download, UserPlus, Edit, Trash2 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
-import { useNavigate } from 'react-router-dom';
 
 interface User {
   id: string;
@@ -18,237 +31,298 @@ interface User {
   department: string;
   role: string;
   status: 'active' | 'inactive' | 'pending';
-  lastActive: string;
+  wellbeingScore: number;
+  lastActivity: string;
 }
 
 const B2BAdminUsersPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { userMode } = useUserMode();
-  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filter, setFilter] = useState('all');
-  const [users, setUsers] = useState<User[]>([]);
-  
-  // Vérification que l'utilisateur est bien un administrateur
-  useEffect(() => {
-    if (userMode !== 'b2b_admin' && user?.role !== 'b2b_admin') {
-      navigate('/b2b/selection');
+  const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const [showInviteForm, setShowInviteForm] = useState(false);
+
+  const [users] = useState<User[]>([
+    {
+      id: '1',
+      name: 'Marie Dubois',
+      email: 'marie.dubois@entreprise.com',
+      department: 'Marketing',
+      role: 'Manager',
+      status: 'active',
+      wellbeingScore: 85,
+      lastActivity: 'Il y a 2h'
+    },
+    {
+      id: '2',
+      name: 'Pierre Martin',
+      email: 'pierre.martin@entreprise.com',
+      department: 'IT',
+      role: 'Développeur',
+      status: 'active',
+      wellbeingScore: 92,
+      lastActivity: 'Il y a 1h'
+    },
+    {
+      id: '3',
+      name: 'Sophie Laurent',
+      email: 'sophie.laurent@entreprise.com',
+      department: 'RH',
+      role: 'Responsable RH',
+      status: 'active',
+      wellbeingScore: 78,
+      lastActivity: 'Il y a 30min'
+    },
+    {
+      id: '4',
+      name: 'Thomas Rousseau',
+      email: 'thomas.rousseau@entreprise.com',
+      department: 'Finance',
+      role: 'Comptable',
+      status: 'inactive',
+      wellbeingScore: 65,
+      lastActivity: 'Il y a 2 jours'
+    },
+    {
+      id: '5',
+      name: 'Julie Moreau',
+      email: 'julie.moreau@entreprise.com',
+      department: 'Commercial',
+      role: 'Commerciale',
+      status: 'pending',
+      wellbeingScore: 0,
+      lastActivity: 'Jamais'
     }
-  }, [userMode, user, navigate]);
-  
-  // Simulation du chargement des données des utilisateurs
-  useEffect(() => {
-    const loadUsers = async () => {
-      setIsLoading(true);
-      
-      // Données simulées
-      const mockUsers: User[] = [
-        { id: '1', name: 'Marie Durand', email: 'm.durand@entreprise.com', department: 'Marketing', role: 'Utilisateur', status: 'active', lastActive: 'Il y a 2 heures' },
-        { id: '2', name: 'Pierre Lambert', email: 'p.lambert@entreprise.com', department: 'Ventes', role: 'Utilisateur', status: 'active', lastActive: 'Aujourd\'hui' },
-        { id: '3', name: 'Sophie Martin', email: 's.martin@entreprise.com', department: 'RH', role: 'Admin', status: 'active', lastActive: 'Il y a 30 minutes' },
-        { id: '4', name: 'Jean Bernard', email: 'j.bernard@entreprise.com', department: 'IT', role: 'Utilisateur', status: 'inactive', lastActive: 'Il y a 2 semaines' },
-        { id: '5', name: 'Camille Petit', email: 'c.petit@entreprise.com', department: 'Support', role: 'Utilisateur', status: 'active', lastActive: 'Hier' },
-        { id: '6', name: 'Thomas Legrand', email: 't.legrand@entreprise.com', department: 'R&D', role: 'Utilisateur', status: 'pending', lastActive: 'Jamais' },
-        { id: '7', name: 'Julie Robert', email: 'j.robert@entreprise.com', department: 'Design', role: 'Utilisateur', status: 'active', lastActive: 'Il y a 1 jour' },
-        { id: '8', name: 'Nicolas Morel', email: 'n.morel@entreprise.com', department: 'Finance', role: 'Utilisateur', status: 'inactive', lastActive: 'Il y a 1 mois' },
-      ];
-      
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      setUsers(mockUsers);
-      setIsLoading(false);
-    };
-    
-    loadUsers();
-  }, []);
-  
+  ]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'bg-green-100 text-green-800';
+      case 'inactive': return 'bg-gray-100 text-gray-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-600';
+    if (score >= 60) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const handleUserAction = (action: string, userId: string) => {
+    switch (action) {
+      case 'edit':
+        toast.info(`Édition de l'utilisateur ${userId}`);
+        break;
+      case 'deactivate':
+        toast.success(`Utilisateur ${userId} désactivé`);
+        break;
+      case 'resend':
+        toast.success(`Invitation renvoyée à l'utilisateur ${userId}`);
+        break;
+      default:
+        console.log(action, userId);
+    }
+  };
+
   const handleInviteUser = () => {
-    toast.success("Invitation envoyée avec succès");
+    toast.success("Invitation envoyée avec succès!");
+    setShowInviteForm(false);
   };
-  
-  const handleExportUsers = () => {
-    toast.success("Export des utilisateurs en cours...");
-  };
-  
-  const handleDeleteUser = (userId: string) => {
-    toast.success("Utilisateur supprimé avec succès");
-    setUsers(users.filter(user => user.id !== userId));
-  };
-  
+
   const filteredUsers = users.filter(user => {
-    // Filtre par statut
-    if (filter !== 'all' && user.status !== filter) {
-      return false;
-    }
-    
-    // Recherche par nom ou email
-    if (searchTerm && !user.name.toLowerCase().includes(searchTerm.toLowerCase()) && 
-        !user.email.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false;
-    }
-    
-    return true;
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesDepartment = selectedDepartment === 'all' || user.department === selectedDepartment;
+    return matchesSearch && matchesDepartment;
   });
-  
+
   return (
-    <div className="container mx-auto p-4 md:p-6">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Gestion des utilisateurs</h1>
+          <h1 className="text-3xl font-bold">Gestion des Utilisateurs</h1>
           <p className="text-muted-foreground">
-            Gérez les membres de votre organisation
+            Administrer les comptes et permissions des collaborateurs
           </p>
         </div>
-        
-        <div className="flex gap-2 mt-4 md:mt-0">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleExportUsers}
-            className="flex items-center gap-2"
-          >
-            <Download className="h-4 w-4" />
+        <div className="flex space-x-2">
+          <Button variant="outline">
+            <Download className="mr-2 h-4 w-4" />
             Exporter
           </Button>
-          <Button 
-            size="sm"
-            onClick={handleInviteUser}
-            className="flex items-center gap-2"
-          >
-            <UserPlus className="h-4 w-4" />
+          <Button onClick={() => setShowInviteForm(true)}>
+            <UserPlus className="mr-2 h-4 w-4" />
             Inviter un utilisateur
           </Button>
         </div>
-      </header>
-      
+      </div>
+
+      {/* Search and Filters */}
       <Card>
-        <CardHeader>
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="relative flex-1 w-full md:max-w-sm">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Rechercher par nom ou email..." 
-                className="pl-8" 
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher par nom ou email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
               />
             </div>
-            <div className="flex items-center gap-2 w-full md:w-auto">
-              <Filter className="h-4 w-4 text-muted-foreground" />
-              <Select value={filter} onValueChange={setFilter}>
-                <SelectTrigger className="w-full md:w-32">
-                  <SelectValue placeholder="Filtrer" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous</SelectItem>
-                  <SelectItem value="active">Actifs</SelectItem>
-                  <SelectItem value="inactive">Inactifs</SelectItem>
-                  <SelectItem value="pending">En attente</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Button variant="outline">
+              <Filter className="mr-2 h-4 w-4" />
+              Filtres avancés
+            </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Invite Form */}
+      {showInviteForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Inviter un nouvel utilisateur</CardTitle>
+            <CardDescription>
+              Envoyez une invitation par email à un nouveau collaborateur
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Email</label>
+                <Input placeholder="utilisateur@entreprise.com" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Nom complet</label>
+                <Input placeholder="Nom Prénom" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Département</label>
+                <Input placeholder="Marketing, IT, RH..." />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Rôle</label>
+                <Input placeholder="Manager, Développeur..." />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setShowInviteForm(false)}>
+                Annuler
+              </Button>
+              <Button onClick={handleInviteUser}>
+                <Mail className="mr-2 h-4 w-4" />
+                Envoyer l'invitation
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Users Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Users className="mr-2 h-5 w-5" />
+            Utilisateurs ({filteredUsers.length})
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <div className="h-96 flex items-center justify-center">
-              <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
-            </div>
-          ) : filteredUsers.length === 0 ? (
-            <div className="h-60 flex items-center justify-center flex-col">
-              <Search className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium mb-1">Aucun utilisateur trouvé</h3>
-              <p className="text-muted-foreground text-sm">
-                Essayez de modifier vos filtres ou votre recherche
-              </p>
-            </div>
-          ) : (
-            <div className="rounded-md border overflow-auto">
-              <table className="min-w-full divide-y divide-border">
-                <thead>
-                  <tr className="bg-muted/50">
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Utilisateur</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Département</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Statut</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Dernière activité</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-background divide-y divide-border">
-                  {filteredUsers.map((user) => (
-                    <tr key={user.id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="font-medium">{user.name.charAt(0)}{user.name.split(' ')[1]?.charAt(0)}</span>
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium">{user.name}</div>
-                            <div className="text-sm text-muted-foreground">{user.email}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">{user.department}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge 
-                          className={
-                            user.status === 'active' ? 'bg-green-100 text-green-800 hover:bg-green-200' :
-                            user.status === 'inactive' ? 'bg-gray-100 text-gray-800 hover:bg-gray-200' :
-                            'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                          }
-                        >
-                          {user.status === 'active' ? 'Actif' : 
-                           user.status === 'inactive' ? 'Inactif' : 'En attente'}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">{user.lastActive}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                        <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <Mail className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
-                            onClick={() => handleDeleteUser(user.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-        <CardFooter className="flex items-center justify-between py-4">
-          <p className="text-sm text-muted-foreground">
-            Affichage de <strong>{filteredUsers.length}</strong> sur <strong>{users.length}</strong> utilisateurs
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={true}
-            >
-              Précédent
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={true}
-            >
-              Suivant
-            </Button>
+          <div className="space-y-4">
+            {filteredUsers.map((user) => (
+              <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                    <span className="font-medium text-primary">
+                      {user.name.split(' ').map(n => n[0]).join('')}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="font-medium">{user.name}</h3>
+                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                      <span className="flex items-center">
+                        <Mail className="mr-1 h-3 w-3" />
+                        {user.email}
+                      </span>
+                      <span className="flex items-center">
+                        <MapPin className="mr-1 h-3 w-3" />
+                        {user.department}
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{user.role}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <div className="text-right">
+                    <div className="flex items-center space-x-2">
+                      <Badge className={getStatusColor(user.status)}>
+                        {user.status === 'active' ? 'Actif' : 
+                         user.status === 'inactive' ? 'Inactif' : 'En attente'}
+                      </Badge>
+                    </div>
+                    {user.status === 'active' && (
+                      <p className={`text-sm font-medium ${getScoreColor(user.wellbeingScore)}`}>
+                        Score: {user.wellbeingScore}/100
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground">{user.lastActivity}</p>
+                  </div>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleUserAction('edit', user.id)}>
+                        Éditer
+                      </DropdownMenuItem>
+                      {user.status === 'pending' && (
+                        <DropdownMenuItem onClick={() => handleUserAction('resend', user.id)}>
+                          Renvoyer l'invitation
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem onClick={() => handleUserAction('deactivate', user.id)}>
+                        {user.status === 'active' ? 'Désactiver' : 'Activer'}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            ))}
           </div>
-        </CardFooter>
+        </CardContent>
       </Card>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardContent className="p-6 text-center">
+            <div className="text-2xl font-bold text-green-600">
+              {users.filter(u => u.status === 'active').length}
+            </div>
+            <p className="text-sm text-muted-foreground">Utilisateurs actifs</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6 text-center">
+            <div className="text-2xl font-bold text-yellow-600">
+              {users.filter(u => u.status === 'pending').length}
+            </div>
+            <p className="text-sm text-muted-foreground">Invitations en attente</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-6 text-center">
+            <div className="text-2xl font-bold text-blue-600">
+              {Math.round(users.filter(u => u.status === 'active').reduce((acc, u) => acc + u.wellbeingScore, 0) / users.filter(u => u.status === 'active').length) || 0}
+            </div>
+            <p className="text-sm text-muted-foreground">Score moyen bien-être</p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

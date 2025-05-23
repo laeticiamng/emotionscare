@@ -1,298 +1,269 @@
 
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart, LineChart, Users, Activity, FileText, User, Settings, Shield } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Users, 
+  TrendingUp, 
+  AlertTriangle, 
+  Activity, 
+  BarChart3, 
+  Settings, 
+  Shield,
+  Bell,
+  Calendar,
+  MessageSquare
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const B2BAdminDashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { userMode } = useUserMode();
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Vérification que l'utilisateur est bien un administrateur
-  useEffect(() => {
-    if (userMode !== 'b2b_admin' && user?.role !== 'b2b_admin') {
-      navigate('/b2b/selection');
+  const [notifications] = useState([
+    { id: 1, type: 'warning', message: '3 employés avec un score de bien-être faible', time: 'Il y a 1h' },
+    { id: 2, type: 'info', message: 'Nouveau rapport mensuel disponible', time: 'Il y a 2h' },
+    { id: 3, type: 'success', message: 'Objectif de participation atteint (85%)', time: 'Il y a 4h' }
+  ]);
+
+  const stats = [
+    {
+      title: "Employés actifs",
+      value: "127/150",
+      change: "+5%",
+      icon: Users,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50"
+    },
+    {
+      title: "Score moyen bien-être",
+      value: "78/100",
+      change: "+12%",
+      icon: Activity,
+      color: "text-green-600",
+      bgColor: "bg-green-50"
+    },
+    {
+      title: "Alertes actives",
+      value: "3",
+      change: "-2",
+      icon: AlertTriangle,
+      color: "text-orange-600",
+      bgColor: "bg-orange-50"
+    },
+    {
+      title: "Engagement",
+      value: "84%",
+      change: "+8%",
+      icon: TrendingUp,
+      color: "text-purple-600",
+      bgColor: "bg-purple-50"
     }
-  }, [userMode, user, navigate]);
-  
-  // Simulation du chargement des données
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-    
-    return () => clearTimeout(timer);
-  }, []);
-  
+  ];
+
+  const quickActions = [
+    {
+      title: "Gérer les utilisateurs",
+      description: "Administrer les comptes et permissions",
+      icon: Users,
+      action: () => navigate('/b2b/admin/users'),
+      color: "bg-blue-600 hover:bg-blue-700"
+    },
+    {
+      title: "Analytics avancées",
+      description: "Rapports détaillés et insights",
+      icon: BarChart3,
+      action: () => navigate('/b2b/admin/analytics'),
+      color: "bg-green-600 hover:bg-green-700"
+    },
+    {
+      title: "Paramètres système",
+      description: "Configuration de la plateforme",
+      icon: Settings,
+      action: () => console.log('Settings'),
+      color: "bg-purple-600 hover:bg-purple-700"
+    },
+    {
+      title: "Sécurité",
+      description: "Audit et contrôles de sécurité",
+      icon: Shield,
+      action: () => console.log('Security'),
+      color: "bg-red-600 hover:bg-red-700"
+    }
+  ];
+
   return (
-    <div className="container mx-auto p-4 md:p-6">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Console d'administration</h1>
+          <h1 className="text-3xl font-bold">Dashboard Administrateur</h1>
           <p className="text-muted-foreground">
-            Bienvenue, {user?.name || 'Administrateur'}! Voici le tableau de bord de l'organisation.
+            Bienvenue {user?.name}, gérez le bien-être de votre organisation
           </p>
         </div>
-        
-        <div className="flex gap-2 mt-4 md:mt-0">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate('/b2b/admin/analytics')}
-          >
-            <Activity className="mr-2 h-4 w-4" />
-            Analytiques complètes
+        <div className="flex space-x-2">
+          <Button variant="outline" size="icon">
+            <Bell className="h-4 w-4" />
           </Button>
-          <Button 
-            size="sm"
-            onClick={() => navigate('/b2b/admin/users')}
-          >
-            <Users className="mr-2 h-4 w-4" />
-            Gestion des utilisateurs
+          <Button>
+            <Calendar className="mr-2 h-4 w-4" />
+            Planifier une intervention
           </Button>
         </div>
-      </header>
-      
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        {[
-          { title: 'Utilisateurs actifs', value: '48', icon: Users, color: 'bg-blue-100', textColor: 'text-blue-700' },
-          { title: 'Score moyen', value: '72%', icon: Activity, color: 'bg-green-100', textColor: 'text-green-700' },
-          { title: 'Sessions cette semaine', value: '184', icon: LineChart, color: 'bg-purple-100', textColor: 'text-purple-700' },
-          { title: 'Alertes', value: '3', icon: Shield, color: 'bg-red-100', textColor: 'text-red-700' }
-        ].map((stat, index) => (
-          <Card key={index}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-muted-foreground">{stat.title}</p>
-                  <h3 className="text-3xl font-bold">{stat.value}</h3>
-                </div>
-                <div className={`${stat.color} p-3 rounded-full`}>
-                  <stat.icon className={`h-6 w-6 ${stat.textColor}`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
       </div>
-      
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview" className="flex items-center gap-2">
-            <BarChart className="h-4 w-4" />
-            <span>Vue d'ensemble</span>
-          </TabsTrigger>
-          <TabsTrigger value="users" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            <span>Utilisateurs</span>
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            <span>Configuration</span>
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Tendances de bien-être</CardTitle>
-                <CardDescription>Moyenne sur les 30 derniers jours</CardDescription>
-              </CardHeader>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={index}>
               <CardContent className="p-6">
-                {isLoading ? (
-                  <div className="h-80 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {stat.title}
+                    </p>
+                    <p className="text-2xl font-bold">{stat.value}</p>
+                    <div className="flex items-center mt-1">
+                      <Badge variant={stat.change.startsWith('+') ? 'default' : 'secondary'} className="text-xs">
+                        {stat.change}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground ml-2">vs mois dernier</span>
+                    </div>
                   </div>
-                ) : (
-                  <div className="h-80 bg-muted/40 rounded-md flex items-center justify-center">
-                    <LineChart className="h-10 w-10 text-muted-foreground" />
-                    <p className="ml-2 text-muted-foreground">Graphique de tendances</p>
+                  <div className={`p-3 rounded-full ${stat.bgColor}`}>
+                    <Icon className={`h-6 w-6 ${stat.color}`} />
                   </div>
-                )}
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Activités récentes</CardTitle>
-                <CardDescription>Dernières 24 heures</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isLoading ? (
-                  <div className="h-80 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
-                  </div>
-                ) : (
-                  <div className="space-y-4 h-80 overflow-auto pr-2">
-                    {[
-                      { user: "Marie Durand", action: "A complété une analyse émotionnelle", time: "Il y a 10 minutes" },
-                      { user: "Pierre Lambert", action: "A rejoint l'espace social", time: "Il y a 45 minutes" },
-                      { user: "Sophie Martin", action: "A partagé un message de soutien", time: "Il y a 2 heures" },
-                      { user: "Jean-Michel Bernard", action: "A atteint un score de bien-être de 85%", time: "Il y a 3 heures" },
-                      { user: "Camille Petit", action: "A effectué 5 analyses cette semaine", time: "Il y a 4 heures" },
-                      { user: "Thomas Legrand", action: "S'est connecté après 2 semaines", time: "Il y a 5 heures" },
-                    ].map((activity, index) => (
-                      <div key={index} className="flex justify-between border-b pb-3">
-                        <div>
-                          <p className="font-medium">{activity.user}</p>
-                          <p className="text-sm text-muted-foreground">{activity.action}</p>
-                        </div>
-                        <p className="text-xs text-muted-foreground whitespace-nowrap">{activity.time}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="users">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <div>
-                  <CardTitle>Liste des utilisateurs</CardTitle>
-                  <CardDescription>Gestion des membres de l'organisation</CardDescription>
                 </div>
-                <Button>
-                  Ajouter un utilisateur
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Actions rapides</CardTitle>
+          <CardDescription>
+            Accédez rapidement aux fonctionnalités d'administration
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickActions.map((action, index) => {
+              const Icon = action.icon;
+              return (
+                <Button
+                  key={index}
+                  variant="outline"
+                  className="h-auto p-4 flex flex-col items-center space-y-2"
+                  onClick={action.action}
+                >
+                  <div className={`p-3 rounded-full ${action.color}`}>
+                    <Icon className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-medium">{action.title}</h3>
+                    <p className="text-xs text-muted-foreground">
+                      {action.description}
+                    </p>
+                  </div>
                 </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="h-96 flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
-                </div>
-              ) : (
-                <div className="rounded-md border">
-                  <table className="min-w-full divide-y divide-border">
-                    <thead>
-                      <tr className="bg-muted/50">
-                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Nom</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Département</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Score</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-background divide-y divide-border">
-                      {[
-                        { name: "Marie Durand", email: "m.durand@entreprise.com", department: "Marketing", score: "82%" },
-                        { name: "Pierre Lambert", email: "p.lambert@entreprise.com", department: "Ventes", score: "75%" },
-                        { name: "Sophie Martin", email: "s.martin@entreprise.com", department: "RH", score: "91%" },
-                        { name: "Jean-Michel Bernard", email: "jm.bernard@entreprise.com", department: "R&D", score: "68%" },
-                        { name: "Camille Petit", email: "c.petit@entreprise.com", department: "Support", score: "79%" },
-                      ].map((user, index) => (
-                        <tr key={index}>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <div className="ml-4">
-                                <div className="text-sm font-medium">{user.name}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">{user.email}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">{user.department}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">{user.score}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                            <Button variant="ghost" size="sm">
-                              Voir
-                            </Button>
-                            <Button variant="ghost" size="sm">
-                              Éditer
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="settings">
-          <Card>
-            <CardHeader>
-              <CardTitle>Paramètres de l'organisation</CardTitle>
-              <CardDescription>Configurez les paramètres de votre organisation</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Informations générales</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Ces informations sont utilisées pour personnaliser l'expérience de vos collaborateurs.
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Nom de l'organisation</label>
-                      <input type="text" className="w-full p-2 border rounded-md" defaultValue="EmotionsCare Entreprise" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Email de contact</label>
-                      <input type="email" className="w-full p-2 border rounded-md" defaultValue="contact@emotionscare.fr" />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="space-y-2 pt-4 border-t">
-                  <h3 className="text-lg font-medium">Paramètres avancés</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Configuration avancée pour l'administration de la plateforme.
-                  </p>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Espace social interne</p>
-                        <p className="text-sm text-muted-foreground">Activer l'espace d'échange entre collaborateurs</p>
-                      </div>
-                      <div className="h-6 w-11 bg-primary rounded-full relative cursor-pointer">
-                        <div className="h-5 w-5 bg-white rounded-full absolute right-0.5 top-0.5"></div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Analyses anonymes</p>
-                        <p className="text-sm text-muted-foreground">Les utilisateurs peuvent effectuer des analyses anonymes</p>
-                      </div>
-                      <div className="h-6 w-11 bg-muted rounded-full relative cursor-pointer">
-                        <div className="h-5 w-5 bg-white rounded-full absolute left-0.5 top-0.5"></div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">Alertes de bien-être</p>
-                        <p className="text-sm text-muted-foreground">Notifier les administrateurs en cas de score critique</p>
-                      </div>
-                      <div className="h-6 w-11 bg-primary rounded-full relative cursor-pointer">
-                        <div className="h-5 w-5 bg-white rounded-full absolute right-0.5 top-0.5"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button variant="outline">Annuler</Button>
-                  <Button>Enregistrer les modifications</Button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Notifications and Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Bell className="mr-2 h-5 w-5" />
+              Notifications importantes
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {notifications.map((notif) => (
+              <div key={notif.id} className="flex items-start space-x-3 p-3 border rounded-lg">
+                <div className={`w-2 h-2 rounded-full mt-2 ${
+                  notif.type === 'warning' ? 'bg-orange-500' :
+                  notif.type === 'success' ? 'bg-green-500' : 'bg-blue-500'
+                }`}></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{notif.message}</p>
+                  <p className="text-xs text-muted-foreground">{notif.time}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <MessageSquare className="mr-2 h-5 w-5" />
+              Activité récente
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Users className="h-4 w-4 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">15 nouveaux utilisateurs cette semaine</p>
+                  <p className="text-xs text-muted-foreground">Département Marketing</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <Activity className="h-4 w-4 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Score équipe IT : 92/100</p>
+                  <p className="text-xs text-muted-foreground">Meilleure performance du mois</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <BarChart3 className="h-4 w-4 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Rapport mensuel généré</p>
+                  <p className="text-xs text-muted-foreground">Prêt pour la direction</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts placeholder */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Tendances bien-être</CardTitle>
+          <CardDescription>
+            Évolution des scores de bien-être sur les 6 derniers mois
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-64 flex items-center justify-center bg-muted/20 rounded-lg">
+            <div className="text-center">
+              <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <p className="text-lg font-medium">Graphiques en développement</p>
+              <p className="text-sm text-muted-foreground">
+                Les analytics détaillées seront disponibles prochainement
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle, Building2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { AlertCircle, Building2, Loader2 } from 'lucide-react';
 
 const B2BUserRegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,9 +18,9 @@ const B2BUserRegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    company: '',
     password: '',
     confirmPassword: '',
+    company: '',
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +37,6 @@ const B2BUserRegisterPage: React.FC = () => {
     e.preventDefault();
     setError(null);
     
-    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError("Les mots de passe ne correspondent pas.");
       return;
@@ -48,23 +47,13 @@ const B2BUserRegisterPage: React.FC = () => {
       return;
     }
     
-    // Vérification de l'email professionnel
-    if (!formData.email.includes('@') || formData.email.endsWith('@gmail.com') || 
-        formData.email.endsWith('@yahoo.com') || formData.email.endsWith('@hotmail.com')) {
-      setError("Veuillez utiliser une adresse email professionnelle.");
-      return;
-    }
-    
     setIsLoading(true);
     
     try {
-      // Définir le mode utilisateur
       setUserMode('b2b_user');
-      
-      // Enregistrer l'utilisateur avec les métadonnées supplémentaires
       await register(formData.email, formData.password, formData.name);
       
-      toast.success("Compte professionnel créé avec succès!");
+      toast.success("Compte créé avec succès!");
       navigate('/b2b/user/dashboard');
     } catch (error) {
       console.error("Register error:", error);
@@ -84,10 +73,8 @@ const B2BUserRegisterPage: React.FC = () => {
               <Building2 className="h-8 w-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Créer un compte Collaborateur</CardTitle>
-          <CardDescription>
-            Inscrivez-vous avec votre email professionnel
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold">Inscription Collaborateur</CardTitle>
+          <CardDescription>Créez votre compte professionnel</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -178,21 +165,18 @@ const B2BUserRegisterPage: React.FC = () => {
             </Button>
           </form>
           
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-muted-foreground">
               Vous avez déjà un compte?{" "}
               <Button variant="link" onClick={() => navigate('/b2b/user/login')} className="p-0">
                 Se connecter
               </Button>
             </p>
-            
-            <Button 
-              variant="ghost" 
-              className="mt-4"
-              onClick={() => navigate('/b2b/selection')}
-            >
-              Retour à la sélection
-            </Button>
+            <div className="pt-4 border-t">
+              <Button variant="ghost" onClick={() => navigate('/b2b/selection')}>
+                Retour à la sélection
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
