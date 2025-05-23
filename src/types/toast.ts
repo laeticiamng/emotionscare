@@ -1,37 +1,28 @@
 
-import { ReactNode } from 'react';
-
-export type NotificationType = 'default' | 'error' | 'success' | 'warning' | 'info' | 'badge';
-
-export interface Toast {
-  id: string;
-  title?: string | ReactNode;
-  description?: string | ReactNode;
-  action?: ReactNode;
-  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
-  duration?: number;
-  open?: boolean;
-}
+import { ReactElement } from 'react';
 
 export interface ToastProps {
-  toast: Toast;
+  id?: string;
+  title?: string;
+  description?: string;
+  action?: ToastActionElement;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  variant?: 'default' | 'destructive';
+  duration?: number;
+}
+
+export interface ToastActionElement extends ReactElement {
+  altText: string;
 }
 
 export interface ToastOptions {
-  title?: string | ReactNode;
-  description?: string | ReactNode;
-  action?: ReactNode;
-  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
+  title?: string;
+  description?: string;
+  variant?: 'default' | 'success' | 'error' | 'warning' | 'info' | 'destructive';
   duration?: number;
-  open?: boolean;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
 }
-
-export interface ToastAction {
-  altText: string;
-  onClick: () => void;
-  children?: React.ReactNode;
-}
-
-export type ToastActionElement = React.ReactElement<
-  React.ComponentPropsWithoutRef<'button'>
->;

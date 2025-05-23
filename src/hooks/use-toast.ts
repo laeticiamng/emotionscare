@@ -75,3 +75,6 @@ export function useToast() {
     dismiss: toast.dismiss,
   };
 }
+
+// Export the direct toast function from sonner for convenience
+export { toast };
