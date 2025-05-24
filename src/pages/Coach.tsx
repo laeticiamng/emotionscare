@@ -1,98 +1,41 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Heart, Send, Loader2, User, Bot, Lightbulb, Target } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Send, 
-  Bot, 
-  User, 
-  Heart,
-  Brain,
-  Sparkles,
-  MessageSquare,
-  Clock,
-  Target
-} from 'lucide-react';
-import { toast } from 'sonner';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
 interface Message {
   id: string;
   content: string;
-  sender: 'user' | 'coach';
+  isUser: boolean;
   timestamp: Date;
-  type?: 'text' | 'suggestion' | 'exercise';
 }
 
 const Coach: React.FC = () => {
   const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  const isDemoAccount = user?.email?.endsWith('@exemple.fr');
-  const userName = user?.user_metadata?.name?.split(' ')[0] || 'Utilisateur';
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  useEffect(() => {
-    // Initialize with welcome message
-    if (messages.length === 0) {
+    // Simuler le chargement initial
+    setTimeout(() => {
+      setIsLoading(false);
+      // Message de bienvenue du coach
       const welcomeMessage: Message = {
         id: '1',
-        content: `Bonjour ${userName} ! Je suis votre coach IA EmotionsCare. Je suis là pour vous accompagner dans votre parcours de bien-être émotionnel. Comment vous sentez-vous aujourd'hui ?`,
-        sender: 'coach',
-        timestamp: new Date(),
-        type: 'text'
+        content: `Bonjour ${user?.user_metadata?.firstName || user?.user_metadata?.name || 'vous'} ! 👋\n\nJe suis votre coach IA personnel d'EmotionsCare. Je suis là pour vous accompagner dans votre parcours de bien-être émotionnel.\n\nComment puis-je vous aider aujourd'hui ? Vous pouvez me parler de :\n• Votre état émotionnel actuel\n• Vos objectifs de bien-être\n• Vos défis quotidiens\n• Toute question sur la gestion des émotions`,
+        isUser: false,
+        timestamp: new Date()
       };
       setMessages([welcomeMessage]);
-    }
-  }, [userName]);
-
-  const generateCoachResponse = (userMessage: string): Message => {
-    const lowerMessage = userMessage.toLowerCase();
-    
-    let response = '';
-    let type: 'text' | 'suggestion' | 'exercise' = 'text';
-
-    if (lowerMessage.includes('stress') || lowerMessage.includes('anxieux') || lowerMessage.includes('angoisse')) {
-      response = `Je comprends que vous ressentez du stress. Voici quelques techniques qui peuvent vous aider : prenez 3 respirations profondes, concentrez-vous sur le moment présent, et rappelez-vous que cette situation est temporaire. Souhaitez-vous que je vous guide dans un exercice de relaxation ?`;
-      type = 'suggestion';
-    } else if (lowerMessage.includes('triste') || lowerMessage.includes('déprim') || lowerMessage.includes('moral')) {
-      response = `Je sens que vous traversez une période difficile. C'est normal de ressentir de la tristesse parfois. Essayez de vous entourer de personnes bienveillantes, pratiquez une activité qui vous fait du bien, et n'hésitez pas à exprimer vos émotions. Voulez-vous parler de ce qui vous préoccupe ?`;
-    } else if (lowerMessage.includes('heureux') || lowerMessage.includes('joie') || lowerMessage.includes('content')) {
-      response = `C'est merveilleux de vous entendre si positif ! Profitez de ce moment de bonheur et gardez en mémoire ce qui vous rend heureux. Cela pourra vous aider dans les moments plus difficiles. Qu'est-ce qui vous rend heureux aujourd'hui ?`;
-    } else if (lowerMessage.includes('fatigue') || lowerMessage.includes('épuisé') || lowerMessage.includes('sommeil')) {
-      response = `La fatigue peut affecter votre bien-être émotionnel. Assurez-vous de bien dormir, prenez des pauses régulières, et n'hésitez pas à déléguer si possible. Avez-vous essayé des techniques de relaxation avant le coucher ?`;
-    } else if (lowerMessage.includes('colère') || lowerMessage.includes('énervé') || lowerMessage.includes('frustré')) {
-      response = `La colère est une émotion naturelle. Essayez de comprendre ce qui la déclenche, prenez du recul, et exprimez-la de manière constructive. Un exercice de respiration peut aussi vous aider à vous calmer. Souhaitez-vous que je vous propose des techniques de gestion de la colère ?`;
-      type = 'exercise';
-    } else if (lowerMessage.includes('exercice') || lowerMessage.includes('meditation') || lowerMessage.includes('relaxation')) {
-      response = `Parfait ! Voici un exercice simple : Fermez les yeux, respirez profondément par le nez en comptant jusqu'à 4, retenez votre souffle pendant 4 secondes, puis expirez par la bouche en comptant jusqu'à 6. Répétez 5 fois. Comment vous sentez-vous ?`;
-      type = 'exercise';
-    } else {
-      response = `Merci de partager cela avec moi. Je suis là pour vous écouter et vous accompagner. Pouvez-vous me dire plus précisément comment vous vous sentez émotionnellement en ce moment ? Cela m'aidera à mieux vous conseiller.`;
-    }
-
-    return {
-      id: Date.now().toString(),
-      content: response,
-      sender: 'coach',
-      timestamp: new Date(),
-      type
-    };
-  };
+    }, 1000);
+  }, [user]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -100,7 +43,7 @@ const Coach: React.FC = () => {
     const userMessage: Message = {
       id: Date.now().toString(),
       content: inputMessage,
-      sender: 'user',
+      isUser: true,
       timestamp: new Date()
     };
 
@@ -108,150 +51,125 @@ const Coach: React.FC = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate typing delay
+    // Simuler une réponse du coach IA
     setTimeout(() => {
-      const coachResponse = generateCoachResponse(inputMessage);
+      const responses = [
+        "Je comprends ce que vous ressentez. C'est tout à fait normal de vivre ces ém otions. Voici quelques stratégies qui pourraient vous aider...",
+        "Merci de partager cela avec moi. Basé sur ce que vous me dites, je recommande de commencer par des exercices de respiration profonde.",
+        "C'est formidable que vous preniez le temps de réfléchir à votre bien-être ! Voici quelques conseils personnalisés pour votre situation...",
+        "Je sens que vous traversez une période délicate. Rappelez-vous que chaque émotion a sa place et son utilité. Voici comment nous pouvons travailler ensemble...",
+        "Excellent ! Cette prise de conscience est déjà un grand pas vers votre bien-être. Continuons à explorer ensemble..."
+      ];
+
+      const coachResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        content: responses[Math.floor(Math.random() * responses.length)],
+        isUser: false,
+        timestamp: new Date()
+      };
+
       setMessages(prev => [...prev, coachResponse]);
       setIsTyping(false);
-    }, 1000 + Math.random() * 2000);
+    }, 2000);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
+  const suggestedQuestions = [
+    "Comment gérer mon stress au travail ?",
+    "J'ai du mal à m'endormir, que faire ?",
+    "Comment améliorer ma confiance en moi ?",
+    "Que faire quand je me sens débordé ?"
+  ];
+
+  const handleSuggestedQuestion = (question: string) => {
+    setInputMessage(question);
   };
 
-  const quickSuggestions = [
-    "Je me sens stressé(e)",
-    "J'ai besoin de motivation",
-    "Je suis anxieux/anxieuse",
-    "Comment gérer ma colère ?",
-    "Je veux méditer",
-    "J'ai des difficultés à dormir"
-  ];
-
-  const coachStats = isDemoAccount ? [
-    { label: 'Sessions', value: '23' },
-    { label: 'Jours consécutifs', value: '7' },
-    { label: 'Progression', value: '+15%' }
-  ] : [
-    { label: 'Sessions', value: '0' },
-    { label: 'Jours consécutifs', value: '0' },
-    { label: 'Progression', value: '--' }
-  ];
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingAnimation text="Préparation de votre coach personnel..." />
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
+    <div className="container mx-auto p-6 space-y-8 max-w-4xl">
+      {/* En-tête */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6 }}
       >
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Coach IA</h1>
-            <p className="text-muted-foreground mt-1">
-              Votre accompagnateur personnel de bien-être émotionnel
-            </p>
-          </div>
-          
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
-            {coachStats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-lg font-bold">{stat.value}</div>
-                <div className="text-xs text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
-          </div>
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-2 flex items-center justify-center gap-3">
+            <Heart className="h-8 w-8 text-red-500" />
+            Coach IA Personnel
+          </h1>
+          <p className="text-muted-foreground">
+            Votre compagnon de bien-être émotionnel, disponible 24h/24
+          </p>
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Chat Interface */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="lg:col-span-3"
-        >
-          <Card className="h-[600px] flex flex-col">
-            <CardHeader className="border-b">
-              <div className="flex items-center space-x-3">
-                <Avatar>
-                  <AvatarImage src="/coach-avatar.png" />
-                  <AvatarFallback className="bg-primary/10">
-                    <Bot className="h-5 w-5 text-primary" />
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <CardTitle className="text-lg">Coach EmotionsCare</CardTitle>
-                  <CardDescription className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>En ligne</span>
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            
+      {/* Zone de chat */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+      >
+        <Card className="h-[500px] flex flex-col">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Bot className="h-5 w-5 text-blue-600" />
+              Conversation avec votre coach
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex-1 flex flex-col">
             {/* Messages */}
-            <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto space-y-4 mb-4">
               {messages.map((message) => (
-                <div
+                <motion.div
                   key={message.id}
-                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div className={`flex items-start space-x-2 max-w-[80%] ${
-                    message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
+                  <div className={`max-w-[80%] p-3 rounded-lg ${
+                    message.isUser 
+                      ? 'bg-primary text-primary-foreground ml-4' 
+                      : 'bg-muted mr-4'
                   }`}>
-                    <Avatar className="w-8 h-8">
-                      {message.sender === 'coach' ? (
-                        <AvatarFallback className="bg-primary/10">
-                          <Bot className="h-4 w-4 text-primary" />
-                        </AvatarFallback>
-                      ) : (
-                        <AvatarFallback className="bg-blue-100">
-                          <User className="h-4 w-4 text-blue-600" />
-                        </AvatarFallback>
+                    <div className="flex items-start gap-2">
+                      {!message.isUser && (
+                        <Bot className="h-4 w-4 mt-1 text-blue-600 flex-shrink-0" />
                       )}
-                    </Avatar>
-                    
-                    <div className={`rounded-lg p-3 ${
-                      message.sender === 'user' 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted'
-                    }`}>
-                      <p className="text-sm">{message.content}</p>
-                      {message.type && message.type !== 'text' && (
-                        <Badge 
-                          variant="secondary" 
-                          className="mt-2 text-xs"
-                        >
-                          {message.type === 'suggestion' ? 'Conseil' : 'Exercice'}
-                        </Badge>
+                      {message.isUser && (
+                        <User className="h-4 w-4 mt-1 flex-shrink-0" />
                       )}
-                      <div className="text-xs opacity-70 mt-1">
-                        {message.timestamp.toLocaleTimeString('fr-FR', { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
+                      <div className="flex-1">
+                        <p className="text-sm whitespace-pre-line">{message.content}</p>
+                        <p className="text-xs opacity-70 mt-1">
+                          {message.timestamp.toLocaleTimeString('fr-FR', { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}
+                        </p>
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
               
               {isTyping && (
-                <div className="flex justify-start">
-                  <div className="flex items-center space-x-2">
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback className="bg-primary/10">
-                        <Bot className="h-4 w-4 text-primary" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="bg-muted rounded-lg p-3">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex justify-start"
+                >
+                  <div className="max-w-[80%] p-3 rounded-lg bg-muted mr-4">
+                    <div className="flex items-center gap-2">
+                      <Bot className="h-4 w-4 text-blue-600" />
                       <div className="flex space-x-1">
                         <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
                         <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -259,107 +177,109 @@ const Coach: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               )}
-              
-              <div ref={messagesEndRef} />
-            </CardContent>
-            
-            {/* Input */}
-            <div className="border-t p-4">
-              <div className="flex space-x-2">
+            </div>
+
+            {/* Zone de saisie */}
+            <div className="space-y-3">
+              <div className="flex gap-2">
                 <Input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Tapez votre message..."
+                  placeholder="Écrivez votre message..."
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   disabled={isTyping}
                 />
-                <Button 
-                  onClick={handleSendMessage}
-                  disabled={!inputMessage.trim() || isTyping}
-                >
-                  <Send className="h-4 w-4" />
+                <Button onClick={handleSendMessage} disabled={isTyping || !inputMessage.trim()}>
+                  {isTyping ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
-          </Card>
-        </motion.div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
-        {/* Sidebar */}
+      {/* Questions suggérées */}
+      {messages.length <= 1 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="space-y-6"
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
-          {/* Quick Suggestions */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Sparkles className="h-5 w-5" />
-                <span>Suggestions rapides</span>
+              <CardTitle className="flex items-center gap-2">
+                <Lightbulb className="h-5 w-5" />
+                Questions fréquentes
               </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {quickSuggestions.map((suggestion, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setInputMessage(suggestion)}
-                  className="w-full justify-start text-left h-auto p-3"
-                >
-                  {suggestion}
-                </Button>
-              ))}
-            </CardContent>
-          </Card>
-
-          {/* Coach Features */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Brain className="h-5 w-5" />
-                <span>Fonctionnalités</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-3 text-sm">
-                <Heart className="h-4 w-4 text-red-500" />
-                <span>Analyse émotionnelle en temps réel</span>
-              </div>
-              <div className="flex items-center space-x-3 text-sm">
-                <Target className="h-4 w-4 text-blue-500" />
-                <span>Conseils personnalisés</span>
-              </div>
-              <div className="flex items-center space-x-3 text-sm">
-                <Clock className="h-4 w-4 text-green-500" />
-                <span>Disponible 24h/24</span>
-              </div>
-              <div className="flex items-center space-x-3 text-sm">
-                <MessageSquare className="h-4 w-4 text-purple-500" />
-                <span>Conversations privées</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Today's Tip */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Conseil du jour</CardTitle>
+              <CardDescription>
+                Cliquez sur une question pour commencer la conversation
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-4 rounded-lg">
-                <p className="text-sm">
-                  "Prenez 5 minutes aujourd'hui pour respirer consciemment. 
-                  Votre esprit vous remerciera."
-                </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {suggestedQuestions.map((question, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    onClick={() => handleSuggestedQuestion(question)}
+                    className="h-auto p-4 text-left justify-start"
+                    disabled={isTyping}
+                  >
+                    <span className="text-sm">{question}</span>
+                  </Button>
+                ))}
               </div>
             </CardContent>
           </Card>
         </motion.div>
-      </div>
+      )}
+
+      {/* Conseils et fonctionnalités */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+      >
+        <Card className="bg-muted/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Votre coach peut vous aider avec
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <Heart className="h-8 w-8 mx-auto mb-2 text-red-500" />
+                <h3 className="font-medium mb-1">Gestion des émotions</h3>
+                <p className="text-sm text-muted-foreground">
+                  Techniques pour comprendre et gérer vos émotions au quotidien
+                </p>
+              </div>
+              <div className="text-center">
+                <Target className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+                <h3 className="font-medium mb-1">Objectifs bien-être</h3>
+                <p className="text-sm text-muted-foreground">
+                  Définition et suivi de vos objectifs de développement personnel
+                </p>
+              </div>
+              <div className="text-center">
+                <Lightbulb className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
+                <h3 className="font-medium mb-1">Conseils personnalisés</h3>
+                <p className="text-sm text-muted-foreground">
+                  Recommandations adaptées à votre profil et vos besoins
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };

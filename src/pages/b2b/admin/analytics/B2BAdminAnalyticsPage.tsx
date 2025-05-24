@@ -1,361 +1,301 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  Calendar,
-  Download,
-  Filter,
-  Heart,
-  Target,
-  Clock,
-  Award
-} from 'lucide-react';
+import { BarChart3, TrendingUp, Users, Calendar, Download, Filter } from 'lucide-react';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
 const B2BAdminAnalyticsPage: React.FC = () => {
-  const { user } = useAuth();
-  const [selectedPeriod, setSelectedPeriod] = useState('7d');
-  const [selectedDepartment, setSelectedDepartment] = useState('all');
-  
-  const isDemoAccount = user?.email?.endsWith('@exemple.fr');
+  const [isLoading, setIsLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState('30d');
 
-  const overviewStats = [
-    {
-      title: 'Engagement global',
-      value: isDemoAccount ? '89%' : '--',
-      change: '+5.2%',
-      trend: 'up'
-    },
-    {
-      title: 'Sessions moyennes/jour',
-      value: isDemoAccount ? '2.4' : '--',
-      change: '+12%',
-      trend: 'up'
-    },
-    {
-      title: 'Score bien-être moyen',
-      value: isDemoAccount ? '78.5' : '--',
-      change: '+3.1%',
-      trend: 'up'
-    },
-    {
-      title: 'Taux de rétention',
-      value: isDemoAccount ? '94%' : '--',
-      change: '-1.2%',
-      trend: 'down'
-    }
-  ];
+  useEffect(() => {
+    // Simuler le chargement des données
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  }, []);
 
-  const departmentData = isDemoAccount ? [
-    { name: 'Développement', users: 24, sessions: 187, avgScore: 85, engagement: 92 },
-    { name: 'Marketing', users: 18, sessions: 134, avgScore: 79, engagement: 87 },
-    { name: 'RH', users: 12, sessions: 98, avgScore: 88, engagement: 95 },
-    { name: 'Commercial', users: 32, sessions: 201, avgScore: 74, engagement: 78 },
-    { name: 'Support', users: 16, sessions: 112, avgScore: 82, engagement: 91 }
-  ] : [];
-
-  const wellbeingTrends = isDemoAccount ? [
-    { week: 'Sem 1', stress: 65, happiness: 72, energy: 68 },
-    { week: 'Sem 2', stress: 62, happiness: 75, energy: 71 },
-    { week: 'Sem 3', stress: 59, happiness: 78, energy: 74 },
-    { week: 'Sem 4', stress: 56, happiness: 81, energy: 77 }
-  ] : [];
-
-  const usagePatterns = isDemoAccount ? [
-    { time: '8h', sessions: 23 },
-    { time: '9h', sessions: 45 },
-    { time: '10h', sessions: 67 },
-    { time: '11h', sessions: 54 },
-    { time: '12h', sessions: 89 },
-    { time: '13h', sessions: 76 },
-    { time: '14h', sessions: 92 },
-    { time: '15h', sessions: 78 },
-    { time: '16h', sessions: 65 },
-    { time: '17h', sessions: 43 },
-    { time: '18h', sessions: 32 }
-  ] : [];
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingAnimation text="Chargement des analytics..." />
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
+    <div className="container mx-auto p-6 space-y-8">
+      {/* En-tête */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6 }}
       >
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
-            <p className="text-muted-foreground mt-1">
-              Analyse détaillée du bien-être organisationnel
-              {isDemoAccount && ' (Données de démonstration)'}
+            <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
+              <BarChart3 className="h-8 w-8 text-blue-600" />
+              Analytics Avancées
+            </h1>
+            <p className="text-muted-foreground">
+              Insights détaillés sur l'utilisation et le bien-être de votre organisation
             </p>
           </div>
-          
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
-            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7d">7 jours</SelectItem>
-                <SelectItem value="30d">30 jours</SelectItem>
-                <SelectItem value="90d">3 mois</SelectItem>
-                <SelectItem value="1y">1 an</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Button variant="outline">
-              <Download className="mr-2 h-4 w-4" />
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-2" />
+              Filtres
+            </Button>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
               Exporter
             </Button>
           </div>
         </div>
       </motion.div>
 
-      {/* Overview Stats */}
+      {/* Sélecteur de période */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        transition={{ duration: 0.6, delay: 0.1 }}
       >
-        {overviewStats.map((stat, index) => (
-          <Card key={index}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className={`text-xs ${
-                    stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {stat.change}
-                  </p>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex gap-2">
+              {['7d', '30d', '90d', '1y'].map((range) => (
+                <Button
+                  key={range}
+                  variant={timeRange === range ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setTimeRange(range)}
+                >
+                  {range === '7d' ? '7 jours' : 
+                   range === '30d' ? '30 jours' :
+                   range === '90d' ? '3 mois' : '1 an'}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Métriques principales */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Utilisateurs actifs</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">142</div>
+              <p className="text-xs text-muted-foreground">
+                <span className="text-green-600">+12%</span> vs période précédente
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Sessions moyennes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">3.8</div>
+              <p className="text-xs text-muted-foreground">
+                <span className="text-green-600">+8%</span> vs période précédente
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Score bien-être</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">7.2/10</div>
+              <p className="text-xs text-muted-foreground">
+                <span className="text-green-600">+0.3</span> vs période précédente
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium">Engagement</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">76%</div>
+              <p className="text-xs text-muted-foreground">
+                <span className="text-red-600">-2%</span> vs période précédente
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </motion.div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Utilisation par fonctionnalité */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Utilisation par fonctionnalité</CardTitle>
+              <CardDescription>Répartition des sessions par type d'activité</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Scan émotionnel</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 bg-muted rounded-full h-2">
+                      <div className="bg-blue-600 h-2 rounded-full" style={{ width: '65%' }}></div>
+                    </div>
+                    <span className="text-sm font-medium">65%</span>
+                  </div>
                 </div>
-                <TrendingUp className={`h-4 w-4 ${
-                  stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
-                }`} />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Coaching IA</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 bg-muted rounded-full h-2">
+                      <div className="bg-green-600 h-2 rounded-full" style={{ width: '48%' }}></div>
+                    </div>
+                    <span className="text-sm font-medium">48%</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Musique thérapeutique</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 bg-muted rounded-full h-2">
+                      <div className="bg-purple-600 h-2 rounded-full" style={{ width: '52%' }}></div>
+                    </div>
+                    <span className="text-sm font-medium">52%</span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm">Journal personnel</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-32 bg-muted rounded-full h-2">
+                      <div className="bg-orange-600 h-2 rounded-full" style={{ width: '35%' }}></div>
+                    </div>
+                    <span className="text-sm font-medium">35%</span>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
-        ))}
-      </motion.div>
+        </motion.div>
 
-      {/* Analytics Tabs */}
+        {/* Tendances bien-être */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Tendances bien-être</CardTitle>
+              <CardDescription>Évolution du score de bien-être global</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-48 flex items-end justify-between gap-2">
+                {Array.from({ length: 12 }, (_, i) => (
+                  <div key={i} className="flex flex-col items-center">
+                    <div 
+                      className="bg-gradient-to-t from-blue-600 to-blue-400 rounded-sm w-6"
+                      style={{ height: `${Math.random() * 150 + 50}px` }}
+                    ></div>
+                    <span className="text-xs text-muted-foreground mt-2">
+                      {new Date(2024, i).toLocaleDateString('fr-FR', { month: 'short' })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      {/* Données détaillées par équipe */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
       >
-        <Tabs defaultValue="departments" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="departments">Départements</TabsTrigger>
-            <TabsTrigger value="wellbeing">Bien-être</TabsTrigger>
-            <TabsTrigger value="usage">Utilisation</TabsTrigger>
-            <TabsTrigger value="reports">Rapports</TabsTrigger>
-          </TabsList>
-
-          {/* Departments Analytics */}
-          <TabsContent value="departments">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Users className="h-5 w-5" />
-                  <span>Performance par département</span>
-                </CardTitle>
-                <CardDescription>
-                  Analyse comparative des départements
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {departmentData.length > 0 ? (
-                  <div className="space-y-4">
-                    {departmentData.map((dept, index) => (
-                      <div key={index} className="grid grid-cols-5 gap-4 p-4 border rounded-lg">
-                        <div>
-                          <p className="font-medium">{dept.name}</p>
-                          <p className="text-sm text-muted-foreground">{dept.users} utilisateurs</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-lg font-semibold">{dept.sessions}</p>
-                          <p className="text-xs text-muted-foreground">Sessions</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-lg font-semibold">{dept.avgScore}%</p>
-                          <p className="text-xs text-muted-foreground">Score moyen</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-lg font-semibold">{dept.engagement}%</p>
-                          <p className="text-xs text-muted-foreground">Engagement</p>
-                        </div>
-                        <div className="flex justify-center">
-                          <div className={`w-3 h-3 rounded-full ${
-                            dept.engagement >= 90 ? 'bg-green-500' :
-                            dept.engagement >= 80 ? 'bg-yellow-500' : 'bg-red-500'
-                          }`} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Aucune donnée disponible</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Wellbeing Trends */}
-          <TabsContent value="wellbeing">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Heart className="h-5 w-5" />
-                    <span>Tendances bien-être</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {wellbeingTrends.length > 0 ? (
-                    <div className="space-y-4">
-                      {wellbeingTrends.map((trend, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 border rounded">
-                          <span className="font-medium">{trend.week}</span>
-                          <div className="flex space-x-4 text-sm">
-                            <span className="text-red-600">Stress: {trend.stress}%</span>
-                            <span className="text-green-600">Bonheur: {trend.happiness}%</span>
-                            <span className="text-blue-600">Énergie: {trend.energy}%</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground">Aucune donnée de tendance</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center space-x-2">
-                    <Target className="h-5 w-5" />
-                    <span>Objectifs atteints</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {isDemoAccount ? (
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 border rounded">
-                        <span>Sessions hebdomadaires</span>
-                        <span className="font-semibold text-green-600">87%</span>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded">
-                        <span>Participation équipe</span>
-                        <span className="font-semibold text-green-600">94%</span>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded">
-                        <span>Score bien-être cible</span>
-                        <span className="font-semibold text-yellow-600">78%</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground">Aucun objectif défini</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Performance par équipe
+            </CardTitle>
+            <CardDescription>
+              Comparaison des métriques entre départements
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2">Équipe</th>
+                    <th className="text-center p-2">Membres</th>
+                    <th className="text-center p-2">Actifs (7j)</th>
+                    <th className="text-center p-2">Score bien-être</th>
+                    <th className="text-center p-2">Engagement</th>
+                    <th className="text-center p-2">Évolution</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b">
+                    <td className="p-2 font-medium">Marketing</td>
+                    <td className="text-center p-2">32</td>
+                    <td className="text-center p-2">28</td>
+                    <td className="text-center p-2">8.2/10</td>
+                    <td className="text-center p-2">87%</td>
+                    <td className="text-center p-2">
+                      <span className="text-green-600">↗ +5%</span>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-2 font-medium">Développement</td>
+                    <td className="text-center p-2">28</td>
+                    <td className="text-center p-2">24</td>
+                    <td className="text-center p-2">7.8/10</td>
+                    <td className="text-center p-2">79%</td>
+                    <td className="text-center p-2">
+                      <span className="text-green-600">↗ +2%</span>
+                    </td>
+                  </tr>
+                  <tr className="border-b">
+                    <td className="p-2 font-medium">Commercial</td>
+                    <td className="text-center p-2">24</td>
+                    <td className="text-center p-2">18</td>
+                    <td className="text-center p-2">6.9/10</td>
+                    <td className="text-center p-2">68%</td>
+                    <td className="text-center p-2">
+                      <span className="text-red-600">↘ -3%</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="p-2 font-medium">Support</td>
+                    <td className="text-center p-2">18</td>
+                    <td className="text-center p-2">16</td>
+                    <td className="text-center p-2">7.5/10</td>
+                    <td className="text-center p-2">82%</td>
+                    <td className="text-center p-2">
+                      <span className="text-green-600">↗ +1%</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-          </TabsContent>
-
-          {/* Usage Patterns */}
-          <TabsContent value="usage">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Clock className="h-5 w-5" />
-                  <span>Patterns d'utilisation</span>
-                </CardTitle>
-                <CardDescription>
-                  Analyse des heures d'utilisation
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {usagePatterns.length > 0 ? (
-                  <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-11 gap-2">
-                    {usagePatterns.map((pattern, index) => (
-                      <div key={index} className="text-center p-2 border rounded">
-                        <p className="text-xs text-muted-foreground">{pattern.time}</p>
-                        <p className="font-semibold">{pattern.sessions}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Aucune donnée d'utilisation</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Reports */}
-          <TabsContent value="reports">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <BarChart3 className="h-5 w-5" />
-                  <span>Rapports personnalisés</span>
-                </CardTitle>
-                <CardDescription>
-                  Générer et télécharger des rapports détaillés
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button variant="outline" className="h-auto p-6 flex flex-col items-center space-y-2">
-                    <Users className="h-8 w-8" />
-                    <span>Rapport d'engagement</span>
-                    <span className="text-xs text-muted-foreground">Données de participation</span>
-                  </Button>
-                  
-                  <Button variant="outline" className="h-auto p-6 flex flex-col items-center space-y-2">
-                    <Heart className="h-8 w-8" />
-                    <span>Rapport bien-être</span>
-                    <span className="text-xs text-muted-foreground">Scores et tendances</span>
-                  </Button>
-                  
-                  <Button variant="outline" className="h-auto p-6 flex flex-col items-center space-y-2">
-                    <Calendar className="h-8 w-8" />
-                    <span>Rapport mensuel</span>
-                    <span className="text-xs text-muted-foreground">Synthèse complète</span>
-                  </Button>
-                  
-                  <Button variant="outline" className="h-auto p-6 flex flex-col items-center space-y-2">
-                    <Award className="h-8 w-8" />
-                    <span>Rapport de performance</span>
-                    <span className="text-xs text-muted-foreground">ROI et objectifs</span>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          </CardContent>
+        </Card>
       </motion.div>
     </div>
   );

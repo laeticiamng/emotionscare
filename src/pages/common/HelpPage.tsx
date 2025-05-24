@@ -5,311 +5,319 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { 
-  HelpCircle, 
-  Search, 
-  MessageSquare, 
-  Mail, 
-  Phone, 
-  Book,
-  Video,
-  FileText,
-  Send,
-  ExternalLink
+  HelpCircle, Search, MessageCircle, BookOpen, 
+  Mail, Phone, Clock, Users, ChevronDown, ChevronRight 
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const HelpPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [contactForm, setContactForm] = useState({
-    name: '',
-    email: '',
     subject: '',
     message: ''
   });
 
-  const handleContactSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success('Votre message a été envoyé. Nous vous répondrons dans les plus brefs délais.');
-    setContactForm({ name: '', email: '', subject: '', message: '' });
-  };
-
   const faqItems = [
     {
-      question: "Comment commencer à utiliser EmotionsCare ?",
-      answer: "Après votre inscription, suivez le processus d'onboarding qui vous guidera dans la configuration de votre profil et la définition de vos objectifs de bien-être. Vous pourrez ensuite accéder à toutes les fonctionnalités depuis votre tableau de bord."
+      question: 'Comment fonctionne le scanner d\'émotions ?',
+      answer: 'Notre scanner d\'émotions utilise l\'IA pour analyser vos textes, votre voix ou vos réactions. Il identifie les émotions dominantes et vous propose des recommandations personnalisées pour améliorer votre bien-être.'
     },
     {
-      question: "Mes données sont-elles sécurisées ?",
-      answer: "Oui, nous prenons la sécurité très au sérieux. Toutes vos données sont chiffrées et stockées de manière sécurisée. Nous respectons le RGPD et ne partageons jamais vos informations personnelles avec des tiers sans votre consentement explicite."
+      question: 'Mes données sont-elles sécurisées ?',
+      answer: 'Absolument. Toutes vos données sont chiffrées et stockées de manière sécurisée. Nous respectons le RGPD et ne partageons jamais vos informations personnelles sans votre consentement explicite.'
     },
     {
-      question: "Comment fonctionne l'analyse émotionnelle ?",
-      answer: "Notre IA utilise des technologies avancées de traitement du langage naturel et d'analyse vocale pour comprendre vos émotions à partir de vos textes, voix ou choix d'émojis. L'analyse est instantanée et vous donne un aperçu de votre état émotionnel actuel."
+      question: 'Comment fonctionne l\'essai gratuit ?',
+      answer: 'L\'essai gratuit de 3 jours vous donne accès à toutes les fonctionnalités premium d\'EmotionsCare. Aucune carte de crédit n\'est requise pour commencer.'
     },
     {
-      question: "Puis-je utiliser EmotionsCare hors ligne ?",
-      answer: "Certaines fonctionnalités de base sont disponibles hors ligne, comme la rédaction dans votre journal personnel. Cependant, l'analyse IA et la synchronisation nécessitent une connexion internet."
+      question: 'Puis-je utiliser EmotionsCare sur mobile ?',
+      answer: 'Oui, EmotionsCare est optimisé pour tous les appareils. Vous pouvez accéder à toutes les fonctionnalités depuis votre smartphone, tablette ou ordinateur.'
     },
     {
-      question: "Comment annuler mon abonnement ?",
-      answer: "Vous pouvez annuler votre abonnement à tout moment depuis les paramètres de votre compte. Votre accès restera actif jusqu'à la fin de votre période de facturation actuelle."
-    },
-    {
-      question: "Que faire si je rencontre un problème technique ?",
-      answer: "Contactez notre support technique via le formulaire ci-dessous ou par email. Décrivez le problème en détail et nous vous aiderons rapidement à le résoudre."
+      question: 'Comment inviter mes collègues (compte B2B) ?',
+      answer: 'Les administrateurs peuvent inviter des collaborateurs depuis la section "Gestion des utilisateurs". Une invitation par email sera envoyée avec les instructions de connexion.'
     }
   ];
 
-  const quickLinks = [
+  const contactChannels = [
     {
-      title: "Guide de démarrage",
-      description: "Apprenez les bases d'EmotionsCare",
-      icon: <Book className="h-6 w-6" />,
-      action: () => console.log('Guide')
+      icon: Mail,
+      title: 'Email',
+      description: 'Contactez-nous par email',
+      value: 'support@emotionscare.fr',
+      action: () => window.open('mailto:support@emotionscare.fr')
     },
     {
-      title: "Tutoriels vidéo",
-      description: "Regardez nos guides en vidéo",
-      icon: <Video className="h-6 w-6" />,
-      action: () => console.log('Vidéos')
+      icon: MessageCircle,
+      title: 'Chat en direct',
+      description: 'Discutez avec notre équipe',
+      value: 'Disponible 9h-18h',
+      action: () => toast.info('Chat en direct bientôt disponible')
     },
     {
-      title: "Documentation API",
-      description: "Pour les développeurs",
-      icon: <FileText className="h-6 w-6" />,
-      action: () => console.log('API')
+      icon: Phone,
+      title: 'Téléphone',
+      description: 'Appelez notre support',
+      value: '+33 1 23 45 67 89',
+      action: () => window.open('tel:+33123456789')
     },
     {
-      title: "Statut des services",
-      description: "Vérifiez l'état de nos services",
-      icon: <ExternalLink className="h-6 w-6" />,
-      action: () => console.log('Statut')
+      icon: BookOpen,
+      title: 'Documentation',
+      description: 'Consultez notre guide',
+      value: 'Guide complet',
+      action: () => toast.info('Documentation en ligne bientôt disponible')
     }
   ];
 
-  const filteredFAQ = faqItems.filter(item =>
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactForm.subject || !contactForm.message) {
+      toast.error('Veuillez remplir tous les champs');
+      return;
+    }
+    
+    // Simuler l'envoi du message
+    toast.success('Message envoyé ! Nous vous répondrons dans les plus brefs délais.');
+    setContactForm({ subject: '', message: '' });
+  };
+
+  const filteredFaq = faqItems.filter(item =>
     item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.answer.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
+    <div className="container mx-auto p-6 space-y-8 max-w-6xl">
+      {/* En-tête */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6 }}
       >
         <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight">Centre d'aide</h1>
-          <p className="text-muted-foreground mt-2">
-            Trouvez des réponses à vos questions ou contactez notre équipe
+          <h1 className="text-3xl font-bold mb-2 flex items-center justify-center gap-3">
+            <HelpCircle className="h-8 w-8" />
+            Centre d'aide
+          </h1>
+          <p className="text-muted-foreground">
+            Trouvez des réponses à vos questions ou contactez notre équipe de support
           </p>
         </div>
       </motion.div>
 
-      {/* Search */}
+      {/* Recherche */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="max-w-2xl mx-auto"
-      >
-        <div className="relative">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher dans l'aide..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </motion.div>
-
-      {/* Quick Links */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
       >
         <Card>
-          <CardHeader>
-            <CardTitle>Liens rapides</CardTitle>
-            <CardDescription>
-              Accédez rapidement aux ressources les plus utiles
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {quickLinks.map((link, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  onClick={link.action}
-                  className="h-auto flex flex-col items-center gap-3 p-6"
-                >
-                  <div className="p-2 bg-primary/10 rounded-full text-primary">
-                    {link.icon}
-                  </div>
-                  <div className="text-center">
-                    <div className="font-medium">{link.title}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {link.description}
-                    </div>
-                  </div>
-                </Button>
-              ))}
+          <CardContent className="p-6">
+            <div className="relative max-w-2xl mx-auto">
+              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher dans l'aide..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 text-base h-12"
+              />
             </div>
           </CardContent>
         </Card>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* FAQ */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="lg:col-span-2"
         >
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <HelpCircle className="h-5 w-5" />
-                <span>Questions fréquentes</span>
-              </CardTitle>
+              <CardTitle>Questions fréquentes</CardTitle>
               <CardDescription>
-                {filteredFAQ.length} question{filteredFAQ.length > 1 ? 's' : ''} trouvée{filteredFAQ.length > 1 ? 's' : ''}
+                Trouvez rapidement des réponses aux questions les plus courantes
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Accordion type="single" collapsible className="space-y-2">
-                {filteredFAQ.map((item, index) => (
-                  <AccordionItem key={index} value={`item-${index}`} className="border rounded-lg px-4">
-                    <AccordionTrigger className="text-left hover:no-underline">
-                      {item.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground">
-                      {item.answer}
-                    </AccordionContent>
-                  </AccordionItem>
+              <div className="space-y-3">
+                {filteredFaq.map((faq, index) => (
+                  <div key={index} className="border rounded-lg">
+                    <button
+                      onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
+                      className="w-full p-4 text-left hover:bg-muted/50 transition-colors flex items-center justify-between"
+                    >
+                      <span className="font-medium">{faq.question}</span>
+                      {expandedFaq === index ? (
+                        <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
+                      )}
+                    </button>
+                    {expandedFaq === index && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="px-4 pb-4"
+                      >
+                        <p className="text-muted-foreground">{faq.answer}</p>
+                      </motion.div>
+                    )}
+                  </div>
                 ))}
-              </Accordion>
-              
-              {filteredFAQ.length === 0 && (
-                <div className="text-center py-8">
-                  <HelpCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    Aucune question trouvée pour "{searchTerm}"
-                  </p>
-                </div>
-              )}
+              </div>
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Contact Form */}
+        {/* Canaux de contact */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
         >
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <MessageSquare className="h-5 w-5" />
-                <span>Nous contacter</span>
-              </CardTitle>
+              <CardTitle>Nous contacter</CardTitle>
               <CardDescription>
-                Vous ne trouvez pas votre réponse ? Envoyez-nous un message
+                Plusieurs moyens de nous joindre
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <form onSubmit={handleContactSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Nom</label>
-                    <Input
-                      value={contactForm.name}
-                      onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Votre nom"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Email</label>
-                    <Input
-                      type="email"
-                      value={contactForm.email}
-                      onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
-                      placeholder="votre@email.com"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2">Sujet</label>
-                  <Input
-                    value={contactForm.subject}
-                    onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
-                    placeholder="De quoi voulez-vous parler ?"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2">Message</label>
-                  <Textarea
-                    value={contactForm.message}
-                    onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
-                    placeholder="Décrivez votre question ou problème..."
-                    className="min-h-[100px]"
-                    required
-                  />
-                </div>
-                
-                <Button type="submit" className="w-full">
-                  <Send className="mr-2 h-4 w-4" />
-                  Envoyer le message
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          {/* Contact Info */}
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Autres moyens de contact</CardTitle>
-            </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <Mail className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">Email</p>
-                  <p className="text-sm text-muted-foreground">support@emotionscare.com</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="font-medium">Téléphone</p>
-                  <p className="text-sm text-muted-foreground">+33 1 23 45 67 89</p>
-                  <p className="text-xs text-muted-foreground">Lun-Ven 9h-18h</p>
-                </div>
-              </div>
-              
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <p className="text-sm text-muted-foreground">
-                  Temps de réponse moyen : <strong>2-4 heures</strong> en jours ouvrés
-                </p>
-              </div>
+              {contactChannels.map((channel, index) => {
+                const Icon = channel.icon;
+                return (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    onClick={channel.action}
+                    className="w-full h-auto p-4 flex flex-col items-start gap-2"
+                  >
+                    <div className="flex items-center gap-2 w-full">
+                      <Icon className="h-5 w-5" />
+                      <span className="font-medium">{channel.title}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground text-left">
+                      {channel.description}
+                    </p>
+                    <p className="text-sm font-medium text-primary">
+                      {channel.value}
+                    </p>
+                  </Button>
+                );
+              })}
             </CardContent>
           </Card>
         </motion.div>
       </div>
+
+      {/* Formulaire de contact */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5" />
+              Envoyer un message
+            </CardTitle>
+            <CardDescription>
+              Décrivez votre problème ou votre question, nous vous répondrons rapidement
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleContactSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label htmlFor="subject" className="text-sm font-medium">
+                    Sujet
+                  </label>
+                  <Input
+                    id="subject"
+                    placeholder="Décrivez brièvement votre demande"
+                    value={contactForm.subject}
+                    onChange={(e) => setContactForm(prev => ({ ...prev, subject: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    Temps de réponse estimé
+                  </label>
+                  <p className="text-sm text-muted-foreground bg-muted/50 p-2 rounded">
+                    Sous 24h en jours ouvrés
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="message" className="text-sm font-medium">
+                  Message
+                </label>
+                <Textarea
+                  id="message"
+                  placeholder="Décrivez votre problème ou votre question en détail..."
+                  className="min-h-[120px]"
+                  value={contactForm.message}
+                  onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                />
+              </div>
+              
+              <Button type="submit" className="w-full">
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Envoyer le message
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Informations sur le support */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+      >
+        <Card className="bg-muted/50">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div>
+                <Clock className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+                <h3 className="font-medium mb-1">Horaires de support</h3>
+                <p className="text-sm text-muted-foreground">
+                  Lundi - Vendredi<br />
+                  9h00 - 18h00 (CET)
+                </p>
+              </div>
+              <div>
+                <Users className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                <h3 className="font-medium mb-1">Équipe dédiée</h3>
+                <p className="text-sm text-muted-foreground">
+                  Experts en bien-être<br />
+                  et support technique
+                </p>
+              </div>
+              <div>
+                <MessageCircle className="h-8 w-8 mx-auto mb-2 text-purple-600" />
+                <h3 className="font-medium mb-1">Réponse rapide</h3>
+                <p className="text-sm text-muted-foreground">
+                  Réponse garantie<br />
+                  sous 24h ouvrées
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };

@@ -3,350 +3,269 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Heart, 
-  TrendingUp, 
-  Calendar, 
-  Music, 
-  BookOpen, 
-  Brain,
-  Target,
-  Clock,
-  Smile,
-  Award,
-  ArrowRight,
-  Plus
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { Heart, Brain, Music, BookOpen, Zap, TrendingUp, Calendar, Target } from 'lucide-react';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
 const B2CDashboardPage: React.FC = () => {
-  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState({
+    emotionScans: 12,
+    journalEntries: 8,
+    musicSessions: 15,
+    coachingSessions: 5
+  });
   const navigate = useNavigate();
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [isTrialUser, setIsTrialUser] = useState(false);
-  const [trialDaysLeft, setTrialDaysLeft] = useState(3);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
+    // Simuler le chargement des données
+    setTimeout(() => {
+      setIsLoading(false);
     }, 1000);
-
-    // Check if user is in trial period
-    if (user?.email?.endsWith('@exemple.fr')) {
-      setIsTrialUser(false); // Demo accounts don't have trial
-    } else {
-      setIsTrialUser(true);
-      // Calculate trial days left (would normally come from user metadata)
-      const trialEnd = new Date(Date.now() + trialDaysLeft * 24 * 60 * 60 * 1000);
-      const daysLeft = Math.max(0, Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
-      setTrialDaysLeft(daysLeft);
-    }
-
-    return () => clearInterval(timer);
-  }, [user, trialDaysLeft]);
-
-  const getGreeting = () => {
-    const hour = currentTime.getHours();
-    if (hour < 12) return 'Bonjour';
-    if (hour < 18) return 'Bon après-midi';
-    return 'Bonsoir';
-  };
-
-  const userName = user?.user_metadata?.name || user?.email?.split('@')[0] || 'Utilisateur';
-  const isDemoAccount = user?.email?.endsWith('@exemple.fr');
-
-  const stats = [
-    {
-      title: 'Séances complétées',
-      value: isDemoAccount ? '24' : '0',
-      icon: <Target className="h-4 w-4" />,
-      trend: '+12%',
-      color: 'text-green-600'
-    },
-    {
-      title: 'Streak actuel',
-      value: isDemoAccount ? '7 jours' : '0 jours',
-      icon: <Calendar className="h-4 w-4" />,
-      trend: 'Record !',
-      color: 'text-blue-600'
-    },
-    {
-      title: 'Score bien-être',
-      value: isDemoAccount ? '85%' : '--',
-      icon: <Heart className="h-4 w-4" />,
-      trend: '+8 points',
-      color: 'text-red-600'
-    },
-    {
-      title: 'Minutes de méditation',
-      value: isDemoAccount ? '180' : '0',
-      icon: <Clock className="h-4 w-4" />,
-      trend: 'Cette semaine',
-      color: 'text-purple-600'
-    }
-  ];
+  }, []);
 
   const quickActions = [
     {
       title: 'Scanner mes émotions',
-      description: 'Analyse rapide de votre état émotionnel',
-      icon: <Brain className="h-6 w-6" />,
+      description: 'Analysez votre état émotionnel actuel',
+      icon: Brain,
       action: () => navigate('/scan'),
-      color: 'bg-blue-500'
+      color: 'bg-blue-100 text-blue-600'
     },
     {
-      title: 'Session de coaching',
-      description: 'Coaching personnalisé avec IA',
-      icon: <Heart className="h-6 w-6" />,
+      title: 'Coach IA',
+      description: 'Obtenez des conseils personnalisés',
+      icon: Heart,
       action: () => navigate('/coach'),
-      color: 'bg-red-500'
+      color: 'bg-red-100 text-red-600'
     },
     {
-      title: 'Musique apaisante',
-      description: 'Créer une playlist adaptée',
-      icon: <Music className="h-6 w-6" />,
+      title: 'Musique thérapeutique',
+      description: 'Écoutez de la musique adaptée',
+      icon: Music,
       action: () => navigate('/music'),
-      color: 'bg-green-500'
+      color: 'bg-purple-100 text-purple-600'
     },
     {
-      title: 'Journal personnel',
-      description: 'Écrire et analyser vos pensées',
-      icon: <BookOpen className="h-6 w-6" />,
+      title: 'Mon journal',
+      description: 'Notez vos pensées et émotions',
+      icon: BookOpen,
       action: () => navigate('/journal'),
-      color: 'bg-purple-500'
+      color: 'bg-green-100 text-green-600'
     }
   ];
 
-  const recentActivities = isDemoAccount ? [
-    {
-      type: 'coaching',
-      title: 'Session de méditation guidée',
-      time: 'Il y a 2 heures',
-      mood: 'Calme'
-    },
-    {
-      type: 'scan',
-      title: 'Analyse émotionnelle',
-      time: 'Hier',
-      mood: 'Optimiste'
-    },
-    {
-      type: 'journal',
-      title: 'Entrée de journal',
-      time: 'Il y a 3 jours',
-      mood: 'Réfléchi'
-    }
-  ] : [];
+  const recentActivities = [
+    { type: 'scan', message: 'Scan émotionnel terminé', time: '2h', mood: 'Calme' },
+    { type: 'journal', message: 'Nouvelle entrée journal', time: '1j', title: 'Réflexions du matin' },
+    { type: 'music', message: 'Session musique', time: '2j', duration: '15 min' },
+    { type: 'coaching', message: 'Session de coaching', time: '3j', topic: 'Gestion du stress' }
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingAnimation text="Chargement de votre tableau de bord..." />
+      </div>
+    );
+  }
+
+  const isDemo = user?.email?.endsWith('@exemple.fr');
+  const isTrialActive = user?.trial_end && new Date(user.trial_end) > new Date();
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      {/* Welcome Section */}
+    <div className="container mx-auto p-6 space-y-8">
+      {/* En-tête de bienvenue */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6 }}
       >
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {getGreeting()}, {userName} !
+            <h1 className="text-3xl font-bold mb-2">
+              Bonjour {user?.user_metadata?.firstName || user?.user_metadata?.name || 'Utilisateur'} ! 
             </h1>
-            <p className="text-muted-foreground mt-1">
-              {isDemoAccount 
-                ? 'Voici votre aperçu EmotionsCare avec des données de démonstration'
-                : 'Bienvenue dans votre espace de bien-être personnel'
-              }
+            <p className="text-muted-foreground">
+              Comment vous sentez-vous aujourd'hui ?
             </p>
           </div>
-          
-          {isTrialUser && !isDemoAccount && (
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-4 md:mt-0">
-              <div className="flex items-center space-x-2">
-                <Award className="h-5 w-5 text-green-600" />
-                <span className="text-sm font-medium text-green-700 dark:text-green-300">
-                  Essai gratuit - {trialDaysLeft} jour{trialDaysLeft > 1 ? 's' : ''} restant{trialDaysLeft > 1 ? 's' : ''}
-                </span>
-              </div>
+          {isDemo && (
+            <div className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm">
+              Mode Démo
+            </div>
+          )}
+          {isTrialActive && !isDemo && (
+            <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+              Essai gratuit actif
             </div>
           )}
         </div>
       </motion.div>
 
-      {/* Stats Grid */}
+      {/* Actions rapides */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-      >
-        {stats.map((stat, index) => (
-          <Card key={index}>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                  <p className={`text-xs ${stat.color}`}>{stat.trend}</p>
-                </div>
-                <div className={`p-2 rounded-full bg-muted ${stat.color}`}>
-                  {stat.icon}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </motion.div>
-
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
       >
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Plus className="h-5 w-5" />
-              <span>Actions rapides</span>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5" />
+              Actions rapides
             </CardTitle>
             <CardDescription>
-              Commencez votre session de bien-être dès maintenant
+              Commencez votre journée bien-être
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {quickActions.map((action, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  onClick={action.action}
-                  className="h-auto flex flex-col items-center gap-3 p-6 hover:shadow-md transition-all"
-                >
-                  <div className={`p-3 rounded-full text-white ${action.color}`}>
-                    {action.icon}
-                  </div>
-                  <div className="text-center">
-                    <div className="font-medium">{action.title}</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {action.description}
-                    </div>
-                  </div>
-                </Button>
-              ))}
+              {quickActions.map((action, index) => {
+                const Icon = action.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
+                  >
+                    <Button
+                      onClick={action.action}
+                      variant="outline"
+                      className="h-auto p-4 flex flex-col items-center gap-3 w-full"
+                    >
+                      <div className={`p-3 rounded-full ${action.color}`}>
+                        <Icon className="h-6 w-6" />
+                      </div>
+                      <div className="text-center">
+                        <h3 className="font-medium">{action.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {action.description}
+                        </p>
+                      </div>
+                    </Button>
+                  </motion.div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
       </motion.div>
 
-      {/* Recent Activity & Progress */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activities */}
+        {/* Statistiques */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Clock className="h-5 w-5" />
-                <span>Activités récentes</span>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Vos statistiques
               </CardTitle>
+              <CardDescription>
+                Votre activité des 30 derniers jours
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              {recentActivities.length > 0 ? (
-                <div className="space-y-4">
-                  {recentActivities.map((activity, index) => (
-                    <div key={index} className="flex items-center space-x-3 p-3 rounded-lg border">
-                      <div className="p-2 rounded-full bg-primary/10">
-                        {activity.type === 'coaching' && <Heart className="h-4 w-4 text-red-500" />}
-                        {activity.type === 'scan' && <Brain className="h-4 w-4 text-blue-500" />}
-                        {activity.type === 'journal' && <BookOpen className="h-4 w-4 text-purple-500" />}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{activity.title}</p>
-                        <p className="text-sm text-muted-foreground">{activity.time}</p>
-                      </div>
-                      <span className="text-sm bg-muted px-2 py-1 rounded">
-                        {activity.mood}
-                      </span>
-                    </div>
-                  ))}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">{stats.emotionScans}</div>
+                  <div className="text-xs text-muted-foreground">Scans émotionnels</div>
                 </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Smile className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    Aucune activité récente. Commencez votre première session !
-                  </p>
-                  <Button 
-                    onClick={() => navigate('/scan')} 
-                    className="mt-4"
-                  >
-                    Commencer maintenant
-                  </Button>
+                <div className="text-center p-3 bg-green-50 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">{stats.journalEntries}</div>
+                  <div className="text-xs text-muted-foreground">Entrées journal</div>
                 </div>
-              )}
+                <div className="text-center p-3 bg-purple-50 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600">{stats.musicSessions}</div>
+                  <div className="text-xs text-muted-foreground">Sessions musique</div>
+                </div>
+                <div className="text-center p-3 bg-red-50 rounded-lg">
+                  <div className="text-2xl font-bold text-red-600">{stats.coachingSessions}</div>
+                  <div className="text-xs text-muted-foreground">Sessions coaching</div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Progress & Goals */}
+        {/* Activités récentes */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
         >
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="h-5 w-5" />
-                <span>Vos progrès</span>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Activités récentes
               </CardTitle>
+              <CardDescription>
+                Vos dernières interactions
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Objectif hebdomadaire</span>
-                  <span>{isDemoAccount ? '5/7' : '0/7'} sessions</span>
-                </div>
-                <Progress value={isDemoAccount ? 71 : 0} className="h-2" />
+            <CardContent>
+              <div className="space-y-3">
+                {recentActivities.map((activity, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full"></div>
+                      <div>
+                        <p className="text-sm font-medium">{activity.message}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {activity.mood || activity.title || activity.topic || `Durée: ${activity.duration}`}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-xs text-muted-foreground">{activity.time}</span>
+                  </div>
+                ))}
               </div>
-              
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Streak de méditation</span>
-                  <span>{isDemoAccount ? '7' : '0'} jours</span>
-                </div>
-                <Progress value={isDemoAccount ? 100 : 0} className="h-2" />
-              </div>
-              
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Score bien-être mensuel</span>
-                  <span>{isDemoAccount ? '85%' : '--'}</span>
-                </div>
-                <Progress value={isDemoAccount ? 85 : 0} className="h-2" />
-              </div>
-
-              {!isDemoAccount && (
-                <div className="bg-muted/50 p-4 rounded-lg text-center">
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Commencez votre première analyse pour voir vos progrès
-                  </p>
-                  <Button onClick={() => navigate('/scan')} size="sm">
-                    Démarrer l'analyse
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
-              )}
             </CardContent>
           </Card>
         </motion.div>
       </div>
+
+      {/* Objectifs du jour */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Objectifs du jour
+            </CardTitle>
+            <CardDescription>
+              Progressez vers votre bien-être quotidien
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                <input type="checkbox" checked className="rounded" readOnly />
+                <span className="text-sm">Effectuer un scan émotionnel matinal</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <input type="checkbox" className="rounded" />
+                <span className="text-sm">Écrire dans mon journal (5 min)</span>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <input type="checkbox" className="rounded" />
+                <span className="text-sm">Session de musique thérapeutique (10 min)</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };

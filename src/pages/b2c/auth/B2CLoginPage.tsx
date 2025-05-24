@@ -7,9 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, Heart } from 'lucide-react';
 import { toast } from 'sonner';
-import AuthTransition from '@/components/auth/AuthTransition';
 
 const B2CLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -44,99 +43,137 @@ const B2CLoginPage: React.FC = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setEmail('demo@exemple.fr');
+    setPassword('demo123');
+    
+    setIsLoading(true);
+    try {
+      // Simuler une connexion démo
+      setTimeout(() => {
+        setUserMode('b2c');
+        toast.success('Connexion démo réussie !');
+        navigate('/b2c/dashboard');
+        setIsLoading(false);
+      }, 1000);
+    } catch (error) {
+      toast.error('Erreur lors de la connexion démo');
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <AuthTransition>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-blue-900 dark:via-slate-800 dark:to-purple-900 flex items-center justify-center p-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <Card className="w-full max-w-md">
-            <CardHeader className="text-center relative">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate('/choose-mode')}
-                className="absolute left-4 top-4"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <CardTitle className="text-2xl">Connexion Particulier</CardTitle>
-              <CardDescription>
-                Connectez-vous à votre espace personnel EmotionsCare
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="email"
-                      placeholder="votre@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Mot de passe"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 pr-10"
-                      required
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-1 top-1 h-8 w-8"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                </div>
-                
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Se connecter
-                </Button>
-              </form>
-              
-              <div className="space-y-4 mt-6">
-                <div className="text-center">
-                  <Link 
-                    to="/b2c/reset-password" 
-                    className="text-sm text-muted-foreground hover:text-primary"
-                  >
-                    Mot de passe oublié ?
-                  </Link>
-                </div>
-                
-                <div className="text-center">
-                  <span className="text-sm text-muted-foreground">Pas encore de compte ? </span>
-                  <Link 
-                    to="/b2c/register" 
-                    className="text-sm text-primary hover:underline"
-                  >
-                    S'inscrire
-                  </Link>
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50 dark:from-red-900 dark:via-slate-800 dark:to-pink-900 flex items-center justify-center p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/choose-mode')}
+              className="absolute left-4 top-4"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div className="mx-auto mb-4 p-3 bg-red-100 dark:bg-red-900/30 rounded-full w-fit">
+              <Heart className="h-8 w-8 text-red-500" />
+            </div>
+            <CardTitle className="text-2xl">Connexion Particulier</CardTitle>
+            <CardDescription>
+              Accédez à votre espace personnel EmotionsCare
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="email"
+                    placeholder="votre@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-    </AuthTransition>
+              
+              <div className="space-y-2">
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Mot de passe"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10 pr-10"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1 h-8 w-8"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+              
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Se connecter
+              </Button>
+            </form>
+            
+            <div className="space-y-4 mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Ou</span>
+                </div>
+              </div>
+              
+              <Button 
+                variant="outline" 
+                onClick={handleDemoLogin}
+                disabled={isLoading}
+                className="w-full"
+              >
+                Essayer la démo
+              </Button>
+              
+              <div className="text-center">
+                <Link 
+                  to="/b2c/reset-password" 
+                  className="text-sm text-primary hover:underline"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
+              
+              <div className="text-center">
+                <span className="text-sm text-muted-foreground">Pas encore de compte ? </span>
+                <Link 
+                  to="/b2c/register" 
+                  className="text-sm text-primary hover:underline"
+                >
+                  S'inscrire
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
   );
 };
 

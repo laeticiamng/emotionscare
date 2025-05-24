@@ -4,370 +4,285 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Brain, 
-  Mic, 
-  FileText, 
-  Smile, 
-  Heart,
-  TrendingUp,
-  Calendar,
-  Target,
-  Zap
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { Brain, FileText, Mic, Smile, TrendingUp, Calendar } from 'lucide-react';
 import EmotionScanForm from '@/components/scan/EmotionScanForm';
 import { EmotionResult } from '@/types/emotion';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
 const ScanPage: React.FC = () => {
-  const { user } = useAuth();
-  const [currentScan, setCurrentScan] = useState<EmotionResult | null>(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-
-  const isDemoAccount = user?.email?.endsWith('@exemple.fr');
+  const [showScanForm, setShowScanForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastResult, setLastResult] = useState<EmotionResult | null>(null);
+  const [scanHistory, setScanHistory] = useState<EmotionResult[]>([
+    {
+      emotions: [
+        { name: 'Calme', intensity: 78 },
+        { name: 'Optimisme', intensity: 65 },
+        { name: 'Sérénité', intensity: 72 }
+      ],
+      confidence: 82,
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2h ago
+      recommendations: 'Excellente journée ! Continuez sur cette lancée positive.',
+      analysisType: 'text'
+    },
+    {
+      emotions: [
+        { name: 'Stress', intensity: 45 },
+        { name: 'Fatigue', intensity: 60 },
+        { name: 'Détermination', intensity: 70 }
+      ],
+      confidence: 75,
+      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+      recommendations: 'Prenez une pause et respirez profondément.',
+      analysisType: 'audio'
+    }
+  ]);
 
   const handleScanComplete = (result: EmotionResult) => {
-    setCurrentScan(result);
-    setShowResults(true);
-    setIsScanning(false);
-    toast.success('Analyse émotionnelle terminée !');
+    setLastResult(result);
+    setScanHistory(prev => [result, ...prev]);
+    setShowScanForm(false);
   };
 
-  const handleStartNewScan = () => {
-    setCurrentScan(null);
-    setShowResults(false);
-    setIsScanning(true);
+  const getEmotionColor = (intensity: number) => {
+    if (intensity >= 70) return 'text-green-600 bg-green-100';
+    if (intensity >= 40) return 'text-orange-600 bg-orange-100';
+    return 'text-red-600 bg-red-100';
   };
 
-  const recentScans = isDemoAccount ? [
-    {
-      date: '2024-01-24',
-      time: '14:30',
-      emotions: ['Calme', 'Optimiste'],
-      score: 85
-    },
-    {
-      date: '2024-01-23',
-      time: '09:15',
-      emotions: ['Énergique', 'Concentré'],
-      score: 92
-    },
-    {
-      date: '2024-01-22',
-      time: '16:45',
-      emotions: ['Détendu', 'Satisfait'],
-      score: 78
+  const getAnalysisTypeIcon = (type: string) => {
+    switch (type) {
+      case 'text': return <FileText className="h-4 w-4" />;
+      case 'audio': return <Mic className="h-4 w-4" />;
+      case 'emoji': return <Smile className="h-4 w-4" />;
+      default: return <Brain className="h-4 w-4" />;
     }
-  ] : [];
+  };
 
-  const emotionTrends = isDemoAccount ? [
-    { emotion: 'Bonheur', percentage: 78, trend: 'up' },
-    { emotion: 'Calme', percentage: 85, trend: 'up' },
-    { emotion: 'Énergie', percentage: 72, trend: 'stable' },
-    { emotion: 'Stress', percentage: 25, trend: 'down' }
-  ] : [];
-
-  const ScanResults = ({ result }: { result: EmotionResult }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <Card>
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 p-4 bg-green-100 dark:bg-green-900/30 rounded-full w-fit">
-            <Heart className="h-8 w-8 text-green-600" />
-          </div>
-          <CardTitle>Analyse terminée</CardTitle>
-          <CardDescription>
-            Voici votre état émotionnel actuel
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="text-center">
-            <div className="text-4xl font-bold text-green-600 mb-2">
-              {result.confidence}%
-            </div>
-            <p className="text-muted-foreground">Score de bien-être</p>
-          </div>
-
-          <div className="space-y-4">
-            <h4 className="font-medium">Émotions détectées :</h4>
-            <div className="grid grid-cols-2 gap-4">
-              {result.emotions.map((emotion, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                  <span className="font-medium">{emotion.name}</span>
-                  <span className="text-sm text-muted-foreground">{emotion.intensity}%</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {result.recommendations && (
-            <div className="space-y-2">
-              <h4 className="font-medium">Recommandations :</h4>
-              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                <p className="text-sm">{result.recommendations}</p>
-              </div>
-            </div>
-          )}
-
-          <div className="flex space-x-2">
-            <Button onClick={handleStartNewScan} className="flex-1">
-              Nouvelle analyse
-            </Button>
-            <Button variant="outline" className="flex-1">
-              Voir l'historique
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
-  );
-
-  if (showResults && currentScan) {
+  if (isLoading) {
     return (
-      <div className="container mx-auto py-6 space-y-6">
-        <div className="max-w-2xl mx-auto">
-          <ScanResults result={currentScan} />
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        <LoadingAnimation text="Analyse de vos émotions en cours..." />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
+    <div className="container mx-auto p-6 space-y-8">
+      {/* En-tête */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6 }}
       >
         <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight">Scanner vos émotions</h1>
-          <p className="text-muted-foreground mt-2">
-            Analysez votre état émotionnel en temps réel avec notre IA avancée
+          <h1 className="text-3xl font-bold mb-2 flex items-center justify-center gap-3">
+            <Brain className="h-8 w-8 text-blue-600" />
+            Scanner d'émotions
+          </h1>
+          <p className="text-muted-foreground">
+            Analysez votre état émotionnel et obtenez des recommandations personnalisées
           </p>
         </div>
       </motion.div>
 
-      {/* Main Scan Interface */}
-      {isScanning ? (
-        <div className="max-w-2xl mx-auto">
-          <EmotionScanForm 
-            onComplete={handleScanComplete}
-            onClose={() => setIsScanning(false)}
-          />
-        </div>
-      ) : (
+      {/* Action principale */}
+      {!showScanForm && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="max-w-4xl mx-auto"
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          <Card className="text-center">
+            <CardContent className="p-8">
+              <div className="mx-auto mb-6 p-4 bg-blue-100 dark:bg-blue-900/30 rounded-full w-fit">
+                <Brain className="h-12 w-12 text-blue-600" />
+              </div>
+              <h2 className="text-2xl font-semibold mb-4">
+                Comment vous sentez-vous en ce moment ?
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Choisissez votre méthode d'analyse préférée pour scanner vos émotions
+              </p>
+              <Button 
+                onClick={() => setShowScanForm(true)}
+                size="lg"
+                className="px-8"
+              >
+                Commencer l'analyse
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Formulaire de scan */}
+      {showScanForm && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <EmotionScanForm 
+            onComplete={handleScanComplete}
+            onClose={() => setShowScanForm(false)}
+          />
+        </motion.div>
+      )}
+
+      {/* Dernier résultat */}
+      {lastResult && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
           <Card>
-            <CardHeader className="text-center">
-              <CardTitle className="flex items-center justify-center space-x-2">
-                <Brain className="h-6 w-6" />
-                <span>Choisissez votre méthode d'analyse</span>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Votre dernière analyse
               </CardTitle>
               <CardDescription>
-                Plusieurs options s'offrent à vous pour analyser vos émotions
+                Réalisée le {lastResult.timestamp.toLocaleDateString('fr-FR')} à {lastResult.timestamp.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Button
-                  variant="outline"
-                  onClick={handleStartNewScan}
-                  className="h-auto flex flex-col items-center gap-4 p-8 hover:bg-primary/5"
-                >
-                  <div className="p-4 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                    <FileText className="h-8 w-8 text-blue-600" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h3 className="font-medium mb-3">Émotions détectées</h3>
+                  <div className="space-y-2">
+                    {lastResult.emotions.map((emotion, index) => (
+                      <div key={index} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                        <span className="font-medium">{emotion.name}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-20 bg-muted rounded-full h-2">
+                            <div 
+                              className="bg-primary h-2 rounded-full transition-all duration-500"
+                              style={{ width: `${emotion.intensity}%` }}
+                            ></div>
+                          </div>
+                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${getEmotionColor(emotion.intensity)}`}>
+                            {emotion.intensity}%
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="text-center">
-                    <h3 className="font-medium mb-2">Analyse textuelle</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Décrivez comment vous vous sentez
-                    </p>
+                </div>
+                <div>
+                  <h3 className="font-medium mb-3">Recommandations</h3>
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                    <p className="text-sm">{lastResult.recommendations}</p>
+                    <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                      {getAnalysisTypeIcon(lastResult.analysisType)}
+                      <span>Analyse {lastResult.analysisType === 'text' ? 'textuelle' : lastResult.analysisType === 'audio' ? 'audio' : 'émoji'}</span>
+                      <span>•</span>
+                      <span>Confiance: {lastResult.confidence}%</span>
+                    </div>
                   </div>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  onClick={handleStartNewScan}
-                  className="h-auto flex flex-col items-center gap-4 p-8 hover:bg-primary/5"
-                >
-                  <div className="p-4 bg-green-100 dark:bg-green-900/30 rounded-full">
-                    <Mic className="h-8 w-8 text-green-600" />
-                  </div>
-                  <div className="text-center">
-                    <h3 className="font-medium mb-2">Analyse vocale</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Parlez pour analyser votre voix
-                    </p>
-                  </div>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  onClick={handleStartNewScan}
-                  className="h-auto flex flex-col items-center gap-4 p-8 hover:bg-primary/5"
-                >
-                  <div className="p-4 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-                    <Smile className="h-8 w-8 text-purple-600" />
-                  </div>
-                  <div className="text-center">
-                    <h3 className="font-medium mb-2">Sélection d'émojis</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Choisissez vos émotions visuellement
-                    </p>
-                  </div>
-                </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
         </motion.div>
       )}
 
-      {/* Dashboard Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Scans */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Calendar className="h-5 w-5" />
-                <span>Analyses récentes</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {recentScans.length > 0 ? (
-                <div className="space-y-4">
-                  {recentScans.map((scan, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <p className="font-medium">{scan.date} à {scan.time}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {scan.emotions.join(', ')}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <div className={`text-lg font-bold ${
-                          scan.score >= 80 ? 'text-green-600' :
-                          scan.score >= 60 ? 'text-yellow-600' : 'text-red-600'
-                        }`}>
-                          {scan.score}%
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Brain className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground mb-4">
-                    Aucune analyse récente
-                  </p>
-                  <Button onClick={handleStartNewScan}>
-                    Commencer votre première analyse
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Emotion Trends */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="h-5 w-5" />
-                <span>Tendances émotionnelles</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {emotionTrends.length > 0 ? (
-                <div className="space-y-4">
-                  {emotionTrends.map((trend, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium">{trend.emotion}</span>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm text-muted-foreground">
-                            {trend.percentage}%
-                          </span>
-                          {trend.trend === 'up' && <TrendingUp className="h-4 w-4 text-green-500" />}
-                          {trend.trend === 'down' && <TrendingUp className="h-4 w-4 text-red-500 rotate-180" />}
-                          {trend.trend === 'stable' && <Target className="h-4 w-4 text-yellow-500" />}
-                        </div>
-                      </div>
-                      <Progress value={trend.percentage} className="h-2" />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">
-                    Effectuez quelques analyses pour voir vos tendances
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* Quick Tips */}
+      {/* Historique des scans */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
       >
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Zap className="h-5 w-5" />
-              <span>Conseils pour une meilleure analyse</span>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Historique de vos analyses
             </CardTitle>
+            <CardDescription>
+              Suivez l'évolution de votre état émotionnel
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {scanHistory.map((scan, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center gap-2">
+                      {getAnalysisTypeIcon(scan.analysisType)}
+                      <span className="font-medium">
+                        {scan.timestamp.toLocaleDateString('fr-FR')} - {scan.timestamp.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <span className="text-xs bg-muted px-2 py-1 rounded-full">
+                      Confiance: {scan.confidence}%
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Émotions principales</h4>
+                      <div className="flex gap-2 flex-wrap">
+                        {scan.emotions.slice(0, 3).map((emotion, emotionIndex) => (
+                          <span
+                            key={emotionIndex}
+                            className={`text-xs px-2 py-1 rounded-full font-medium ${getEmotionColor(emotion.intensity)}`}
+                          >
+                            {emotion.name} ({emotion.intensity}%)
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Recommandation</h4>
+                      <p className="text-sm text-muted-foreground">{scan.recommendations}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Conseils et informations */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <Card className="bg-muted/50">
+          <CardHeader>
+            <CardTitle>💡 Comment optimiser vos analyses ?</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-muted/50 rounded-lg">
-                <FileText className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                <h4 className="font-medium mb-1">Soyez honnête</h4>
-                <p className="text-xs text-muted-foreground">
-                  Décrivez vraiment ce que vous ressentez
+              <div className="text-center">
+                <FileText className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+                <h3 className="font-medium mb-1">Analyse textuelle</h3>
+                <p className="text-sm text-muted-foreground">
+                  Décrivez vos sentiments avec vos propres mots pour une analyse précise
                 </p>
               </div>
-              
-              <div className="text-center p-4 bg-muted/50 rounded-lg">
-                <Mic className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                <h4 className="font-medium mb-1">Environnement calme</h4>
-                <p className="text-xs text-muted-foreground">
-                  Choisissez un endroit sans bruit pour l'analyse vocale
+              <div className="text-center">
+                <Mic className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                <h3 className="font-medium mb-1">Analyse vocale</h3>
+                <p className="text-sm text-muted-foreground">
+                  Parlez naturellement pendant 15-30 secondes pour capturer les nuances
                 </p>
               </div>
-              
-              <div className="text-center p-4 bg-muted/50 rounded-lg">
-                <Heart className="h-8 w-8 text-red-500 mx-auto mb-2" />
-                <h4 className="font-medium mb-1">Régularité</h4>
-                <p className="text-xs text-muted-foreground">
-                  Analysez-vous régulièrement pour de meilleurs résultats
+              <div className="text-center">
+                <Smile className="h-8 w-8 mx-auto mb-2 text-purple-600" />
+                <h3 className="font-medium mb-1">Sélection d'émojis</h3>
+                <p className="text-sm text-muted-foreground">
+                  Choisissez les émojis qui représentent le mieux votre état actuel
                 </p>
               </div>
             </div>

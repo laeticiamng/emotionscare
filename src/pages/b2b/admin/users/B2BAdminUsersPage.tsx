@@ -1,341 +1,261 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/contexts/AuthContext';
 import { 
-  Users, 
-  UserPlus, 
-  Search, 
-  Filter,
-  MoreHorizontal,
-  Mail,
-  Shield,
-  Edit,
-  Trash2,
-  Download,
-  Upload
+  Users, Search, Plus, Filter, MoreHorizontal, 
+  UserCheck, UserX, Mail, Calendar 
 } from 'lucide-react';
-import { toast } from 'sonner';
+import LoadingAnimation from '@/components/ui/loading-animation';
 
 const B2BAdminUsersPage: React.FC = () => {
-  const { user } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('all');
-  
-  const isDemoAccount = user?.email?.endsWith('@exemple.fr');
-
-  const mockUsers = isDemoAccount ? [
+  const [users, setUsers] = useState([
     {
       id: 1,
       name: 'Marie Dubois',
-      email: 'marie.dubois@exemple.fr',
+      email: 'marie.dubois@entreprise.com',
+      role: 'Collaborateur',
       department: 'Marketing',
-      role: 'user',
-      status: 'active',
-      lastActive: '2024-01-24',
-      engagementScore: 87
+      status: 'Actif',
+      lastActivity: '2024-01-20',
+      wellbeingScore: 8.2
     },
     {
       id: 2,
       name: 'Pierre Martin',
-      email: 'pierre.martin@exemple.fr',
+      email: 'pierre.martin@entreprise.com',
+      role: 'Collaborateur',
       department: 'Développement',
-      role: 'user',
-      status: 'active',
-      lastActive: '2024-01-24',
-      engagementScore: 92
+      status: 'Actif',
+      lastActivity: '2024-01-19',
+      wellbeingScore: 7.8
     },
     {
       id: 3,
       name: 'Sophie Laurent',
-      email: 'sophie.laurent@exemple.fr',
-      department: 'RH',
-      role: 'admin',
-      status: 'active',
-      lastActive: '2024-01-23',
-      engagementScore: 95
+      email: 'sophie.laurent@entreprise.com',
+      role: 'Manager',
+      department: 'Commercial',
+      status: 'Inactif',
+      lastActivity: '2024-01-15',
+      wellbeingScore: 6.9
     },
     {
       id: 4,
-      name: 'Thomas Petit',
-      email: 'thomas.petit@exemple.fr',
-      department: 'Commercial',
-      role: 'user',
-      status: 'inactive',
-      lastActive: '2024-01-20',
-      engagementScore: 65
-    },
-    {
-      id: 5,
-      name: 'Julie Moreau',
-      email: 'julie.moreau@exemple.fr',
-      department: 'Support',
-      role: 'user',
-      status: 'active',
-      lastActive: '2024-01-24',
-      engagementScore: 91
+      name: 'Demo Admin',
+      email: 'admin@exemple.fr',
+      role: 'Administrateur',
+      department: 'IT',
+      status: 'Actif',
+      lastActivity: '2024-01-20',
+      wellbeingScore: 8.5
     }
-  ] : [];
+  ]);
 
-  const departments = ['Tous', 'Développement', 'Marketing', 'RH', 'Commercial', 'Support'];
+  useEffect(() => {
+    // Simuler le chargement des données
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  }, []);
 
-  const filteredUsers = mockUsers.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDepartment = selectedDepartment === 'all' || 
-                             user.department === selectedDepartment;
-    return matchesSearch && matchesDepartment;
-  });
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.department.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleInviteUser = () => {
-    toast.success('Invitation envoyée avec succès');
-  };
-
-  const handleEditUser = (userId: number) => {
-    toast.info(`Édition de l'utilisateur ${userId}`);
-  };
-
-  const handleDeleteUser = (userId: number) => {
-    toast.error(`Utilisateur ${userId} supprimé`);
+    // Simuler l'ajout d'un utilisateur
+    console.log('Inviter un nouvel utilisateur');
   };
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'active':
-        return <Badge variant="default" className="bg-green-100 text-green-800">Actif</Badge>;
-      case 'inactive':
-        return <Badge variant="secondary">Inactif</Badge>;
-      case 'pending':
-        return <Badge variant="outline">En attente</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
+    return status === 'Actif' 
+      ? <Badge variant="default" className="bg-green-100 text-green-700">Actif</Badge>
+      : <Badge variant="secondary">Inactif</Badge>;
   };
 
   const getRoleBadge = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return <Badge variant="destructive">Admin</Badge>;
-      case 'user':
-        return <Badge variant="outline">Utilisateur</Badge>;
-      default:
-        return <Badge variant="secondary">{role}</Badge>;
-    }
+    const colors = {
+      'Administrateur': 'bg-purple-100 text-purple-700',
+      'Manager': 'bg-blue-100 text-blue-700',
+      'Collaborateur': 'bg-gray-100 text-gray-700'
+    };
+    return (
+      <Badge variant="secondary" className={colors[role as keyof typeof colors]}>
+        {role}
+      </Badge>
+    );
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingAnimation text="Chargement des utilisateurs..." />
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      {/* Header */}
+    <div className="container mx-auto p-6 space-y-8">
+      {/* En-tête */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6 }}
       >
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Gestion des utilisateurs</h1>
-            <p className="text-muted-foreground mt-1">
+            <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
+              <Users className="h-8 w-8 text-blue-600" />
+              Gestion des utilisateurs
+            </h1>
+            <p className="text-muted-foreground">
               Administrez les comptes et permissions de votre organisation
-              {isDemoAccount && ' (Données de démonstration)'}
             </p>
           </div>
-          
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
-            <Button variant="outline">
-              <Upload className="mr-2 h-4 w-4" />
-              Importer
-            </Button>
-            <Button variant="outline">
-              <Download className="mr-2 h-4 w-4" />
-              Exporter
-            </Button>
-            <Button onClick={handleInviteUser}>
-              <UserPlus className="mr-2 h-4 w-4" />
-              Inviter un utilisateur
-            </Button>
-          </div>
+          <Button onClick={handleInviteUser} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Inviter un utilisateur
+          </Button>
         </div>
       </motion.div>
 
-      {/* Stats Cards */}
+      {/* Statistiques rapides */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-4 gap-6"
+        transition={{ duration: 0.6, delay: 0.1 }}
       >
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <Users className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium text-muted-foreground">Total utilisateurs</span>
-            </div>
-            <p className="text-2xl font-bold">{isDemoAccount ? mockUsers.length : '0'}</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <Shield className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium text-muted-foreground">Utilisateurs actifs</span>
-            </div>
-            <p className="text-2xl font-bold">
-              {isDemoAccount ? mockUsers.filter(u => u.status === 'active').length : '0'}
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <Mail className="h-4 w-4 text-yellow-600" />
-              <span className="text-sm font-medium text-muted-foreground">Invitations en attente</span>
-            </div>
-            <p className="text-2xl font-bold">
-              {isDemoAccount ? '3' : '0'}
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <Users className="h-4 w-4 text-purple-600" />
-              <span className="text-sm font-medium text-muted-foreground">Administrateurs</span>
-            </div>
-            <p className="text-2xl font-bold">
-              {isDemoAccount ? mockUsers.filter(u => u.role === 'admin').length : '0'}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">{users.length}</div>
+              <div className="text-sm text-muted-foreground">Total utilisateurs</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-green-600">
+                {users.filter(u => u.status === 'Actif').length}
+              </div>
+              <div className="text-sm text-muted-foreground">Utilisateurs actifs</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-purple-600">
+                {users.filter(u => u.role === 'Administrateur').length}
+              </div>
+              <div className="text-sm text-muted-foreground">Administrateurs</div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <div className="text-2xl font-bold text-orange-600">
+                {(users.reduce((acc, u) => acc + u.wellbeingScore, 0) / users.length).toFixed(1)}/10
+              </div>
+              <div className="text-sm text-muted-foreground">Score moyen</div>
+            </CardContent>
+          </Card>
+        </div>
       </motion.div>
 
-      {/* Search and Filters */}
+      {/* Filtres et recherche */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
       >
         <Card>
-          <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
+          <CardContent className="p-4">
+            <div className="flex gap-4 items-center">
+              <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Rechercher par nom ou email..."
+                  placeholder="Rechercher un utilisateur..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
                 />
               </div>
-              
-              <select
-                className="px-3 py-2 border rounded-md"
-                value={selectedDepartment}
-                onChange={(e) => setSelectedDepartment(e.target.value)}
-              >
-                <option value="all">Tous les départements</option>
-                {departments.slice(1).map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
-                ))}
-              </select>
-              
-              <Button variant="outline">
-                <Filter className="mr-2 h-4 w-4" />
-                Plus de filtres
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4 mr-2" />
+                Filtres
               </Button>
             </div>
           </CardContent>
         </Card>
       </motion.div>
 
-      {/* Users Table */}
+      {/* Liste des utilisateurs */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
       >
         <Card>
           <CardHeader>
-            <CardTitle>Liste des utilisateurs</CardTitle>
+            <CardTitle>Utilisateurs ({filteredUsers.length})</CardTitle>
             <CardDescription>
-              {filteredUsers.length} utilisateur{filteredUsers.length > 1 ? 's' : ''} trouvé{filteredUsers.length > 1 ? 's' : ''}
+              Liste de tous les utilisateurs de votre organisation
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {filteredUsers.length > 0 ? (
-              <div className="space-y-4">
-                {filteredUsers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-medium">
-                          {user.name.split(' ').map(n => n[0]).join('')}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium">{user.name}</p>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
-                        <p className="text-xs text-muted-foreground">{user.department}</p>
-                      </div>
+            <div className="space-y-4">
+              {filteredUsers.map((user) => (
+                <motion.div
+                  key={user.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                      {user.name.split(' ').map(n => n[0]).join('')}
                     </div>
-                    
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <p className="text-sm font-medium">Score: {user.engagementScore}%</p>
-                        <p className="text-xs text-muted-foreground">Dernière activité: {user.lastActive}</p>
-                      </div>
-                      
-                      <div className="flex flex-col space-y-1">
-                        {getStatusBadge(user.status)}
-                        {getRoleBadge(user.role)}
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEditUser(user.id)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteUser(user.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </div>
+                    <div>
+                      <h3 className="font-medium">{user.name}</h3>
+                      <p className="text-sm text-muted-foreground flex items-center gap-1">
+                        <Mail className="h-3 w-3" />
+                        {user.email}
+                      </p>
+                      <p className="text-sm text-muted-foreground">{user.department}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">
-                  {searchTerm || selectedDepartment !== 'all' 
-                    ? 'Aucun utilisateur trouvé avec ces critères'
-                    : 'Aucun utilisateur dans votre organisation'
-                  }
-                </p>
-                {!searchTerm && selectedDepartment === 'all' && (
-                  <Button onClick={handleInviteUser}>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Inviter le premier utilisateur
-                  </Button>
-                )}
-              </div>
-            )}
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="text-center">
+                      <div className="text-sm font-medium">{user.wellbeingScore}/10</div>
+                      <div className="text-xs text-muted-foreground">Bien-être</div>
+                    </div>
+                    
+                    <div className="text-center">
+                      <div className="text-sm flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(user.lastActivity).toLocaleDateString('fr-FR')}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Dernière activité</div>
+                    </div>
+                    
+                    <div className="flex flex-col gap-1">
+                      {getStatusBadge(user.status)}
+                      {getRoleBadge(user.role)}
+                    </div>
+                    
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </motion.div>
