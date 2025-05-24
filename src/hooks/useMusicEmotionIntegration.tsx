@@ -39,7 +39,7 @@ export const useMusicEmotionIntegration = () => {
       'anxious': 'Des mélodies relaxantes pour apaiser votre anxiété',
       'energetic': 'Des rythmes dynamiques pour soutenir votre énergie',
       'neutral': 'Une playlist adaptée à votre état émotionnel actuel',
-      'fear': "Sons calmes pour apaiser et retrouver la sérénité",
+      'fear': "Sons calmes pour apaiser l'anxiété et retrouver la sérénité",
       'surprise': 'Mélodies rafraîchissantes et légères pour accompagner ce moment',
       'disgust': "Musiques transformatives pour améliorer votre état d'esprit"
     };
