@@ -8,7 +8,7 @@ import { MusicContext } from '@/contexts/MusicContext';
 export const useMusic = () => {
   const context = useContext(MusicContext);
   
-  if (!context || Object.keys(context).length === 0) {
+  if (!context) {
     throw new Error('useMusic must be used within a MusicProvider');
   }
   

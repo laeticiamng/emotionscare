@@ -4,17 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
 import { Play, Pause, Volume1, Volume2, VolumeX } from 'lucide-react';
-import { useMusic } from '@/contexts'; // Importation corrigée
+import { useMusic } from '@/hooks/useMusic';
 
 const AudioController: React.FC = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.5);
   const [isMuted, setIsMuted] = useState(false);
   const { toast } = useToast();
-  const music = useMusic();
+  const { isPlaying, volume, setVolume, play, pause, currentTrack } = useMusic();
 
   const togglePlayback = () => {
-    setIsPlaying(!isPlaying);
+    if (isPlaying) {
+      pause();
+    } else if (currentTrack) {
+      play(currentTrack);
+    }
     toast({
       title: isPlaying ? 'Audio en pause' : 'Lecture audio',
       description: isPlaying ? 'La lecture audio a été mise en pause' : 'La lecture audio a commencé',
@@ -23,10 +25,16 @@ const AudioController: React.FC = () => {
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
+    if (!isMuted) {
+      setVolume(0);
+    } else {
+      setVolume(0.5);
+    }
   };
 
   const handleVolumeChange = (value: number[]) => {
     setVolume(value[0]);
+    setIsMuted(value[0] === 0);
   };
 
   const VolumeIcon = () => {

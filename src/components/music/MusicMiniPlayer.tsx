@@ -4,7 +4,6 @@ import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
 
 interface MusicMiniPlayerProps {
   className?: string;
@@ -15,46 +14,40 @@ const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
     currentTrack, 
     isPlaying, 
     pause, 
-    resume,
+    play,
     next,
     previous,
-    prevTrack,
-    muted,
-    toggleMute 
+    volume,
+    setVolume 
   } = useMusic();
 
   const handlePlayPause = () => {
     if (isPlaying) {
-      if (typeof pause === 'function') {
-        pause();
-      }
-    } else {
-      if (typeof resume === 'function') {
-        resume();
-      }
+      pause();
+    } else if (currentTrack) {
+      play(currentTrack);
     }
   };
 
   const handleNext = () => {
-    if (typeof next === 'function') {
-      next();
-    }
+    next();
   };
 
   const handlePrevious = () => {
-    if (typeof prevTrack === 'function') {
-      prevTrack();
-    } else if (typeof previous === 'function') {
-      previous();
+    previous();
+  };
+
+  const toggleMute = () => {
+    if (volume > 0) {
+      setVolume(0);
+    } else {
+      setVolume(0.8);
     }
   };
 
   if (!currentTrack) {
     return null;
   }
-
-  const title = getTrackTitle(currentTrack);
-  const artist = getTrackArtist(currentTrack);
 
   return (
     <div className={cn("flex items-center space-x-2", className)}>
@@ -78,18 +71,18 @@ const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
       </Button>
 
       <Button onClick={toggleMute} size="icon" variant="ghost">
-        {muted ? (
+        {volume === 0 ? (
           <VolumeX className="h-4 w-4" />
         ) : (
           <Volume2 className="h-4 w-4" />
         )}
-        <span className="sr-only">{muted ? 'Activer le son' : 'Couper le son'}</span>
+        <span className="sr-only">{volume === 0 ? 'Activer le son' : 'Couper le son'}</span>
       </Button>
 
       <div className="hidden sm:block truncate max-w-[120px]">
-        <p className="text-xs font-medium truncate">{title || 'Sans titre'}</p>
+        <p className="text-xs font-medium truncate">{currentTrack.title || 'Sans titre'}</p>
         <p className="text-xs text-muted-foreground truncate">
-          {artist || 'Artiste inconnu'}
+          {currentTrack.artist || 'Artiste inconnu'}
         </p>
       </div>
     </div>
