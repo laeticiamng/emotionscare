@@ -1,160 +1,151 @@
 
-import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
-import { AudioTrack as Track } from '@/types/audio';
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+
+interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;
+  url: string;
+  artwork?: string;
+}
 
 interface MusicContextType {
   currentTrack: Track | null;
   isPlaying: boolean;
-  playlist: Track[];
   volume: number;
+  playlist: Track[];
   currentTime: number;
   duration: number;
+  isLoading: boolean;
   play: (track?: Track) => void;
   pause: () => void;
+  stop: () => void;
   next: () => void;
   previous: () => void;
   setVolume: (volume: number) => void;
   seek: (time: number) => void;
+  addToPlaylist: (track: Track) => void;
+  removeFromPlaylist: (trackId: string) => void;
   setPlaylist: (tracks: Track[]) => void;
-  generateEmotionalMusic: (emotion: string) => Promise<Track[]>;
+  clearPlaylist: () => void;
 }
 
-export const MusicContext = createContext<MusicContextType | undefined>(undefined);
+const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
-export const useMusic = () => {
+interface MusicProviderProps {
+  children: ReactNode;
+}
+
+export const MusicProvider: React.FC<MusicProviderProps> = ({ children }) => {
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolumeState] = useState(0.7);
+  const [playlist, setPlaylistState] = useState<Track[]>([]);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const play = useCallback((track?: Track) => {
+    if (track) {
+      setCurrentTrack(track);
+    }
+    setIsPlaying(true);
+  }, []);
+
+  const pause = useCallback(() => {
+    setIsPlaying(false);
+  }, []);
+
+  const stop = useCallback(() => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+  }, []);
+
+  const next = useCallback(() => {
+    if (playlist.length === 0 || !currentTrack) return;
+    
+    const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
+    const nextIndex = (currentIndex + 1) % playlist.length;
+    const nextTrack = playlist[nextIndex];
+    
+    if (nextTrack) {
+      setCurrentTrack(nextTrack);
+      setIsPlaying(true);
+    }
+  }, [playlist, currentTrack]);
+
+  const previous = useCallback(() => {
+    if (playlist.length === 0 || !currentTrack) return;
+    
+    const currentIndex = playlist.findIndex(track => track.id === currentTrack.id);
+    const prevIndex = currentIndex === 0 ? playlist.length - 1 : currentIndex - 1;
+    const prevTrack = playlist[prevIndex];
+    
+    if (prevTrack) {
+      setCurrentTrack(prevTrack);
+      setIsPlaying(true);
+    }
+  }, [playlist, currentTrack]);
+
+  const setVolume = useCallback((newVolume: number) => {
+    setVolumeState(Math.max(0, Math.min(1, newVolume)));
+  }, []);
+
+  const seek = useCallback((time: number) => {
+    setCurrentTime(time);
+  }, []);
+
+  const addToPlaylist = useCallback((track: Track) => {
+    setPlaylistState(prev => [...prev, track]);
+  }, []);
+
+  const removeFromPlaylist = useCallback((trackId: string) => {
+    setPlaylistState(prev => prev.filter(track => track.id !== trackId));
+  }, []);
+
+  const setPlaylist = useCallback((tracks: Track[]) => {
+    setPlaylistState(tracks);
+  }, []);
+
+  const clearPlaylist = useCallback(() => {
+    setPlaylistState([]);
+    setCurrentTrack(null);
+    setIsPlaying(false);
+  }, []);
+
+  const value: MusicContextType = {
+    currentTrack,
+    isPlaying,
+    volume,
+    playlist,
+    currentTime,
+    duration,
+    isLoading,
+    play,
+    pause,
+    stop,
+    next,
+    previous,
+    setVolume,
+    seek,
+    addToPlaylist,
+    removeFromPlaylist,
+    setPlaylist,
+    clearPlaylist,
+  };
+
+  return (
+    <MusicContext.Provider value={value}>
+      {children}
+    </MusicContext.Provider>
+  );
+};
+
+export const useMusic = (): MusicContextType => {
   const context = useContext(MusicContext);
   if (context === undefined) {
     throw new Error('useMusic must be used within a MusicProvider');
   }
   return context;
-};
-
-export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [playlist, setPlaylist] = useState<Track[]>([]);
-  const [volume, setVolumeState] = useState(0.8);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-    }
-
-    const audio = audioRef.current;
-
-    const updateTime = () => setCurrentTime(audio.currentTime);
-    const updateDuration = () => setDuration(audio.duration);
-    const handleEnded = () => next();
-
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('loadedmetadata', updateDuration);
-    audio.addEventListener('ended', handleEnded);
-
-    return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('loadedmetadata', updateDuration);
-      audio.removeEventListener('ended', handleEnded);
-    };
-  }, []);
-
-  const play = (track?: Track) => {
-    if (track && track !== currentTrack) {
-      setCurrentTrack(track);
-      if (audioRef.current) {
-        audioRef.current.src = track.url || track.audioUrl || '';
-      }
-    }
-    
-    if (audioRef.current) {
-      audioRef.current.play();
-      setIsPlaying(true);
-    }
-  };
-
-  const pause = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-  };
-
-  const next = () => {
-    if (currentTrack && playlist.length > 0) {
-      const currentIndex = playlist.findIndex(t => t.id === currentTrack.id);
-      const nextIndex = (currentIndex + 1) % playlist.length;
-      play(playlist[nextIndex]);
-    }
-  };
-
-  const previous = () => {
-    if (currentTrack && playlist.length > 0) {
-      const currentIndex = playlist.findIndex(t => t.id === currentTrack.id);
-      const prevIndex = currentIndex === 0 ? playlist.length - 1 : currentIndex - 1;
-      play(playlist[prevIndex]);
-    }
-  };
-
-  const setVolume = (newVolume: number) => {
-    setVolumeState(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-    }
-  };
-
-  const seek = (time: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setCurrentTime(time);
-    }
-  };
-
-  const generateEmotionalMusic = async (emotion: string): Promise<Track[]> => {
-    console.log('Generating music for emotion:', emotion);
-    
-    const mockTracks: Track[] = [
-      {
-        id: `generated-${Date.now()}-1`,
-        title: `Musique pour ${emotion} 1`,
-        artist: 'EmotionsCare AI',
-        duration: 180,
-        url: '/sounds/ambient-calm.mp3',
-        emotion,
-        mood: emotion
-      },
-      {
-        id: `generated-${Date.now()}-2`,
-        title: `Musique pour ${emotion} 2`,
-        artist: 'EmotionsCare AI',
-        duration: 240,
-        url: '/sounds/ambient-calm.mp3',
-        emotion,
-        mood: emotion
-      }
-    ];
-
-    return mockTracks;
-  };
-
-  const value = {
-    currentTrack,
-    isPlaying,
-    playlist,
-    volume,
-    currentTime,
-    duration,
-    play,
-    pause,
-    next,
-    previous,
-    setVolume,
-    seek,
-    setPlaylist,
-    generateEmotionalMusic
-  };
-
-  return <MusicContext.Provider value={value}>{children}</MusicContext.Provider>;
 };

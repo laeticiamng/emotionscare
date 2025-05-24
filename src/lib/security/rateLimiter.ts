@@ -1,190 +1,133 @@
 
 /**
- * Client-side rate limiting implementation
+ * Client-side rate limiting system
  */
 
 interface RateLimitConfig {
   maxRequests: number;
   windowMs: number;
-  keyGenerator?: (context?: any) => string;
+  blockDurationMs?: number;
 }
 
-interface RateLimitEntry {
-  count: number;
-  resetTime: number;
-}
-
-class ClientRateLimiter {
-  private cache = new Map<string, RateLimitEntry>();
-  private cleanupInterval: NodeJS.Timeout | null = null;
-
-  constructor() {
-    // Cleanup expired entries every minute
-    this.cleanupInterval = setInterval(() => {
-      this.cleanup();
-    }, 60000);
-  }
-
-  private cleanup(): void {
-    const now = Date.now();
-    for (const [key, entry] of this.cache.entries()) {
-      if (now > entry.resetTime) {
-        this.cache.delete(key);
-      }
-    }
-  }
-
-  private getKey(action: string, context?: any, keyGenerator?: (context?: any) => string): string {
-    if (keyGenerator) {
-      return `${action}:${keyGenerator(context)}`;
-    }
-    return `${action}:global`;
-  }
-
-  isAllowed(action: string, config: RateLimitConfig, context?: any): boolean {
-    const key = this.getKey(action, context, config.keyGenerator);
-    const now = Date.now();
-    
-    let entry = this.cache.get(key);
-    
-    if (!entry || now > entry.resetTime) {
-      // Create new entry or reset expired one
-      entry = {
-        count: 1,
-        resetTime: now + config.windowMs
-      };
-      this.cache.set(key, entry);
-      return true;
-    }
-    
-    if (entry.count >= config.maxRequests) {
-      return false;
-    }
-    
-    entry.count++;
-    this.cache.set(key, entry);
-    return true;
-  }
-
-  getRemainingRequests(action: string, config: RateLimitConfig, context?: any): number {
-    const key = this.getKey(action, context, config.keyGenerator);
-    const entry = this.cache.get(key);
-    
-    if (!entry || Date.now() > entry.resetTime) {
-      return config.maxRequests;
-    }
-    
-    return Math.max(0, config.maxRequests - entry.count);
-  }
-
-  getResetTime(action: string, config: RateLimitConfig, context?: any): number | null {
-    const key = this.getKey(action, context, config.keyGenerator);
-    const entry = this.cache.get(key);
-    
-    if (!entry || Date.now() > entry.resetTime) {
-      return null;
-    }
-    
-    return entry.resetTime;
-  }
-
-  clear(action?: string): void {
-    if (action) {
-      // Clear specific action entries
-      for (const key of this.cache.keys()) {
-        if (key.startsWith(`${action}:`)) {
-          this.cache.delete(key);
-        }
-      }
-    } else {
-      // Clear all entries
-      this.cache.clear();
-    }
-  }
-
-  destroy(): void {
-    if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval);
-      this.cleanupInterval = null;
-    }
-    this.cache.clear();
-  }
-}
-
-// Global rate limiter instance
-const rateLimiter = new ClientRateLimiter();
-
-// Predefined rate limit configurations
 export const RATE_LIMITS = {
-  LOGIN_ATTEMPTS: {
-    maxRequests: 5,
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    keyGenerator: (context: { email?: string }) => context?.email || 'anonymous'
-  },
-  API_CALLS: {
-    maxRequests: 100,
-    windowMs: 60 * 1000, // 1 minute
-  },
-  SEARCH_REQUESTS: {
-    maxRequests: 20,
-    windowMs: 60 * 1000, // 1 minute
-  },
-  FILE_UPLOADS: {
-    maxRequests: 10,
-    windowMs: 60 * 1000, // 1 minute
-  },
-  PASSWORD_RESET: {
-    maxRequests: 3,
-    windowMs: 60 * 60 * 1000, // 1 hour
-    keyGenerator: (context: { email?: string }) => context?.email || 'anonymous'
-  },
-  CHAT_MESSAGES: {
-    maxRequests: 30,
-    windowMs: 60 * 1000, // 1 minute
-  }
+  api_calls: { maxRequests: 60, windowMs: 60000 }, // 60 requests per minute
+  login_attempts: { maxRequests: 5, windowMs: 300000, blockDurationMs: 900000 }, // 5 attempts per 5 minutes, block for 15 minutes
+  scan_requests: { maxRequests: 10, windowMs: 60000 }, // 10 scans per minute
+  chat_messages: { maxRequests: 30, windowMs: 60000 }, // 30 messages per minute
+  file_uploads: { maxRequests: 10, windowMs: 300000 }, // 10 uploads per 5 minutes
 } as const;
 
-/**
- * Check if an action is rate limited
- */
+interface RateLimitEntry {
+  timestamps: number[];
+  blockedUntil?: number;
+}
+
+class RateLimiter {
+  private storage: Map<string, RateLimitEntry> = new Map();
+
+  private getKey(action: string, context?: any): string {
+    const contextStr = context ? JSON.stringify(context) : '';
+    return `${action}:${contextStr}`;
+  }
+
+  private cleanExpiredEntries(key: string, config: RateLimitConfig): void {
+    const entry = this.storage.get(key);
+    if (!entry) return;
+
+    const now = Date.now();
+    const cutoff = now - config.windowMs;
+    
+    entry.timestamps = entry.timestamps.filter(timestamp => timestamp > cutoff);
+    
+    if (entry.blockedUntil && entry.blockedUntil < now) {
+      delete entry.blockedUntil;
+    }
+
+    if (entry.timestamps.length === 0 && !entry.blockedUntil) {
+      this.storage.delete(key);
+    }
+  }
+
+  public checkLimit(
+    action: keyof typeof RATE_LIMITS,
+    context?: any
+  ): { allowed: boolean; remaining: number; resetTime: number | null } {
+    const config = RATE_LIMITS[action];
+    const key = this.getKey(action, context);
+    const now = Date.now();
+
+    this.cleanExpiredEntries(key, config);
+
+    let entry = this.storage.get(key);
+    if (!entry) {
+      entry = { timestamps: [] };
+      this.storage.set(key, entry);
+    }
+
+    // Check if currently blocked
+    if (entry.blockedUntil && entry.blockedUntil > now) {
+      return {
+        allowed: false,
+        remaining: 0,
+        resetTime: entry.blockedUntil
+      };
+    }
+
+    const currentCount = entry.timestamps.length;
+    const remaining = Math.max(0, config.maxRequests - currentCount);
+
+    if (currentCount >= config.maxRequests) {
+      // Rate limit exceeded
+      if (config.blockDurationMs) {
+        entry.blockedUntil = now + config.blockDurationMs;
+      }
+      
+      const oldestTimestamp = entry.timestamps[0];
+      const resetTime = oldestTimestamp + config.windowMs;
+      
+      return {
+        allowed: false,
+        remaining: 0,
+        resetTime: config.blockDurationMs ? entry.blockedUntil : resetTime
+      };
+    }
+
+    // Allow the request and record it
+    entry.timestamps.push(now);
+    
+    const oldestTimestamp = entry.timestamps[0];
+    const resetTime = oldestTimestamp + config.windowMs;
+
+    return {
+      allowed: true,
+      remaining: remaining - 1,
+      resetTime
+    };
+  }
+
+  public reset(action: keyof typeof RATE_LIMITS, context?: any): void {
+    const key = this.getKey(action, context);
+    this.storage.delete(key);
+  }
+
+  public getRemainingRequests(action: keyof typeof RATE_LIMITS, context?: any): number {
+    const config = RATE_LIMITS[action];
+    const key = this.getKey(action, context);
+    
+    this.cleanExpiredEntries(key, config);
+    
+    const entry = this.storage.get(key);
+    if (!entry || (entry.blockedUntil && entry.blockedUntil > Date.now())) {
+      return 0;
+    }
+    
+    return Math.max(0, config.maxRequests - entry.timestamps.length);
+  }
+}
+
+export const rateLimiter = new RateLimiter();
+
 export const checkRateLimit = (
   action: keyof typeof RATE_LIMITS,
   context?: any
-): { allowed: boolean; remaining: number; resetTime: number | null } => {
-  const config = RATE_LIMITS[action];
-  const allowed = rateLimiter.isAllowed(action, config, context);
-  const remaining = rateLimiter.getRemainingRequests(action, config, context);
-  const resetTime = rateLimiter.getResetTime(action, config, context);
-
-  return { allowed, remaining, resetTime };
-};
-
-/**
- * Rate limiting decorator for async functions
- */
-export const withRateLimit = <T extends (...args: any[]) => Promise<any>>(
-  action: keyof typeof RATE_LIMITS,
-  fn: T,
-  contextExtractor?: (...args: Parameters<T>) => any
-): T => {
-  return (async (...args: Parameters<T>) => {
-    const context = contextExtractor ? contextExtractor(...args) : undefined;
-    const { allowed, resetTime } = checkRateLimit(action, context);
-
-    if (!allowed) {
-      const waitTime = resetTime ? Math.ceil((resetTime - Date.now()) / 1000) : 60;
-      throw new Error(`Trop de tentatives. Réessayez dans ${waitTime} secondes.`);
-    }
-
-    return fn(...args);
-  }) as T;
-};
-
-/**
- * Clear rate limit for specific action
- */
-export const clearRateLimit = (action?: keyof typeof RATE_LIMITS): void => {
-  rateLimiter.clear(action);
-};
-
-export { rateLimiter };
+) => rateLimiter.checkLimit(action, context);
