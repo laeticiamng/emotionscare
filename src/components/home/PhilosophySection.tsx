@@ -1,9 +1,13 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Clock, Users, Zap } from 'lucide-react';
+import { Heart, Clock, Users, Zap, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const PhilosophySection: React.FC = () => {
+  const navigate = useNavigate();
+  
   const values = [
     {
       icon: Heart,
@@ -46,10 +50,18 @@ const PhilosophySection: React.FC = () => {
               Notre philosophie
             </span>
           </h2>
-          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed mb-8">
             Nous croyons profondément que le bien-être authentique naît de la rencontre 
             entre l'introspection personnelle et la force du collectif.
           </p>
+          
+          <Button 
+            onClick={() => navigate('/philosophy')}
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            Découvrir le parcours interactif
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">

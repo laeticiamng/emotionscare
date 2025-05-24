@@ -1,242 +1,305 @@
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Heart, Brain, Music, Shield, Sparkles, Users } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Heart, Users, Clock, Zap, ArrowRight, Brain, Building2, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import AnimatedBackground from '@/components/home/AnimatedBackground';
-import WelcomeMessage from '@/components/home/WelcomeMessage';
+import PhilosophySection from '@/components/home/PhilosophySection';
 
 const ImmersiveHome: React.FC = () => {
   const navigate = useNavigate();
+  const [activePhilosophy, setActivePhilosophy] = useState<number | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
 
-  const features = [
+  const philosophyPillars = [
     {
       icon: Heart,
-      title: "Bien-être émotionnel",
-      description: "Analysez et comprenez vos émotions avec l'IA",
-      color: "text-red-500"
-    },
-    {
-      icon: Brain,
-      title: "Coach IA personnalisé",
-      description: "Accompagnement intelligent 24h/24",
-      color: "text-purple-500"
-    },
-    {
-      icon: Music,
-      title: "Thérapie musicale",
-      description: "Playlists adaptées à votre état émotionnel",
-      color: "text-blue-500"
+      title: "La parenthèse personnelle",
+      description: "Chaque individu mérite un moment de pause, un espace sacré pour se reconnecter à soi-même.",
+      color: "text-pink-500",
+      bgColor: "bg-pink-50 dark:bg-pink-950"
     },
     {
       icon: Users,
-      title: "Solution entreprise",
-      description: "Gestion du bien-être en équipe",
-      color: "text-green-500"
+      title: "L'énergie partagée",
+      description: "Dans le collectif naît une force nouvelle, une synergie qui élève chacun vers le meilleur de lui-même.",
+      color: "text-purple-500",
+      bgColor: "bg-purple-50 dark:bg-purple-950"
+    },
+    {
+      icon: Clock,
+      title: "Le temps comme luxe",
+      description: "Redéfinir le temps non comme une contrainte mais comme un cadeau précieux à s'offrir.",
+      color: "text-blue-500",
+      bgColor: "bg-blue-50 dark:bg-blue-950"
+    },
+    {
+      icon: Zap,
+      title: "L'essentiel révélé",
+      description: "Dans le partage d'énergie positive, l'essentiel émerge naturellement, authentiquement.",
+      color: "text-amber-500",
+      bgColor: "bg-amber-50 dark:bg-amber-950"
     }
   ];
 
-  const stats = [
-    { value: "10k+", label: "Utilisateurs actifs" },
-    { value: "95%", label: "Satisfaction client" },
-    { value: "24/7", label: "Support disponible" }
-  ];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 relative overflow-hidden">
-      <AnimatedBackground />
-      
-      {/* Hero Section */}
-      <motion.section 
-        className="relative z-10 pt-20 pb-32 px-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="container mx-auto text-center max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      {/* Hero Section avec philosophie */}
+      <section className="relative py-20 px-6 text-center overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="max-w-6xl mx-auto"
+        >
+          <h1 className="text-5xl md:text-7xl font-bold mb-6">
+            <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              EmotionsCare
+            </span>
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 mb-8 max-w-4xl mx-auto leading-relaxed">
+            Offrir à chacun une parenthèse, à chaque équipe une énergie partagée.
+            Ici, le temps redevient un luxe accessible, et l'essentiel se retrouve dans l'énergie partagée.
+          </p>
+
+          <Button
+            onClick={() => setShowDetails(!showDetails)}
+            variant="outline"
+            className="mb-12 border-2 hover:bg-primary/5"
+          >
+            Découvrir notre philosophie
+            <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${showDetails ? 'rotate-180' : ''}`} />
+          </Button>
+        </motion.div>
+
+        {/* Parcours interactif de la philosophie */}
+        <AnimatePresence>
+          {showDetails && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="max-w-6xl mx-auto mb-16"
+            >
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {philosophyPillars.map((pillar, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    onHoverStart={() => setActivePhilosophy(index)}
+                    onHoverEnd={() => setActivePhilosophy(null)}
+                    className="cursor-pointer"
+                  >
+                    <Card className={`h-full transition-all duration-300 ${
+                      activePhilosophy === index 
+                        ? 'shadow-lg scale-105 border-primary' 
+                        : 'shadow-md hover:shadow-lg'
+                    }`}>
+                      <CardHeader className="text-center">
+                        <div className={`mx-auto p-4 rounded-full ${pillar.bgColor} mb-4`}>
+                          <pillar.icon className={`h-8 w-8 ${pillar.color}`} />
+                        </div>
+                        <CardTitle className="text-lg">{pillar.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                          {pillar.description}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </section>
+
+      {/* Sections séparées Particuliers et Entreprises */}
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mb-8"
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
           >
-            <div className="flex items-center justify-center mb-6">
-              <Sparkles className="h-8 w-8 text-purple-500 mr-3 animate-pulse" />
-              <span className="text-purple-600 dark:text-purple-400 font-semibold text-lg">
-                Powered by AI
-              </span>
-            </div>
-            
-            <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 leading-tight">
-              EmotionsCare
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Votre plateforme de bien-être émotionnel nouvelle génération. 
-              Découvrez, analysez et améliorez votre santé mentale avec l'intelligence artificielle.
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Votre parcours de <span className="text-primary">bien-être</span>
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
+              Que vous soyez un particulier en quête d'équilibre ou une entreprise 
+              soucieuse du bien-être de ses équipes, nous avons la solution adaptée.
             </p>
           </motion.div>
 
-          <WelcomeMessage className="mb-12 text-lg text-gray-500 dark:text-gray-400" />
-
-          <motion.div
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold rounded-2xl shadow-xl transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
-              onClick={() => navigate('/b2c/login')}
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* Section Particuliers */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
             >
-              Commencer maintenant
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            
-            <Button
-              variant="outline"
+              <Card className="h-full shadow-xl border-2 hover:shadow-2xl transition-all duration-300 group">
+                <CardHeader className="text-center bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-950 dark:to-purple-950">
+                  <div className="mx-auto p-6 rounded-full bg-white/80 dark:bg-slate-800/80 mb-4 group-hover:scale-110 transition-transform">
+                    <Heart className="h-12 w-12 text-pink-500" />
+                  </div>
+                  <CardTitle className="text-3xl font-bold">Espace Personnel</CardTitle>
+                  <CardDescription className="text-lg mt-2">
+                    Votre parenthèse quotidienne pour retrouver l'équilibre
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <div className="space-y-6 mb-8">
+                    <div className="flex items-start gap-3">
+                      <Brain className="h-6 w-6 text-pink-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold mb-1">Scanner d'émotions IA</h4>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          Analysez votre état émotionnel avec notre technologie avancée
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Users className="h-6 w-6 text-pink-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold mb-1">Coach personnel IA</h4>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          Accompagnement personnalisé adapté à votre situation
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Clock className="h-6 w-6 text-pink-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold mb-1">Musicothérapie adaptive</h4>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          Sons apaisants personnalisés selon votre humeur
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={() => navigate('/b2c/login')}
+                    className="w-full bg-pink-500 hover:bg-pink-600 text-white py-3 rounded-full font-semibold"
+                    size="lg"
+                  >
+                    Commencer mon parcours
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Section Entreprises */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+            >
+              <Card className="h-full shadow-xl border-2 hover:shadow-2xl transition-all duration-300 group">
+                <CardHeader className="text-center bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
+                  <div className="mx-auto p-6 rounded-full bg-white/80 dark:bg-slate-800/80 mb-4 group-hover:scale-110 transition-transform">
+                    <Building2 className="h-12 w-12 text-blue-500" />
+                  </div>
+                  <CardTitle className="text-3xl font-bold">Espace Entreprise</CardTitle>
+                  <CardDescription className="text-lg mt-2">
+                    L'énergie partagée au service de vos équipes
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <div className="space-y-6 mb-8">
+                    <div className="flex items-start gap-3">
+                      <Users className="h-6 w-6 text-blue-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold mb-1">Cocon social sécurisé</h4>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          Espace bienveillant pour le partage et l'entraide
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Zap className="h-6 w-6 text-blue-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold mb-1">Défis d'équipe</h4>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          Challenges collaboratifs pour renforcer la cohésion
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Clock className="h-6 w-6 text-blue-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold mb-1">Analytics RH</h4>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          Tableaux de bord pour optimiser le bien-être collectif
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={() => navigate('/b2b/selection')}
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-full font-semibold"
+                    size="lg"
+                  >
+                    Découvrir nos solutions
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section philosophie détaillée */}
+      <PhilosophySection />
+
+      {/* Call to Action final */}
+      <section className="py-20 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="max-w-4xl mx-auto text-center"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Prêt à transformer votre rapport au bien-être ?
+          </h2>
+          <p className="text-xl mb-8 opacity-90">
+            Rejoignez des milliers d'utilisateurs qui ont déjà fait le choix d'EmotionsCare
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              onClick={() => navigate('/b2c/login')}
               size="lg"
-              className="border-2 border-purple-200 hover:border-purple-300 text-purple-700 dark:text-purple-300 px-8 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 hover:scale-105"
+              variant="secondary"
+              className="bg-white text-purple-600 hover:bg-gray-100"
+            >
+              Commencer gratuitement
+            </Button>
+            <Button 
               onClick={() => navigate('/b2b/selection')}
+              size="lg"
+              variant="outline"
+              className="border-white text-white hover:bg-white/10"
             >
               Solutions entreprise
             </Button>
-          </motion.div>
-
-          {/* Stats */}
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-          >
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                className="text-center"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-gray-600 dark:text-gray-400 font-medium">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </motion.section>
-
-      {/* Features Section */}
-      <motion.section
-        className="relative z-10 py-20 px-4"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-      >
-        <div className="container mx-auto max-w-6xl">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Fonctionnalités innovantes
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Découvrez nos outils avancés pour votre bien-être émotionnel
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -8 }}
-              >
-                <Card className="h-full bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
-                  <CardContent className="p-8 text-center">
-                    <motion.div
-                      className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-slate-700 dark:to-slate-600 shadow-lg mb-6 ${feature.color}`}
-                      whileHover={{ rotate: 5, scale: 1.1 }}
-                      transition={{ type: "spring", stiffness: 300 }}
-                    >
-                      <feature.icon className="h-8 w-8" />
-                    </motion.div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
           </div>
-        </div>
-      </motion.section>
-
-      {/* CTA Section */}
-      <motion.section
-        className="relative z-10 py-20 px-4"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-      >
-        <div className="container mx-auto max-w-4xl text-center">
-          <motion.div
-            className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 shadow-2xl"
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <div className="flex items-center justify-center mb-6">
-              <Shield className="h-8 w-8 text-white mr-3" />
-              <span className="text-white/90 font-semibold text-lg">
-                Sécurisé & Confidentiel
-              </span>
-            </div>
-            
-            <h3 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              Prêt à transformer votre bien-être ?
-            </h3>
-            
-            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              Rejoignez des milliers d'utilisateurs qui ont déjà amélioré leur qualité de vie
-            </p>
-            
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Button
-                size="lg"
-                variant="secondary"
-                className="bg-white text-purple-600 hover:bg-gray-50 px-8 py-4 text-lg font-semibold rounded-2xl shadow-lg"
-                onClick={() => navigate('/b2c/register')}
-              >
-                Créer mon compte gratuitement
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </motion.div>
-          </motion.div>
-        </div>
-      </motion.section>
+        </motion.div>
+      </section>
     </div>
   );
 };
