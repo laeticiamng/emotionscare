@@ -2,6 +2,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { b2cNavItems, b2bUserNavItems, b2bAdminNavItems } from './navConfig';
@@ -62,7 +63,14 @@ const UnifiedNavigation: React.FC<UnifiedNavigationProps> = ({
           >
             <Icon className={cn("h-4 w-4", !collapsed && "mr-3")} />
             {!collapsed && (
-              <span className="truncate">{item.title}</span>
+              <div className="flex items-center justify-between w-full">
+                <span className="truncate">{item.title}</span>
+                {item.badge && (
+                  <Badge variant="secondary" className="ml-2">
+                    {item.badge}
+                  </Badge>
+                )}
+              </div>
             )}
           </Button>
         );

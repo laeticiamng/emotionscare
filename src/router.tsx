@@ -100,95 +100,59 @@ const routes: RouteObject[] = [
           // Routes B2C protégées
           {
             path: 'b2c/dashboard',
-            element: 
-              <AuthTransition>
-                <B2CDashboardPage />
-              </AuthTransition>
+            element: <AuthTransition><B2CDashboardPage /></AuthTransition>
           },
           
           // Routes B2B User protégées
           {
             path: 'b2b/user/dashboard',
-            element: 
-              <AuthTransition>
-                <B2BUserDashboardPage />
-              </AuthTransition>
+            element: <AuthTransition><B2BUserDashboardPage /></AuthTransition>
           },
           
           // Routes B2B Admin protégées
           {
             path: 'b2b/admin/dashboard',
-            element: 
-              <AuthTransition>
-                <B2BAdminDashboardPage />
-              </AuthTransition>
+            element: <AuthTransition><B2BAdminDashboardPage /></AuthTransition>
           },
           {
             path: 'b2b/admin/analytics',
-            element: 
-              <AuthTransition>
-                <B2BAdminAnalyticsPage />
-              </AuthTransition>
+            element: <AuthTransition><B2BAdminAnalyticsPage /></AuthTransition>
           },
           {
             path: 'b2b/admin/users',
-            element: 
-              <AuthTransition>
-                <B2BAdminUsersPage />
-              </AuthTransition>
+            element: <AuthTransition><B2BAdminUsersPage /></AuthTransition>
           },
           
           // Routes fonctionnelles accessibles à tous les utilisateurs connectés
           {
             path: 'scan',
-            element: 
-              <AuthTransition>
-                <ScanPage />
-              </AuthTransition>
+            element: <AuthTransition><ScanPage /></AuthTransition>
           },
           {
             path: 'coach',
-            element: 
-              <AuthTransition>
-                <Coach />
-              </AuthTransition>
+            element: <AuthTransition><Coach /></AuthTransition>
           },
           {
             path: 'music',
-            element: 
-              <AuthTransition>
-                <Music />
-              </AuthTransition>
+            element: <AuthTransition><Music /></AuthTransition>
           },
           {
             path: 'journal',
-            element: 
-              <AuthTransition>
-                <Journal />
-              </AuthTransition>
+            element: <AuthTransition><Journal /></AuthTransition>
           },
           
           // Routes communes
           {
             path: 'profile',
-            element: 
-              <AuthTransition>
-                <ProfilePage />
-              </AuthTransition>
+            element: <AuthTransition><ProfilePage /></AuthTransition>
           },
           {
             path: 'settings',
-            element: 
-              <AuthTransition>
-                <SettingsPage />
-              </AuthTransition>
+            element: <AuthTransition><SettingsPage /></AuthTransition>
           },
           {
             path: 'help',
-            element: 
-              <AuthTransition>
-                <HelpPage />
-              </AuthTransition>
+            element: <AuthTransition><HelpPage /></AuthTransition>
           },
         ],
       },

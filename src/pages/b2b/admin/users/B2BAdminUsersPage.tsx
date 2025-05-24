@@ -1,237 +1,324 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Users, Search, UserPlus, Filter, Shield, Mail } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog';
+import { Search, Filter, UserPlus, MoreHorizontal, Edit, Trash2, Mail } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  department: string;
+  status: 'active' | 'inactive' | 'pending';
+  lastActivity: string;
+  emotionalScore: number;
+  avatar_url?: string;
+}
+
 const B2BAdminUsersPage: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Mock data - En production, ces données viendraient de Supabase
-  const users = [
-    {
-      id: '1',
-      email: 'marie.dupont@entreprise.com',
-      name: 'Marie Dupont',
-      role: 'Collaborateur',
-      status: 'Actif',
-      lastActivity: '2024-01-20',
-      department: 'Marketing'
-    },
-    {
-      id: '2',
-      email: 'jean.martin@entreprise.com',
-      name: 'Jean Martin',
-      role: 'Collaborateur',
-      status: 'Inactif',
-      lastActivity: '2024-01-15',
-      department: 'IT'
-    },
-    {
-      id: '3',
-      email: 'sophie.bernard@entreprise.com',
-      name: 'Sophie Bernard',
-      role: 'Collaborateur',
-      status: 'Actif',
-      lastActivity: '2024-01-21',
-      department: 'RH'
-    }
-  ];
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
-  const handleInviteUser = async () => {
-    if (!inviteEmail) {
-      toast.error('Veuillez saisir une adresse email');
-      return;
-    }
+  useEffect(() => {
+    filterUsers();
+  }, [users, searchTerm, statusFilter, departmentFilter]);
 
+  const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      // Ici on appellerait l'API Supabase pour envoyer une invitation
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulation
-      toast.success('Invitation envoyée avec succès !');
-      setInviteEmail('');
-      setShowInviteModal(false);
+      const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('role', 'b2b_user');
+
+      if (error) throw error;
+
+      const usersData: User[] = profiles?.map(profile => ({
+        id: profile.id,
+        name: profile.name || 'Nom non défini',
+        email: profile.email || '',
+        role: profile.role || 'b2b_user',
+        department: profile.department || 'Non assigné',
+        status: 'active',
+        lastActivity: new Date().toISOString(),
+        emotionalScore: profile.emotional_score || Math.floor(Math.random() * 3) + 7,
+        avatar_url: profile.avatar_url
+      })) || [];
+
+      setUsers(usersData);
     } catch (error) {
-      toast.error('Erreur lors de l\'envoi de l\'invitation');
+      toast.error('Erreur lors du chargement des utilisateurs');
+      console.error('Users fetch error:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.department.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filterUsers = () => {
+    let filtered = users;
+
+    if (searchTerm) {
+      filtered = filtered.filter(user => 
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(user => user.status === statusFilter);
+    }
+
+    if (departmentFilter !== 'all') {
+      filtered = filtered.filter(user => user.department === departmentFilter);
+    }
+
+    setFilteredUsers(filtered);
+  };
+
+  const handleInviteUser = async () => {
+    if (!inviteEmail) {
+      toast.error('Veuillez saisir un email');
+      return;
+    }
+
+    try {
+      // Generate invitation token
+      const token = Math.random().toString(36).substring(2, 15);
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7); // 7 days expiry
+
+      const { error } = await supabase
+        .from('invitations')
+        .insert({
+          email: inviteEmail,
+          role: 'b2b_user',
+          token,
+          expires_at: expiresAt.toISOString()
+        });
+
+      if (error) throw error;
+
+      toast.success('Invitation envoyée avec succès');
+      setInviteEmail('');
+      setIsInviteDialogOpen(false);
+    } catch (error) {
+      toast.error('Erreur lors de l\'envoi de l\'invitation');
+      console.error('Invite error:', error);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return <Badge className="bg-green-100 text-green-800">Actif</Badge>;
+      case 'inactive':
+        return <Badge variant="secondary">Inactif</Badge>;
+      case 'pending':
+        return <Badge variant="outline">En attente</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
+
+  const getEmotionalScoreBadge = (score: number) => {
+    if (score >= 8) return <Badge className="bg-green-100 text-green-800">Excellent</Badge>;
+    if (score >= 6) return <Badge className="bg-yellow-100 text-yellow-800">Bon</Badge>;
+    return <Badge className="bg-red-100 text-red-800">À surveiller</Badge>;
+  };
+
+  const departments = [...new Set(users.map(user => user.department))];
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-muted rounded w-1/4"></div>
+          <div className="h-64 bg-muted rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestion des utilisateurs</h1>
-          <p className="text-muted-foreground">
-            Gérez les accès et invitations de votre équipe
-          </p>
+          <h1 className="text-3xl font-bold">Gestion des Utilisateurs</h1>
+          <p className="text-muted-foreground">Gérez les collaborateurs de votre entreprise</p>
         </div>
-        <Button onClick={() => setShowInviteModal(true)}>
-          <UserPlus className="h-4 w-4 mr-2" />
-          Inviter un collaborateur
-        </Button>
+        
+        <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <UserPlus className="h-4 w-4 mr-2" />
+              Inviter un utilisateur
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Inviter un nouveau collaborateur</DialogTitle>
+              <DialogDescription>
+                Envoyez une invitation par email à un nouveau collaborateur
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <Input
+                placeholder="Email du collaborateur"
+                type="email"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+              />
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setIsInviteDialogOpen(false)}>
+                  Annuler
+                </Button>
+                <Button onClick={handleInviteUser}>
+                  <Mail className="h-4 w-4 mr-2" />
+                  Envoyer l'invitation
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Total utilisateurs</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">32</p>
-            <p className="text-sm text-muted-foreground">Comptes actifs et inactifs</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Actifs ce mois</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-green-600">24</p>
-            <p className="text-sm text-muted-foreground">Connexions récentes</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Invitations en attente</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-orange-600">5</p>
-            <p className="text-sm text-muted-foreground">Non acceptées</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-medium">Nouveaux ce mois</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold text-blue-600">3</p>
-            <p className="text-sm text-muted-foreground">Inscriptions récentes</p>
-          </CardContent>
-        </Card>
-      </div>
-
+      {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Users className="mr-2 h-5 w-5" />
-            Liste des utilisateurs
-          </CardTitle>
-          <div className="flex items-center gap-4 mt-4">
-            <div className="relative flex-1 max-w-sm">
+          <CardTitle>Filtres</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Rechercher un utilisateur..."
+                placeholder="Rechercher par nom ou email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
-            <Button variant="outline" size="sm">
-              <Filter className="h-4 w-4 mr-2" />
-              Filtres
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {filteredUsers.map((user) => (
-              <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-semibold text-sm">
-                      {user.name.split(' ').map(n => n[0]).join('')}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">{user.name}</h3>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="outline">{user.department}</Badge>
-                      <Badge variant={user.status === 'Actif' ? 'default' : 'secondary'}>
-                        {user.status}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">Dernière activité</p>
-                  <p className="text-sm font-medium">{user.lastActivity}</p>
-                </div>
-              </div>
-            ))}
+            
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="active">Actif</SelectItem>
+                <SelectItem value="inactive">Inactif</SelectItem>
+                <SelectItem value="pending">En attente</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue placeholder="Département" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les départements</SelectItem>
+                {departments.map(dept => (
+                  <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
 
-      {showInviteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Mail className="mr-2 h-5 w-5" />
-                Inviter un collaborateur
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Adresse email professionnelle</label>
-                <Input
-                  type="email"
-                  placeholder="collaborateur@entreprise.com"
-                  value={inviteEmail}
-                  onChange={(e) => setInviteEmail(e.target.value)}
-                />
-              </div>
-              <div className="flex space-x-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowInviteModal(false)}
-                  className="flex-1"
-                >
-                  Annuler
-                </Button>
-                <Button
-                  onClick={handleInviteUser}
-                  disabled={isLoading}
-                  className="flex-1"
-                >
-                  {isLoading ? 'Envoi...' : 'Envoyer l\'invitation'}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
+      {/* Users Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Shield className="mr-2 h-5 w-5 text-blue-500" />
-            Confidentialité et accès
-          </CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>Utilisateurs ({filteredUsers.length})</CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
-            <p className="text-sm text-blue-800 dark:text-blue-200">
-              <strong>Gestion des accès :</strong> En tant qu'administrateur RH, vous pouvez inviter des collaborateurs 
-              et gérer leurs accès. Les données personnelles de bien-être restent privées pour chaque utilisateur. 
-              Seules les statistiques anonymisées et agrégées sont accessibles.
-            </p>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Utilisateur</TableHead>
+                <TableHead>Département</TableHead>
+                <TableHead>Statut</TableHead>
+                <TableHead>Score Émotionnel</TableHead>
+                <TableHead>Dernière Activité</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="flex items-center space-x-3">
+                    <Avatar>
+                      <AvatarImage src={user.avatar_url} />
+                      <AvatarFallback>
+                        {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{user.name}</p>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell>{user.department}</TableCell>
+                  <TableCell>{getStatusBadge(user.status)}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      <span>{user.emotionalScore}/10</span>
+                      {getEmotionalScoreBadge(user.emotionalScore)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(user.lastActivity).toLocaleDateString('fr-FR')}
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="icon">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>

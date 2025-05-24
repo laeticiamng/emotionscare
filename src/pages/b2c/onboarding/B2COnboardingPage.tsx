@@ -2,60 +2,89 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowRight, User, Target, Heart, CheckCircle } from 'lucide-react';
+import { Heart, Brain, Target, User, ArrowRight, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
 interface OnboardingData {
-  firstName: string;
-  lastName: string;
-  age: string;
-  goals: string;
-  concerns: string;
-  preferences: string[];
+  goals: string[];
+  interests: string[];
+  experience: string;
+  personalNote: string;
 }
 
 const B2COnboardingPage: React.FC = () => {
-  const [step, setStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0);
   const [data, setData] = useState<OnboardingData>({
-    firstName: '',
-    lastName: '',
-    age: '',
-    goals: '',
-    concerns: '',
-    preferences: []
+    goals: [],
+    interests: [],
+    experience: '',
+    personalNote: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const totalSteps = 4;
-
-  const handleNext = () => {
-    if (step < totalSteps) {
-      setStep(step + 1);
+  const steps = [
+    {
+      title: 'Vos objectifs',
+      icon: Target,
+      description: 'Quels sont vos objectifs avec EmotionsCare ?'
+    },
+    {
+      title: 'Vos centres d\'intérêt',
+      icon: Heart,
+      description: 'Qu\'est-ce qui vous passionne ?'
+    },
+    {
+      title: 'Votre expérience',
+      icon: Brain,
+      description: 'Votre expérience avec le bien-être émotionnel'
+    },
+    {
+      title: 'Note personnelle',
+      icon: User,
+      description: 'Partagez-nous en plus sur vous'
     }
-  };
+  ];
 
-  const handlePrevious = () => {
-    if (step > 1) {
-      setStep(step - 1);
-    }
-  };
+  const goalOptions = [
+    'Gérer le stress', 'Améliorer l\'humeur', 'Développer la mindfulness',
+    'Mieux dormir', 'Augmenter la confiance', 'Équilibre vie-travail'
+  ];
 
-  const handlePreferenceToggle = (preference: string) => {
+  const interestOptions = [
+    'Méditation', 'Musique thérapeutique', 'Journal personnel',
+    'Exercices de respiration', 'Coaching émotionnel', 'Analyse de soi'
+  ];
+
+  const toggleSelection = (field: 'goals' | 'interests', value: string) => {
     setData(prev => ({
       ...prev,
-      preferences: prev.preferences.includes(preference)
-        ? prev.preferences.filter(p => p !== preference)
-        : [...prev.preferences, preference]
+      [field]: prev[field].includes(value)
+        ? prev[field].filter(item => item !== value)
+        : [...prev[field], value]
     }));
+  };
+
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleComplete();
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
   };
 
   const handleComplete = async () => {
@@ -65,178 +94,142 @@ const B2COnboardingPage: React.FC = () => {
         const { error } = await supabase
           .from('profiles')
           .update({
-            name: `${data.firstName} ${data.lastName}`,
             preferences: {
-              age: data.age,
-              goals: data.goals,
-              concerns: data.concerns,
-              preferences: data.preferences,
-              onboarding_completed: true
+              ...data,
+              onboarding_completed: true,
+              completed_at: new Date().toISOString()
             }
           })
           .eq('id', user.id);
 
         if (error) throw error;
-        
-        toast.success('Profil configuré avec succès !');
+
+        toast.success('Configuration terminée ! Bienvenue sur EmotionsCare');
         navigate('/b2c/dashboard');
       }
     } catch (error) {
       toast.error('Erreur lors de la sauvegarde');
+      console.error('Onboarding error:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const preferences = [
-    'Méditation', 'Relaxation', 'Exercices de respiration', 
-    'Musique thérapeutique', 'Journal personnel', 'Coaching IA',
-    'Analyses émotionnelles', 'Suivi de progression'
-  ];
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 0:
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              {goalOptions.map((goal) => (
+                <Button
+                  key={goal}
+                  variant={data.goals.includes(goal) ? "default" : "outline"}
+                  onClick={() => toggleSelection('goals', goal)}
+                  className="h-auto p-3 text-center"
+                >
+                  {goal}
+                </Button>
+              ))}
+            </div>
+          </div>
+        );
+      case 1:
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              {interestOptions.map((interest) => (
+                <Button
+                  key={interest}
+                  variant={data.interests.includes(interest) ? "default" : "outline"}
+                  onClick={() => toggleSelection('interests', interest)}
+                  className="h-auto p-3 text-center"
+                >
+                  {interest}
+                </Button>
+              ))}
+            </div>
+          </div>
+        );
+      case 2:
+        return (
+          <div className="space-y-4">
+            <Textarea
+              placeholder="Décrivez votre expérience avec les pratiques de bien-être émotionnel..."
+              value={data.experience}
+              onChange={(e) => setData(prev => ({ ...prev, experience: e.target.value }))}
+              rows={4}
+            />
+          </div>
+        );
+      case 3:
+        return (
+          <div className="space-y-4">
+            <Textarea
+              placeholder="Y a-t-il quelque chose de spécifique que vous aimeriez nous faire savoir ?"
+              value={data.personalNote}
+              onChange={(e) => setData(prev => ({ ...prev, personalNote: e.target.value }))}
+              rows={4}
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-blue-900 dark:via-slate-800 dark:to-purple-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center p-4">
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
+        transition={{ duration: 0.5 }}
         className="w-full max-w-2xl"
       >
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Configuration de votre profil</CardTitle>
-            <CardDescription>
-              Aidez-nous à personnaliser votre expérience EmotionsCare
-            </CardDescription>
-            <Progress value={(step / totalSteps) * 100} className="mt-4" />
-            <p className="text-sm text-muted-foreground">Étape {step} sur {totalSteps}</p>
+            <div className="flex items-center justify-center mb-4">
+              {React.createElement(steps[currentStep].icon, { 
+                className: "h-12 w-12 text-primary" 
+              })}
+            </div>
+            <CardTitle className="text-2xl">{steps[currentStep].title}</CardTitle>
+            <CardDescription>{steps[currentStep].description}</CardDescription>
+            
+            <div className="flex justify-center mt-4">
+              <div className="flex space-x-2">
+                {steps.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`h-2 w-8 rounded-full transition-colors ${
+                      index <= currentStep ? 'bg-primary' : 'bg-muted'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
-            {step === 1 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-4"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <User className="h-5 w-5 text-blue-600" />
-                  <h3 className="text-lg font-medium">Informations personnelles</h3>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    placeholder="Prénom"
-                    value={data.firstName}
-                    onChange={(e) => setData(prev => ({ ...prev, firstName: e.target.value }))}
-                  />
-                  <Input
-                    placeholder="Nom"
-                    value={data.lastName}
-                    onChange={(e) => setData(prev => ({ ...prev, lastName: e.target.value }))}
-                  />
-                </div>
-                <Input
-                  type="number"
-                  placeholder="Âge"
-                  value={data.age}
-                  onChange={(e) => setData(prev => ({ ...prev, age: e.target.value }))}
-                />
-              </motion.div>
-            )}
-
-            {step === 2 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-4"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <Target className="h-5 w-5 text-blue-600" />
-                  <h3 className="text-lg font-medium">Vos objectifs</h3>
-                </div>
-                <Textarea
-                  placeholder="Quels sont vos objectifs de bien-être ? (ex: réduire le stress, améliorer l'humeur, mieux gérer les émotions...)"
-                  value={data.goals}
-                  onChange={(e) => setData(prev => ({ ...prev, goals: e.target.value }))}
-                  rows={4}
-                />
-              </motion.div>
-            )}
-
-            {step === 3 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-4"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <Heart className="h-5 w-5 text-blue-600" />
-                  <h3 className="text-lg font-medium">Préoccupations actuelles</h3>
-                </div>
-                <Textarea
-                  placeholder="Y a-t-il des préoccupations particulières que vous aimeriez aborder ? (optionnel)"
-                  value={data.concerns}
-                  onChange={(e) => setData(prev => ({ ...prev, concerns: e.target.value }))}
-                  rows={4}
-                />
-              </motion.div>
-            )}
-
-            {step === 4 && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-4"
-              >
-                <div className="flex items-center gap-2 mb-4">
-                  <CheckCircle className="h-5 w-5 text-blue-600" />
-                  <h3 className="text-lg font-medium">Fonctionnalités préférées</h3>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Sélectionnez les fonctionnalités qui vous intéressent le plus :
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  {preferences.map((preference) => (
-                    <Button
-                      key={preference}
-                      variant={data.preferences.includes(preference) ? "default" : "outline"}
-                      onClick={() => handlePreferenceToggle(preference)}
-                      className="text-left justify-start h-auto py-3"
-                    >
-                      {preference}
-                    </Button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-
-            <div className="flex justify-between mt-8">
+          
+          <CardContent className="space-y-6">
+            {renderStepContent()}
+            
+            <div className="flex justify-between pt-4">
               <Button
                 variant="outline"
-                onClick={handlePrevious}
-                disabled={step === 1}
+                onClick={handleBack}
+                disabled={currentStep === 0}
               >
+                <ArrowLeft className="h-4 w-4 mr-2" />
                 Précédent
               </Button>
               
-              {step < totalSteps ? (
-                <Button
-                  onClick={handleNext}
-                  disabled={
-                    (step === 1 && (!data.firstName || !data.lastName)) ||
-                    (step === 2 && !data.goals)
-                  }
-                >
-                  Suivant
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleComplete}
-                  disabled={isLoading || data.preferences.length === 0}
-                >
-                  {isLoading ? 'Finalisation...' : 'Terminer'}
-                </Button>
-              )}
+              <Button
+                onClick={handleNext}
+                disabled={isLoading}
+              >
+                {currentStep === steps.length - 1 ? 'Terminer' : 'Suivant'}
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
             </div>
           </CardContent>
         </Card>

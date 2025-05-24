@@ -1,25 +1,16 @@
 
-import { 
-  Home, 
-  Scan, 
-  Brain, 
-  Music, 
-  BookOpen, 
-  BarChart3, 
-  Users, 
-  Settings, 
-  HelpCircle,
-  Shield,
-  UserCheck
-} from 'lucide-react';
+import { Home, Scan, Bot, Music, BookOpen, Users, Settings, HelpCircle, BarChart, UserCheck } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 export interface NavItem {
   title: string;
   href: string;
-  icon: any;
+  icon: LucideIcon;
   description?: string;
+  badge?: string;
 }
 
+// Navigation items for B2C users
 export const b2cNavItems: NavItem[] = [
   {
     title: 'Tableau de bord',
@@ -28,7 +19,7 @@ export const b2cNavItems: NavItem[] = [
     description: 'Vue d\'ensemble de votre bien-être'
   },
   {
-    title: 'Scanner',
+    title: 'Scanner Émotions',
     href: '/scan',
     icon: Scan,
     description: 'Analysez vos émotions'
@@ -36,32 +27,33 @@ export const b2cNavItems: NavItem[] = [
   {
     title: 'Coach IA',
     href: '/coach',
-    icon: Brain,
-    description: 'Accompagnement personnalisé'
+    icon: Bot,
+    description: 'Assistant personnel'
   },
   {
-    title: 'Musique',
+    title: 'Musique Thérapie',
     href: '/music',
     icon: Music,
-    description: 'Thérapie musicale'
+    description: 'Musiques personnalisées'
   },
   {
-    title: 'Journal',
+    title: 'Journal Personnel',
     href: '/journal',
     icon: BookOpen,
-    description: 'Votre journal personnel'
+    description: 'Votre journal intime'
   }
 ];
 
+// Navigation items for B2B users (collaborators)
 export const b2bUserNavItems: NavItem[] = [
   {
     title: 'Tableau de bord',
     href: '/b2b/user/dashboard',
     icon: Home,
-    description: 'Vue d\'ensemble de votre bien-être'
+    description: 'Vue d\'ensemble personnelle'
   },
   {
-    title: 'Scanner',
+    title: 'Scanner Émotions',
     href: '/scan',
     icon: Scan,
     description: 'Analysez vos émotions'
@@ -69,67 +61,87 @@ export const b2bUserNavItems: NavItem[] = [
   {
     title: 'Coach IA',
     href: '/coach',
-    icon: Brain,
-    description: 'Accompagnement personnalisé'
+    icon: Bot,
+    description: 'Assistant personnel'
   },
   {
-    title: 'Musique',
+    title: 'Musique Thérapie',
     href: '/music',
     icon: Music,
-    description: 'Thérapie musicale'
+    description: 'Musiques personnalisées'
   },
   {
-    title: 'Journal',
+    title: 'Journal Personnel',
     href: '/journal',
     icon: BookOpen,
     description: 'Votre journal personnel'
   }
 ];
 
+// Navigation items for B2B admins
 export const b2bAdminNavItems: NavItem[] = [
   {
     title: 'Tableau de bord',
     href: '/b2b/admin/dashboard',
     icon: Home,
-    description: 'Vue d\'ensemble RH'
+    description: 'Vue d\'ensemble administrateur'
   },
   {
     title: 'Analytics',
     href: '/b2b/admin/analytics',
-    icon: BarChart3,
-    description: 'Analyses détaillées'
+    icon: BarChart,
+    description: 'Analyses et statistiques'
   },
   {
-    title: 'Équipes',
+    title: 'Gestion Utilisateurs',
     href: '/b2b/admin/users',
-    icon: Users,
-    description: 'Gestion des utilisateurs'
+    icon: UserCheck,
+    description: 'Gérer les collaborateurs'
   },
   {
-    title: 'Rapports',
-    href: '/b2b/admin/reports',
-    icon: Shield,
-    description: 'Rapports RGPD'
+    title: 'Scanner Émotions',
+    href: '/scan',
+    icon: Scan,
+    description: 'Analysez vos émotions'
+  },
+  {
+    title: 'Coach IA',
+    href: '/coach',
+    icon: Bot,
+    description: 'Assistant personnel'
+  },
+  {
+    title: 'Musique Thérapie',
+    href: '/music',
+    icon: Music,
+    description: 'Musiques personnalisées'
+  },
+  {
+    title: 'Journal Personnel',
+    href: '/journal',
+    icon: BookOpen,
+    description: 'Votre journal personnel'
   }
 ];
 
+// Common navigation items (footer)
 export const commonNavItems: NavItem[] = [
   {
     title: 'Profil',
     href: '/profile',
-    icon: UserCheck,
-    description: 'Votre profil'
+    icon: Users,
+    description: 'Gérer votre profil'
   },
   {
     title: 'Paramètres',
     href: '/settings',
     icon: Settings,
-    description: 'Configuration'
+    description: 'Configurer l\'application'
   },
   {
     title: 'Aide',
     href: '/help',
     icon: HelpCircle,
-    description: 'Support et aide'
+    description: 'Support et documentation'
   }
 ];

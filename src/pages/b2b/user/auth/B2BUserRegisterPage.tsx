@@ -6,24 +6,23 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { ArrowLeft, Mail, Lock, User, Building, Loader2, Eye, EyeOff } from 'lucide-react';
+import { useUserMode } from '@/contexts/UserModeContext';
+import { ArrowLeft, Mail, Lock, User, Building, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const B2BUserRegisterPage: React.FC = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
     company: '',
-    position: ''
+    department: ''
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { signUp } = useAuth();
+  const { setUserMode } = useUserMode();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,21 +40,18 @@ const B2BUserRegisterPage: React.FC = () => {
     setIsLoading(true);
     try {
       const { error } = await signUp(formData.email, formData.password, {
-        name: `${formData.firstName} ${formData.lastName}`,
+        name: formData.name,
         role: 'b2b_user',
         company: formData.company,
-        position: formData.position
+        department: formData.department
       });
-
+      
       if (error) {
-        if (error.message.includes('already registered')) {
-          toast.error('Cette adresse email est déjà utilisée');
-        } else {
-          toast.error('Erreur lors de l\'inscription');
-        }
+        toast.error('Erreur lors de l\'inscription : ' + error.message);
       } else {
+        setUserMode('b2b_user');
         toast.success('Inscription réussie ! Vérifiez votre email pour confirmer votre compte.');
-        navigate('/b2b/user/login');
+        navigate('/b2b/user/dashboard');
       }
     } catch (error) {
       toast.error('Erreur lors de l\'inscription');
@@ -64,20 +60,22 @@ const B2BUserRegisterPage: React.FC = () => {
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-100 dark:from-blue-900 dark:via-slate-800 dark:to-slate-700 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-blue-900 dark:via-slate-800 dark:to-purple-900 flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="w-full max-w-md"
       >
-        <Card>
-          <CardHeader className="text-center relative">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
             <Button
               variant="ghost"
               size="icon"
@@ -86,9 +84,6 @@ const B2BUserRegisterPage: React.FC = () => {
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Building className="h-8 w-8 text-blue-600" />
-            </div>
             <CardTitle className="text-2xl">Inscription Collaborateur</CardTitle>
             <CardDescription>
               Créez votre compte collaborateur EmotionsCare
@@ -96,117 +91,110 @@ const B2BUserRegisterPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Prénom"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    className="pl-10"
-                    required
-                  />
-                </div>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Nom"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    name="name"
+                    type="text"
+                    placeholder="Nom complet"
+                    value={formData.name}
+                    onChange={handleInputChange}
                     className="pl-10"
                     required
                   />
                 </div>
               </div>
-
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="email"
-                  placeholder="Email professionnel"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  className="pl-10"
-                  required
-                />
+              
+              <div className="space-y-2">
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    name="email"
+                    type="email"
+                    placeholder="Email professionnel"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
 
-              <div className="relative">
-                <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Entreprise"
-                  value={formData.company}
-                  onChange={(e) => handleInputChange('company', e.target.value)}
-                  className="pl-10"
-                  required
-                />
+              <div className="space-y-2">
+                <div className="relative">
+                  <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    name="company"
+                    type="text"
+                    placeholder="Entreprise"
+                    value={formData.company}
+                    onChange={handleInputChange}
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
 
-              <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Poste"
-                  value={formData.position}
-                  onChange={(e) => handleInputChange('position', e.target.value)}
-                  className="pl-10"
-                />
+              <div className="space-y-2">
+                <div className="relative">
+                  <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    name="department"
+                    type="text"
+                    placeholder="Département (optionnel)"
+                    value={formData.department}
+                    onChange={handleInputChange}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    name="password"
+                    type="password"
+                    placeholder="Mot de passe"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="pl-10"
+                    required
+                    minLength={6}
+                  />
+                </div>
               </div>
 
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Mot de passe"
-                  value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
-                  className="pl-10 pr-10"
-                  required
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-1 h-8 w-8"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
+              <div className="space-y-2">
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    name="confirmPassword"
+                    type="password"
+                    placeholder="Confirmer le mot de passe"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    className="pl-10"
+                    required
+                    minLength={6}
+                  />
+                </div>
               </div>
-
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirmer le mot de passe"
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                  className="pl-10 pr-10"
-                  required
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-2 top-1 h-8 w-8"
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-
+              
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Créer mon compte
               </Button>
             </form>
-
-            <div className="text-center mt-6">
-              <p className="text-sm text-muted-foreground">
-                Vous avez déjà un compte ?{' '}
-                <Link to="/b2b/user/login" className="text-primary hover:underline">
-                  Se connecter
-                </Link>
-              </p>
+            
+            <div className="text-center mt-4">
+              <Link 
+                to="/b2b/user/login" 
+                className="text-sm text-muted-foreground hover:text-primary"
+              >
+                Déjà un compte ? Se connecter
+              </Link>
             </div>
           </CardContent>
         </Card>
