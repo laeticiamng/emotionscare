@@ -36,8 +36,8 @@ export const loadMusicComponents = () => {
 
 export const loadAnalyticsComponents = () => {
   return Promise.all([
-    import('@/components/charts/LineChart'),
-    import('@/components/charts/EmotionPieChart'),
+    import('@/components/dashboard/charts/LineChart'),
+    import('@/components/dashboard/charts/EmotionPieChart'),
     import('@/components/dashboard/charts/WeeklyActivityChart')
   ]);
 };
@@ -49,7 +49,7 @@ export const loadRoleSpecificComponents = (role: string) => {
       return import('@/components/dashboard/b2c');
     case 'b2b_admin':
       return import('@/components/dashboard/admin/AdminDashboard');
-    case 'b2b_user':
+    case 'b2b_user'::
       return import('@/components/dashboard/UserDashboard');
     default:
       return Promise.resolve();
