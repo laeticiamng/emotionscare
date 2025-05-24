@@ -1,173 +1,281 @@
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNavigate } from 'react-router-dom';
-import { Brain, Heart, Music, Users, CheckCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2, Heart, ArrowRight, CheckCircle } from 'lucide-react';
 
 const B2COnboardingPage: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    age: '',
+    profession: '',
+    emotionalGoals: [] as string[],
+    wellnessExperience: '',
+    preferredTime: '',
+    notifications: true
+  });
   const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const steps = [
-    {
-      title: "Bienvenue sur EmotionsCare",
-      description: "Votre compagnon de bien-être émotionnel alimenté par l'IA",
-      icon: Heart,
-      content: (
-        <div className="text-center space-y-4">
-          <p className="text-muted-foreground">
-            Découvrez une nouvelle approche du bien-être émotionnel avec nos outils innovants.
-          </p>
-          <div className="grid grid-cols-2 gap-4 mt-6">
-            <div className="flex flex-col items-center p-4 border rounded-lg">
-              <Brain className="h-8 w-8 text-blue-500 mb-2" />
-              <span className="text-sm font-medium">Scanner d'émotions</span>
-            </div>
-            <div className="flex flex-col items-center p-4 border rounded-lg">
-              <Heart className="h-8 w-8 text-red-500 mb-2" />
-              <span className="text-sm font-medium">Coach IA</span>
-            </div>
-            <div className="flex flex-col items-center p-4 border rounded-lg">
-              <Music className="h-8 w-8 text-purple-500 mb-2" />
-              <span className="text-sm font-medium">Musique thérapeutique</span>
-            </div>
-            <div className="flex flex-col items-center p-4 border rounded-lg">
-              <Users className="h-8 w-8 text-green-500 mb-2" />
-              <span className="text-sm font-medium">Journal personnel</span>
-            </div>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Scanner d'émotions",
-      description: "Analysez vos émotions avec précision",
-      icon: Brain,
-      content: (
-        <div className="space-y-4">
-          <p className="text-muted-foreground">
-            Notre scanner d'émotions utilise l'IA pour analyser votre état émotionnel à travers :
-          </p>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Analyse textuelle de vos messages
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Reconnaissance d'émojis et expressions
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Analyse vocale de votre humeur
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Suivi de votre évolution émotionnelle
-            </li>
-          </ul>
-        </div>
-      )
-    },
-    {
-      title: "Période d'essai gratuite",
-      description: "3 jours pour découvrir toutes les fonctionnalités",
-      icon: CheckCircle,
-      content: (
-        <div className="space-y-4">
-          <div className="text-center p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
-            <h3 className="text-2xl font-bold text-primary mb-2">3 jours gratuits</h3>
-            <p className="text-muted-foreground">
-              Accès complet à toutes les fonctionnalités premium
-            </p>
-          </div>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Scanner d'émotions illimité
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Coach IA personnalisé
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Génération de musique thérapeutique
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500" />
-              Journal avec analyse IA
-            </li>
-          </ul>
-        </div>
-      )
-    }
+  const totalSteps = 3;
+
+  const emotionalGoalsOptions = [
+    'Gérer le stress',
+    'Améliorer la confiance en soi',
+    'Réguler les émotions',
+    'Développer la résilience',
+    'Améliorer les relations',
+    'Augmenter la motivation',
+    'Mieux dormir',
+    'Réduire l\'anxiété'
   ];
 
+  const handleGoalToggle = (goal: string) => {
+    setFormData(prev => ({
+      ...prev,
+      emotionalGoals: prev.emotionalGoals.includes(goal)
+        ? prev.emotionalGoals.filter(g => g !== goal)
+        : [...prev.emotionalGoals, goal]
+    }));
+  };
+
   const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      toast.success('Bienvenue dans votre espace EmotionsCare !');
-      navigate('/b2c/dashboard');
+    if (currentStep < totalSteps) {
+      setCurrentStep(prev => prev + 1);
     }
   };
 
-  const handleSkip = () => {
-    navigate('/b2c/dashboard');
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
+    }
   };
 
-  const currentStepData = steps[currentStep];
-  const Icon = currentStepData.icon;
+  const handleComplete = async () => {
+    setIsLoading(true);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            preferences: {
+              ...formData,
+              onboarding_completed: true,
+              onboarding_date: new Date().toISOString()
+            }
+          })
+          .eq('id', user.id);
+
+        if (error) {
+          toast({
+            title: "Erreur",
+            description: "Impossible de sauvegarder vos préférences",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        toast({
+          title: "Bienvenue sur EmotionsCare !",
+          description: "Votre profil a été configuré avec succès. Profitez de vos 3 jours gratuits !",
+        });
+
+        navigate('/b2c/dashboard');
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-2">Parlez-nous de vous</h2>
+              <p className="text-gray-600">Ces informations nous aident à personnaliser votre expérience</p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="age">Âge (optionnel)</Label>
+                <Input
+                  id="age"
+                  type="number"
+                  placeholder="Votre âge"
+                  value={formData.age}
+                  onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="profession">Profession (optionnel)</Label>
+                <Input
+                  id="profession"
+                  placeholder="Votre profession"
+                  value={formData.profession}
+                  onChange={(e) => setFormData(prev => ({ ...prev, profession: e.target.value }))}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="preferredTime">Moment préféré pour le bien-être</Label>
+                <select 
+                  className="w-full p-2 border rounded-md"
+                  value={formData.preferredTime}
+                  onChange={(e) => setFormData(prev => ({ ...prev, preferredTime: e.target.value }))}
+                >
+                  <option value="">Sélectionnez un moment</option>
+                  <option value="morning">Matin</option>
+                  <option value="afternoon">Après-midi</option>
+                  <option value="evening">Soir</option>
+                  <option value="flexible">Flexible</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-2">Vos objectifs de bien-être</h2>
+              <p className="text-gray-600">Sélectionnez les domaines sur lesquels vous souhaitez travailler</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              {emotionalGoalsOptions.map((goal) => (
+                <div key={goal} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={goal}
+                    checked={formData.emotionalGoals.includes(goal)}
+                    onCheckedChange={() => handleGoalToggle(goal)}
+                  />
+                  <Label htmlFor={goal} className="text-sm">{goal}</Label>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-2">Dernières préférences</h2>
+              <p className="text-gray-600">Configurez votre expérience finale</p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="wellnessExperience">Expérience avec le bien-être mental (optionnel)</Label>
+                <Textarea
+                  id="wellnessExperience"
+                  placeholder="Décrivez brièvement votre expérience avec le bien-être mental, la méditation, etc."
+                  value={formData.wellnessExperience}
+                  onChange={(e) => setFormData(prev => ({ ...prev, wellnessExperience: e.target.value }))}
+                />
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="notifications"
+                  checked={formData.notifications}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, notifications: checked as boolean }))}
+                />
+                <Label htmlFor="notifications" className="text-sm">
+                  Recevoir des notifications pour mes sessions de bien-être
+                </Label>
+              </div>
+
+              <div className="bg-green-50 p-4 rounded-lg">
+                <div className="flex items-center text-green-700 mb-2">
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  <span className="font-medium">Votre période d'essai gratuite</span>
+                </div>
+                <p className="text-sm text-green-600">
+                  Vous bénéficiez de 3 jours d'accès complet gratuit à toutes les fonctionnalités EmotionsCare !
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-blue-900 dark:via-slate-800 dark:to-indigo-900 flex items-center justify-center p-6">
-      <motion.div
-        key={currentStep}
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -50 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-lg"
-      >
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl">
         <Card>
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 p-3 bg-primary/10 rounded-full w-fit">
-              <Icon className="h-8 w-8 text-primary" />
+            <div className="flex items-center justify-center mb-4">
+              <Heart className="h-8 w-8 text-blue-500 mr-2" />
+              <span className="text-2xl font-bold">EmotionsCare</span>
             </div>
-            <CardTitle className="text-2xl">{currentStepData.title}</CardTitle>
-            <CardDescription>{currentStepData.description}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {currentStepData.content}
+            <CardTitle>Configuration de votre profil</CardTitle>
+            <CardDescription>
+              Étape {currentStep} sur {totalSteps}
+            </CardDescription>
             
-            <div className="flex items-center justify-between mt-8">
-              <div className="flex space-x-1">
-                {steps.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`h-2 w-8 rounded ${
-                      index <= currentStep ? 'bg-primary' : 'bg-muted'
-                    }`}
-                  />
-                ))}
-              </div>
-              
-              <div className="flex gap-2">
-                <Button variant="ghost" onClick={handleSkip}>
-                  Passer
-                </Button>
+            {/* Progress bar */}
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-4">
+              <div 
+                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+              ></div>
+            </div>
+          </CardHeader>
+          
+          <CardContent>
+            {renderStep()}
+
+            <div className="flex justify-between mt-8">
+              <Button
+                variant="outline"
+                onClick={handlePrevious}
+                disabled={currentStep === 1}
+              >
+                Précédent
+              </Button>
+
+              {currentStep < totalSteps ? (
                 <Button onClick={handleNext}>
-                  {currentStep === steps.length - 1 ? 'Commencer' : 'Suivant'}
+                  Suivant
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-              </div>
+              ) : (
+                <Button onClick={handleComplete} disabled={isLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Terminer
+                  <CheckCircle className="ml-2 h-4 w-4" />
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 };
