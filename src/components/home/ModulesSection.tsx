@@ -1,6 +1,9 @@
+
 import React from 'react';
 import EmotionalModule from './EmotionalModule';
 import MindfulnessModule from './MindfulnessModule';
+import ModuleCard from './ModuleCard';
+import { Brain, Heart, Waves } from 'lucide-react';
 
 interface ModulesSectionProps {
   className?: string;
@@ -48,7 +51,16 @@ const ModulesSection: React.FC<ModulesSectionProps> = ({
         <EmotionalModule />
         <MindfulnessModule />
         
-        {/* Modules additionnels qui pourraient être ajoutés ultérieurement */}
+        {/* Nouveau module de méditation */}
+        <ModuleCard
+          icon={<Brain className="h-6 w-6" />}
+          title="Méditation & Relaxation"
+          description="Sessions guidées, exercices de respiration et ambiances sonores pour votre bien-être mental"
+          statIcon={<Waves className="h-4 w-4" />}
+          statText="Sessions disponibles"
+          statValue="50+"
+          to="/meditation"
+        />
       </div>
     </div>
   );

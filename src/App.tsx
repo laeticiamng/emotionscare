@@ -1,33 +1,29 @@
 
-import React, { Suspense, useEffect } from 'react';
-import AppProviders from '@/providers/AppProviders';
-import AppRouter from '@/AppRouter';
-import LoadingAnimation from '@/components/ui/loading-animation';
-import { PerformanceProvider } from '@/components/performance/PerformanceProvider';
-import { preloadCriticalChunks } from '@/utils/bundleOptimization';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useState } from "react";
+import Home from "./Home";
+import MeditationPage from "./pages/MeditationPage";
+
+const queryClient = new QueryClient();
 
 function App() {
-  useEffect(() => {
-    // Preload des chunks critiques après le premier render
-    const timer = setTimeout(() => {
-      preloadCriticalChunks();
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
-    <PerformanceProvider>
-      <AppProviders>
-        <Suspense fallback={
-          <div className="flex h-screen items-center justify-center">
-            <LoadingAnimation text="Chargement de l'application..." />
-          </div>
-        }>
-          <AppRouter />
-        </Suspense>
-      </AppProviders>
-    </PerformanceProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/meditation" element={<MeditationPage />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 }
 
