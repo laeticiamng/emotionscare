@@ -13,22 +13,42 @@
 .immersive-title {
   font-family: 'Nunito', 'Inter', system-ui, sans-serif;
   font-weight: 800;
-  font-size: clamp(2rem, 5vw, 2.8rem);
   background: linear-gradient(90deg, var(--primary), var(--accent));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   text-align: center;
-  margin-bottom: 1.5rem;
-  margin-top: 2.5rem;
   text-shadow: 0 4px 28px rgba(54, 97, 255, 0.15);
-  line-height: 1.2;
+  line-height: 1.1;
+  word-break: keep-all;
+  white-space: nowrap;
+}
+
+/* Responsive font sizes for mobile */
+@media (max-width: 640px) {
+  .immersive-title {
+    font-size: clamp(1.5rem, 8vw, 2.5rem) !important;
+    letter-spacing: 0.01em;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .immersive-title {
+    font-size: clamp(2rem, 6vw, 3rem) !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .immersive-title {
+    font-size: clamp(2.5rem, 5vw, 4rem) !important;
+  }
 }
 
 .premium-button {
-  font-size: 1.2rem;
-  padding: 1.2rem 3rem;
+  font-size: 1rem;
+  padding: 1rem 2rem;
   background: var(--primary);
   color: white;
   border: none;
@@ -52,8 +72,8 @@
 /* Media queries for responsive design */
 @media (max-width: 768px) {
   .premium-button {
-    font-size: 1rem;
-    padding: 1rem 2rem;
+    font-size: 0.9rem;
+    padding: 0.875rem 1.5rem;
   }
 }
 

@@ -1,12 +1,17 @@
 
 import React, { lazy } from 'react';
+import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';
 
-// Pages principales
-export const ImmersiveHome = lazy(() => import('@/pages/ImmersiveHome'));
-export const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
+// Lazy load des composants pour optimiser les performances
+export const ImmersiveHome = lazy(() => 
+  import('@/components/home/ImmersiveHome').then(module => ({
+    default: module.ImmersiveHome
+  }))
+);
 
-// Export par défaut pour compatibilité
-export default {
-  ImmersiveHome,
-  MeditationPage,
-};
+// Wrapper avec Suspense pour le chargement
+export const ImmersiveHomeWrapper: React.FC = () => (
+  <React.Suspense fallback={<ComponentLoadingFallback />}>
+    <ImmersiveHome />
+  </React.Suspense>
+);
