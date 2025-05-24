@@ -1,15 +1,6 @@
 
 import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
-
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  url: string;
-  emotion?: string;
-  mood?: string;
-}
+import { AudioTrack as Track } from '@/types/audio';
 
 interface MusicContextType {
   currentTrack: Track | null;
@@ -28,7 +19,6 @@ interface MusicContextType {
   generateEmotionalMusic: (emotion: string) => Promise<Track[]>;
 }
 
-// Export the context
 export const MusicContext = createContext<MusicContextType | undefined>(undefined);
 
 export const useMusic = () => {
@@ -75,7 +65,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (track && track !== currentTrack) {
       setCurrentTrack(track);
       if (audioRef.current) {
-        audioRef.current.src = track.url;
+        audioRef.current.src = track.url || track.audioUrl || '';
       }
     }
     
@@ -123,10 +113,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const generateEmotionalMusic = async (emotion: string): Promise<Track[]> => {
-    // TODO: Integrate with MusicGen API
     console.log('Generating music for emotion:', emotion);
     
-    // Mock generated tracks based on emotion
     const mockTracks: Track[] = [
       {
         id: `generated-${Date.now()}-1`,

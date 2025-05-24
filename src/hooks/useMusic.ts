@@ -2,9 +2,6 @@
 import { useContext } from 'react';
 import { MusicContext } from '@/contexts/MusicContext';
 
-/**
- * Hook to access the music context throughout the application
- */
 export const useMusic = () => {
   const context = useContext(MusicContext);
   

@@ -1,7 +1,7 @@
 
 // Re-export all types from their respective files
-export * from './music';
 export * from './audio';
+export * from './music';
 export * from './support';
 
 // Navigation types
