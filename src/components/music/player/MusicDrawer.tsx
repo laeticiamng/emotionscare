@@ -1,112 +1,40 @@
 
 import React from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
-import { useMusic } from '@/hooks/useMusic';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
-import { getTrackTitle, getTrackArtist, getTrackCover } from '@/utils/musicCompatibility';
+import { Music } from 'lucide-react';
+import EnhancedMusicPlayer from './EnhancedMusicPlayer';
+import { useMusic } from '@/hooks/useMusic';
 
 interface MusicDrawerProps {
-  open: boolean;
-  onClose: () => void;
-  onOpenChange: (open: boolean) => void;
+  children?: React.ReactNode;
 }
 
-const MusicDrawer: React.FC<MusicDrawerProps> = ({
-  open,
-  onOpenChange,
-  onClose
-}) => {
-  const { 
-    currentTrack, 
-    playlist, 
-    isPlaying, 
-    togglePlay, 
-    nextTrack, 
-    previousTrack 
-  } = useMusic();
-
-  if (!currentTrack) {
-    return null;
-  }
-  
-  const title = getTrackTitle(currentTrack);
-  const artist = getTrackArtist(currentTrack);
-  const coverUrl = getTrackCover(currentTrack);
+const MusicDrawer: React.FC<MusicDrawerProps> = ({ children }) => {
+  const { currentTrack } = useMusic();
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle>Music Player</SheetTitle>
-          <SheetDescription>
-            Control your music playback
-          </SheetDescription>
+    <Sheet>
+      <SheetTrigger asChild>
+        {children || (
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="fixed bottom-4 left-4 z-50 shadow-lg"
+          >
+            <Music className="h-4 w-4" />
+          </Button>
+        )}
+      </SheetTrigger>
+      <SheetContent side="bottom" className="h-[80vh] p-0">
+        <SheetHeader className="p-6 pb-0">
+          <SheetTitle>Lecteur Musical</SheetTitle>
         </SheetHeader>
-        
-        <div className="flex flex-col items-center mt-6 space-y-6">
-          {/* Album art */}
-          <div className="w-48 h-48 rounded-lg overflow-hidden bg-muted">
-            {coverUrl ? (
-              <img 
-                src={coverUrl}
-                alt={title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="text-muted-foreground">No Cover</span>
-              </div>
-            )}
-          </div>
-          
-          {/* Track info */}
-          <div className="text-center">
-            <h3 className="font-semibold text-lg">{title}</h3>
-            <p className="text-muted-foreground">{artist}</p>
-          </div>
-          
-          {/* Player controls */}
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" size="icon" onClick={previousTrack}>
-              <SkipBack className="h-5 w-5" />
-            </Button>
-            
-            <Button 
-              variant="default" 
-              size="icon" 
-              className="h-12 w-12 rounded-full" 
-              onClick={togglePlay}
-            >
-              {isPlaying ? (
-                <Pause className="h-6 w-6" />
-              ) : (
-                <Play className="h-6 w-6 ml-0.5" />
-              )}
-            </Button>
-            
-            <Button variant="outline" size="icon" onClick={nextTrack}>
-              <SkipForward className="h-5 w-5" />
-            </Button>
-          </div>
-          
-          {/* Playlist tracks */}
-          {playlist && playlist.tracks && playlist.tracks.length > 0 && (
-            <div className="w-full mt-6">
-              <h4 className="font-medium mb-2">Playlist</h4>
-              <div className="max-h-64 overflow-y-auto space-y-1">
-                {playlist.tracks.map((track) => (
-                  <div 
-                    key={track.id}
-                    className={`p-2 rounded ${currentTrack.id === track.id ? 'bg-primary/10' : 'hover:bg-muted'}`}
-                  >
-                    <p className="font-medium text-sm">{getTrackTitle(track)}</p>
-                    <p className="text-xs text-muted-foreground">{getTrackArtist(track)}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+        <div className="p-6 pt-4 h-full overflow-auto">
+          <EnhancedMusicPlayer 
+            track={currentTrack}
+            className="max-w-2xl mx-auto"
+          />
         </div>
       </SheetContent>
     </Sheet>

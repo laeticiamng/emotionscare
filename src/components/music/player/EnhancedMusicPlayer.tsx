@@ -1,9 +1,8 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Badge } from '@/components/ui/badge';
 import { 
   Play, 
   Pause, 
@@ -11,27 +10,32 @@ import {
   SkipForward, 
   Volume2, 
   VolumeX, 
-  Heart,
-  Share2,
-  MoreHorizontal,
+  Repeat, 
   Shuffle,
-  Repeat
+  Heart,
+  MoreHorizontal
 } from 'lucide-react';
 import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
-import WaveformVisualizer from './WaveformVisualizer';
 import TrackDetails from './TrackDetails';
+import WaveformVisualizer from './WaveformVisualizer';
+import PlayerKeyboardShortcuts from './PlayerKeyboardShortcuts';
+import { MusicTrack } from '@/types/music';
 
 interface EnhancedMusicPlayerProps {
+  track?: MusicTrack | null;
   className?: string;
-  showVisualizer?: boolean;
-  compact?: boolean;
+  size?: 'compact' | 'normal' | 'expanded';
+  showWaveform?: boolean;
+  showKeyboardShortcuts?: boolean;
 }
 
 const EnhancedMusicPlayer: React.FC<EnhancedMusicPlayerProps> = ({
+  track,
   className,
-  showVisualizer = true,
-  compact = false
+  size = 'normal',
+  showWaveform = true,
+  showKeyboardShortcuts = true
 }) => {
   const {
     currentTrack,
@@ -48,87 +52,38 @@ const EnhancedMusicPlayer: React.FC<EnhancedMusicPlayerProps> = ({
   } = useMusic();
 
   const [isMuted, setIsMuted] = useState(false);
+  const [isRepeat, setIsRepeat] = useState(false);
+  const [isShuffle, setIsShuffle] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-  const [isShuffled, setIsShuffled] = useState(false);
-  const [repeatMode, setRepeatMode] = useState<'off' | 'one' | 'all'>('off');
 
-  // Format time helper
-  const formatTime = useCallback((seconds: number) => {
+  const activeTrack = track || currentTrack;
+
+  const formatTime = (seconds: number) => {
+    if (!seconds || isNaN(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  }, []);
-
-  // Progress percentage
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement) return;
-      
-      switch (e.code) {
-        case 'Space':
-          e.preventDefault();
-          isPlaying ? pause() : play();
-          break;
-        case 'ArrowLeft':
-          e.preventDefault();
-          previous();
-          break;
-        case 'ArrowRight':
-          e.preventDefault();
-          next();
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          setVolume(Math.min(1, volume + 0.1));
-          break;
-        case 'ArrowDown':
-          e.preventDefault();
-          setVolume(Math.max(0, volume - 0.1));
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [isPlaying, volume, play, pause, next, previous, setVolume]);
-
-  const handleSeek = (value: number[]) => {
-    const newTime = (value[0] / 100) * duration;
-    seek(newTime);
   };
 
-  const handleVolumeChange = (value: number[]) => {
-    const newVolume = value[0] / 100;
-    setVolume(newVolume);
-    setIsMuted(newVolume === 0);
+  const handleVolumeToggle = () => {
+    const newMuted = !isMuted;
+    setIsMuted(newMuted);
+    setVolume(newMuted ? 0 : 0.7);
   };
 
-  const toggleMute = () => {
-    if (isMuted) {
-      setVolume(0.7);
-      setIsMuted(false);
-    } else {
-      setVolume(0);
-      setIsMuted(true);
-    }
+  const handleSeek = (values: number[]) => {
+    const time = (values[0] / 100) * (duration || 0);
+    seek(time);
   };
 
-  const toggleRepeat = () => {
-    const modes: Array<'off' | 'one' | 'all'> = ['off', 'one', 'all'];
-    const currentIndex = modes.indexOf(repeatMode);
-    setRepeatMode(modes[(currentIndex + 1) % modes.length]);
-  };
+  const progress = duration ? (currentTime / duration) * 100 : 0;
 
-  if (!currentTrack) {
+  if (!activeTrack) {
     return (
       <Card className={cn("w-full", className)}>
         <CardContent className="p-6">
-          <div className="text-center text-muted-foreground">
-            <div className="w-16 h-16 mx-auto mb-4 bg-muted rounded-full flex items-center justify-center">
+          <div className="text-center text-muted-foreground py-8">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
               <Play className="h-8 w-8" />
             </div>
             <p>Aucune musique sélectionnée</p>
@@ -139,88 +94,68 @@ const EnhancedMusicPlayer: React.FC<EnhancedMusicPlayerProps> = ({
     );
   }
 
-  if (compact) {
-    return (
-      <Card className={cn("w-full max-w-sm", className)}>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary/20 to-primary/40 rounded-lg flex items-center justify-center">
-              <Play className="h-6 w-6 text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-sm truncate">{currentTrack.title}</h4>
-              <p className="text-xs text-muted-foreground truncate">{currentTrack.artist}</p>
-            </div>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={isPlaying ? pause : play}
-              className="h-8 w-8 flex-shrink-0"
-            >
-              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const sizeClasses = {
+    compact: 'p-4 space-y-3',
+    normal: 'p-6 space-y-4',
+    expanded: 'p-8 space-y-6'
+  };
 
   return (
-    <Card className={cn("w-full bg-gradient-to-b from-card to-card/50 backdrop-blur-sm", className)}>
-      <CardContent className="p-6 space-y-6">
-        {/* Track Info & Cover */}
-        <TrackDetails track={currentTrack} />
-
-        {/* Waveform Visualizer */}
-        {showVisualizer && (
-          <div className="h-20">
-            <WaveformVisualizer 
-              isPlaying={isPlaying}
-              progress={progress}
-              onSeek={handleSeek}
-            />
-          </div>
-        )}
-
-        {/* Progress Bar */}
-        <div className="space-y-2">
-          <Slider
-            value={[progress]}
-            max={100}
-            step={0.1}
-            onValueChange={handleSeek}
-            className="w-full cursor-pointer"
+    <>
+      {showKeyboardShortcuts && (
+        <PlayerKeyboardShortcuts enabled={true} showTooltips={false} />
+      )}
+      
+      <Card className={cn("w-full bg-gradient-to-br from-background to-muted/20", className)}>
+        <CardContent className={sizeClasses[size]}>
+          {/* Track Details */}
+          <TrackDetails 
+            track={activeTrack} 
+            size={size === 'compact' ? 'sm' : size === 'expanded' ? 'lg' : 'md'}
+            className="mb-4"
           />
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(duration)}</span>
-          </div>
-        </div>
 
-        {/* Main Controls */}
-        <div className="flex items-center justify-between">
-          {/* Left Side - Additional Controls */}
-          <div className="flex items-center gap-2">
+          {/* Waveform Visualizer */}
+          {showWaveform && size !== 'compact' && (
+            <div className="h-16 mb-4">
+              <WaveformVisualizer
+                isPlaying={isPlaying || false}
+                progress={progress}
+                onSeek={handleSeek}
+                className="h-full"
+              />
+            </div>
+          )}
+
+          {/* Progress Bar */}
+          <div className="space-y-2">
+            <Slider
+              value={[progress]}
+              max={100}
+              step={0.1}
+              onValueChange={handleSeek}
+              className="cursor-pointer"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>{formatTime(currentTime || 0)}</span>
+              <span>{formatTime(duration || 0)}</span>
+            </div>
+          </div>
+
+          {/* Main Controls */}
+          <div className="flex items-center justify-center gap-4">
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsShuffled(!isShuffled)}
-              className={cn("h-8 w-8", isShuffled && "text-primary")}
+              onClick={() => setIsShuffle(!isShuffle)}
+              className={cn(
+                "h-8 w-8",
+                isShuffle && "text-primary"
+              )}
             >
               <Shuffle className="h-4 w-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsLiked(!isLiked)}
-              className={cn("h-8 w-8", isLiked && "text-red-500")}
-            >
-              <Heart className={cn("h-4 w-4", isLiked && "fill-current")} />
-            </Button>
-          </div>
 
-          {/* Center - Playback Controls */}
-          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
@@ -233,12 +168,12 @@ const EnhancedMusicPlayer: React.FC<EnhancedMusicPlayerProps> = ({
             <Button
               size="icon"
               onClick={isPlaying ? pause : play}
-              className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 shadow-lg transition-all duration-200 hover:scale-105"
+              className="h-12 w-12 rounded-full"
             >
               {isPlaying ? (
-                <Pause className="h-6 w-6 text-primary-foreground" />
+                <Pause className="h-6 w-6" />
               ) : (
-                <Play className="h-6 w-6 text-primary-foreground ml-0.5" />
+                <Play className="h-6 w-6 ml-1" />
               )}
             </Button>
 
@@ -250,93 +185,75 @@ const EnhancedMusicPlayer: React.FC<EnhancedMusicPlayerProps> = ({
             >
               <SkipForward className="h-5 w-5" />
             </Button>
-          </div>
 
-          {/* Right Side - Volume & More */}
-          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
-              onClick={toggleRepeat}
-              className={cn("h-8 w-8", repeatMode !== 'off' && "text-primary")}
+              onClick={() => setIsRepeat(!isRepeat)}
+              className={cn(
+                "h-8 w-8",
+                isRepeat && "text-primary"
+              )}
             >
               <Repeat className="h-4 w-4" />
-              {repeatMode === 'one' && (
-                <Badge variant="secondary" className="absolute -top-1 -right-1 h-4 w-4 p-0 text-xs">
-                  1
-                </Badge>
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-            >
-              <Share2 className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-            >
-              <MoreHorizontal className="h-4 w-4" />
             </Button>
           </div>
-        </div>
 
-        {/* Volume Control */}
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleMute}
-            onMouseEnter={() => setShowVolumeSlider(true)}
-            className="h-8 w-8"
-          >
-            {isMuted || volume === 0 ? (
-              <VolumeX className="h-4 w-4" />
-            ) : (
-              <Volume2 className="h-4 w-4" />
-            )}
-          </Button>
-          
-          <div 
-            className={cn(
-              "flex-1 transition-all duration-200",
-              showVolumeSlider ? "opacity-100" : "opacity-60"
-            )}
-            onMouseEnter={() => setShowVolumeSlider(true)}
-            onMouseLeave={() => setShowVolumeSlider(false)}
-          >
-            <Slider
-              value={[isMuted ? 0 : volume * 100]}
-              max={100}
-              step={1}
-              onValueChange={handleVolumeChange}
-              className="w-full"
-            />
-          </div>
-          
-          <span className="text-xs text-muted-foreground w-8 text-right">
-            {Math.round((isMuted ? 0 : volume) * 100)}%
-          </span>
-        </div>
+          {/* Secondary Controls */}
+          <div className="flex items-center justify-between">
+            {/* Volume Control */}
+            <div className="flex items-center gap-2 flex-1 max-w-32">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleVolumeToggle}
+                className="h-8 w-8 flex-shrink-0"
+              >
+                {isMuted || volume === 0 ? (
+                  <VolumeX className="h-4 w-4" />
+                ) : (
+                  <Volume2 className="h-4 w-4" />
+                )}
+              </Button>
+              <Slider
+                value={[isMuted ? 0 : (volume || 0) * 100]}
+                max={100}
+                step={1}
+                onValueChange={(values) => {
+                  const newVolume = values[0] / 100;
+                  setVolume(newVolume);
+                  setIsMuted(newVolume === 0);
+                }}
+                className="flex-1"
+              />
+            </div>
 
-        {/* Track Metadata */}
-        {currentTrack.emotion && (
-          <div className="flex gap-2">
-            <Badge variant="secondary" className="text-xs">
-              {currentTrack.emotion}
-            </Badge>
-            {currentTrack.mood && (
-              <Badge variant="outline" className="text-xs">
-                {currentTrack.mood}
-              </Badge>
-            )}
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsLiked(!isLiked)}
+                className={cn(
+                  "h-8 w-8",
+                  isLiked && "text-red-500"
+                )}
+              >
+                <Heart className={cn("h-4 w-4", isLiked && "fill-current")} />
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 

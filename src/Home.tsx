@@ -1,6 +1,8 @@
 
 import React, { useEffect } from 'react';
 import ImmersiveHome from './pages/ImmersiveHome';
+import MusicDrawer from '@/components/music/player/MusicDrawer';
+import MiniPlayer from '@/components/music/player/MiniPlayer';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { logModeSelection } from './utils/modeSelectionLogger';
 
@@ -15,7 +17,17 @@ const Home: React.FC = () => {
     }
   }, [location.state]);
 
-  return <ImmersiveHome />;
+  return (
+    <div className="relative">
+      <ImmersiveHome />
+      
+      {/* Mini Player fixe en bas à droite */}
+      <MiniPlayer onExpand={() => {}} />
+      
+      {/* Drawer musical accessible depuis le bouton en bas à gauche */}
+      <MusicDrawer />
+    </div>
+  );
 };
 
 export default Home;
