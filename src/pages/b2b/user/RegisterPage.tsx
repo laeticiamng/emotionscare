@@ -1,103 +1,58 @@
 
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Users, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 
-const B2BUserRegisterPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [company, setCompany] = useState('');
-  const { login, isLoading } = useAuth();
+const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      alert('Les mots de passe ne correspondent pas');
-      return;
-    }
-    try {
-      await login(email, password, 'b2b_user');
-      navigate('/b2b/user/dashboard');
-    } catch (error) {
-      console.error('Register error:', error);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Inscription Collaborateur</CardTitle>
-          <CardDescription>Rejoignez votre organisation sur EmotionsCare</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="company">Entreprise</Label>
-              <Input
-                id="company"
-                type="text"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                required
-              />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md"
+      >
+        <Button
+          onClick={() => navigate('/b2b/selection')}
+          variant="ghost"
+          className="mb-6"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Retour à la sélection
+        </Button>
+
+        <Card>
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <Users className="h-12 w-12 text-blue-500" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email professionnel</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+            <CardTitle className="text-2xl">Inscription Utilisateur B2B</CardTitle>
+            <CardDescription>
+              Créez votre compte professionnel
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-center text-gray-600 dark:text-gray-300">
+                Fonctionnalité en cours de développement
+              </p>
+              <Button 
+                onClick={() => navigate('/b2b/user/login')}
+                className="w-full bg-blue-500 hover:bg-blue-600"
+              >
+                Aller à la connexion
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Inscription...' : 'S\'inscrire'}
-            </Button>
-          </form>
-          <div className="mt-4 text-center space-y-2">
-            <p>
-              <Link to="/b2b/user/login" className="text-primary hover:underline">
-                Déjà un compte ? Se connecter
-              </Link>
-            </p>
-            <p>
-              <Link to="/b2b/selection" className="text-muted-foreground hover:underline">
-                ← Retour à la sélection B2B
-              </Link>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };
 
-export default B2BUserRegisterPage;
+export default RegisterPage;

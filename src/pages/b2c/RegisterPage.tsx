@@ -1,92 +1,58 @@
 
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Heart, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 
-const B2CRegisterPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const { login, isLoading } = useAuth();
+const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      alert('Les mots de passe ne correspondent pas');
-      return;
-    }
-    try {
-      await login(email, password, 'b2c');
-      navigate('/b2c/onboarding');
-    } catch (error) {
-      console.error('Register error:', error);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Inscription Particulier</CardTitle>
-          <CardDescription>Créez votre compte personnel</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md"
+      >
+        <Button
+          onClick={() => navigate('/')}
+          variant="ghost"
+          className="mb-6"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Retour à l'accueil
+        </Button>
+
+        <Card>
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <Heart className="h-12 w-12 text-pink-500" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+            <CardTitle className="text-2xl">Inscription Personnel</CardTitle>
+            <CardDescription>
+              Créez votre compte pour commencer votre parcours de bien-être
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-center text-gray-600 dark:text-gray-300">
+                Fonctionnalité en cours de développement
+              </p>
+              <Button 
+                onClick={() => navigate('/b2c/login')}
+                className="w-full bg-pink-500 hover:bg-pink-600"
+              >
+                Aller à la connexion
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Inscription...' : 'S\'inscrire'}
-            </Button>
-          </form>
-          <div className="mt-4 text-center space-y-2">
-            <p>
-              <Link to="/b2c/login" className="text-primary hover:underline">
-                Déjà un compte ? Se connecter
-              </Link>
-            </p>
-            <p>
-              <Link to="/choose-mode" className="text-muted-foreground hover:underline">
-                Retour au choix du mode
-              </Link>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };
 
-export default B2CRegisterPage;
+export default RegisterPage;

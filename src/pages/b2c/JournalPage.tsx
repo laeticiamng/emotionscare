@@ -1,16 +1,16 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Scan } from 'lucide-react';
+import { ArrowLeft, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 
-const ScanPage: React.FC = () => {
+const JournalPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
         <Button
           onClick={() => navigate('/b2c/dashboard')}
@@ -28,19 +28,19 @@ const ScanPage: React.FC = () => {
         >
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <Scan className="h-12 w-12 text-blue-500" />
+              <BookOpen className="h-12 w-12 text-amber-500" />
             </div>
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-              Scanner Émotionnel
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+              Journal Émotionnel
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300">
-              Analysez votre état émotionnel en temps réel
+              Exprimez et suivez vos émotions au quotidien
             </p>
           </div>
 
           <Card className="max-w-2xl mx-auto">
             <CardHeader>
-              <CardTitle className="text-2xl text-center">Analyse Émotionnelle</CardTitle>
+              <CardTitle className="text-2xl text-center">Votre Espace Journal</CardTitle>
               <CardDescription className="text-center">
                 Fonctionnalité en cours de développement
               </CardDescription>
@@ -48,8 +48,22 @@ const ScanPage: React.FC = () => {
             <CardContent className="p-8">
               <div className="text-center space-y-4">
                 <p className="text-gray-600 dark:text-gray-300">
-                  Scanner vocal et textuel pour analyser vos émotions
+                  Bientôt, vous pourrez tenir un journal émotionnel personnalisé pour :
                 </p>
+                <ul className="text-left space-y-2 max-w-md mx-auto">
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
+                    Enregistrer vos émotions quotidiennes
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
+                    Suivre vos tendances émotionnelles
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-2 h-2 bg-amber-500 rounded-full mr-3"></div>
+                    Recevoir des insights personnalisés
+                  </li>
+                </ul>
               </div>
             </CardContent>
           </Card>
@@ -59,4 +73,4 @@ const ScanPage: React.FC = () => {
   );
 };
 
-export default ScanPage;
+export default JournalPage;

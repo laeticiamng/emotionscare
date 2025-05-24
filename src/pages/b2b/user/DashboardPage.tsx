@@ -1,131 +1,90 @@
 
 import React from 'react';
+import { motion } from 'framer-motion';
+import { Users, Scan, Brain, Music } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Music, Brain, Heart, Users, Target, Shield } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const B2BUserDashboardPage: React.FC = () => {
+const DashboardPage: React.FC = () => {
+  const navigate = useNavigate();
+
+  const modules = [
+    {
+      title: "Scanner Émotionnel",
+      description: "Analysez votre état émotionnel",
+      icon: <Scan className="h-8 w-8 text-blue-500" />,
+      path: "/b2b/user/scan",
+      color: "from-blue-500 to-cyan-500"
+    },
+    {
+      title: "Coach IA",
+      description: "Votre accompagnateur professionnel",
+      icon: <Brain className="h-8 w-8 text-purple-500" />,
+      path: "/b2b/user/coach",
+      color: "from-purple-500 to-pink-500"
+    },
+    {
+      title: "Musicothérapie",
+      description: "Musique pour votre bien-être au travail",
+      icon: <Music className="h-8 w-8 text-green-500" />,
+      path: "/b2b/user/music",
+      color: "from-green-500 to-emerald-500"
+    }
+  ];
+
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Espace Collaborateur</h1>
-        <p className="text-muted-foreground">Votre bien-être au travail</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Scan Émotionnel</CardTitle>
-            <Brain className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">
-              Analyser mon état
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Coach IA</CardTitle>
-            <Heart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">
-              Séance coaching
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Musicothérapie</CardTitle>
-            <Music className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">
-              Écouter
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Défis d'Équipe</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">
-              Participer
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cocon Social</CardTitle>
-            <Shield className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">
-              Accéder
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Communauté</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <Button variant="outline" className="w-full">
-              Explorer
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Mon bien-être aujourd'hui</CardTitle>
-            <CardDescription>Suivi de votre état émotionnel</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <div className="text-4xl mb-4">😊</div>
-              <p className="text-muted-foreground mb-4">Aucune donnée aujourd'hui</p>
-              <Button>Faire un scan émotionnel</Button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="text-center mb-12">
+            <div className="flex justify-center mb-4">
+              <Users className="h-16 w-16 text-blue-500" />
             </div>
-          </CardContent>
-        </Card>
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Tableau de Bord Utilisateur B2B
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Votre espace de bien-être professionnel
+            </p>
+          </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Recommandations du jour</CardTitle>
-            <CardDescription>Activités personnalisées pour vous</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <span>Pause méditation (10 min)</span>
-                <Button size="sm" variant="outline">Commencer</Button>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <span>Playlist concentration</span>
-                <Button size="sm" variant="outline">Écouter</Button>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <span>Défi équipe du jour</span>
-                <Button size="sm" variant="outline">Participer</Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {modules.map((module, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <Card className="h-full hover:shadow-xl transition-all duration-300 group cursor-pointer">
+                  <CardHeader className="text-center pb-4">
+                    <div className="flex justify-center mb-4 group-hover:scale-110 transition-transform">
+                      {module.icon}
+                    </div>
+                    <CardTitle className="text-lg">{module.title}</CardTitle>
+                    <CardDescription>{module.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <Button 
+                      onClick={() => navigate(module.path)}
+                      className={`w-full bg-gradient-to-r ${module.color} hover:opacity-90`}
+                    >
+                      Accéder
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </div>
   );
 };
 
-export default B2BUserDashboardPage;
+export default DashboardPage;

@@ -1,19 +1,19 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Scan } from 'lucide-react';
+import { ArrowLeft, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 
-const ScanPage: React.FC = () => {
+const CoachPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
         <Button
-          onClick={() => navigate('/b2b/user/dashboard')}
+          onClick={() => navigate('/b2c/dashboard')}
           variant="ghost"
           className="mb-8"
         >
@@ -28,19 +28,19 @@ const ScanPage: React.FC = () => {
         >
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <Scan className="h-12 w-12 text-blue-500" />
+              <Brain className="h-12 w-12 text-purple-500" />
             </div>
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-              Scanner Émotionnel B2B
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+              Coach IA
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300">
-              Analysez votre état émotionnel professionnel
+              Votre accompagnateur personnel intelligent
             </p>
           </div>
 
           <Card className="max-w-2xl mx-auto">
             <CardHeader>
-              <CardTitle className="text-2xl text-center">Analyse Professionnelle</CardTitle>
+              <CardTitle className="text-2xl text-center">Assistant Coach</CardTitle>
               <CardDescription className="text-center">
                 Fonctionnalité en cours de développement
               </CardDescription>
@@ -48,7 +48,7 @@ const ScanPage: React.FC = () => {
             <CardContent className="p-8">
               <div className="text-center space-y-4">
                 <p className="text-gray-600 dark:text-gray-300">
-                  Scanner optimisé pour le contexte professionnel
+                  Votre coach IA personnalisé vous accompagnera bientôt
                 </p>
               </div>
             </CardContent>
@@ -59,4 +59,4 @@ const ScanPage: React.FC = () => {
   );
 };
 
-export default ScanPage;
+export default CoachPage;

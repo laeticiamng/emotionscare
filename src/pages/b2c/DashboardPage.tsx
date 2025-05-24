@@ -1,124 +1,111 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Brain, Music, MessageSquare, Calendar, TrendingUp } from 'lucide-react';
+import { Heart, Brain, Music, BookOpen, Scan, Users, Gamepad2, Settings } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardPage: React.FC = () => {
+  const navigate = useNavigate();
+
   const modules = [
-    { icon: <Brain className="h-6 w-6" />, title: "Scanner d'émotions", description: "Analysez votre état émotionnel", color: "text-blue-500" },
-    { icon: <MessageSquare className="h-6 w-6" />, title: "Coach IA", description: "Accompagnement personnalisé", color: "text-green-500" },
-    { icon: <Music className="h-6 w-6" />, title: "Musique thérapeutique", description: "Sons adaptés à votre humeur", color: "text-purple-500" },
-    { icon: <Calendar className="h-6 w-6" />, title: "Journal émotionnel", description: "Suivez votre évolution", color: "text-orange-500" }
+    {
+      title: "Journal",
+      description: "Suivez vos émotions quotidiennes",
+      icon: <BookOpen className="h-8 w-8 text-amber-500" />,
+      path: "/b2c/journal",
+      color: "from-amber-500 to-orange-500"
+    },
+    {
+      title: "Scanner Émotionnel",
+      description: "Analysez votre état émotionnel",
+      icon: <Scan className="h-8 w-8 text-blue-500" />,
+      path: "/b2c/scan",
+      color: "from-blue-500 to-cyan-500"
+    },
+    {
+      title: "Coach IA",
+      description: "Votre accompagnateur personnel",
+      icon: <Brain className="h-8 w-8 text-purple-500" />,
+      path: "/b2c/coach",
+      color: "from-purple-500 to-pink-500"
+    },
+    {
+      title: "Musicothérapie",
+      description: "Musique adaptée à vos émotions",
+      icon: <Music className="h-8 w-8 text-green-500" />,
+      path: "/b2c/music",
+      color: "from-green-500 to-emerald-500"
+    },
+    {
+      title: "Réalité Virtuelle",
+      description: "Expériences immersives",
+      icon: <Heart className="h-8 w-8 text-red-500" />,
+      path: "/b2c/vr",
+      color: "from-red-500 to-rose-500"
+    },
+    {
+      title: "Gamification",
+      description: "Défis et récompenses",
+      icon: <Gamepad2 className="h-8 w-8 text-indigo-500" />,
+      path: "/b2c/gamification",
+      color: "from-indigo-500 to-violet-500"
+    },
+    {
+      title: "Social",
+      description: "Connectez-vous avec la communauté",
+      icon: <Users className="h-8 w-8 text-teal-500" />,
+      path: "/b2c/social",
+      color: "from-teal-500 to-cyan-500"
+    },
+    {
+      title: "Paramètres",
+      description: "Personnalisez votre expérience",
+      icon: <Settings className="h-8 w-8 text-gray-500" />,
+      path: "/b2c/settings",
+      color: "from-gray-500 to-slate-500"
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 dark:from-gray-900 dark:to-gray-800 p-6">
-      <div className="container mx-auto max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
+          transition={{ duration: 0.8 }}
         >
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-3">
-                <Heart className="h-8 w-8 text-pink-500" />
-                Tableau de bord personnel
-              </h1>
-              <p className="text-gray-600 dark:text-gray-300 mt-2">
-                Bienvenue dans votre espace de bien-être émotionnel
-              </p>
-            </div>
-            <Badge variant="secondary" className="px-3 py-1">
-              Version Démo
-            </Badge>
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Tableau de Bord Personnel
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Bienvenue dans votre espace de bien-être émotionnel
+            </p>
           </div>
-        </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-blue-100">Humeur du jour</p>
-                    <p className="text-2xl font-bold">Positive</p>
-                  </div>
-                  <TrendingUp className="h-8 w-8 text-blue-100" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-300">Sessions cette semaine</p>
-                    <p className="text-2xl font-bold">7</p>
-                  </div>
-                  <Calendar className="h-8 w-8 text-green-500" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-300">Progression</p>
-                    <p className="text-2xl font-bold">85%</p>
-                  </div>
-                  <TrendingUp className="h-8 w-8 text-purple-500" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-        >
-          <h2 className="text-2xl font-bold mb-6">Vos modules</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {modules.map((module, index) => (
               <motion.div
-                key={module.title}
+                key={index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
               >
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                  <CardHeader>
-                    <div className={`${module.color} mb-2`}>
+                <Card className="h-full hover:shadow-xl transition-all duration-300 group cursor-pointer">
+                  <CardHeader className="text-center pb-4">
+                    <div className="flex justify-center mb-4 group-hover:scale-110 transition-transform">
                       {module.icon}
                     </div>
                     <CardTitle className="text-lg">{module.title}</CardTitle>
                     <CardDescription>{module.description}</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <Button variant="outline" className="w-full">
+                  <CardContent className="pt-0">
+                    <Button 
+                      onClick={() => navigate(module.path)}
+                      className={`w-full bg-gradient-to-r ${module.color} hover:opacity-90`}
+                    >
                       Accéder
                     </Button>
                   </CardContent>

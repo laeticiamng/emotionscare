@@ -1,70 +1,58 @@
 
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 
-const B2BAdminLoginPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { login, isLoading } = useAuth();
+const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await login(email, password, 'b2b_admin');
-      navigate('/b2b/admin/dashboard');
-    } catch (error) {
-      console.error('Login error:', error);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Connexion Administrateur</CardTitle>
-          <CardDescription>Accès au tableau de bord RH</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email administrateur</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md"
+      >
+        <Button
+          onClick={() => navigate('/b2b/selection')}
+          variant="ghost"
+          className="mb-6"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Retour à la sélection
+        </Button>
+
+        <Card>
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <Shield className="h-12 w-12 text-green-500" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+            <CardTitle className="text-2xl">Connexion Administrateur RH</CardTitle>
+            <CardDescription>
+              Accédez à votre tableau de bord administrateur
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p className="text-center text-gray-600 dark:text-gray-300">
+                Fonctionnalité en cours de développement
+              </p>
+              <Button 
+                onClick={() => navigate('/b2b/admin/dashboard')}
+                className="w-full bg-green-500 hover:bg-green-600"
+              >
+                Accès démo
+              </Button>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Connexion...' : 'Se connecter'}
-            </Button>
-          </form>
-          <div className="mt-4 text-center">
-            <Link to="/b2b/selection" className="text-muted-foreground hover:underline">
-              ← Retour à la sélection B2B
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };
 
-export default B2BAdminLoginPage;
+export default LoginPage;
