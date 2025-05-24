@@ -2,230 +2,149 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, TrendingUp, Target, Award, Flame } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Progress } from '@/components/ui/progress';
+import { Calendar, Clock, Target, TrendingUp, Award, Flame } from 'lucide-react';
 
-// Données mock pour les statistiques
-const weeklyData = [
-  { day: 'Lun', minutes: 15 },
-  { day: 'Mar', minutes: 20 },
-  { day: 'Mer', minutes: 10 },
-  { day: 'Jeu', minutes: 25 },
-  { day: 'Ven', minutes: 30 },
-  { day: 'Sam', minutes: 45 },
-  { day: 'Dim', minutes: 35 }
-];
-
-const categoryData = [
-  { name: 'Relaxation', value: 40, color: '#3b82f6' },
-  { name: 'Concentration', value: 25, color: '#8b5cf6' },
-  { name: 'Sommeil', value: 20, color: '#06b6d4' },
-  { name: 'Stress', value: 15, color: '#10b981' }
-];
-
-const achievements = [
-  { id: 1, name: 'Premier pas', description: 'Première session de méditation', earned: true },
-  { id: 2, name: 'Régularité', description: '7 jours consécutifs', earned: true },
-  { id: 3, name: 'Explorateur', description: 'Essayé 5 types différents', earned: true },
-  { id: 4, name: 'Maître du temps', description: '100 minutes au total', earned: false },
-  { id: 5, name: 'Zen master', description: '30 jours consécutifs', earned: false }
-];
+interface MeditationStat {
+  label: string;
+  value: string | number;
+  icon: React.ReactNode;
+  trend?: string;
+  progress?: number;
+}
 
 const MeditationStats: React.FC = () => {
-  const totalMinutes = 180;
-  const totalSessions = 24;
-  const streakDays = 7;
-  const averageSession = Math.round(totalMinutes / totalSessions);
+  // Mock data - En production, ces données viendraient d'une API
+  const stats: MeditationStat[] = [
+    {
+      label: 'Sessions cette semaine',
+      value: 5,
+      icon: <Calendar className="h-4 w-4" />,
+      trend: '+2 vs semaine dernière'
+    },
+    {
+      label: 'Temps total médité',
+      value: '2h 45min',
+      icon: <Clock className="h-4 w-4" />,
+      trend: '+35min cette semaine'
+    },
+    {
+      label: 'Série actuelle',
+      value: 7,
+      icon: <Flame className="h-4 w-4" />,
+      trend: 'jours consécutifs'
+    },
+    {
+      label: 'Objectif hebdomadaire',
+      value: '71%',
+      icon: <Target className="h-4 w-4" />,
+      progress: 71
+    }
+  ];
+
+  const weeklyGoal = {
+    target: 7,
+    completed: 5,
+    percentage: Math.round((5 / 7) * 100)
+  };
+
+  const recentAchievements = [
+    {
+      id: '1',
+      title: 'Première semaine',
+      description: '7 jours de méditation consécutifs',
+      icon: '🏆',
+      date: 'Il y a 3 jours'
+    },
+    {
+      id: '2',
+      title: 'Respirateur zen',
+      description: '50 exercices de respiration complétés',
+      icon: '🧘',
+      date: 'Il y a 1 semaine'
+    },
+    {
+      id: '3',
+      title: 'Explorateur sonore',
+      description: 'Tous les types d\'ambiances testés',
+      icon: '🎵',
+      date: 'Il y a 2 semaines'
+    }
+  ];
+
+  const monthlyData = [
+    { week: 'Sem. 1', sessions: 3, minutes: 45 },
+    { week: 'Sem. 2', sessions: 5, minutes: 75 },
+    { week: 'Sem. 3', sessions: 6, minutes: 90 },
+    { week: 'Sem. 4', sessions: 5, minutes: 85 }
+  ];
 
   return (
     <div className="space-y-6">
       {/* Statistiques principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Minutes</p>
-                <p className="text-2xl font-bold">{totalMinutes}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat, index) => (
+          <Card key={index}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                  <p className="text-2xl font-bold">{stat.value}</p>
+                  {stat.trend && (
+                    <p className="text-xs text-muted-foreground">{stat.trend}</p>
+                  )}
+                  {stat.progress && (
+                    <Progress value={stat.progress} className="mt-2" />
+                  )}
+                </div>
+                <div className="text-primary">{stat.icon}</div>
               </div>
-              <Clock className="h-8 w-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Sessions</p>
-                <p className="text-2xl font-bold">{totalSessions}</p>
-              </div>
-              <Target className="h-8 w-8 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Série Actuelle</p>
-                <p className="text-2xl font-bold">{streakDays} jours</p>
-              </div>
-              <Flame className="h-8 w-8 text-orange-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Moyenne</p>
-                <p className="text-2xl font-bold">{averageSession} min</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-purple-500" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Graphique hebdomadaire */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Progression Hebdomadaire
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={weeklyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="day" />
-                <YAxis />
-                <Tooltip />
-                <Line 
-                  type="monotone" 
-                  dataKey="minutes" 
-                  stroke="#3b82f6" 
-                  strokeWidth={3}
-                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Répartition par catégorie */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Répartition par Type</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                >
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Objectifs et badges */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Objectifs du mois */}
+        {/* Objectif hebdomadaire */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5" />
-              Objectifs du Mois
+              Objectif Hebdomadaire
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
+          <CardContent>
+            <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm">Sessions (20/30)</span>
-                <span className="text-sm font-medium">67%</span>
+                <span className="text-sm">Progression</span>
+                <Badge variant="secondary">{weeklyGoal.completed}/{weeklyGoal.target} sessions</Badge>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-500 h-2 rounded-full" style={{ width: '67%' }}></div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Minutes (180/300)</span>
-                <span className="text-sm font-medium">60%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{ width: '60%' }}></div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Série de jours (7/14)</span>
-                <span className="text-sm font-medium">50%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-orange-500 h-2 rounded-full" style={{ width: '50%' }}></div>
-              </div>
+              <Progress value={weeklyGoal.percentage} className="h-3" />
+              <p className="text-sm text-muted-foreground">
+                Plus que {weeklyGoal.target - weeklyGoal.completed} sessions pour atteindre votre objectif !
+              </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Badges et récompenses */}
+        {/* Réalisations récentes */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Award className="h-5 w-5" />
-              Badges & Récompenses
+              Réalisations Récentes
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 gap-3">
-              {achievements.map(achievement => (
-                <div 
-                  key={achievement.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border ${
-                    achievement.earned 
-                      ? 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800' 
-                      : 'bg-gray-50 border-gray-200 dark:bg-gray-900 dark:border-gray-700'
-                  }`}
-                >
-                  <Award 
-                    className={`h-6 w-6 ${
-                      achievement.earned ? 'text-green-500' : 'text-gray-400'
-                    }`}
-                  />
-                  <div className="flex-1">
-                    <p className={`font-medium ${achievement.earned ? 'text-green-700 dark:text-green-300' : 'text-gray-500'}`}>
-                      {achievement.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {achievement.description}
-                    </p>
+            <div className="space-y-3">
+              {recentAchievements.map((achievement) => (
+                <div key={achievement.id} className="flex items-start gap-3 p-2 rounded-lg bg-muted/50">
+                  <div className="text-2xl">{achievement.icon}</div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm">{achievement.title}</p>
+                    <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{achievement.date}</p>
                   </div>
-                  {achievement.earned && (
-                    <Badge className="bg-green-500">
-                      Obtenu
-                    </Badge>
-                  )}
                 </div>
               ))}
             </div>
@@ -233,33 +152,44 @@ const MeditationStats: React.FC = () => {
         </Card>
       </div>
 
-      {/* Session récentes */}
+      {/* Évolution mensuelle */}
       <Card>
         <CardHeader>
-          <CardTitle>Sessions Récentes</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            Évolution ce Mois
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {[
-              { date: 'Aujourd\'hui', type: 'Relaxation', duration: 15, time: '09:30' },
-              { date: 'Hier', type: 'Concentration', duration: 20, time: '18:45' },
-              { date: 'Il y a 2 jours', type: 'Sommeil', duration: 10, time: '22:15' },
-              { date: 'Il y a 3 jours', type: 'Stress', duration: 25, time: '14:20' },
-              { date: 'Il y a 4 jours', type: 'Relaxation', duration: 30, time: '08:00' }
-            ].map((session, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-primary"></div>
-                  <div>
-                    <p className="font-medium">{session.type}</p>
-                    <p className="text-sm text-muted-foreground">{session.date} à {session.time}</p>
+          <div className="space-y-4">
+            <div className="grid grid-cols-4 gap-4">
+              {monthlyData.map((week, index) => (
+                <div key={index} className="text-center space-y-2">
+                  <p className="text-sm font-medium">{week.week}</p>
+                  <div className="space-y-1">
+                    <div className="text-lg font-bold text-primary">{week.sessions}</div>
+                    <div className="text-xs text-muted-foreground">sessions</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-sm font-medium">{week.minutes}min</div>
+                    <div className="text-xs text-muted-foreground">médité</div>
                   </div>
                 </div>
-                <Badge variant="outline">
-                  {session.duration} min
-                </Badge>
+              ))}
+            </div>
+            
+            <div className="pt-4 border-t">
+              <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                  <p className="text-sm text-muted-foreground">Total ce mois</p>
+                  <p className="text-xl font-bold">19 sessions</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Temps total</p>
+                  <p className="text-xl font-bold">4h 55min</p>
+                </div>
               </div>
-            ))}
+            </div>
           </div>
         </CardContent>
       </Card>
