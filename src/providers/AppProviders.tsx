@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { Toaster } from 'sonner';
+import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { MusicProvider } from '@/contexts/music/MusicContext';
 
@@ -15,7 +15,7 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
       <AuthProvider>
         <MusicProvider>
           {children}
-          <Toaster position="top-right" />
+          <Toaster />
         </MusicProvider>
       </AuthProvider>
     </BrowserRouter>
