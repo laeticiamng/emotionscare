@@ -1,21 +1,26 @@
+
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
-
-// B2C Pages
-const B2CLoginPage = React.lazy(() => import('@/pages/b2c/auth/B2CLoginPage'));
-const B2CRegisterPage = React.lazy(() => import('@/pages/b2c/auth/B2CRegisterPage'));
-const B2CResetPasswordPage = React.lazy(() => import('@/pages/b2c/auth/B2CResetPasswordPage'));
-const B2CDashboardPage = React.lazy(() => import('@/pages/b2c/dashboard/B2CDashboardPage'));
-const B2COnboardingPage = React.lazy(() => import('@/pages/b2c/onboarding/B2COnboardingPage'));
-
-// B2B Pages
-const B2BSelectionPage = React.lazy(() => import('@/pages/auth/B2BSelectionPage'));
-
-// Other Pages
-const HomePage = React.lazy(() => import('@/pages/HomePage'));
-const ChooseModePage = React.lazy(() => import('@/pages/auth/ChooseModeFlow'));
+import {
+  B2CLoginPage,
+  B2CRegisterPage,
+  B2CResetPasswordPage,
+  B2CDashboardPage,
+  B2COnboardingPage,
+  B2BSelectionPage,
+  B2BUserLoginPage,
+  B2BUserRegisterPage,
+  B2BUserDashboardPage,
+  B2BUserScanPage,
+  B2BUserCoachPage,
+  B2BUserMusicPage,
+  B2BAdminLoginPage,
+  B2BAdminDashboardPage,
+  HomePage,
+  ChooseModePage
+} from '@/utils/lazyComponents';
 
 const routes = [
   {
@@ -82,11 +87,11 @@ const routes = [
         children: [
           {
             path: 'login',
-            element: React.lazy(() => import('@/pages/b2b/user/auth/B2BUserLoginPage')),
+            element: <B2BUserLoginPage />,
           },
           {
             path: 'register',
-            element: React.lazy(() => import('@/pages/b2b/user/auth/B2BUserRegisterPage')),
+            element: <B2BUserRegisterPage />,
           },
           {
             path: 'dashboard',
@@ -98,7 +103,7 @@ const routes = [
             children: [
               {
                 index: true,
-                element: React.lazy(() => import('@/pages/b2b/user/dashboard/B2BUserDashboardPage')),
+                element: <B2BUserDashboardPage />,
               },
             ],
           },
@@ -112,7 +117,7 @@ const routes = [
             children: [
               {
                 index: true,
-                element: React.lazy(() => import('@/pages/b2b/user/scan/B2BUserScanPage')),
+                element: <B2BUserScanPage />,
               },
             ],
           },
@@ -126,7 +131,7 @@ const routes = [
             children: [
               {
                 index: true,
-                element: React.lazy(() => import('@/pages/b2b/user/coach/B2BUserCoachPage')),
+                element: <B2BUserCoachPage />,
               },
             ],
           },
@@ -140,7 +145,7 @@ const routes = [
             children: [
               {
                 index: true,
-                element: React.lazy(() => import('@/pages/b2b/user/music/B2BUserMusicPage')),
+                element: <B2BUserMusicPage />,
               },
             ],
           },
@@ -152,7 +157,7 @@ const routes = [
         children: [
           {
             path: 'login',
-            element: React.lazy(() => import('@/pages/b2b/admin/auth/B2BAdminLoginPage')),
+            element: <B2BAdminLoginPage />,
           },
           {
             path: 'dashboard',
@@ -164,7 +169,7 @@ const routes = [
             children: [
               {
                 index: true,
-                element: React.lazy(() => import('@/pages/b2b/admin/dashboard/B2BAdminDashboardPage')),
+                element: <B2BAdminDashboardPage />,
               },
             ],
           },
@@ -173,7 +178,7 @@ const routes = [
     ],
   },
   
-  // Redirections pour les routes obsolètes (à conserver temporairement)
+  // Redirections pour les routes obsolètes
   {
     path: '/login-collaborateur',
     element: <Navigate to="/b2b/user/login" replace />,
