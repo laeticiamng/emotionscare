@@ -1,172 +1,217 @@
 
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, TrendingUp, AlertTriangle, Activity, Heart, Shield } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  Users, 
+  TrendingUp, 
+  AlertTriangle, 
+  BarChart3, 
+  Shield, 
+  Calendar,
+  Brain,
+  Heart
+} from 'lucide-react';
 
 const B2BAdminDashboardPage: React.FC = () => {
-  const stats = [
+  const { user } = useAuth();
+
+  const kpiCards = [
     {
-      title: "Collaborateurs actifs",
-      value: "145",
-      change: "+12%",
+      title: 'Collaborateurs actifs',
+      value: '247',
+      change: '+12%',
       icon: Users,
-      color: "text-blue-500"
+      color: 'text-blue-600',
     },
     {
-      title: "Score bien-être moyen",
-      value: "82%",
-      change: "+5%",
+      title: 'Score bien-être moyen',
+      value: '7.3/10',
+      change: '+0.5',
       icon: Heart,
-      color: "text-green-500"
+      color: 'text-green-600',
     },
     {
-      title: "Alertes en cours",
-      value: "3",
-      change: "-2",
+      title: 'Alertes en cours',
+      value: '3',
+      change: '-2',
       icon: AlertTriangle,
-      color: "text-orange-500"
+      color: 'text-orange-600',
     },
     {
-      title: "Participation",
-      value: "94%",
-      change: "+8%",
-      icon: Activity,
-      color: "text-purple-500"
-    }
+      title: 'Sessions cette semaine',
+      value: '1,247',
+      change: '+23%',
+      icon: Brain,
+      color: 'text-purple-600',
+    },
   ];
 
   return (
-    <>
-      <Helmet>
-        <title>Tableau de bord Administrateur - EmotionsCare</title>
-        <meta name="description" content="Dashboard administrateur RH EmotionsCare" />
-      </Helmet>
-      
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Tableau de bord RH
-            </h1>
-            <p className="text-gray-600">
-              Vue d'ensemble du bien-être de vos équipes
-            </p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Shield className="h-6 w-6 text-red-500" />
-            <span className="text-sm font-medium">Mode Administrateur</span>
-          </div>
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold">Tableau de bord RH</h1>
+          <p className="text-muted-foreground mt-1">
+            Vue d'ensemble du bien-être de vos équipes
+          </p>
         </div>
-
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat) => {
-            const IconComponent = stat.icon;
-            return (
-              <Card key={stat.title}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {stat.title}
-                  </CardTitle>
-                  <IconComponent className={`h-4 w-4 ${stat.color}`} />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {stat.change} par rapport au mois dernier
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">
+            <Shield className="h-3 w-3 mr-1" />
+            Administrateur
+          </Badge>
+          <Button variant="outline" size="sm">
+            <Calendar className="h-4 w-4 mr-2" />
+            Générer rapport
+          </Button>
         </div>
+      </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Évolution du bien-être</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 flex items-center justify-center text-gray-500">
-                Graphique d'évolution du bien-être
-              </div>
-            </CardContent>
-          </Card>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {kpiCards.map((kpi, index) => {
+          const Icon = kpi.icon;
+          return (
+            <Card key={index}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+                <Icon className={`h-4 w-4 ${kpi.color}`} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{kpi.value}</div>
+                <p className="text-xs text-muted-foreground">
+                  <span className={kpi.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}>
+                    {kpi.change}
+                  </span>
+                  {' '}depuis le mois dernier
+                </p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Répartition par département</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[
-                  { dept: "Développement", score: 85, color: "bg-blue-500" },
-                  { dept: "Marketing", score: 78, color: "bg-green-500" },
-                  { dept: "RH", score: 92, color: "bg-purple-500" },
-                  { dept: "Commercial", score: 76, color: "bg-orange-500" }
-                ].map((dept) => (
-                  <div key={dept.dept} className="flex items-center space-x-3">
-                    <div className="w-16 text-sm">{dept.dept}</div>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className={`${dept.color} h-2 rounded-full`}
-                        style={{ width: `${dept.score}%` }}
-                      />
-                    </div>
-                    <div className="w-12 text-sm font-medium">{dept.score}%</div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Activity */}
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Team Overview */}
         <Card>
           <CardHeader>
-            <CardTitle>Activité récente</CardTitle>
+            <CardTitle>Vue d'ensemble des équipes</CardTitle>
+            <CardDescription>
+              Statut bien-être par département
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[
-                {
-                  user: "Marie Dubois",
-                  action: "a effectué un scan émotionnel",
-                  time: "Il y a 5 minutes",
-                  status: "positive"
-                },
-                {
-                  user: "Thomas Martin",
-                  action: "a marqué un niveau de stress élevé",
-                  time: "Il y a 15 minutes",
-                  status: "warning"
-                },
-                {
-                  user: "Sophie Leclerc",
-                  action: "a terminé sa session de méditation",
-                  time: "Il y a 30 minutes",
-                  status: "positive"
-                }
-              ].map((activity, index) => (
-                <div key={index} className="flex items-center space-x-4 p-3 rounded-lg bg-gray-50">
-                  <div className={`w-2 h-2 rounded-full ${
-                    activity.status === 'positive' ? 'bg-green-500' : 'bg-orange-500'
-                  }`} />
-                  <div className="flex-1">
-                    <p className="text-sm">
-                      <span className="font-medium">{activity.user}</span> {activity.action}
-                    </p>
-                    <p className="text-xs text-gray-500">{activity.time}</p>
-                  </div>
+              <div className="flex justify-between items-center p-3 rounded-lg bg-muted/50">
+                <div>
+                  <p className="font-medium">Développement</p>
+                  <p className="text-sm text-muted-foreground">32 collaborateurs</p>
                 </div>
-              ))}
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span className="text-sm">Excellent</span>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center p-3 rounded-lg bg-muted/50">
+                <div>
+                  <p className="font-medium">Marketing</p>
+                  <p className="text-sm text-muted-foreground">18 collaborateurs</p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <span className="text-sm">Attention</span>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center p-3 rounded-lg bg-muted/50">
+                <div>
+                  <p className="font-medium">Commercial</p>
+                  <p className="text-sm text-muted-foreground">24 collaborateurs</p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span className="text-sm">Bon</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Alerts */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Alertes récentes</CardTitle>
+            <CardDescription>
+              Situations nécessitant votre attention
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex items-start space-x-3 p-3 rounded-lg bg-red-50 border border-red-200">
+                <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium">Score bien-être en baisse</p>
+                  <p className="text-xs text-muted-foreground">Équipe Marketing - Intervention recommandée</p>
+                  <p className="text-xs text-muted-foreground">Il y a 2 heures</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3 p-3 rounded-lg bg-yellow-50 border border-yellow-200">
+                <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium">Absence répétée</p>
+                  <p className="text-xs text-muted-foreground">Jean D. - 3 absences cette semaine</p>
+                  <p className="text-xs text-muted-foreground">Il y a 1 jour</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-200">
+                <TrendingUp className="h-5 w-5 text-orange-500 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium">Pic de stress détecté</p>
+                  <p className="text-xs text-muted-foreground">Équipe Développement - Projet en cours</p>
+                  <p className="text-xs text-muted-foreground">Il y a 3 jours</p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
-    </>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Actions rapides</CardTitle>
+          <CardDescription>
+            Gérez vos équipes et accédez aux outils d'administration
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Button variant="outline" className="h-20 flex flex-col space-y-2">
+              <Users className="h-6 w-6" />
+              <span>Gestion d'équipe</span>
+            </Button>
+            
+            <Button variant="outline" className="h-20 flex flex-col space-y-2">
+              <BarChart3 className="h-6 w-6" />
+              <span>Analytics</span>
+            </Button>
+            
+            <Button variant="outline" className="h-20 flex flex-col space-y-2">
+              <Calendar className="h-6 w-6" />
+              <span>Planifier intervention</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

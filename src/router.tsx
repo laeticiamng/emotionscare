@@ -77,6 +77,100 @@ const routes = [
         path: 'selection',
         element: <B2BRoleSelectionPage />,
       },
+      // B2B User Routes
+      {
+        path: 'user',
+        children: [
+          {
+            path: 'login',
+            element: React.lazy(() => import('@/pages/b2b/user/auth/B2BUserLoginPage')),
+          },
+          {
+            path: 'register',
+            element: React.lazy(() => import('@/pages/b2b/user/auth/B2BUserRegisterPage')),
+          },
+          {
+            path: 'dashboard',
+            element: (
+              <ProtectedRoute requiredRole="b2b_user">
+                <MainLayout />
+              </ProtectedRoute>
+            ),
+            children: [
+              {
+                index: true,
+                element: React.lazy(() => import('@/pages/b2b/user/dashboard/B2BUserDashboardPage')),
+              },
+            ],
+          },
+          {
+            path: 'scan',
+            element: (
+              <ProtectedRoute requiredRole="b2b_user">
+                <MainLayout />
+              </ProtectedRoute>
+            ),
+            children: [
+              {
+                index: true,
+                element: React.lazy(() => import('@/pages/b2b/user/scan/B2BUserScanPage')),
+              },
+            ],
+          },
+          {
+            path: 'coach',
+            element: (
+              <ProtectedRoute requiredRole="b2b_user">
+                <MainLayout />
+              </ProtectedRoute>
+            ),
+            children: [
+              {
+                index: true,
+                element: React.lazy(() => import('@/pages/b2b/user/coach/B2BUserCoachPage')),
+              },
+            ],
+          },
+          {
+            path: 'music',
+            element: (
+              <ProtectedRoute requiredRole="b2b_user">
+                <MainLayout />
+              </ProtectedRoute>
+            ),
+            children: [
+              {
+                index: true,
+                element: React.lazy(() => import('@/pages/b2b/user/music/B2BUserMusicPage')),
+              },
+            ],
+          },
+        ],
+      },
+      // B2B Admin Routes
+      {
+        path: 'admin',
+        children: [
+          {
+            path: 'login',
+            element: React.lazy(() => import('@/pages/b2b/admin/auth/B2BAdminLoginPage')),
+          },
+          {
+            path: 'dashboard',
+            element: (
+              <ProtectedRoute requiredRole="b2b_admin">
+                <MainLayout />
+              </ProtectedRoute>
+            ),
+            children: [
+              {
+                index: true,
+                element: React.lazy(() => import('@/pages/b2b/admin/dashboard/B2BAdminDashboardPage')),
+              },
+            ],
+          },
+        ],
+      },
     ],
   },
   
