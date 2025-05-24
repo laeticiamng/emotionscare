@@ -20,7 +20,7 @@ export const ImmersiveHome: React.FC = () => {
         >
           {/* Titre principal optimisé pour mobile */}
           <motion.h1 
-            className="immersive-title text-responsive text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-2 sm:mb-4 md:mb-6"
+            className="immersive-title text-responsive font-bold mb-2 sm:mb-4 md:mb-6"
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
