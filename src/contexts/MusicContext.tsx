@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 interface Track {
@@ -148,3 +149,6 @@ export const useMusic = (): MusicContextType => {
   }
   return context;
 };
+
+// Default export for compatibility
+export default MusicContext;
