@@ -9,6 +9,8 @@ import { Suspense } from "react";
 import Home from "./Home";
 import { PageLoadingFallback } from "@/components/ui/loading-fallback";
 import { MeditationPage } from "@/utils/lazyRoutes";
+import EnhancedErrorBoundary from "@/components/ui/enhanced-error-boundary";
+import { SkipToContent } from "@/components/accessibility/SkipToContent";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,22 +23,35 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <MusicProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Suspense fallback={<PageLoadingFallback />}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/meditation" element={<MeditationPage />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </MusicProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <EnhancedErrorBoundary level="critical" showDetails={true}>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <MusicProvider>
+            <SkipToContent />
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Suspense fallback={<PageLoadingFallback />}>
+                <main id="main-content" tabIndex={-1}>
+                  <Routes>
+                    <Route path="/" element={
+                      <EnhancedErrorBoundary level="page">
+                        <Home />
+                      </EnhancedErrorBoundary>
+                    } />
+                    <Route path="/meditation" element={
+                      <EnhancedErrorBoundary level="page">
+                        <MeditationPage />
+                      </EnhancedErrorBoundary>
+                    } />
+                  </Routes>
+                </main>
+              </Suspense>
+            </BrowserRouter>
+          </MusicProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </EnhancedErrorBoundary>
   );
 }
 
