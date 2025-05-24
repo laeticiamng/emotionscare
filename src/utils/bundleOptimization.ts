@@ -1,4 +1,5 @@
 
+
 /**
  * Utilitaires pour l'optimisation du bundle et tree-shaking
  */
@@ -49,9 +50,10 @@ export const loadRoleSpecificComponents = (role: string) => {
       return import('@/components/dashboard/b2c');
     case 'b2b_admin':
       return import('@/components/dashboard/admin/AdminDashboard');
-    case 'b2b_user'::
+    case 'b2b_user':
       return import('@/components/dashboard/UserDashboard');
     default:
       return Promise.resolve();
   }
 };
+
