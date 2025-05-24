@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -10,45 +9,15 @@ const B2CRegisterPage = React.lazy(() => import('@/pages/b2c/auth/B2CRegisterPag
 const B2CResetPasswordPage = React.lazy(() => import('@/pages/b2c/auth/B2CResetPasswordPage'));
 const B2CDashboardPage = React.lazy(() => import('@/pages/b2c/dashboard/B2CDashboardPage'));
 const B2COnboardingPage = React.lazy(() => import('@/pages/b2c/onboarding/B2COnboardingPage'));
-const B2CScanPage = React.lazy(() => import('@/pages/b2c/scan/B2CScanPage'));
-const B2CSocialPage = React.lazy(() => import('@/pages/b2c/social/B2CSocialPage'));
-const B2CJournalPage = React.lazy(() => import('@/pages/b2c/journal/B2CJournalPage'));
-const B2CMusicPage = React.lazy(() => import('@/pages/b2c/music/B2CMusicPage'));
-const B2CCoachPage = React.lazy(() => import('@/pages/b2c/coach/B2CCoachPage'));
 
-// B2B User Pages
-const B2BUserLoginPage = React.lazy(() => import('@/pages/b2b/user/auth/B2BUserLoginPage'));
-const B2BUserRegisterPage = React.lazy(() => import('@/pages/b2b/user/auth/B2BUserRegisterPage'));
-const B2BUserDashboardPage = React.lazy(() => import('@/pages/b2b/user/dashboard/B2BUserDashboardPage'));
-const B2BUserScanPage = React.lazy(() => import('@/pages/b2b/user/scan/B2BUserScanPage'));
-const B2BUserSocialPage = React.lazy(() => import('@/pages/b2b/user/social/B2BUserSocialPage'));
-const B2BUserJournalPage = React.lazy(() => import('@/pages/b2b/user/journal/B2BUserJournalPage'));
-const B2BUserMusicPage = React.lazy(() => import('@/pages/b2b/user/music/B2BUserMusicPage'));
-const B2BUserCoachPage = React.lazy(() => import('@/pages/b2b/user/coach/B2BUserCoachPage'));
-
-// B2B Admin Pages
-const B2BAdminLoginPage = React.lazy(() => import('@/pages/b2b/admin/auth/B2BAdminLoginPage'));
-const B2BAdminDashboardPage = React.lazy(() => import('@/pages/b2b/admin/dashboard/B2BAdminDashboardPage'));
-const B2BAdminUsersPage = React.lazy(() => import('@/pages/b2b/admin/users/B2BAdminUsersPage'));
-const B2BAdminAnalyticsPage = React.lazy(() => import('@/pages/b2b/admin/analytics/B2BAdminAnalyticsPage'));
-
-// B2B Selection
+// B2B Pages
 const B2BRoleSelectionPage = React.lazy(() => import('@/pages/b2b/selection/B2BRoleSelectionPage'));
-
-// Shared Application Pages
-const ScanPage = React.lazy(() => import('@/pages/ScanPage'));
-const Coach = React.lazy(() => import('@/pages/Coach'));
-const Music = React.lazy(() => import('@/pages/Music'));
-const Journal = React.lazy(() => import('@/pages/Journal'));
 
 // Other Pages
 const HomePage = React.lazy(() => import('@/pages/HomePage'));
-const ChooseModePage = React.lazy(() => import('@/pages/ChooseModePage'));
-const ProfilePage = React.lazy(() => import('@/pages/ProfilePage'));
-const SettingsPage = React.lazy(() => import('@/pages/SettingsPage'));
-const HelpPage = React.lazy(() => import('@/pages/HelpPage'));
+const ChooseModePage = React.lazy(() => import('@/pages/auth/ChooseModeFlow'));
 
-export const routes = [
+const routes = [
   {
     path: '/',
     element: <HomePage />,
@@ -96,150 +65,35 @@ export const routes = [
           },
         ],
       },
-      {
-        path: 'scan',
-        element: <B2CScanPage />,
-      },
-      {
-        path: 'social',
-        element: <B2CSocialPage />,
-      },
-      {
-        path: 'journal',
-        element: <B2CJournalPage />,
-      },
-      {
-        path: 'music',
-        element: <B2CMusicPage />,
-      },
-      {
-        path: 'coach',
-        element: <B2CCoachPage />,
-      },
     ],
   },
-
-  // B2B User Routes
+  
+  // B2B Routes
   {
-    path: '/b2b/user',
+    path: '/b2b',
     children: [
       {
-        path: 'login',
-        element: <B2BUserLoginPage />,
-      },
-      {
-        path: 'register',
-        element: <B2BUserRegisterPage />,
-      },
-      {
-        path: 'dashboard',
-        element: (
-          <ProtectedRoute requiredRole="b2b_user">
-            <MainLayout />
-          </ProtectedRoute>
-        ),
-        children: [
-          {
-            index: true,
-            element: <B2BUserDashboardPage />,
-          },
-        ],
-      },
-      {
-        path: 'scan',
-        element: <B2BUserScanPage />,
-      },
-      {
-        path: 'social',
-        element: <B2BUserSocialPage />,
-      },
-      {
-        path: 'journal',
-        element: <B2BUserJournalPage />,
-      },
-      {
-        path: 'music',
-        element: <B2BUserMusicPage />,
-      },
-      {
-        path: 'coach',
-        element: <B2BUserCoachPage />,
+        path: 'selection',
+        element: <B2BRoleSelectionPage />,
       },
     ],
   },
-
-  // B2B Admin Routes
+  
+  // Redirections pour les anciennes routes
   {
-    path: '/b2b/admin',
-    children: [
-      {
-        path: 'login',
-        element: <B2BAdminLoginPage />,
-      },
-      {
-        path: 'dashboard',
-        element: (
-          <ProtectedRoute requiredRole="b2b_admin">
-            <MainLayout />
-          </ProtectedRoute>
-        ),
-        children: [
-          {
-            index: true,
-            element: <B2BAdminDashboardPage />,
-          },
-        ],
-      },
-      {
-        path: 'users',
-        element: <B2BAdminUsersPage />,
-      },
-      {
-        path: 'analytics',
-        element: <B2BAdminAnalyticsPage />,
-      },
-    ],
-  },
-
-  // B2B Selection
-  {
-    path: '/b2b/selection',
-    element: <B2BRoleSelectionPage />,
-  },
-
-  // Shared routes that redirect based on user mode
-  {
-    path: '/scan',
-    element: <ScanPage />,
+    path: '/login-collaborateur',
+    element: <Navigate to="/b2b/user/login" replace />,
   },
   {
-    path: '/coach',
-    element: <Coach />,
+    path: '/login-admin',
+    element: <Navigate to="/b2b/admin/login" replace />,
   },
   {
-    path: '/music',
-    element: <Music />,
+    path: '/login',
+    element: <Navigate to="/choose-mode" replace />,
   },
-  {
-    path: '/journal',
-    element: <Journal />,
-  },
-
-  // Common pages
-  {
-    path: '/profile',
-    element: <ProfilePage />,
-  },
-  {
-    path: '/settings',
-    element: <SettingsPage />,
-  },
-  {
-    path: '/help',
-    element: <HelpPage />,
-  },
-
-  // Catch all route
+  
+  // Catch all - redirect to home
   {
     path: '*',
     element: <Navigate to="/" replace />,
